@@ -4,14 +4,15 @@ Unprocessed ideas — things worth exploring but not yet committed to. Each entr
 
 ## Idea List
 
-### MetaSync: incident learning for meta-knowledge
-Build on the existing `/orient` skill with two additional capabilities:
+### Flag: continuous improvement intake
+Quick-capture system for improvement observations. When something goes wrong — agent misbehavior, a gap in standards, a clunky workflow — flag it with a sentence and get back to work. Entries accumulate in a structured backlog for later triage and resolution.
 
-1. **Incident reporting.** The user can report process failures ("my green agent launched into implementation without proposing a user test first") and the skill helps diagnose which skill, standard, or instruction needs strengthening to prevent recurrence.
+**Status:** v1 built. `/flag` skill and CLI tool (`dev-tools/src/flag/`) append JSONL records to `dev-playbook/flagged_backlog/log.jsonl`. Captures timestamp, cwd, and message.
 
-2. **Event log.** Every incident and the resulting fix are logged with timestamps so the user can see how the system of skills and standards is developing over time — what broke, what was tightened, and whether the same class of failure recurs.
-
-The goal is a feedback loop: observe a failure → trace it to a gap in meta knowledge → patch the gap → log the event → verify the class of failure declines.
+**Open questions:**
+- What does the triage/review workflow look like? (A separate skill? Manual?)
+- How do we close the loop — trace a flag to a fix and mark it resolved?
+- Should flags eventually get categories/tags, or let taxonomy emerge from data?
 
 ### Prior art research: spec parsing
 Before finalizing a custom spec format, investigate existing standards and libraries (TLA+, Alloy, Cucumber/Gherkin, RFC 2119, OpenAPI, etc.) that already handle deterministic parsing and testing of specifications.
