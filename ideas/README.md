@@ -4,16 +4,6 @@ Unprocessed ideas — things worth exploring but not yet committed to. Each entr
 
 ## Idea List
 
-### Flag: continuous improvement intake
-Quick-capture system for improvement observations. When something goes wrong — agent misbehavior, a gap in standards, a clunky workflow — flag it with a sentence and get back to work. Entries accumulate in a structured backlog for later triage and resolution.
-
-**Status:** v1 built. `/flag` skill and CLI tool (`dev-tools/src/flag/`) append JSONL records to `dev-playbook/flagged_backlog/log.jsonl`. Captures timestamp, cwd, and message.
-
-**Open questions:**
-- What does the triage/review workflow look like? (A separate skill? Manual?)
-- How do we close the loop — trace a flag to a fix and mark it resolved?
-- Should flags eventually get categories/tags, or let taxonomy emerge from data?
-
 ### Prior art research: spec parsing
 Before finalizing a custom spec format, investigate existing standards and libraries (TLA+, Alloy, Cucumber/Gherkin, RFC 2119, OpenAPI, etc.) that already handle deterministic parsing and testing of specifications.
 
