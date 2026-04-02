@@ -1,8 +1,6 @@
 # dev-playbook
 
-Geoff's meta repo — standards, agent configuration, and project templates that govern all repositories in the workspace.
-
-## Some past wisdom
+Standards, agent configuration, and project templates for a multi-repo workspace.
 
 > *"Often, when we find a recurring problem, something that happens over and over again, we pull the team together, ask them to try harder, do better – essentially, we ask for good intentions. This rarely works… When you are asking for good intentions, you are not asking for a change… because people already had good intentions. But if good intentions don't work, what does? Mechanisms work."*  
 > — Amazon leadership principles
