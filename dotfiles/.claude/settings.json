@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git status:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(du:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)"
+    ]
+  },
+  "model": "us.anthropic.claude-opus-4-6-v1[1m]",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SOUND=$(find '/Users/ngeoffre/My Drive/Clear/Data/claude code sounds' -name '*.mp3' | sort -R | head -1) && afplay \"$SOUND\" &",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SOUND=$(find '/Users/ngeoffre/My Drive/Clear/Data/claude code sounds' -name '*.mp3' | sort -R | head -1) && afplay \"$SOUND\" &",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "effortLevel": "high"
+}

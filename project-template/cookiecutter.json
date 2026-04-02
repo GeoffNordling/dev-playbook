@@ -1,0 +1,9 @@
+{
+    "project_name": "My Project",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
+    "package_name": "{{ cookiecutter.project_slug.replace('-', '_') }}",
+    "author_name": "Geoff Nordling",
+    "description": "",
+    "python_version": "3.12",
+    "project_layout": ["scripts", "scripts+notebooks", "package", "package+scripts", "package+notebooks", "package+scripts+notebooks"]
+}

@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.7
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy{% if 'package' in cookiecutter.project_layout %} src/{% endif %}{% if 'scripts' in cookiecutter.project_layout %} scripts/{% endif %}
+        language: system
+        pass_filenames: false
+        types: [python]

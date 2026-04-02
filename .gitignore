@@ -1,0 +1,21 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# dotfiles — machine-local and ephemeral files
+dotfiles/.claude/settings.local.json
+dotfiles/.claude/history.jsonl
+dotfiles/.claude/debug/
+dotfiles/.claude/file-history/
+dotfiles/.claude/session-env/
+dotfiles/.claude/paste-cache/
+dotfiles/.claude/cache/
+dotfiles/.claude/downloads/
+dotfiles/.claude/backups/
+dotfiles/.claude/shell-snapshots/
+dotfiles/.claude/plans/
+dotfiles/.claude/tasks/
+dotfiles/.claude/todos/
+dotfiles/.claude/sessions/
+dotfiles/.claude/plugins/
+dotfiles/.claude/projects/
