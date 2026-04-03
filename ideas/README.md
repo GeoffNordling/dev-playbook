@@ -18,3 +18,6 @@ A lightweight agent that can be dispatched to quickly explore an idea, check pri
 
 ### Code Quality Skill
 The green agent gave me horrible, monolithic, nested, complicated, mindlessly stupid code today, and I had to reject it multiple times and tell it to give me nice code where single functions did single things. I can't believe I had to tell it that, but apparently I still do, even with opus 4.6. A skill or a document that reminds the agents of this and automatically tells them to fix their code quality.
+
+### Context Switch Primer Skill
+A generic skill invokable at any time in any context that helps the human quickly recover from a hard context switch. When invoked, it produces a structured primer covering: (1) pertinent facts about the current project/task, (2) next steps that were in flight, and (3) a summary of notable things that happened earlier in the conversation. Goal: get back up to speed fast without re-reading the full chat history.
