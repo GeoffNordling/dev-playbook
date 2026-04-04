@@ -25,7 +25,7 @@ Tests verify **what** the system does, not **how** it does it. This is the singl
 
 - **Assert on observable outputs.** Return values, side effects (messages sent, records written), raised exceptions. Never assert on internal state, private attributes, or implementation details.
 - **Name by capability, not mechanism.** `test_request_includes_trace_id`, not `test_structlog_processor_adds_trace_id`. The test should survive an implementation swap without changes.
-- **Import from the public API.** Test what the package exports, not its internal module layout. If the test needs to reach into `_internal` or `_impl`, the public API is incomplete — flag it, don't work around it.
+- **Test behavior, not implementation.** Assert on inputs, outputs, and side effects. Do not assert on internal state or call sequences.
 
 ## The Humble Object Pattern
 
