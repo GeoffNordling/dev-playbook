@@ -44,6 +44,7 @@ Ask yourself: would a red agent be forced to invent class names, module boundari
 - Use the **interview pattern**: ask the user clarifying questions about architectural preferences before drafting anything. Incorporate answers into the design spec, not as side conversation.
 - Draft or update `specs/design.md` (or files within `specs/design/` if split).
 - Use RFC 2119 modal verbs (SHALL, SHOULD, MAY) consistently.
+- **Non-mandatory requirements are optional to include in design.** SHOULD and MAY requirements do not need to appear in the design spec. However, any requirement that is included in the design spec — regardless of its obligation level — must be implemented and tested like all other designed requirements. Including a non-mandatory requirement in design is a commitment to deliver it.
 - Reference relevant ADRs for the reasoning behind individual decisions rather than re-explaining them.
 - If a significant new architectural decision is made during this process, propose an ADR for it.
 - Present the draft to the user and wait for approval. Iterate until they are satisfied.

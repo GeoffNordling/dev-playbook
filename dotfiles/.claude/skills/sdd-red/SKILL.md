@@ -71,7 +71,7 @@ Within a category, check whether implementation code already exists. This determ
 
 ## Writing Tests
 
-- Every SHALL requirement in scope needs test coverage. SHOULD requirements should have coverage where practical. MAY requirements are optional.
+- **Every requirement in the design spec must have test coverage**, regardless of its obligation level (SHALL, SHOULD, or MAY). The design spec is the contract; if a requirement appears there, it must be tested. Non-mandatory requirements that were not included in the design spec do not need tests.
 - Mark every test with the requirement ID it covers using `@pytest.mark.req("REQ-AREA-NNN")` (AREA is 3–6 uppercase letters, NNN is a 3-digit number, e.g. `@pytest.mark.req("REQ-PARSE-001")`). Every test SHALL reference at least one requirement ID. Many tests per requirement is normal (happy path, edge cases, error cases). Many requirements per test should be limited to integration or scenario tests that inherently span multiple behaviors.
 - Use the **interview pattern**: if requirements are ambiguous about expected behavior, ask the user before writing tests that encode assumptions. Answers that reveal spec gaps or ambiguities SHALL be flagged to the user for spec updates, not handled ad hoc.
 - **Prefer general over specific.** Derive test data from registries, configs, or the codebase rather than hardcoding specific names, IDs, or values that could change. Tests should survive additions, removals, and renames without edits. When a behavior applies to a class of things (e.g., all agents, all schemas), loop over the class rather than picking one example.
