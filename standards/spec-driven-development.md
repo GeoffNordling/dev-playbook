@@ -212,18 +212,3 @@ Guidelines:
 ## Machine-Readable Contracts
 
 Where appropriate, natural language requirements `SHOULD` be paired with machine-readable contracts (OpenAPI specs, JSON Schema) to formally constrain agent behavior. These are especially useful for API boundaries and data structures where ambiguity could cause silent regressions.
-
----
-
-## The Spec as a Recovery Point
-
-When a session derails, context gets polluted, or an agent goes off track, the recovery procedure is:
-
-1. Open a new session
-2. Load the spec explicitly into context (e.g. `@specs/functional_requirements.md`)
-3. Paste the error or describe the problem
-4. Continue from the spec
-
-This is only possible if the spec is in Git and current. A stale spec cannot serve as a recovery point. This is a concrete operational reason why the living document principle is non-negotiable.
-
-
