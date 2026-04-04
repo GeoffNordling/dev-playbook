@@ -190,6 +190,8 @@ A requirement `SHALL NOT` mix obligation levels. If a multi-sentence requirement
 
 Specs `SHALL` use LaTeX math notation (e.g., `$k$`, `$N-1$`) when referring to variables, quantities, or mathematical relationships. This distinguishes formal variables from prose and renders correctly in markdown environments.
 
+Specs `SHALL` avoid writing algorithm or standard names that match the `AREA-NNN` requirement ID pattern (3-6 uppercase letters, hyphen, three digits). The `sdd-trace` tool flags these as malformed requirement IDs. Use the unhyphenated form instead (e.g., write "SHA256" not "SHA-256", "AES128" not "AES-128").
+
 ### Examples
 - **REQ-AUTH-001**: When the user submits a form, the system `SHALL` validate all fields before submission. — mandatory
 - **REQ-AUTH-002**: When validation fails, the system `SHOULD` highlight the offending field in red. — non-mandatory (quality target)
