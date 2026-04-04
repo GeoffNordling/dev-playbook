@@ -16,7 +16,7 @@ The user provides free-form input describing what they want to design or what fe
 
 ## First Steps
 
-1. **Run traceability check.** Run `/Volumes/workplace/dev-tools/.venv/bin/sdd-trace` from the project root. This shows a compact summary of requirement coverage. Use `--detail <AREA>` to drill into specific area codes if needed. Interpret the results based on the stage of design:
+1. **Run traceability check.** Run `/Volumes/workplace/dev-tools/.venv/bin/sdd-trace` from the project root. This shows a compact summary of requirement coverage. Use `--detail <AREA> [<AREA> ...]` to drill into specific area codes if needed (always a single invocation — never run the tool multiple times with different areas). Interpret the results based on the stage of design:
    - **Starting out** (no design spec yet): expect 0% coverage — every requirement will show as unmapped. This is normal. Use the list of unmapped requirements as your backlog of what needs designing.
    - **Mid-design** (design spec partially written): some requirements will be mapped, others won't. Focus the session on the unmapped ones — these are the gaps to fill next.
    - **Wrapping up** (design spec nearly complete): coverage should be approaching 100%. Any remaining gaps are what's left to address before the design is done.

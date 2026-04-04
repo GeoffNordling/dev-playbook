@@ -67,6 +67,6 @@ Bugs are spec gaps, not just code errors. Each fix is an opportunity to make the
 ## Completion
 
 - All tests in scope pass.
-- Run `/Volumes/workplace/dev-tools/.venv/bin/sdd-trace` from the project root to verify coverage is intact. The tool auto-detects `specs/` and `tests/` directories (override with `--specs`/`--tests` if needed). It exits 0 when every requirement is covered and no orphaned markers exist. Use `--detail <AREA>` to drill into specific area codes if gaps are found. Verify that no previously covered requirements have lost coverage.
+- Run `/Volumes/workplace/dev-tools/.venv/bin/sdd-trace` from the project root to verify coverage is intact. The tool auto-detects `specs/` and `tests/` directories (override with `--specs`/`--tests` if needed). It exits 0 when every requirement is covered and no orphaned markers exist. Use `--detail <AREA> [<AREA> ...]` to drill into specific area codes if gaps are found (always a single invocation — never run the tool multiple times with different areas). Verify that no previously covered requirements have lost coverage.
 - **Run the project's lint, format, and typecheck commands before presenting your changes** (check `CLAUDE.md` or `Makefile` for the exact commands). When a check fails, self-correct rather than accumulating errors across tasks.
 - Present a summary to the user: what was implemented, any spec updates made, any decisions that need discussion.
