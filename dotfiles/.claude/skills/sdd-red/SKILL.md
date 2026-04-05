@@ -30,7 +30,7 @@ When your work is complete and approved, commit your changes and push the branch
 
 1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
    it exists, read it for issue context and scope.
-2. Glob for `<skill_base_dir>/references/*.md` (where `<skill_base_dir>` is shown in "Base directory for this skill" at the top of this prompt) and read every file found. These references govern structure, naming, assertions, mocking patterns, and behavioral focus for all tests you write. If no files are found, tell the user that no reference files were found at that path and ask how to proceed.
+2. Load reference files from `<skill_base_dir>/references/` (where `<skill_base_dir>` is shown in "Base directory for this skill" at the top of this prompt). These references govern structure, naming, assertions, mocking patterns, and behavioral focus for all tests you write. **Use `ls` via Bash to list the directory, then Read each `.md` file.** Do not use Glob; it silently returns empty results for paths outside the project working directory. If `ls` shows no `.md` files or the directory does not exist, stop and tell the user; do not continue without references.
 2. Read the project's specs. Check for:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - `specs/design.md` or, if split, `specs/design/index.md`
