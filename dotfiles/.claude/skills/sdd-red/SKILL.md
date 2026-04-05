@@ -36,8 +36,7 @@ When your work is complete and approved, commit your changes and push the branch
    - `specs/design.md` or, if split, `specs/design/index.md`
    - The project's `CLAUDE.md` for project-specific testing conventions or overrides
    - Any existing test files to understand the project's testing patterns
-3. Check for `tests/RED_STATUS.md` — a scratchpad tracking coverage progress, active patterns, and open questions for the red phase. If it exists, read it. Update it frequently as you work: after completing each requirement group, when patterns change, and when open questions are resolved or new ones arise. Keep it current and forward-looking — remove information that is no longer relevant.
-4. Tell the user what you found and align on which requirements are in scope for this round of test writing.
+3. Tell the user what you found and align on which requirements are in scope for this round of test writing.
 
 ## Mandatory Plan Gate
 
@@ -56,7 +55,7 @@ Follow the testing conventions loaded in step 1.
 
 **Contract-first when no code exists.** When writing tests before implementation, the tests define the interface contract. Keep it minimal: use the spec's language for names, only include parameters the spec implies, and don't invent configuration the spec doesn't mention. If you find yourself specifying constructor arguments that feel like implementation choices, you're over-prescribing — step back and test the behavior from further out.
 
-**Note non-deterministic gaps.** When a requirement spans a non-deterministic boundary (LLM call, network request), decompose it: test the deterministic parts, note the non-deterministic gap in `RED_STATUS.md`.
+**Note non-deterministic gaps.** When a requirement spans a non-deterministic boundary (LLM call, network request), decompose it: test the deterministic parts, flag the non-deterministic gap to the user.
 
 ## Pacing
 
