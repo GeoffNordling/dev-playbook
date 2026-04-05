@@ -84,5 +84,6 @@ Bugs are spec gaps, not just code errors. Each fix is an opportunity to make the
 
 - All tests in scope pass.
 - Run `/Volumes/workplace/dev-tools/.venv/bin/sdd-trace` from the project root to verify coverage is intact. The tool auto-detects `specs/` and `tests/` directories (override with `--specs`/`--tests` if needed). It exits 0 when every requirement is covered and no orphaned markers exist. Use `--detail <AREA> [<AREA> ...]` to drill into specific area codes if gaps are found (always a single invocation — never run the tool multiple times with different areas). Verify that no previously covered requirements have lost coverage.
+- **Clean up stub markers.** The design agent marks temporarily unused imports with `# noqa: F401 (stub)`. Before finishing, run `grep -r "noqa: F401 (stub)" src/` across the entire source tree and remove every occurrence. These markers must not survive the green phase.
 - **Run the project's lint, format, and typecheck commands before presenting your changes** (check `CLAUDE.md` or `Makefile` for the exact commands). When a check fails, self-correct rather than accumulating errors across tasks.
 - Present a summary to the user: what was implemented, any spec updates made, any decisions that need discussion.
