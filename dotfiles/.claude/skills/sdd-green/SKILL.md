@@ -10,9 +10,23 @@ Make the tests pass. This is the "green" phase of spec-driven TDD — implementa
 
 The user provides free-form input describing what to implement or which area to focus on.
 
-## Critical Rule
+## Critical Rules
 
 Do NOT modify tests. Tests were written by a separate agent session (`/sdd-red`) and represent the acceptance criteria derived from requirements. If a test seems wrong or unclear, stop and discuss with the user rather than changing it.
+
+**Stop on test-imposed barriers.** When a failing test requires a change that
+would break other tests, or when the test suite has gaps that prevent clean
+implementation (e.g., missing mocks, wrong fixture counts, helper functions
+that don't account for new fields), STOP immediately. Do not work around the
+barrier by reordering fields, adding defaults that the spec doesn't call for,
+or restructuring code to sidestep the test constraint. Instead:
+
+1. Describe the barrier and which test(s) cause it.
+2. Explain what the red agent needs to change.
+3. Wait for the user to decide next steps.
+
+This applies even if you could "make it work" with a workaround. Workarounds
+that deviate from the spec to accommodate test gaps are never acceptable.
 
 ## Workflow Context
 
