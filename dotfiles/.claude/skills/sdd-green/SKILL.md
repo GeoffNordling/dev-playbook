@@ -38,7 +38,9 @@ Check for test files the red agent has produced before starting each implementat
 
 ## First Steps
 
-1. Read the project's specs. Check for:
+1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
+   it exists, read it for issue context and scope.
+2. Read the project's specs. Check for:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - `specs/design.md` or, if split, `specs/design/index.md`
    - The project's `CLAUDE.md`

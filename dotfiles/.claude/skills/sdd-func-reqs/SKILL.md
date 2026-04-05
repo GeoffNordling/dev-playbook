@@ -10,7 +10,9 @@ Help the user write or update functional requirements for the project. The user 
 
 ## First Steps
 
-1. Read the spec-driven-development standard for spec conventions:
+1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
+   it exists, read it for issue context and scope.
+2. Read the spec-driven-development standard for spec conventions:
    - **Mac (Darwin):** `/Volumes/workplace/dev-playbook/standards/spec-driven-development.md`
    - **WSL:** `~/workspace/dev-playbook/standards/spec-driven-development.md`
 2. Read the project's existing specs if they exist:
