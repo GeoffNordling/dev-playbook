@@ -84,6 +84,26 @@ after an SDD phase completes:
 3. Recommend the next phase or declare the issue complete.
 4. Write a new handoff file if another phase is needed.
 
+### After Green Phase — Operational Review
+
+Before declaring the issue complete, review the operational impact of the
+changes. Ask: "if someone pulls main after this merges, does everything
+just work?" Look for:
+
+- Data files, databases, or caches that are incompatible with the new code
+- Config changes, new environment variables, or new dependencies
+- Anything that requires manual action beyond `git pull`
+
+If the answer is "no, something breaks," fix it before moving on.
+
+### E2E Verification
+
+After the green phase, if the project has real data or representative
+inputs available, run the actual code against them — not just unit tests.
+Pick a representative sample and verify the full pipeline produces correct
+output. Unit tests check contracts; e2e checks that the system actually
+works. If no real data is available, note this to the user and skip.
+
 Always wait for user confirmation before recommending or writing.
 
 ## Completion
