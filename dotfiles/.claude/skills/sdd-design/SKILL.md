@@ -10,7 +10,7 @@ Collaborate with the user to design the system's structure before implementation
 
 The [spec-driven-development standard](standards/spec-driven-development.md) (in the dev-playbook repo) defines what belongs in `design.md`, when it's warranted, and how it relates to ADRs. Follow those conventions.
 
-**Do not commit changes automatically.** Present your changes for the user to review the diffs. Only commit when the user explicitly asks.
+When your work is complete and approved, commit your changes and push the branch.
 
 The user provides free-form input describing what they want to design or what feature they're working on.
 
@@ -57,5 +57,6 @@ This skill produces an updated design spec and interface stubs. No implementatio
 
 - An updated design spec (approved by the user), or a clear decision that no design spec is needed, with an explanation of why the functional spec is sufficient.
 - **Interface stubs.** After the design spec is approved, create stub modules, classes, and functions matching the design spec's module layout and interfaces. Stubs define the interface shape only: function/method signatures with `raise NotImplementedError`, classes with empty bodies or `__init__` with `pass`, and modules with just enough to make `import` succeed. Stubs reflect the spec's vocabulary and the design doc's structure. The red agent writes tests against these stubs; the green agent replaces them with real code.
+  - **Preserve old implementations.** When stubbing a method that replaces an existing implementation, comment out the old body and bracket it with `# --- old implementation ---` / `# --- end old implementation ---` markers above the `raise NotImplementedError`. Do not delete the old code; the red and green agents benefit from seeing the prior logic.
   - **Do not use `from __future__ import annotations`** unless a concrete forward reference requires it.
 - **Run the project's lint, format, and typecheck commands before presenting your changes** (check `CLAUDE.md` or `Makefile` for the exact commands). When a check fails, self-correct rather than accumulating errors across tasks.

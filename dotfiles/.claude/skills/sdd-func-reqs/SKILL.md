@@ -37,3 +37,7 @@ Use the interview pattern to collaborate with the user on requirements. Ask clar
 ## Output
 
 This skill produces spec documentation only — no code, no tests.
+
+## Wrapping Up
+
+When the user approves the final draft, commit your changes and push the branch.

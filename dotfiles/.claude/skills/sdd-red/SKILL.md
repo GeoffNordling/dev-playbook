@@ -24,7 +24,7 @@ Tests and implementation are written by separate agent contexts so that the test
 
 This skill is part of a spec-driven TDD workflow following SDD conventions. It typically runs in parallel with `/sdd-green` in a separate terminal — red produces tests, green implements against them. The user controls pacing across both agents.
 
-**Do not commit changes automatically.** Present your changes for the user to review the diffs. Only commit when the user explicitly asks.
+When your work is complete and approved, commit your changes and push the branch.
 
 ## First Steps
 

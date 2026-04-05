@@ -34,7 +34,7 @@ This skill is part of a spec-driven TDD workflow following SDD conventions. It t
 
 Check for test files the red agent has produced before starting each implementation batch.
 
-**Do not commit changes automatically.** Present your changes for the user to review the diffs. Only commit when the user explicitly asks.
+When your work is complete and approved, commit your changes and push the branch.
 
 ## First Steps
 
