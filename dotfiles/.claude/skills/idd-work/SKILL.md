@@ -31,6 +31,10 @@ context.
 If no branch or PR exists yet, scaffold them per the **Branch and Draft PR**
 section of the development workflow standard. Get user approval first.
 
+GitHub requires at least one commit on the branch before a PR can be created.
+Create an empty commit (e.g., `git commit --allow-empty`) and push before
+running `gh pr create`.
+
 ## Phase Recommendation
 
 Based on the state of durable artifacts, recommend the next SDD phase:
