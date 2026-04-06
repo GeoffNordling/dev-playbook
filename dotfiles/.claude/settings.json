@@ -3,7 +3,8 @@
   "permissions": {
     "allow": [
       "Read(/Volumes/workplace/dev-playbook/**)",
-      "Read(/Volumes/workplace/dev-tools/**)"
+      "Read(/Volumes/workplace/dev-tools/**)",
+      "Read(~/.claude/skills/**)"
     ]
   },
   "hooks": {
