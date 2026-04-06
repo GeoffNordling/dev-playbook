@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""Sync all Git repos in a workspace with their remotes.
+
+For each repository:
+  - Auto-pulls if behind and no local conflicts (clean, not ahead)
+  - Auto-pushes if ahead and no local conflicts (clean, not behind)
+  - Reports an error if there is any potential for conflict
+
+Designed to keep two machines (e.g. Mac and Windows WSL) in sync.
+
+Usage:
+    repo-sync                    # Auto-detect workplace directory
+    repo-sync /path/to/workspace # Explicit workspace path
+"""
+
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from devtools_lib.workspace import find_workplace, git, list_repos
+
+# Status markers
+OK = "\033[32m✓\033[0m"
+FAIL = "\033[31m✗\033[0m"
+WARN = "\033[33m!\033[0m"
+PULLED = "\033[36m↓\033[0m"
+PUSHED = "\033[35m↑\033[0m"
+
+
+def check_repo(repo: Path) -> tuple[list[str], str | None]:
+    """Return (problems, action). action is 'pulled', 'pushed', or None."""
+    problems: list[str] = []
+
+    # 1. Uncommitted changes
+    status = git("status", "--porcelain", cwd=repo)
+    if status.returncode != 0:
+        return [f"git status failed: {status.stderr.strip()}"], None
+    uncommitted = bool(status.stdout.strip())
+    if uncommitted:
+        lines = status.stdout.strip().splitlines()
+        problems.append(f"{len(lines)} uncommitted change(s)")
+
+    # 2. Fetch latest from remote (quick, no merge)
+    fetch = git("fetch", "--all", "--quiet", cwd=repo)
+    if fetch.returncode != 0:
+        problems.append(f"fetch failed: {fetch.stderr.strip()}")
+        return problems, None
+
+    # Determine the current branch and its upstream
+    branch = git("symbolic-ref", "--short", "HEAD", cwd=repo)
+    if branch.returncode != 0:
+        problems.append("detached HEAD")
+        return problems, None
+    branch_name = branch.stdout.strip()
+
+    upstream = git("rev-parse", "--abbrev-ref", f"{branch_name}@{{upstream}}", cwd=repo)
+    if upstream.returncode != 0:
+        problems.append(f"branch '{branch_name}' has no upstream tracking branch")
+        return problems, None
+    upstream_name = upstream.stdout.strip()
+
+    # 3. Count commits ahead/behind
+    rev_list = git(
+        "rev-list",
+        "--left-right",
+        "--count",
+        f"{branch_name}...{upstream_name}",
+        cwd=repo,
+    )
+    if rev_list.returncode != 0:
+        problems.append(f"rev-list failed: {rev_list.stderr.strip()}")
+        return problems, None
+
+    ahead, behind = (int(x) for x in rev_list.stdout.strip().split())
+
+    if ahead and not uncommitted and not behind:
+        push = git("push", "--quiet", cwd=repo)
+        if push.returncode == 0:
+            return [], "pushed"
+        else:
+            problems.append(f"auto-push failed: {push.stderr.strip()}")
+    elif ahead:
+        problems.append(f"{ahead} commit(s) not pushed")
+
+    if behind and not uncommitted and not ahead:
+        pull = git("pull", "--ff-only", "--quiet", cwd=repo)
+        if pull.returncode == 0:
+            return [], "pulled"
+        else:
+            problems.append(f"auto-pull failed: {pull.stderr.strip()}")
+    elif behind:
+        problems.append(f"{behind} commit(s) not pulled")
+
+    return problems, None
+
+
+def main() -> None:
+    workspace = Path(sys.argv[1]) if len(sys.argv) > 1 else find_workplace()
+
+    if not workspace.is_dir():
+        print(f"Not a directory: {workspace}", file=sys.stderr)
+        sys.exit(1)
+
+    repos = list_repos(workspace)
+
+    if not repos:
+        print("No directories found.")
+        sys.exit(0)
+
+    with ThreadPoolExecutor() as pool:
+        results = list(pool.map(check_repo, repos))
+
+    any_problems = False
+    for repo, (problems, action) in zip(repos, results, strict=True):
+        if action == "pulled":
+            print(f"  {PULLED}  {repo.name} (pulled)")
+        elif action == "pushed":
+            print(f"  {PUSHED}  {repo.name} (pushed)")
+        elif not problems:
+            print(f"  {OK}  {repo.name}")
+        else:
+            any_problems = True
+            print(f"  {FAIL}  {repo.name}")
+            for p in problems:
+                print(f"        {p}")
+
+    if any_problems:
+        print(f"\n  {WARN}  Some repos are not fully synced.")
+        sys.exit(1)
+    else:
+        print(f"\n  {OK}  All repos are synced.")
+
+
+if __name__ == "__main__":
+    main()

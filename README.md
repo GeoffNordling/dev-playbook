@@ -1,6 +1,6 @@
 # dev-playbook
 
-Standards, agent configuration, and project templates for a multi-repo workspace.
+Standards, agent configuration, project templates, and CLI tools for a multi-repo workspace.
 
 > *"Often, when we find a recurring problem, something that happens over and over again, we pull the team together, ask them to try harder, do better – essentially, we ask for good intentions. This rarely works… When you are asking for good intentions, you are not asking for a change… because people already had good intentions. But if good intentions don't work, what does? Mechanisms work."*  
 > — Amazon leadership principles
@@ -17,19 +17,16 @@ Standards, agent configuration, and project templates for a multi-repo workspace
 - Formal standards governing the workspace
 - Agent configuration (skills, rules, settings)
 - Project templates
+- CLI tools and shared libraries for workspace automation
 
 ## What does NOT belong here
 
 - Project-specific documentation — put it in that project's repo
-- CLI tools or scripts — those go in dev-tools
 - Application code
 
 ## The workspace
 
-All repos live under a single root directory: `/Volumes/workplace/` on the work Mac, `~/workspace/` on the personal Windows/WSL machines. Two meta repos govern everything else:
-
-- **dev-playbook** (this repo) — standards, agent configuration, and project templates
-- **dev-tools** — CLI tools and shared libraries for workspace automation
+All repos live under a single root directory: `/Volumes/workplace/` on the work Mac, `~/workspace/` on the personal Windows/WSL machines. One meta repo governs everything else: **dev-playbook** (this repo).
 
 ## What's in this repo
 
@@ -47,7 +44,7 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Claude Code skills | `dotfiles/.claude/skills/` | Workflow automation, dev-tools wrappers, etc. |
+| Claude Code skills | `dotfiles/.claude/skills/` | Workflow automation, tool wrappers, etc. |
 | Global rules | `dotfiles/.claude/rules/` | Applied to every conversation |
 | Global settings | `dotfiles/.claude/settings.json` | Model, permissions, hooks |
 | Externally managed skills | `dotfiles/.agents/skills/`, `dotfiles/.dhub/skills/` | Externally managed skills |
@@ -57,3 +54,13 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 | Object | Location | Purpose |
 |--------|----------|---------|
 | Cookiecutter template | `project-template/` | Bootstrap new Python projects with standard tooling |
+
+### Tools (tools/)
+
+CLI utilities, shared libraries, and spec-driven packages. See [tools/README.md](tools/README.md) for detailed usage and reference.
+
+| Object | Location | Purpose |
+|--------|----------|---------|
+| Standalone scripts | `tools/bin/` | `py-outline`, `repo-conformance`, `repo-sync` |
+| Packages | `tools/src/sdd_trace/` | Verify bidirectional traceability between requirements, design specs, and tests |
+| Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |

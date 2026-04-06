@@ -8,7 +8,7 @@ Stow symlinks the contents of this directory into `$HOME`, so `~/.claude/`, `~/.
 
 ```
 .claude/
-  skills/      Claude Code skills (SDD workflow, commit-push, dev-tools wrappers, etc.)
+  skills/      Claude Code skills (SDD workflow, commit-push, tool wrappers, etc.)
   rules/       Global rules applied to every conversation
   settings.json          Global Claude Code settings (model, permissions, hooks)
 .agents/skills/    Externally managed skills
