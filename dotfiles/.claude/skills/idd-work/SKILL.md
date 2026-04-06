@@ -121,4 +121,5 @@ Always wait for user confirmation before recommending or writing.
 When all phases are done and tests pass:
 
 1. Update the PR description with a final summary.
-2. Tell the user the PR is ready for review.
+2. Delete the handoff file (`<project_root>/.claude/idd-handoff.md`).
+3. Tell the user the PR is ready for review.
