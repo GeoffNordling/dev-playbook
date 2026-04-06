@@ -35,7 +35,7 @@ Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts
 
 ### Standalone scripts (`bin/`)
 
-Each script is self-contained with a PEP 723 `# /// script` block. `setup.sh` adds `bin/` to PATH; after that, invoke them by name.
+Each script is self-contained with a PEP 723 `# /// script` block. Skills reference them by absolute path.
 
 | Tool | Location | Purpose |
 |------|----------|---------|
