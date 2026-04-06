@@ -14,6 +14,16 @@ design, red, green).
 The user provides an issue number, URL, or description, plus any optional
 context.
 
+## Agent Identity
+
+The FIRST line of your FIRST message MUST be exactly:
+
+```
+<<<AGENT:idd-work>>>
+```
+
+Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
+
 ## First Steps
 
 1. Read the development workflow standard; it governs this skill's behavior:
