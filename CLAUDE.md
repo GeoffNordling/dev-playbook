@@ -15,7 +15,7 @@
 - Lint: `cd tools && make lint`
 - Format: `cd tools && make format`
 - Typecheck: `cd tools && make typecheck`
-- Setup: `tools/setup.sh` (PATH) then `cd tools && uv pip install -e .` (packages)
+- Setup: `cd tools && uv pip install -e .` (packages)
 
 ## Code style (tools/)
 

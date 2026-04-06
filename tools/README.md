@@ -26,11 +26,10 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 ## Setup
 
 ```bash
-tools/setup.sh          # adds tools/bin/ to PATH via shell rc file
 cd tools && uv pip install -e .   # installs packages (sdd-trace)
 ```
 
-Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts in `bin/` use PEP 723 inline metadata; `uv run` handles their dependencies automatically.
+Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts in `bin/` use PEP 723 inline metadata; `uv run` handles their dependencies automatically. Skills reference tools by absolute path; no PATH configuration needed.
 
 ## What's here
 
