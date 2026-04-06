@@ -63,8 +63,13 @@ When the user approves a phase, write a handoff file at
 `<project_root>/.claude/idd-handoff.md` (gitignored). The SDD agent reads
 this file on startup for context.
 
-The handoff file is a context briefing, not a log. Overwrite it entirely
-each time. Format:
+The handoff file is a context briefing, not a design brief. Give the agent
+the context it needs to make good decisions; do not make those decisions for
+it. State the problem, the current state, and any hard constraints. Do not
+prescribe the solution, enumerate implementation steps, or tell the agent
+which files, fields, or modules to change. Overwrite it entirely each time.
+
+Format:
 
 ```markdown
 # IDD Handoff
@@ -73,13 +78,13 @@ each time. Format:
 - **Branch:** <branch name>
 - **PR:** #<pr number>
 - **Phase:** <func-reqs | design | red-green | green>
-- **Scope:** <what this phase should focus on>
+- **Scope:** <one-sentence description of what this phase covers>
 
 ## Context
 
 <Brief summary of what has been done so far and what remains. Include
-any decisions or constraints from the issue or prior phases that the
-SDD agent needs to know.>
+hard constraints, decisions from prior phases, and things to look out
+for that are relevant to the scope of the agent's session.>
 ```
 
 ## Reviewing Agent Output
@@ -96,8 +101,8 @@ Understand what each phase is expected to produce:
 - **Green agent**: implements the stubs so tests pass.
 
 Flag only genuinely wrong changes (incorrect logic, unrelated file
-modifications, spec contradictions). Look for opportunities to improve
-standardization and organization.
+modifications, spec contradictions). Trust the agent's judgment on
+approach and organization.
 
 ## Ongoing Coordination
 
