@@ -104,6 +104,12 @@ Flag only genuinely wrong changes (incorrect logic, unrelated file
 modifications, spec contradictions). Trust the agent's judgment on
 approach and organization.
 
+If the review is clean, proceed directly: present your review, recommend
+the next phase, and write the handoff file in one response. Do not wait
+for user approval between reviewing and writing the handoff. If you find
+something wrong or ambiguous that needs the user's input, stop and
+escalate before writing the handoff.
+
 ## Ongoing Coordination
 
 This skill stays alive as the dispatcher terminal. When the user returns
@@ -143,7 +149,7 @@ Pick a representative sample and verify the full pipeline produces correct
 output. Unit tests check contracts; e2e checks that the system actually
 works. If no real data is available, note this to the user and skip.
 
-Always wait for user confirmation before recommending or writing.
+Wait for user confirmation before running E2E verification.
 
 ### Git Hygiene
 
