@@ -111,6 +111,13 @@ after an SDD phase completes:
 3. Recommend the next phase or declare the issue complete.
 4. Write a new handoff file if another phase is needed.
 
+### After Green Phase — Cleanup Check
+
+Grep the branch diff for `# noqa: F401 (stub)` markers. The design agent
+adds these to suppress lint on imports that are unused until stubs are
+implemented. After the green phase, the imports should be live; remove the
+`# noqa` comments. If any import is still unused, investigate why.
+
 ### After Green Phase — Operational Review
 
 Before declaring the issue complete, review the operational impact of the
