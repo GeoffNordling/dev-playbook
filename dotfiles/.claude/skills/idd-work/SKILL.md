@@ -82,6 +82,23 @@ any decisions or constraints from the issue or prior phases that the
 SDD agent needs to know.>
 ```
 
+## Reviewing Agent Output
+
+When an SDD agent finishes, review its commits for correctness and scope.
+Understand what each phase is expected to produce:
+
+- **Func-reqs agent**: updates `specs/functional_requirements.md` only.
+- **Design agent**: updates `specs/design.md` and may also write
+  implementation stubs (new files, new fields, `raise NotImplementedError`
+  bodies). This is expected; stubs give the red agent something to write
+  tests against.
+- **Red agent**: writes tests that fail against the stubs.
+- **Green agent**: implements the stubs so tests pass.
+
+Flag only genuinely wrong changes (incorrect logic, unrelated file
+modifications, spec contradictions). Look for opportunities to improve
+standardization and organization.
+
 ## Ongoing Coordination
 
 This skill stays alive as the dispatcher terminal. When the user returns
