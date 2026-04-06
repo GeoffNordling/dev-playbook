@@ -123,3 +123,5 @@ When all phases are done and tests pass:
 1. Update the PR description with a final summary.
 2. Delete the handoff file (`<project_root>/.claude/idd-handoff.md`).
 3. Tell the user the PR is ready for review.
+4. Wait for the user to confirm the PR is merged and the branch is deleted,
+   then check out `main` and pull.
