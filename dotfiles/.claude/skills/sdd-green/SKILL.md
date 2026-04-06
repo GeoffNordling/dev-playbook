@@ -10,6 +10,16 @@ Make the tests pass. This is the "green" phase of spec-driven TDD — implementa
 
 The user provides free-form input describing what to implement or which area to focus on.
 
+## Agent Identity
+
+The FIRST line of your FIRST message MUST be exactly:
+
+```
+<<<AGENT:sdd-green>>>
+```
+
+Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
+
 ## Critical Rules
 
 Do NOT modify tests. Tests were written by a separate agent session (`/sdd-red`) and represent the acceptance criteria derived from requirements. If a test seems wrong or unclear, stop and discuss with the user rather than changing it.

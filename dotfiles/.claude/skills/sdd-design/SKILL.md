@@ -14,6 +14,16 @@ When your work is complete and approved, commit your changes and push the branch
 
 The user provides free-form input describing what they want to design or what feature they're working on.
 
+## Agent Identity
+
+The FIRST line of your FIRST message MUST be exactly:
+
+```
+<<<AGENT:sdd-design>>>
+```
+
+Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
+
 ## First Steps
 
 1. **Check for handoff file.** Check for `<project_root>/.claude/idd-handoff.md`.
