@@ -40,7 +40,6 @@ All repos live under a single root directory: `/Volumes/workplace/` on the work 
 | Repo documentation | `standards/repo-documentation.md` | Required/optional files for every repo and their scope |
 | Development workflow | `standards/development-workflow.md` | Issues, branches, draft PRs, spec-driven development |
 | Spec-driven development | `standards/spec-driven-development.md` | How specs are written (EARS, RFC 2119, requirement IDs, traceability) |
-| Ideas backlog | `ideas/README.md` | Unprocessed ideas for research or implementation |
 
 ### Agent configuration (dotfiles/)
 

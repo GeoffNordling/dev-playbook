@@ -1,4 +1,4 @@
-# Skill Edits
+# Dev Playbook Edit Dotfiles
 
 Skills and rules under `~/.claude/` are **symlinked from dev-playbook**. Always edit the source files, not the symlink targets.
 
