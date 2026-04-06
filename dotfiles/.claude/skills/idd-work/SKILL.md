@@ -140,6 +140,16 @@ works. If no real data is available, note this to the user and skip.
 
 Always wait for user confirmation before recommending or writing.
 
+### Git Hygiene
+
+Before closing the loop, verify the working tree is fully clean and pushed:
+
+1. Run `git status` to check for uncommitted or untracked changes. SDD
+   agents sometimes make changes without committing them.
+2. If there are uncommitted changes, review, commit, and push them.
+3. Confirm `git status` shows a clean tree and the branch is up to date
+   with the remote.
+
 ## Completion
 
 When all phases are done and tests pass:
