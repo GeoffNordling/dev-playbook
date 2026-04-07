@@ -1,13 +1,14 @@
 {
-  "model": "us.anthropic.claude-opus-4-6-v1",
   "permissions": {
     "allow": [
       "Read(/Volumes/workplace/dev-playbook/**)",
       "Read(/Volumes/workplace/dev-playbook/**/*)",
+      "Read(/Volumes/workplace/dev-playbook/standards/spec-driven-development.md)",
       "Read(~/.claude/skills/**)",
       "Bash(ls:*)"
     ]
   },
+  "model": "us.anthropic.claude-opus-4-6-v1[1m]",
   "hooks": {
     "Stop": [
       {
