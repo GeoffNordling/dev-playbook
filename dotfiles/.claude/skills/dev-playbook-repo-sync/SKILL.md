@@ -1,5 +1,5 @@
 ---
-name: repo-sync
+name: dev-playbook-repo-sync
 description: Sync all Git repos in the workspace with their remotes
 disable-model-invocation: true
 ---
