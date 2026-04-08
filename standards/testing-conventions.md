@@ -1,6 +1,6 @@
 # Testing Conventions
 
-These are default testing conventions. The project's `CLAUDE.md` may override any of these.
+These are default testing conventions. Individual projects may supercede.
 
 ## Framework
 
@@ -23,9 +23,9 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 
 Tests verify **what** the system does, not **how** it does it. This is the single most important principle in this document.
 
-- **Assert on observable outputs.** Return values, side effects (messages sent, records written), raised exceptions. Never assert on internal state, private attributes, or implementation details.
+- **Assert on observable outputs.** Return values, state changes (records stored, files written), raised exceptions. Never assert on internal state, private attributes, or implementation details.
+- **Assert on outcomes, not call sequences.** Prefer "the record is in the store" over "insert was called once with these arguments." When using mocks, assert on the minimum necessary to verify the contract; do not over-specify call counts, argument shapes, or call ordering unless the ordering is part of the contract.
 - **Name by capability, not mechanism.** `test_request_includes_trace_id`, not `test_structlog_processor_adds_trace_id`. The test should survive an implementation swap without changes.
-- **Test behavior, not implementation.** Assert on inputs, outputs, and side effects. Do not assert on internal state or call sequences.
 
 ## The Humble Object Pattern
 
@@ -40,15 +40,38 @@ When testing systems with non-deterministic components (LLM calls, network reque
 
 **Do not test the non-deterministic decision itself.** "Does the LLM give a good answer?" is an evaluation question, not a test question. Measure it through observability and evals.
 
-The mock point IS the boundary. Mock the non-deterministic component to test everything around it.
+## Test Doubles
+
+There are three kinds of test doubles. Choose the lightest one that verifies the behavior you care about.
+
+### Real objects (integration tests)
+
+Use the real implementation when it is cheap and deterministic. SQLite in `tmp_path`, in-process HTTP servers, and real parsers operating on fixture files are all examples. Integration tests that exercise the real dependency give the highest confidence but are slower and harder to isolate.
+
+### Fakes (the default for dependencies with state or logic)
+
+A fake is a working, simplified implementation of a real interface, built for testing. It has real logic inside; just simpler. A `FakeFeatureStore` backed by a dict instead of SQLite, a `FakeEmailSender` that appends to a list instead of hitting SMTP.
+
+**Prefer fakes when:**
+- The dependency has state or logic that tests need to exercise (stores, queues, caches).
+- Multiple tests share the same dependency; a fake is written once and reused across the suite.
+- You want tests that survive refactoring; fakes couple to the interface, not the implementation.
+
+Fakes live in the test directory (e.g., `tests/fakes.py` or alongside the tests that use them). They only implement the methods that callers actually use; they do not replicate production complexity.
+
+**Fakes as fixtures.** Fakes are often provided through pytest fixtures. A fixture that constructs a fake implementation serves as the interface contract for the code under test.
+
+### Mocks (side effects, failures, thin boundaries)
+
+Use `unittest.mock` when you need to:
+- **Verify a side effect happened**; an email was sent, a metric was recorded, an audit log was written. The interaction itself is the observable outcome.
+- **Simulate failure modes** that are hard to trigger with a fake; network timeouts, disk full, API 500s.
+- **Stub a non-deterministic or expensive boundary**; the LLM client, an external API, a cloud service. The Humble Object pattern identifies these boundaries.
+
+**Do not mock internal implementation details.** If you need to mock deep inside your own code to test something, the design likely needs refactoring; extract an interface and use a fake instead. When you must isolate a function-level dependency within your own code, mock at the boundary (the function's entry point), not deep in the call chain.
 
 ## Fixtures and Setup
 
 - **Use fixtures for setup and teardown.** Standardize construction and cleanup through pytest fixtures rather than ad-hoc setup code in test bodies.
 - **Narrowest scope.** Use the narrowest fixture scope that works: function (default) > class > module > session. Shared state between tests causes flaky failures.
-- **Fixtures define the contract.** When writing tests before implementation, fixtures that construct objects serve as the interface contract for the green agent. Keep them minimal — only the parameters the spec implies.
-
-## Mocking
-
-- **Mock boundaries, not internals.** Mock external services (APIs, databases, third-party libraries). Do not mock your own code — if you need to mock internal modules to test something, the design likely needs refactoring.
-- **Non-deterministic components are natural mock boundaries.** Mock the LLM client, HTTP client, or external API to test everything around it.
+- **Fixtures define the contract.** When writing tests before implementation, fixtures that construct objects (including fakes) serve as the interface contract for the green agent. Keep them minimal; only the parameters the spec implies.
