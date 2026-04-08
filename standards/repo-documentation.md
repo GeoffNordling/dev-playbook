@@ -61,16 +61,7 @@ These files have standardized names and locations. They exist when needed and ar
 
 ROADMAP.md SHALL NOT contain: timelines, status tracking, or completed items. It is a forward-looking document.
 
-### BUSINESS_CONTEXT.md
-
-**Audience:** Human and agent
-**Scope:** Why this exists in the real world.
-**Location:** Repository root
-
-- The domain problem, the stakeholders, the constraints
-- What you'd explain to someone who asked "why are you building this?"
-
-Only needed when the domain isn't obvious from README.md alone. A simple CLI tool doesn't need one. A simulation modeling a robotics assembly line does.
+> **Note:** Some older repos contain a `BUSINESS_CONTEXT.md` at the root. This is not a standard file for new repos, but if it exists it should be read — it describes the domain problem and why the project exists.
 
 ### specs/
 
@@ -102,7 +93,6 @@ No repo needs a status field. File presence tells you everything:
 |---|---|
 | README + CLAUDE.md only | Simple or stable. Nothing planned. |
 | + ROADMAP.md | Forward work is planned. |
-| + BUSINESS_CONTEXT.md | Domain is non-trivial. |
 | + specs/ (functional only) | Complex enough for formal requirements. |
 | + specs/design.md | Complex enough to need explicit system structure. |
 | + docs/adr/ | Enough architectural decisions to warrant a log. |

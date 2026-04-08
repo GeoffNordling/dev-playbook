@@ -36,7 +36,7 @@ RECOGNIZED_ROOT_MD = {
 }
 
 # Files that have a required location (must be at root if they exist anywhere).
-LOCATION_CHECKED = {"ROADMAP.md", "BUSINESS_CONTEXT.md"}
+LOCATION_CHECKED = {"ROADMAP.md"}
 
 # Directories to exclude when scanning for misplaced files.
 SCAN_EXCLUDE_DIRS = {

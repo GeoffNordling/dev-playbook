@@ -20,7 +20,7 @@ From the repo root, check for these files and directories:
 - `README.md`
 - `CLAUDE.md`
 - `ROADMAP.md`
-- `BUSINESS_CONTEXT.md`
+- `BUSINESS_CONTEXT.md` (optional — some older repos have this; read it if present)
 - `specs/functional_requirements.md`
 - `specs/design.md`
 - `docs/adr/README.md`
