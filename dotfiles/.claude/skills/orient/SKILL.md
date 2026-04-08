@@ -39,6 +39,4 @@ Run `gh issue list` to see what tactical work is tracked.
 
 ## Step 5 — Summarize
 
-Give the user a brief summary of what you learned and, based on everything you
-found (docs, roadmap, issues, repo shape), what you think the logical next step
-for this project is.
+Give the user a brief summary of what you learned. Include whether you noticed any obvious duplicate, redundant, or inaccurate documentation.
