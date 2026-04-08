@@ -40,7 +40,10 @@ When your work is complete and approved, commit your changes and push the branch
 
 1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
    it exists, read it for issue context and scope.
-2. Load reference files from `<skill_base_dir>/references/` (where `<skill_base_dir>` is shown in "Base directory for this skill" at the top of this prompt). These references govern structure, naming, assertions, mocking patterns, and behavioral focus for all tests you write. **Use `ls` via Bash to list the directory, then Read each `.md` file.** Do not use Glob; it silently returns empty results for paths outside the project working directory. If `ls` shows no `.md` files or the directory does not exist, stop and tell the user; do not continue without references.
+2. Load the testing conventions:
+   `~/workspace/dev-playbook/standards/testing-conventions.md`
+
+   These conventions govern structure, naming, assertions, mocking patterns, and behavioral focus for all tests you write. **Use the Read tool to load the file.** If it does not exist, stop and tell the user; do not continue without it.
 2. Read the project's specs. Check for:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - `specs/design.md` or, if split, `specs/design/index.md`
@@ -92,6 +95,6 @@ Within a category, check whether implementation code already exists. This determ
 
 - Test files that cover the in-scope requirements.
 - Run the tests to confirm they execute without errors (import failures, syntax errors, fixture problems). Test *failures* (assertion errors) are expected and normal — this is the red phase. Tests that pass because the implementation already exists are a neutral observation, not a success. Do not celebrate passing tests or frame them as achievements. The success metric for this skill is accurate, complete coverage of the spec.
-- Run `/Volumes/workplace/dev-playbook/tools/.venv/bin/sdd-trace` from the project root to verify all in-scope requirements have test coverage and all tests reference valid requirement IDs. The tool auto-detects `specs/` and `tests/` directories (override with `--specs`/`--tests` if needed). It exits 0 when every requirement is covered and no orphaned markers exist. Use `--detail <AREA> [<AREA> ...]` to drill into specific area codes if gaps are found (always a single invocation — never run the tool multiple times with different areas). Present the results to the user.
+- Run `~/workspace/dev-playbook/tools/.venv/bin/sdd-trace` from the project root to verify all in-scope requirements have test coverage and all tests reference valid requirement IDs. The tool auto-detects `specs/` and `tests/` directories (override with `--specs`/`--tests` if needed). It exits 0 when every requirement is covered and no orphaned markers exist. Use `--detail <AREA> [<AREA> ...]` to drill into specific area codes if gaps are found (always a single invocation — never run the tool multiple times with different areas). Present the results to the user.
 - **Run the project's lint, format, and typecheck commands before presenting your changes** (check `CLAUDE.md` or `Makefile` for the exact commands). When a check fails, self-correct rather than accumulating errors across tasks.
 - Wait for user review before finishing.

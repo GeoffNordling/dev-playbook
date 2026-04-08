@@ -1,14 +1,4 @@
 {
-  "permissions": {
-    "allow": [
-      "Read(/Volumes/workplace/dev-playbook/**)",
-      "Read(/Volumes/workplace/dev-playbook/**/*)",
-      "Read(/Volumes/workplace/dev-playbook/standards/spec-driven-development.md)",
-      "Read(~/.claude/skills/**)",
-      "Bash(ls:*)"
-    ]
-  },
-  "model": "us.anthropic.claude-opus-4-6-v1[1m]",
   "hooks": {
     "Stop": [
       {
@@ -16,7 +6,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "for p in /Volumes/workplace/sounds/play-sound.sh /home/gmnordling/workspace/sounds/play-sound.sh; do [ -f \"$p\" ] && bash \"$p\" && break; done"
+            "command": "bash /home/gmnordling/workspace/sounds/play-sound.sh"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/gmnordling/workspace/sounds/play-sound.sh"
           }
         ]
       }

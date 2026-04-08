@@ -18,7 +18,7 @@ The user may provide free-form input describing what to focus on. If no input is
 
 ## Workflow
 
-1. Run `/Volumes/workplace/dev-playbook/tools/.venv/bin/sdd-trace` from the project root. The tool auto-detects `specs/` and `tests/` directories. This prints a compact summary: area code counts, requirement totals, design coverage, and test coverage. To drill into specific areas, use `--detail <AREA> [<AREA> ...]` (e.g., `--detail ERR AQD`).
+1. Run `~/workspace/dev-playbook/tools/.venv/bin/sdd-trace` from the project root. The tool auto-detects `specs/` and `tests/` directories. This prints a compact summary: area code counts, requirement totals, design coverage, and test coverage. To drill into specific areas, use `--detail <AREA> [<AREA> ...]` (e.g., `--detail ERR AQD`).
 2. Read the output. If exit code is 0, everything traces cleanly. If exit code is 1, there are gaps.
 3. Present the results to the user. For any gaps found:
    - **Untested requirements**: requirement IDs in the functional spec with no test markers

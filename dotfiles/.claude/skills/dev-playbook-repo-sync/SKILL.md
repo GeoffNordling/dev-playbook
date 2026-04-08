@@ -10,8 +10,6 @@ Sync all Git repos in the workspace with their remotes. Auto-pulls and auto-push
 
 ## Workflow
 
-1. Determine the platform and run the sync script:
-   - **Mac (Darwin):** `/Volumes/workplace/dev-playbook/tools/bin/repo-sync`
-   - **WSL:** `~/workspace/dev-playbook/tools/bin/repo-sync`
+1. Run the sync script: `~/workspace/dev-playbook/tools/bin/repo-sync`
 2. Show the user the full output.
 3. If any repos are out of sync, summarize what needs attention.

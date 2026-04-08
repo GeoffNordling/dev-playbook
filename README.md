@@ -26,7 +26,7 @@ Standards, agent configuration, project templates, and CLI tools for a multi-rep
 
 ## The workspace
 
-All repos live under a single root directory: `/Volumes/workplace/` on the work Mac, `~/workspace/` on the personal Windows/WSL machines. One meta repo governs everything else: **dev-playbook** (this repo).
+All repos live under a single root directory: `~/workspace/`. One meta repo governs everything else: **dev-playbook** (this repo).
 
 ## What's in this repo
 

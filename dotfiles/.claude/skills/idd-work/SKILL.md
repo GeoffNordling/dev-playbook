@@ -27,8 +27,7 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 ## First Steps
 
 1. Read the development workflow standard; it governs this skill's behavior:
-   - **Mac (Darwin):** `/Volumes/workplace/dev-playbook/standards/development-workflow.md`
-   - **WSL:** `~/workspace/dev-playbook/standards/development-workflow.md`
+   `~/workspace/dev-playbook/standards/development-workflow.md`
 2. Follow the **Session Handoff** sequence from that standard to reconstruct
    context from durable artifacts.
 3. Read `CLAUDE.md` and check whether `specs/` exists (indicating SDD).

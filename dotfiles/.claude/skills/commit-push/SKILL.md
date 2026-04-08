@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Commit all changes and push.
 
-If the working directory is /Volumes/workplace/RDMWorkspace/src/RDMCore, then immediately reject this skill and escalate to user. We should never run this skill while workiong oin the RDMCore project.
+If the working directory is ~/workspace/RDMWorkspace/src/RDMCore, then immediately reject this skill and escalate to user. We should never run this skill while working on the RDMCore project.
 
 ## Output discipline
 
