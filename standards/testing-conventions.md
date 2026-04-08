@@ -16,7 +16,7 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 
 - **Arrange-Act-Assert.** Every test has three clear sections: set up the conditions, perform the action, verify the result. Separate them with blank lines for readability.
 - **One concept per test.** Each test verifies one behavior or scenario. Multiple assertions are fine when they all verify aspects of the same concept.
-- **Descriptive names.** Test names read like behavior descriptions: `test_login_rejects_expired_token`, not `test_login_2`. The name should tell you what broke without reading the test body.
+- **Descriptive names.** Test names read like behavior descriptions: `test_login_rejects_expired_token`, not `test_login_2`. The name should tell you what the test does without reading the body.
 - **No logic in tests.** No if/else, no try/except in test bodies. Tests are boring and linear.
 
 ## Behavioral Focus
@@ -46,11 +46,11 @@ There are three kinds of test doubles. Choose the lightest one that verifies the
 
 ### Real objects (integration tests)
 
-Use the real implementation when it is cheap and deterministic. SQLite in `tmp_path`, in-process HTTP servers, and real parsers operating on fixture files are all examples. Integration tests that exercise the real dependency give the highest confidence but are slower and harder to isolate.
+Use the real implementation when it is cheap and deterministic. A real database in a temp directory, an in-process HTTP server, and real parsers operating on fixture files are all examples. Integration tests that exercise the real dependency give the highest confidence but are slower and harder to isolate.
 
 ### Fakes (the default for dependencies with state or logic)
 
-A fake is a working, simplified implementation of a real interface, built for testing. It has real logic inside; just simpler. A `FakeFeatureStore` backed by a dict instead of SQLite, a `FakeEmailSender` that appends to a list instead of hitting SMTP.
+A fake is a working, simplified implementation of a real interface, built for testing. It has real logic inside; just simpler. A store backed by an in-memory dict instead of a real database, an email sender that appends to a list instead of hitting an SMTP server.
 
 **Prefer fakes when:**
 - The dependency has state or logic that tests need to exercise (stores, queues, caches).
