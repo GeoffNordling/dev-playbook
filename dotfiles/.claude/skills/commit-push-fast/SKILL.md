@@ -1,3 +1,9 @@
+---
+name: commit-push-fast
+description: Stage everything, commit, and push with no analysis or narration
+disable-model-invocation: true
+---
+
 # Commit-Push-Fast
 
 Stage everything, commit, push. No analysis, no narration.
