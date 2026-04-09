@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 
 # tools
+tools/lib/
 tools/.venv/
 tools/.mypy_cache/
 tools/.ruff_cache/
