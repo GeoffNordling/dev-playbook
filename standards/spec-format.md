@@ -275,8 +275,48 @@ OFT natively supports hierarchical organization. It scans all Markdown files it 
 
 Every `req` item defined in the functional spec `SHALL` appear in the design spec via at least one `Covers:` link from a `dsn` item. This ensures every functional requirement has been translated into a concrete piece of the design.
 
-OFT (invoked via `pytest-sdd`) verifies this coverage. See the project's `CLAUDE.md` for the exact invocation.
+OFT (invoked via `pytest-sdd`) verifies this coverage. See [Tooling Integration](#tooling-integration) below.
 
 ### Machine-Readable Contracts
 
 Where appropriate, natural language requirements `SHOULD` be paired with machine-readable contracts (OpenAPI specs, JSON Schema) to formally constrain agent behavior. These are especially useful for API boundaries and data structures where ambiguity could cause silent regressions.
+
+---
+
+## Tooling Integration
+
+### pytest-sdd
+
+`pytest-sdd` is a pytest plugin that validates OFT spec files as part of the normal test suite. It provides two checks:
+
+- **Lint** (`-m spec -k lint`): structural validation of every `.md` spec file — ID format, Status field, bare obligation keywords, mixed obligation levels, Covers syntax, Needs values.
+- **Trace** (`-m spec -k trace`): full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied.
+
+**Installation:**
+
+```bash
+uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"
+```
+
+**Configuration** in `pyproject.toml`:
+
+```toml
+[tool.pytest-sdd]
+spec_dirs = ["specs/functional_requirements", "specs/design"]
+oft_jar = "tools/openfasttrace-4.2.2.jar"
+```
+
+Both fields are required. `spec_dirs` lists the directories containing OFT markdown files; `oft_jar` is the path to the OpenFastTrace JAR (v4.2.2), relative to the project root. Download the JAR from https://github.com/itsallcode/openfasttrace/releases.
+
+**Invocation:**
+
+```bash
+pytest -m spec              # run all spec checks (lint + trace)
+pytest -m spec -k lint      # lint only
+pytest -m spec -k trace     # traceability only
+pytest -m "not spec"        # skip spec checks
+```
+
+Spec checks run automatically when `pytest` is invoked without `-m` flags, interleaved with the normal test suite. The `spec` marker allows selective execution.
+
+**OFT JAR requirement:** Java must be on `PATH`. The JAR file must exist at the configured path. Neither is optional — a missing JAR or missing Java is a hard test failure.
