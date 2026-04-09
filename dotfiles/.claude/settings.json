@@ -1,5 +1,4 @@
 {
-  "model": "opusplan",
   "hooks": {
     "Stop": [
       {
@@ -23,5 +22,6 @@
         ]
       }
     ]
-  }
+  },
+  "model": "opusplan"
 }
