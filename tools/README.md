@@ -26,7 +26,7 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 ## Setup
 
 ```bash
-cd tools && uv pip install -e .   # installs packages (sdd-trace, pytest-sdd)
+cd tools && uv pip install -e .   # installs packages (pytest-sdd, devtools_lib)
 ```
 
 Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts in `bin/` use PEP 723 inline metadata; `uv run` handles their dependencies automatically. Skills reference tools by absolute path; no PATH configuration needed.
@@ -49,7 +49,6 @@ Installed via `pyproject.toml` console entry points.
 
 | Package | Location | Purpose |
 |---------|----------|---------|
-| `sdd-trace` | `src/sdd_trace/` | Legacy traceability CLI (pre-OFT); superseded by pytest-sdd for new projects |
 | `pytest-sdd` | `src/pytest_sdd/` | pytest plugin for OFT spec validation: lint checks + traceability via OFT JAR |
 
 ### Shared library
@@ -107,12 +106,3 @@ pytest -m spec -k trace # traceability only
 
 Requires Java on `PATH` and the OFT JAR at `../dev-playbook/tools/lib/openfasttrace-4.2.2.jar`.
 
-### sdd-trace
-
-Legacy traceability CLI for pre-OFT specs. Superseded by `pytest-sdd` for all new projects. Verify traceability across a linear pipeline: functional requirements → design → tests.
-
-```bash
-sdd-trace
-sdd-trace --specs path/to/specs --tests path/to/tests
-sdd-trace --detail ERR AQD
-```

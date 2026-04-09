@@ -63,5 +63,5 @@ CLI utilities, shared libraries, and spec-driven packages. See [tools/README.md]
 | Object | Location | Purpose |
 |--------|----------|---------|
 | Standalone scripts | `tools/bin/` | `py-outline`, `repo-conformance`, `repo-sync` |
-| Packages | `tools/src/pytest_sdd/`, `tools/src/sdd_trace/` | `pytest-sdd`: OFT spec validation plugin; `sdd-trace`: legacy traceability CLI |
+| Packages | `tools/src/pytest_sdd/` | pytest plugin for OFT spec validation: lint checks + traceability via OFT JAR |
 | Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |

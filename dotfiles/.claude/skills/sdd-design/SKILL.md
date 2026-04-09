@@ -28,11 +28,11 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 
 1. **Check for handoff file.** Check for `<project_root>/.claude/idd-handoff.md`.
    If it exists, read it for issue context and scope.
-2. **Run traceability check.** Run `~/workspace/dev-playbook/tools/.venv/bin/sdd-trace` from the project root. This shows a compact summary of requirement coverage. Use `--detail <AREA> [<AREA> ...]` to drill into specific area codes if needed (always a single invocation — never run the tool multiple times with different areas). Interpret the results based on the stage of design:
-   - **Starting out** (no design spec yet): expect 0% coverage — every requirement will show as unmapped. This is normal. Use the list of unmapped requirements as your backlog of what needs designing.
-   - **Mid-design** (design spec partially written): some requirements will be mapped, others won't. Focus the session on the unmapped ones — these are the gaps to fill next.
-   - **Wrapping up** (design spec nearly complete): coverage should be approaching 100%. Any remaining gaps are what's left to address before the design is done.
-   If the tool exits with code 2 (configuration error, e.g. no specs directory), that's fine — it means the project hasn't set up specs yet. Note it and continue.
+2. **Run spec checks.** Run `uv run pytest -m spec` from the project root. Interpret the results based on the stage of design:
+   - **Starting out** (no design spec yet): the trace check will fail because `Needs:` declarations in the functional requirements are not satisfied — this is expected. The OFT output lists uncovered requirements; use that as your backlog of what needs designing.
+   - **Mid-design** (design spec partially written): some requirements will be covered, others won't. Focus the session on what OFT reports as uncovered.
+   - **Wrapping up** (design spec nearly complete): all checks should pass. Any remaining failures indicate gaps to close.
+   If `pytest-sdd` is not configured in `pyproject.toml`, the plugin is silently inactive — that's fine for a project just getting started.
 2. Read the project's specs and architecture artifacts. Check for:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - `specs/design.md` or, if split, `specs/design/index.md`
