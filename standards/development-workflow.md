@@ -2,7 +2,7 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in the [spec-driven-development standard](spec-driven-development.md).
+conventions in the [spec format reference](spec-format.md).
 
 ## Purpose
 

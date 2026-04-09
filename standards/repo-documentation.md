@@ -2,7 +2,7 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in the [spec-driven-development standard](spec-driven-development.md).
+conventions in the [spec format reference](spec-format.md).
 
 ## Purpose
 
@@ -72,7 +72,7 @@ ROADMAP.md SHALL NOT contain: timelines, status tracking, or completed items. It
 - `functional_requirements.md` — behavior in EARS + RFC 2119
 - `design.md` — components, interfaces, and data flow in RFC 2119
 
-The [spec-driven-development standard](spec-driven-development.md) governs how specs are written, structured, and maintained. Refer to it for format, requirement IDs, splitting rules, and the relationship between functional requirements and system design.
+The [spec-driven-development standard](spec-driven-development.md) defines when specs are warranted and the overall philosophy. The [spec format reference](spec-format.md) governs how specs are written and structured — format, requirement IDs, splitting rules, and the relationship between functional requirements and system design.
 
 ### docs/adr/
 
@@ -83,7 +83,7 @@ The [spec-driven-development standard](spec-driven-development.md) governs how s
 - One file per decision, immutable once written
 - Indexed by `docs/adr/README.md`
 
-The [spec-driven-development standard](spec-driven-development.md) defines when ADRs are appropriate and how they relate to the design spec. Refer to it for format and usage guidance.
+The [spec-driven-development standard](spec-driven-development.md) defines when ADRs are appropriate and how they relate to the design spec.
 
 ## The Implicit Status Ladder
 
