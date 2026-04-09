@@ -26,7 +26,7 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 ## Setup
 
 ```bash
-cd tools && uv pip install -e .   # installs packages (sdd-trace)
+cd tools && uv pip install -e .   # installs packages (sdd-trace, pytest-sdd)
 ```
 
 Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts in `bin/` use PEP 723 inline metadata; `uv run` handles their dependencies automatically. Skills reference tools by absolute path; no PATH configuration needed.
@@ -49,7 +49,8 @@ Installed via `pyproject.toml` console entry points.
 
 | Package | Location | Purpose |
 |---------|----------|---------|
-| `sdd-trace` | `src/sdd_trace/` | Verify bidirectional traceability between requirements, design specs, and tests |
+| `sdd-trace` | `src/sdd_trace/` | Legacy traceability CLI (pre-OFT); superseded by pytest-sdd for new projects |
+| `pytest-sdd` | `src/pytest_sdd/` | pytest plugin for OFT spec validation: lint checks + traceability via OFT JAR |
 
 ### Shared library
 
@@ -90,9 +91,25 @@ repo-sync /path/to/workspace
 
 **Exit codes:** 0 = all synced, 1 = some repos not fully synced.
 
+### pytest-sdd
+
+pytest plugin for validating OFT spec files as part of the normal test suite. Installed as a dev dependency in each project; configured in `pyproject.toml`. See [spec-format.md](../standards/spec-format.md#tooling-integration) for configuration and invocation.
+
+```bash
+uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"
+```
+
+```bash
+pytest -m spec          # run all spec checks (lint + trace)
+pytest -m spec -k lint  # lint only
+pytest -m spec -k trace # traceability only
+```
+
+Requires Java on `PATH` and the OFT JAR at `../dev-playbook/tools/lib/openfasttrace-4.2.2.jar`.
+
 ### sdd-trace
 
-Verify traceability across a linear pipeline: functional requirements → design → tests. Every mandatory requirement (`SHALL`/`SHALL NOT`) must appear in the design spec, and everything in the design spec must have at least one test. Non-mandatory requirements (`SHOULD`, `MAY`) are counted but not tracked. Also validates spec formatting (well-formed IDs, single obligation keyword per requirement). When no design spec exists, falls back to requiring mandatory requirements are tested directly.
+Legacy traceability CLI for pre-OFT specs. Superseded by `pytest-sdd` for all new projects. Verify traceability across a linear pipeline: functional requirements → design → tests.
 
 ```bash
 sdd-trace
