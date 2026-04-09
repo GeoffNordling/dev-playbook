@@ -22,8 +22,8 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 
 1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
    it exists, read it for issue context and scope.
-2. Read the spec-driven-development standard for spec conventions:
-   `~/workspace/dev-playbook/standards/spec-driven-development.md`
+2. Read the spec format reference for spec conventions:
+   `~/workspace/dev-playbook/standards/spec-format.md`
 2. Read the project's existing specs if they exist:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - The project's `CLAUDE.md`
@@ -38,8 +38,8 @@ Use the interview pattern to collaborate with the user on requirements. Ask clar
 
 ## Drafting
 
-- Write requirements in EARS notation with RFC 2119 modal verbs, as prescribed by the spec-driven-development standard.
-- Every requirement gets a unique, stable `REQ-{AREA}-{NNN}` identifier (AREA is 3–6 uppercase letters, NNN is a 3-digit number).
+- Write requirements following the spec format reference: EARS sentence templates with RFC 2119 modal verbs for prose, OFT Requirement-Enhanced Markdown for structure and traceability.
+- Every requirement gets a unique OFT specification item ID in `type~name~revision` format (e.g., `req~auth.login-validation~1`). Use `req` as the type. See the spec format reference for naming rules and required keywords (`Status:`, `Covers:`, `Needs:`).
 - Include an explicit out-of-scope section.
 - Present the draft to the user and iterate until they are satisfied.
 

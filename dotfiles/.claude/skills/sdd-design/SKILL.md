@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Collaborate with the user to design the system's structure before implementation begins. The design spec is the bridge between the functional spec and the red/green implementation phase.
 
-The [spec-driven-development standard](standards/spec-driven-development.md) (in the dev-playbook repo) defines what belongs in `design.md`, when it's warranted, and how it relates to ADRs. Follow those conventions.
+The [spec format reference](~/workspace/dev-playbook/standards/spec-format.md) defines the OFT format for spec items, traceability, and file structure. Follow those conventions for `design.md`. For guidance on when a design spec is warranted and how it relates to ADRs, see the [spec-driven-development standard](~/workspace/dev-playbook/standards/spec-driven-development.md).
 
 When your work is complete and approved, commit your changes and push the branch.
 
@@ -51,12 +51,13 @@ Ask yourself: would a red agent be forced to invent class names, module boundari
 - **Be precise about operations.** When a field is computed or aggregated, specify the exact operation (sum, min, max, count, derived). "Aggregated from X" is not a design; it defers the decision.
 - **Stay at a moderate level of abstraction.** The design spec names modules, classes, their fields, and how they relate. It does not prescribe serialization formats, internal algorithms, or implementation details. When in doubt, propose the simpler option and let the user escalate complexity.
 - **Prefer explicit structures over design pattern abstractions.** If a fixed containment hierarchy works, say that. Do not reach for Composite, Strategy, or other named patterns unless the problem genuinely requires that generality.
-- **Do not restate functional requirements.** The design spec documents decisions that are not already specified in the functional requirements: module boundaries, data structures, configuration choices, mechanism details. If a functional requirement fully specifies a behavior (e.g., exit code values, output format rules), the design spec should reference the REQ ID for traceability but not repeat the specification. Only add design-spec text when there is a genuine design decision beyond what the functional spec prescribes.
+- **Do not restate functional requirements.** The design spec documents decisions that are not already specified in the functional requirements: module boundaries, data structures, configuration choices, mechanism details. If a functional requirement fully specifies a behavior (e.g., exit code values, output format rules), the design spec should reference the requirement's OFT ID for traceability but not repeat the specification. Only add design-spec text when there is a genuine design decision beyond what the functional spec prescribes.
 - **Keep the design doc forward-looking.** Only describe the current design. Do not reference discarded alternatives, prior iterations, or the reasoning path. That belongs in ADRs.
 - **Order sections to follow the pipeline.** Sections should appear in the order they execute. If discovery happens before parsing, discovery comes first in the doc.
 - Use the **interview pattern**: ask the user clarifying questions about architectural preferences before drafting anything. Incorporate answers into the design spec, not as side conversation.
 - Draft or update `specs/design.md` (or files within `specs/design/` if split).
 - Use RFC 2119 modal verbs (SHALL, SHOULD, MAY) consistently.
+- **Structure design items as OFT spec items.** Use `dsn` type IDs (e.g., `dsn~auth.login-validation~1`). Each design item `SHALL` include a `Covers:` link to the `req` item(s) it satisfies and a `Needs:` declaration for required downstream coverage (typically `utest` and/or `itest`). See the spec format reference for the full item anatomy.
 - **Non-mandatory requirements are optional to include in design.** SHOULD and MAY requirements do not need to appear in the design spec. However, any requirement that is included in the design spec — regardless of its obligation level — must be implemented and tested like all other designed requirements. Including a non-mandatory requirement in design is a commitment to deliver it.
 - Reference relevant ADRs for the reasoning behind individual decisions rather than re-explaining them.
 - If a significant new architectural decision is made during this process, propose an ADR for it.
