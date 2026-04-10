@@ -23,6 +23,7 @@ from pytest_sdd.models import (
     SPEC_ID_BARE_RE,
     VALID_STATUSES,
     SpecItem,
+    strip_oft_off_blocks,
 )
 
 
@@ -136,11 +137,12 @@ def check_id_format(path: Path, text: str, valid_items: list[SpecItem]) -> list[
 
 def run_all(path: Path, text: str, items: list[SpecItem]) -> list[str]:
     """Run all lint checks and return combined error list."""
+    filtered_text = strip_oft_off_blocks(text)
     errors: list[str] = []
-    errors.extend(check_bare_obligations(path, text))
+    errors.extend(check_bare_obligations(path, filtered_text))
     errors.extend(check_mixed_obligations(items))
     errors.extend(check_status(items))
     errors.extend(check_covers_syntax(items))
     errors.extend(check_needs_values(items))
-    errors.extend(check_id_format(path, text, items))
+    errors.extend(check_id_format(path, filtered_text, items))
     return errors

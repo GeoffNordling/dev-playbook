@@ -413,6 +413,61 @@ Needs: utest
         assert "Rationale:" in items[0].body
         assert "This is why." in items[0].body
 
+    def test_oft_off_block_prevents_phantom_items(self, tmp_path):
+        """Spec IDs inside <!-- oft:off --> blocks are not parsed."""
+        f = tmp_path / "index.md"
+        _write(
+            f,
+            """\
+# Index
+
+<!-- oft:off -->
+IDs use the `req~name~revision` format.
+
+---
+
+### Example Item
+`req~example.item~1`
+Status: approved
+
+The system `SHALL` do something.
+
+Needs: utest
+
+---
+<!-- oft:on -->
+""",
+        )
+        items = parse_spec_file(f)
+        assert items == []
+
+    def test_oft_off_block_real_items_outside_still_parsed(self, tmp_path):
+        """Items outside off-blocks are still parsed normally."""
+        f = tmp_path / "spec.md"
+        _write(
+            f,
+            """\
+<!-- oft:off -->
+`req~example.ignored~1`
+<!-- oft:on -->
+
+---
+
+### Real Item
+`req~area.real~1`
+Status: approved
+
+The system `SHALL` do something.
+
+Needs: utest
+
+---
+""",
+        )
+        items = parse_spec_file(f)
+        assert len(items) == 1
+        assert items[0].id == "req~area.real~1"
+
     def test_covers_with_asterisk_bullets(self, tmp_path):
         """Covers: blocks may use * or + bullets as well as -."""
         f = tmp_path / "spec.md"

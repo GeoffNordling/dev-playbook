@@ -4,6 +4,29 @@ import re
 from dataclasses import dataclass, field
 
 # ---------------------------------------------------------------------------
+# OFT off-block markers
+# ---------------------------------------------------------------------------
+
+# Matches <!-- oft:off --> ... <!-- oft:on --> blocks (including content)
+OFT_OFF_BLOCK_RE = re.compile(
+    r"<!--\s*oft:off\s*-->.*?<!--\s*oft:on\s*-->",
+    re.DOTALL,
+)
+
+
+def strip_oft_off_blocks(text: str) -> str:
+    """Remove content between <!-- oft:off --> and <!-- oft:on --> markers.
+
+    Replaces each off-block with the equivalent number of blank lines so that
+    line numbers in error messages remain accurate.
+    """
+    def _blank_lines(match: "re.Match[str]") -> str:
+        return "\n" * match.group().count("\n")
+
+    return OFT_OFF_BLOCK_RE.sub(_blank_lines, text)
+
+
+# ---------------------------------------------------------------------------
 # Regex patterns
 # ---------------------------------------------------------------------------
 

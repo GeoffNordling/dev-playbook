@@ -32,6 +32,7 @@ from pytest_sdd.models import (
     SPEC_ID_RE,
     STATUS_RE,
     SpecItem,
+    strip_oft_off_blocks,
 )
 
 
@@ -42,7 +43,8 @@ def parse_spec_file(path: Path) -> list[SpecItem]:
     sections). Does not raise on missing fields — missing Status or Needs are
     captured as empty strings/lists and flagged by the linter.
     """
-    text = path.read_text(encoding="utf-8")
+    raw_text = path.read_text(encoding="utf-8")
+    text = strip_oft_off_blocks(raw_text)
     segments = HRULE_RE.split(text)
     items: list[SpecItem] = []
     line_offset = 0

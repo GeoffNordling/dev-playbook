@@ -12,6 +12,7 @@ import pytest
 
 from pytest_sdd.config import SddConfig
 from pytest_sdd.lint import run_all as run_lint
+from pytest_sdd.markers import create_coverage_dir
 from pytest_sdd.parser import parse_spec_file
 from pytest_sdd.trace import require_java, resolve_oft_jar, run_oft_trace
 
@@ -72,26 +73,41 @@ class SpecLintItem(pytest.Item):
 class SpecTraceItem(pytest.Item):
     """OFT traceability check across all configured spec directories."""
 
-    def __init__(self, *, sdd_config: SddConfig, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        sdd_config: SddConfig,
+        test_items: list[pytest.Item],
+        **kwargs,
+    ) -> None:
         super().__init__(**kwargs)
         self.sdd_config = sdd_config
+        self.test_items = test_items
         self.add_marker(pytest.mark.spec)
 
     def runtest(self) -> None:
         jar_path = resolve_oft_jar(self.sdd_config.oft_jar)
         require_java()
 
-        for spec_dir in self.sdd_config.spec_dirs:
-            if not spec_dir.is_dir():
-                raise FileNotFoundError(
-                    f"Spec directory not found: {spec_dir}"
-                )
-            try:
-                run_oft_trace(jar_path, spec_dir)
-            except subprocess.CalledProcessError as exc:
-                raise SpecTraceError(
-                    f"OFT trace failed for {spec_dir}:\n{exc.output}"
-                ) from exc
+        # Generate coverage file from pytest markers (if any)
+        coverage_tmp = create_coverage_dir(self.test_items)
+        extra_inputs = [Path(coverage_tmp.name)] if coverage_tmp else []
+
+        try:
+            for spec_dir in self.sdd_config.spec_dirs:
+                if not spec_dir.is_dir():
+                    raise FileNotFoundError(
+                        f"Spec directory not found: {spec_dir}"
+                    )
+                try:
+                    run_oft_trace(jar_path, spec_dir, extra_inputs)
+                except subprocess.CalledProcessError as exc:
+                    raise SpecTraceError(
+                        f"OFT trace failed for {spec_dir}:\n{exc.output}"
+                    ) from exc
+        finally:
+            if coverage_tmp:
+                coverage_tmp.cleanup()
 
     def repr_failure(self, excinfo, style=None):
         if isinstance(excinfo.value, (SpecTraceError, FileNotFoundError, RuntimeError)):

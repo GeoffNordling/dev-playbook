@@ -9,6 +9,7 @@ from pytest_sdd.lint import (
     check_mixed_obligations,
     check_needs_values,
     check_status,
+    run_all,
 )
 from pytest_sdd.models import SpecItem
 
@@ -287,3 +288,60 @@ class TestIdFormat:
         text = "`req~1invalid~1`"
         errors = check_id_format(path, text, [])
         assert len(errors) == 1
+
+
+# ---------------------------------------------------------------------------
+# run_all with <!-- oft:off --> blocks
+# ---------------------------------------------------------------------------
+
+
+class TestOftOffBlocks:
+    def test_bare_obligation_in_off_block_ignored(self):
+        text = (
+            "<!-- oft:off -->\n"
+            "Every item uses SHALL be tested.\n"
+            "<!-- oft:on -->\n"
+        )
+        errors = run_all(Path("spec.md"), text, [])
+        assert errors == []
+
+    def test_near_miss_id_in_off_block_ignored(self):
+        text = (
+            "<!-- oft:off -->\n"
+            "IDs use the `req~name~revision` format.\n"
+            "<!-- oft:on -->\n"
+        )
+        errors = run_all(Path("spec.md"), text, [])
+        assert errors == []
+
+    def test_content_outside_off_block_still_checked(self):
+        text = (
+            "<!-- oft:off -->\n"
+            "Example: SHALL be ignored.\n"
+            "<!-- oft:on -->\n"
+            "But this SHALL fail.\n"
+        )
+        errors = run_all(Path("spec.md"), text, [])
+        assert len(errors) == 1
+        assert "SHALL" in errors[0]
+
+    def test_multiple_off_blocks(self):
+        text = (
+            "<!-- oft:off -->\nSHALL\n<!-- oft:on -->\n"
+            "Clean line.\n"
+            "<!-- oft:off -->\nSHOULD\n<!-- oft:on -->\n"
+        )
+        errors = run_all(Path("spec.md"), text, [])
+        assert errors == []
+
+    def test_line_numbers_preserved_after_stripping(self):
+        text = (
+            "line 1\n"
+            "<!-- oft:off -->\n"
+            "line 3\n"
+            "<!-- oft:on -->\n"
+            "line 5 SHALL fail\n"
+        )
+        errors = run_all(Path("spec.md"), text, [])
+        assert len(errors) == 1
+        assert "spec.md:5:" in errors[0]

@@ -54,12 +54,14 @@ def pytest_collection_modifyitems(
             )
             spec_items.extend(collector.collect())
 
-    # One SpecTraceItem for the entire spec tree
+    # One SpecTraceItem for the entire spec tree — pass collected test items
+    # so it can extract @pytest.mark.req/dsn markers for OFT coverage bridging
     trace_item = SpecTraceItem.from_parent(
         session,
         name="spec-trace",
         path=session.fspath,
         sdd_config=sdd_config,
+        test_items=list(items),
     )
     spec_items.append(trace_item)
 
