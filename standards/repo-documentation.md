@@ -16,89 +16,45 @@ Define a consistent file hierarchy and scope boundary for every repository in th
 
 **No duplication across files.** Each piece of information has exactly one home. Files reference each other rather than repeating content.
 
-## Required Files
+## Audience and Presence
 
-Every repository SHALL have these files.
+Every file in the documentation hierarchy has two properties.
 
-### README.md
+### Audience
 
-**Audience:** Human
-**Scope:** What is this and how do I use it.
+Who is expected to read the file. These are intended audiences, not access
+restrictions — a human may read CLAUDE.md; an agent may read a human-audience
+file. The distinction governs formatting conventions and cross-reference style.
 
-- What the project does
-- Prerequisites and setup
-- How to run it
-
-README.md SHALL NOT contain: agent instructions, roadmap items, business rationale, or architecture decisions.
-
-### CLAUDE.md
-
-**Audience:** Agent (Claude Code)
-**Scope:** How to operate in this repo.
-
-- Build, run, and test commands
-- Rules and constraints (what not to do, what to always do)
-- Pointers to other docs the agent should consult before specific tasks
-
-CLAUDE.md SHALL NOT contain: what the project is, why it exists, what's planned, or developer profile information (global preferences belong in `~/.claude/` rules, not per-repo).
-
-## Optional Files
-
-These files have standardized names and locations. They exist when needed and are absent when not. Each layer builds on the previous — the further down the list, the more complex the project.
-
-### ROADMAP.md
-
-**Audience:** Human and agent
-**Scope:** What's next.
-**Location:** Repository root
-
-- Planned work, ordered by priority
-- No timelines, no assignees — just what and roughly why
-
-**Presence signal:** Exists with items = forward work planned. Absent = nothing planned (stable or parked).
-
-**What's next?** To find the next step in any repo: open ROADMAP.md. If it doesn't exist, check `gh issue list`. If neither has items, nothing is planned.
-
-ROADMAP.md SHALL NOT contain: timelines, status tracking, or completed items. It is a forward-looking document.
-
-> **Note:** Some older repos contain a `BUSINESS_CONTEXT.md` at the root. This is not a standard file for new repos, but if it exists it should be read — it describes the domain problem and why the project exists.
-
-### specs/
-
-**Audience:** Human and agent
-**Scope:** What the system does and how it's built, formally.
-**Location:** `/specs/` directory in repo root
-
-- `functional_requirements.md` — behavior in EARS + RFC 2119
-- `design.md` — components, interfaces, and data flow in RFC 2119
-
-The [spec-driven-development standard](spec-driven-development.md) defines when specs are warranted and the overall philosophy. The [spec format reference](spec-format.md) governs how specs are written and structured — format, requirement IDs, splitting rules, and the relationship between functional requirements and system design.
-
-### docs/adr/
-
-**Audience:** Human and agent
-**Scope:** Why we made each significant technical choice.
-**Location:** `/docs/adr/` directory in repo root
-
-- One file per decision, immutable once written
-- Indexed by `docs/adr/README.md`
-
-The [spec-driven-development standard](spec-driven-development.md) defines when ADRs are appropriate and how they relate to the design spec.
-
-## The Implicit Status Ladder
-
-No repo needs a status field. File presence tells you everything:
-
-| What exists | What it tells you |
+| Audience | Cross-reference style |
 |---|---|
-| README + CLAUDE.md only | Simple or stable. Nothing planned. |
-| + ROADMAP.md | Forward work is planned. |
-| + specs/ (functional only) | Complex enough for formal requirements. |
-| + specs/design.md | Complex enough to need explicit system structure. |
-| + docs/adr/ | Enough architectural decisions to warrant a log. |
+| Human + Agent | Inline links with the full path as the target — e.g., `[spec format reference](~/workspace/dev-playbook/standards/spec-format.md)`. Humans get clickable navigation; agents get an unambiguous path. |
+| Agent | Full paths as inline code — e.g., `` `~/workspace/dev-playbook/standards/spec-format.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+| Human | Relative inline links — e.g., `[spec format](spec-format.md)`. Shortest clickable form; agents do not consume these files during normal work. |
+
+### Presence
+
+Whether the file is required or optional.
+
+| Presence | Meaning |
+|---|---|
+| Required | Every repository `SHALL` have this file. |
+| Optional | A repository `MAY` have this file. Exists when needed, absent when not. |
+
+## Files
+
+| File | Audience | Presence | Scope |
+|---|---|---|---|
+| `CLAUDE.md` | Agent | Required | How to operate in this repo: build/run/test commands, rules, pointers to other docs. `SHALL NOT` contain what the project is, why it exists, or developer profile information. |
+| `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
+| `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
+| `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec format reference](~/workspace/dev-playbook/standards/spec-format.md) for file layout, splitting rules, and content conventions. |
+| `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
+| `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. |
 
 ## Tactical Work
 
-Specific, actionable work items (bugs, tasks, features) SHALL be tracked in GitHub Issues, not in-repo files. There SHALL NOT be a TODO.md, TASKS.md, or similar file in the repository.
+Specific, actionable work items (bugs, tasks, features) `SHALL` be tracked in GitHub Issues, not in-repo files. There `SHALL NOT` be a TODO.md, TASKS.md, or similar file in the repository.
 
-GitHub Issues is the single source of truth for "what specific thing should I do next." ROADMAP.md provides strategic direction; issues provide tactical actions.
+GitHub Issues is the single source of truth for "what specific thing should I do next."

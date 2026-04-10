@@ -249,14 +249,7 @@ This section will not be parsed for spec items.
 
 ### Spec Files
 
-All spec files `SHALL` live in a `/specs/` directory at the repository root, versioned alongside the code.
-
-| File | Contents |
-|------|----------|
-| `specs/functional_requirements.md` | What the system does, written as OFT `req` (and `feat`) items |
-| `specs/design.md` | How the system is built, written as OFT `dsn` items |
-
-The `design.md` file is optional. See the [spec-driven-development standard](spec-driven-development.md) for guidance on when a design spec is warranted.
+All spec files `SHALL` live in a `/specs/` directory at the repository root, versioned alongside the code. The [repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md) defines which files exist and their purpose.
 
 ### Splitting Large Specs
 
