@@ -38,7 +38,7 @@ When your work is complete and approved, commit your changes and push the branch
 
 ## First Steps
 
-1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
+1. Check for a handoff file at `<project_root>/.claude/sdd-handoff.md`. If
    it exists, read it for issue context and scope.
 2. Load the testing conventions:
    `~/workspace/dev-playbook/standards/testing-conventions.md`

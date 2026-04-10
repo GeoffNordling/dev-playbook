@@ -26,7 +26,7 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 
 ## First Steps
 
-1. **Check for handoff file.** Check for `<project_root>/.claude/idd-handoff.md`.
+1. **Check for handoff file.** Check for `<project_root>/.claude/sdd-handoff.md`.
    If it exists, read it for issue context and scope.
 2. **Run spec checks.** Run `uv run pytest -m spec` from the project root. Interpret the results based on the stage of design:
    - **Starting out** (no design spec yet): the trace check will fail because `Needs:` declarations in the functional requirements are not satisfied — this is expected. The OFT output lists uncovered requirements; use that as your backlog of what needs designing.

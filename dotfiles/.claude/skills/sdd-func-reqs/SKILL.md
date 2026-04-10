@@ -20,7 +20,7 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 
 ## First Steps
 
-1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
+1. Check for a handoff file at `<project_root>/.claude/sdd-handoff.md`. If
    it exists, read it for issue context and scope.
 2. Read the spec format reference for spec conventions:
    `~/workspace/dev-playbook/standards/spec-format.md`

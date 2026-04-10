@@ -1,15 +1,15 @@
 ---
-name: idd-work
-description: Dispatch and coordinate issue-driven development across SDD phases
+name: sdd-issue-coordinate
+description: Dispatch and coordinate spec-driven development on a GitHub issue
 disable-model-invocation: true
 ---
 
-# IDD Work
+# SDD Issue Coordinate
 
-Pick up, coordinate, and drive development work on a GitHub issue. This skill
-is the dispatcher for issue-driven development; it owns the outer workflow
-loop while the SDD agents own the inner phases (functional requirements,
-design, red, green).
+Pick up, coordinate, and drive development work on a GitHub issue using
+spec-driven development. This skill is the dispatcher; it owns the outer
+workflow loop while the SDD agents own the inner phases (functional
+requirements, design, red, green).
 
 The user provides an issue number, URL, or description, plus any optional
 context.
@@ -19,7 +19,7 @@ context.
 The FIRST line of your FIRST message MUST be exactly:
 
 ```
-<<<AGENT:idd-work>>>
+<<<AGENT:sdd-issue-coordinate>>>
 ```
 
 Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
@@ -30,7 +30,10 @@ Output it verbatim with no other text on that line. This is a machine-readable s
    `~/workspace/dev-playbook/standards/development-workflow.md`
 2. Follow the **Session Handoff** sequence from that standard to reconstruct
    context from durable artifacts.
-3. Read `CLAUDE.md` and check whether `specs/` exists (indicating SDD).
+3. Review the `specs/` directory. You should find functional requirements
+   and possibly design specs, in either flat file or hierarchical folder
+   form. If `specs/` does not exist or is empty, stop and escalate to the
+   user — this skill requires spec-driven development.
 4. Present findings: the issue, any existing work, and the current state of
    durable artifacts. Recommend the next phase (see below). Wait for the
    user to confirm before proceeding.
@@ -50,8 +53,8 @@ Based on the state of durable artifacts, recommend the next SDD phase:
 
 - No functional requirements for this feature -> functional requirements
 - Requirements exist but no design spec coverage -> design
-- Design exists but tests are missing -> red and green (parallel; tell the
-  user to open two terminals)
+- Design exists but tests are missing -> red and green (the user will open
+  parallel terminals for these)
 - Tests exist but failing -> green
 
 Always wait for explicit user approval before proceeding.
@@ -59,7 +62,7 @@ Always wait for explicit user approval before proceeding.
 ## Handoff File
 
 When the user approves a phase, write a handoff file at
-`<project_root>/.claude/idd-handoff.md` (gitignored). The SDD agent reads
+`<project_root>/.claude/sdd-handoff.md` (gitignored). The SDD agent reads
 this file on startup for context.
 
 The handoff file is a context briefing, not a design brief. Give the agent
@@ -91,8 +94,8 @@ for that are relevant to the scope of the agent's session.>
 When an SDD agent finishes, review its commits for correctness and scope.
 Understand what each phase is expected to produce:
 
-- **Func-reqs agent**: updates `specs/functional_requirements.md` only.
-- **Design agent**: updates `specs/design.md` and may also write
+- **Func-reqs agent**: updates the functional requirements specs only.
+- **Design agent**: updates the design specs and may also write
   implementation stubs (new files, new fields, `raise NotImplementedError`
   bodies). This is expected; stubs give the red agent something to write
   tests against.
@@ -165,7 +168,7 @@ Before closing the loop, verify the working tree is fully clean and pushed:
 When all phases are done and tests pass:
 
 1. Update the PR description with a final summary.
-2. Delete the handoff file (`<project_root>/.claude/idd-handoff.md`).
+2. Delete the handoff file (`<project_root>/.claude/sdd-handoff.md`).
 3. Tell the user the PR is ready for review.
 4. Wait for the user to confirm the PR is merged and the branch is deleted,
    then check out `main` and pull.

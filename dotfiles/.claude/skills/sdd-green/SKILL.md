@@ -48,7 +48,7 @@ When your work is complete and approved, commit your changes and push the branch
 
 ## First Steps
 
-1. Check for a handoff file at `<project_root>/.claude/idd-handoff.md`. If
+1. Check for a handoff file at `<project_root>/.claude/sdd-handoff.md`. If
    it exists, read it for issue context and scope.
 2. Read the project's specs. Check for:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)

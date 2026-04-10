@@ -15,23 +15,15 @@ Run `ls` at the repo root to see the top-level file and directory structure.
 
 ## Step 2 — Discover what documentation exists
 
-From the repo root, check for these files and directories:
+Read the Files table in the repo documentation standard:
+`~/workspace/dev-playbook/standards/repo-documentation.md`
 
-- `README.md`
-- `CLAUDE.md`
-- `ROADMAP.md`
-- `BUSINESS_CONTEXT.md` (optional — some older repos have this; read it if present)
-- `specs/functional_requirements.md`
-- `specs/design.md`
-- `docs/adr/README.md`
-
-Use Glob to check which of these exist. Do not search for anything else.
+Check which of those files and directories exist in the current repo.
 
 ## Step 3 — Read what exists
 
-Read each file that exists, in the order listed above. For specs and ADR index
-files, read just enough to understand scope — do not read every ADR entry or
-chase cross-references.
+Read each file that exists. For specs and docs, read just enough to understand
+scope — do not chase cross-references or read every sub-file.
 
 ## Step 4 — Check open issues
 
