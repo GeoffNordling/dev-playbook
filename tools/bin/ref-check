@@ -96,13 +96,29 @@ def main():
 
     repo_root = Path(args.directory).resolve()
     md_files = find_md_files(repo_root)
+
+    if not md_files:
+        print(f"ref-check: no .md files found in {repo_root}", file=sys.stderr)
+        sys.exit(2)
+
     has_broken = False
+    total = 0
+    broken = 0
 
     for filepath in md_files:
         for ref in scan_file(filepath, repo_root):
             print(json.dumps(ref))
+            total += 1
             if ref["status"] == "broken":
                 has_broken = True
+                broken += 1
+
+    if total == 0:
+        print(f"ref-check: no cross-references found in {repo_root}", file=sys.stderr)
+    elif has_broken:
+        print(f"ref-check: {broken}/{total} broken", file=sys.stderr)
+    else:
+        print(f"ref-check: {total} references, all ok", file=sys.stderr)
 
     sys.exit(1 if has_broken else 0)
 
