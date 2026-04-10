@@ -41,13 +41,13 @@ def require_java() -> str:
 
 def run_oft_trace(
     jar_path: Path,
-    specs_dir: Path,
-    extra_inputs: list[Path] | None = None,
+    input_paths: list[Path],
 ) -> subprocess.CompletedProcess:
-    """Run OFT trace on a spec directory with optional extra input paths.
+    """Run OFT trace across all input paths in a single invocation.
 
-    Extra inputs (e.g. generated coverage files) are passed to OFT alongside
-    the spec directory. OFT unions all spec items found across all inputs.
+    OFT unions all spec items found across all input paths, which is required
+    for cross-directory traceability chains (e.g. req -> dsn -> utest where
+    each artifact type lives in a different directory).
 
     Raises RuntimeError if java is not on PATH.
     Raises FileNotFoundError if the JAR does not exist.
@@ -56,8 +56,8 @@ def run_oft_trace(
     java = require_java()
     resolved_jar = resolve_oft_jar(jar_path)
 
-    cmd = [java, "-jar", str(resolved_jar), "trace", str(specs_dir)]
-    for path in extra_inputs or []:
+    cmd = [java, "-jar", str(resolved_jar), "trace"]
+    for path in input_paths:
         cmd.append(str(path))
 
     result = subprocess.run(

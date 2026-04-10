@@ -89,22 +89,27 @@ class SpecTraceItem(pytest.Item):
         jar_path = resolve_oft_jar(self.sdd_config.oft_jar)
         require_java()
 
+        # Validate all spec dirs exist
+        for spec_dir in self.sdd_config.spec_dirs:
+            if not spec_dir.is_dir():
+                raise FileNotFoundError(
+                    f"Spec directory not found: {spec_dir}"
+                )
+
         # Generate coverage file from pytest markers (if any)
         coverage_tmp = create_coverage_dir(self.test_items)
-        extra_inputs = [Path(coverage_tmp.name)] if coverage_tmp else []
+
+        # Single OFT invocation across all spec dirs + coverage
+        input_paths = list(self.sdd_config.spec_dirs)
+        if coverage_tmp:
+            input_paths.append(Path(coverage_tmp.name))
 
         try:
-            for spec_dir in self.sdd_config.spec_dirs:
-                if not spec_dir.is_dir():
-                    raise FileNotFoundError(
-                        f"Spec directory not found: {spec_dir}"
-                    )
-                try:
-                    run_oft_trace(jar_path, spec_dir, extra_inputs)
-                except subprocess.CalledProcessError as exc:
-                    raise SpecTraceError(
-                        f"OFT trace failed for {spec_dir}:\n{exc.output}"
-                    ) from exc
+            run_oft_trace(jar_path, input_paths)
+        except subprocess.CalledProcessError as exc:
+            raise SpecTraceError(
+                f"OFT trace failed:\n{exc.output}"
+            ) from exc
         finally:
             if coverage_tmp:
                 coverage_tmp.cleanup()
