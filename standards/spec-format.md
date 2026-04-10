@@ -63,7 +63,7 @@ Substitute the modal verb in any EARS sentence to grade the requirement's obliga
 Guidelines:
 - One scenario per section. If a second example is needed, the section's vocabulary may be too overloaded and `SHOULD` be split.
 - Place the example after the section's prose introduction and before the formal spec items.
-- Use a fenced code block or structured format that mirrors what the system actually produces or consumes.
+- Examples `SHALL` use indented code blocks (4-space indent) or structured format that mirrors what the system actually produces or consumes. Spec files `SHALL NOT` contain fenced code blocks (triple backticks) — OFT's markdown parser silently ignores all spec items that appear after a fenced code block.
 
 ---
 

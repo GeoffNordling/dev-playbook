@@ -5,6 +5,7 @@ from pathlib import Path
 from pytest_sdd.lint import (
     check_bare_obligations,
     check_covers_syntax,
+    check_fenced_code_blocks,
     check_id_format,
     check_mixed_obligations,
     check_needs_values,
@@ -345,3 +346,45 @@ class TestOftOffBlocks:
         errors = run_all(Path("spec.md"), text, [])
         assert len(errors) == 1
         assert "spec.md:5:" in errors[0]
+
+
+class TestCheckFencedCodeBlocks:
+    def test_no_fenced_blocks_passes(self):
+        text = "# Title\n\nSome text\n\n    indented code block\n"
+        assert check_fenced_code_blocks(Path("spec.md"), text) == []
+
+    def test_fenced_block_detected(self):
+        text = "# Title\n\n```python\nprint('hello')\n```\n"
+        errors = check_fenced_code_blocks(Path("spec.md"), text)
+        assert len(errors) == 2  # opening and closing ```
+        assert "spec.md:3:" in errors[0]
+        assert "fenced code block" in errors[0]
+
+    def test_fenced_block_with_language_tag(self):
+        text = "```json\n{}\n```\n"
+        errors = check_fenced_code_blocks(Path("spec.md"), text)
+        assert len(errors) == 2
+
+    def test_reports_correct_line_numbers(self):
+        text = "line 1\nline 2\n```\ncode\n```\nline 6\n"
+        errors = check_fenced_code_blocks(Path("spec.md"), text)
+        assert "spec.md:3:" in errors[0]
+        assert "spec.md:5:" in errors[1]
+
+    def test_indented_code_blocks_allowed(self):
+        text = "# Title\n\n    code line 1\n    code line 2\n"
+        assert check_fenced_code_blocks(Path("spec.md"), text) == []
+
+    def test_fenced_block_in_oft_off_section_ignored(self):
+        text = (
+            "# Title\n"
+            "<!-- oft:off -->\n"
+            "```python\n"
+            "example code\n"
+            "```\n"
+            "<!-- oft:on -->\n"
+        )
+        # run_all strips oft:off blocks before checking
+        errors = run_all(Path("spec.md"), text, [])
+        fenced_errors = [e for e in errors if "fenced code block" in e]
+        assert fenced_errors == []

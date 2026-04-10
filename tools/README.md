@@ -106,3 +106,12 @@ pytest -m spec -k trace # traceability only
 
 Requires Java on `PATH` and the OFT JAR at `../dev-playbook/tools/lib/openfasttrace-4.2.2.jar`.
 
+#### Updating downstream projects after changes
+
+Downstream projects pin `dev-playbook-tools` to a specific git commit in their `uv.lock`. After pushing changes here, `uv sync` alone in the downstream repo will **not** pick them up. You must refresh the lock:
+
+```bash
+cd /path/to/downstream-project
+uv lock --upgrade-package dev-playbook-tools && uv sync
+```
+

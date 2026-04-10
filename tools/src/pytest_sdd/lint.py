@@ -16,6 +16,7 @@ from pathlib import Path
 
 from pytest_sdd.models import (
     BACKTICK_SPAN_RE,
+    FENCED_CODE_BLOCK_RE,
     KNOWN_ARTIFACT_TYPES,
     NEAR_MISS_ID_RE,
     OBLIGATION_BACKTICK_RE,
@@ -135,10 +136,27 @@ def check_id_format(path: Path, text: str, valid_items: list[SpecItem]) -> list[
     return errors
 
 
+def check_fenced_code_blocks(path: Path, text: str) -> list[str]:
+    """Reject fenced code blocks (triple backticks) in spec files.
+
+    OFT's markdown parser silently ignores all spec items that appear after a
+    fenced code block. Use indented code blocks (4-space indent) instead.
+    """
+    errors: list[str] = []
+    for line_num, line in enumerate(text.splitlines(), start=1):
+        if FENCED_CODE_BLOCK_RE.match(line):
+            errors.append(
+                f"{path.name}:{line_num}: fenced code block (```) breaks OFT parsing; "
+                "use indented code blocks (4-space indent) instead"
+            )
+    return errors
+
+
 def run_all(path: Path, text: str, items: list[SpecItem]) -> list[str]:
     """Run all lint checks and return combined error list."""
     filtered_text = strip_oft_off_blocks(text)
     errors: list[str] = []
+    errors.extend(check_fenced_code_blocks(path, filtered_text))
     errors.extend(check_bare_obligations(path, filtered_text))
     errors.extend(check_mixed_obligations(items))
     errors.extend(check_status(items))

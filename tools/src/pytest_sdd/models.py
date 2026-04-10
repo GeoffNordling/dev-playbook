@@ -63,6 +63,9 @@ COVERS_RE = re.compile(r"^Covers:\s*\n((?:[ \t]*[-*+][ \t]+\S+[ \t]*\n?)+)", re.
 # Heading patterns
 H3_RE = re.compile(r"^###\s+(.+)$", re.MULTILINE)
 
+# Fenced code block opening (triple backticks with optional language tag)
+FENCED_CODE_BLOCK_RE = re.compile(r"^```", re.MULTILINE)
+
 # Horizontal rule (section separator between spec items)
 HRULE_RE = re.compile(r"^---\s*$", re.MULTILINE)
 
