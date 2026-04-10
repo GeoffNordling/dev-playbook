@@ -1,36 +1,34 @@
 ---
 name: commit-push
-description: Commit all changes and push to remote
+description: "Commit and push. Normal mode: only files from current work. Fast mode (/commit-push fast): stage everything."
 disable-model-invocation: true
 ---
 
 # Commit-Push
 
-Commit all changes and push.
+Commit and push. Do not narrate — just do it. Only speak up if something is unexpected.
 
-If the working directory is ~/workspace/RDMWorkspace/src/RDMCore, then immediately reject this skill and escalate to user. We should never run this skill while working on the RDMCore project.
+## Arguments
 
-## Output discipline
+- No argument: **normal mode**
+- `fast`: **fast mode**
 
-Be quiet. Execute the workflow steps without narrating each one. Only speak up if something looks unexpected or needs user input. If everything is normal, go straight from tools to commit+push with minimal commentary.
+## Normal Mode
 
-## Workflow
+1. `git status` and `git diff --stat`
+2. Stage files related to the work you did in this conversation
+3. Do NOT stage unrelated changes — other agents may own those
+5. `git log --oneline -3` to match commit message style
+6. Commit with a concise message, then push
 
-1. Run `git status` to see all changes
-2. Run `git diff --stat` to see which files changed and by how much
-3. If any file in the stat output was not expected to change, run `git diff <file>` on that file only to investigate before proceeding
-4. Run `git log --oneline -3` to match commit message style
-5. Stage all relevant files (exclude obvious temp files, secrets, etc.)
-6. Create a concise commit message summarizing the changes
-7. Commit and push all in the same command.
+## Fast Mode
 
-## Commit Message Format
+1. `git add -A`
+2. `git diff --cached --stat` to build a one-line commit message
+3. Commit, then push
 
-- Short summary line describing what was done
-- Blank line
-- Bullet points for multiple changes (if needed)
+## Both Modes
 
-## Safety
-
-- Never commit .env files, credentials, or secrets
-- Ask user before committing if changes look unusual or unintended
+- Always stage `settings.json` changes — these are housekeeping, always include them
+- Never commit `.env` files, credentials, or secrets
+- End the commit message with: `Co-Authored-By: Claude <noreply@anthropic.com>`
