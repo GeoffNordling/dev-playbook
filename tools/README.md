@@ -40,7 +40,7 @@ Each script is self-contained with a PEP 723 `# /// script` block. Skills refere
 | Tool | Location | Purpose |
 |------|----------|---------|
 | `py-outline` | `bin/py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
-| `repo-conformance` | `bin/repo-conformance` | Check workspace repos against the repo-documentation standard |
+| `ref-check` | `bin/ref-check` | Scan markdown files for cross-references and report broken links as JSON Lines |
 | `repo-sync` | `bin/repo-sync` | Sync all workspace repos with their remotes (auto-pull/push when safe) |
 
 ### Packages (`src/`)
@@ -55,7 +55,7 @@ Installed via `pyproject.toml` console entry points.
 
 | Library | Location | Purpose |
 |---------|----------|---------|
-| `devtools_lib` | `src/devtools_lib/` | Workspace discovery, git helpers; consumed by `repo-conformance`, `repo-sync` |
+| `devtools_lib` | `src/devtools_lib/` | Workspace discovery, git helpers; consumed by `repo-sync` |
 
 ## Tool reference
 
@@ -70,14 +70,15 @@ py-outline src/mypackage
 py-outline src/mypackage > structure.txt
 ```
 
-### repo-conformance
+### ref-check
 
-Check repos against the [repo-documentation standard](https://github.com/GeoffNordling/dev-playbook/blob/main/standards/repo-documentation.md). Scans for required files, misplaced files, and unknown root-level markdown.
+Scan all markdown files for `~/workspace/` cross-references and report their status as JSON Lines to stdout. Designed for agent consumption.
 
 ```bash
-repo-conformance /path/to/repo
-repo-conformance --all
+ref-check [directory]
 ```
+
+Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok`, `broken`, or `external`). Exit code 1 if any broken references.
 
 ### repo-sync
 

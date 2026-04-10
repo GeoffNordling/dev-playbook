@@ -26,11 +26,13 @@ Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
 file. The distinction governs formatting conventions and cross-reference style.
 
+All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/standards/spec-format.md`. This makes every reference detectable and resolvable by tooling. The audience determines the wrapper:
+
 | Audience | Cross-reference style |
 |---|---|
-| Human + Agent | Inline links with the full path as the target — e.g., `[spec format reference](~/workspace/dev-playbook/standards/spec-format.md)`. Humans get clickable navigation; agents get an unambiguous path. |
-| Agent | Full paths as inline code — e.g., `` `~/workspace/dev-playbook/standards/spec-format.md` ``. No inline links; they add syntax noise without adding information for an agent. |
-| Human | Relative inline links — e.g., `[spec format](spec-format.md)`. Shortest clickable form; agents do not consume these files during normal work. |
+| Human | Inline link with full path as target — e.g., `[spec format reference](~/workspace/dev-playbook/standards/spec-format.md)`. |
+| Human + Agent | Same as Human. |
+| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/standards/spec-format.md` ``. No inline links; they add syntax noise without adding information for an agent. |
 
 ### Presence
 
