@@ -92,9 +92,7 @@ class SpecTraceItem(pytest.Item):
         # Validate all spec dirs exist
         for spec_dir in self.sdd_config.spec_dirs:
             if not spec_dir.is_dir():
-                raise FileNotFoundError(
-                    f"Spec directory not found: {spec_dir}"
-                )
+                raise FileNotFoundError(f"Spec directory not found: {spec_dir}")
 
         # Generate coverage file from pytest markers (if any)
         coverage_tmp = create_coverage_dir(self.test_items)
@@ -107,9 +105,7 @@ class SpecTraceItem(pytest.Item):
         try:
             run_oft_trace(jar_path, input_paths)
         except subprocess.CalledProcessError as exc:
-            raise SpecTraceError(
-                f"OFT trace failed:\n{exc.output}"
-            ) from exc
+            raise SpecTraceError(f"OFT trace failed:\n{exc.output}") from exc
         finally:
             if coverage_tmp:
                 coverage_tmp.cleanup()

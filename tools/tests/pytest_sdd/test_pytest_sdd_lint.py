@@ -30,7 +30,8 @@ def _item(
         revision=int(parts[2]),
         title="Item",
         status=status,
-        body=body or f"The system `SHALL` do something.\n\nNeeds: {', '.join(needs or ['utest'])}",
+        body=body
+        or f"The system `SHALL` do something.\n\nNeeds: {', '.join(needs or ['utest'])}",
         needs=needs if needs is not None else ["utest"],
         covers=covers or [],
         source_file="spec.md",
@@ -187,7 +188,10 @@ class TestStatus:
         assert "missing Status" in errors[0]
 
     def test_multiple_items(self):
-        items = [_item("req~a.x~1", status="approved"), _item("req~a.y~1", status="bad")]
+        items = [
+            _item("req~a.x~1", status="approved"),
+            _item("req~a.y~1", status="bad"),
+        ]
         errors = check_status(items)
         assert len(errors) == 1
         assert "req~a.y~1" in errors[0]
@@ -298,11 +302,7 @@ class TestIdFormat:
 
 class TestOftOffBlocks:
     def test_bare_obligation_in_off_block_ignored(self):
-        text = (
-            "<!-- oft:off -->\n"
-            "Every item uses SHALL be tested.\n"
-            "<!-- oft:on -->\n"
-        )
+        text = "<!-- oft:off -->\nEvery item uses SHALL be tested.\n<!-- oft:on -->\n"
         errors = run_all(Path("spec.md"), text, [])
         assert errors == []
 
@@ -336,13 +336,7 @@ class TestOftOffBlocks:
         assert errors == []
 
     def test_line_numbers_preserved_after_stripping(self):
-        text = (
-            "line 1\n"
-            "<!-- oft:off -->\n"
-            "line 3\n"
-            "<!-- oft:on -->\n"
-            "line 5 SHALL fail\n"
-        )
+        text = "line 1\n<!-- oft:off -->\nline 3\n<!-- oft:on -->\nline 5 SHALL fail\n"
         errors = run_all(Path("spec.md"), text, [])
         assert len(errors) == 1
         assert "spec.md:5:" in errors[0]
@@ -377,12 +371,7 @@ class TestCheckFencedCodeBlocks:
 
     def test_fenced_block_in_oft_off_section_ignored(self):
         text = (
-            "# Title\n"
-            "<!-- oft:off -->\n"
-            "```python\n"
-            "example code\n"
-            "```\n"
-            "<!-- oft:on -->\n"
+            "# Title\n<!-- oft:off -->\n```python\nexample code\n```\n<!-- oft:on -->\n"
         )
         # run_all strips oft:off blocks before checking
         errors = run_all(Path("spec.md"), text, [])

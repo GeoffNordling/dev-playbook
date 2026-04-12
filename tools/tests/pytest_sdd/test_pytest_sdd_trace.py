@@ -34,7 +34,10 @@ class TestRequireJava:
         assert result == "/usr/bin/java"
 
     def test_java_not_found_raises(self):
-        with patch("shutil.which", return_value=None), pytest.raises(RuntimeError, match="java not found"):
+        with (
+            patch("shutil.which", return_value=None),
+            pytest.raises(RuntimeError, match="java not found"),
+        ):
             require_java()
 
 
@@ -50,8 +53,10 @@ class TestRunOftTrace:
         mock_result.stdout = "ok\n"
         mock_result.stderr = ""
 
-        with patch("shutil.which", return_value="/usr/bin/java"), \
-             patch("subprocess.run", return_value=mock_result) as mock_run:
+        with (
+            patch("shutil.which", return_value="/usr/bin/java"),
+            patch("subprocess.run", return_value=mock_result) as mock_run,
+        ):
             result = run_oft_trace(jar, [specs])
 
         assert result.returncode == 0
@@ -75,8 +80,10 @@ class TestRunOftTrace:
         mock_result.stdout = "ok\n"
         mock_result.stderr = ""
 
-        with patch("shutil.which", return_value="/usr/bin/java"), \
-             patch("subprocess.run", return_value=mock_result) as mock_run:
+        with (
+            patch("shutil.which", return_value="/usr/bin/java"),
+            patch("subprocess.run", return_value=mock_result) as mock_run,
+        ):
             run_oft_trace(jar, [reqs, design])
 
         args = mock_run.call_args[0][0]
@@ -94,21 +101,29 @@ class TestRunOftTrace:
         mock_result.stdout = "FAILED: missing coverage\n"
         mock_result.stderr = ""
 
-        with patch("shutil.which", return_value="/usr/bin/java"), \
-             patch("subprocess.run", return_value=mock_result), \
-             pytest.raises(subprocess.CalledProcessError):
+        with (
+            patch("shutil.which", return_value="/usr/bin/java"),
+            patch("subprocess.run", return_value=mock_result),
+            pytest.raises(subprocess.CalledProcessError),
+        ):
             run_oft_trace(jar, [specs])
 
     def test_java_not_found_raises(self, tmp_path):
         jar = tmp_path / "oft.jar"
         jar.write_bytes(b"PK")
 
-        with patch("shutil.which", return_value=None), pytest.raises(RuntimeError, match="java not found"):
+        with (
+            patch("shutil.which", return_value=None),
+            pytest.raises(RuntimeError, match="java not found"),
+        ):
             run_oft_trace(jar, [tmp_path])
 
     def test_missing_jar_raises_before_subprocess(self, tmp_path):
         jar = tmp_path / "missing.jar"
-        with patch("shutil.which", return_value="/usr/bin/java"), \
-             patch("subprocess.run") as mock_run, pytest.raises(FileNotFoundError):
+        with (
+            patch("shutil.which", return_value="/usr/bin/java"),
+            patch("subprocess.run") as mock_run,
+            pytest.raises(FileNotFoundError),
+        ):
             run_oft_trace(jar, [tmp_path])
         mock_run.assert_not_called()

@@ -108,9 +108,7 @@ def check_needs_values(items: list[SpecItem]) -> list[str]:
     for item in items:
         for need in item.needs:
             if need not in KNOWN_ARTIFACT_TYPES:
-                errors.append(
-                    f"{item.id}: unknown artifact type '{need}' in Needs:"
-                )
+                errors.append(f"{item.id}: unknown artifact type '{need}' in Needs:")
     return errors
 
 

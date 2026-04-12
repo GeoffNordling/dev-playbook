@@ -1,7 +1,5 @@
 """End-to-end tests for the pytest-sdd plugin using pytester."""
 
-
-
 VALID_SPEC_ITEM = """\
 ---
 

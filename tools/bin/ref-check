@@ -10,6 +10,13 @@ Usage:
 # /// script
 # requires-python = ">=3.11"
 # ///
+# /// pre-commit
+# id = "ref-check"
+# entry = "python3 tools/bin/ref-check ."
+# pass_filenames = false
+# types = ["markdown"]
+# standard = "standards/repo-documentation.md"
+# ///
 
 import argparse
 import json
@@ -72,12 +79,14 @@ def scan_file(filepath: Path, repo_root: Path) -> list[dict]:
                 target_str = match.group(0)
                 resolved = Path(target_str.replace("~", str(Path.home())))
                 status = classify_ref(resolved, repo_root)
-                results.append({
-                    "source": source,
-                    "line": line_num,
-                    "target": target_str,
-                    "status": status,
-                })
+                results.append(
+                    {
+                        "source": source,
+                        "line": line_num,
+                        "target": target_str,
+                        "status": status,
+                    }
+                )
     return results
 
 
@@ -95,6 +104,15 @@ def main():
     args = parser.parse_args()
 
     repo_root = Path(args.directory).resolve()
+
+    standard = repo_root / "standards" / "repo-documentation.md"
+    if not standard.exists():
+        print(
+            f"ref-check: governing standard not found: {standard}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
     md_files = find_md_files(repo_root)
 
     if not md_files:

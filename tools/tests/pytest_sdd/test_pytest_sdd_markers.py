@@ -92,10 +92,12 @@ class TestGenerateCoverageMarkdown:
         assert "- dsn~auth.login~1" in md
 
     def test_multiple_ids_sorted(self):
-        md = generate_coverage_markdown({
-            "req~z.item~1": {"test::t1"},
-            "req~a.item~1": {"test::t2"},
-        })
+        md = generate_coverage_markdown(
+            {
+                "req~z.item~1": {"test::t1"},
+                "req~a.item~1": {"test::t2"},
+            }
+        )
         # a.item should appear before z.item
         pos_a = md.index("req~a.item~1")
         pos_z = md.index("req~z.item~1")
@@ -103,10 +105,12 @@ class TestGenerateCoverageMarkdown:
 
     def test_generated_markdown_parses_cleanly(self, tmp_path):
         """The generated markdown should be parseable by our own parser."""
-        md = generate_coverage_markdown({
-            "req~auth.login~1": {"test::t1"},
-            "req~auth.logout~2": {"test::t2"},
-        })
+        md = generate_coverage_markdown(
+            {
+                "req~auth.login~1": {"test::t1"},
+                "req~auth.logout~2": {"test::t2"},
+            }
+        )
         f = tmp_path / "coverage.md"
         f.write_text(md, encoding="utf-8")
         items = parse_spec_file(f)

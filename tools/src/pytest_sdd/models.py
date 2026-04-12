@@ -20,6 +20,7 @@ def strip_oft_off_blocks(text: str) -> str:
     Replaces each off-block with the equivalent number of blank lines so that
     line numbers in error messages remain accurate.
     """
+
     def _blank_lines(match: "re.Match[str]") -> str:
         return "\n" * match.group().count("\n")
 
@@ -58,7 +59,9 @@ STATUS_RE = re.compile(r"^Status:\s*(\S+)\s*$", re.MULTILINE)
 NEEDS_RE = re.compile(r"^Needs:\s*(.+)$", re.MULTILINE)
 
 # Covers block: "Covers:\n  - ref\n  - ref"
-COVERS_RE = re.compile(r"^Covers:\s*\n((?:[ \t]*[-*+][ \t]+\S+[ \t]*\n?)+)", re.MULTILINE)
+COVERS_RE = re.compile(
+    r"^Covers:\s*\n((?:[ \t]*[-*+][ \t]+\S+[ \t]*\n?)+)", re.MULTILINE
+)
 
 # Heading patterns
 H3_RE = re.compile(r"^###\s+(.+)$", re.MULTILINE)
@@ -75,10 +78,20 @@ HRULE_RE = re.compile(r"^---\s*$", re.MULTILINE)
 
 VALID_STATUSES = frozenset({"draft", "proposed", "approved"})
 
-KNOWN_ARTIFACT_TYPES = frozenset({
-    "feat", "req", "arch", "dsn", "impl",
-    "utest", "itest", "stest", "sman", "oman",
-})
+KNOWN_ARTIFACT_TYPES = frozenset(
+    {
+        "feat",
+        "req",
+        "arch",
+        "dsn",
+        "impl",
+        "utest",
+        "itest",
+        "stest",
+        "sman",
+        "oman",
+    }
+)
 
 # ---------------------------------------------------------------------------
 # Data types
@@ -89,14 +102,14 @@ KNOWN_ARTIFACT_TYPES = frozenset({
 class SpecItem:
     """A single OFT specification item parsed from a markdown file."""
 
-    id: str              # "req~ing.allowlist-check~1"
-    item_type: str       # "req"
-    name: str            # "ing.allowlist-check"
-    revision: int        # 1
-    title: str           # "Allowlist Check" (from ### heading before ID)
-    status: str          # "approved" (or "" if missing/malformed)
-    body: str            # full segment text (for obligation scanning)
-    needs: list[str] = field(default_factory=list)    # ["dsn", "utest"] or []
-    covers: list[str] = field(default_factory=list)   # ["req~area.name~1", ...] or []
-    source_file: str = ""   # absolute file path
-    line_number: int = 0    # line number of the ID line in the file
+    id: str  # "req~ing.allowlist-check~1"
+    item_type: str  # "req"
+    name: str  # "ing.allowlist-check"
+    revision: int  # 1
+    title: str  # "Allowlist Check" (from ### heading before ID)
+    status: str  # "approved" (or "" if missing/malformed)
+    body: str  # full segment text (for obligation scanning)
+    needs: list[str] = field(default_factory=list)  # ["dsn", "utest"] or []
+    covers: list[str] = field(default_factory=list)  # ["req~area.name~1", ...] or []
+    source_file: str = ""  # absolute file path
+    line_number: int = 0  # line number of the ID line in the file

@@ -52,9 +52,7 @@ def load_config_from_root(root: Path) -> "SddConfig | None":
     # spec_dirs — required
     raw_dirs = section.get("spec_dirs")
     if not raw_dirs:
-        raise ValueError(
-            "[tool.pytest-sdd] missing required field 'spec_dirs'"
-        )
+        raise ValueError("[tool.pytest-sdd] missing required field 'spec_dirs'")
     if isinstance(raw_dirs, str):
         raw_dirs = [raw_dirs]
     spec_dirs = [root / d for d in raw_dirs]
@@ -62,9 +60,7 @@ def load_config_from_root(root: Path) -> "SddConfig | None":
     # oft_jar — required
     raw_jar = section.get("oft_jar")
     if not raw_jar:
-        raise ValueError(
-            "[tool.pytest-sdd] missing required field 'oft_jar'"
-        )
+        raise ValueError("[tool.pytest-sdd] missing required field 'oft_jar'")
     oft_jar = root / raw_jar
 
     return SddConfig(spec_dirs=spec_dirs, oft_jar=oft_jar)

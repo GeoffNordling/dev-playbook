@@ -101,7 +101,10 @@ Needs: utest
         assert len(items) == 1
         item = items[0]
         assert item.item_type == "dsn"
-        assert item.covers == ["req~class.assign-categories~1", "req~class.prefer-specific~1"]
+        assert item.covers == [
+            "req~class.assign-categories~1",
+            "req~class.prefer-specific~1",
+        ]
         assert item.needs == ["utest"]
 
     def test_needs_comma_separated(self, tmp_path):

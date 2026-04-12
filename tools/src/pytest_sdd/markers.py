@@ -52,17 +52,19 @@ def generate_coverage_markdown(covered_ids: dict[str, set[str]]) -> str:
             continue
         name = match.group(2)
         revision = match.group(3)
-        lines.extend([
-            "---",
-            "",
-            f"### Test coverage for {spec_id}",
-            f"`utest~{name}~{revision}`",
-            "Status: approved",
-            "",
-            "Covers:",
-            f"  - {spec_id}",
-            "",
-        ])
+        lines.extend(
+            [
+                "---",
+                "",
+                f"### Test coverage for {spec_id}",
+                f"`utest~{name}~{revision}`",
+                "Status: approved",
+                "",
+                "Covers:",
+                f"  - {spec_id}",
+                "",
+            ]
+        )
     lines.append("---\n")
     return "\n".join(lines)
 

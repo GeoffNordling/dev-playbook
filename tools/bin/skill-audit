@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+"""Audit skill SKILL.md files for front matter conformance.
+
+Scans all SKILL.md files under dotfiles/.claude/skills/ and checks them
+against the conventions in standards/skill-authoring.md.
+
+Usage:
+    skill-audit [directory]
+"""
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pyyaml"]
+# ///
+# /// pre-commit
+# id = "skill-audit"
+# entry = "python3 tools/bin/skill-audit"
+# pass_filenames = false
+# always_run = true
+# standard = "standards/skill-authoring.md"
+# ///
+
+import argparse
+import re
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+import yaml
+
+REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
+BANNED_FIELDS = ("user-invocable",)
+VALID_MODELS = ("haiku", "sonnet", "opus")
+VALID_EFFORTS = ("low", "medium", "high")
+KEBAB_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+
+@dataclass
+class Finding:
+    file: str
+    check: str
+    message: str
+
+    def __str__(self) -> str:
+        return f"{self.file}:{self.check}: {self.message}"
+
+
+def parse_skill(path: Path) -> tuple[dict | None, str]:
+    """Parse YAML front matter and body from a SKILL.md file."""
+    text = path.read_text()
+    if not text.startswith("---\n"):
+        return None, text
+
+    end = text.index("\n---\n", 4)
+    front_matter = yaml.safe_load(text[4:end])
+    body = text[end + 5 :]
+    return front_matter, body
+
+
+def check_required_fields(fm: dict, rel: str) -> list[Finding]:
+    findings = []
+    for field in REQUIRED_FIELDS:
+        if field not in fm:
+            findings.append(Finding(rel, "required-field", f"missing '{field}'"))
+    return findings
+
+
+def check_banned_fields(fm: dict, rel: str) -> list[Finding]:
+    findings = []
+    for field in BANNED_FIELDS:
+        if field in fm:
+            findings.append(
+                Finding(rel, "banned-field", f"'{field}' must not be present")
+            )
+    return findings
+
+
+def check_name(fm: dict, dir_name: str, rel: str) -> list[Finding]:
+    findings = []
+    name = fm.get("name")
+    if name is None:
+        return findings  # already caught by required-field check
+
+    if name != dir_name:
+        findings.append(
+            Finding(
+                rel,
+                "name-match",
+                f"name '{name}' does not match directory '{dir_name}'",
+            )
+        )
+    if not KEBAB_RE.match(name):
+        findings.append(Finding(rel, "name-format", f"name '{name}' is not kebab-case"))
+    return findings
+
+
+def check_description(fm: dict, rel: str) -> list[Finding]:
+    findings = []
+    desc = fm.get("description")
+    if desc is None:
+        return findings
+
+    if len(desc) > 80:
+        findings.append(
+            Finding(
+                rel, "description-length", f"description is {len(desc)} chars (max 80)"
+            )
+        )
+    if desc.endswith("."):
+        findings.append(
+            Finding(rel, "description-period", "description has trailing period")
+        )
+    return findings
+
+
+def check_model(fm: dict, rel: str) -> list[Finding]:
+    model = fm.get("model")
+    if model is None:
+        return []
+    if model not in VALID_MODELS:
+        return [Finding(rel, "model-value", f"model '{model}' not in {VALID_MODELS}")]
+    return []
+
+
+def check_effort(fm: dict, rel: str) -> list[Finding]:
+    effort = fm.get("effort")
+    if effort is None:
+        return []
+    if effort not in VALID_EFFORTS:
+        return [
+            Finding(rel, "effort-value", f"effort '{effort}' not in {VALID_EFFORTS}")
+        ]
+    return []
+
+
+def check_disable_model_invocation(fm: dict, rel: str) -> list[Finding]:
+    value = fm.get("disable-model-invocation")
+    if value is None:
+        return []
+    if not isinstance(value, bool):
+        return [
+            Finding(
+                rel,
+                "dmi-type",
+                f"disable-model-invocation must be boolean, got '{value}'",
+            )
+        ]
+    return []
+
+
+def check_body_h1(body: str, rel: str) -> list[Finding]:
+    for line in body.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("# "):
+            return []
+        return [
+            Finding(rel, "body-h1", f"body must start with H1, got: '{stripped[:40]}'")
+        ]
+    return [Finding(rel, "body-h1", "body is empty")]
+
+
+def audit_skill(path: Path, repo_root: Path) -> list[Finding]:
+    rel = str(path.relative_to(repo_root))
+    dir_name = path.parent.name
+
+    try:
+        fm, body = parse_skill(path)
+    except Exception as e:
+        return [Finding(rel, "parse", str(e))]
+
+    if fm is None:
+        return [Finding(rel, "front-matter", "no YAML front matter found")]
+
+    findings = []
+    findings.extend(check_required_fields(fm, rel))
+    findings.extend(check_banned_fields(fm, rel))
+    findings.extend(check_name(fm, dir_name, rel))
+    findings.extend(check_description(fm, rel))
+    findings.extend(check_model(fm, rel))
+    findings.extend(check_effort(fm, rel))
+    findings.extend(check_disable_model_invocation(fm, rel))
+    findings.extend(check_body_h1(body, rel))
+    return findings
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Repository root to scan (default: current directory)",
+    )
+    args = parser.parse_args()
+
+    repo_root = Path(args.directory).resolve()
+
+    standard = repo_root / "standards" / "skill-authoring.md"
+    if not standard.exists():
+        print(
+            f"skill-audit: governing standard not found: {standard}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    skills_dir = repo_root / "dotfiles" / ".claude" / "skills"
+    skill_files = sorted(skills_dir.glob("*/SKILL.md"))
+
+    if not skill_files:
+        print(f"skill-audit: no skills found in {skills_dir}", file=sys.stderr)
+        sys.exit(2)
+
+    all_findings = []
+    for path in skill_files:
+        all_findings.extend(audit_skill(path, repo_root))
+
+    for f in all_findings:
+        print(f)
+
+    issues = len(all_findings)
+    skills = len(skill_files)
+    if issues:
+        print(f"skill-audit: {skills} skills, {issues} issue(s)", file=sys.stderr)
+    else:
+        print(f"skill-audit: {skills} skills, all ok", file=sys.stderr)
+
+    sys.exit(1 if issues else 0)
+
+
+if __name__ == "__main__":
+    main()

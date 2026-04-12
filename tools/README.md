@@ -35,13 +35,57 @@ Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts
 
 ### Standalone scripts (`bin/`)
 
-Each script is self-contained with a PEP 723 `# /// script` block. Skills reference them by absolute path.
+Each script is self-contained with a PEP 723 `# /// script` block. Skills reference them by absolute path. Scripts fall into two categories.
 
-| Tool | Location | Purpose |
+#### Validation scripts
+
+Run automatically on every commit via pre-commit hooks. Each validation script:
+
+- Declares a `# /// pre-commit` metadata block (see below) with its hook config and the standard it enforces
+- Asserts its governing standard exists at startup — fails immediately if the standard has moved or been renamed
+- Exits 0 on success, 1 on failure, 2 on tool error
+- Writes machine-readable findings to stdout (one line per finding)
+- Writes a human-readable summary to stderr (one line)
+
+| Tool | Standard | Purpose |
 |------|----------|---------|
-| `py-outline` | `bin/py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
-| `ref-check` | `bin/ref-check` | Scan markdown files for cross-references and report broken links as JSON Lines |
-| `repo-sync` | `bin/repo-sync` | Sync all workspace repos with their remotes (auto-pull/push when safe) |
+| `ref-check` | [repo-documentation.md](../standards/repo-documentation.md) | Broken cross-references in markdown |
+| `skill-audit` | [skill-authoring.md](../standards/skill-authoring.md) | Skill front matter conformance |
+
+##### `# /// pre-commit` metadata
+
+Validation scripts embed pre-commit hook configuration as inline metadata, similar to PEP 723. The `generate-pre-commit` script reads these blocks to produce the generated section of `.pre-commit-config.yaml`.
+
+```python
+# /// pre-commit
+# id = "skill-audit"
+# entry = "python3 tools/bin/skill-audit"
+# pass_filenames = false
+# files = "dotfiles/\\.claude/skills/"
+# standard = "standards/skill-authoring.md"
+# ///
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | Hook identifier (used in `.pre-commit-config.yaml`) |
+| `entry` | Yes | Command to run |
+| `pass_filenames` | Yes | Whether pre-commit passes changed filenames as arguments |
+| `types` | No | File types that trigger the hook (e.g., `["markdown"]`) |
+| `always_run` | No | If `true`, run on every commit regardless of which files changed |
+| `files` | No | Regex pattern limiting which file paths trigger the hook |
+| `standard` | Yes | Path (relative to repo root) to the standards document this script enforces |
+
+After adding or modifying a `# /// pre-commit` block, run `python3 tools/bin/generate-pre-commit` to regenerate the hooks.
+
+#### Utility scripts
+
+Run ad hoc on user demand. Not part of the pre-commit pipeline.
+
+| Tool | Purpose |
+|------|---------|
+| `py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
+| `repo-sync` | Sync all workspace repos with their remotes (auto-pull/push when safe) |
 
 ### Packages (`src/`)
 
@@ -72,13 +116,31 @@ py-outline src/mypackage > structure.txt
 
 ### ref-check
 
-Scan all markdown files for `~/workspace/` cross-references and report their status as JSON Lines to stdout. Designed for agent consumption.
+Scan all markdown files for `~/workspace/` cross-references and report their status as JSON Lines to stdout. Designed for agent consumption. Enforces the cross-reference conventions in [repo-documentation.md](../standards/repo-documentation.md).
 
 ```bash
 ref-check [directory]
 ```
 
 Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok`, `broken`, or `external`). Exit code 1 if any broken references.
+
+### skill-audit
+
+Audit all skill SKILL.md files for front matter conformance against [skill-authoring.md](../standards/skill-authoring.md).
+
+```bash
+skill-audit [directory]
+```
+
+One line per finding to stdout in `file:check: message` format. Exit code 1 if any issues found.
+
+### generate-pre-commit
+
+Scan `tools/bin/` for `# /// pre-commit` metadata blocks and regenerate the validation hooks section of `.pre-commit-config.yaml`. Run this after adding or changing a validation script.
+
+```bash
+generate-pre-commit [directory]
+```
 
 ### repo-sync
 
