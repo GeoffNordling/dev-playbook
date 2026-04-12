@@ -6,6 +6,37 @@ conventions in the [spec format reference](spec-format.md).
 
 ---
 
+Spec-driven development is a project-level commitment. The human decides whether a project uses this workflow. When this document is referenced by a project, all of its rules apply.
+
+---
+
+## Core Principles
+
+**Spec-as-source.** The spec is the only artifact the human authors. The human never edits code directly — all code is generated from the spec. The human writes and maintains the spec; agents derive tasks, write tests, and implement code from it.
+
+**The spec `SHALL` explicitly state what NOT to build.** Scope exclusions are as important as requirements. Without them, the agent makes reasonable assumptions that turn out wrong. An explicit out-of-scope section prevents the agent from building things you didn't ask for.
+
+**The spec `SHALL` always describe reality, not intent.** When implementation diverges from the spec, the spec `SHALL` be updated to reflect what was actually built. Changes to behavior `SHOULD` include a corresponding spec update in the same commit or pull request. A stale spec is a maintenance failure.
+
+**Functional requirements are about behavior; non-functional requirements are about system qualities.** Non-functional requirements — performance, security, scalability, reliability — constrain how well the system does what it does. They are valid spec items that follow the same format. This workspace consciously omits them because personal projects rarely have meaningful non-functional constraints.
+
+**Functional before design.** Decide what the system does before deciding how it's structured. A functional spec is always written first. A design spec is written after behavior is settled.
+
+**The design layer's primary role is to name the interfaces that tests target.** Each design item connects a functional requirement to the specific code (module, class, function) that fulfills it. The red agent writes tests against that interface; the green agent implements it. Without this layer, the red agent has no target — the functional requirement says what the system does, but not where the code lives or what the public API looks like.
+
+The design layer's secondary role is to document design decisions — algorithm choice, data structure, component boundary, error handling strategy — when those decisions exist. Most design items do both; some only do one.
+
+**Every design item `SHALL` earn its place.** A design item earns its place by doing one or both of:
+
+- **Naming an interface** — connecting a functional requirement to the specific code that fulfills it. This is the essential bridge between behavioral requirements and testable code.
+- **Making a concrete design decision** — something the functional requirement deliberately left open, where options were weighed and a choice was made.
+
+A design item `SHALL NOT` merely restate the functional requirement's behavior without naming an interface or making a decision. Every design item must do at least one of the above. Most functional requirements will have a corresponding design item, because the red agent needs a target even when there is no hard design decision. Cases where a functional requirement skips the design layer entirely are rare.
+
+For how to write and format spec items — IDs, keywords, coverage chains, EARS templates, RFC 2119 obligations, and file structure — see the [spec format reference](spec-format.md).
+
+---
+
 ## References
 
 - RFC 2119 — Key Words for Use in RFCs to Indicate Requirement Levels (Bradner, 1997)
@@ -13,58 +44,3 @@ conventions in the [spec format reference](spec-format.md).
 - Joel on Software — Painless Functional Specifications, Parts 1–4 (Spolsky, Oct 2000)
 - Design Docs at Google — Industrial Empathy (Ubl)
 - Engineering Practices for LLM Application Development — ThoughtWorks (Tan & Wang, Feb 2024)
-
----
-
-## Core Principles
-
-**Write the spec before writing code.** Every decision you skip in a spec gets made anyway — just later, under worse conditions, mid-build or post-ship. Front-loading decisions is always cheaper.
-
-**Only write a spec when there are hard decisions to document.** If a spec would just be an implementation manual with no genuine choices in it, there was nothing worth writing. The spec earns its existence by capturing difficult decisions — options considered, trade-offs weighed, and the choice made. If there were no hard decisions, skip the doc.
-
-**The spec `SHALL` explicitly state what NOT to build.** Scope exclusions are as important as requirements. Without them, the agent makes reasonable assumptions that turn out wrong. An explicit out-of-scope section prevents the agent from building things you didn't ask for.
-
-**The spec is a living document.** It `SHALL` stay in sync with what the system actually does as development proceeds. Stale specs are a maintenance failure, not an inherent property of specs. Changes to behavior `SHOULD` include a corresponding spec update in the same commit or pull request.
-
-**Functional before design.** Decide what the system does before deciding how it's structured. A functional spec is always written first. A design spec is written after behavior is settled.
-
-**Every design item `SHALL` earn its place.** A design item earns its place by doing one or both of:
-
-- **Making a concrete design decision** — algorithm choice, data structure, component boundary, error handling strategy. Something the functional requirement deliberately left open.
-- **Assigning ownership** — connecting a functional requirement to the specific code (module, class, function) that fulfills it. The red agent writes tests against that interface; the green agent implements it.
-
-A design item that does neither — that merely restates the functional requirement's behavior without naming an interface or making a decision — is a passthrough and `SHALL` be deleted. Most functional requirements will have a corresponding design item, because even when there is no hard design decision, the ownership assignment tells agents what to build against. Cases where a functional requirement skips the design layer entirely are rare.
-
-**Humans `SHALL NOT` write tasks.** Deriving and managing implementation tasks is the agent's job. The human only ever edits the spec. The agent creates, tracks, and completes its own tasks from the spec. Writing tasks manually reduces the human to a project manager for the LLM and defeats the purpose of agentic development.
-
-**Plans are ephemeral; specs are durable.** Claude Code's plan mode is a thinking tool — plans are intentionally not version controlled and are disposable once used. The spec in Git is the durable source of truth. These are distinct artifacts and `SHALL NOT` be conflated.
-
-For how to write and format spec items — IDs, keywords, coverage chains, EARS templates, RFC 2119 obligations, and file structure — see the [spec format reference](spec-format.md).
-
----
-
-## Deviations
-
-**Deviations from the spec `SHALL` be documented before merging.** When implementation diverges from the spec, the deviation is captured and the spec is updated to reflect what was actually built. The spec always describes reality, not intent.
-
----
-
-## The Three Levels of Spec-Driven Development
-
-These levels represent a progression of maturity. Each builds on the previous.
-
-| Level | Definition |
-|---|---|
-| **Spec-First** | The spec is written before any code. Implementation follows the spec. |
-| **Spec-Anchored** | The spec remains alive and current throughout the project lifecycle. It is updated as the system evolves. |
-| **Spec-as-Source** | The spec is the only artifact the human authors. The human never edits code directly — all code is generated from the spec. This is the most aspirational level and the target practice. |
-
----
-
-## When Spec-Driven Development is Overkill
-
-SDD is not always warranted. Apply the same hard-decisions test: if there is nothing difficult to decide and document, the overhead is not justified.
-
-SDD is appropriate for: large refactors touching many files, migrations, features with unclear or evolving requirements.
-
-SDD is overkill for: single-file changes, simple well-defined bug fixes, trivially small features with no real decisions to make.
