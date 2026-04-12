@@ -1,6 +1,7 @@
 ---
 name: ref-check
 description: Scan for broken cross-references between markdown files
+disable-model-invocation: false
 model: sonnet
 effort: medium
 allowed-tools: Bash(python3 *)

@@ -10,3 +10,4 @@ Cross-project engineering standards that apply to all repositories in the worksp
 | [development-workflow.md](development-workflow.md) | How we use GitHub Issues, branches, PRs, and spec-driven development across sessions |
 | [spec-driven-development.md](spec-driven-development.md) | Philosophy, principles, and when to use spec-driven development |
 | [spec-format.md](spec-format.md) | How specs are written and formatted: OFT structure, EARS templates, RFC 2119 obligations, file layout |
+| [skill-authoring.md](skill-authoring.md) | Conventions for writing Claude Code skills |

@@ -1,7 +1,7 @@
 ---
 name: orient-workspace-meta
 description: Orient to the dev-playbook meta repo
-disable-model-invocation: true
+disable-model-invocation: false
 model: sonnet
 effort: medium
 ---

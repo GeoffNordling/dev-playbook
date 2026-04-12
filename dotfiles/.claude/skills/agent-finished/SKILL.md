@@ -1,8 +1,9 @@
 ---
 name: agent-finished
-description: Resume workflow after a parallel agent finishes
-user-invocable: false
+description: Tell the agent that a parallel agent has finished
+disable-model-invocation: true
 model: opus
+effort: low
 ---
 
 # Agent Finished
