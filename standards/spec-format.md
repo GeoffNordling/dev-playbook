@@ -7,8 +7,6 @@ Our specs use two complementary systems:
 
 RFC 2119 and EARS handle how individual requirements read. OFT handles structure and linking. The two systems are independent and complementary.
 
----
-
 ## References
 
 - RFC 2119 — Key Words for Use in RFCs to Indicate Requirement Levels (Bradner, 1997)
@@ -16,11 +14,9 @@ RFC 2119 and EARS handle how individual requirements read. OFT handles structure
 - OFT user guide (canonical format reference): https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md
 - OFT repository: https://github.com/itsallcode/openfasttrace
 
----
+## Prose: RFC 2119 and EARS
 
-## Writing Specs with RFC 2119 and EARS
-
-### RFC 2119 Obligation Levels
+### Obligation Levels
 
 Requirements use RFC 2119 modal verbs to indicate the strength of each obligation. This workspace uses a subset of the RFC 2119 vocabulary for consistency:
 
@@ -34,11 +30,9 @@ Requirements use RFC 2119 modal verbs to indicate the strength of each obligatio
 
 All uppercase obligation verbs `SHALL` be wrapped in backticks wherever they appear — in requirements, prose, and section introductions. This is a universal formatting rule with no exceptions.
 
-### One Obligation Level Per Requirement
+A requirement `SHALL NOT` mix obligation levels (absolute, preference, optional). For example, a requirement that contains both `SHALL` and `SHOULD` is mixing an absolute obligation with a preference — the `SHOULD` behavior `SHALL` be split into its own spec item with its own ID. Using both `SHALL` and `SHALL NOT` within a requirement is permitted because they are the same level (absolute).
 
-A requirement `SHALL NOT` mix obligation levels. If a multi-sentence requirement contains behavior at a different obligation level, that behavior `SHALL` be split into its own spec item with its own ID. Repeating the same keyword within a requirement is permitted.
-
-### EARS Sentence Templates
+### Sentence Templates
 
 Requirements `SHALL` be written using EARS (Easy Approach to Requirements Syntax) sentence templates. EARS provides the sentence structure; the obligation level table above provides the strength of obligation.
 
@@ -52,24 +46,23 @@ Requirements `SHALL` be written using EARS (Easy Approach to Requirements Syntax
 
 Substitute the modal verb in any EARS sentence to grade the requirement's obligation level.
 
-### Other Prose Conventions
+### Prose Conventions
 
 **LaTeX math notation.** Specs `SHALL` use LaTeX math notation (e.g., `$k$`, `$N-1$`) when referring to variables, quantities, or mathematical relationships. This distinguishes formal variables from prose and renders correctly in markdown environments.
 
 **Artifact type vocabulary conflict.** Spec item names that happen to match an artifact type pattern (3–6 letters, hyphen, 3 digits — e.g., `SHA-256`, `AES-128`) `SHALL` be written in unhyphenated form (`SHA256`, `AES128`). OFT may parse these as malformed IDs.
 
-**Illustrative examples.** A spec section that introduces non-trivial domain vocabulary `SHOULD` include a short illustrative example before the formal requirements. The example grounds the vocabulary in concrete terms so that requirements can reference it without re-explaining.
+**Fenced code blocks.** Spec files `SHALL NOT` contain fenced code blocks (triple backticks). OFT's markdown parser silently ignores all spec items that appear after a fenced code block. Use indented code blocks (4-space indent) instead.
 
-Guidelines:
+**Illustrative examples.** A spec section that introduces non-trivial domain vocabulary `SHOULD` include a short illustrative example before the formal requirements. The example grounds the vocabulary in concrete terms so that requirements can reference it without re-explaining. Guidelines:
+
 - One scenario per section. If a second example is needed, the section's vocabulary may be too overloaded and `SHOULD` be split.
 - Place the example after the section's prose introduction and before the formal spec items.
-- Examples `SHALL` use indented code blocks (4-space indent) or structured format that mirrors what the system actually produces or consumes. Spec files `SHALL NOT` contain fenced code blocks (triple backticks) — OFT's markdown parser silently ignores all spec items that appear after a fenced code block.
+- Examples `SHALL` use indented code blocks (4-space indent) or structured format that mirrors what the system actually produces or consumes.
 
----
+## Structure: OpenFastTrace
 
-## Structuring Specs with OpenFastTrace
-
-### Specification Item ID Format
+### ID Format
 
 Every requirement, design item, or test marker is identified by a tilde-separated ID:
 
@@ -115,7 +108,7 @@ OFT defines a conventional vocabulary of artifact types. Projects `MAY` define a
 | `uman` | User manual |
 | `oman` | Operations manual |
 
-### Specification Item Structure
+### Item Structure
 
 A complete specification item in a Markdown file:
 
@@ -143,42 +136,20 @@ Needs: dsn, utest
 
 The heading (`### Login Credential Validation`) is a standard Markdown heading and gives the item a human-readable title. The ID line immediately follows. The item ends when the next heading, ID line, or horizontal rule (`---`) is encountered.
 
-#### Keywords
-
 Every keyword is followed by a colon. Content may start on the same line or the next, depending on the keyword.
 
-**`Status:`** — lifecycle state of the item. One of `draft`, `proposed`, `approved`. Appears before the description. Important: OFT does **not** automatically exclude `draft` items from coverage enforcement — draft items participate in tracing like any other item. Status is informational only.
+| Keyword | Description | Notes |
+|---|---|---|
+| `Status:` | Lifecycle state: `draft`, `proposed`, or `approved`. Appears before the description. | OFT does **not** exclude `draft` items from coverage — status is informational only. |
+| `Covers:` | Upstream IDs this item satisfies. Bullet format (`-`, `*`, or `+`), one ID per line. | Machine-readable claim, not free-form prose. |
+| `Needs:` | Downstream artifact types that `SHALL` cover this item. | Comma-separated (`Needs: dsn, utest`) or bulleted list. Do not mix formats within one item. |
+| `Rationale:` | Why the requirement exists. | Named field so tooling can extract it separately from the description. |
+| `Comment:` | Caveats, implementation notes, or anything that fits neither description nor rationale. | |
+| `Tags:` | Comma-separated labels for filtering traces by team or component. | Optional. |
+| `Depends:` | Ordering dependencies between items. | Does not affect coverage; currently affects XML output only. |
+| `Description:` | Explicit marker for the start of the description body. | Optional — any non-keyword text automatically starts the description. |
 
-**`Covers:`** — explicit upstream links. Lists the IDs this item satisfies. Machine-readable claim; not free-form prose. Bullet format using `-`, `*`, or `+`. One ID per line.
-
-```
-Covers:
-- feat~user-authentication~1
-- feat~session-management~2
-```
-
-**`Needs:`** — declares which downstream artifact types `SHALL` cover this item. OFT fails the trace if any required type is absent. Two syntax variants (do not mix within one item):
-
-```
-Needs: dsn, utest
-```
-```
-Needs:
-- dsn
-- utest
-```
-
-**`Rationale:`** — the reason the requirement exists. Named field so tooling can extract it separately from the description.
-
-**`Comment:`** — caveats, implementation notes, or anything that fits neither description nor rationale.
-
-**`Tags:`** — comma-separated labels for filtering traces by team or component. Optional.
-
-**`Depends:`** — ordering dependencies between items. Does not affect coverage; currently affects XML output only.
-
-**`Description:`** — explicit keyword to mark the start of the description body. Optional: any non-keyword text automatically starts the description. Only needed in unusual layouts.
-
-### The Coverage Chain
+### Coverage Chain
 
 OFT enforces a directed graph of coverage. Each item declares what must cover it downstream (`Needs:`), and each downstream item declares what it covers upstream (`Covers:`). OFT walks this graph and fails if any required link is absent.
 
@@ -223,7 +194,7 @@ arch --> dsn : req~auth.login-validation~1
 
 **Do not use forwarding in this workspace.** When a layer has nothing to say for a particular item, the item `SHALL` skip that layer entirely (by omitting the type from its `Needs:`) rather than creating a hollow passthrough. Forwarding is documented here so you recognize it if you encounter it in the OFT documentation.
 
-### Excluding Sections from OFT Parsing
+### Excluding Sections
 
 When a document contains text that looks like OFT IDs but is not intended to be parsed (examples, reference sections, this document itself), exclude the section:
 
@@ -234,9 +205,7 @@ This section will not be parsed for spec items.
 <!-- oft:on -->
 ```
 
----
-
-## File Structure and Organization
+## File Organization
 
 ### Spec Files
 
@@ -255,21 +224,7 @@ When split:
 
 OFT natively supports hierarchical organization. It scans all Markdown files it encounters recursively, assembling the full coverage graph from whatever IDs and links it finds. File names and folder structure do not affect tracing.
 
-### Requirement Traceability
-
-Every `req` item defined in the functional spec `SHALL` appear in the design spec via at least one `Covers:` link from a `dsn` item. This ensures every functional requirement has been translated into a concrete piece of the design.
-
-OFT (invoked via `pytest-sdd`) verifies this coverage. See [Tooling Integration](#tooling-integration) below.
-
-### Machine-Readable Contracts
-
-Where appropriate, natural language requirements `SHOULD` be paired with machine-readable contracts (OpenAPI specs, JSON Schema) to formally constrain agent behavior. These are especially useful for API boundaries and data structures where ambiguity could cause silent regressions.
-
----
-
-## Tooling Integration
-
-### pytest-sdd
+## Tooling: pytest-sdd
 
 `pytest-sdd` is a pytest plugin that validates OFT spec files as part of the normal test suite. It provides two checks:
 
