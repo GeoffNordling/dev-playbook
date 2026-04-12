@@ -164,7 +164,7 @@ Each arrow represents a coverage relationship: the downstream layer covers the u
 **Which layers are required depends on the project and the item:**
 
 - `feat` is required. Every project `SHALL` begin the chain at `feat`.
-- `dsn` is optional per-item. A `req` item whose behavior requires no design decision `MAY` declare `Needs: utest` or `Needs: itest` directly, skipping `dsn`.
+- `dsn` is expected for most `req` items — see [Every design item SHALL earn its place](spec-driven-development.md#every-design-item-shall-earn-its-place). In rare cases where a `req` item needs neither a design decision nor an ownership assignment, it `MAY` declare `Needs: utest` or `Needs: itest` directly, skipping `dsn`.
 - Each item's `Needs:` declaration `SHALL` list whichever test types are appropriate to verify it. A `req` item may need `utest`, `itest`, or both. A `dsn` item may need `utest`, `itest`, or both.
 
 A **terminating item** has no `Needs:` declaration. OFT treats it as a leaf — nothing downstream is required.

@@ -26,7 +26,14 @@ conventions in the [spec format reference](spec-format.md).
 
 **The spec is a living document.** It `SHALL` stay in sync with what the system actually does as development proceeds. Stale specs are a maintenance failure, not an inherent property of specs. Changes to behavior `SHOULD` include a corresponding spec update in the same commit or pull request.
 
-**Functional before design.** Decide what the system does before deciding how it's structured. A functional spec is always written first. A design spec is written after behavior is settled, defining the components, interfaces, and data structures that the red/green agents will implement against.
+**Functional before design.** Decide what the system does before deciding how it's structured. A functional spec is always written first. A design spec is written after behavior is settled.
+
+**Every design item `SHALL` earn its place.** A design item earns its place by doing one or both of:
+
+- **Making a concrete design decision** — algorithm choice, data structure, component boundary, error handling strategy. Something the functional requirement deliberately left open.
+- **Assigning ownership** — connecting a functional requirement to the specific code (module, class, function) that fulfills it. The red agent writes tests against that interface; the green agent implements it.
+
+A design item that does neither — that merely restates the functional requirement's behavior without naming an interface or making a decision — is a passthrough and `SHALL` be deleted. Most functional requirements will have a corresponding design item, because even when there is no hard design decision, the ownership assignment tells agents what to build against. Cases where a functional requirement skips the design layer entirely are rare.
 
 **Humans `SHALL NOT` write tasks.** Deriving and managing implementation tasks is the agent's job. The human only ever edits the spec. The agent creates, tracks, and completes its own tasks from the spec. Writing tasks manually reduces the human to a project manager for the LLM and defeats the purpose of agentic development.
 
