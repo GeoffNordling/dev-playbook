@@ -5,7 +5,7 @@ disable-model-invocation: true
 model: haiku
 effort: low
 argument-hint: "[fast]"
-allowed-tools: Bash(git *)
+allowed-tools: Bash(git status *)
 ---
 
 # Commit-Push
