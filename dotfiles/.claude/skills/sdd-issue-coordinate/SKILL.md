@@ -1,7 +1,10 @@
 ---
 name: sdd-issue-coordinate
-description: Dispatch and coordinate spec-driven development on a GitHub issue
+description: Coordinate spec-driven development on an issue
 disable-model-invocation: true
+model: opus
+effort: high
+argument-hint: "[issue-number-or-url]"
 ---
 
 # SDD Issue Coordinate

@@ -1,7 +1,10 @@
 ---
 name: orient
-description: Orient to the current repository by reading its standard documentation files
+description: Orient to the current repository
 disable-model-invocation: true
+model: sonnet
+effort: medium
+allowed-tools: Bash(ls *) Bash(gh issue list *)
 ---
 
 # Orient

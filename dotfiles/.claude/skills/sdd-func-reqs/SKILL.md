@@ -1,7 +1,9 @@
 ---
 name: sdd-func-reqs
-description: Write or update functional requirements for the project
+description: Write or update functional requirements
 disable-model-invocation: true
+model: opus
+effort: high
 ---
 
 # SDD Func Reqs

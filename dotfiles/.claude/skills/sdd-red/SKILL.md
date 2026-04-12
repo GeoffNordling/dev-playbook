@@ -1,7 +1,9 @@
 ---
 name: sdd-red
-description: Write tests from the spec in the red phase of spec-driven TDD
+description: Write tests from spec (red phase)
 disable-model-invocation: true
+model: opus
+effort: high
 ---
 
 # SDD Red

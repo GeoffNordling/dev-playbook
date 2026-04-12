@@ -1,7 +1,10 @@
 ---
 name: repo-sync
-description: Sync all Git repos in the workspace with their remotes
+description: Sync workspace repos with remotes
 disable-model-invocation: true
+model: haiku
+effort: low
+allowed-tools: Bash(~/workspace/dev-playbook/tools/bin/repo-sync)
 ---
 
 # Repo Sync

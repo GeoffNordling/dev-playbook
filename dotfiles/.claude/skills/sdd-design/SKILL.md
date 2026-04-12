@@ -1,7 +1,9 @@
 ---
 name: sdd-design
-description: Design system structure bridging functional requirements and implementation
+description: Design system structure from functional requirements
 disable-model-invocation: true
+model: opus
+effort: high
 ---
 
 # SDD Design

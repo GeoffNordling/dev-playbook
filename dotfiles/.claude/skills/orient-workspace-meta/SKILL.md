@@ -1,7 +1,9 @@
 ---
 name: orient-workspace-meta
-description: Orient the agent to the workspace's meta repo (dev-playbook)
+description: Orient to the dev-playbook meta repo
 disable-model-invocation: true
+model: sonnet
+effort: medium
 ---
 
 # Orient — Workspace Meta

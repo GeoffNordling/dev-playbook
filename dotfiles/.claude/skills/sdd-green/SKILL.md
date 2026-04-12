@@ -1,7 +1,9 @@
 ---
 name: sdd-green
-description: Make tests pass in the green phase of spec-driven TDD
+description: Implement code to pass tests (green phase)
 disable-model-invocation: true
+model: sonnet
+effort: medium
 ---
 
 # SDD Green
