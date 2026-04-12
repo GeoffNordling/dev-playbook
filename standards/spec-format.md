@@ -182,26 +182,19 @@ Needs:
 
 OFT enforces a directed graph of coverage. Each item declares what must cover it downstream (`Needs:`), and each downstream item declares what it covers upstream (`Covers:`). OFT walks this graph and fails if any required link is absent.
 
-Our standard chain for a project:
+Our standard layers, from upstream to downstream:
 
 ```
-feat~user-authentication~1
-  Needs: req
-      |
-      ▼
-req~auth.login-validation~1         (Covers: feat~user-authentication~1)
-  Needs: dsn, utest
-      |                   |
-      ▼                   ▼
-dsn~auth.login-validation~1     utest~auth.login-validation~1
-  Covers: req~...                 Covers: req~...
-  Needs: itest                    (no Needs — terminates chain)
-      |
-      ▼
-itest~auth.login-validation~1
-  Covers: dsn~...
-  (no Needs — terminates chain)
+feat  →  req  →  dsn  →  utest / itest
 ```
+
+Each arrow represents a coverage relationship: the downstream layer covers the upstream layer. Every item declares which downstream types must cover it (`Needs:`) and which upstream items it satisfies (`Covers:`).
+
+**Which layers are required depends on the project and the item:**
+
+- `feat` is required. Every project `SHALL` begin the chain at `feat`.
+- `dsn` is optional per-item. A `req` item whose behavior requires no design decision `MAY` declare `Needs: utest` or `Needs: itest` directly, skipping `dsn`.
+- Each item's `Needs:` declaration `SHALL` list whichever test types are appropriate to verify it. A `req` item may need `utest`, `itest`, or both. A `dsn` item may need `utest`, `itest`, or both.
 
 A **terminating item** has no `Needs:` declaration. OFT treats it as a leaf — nothing downstream is required.
 
@@ -209,8 +202,6 @@ OFT fails the trace when:
 - Any item's `Needs:` types are not all covered by at least one item of each required type
 - A `Covers:` link references an ID that does not exist at that revision
 - Any item is orphaned (has `Covers:` pointing to a nonexistent item)
-
-The `feat` level is optional for smaller projects. A project with no feature decomposition `MAY` begin the chain at `req`.
 
 ### Revision Policy
 
@@ -230,7 +221,7 @@ OFT supports a forwarding syntax that lets a document layer acknowledge a requir
 arch --> dsn : req~auth.login-validation~1
 ```
 
-**Do not use forwarding in this workspace.** Every layer in our standard chain (`feat → req → dsn → utest/itest`) is expected to have real content. Forwarding is an escape hatch for situations where a chain layer exists structurally but has nothing to say — a situation our chain is designed to avoid. It is documented here so you recognize it if you encounter it in the OFT documentation.
+**Do not use forwarding in this workspace.** When a layer has nothing to say for a particular item, the item `SHALL` skip that layer entirely (by omitting the type from its `Needs:`) rather than creating a hollow passthrough. Forwarding is documented here so you recognize it if you encounter it in the OFT documentation.
 
 ### Excluding Sections from OFT Parsing
 
