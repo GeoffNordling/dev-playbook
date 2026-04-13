@@ -28,5 +28,7 @@ require the user to specify which one (via `$ARGUMENTS`).
    If `$ARGUMENTS` is provided, match it against filenames using
    case-insensitive word matching. If ambiguous or no match, list
    available protocols and ask.
-3. Read the matched `.instruction.md` file.
+3. Read the matched `.instruction.md` file **at HEAD**. Do not look at
+   git history, prior commits, or older versions of the protocol. The
+   current file is the authoritative instruction.
 4. Confirm which protocol was loaded with a one-sentence summary.
