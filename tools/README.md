@@ -155,7 +155,7 @@ repo-sync /path/to/workspace
 
 ### pytest-sdd
 
-pytest plugin for validating OFT spec files as part of the normal test suite. Installed as a dev dependency in each project; configured in `pyproject.toml`. See [spec-format.md](../standards/spec-format.md#tooling-integration) for configuration and invocation.
+pytest plugin for validating OFT spec files as part of the normal test suite. Installed as a dev dependency in each project; configured in `pyproject.toml`. See [tooling.md](../standards/spec-driven-development/tooling.md) for configuration and invocation.
 
 ```bash
 uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"

@@ -1,4 +1,4 @@
-# Spec Format Reference
+# Spec Writing Reference
 
 Our specs use two complementary systems:
 
@@ -81,7 +81,7 @@ In source files, IDs are wrapped in backticks: `` `req~auth.login-validation~1` 
 - No consecutive dots
 - Dots create readable hierarchies: `auth.login-validation`, `parser.segment.timestamp`
 
-**revision** — a positive integer (conventionally starting at 1). See [Revision Policy](#revision-policy).
+**revision** — a positive integer (conventionally starting at 1). See [design-layer.md](design-layer.md#revision-policy) for the revision policy.
 
 Examples:
 ```
@@ -93,20 +93,17 @@ utest~auth.login-validation~3
 
 ### Artifact Types
 
-OFT defines a conventional vocabulary of artifact types. Projects `MAY` define additional custom types; custom types `SHALL` be documented in the project's `specs/` directory.
+This workspace uses five of OFT's artifact types:
 
 | Type | Purpose |
 |------|---------|
 | `feat` | High-level feature |
 | `req` | User/functional requirement |
-| `arch` | Architectural requirement |
 | `dsn` | Design item |
-| `impl` | Implementation marker (in source code) |
 | `utest` | Unit test |
 | `itest` | Integration test |
-| `stest` | System test |
-| `uman` | User manual |
-| `oman` | Operations manual |
+
+OFT supports additional types (`arch`, `impl`, `stest`, `uman`, `oman`) but this workspace does not use them. Projects `MAY` adopt additional types if needed; additional types `SHALL` be documented in the project's `specs/` directory.
 
 ### Item Structure
 
@@ -149,51 +146,6 @@ Every keyword is followed by a colon. Content may start on the same line or the 
 | `Depends:` | Ordering dependencies between items. | Does not affect coverage; currently affects XML output only. |
 | `Description:` | Explicit marker for the start of the description body. | Optional — any non-keyword text automatically starts the description. |
 
-### Coverage Chain
-
-OFT enforces a directed graph of coverage. Each item declares what must cover it downstream (`Needs:`), and each downstream item declares what it covers upstream (`Covers:`). OFT walks this graph and fails if any required link is absent.
-
-Our standard layers, from upstream to downstream:
-
-```
-feat  →  req  →  dsn  →  utest / itest
-```
-
-Each arrow represents a coverage relationship: the downstream layer covers the upstream layer. Every item declares which downstream types must cover it (`Needs:`) and which upstream items it satisfies (`Covers:`).
-
-**Which layers are required depends on the project and the item:**
-
-- `feat` is required. Every project `SHALL` begin the chain at `feat`.
-- `dsn` is expected for most `req` items — see [Every design item SHALL earn its place](spec-driven-development.md#every-design-item-shall-earn-its-place). In rare cases where a `req` item needs neither a design decision nor an ownership assignment, it `MAY` declare `Needs: utest` or `Needs: itest` directly, skipping `dsn`.
-- Each item's `Needs:` declaration `SHALL` list whichever test types are appropriate to verify it. A `req` item may need `utest`, `itest`, or both. A `dsn` item may need `utest`, `itest`, or both.
-
-A **terminating item** has no `Needs:` declaration. OFT treats it as a leaf — nothing downstream is required.
-
-OFT fails the trace when:
-- Any item's `Needs:` types are not all covered by at least one item of each required type
-- A `Covers:` link references an ID that does not exist at that revision
-- Any item is orphaned (has `Covers:` pointing to a nonexistent item)
-
-### Revision Policy
-
-The revision number is a semantic version for the item's meaning.
-
-**Increment** the revision when the semantic content changes — when the requirement means something different than it did before. This immediately breaks all downstream `Covers:` links that referenced the previous revision, forcing downstream documents to explicitly acknowledge and respond to the change.
-
-**Do not increment** for typo fixes, rephrasing that does not change meaning, or formatting changes.
-
-When you increment a revision, update all `Covers:` references in downstream documents to the new revision. If a downstream item's response to the change is "no change needed," update the `Covers:` link and note this in the `Comment:` field.
-
-### Forwarding
-
-OFT supports a forwarding syntax that lets a document layer acknowledge a requirement and pass coverage responsibility downstream without creating a full spec item:
-
-```markdown
-arch --> dsn : req~auth.login-validation~1
-```
-
-**Do not use forwarding in this workspace.** When a layer has nothing to say for a particular item, the item `SHALL` skip that layer entirely (by omitting the type from its `Needs:`) rather than creating a hollow passthrough. Forwarding is documented here so you recognize it if you encounter it in the OFT documentation.
-
 ### Excluding Sections
 
 When a document contains text that looks like OFT IDs but is not intended to be parsed (examples, reference sections, this document itself), exclude the section:
@@ -223,49 +175,3 @@ When split:
 - Each folder `SHALL` contain an `index.md` — a structured Markdown table listing every file with a one-line scope description, so an agent can decide which files to load without reading all of them
 
 OFT natively supports hierarchical organization. It scans all Markdown files it encounters recursively, assembling the full coverage graph from whatever IDs and links it finds. File names and folder structure do not affect tracing.
-
-## Tooling: pytest-sdd
-
-`pytest-sdd` is a pytest plugin that validates OFT spec files as part of the normal test suite. It provides two checks:
-
-- **Lint** (`-m spec -k lint`): structural validation of every `.md` spec file — ID format, Status field, bare obligation keywords, mixed obligation levels, Covers syntax, Needs values.
-- **Trace** (`-m spec -k trace`): full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied.
-
-**Installation:**
-
-```bash
-uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"
-```
-
-**Configuration** in `pyproject.toml`:
-
-```toml
-[tool.pytest-sdd]
-spec_dirs = ["specs/functional_requirements", "specs/design"]
-oft_jar = "../dev-playbook/tools/lib/openfasttrace-4.2.2.jar"
-```
-
-Both fields are required. `spec_dirs` lists the directories containing OFT markdown files; `oft_jar` is the path to the OpenFastTrace JAR (v4.2.2), relative to the project root.
-
-The JAR is vendored once in dev-playbook at `tools/lib/openfasttrace-4.2.2.jar` (gitignored). All workspace projects reference it via the relative path `../dev-playbook/tools/lib/openfasttrace-4.2.2.jar`. This assumes the standard workspace layout where all repos live under `~/workspace/`. If the JAR is not present, download it from https://github.com/itsallcode/openfasttrace/releases/tag/4.2.2 and place it at that path.
-
-Projects that only have functional requirements and no design layer omit `specs/design` from `spec_dirs`:
-
-```toml
-[tool.pytest-sdd]
-spec_dirs = ["specs/functional_requirements"]
-oft_jar = "../dev-playbook/tools/lib/openfasttrace-4.2.2.jar"
-```
-
-**Invocation:**
-
-```bash
-pytest -m spec              # run all spec checks (lint + trace)
-pytest -m spec -k lint      # lint only
-pytest -m spec -k trace     # traceability only
-pytest -m "not spec"        # skip spec checks
-```
-
-Spec checks run automatically when `pytest` is invoked without `-m` flags, interleaved with the normal test suite. The `spec` marker allows selective execution.
-
-**OFT JAR requirement:** Java must be on `PATH`. The JAR file must exist at the configured path. Neither is optional — a missing JAR or missing Java is a hard test failure.

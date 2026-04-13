@@ -36,8 +36,7 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 |--------|----------|---------|
 | Repo documentation | `standards/repo-documentation.md` | Required/optional files for every repo and their scope |
 | Development workflow | `standards/development-workflow.md` | Issues, branches, draft PRs, spec-driven development |
-| Spec-driven development | `standards/spec-driven-development.md` | Philosophy, principles, and when to use spec-driven development |
-| Spec format | `standards/spec-format.md` | How specs are written: OFT structure, EARS templates, RFC 2119 obligations, file layout |
+| Spec-driven development | `standards/spec-driven-development/` | Philosophy, writing conventions, design layer, tooling |
 
 ### Agent configuration (dotfiles/)
 

@@ -10,7 +10,7 @@ effort: high
 
 Collaborate with the user to design the system's structure before implementation begins. The design spec is the bridge between the functional spec and the red/green implementation phase.
 
-The [spec format reference](~/workspace/dev-playbook/standards/spec-format.md) defines the OFT format for spec items, traceability, and file structure. Follow those conventions for `design.md`. For guidance on when a design spec is warranted and how it relates to ADRs, see the [spec-driven-development standard](~/workspace/dev-playbook/standards/spec-driven-development.md).
+The [spec writing reference](~/workspace/dev-playbook/standards/spec-driven-development/writing.md) defines the OFT format for spec items and file structure. The [design layer standard](~/workspace/dev-playbook/standards/spec-driven-development/design-layer.md) defines what design items are for, the coverage chain, and revision policy. Follow both for `design.md`.
 
 When your work is complete and approved, commit your changes and push the branch.
 

@@ -24,8 +24,8 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 
 1. Check for a handoff file at `<project_root>/.claude/sdd-handoff.md`. If
    it exists, read it for issue context and scope.
-2. Read the spec format reference for spec conventions:
-   `~/workspace/dev-playbook/standards/spec-format.md`
+2. Read the spec writing reference for spec conventions:
+   `~/workspace/dev-playbook/standards/spec-driven-development/writing.md`
 2. Read the project's existing specs if they exist:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - The project's `CLAUDE.md`
