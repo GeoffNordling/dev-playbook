@@ -15,7 +15,7 @@ Load a protocol instruction for the current session.
 When only one protocol exists, load it automatically without requiring
 an argument. Currently hardcoded to:
 
-`directed-workflow-faithful-projection`
+`align-map-execute`
 
 When multiple protocols exist in the directory, remove this default and
 require the user to specify which one (via `$ARGUMENTS`).
