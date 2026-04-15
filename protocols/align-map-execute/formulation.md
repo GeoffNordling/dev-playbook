@@ -42,14 +42,14 @@ evaluate, and iteratively refining the agent's model of human intent.
 |--------|------|-------------|
 | $O$ | Objective | The explicit statement of what the task should accomplish — the human's best articulation of $H$, communicated precisely enough for the agent to act on |
 | $S$ | Scope | The boundary of the task — what is in and what is out: which artifacts to examine (often a codebase) and to what depth (level of abstraction) |
-| $R$ | References | Documents for agent context and/or normative standards |
 | $F$ | Facets | The dimensions along which the human evaluates the territory — what the human cares about. Each facet becomes a column of $M$ |
+| $R$ | References | Documents for agent context and/or normative standards |
 
 #### Constructed
 
 | Symbol | Name | Description |
 |--------|------|-------------|
-| $A$ | Alignment | The shared operating model — the human and agent's working approximation of $H$, encoding how they have agreed to work: quality criteria, what to bring back for evaluation. Constructed in Stage 1 from $O$, $S$, $R$, $F$; persisted in the protocol state document, mutable throughout |
+| $A$ | Alignment | The shared operating model — the human and agent's working approximation of $H$, encoding how they have agreed to work: quality criteria, what to bring back for evaluation. Constructed in Stage 1 from $O$, $S$, $F$, $R$; persisted in the protocol state document, mutable throughout |
 | $M$ | Map | The map of the territory — a matrix whose columns are the facets in $F$ and whose rows are regions discovered by surveying $S$. Each cell is a descriptor: what is there, not whether it is good. Constructed in Stage 2, persisted in the protocol state document, mutable throughout |
 
 #### Operational
@@ -59,8 +59,8 @@ evaluate, and iteratively refining the agent's model of human intent.
 | $C_a$ | Agent context | Token budget for a single agent pass; discrete, finite. Degrades under load — a leaner context produces sharper reasoning |
 | $C_h$ | Human context | What a human can hold in mind simultaneously; latent, finite. Smaller than $C_a$ for raw information, richer for abstraction and judgment. Same degradation applies |
 | $\kappa$ | Agent capability | Effective capability of the agent for this task: $\kappa(O, S, F, R, C_a)$. Not fixed — the same model has different $\kappa$ for different tasks. Improves as the frontier advances |
-| $Q^*$ | Quality threshold | The minimum acceptable quality of the agent's work at each step — latent, never directly observable by either party |
-| $\sigma^*$ | Optimal step size | The latent optimal amount of work per iteration — a property of the task/agent/alignment configuration, not a human preference. Neither party knows $\sigma^*$ |
+| $Q^\ast$ | Quality threshold | The minimum acceptable quality of the agent's work at each step — latent, never directly observable by either party |
+| $\sigma^\ast$ | Optimal step size | The latent optimal amount of work per iteration — a property of the task/agent/alignment configuration, not a human preference. Neither party knows $\sigma^\ast$ |
 | $\sigma$ | Step size | How far the agent goes any time it is operating on its own before checking back: $\sigma = f(\kappa)$. Applies at whatever scale the agent happens to be working. Higher capability, bigger steps. $\sigma$ bounds the accumulated drift between the agent's working model and $H$ — the human cannot observe quality directly, so smaller $\sigma$ limits the risk of unobserved degradation |
 | $L$ | Intent calibration log | Persistent record of human direction — each entry captures a finding the agent raised, the human's response, and the implication for future work. Organized by $F$. Survives context resets; enables a fresh agent to reconstruct $A$ |
 
@@ -83,14 +83,14 @@ Because $\dim(S) \gg C_h$, $F$, $A$, and $M$ must each be:
 
 ## Stage 1: Build the Shared Alignment
 
-The human provides $O$, $S$, $R$, and $F$. The agent forms an
+The human provides $O$, $S$, $F$, and $R$. The agent forms an
 initial alignment state $A$:
 
-$$A_0 = f(O,\; S,\; R,\; F)$$
+$$A_0 = f(O,\; S,\; F,\; R)$$
 
-$A^*$ is the shared operating model — how the human and agent have
+$A^\ast$ is the shared operating model — how the human and agent have
 agreed to work: what quality criteria to apply, what the agent should
-bring back for evaluation. $A^*$ persists
+bring back for evaluation. $A^\ast$ persists
 as a section of the protocol state document and governs all
 subsequent work.
 
@@ -99,7 +99,7 @@ Each question-response pair updates the alignment:
 
 $$A_{i+1} = A_i + \Delta_i$$
 
-This continues until the human signals confidence. Let $A^*$ denote
+This continues until the human signals confidence. Let $A^\ast$ denote
 the approved alignment.
 
 ---
@@ -121,7 +121,7 @@ $S$, conditioned on $A$ and $F$:
 
 $$\pi : (A,\; F,\; S) \;\to\; M$$
 
-$$M_0 = \pi(A^*,\; F,\; S)$$
+$$M_0 = \pi(A^\ast,\; F,\; S)$$
 
 $\pi$ must be faithful enough that **approving both $A$ and $M$ is
 equivalent to approving the operating model and the exhaustive
@@ -141,7 +141,7 @@ This continues until the human approves.
 The agent persists the full protocol state as the **protocol state
 document** (`PROTOCOL_STATE.md` in the project repo). It contains:
 
-- $O$, $S$, $R$, $F$ — as refined through alignment
+- $O$, $S$, $F$, $R$ — as refined through alignment
 - $A$ — the shared alignment reached in Stage 1
 - $M$ — the map produced in Stage 2
 - $L$ — the intent calibration log, updated during Stage 4
@@ -157,7 +157,7 @@ conversation that produced it.
 The agent and human collaborate to satisfy $H$ by executing work
 across the regions of $M$, updating $A$ and $M$ as understanding
 evolves. Execution has two convergence goals: converge on $H$ so
-work is done correctly, and converge on $\sigma^*$ so work is done
+work is done correctly, and converge on $\sigma^\ast$ so work is done
 efficiently.
 
 ### Work loop
@@ -176,8 +176,8 @@ efficiently.
 
 $\sigma$ governs how far the agent goes autonomously — in both
 analysis and action — before checking back with the human. The
-agent approximates $\sigma^*$ conservatively: it never knows
-whether its output meets $Q^*$, so smaller $\sigma$ limits the
+agent approximates $\sigma^\ast$ conservatively: it never knows
+whether its output meets $Q^\ast$, so smaller $\sigma$ limits the
 risk of unobserved drift from $A$. As $A$ improves, $\sigma$ can
 grow — the agent earns autonomy.
 
@@ -192,7 +192,7 @@ response, and the implication for future work.
 $L$ survives context resets. A fresh agent reading $L$ reconstructs
 $A$ without access to the conversations that produced it. Over
 time, $L$ refines $A$, which in turn allows $\sigma$ to grow
-toward $\sigma^*$.
+toward $\sigma^\ast$.
 
 After completing a unit of work, the human and agent update $M$
 (status, structure) and may revise $A$ if the work revealed a gap
