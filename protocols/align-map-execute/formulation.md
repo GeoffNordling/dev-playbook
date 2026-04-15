@@ -86,7 +86,7 @@ Because $\dim(S) \gg C_h$, $F$, $A$, and $M$ must each be:
 The human provides $O$, $S$, $F$, and $R$. The agent forms an
 initial alignment state $A$:
 
-$$A_0 = f(O,\; S,\; F,\; R)$$
+$$A_0 = f(O,  S,  F,  R)$$
 
 $A^\ast$ is the shared operating model — how the human and agent have
 agreed to work: what quality criteria to apply, what the agent should
@@ -119,9 +119,9 @@ cell $M_{wf}$ describes region $w$ along facet $f$.
 The agent produces $M$ by applying a projection operator $\pi$ to
 $S$, conditioned on $A$ and $F$:
 
-$$\pi : (A,\; F,\; S) \;\to\; M$$
+$$\pi : (A,  F,  S)  \to  M$$
 
-$$M_0 = \pi(A^\ast,\; F,\; S)$$
+$$M_0 = \pi(A^\ast,  F,  S)$$
 
 $\pi$ must be faithful enough that **approving both $A$ and $M$ is
 equivalent to approving the operating model and the exhaustive
@@ -130,7 +130,7 @@ survey**.
 The human evaluates $M$ and provides feedback. Each round of
 feedback updates $A$, $M$, or both:
 
-$$M_{j+1} = \pi(A_j + \Delta_j,\; F,\; S)$$
+$$M_{j+1} = \pi(A_j + \Delta_j,  F,  S)$$
 
 This continues until the human approves.
 
