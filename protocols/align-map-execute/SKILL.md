@@ -61,6 +61,9 @@ The user gives you four things to start:
 - **References** — documents you should read for context or as
   normative standards. Read all references in full.
 
+If the user does not provide one of the four, ask for it — do not infer
+it from context and move on.
+
 From these, form your initial understanding of the user's intent. Then
 ask clarifying questions to sharpen that understanding — one round at a
 time, as many rounds as needed. Each answer updates your model of what
@@ -68,7 +71,12 @@ the user actually wants. Focus your questions on intent: the user's
 priorities, quality bar, what matters most. Save tactical decisions
 about specific situations for Phase 3.
 
-Continue until the user signals they are confident you understand.
+Before moving on from Phase 1, restate each of the four inputs back to
+the user as a distinct, named statement: **Objective**, **Scope**,
+**Facets**, and **References**. Each statement must be precise enough
+for the user to say "no, that's wrong." Do not proceed to Phase 2 until
+the user has confirmed all four.
+
 The result is the **shared alignment** — a mutual understanding that
 governs everything that follows. The shared alignment is the operating
 model: how you and the user have agreed to work. It has two sections:
