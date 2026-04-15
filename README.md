@@ -30,6 +30,12 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 
 ## What's in this repo
 
+### Protocols (protocols/)
+
+| Object | Location | Purpose |
+|--------|----------|---------|
+| Align, Map, Execute | `protocols/align-map-execute/` | Structured human-agent collaboration on large-scope tasks |
+
 ### Standards
 
 | Object | Location | Purpose |

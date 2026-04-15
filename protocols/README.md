@@ -1,0 +1,55 @@
+# Protocols
+
+We find it useful to approach complex problems by first decomposing them formally: name the primitives, define their relationships, and impose algorithmic structure. This organizes the mind, exposes gaps, and supports consistent implementation.
+
+In that spirit, this playbook defines a **protocol** as an augmented skill with two components:
+- **Formulation** (`formulation.md`). A pseudo-mathematical algorithm that lets us step back from the particulars of a project and reason about the workflow itself. When we are always zoomed in — this codebase, this bug, this spec — we optimize locally but never examine the system we are operating within. The formulation gives us a general, abstract vocabulary for that system: objects we can name, relationships we can question, constraints we can tighten or relax. It uses the skeleton of a formal framework, but is pre-rigorous. The objects are not precise enough to support proofs. The notation imposes discipline on our thinking without claiming rigor it does not have.
+- **Skill** (`SKILL.md`). A faithful, plain-language translation of the algorithm that an agent executes directly. We have a strong prior belief (not tested) that invoking the formulation directly would degrade the executing agent's performance by diverting attention from the task to the notation. This translation may also emphasize specific operational details that do not naturally fit within the formal specification. 
+
+Both documents live side-by-side in the protocol directory. The skill is symlinked into `.claude/skills/` so that Claude Code can invoke it.
+
+## Index
+
+| Protocol | Description |
+|----------|-------------|
+| [Align, Map, Execute](align-map-execute/) | Human-agent collaborative work on tasks whose scope exceeds what the human can hold in mind |
+
+## Field Notes
+
+### v0: Structure reduces variance
+
+After completing v0 of Align, Map, Execute, we questioned whether the
+protocol describes anything beyond a well-run Claude Code session. The
+core loop — align on intent, search the space, present a summary, human
+directs, agent acts — is what a competent user already does intuitively.
+
+The value is not in prescribing new behavior. It is in naming and
+structuring the objects. When the workflow is implicit, every session
+produces a bespoke, unrepeatable interaction. The agent gives whatever
+summary feels natural; the human steers by instinct. This works, but
+the variance is high. There is no artifact to evaluate, no structure to
+improve, and no vocabulary for discussing what went wrong.
+
+Naming the objects and defining their relationships makes the workflow
+**improvable**. After a session, a meta-agent can evaluate specific
+objects — "Was $M$ faithful? Was $\sigma$ appropriate? Did $A$ drift?"
+— rather than answering the vague question "how could this conversation
+be better?" Over time, this produces supervised examples of how to
+improve each component.
+
+Structure reduces variance. That is the contribution.
+
+### v1: Facets and the map's matrix structure
+
+The first execution of Align, Map, Execute revealed that the agent
+could not construct a useful map. The instruction said the map should be
+"organized according to the alignment" — the agent interpreted this
+freely and produced random artifacts that did not meet $H$ (defined as
+human intent when writing this algorithm!).
+
+The fix was to introduce $F$ (facets) as a separate primitive and define
+$M$ as a matrix: $F$ defines the columns, regions from surveying $S$
+define the rows. This makes the Phase 1 → Phase 2 handoff mechanical:
+Phase 1 produces the operating model ($A$), the human provides the
+evaluation dimensions ($F$), and Phase 2 applies $F$ to $S$ to fill in
+the cells.
