@@ -145,6 +145,10 @@ document** (`PROTOCOL_STATE.md` in the project repo). It contains:
 - $A$ — the shared alignment reached in Stage 1
 - $M$ — the map produced in Stage 2
 - $L$ — the intent calibration log, updated during Stage 4
+- Scratchpad — the human's notes: observations, ideas, and open
+  questions that arise during the work. Human-owned; the agent
+  writes entries at the human's request but does not interpret
+  them as direction or act on them
 
 The document is self-contained: any party reading it cold can
 reconstruct the full protocol state without access to the

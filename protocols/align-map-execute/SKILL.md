@@ -191,11 +191,15 @@ The document contains:
   in another, held until the relevant pass
 - **Intent calibration log** — updated during Phase 3 as the user
   gives direction
+- **Scratchpad** — the user's notes (see below)
 
 Each section is marked with a status — **approved** or **pending**.
-After Phase 1, write the document with the alignment complete and the
-map pending. After Phase 2, update the map section. During Phase 3,
-update the map and calibration log after each region.
+A section starts as **pending** and moves to **approved** only when the
+user explicitly confirms it. Never mark a section approved on your own.
+After Phase 1, write the document with the alignment approved and the
+map pending. After Phase 2, update the map section — it remains
+**pending** until the user confirms it. During Phase 3, update the map
+and calibration log after each region.
 
 The shared alignment section is the alignment as agreed — transfer it
 in full, not summarized. A fresh agent resuming from this document will
@@ -226,3 +230,12 @@ why that decision is evidence for future autonomy on that facet.
 The log refines the shared alignment. A fresh agent reading the log
 reconstructs the alignment without access to the conversation that
 produced it.
+
+### Scratchpad
+
+The last section of the protocol state document is the user's
+scratchpad — a place for observations, ideas, and open questions that
+arise during the work. Write entries when the user asks you to. Do not
+interpret scratchpad content as direction, do not act on it, and do not
+incorporate it into the alignment or the map. It is the user's private
+notepad; you are the scribe.
