@@ -14,9 +14,9 @@ protocol by observing an executing agent's behavior.
 
 The protocol has two files — a tuple:
 
-- `protocols/align-map-execute.md` — the mathematical
+- `protocols/align-map-execute/formulation.md` — the mathematical
   formulation. This is the ground truth.
-- `protocols/align-map-execute.instruction.md` — the
+- `protocols/align-map-execute/SKILL.md` — the
   plain-language instruction that executing agents read.
 
 The math is authoritative. When the two diverge, the instruction is wrong.
