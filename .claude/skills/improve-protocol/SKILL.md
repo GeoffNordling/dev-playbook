@@ -34,7 +34,16 @@ the mark. For each observation:
 
 1. **Diagnose.** Identify where the gap is. Did the instruction fail to
    convey what the math specifies? Or does the math itself not capture
-   what the user actually wants? Often it is both.
+   what the user actually wants? Often it is both. Conclusions must be
+   supported by the evidence the observation actually provides:
+   - An agent correcting after explicit human direction is not evidence
+     that the instruction is sufficient — it only shows the agent can
+     follow a direct command.
+   - The test for instruction sufficiency is whether a fresh agent,
+     reading only the instruction, would behave correctly without human
+     correction.
+   - When the evidence is ambiguous, say so. Do not resolve ambiguity
+     by asserting a conclusion.
 2. **Align.** Discuss the fix with the user before editing. The user
    decides what the protocol should say — you help them think through
    implications and find precise wording.
