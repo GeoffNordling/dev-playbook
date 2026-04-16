@@ -42,7 +42,7 @@ Use the interview pattern to collaborate with the user on requirements. Ask clar
 
 - Write requirements following the spec format reference: EARS sentence templates with RFC 2119 modal verbs for prose, OFT Requirement-Enhanced Markdown for structure and traceability.
 - Every requirement gets a unique OFT specification item ID in `type~name~revision` format (e.g., `req~auth.login-validation~1`). Use `req` as the type. See the spec format reference for naming rules and required keywords (`Status:`, `Covers:`, `Needs:`).
-- Include an explicit out-of-scope section.
+- Ask the user whether anything belongs in an out-of-scope section. If yes, capture it. If no, include the section with an explicit `NA` so it is clear the question was asked and answered.
 - Present the draft to the user and iterate until they are satisfied.
 
 ## Output
