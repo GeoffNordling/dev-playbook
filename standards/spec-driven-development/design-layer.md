@@ -4,22 +4,35 @@ The key words `SHALL`, `SHALL NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` in this
 document are to be interpreted as described in RFC 2119, following the vocabulary
 conventions in [writing.md](writing.md).
 
-## Why the Design Layer Exists
+## Purpose
 
-**Functional before design.** Decide what the system does before deciding how it's structured. A functional spec is always written first. A design spec is written after behavior is settled.
+Functional requirements describe behavior. Design items record the decisions that shape the code fulfilling that behavior. A functional spec is written first; design items follow once the behavior is settled.
 
-**The design layer's primary role is to name the interfaces that tests target.** Each design item connects a functional requirement to the specific code (module, class, function) that fulfills it. The red agent writes tests against that interface; the green agent implements it. Without this layer, the red agent has no target — the functional requirement says what the system does, but not where the code lives or what the public API looks like.
+A design item can commit to any of the decisions a design makes: the public API surface, the algorithm, the data schema, the error semantics, the data structure. API shape is one kind of decision, and is often the only decision a given dsn records.
 
-**The design layer's secondary role is to document design decisions** — algorithm choice, data structure, component boundary, error handling strategy — when those decisions exist. Most design items do both; some only do one.
+## Four Principles
 
-## What Qualifies a Design Item
+### 1. Single role
 
-**Every design item `SHALL` earn its place.** A design item earns its place by doing one or both of:
+Every design item records a design decision. API shape, algorithm, data schema, error semantics, and data-structure choice are equal kinds of decision. A dsn whose only decision is the shape of a public callable is as complete as one that commits to several choices together.
 
-- **Naming an interface** — connecting a functional requirement to the specific code that fulfills it. This is the essential bridge between behavioral requirements and testable code.
-- **Making a concrete design decision** — something the functional requirement deliberately left open, where options were weighed and a choice was made.
+### 2. Observable-to-tests scope
 
-A design item `SHALL NOT` merely restate the functional requirement's behavior without naming an interface or making a decision. Every design item must do at least one of the above. Most functional requirements will have a corresponding design item, because the red agent needs a target even when there is no hard design decision. Cases where a functional requirement skips the design layer entirely are rare.
+A design item commits to a decision when a test could fail on it if the decision were changed. Structural choices below the public surface — private helpers, internal delegation, non-public module layout — belong to the code and are written by the green agent.
+
+The question to ask at every fork is: *Can I write a test that fails if this decision flips?* When the answer is yes, the decision belongs in a dsn. When the answer is no, the decision belongs to the green agent.
+
+### 3. Commitment by naming
+
+When a dsn names a public surface, the shape of what it names is the commitment. Naming `parse_session(path: Path) -> Session` commits the public surface to a module-level callable with that signature. Naming `Parser.parse(path: Path) -> Session` commits the public surface to a class with that method. The `Interface:` keyword (see [Interface Declarations](writing.md#interface-declarations)) carries the committed signature in a form the validator checks against code.
+
+### 4. Design-agent ownership of structure
+
+The design agent performs brownfield reconnaissance — reading the existing code, choosing whether new functionality extends an existing class or introduces a new one, selecting the public surface — before writing any dsn. The output is dsn items plus interface stubs (`raise NotImplementedError` bodies) that the red agent tests against and the green agent fills in. The reasoning behind structural choices lives in each dsn's `Rationale:` field. Red-first workflow stays.
+
+## When to write a design item
+
+Every design item commits to at least one decision the functional requirement leaves open — the shape of a public surface, an algorithm, a schema, an error contract, or another choice a test could observe. Most functional requirements have a corresponding design item; cases where a `req` skips the design layer entirely are rare.
 
 ## Coverage Chain
 

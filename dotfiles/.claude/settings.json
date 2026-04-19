@@ -1,10 +1,4 @@
 {
-  "model": "opus",
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  },
-  "voiceEnabled": true,
   "hooks": {
     "Stop": [
       {
@@ -17,5 +11,10 @@
         ]
       }
     ]
-  }
+  },
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "voiceEnabled": true
 }

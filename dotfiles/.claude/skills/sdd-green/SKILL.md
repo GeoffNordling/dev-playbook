@@ -50,16 +50,15 @@ When your work is complete and approved, commit your changes and push the branch
 
 ## First Steps
 
-1. Check for a handoff file at `<project_root>/.claude/sdd-handoff.md`. If
-   it exists, read it for issue context and scope.
-2. Read the project's specs. Check for:
+1. **Check for a handoff file** at `<project_root>/.claude/sdd-handoff.md`. If it exists, read it for issue context and scope.
+2. **Read the project's specs.** Check for:
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - `specs/design.md` or, if split, `specs/design/index.md`
    - The project's `CLAUDE.md`
-2. Read existing code under `src/`. This may include full implementations, partial implementations, or stubs created by the red agent to make tests importable. Understand what already exists before writing anything.
-3. Read the existing tests to understand what needs to pass. The tests define the behavioral contract — function names, parameters, and expected outputs are your interface specification. Ignore `tests/RED_STATUS.md` if it exists — that is the red agent's working scratchpad, not part of the test contract.
-4. Run the tests to see the current state — which pass, which fail. Some tests may already pass against existing code; your scope is the failing tests.
-5. Tell the user what you found and align on the scope of implementation before writing code.
+3. **Read existing code under `src/`.** This may include full implementations, partial implementations, or stubs created by the red agent to make tests importable. Understand what already exists before writing anything.
+4. **Read the existing tests** to understand what needs to pass. The tests define the behavioral contract — function names, parameters, and expected outputs are your interface specification. Ignore `tests/RED_STATUS.md` if it exists — that is the red agent's working scratchpad, not part of the test contract.
+5. **Run the tests** to see the current state — which pass, which fail. Some tests may already pass against existing code; your scope is the failing tests.
+6. **Tell the user what you found** and align on the scope of implementation before writing code.
 
 ## Mandatory Plan Gate
 
@@ -76,11 +75,12 @@ This is a hard gate. Skipping it — for any reason, including apparent simplici
 
 The goal is to maximize both agentic efficiency and the value of human check-ins. The right step size is one where the human provides meaningful course corrections; not rubber-stamping every move, and not prescribing a full restart because the agent went too far off course. One requirement category (e.g., Discovery, Parsing) is the default unit of autonomous work between human reviews.
 
-- Work one requirement (or small group of related requirements) at a time. After each, run the tests to confirm progress — more tests should pass or remain passing.
+- **Work one requirement at a time** (or a small group of related requirements). After each, run the tests to confirm progress — more tests should pass or remain passing.
 - **Write the minimum code to make tests pass.** Do not add features, abstractions, or configurability beyond what the tests require. If only one test calls a function, that function doesn't need to handle five other cases.
 - **Humble Object pattern at non-deterministic boundaries.** Some tests will mock non-deterministic components (LLM calls, external APIs). The mock point reveals where the boundary is. Keep the non-deterministic component as thin as possible — a narrow integration point surrounded by testable, deterministic logic. If you find yourself writing complex logic inside the non-deterministic layer that tests can't reach, refactor it out into a testable function.
-- Follow the design spec if it exists. If none exists, make straightforward implementation choices and note any significant decisions for the user.
-- When implementation diverges from the spec, flag the divergence to the user — the spec needs updating to reflect what was actually built. Do not edit the spec directly.
+- **Changing a public signature requires a spec amendment.** Signatures named in `Interface:` declarations are the committed public surface. `pytest-sdd`'s interface validator fails pytest collection when the code's signature diverges from the committed one. If you need a different signature, stop and propose a spec amendment rather than changing the code unilaterally.
+- **Follow the design spec** if it exists. If none exists, make straightforward implementation choices and note any significant decisions for the user.
+- **When implementation diverges from the spec, flag the divergence to the user** — the spec needs updating to reflect what was actually built. Do not edit the spec directly.
 
 ## Bug-Fix Loop
 
@@ -94,8 +94,8 @@ Bugs are spec gaps, not just code errors. Each fix is an opportunity to make the
 
 ## Completion
 
-- All tests in scope pass.
-- Run `uv run pytest` to confirm all tests pass. Spec checks (`pytest-sdd`) are baked into the suite and run automatically — a fully green suite means both the implementation tests and the spec lint/traceability checks passed. If spec checks fail, they will appear as named test items in the output and identify exactly what is wrong.
+- **All tests in scope pass.**
+- **Run `uv run pytest`** to confirm all tests pass. Spec checks (`pytest-sdd`) are baked into the suite and run automatically — a fully green suite means both the implementation tests and the spec lint/traceability checks passed. If spec checks fail, they will appear as named test items in the output and identify exactly what is wrong.
 - **Clean up stub markers.** The design agent marks temporarily unused imports with `# noqa: F401 (stub)`. Before finishing, run `grep -r "noqa: F401 (stub)" src/` across the entire source tree and remove every occurrence. These markers must not survive the green phase.
 - **Run the project's lint, format, and typecheck commands before presenting your changes** (check `CLAUDE.md` or `Makefile` for the exact commands). When a check fails, self-correct rather than accumulating errors across tasks.
-- Present a summary to the user: what was implemented, any spec updates made, any decisions that need discussion.
+- **Present a summary to the user:** what was implemented, any spec updates made, any decisions that need discussion.

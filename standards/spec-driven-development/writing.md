@@ -145,6 +145,52 @@ Every keyword is followed by a colon. Content may start on the same line or the 
 | `Tags:` | Comma-separated labels for filtering traces by team or component. | Optional. |
 | `Depends:` | Ordering dependencies between items. | Does not affect coverage; currently affects XML output only. |
 | `Description:` | Explicit marker for the start of the description body. | Optional — any non-keyword text automatically starts the description. |
+| `Interface:` | Public surface (signature) committed by a `dsn` item. One signature per line; repeatable. | `dsn` items only. Machine-validated; see [Interface Declarations](#interface-declarations). |
+
+### Interface Declarations
+
+Design items that commit to a public surface `SHALL` declare the committed signatures in an `Interface:` field. The field is machine-validated: `pytest-sdd` imports the named symbol, introspects its signature, and fails at pytest collection time when the committed signature and the actual signature diverge.
+
+#### Format
+
+Each `Interface:` entry is a single line declaring one signature. A design item may declare multiple `Interface:` entries to commit to multiple related signatures (e.g., a class and its public methods).
+
+    Interface: parser.parse_session(path: pathlib.Path) -> parser.Session
+    Interface: parser.SessionParser.__init__(self, config: parser.ParserConfig) -> None
+    Interface: parser.SessionParser.parse(self, path: pathlib.Path) -> parser.Session
+
+Each signature includes the fully-qualified symbol path (`module.ClassName.method`), the parameter list with annotations, and the return annotation. Parameter kinds are expressed using standard Python syntax (`/` for positional-only, `*` for keyword-only, `*args`, `**kwargs`).
+
+Instance methods include `self`. Classmethods include `cls`. Staticmethods omit both.
+
+#### Annotation convention
+
+Interface annotations follow a single modern idiom, matching what ruff's `UP` rules produce in the code.
+
+| Annotation form | Modern (use) | Legacy |
+|---|---|---|
+| Non-stdlib classes | `pathlib.Path`, `myapp.session.Session` | bare `Path`, bare `Session` |
+| Built-in generics | `list[int]`, `dict[str, Event]` | `typing.List[int]`, `typing.Dict[str, Event]` |
+| Unions with None | `Event \| None` | `Optional[Event]`, `Union[Event, None]` |
+| Primitives | `int`, `str`, `float`, `bool`, `bytes` | — |
+
+Complex types are named through a single import and referenced by name rather than inlined as sprawling generic expressions.
+
+#### Validator behavior
+
+`pytest-sdd` parses each `Interface:` at pytest collection time and:
+
+1. Imports the fully-qualified module containing the named symbol.
+2. Resolves the symbol via attribute access (with MRO for inherited methods).
+3. Reads its signature via `inspect.signature()` and evaluates annotations via `typing.get_type_hints()`.
+4. Qualifies each annotation's class with its `__module__` and renders in modern form.
+5. Compares parameter names, kinds, annotations, return annotation, and presence of defaults against the committed form.
+
+Any mismatch fails collection. Because ruff's `UP` rules keep the code in the same modern idiom as the dsn, the comparison runs without a normalization layer.
+
+#### Coexistence with prose
+
+A design item may contain both prose and `Interface:` entries. Prose captures non-API decisions — schema, algorithm, error semantics — and flows through the OFT tooling into traceability reports and chain-text output. `Interface:` entries are the machine-checked part: the validator compares them against the code.
 
 ### Excluding Sections
 

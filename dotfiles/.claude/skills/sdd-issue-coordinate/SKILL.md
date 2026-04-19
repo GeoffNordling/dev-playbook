@@ -14,6 +14,12 @@ spec-driven development. This skill is the dispatcher; it owns the outer
 workflow loop while the SDD agents own the inner phases (functional
 requirements, design, red, green).
 
+Before starting, read this reference end to end. If it is missing, stop and tell the user:
+
+- [Development workflow standard](~/workspace/dev-playbook/standards/development-workflow.md) — session handoff sequence, branch and draft PR scaffolding, PR description format.
+
+Throughout the rest of this skill it is referred to as the *development workflow standard*.
+
 The user provides an issue number, URL, or description, plus any optional
 context.
 
@@ -29,15 +35,13 @@ Output it verbatim with no other text on that line. This is a machine-readable s
 
 ## First Steps
 
-1. Read the development workflow standard; it governs this skill's behavior:
-   `~/workspace/dev-playbook/standards/development-workflow.md`
-2. Follow the **Session Handoff** sequence from that standard to reconstruct
+1. Follow the **Session Handoff** sequence from the development workflow standard to reconstruct
    context from durable artifacts.
-3. Review the `specs/` directory. You should find functional requirements
+2. Review the `specs/` directory. You should find functional requirements
    and possibly design specs, in either flat file or hierarchical folder
    form. If `specs/` does not exist or is empty, stop and escalate to the
    user — this skill requires spec-driven development.
-4. Present findings: the issue, any existing work, and the current state of
+3. Present findings: the issue, any existing work, and the current state of
    durable artifacts. Recommend the next phase (see below). Wait for the
    user to confirm before proceeding.
 

@@ -23,6 +23,7 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 
 Tests verify **what** the system does, not **how** it does it. This is the single most important principle in this document.
 
+- **Access only public names.** Tests exercise identifiers without a leading underscore. Private helpers (`_foo`, `_Tokenizer`) are reached through the public interfaces that call them. Python dunder protocol methods (`__init__`, `__iter__`, etc.) count as public.
 - **Assert on observable outputs.** Return values, state changes (records stored, files written), raised exceptions. Never assert on internal state, private attributes, or implementation details.
 - **Assert on outcomes, not call sequences.** Prefer "the record is in the store" over "insert was called once with these arguments." When using mocks, assert on the minimum necessary to verify the contract; do not over-specify call counts, argument shapes, or call ordering unless the ordering is part of the contract.
 - **Name by capability, not mechanism.** `test_request_includes_trace_id`, not `test_structlog_processor_adds_trace_id`. The test should survive an implementation swap without changes.
