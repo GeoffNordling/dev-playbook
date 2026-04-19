@@ -1,27 +1,8 @@
 {
   "model": "opus",
-  "hooks": {
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash /home/gmnordling/workspace/sounds/play-sound.sh"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash /home/gmnordling/workspace/sounds/play-sound.sh"
-          }
-        ]
-      }
-    ]
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
   }
 }
