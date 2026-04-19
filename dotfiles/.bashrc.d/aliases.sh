@@ -1,5 +1,7 @@
 # Shell aliases — sourced by ~/.bashrc via ~/.bashrc.d/* loader.
 
+alias work='cd /home/geoff/workspace'
+
 alias gs='git status'
 alias gaa='git add --all'
 alias gc='git commit -m'
