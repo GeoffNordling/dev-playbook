@@ -2,6 +2,7 @@
 
 alias work='cd /home/geoff/workspace'
 
+alias gb='git branch'
 alias gs='git status'
 alias gaa='git add --all'
 alias gc='git commit -m'
