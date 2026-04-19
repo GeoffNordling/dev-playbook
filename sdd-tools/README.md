@@ -2,14 +2,19 @@
 
 Spec-driven development is a [frontier-invariant](../protocols/README.md) response to rapidly advancing AI capabilities. It lets humans specify requirements at the highest appropriate level of abstraction — in terms natural for humans to express and think about, yet precise enough for the current generation of AI to understand and implement reliably.
 
+> *"It appears to be a quite general principle that, whenever there is a randomized way of doing something, then there is a non-randomized way that delivers better performance but requires more thought."*  
+> — E.T. Jaynes
+>
+> *"A designer knows he has achieved perfection not when there is nothing left to add, but when there is nothing left to take away."*  
+> — Antoine de Saint-Exupéry
+>
+> *"I didn't have time to write a short letter, so I wrote a long one instead."*  
+> — Mark Twain (attributed)
+
 The tools here serve two narrow, enduring purposes:
 
 - **Deterministic validation** — lint specs, check traces, verify interface signatures. Structure reduces variance; these checks will always be cheaper, faster, and more reliable than AI for the specific narrow things they do, even as AI continues to advance.
 - **Deterministic compression** — render conformant specs into views that fit within the human context window. Compressed yet precise, sufficient for their purpose, deterministic and reliable.
-
-<!-- QUOTES: placeholder — fill in later -->
-> *"…"*
-> — TBD
 
 ## What belongs here
 
