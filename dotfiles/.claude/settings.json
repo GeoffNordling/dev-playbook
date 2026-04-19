@@ -4,5 +4,18 @@
     "enabled": true,
     "mode": "hold"
   },
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/geoff/workspace/sounds/play-sound-fedora.sh"
+          }
+        ]
+      }
+    ]
+  }
 }
