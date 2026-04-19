@@ -26,4 +26,4 @@
 
 - Python >= 3.11; ruff for lint + format, mypy for type checking
 - Line length 88 (ruff default)
-- Ruff rules: E, W, F, I, UP, B, SIM (E501 ignored)
+- Ruff rules: E, W, F, I, UP, B, SIM, SLF (E501 ignored)
