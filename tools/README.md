@@ -86,6 +86,7 @@ Run ad hoc on user demand. Not part of the pre-commit pipeline.
 |------|---------|
 | `py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
 | `repo-sync` | Sync all workspace repos with their remotes (auto-pull/push when safe) |
+| `workspace-backup` | Archive every workspace repo (with `.git/`) into a single dated .zip |
 
 ### Packages (`src/`)
 
@@ -153,6 +154,19 @@ repo-sync /path/to/workspace
 ```
 
 **Exit codes:** 0 = all synced, 1 = some repos not fully synced.
+
+### workspace-backup
+
+Archive every Git repo in a workspace into a single dated `.zip`, preserving each repo's `.git/` directory so the archive can fully replace the workspace if GitHub is lost. Each repo becomes a top-level folder inside the archive.
+
+```bash
+workspace-backup                      # auto-detect workspace, write workspace-backup-YYYY-MM-DD.zip
+workspace-backup /path/to/workspace   # explicit workspace
+workspace-backup -o /tmp/snap.zip     # custom output path
+workspace-backup --force              # overwrite existing output
+```
+
+Skips hidden directories, non-repo subfolders, and the entries in `devtools_lib.workspace.SKIP_DIRS`. Symlinks are not followed.
 
 ### sdd-chain-text
 
