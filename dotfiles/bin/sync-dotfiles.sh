@@ -13,7 +13,7 @@ DOTFILES="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARGET="$HOME"
 
 # Directories that stow manages (relative to $TARGET)
-MANAGED_DIRS=(".claude" ".agents" ".dhub")
+MANAGED_DIRS=(".claude" ".agents" ".dhub" ".bashrc.d")
 
 # Remove broken symlinks in managed directories
 for dir in "${MANAGED_DIRS[@]}"; do

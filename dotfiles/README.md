@@ -13,6 +13,7 @@ Stow symlinks the contents of this directory into `$HOME`, so `~/.claude/`, `~/.
   settings.json          Global Claude Code settings (model, permissions, hooks)
 .agents/skills/    Externally managed skills
 .dhub/skills/      Externally managed skills
+.bashrc.d/         Bash snippets auto-sourced by Fedora's stock ~/.bashrc
 bin/
   sync-dotfiles.sh   Stow sync — run after adding or removing files
 ```
