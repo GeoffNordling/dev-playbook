@@ -12,8 +12,8 @@ Collaborate with the user to design the system's structure before implementation
 
 Before starting, read both of these references end to end:
 
-- [Spec writing reference](~/workspace/dev-playbook/standards/spec-driven-development/writing.md) — OFT format for spec items, including the `Interface:` keyword.
-- [Design-layer standard](~/workspace/dev-playbook/standards/spec-driven-development/design-layer.md) — the four principles that govern design items, coverage chain, and revision policy.
+- [Spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) — OFT format for spec items, including the `Interface:` keyword.
+- [Design-layer standard](~/workspace/dev-playbook/sdd-standards/design-layer.md) — the four principles that govern design items, coverage chain, and revision policy.
 
 Throughout the rest of this skill they are referred to as the *writing reference* and the *design-layer standard*.
 

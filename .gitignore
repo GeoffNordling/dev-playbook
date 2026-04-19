@@ -3,11 +3,17 @@ __pycache__/
 *.pyc
 
 # tools
-tools/lib/
 tools/.venv/
 tools/.mypy_cache/
 tools/.ruff_cache/
 tools/.pytest_cache/
+
+# sdd-tools
+sdd-tools/lib/
+sdd-tools/.venv/
+sdd-tools/.mypy_cache/
+sdd-tools/.ruff_cache/
+sdd-tools/.pytest_cache/
 
 # dotfiles — machine-local and ephemeral files
 dotfiles/.claude/settings.local.json

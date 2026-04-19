@@ -2,7 +2,7 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in the [spec writing reference](spec-driven-development/writing.md).
+conventions in the [spec writing reference](../sdd-standards/writing.md).
 
 ## Purpose
 
@@ -26,13 +26,13 @@ Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
 file. The distinction governs formatting conventions and cross-reference style.
 
-All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/standards/spec-driven-development/writing.md`. This makes every reference detectable and resolvable by tooling. The audience determines the wrapper:
+All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/writing.md`. This makes every reference detectable and resolvable by tooling. The audience determines the wrapper:
 
 | Audience | Cross-reference style |
 |---|---|
-| Human | Inline link with full path as target — e.g., `[spec writing reference](~/workspace/dev-playbook/standards/spec-driven-development/writing.md)`. |
+| Human | Inline link with full path as target — e.g., `[spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md)`. |
 | Human + Agent | Same as Human. |
-| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/standards/spec-driven-development/writing.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/writing.md` ``. No inline links; they add syntax noise without adding information for an agent. |
 
 ### Presence
 
@@ -51,7 +51,7 @@ Whether the file is required or optional.
 | `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
 | `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
 | `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec writing reference](~/workspace/dev-playbook/standards/spec-driven-development/writing.md) for file layout, splitting rules, and content conventions. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) for file layout, splitting rules, and content conventions. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. |
 

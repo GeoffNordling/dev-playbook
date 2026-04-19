@@ -2,7 +2,7 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in the [spec writing reference](spec-driven-development/writing.md).
+conventions in the [spec writing reference](../sdd-standards/writing.md).
 
 ## Purpose
 
@@ -12,7 +12,7 @@ memory or verbal handoff.
 
 This standard governs how work is tracked and handed off. It does not govern how
 code is developed. Projects that follow spec-driven development use the
-[spec-driven-development standard](spec-driven-development/overview.md) and its
+[spec-driven-development standard](../sdd-standards/overview.md) and its
 associated skills for that.
 
 ## Mental Model

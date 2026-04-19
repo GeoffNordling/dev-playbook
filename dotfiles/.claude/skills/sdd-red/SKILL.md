@@ -13,7 +13,7 @@ Write tests from the spec. This is the "red" phase of spec-driven TDD — tests 
 Before starting, read both of these references end to end. If either is missing, stop and tell the user:
 
 - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — structure, naming, assertions, mocking patterns, and behavioral focus for all tests.
-- [Spec writing reference](~/workspace/dev-playbook/standards/spec-driven-development/writing.md) — OFT format for spec items, including the `Interface:` keyword that names test targets.
+- [Spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) — OFT format for spec items, including the `Interface:` keyword that names test targets.
 
 Throughout the rest of this skill they are referred to as the *testing conventions* and the *writing reference*.
 

@@ -62,7 +62,7 @@ The following tools were evaluated and rejected because they are not markdown-na
 
 - All spec files across the workspace use OFT's `type~name~revision` ID format
 - Java must be installed on developer machines for traceability checks (lint checks are pure Python and have no Java dependency)
-- The OFT JAR (v4.2.2) is vendored once in `dev-playbook/tools/lib/` (gitignored) and referenced by all projects via relative path
+- The OFT JAR (v4.2.2) is vendored once in `dev-playbook/sdd-tools/lib/` (gitignored) and referenced by all projects via relative path
 - `sdd-trace` is removed; `pytest-sdd` replaces it
 - Spec checks run automatically as part of `pytest` — no separate invocation needed
 - The `<!-- oft:off -->` / `<!-- oft:on -->` markers can exclude sections from both OFT and pytest-sdd parsing

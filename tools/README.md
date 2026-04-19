@@ -2,6 +2,8 @@
 
 CLI utilities and shared libraries for workspace automation; lightweight, pragmatic glue across a multi-repo workspace.
 
+> Spec-driven-development tools live in [`sdd-tools/`](../sdd-tools/).
+
 > *"The perfect race car crosses the finish line in first place and then falls to pieces."*  
 > — Ferdinand Porsche
 >
@@ -13,20 +15,19 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 
 ## What belongs here
 
-- CLI tools that operate across multiple repos or automate workspace tasks
+- Simple CLI tools that automate workspace tasks across multiple repos
 - Shared libraries consumed by those tools
-- Spec-driven packages with their own test suites
 
 ## What does NOT belong here
 
+- Spec-driven-development tools — those go in [`sdd-tools/`](../sdd-tools/)
 - Project-specific scripts — put them in that project's repo
-- Standards, agent configuration, or templates — those go in the repo root
-- One-off shell aliases — put them in dotfiles
+- Anything with a dedicated home elsewhere in this repo (standards, agent config, templates, shell aliases)
 
 ## Setup
 
 ```bash
-cd tools && uv pip install -e .   # installs packages (pytest-sdd, sdd-chain-text, devtools_lib)
+cd tools && uv pip install -e .   # installs devtools_lib
 ```
 
 Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts in `bin/` use PEP 723 inline metadata; `uv run` handles their dependencies automatically. Skills reference tools by absolute path; no PATH configuration needed.
@@ -88,16 +89,7 @@ Run ad hoc on user demand. Not part of the pre-commit pipeline.
 | `repo-sync` | Sync all workspace repos with their remotes (auto-pull/push when safe) |
 | `workspace-backup` | Archive every workspace repo (with `.git/`) into a single dated .zip |
 
-### Packages (`src/`)
-
-Installed via `pyproject.toml` console entry points.
-
-| Package | Location | Purpose |
-|---------|----------|---------|
-| `pytest-sdd` | `src/pytest_sdd/` | pytest plugin for OFT spec validation: lint checks + traceability via OFT JAR |
-| `sdd-chain-text` | `src/sdd_chain_text/` | Standalone CLI: display full spec traceability chains with body text |
-
-### Shared library
+### Shared library (`src/`)
 
 | Library | Location | Purpose |
 |---------|----------|---------|
@@ -168,43 +160,4 @@ workspace-backup --force              # overwrite existing output
 
 Skips hidden directories, non-repo subfolders, and the entries in `devtools_lib.workspace.SKIP_DIRS`. Symlinks are not followed.
 
-### sdd-chain-text
-
-Display full spec traceability chains with verbatim body text. Reads `[tool.pytest-sdd]` config from the project's `pyproject.toml`, runs the OFT JAR to extract all spec items as XML, builds coverage chains, and prints them with full text at each layer.
-
-```bash
-sdd-chain-text                       # dump all chains
-sdd-chain-text --id '*auth*'         # chains containing items matching glob
-sdd-chain-text --type dsn            # chains containing dsn items
-sdd-chain-text --file registry       # chains with items from matching files
-sdd-chain-text --feature '*user*'    # chains rooted at a matching feat item
-sdd-chain-text --root /path/to/proj  # explicit project root
-```
-
-Test layers (utest, itest) are excluded from chain output. Requires Java on `PATH` and the OFT JAR configured in `pyproject.toml`.
-
-### pytest-sdd
-
-pytest plugin for validating OFT spec files as part of the normal test suite. Installed as a dev dependency in each project; configured in `pyproject.toml`. See [tooling.md](../standards/spec-driven-development/tooling.md) for configuration and invocation.
-
-```bash
-uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"
-```
-
-```bash
-pytest -m spec          # run all spec checks (lint + trace)
-pytest -m spec -k lint  # lint only
-pytest -m spec -k trace # traceability only
-```
-
-Requires Java on `PATH` and the OFT JAR at `../dev-playbook/tools/lib/openfasttrace-4.2.2.jar`.
-
-#### Updating downstream projects after changes
-
-Downstream projects pin `dev-playbook-tools` to a specific git commit in their `uv.lock`. After pushing changes here, `uv sync` alone in the downstream repo will **not** pick them up. You must refresh the lock:
-
-```bash
-cd /path/to/downstream-project
-uv lock --upgrade-package dev-playbook-tools && uv sync
-```
 

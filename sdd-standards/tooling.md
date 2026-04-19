@@ -10,7 +10,7 @@
 **Installation:**
 
 ```bash
-uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"
+uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=sdd-tools"
 ```
 
 **Configuration** in `pyproject.toml`:
@@ -18,19 +18,19 @@ uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#sub
 ```toml
 [tool.pytest-sdd]
 spec_dirs = ["specs/functional_requirements", "specs/design"]
-oft_jar = "../dev-playbook/tools/lib/openfasttrace-4.2.2.jar"
+oft_jar = "../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar"
 ```
 
 Both fields are required. `spec_dirs` lists the directories containing OFT markdown files; `oft_jar` is the path to the OpenFastTrace JAR (v4.2.2), relative to the project root.
 
-The JAR is vendored once in dev-playbook at `tools/lib/openfasttrace-4.2.2.jar` (gitignored). All workspace projects reference it via the relative path `../dev-playbook/tools/lib/openfasttrace-4.2.2.jar`. This assumes the standard workspace layout where all repos live under `~/workspace/`. If the JAR is not present, download it from https://github.com/itsallcode/openfasttrace/releases/tag/4.2.2 and place it at that path.
+The JAR is vendored once in dev-playbook at `sdd-tools/lib/openfasttrace-4.2.2.jar` (gitignored). All workspace projects reference it via the relative path `../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar`. This assumes the standard workspace layout where all repos live under `~/workspace/`. If the JAR is not present, download it from https://github.com/itsallcode/openfasttrace/releases/tag/4.2.2 and place it at that path.
 
 Projects that only have functional requirements and no design layer omit `specs/design` from `spec_dirs`:
 
 ```toml
 [tool.pytest-sdd]
 spec_dirs = ["specs/functional_requirements"]
-oft_jar = "../dev-playbook/tools/lib/openfasttrace-4.2.2.jar"
+oft_jar = "../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar"
 ```
 
 **Invocation:**
@@ -59,7 +59,7 @@ Test layers (utest, itest) are excluded from output. Coverage validation is out 
 `sdd-chain-text` is installed as a console script from the same `dev-playbook-tools` package as `pytest-sdd`:
 
 ```bash
-uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=tools"
+uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=sdd-tools"
 ```
 
 **Invocation:**

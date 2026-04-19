@@ -4,7 +4,7 @@ Configuration lives in [tool.pytest-sdd]:
 
     [tool.pytest-sdd]
     spec_dirs = ["specs/functional_requirements", "specs/design"]
-    oft_jar = "tools/openfasttrace-4.2.2.jar"
+    oft_jar = "../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar"
 
 All fields are required when the section is present. Returns None if the
 section is absent (plugin disabled for this project).

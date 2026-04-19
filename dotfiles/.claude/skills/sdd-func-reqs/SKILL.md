@@ -12,7 +12,7 @@ Help the user write or update functional requirements for the project.
 
 Before starting, read this reference end to end. If it is missing, stop and tell the user:
 
-- [Spec writing reference](~/workspace/dev-playbook/standards/spec-driven-development/writing.md) — EARS sentence templates, RFC 2119 modal verbs, OFT Requirement-Enhanced Markdown format.
+- [Spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) — EARS sentence templates, RFC 2119 modal verbs, OFT Requirement-Enhanced Markdown format.
 
 Throughout the rest of this skill it is referred to as the *writing reference*.
 

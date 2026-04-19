@@ -79,7 +79,7 @@ Recorded here as potential future work, not adopted today:
 
 ## Consequences
 
-- `standards/spec-driven-development/overview.md` principles updated: the `Spec-as-source` principle is replaced by **Spec-anchored** (with Böckeler reference and a link back to this ADR); a new **SDD Triangle** principle replaces the "spec describes reality" principle (with Breunig reference); the universal "state what NOT to build" principle is removed; "non-functional requirements" is renamed to **technical requirements**.
+- `sdd-standards/overview.md` principles updated: the `Spec-as-source` principle is replaced by **Spec-anchored** (with Böckeler reference and a link back to this ADR); a new **SDD Triangle** principle replaces the "spec describes reality" principle (with Breunig reference); the universal "state what NOT to build" principle is removed; "non-functional requirements" is renamed to **technical requirements**.
 - `dotfiles/.claude/skills/sdd-func-reqs/SKILL.md` updated: the out-of-scope section is no longer prescribed unconditionally. The skill now asks the user and records `NA` when the answer is no.
 - [ADR-002](002-evaluate-spec-kit-retain-custom-sdd.md)'s "project-level principles document" as an idea worth adopting is reversed here; the "structured research phase" idea from ADR-002 remains open.
 - No changes to OFT, `pytest-sdd`, `sdd-chain-text`, the red/green skills, the design skill (apart from the principles fixes above), or the issue-coordinate dispatcher.

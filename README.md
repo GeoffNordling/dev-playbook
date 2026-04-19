@@ -42,7 +42,17 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 |--------|----------|---------|
 | Repo documentation | `standards/repo-documentation.md` | Required/optional files for every repo and their scope |
 | Development workflow | `standards/development-workflow.md` | Issues, branches, draft PRs, spec-driven development |
-| Spec-driven development | `standards/spec-driven-development/` | Philosophy, writing conventions, design layer, tooling |
+
+### SDD standards (sdd-standards/)
+
+Spec-driven-development standards: philosophy, writing conventions, design layer, tooling. See [sdd-standards/README.md](sdd-standards/README.md).
+
+| Object | Location | Purpose |
+|--------|----------|---------|
+| Overview | `sdd-standards/overview.md` | Philosophy and core principles |
+| Spec writing | `sdd-standards/writing.md` | OFT structure, EARS templates, RFC 2119 obligations, file layout |
+| Design layer | `sdd-standards/design-layer.md` | Design specs, coverage chain, revision policy |
+| Tooling | `sdd-standards/tooling.md` | pytest-sdd setup, configuration, invocation |
 
 ### Agent configuration (dotfiles/)
 
@@ -63,10 +73,19 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 
 ### Tools (tools/)
 
-CLI utilities, shared libraries, and spec-driven packages. See [tools/README.md](tools/README.md) for detailed usage and reference.
+CLI utilities and shared libraries for workspace automation. See [tools/README.md](tools/README.md) for detailed usage and reference.
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `repo-sync` |
-| Packages | `tools/src/pytest_sdd/` | pytest plugin for OFT spec validation: lint checks + traceability via OFT JAR |
+| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `repo-sync`, `skill-audit`, `workspace-backup`, `generate-pre-commit` |
 | Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |
+
+### SDD tools (sdd-tools/)
+
+Deterministic validators and compressors for spec-driven-development artifacts. See [sdd-tools/README.md](sdd-tools/README.md).
+
+| Object | Location | Purpose |
+|--------|----------|---------|
+| pytest plugin | `sdd-tools/src/pytest_sdd/` | OFT spec validation: lint checks + traceability via OFT JAR |
+| CLI tool | `sdd-tools/src/sdd_chain_text/` | Display spec traceability chains with body text |
+| Vendored JAR | `sdd-tools/lib/openfasttrace-4.2.2.jar` | OpenFastTrace JAR (gitignored) |

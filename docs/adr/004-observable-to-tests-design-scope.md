@@ -7,7 +7,7 @@
 
 The custom SDD workflow established in [ADR-001](001-adopt-openfasttrace.md), [ADR-002](002-evaluate-spec-kit-retain-custom-sdd.md), and [ADR-003](003-evaluate-sdd-community-landscape.md) leaves three gaps that became apparent during use.
 
-**The design-layer framing was imprecise.** The current [design-layer.md](../../standards/spec-driven-development/design-layer.md) presents design items as serving a *primary* role of "naming the interfaces that tests target" and a *secondary* role of recording design decisions. The split blurs what belongs in a dsn versus what belongs in code, particularly for greenfield work where committing to a specific class or function felt premature before the code existed. The same imprecision pushed authors toward verbose disclaimers about what a dsn was not constraining, which scaled poorly.
+**The design-layer framing was imprecise.** The current [design-layer.md](../../sdd-standards/design-layer.md) presents design items as serving a *primary* role of "naming the interfaces that tests target" and a *secondary* role of recording design decisions. The split blurs what belongs in a dsn versus what belongs in code, particularly for greenfield work where committing to a specific class or function felt premature before the code existed. The same imprecision pushed authors toward verbose disclaimers about what a dsn was not constraining, which scaled poorly.
 
 **Public-surface claims in dsn items were not machine-validated.** A dsn could claim a function exists with a given signature while the actual code drifted to a different signature. Unlike `req → utest` coverage (enforced by `@pytest.mark.req` markers and `pytest-sdd`), public-surface claims were prose that could silently rot. Any artifact in the coverage chain should be machine-checkable.
 
@@ -41,7 +41,7 @@ Tests access only public names (identifiers not prefixed with `_`, excluding Pyt
 
 Two enforcement mechanisms combine:
 
-- **Ruff `SLF001`** (private-member-access) is enabled in `tools/pyproject.toml`. It catches `obj._private` attribute access.
+- **Ruff `SLF001`** (private-member-access) is enabled in both `tools/pyproject.toml` and `sdd-tools/pyproject.toml`. It catches `obj._private` attribute access.
 - **`pytest-sdd` adds a test-privacy AST check** that flags non-dunder leading-underscore imports and attribute accesses reaching into non-test modules. Leading-underscore helpers defined locally in test files remain scoped to the test file and pass.
 
 ### Reasoning goes in `Rationale:`
@@ -66,8 +66,8 @@ A per-feature code-organization overview comes from `sdd-chain-text --view=struc
 
 ## Consequences
 
-- `standards/spec-driven-development/design-layer.md` is rewritten around the four principles.
-- `standards/spec-driven-development/writing.md` gains the `Interface:` keyword spec and the annotation convention.
+- `sdd-standards/design-layer.md` is rewritten around the four principles.
+- `sdd-standards/writing.md` gains the `Interface:` keyword spec and the annotation convention.
 - `standards/testing-conventions.md` gains one line making the public-only rule explicit.
 - `dotfiles/.claude/skills/sdd-design/SKILL.md` is rewritten to reflect the four principles, brownfield reconnaissance, `Interface:` authoring, interface-stub generation, and `Rationale:` as the reasoning home.
 - `dotfiles/.claude/skills/sdd-red/SKILL.md` is updated to read `Interface:` as the test target rather than parsing dsn prose.
@@ -76,5 +76,5 @@ A per-feature code-organization overview comes from `sdd-chain-text --view=struc
 - Two follow-up issues are opened:
   - `pytest-sdd` refactor for modular hosting of OFT parsing, coverage graph, `Interface:` parsing, introspection validator, test-privacy check, and reporting. Refactor plan is required before code.
   - `sdd-chain-text --view=structure` mode for the derived code-organization view.
-- Ruff `SLF001` is enabled in `tools/pyproject.toml`.
+- Ruff `SLF001` is enabled in both `tools/pyproject.toml` and `sdd-tools/pyproject.toml`.
 - The deferred directions from [ADR-003](003-evaluate-sdd-community-landscape.md) (adversarial review, replanning phase, `dec` artifact type) remain open; none are addressed here.
