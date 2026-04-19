@@ -1,14 +1,15 @@
 # SDD Tools
 
-Deterministic tools that validate spec-driven-development artifacts and compress them into human-graspable views.
+Spec-driven development is a [frontier-invariant](../protocols/README.md) response to rapidly advancing AI capabilities. It lets humans specify requirements at the highest appropriate level of abstraction — in terms natural for humans to express and think about, yet precise enough for the current generation of AI to understand and implement reliably.
+
+The tools here serve two narrow, enduring purposes:
+
+- **Deterministic validation** — lint specs, check traces, verify interface signatures. Structure reduces variance; these checks will always be cheaper, faster, and more reliable than AI for the specific narrow things they do, even as AI continues to advance.
+- **Deterministic compression** — render conformant specs into views that fit within the human context window. Compressed yet precise, sufficient for their purpose, deterministic and reliable.
 
 <!-- QUOTES: placeholder — fill in later -->
 > *"…"*
 > — TBD
-
-## Principle: frontier-invariance
-
-These tools are scoped to the narrow operations that beat AI on cost, speed, and reliability — and stay that way as models improve. Humans specify requirements at the highest natural level of abstraction; these tools check, trace, and render the result deterministically. Anything a frontier model will do better next year does not belong here.
 
 ## What belongs here
 
