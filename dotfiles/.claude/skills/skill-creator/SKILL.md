@@ -17,7 +17,7 @@ Read the [skill authoring standard](~/workspace/dev-playbook/standards/skill-aut
 ## Workflow
 
 1. Read the skill authoring standard.
-2. Discuss the skill's purpose with the user. Clarify: what does the skill do, who invokes it (user or model), what judgment level is required, and whether it needs arguments or references.
+2. Discuss the skill's purpose with the user. Clarify: what does the skill do, who invokes it (user or model), which model to pin (or none), and whether it needs arguments or references.
 3. Create the skill directory and `SKILL.md` under the appropriate `.claude/skills/` location. If the skill belongs to a specific project, place it there; otherwise use `~/workspace/dev-playbook/dotfiles/.claude/skills/`.
 4. Walk the checklist from the standard and confirm each item passes.
 5. Run `~/workspace/dev-playbook/dotfiles/bin/sync-dotfiles.sh` if the skill was added to dotfiles.

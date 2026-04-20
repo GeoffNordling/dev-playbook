@@ -12,7 +12,7 @@
       }
     ]
   },
-  "effortLevel": "medium",
+  "effortLevel": "xhigh",
   "voice": {
     "enabled": true,
     "mode": "hold"

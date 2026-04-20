@@ -30,20 +30,20 @@ argument-hint: "<hint>"             # optional
 
 ### Required Fields
 
-Every skill must have all five of these:
+Every skill must have all four of these:
 
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | One-line plain text, under 80 chars. Starts with a verb or noun phrase, no trailing period. |
 | `disable-model-invocation` | `true` for skills invoked only by the user. `false` for skills Claude should auto-invoke when relevant. Always explicit — never rely on the default. |
-| `model` | `haiku`, `sonnet`, or `opus`. See [Model Selection](#model-selection). |
 | `effort` | `low`, `medium`, or `high`. See [Effort Selection](#effort-selection). |
 
 ### Optional Fields
 
 | Field | When to include |
 |-------|-----------------|
+| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Include when the task's cognitive demand diverges from the session default. Omit to let the skill inherit the session model. See [Model Selection](#model-selection). |
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 
@@ -55,17 +55,9 @@ Every skill must have all five of these:
 
 ## Model Selection
 
-Match the model to the cognitive demands of the task:
-
-| Model | When to use | Examples |
-|-------|-------------|---------|
-| `haiku` | Mechanical, low-judgment tasks with explicit steps | commit-push, repo-sync |
-| `sonnet` | Moderate judgment, following documented conventions | orient, ref-check, sdd-green |
-| `opus` | High judgment, ambiguity resolution, design decisions | sdd-design, sdd-red, polish |
-
-If the skill's instructions fully prescribe what to do, use a cheaper model.
-If the skill requires judgment calls, trade-off evaluation, or ambiguity
-resolution, use a more capable model.
+When authoring a skill, ask the user which model to pin. If the user says
+none, omit the `model` field entirely — the skill will inherit the session
+model.
 
 ## Effort Selection
 
@@ -138,6 +130,6 @@ The agent loads these on demand rather than paying the context cost upfront.
 Before shipping a new skill:
 
 - [ ] Directory name matches `name` field
-- [ ] All five required front matter fields present
+- [ ] All four required front matter fields present
 - [ ] Body starts with an `# H1` title
 - [ ] Arguments use `$ARGUMENTS` or `$0`/`$1` per the conventions above

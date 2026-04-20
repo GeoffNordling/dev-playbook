@@ -2,7 +2,6 @@
 name: commit-push
 description: Commit and push
 disable-model-invocation: true
-model: haiku
 effort: low
 argument-hint: "[fast]"
 allowed-tools: Bash(git *)
