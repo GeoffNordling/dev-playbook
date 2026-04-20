@@ -1,30 +1,31 @@
-"""Extract OFT coverage from pytest markers and generate spec items.
+"""Pytest marker harvest → synthetic utest spec items.
 
 Scans collected pytest items for markers whose names match OFT artifact types
-(e.g., @pytest.mark.req, @pytest.mark.dsn). For each unique spec ID referenced,
-generates a ``utest`` spec item that covers it. The generated items are written
-to a temporary markdown file that OFT can read alongside the real spec dirs.
+(e.g. ``@pytest.mark.req``). For each unique covered spec ID, generates a
+``utest`` spec item that covers it. The synthesized markdown is written to a
+temporary directory and handed to the OFT trace pass alongside the real spec
+dirs.
 
-This bridges the gap between pytest-level traceability markers and OFT's
-markdown-only tracing model.
+Bridges pytest-level traceability markers and OFT's markdown-only model.
 """
+
+from __future__ import annotations
 
 import tempfile
 from pathlib import Path
 
 import pytest
 
-from pytest_sdd.models import KNOWN_ARTIFACT_TYPES, SPEC_ID_BARE_RE
+from sdd_tools.models import KNOWN_ARTIFACT_TYPES, SPEC_ID_BARE_RE
 
-# Marker names we scan for: OFT artifact types that appear in test markers
 _MARKER_NAMES = KNOWN_ARTIFACT_TYPES
 
 
 def collect_covered_ids(items: list[pytest.Item]) -> dict[str, set[str]]:
     """Scan pytest items for OFT-related markers and return covered spec IDs.
 
-    Returns a dict mapping each covered spec ID (e.g. "req~auth.login~1")
-    to the set of test node IDs that cover it.
+    Returns a dict mapping each covered spec ID (e.g. "req~auth.login~1") to
+    the set of test node IDs that cover it.
     """
     covered: dict[str, set[str]] = {}
     for item in items:
@@ -38,10 +39,7 @@ def collect_covered_ids(items: list[pytest.Item]) -> dict[str, set[str]]:
 
 
 def generate_coverage_markdown(covered_ids: dict[str, set[str]]) -> str:
-    """Generate OFT-compatible markdown with utest items covering the given IDs.
-
-    Each unique covered spec ID gets one ``utest`` item with a Covers: link.
-    """
+    """Generate OFT-compatible markdown of utest items covering the given IDs."""
     if not covered_ids:
         return ""
 
@@ -70,10 +68,7 @@ def generate_coverage_markdown(covered_ids: dict[str, set[str]]) -> str:
 
 
 def write_coverage_file(covered_ids: dict[str, set[str]], tmp_dir: Path) -> Path:
-    """Write generated coverage markdown to a file in the given directory.
-
-    Returns the path to the written file.
-    """
+    """Write generated coverage markdown to a file and return the path."""
     content = generate_coverage_markdown(covered_ids)
     coverage_file = tmp_dir / "utest-coverage.md"
     coverage_file.write_text(content, encoding="utf-8")
@@ -82,16 +77,16 @@ def write_coverage_file(covered_ids: dict[str, set[str]], tmp_dir: Path) -> Path
 
 def create_coverage_dir(
     items: list[pytest.Item],
-) -> "tempfile.TemporaryDirectory | None":
-    """Scan items for markers and create a temp dir with coverage markdown.
+) -> tempfile.TemporaryDirectory[str] | None:
+    """Scan items for markers and create a temp dir holding the coverage file.
 
-    Returns a TemporaryDirectory (caller must manage its lifecycle) or None
-    if no markers were found.
+    Returns a TemporaryDirectory (caller manages lifecycle) or None if no
+    markers were found.
     """
     covered_ids = collect_covered_ids(items)
     if not covered_ids:
         return None
 
-    tmp = tempfile.TemporaryDirectory(prefix="pytest-sdd-")
+    tmp = tempfile.TemporaryDirectory(prefix="sdd-tools-")
     write_coverage_file(covered_ids, Path(tmp.name))
     return tmp

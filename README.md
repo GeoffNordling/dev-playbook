@@ -86,6 +86,7 @@ Deterministic validators and compressors for spec-driven-development artifacts. 
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| pytest plugin | `sdd-tools/src/pytest_sdd/` | OFT spec validation: lint checks + traceability via OFT JAR |
-| CLI tool | `sdd-tools/src/sdd_chain_text/` | Display spec traceability chains with body text |
+| Package | `sdd-tools/src/sdd_tools/` | Validators (lint, coverage, interface, privacy) + chain compressor |
+| pytest plugin | `sdd_tools.pytest_plugin` | hosts every validator as a `spec`-marked item |
+| CLI tool | `sdd-chain` (`sdd_tools.cli.chain`) | Display spec traceability chains with body text |
 | Vendored JAR | `sdd-tools/lib/openfasttrace-4.2.2.jar` | OpenFastTrace JAR (gitignored) |
