@@ -5,14 +5,7 @@ Our specs use two complementary systems:
 - **RFC 2119 modal verbs + EARS sentence templates** — govern the *prose* inside each spec item: what the requirement says and how strong the obligation is.
 - **OpenFastTrace (OFT) Requirement-Enhanced Markdown** — governs the *structure* of each spec item: how it is identified, how items link to each other, and how a tracing tool can verify that every requirement has been designed, implemented, and tested.
 
-RFC 2119 and EARS handle how individual requirements read. OFT handles structure and linking. The two systems are independent and complementary.
-
-## References
-
-- RFC 2119 — Key Words for Use in RFCs to Indicate Requirement Levels (Bradner, 1997)
-- EARS — Easy Approach to Requirements Syntax (Mavin et al.)
-- OFT user guide (canonical format reference): https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md
-- OFT repository: https://github.com/itsallcode/openfasttrace
+RFC 2119 and EARS handle how individual requirements read. OFT handles structure and linking. The two systems are independent and complementary. See [overview.md](overview.md#references) for the canonical references.
 
 ## Prose: RFC 2119 and EARS
 
@@ -139,7 +132,7 @@ Every keyword is followed by a colon. Content may start on the same line or the 
 |---|---|---|
 | `Status:` | Lifecycle state: `draft`, `proposed`, or `approved`. Appears before the description. | OFT does **not** exclude `draft` items from coverage — status is informational only. |
 | `Covers:` | Upstream IDs this item satisfies. Bullet format (`-`, `*`, or `+`), one ID per line. | Machine-readable claim, not free-form prose. |
-| `Needs:` | Downstream artifact types that `SHALL` cover this item. | Comma-separated (`Needs: dsn, utest`) or bulleted list. Do not mix formats within one item. |
+| `Needs:` | Downstream artifact types that `SHALL` cover this item. | Comma-separated (`Needs: dsn, utest`). |
 | `Rationale:` | Why the requirement exists. | Named field so tooling can extract it separately from the description. |
 | `Comment:` | Caveats, implementation notes, or anything that fits neither description nor rationale. | |
 | `Tags:` | Comma-separated labels for filtering traces by team or component. | Optional. |

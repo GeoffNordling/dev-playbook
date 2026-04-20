@@ -1,23 +1,16 @@
 # Spec Tooling
 
-## pytest-sdd
+Two tools ship from the `pytest-sdd` package in dev-playbook: a pytest plugin (`pytest-sdd`) and a standalone CLI (`sdd-chain`). Both read the same `[tool.pytest-sdd]` configuration.
 
-`pytest-sdd` is a pytest plugin that hosts every SDD validator as part of the normal test suite. Each validator runs as a single pytest item tagged with the `spec` marker:
-
-- **`spec-lint`** — structural validation of every `.md` spec file: ID format, Status field, bare obligation keywords, mixed obligation levels, Covers syntax, Needs values, fenced code blocks.
-- **`spec-coverage`** — full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied.
-- **`spec-interface`** — for every dsn item that declares an `Interface:`, imports the named symbol and verifies the actual signature matches the committed one. Hard-fails on missing symbol or signature mismatch.
-- **`spec-privacy`** — AST scan of every test file flagging non-dunder leading-underscore imports and attribute accesses that reach into non-test modules. Local underscore helpers in test files pass.
-
-Each validator emits structured `Finding` blocks; the failure message renders them in a uniform format.
-
-**Installation:**
+## Installation
 
 ```bash
 uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=sdd-tools"
 ```
 
-**Configuration** in `pyproject.toml`:
+## Configuration
+
+In `pyproject.toml`:
 
 ```toml
 [tool.pytest-sdd]
@@ -37,6 +30,19 @@ spec_dirs = ["specs/functional_requirements"]
 oft_jar = "../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar"
 ```
 
+**OFT JAR requirement.** Java must be on `PATH`. The JAR file must exist at the configured path. Neither is optional — a missing JAR or missing Java is a hard failure for `spec-coverage`, `spec-interface`, and `sdd-chain`.
+
+## pytest-sdd
+
+`pytest-sdd` is a pytest plugin that hosts every SDD validator as part of the normal test suite. Each validator runs as a single pytest item tagged with the `spec` marker:
+
+- **`spec-lint`** — structural validation of every `.md` spec file: ID format, Status field, bare obligation keywords, mixed obligation levels, Covers syntax, Needs values, fenced code blocks.
+- **`spec-coverage`** — full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied.
+- **`spec-interface`** — for every dsn item that declares an `Interface:`, imports the named symbol and verifies the actual signature matches the committed one. Hard-fails on missing symbol or signature mismatch.
+- **`spec-privacy`** — AST scan of every test file flagging non-dunder leading-underscore imports and attribute accesses that reach into non-test modules. Local underscore helpers in test files pass.
+
+Each validator emits structured `Finding` blocks; the failure message renders them in a uniform format.
+
 **Invocation:**
 
 ```bash
@@ -50,23 +56,13 @@ pytest -m "not spec"                 # skip every SDD validator
 
 Validators run automatically when `pytest` is invoked without `-m` flags, alongside the project's normal test suite. The `spec` marker allows selective execution.
 
-**OFT JAR requirement:** Java must be on `PATH`. The JAR file must exist at the configured path. Neither is optional — a missing JAR or missing Java is a hard test failure for `spec-coverage` and `spec-interface`.
-
 ## sdd-chain
 
-`sdd-chain` is a standalone CLI that displays full spec traceability chains with verbatim body text. It reads the same `[tool.pytest-sdd]` configuration as `pytest-sdd`, runs the OFT JAR's `convert` command to extract all spec items as structured XML, enumerates coverage chains (feat → req → dsn), and prints each chain with the full text of every item at every layer.
+`sdd-chain` is a standalone CLI that displays full spec traceability chains with verbatim body text. It runs the OFT JAR's `convert` command to extract all spec items as structured XML, enumerates coverage chains (feat → req → dsn), and prints each chain with the full text of every item at every layer.
 
 The tool answers the question "is the content at each layer appropriate?" — features describe capabilities, functional requirements describe behavior, design items name interfaces and make structural decisions. Each chain is self-contained: shared upstream items repeat so that every chain can be read independently.
 
 Test layers (utest, itest) are excluded from output. Coverage validation is out of scope — that is what `pytest -m spec -k coverage` does.
-
-**Installation:**
-
-`sdd-chain` ships as a console script from the same `pytest-sdd` package:
-
-```bash
-uv add --dev "pytest-sdd @ git+https://github.com/GeoffNordling/dev-playbook#subdirectory=sdd-tools"
-```
 
 **Invocation:**
 
@@ -78,5 +74,3 @@ sdd-chain --file registry       # chains with items from files matching this sub
 sdd-chain --feature '*user*'    # chains rooted at a feat item matching this glob
 sdd-chain --root /path/to/proj  # explicit project root (default: auto-detect from cwd)
 ```
-
-**OFT JAR requirement:** Same as `pytest-sdd` — Java must be on `PATH` and the OFT JAR must exist at the configured path.

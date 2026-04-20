@@ -1,10 +1,4 @@
-"""End-to-end tests for the sdd-tools pytest plugin via pytester.
-
-These tests stand up a minimal project tree, invoke pytest within it, and
-inspect the collected/run items. The OFT JAR is stubbed out as a small file
-that's only used for existence checks — Java-dependent items are skipped
-unless tests specifically exercise them.
-"""
+"""Tests for sdd_tools.pytest_plugin."""
 
 VALID_REQ = """\
 ---

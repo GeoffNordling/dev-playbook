@@ -28,7 +28,7 @@ Standards, agent configuration, project templates, and CLI tools for a multi-rep
 
 All repos live under a single root directory: `~/workspace/`. One meta repo governs everything else: **dev-playbook** (this repo).
 
-## What's in this repo
+## What's here
 
 ### Protocols (protocols/)
 
@@ -45,7 +45,7 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 
 ### SDD standards (sdd-standards/)
 
-Spec-driven-development standards: philosophy, writing conventions, design layer, tooling. See [sdd-standards/README.md](sdd-standards/README.md).
+Spec-driven development standards: philosophy, writing conventions, design layer, tooling. See [sdd-standards/README.md](sdd-standards/README.md).
 
 | Object | Location | Purpose |
 |--------|----------|---------|
@@ -82,11 +82,11 @@ CLI utilities and shared libraries for workspace automation. See [tools/README.m
 
 ### SDD tools (sdd-tools/)
 
-Deterministic validators and compressors for spec-driven-development artifacts. See [sdd-tools/README.md](sdd-tools/README.md).
+Deterministic validators and compressors for spec-driven development artifacts. See [sdd-tools/README.md](sdd-tools/README.md).
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Package | `sdd-tools/src/sdd_tools/` | Validators (lint, coverage, interface, privacy) + chain compressor |
+| Package | `sdd-tools/src/sdd_tools/` | Validators (lint, coverage, interface, test-privacy) + chain compressor |
 | pytest plugin | `sdd_tools.pytest_plugin` | hosts every validator as a `spec`-marked item |
 | CLI tool | `sdd-chain` (`sdd_tools.cli.chain`) | Display spec traceability chains with body text |
 | Vendored JAR | `sdd-tools/lib/openfasttrace-4.2.2.jar` | OpenFastTrace JAR (gitignored) |

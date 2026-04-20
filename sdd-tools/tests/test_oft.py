@@ -1,4 +1,4 @@
-"""Tests for sdd_tools.oft — XML parsing and Interface extraction."""
+"""Tests for sdd_tools.oft."""
 
 from pathlib import Path
 

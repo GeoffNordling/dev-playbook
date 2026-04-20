@@ -34,45 +34,38 @@ The tools here serve two narrow, enduring purposes:
 cd sdd-tools && uv sync
 ```
 
-Requires Python >= 3.11, [uv](https://docs.astral.sh/uv/), and Java on `PATH` for the OFT JAR.
+Requires Python >= 3.11, [uv](https://docs.astral.sh/uv/), Java on `PATH`, and the OpenFastTrace JAR at `lib/openfasttrace-4.2.2.jar` (gitignored; download from https://github.com/itsallcode/openfasttrace/releases/tag/4.2.2).
 
-## Layout
-
-```
-sdd-tools/
-├── src/sdd_tools/
-│   ├── models.py           SpecItem + Finding (canonical types)
-│   ├── config.py           [tool.pytest-sdd] reader
-│   ├── oft.py              JAR adapter: trace, convert, parse XML → SpecItem
-│   ├── lint.py             markdown lint → Finding list
-│   ├── interface.py        Interface: parser + signature introspection
-│   ├── privacy.py          AST test-privacy walk
-│   ├── markers.py          pytest markers → synthetic utest md
-│   ├── pytest_plugin.py    plugin entry; one pytest item per validator
-│   ├── chains.py           coverage chain builder
-│   ├── filtering.py        chain filters
-│   ├── formatter.py        chain text renderer
-│   └── cli/chain.py        sdd-chain entry point
-├── tests/
-├── lib/openfasttrace-4.2.2.jar   (gitignored)
-├── pyproject.toml
-└── Makefile
-```
-
-## Vendored binaries (`lib/`)
-
-| File | Purpose |
-|------|---------|
-| `openfasttrace-4.2.2.jar` | OpenFastTrace JAR used by every JAR-backed validator (gitignored) |
-
-## Tools
+## What's here
 
 | Surface | Entry point | Purpose |
 |---------|-------------|---------|
-| pytest plugin | `sdd_tools.pytest_plugin` | hosts `spec-lint`, `spec-coverage`, `spec-interface`, `spec-privacy` items |
+| pytest plugin | `sdd_tools.pytest_plugin` | hosts every validator as a `spec`-marked item |
 | CLI | `sdd-chain` (`sdd_tools.cli.chain:main`) | render full spec traceability chains with body text |
 
-Each tool supports `--help` for usage. See [sdd-standards/tooling.md](../sdd-standards/tooling.md) for installation, configuration, invocation, and CI integration.
+## Tool reference
+
+Each tool supports `--help` for full usage. See [sdd-standards/tooling.md](../sdd-standards/tooling.md) for configuration, invocation detail, and CI integration.
+
+### pytest-sdd
+
+Pytest plugin that synthesizes one `spec`-marked pytest item per SDD validator (lint, coverage, interface, test-privacy). Items fail with rendered `Finding` blocks.
+
+```bash
+pytest -m spec                       # all SDD validators
+pytest -m spec -k lint               # lint only
+pytest -m "not spec"                 # skip every SDD validator
+```
+
+### sdd-chain
+
+Render full spec traceability chains (feat → req → dsn) with verbatim body text at every layer. Test layers are excluded from output.
+
+```bash
+sdd-chain                       # dump all chains
+sdd-chain --id '*auth*'         # chains containing a matching item
+sdd-chain --feature '*user*'    # chains rooted at a matching feat item
+```
 
 ## Output contract
 
@@ -95,3 +88,15 @@ The pytest plugin renders the failing item's failure message as the rendered Fin
 | 2 | Tool-level error — JAR missing, Java missing, unreadable config |
 
 pytest-hosted validators inherit pytest's native exit scheme.
+
+## Development
+
+```bash
+cd sdd-tools && uv sync      # setup
+uv run pytest                # tests
+make lint                    # ruff check
+make format                  # ruff format
+make typecheck               # mypy
+```
+
+Python >= 3.11; ruff for lint + format, mypy for type checking. Line length 88 (ruff default). Ruff rules: E, W, F, I, UP, B, SIM, SLF (E501 ignored).

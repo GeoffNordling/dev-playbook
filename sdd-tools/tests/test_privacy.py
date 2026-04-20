@@ -1,4 +1,4 @@
-"""Tests for sdd_tools.privacy — AST test-privacy validator."""
+"""Tests for sdd_tools.privacy."""
 
 from pathlib import Path
 

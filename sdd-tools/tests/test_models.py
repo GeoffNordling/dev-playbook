@@ -1,4 +1,4 @@
-"""Tests for sdd_tools.models — SpecItem and Finding."""
+"""Tests for sdd_tools.models."""
 
 from pathlib import Path
 

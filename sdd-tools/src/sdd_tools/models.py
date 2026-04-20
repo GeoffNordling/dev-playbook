@@ -26,7 +26,7 @@ KNOWN_ARTIFACT_TYPES = frozenset(
         "utest",
         "itest",
         "stest",
-        "sman",
+        "uman",
         "oman",
     }
 )

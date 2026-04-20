@@ -1,4 +1,4 @@
-"""Tests for sdd_tools.markers — pytest marker harvest."""
+"""Tests for sdd_tools.markers."""
 
 from pathlib import Path
 from unittest.mock import Mock

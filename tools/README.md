@@ -2,8 +2,6 @@
 
 CLI utilities and shared libraries for workspace automation; lightweight, pragmatic glue across a multi-repo workspace.
 
-> Spec-driven-development tools live in [`sdd-tools/`](../sdd-tools/).
-
 > *"The perfect race car crosses the finish line in first place and then falls to pieces."*  
 > — Ferdinand Porsche
 >
@@ -20,14 +18,14 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 
 ## What does NOT belong here
 
-- Spec-driven-development tools — those go in [`sdd-tools/`](../sdd-tools/)
+- Spec-driven development tools — those go in [`sdd-tools/`](../sdd-tools/)
 - Project-specific scripts — put them in that project's repo
 - Anything with a dedicated home elsewhere in this repo (standards, agent config, templates, shell aliases)
 
 ## Setup
 
 ```bash
-cd tools && uv pip install -e .   # installs devtools_lib
+cd tools && uv sync
 ```
 
 Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/). Standalone scripts in `bin/` use PEP 723 inline metadata; `uv run` handles their dependencies automatically. Skills reference tools by absolute path; no PATH configuration needed.
@@ -160,4 +158,14 @@ workspace-backup --force              # overwrite existing output
 
 Skips hidden directories, non-repo subfolders, and the entries in `devtools_lib.workspace.SKIP_DIRS`. Symlinks are not followed.
 
+## Development
 
+```bash
+cd tools && uv sync          # setup
+uv run pytest                # tests
+make lint                    # ruff check
+make format                  # ruff format
+make typecheck               # mypy
+```
+
+Python >= 3.11; ruff for lint + format, mypy for type checking. Line length 88 (ruff default). Ruff rules: E, W, F, I, UP, B, SIM, SLF (E501 ignored). Standalone scripts in `bin/` use PEP 723 inline metadata — their dependencies do not go in `pyproject.toml`. Packages in `src/` ship via `pyproject.toml` console entry points. When adding a new tool, add it to the tables above.

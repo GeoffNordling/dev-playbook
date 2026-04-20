@@ -1,4 +1,4 @@
-"""Tests for sdd_tools.lint — Finding-emitting markdown lint."""
+"""Tests for sdd_tools.lint."""
 
 from pathlib import Path
 

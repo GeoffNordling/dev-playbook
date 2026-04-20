@@ -33,7 +33,7 @@ _SDD_KEY: pytest.StashKey[SddConfig] = pytest.StashKey()
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
-        "spec: marks SDD validation tests (lint, coverage, interface, privacy)",
+        "spec: marks SDD validation tests (lint, coverage, interface, test-privacy)",
     )
     sdd_config = load_config_from_root(Path(config.rootpath))
     if sdd_config is not None:
@@ -51,7 +51,7 @@ def pytest_collection_modifyitems(
         return
 
     # Snapshot test items before injection so validators that depend on the
-    # real test suite (privacy, coverage marker harvest) don't see our items.
+    # real test suite (test-privacy, coverage marker harvest) don't see our items.
     test_items = list(items)
 
     spec_items: list[pytest.Item] = [
@@ -104,7 +104,7 @@ class SddTraceError(Exception):
 
 
 class SddValidatorItem(pytest.Item):
-    """Pytest item for a Finding-emitting validator (lint, interface, privacy)."""
+    """Pytest item for a Finding-emitting validator (lint, interface, test-privacy)."""
 
     def __init__(
         self,

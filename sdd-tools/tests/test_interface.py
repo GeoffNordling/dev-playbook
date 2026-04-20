@@ -1,4 +1,4 @@
-"""Tests for sdd_tools.interface — Interface signature validator."""
+"""Tests for sdd_tools.interface."""
 
 from __future__ import annotations
 

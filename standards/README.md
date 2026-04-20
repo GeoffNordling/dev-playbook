@@ -2,7 +2,7 @@
 
 Cross-project engineering standards that apply to all repositories in the workspace.
 
-> Spec-driven-development standards live in [`sdd-standards/`](../sdd-standards/).
+> Spec-driven development standards live in [`sdd-standards/`](../sdd-standards/).
 
 ## Contents
 

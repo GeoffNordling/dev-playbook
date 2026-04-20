@@ -12,7 +12,7 @@ memory or verbal handoff.
 
 This standard governs how work is tracked and handed off. It does not govern how
 code is developed. Projects that follow spec-driven development use the
-[spec-driven-development standard](../sdd-standards/overview.md) and its
+[spec-driven development standard](../sdd-standards/overview.md) and its
 associated skills for that.
 
 ## Mental Model
