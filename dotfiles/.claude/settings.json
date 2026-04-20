@@ -12,6 +12,7 @@
       }
     ]
   },
+  "effortLevel": "medium",
   "voice": {
     "enabled": true,
     "mode": "hold"
