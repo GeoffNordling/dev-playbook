@@ -19,16 +19,6 @@ Throughout the rest of this skill they are referred to as the *testing conventio
 
 The user provides free-form input describing what feature or requirements to write tests for.
 
-## Agent Identity
-
-The FIRST line of your FIRST message MUST be exactly:
-
-```
-<<<AGENT:sdd-red>>>
-```
-
-Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
-
 ## Critical Rule — Test Isolation
 
 Do NOT write real implementation code. Implementation happens in a separate agent session using `/sdd-green`.
