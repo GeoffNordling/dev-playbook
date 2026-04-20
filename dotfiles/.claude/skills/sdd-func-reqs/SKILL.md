@@ -18,16 +18,6 @@ Throughout the rest of this skill it is referred to as the *writing reference*.
 
 The user provides free-form input describing what they want to specify or what area needs updating.
 
-## Agent Identity
-
-The FIRST line of your FIRST message MUST be exactly:
-
-```
-<<<AGENT:sdd-func-reqs>>>
-```
-
-Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
-
 ## First Steps
 
 1. Check for a handoff file at `<project_root>/.claude/sdd-handoff.md`. If it exists, read it for issue context and scope.

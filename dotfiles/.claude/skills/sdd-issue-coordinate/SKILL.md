@@ -23,16 +23,6 @@ Throughout the rest of this skill it is referred to as the *development workflow
 The user provides an issue number, URL, or description, plus any optional
 context.
 
-## Agent Identity
-
-The FIRST line of your FIRST message MUST be exactly:
-
-```
-<<<AGENT:sdd-issue-coordinate>>>
-```
-
-Output it verbatim with no other text on that line. This is a machine-readable sentinel for transcript consumers.
-
 ## First Steps
 
 1. Follow the **Session Handoff** sequence from the development workflow standard to reconstruct
