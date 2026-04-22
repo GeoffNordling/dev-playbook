@@ -2,11 +2,12 @@
 """Check cross-references in markdown files.
 
 Scans all .md files for ~/workspace/ paths, resolves them, and reports
-status as JSON Lines to stdout. Targets may be any file or directory.
-Fenced code blocks are skipped. Designed for agent consumption.
+broken references as JSON Lines to stdout. Targets may be any file or
+directory. Fenced code blocks are skipped. Pass --all to emit every
+reference (including ok/external) for agent consumption.
 
 Usage:
-    ref-check [directory]
+    ref-check [--all] [directory]
 """
 # /// script
 # requires-python = ">=3.11"
@@ -110,6 +111,11 @@ def main():
         default=".",
         help="Repository root to scan (default: current directory)",
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Emit JSON for every reference, not just broken ones",
+    )
     args = parser.parse_args()
 
     repo_root = Path(args.directory).resolve()
@@ -134,11 +140,12 @@ def main():
 
     for filepath in md_files:
         for ref in scan_file(filepath, repo_root):
-            print(json.dumps(ref))
             total += 1
             if ref["status"] == "broken":
                 has_broken = True
                 broken += 1
+            if args.all or ref["status"] == "broken":
+                print(json.dumps(ref))
 
     if total == 0:
         print(f"ref-check: no cross-references found in {repo_root}", file=sys.stderr)
