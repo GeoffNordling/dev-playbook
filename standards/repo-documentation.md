@@ -26,13 +26,22 @@ Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
 file. The distinction governs formatting conventions and cross-reference style.
 
-All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/writing.md`. This makes every reference detectable and resolvable by tooling. The audience determines the wrapper:
+All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/writing.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored. The audience determines the wrapper:
 
 | Audience | Cross-reference style |
 |---|---|
 | Human | Inline link with full path as target — e.g., `[spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md)`. |
 | Human + Agent | Same as Human. |
 | Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/writing.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+
+### Fenced code blocks
+
+Fenced code blocks delimited by triple backticks or `~~~` may contain `~/workspace/` paths in shell examples or sample output; `ref-check` skips them. For example:
+
+```bash
+# Run ref-check from any workspace repo:
+python3 ~/workspace/dev-playbook/tools/bin/ref-check .
+```
 
 ### Presence
 

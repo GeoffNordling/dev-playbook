@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Check cross-references between markdown files.
+"""Check cross-references in markdown files.
 
 Scans all .md files for ~/workspace/ paths, resolves them, and reports
-status as JSON Lines to stdout. Designed for agent consumption.
+status as JSON Lines to stdout. Targets may be any file or directory.
+Fenced code blocks are skipped. Designed for agent consumption.
 
 Usage:
     ref-check [directory]
@@ -36,7 +37,8 @@ EXCLUDE_DIRS = {
     "node_modules",
 }
 
-REF_PATTERN = re.compile(r"~/workspace/[^ )`]+\.md")
+REF_PATTERN = re.compile(r"~/workspace/[^ )`]+")
+FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
 
 
 def find_md_files(root: Path) -> list[Path]:
@@ -73,11 +75,18 @@ def scan_file(filepath: Path, repo_root: Path) -> list[dict]:
     """Extract and classify all cross-references in a file."""
     results = []
     source = str(filepath.relative_to(repo_root))
+    in_fence = False
     with open(filepath) as f:
         for line_num, line in enumerate(f, start=1):
+            if FENCE_PATTERN.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
             for match in REF_PATTERN.finditer(line):
                 target_str = match.group(0)
-                resolved = Path(target_str.replace("~", str(Path.home())))
+                path_str = target_str.split("#", 1)[0]
+                resolved = Path(path_str.replace("~", str(Path.home())))
                 status = classify_ref(resolved, repo_root)
                 results.append(
                     {
