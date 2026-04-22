@@ -55,4 +55,45 @@ Read in full:
 - `~/workspace/dev-playbook/docs/adr/004-observable-to-tests-design-scope.md`
 - `~/workspace/dev-playbook/docs/adr/005-design-dimensions-and-verification-fields.md`
 
-## Shared Alignment — pending
+## Shared Alignment — **approved**
+
+### Description
+
+Enumerable report for every facet: items sorted by classification, then by
+source location. Each item names a specific thing, cites where, states what
+I observe. Try this shape across all six facets; may revise per-facet if it
+fits poorly.
+
+1. **Organization** — module/package tree compactly rendered, short layering
+   statement, grouping rationale I infer. Flag files with no clear home,
+   oversized modules, shallow wrappers.
+2. **Functionality** — for each module/public function in scope: one-line
+   purpose and an observation of whether the code delivers it. Flag mismatches
+   (purpose-unclear, code-does-more, code-does-less, "can't tell").
+3. **Duplication** — enumerated instances of the same logic/functionality in
+   more than one place. Per item: locations (≥2), what's duplicated, and
+   whether it looks true-duplicate or parallel-but-intentionally-different.
+4. **Dependencies** — (a) external deps with purpose; (b) internal
+   module-to-module edges. Flag circular deps, heavy chains, deps that look
+   undermotivated.
+5. **Test structure** — inventory: test files, fixtures (location, scope,
+   what they produce), naming conventions, coverage granularity,
+   mock/synthetic vs. real spec data.
+6. **Test value** — per test, one line: does it verify real behavior, or is
+   it fake-green? Flag fake-green and "can't tell without running" as their
+   own items.
+
+Counts where they help. Anchors use `path:line` or `module.symbol`.
+
+### Quality
+
+- **Complete within scope.** No silent skipping. When a facet has no finding
+  for a region, say so.
+- **Anchored.** Every assertion cites `path:line` or a fully-qualified symbol.
+- **Compressed.** A few lines per item.
+- **Neutral.** Describe; don't pre-grade. The user judges.
+- **Uncertainty-honest.** "Can't tell" is a first-class finding.
+- **Redundancy-aware.** Cross-reference when the same finding spans facets;
+  don't re-state.
+
+## Map — pending
