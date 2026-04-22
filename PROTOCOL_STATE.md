@@ -165,7 +165,7 @@ in a single pass.
 | # | Region | Status |
 |---|---|---|
 | 1 | Package glue | complete |
-| 2 | Config | not started |
+| 2 | Config | analyzed, awaiting direction |
 | 3 | Data models | not started |
 | 4 | Markdown parser | not started |
 | 5 | OFT JAR wrapper | not started |
@@ -178,7 +178,17 @@ in a single pass.
 
 ## Displaced Content
 
-_(Findings surfaced in one region's pass that belong to a later region. None yet.)_
+### For Region 11 (CLI suite)
+
+- **Duplicated "resolve config or exit 2" pattern across all 4 CLIs.**
+  Each of `cli/chain.py:72,74`, `cli/index.py:45,48`, `cli/atlas.py:44,47`,
+  `cli/review.py:53,56` repeats:
+      root = args.root or find_project_root()
+      config = load_config_from_root(root)
+      if config is None: print err; return 2
+  Candidate for a small helper in `config.py` (e.g.
+  `resolve_config(root_arg) -> SddConfig`). Surfaced during Region 2
+  (Config) analysis; belongs in the CLI-suite pass where it lives.
 
 ## Intent Calibration Log
 
