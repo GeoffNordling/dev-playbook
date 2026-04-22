@@ -200,7 +200,7 @@ toward $\sigma^\ast$.
 
 After completing a unit of work, the human and agent update $M$
 (status, structure) and may revise $A$ if the work revealed a gap
-in the operating model. When traversing $M$ by facet, content
-removed from one facet may belong in another; displaced content is
-recorded in the protocol state document until the relevant pass.
+in the operating model. Findings surfaced during one pass that belong
+in a later pass are recorded as displaced content in the protocol
+state document until their pass.
 The work is complete when $O$ is satisfied.

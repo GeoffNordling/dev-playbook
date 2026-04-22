@@ -174,8 +174,9 @@ revise the map (status, structure), record progress at the granularity
 of the traversal (e.g., if working facet-by-facet, mark which facets
 are complete), and revise the shared alignment if the work revealed a
 gap in the operating model. A fresh agent resuming from the document
-should see exactly where to pick up. When working facet-by-facet,
-content removed from one facet often belongs in a later facet. Record
+should see exactly where to pick up. Findings surfaced during one
+pass often belong in a later pass (a later facet under facet-major
+traversal, a later region under region-major traversal). Record
 displaced content so nothing is lost between passes. The work is
 complete when the objective is satisfied.
 
@@ -203,8 +204,8 @@ The document contains:
   refined through alignment
 - **Shared alignment** — the operating model reached in Phase 1
 - **Map** — produced in Phase 2, region status updated during Phase 3
-- **Displaced content** — ideas removed from one facet that belong
-  in another, held until the relevant pass
+- **Displaced content** — findings surfaced during one pass that
+  belong in a later pass, held until that pass
 - **Intent calibration log** — updated during Phase 3 as the user
   gives direction
 - **Scratchpad** — the user's notes (see below)
