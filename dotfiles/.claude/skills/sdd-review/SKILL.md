@@ -1,6 +1,6 @@
 ---
 name: sdd-review
-description: Run the AgentReview inventory and report dsn commitments that are stale or out-of-sync with the code
+description: Check AgentReview commitments against the code and report drift
 disable-model-invocation: true
 model: opus
 effort: high

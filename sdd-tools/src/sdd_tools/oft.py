@@ -133,7 +133,7 @@ def parse_xml(xml_text: str) -> list[SpecItem]:
 
             description = _text(obj.find("description"))
             interfaces = (
-                _parse_interfaces(description) if doctype == "dsn" else []
+                parse_interfaces(description) if doctype == "dsn" else []
             )
 
             items.append(
@@ -169,7 +169,7 @@ def _text(element: ET.Element | None) -> str:
     return (element.text or "").strip()
 
 
-def _parse_interfaces(description: str) -> list[str]:
+def parse_interfaces(description: str) -> list[str]:
     """Extract Interface: signature lines from a dsn item description.
 
     Each line starting with `Interface:` contributes one signature.

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from sdd_tools.oft import _parse_interfaces, parse_xml
+from sdd_tools.oft import parse_interfaces, parse_xml
 
 
 def _xml(specobjects: str) -> str:
@@ -119,21 +119,21 @@ class TestParseXml:
 class TestParseInterfaces:
     def test_single_line(self):
         body = "Interface: foo.bar(x: int) -> None\n"
-        assert _parse_interfaces(body) == ["foo.bar(x: int) -> None"]
+        assert parse_interfaces(body) == ["foo.bar(x: int) -> None"]
 
     def test_indented_line(self):
         body = "    Interface: foo.bar(x: int) -> None\n"
-        assert _parse_interfaces(body) == ["foo.bar(x: int) -> None"]
+        assert parse_interfaces(body) == ["foo.bar(x: int) -> None"]
 
     def test_multiple(self):
         body = (
             "Interface: m.A.__init__(self, x: int) -> None\n"
             "Interface: m.A.run(self) -> None\n"
         )
-        assert _parse_interfaces(body) == [
+        assert parse_interfaces(body) == [
             "m.A.__init__(self, x: int) -> None",
             "m.A.run(self) -> None",
         ]
 
     def test_no_interface_returns_empty(self):
-        assert _parse_interfaces("Just prose, no Interface line.\n") == []
+        assert parse_interfaces("Just prose, no Interface line.\n") == []

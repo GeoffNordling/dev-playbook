@@ -32,7 +32,7 @@ def validate_interfaces(items: list[SpecItem]) -> list[Finding]:
 
 
 def _check_one(item: SpecItem, committed: str) -> list[Finding]:
-    qualified = _qualified_name(committed)
+    qualified = qualified_name(committed)
     if not qualified:
         return [
             Finding(
@@ -46,7 +46,7 @@ def _check_one(item: SpecItem, committed: str) -> list[Finding]:
             )
         ]
 
-    obj = _resolve_symbol(qualified)
+    obj = resolve_symbol(qualified)
     if obj is None:
         return [
             Finding(
@@ -93,7 +93,7 @@ def _check_one(item: SpecItem, committed: str) -> list[Finding]:
     return []
 
 
-def _qualified_name(committed: str) -> str:
+def qualified_name(committed: str) -> str:
     """Extract the dotted symbol path from a committed Interface: line."""
     paren = committed.find("(")
     if paren <= 0:
@@ -101,7 +101,7 @@ def _qualified_name(committed: str) -> str:
     return committed[:paren].strip()
 
 
-def _resolve_symbol(qualified: str) -> Any | None:
+def resolve_symbol(qualified: str) -> Any | None:
     """Resolve a dotted name by importing the longest module prefix.
 
     For ``a.b.C.method``, tries to import ``a.b.C.method`` first, then

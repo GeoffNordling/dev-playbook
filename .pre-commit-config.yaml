@@ -32,4 +32,10 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: test-privacy
+        name: test-privacy
+        entry: python3 tools/bin/test-privacy sdd-tools/tests
+        language: system
+        pass_filenames: false
+        always_run: true
 # --- end generated ---
