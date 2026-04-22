@@ -41,8 +41,6 @@ Substitute the modal verb in any EARS sentence to grade the requirement's obliga
 
 ### Prose Conventions
 
-**Artifact type vocabulary conflict.** Spec item names that happen to match an artifact type pattern (3–6 letters, hyphen, 3 digits — e.g., `SHA-256`, `AES-128`) `SHALL` be written in unhyphenated form (`SHA256`, `AES128`). OFT may parse these as malformed IDs.
-
 **Fenced code blocks.** Spec files `SHALL NOT` contain fenced code blocks (triple backticks). OFT's markdown parser silently ignores all spec items that appear after a fenced code block. Use indented code blocks (4-space indent) instead.
 
 **Illustrative examples.** A spec section that introduces non-trivial domain vocabulary `SHOULD` include a short illustrative example before the formal requirements. The example grounds the vocabulary in concrete terms so that requirements can reference it without re-explaining. Guidelines:

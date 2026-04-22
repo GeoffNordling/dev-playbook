@@ -88,7 +88,6 @@ Mapping from standard rule to the tool that enforces it.
 | [writing.md — Prose](writing.md#prose-rfc-2119-and-ears) | Backticked obligation keywords | `spec-lint` |
 | [writing.md — Prose](writing.md#prose-rfc-2119-and-ears) | One obligation level per item | `spec-lint` |
 | [writing.md — Prose](writing.md#prose-conventions) | Fenced code blocks forbidden | `spec-lint` |
-| [writing.md — Prose](writing.md#prose-conventions) | Unhyphenated ID-shaped name tokens | — |
 | [writing.md — Prose](writing.md#sentence-templates) | EARS sentence form | — |
 | [writing.md — Prose](writing.md#prose-conventions) | Illustrative examples (`SHOULD`) | — |
 | [writing.md — Structure](writing.md#id-format) | Well-formed `type~name~revision` IDs | `spec-lint` |
