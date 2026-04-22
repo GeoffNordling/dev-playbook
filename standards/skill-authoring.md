@@ -22,7 +22,7 @@ name: <skill-name>
 description: <one-line summary>
 disable-model-invocation: <true|false>
 model: <haiku|sonnet|opus>
-effort: <low|medium|high>
+effort: <low|medium|high|xhigh>
 allowed-tools: <tool spec>          # optional
 argument-hint: "<hint>"             # optional
 ---
@@ -37,7 +37,7 @@ Every skill must have all four of these:
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | One-line plain text, under 80 chars. Starts with a verb or noun phrase, no trailing period. |
 | `disable-model-invocation` | `true` for skills invoked only by the user. `false` for skills Claude should auto-invoke when relevant. Always explicit — never rely on the default. |
-| `effort` | `low`, `medium`, or `high`. See [Effort Selection](#effort-selection). |
+| `effort` | `low`, `medium`, `high`, or `xhigh`. See [Effort Selection](#effort-selection). |
 
 ### Optional Fields
 
@@ -61,11 +61,7 @@ model.
 
 ## Effort Selection
 
-| Effort | When to use | Examples |
-|--------|-------------|---------|
-| `low` | Single-purpose, linear workflow | commit-push, repo-sync, agent-finished |
-| `medium` | Multi-step with some branching | orient, ref-check, prime-user-context |
-| `high` | Complex multi-phase workflows with gates and iteration | sdd-issue-coordinate, sdd-design, sdd-red |
+When authoring a skill, ask the user which effort level to set. Valid values are `low`, `medium`, `high`, or `xhigh`.
 
 ## Arguments
 

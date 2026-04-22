@@ -3,20 +3,14 @@ name: sdd-design
 description: Design system structure from functional requirements
 disable-model-invocation: true
 model: opus
-effort: high
+effort: xhigh
 ---
 
 # SDD Design
 
-Collaborate with the user to design the system's structure before implementation begins. The design spec is the bridge between the functional spec and the red/green implementation phase.
+Collaborate with the user to produce the design spec for a feature before implementation begins.
 
-Before starting, read both of these references end to end:
-
-- [Spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) — OFT format for spec items, including the `Interface:` and `AgentReview:` keywords.
-- [Design-layer standard](~/workspace/dev-playbook/sdd-standards/design-layer.md) — commitment scope, the four decision dimensions, dimension section organization, and verification fields for design items.
-- [Overview](~/workspace/dev-playbook/sdd-standards/overview.md) — coverage chain mechanics and revision policy.
-
-Throughout the rest of this skill they are referred to as the *writing reference* and the *design-layer standard*.
+Before starting, read every `.md` file under `~/workspace/dev-playbook/sdd-standards/` and `~/workspace/dev-playbook/sdd-tools/` end-to-end. They are the authoritative source for spec structure, the design dimensions, the verification fields, and the CLIs you will invoke during the session. Do not proceed until you have read them.
 
 When your work is complete and approved, commit your changes and push the branch.
 
@@ -34,7 +28,8 @@ The user provides free-form input describing what they want to design or what fe
    - `specs/functional_requirements.md` or, if split, `specs/functional_requirements/index.md` (then load relevant files based on the index)
    - `specs/design.md` or, if split, `specs/design/index.md`
    - `docs/adr/` for prior architectural decisions (check `README.md` for the index)
-4. **Tell the user what you found** and what you understand the current state to be. Include the traceability summary: how many requirements are mapped vs. unmapped, and which unmapped requirements are candidates for this session. If `design.md` already exists, summarize what's already there and ask what section to extend next. If it does not exist, align on what specifically is being designed before proceeding.
+4. **Survey the existing `dsn` surface.** If a design spec exists, run `sdd-index` from the project root to get a one-line-per-`dsn` catalog grouped by dimension. This is your map of what is already committed before you add to it. Skip this step if no design spec exists yet.
+5. **Tell the user what you found** and what you understand the current state to be. Include the traceability summary: how many requirements are mapped vs. unmapped, and which unmapped requirements are candidates for this session. If `design.md` already exists, summarize what's already there and ask what section to extend next. If it does not exist, align on what specifically is being designed before proceeding.
 
 ## Brownfield Reconnaissance
 
@@ -46,21 +41,26 @@ Ask yourself: would a red agent be forced to invent class names, module boundari
 
 ## Drafting the Design Spec
 
-- **Start with the data model.** Define entities, their fields, containment relationships, and ownership before discussing pipelines or modules. Then define behavior on objects (methods they own). The processing pipeline should emerge from how the objects compose, not the other way around.
-- **Be precise about operations.** When a field is computed or aggregated, specify the exact operation (sum, min, max, count, derived). "Aggregated from X" is not a design; it defers the decision.
-- **Author `Interface:` entries for committed public surfaces.** When a dsn commits to a public callable, class, or method, declare its signature with an `Interface:` entry. One signature per line; repeat for multiple related signatures (e.g., a class plus its public methods). Format and annotation convention are in the writing reference.
-- **Prefer explicit structures over design pattern abstractions.** If a fixed containment hierarchy works, say that. Do not reach for Composite, Strategy, or other named patterns unless the problem genuinely requires that generality.
-- **Do not restate functional requirements.** The design spec documents decisions that are not already specified in the functional requirements: module boundaries, data structures, configuration choices, mechanism details. If a functional requirement fully specifies a behavior (e.g., exit code values, output format rules), the design spec should reference the requirement's OFT ID for traceability but not repeat the specification. Only add design-spec text when there is a genuine design decision beyond what the functional spec prescribes.
-- **Keep the design doc forward-looking.** Only describe the current design. Do not reference discarded alternatives, prior iterations, or the reasoning path. That belongs in ADRs.
-- **Order sections to follow the pipeline.** Sections should appear in the order they execute. If discovery happens before parsing, discovery comes first in the doc.
 - **Use the interview pattern.** Ask the user clarifying questions about architectural preferences before drafting anything. Incorporate answers into the design spec, not as side conversation.
+- **Work the dimensions in canonical order.** Draft Data first, then API Shape, then Algorithms, then Composition. Each dimension builds on the ones before it.
 - **Draft or update `specs/design.md`** (or files within `specs/design/` if split).
-- **Use RFC 2119 modal verbs** (SHALL, SHOULD, MAY) consistently.
-- **Structure design items as OFT spec items.** Use `dsn` type IDs (e.g., `dsn~auth.login-validation~1`). Each design item `SHALL` include a `Covers:` link to the `req` item(s) it satisfies and a `Needs:` declaration for required downstream coverage (typically `utest` and/or `itest`). See the writing reference for the full item anatomy.
-- **Non-mandatory requirements are optional to include in design.** SHOULD and MAY requirements do not need to appear in the design spec. However, any requirement that is included in the design spec — regardless of its obligation level — must be implemented and tested like all other designed requirements. Including a non-mandatory requirement in design is a commitment to deliver it.
+- **Be precise about operations.** When a field is computed or aggregated, specify the exact operation (sum, min, max, count, derived). "Aggregated from X" is not a design; it defers the decision.
+- **Prefer explicit structures over design-pattern abstractions.** If a fixed containment hierarchy works, say that. Do not reach for Composite, Strategy, or other named patterns unless the problem genuinely requires that generality.
+- **Do not restate functional requirements.** Reference the `req`'s OFT ID for traceability rather than repeating behavior the functional spec already pins down.
+- **Keep the design doc forward-looking.** Only describe the current design. Discarded alternatives and reasoning paths belong in ADRs.
+- **Non-mandatory requirements are optional to include.** `SHOULD` and `MAY` requirements do not need to appear in the design spec. However, any requirement included in the design spec — regardless of obligation level — must be implemented and tested like any other designed requirement. Including a non-mandatory requirement is a commitment to deliver it.
 - **Reference relevant ADRs** for the reasoning behind individual decisions rather than re-explaining them.
-- **Propose an ADR** if a significant new architectural decision is made during this process.
+- **Propose an ADR** if a significant new architectural decision emerges during the session.
 - **Present the draft to the user** and wait for approval. Iterate until they are satisfied.
+
+## Navigating a Growing `dsn` Collection
+
+As the design spec grows past what fits comfortably in a single prompt, two CLIs compress it to the view you need:
+
+- **`sdd-index`** — one line per `dsn` (id, title, source location) grouped by dimension. Run it when deciding whether to extend an existing `dsn` vs. add a new one, when surveying an unfamiliar dimension before drafting, or when you need the whole commitment inventory at a glance.
+- **`sdd-atlas`** — full body of every `dsn` grouped by dimension, including all keyword fields. Run it when `sdd-index`'s one-liners are not enough — e.g., to check for overlap with existing `Interface:` declarations before drafting a new one, or to read `Rationale:` fields before reusing a nearby abstraction.
+
+Rule of thumb: reach for `sdd-index` first; escalate to `sdd-atlas` only when titles don't answer the question.
 
 ## Output
 
