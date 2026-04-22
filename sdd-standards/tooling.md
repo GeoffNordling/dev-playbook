@@ -1,6 +1,6 @@
 # Spec Tooling
 
-Tools ship from the `pytest-sdd` package in dev-playbook: a pytest plugin (`pytest-sdd`) and two standalone CLIs (`sdd-chain`, `sdd-review`). All three read the same `[tool.pytest-sdd]` configuration.
+Tools ship from the `pytest-sdd` package in dev-playbook: a pytest plugin (`pytest-sdd`) and four standalone CLIs (`sdd-chain`, `sdd-review`, `sdd-index`, `sdd-atlas`). All read the same `[tool.pytest-sdd]` configuration.
 
 ## Installation
 
@@ -78,6 +78,36 @@ sdd-chain --root /path/to/proj  # explicit project root (default: auto-detect fr
 `sdd-review` is a standalone CLI that scans every `dsn` spec item for `AgentReview:` fields and emits structured records — spec ID, source location, prose body — for consumption by the `sdd-review` skill. The skill reads those records and dispatches a review agent per item, reporting items that are stale or out-of-sync with the code.
 
 `sdd-review` is reporting, not validation: it emits facts, does not gate a pytest run, and has no pass/fail. Well-formedness of `AgentReview:` fields is checked at pytest collection time by `spec-lint`.
+
+## sdd-index
+
+`sdd-index` is a standalone CLI that emits a one-line catalog of every `dsn` item in the project — id, title, and source location — keyed by the four design dimensions. The output is the full inventory of design commitments at a glance, without any body text.
+
+Output is markdown, grouped by the four dimension headers (`## Data`, `## API Shape`, `## Algorithms`, `## Composition`). Each group lists the items that appear under that header across all spec files, in file order. Empty dimensions render as the header with no entries, preserving the explicit "nothing to commit here" signal from the spec files.
+
+`sdd-index` is the cheapest compression view — useful as a first pass for humans scanning the project's design surface, and as input to agent prompts that need to reason about the dsn inventory without reading every body.
+
+**Invocation:**
+
+```bash
+sdd-index                       # dump the whole project
+sdd-index --root /path/to/proj  # explicit project root (default: auto-detect from cwd)
+```
+
+## sdd-atlas
+
+`sdd-atlas` is a standalone CLI that emits the full body of every `dsn` item in the project, keyed by dimension. It applies the same dimension-scoped filter as `sdd-index` but retains each item's body, including all keyword fields (`Status:`, `Covers:`, `Needs:`, `Interface:`, `AgentReview:`, `Rationale:`, `Comment:`).
+
+Output is markdown, grouped by the four dimension headers. Items within each group render in file order.
+
+`sdd-atlas` is for cases where the catalog-level view from `sdd-index` is insufficient and the reader needs the full text. Both humans and agents use it as input to ad-hoc prompted summarization until richer projections (schema extraction, cross-dimension linking, gap analysis) prove their worth through dogfooding.
+
+**Invocation:**
+
+```bash
+sdd-atlas                       # dump the whole project
+sdd-atlas --root /path/to/proj  # explicit project root (default: auto-detect from cwd)
+```
 
 ## Rule-to-tool crosswalk
 

@@ -1,7 +1,7 @@
 # ADR-005: Design Dimensions and Verification Fields
 
 **Date:** 2026-04-21
-**Status:** Draft — decisions below are settled; compression tooling is pending a follow-on discussion (see [Open](#open)).
+**Status:** Accepted
 
 ## Context
 
@@ -139,6 +139,19 @@ A new tool and skill execute agent reviews on demand:
 
 This matches the sdd-tools mandate: deterministic extraction in the tool, judgment in the agent.
 
+### Compression tooling
+
+A `dsn` collection of 30+ items exceeds the human context window, and agents burn context reading spec files iteratively. Compression addresses both consumers through the same projections with different renderings. The duality: **AI-side** compression delivers compact structured views through a single tool call so the agent does not grep-and-read; **human-side** compression renders the same projections so the human can grasp large collections at a glance. The dimension section organization above makes dimension-scoped projection deterministic — projection reduces to a markdown-header filter.
+
+Two initial CLIs:
+
+- **`sdd-index`** — one line per `dsn` (id, title, source location) across the whole project, keyed by dimension. A catalog view.
+- **`sdd-atlas`** — every `dsn`'s full body, extracted and concatenated across the whole project, keyed by dimension. A filter view.
+
+Both operate on whole-project scope (no filter flags), emit markdown, and reuse `sdd-tools`' SpecItem parser. `sdd-chain` remains separate — it serves traceability (focused feat→req→dsn narrative walks), not design-phase comprehension.
+
+Richer projections — structural extraction of schemas, cross-dimension linking, gap analysis — are deferred until dogfooding reveals which are needed and what structural anchors would enable them. `Interface:` provides a structural anchor for API Shape; Data, Algorithms, and Composition are prose-heavy without analogous anchors. Introducing new anchors is reversible but speculative before friction proves the need. In the interim, humans and agents use `sdd-index` and `sdd-atlas` as inputs to ad-hoc prompted summarization.
+
 ## Alternatives Considered
 
 | Alternative | Why rejected |
@@ -151,24 +164,20 @@ This matches the sdd-tools mandate: deterministic extraction in the tool, judgme
 | Alternate field names (`Verification:`, `Upheld:`, `Reviewed:`) | `Verification:` is formal and muddled with the test channel. `Upheld:` is abstract — doesn't name the mechanism. `Reviewed:` conflates with PR review. `AgentReview:` is explicit and unambiguous. |
 | Require one dsn per verification field | Inflates dsn count without gaining clarity. One design decision may span multiple aspects; one dsn captures them. |
 | Keep "Pipeline" as the dimension name | "Pipeline" implies linear data flow. "Composition" generalizes to any form of combining operations, including branching, fan-out, event-driven. |
+| Single `sdd-compress` CLI with `--view` flags | Per-view CLIs keep each tool focused, discoverable, and independently evolvable. `sdd-chain` already follows this pattern. |
+| Emit structured (JSON) and markdown output in parallel | Start with markdown only. The agent reads markdown fine; dogfooding will show whether a structured mode is worth the complexity. |
+| Introduce structural anchors for Data, Algorithms, Composition now (a `Schema:` field, step-list convention, edge declarations) | Speculative before dogfooding shows which projections are actually missing. Anchors commit vocabulary that is hard to reverse gracefully. Defer to friction-driven design. |
 
 ## Consequences
 
 - `sdd-standards/overview.md` gains Coverage Chain, Revision Policy, and Forwarding — sections that apply across all layers, previously housed in `design-layer.md`.
 - `sdd-standards/design-layer.md` is rewritten around the new structure: Purpose, Decision Dimensions, Dimension Section Organization, Verification Fields. The "Four Principles" section is removed; Coverage Chain, Revision Policy, and Forwarding relocate to `overview.md`.
 - `sdd-standards/writing.md` gains an `AgentReview:` entry in the keyword table and an AgentReview Declarations subsection parallel to Interface Declarations. The LaTeX math convention is dropped as a rendering preference, not a correctness rule.
-- `sdd-standards/tooling.md` documents the new `sdd-review` CLI, expands `spec-lint`'s rule list (AgentReview well-formedness, dimension section organization, per-dsn verification-field presence), adds a rule-to-tool crosswalk, and removes `spec-privacy` (test privacy is a testing-conventions concern, out of SDD scope; the module will migrate out of `sdd-tools/` in a follow-on refactor).
+- `sdd-standards/tooling.md` documents the new `sdd-review`, `sdd-index`, and `sdd-atlas` CLIs; expands `spec-lint`'s rule list (AgentReview well-formedness, dimension section organization, per-dsn verification-field presence); adds a rule-to-tool crosswalk; and removes `spec-privacy` (test privacy is a testing-conventions concern, out of SDD scope; the module will migrate out of `sdd-tools/` in a follow-on refactor).
 - `sdd-standards/README.md` blurbs are updated to reflect the new content boundaries.
-- `dotfiles/.claude/skills/sdd-design/SKILL.md` is updated to reference the four dimensions, the commitment-based scope rule, the dimension section organization, and the three verification fields. (Deferred until the compression tooling is in place — see [Open](#open).)
+- `dotfiles/.claude/skills/sdd-design/SKILL.md` is updated to reference the four dimensions, the commitment-based scope rule, the dimension section organization, the three verification fields, and the compression CLIs the design agent uses to navigate large `dsn` collections. (Deferred until `sdd-index` and `sdd-atlas` are built.)
 - New tool: `sdd-tools/src/sdd_tools/cli/review.py` (`sdd-review`) scans `AgentReview:` fields.
 - New skill: `dotfiles/.claude/skills/sdd-review/SKILL.md` invokes the review agent per `AgentReview:` item.
+- New tools: `sdd-tools/src/sdd_tools/cli/index.py` (`sdd-index`) and `sdd-tools/src/sdd_tools/cli/atlas.py` (`sdd-atlas`) emit per-dimension catalog and full-body projections of every `dsn` in the project.
 - `spec-lint` gains rules for dimension section organization, `AgentReview:` well-formedness, and verification-field presence on every `dsn`. No separate leaf validator is needed — the uniform verification-field rule subsumes the former "leaf dsn" case.
 - ADR-004 is partially superseded: its scope rule (Principle 2) is reframed; its five-dimension list is consolidated to four. The `Interface:` machinery and observable-to-tests premise remain.
-
-## Open
-
-**Compression tooling for the dsn wall-of-markdown problem.** A dsn collection of 30+ items exceeds the human context window. The design agent produces them; the human needs tools that project the collection onto one dimension at a time — e.g., a Data-only view, an API-shape-only view. `sdd-chain` today is tuned for feat→req→dsn narrative walks, not for design-phase consumption.
-
-This ADR will be completed by a follow-on decision on the compression views — what views exist, what each answers, what the CLI surface looks like. The dimension framing above sets up the vocabulary the views will use; without the views, the dimensions remain useful for thinking but do not scale past a dozen dsn items.
-
-Next step: separate focused discussion on compression tooling; update this ADR's Decision and Consequences sections with the outcome; move Status from Draft to Accepted; integrate the complete ADR into the standards.
