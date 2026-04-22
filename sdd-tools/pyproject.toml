@@ -5,6 +5,9 @@ requires-python = ">=3.11"
 
 [project.scripts]
 sdd-chain = "sdd_tools.cli.chain:main"
+sdd-index = "sdd_tools.cli.index:main"
+sdd-atlas = "sdd_tools.cli.atlas:main"
+sdd-review = "sdd_tools.cli.review:main"
 
 [project.entry-points.pytest11]
 pytest-sdd = "sdd_tools.pytest_plugin"

@@ -49,14 +49,14 @@ oft_jar = "tools/oft.jar"
 
 
 class TestCollection:
-    def test_four_validators_collected(self, pytester):
+    def test_three_validators_collected(self, pytester):
         _minimal_project(pytester, VALID_REQ)
         result = pytester.runpytest("--collect-only", "-q")
         out = result.stdout.str()
         assert "spec-lint" in out
         assert "spec-coverage" in out
         assert "spec-interface" in out
-        assert "spec-privacy" in out
+        assert "spec-privacy" not in out
 
     def test_no_config_no_items(self, pytester):
         pytester.makefile(".toml", pyproject="[project]\nname = 'p'\n")
@@ -112,24 +112,3 @@ class TestCoverageItem:
         result.assert_outcomes(failed=1)
 
 
-class TestPrivacyItem:
-    def test_clean_test_file_passes(self, pytester):
-        _minimal_project(pytester, VALID_REQ)
-        pytester.makepyfile(test_x="def test_a(): pass\n")
-        result = pytester.runpytest("-k", "spec-privacy")
-        result.assert_outcomes(passed=1)
-
-    def test_private_import_fails(self, pytester):
-        _minimal_project(pytester, VALID_REQ)
-        # `from os import _exit` is a real importable private name. The privacy
-        # rule flags any leading-underscore import from a non-test module.
-        pytester.makepyfile(
-            test_x=(
-                "from os import _exit\n"
-                "def test_a():\n"
-                "    assert _exit is _exit\n"
-            )
-        )
-        result = pytester.runpytest("-k", "spec-privacy")
-        result.assert_outcomes(failed=1)
-        assert "privacy.import-private" in result.stdout.str()

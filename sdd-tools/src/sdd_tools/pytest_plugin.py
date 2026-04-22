@@ -1,9 +1,9 @@
 """pytest-sdd plugin entry point.
 
-Hosts every SDD validator (lint, coverage, interface, test-privacy) as a
-pytest item tagged with the ``spec`` marker. Synthesizes one item per
-validator at collection time. Each item's failure message renders the
-validator's Finding list (or, for coverage, the OFT JAR's report).
+Hosts every SDD validator (lint, coverage, interface) as a pytest item tagged
+with the ``spec`` marker. Synthesizes one item per validator at collection
+time. Each item's failure message renders the validator's Finding list (or,
+for coverage, the OFT JAR's report).
 
 Usage:
     pytest -m spec           # run only spec checks
@@ -25,7 +25,6 @@ from sdd_tools.lint import lint_file
 from sdd_tools.markers import create_coverage_dir
 from sdd_tools.models import Finding, render_findings
 from sdd_tools.oft import load_spec_items, require_java, resolve_oft_jar, run_oft_trace
-from sdd_tools.privacy import validate_files
 
 _SDD_KEY: pytest.StashKey[SddConfig] = pytest.StashKey()
 
@@ -33,7 +32,7 @@ _SDD_KEY: pytest.StashKey[SddConfig] = pytest.StashKey()
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
-        "spec: marks SDD validation tests (lint, coverage, interface, test-privacy)",
+        "spec: marks SDD validation tests (lint, coverage, interface)",
     )
     sdd_config = load_config_from_root(Path(config.rootpath))
     if sdd_config is not None:
@@ -50,8 +49,8 @@ def pytest_collection_modifyitems(
     if sdd_config is None:
         return
 
-    # Snapshot test items before injection so validators that depend on the
-    # real test suite (test-privacy, coverage marker harvest) don't see our items.
+    # Snapshot test items before injection so the coverage marker harvest
+    # doesn't see our synthesized items.
     test_items = list(items)
 
     spec_items: list[pytest.Item] = [
@@ -78,14 +77,6 @@ def pytest_collection_modifyitems(
             validator=_run_interface,
             test_items=None,
         ),
-        SddValidatorItem.from_parent(
-            session,
-            name="spec-privacy",
-            path=Path(config.rootpath),
-            sdd_config=sdd_config,
-            validator=_run_privacy,
-            test_items=test_items,
-        ),
     ]
     items.extend(spec_items)
 
@@ -104,7 +95,7 @@ class SddTraceError(Exception):
 
 
 class SddValidatorItem(pytest.Item):
-    """Pytest item for a Finding-emitting validator (lint, interface, test-privacy)."""
+    """Pytest item for a Finding-emitting validator (lint, interface)."""
 
     def __init__(
         self,
@@ -203,19 +194,3 @@ def _run_interface(
 ) -> list[Finding]:
     items = load_spec_items(sdd_config.oft_jar, sdd_config.spec_dirs)
     return validate_interfaces(items)
-
-
-def _run_privacy(
-    _sdd_config: SddConfig, test_items: list[pytest.Item] | None
-) -> list[Finding]:
-    if not test_items:
-        return []
-    paths: list[Path] = []
-    seen: set[Path] = set()
-    for item in test_items:
-        path = item.path
-        if path in seen:
-            continue
-        seen.add(path)
-        paths.append(path)
-    return validate_files(paths)

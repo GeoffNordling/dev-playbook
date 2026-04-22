@@ -1,6 +1,8 @@
 """Shared data types for sdd_tools.
 
-SpecItem -- canonical representation of one OFT spec item, produced by the JAR.
+SpecItem -- one spec item, produced by either the OFT JAR or parse/markdown.py.
+SpecFile -- one markdown spec file, produced by parse/markdown.py.
+Section  -- a top-level section within a SpecFile (one per ``## Header``).
 Finding  -- canonical output of every validator. Replaces ad-hoc list[str].
 """
 
@@ -31,10 +33,18 @@ KNOWN_ARTIFACT_TYPES = frozenset(
     }
 )
 
+# Canonical dsn design dimensions (ADR-005). Order matters — dimension section
+# organization requires these four H2 headers in this order in every dsn file.
+DIMENSION_NAMES: tuple[str, ...] = ("Data", "API Shape", "Algorithms", "Composition")
+
 
 @dataclass
 class SpecItem:
-    """One OFT specification item, parsed from the JAR's XML output."""
+    """One OFT specification item.
+
+    Produced by either the OFT JAR (via ``oft.load_spec_items``) or the
+    pure-Python markdown parser (``parse.markdown.parse_file``).
+    """
 
     id: str  # "dsn~parser.session~1"
     doctype: str  # "req", "dsn", "feat", "utest", "itest", ...
@@ -50,6 +60,46 @@ class SpecItem:
     source_line: int
     interfaces: list[str] = field(default_factory=list)
     # parsed from description; empty for non-dsn items
+    agent_reviews: list[str] = field(default_factory=list)
+    # parsed from description; empty for non-dsn items
+    raw_body: str = ""
+    # Raw body text from the ID line through the item's end, verbatim.
+    # Populated by the markdown-tier parser; empty when the item came from the
+    # OFT JAR (which does not preserve source text). Used by lint rules that
+    # need per-item text scanning (e.g., mixed-obligation detection).
+
+
+@dataclass
+class Section:
+    """One top-level section of a SpecFile, delimited by a ``## Header`` line.
+
+    Items before any H2 are placed in a preamble section with ``header=None``.
+    """
+
+    header: str | None  # "Data", "API Shape", arbitrary ... or None for preamble
+    header_line: int | None  # 1-based line number of the ``## Header`` line
+    items: list[SpecItem] = field(default_factory=list)
+
+    @property
+    def is_dimension(self) -> bool:
+        """True if the section header is one of the four canonical dimensions."""
+        return self.header in DIMENSION_NAMES
+
+
+@dataclass
+class SpecFile:
+    """One parsed markdown spec file.
+
+    Produced by ``parse.markdown.parse_file``. Represents the file's section
+    structure (H2 headers) alongside its spec items.
+    """
+
+    path: Path
+    sections: list[Section] = field(default_factory=list)
+
+    def all_items(self) -> list[SpecItem]:
+        """Flat list of every item across every section."""
+        return [item for section in self.sections for item in section.items]
 
 
 @dataclass(frozen=True)

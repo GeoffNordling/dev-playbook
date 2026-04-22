@@ -13,13 +13,14 @@ Spec-driven development is a [frontier-invariant](../protocols/README.md) respon
 
 The tools here serve two narrow, enduring purposes:
 
-- **Deterministic validation** — lint specs, check traces, verify interface signatures, enforce test-privacy. Structure reduces variance; these checks will always be cheaper, faster, and more reliable than AI for the specific narrow things they do, even as AI continues to advance.
+- **Deterministic validation** — lint specs, check traces, verify interface signatures. Structure reduces variance; these checks will always be cheaper, faster, and more reliable than AI for the specific narrow things they do, even as AI continues to advance.
 - **Deterministic compression** — render conformant specs into views that fit within the human context window. Compressed yet precise, sufficient for their purpose, deterministic and reliable.
 
 ## What belongs here
 
-- Validators that enforce conformance to SDD standards (lint, trace, interface signatures, test-privacy)
-- Compressors that render conformant specs into human-graspable views (chains, structure summaries) with 100% accuracy
+- Validators that enforce conformance to SDD standards (lint, trace, interface signatures)
+- Compressors that render conformant specs into human-graspable views (chains, dimension projections) with 100% accuracy
+- Reporters that inventory spec-declared commitments for follow-up by skills (AgentReview records)
 - Supporting libraries consumed by the above
 
 ## What does NOT belong here
@@ -38,10 +39,17 @@ Requires Python >= 3.11, [uv](https://docs.astral.sh/uv/), Java on `PATH`, and t
 
 ## What's here
 
-| Surface | Entry point | Purpose |
-|---------|-------------|---------|
-| pytest plugin | `sdd_tools.pytest_plugin` | hosts every validator as a `spec`-marked item |
-| CLI | `sdd-chain` (`sdd_tools.cli.chain:main`) | render full spec traceability chains with body text |
+| Surface | Entry point | Role | Parse tier |
+|---|---|---|---|
+| pytest plugin | `sdd_tools.pytest_plugin` | `spec-lint` (structure + dimensions + verification), `spec-coverage`, `spec-interface` | markdown (lint) + OFT JAR (coverage, interface) |
+| CLI | `sdd-chain` (`sdd_tools.cli.chain:main`) | Focused-narrative projection (feat→req→dsn walks) | OFT JAR |
+| CLI | `sdd-index` (`sdd_tools.cli.index:main`) | Per-dimension one-line catalog of every `dsn` | markdown |
+| CLI | `sdd-atlas` (`sdd_tools.cli.atlas:main`) | Per-dimension full-body dump of every `dsn` | markdown |
+| CLI | `sdd-review` (`sdd_tools.cli.review:main`) | `AgentReview:` inventory (reporting, not validation) | markdown |
+
+The markdown tier is a pure-Python parser in `sdd_tools.parse.markdown`; the OFT tier wraps the `openfasttrace` JAR via `sdd_tools.oft`. Lint modules, `sdd-index`, `sdd-atlas`, and `sdd-review` share the markdown tier; `sdd-chain`, coverage, and the interface validator share the OFT tier.
+
+Test-privacy enforcement has moved out of SDD scope to [`tools/bin/test-privacy`](../tools/bin/test-privacy) — it enforces a testing convention, not an SDD rule.
 
 ## Tool reference
 
@@ -49,7 +57,7 @@ Each tool supports `--help` for full usage. See [sdd-standards/tooling.md](../sd
 
 ### pytest-sdd
 
-Pytest plugin that synthesizes one `spec`-marked pytest item per SDD validator (lint, coverage, interface, test-privacy). Items fail with rendered `Finding` blocks.
+Pytest plugin that synthesizes one `spec`-marked pytest item per SDD validator (`spec-lint`, `spec-coverage`, `spec-interface`). Items fail with rendered `Finding` blocks.
 
 ```bash
 pytest -m spec                       # all SDD validators
@@ -65,6 +73,33 @@ Render full spec traceability chains (feat → req → dsn) with verbatim body t
 sdd-chain                       # dump all chains
 sdd-chain --id '*auth*'         # chains containing a matching item
 sdd-chain --feature '*user*'    # chains rooted at a matching feat item
+```
+
+### sdd-index
+
+Emit a per-dimension one-line catalog of every `dsn` in the project — id, title, source location — grouped under the four dimension headers (`## Data`, `## API Shape`, `## Algorithms`, `## Composition`). Useful as a first pass for humans scanning the project's design surface, and as input to agent prompts that reason about the dsn inventory without reading every body.
+
+```bash
+sdd-index                       # whole project
+sdd-index --root /path/to/proj  # explicit project root
+```
+
+### sdd-atlas
+
+Emit the full body of every `dsn` in the project, grouped by dimension. Same discovery and filtering as `sdd-index`, but retains each item's prose and keyword fields. Use when the catalog view is not enough.
+
+```bash
+sdd-atlas                       # whole project
+sdd-atlas --root /path/to/proj  # explicit project root
+```
+
+### sdd-review
+
+Inventory every `dsn` carrying an `AgentReview:` field. Emits one structured record per reviewed item, consumed by the `sdd-review` skill which dispatches a review agent per record. Reporting only — well-formedness of `AgentReview:` fields is enforced at pytest collection time by `spec-lint`.
+
+```bash
+sdd-review                      # whole project
+sdd-review --root /path/to/proj # explicit project root
 ```
 
 ## Output contract

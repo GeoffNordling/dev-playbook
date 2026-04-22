@@ -77,7 +77,7 @@ CLI utilities and shared libraries for workspace automation. See [tools/README.m
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `repo-sync`, `skill-audit`, `workspace-backup`, `generate-pre-commit` |
+| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `repo-sync`, `skill-audit`, `test-privacy`, `workspace-backup`, `generate-pre-commit` |
 | Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |
 
 ### SDD tools (sdd-tools/)
@@ -86,7 +86,10 @@ Deterministic validators and compressors for spec-driven development artifacts. 
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Package | `sdd-tools/src/sdd_tools/` | Validators (lint, coverage, interface, test-privacy) + chain compressor |
-| pytest plugin | `sdd_tools.pytest_plugin` | hosts every validator as a `spec`-marked item |
-| CLI tool | `sdd-chain` (`sdd_tools.cli.chain`) | Display spec traceability chains with body text |
+| Package | `sdd-tools/src/sdd_tools/` | Validators (lint, coverage, interface) + compression / reporting CLIs |
+| pytest plugin | `sdd_tools.pytest_plugin` | hosts `spec-lint`, `spec-coverage`, `spec-interface` as `spec`-marked items |
+| CLI tool | `sdd-chain` (`sdd_tools.cli.chain`) | Render spec traceability chains with body text |
+| CLI tool | `sdd-index` (`sdd_tools.cli.index`) | Per-dimension one-line catalog of every `dsn` |
+| CLI tool | `sdd-atlas` (`sdd_tools.cli.atlas`) | Per-dimension full-body dump of every `dsn` |
+| CLI tool | `sdd-review` (`sdd_tools.cli.review`) | `AgentReview:` inventory for the review skill |
 | Vendored JAR | `sdd-tools/lib/openfasttrace-4.2.2.jar` | OpenFastTrace JAR (gitignored) |

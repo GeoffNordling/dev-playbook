@@ -50,6 +50,7 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 |------|----------|---------|
 | `ref-check` | [repo-documentation.md](../standards/repo-documentation.md) | Broken cross-references in markdown |
 | `skill-audit` | [skill-authoring.md](../standards/skill-authoring.md) | Skill front matter conformance |
+| `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
 
 ##### `# /// pre-commit` metadata
 
@@ -125,6 +126,17 @@ skill-audit [directory]
 ```
 
 One line per finding to stdout in `file:check: message` format. Exit code 1 if any issues found.
+
+### test-privacy
+
+Flag private-name access in test files. Enforces the "Access only public names" rule from [testing-conventions.md](../standards/testing-conventions.md): tests `SHALL` exercise public identifiers only, reaching private helpers through the public interfaces that call them.
+
+```bash
+test-privacy                       # scans ./tests
+test-privacy path/to/tests [...]   # scans one or more explicit directories
+```
+
+One line per finding to stdout in `file:line  rule  message` form. Exit code 0 if clean, 1 if any findings, 2 on tool error. Migrated from `sdd-tools`' `spec-privacy` pytest item; the SDD plugin no longer enforces this rule.
 
 ### generate-pre-commit
 
