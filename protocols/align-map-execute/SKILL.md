@@ -106,35 +106,33 @@ surveying the scope as rows. No exceptions to this shape: never
 transpose it, never replace the matrix with a bulleted outline, never
 drop columns.
 
-The facets the user provided become the **columns**. The survey of the
-scope reveals natural regions — contiguous areas that form coherent
-units of work — those become the **rows**. Each cell is a descriptor:
-what is there, with counts where useful. A few words per cell, not
-sentences.
+The facets the user provided become the **columns**. The survey of
+the scope reveals natural regions — contiguous areas that form
+coherent units of work — those become the **rows**. Each cell is a
+**t-shirt size estimate** of the work required to investigate that
+region along that facet: `S`, `M`, `L`, `XL`, or `—` if the facet
+does not apply to that region. The descriptive work happens in
+Phase 3; here you are sizing.
 
-| Region   | Facet 1                     | Facet 2                   |
-|----------|-----------------------------|---------------------------|
-| Region A | 4 items specifying X, Y, Z  | 1 item covering all of W  |
-| Region B | 12 items: 8 of W, 4 of V   | 3 items, each covering 2–4 from W |
-| Region C | 2 items specifying P        | 0 items                   |
+| Region   | Facet 1 | Facet 2 | Facet 3 |
+|----------|---------|---------|---------|
+| Region A | S       | M       | —       |
+| Region B | L       | XL      | S       |
+| Region C | S       | —       | M       |
 
-The map is an inventory. Each cell describes what is there — the user
-judges quality. Use descriptors and counts only.
-
-Every cell must have a descriptor. No cell is blank or marked "pending"
-— the map is complete at the end of Phase 2. Each region is one row;
-if you need more than one row for a region, the region is too large —
+Every cell must have a sizing. No cell is blank or marked "pending" —
+the map is complete at the end of Phase 2. Each region is one row; if
+you need more than one row for a region, the region is too large —
 split it or compress further.
 
 You do not yet know what the user truly wants, so when faced with
-structural or content choices about the map, surface the choice rather
-than making it yourself:
+structural choices about the map, surface the choice rather than
+making it yourself:
 
-- If a cell feels ambiguous or you are unsure what descriptor fits,
-  ask the user what to write.
+- If you cannot confidently size a cell, ask the user.
 - If the matrix is wide enough that scanning it feels hard, still
   render it in full; flag the concern and let the user decide whether
-  to compress cells, merge facets, or leave it as is.
+  to merge facets or leave it as is.
 
 The scope may be large — survey it in passes if needed, but the map
 itself stays small.

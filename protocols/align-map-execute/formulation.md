@@ -50,7 +50,7 @@ evaluate, and iteratively refining the agent's model of human intent.
 | Symbol | Name | Description |
 |--------|------|-------------|
 | $A$ | Alignment | The shared operating model — the human and agent's working approximation of $H$, encoding two commitments: **description** (what the agent produces for the human to evaluate — form, content, framing per facet) and **quality** (the standard that output must meet). Does not encode traversal; traversal decisions emerge in Stage 4 from $M$. Constructed in Stage 1 from $O$, $S$, $F$, $R$; persisted in the protocol state document, mutable throughout |
-| $M$ | Map | The map of the territory — a matrix whose columns are the facets in $F$ and whose rows are regions discovered by surveying $S$. Each cell is a descriptor: what is there, not whether it is good. Constructed in Stage 2, persisted in the protocol state document, mutable throughout |
+| $M$ | Map | The map of the work — a matrix whose columns are the facets in $F$ and whose rows are regions discovered by surveying $S$. Each cell $M_{wf}$ estimates the work required to investigate region $w$ along facet $f$, not a description of what is there. Constructed in Stage 2, persisted in the protocol state document, mutable throughout |
 
 #### Operational
 
@@ -76,8 +76,8 @@ Because $\dim(S) \gg C_h$, $F$, $A$, and $M$ must each be:
   and $A$ against $H$; $M$ against $S$ conditioned on $F$ and $A$.
 - **Complete.** $F$, $A$, and $M$ are jointly a sufficient basis for
   executing the work. $F$ defines how to focus attention. $A$ addresses
-  intent. $M$ inventories the territory along those
-  dimensions. The decomposition of $H$ is lossy but complete.
+  intent. $M$ sizes the work along those dimensions. The decomposition
+  of $H$ is lossy but complete.
 
 ---
 
@@ -107,17 +107,16 @@ the approved alignment.
 
 ## Stage 2: Build the Map
 
-The agent surveys $S$ and produces $M$ — the map of the territory.
-$F$ defines the columns (the dimensions of evaluation). The survey
-of $S$ reveals natural regions — contiguous areas that form coherent
-units of work — which become the rows. Each cell is a descriptor:
-what is there, with counts where useful. If a cell requires detailed
-reading to evaluate, the region is too large or the facet too broad.
+The agent surveys $S$ and produces $M$ — the map of the work.
+$F$ defines the columns. The survey of $S$ reveals natural regions —
+contiguous areas that form coherent units of work — which become the
+rows. Each cell $M_{wf}$ is a compact size estimate of the work
+required to investigate region $w$ along facet $f$. Descriptions of
+what is there are deferred to Stage 4.
 
-$M$ is a matrix: one row per region, one column per facet. Each
-cell $M_{wf}$ describes region $w$ along facet $f$.
+$M$ is a matrix: one row per region, one column per facet.
 
-The agent produces $M$ by applying a projection operator $\pi$ to
+The agent produces $M$ by applying a sizing operator $\pi$ to
 $S$, conditioned on $A$ and $F$:
 
 $$\pi : (A,  F,  S)  \to  M$$
@@ -125,8 +124,8 @@ $$\pi : (A,  F,  S)  \to  M$$
 $$M_0 = \pi(A^\ast,  F,  S)$$
 
 $\pi$ must be faithful enough that **approving both $A$ and $M$ is
-equivalent to approving the operating model and the exhaustive
-survey**.
+equivalent to approving the operating model and the work
+decomposition** — the regions × facets grid with its sizings.
 
 The human evaluates $M$ and provides feedback. Each round of
 feedback updates $A$, $M$, or both:
