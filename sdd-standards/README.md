@@ -6,7 +6,7 @@ Standards for spec-driven development: philosophy, writing conventions, design l
 
 | File | Purpose |
 |------|---------|
-| [overview.md](overview.md) | Philosophy and core principles — what SDD is and why |
-| [writing.md](writing.md) | How to write spec items: OFT structure, EARS templates, RFC 2119 obligations, file layout |
-| [design-layer.md](design-layer.md) | What design specs are for, coverage chain, revision policy |
-| [tooling.md](tooling.md) | pytest-sdd setup, configuration, and invocation |
+| [overview.md](overview.md) | Philosophy and core principles, coverage chain, revision policy — what SDD is and how its pieces fit |
+| [writing.md](writing.md) | How to write any spec item: OFT structure, EARS templates, RFC 2119 obligations, keyword reference (including `Interface:` and `AgentReview:`), file layout |
+| [design-layer.md](design-layer.md) | Design-layer specifics: commitment scope, the four decision dimensions, dimension section organization, verification fields |
+| [tooling.md](tooling.md) | pytest-sdd setup, CLIs (`sdd-chain`, `sdd-review`), rule-to-tool crosswalk |

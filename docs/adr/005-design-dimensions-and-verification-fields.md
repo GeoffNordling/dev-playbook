@@ -24,7 +24,7 @@ Design items commit decisions across exactly four dimensions. Previously implici
 3. **Algorithms** — the exact operations that produce outputs from inputs. Sum, fold, filter, derive. A system typically commits several.
 4. **Composition** — how operations combine. Sequencing, dependency, data flow, fan-out, fan-in.
 
-Each dimension `MAY` be null for a given project. A pure-data library may have no Algorithms or Composition; a single-function tool may have no Composition; a CLI wrapper may have thin Algorithms. The dimensions are axes a project *may* have decisions on, not a checklist.
+At the project level, any dimension `MAY` be null. A pure-data library may have no Algorithms or Composition; a single-function tool may have no Composition; a CLI wrapper may have thin Algorithms. Every individual `dsn`, however, `SHALL` commit to at least one dimension; a `dsn` with no dimensional commitment is not a design decision, it is narrative.
 
 Consolidations from ADR-004's five-item list:
 
@@ -33,6 +33,19 @@ Consolidations from ADR-004's five-item list:
 - **Module layout** (extend-vs-new) folds into API shape; the fully-qualified symbol path declared in `Interface:` encodes the placement.
 
 Elevation: **Composition** is promoted from an implicit organizing axis (the existing skill already says to "order sections to follow the pipeline") to a first-class dimension. Two designs with identical Data, API shape, and Algorithms can still commit to different Compositions and produce different integration-test outcomes.
+
+### Dimension section organization
+
+Every `dsn` spec file `SHALL` organize its items under four markdown section headers, one per dimension, in this order:
+
+    ## Data
+    ## API Shape
+    ## Algorithms
+    ## Composition
+
+Every `dsn` item `SHALL` appear under exactly one header. Items that float above or between sections are errors. When a file has no commitments for a given dimension, the header still appears with an empty body — the explicit signal "considered, nothing to commit here." A missing header is not equivalent to an empty one; the header makes the absence deliberate.
+
+This markdown-header organization serves two purposes. First, it forces the author to classify each `dsn` into a dimension at the moment of writing, rather than inferring classification post-hoc from prose. Second, it enables per-dimension projection by downstream compression tools without requiring a separate `Dimension:` field on every item. A `Dimension:` field remains a fallback option if section-based projection proves insufficient in practice.
 
 ### Scope of a design item
 
@@ -68,11 +81,13 @@ A single dsn records one design decision. That decision `MAY` commit multiple as
 
 Forcing separate dsn items per verification field would inflate the dsn count and artificially split closely related commitments.
 
-### Leaf dsn
+### Verification coverage
 
-A dsn is a leaf in the OFT chain when it has no `Needs:` declaration — nothing downstream in the coverage graph is required. Verification of a leaf dsn comes from whichever fields it carries: the Interface validator checks `Interface:` entries, the `sdd-review` skill checks `AgentReview:` entries. A dsn with `Needs:` is not a leaf; tests cover it.
+Every `dsn` `SHALL` carry at least one verification field — one of `Needs:`, `Interface:`, or `AgentReview:`. A `dsn` with none of these names a commitment that nothing ever checks.
 
-Non-testable behavioral commitments end the chain at a leaf dsn. Example:
+The rule is uniform across all `dsn` items. Items with `Needs:` are verified downstream by tests; items with `Interface:` are verified by the interface validator; items with `AgentReview:` are verified by the review skill. The rule does not distinguish chain leaves from interior nodes: a `dsn` that terminates its branch (no `Needs:`) is subject to the same rule as any other and must still carry `Interface:` or `AgentReview:`. "Leaf" remains descriptive vocabulary for an item with no `Needs:`, but it is not a special validation category.
+
+Non-testable behavioral commitments terminate the chain with `AgentReview:` alone. Example:
 
     feat~agent~1
         ↑ Covers:
@@ -84,7 +99,6 @@ Non-testable behavioral commitments end the chain at a leaf dsn. Example:
         Enforcement via system prompt directive.
         AgentReview: The agent's system prompt at src/prompts/agent.md should contain
                      a directive discouraging filler or polite conversation.
-        (no Needs: → leaf)
 
 ### Drop the "Four Principles" section
 
@@ -93,19 +107,28 @@ The four principles in `design-layer.md` are dissolved:
 | Principle | Resolution |
 |---|---|
 | P1 — Single role | Redundant with the new Decision Dimensions section. Removed. |
-| P2 — Observable-to-tests scope | Reframed and moved into the new Scope of a Design Item section. |
+| P2 — Observable-to-tests scope | Reframed as commitment-based scope and folded into Purpose in `design-layer.md`. |
 | P3 — Commitment by naming | Specific to API shape; content relocated into the API shape dimension definition and the existing `Interface:` section of [writing.md](../../sdd-standards/writing.md). |
 | P4 — Design-agent ownership of structure | Workflow guidance, not a standard. Relocated to [sdd-design/SKILL.md](../../dotfiles/.claude/skills/sdd-design/SKILL.md). |
 
 ### Revised structure of `design-layer.md`
 
-1. Purpose (existing)
+`design-layer.md` is refactored to contain `dsn`-layer specifics only. Sections that apply across all layers are moved to `overview.md`, where they frame the workflow as a whole rather than the design layer specifically.
+
+New `design-layer.md`:
+
+1. Purpose (rewritten around commitment framing)
 2. Decision Dimensions (new)
-3. Scope of a Design Item (new)
-4. Verification Fields (new — Interface, Needs, AgentReview, combining fields, leaf dsn)
-5. Coverage Chain (existing)
-6. Revision Policy (existing)
-7. Forwarding (existing)
+3. Dimension Section Organization (new)
+4. Verification Fields (new — `Needs:`, `Interface:`, `AgentReview:`; combining; uniform rule)
+
+Moved to `overview.md`:
+
+- Coverage Chain (chain-wide rules, not `dsn`-specific)
+- Revision Policy (applies to every layer)
+- Forwarding (chain-adjacent)
+
+The "Scope of a Design Item" framing from an earlier draft of this ADR is folded into Purpose, since the commitment-based definition is what makes a `dsn` a `dsn`.
 
 ### Tool and skill
 
@@ -131,11 +154,15 @@ This matches the sdd-tools mandate: deterministic extraction in the tool, judgme
 
 ## Consequences
 
-- `sdd-standards/design-layer.md` is rewritten around the new structure above. The "Four Principles" section is removed; new sections for Decision Dimensions, Scope of a Design Item, and Verification Fields are added.
-- `sdd-standards/writing.md` gains an `AgentReview:` entry in the keyword table and a subsection describing its format alongside the existing Interface Declarations subsection.
-- `dotfiles/.claude/skills/sdd-design/SKILL.md` is updated to reference the four dimensions, the commitment-based scope rule, and the three verification fields. (Deferred until the compression tooling is in place — see [Open](#open).)
+- `sdd-standards/overview.md` gains Coverage Chain, Revision Policy, and Forwarding — sections that apply across all layers, previously housed in `design-layer.md`.
+- `sdd-standards/design-layer.md` is rewritten around the new structure: Purpose, Decision Dimensions, Dimension Section Organization, Verification Fields. The "Four Principles" section is removed; Coverage Chain, Revision Policy, and Forwarding relocate to `overview.md`.
+- `sdd-standards/writing.md` gains an `AgentReview:` entry in the keyword table and an AgentReview Declarations subsection parallel to Interface Declarations. The LaTeX math convention is dropped as a rendering preference, not a correctness rule.
+- `sdd-standards/tooling.md` documents the new `sdd-review` CLI, expands `spec-lint`'s rule list (AgentReview well-formedness, dimension section organization, per-dsn verification-field presence), adds a rule-to-tool crosswalk, and removes `spec-privacy` (test privacy is a testing-conventions concern, out of SDD scope; the module will migrate out of `sdd-tools/` in a follow-on refactor).
+- `sdd-standards/README.md` blurbs are updated to reflect the new content boundaries.
+- `dotfiles/.claude/skills/sdd-design/SKILL.md` is updated to reference the four dimensions, the commitment-based scope rule, the dimension section organization, and the three verification fields. (Deferred until the compression tooling is in place — see [Open](#open).)
 - New tool: `sdd-tools/src/sdd_tools/cli/review.py` (`sdd-review`) scans `AgentReview:` fields.
 - New skill: `dotfiles/.claude/skills/sdd-review/SKILL.md` invokes the review agent per `AgentReview:` item.
+- `spec-lint` gains rules for dimension section organization, `AgentReview:` well-formedness, and verification-field presence on every `dsn`. No separate leaf validator is needed — the uniform verification-field rule subsumes the former "leaf dsn" case.
 - ADR-004 is partially superseded: its scope rule (Principle 2) is reframed; its five-dimension list is consolidated to four. The `Interface:` machinery and observable-to-tests premise remain.
 
 ## Open

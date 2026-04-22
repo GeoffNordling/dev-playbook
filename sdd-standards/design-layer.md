@@ -1,80 +1,62 @@
 # Design Layer
 
-The key words `SHALL`, `SHALL NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` in this
-document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in [writing.md](writing.md).
+The key words `SHALL`, `SHALL NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` in this document are to be interpreted as described in RFC 2119, following the vocabulary conventions in [writing.md](writing.md).
 
 ## Purpose
 
-Functional requirements describe behavior. Design items record the decisions that shape the code fulfilling that behavior. A functional spec is written first; design items follow once the behavior is settled.
+Functional requirements describe behavior; design items (`dsn`) record the decisions that shape the code fulfilling that behavior. A `dsn` is written after the behavior is settled.
 
-A design item can commit to any of the decisions a design makes: the public API surface, the algorithm, the data schema, the error semantics, the data structure. API shape is one kind of decision, and is often the only decision a given dsn records.
+A `dsn` records a **commitment** — a decision whose chosen option some other part of the system will rely on: callers, tests, downstream code. Decisions inside a module's private boundary (internal helpers, file layout, local control flow) are not commitments and belong to the green agent.
 
-## Four Principles
+## Decision Dimensions
 
-### 1. Single role
+A `dsn` commits decisions across one or more of four dimensions:
 
-Every design item records a design decision. API shape, algorithm, data schema, error semantics, and data-structure choice are equal kinds of decision. A dsn whose only decision is the shape of a public callable is as complete as one that commits to several choices together.
+1. **Data** — the fundamental abstractions the system is built around. Entities, fields, relationships, containment, ownership. These abstractions exist in both the design spec and the implementation code; they are the nouns the system manipulates.
+2. **API Shape** — signatures of public callables, classes, and methods. What callers name, invoke, and receive.
+3. **Algorithms** — the exact operations that produce outputs from inputs. Sum, fold, filter, derive. A system typically commits several.
+4. **Composition** — how operations combine. Sequencing, dependency, data flow, fan-out, fan-in.
 
-### 2. Observable-to-tests scope
+At the project level, any dimension `MAY` be null: a pure-data library may have no Algorithms or Composition; a single-function tool may have no Composition; a CLI wrapper may have thin Algorithms. Every individual `dsn`, however, `SHALL` commit to at least one dimension.
 
-A design item commits to a decision when a test could fail on it if the decision were changed. Structural choices below the public surface — private helpers, internal delegation, non-public module layout — belong to the code and are written by the green agent.
+Error semantics fold into API Shape (raises are part of the contract) and Algorithms (failure paths). Data-structure choice folds into API Shape when the signature pins it (e.g., `-> list[Event]`), or into the green agent's territory when the signature abstracts it (e.g., `-> Iterable[Event]`).
 
-The question to ask at every fork is: *Can I write a test that fails if this decision flips?* When the answer is yes, the decision belongs in a dsn. When the answer is no, the decision belongs to the green agent.
+## Dimension Section Organization
 
-### 3. Commitment by naming
+Every `dsn` spec file `SHALL` organize its items under four markdown section headers, one per dimension, in this order:
 
-When a dsn names a public surface, the shape of what it names is the commitment. Naming `parse_session(path: Path) -> Session` commits the public surface to a module-level callable with that signature. Naming `Parser.parse(path: Path) -> Session` commits the public surface to a class with that method. The `Interface:` keyword (see [Interface Declarations](writing.md#interface-declarations)) carries the committed signature in a form the validator checks against code.
+    ## Data
+    ## API Shape
+    ## Algorithms
+    ## Composition
 
-### 4. Design-agent ownership of structure
+Every `dsn` item `SHALL` appear under exactly one of these four headers. Items that float above or between section headers are errors.
 
-The design agent performs brownfield reconnaissance — reading the existing code, choosing whether new functionality extends an existing class or introduces a new one, selecting the public surface — before writing any dsn. The output is dsn items plus interface stubs (`raise NotImplementedError` bodies) that the red agent tests against and the green agent fills in. The reasoning behind structural choices lives in each dsn's `Rationale:` field. Red-first workflow stays.
+A file where a dimension has no commitments `SHALL` still include the header with an empty section. The empty header is the explicit signal "considered, nothing to commit here." A missing header is not equivalent to an empty section; the header makes the absence deliberate.
 
-## When to write a design item
+## Verification Fields
 
-Every design item commits to at least one decision the functional requirement leaves open — the shape of a public surface, an algorithm, a schema, an error contract, or another choice a test could observe. Most functional requirements have a corresponding design item; cases where a `req` skips the design layer entirely are rare.
+[overview.md](overview.md#coverage-chain) establishes the general rule that every requirement ties off with a verification mechanism. For `dsn` items, this rule takes a specialized form: every `dsn` `SHALL` carry at least one of three verification fields. A single `dsn` `MAY` combine any subset — one design decision often commits multiple aspects simultaneously, and forcing separate items per field would inflate the `dsn` count and artificially split closely related commitments.
 
-## Coverage Chain
+| Field | Origin | Purpose | Verified by |
+|---|---|---|---|
+| `Needs: utest, itest` | OFT standard | Behavioral commitment | pytest run |
+| `Interface:` | Workspace extension | Structural contract | Interface validator at pytest collection time |
+| `AgentReview:` | Workspace extension | Non-test commitment | `sdd-review` skill on invocation |
 
-OFT enforces a directed graph of coverage. Each item declares what must cover it downstream (`Needs:`), and each downstream item declares what it covers upstream (`Covers:`). OFT walks this graph and fails if any required link is absent.
+Format details for `Interface:` and `AgentReview:` live in [writing.md](writing.md#interface-declarations) alongside the other spec keywords.
 
-The standard layers, from upstream to downstream:
+**Example: one `dsn`, multiple verification fields.**
 
-```
-feat  →  req  →  dsn  →  utest / itest
-```
+    Needs: utest
+    Interface: myapp.parser.Parser.parse(path: pathlib.Path) -> myapp.session.Session
+    AgentReview: Log output from Parser.parse follows the human-readable format specified in docs/log-format.md.
 
-Each arrow represents a coverage relationship: the downstream layer covers the upstream layer. Every item declares which downstream types must cover it (`Needs:`) and which upstream items it satisfies (`Covers:`).
+**Example: non-testable commitment.** Some requirements cannot be deterministically tested — e.g., "the agent `SHALL NOT` attempt polite conversation for no reason." The `dsn` terminates its chain with `AgentReview:` alone:
 
-**Which layers are required depends on the project and the item:**
+    dsn~agent.no-polite-conversation~1
+        Enforcement via system prompt directive.
+        AgentReview: The agent's system prompt at src/prompts/agent.md should contain
+                     a directive discouraging filler or polite conversation.
 
-- `feat` is required. Every project `SHALL` begin the chain at `feat`.
-- `dsn` is expected for most `req` items. In rare cases where a `req` item needs neither a design decision nor an ownership assignment, it `MAY` declare `Needs: utest` or `Needs: itest` directly, skipping `dsn`.
-- Each item's `Needs:` declaration `SHALL` list whichever test types are appropriate to verify it. A `req` item may need `utest`, `itest`, or both. A `dsn` item may need `utest`, `itest`, or both.
-
-A **terminating item** has no `Needs:` declaration. OFT treats it as a leaf — nothing downstream is required.
-
-OFT fails the trace when:
-- Any item's `Needs:` types are not all covered by at least one item of each required type
-- A `Covers:` link references an ID that does not exist at that revision
-- Any item is orphaned (has `Covers:` pointing to a nonexistent item)
-
-## Revision Policy
-
-The revision number is a semantic version for the item's meaning.
-
-**Increment** the revision when the semantic content changes — when the requirement means something different than it did before. This immediately breaks all downstream `Covers:` links that referenced the previous revision, forcing downstream documents to explicitly acknowledge and respond to the change.
-
-**Do not increment** for typo fixes, rephrasing that does not change meaning, or formatting changes.
-
-When you increment a revision, update all `Covers:` references in downstream documents to the new revision. If a downstream item's response to the change is "no change needed," update the `Covers:` link and note this in the `Comment:` field.
-
-## Forwarding
-
-OFT supports a forwarding syntax that lets a document layer acknowledge a requirement and pass coverage responsibility downstream without creating a full spec item:
-
-```markdown
-arch --> dsn : req~auth.login-validation~1
-```
-
-**Do not use forwarding in this workspace.** When a layer has nothing to say for a particular item, the item `SHALL` skip that layer entirely (by omitting the type from its `Needs:`) rather than creating a hollow passthrough. Forwarding is documented here so you recognize it if you encounter it in the OFT documentation.
+No `Needs:`, no `Interface:` — the review skill is what verifies the commitment.

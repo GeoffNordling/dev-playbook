@@ -41,8 +41,6 @@ Substitute the modal verb in any EARS sentence to grade the requirement's obliga
 
 ### Prose Conventions
 
-**LaTeX math notation.** Specs `SHALL` use LaTeX math notation (e.g., `$k$`, `$N-1$`) when referring to variables, quantities, or mathematical relationships. This distinguishes formal variables from prose and renders correctly in markdown environments.
-
 **Artifact type vocabulary conflict.** Spec item names that happen to match an artifact type pattern (3–6 letters, hyphen, 3 digits — e.g., `SHA-256`, `AES-128`) `SHALL` be written in unhyphenated form (`SHA256`, `AES128`). OFT may parse these as malformed IDs.
 
 **Fenced code blocks.** Spec files `SHALL NOT` contain fenced code blocks (triple backticks). OFT's markdown parser silently ignores all spec items that appear after a fenced code block. Use indented code blocks (4-space indent) instead.
@@ -74,7 +72,7 @@ In source files, IDs are wrapped in backticks: `` `req~auth.login-validation~1` 
 - No consecutive dots
 - Dots create readable hierarchies: `auth.login-validation`, `parser.segment.timestamp`
 
-**revision** — a positive integer (conventionally starting at 1). See [design-layer.md](design-layer.md#revision-policy) for the revision policy.
+**revision** — a positive integer (conventionally starting at 1). See [overview.md](overview.md#revision-policy) for the revision policy.
 
 Examples:
 ```
@@ -139,6 +137,7 @@ Every keyword is followed by a colon. Content may start on the same line or the 
 | `Depends:` | Ordering dependencies between items. | Does not affect coverage; currently affects XML output only. |
 | `Description:` | Explicit marker for the start of the description body. | Optional — any non-keyword text automatically starts the description. |
 | `Interface:` | Public surface (signature) committed by a `dsn` item. One signature per line; repeatable. | `dsn` items only. Machine-validated; see [Interface Declarations](#interface-declarations). |
+| `AgentReview:` | Prose describing what the review agent must check. Repeatable. | `dsn` items only. Verified by the `sdd-review` skill; see [AgentReview Declarations](#agentreview-declarations). |
 
 ### Interface Declarations
 
@@ -184,6 +183,33 @@ Any mismatch fails collection. Because ruff's `UP` rules keep the code in the sa
 #### Coexistence with prose
 
 A design item may contain both prose and `Interface:` entries. Prose captures non-API decisions — schema, algorithm, error semantics — and flows through the OFT tooling into traceability reports and chain-text output. `Interface:` entries are the machine-checked part: the validator compares them against the code.
+
+### AgentReview Declarations
+
+Design items that commit to a non-testable behavior or a review-only property `SHALL` declare what must be checked in an `AgentReview:` field. The field carries prose; the `sdd-review` skill reads it on invocation and dispatches a review agent per item.
+
+#### Format
+
+Each `AgentReview:` entry is a single declaration describing one thing to check. A design item `MAY` declare multiple entries for multiple separate checks.
+
+    AgentReview: The agent's system prompt at src/prompts/agent.md should contain
+                 a directive discouraging filler or polite conversation.
+
+File paths named inside the prose let the review agent locate what to compare against. Path staleness is detected when the review runs — `spec-lint` does not parse free-form prose for paths.
+
+#### When to use
+
+`AgentReview:` is the mechanism for commitments that cannot be deterministically tested. Typical cases:
+
+- Behavioral requirements for LLM agents (e.g., "`SHALL NOT` attempt polite conversation for no reason")
+- Output-format requirements where a prompt-inclusion test would degenerate into test-theater
+- Cross-cutting conventions too contextual for a unit assertion
+
+If a commitment can be tested deterministically, prefer `Needs: utest` or `Needs: itest` — tests are faster and more reliable than a review skill.
+
+#### Coexistence with other verification fields
+
+A `dsn` `MAY` combine `AgentReview:` with `Needs:` and `Interface:`. One design decision often commits several aspects; one `dsn` captures them all. See [Verification Fields](design-layer.md#verification-fields) for the rules on combining.
 
 ### Excluding Sections
 

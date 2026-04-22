@@ -49,10 +49,10 @@ Spec-driven development standards: philosophy, writing conventions, design layer
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Overview | `sdd-standards/overview.md` | Philosophy and core principles |
-| Spec writing | `sdd-standards/writing.md` | OFT structure, EARS templates, RFC 2119 obligations, file layout |
-| Design layer | `sdd-standards/design-layer.md` | Design specs, coverage chain, revision policy |
-| Tooling | `sdd-standards/tooling.md` | pytest-sdd setup, configuration, invocation |
+| Overview | `sdd-standards/overview.md` | Philosophy and core principles, coverage chain, revision policy |
+| Spec writing | `sdd-standards/writing.md` | OFT structure, EARS templates, RFC 2119 obligations, keyword reference, file layout |
+| Design layer | `sdd-standards/design-layer.md` | Commitment scope, decision dimensions, dimension section organization, verification fields |
+| Tooling | `sdd-standards/tooling.md` | pytest-sdd setup, CLIs, rule-to-tool crosswalk |
 
 ### Agent configuration (dotfiles/)
 
