@@ -3,7 +3,7 @@
 ## Rules
 
 - Always edit files here — never at the symlink targets under `~/`.
-- Run `bin/sync-dotfiles.sh` after adding or removing files. Edits to existing files take effect immediately.
+- Run `bin/sync-dotfiles.sh` after adding or removing files. Edits to existing `.claude/skills/` files require restarting Claude Code to take effect — the running session caches skill content at startup.
 
 ## Structure
 
