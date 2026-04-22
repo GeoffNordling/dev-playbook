@@ -59,10 +59,10 @@ Read in full:
 
 ### Description
 
-Enumerable report for every facet: items sorted by classification, then by
-source location. Each item names a specific thing, cites where, states what
-I observe. Try this shape across all six facets; may revise per-facet if it
-fits poorly.
+Each Phase 3 pass produces an enumerable report over the selected work:
+items sorted by classification, then by source location. Each item names a
+specific thing, cites where, states what I observe. This shape applies
+across all six facets; may revise per-facet if it fits poorly.
 
 1. **Organization** — module/package tree compactly rendered, short layering
    statement, grouping rationale I infer. Flag files with no clear home,
@@ -96,4 +96,134 @@ Counts where they help. Anchors use `path:line` or `module.symbol`.
 - **Redundancy-aware.** Cross-reference when the same finding spans facets;
   don't re-state.
 
-## Map — pending
+## Map — **approved**
+
+Rows are topic-based regions: each unites a module (or module group) with its
+tests so all six facets apply. Facets 1–4 look at production code; facets 5–6
+look at the region's tests. `—` marks a facet that does not apply (e.g. a
+region with no tests).
+
+Cells are t-shirt sizings of the work to investigate each region along each
+facet: `S`, `M`, `L`, `XL`. Descriptive analysis happens in Phase 3.
+
+### Regions
+
+| # | Region | Files |
+|---|---|---|
+| 1 | Package glue | `src/sdd_tools/__init__.py`, `pyproject.toml`, `Makefile`, `conftest.py`, `README.md` |
+| 2 | Config | `config.py`, `tests/test_config.py` |
+| 3 | Data models | `models.py`, `tests/test_models.py` |
+| 4 | Markdown parser | `parse/markdown.py`, `parse/__init__.py`, `tests/test_parse_markdown.py` |
+| 5 | OFT JAR wrapper | `oft.py`, `tests/test_oft.py` |
+| 6 | Lint suite | `lint.py`, `lint_id.py`, `lint_obligations.py`, `lint_syntax.py`, `lint_dimensions.py`, `lint_verification.py`, `tests/test_lint.py`, `tests/test_lint_dimensions.py`, `tests/test_lint_verification.py` |
+| 7 | Interface validator | `interface.py`, `tests/test_interface.py`, `tests/iface_fixture.py` |
+| 8 | Pytest markers | `markers.py`, `tests/test_markers.py` |
+| 9 | Shared helpers | `chains.py`, `filtering.py`, `formatter.py`, `tests/test_chains.py`, `tests/test_filtering.py`, `tests/test_formatter.py` |
+| 10 | Pytest plugin | `pytest_plugin.py`, `tests/test_pytest_plugin.py` |
+| 11 | CLI suite | `cli/chain.py`, `cli/index.py`, `cli/atlas.py`, `cli/review.py`, `tests/test_cli_chain.py`, `tests/test_cli_index.py`, `tests/test_cli_atlas.py`, `tests/test_cli_review.py` |
+
+### Matrix
+
+| # | Region              | Organization | Functionality | Duplication | Dependencies | Test structure | Test value |
+|---|---------------------|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | Package glue        | S   | S   | —   | S   | —   | —   |
+| 2 | Config              | S   | S   | S   | S   | S   | S   |
+| 3 | Data models         | S   | M   | S   | S   | S   | S   |
+| 4 | Markdown parser     | S   | L   | M   | S   | L   | L   |
+| 5 | OFT JAR wrapper     | S   | M   | S   | S   | M   | M   |
+| 6 | Lint suite          | M   | L   | L   | M   | L   | L   |
+| 7 | Interface validator | S   | L   | S   | S   | M   | M   |
+| 8 | Pytest markers      | S   | S   | S   | S   | M   | M   |
+| 9 | Shared helpers      | M   | M   | M   | S   | M   | M   |
+| 10| Pytest plugin       | S   | M   | M   | M   | M   | M   |
+| 11| CLI suite           | M   | L   | L   | M   | L   | L   |
+
+### Sizing rationale
+
+- **Small single-file modules** (Config, Data models, Markers) size `S` on most
+  facets. Their surface is narrow enough to read and judge in one pass.
+- **Pure-Python parser** (`parse/markdown.py`, 363 lines) is the single largest
+  module; functionality and tests each rate `L`.
+- **Interface validator** (238 lines of introspection logic against real
+  fixture symbols) rates `L` on functionality, `M` on tests.
+- **Lint suite** spans six source modules and three test modules (~470 + ~460
+  lines) with many rules; functionality, duplication (overlap between
+  rule modules and the parser's section model), and tests all rate `L`.
+- **CLI suite** has four CLIs sharing config-load / root-detection /
+  dimension-grouping patterns; functionality, duplication, and tests rate `L`.
+- **Pytest plugin** (196 lines) is the integration seam — synthesizes
+  pytest items, composes lint + coverage + interface; `M` across the board.
+- Facets 5–6 are `—` for Package glue (no tests).
+
+### Traversal
+
+Row-by-row (region-by-region): one region at a time, all six facets together
+in a single pass.
+
+## Region Progress
+
+| # | Region | Status |
+|---|---|---|
+| 1 | Package glue | complete |
+| 2 | Config | not started |
+| 3 | Data models | not started |
+| 4 | Markdown parser | not started |
+| 5 | OFT JAR wrapper | not started |
+| 6 | Lint suite | not started |
+| 7 | Interface validator | not started |
+| 8 | Pytest markers | not started |
+| 9 | Shared helpers | not started |
+| 10 | Pytest plugin | not started |
+| 11 | CLI suite | not started |
+
+## Displaced Content
+
+_(Findings surfaced in one region's pass that belong to a later region. None yet.)_
+
+## Intent Calibration Log
+
+### General
+
+- **Matrix shape is not up for re-litigation.** The rows unify code + tests
+  because facets 5–6 are the test columns; proposing a code/test row split
+  was a misread. Future passes should treat the shape as settled.
+- **Traversal: row-by-row.** One region, all six facets together, in a
+  single report the user can review before moving on.
+- **Surface new findings distinctly — don't bury them in fix-writeups.**
+  When a fix creates a new observation (e.g., a redundancy left behind),
+  treat it as a fresh numbered item and get explicit direction, rather
+  than folding it as a "minor follow-up" line. The user needs to see each
+  finding clearly enumerated, not smuggled in via prose.
+- **Consistency principle for tooling entry points.** User rejects
+  asymmetry like "three of four dev-loop checks scripted in Makefile,
+  one not." Apply symmetry: if `format` / `lint` / `typecheck` are
+  targets, so is `test`. Generalize: flag and default-fix cases where
+  a tooling surface covers N-1 of N equivalent operations.
+
+### Organization
+
+- **`__init__.py` files SHALL be blank.** User rejected docstrings in all three
+  `__init__.py` files (`src/sdd_tools/__init__.py`, `cli/__init__.py`,
+  `parse/__init__.py`) and directed blanking. Reason: docstrings in package
+  `__init__.py` are useless commentary. **How to apply:** in every subsequent
+  region, flag any non-blank `__init__.py` as an anomaly and default to
+  blanking unless it carries actual exports / `__all__`.
+
+### Functionality
+_(empty)_
+
+### Duplication
+_(empty)_
+
+### Dependencies
+_(empty)_
+
+### Test structure
+_(empty)_
+
+### Test value
+_(empty)_
+
+## Scratchpad
+
+_(user's notes — agent writes only on user request)_
