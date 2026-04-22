@@ -37,7 +37,7 @@ oft_jar = "../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar"
 `pytest-sdd` is a pytest plugin that hosts every SDD validator as part of the normal test suite. Each validator runs as a single pytest item tagged with the `spec` marker:
 
 - **`spec-lint`** — structural validation of every `.md` spec file: ID format, Status field, obligation keyword backticking, mixed obligation levels, `Covers:` syntax, `Needs:` values, fenced code blocks, `AgentReview:` well-formedness, dimension section organization in `dsn` files, and verification-field presence on every `dsn`.
-- **`spec-coverage`** — full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied and every `Covers:` reference resolves.
+- **`spec-coverage`** — full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied and every `Covers:` reference resolves. Test coverage is derived from `@pytest.mark.req` / `@pytest.mark.dsn` markers on the tests pytest collected for this run, so scoped runs (`pytest path/to/file.py`, `-k` filters) produce a partial picture — requirements covered only by uncollected tests surface as `-utest`. Run `pytest` with no scope arguments to evaluate full coverage.
 - **`spec-interface`** — for every `dsn` item that declares an `Interface:`, imports the named symbol and verifies the actual signature matches the committed one. Hard-fails on missing symbol or signature mismatch.
 
 Each validator emits structured `Finding` blocks; the failure message renders them in a uniform format.
