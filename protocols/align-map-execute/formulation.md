@@ -49,7 +49,7 @@ evaluate, and iteratively refining the agent's model of human intent.
 
 | Symbol | Name | Description |
 |--------|------|-------------|
-| $A$ | Alignment | The shared operating model — the human and agent's working approximation of $H$, encoding how they have agreed to work: quality criteria, what to bring back for evaluation. Constructed in Stage 1 from $O$, $S$, $F$, $R$; persisted in the protocol state document, mutable throughout |
+| $A$ | Alignment | The shared operating model — the human and agent's working approximation of $H$, encoding two commitments: **description** (what the agent produces for the human to evaluate — form, content, framing per facet) and **quality** (the standard that output must meet). Does not encode traversal; traversal decisions emerge in Stage 4 from $M$. Constructed in Stage 1 from $O$, $S$, $F$, $R$; persisted in the protocol state document, mutable throughout |
 | $M$ | Map | The map of the territory — a matrix whose columns are the facets in $F$ and whose rows are regions discovered by surveying $S$. Each cell is a descriptor: what is there, not whether it is good. Constructed in Stage 2, persisted in the protocol state document, mutable throughout |
 
 #### Operational
@@ -88,11 +88,12 @@ initial alignment state $A$:
 
 $$A_0 = f(O,  S,  F,  R)$$
 
-$A^\ast$ is the shared operating model — how the human and agent have
-agreed to work: what quality criteria to apply, what the agent should
-bring back for evaluation. $A^\ast$ persists
-as a section of the protocol state document and governs all
-subsequent work.
+$A^\ast$ is the shared operating model — a pair of commitments:
+**description** (what the agent produces for the human's evaluation)
+and **quality** (the standard that output must meet). $A$ does not
+encode traversal order: those decisions emerge in Stage 4 from $M$.
+$A^\ast$ persists as a section of the protocol state document and
+governs all subsequent work.
 
 The agent asks clarifying questions to refine its understanding.
 Each question-response pair updates the alignment:

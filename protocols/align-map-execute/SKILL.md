@@ -79,12 +79,17 @@ the user has confirmed all four.
 
 The result is the **shared alignment** — a mutual understanding that
 governs everything that follows. The shared alignment is the operating
-model: how you and the user have agreed to work. It has two sections:
+model: what you produce for the user to evaluate, and the bar that
+output must meet. It has two sections:
 
-- **Quality** — what constitutes good work: evaluation criteria, what
-  you should bring back for review, standards for the output.
-- **Process** — how to move through the work: traversal order, facet
-  grouping, structural decisions about how execution proceeds.
+- **Description** — what you produce for the user to evaluate: the
+  form, content, and framing of what you surface per facet.
+- **Quality** — the standard your output must meet: evaluation
+  criteria, completeness, rigor.
+
+The shared alignment does not specify traversal order. Traversal is a
+property of the map, not the alignment — you decide how to move through
+the work in Phase 3, after the map exists.
 
 The shared alignment must be precise enough to be falsifiable — if it
 is vague, neither you nor the user can tell whether it is wrong. Include
@@ -95,8 +100,11 @@ becomes difficult to read or evaluate in a single pass.
 
 ## Phase 2: Build the Map
 
-Survey the scope. Then produce the **map** — a table the user can read
-at a glance.
+Survey the scope. Then produce the **map** — always rendered as a 2D
+matrix with the facets as columns and the regions discovered by
+surveying the scope as rows. No exceptions to this shape: never
+transpose it, never replace the matrix with a bulleted outline, never
+drop columns.
 
 The facets the user provided become the **columns**. The survey of the
 scope reveals natural regions — contiguous areas that form coherent
@@ -113,10 +121,20 @@ sentences.
 The map is an inventory. Each cell describes what is there — the user
 judges quality. Use descriptors and counts only.
 
-Each region is one row. If you need more than one row for a region, the
-region is too large — split it or compress further. If the table is too
-wide to scan at a glance, there are too many facets — merge facets or
-split the workflow.
+Every cell must have a descriptor. No cell is blank or marked "pending"
+— the map is complete at the end of Phase 2. Each region is one row;
+if you need more than one row for a region, the region is too large —
+split it or compress further.
+
+You do not yet know what the user truly wants, so when faced with
+structural or content choices about the map, surface the choice rather
+than making it yourself:
+
+- If a cell feels ambiguous or you are unsure what descriptor fits,
+  ask the user what to write.
+- If the matrix is wide enough that scanning it feels hard, still
+  render it in full; flag the concern and let the user decide whether
+  to compress cells, merge facets, or leave it as is.
 
 The scope may be large — survey it in passes if needed, but the map
 itself stays small.
