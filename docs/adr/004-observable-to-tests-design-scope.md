@@ -48,15 +48,11 @@ Two enforcement mechanisms combine:
 
 Brownfield reconnaissance output — why the design extends `FooParser` rather than creating a new class, why a free function rather than a class — lives in each dsn's existing `Rationale:` field.
 
-### Structure view is derived
-
-A per-feature code-organization overview comes from `sdd-chain-text --view=structure`, walking the dsn collection and printing the committed interfaces. The view is regenerated on demand; the dsn items themselves are the source of truth.
-
 ## Alternatives Considered
 
 | Alternative | Why rejected |
 |---|---|
-| Separate code-organization document (per-feature or per-project) | Stale-on-merge unless machine-validated; once machine-validated, it duplicates what `Interface:` on dsn items already provides. The derived `--view=structure` meets the human-review need without introducing a maintained artifact. |
+| Separate code-organization document (per-feature or per-project) | Stale-on-merge unless machine-validated; once machine-validated, it duplicates what `Interface:` on dsn items already provides. A derived view over the dsn collection meets the human-review need without introducing a maintained artifact. |
 | `arch~` artifact type for structural items | No relational claims (module-A-imports-module-B, module-boundary assertions) are pressing at current scale. Deferred until a case surfaces where signature-level dsn items cannot express the constraint. |
 | Protocol/ABC structural-typing validation | Low value at current scale. A dsn naming concrete classes and methods directly is sufficient. Deferred. |
 | Stdlib annotation shorthand with a known-name table | Ambiguity and maintenance cost of the table outweigh the ergonomic gain. Fully-qualified explicit form is unambiguous, and ruff `UP` already keeps code in modern form. |
@@ -73,8 +69,6 @@ A per-feature code-organization overview comes from `sdd-chain-text --view=struc
 - `dotfiles/.claude/skills/sdd-red/SKILL.md` is updated to read `Interface:` as the test target rather than parsing dsn prose.
 - `dotfiles/.claude/skills/sdd-green/SKILL.md` is updated to state that invisible choices below the committed surface belong to the green agent.
 - `sdd-func-reqs` and `sdd-issue-coordinate` are audited; substantive changes expected to be zero.
-- Two follow-up issues are opened:
-  - `pytest-sdd` refactor for modular hosting of OFT parsing, coverage graph, `Interface:` parsing, introspection validator, test-privacy check, and reporting. Refactor plan is required before code.
-  - `sdd-chain-text --view=structure` mode for the derived code-organization view.
+- A follow-up issue is opened: `pytest-sdd` refactor for modular hosting of OFT parsing, coverage graph, `Interface:` parsing, introspection validator, test-privacy check, and reporting. Refactor plan is required before code.
 - Ruff `SLF001` is enabled in both `tools/pyproject.toml` and `sdd-tools/pyproject.toml`.
 - The deferred directions from [ADR-003](003-evaluate-sdd-community-landscape.md) (adversarial review, replanning phase, `dec` artifact type) remain open; none are addressed here.
