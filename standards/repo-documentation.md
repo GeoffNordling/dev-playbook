@@ -63,7 +63,7 @@ Whether the file is required or optional.
 | `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
 | `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
 | `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) for content conventions and [oft-format.md — File organization](~/workspace/dev-playbook/sdd-standards/oft-format.md#file-organization--extension) for file layout and splitting rules. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) for content conventions and [oft.md — File organization](~/workspace/dev-playbook/sdd-standards/oft.md#file-organization--extension) for file layout and splitting rules. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. |
 

@@ -3,7 +3,7 @@
 This file is about the *semantics* of design items (`dsn`) — what a design
 commitment is and which dimensions it can commit across. Mechanical rules
 for the `Interface:` / `AgentReview:` keywords and the verification-coverage
-rule live in the OFT [Extensions](oft-format.md#extensions) section.
+rule live in the OFT [Extensions](oft.md#extensions) section.
 
 Obligation verbs in this document follow [rfc2119.md](rfc2119.md).
 
@@ -104,7 +104,7 @@ and `SHALL` declare it via the `Dimension:` field described below.
 ## Dimension commitment
 
 Every `dsn` `SHALL` declare its dimension(s) in a
-[`Dimension:` field](oft-format.md#extension-keyword-dimension). The
+[`Dimension:` field](oft.md#extension-keyword-dimension). The
 field takes a comma-separated list of one or more dimension names from
 `{Data, API Shape, Algorithms, Composition}`.
 
@@ -126,12 +126,12 @@ field value.
 Mechanical rules that apply to every `dsn` but are keyword-level (not
 design-semantic) live alongside the OFT format:
 
-- [Verification coverage](oft-format.md#verification-coverage--extension)
+- [Verification coverage](oft.md#verification-coverage--extension)
   — every `dsn` `SHALL` carry at least one of `Needs:`, `Interface:`, or
   `AgentReview:`.
-- [`Interface:` keyword](oft-format.md#extension-keyword-interface) —
+- [`Interface:` keyword](oft.md#extension-keyword-interface) —
   structural commitment format.
-- [`AgentReview:` keyword](oft-format.md#extension-keyword-agentreview) —
+- [`AgentReview:` keyword](oft.md#extension-keyword-agentreview) —
   non-testable commitment format.
-- [`Dimension:` keyword](oft-format.md#extension-keyword-dimension) —
+- [`Dimension:` keyword](oft.md#extension-keyword-dimension) —
   item-level dimension classification format.

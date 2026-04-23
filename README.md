@@ -50,10 +50,11 @@ Spec-driven development standards: philosophy, writing conventions, design layer
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Overview | `sdd-standards/overview.md` | Philosophy and core principles, coverage chain, revision policy |
-| Spec writing | `sdd-standards/writing.md` | OFT structure, EARS templates, RFC 2119 obligations, keyword reference, file layout |
+| RFC 2119 | `sdd-standards/rfc2119.md` | Obligation vocabulary (`MUST` / `SHALL` / `SHOULD` / `MAY`) and the workspace subset |
+| EARS | `sdd-standards/ears.md` | Sentence templates (*When / If / While / Where*) for requirement prose |
+| OFT | `sdd-standards/oft.md` | Requirement-Enhanced Markdown item format, IDs, keywords, linking, and workspace extensions |
+| Spec format | `sdd-standards/spec-format.md` | Integration walkthrough showing how the three standards combine in one spec file |
 | Design layer | `sdd-standards/design-layer.md` | Commitment scope, decision dimensions, per-`dsn` `Dimension:` classification, verification fields |
-| Tooling | `sdd-standards/tooling.md` | pytest-sdd setup, CLIs, rule-to-tool crosswalk |
 
 ### Agent configuration (dotfiles/)
 

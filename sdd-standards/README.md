@@ -6,8 +6,7 @@ all rules in this directory apply.
 
 This directory defines every standard a spec file in this workspace
 conforms to: three external standards (each colocating its workspace
-extensions), a design-layer companion, an integration walkthrough, and a
-tooling overview.
+extensions), an integration walkthrough, and a design-layer companion.
 
 ## Core principles
 
@@ -31,28 +30,38 @@ are valid spec items in the same format but are consciously omitted in
 this workspace, since our personal projects do not have meaningful technical
 constraints.
 
+## Composed from external standards
+
+The workspace spec format is built from three external standards, each
+contributing one layer:
+
+- **RFC 2119** — defines the obligation vocabulary (`MUST` / `SHALL` /
+  `SHOULD` / `MAY`) that grades how strong each requirement is.
+- **EARS** — defines sentence templates (*When / If / While / Where*)
+  that structure each requirement around its triggering condition.
+- **OFT Requirement-Enhanced Markdown** — defines a Markdown item
+  format with stable IDs and `Needs:` / `Covers:` links, turning a pile
+  of requirement prose into a traceable graph.
+
+We adopt each as-is, then subset, constrain, and extend it for the
+workspace. Each of the three primary files below restates its external
+standard and then, in a trailing Extensions section, documents the
+workspace decisions layered on top. Two companion files show how the
+three combine into a single spec file ([spec-format.md](spec-format.md))
+and what extra semantics apply to design items
+([design-layer.md](design-layer.md)).
+
 ## Files
+
+Read in this order:
 
 | File | Purpose |
 |---|---|
 | [rfc2119.md](rfc2119.md) | RFC 2119 / RFC 8174 (BCP 14) obligation vocabulary, plus the workspace subset, backticking rule, and one-obligation-per-item rule. |
 | [ears.md](ears.md) | EARS sentence templates, plus the workspace adoption statement. |
-| [oft-format.md](oft-format.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, fenced-code-block constraint, naming convention, and file organization. |
-| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the four decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
+| [oft.md](oft.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, fenced-code-block constraint, naming convention, and file organization. |
 | [spec-format.md](spec-format.md) | Integration walkthrough showing how the three standards combine in a single spec file, plus the illustrative-examples authoring convention. |
-| [tooling.md](tooling.md) | Tool overview — `pytest-sdd`, `sdd-chain`, `sdd-index`, `sdd-atlas`, `sdd-review`. Describes what enforces the rules in the other files. |
-
-## Where to start
-
-A new author writing their first spec:
-
-1. [spec-format.md](spec-format.md) — the integration walkthrough.
-2. The Extensions section of each standards file for the workspace rules
-   that override the defaults of the external standards.
-3. The remaining content as needed.
-
-An agent entering an SDD phase reads the standards files relevant to its
-phase; the SKILL.md for each phase names which.
+| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the four decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
 
 ## External references
 

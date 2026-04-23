@@ -13,7 +13,7 @@ Write tests from the spec. This is the "red" phase of spec-driven TDD — tests 
 Before starting, read both of these references end to end. If either is missing, stop and tell the user:
 
 - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — structure, naming, assertions, mocking patterns, and behavioral focus for all tests.
-- [Spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) — how the workspace spec format combines OFT structure with RFC 2119 + EARS prose and workspace extensions. For the `Interface:` keyword specifically (names the test targets), see [oft-format.md — `Interface:`](~/workspace/dev-playbook/sdd-standards/oft-format.md#extension-keyword-interface).
+- [Spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) — how the workspace spec format combines OFT structure with RFC 2119 + EARS prose and workspace extensions. For the `Interface:` keyword specifically (names the test targets), see [oft.md — `Interface:`](~/workspace/dev-playbook/sdd-standards/oft.md#extension-keyword-interface).
 
 Throughout the rest of this skill they are referred to as the *testing conventions* and the *spec format walkthrough*.
 

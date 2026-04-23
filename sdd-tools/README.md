@@ -53,7 +53,7 @@ Test-privacy enforcement has moved out of SDD scope to [`tools/bin/test-privacy`
 
 ## Tool reference
 
-Each tool supports `--help` for full usage. See [sdd-standards/tooling.md](../sdd-standards/tooling.md) for configuration, invocation detail, and CI integration.
+Each tool supports `--help` for full usage.
 
 ### pytest-sdd
 

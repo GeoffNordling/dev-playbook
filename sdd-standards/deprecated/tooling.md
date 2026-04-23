@@ -117,20 +117,20 @@ Mapping from standard rule to the tool that enforces it.
 |---|---|---|
 | [rfc2119.md — Backticking](rfc2119.md#backticking--constraint) | Backticked obligation keywords | `spec-lint` |
 | [rfc2119.md — One obligation level](rfc2119.md#one-obligation-level-per-item--constraint) | One obligation level per item | `spec-lint` |
-| [oft-format.md — Fenced code blocks](oft-format.md#fenced-code-blocks--constraint-forbidden) | Fenced code blocks forbidden | `spec-lint` |
+| [oft.md — Fenced code blocks](oft.md#fenced-code-blocks--constraint-forbidden) | Fenced code blocks forbidden | `spec-lint` |
 | [ears.md](ears.md) | EARS sentence form | — |
 | [spec-format.md — Illustrative examples](spec-format.md#illustrative-examples-in-prose) | Illustrative examples (`SHOULD`) | — |
-| [oft-format.md — Specification item ID](oft-format.md#specification-item-id) | Well-formed `type~name~revision` IDs | `spec-lint` |
-| [oft-format.md — Keyword fields](oft-format.md#keyword-fields) | `Status:` field present + valid | `spec-lint` |
-| [oft-format.md — Keyword fields](oft-format.md#keyword-fields) | `Covers:` syntactic form | `spec-lint` |
-| [oft-format.md — Artifact types subset](oft-format.md#artifact-types--subset) | `Needs:` known artifact types | `spec-lint` |
-| [oft-format.md — `Interface:`](oft-format.md#extension-keyword-interface) | `Interface:` parseable, resolves, matches code | `spec-interface` |
-| [oft-format.md — `AgentReview:`](oft-format.md#extension-keyword-agentreview) | `AgentReview:` well-formed prose | `spec-lint` |
-| [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | `Needs:` coverage satisfied | `spec-coverage` |
-| [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | `Covers:` IDs resolve at revision | `spec-coverage` |
-| [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | No orphans | `spec-coverage` |
-| [oft-format.md — Forwarding forbidden](oft-format.md#forwarding--constraint-forbidden) | Forwarding syntax forbidden | — |
-| [oft-format.md — `Dimension:`](oft-format.md#extension-keyword-dimension) | Every `dsn` carries a `Dimension:` field naming one or more valid dimensions | `spec-lint` |
-| [oft-format.md — Verification coverage](oft-format.md#verification-coverage--extension) | Every `dsn` carries at least one of `Needs:` / `Interface:` / `AgentReview:` | `spec-lint` |
+| [oft.md — Specification item ID](oft.md#specification-item-id) | Well-formed `type~name~revision` IDs | `spec-lint` |
+| [oft.md — Keyword fields](oft.md#keyword-fields) | `Status:` field present + valid | `spec-lint` |
+| [oft.md — Keyword fields](oft.md#keyword-fields) | `Covers:` syntactic form | `spec-lint` |
+| [oft.md — Artifact types subset](oft.md#artifact-types--subset) | `Needs:` known artifact types | `spec-lint` |
+| [oft.md — `Interface:`](oft.md#extension-keyword-interface) | `Interface:` parseable, resolves, matches code | `spec-interface` |
+| [oft.md — `AgentReview:`](oft.md#extension-keyword-agentreview) | `AgentReview:` well-formed prose | `spec-lint` |
+| [oft.md — Coverage checks](oft.md#coverage-checks) | `Needs:` coverage satisfied | `spec-coverage` |
+| [oft.md — Coverage checks](oft.md#coverage-checks) | `Covers:` IDs resolve at revision | `spec-coverage` |
+| [oft.md — Coverage checks](oft.md#coverage-checks) | No orphans | `spec-coverage` |
+| [oft.md — Forwarding forbidden](oft.md#forwarding--constraint-forbidden) | Forwarding syntax forbidden | — |
+| [oft.md — `Dimension:`](oft.md#extension-keyword-dimension) | Every `dsn` carries a `Dimension:` field naming one or more valid dimensions | `spec-lint` |
+| [oft.md — Verification coverage](oft.md#verification-coverage--extension) | Every `dsn` carries at least one of `Needs:` / `Interface:` / `AgentReview:` | `spec-lint` |
 
 Rules marked `—` are either agent-judgment territory (EARS form, illustrative examples) or gaps awaiting tool support.
