@@ -10,10 +10,10 @@ things that commonly get conflated:
   `openfasttrace-x.y.z.jar`) that parses the format, walks the coverage
   graph, and reports traceability.
 
-This file describes the **format**. It does not describe the reference
-implementation or any tool. Our choices about which subset of the format we
-use, and which features we deliberately avoid, live in
-[extensions.md](extensions.md).
+This file describes the **format** and then, in a trailing
+[Extensions](#extensions) section, describes the workspace subset,
+added keywords, and constraints layered on top. It does not describe the
+reference implementation or any tool.
 
 ## Document model
 
@@ -239,6 +239,256 @@ an ID defined in `a/b/c.md` is indistinguishable from the same ID in
 Projects may organize files hierarchically, by feature, or flat — all are
 valid. Hierarchical organization is an allowed convenience, not a
 requirement of the format.
+
+## Extensions
+
+Everything above is the external standard. This section records how this
+workspace uses the format: which parts we adopt, what we add on top, and
+what we forbid. The three kinds of decisions are **subset** (we adopt only
+part of the standard's optional vocabulary), **extension** (we add
+capability the standard does not define), and **constraint** (we forbid
+or tighten something the standard allows).
+
+Obligation verbs below follow [rfc2119.md](rfc2119.md).
+
+### Artifact types — subset
+
+The format's recommended set is ten types. This workspace uses five:
+
+| Type | Purpose |
+|---|---|
+| `feat` | High-level feature |
+| `req` | User or functional requirement |
+| `dsn` | Design item |
+| `utest` | Unit test |
+| `itest` | Integration test |
+
+Types not used in this workspace: `arch`, `impl`, `stest`, `uman`, `oman`.
+
+Reason: the five chosen types are sufficient to express the workspace's
+coverage chain (below). Adding more types without a specific need inflates
+the vocabulary without information gain. Projects `MAY` adopt additional
+types if they have a concrete need; additional types `SHALL` be documented
+in the project's `specs/` directory.
+
+### Coverage chain — constraint
+
+The workspace chain is:
+
+    feat  →  req  →  dsn  →  utest / itest
+
+Each arrow is an OFT coverage relationship: the downstream layer covers
+the upstream layer through `Needs:` / `Covers:` links.
+
+Required structure:
+
+- `feat` `SHALL` be the root. Every project `SHALL` begin the chain with
+  `feat` items.
+- `req` items `SHALL` cover `feat`.
+- Most `req` items `SHALL` declare `Needs: dsn` to carry the chain forward
+  into the design layer.
+- `dsn` items `SHALL` cover `req` and are expected for most `req` items. A
+  `req` `MAY` skip `dsn` only when it needs neither a design decision nor
+  an ownership assignment; in that case the `req` `SHALL` declare
+  `Needs: utest` and/or `Needs: itest` directly.
+- `utest` and `itest` `SHALL` cover the item directly upstream. Either a
+  `req` or a `dsn` `MAY` declare `Needs: utest`, `Needs: itest`, or both —
+  whichever is appropriate to verify the commitment.
+- An item with no `Needs:` declaration terminates the chain below itself —
+  nothing downstream is required.
+
+The chain shape is a workspace choice. OFT itself does not prescribe any
+particular inter-layer relationship; it only enforces whatever coverage
+each item declares.
+
+### Forwarding — constraint (forbidden)
+
+OFT's forwarding syntax (see [Forwarding](#forwarding)) `SHALL NOT` be used
+in this workspace. When a layer has nothing to say for a particular item,
+the item `SHALL` skip that layer entirely (by omitting the type from its
+`Needs:`) rather than creating a hollow passthrough.
+
+Reason: a forward is a load-bearing structural element that reads like an
+item but contains no content. Skipping the layer is more honest — the
+coverage chain shows exactly where decisions are made.
+
+### Revision policy — extension
+
+The revision number in an ID is a semantic version for the item's meaning.
+
+**Increment** the revision when the semantic content changes — when the
+requirement means something different than it did before. This voids all
+downstream `Covers:` links that referenced the previous revision, forcing
+downstream documents to explicitly acknowledge and respond to the change.
+
+**Do not increment** for typo fixes, rephrasing that does not change
+meaning, or formatting changes.
+
+When you increment a revision, update all `Covers:` references in
+downstream documents to the new revision. If a downstream item's response
+to the change is "no change needed," update the `Covers:` link and note
+this in the downstream item's `Comment:` field.
+
+Reason: OFT's revision-match check is mechanical — it flags all downstream
+links when an upstream revision bumps. This policy tells authors when that
+flag is the right signal (semantic change) versus when it would be
+unnecessary churn (typos).
+
+### Verification coverage — extension
+
+Every requirement `SHALL` tie off with a verification mechanism at its
+layer.
+
+| Layer | Verification comes from |
+|---|---|
+| `feat` | `Needs:` pointing at a covering downstream type. |
+| `req` | `Needs:` pointing at a covering downstream type. |
+| `dsn` | Any combination of `Needs:`, `Interface:`, or `AgentReview:` — at least one `SHALL` be present. |
+
+A requirement with no verification mechanism is a commitment that nothing
+ever checks. This rule applies at every layer; it is not restricted to
+chain leaves.
+
+`Interface:` and `AgentReview:` are workspace extension keywords defined
+below.
+
+### Extension keyword: `Interface:`
+
+`Interface:` is a workspace-defined keyword, not part of OFT. It is valid
+only on `dsn` items.
+
+A `dsn` that commits to a public surface `SHALL` declare the committed
+signatures in `Interface:` fields so the commitment can be machine-validated
+against the code.
+
+#### Format
+
+Each `Interface:` entry is a single line declaring one signature. A design
+item `MAY` declare multiple `Interface:` entries to commit to multiple
+related signatures (e.g., a class and its public methods).
+
+    Interface: parser.parse_session(path: pathlib.Path) -> parser.Session
+    Interface: parser.SessionParser.__init__(self, config: parser.ParserConfig) -> None
+    Interface: parser.SessionParser.parse(self, path: pathlib.Path) -> parser.Session
+
+Each signature includes the fully-qualified symbol path
+(`module.ClassName.method`), the parameter list with annotations, and the
+return annotation. Parameter kinds use standard Python syntax (`/` for
+positional-only, `*` for keyword-only, `*args`, `**kwargs`). Instance
+methods include `self`; classmethods include `cls`; staticmethods omit
+both.
+
+#### Annotation convention
+
+Interface annotations follow a single modern idiom, matching what ruff's
+`UP` rules produce in the code.
+
+| Annotation form | Modern (use) | Legacy (do not use) |
+|---|---|---|
+| Non-stdlib classes | `pathlib.Path`, `myapp.session.Session` | bare `Path`, bare `Session` |
+| Built-in generics | `list[int]`, `dict[str, Event]` | `typing.List[int]`, `typing.Dict[str, Event]` |
+| Unions with None | `Event \| None` | `Optional[Event]`, `Union[Event, None]` |
+| Primitives | `int`, `str`, `float`, `bool`, `bytes` | — |
+
+Complex types `SHALL` be named through a single import and referenced by
+name rather than inlined as sprawling generic expressions.
+
+#### Coexistence with prose
+
+A `dsn` `MAY` contain both prose and `Interface:` entries. Prose captures
+non-API decisions — schema, algorithm, error semantics — and flows through
+OFT's tracing into reports. `Interface:` entries are the machine-checked
+part: validators compare them against the code.
+
+### Extension keyword: `AgentReview:`
+
+`AgentReview:` is a workspace-defined keyword, not part of OFT. It is
+valid only on `dsn` items.
+
+A `dsn` that commits to a non-testable behavior or a review-only property
+`SHALL` declare what must be checked in an `AgentReview:` field.
+
+#### Format
+
+Each `AgentReview:` entry is a single declaration describing one thing to
+check. A `dsn` `MAY` declare multiple entries for multiple separate
+checks.
+
+    AgentReview: The agent's system prompt at src/prompts/agent.md should
+                 contain a directive discouraging filler or polite
+                 conversation.
+
+File paths named inside the prose let a review agent locate what to
+compare against.
+
+#### When to use
+
+`AgentReview:` is the mechanism for commitments that cannot be
+deterministically tested. Typical cases:
+
+- Behavioral requirements for LLM agents (e.g., "`SHALL NOT` attempt
+  polite conversation for no reason").
+- Output-format requirements where a prompt-inclusion test would
+  degenerate into test-theater.
+- Cross-cutting conventions too contextual for a unit assertion.
+
+If a commitment can be tested deterministically, prefer `Needs: utest` or
+`Needs: itest` — tests are faster and more reliable than a review skill.
+
+#### Coexistence
+
+A `dsn` `MAY` combine `AgentReview:` with `Needs:` and `Interface:`. One
+design decision often commits several aspects simultaneously; one `dsn`
+captures them all, and each field names how its respective aspect is
+verified.
+
+### Fenced code blocks — constraint (forbidden)
+
+Spec files `SHALL NOT` contain fenced code blocks (triple backticks or
+`~~~`). Use indented code blocks (4-space indent) instead.
+
+Reason: the OFT reference parser historically had edge cases around
+fenced code blocks that silently affected which specification items were
+picked up. Indented code blocks render identically and avoid the class of
+bug entirely.
+
+### Naming convention — extension
+
+Item names (the middle segment of `type~name~revision`) `SHOULD` use dots
+to express readable hierarchy: `auth.login-validation`,
+`parser.segment.timestamp`. OFT permits dots in names; this workspace uses
+them as the convention for grouping related items.
+
+Consecutive dots are prohibited by OFT itself; no additional workspace
+rule is needed.
+
+### File organization — extension
+
+All spec files `SHALL` live in a `/specs/` directory at the repository
+root, versioned alongside the code. The
+[repo-documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+defines which files exist and their purpose.
+
+#### Splitting large specs
+
+Each spec file starts as a single file. When it grows large enough to
+impair an agent's ability to work with it in a single context load, it
+`SHOULD` be split into a folder of files organized by feature or
+capability area.
+
+**The decision to split `SHALL` be made by the human, not the agent.**
+
+When split:
+
+- `functional_requirements.md` → `functional_requirements/` folder.
+- `design.md` → `design/` folder.
+- Each folder `SHALL` contain an `index.md` — a structured Markdown table
+  listing every file with a one-line scope description, so an agent can
+  decide which files to load without reading all of them.
+
+OFT natively supports hierarchical organization (see
+[File discovery](#file-discovery)); file names and folder structure do
+not affect tracing.
 
 ## Reference
 

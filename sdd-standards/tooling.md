@@ -115,23 +115,23 @@ Mapping from standard rule to the tool that enforces it.
 
 | Standard | Rule | Enforced by |
 |---|---|---|
-| [extensions.md — Obligation vocabulary](extensions.md#obligation-vocabulary--subset--constraint) | Backticked obligation keywords | `spec-lint` |
-| [extensions.md — Obligation vocabulary](extensions.md#one-obligation-level-per-item) | One obligation level per item | `spec-lint` |
-| [extensions.md — Fenced code blocks](extensions.md#fenced-code-blocks--constraint-forbidden) | Fenced code blocks forbidden | `spec-lint` |
+| [rfc2119.md — Backticking](rfc2119.md#backticking--constraint) | Backticked obligation keywords | `spec-lint` |
+| [rfc2119.md — One obligation level](rfc2119.md#one-obligation-level-per-item--constraint) | One obligation level per item | `spec-lint` |
+| [oft-format.md — Fenced code blocks](oft-format.md#fenced-code-blocks--constraint-forbidden) | Fenced code blocks forbidden | `spec-lint` |
 | [ears.md](ears.md) | EARS sentence form | — |
-| [extensions.md — Illustrative examples](extensions.md#illustrative-examples--extension) | Illustrative examples (`SHOULD`) | — |
+| [spec-format.md — Illustrative examples](spec-format.md#illustrative-examples-in-prose) | Illustrative examples (`SHOULD`) | — |
 | [oft-format.md — Specification item ID](oft-format.md#specification-item-id) | Well-formed `type~name~revision` IDs | `spec-lint` |
 | [oft-format.md — Keyword fields](oft-format.md#keyword-fields) | `Status:` field present + valid | `spec-lint` |
 | [oft-format.md — Keyword fields](oft-format.md#keyword-fields) | `Covers:` syntactic form | `spec-lint` |
-| [extensions.md — Artifact type subset](extensions.md#oft-artifact-types--subset) | `Needs:` known artifact types | `spec-lint` |
-| [extensions.md — `Interface:`](extensions.md#extension-keyword-interface) | `Interface:` parseable, resolves, matches code | `spec-interface` |
-| [extensions.md — `AgentReview:`](extensions.md#extension-keyword-agentreview) | `AgentReview:` well-formed prose | `spec-lint` |
+| [oft-format.md — Artifact types subset](oft-format.md#artifact-types--subset) | `Needs:` known artifact types | `spec-lint` |
+| [oft-format.md — `Interface:`](oft-format.md#extension-keyword-interface) | `Interface:` parseable, resolves, matches code | `spec-interface` |
+| [oft-format.md — `AgentReview:`](oft-format.md#extension-keyword-agentreview) | `AgentReview:` well-formed prose | `spec-lint` |
 | [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | `Needs:` coverage satisfied | `spec-coverage` |
 | [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | `Covers:` IDs resolve at revision | `spec-coverage` |
 | [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | No orphans | `spec-coverage` |
-| [extensions.md — Forwarding forbidden](extensions.md#forwarding--constraint-forbidden) | Forwarding syntax forbidden | — |
-| [extensions.md — Dimension section organization](extensions.md#dimension-section-organization--extension) | All four dimension headers present per `dsn` file | `spec-lint` |
-| [extensions.md — Dimension section organization](extensions.md#dimension-section-organization--extension) | Every `dsn` placed under a dimension header | `spec-lint` |
-| [extensions.md — Verification coverage](extensions.md#verification-coverage--extension) | Every `dsn` carries at least one of `Needs:` / `Interface:` / `AgentReview:` | `spec-lint` |
+| [oft-format.md — Forwarding forbidden](oft-format.md#forwarding--constraint-forbidden) | Forwarding syntax forbidden | — |
+| [design-layer.md — Dimension section organization](design-layer.md#dimension-section-organization) | All four dimension headers present per `dsn` file | `spec-lint` |
+| [design-layer.md — Dimension section organization](design-layer.md#dimension-section-organization) | Every `dsn` placed under a dimension header | `spec-lint` |
+| [oft-format.md — Verification coverage](oft-format.md#verification-coverage--extension) | Every `dsn` carries at least one of `Needs:` / `Interface:` / `AgentReview:` | `spec-lint` |
 
 Rules marked `—` are either agent-judgment territory (EARS form, illustrative examples) or gaps awaiting tool support.

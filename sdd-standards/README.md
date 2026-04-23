@@ -5,8 +5,9 @@ decides whether a project uses this workflow. When a project adopts SDD,
 all rules in this directory apply.
 
 This directory defines every standard a spec file in this workspace
-conforms to: three external standards, a workspace extensions file, a
-design-layer companion, an integration walkthrough, and a tooling overview.
+conforms to: three external standards (each colocating its workspace
+extensions), a design-layer companion, an integration walkthrough, and a
+tooling overview.
 
 ## Core principles
 
@@ -35,12 +36,11 @@ rules.
 
 | File | Purpose |
 |---|---|
-| [rfc2119.md](rfc2119.md) | RFC 2119 obligation vocabulary. External standard, as defined. |
-| [ears.md](ears.md) | EARS sentence templates. External standard, as defined. |
-| [oft-format.md](oft-format.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage. External standard, as defined. |
-| [extensions.md](extensions.md) | Workspace subsets, constraints, and extension keywords (`Interface:`, `AgentReview:`). The load-bearing file for authoring. |
-| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing and the four decision dimensions. |
-| [spec-format.md](spec-format.md) | Integration walkthrough showing how the four standards combine in a single spec file. |
+| [rfc2119.md](rfc2119.md) | RFC 2119 / RFC 8174 (BCP 14) obligation vocabulary, plus the workspace subset, backticking rule, and one-obligation-per-item rule. |
+| [ears.md](ears.md) | EARS sentence templates, plus the workspace adoption statement. |
+| [oft-format.md](oft-format.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` and `AgentReview:` keywords, fenced-code-block constraint, naming convention, and file organization. |
+| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the four decision dimensions, and the dimension section-organization rule for `dsn` files. |
+| [spec-format.md](spec-format.md) | Integration walkthrough showing how the three standards combine in a single spec file, plus the illustrative-examples authoring convention. |
 | [tooling.md](tooling.md) | Tool overview — `pytest-sdd`, `sdd-chain`, `sdd-index`, `sdd-atlas`, `sdd-review`. Describes what enforces the rules in the other files. |
 
 ## Where to start
@@ -48,8 +48,9 @@ rules.
 A new author writing their first spec:
 
 1. [spec-format.md](spec-format.md) — the integration walkthrough.
-2. [extensions.md](extensions.md) — workspace rules that override defaults.
-3. The remaining files as needed.
+2. The Extensions section of each standards file for the workspace rules
+   that override the defaults of the external standards.
+3. The remaining content as needed.
 
 An agent entering an SDD phase reads the standards files relevant to its
 phase; the SKILL.md for each phase names which.

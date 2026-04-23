@@ -1,9 +1,9 @@
 # Design Layer
 
 This file is about the *semantics* of design items (`dsn`) — what a design
-commitment is and which dimensions it can commit across. The mechanical
-rules for organizing and verifying `dsn` items (section headers, the
-three verification fields) live in [extensions.md](extensions.md).
+commitment is and which dimensions it can commit across. Mechanical rules
+for the `Interface:` / `AgentReview:` keywords and the verification-coverage
+rule live in the OFT [Extensions](oft-format.md#extensions) section.
 
 Obligation verbs in this document follow [rfc2119.md](rfc2119.md).
 
@@ -99,23 +99,41 @@ is fine at the project level — the dimension table covers what a given
 project happens to need.
 
 Every individual `dsn`, however, `SHALL` commit to at least one dimension.
-Within the file organization rules (see
-[extensions.md](extensions.md#dimension-section-organization)), each `dsn`
-is placed under the single dimension it primarily commits to; if it
-genuinely spans multiple dimensions, it is a candidate for being split.
+Within the file organization rules below, each `dsn` is placed under the
+single dimension it primarily commits to; if it genuinely spans multiple
+dimensions, it is a candidate for being split.
 
-## Related rules in extensions.md
+## Dimension section organization
 
-These mechanical rules apply to every `dsn` but are not themselves
-design-semantic decisions; they live with our other workspace-level
-conventions:
+Every `dsn` spec file `SHALL` organize its items under four Markdown section
+headers, one per dimension, in this order:
 
-- [Dimension section organization](extensions.md#dimension-section-organization)
-  — the four `##` headers required in every `dsn` file.
-- [Verification coverage](extensions.md#verification-coverage--extension) —
-  every `dsn` `SHALL` carry at least one of `Needs:`, `Interface:`, or
+    ## Data
+    ## API Shape
+    ## Algorithms
+    ## Composition
+
+Every `dsn` item `SHALL` appear under exactly one of these four headers.
+Items that float above or between section headers are errors.
+
+A file where a dimension has no commitments `SHALL` still include the
+header with an empty section. The empty header is the explicit signal
+"considered, nothing to commit here." A missing header is not equivalent
+to an empty section; the header makes the absence deliberate.
+
+Reason: forcing classification at the moment of writing prevents post-hoc
+inference of dimension from prose, and gives downstream tools a
+deterministic anchor for per-dimension projection.
+
+## Related keyword and coverage rules
+
+Mechanical rules that apply to every `dsn` but are keyword-level (not
+design-semantic) live alongside the OFT format:
+
+- [Verification coverage](oft-format.md#verification-coverage--extension)
+  — every `dsn` `SHALL` carry at least one of `Needs:`, `Interface:`, or
   `AgentReview:`.
-- [`Interface:` keyword](extensions.md#extension-keyword-interface) —
+- [`Interface:` keyword](oft-format.md#extension-keyword-interface) —
   structural commitment format.
-- [`AgentReview:` keyword](extensions.md#extension-keyword-agentreview) —
+- [`AgentReview:` keyword](oft-format.md#extension-keyword-agentreview) —
   non-testable commitment format.

@@ -2,9 +2,10 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in
-[RFC 2119](~/workspace/dev-playbook/sdd-standards/rfc2119.md), following the
-vocabulary conventions in
-[sdd-standards/extensions.md](~/workspace/dev-playbook/sdd-standards/extensions.md).
+[sdd-standards/rfc2119.md](~/workspace/dev-playbook/sdd-standards/rfc2119.md),
+including the workspace subset and formatting rules in its
+[Extensions](~/workspace/dev-playbook/sdd-standards/rfc2119.md#extensions)
+section.
 
 ## Purpose
 

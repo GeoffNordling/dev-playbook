@@ -1,39 +1,37 @@
 # Spec File Format — Integration Walkthrough
 
-Specs in this workspace stack three external standards with a set of
-workspace extensions. This file shows how the pieces combine in a single
-spec file; each per-standard file carries the authoritative detail.
+Specs in this workspace stack three external standards. Each standards
+file restates its external standard and then, in a trailing Extensions
+section, documents the workspace subset, constraints, and additions for
+that standard. This file shows how the pieces combine in a single spec
+file.
 
 ## The stack
 
-| Concern | Standard | File |
-|---|---|---|
-| Obligation strength | RFC 2119 | [rfc2119.md](rfc2119.md) |
-| Sentence structure | EARS | [ears.md](ears.md) |
-| Item identity, linking, traceability | OFT Requirement-Enhanced Markdown | [oft-format.md](oft-format.md) |
-| Subsets, constraints, and added keywords | Workspace | [extensions.md](extensions.md) |
+| Concern | Standard + workspace extensions |
+|---|---|
+| Obligation strength | [rfc2119.md](rfc2119.md) |
+| Sentence structure | [ears.md](ears.md) |
+| Item identity, linking, traceability, workspace keywords (`Interface:`, `AgentReview:`) | [oft-format.md](oft-format.md) |
 
-A valid spec file conforms to all four. A spec-phase agent writes prose
-following EARS, grades obligations with RFC 2119 vocabulary, embeds the
-prose in OFT specification items, and respects every workspace-level
-constraint and extension from `extensions.md`.
+A valid spec file conforms to all three. A spec-phase agent writes prose
+following EARS, grades obligations with RFC 2119 vocabulary, and embeds
+the prose in OFT specification items — each subject to the workspace
+Extensions section of its respective standards file.
 
-Design-phase semantics (what a commitment is; the four decision dimensions)
-are covered in [design-layer.md](design-layer.md).
+Design-phase semantics (what a commitment is; the four decision
+dimensions) are covered in [design-layer.md](design-layer.md).
 
 ## Reading order
 
 A new author or agent encountering the workspace for the first time
 `SHOULD` read the files in this order:
 
-1. [rfc2119.md](rfc2119.md) — obligation vocabulary.
+1. [rfc2119.md](rfc2119.md) — obligation vocabulary and workspace subset.
 2. [ears.md](ears.md) — sentence templates.
 3. [oft-format.md](oft-format.md) — item identity, keywords, linking,
-   coverage.
-4. [extensions.md](extensions.md) — workspace subsets, extensions, and
-   constraints. Many rules here override the defaults of the external
-   standards, so this file is load-bearing for practical authoring.
-5. [design-layer.md](design-layer.md) — only when working on `dsn` items.
+   coverage, plus workspace keywords and constraints.
+4. [design-layer.md](design-layer.md) — only when working on `dsn` items.
 
 ## Anatomy of a complete spec item
 
@@ -65,12 +63,12 @@ Where each piece comes from:
 | Piece | Source |
 |---|---|
 | The Markdown heading `### Login Credential Validation` | OFT item structure; any standard Markdown heading names the item. |
-| The ID `` `req~auth.login-validation~1` `` | OFT ID format; the `req` type is part of our subset (extensions.md); the dotted name follows the workspace naming convention (extensions.md). |
+| The ID `` `req~auth.login-validation~1` `` | OFT ID format; the `req` type is part of [our subset](oft-format.md#artifact-types--subset); the dotted name follows the [naming convention](oft-format.md#naming-convention--extension). |
 | `Status: approved` | OFT keyword. |
-| Sentence `When the user submits credentials, the system SHALL verify …` | EARS Event-driven template; `SHALL` is the RFC 2119 obligation verb, backticked per extensions.md. |
+| Sentence `When the user submits credentials, the system SHALL verify …` | EARS Event-driven template; `SHALL` is the RFC 2119 obligation verb, [backticked per the workspace rule](rfc2119.md#backticking--constraint). |
 | `Rationale:` and `Comment:` | OFT keywords. |
 | `Covers:` (bullet list) | OFT linking model. |
-| `Needs: dsn, utest` | OFT linking model; the chain shape (`req → dsn → utest`) is the workspace coverage chain in extensions.md. |
+| `Needs: dsn, utest` | OFT linking model; the chain shape (`req → dsn → utest`) is the [workspace coverage chain](oft-format.md#coverage-chain--constraint). |
 
 ## Anatomy of a `dsn` item with workspace extensions
 
@@ -97,28 +95,40 @@ Where each workspace-specific piece comes from:
 
 | Piece | Source |
 |---|---|
-| The `## API Shape` section header | Dimension section organization (extensions.md). |
-| `Interface: …` | Workspace extension keyword (extensions.md). The signature is machine-validated against the code. |
-| `AgentReview: …` | Workspace extension keyword (extensions.md). Verified by the review skill on invocation. |
-| Combining `Needs:`, `Interface:`, and `AgentReview:` on one item | Verification coverage rule (extensions.md). |
+| The `## API Shape` section header | [Dimension section organization](design-layer.md#dimension-section-organization). |
+| `Interface: …` | [`Interface:` workspace extension keyword](oft-format.md#extension-keyword-interface). The signature is machine-validated against the code. |
+| `AgentReview: …` | [`AgentReview:` workspace extension keyword](oft-format.md#extension-keyword-agentreview). Verified by the review skill on invocation. |
+| Combining `Needs:`, `Interface:`, and `AgentReview:` on one item | [Verification coverage rule](oft-format.md#verification-coverage--extension). |
 
 ## What a valid file looks like as a whole
 
 A spec file `SHALL`:
 
 - Live under the project's `specs/` directory
-  ([extensions.md](extensions.md#file-organization--extension)).
-- Use only [workspace artifact types](extensions.md#oft-artifact-types--subset)
+  ([file organization](oft-format.md#file-organization--extension)).
+- Use only [workspace artifact types](oft-format.md#artifact-types--subset)
   (`feat`, `req`, `dsn`, `utest`, `itest`).
-- Use no fenced code blocks
-  ([extensions.md](extensions.md#fenced-code-blocks--constraint-forbidden)).
-- Use no OFT forwarding syntax
-  ([extensions.md](extensions.md#forwarding--constraint-forbidden)).
+- Use no [fenced code blocks](oft-format.md#fenced-code-blocks--constraint-forbidden).
+- Use no [OFT forwarding syntax](oft-format.md#forwarding--constraint-forbidden).
 - For `dsn` files only, carry the four dimension `##` headers in canonical
-  order ([extensions.md](extensions.md#dimension-section-organization--extension)).
+  order ([dimension section organization](design-layer.md#dimension-section-organization)).
 
 Prose that is not part of any item is ignored by OFT and `MAY` be used
 freely for context, headings, or notes.
+
+## Illustrative examples in prose
+
+A spec section that introduces non-trivial domain vocabulary `SHOULD`
+include a short illustrative example before the formal requirements. The
+example grounds the vocabulary in concrete terms so that requirements can
+reference it without re-explaining.
+
+- One scenario per section. If a second example is needed, the section's
+  vocabulary may be too overloaded and `SHOULD` be split.
+- The example `SHALL` appear after the section's prose introduction and
+  before the formal spec items.
+- Examples `SHALL` use indented code blocks (4-space indent) or structured
+  format that mirrors what the system actually produces or consumes.
 
 ## When things go wrong
 

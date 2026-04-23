@@ -1,9 +1,9 @@
 # EARS — Easy Approach to Requirements Syntax
 
 EARS defines a small set of sentence templates that authors use to phrase
-requirements unambiguously. This file restates the standard. Our conventions
-for combining EARS with other standards are in [extensions.md](extensions.md)
-and [spec-format.md](spec-format.md).
+requirements unambiguously. This workspace adopts EARS unchanged — no
+subset, no extensions, no constraints. [spec-format.md](spec-format.md)
+shows how EARS combines with the other standards in a full spec file.
 
 EARS covers sentence *structure* only. Obligation strength, identity,
 rationale, and metadata are out of scope — obligation strength is handled
