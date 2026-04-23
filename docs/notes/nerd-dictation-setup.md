@@ -7,7 +7,7 @@ revisit the setup without re-doing the research.
 ## TL;DR
 
 - **Tool:** [nerd-dictation](https://github.com/ideasman42/nerd-dictation) — offline speech-to-text that types into the focused window.
-- **Speech engine:** VOSK, small English model (~130 MB unpacked), fully local.
+- **Speech engine:** VOSK, large US English model `vosk-model-en-us-0.22` (~2.7 GB unpacked), fully local.
 - **Input injection:** `ydotool` (via user-mode systemd service).
 - **Python:** dedicated 3.12 venv (Fedora 43's system Python 3.14 lacks vosk wheels).
 - **Install root:** `~/opt/nerd-dictation` (git clone + venv).
@@ -113,16 +113,20 @@ else.
 **Revisit when:** vosk publishes Python 3.14+ wheels — at that point you can
 drop the `python3.12` dependency and use system Python.
 
-### 5. VOSK model: small English (vosk-model-small-en-us-0.15)
+### 5. VOSK model: large US English (vosk-model-en-us-0.22)
 
-| Model   | Size | Accuracy | Latency |
-| ------- | ---- | -------- | ------- |
-| small   | ~130 MB unpacked | Good for dictation | Low |
-| large   | ~1.8 GB          | Better             | Higher RAM + slower |
+| Model   | Size (unpacked) | Accuracy | Latency on CPU |
+| ------- | --------------- | -------- | -------------- |
+| small (`vosk-model-small-en-us-0.15`) | ~130 MB | Inadequate in practice — frequent wrong/missed words | Low |
+| **large (`vosk-model-en-us-0.22`)**   | ~2.7 GB | Good for everyday dictation | ~3–5 s cold load, real-time thereafter |
+| gigaspeech (`vosk-model-en-us-0.42-gigaspeech`) | ~2.3 GB | Comparable WER, trained on newer/conversational data | Slightly slower per frame |
 
-**Chose small** as default — good enough for general English dictation,
-loads fast, low memory footprint. Upgrade to the large model later if
-accuracy becomes the bottleneck.
+**Chose large** because the small model's accuracy was unacceptable for
+real use. The 12-core / 30 GB box has plenty of headroom to run the large
+model on CPU; RAM is not a constraint.
+
+**Revisit gigaspeech if:** large model accuracy still falls short on
+conversational or domain-specific speech.
 
 Model list: https://alphacephei.com/vosk/models
 
@@ -239,10 +243,10 @@ python3.12 -m venv .venv
 ```sh
 mkdir -p ~/.config/nerd-dictation
 cd /tmp
-wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.15.zip
-unzip vosk-model-small-en-us-0.15.zip
-mv vosk-model-small-en-us-0.15 ~/.config/nerd-dictation/model
-rm vosk-model-small-en-us-0.15.zip
+wget https://alphacephei.com/kaldi/models/vosk-model-en-us-0.22.zip
+unzip vosk-model-en-us-0.22.zip
+mv vosk-model-en-us-0.22 ~/.config/nerd-dictation/model
+rm vosk-model-en-us-0.22.zip
 ```
 
 nerd-dictation looks for the model at `~/.config/nerd-dictation/model` by
@@ -278,7 +282,7 @@ chmod +x ~/.local/bin/nerd-dictation
 | `~/opt/nerd-dictation/` | Cloned git repo |
 | `~/opt/nerd-dictation/.venv/` | Python 3.12 venv with vosk |
 | `~/opt/nerd-dictation/nerd-dictation` | The actual script (called by the wrapper) |
-| `~/.config/nerd-dictation/model/` | VOSK speech model |
+| `~/.config/nerd-dictation/model/` | Active VOSK speech model (large, `vosk-model-en-us-0.22`) |
 | `~/.config/nerd-dictation/nerd-dictation.py` | **(optional, not yet created)** User config for word substitutions, etc. |
 | `~/.local/bin/nerd-dictation` | Wrapper on PATH |
 
@@ -421,35 +425,34 @@ Pro: instant on/off.
 Con: permanent ~200 MB RAM overhead; slightly more moving parts (a second
 service + a toggle script that calls suspend/resume instead of begin/end).
 
-### Larger VOSK model (better accuracy)
+### Try the gigaspeech model
 
-The small model (~130 MB) is fast and good enough for everyday dictation.
-If you hit accuracy limits (missed words, wrong homophones), swap to the
-large model. Models are listed at <https://alphacephei.com/vosk/models>.
+If the current large model (`vosk-model-en-us-0.22`) still misses words on
+conversational speech or domain-specific vocabulary, try
+`vosk-model-en-us-0.42-gigaspeech` (~2.3 GB unpacked). It's trained on the
+Gigaspeech corpus and tends to do better on informal speech at similar WER.
 
-As of writing, the recommended large English model is
-`vosk-model-en-us-0.22` (~1.8 GB unpacked). Swap steps:
+Swap steps:
 
 ```sh
-# Back up current (small) model
-mv ~/.config/nerd-dictation/model ~/.config/nerd-dictation/model.small
+# Park the current large model as a safety copy
+mv ~/.config/nerd-dictation/model ~/.config/nerd-dictation/model.0.22
 
 # Download, unpack, install
 cd /tmp
-wget https://alphacephei.com/kaldi/models/vosk-model-en-us-0.22.zip
-unzip vosk-model-en-us-0.22.zip
-mv vosk-model-en-us-0.22 ~/.config/nerd-dictation/model
-rm vosk-model-en-us-0.22.zip
+wget https://alphacephei.com/kaldi/models/vosk-model-en-us-0.42-gigaspeech.zip
+unzip vosk-model-en-us-0.42-gigaspeech.zip
+mv vosk-model-en-us-0.42-gigaspeech ~/.config/nerd-dictation/model
+rm vosk-model-en-us-0.42-gigaspeech.zip
 
 # Test
 nerd-dictation begin --output=STDOUT --timeout=3
 ```
 
-To revert: `rm -rf ~/.config/nerd-dictation/model &&
-mv ~/.config/nerd-dictation/model.small ~/.config/nerd-dictation/model`.
+Revert: `rm -rf ~/.config/nerd-dictation/model && mv ~/.config/nerd-dictation/model.0.22 ~/.config/nerd-dictation/model`.
 
-Trade-offs: longer first-load (~3–5 s), higher RAM (~1 GB during dictation),
-better accuracy.
+Trade-offs: slightly slower per-frame decoding on CPU; similar RAM
+footprint to the current large model.
 
 ### Other ideas
 
