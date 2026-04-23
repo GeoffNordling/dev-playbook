@@ -13,9 +13,9 @@ Write tests from the spec. This is the "red" phase of spec-driven TDD — tests 
 Before starting, read both of these references end to end. If either is missing, stop and tell the user:
 
 - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — structure, naming, assertions, mocking patterns, and behavioral focus for all tests.
-- [Spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) — OFT format for spec items, including the `Interface:` keyword that names test targets.
+- [Spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) — how the workspace spec format combines OFT structure with RFC 2119 + EARS prose and workspace extensions. For the `Interface:` keyword specifically (names the test targets), see [extensions.md — `Interface:`](~/workspace/dev-playbook/sdd-standards/extensions.md#extension-keyword-interface).
 
-Throughout the rest of this skill they are referred to as the *testing conventions* and the *writing reference*.
+Throughout the rest of this skill they are referred to as the *testing conventions* and the *spec format walkthrough*.
 
 The user provides free-form input describing what feature or requirements to write tests for.
 
@@ -80,7 +80,7 @@ Within a category, check whether implementation code already exists. This determ
 ## Writing Tests
 
 - **Every requirement in the design spec must have test coverage**, regardless of its obligation level (SHALL, SHOULD, or MAY). The design spec is the contract; if a requirement appears there, it must be tested. Non-mandatory requirements that were not included in the design spec do not need tests.
-- **Mark every test with the requirement ID it covers** using `@pytest.mark.req("req~area.name~revision")` (e.g., `@pytest.mark.req("req~parse.segment-discovery~1")`). The marker value is the OFT spec item ID of the `req` item the test covers — see the writing reference for the ID format. Every test SHALL reference at least one requirement ID. Many tests per requirement is normal (happy path, edge cases, error cases). Many requirements per test should be limited to integration or scenario tests that inherently span multiple behaviors.
+- **Mark every test with the requirement ID it covers** using `@pytest.mark.req("req~area.name~revision")` (e.g., `@pytest.mark.req("req~parse.segment-discovery~1")`). The marker value is the OFT spec item ID of the `req` item the test covers — see the spec format walkthrough for the ID format. Every test SHALL reference at least one requirement ID. Many tests per requirement is normal (happy path, edge cases, error cases). Many requirements per test should be limited to integration or scenario tests that inherently span multiple behaviors.
 - **Use the interview pattern.** If requirements are ambiguous about expected behavior, ask the user before writing tests that encode assumptions. Answers that reveal spec gaps or ambiguities SHALL be flagged to the user for spec updates, not handled ad hoc.
 - **Prefer general over specific.** Derive test data from registries, configs, or the codebase rather than hardcoding specific names, IDs, or values that could change. Tests should survive additions, removals, and renames without edits. When a behavior applies to a class of things (e.g., all agents, all schemas), loop over the class rather than picking one example.
 - **Every test must have a docstring** describing what it verifies.

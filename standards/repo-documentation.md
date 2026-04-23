@@ -1,8 +1,10 @@
 # Repo Documentation Standard
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
-document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in the [spec writing reference](../sdd-standards/writing.md).
+document are to be interpreted as described in
+[RFC 2119](~/workspace/dev-playbook/sdd-standards/rfc2119.md), following the
+vocabulary conventions in
+[sdd-standards/extensions.md](~/workspace/dev-playbook/sdd-standards/extensions.md).
 
 ## Purpose
 
@@ -26,13 +28,13 @@ Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
 file. The distinction governs formatting conventions and cross-reference style.
 
-All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/writing.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored. The audience determines the wrapper:
+All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/spec-format.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored. The audience determines the wrapper:
 
 | Audience | Cross-reference style |
 |---|---|
-| Human | Inline link with full path as target — e.g., `[spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md)`. |
+| Human | Inline link with full path as target — e.g., `[spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md)`. |
 | Human + Agent | Same as Human. |
-| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/writing.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/spec-format.md` ``. No inline links; they add syntax noise without adding information for an agent. |
 
 ### Fenced code blocks
 
@@ -60,7 +62,7 @@ Whether the file is required or optional.
 | `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
 | `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
 | `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md) for file layout, splitting rules, and content conventions. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) for content conventions and [sdd-standards/extensions.md — File organization](~/workspace/dev-playbook/sdd-standards/extensions.md#file-organization--extension) for file layout and splitting rules. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. |
 

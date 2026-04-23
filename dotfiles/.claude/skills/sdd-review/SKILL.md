@@ -8,7 +8,7 @@ effort: high
 
 # SDD Review
 
-Walk every `AgentReview:` field across the project's design specs, compare each prose commitment against the current system state, and report which commitments are still honored, which are drifting, and which are broken. This is the non-test verification channel for design-layer commitments that cannot be deterministically unit-tested — see [design-layer.md — Verification Fields](~/workspace/dev-playbook/sdd-standards/design-layer.md#verification-fields) for the field definition.
+Walk every `AgentReview:` field across the project's design specs, compare each prose commitment against the current system state, and report which commitments are still honored, which are drifting, and which are broken. This is the non-test verification channel for design-layer commitments that cannot be deterministically unit-tested — see [extensions.md — Verification coverage](~/workspace/dev-playbook/sdd-standards/extensions.md#verification-coverage--extension) for the field definition.
 
 This skill is reporting, not validation. It does not gate CI and does not block commits.
 

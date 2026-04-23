@@ -1,8 +1,9 @@
 # Python Conventions
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
-document are to be interpreted as described in RFC 2119, following the vocabulary
-conventions in the [spec writing reference](~/workspace/dev-playbook/sdd-standards/writing.md).
+document are to be interpreted as described in [RFC 2119](~/workspace/dev-playbook/sdd-standards/rfc2119.md),
+following the vocabulary conventions in
+[sdd-standards/extensions.md](~/workspace/dev-playbook/sdd-standards/extensions.md).
 
 These are default Python conventions. Individual projects may supercede.
 
