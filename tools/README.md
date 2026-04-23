@@ -85,14 +85,13 @@ Run ad hoc on user demand. Not part of the pre-commit pipeline.
 | Tool | Purpose |
 |------|---------|
 | `py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
-| `repo-sync` | Sync all workspace repos with their remotes (auto-pull/push when safe) |
 | `workspace-backup` | Archive every workspace repo (with `.git/`) into a single dated .zip |
 
 ### Shared library (`src/`)
 
 | Library | Location | Purpose |
 |---------|----------|---------|
-| `devtools_lib` | `src/devtools_lib/` | Workspace discovery, git helpers; consumed by `repo-sync` |
+| `devtools_lib` | `src/devtools_lib/` | Workspace discovery, git helpers; consumed by `workspace-backup` |
 
 ## Tool reference
 
@@ -145,17 +144,6 @@ Scan `tools/bin/` for `# /// pre-commit` metadata blocks and regenerate the vali
 ```bash
 generate-pre-commit [directory]
 ```
-
-### repo-sync
-
-Sync all Git repos in the workspace with their remotes. Auto-pulls when behind (clean, not ahead), auto-pushes when ahead (clean, not behind), errors on conflicts. Designed to keep two machines in sync.
-
-```bash
-repo-sync
-repo-sync /path/to/workspace
-```
-
-**Exit codes:** 0 = all synced, 1 = some repos not fully synced.
 
 ### workspace-backup
 
