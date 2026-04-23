@@ -1,15 +1,17 @@
 ---
-name: commit-push
-description: Commit and push
+name: commit
+description: Commit locally; user pushes
 disable-model-invocation: true
 effort: low
 argument-hint: "[fast]"
 allowed-tools: Bash(git *)
 ---
 
-# Commit-Push
+# Commit
 
-Commit and push. Do not narrate — just do it. Only speak up if something is unexpected.
+Commit locally. Do not narrate — just do it. Only speak up if something is unexpected.
+
+`git push` requires a YubiKey tap, so the user pushes. Do not run `git push` yourself.
 
 ## Mode: $0
 
@@ -19,13 +21,15 @@ Commit and push. Do not narrate — just do it. Only speak up if something is un
 2. Stage files related to the work you did in this conversation
 3. Do NOT stage unrelated changes — other agents may own those
 4. `git log --oneline -3` to match commit message style
-5. Commit with a concise message, then push
+5. Commit with a concise message
+6. Tell the user to push.
 
 ### Fast
 
 1. `git add -A`
 2. `git diff --cached --stat` to build a one-line commit message
-3. Commit, then push
+3. Commit
+4. Tell the user to push.
 
 ## All Modes
 

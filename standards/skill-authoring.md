@@ -115,7 +115,7 @@ The agent loads these on demand rather than paying the context cost upfront.
 ## Naming Conventions
 
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
-  Good: `commit-push`, `ref-check`. Bad: `do-the-commit-and-push-thing`.
+  Good: `commit`, `ref-check`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
   Example: `sdd-func-reqs`, `sdd-design`, `sdd-red`, `sdd-green`.
 - **Descriptions**: start with a verb or noun phrase, no trailing period.
