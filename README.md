@@ -42,7 +42,7 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 |--------|----------|---------|
 | Repo documentation | `standards/repo-documentation.md` | Required/optional files for every repo and their scope |
 | Development workflow | `standards/development-workflow.md` | Issues, branches, draft PRs, spec-driven development |
-| Code quality anti-patterns | `standards/code-quality-anti-patterns.md` | Catalog of patterns the `quality-sweep` skill scans for |
+| Code quality anti-patterns | `standards/code-quality-anti-patterns.md` | Catalog of patterns the `code-quality-sweep` skill scans for |
 
 ### SDD standards (sdd-standards/)
 

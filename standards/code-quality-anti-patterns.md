@@ -5,7 +5,7 @@ agentic sweep against the catalog as part of the PR workflow, so each pattern
 is caught before it accumulates.
 
 The authoritative tool is
-`~/workspace/dev-playbook/dotfiles/.claude/skills/quality-sweep/SKILL.md`.
+`~/workspace/dev-playbook/dotfiles/.claude/skills/code-quality-sweep/SKILL.md`.
 
 Each entry below names the anti-pattern, describes what to look for, and states
 the rule the sweep enforces. Entries SHOULD stay small and specific — one
