@@ -50,7 +50,7 @@ IDs are conventionally wrapped in backticks in source files
 |---|---|
 | `type` | A short ASCII-letter string identifying the artifact kind (e.g., `req`, `dsn`). See *Artifact types* below. |
 | `name` | A unique identifier for this item within its type. Must start with a Unicode letter; subsequent characters may be Unicode letters, digits, hyphens (`-`), underscores (`_`), or dots (`.`). No whitespace. No consecutive dots. |
-| `revision` | A non-negative integer. Conventionally starts at 1; starting at 0 is permitted (Tag Importer output defaults to revision 0). |
+| `revision` | A non-negative integer. Conventionally starts at 1; starting at 0 is permitted. |
 
 The dot character in `name` is permitted by the format but carries no
 structural meaning to OFT. It is sometimes used to create readable
@@ -87,10 +87,10 @@ the keyword.
 
 | Keyword | Content | Cardinality |
 |---|---|---|
-| `Status:` | Lifecycle state: `draft`, `proposed`, or `approved`. | At most one per item, appears before the description. |
-| `Description:` | Explicit marker for the start of the description body. | Optional. When absent, any non-keyword prose begins the description automatically. |
-| `Rationale:` | Why the requirement exists. | At most one per item. |
-| `Comment:` | Caveats, implementation notes, or anything that fits neither description nor rationale. | At most one per item. |
+| `Status:` | Lifecycle state: `draft`, `proposed`, or `approved`. | At most one per item. Must appear before `Description:`, `Rationale:`, and `Comment:`. |
+| `Description:` | Explicit marker for the start of the description body. | Optional. When absent, any non-keyword prose begins the description automatically. Must appear before `Rationale:` and `Comment:`. |
+| `Rationale:` | Why the requirement exists. | Conventionally at most one per item. |
+| `Comment:` | Caveats, implementation notes, or anything that fits neither description nor rationale. | Conventionally at most one per item. |
 | `Covers:` | Upstream IDs this item satisfies. | Bullet list (one ID per line, prefixed `-`, `*`, or `+`). |
 | `Needs:` | Downstream artifact types that must cover this item. | Either a comma-separated one-liner (`Needs: dsn, utest`) or a bullet list. The two forms cannot be mixed within one item. |
 | `Tags:` | Labels for filtering. | Comma-separated list. |
@@ -141,17 +141,18 @@ must cover the `req` in turn.
 
 Given a set of items, OFT classifies each outgoing link (`Covers:` entry)
 and each incoming link (coverage received) against the upstream graph.
-An item is a **terminating specification item** when it needs no
-downstream types (empty `Needs:`); terminators are leaves and never
-register as "uncovered".
+An item is a **terminating specification item** when it requires coverage
+in no artifact type — either because it has no `Needs:` keyword at all
+(the common case) or because its `Needs:` list is empty. Terminators are
+leaves and never register as "uncovered".
 
 ### Outgoing-link statuses
 
 | Status | Meaning |
 |---|---|
 | `Covers` | Link resolves cleanly to an existing upstream at the named revision. |
-| `Predated` | The upstream ID exists, but the link names a revision *older* than the upstream's current revision. The covering item is stale; its author must re-evaluate. |
-| `Outdated` | The upstream ID exists, but the link names a revision *newer* than any revision the upstream has ever carried. Usually a typo or stale expectation. |
+| `Predated` | The upstream ID exists, but the link names a revision *newer* than the upstream's current revision. The link is ahead of the upstream — typically a typo or a link written against an expected-but-unlanded revision bump. |
+| `Outdated` | The upstream ID exists, but the link names a revision *older* than the upstream's current revision. The upstream has advanced and the covering item is stale; its author must re-evaluate. |
 | `Ambiguous` | More than one item with the named ID exists, so the link cannot resolve to a single upstream. |
 | `Unwanted` | The link resolves, but the upstream's `Needs:` does not ask for a covering item of this downstream's type. |
 | `Orphaned` | The link names an ID that does not exist in the trace set at all. |
@@ -164,12 +165,12 @@ register as "uncovered".
 | `Covered Unwanted` | A downstream covers this item but declares a type not requested by this item's `Needs:`. |
 | `Covered Predated` / `Covered Outdated` | A downstream covers this item, but the link it supplies is in the `Predated` or `Outdated` state for this item's current revision. |
 
-### Other defects
+### Other statuses and defects
 
-| Defect | Meaning |
-|---|---|
-| Missing coverage | An item's `Needs:` names a type that no downstream covers cleanly. Surfaced in reports with a minus-prefix on the missing type (e.g. `(-utest)`). |
-| `Duplicate` | Two or more items are defined with the same ID. |
+| Name | Scope | Meaning |
+|---|---|---|
+| `Duplicate` | Link status (bidirectional) | Two or more items are defined with the same ID, so any link naming that ID cannot resolve to a single item. |
+| Missing coverage | Item-level defect | An item's `Needs:` names a type that no downstream covers cleanly. Surfaced in reports with a minus-prefix on the missing type (e.g. `(-utest)`). A symmetric `+type` form (e.g. `(+itest)`) appears when coverage is received from a type the item did not request — the same condition the per-link `Covered Unwanted` status flags. |
 
 A trace is considered clean when no defect is reported.
 
@@ -179,7 +180,7 @@ The `revision` component of an ID is a semantic version for the item's
 meaning. Incrementing a revision indicates that the item's content has
 changed in a way that affects downstream items. Because downstream
 `Covers:` entries pin a specific upstream revision, a revision bump
-voids existing coverage links — they become `Predated` defects in the
+voids existing coverage links — they become `Outdated` defects in the
 next trace run, forcing each downstream author to re-evaluate and
 explicitly acknowledge the change.
 
@@ -204,13 +205,15 @@ the arrow):
     - `dsn-->impl:req~bar~1`
 
 The arrow uses two dashes to reduce the chance of parser collisions.
-Forwards are allowed after a title line or within `Needs:`, `Covers:`,
-`Depends:`, or `Tags:` blocks. A forward inside a description, rationale,
+Forwards are allowed after a title line, or after a `Needs:`, `Covers:`,
+`Depends:`, or `Tags:` block. A forward inside a description, rationale,
 or comment block is ignored.
 
-A forward line silently terminates the preceding specification item. This
-is a common source of bugs when a forward is placed inside what the author
-assumed was an ongoing item body.
+A forward line silently terminates the preceding specification item.
+Any `Needs:`, `Covers:`, or similar fields placed after the forward are
+therefore silently dropped from the preceding item — a documented
+footgun. The user guide recommends collecting forwards in a separate
+titled section to avoid placing them mid-item.
 
 ## Excluding sections
 
