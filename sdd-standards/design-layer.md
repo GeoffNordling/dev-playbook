@@ -1,62 +1,121 @@
 # Design Layer
 
-The key words `SHALL`, `SHALL NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` in this document are to be interpreted as described in RFC 2119, following the vocabulary conventions in [writing.md](writing.md).
+This file is about the *semantics* of design items (`dsn`) — what a design
+commitment is and which dimensions it can commit across. The mechanical
+rules for organizing and verifying `dsn` items (section headers, the
+three verification fields) live in [extensions.md](extensions.md).
+
+Obligation verbs in this document follow [rfc2119.md](rfc2119.md).
 
 ## Purpose
 
-Functional requirements describe behavior; design items (`dsn`) record the decisions that shape the code fulfilling that behavior. A `dsn` is written after the behavior is settled.
+Functional requirements describe behavior; design items record the decisions
+that shape the code fulfilling that behavior. A `dsn` is written after the
+behavior is settled.
 
-A `dsn` records a **commitment** — a decision whose chosen option some other part of the system will rely on: callers, tests, downstream code. Decisions inside a module's private boundary (internal helpers, file layout, local control flow) are not commitments and belong to the green agent.
+A `dsn` records a **commitment** — a decision whose chosen option some other
+part of the system will rely on: callers, tests, downstream code. Decisions
+inside a module's private boundary (internal helpers, file layout, local
+control flow) are not commitments and belong to the implementation phase, not
+to the design item.
 
-## Decision Dimensions
+Two tests for whether something is a commitment:
 
-A `dsn` commits decisions across one or more of four dimensions:
+- **Would another part of the system change if the decision flipped?** If
+  yes, it is a commitment. If it is purely internal to one module, it is not.
+- **Could a reviewer or test observe the decision?** If the decision is
+  visible at a public boundary — signature, data schema, error semantic,
+  ordering of effects — it is a commitment.
 
-1. **Data** — the fundamental abstractions the system is built around. Entities, fields, relationships, containment, ownership. These abstractions exist in both the design spec and the implementation code; they are the nouns the system manipulates.
-2. **API Shape** — signatures of public callables, classes, and methods. What callers name, invoke, and receive.
-3. **Algorithms** — the exact operations that produce outputs from inputs. Sum, fold, filter, derive. A system typically commits several.
-4. **Composition** — how operations combine. Sequencing, dependency, data flow, fan-out, fan-in.
+## Decision dimensions
 
-At the project level, any dimension `MAY` be null: a pure-data library may have no Algorithms or Composition; a single-function tool may have no Composition; a CLI wrapper may have thin Algorithms. Every individual `dsn`, however, `SHALL` commit to at least one dimension.
+A `dsn` commits decisions across one or more of four dimensions. Every `dsn`
+`SHALL` commit to at least one dimension; a `dsn` with no dimensional
+commitment is not a design decision — it is narrative.
 
-Error semantics fold into API Shape (raises are part of the contract) and Algorithms (failure paths). Data-structure choice folds into API Shape when the signature pins it (e.g., `-> list[Event]`), or into the green agent's territory when the signature abstracts it (e.g., `-> Iterable[Event]`).
+### Data
 
-## Dimension Section Organization
+The fundamental abstractions the system is built around. Entities, fields,
+relationships, containment, ownership. These abstractions exist in both the
+design spec and the implementation code; they are the nouns the system
+manipulates.
 
-Every `dsn` spec file `SHALL` organize its items under four markdown section headers, one per dimension, in this order:
+Examples: the `Session` entity and its owned `Event` children; the
+`ParserConfig` record; the distinction between a raw `Frame` and a
+derived `Segment`.
 
-    ## Data
-    ## API Shape
-    ## Algorithms
-    ## Composition
+### API Shape
 
-Every `dsn` item `SHALL` appear under exactly one of these four headers. Items that float above or between section headers are errors.
+Signatures of public callables, classes, and methods. What callers name,
+invoke, and receive.
 
-A file where a dimension has no commitments `SHALL` still include the header with an empty section. The empty header is the explicit signal "considered, nothing to commit here." A missing header is not equivalent to an empty section; the header makes the absence deliberate.
+Examples: a function returning `list[Event]` vs. `Iterable[Event]`; a class
+exposing `parse(path)` vs. a free function `parse(path, config)`; raising
+`ValidationError` vs. returning `Result[Session, Error]`.
 
-## Verification Fields
+Error semantics (which exceptions are raised, under what conditions) fold
+into API Shape — raises are part of the contract.
 
-[overview.md](overview.md#coverage-chain) establishes the general rule that every requirement ties off with a verification mechanism. For `dsn` items, this rule takes a specialized form: every `dsn` `SHALL` carry at least one of three verification fields. A single `dsn` `MAY` combine any subset — one design decision often commits multiple aspects simultaneously, and forcing separate items per field would inflate the `dsn` count and artificially split closely related commitments.
+Module layout (where a symbol lives — `myapp.parser.SessionParser` vs.
+`myapp.session.Parser`) folds into API Shape; the fully-qualified symbol
+path encodes the placement.
 
-| Field | Origin | Purpose | Verified by |
-|---|---|---|---|
-| `Needs: utest, itest` | OFT standard | Behavioral commitment | pytest run |
-| `Interface:` | Workspace extension | Structural contract | Interface validator at pytest collection time |
-| `AgentReview:` | Workspace extension | Non-test commitment | `sdd-review` skill on invocation |
+Data-structure choice folds into API Shape when the signature pins it (e.g.,
+`-> list[Event]`); when the signature abstracts it (e.g.,
+`-> Iterable[Event]`), the structure choice drops below the public
+boundary and belongs to the implementation phase.
 
-Format details for `Interface:` and `AgentReview:` live in [writing.md](writing.md#interface-declarations) alongside the other spec keywords.
+### Algorithms
 
-**Example: one `dsn`, multiple verification fields.**
+The exact operations that produce outputs from inputs. Sum, fold, filter,
+derive. A system typically commits several algorithms — each one a stepwise
+operation precise enough that two independent implementations would agree on
+inputs and outputs.
 
-    Needs: utest
-    Interface: myapp.parser.Parser.parse(path: pathlib.Path) -> myapp.session.Session
-    AgentReview: Log output from Parser.parse follows the human-readable format specified in docs/log-format.md.
+Examples: "segment durations are summed to compute session length"; "the
+validator folds over frames from earliest timestamp to latest";
+"anomalies are derived as frames whose deviation exceeds three standard
+deviations."
 
-**Example: non-testable commitment.** Some requirements cannot be deterministically tested — e.g., "the agent `SHALL NOT` attempt polite conversation for no reason." The `dsn` terminates its chain with `AgentReview:` alone:
+Failure paths (what happens when input is malformed) fold into Algorithms.
 
-    dsn~agent.no-polite-conversation~1
-        Enforcement via system prompt directive.
-        AgentReview: The agent's system prompt at src/prompts/agent.md should contain
-                     a directive discouraging filler or polite conversation.
+### Composition
 
-No `Needs:`, no `Interface:` — the review skill is what verifies the commitment.
+How operations combine. Sequencing, dependency, data flow, fan-out, fan-in.
+
+Examples: "parse, then validate, then persist — in that order"; "parsing
+and checksumming run in parallel and their results are joined";
+"validation errors short-circuit later stages."
+
+Two designs with identical Data, API Shape, and Algorithms can still commit
+to different Compositions and produce different integration-test outcomes.
+Composition is a first-class dimension, not a byproduct of the others.
+
+## Dimensions may be null at the project level
+
+A pure-data library may have no Algorithms or Composition. A single-function
+tool may have no Composition. A CLI wrapper may have thin Algorithms. That
+is fine at the project level — the dimension table covers what a given
+project happens to need.
+
+Every individual `dsn`, however, `SHALL` commit to at least one dimension.
+Within the file organization rules (see
+[extensions.md](extensions.md#dimension-section-organization)), each `dsn`
+is placed under the single dimension it primarily commits to; if it
+genuinely spans multiple dimensions, it is a candidate for being split.
+
+## Related rules in extensions.md
+
+These mechanical rules apply to every `dsn` but are not themselves
+design-semantic decisions; they live with our other workspace-level
+conventions:
+
+- [Dimension section organization](extensions.md#dimension-section-organization)
+  — the four `##` headers required in every `dsn` file.
+- [Verification coverage](extensions.md#verification-coverage--extension) —
+  every `dsn` `SHALL` carry at least one of `Needs:`, `Interface:`, or
+  `AgentReview:`.
+- [`Interface:` keyword](extensions.md#extension-keyword-interface) —
+  structural commitment format.
+- [`AgentReview:` keyword](extensions.md#extension-keyword-agentreview) —
+  non-testable commitment format.
