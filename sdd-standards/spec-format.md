@@ -14,8 +14,8 @@ file.
 | Sentence structure | [ears.md](ears.md) |
 | Item identity, linking, traceability, workspace keywords (`Interface:`, `AgentReview:`) | [oft-format.md](oft-format.md) |
 
-A valid spec file conforms to all three. A spec-phase agent writes prose
-following EARS, grades obligations with RFC 2119 vocabulary, and embeds
+A valid spec file conforms to all three. A spec-phase agent grades obligations with RFC 2119 vocabulary, writes prose
+following EARS, and embeds
 the prose in OFT specification items — each subject to the workspace
 Extensions section of its respective standards file.
 
@@ -74,11 +74,10 @@ Where each piece comes from:
 
 A `dsn` may use workspace extension keywords that OFT does not define:
 
-    ## API Shape
-
     ### Session Parser
     `dsn~parser.session~1`
     Status: approved
+    Dimension: API Shape
 
     The session parser reads a log file and returns a `Session` populated
     with its events. Errors are raised as `ParseError`.
@@ -95,7 +94,7 @@ Where each workspace-specific piece comes from:
 
 | Piece | Source |
 |---|---|
-| The `## API Shape` section header | [Dimension section organization](design-layer.md#dimension-section-organization). |
+| `Dimension: API Shape` | [`Dimension:` workspace extension keyword](oft-format.md#extension-keyword-dimension). Classifies the commitment; enables per-dimension projection. |
 | `Interface: …` | [`Interface:` workspace extension keyword](oft-format.md#extension-keyword-interface). The signature is machine-validated against the code. |
 | `AgentReview: …` | [`AgentReview:` workspace extension keyword](oft-format.md#extension-keyword-agentreview). Verified by the review skill on invocation. |
 | Combining `Needs:`, `Interface:`, and `AgentReview:` on one item | [Verification coverage rule](oft-format.md#verification-coverage--extension). |
@@ -110,8 +109,11 @@ A spec file `SHALL`:
   (`feat`, `req`, `dsn`, `utest`, `itest`).
 - Use no [fenced code blocks](oft-format.md#fenced-code-blocks--constraint-forbidden).
 - Use no [OFT forwarding syntax](oft-format.md#forwarding--constraint-forbidden).
-- For `dsn` files only, carry the four dimension `##` headers in canonical
-  order ([dimension section organization](design-layer.md#dimension-section-organization)).
+- For `dsn` items, carry a
+  [`Dimension:` field](oft-format.md#extension-keyword-dimension) naming
+  one or more of the four design dimensions. Section headers within a
+  `dsn` file are free-form — authors may group by dimension, feature,
+  subsystem, or any other axis.
 
 Prose that is not part of any item is ignored by OFT and `MAY` be used
 freely for context, headings, or notes.

@@ -24,13 +24,12 @@ is a tracked action item; the default reconciliation is that the spec wins
 and code updates to match, but the human decides per case. Term from
 Breunig, *The Spec-Driven Development Triangle*.
 
-**Behavioral versus technical requirements.** Functional requirements are
-about behavior; technical requirements are about system qualities —
+**Types of requirements.** Functional requirements are
+about behavior; design requirements are about organization and methods; technical requirements are about system qualities —
 performance, security, scalability, reliability. Technical requirements
 are valid spec items in the same format but are consciously omitted in
-this workspace, since personal projects rarely have meaningful technical
-constraints. Projects that do have them `MAY` add them following the same
-rules.
+this workspace, since our personal projects do not have meaningful technical
+constraints.
 
 ## Files
 
@@ -38,8 +37,8 @@ rules.
 |---|---|
 | [rfc2119.md](rfc2119.md) | RFC 2119 / RFC 8174 (BCP 14) obligation vocabulary, plus the workspace subset, backticking rule, and one-obligation-per-item rule. |
 | [ears.md](ears.md) | EARS sentence templates, plus the workspace adoption statement. |
-| [oft-format.md](oft-format.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` and `AgentReview:` keywords, fenced-code-block constraint, naming convention, and file organization. |
-| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the four decision dimensions, and the dimension section-organization rule for `dsn` files. |
+| [oft-format.md](oft-format.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, fenced-code-block constraint, naming convention, and file organization. |
+| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the four decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
 | [spec-format.md](spec-format.md) | Integration walkthrough showing how the three standards combine in a single spec file, plus the illustrative-examples authoring convention. |
 | [tooling.md](tooling.md) | Tool overview — `pytest-sdd`, `sdd-chain`, `sdd-index`, `sdd-atlas`, `sdd-review`. Describes what enforces the rules in the other files. |
 

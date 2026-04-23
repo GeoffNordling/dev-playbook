@@ -98,32 +98,28 @@ tool may have no Composition. A CLI wrapper may have thin Algorithms. That
 is fine at the project level — the dimension table covers what a given
 project happens to need.
 
-Every individual `dsn`, however, `SHALL` commit to at least one dimension.
-Within the file organization rules below, each `dsn` is placed under the
-single dimension it primarily commits to; if it genuinely spans multiple
-dimensions, it is a candidate for being split.
+Every individual `dsn`, however, `SHALL` commit to at least one dimension
+and `SHALL` declare it via the `Dimension:` field described below.
 
-## Dimension section organization
+## Dimension commitment
 
-Every `dsn` spec file `SHALL` organize its items under four Markdown section
-headers, one per dimension, in this order:
+Every `dsn` `SHALL` declare its dimension(s) in a
+[`Dimension:` field](oft-format.md#extension-keyword-dimension). The
+field takes a comma-separated list of one or more dimension names from
+`{Data, API Shape, Algorithms, Composition}`.
 
-    ## Data
-    ## API Shape
-    ## Algorithms
-    ## Composition
+Most items name a single dimension. A list expresses decisions that
+genuinely commit across dimensions — e.g., a schema decision that also
+pins a return signature commits both `Data` and `API Shape`. Items that
+span three or more dimensions are candidates for splitting; one
+commitment typically has one primary axis.
 
-Every `dsn` item `SHALL` appear under exactly one of these four headers.
-Items that float above or between section headers are errors.
-
-A file where a dimension has no commitments `SHALL` still include the
-header with an empty section. The empty header is the explicit signal
-"considered, nothing to commit here." A missing header is not equivalent
-to an empty section; the header makes the absence deliberate.
-
-Reason: forcing classification at the moment of writing prevents post-hoc
-inference of dimension from prose, and gives downstream tools a
-deterministic anchor for per-dimension projection.
+Reason: forcing classification at the moment of writing prevents
+post-hoc inference of dimension from prose, and gives downstream tools a
+deterministic anchor for per-dimension projection without constraining
+file organization. Authors remain free to group items by feature,
+subsystem, or any other axis; tools still project by dimension from the
+field value.
 
 ## Related keyword and coverage rules
 
@@ -137,3 +133,5 @@ design-semantic) live alongside the OFT format:
   structural commitment format.
 - [`AgentReview:` keyword](oft-format.md#extension-keyword-agentreview) —
   non-testable commitment format.
+- [`Dimension:` keyword](oft-format.md#extension-keyword-dimension) —
+  item-level dimension classification format.

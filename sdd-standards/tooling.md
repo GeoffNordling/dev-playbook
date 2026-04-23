@@ -36,7 +36,7 @@ oft_jar = "../dev-playbook/sdd-tools/lib/openfasttrace-4.2.2.jar"
 
 `pytest-sdd` is a pytest plugin that hosts every SDD validator as part of the normal test suite. Each validator runs as a single pytest item tagged with the `spec` marker:
 
-- **`spec-lint`** — structural validation of every `.md` spec file: ID format, Status field, obligation keyword backticking, mixed obligation levels, `Covers:` syntax, `Needs:` values, fenced code blocks, `AgentReview:` well-formedness, dimension section organization in `dsn` files, and verification-field presence on every `dsn`.
+- **`spec-lint`** — structural validation of every `.md` spec file: ID format, Status field, obligation keyword backticking, mixed obligation levels, `Covers:` syntax, `Needs:` values, fenced code blocks, `AgentReview:` well-formedness, `Dimension:` presence and well-formedness on every `dsn`, and verification-field presence on every `dsn`.
 - **`spec-coverage`** — full OFT traceability check, delegating to the OpenFastTrace JAR to verify that every `Needs:` declaration is satisfied and every `Covers:` reference resolves. Test coverage is derived from `@pytest.mark.req` / `@pytest.mark.dsn` markers on the tests pytest collected for this run, so scoped runs (`pytest path/to/file.py`, `-k` filters) produce a partial picture — requirements covered only by uncollected tests surface as `-utest`. Run `pytest` with no scope arguments to evaluate full coverage.
 - **`spec-interface`** — for every `dsn` item that declares an `Interface:`, imports the named symbol and verifies the actual signature matches the committed one. Hard-fails on missing symbol or signature mismatch.
 
@@ -83,7 +83,7 @@ sdd-chain --root /path/to/proj  # explicit project root (default: auto-detect fr
 
 `sdd-index` is a standalone CLI that emits a one-line catalog of every `dsn` item in the project — id, title, and source location — keyed by the four design dimensions. The output is the full inventory of design commitments at a glance, without any body text.
 
-Output is markdown, grouped by the four dimension headers (`## Data`, `## API Shape`, `## Algorithms`, `## Composition`). Each group lists the items that appear under that header across all spec files, in file order. Empty dimensions render as the header with no entries, preserving the explicit "nothing to commit here" signal from the spec files.
+Output is markdown, grouped under the four dimension headers (`## Data`, `## API Shape`, `## Algorithms`, `## Composition`). Each group lists items whose `Dimension:` field names that dimension, in file order. An item with multiple dimensions appears under each group it names. Dimensions named by no item render as an empty header — the tool's signal, not a requirement of the source files.
 
 `sdd-index` is the cheapest compression view — useful as a first pass for humans scanning the project's design surface, and as input to agent prompts that need to reason about the dsn inventory without reading every body.
 
@@ -96,9 +96,9 @@ sdd-index --root /path/to/proj  # explicit project root (default: auto-detect fr
 
 ## sdd-atlas
 
-`sdd-atlas` is a standalone CLI that emits the full body of every `dsn` item in the project, keyed by dimension. It applies the same dimension-scoped filter as `sdd-index` but retains each item's body, including all keyword fields (`Status:`, `Covers:`, `Needs:`, `Interface:`, `AgentReview:`, `Rationale:`, `Comment:`).
+`sdd-atlas` is a standalone CLI that emits the full body of every `dsn` item in the project, keyed by dimension. It applies the same dimension-scoped filter as `sdd-index` but retains each item's body, including all keyword fields (`Status:`, `Dimension:`, `Covers:`, `Needs:`, `Interface:`, `AgentReview:`, `Rationale:`, `Comment:`).
 
-Output is markdown, grouped by the four dimension headers. Items within each group render in file order.
+Output is markdown, grouped under the four dimension headers. Items within each group render in file order; an item whose `Dimension:` field names multiple dimensions appears under each group it names.
 
 `sdd-atlas` is for cases where the catalog-level view from `sdd-index` is insufficient and the reader needs the full text. Both humans and agents use it as input to ad-hoc prompted summarization until richer projections (schema extraction, cross-dimension linking, gap analysis) prove their worth through dogfooding.
 
@@ -130,8 +130,7 @@ Mapping from standard rule to the tool that enforces it.
 | [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | `Covers:` IDs resolve at revision | `spec-coverage` |
 | [oft-format.md — Coverage checks](oft-format.md#coverage-checks) | No orphans | `spec-coverage` |
 | [oft-format.md — Forwarding forbidden](oft-format.md#forwarding--constraint-forbidden) | Forwarding syntax forbidden | — |
-| [design-layer.md — Dimension section organization](design-layer.md#dimension-section-organization) | All four dimension headers present per `dsn` file | `spec-lint` |
-| [design-layer.md — Dimension section organization](design-layer.md#dimension-section-organization) | Every `dsn` placed under a dimension header | `spec-lint` |
+| [oft-format.md — `Dimension:`](oft-format.md#extension-keyword-dimension) | Every `dsn` carries a `Dimension:` field naming one or more valid dimensions | `spec-lint` |
 | [oft-format.md — Verification coverage](oft-format.md#verification-coverage--extension) | Every `dsn` carries at least one of `Needs:` / `Interface:` / `AgentReview:` | `spec-lint` |
 
 Rules marked `—` are either agent-judgment territory (EARS form, illustrative examples) or gaps awaiting tool support.

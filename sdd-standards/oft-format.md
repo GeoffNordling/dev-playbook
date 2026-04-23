@@ -353,7 +353,9 @@ ever checks. This rule applies at every layer; it is not restricted to
 chain leaves.
 
 `Interface:` and `AgentReview:` are workspace extension keywords defined
-below.
+below. `dsn` items additionally carry a `Dimension:` classification
+field; its rules are in the
+[`Dimension:`](#extension-keyword-dimension) subsection.
 
 ### Extension keyword: `Interface:`
 
@@ -444,6 +446,42 @@ A `dsn` `MAY` combine `AgentReview:` with `Needs:` and `Interface:`. One
 design decision often commits several aspects simultaneously; one `dsn`
 captures them all, and each field names how its respective aspect is
 verified.
+
+### Extension keyword: `Dimension:`
+
+`Dimension:` is a workspace-defined keyword, not part of OFT. It is
+valid only on `dsn` items.
+
+Every `dsn` `SHALL` carry a `Dimension:` field naming one or more of the
+four design dimensions defined in
+[design-layer.md](design-layer.md#decision-dimensions):
+`Data`, `API Shape`, `Algorithms`, `Composition`.
+
+#### Format
+
+The value is a comma-separated list of dimension names on a single line:
+
+    Dimension: Data
+    Dimension: API Shape, Algorithms
+
+Dimension names are spelled exactly as above — two-word names
+(`API Shape`) use a single space; case is preserved. A name outside the
+fixed set is invalid. Empty lists and repeated names within one field
+are invalid.
+
+#### Many allowed, one typical
+
+Most items name a single dimension. A list expresses decisions that
+genuinely commit across dimensions — e.g., a schema decision that also
+pins a return type commits both `Data` and `API Shape`. Items that span
+three or more dimensions are candidates for splitting; one commitment
+typically has one primary axis.
+
+#### Coexistence
+
+A `dsn` `MAY` combine `Dimension:` with `Needs:`, `Interface:`, and
+`AgentReview:`. `Dimension:` classifies the commitment; the verification
+fields name how it is checked.
 
 ### Fenced code blocks — constraint (forbidden)
 

@@ -14,7 +14,7 @@ This skill is reporting, not validation. It does not gate CI and does not block 
 
 ## First steps
 
-1. **Run `sdd-review`** from the project root. Capture its output. Each `## \`dsn~...\`` block is one review target with a source location, its dimension section, and one or more `- ` review prose bullets.
+1. **Run `sdd-review`** from the project root. Capture its output. Each `## \`dsn~...\`` block is one review target with a source location, its dimension(s), and one or more `- ` review prose bullets.
 2. **If the inventory is empty** (`No AgentReview: fields found`), tell the user so and stop. There is nothing to check.
 3. **Summarize the inventory for the user** — count of dsn items, count of review prose entries — before dispatching anything. Ask whether to proceed across the full inventory or a filtered subset (e.g., only items in a specific dimension or a specific subsystem).
 
@@ -22,7 +22,7 @@ This skill is reporting, not validation. It does not gate CI and does not block 
 
 For each `## \`dsn~...\`` record the user accepts, spawn an Explore or general-purpose agent with a focused prompt:
 
-- Provide the dsn id, source location, dimension section, and every review prose entry as context.
+- Provide the dsn id, source location, dimension(s), and every review prose entry as context.
 - Tell the agent its job is to check whether the current code, prompts, docs, or configuration satisfy what the prose commits to. Paths named in the prose (e.g., `src/prompts/agent.md`) are the natural starting points — the agent reads the referenced artifact and compares it to the prose.
 - The agent reports one of three states per review: **ok** (commitment still honored), **drift** (related but weakened), **broken** (the referenced artifact no longer exists, no longer contains the expected content, or directly contradicts the prose).
 - Ask for file:line references to any evidence, and a one-paragraph justification per review.
