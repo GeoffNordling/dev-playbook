@@ -449,16 +449,17 @@ verified.
 
 ### Extension keyword: `Dimension:`
 
-`Dimension:` is a workspace-defined keyword, not part of OFT. It is
-valid only on `dsn` items.
+`Dimension:` is a workspace-defined keyword, not part of OFT.
 
-Every `dsn` `SHALL` carry a `Dimension:` field naming one or more of
-the design dimensions defined in
-[design-layer.md](design-layer.md#decision-dimensions).
+Every spec item `SHALL` carry a `Dimension:` field. On `dsn` items the
+value names one or more of the design dimensions defined in
+[design-layer.md](design-layer.md#decision-dimensions); on non-`dsn`
+items the value `SHALL` be `Null` — the classification does not apply.
 
 #### Format
 
-The value is a comma-separated list of dimension names on a single line:
+On `dsn` items, the value is a comma-separated list of dimension names
+on a single line:
 
     Dimension: Data
     Dimension: API Shape, Algorithms
@@ -467,6 +468,10 @@ Dimension names are spelled exactly as above — two-word names
 (`API Shape`) use a single space; case is preserved. A name outside the
 fixed set is invalid. Empty lists and repeated names within one field
 are invalid.
+
+On non-`dsn` items:
+
+    Dimension: Null
 
 #### Many allowed, one typical
 
@@ -481,6 +486,51 @@ typically has one primary axis.
 A `dsn` `MAY` combine `Dimension:` with `Needs:`, `Interface:`, and
 `AgentReview:`. `Dimension:` classifies the commitment; the verification
 fields name how it is checked.
+
+### Markdown heading — constraint (required)
+
+Every specification item `SHALL` begin with a standard Markdown heading
+that names the item; the ID line follows on the next line. OFT permits
+an item to begin with its ID line directly, with no preceding heading;
+this workspace forbids that form.
+
+Reason: a heading forces the author to give each commitment a
+human-readable name and keeps every item in the Markdown document
+outline, so editors, rendered views, and navigation tools surface items
+consistently. Heading-less items read as loose prose with an ID stapled
+on and are easy to miss when scanning.
+
+### ID backticking — constraint (required)
+
+Every specification item's ID line `SHALL` wrap the ID in backticks
+(e.g., `` `dsn~classifier.topic~1` ``). OFT treats backticking as
+convention; this workspace makes it required.
+
+Reason: backticks mark the ID as a code identifier rather than prose,
+match the form used by every example in the OFT user guide and these
+standards, and give a trivial grep target (`` `dsn~ `` / `` `req~ ``)
+for locating items by type.
+
+### Description keyword — constraint (required)
+
+Every specification item `SHALL` introduce its description with an
+explicit `Description:` keyword. OFT permits prose after the heading
+to serve as the description implicitly; this workspace requires the
+explicit marker.
+
+Reason: uniformity — every item has the same shape, and parsers and
+readers do not have to detect whether leading prose is the description
+or something else. Explicit beats implicit.
+
+### `Needs:` bullet form — constraint (required)
+
+`Needs:` entries `SHALL` be written as a bullet list, even when only
+one artifact type is named. OFT permits a comma-separated one-liner as
+an alternative; this workspace requires the bullet form.
+
+Reason: `Covers:` and `Depends:` are already bullet-only per OFT.
+Forcing `Needs:` into the same form removes a per-keyword rule and
+makes all three relationship lists look identical.
 
 ### Status keyword — constraint (omitted)
 

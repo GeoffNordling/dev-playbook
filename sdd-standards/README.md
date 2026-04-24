@@ -94,7 +94,9 @@ apply only to `dsn` items.
 
     Tags: classifier, llm
 
-    Needs: utest
+    Needs:
+    - utest
+
     Interface: classifier.classify(message: str) -> classifier.TopicLabel
     AgentReview: The system prompt at src/prompts/classifier.md
                  instructs the model to return `OTHER` when the message
@@ -103,11 +105,10 @@ apply only to `dsn` items.
 
 | Field | Scope | Required |
 |---|---|---|
-| Markdown heading | any item | optional — item `MAY` begin with the ID line |
+| Markdown heading | any item | **required** |
 | ID `type~name~rev` | any item | **required** |
-| `Dimension:` | `dsn` only | **required** on `dsn`; invalid elsewhere |
-| `Description:` | any item | optional (prose after the heading is the description automatically) |
-| Body prose | any item | **required** |
+| `Dimension:` | any item | **required** — `Null` on non-`dsn` |
+| `Description:` | any item | **required** |
 | `Rationale:` | any item | optional |
 | `Comment:` | any item | optional |
 | `Covers:` | any item | required unless the item is a root `feat` |
@@ -118,9 +119,10 @@ apply only to `dsn` items.
 | `AgentReview:` | `dsn` only | optional |
 
 Keyword definitions and ordering constraints live in [oft.md](oft.md).
-Body prose follows [rfc2119.md](rfc2119.md) obligation verbs and
-[ears.md](ears.md) sentence templates. Every `dsn` additionally `SHALL`
-carry at least one of `Needs:` / `Interface:` / `AgentReview:` — the
+Description prose follows [rfc2119.md](rfc2119.md) obligation verbs
+and [ears.md](ears.md) sentence templates. Every `dsn` additionally
+`SHALL` carry at least one of `Needs:` / `Interface:` / `AgentReview:`
+— the
 [verification coverage rule](oft.md#verification-coverage--extension).
 
 ## External references
