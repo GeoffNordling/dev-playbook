@@ -77,7 +77,7 @@ sdd-chain --feature '*user*'    # chains rooted at a matching feat item
 
 ### sdd-index
 
-Emit a per-dimension one-line catalog of every `dsn` in the project — id, title, source location — grouped under the four dimension headers (`## Data`, `## API Shape`, `## Algorithms`, `## Composition`). Grouping is driven by each item's `Dimension:` field; items with multiple dimensions appear under each group they name. Useful as a first pass for humans scanning the project's design surface, and as input to agent prompts that reason about the dsn inventory without reading every body.
+Emit a per-dimension one-line catalog of every `dsn` in the project — id, title, source location — grouped under dimension headers. Grouping is driven by each item's `Dimension:` field; items with multiple dimensions appear under each group they name. Useful as a first pass for humans scanning the project's design surface, and as input to agent prompts that reason about the dsn inventory without reading every body.
 
 ```bash
 sdd-index                       # whole project

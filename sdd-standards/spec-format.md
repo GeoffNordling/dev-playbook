@@ -1,103 +1,71 @@
 # Spec File Format — Integration Walkthrough
 
-Specs in this workspace stack three external standards. Each standards
-file restates its external standard and then, in a trailing Extensions
-section, documents the workspace subset, constraints, and additions for
-that standard. This file shows how the pieces combine in a single spec
-file.
+This file is the integration walkthrough: concrete examples of how the
+three standards ([rfc2119.md](rfc2119.md), [ears.md](ears.md),
+[oft.md](oft.md)) combine in a single spec file. Design-phase semantics
+(what a commitment is; the decision dimensions) are covered in
+[design-layer.md](design-layer.md).
 
-## The stack
+## Anatomy of a spec item
 
-| Concern | Standard + workspace extensions |
-|---|---|
-| Obligation strength | [rfc2119.md](rfc2119.md) |
-| Sentence structure | [ears.md](ears.md) |
-| Item identity, linking, traceability, workspace keywords (`Interface:`, `AgentReview:`) | [oft.md](oft.md) |
-
-A valid spec file conforms to all three. A spec-phase agent grades obligations with RFC 2119 vocabulary, writes prose
-following EARS, and embeds
-the prose in OFT specification items — each subject to the workspace
-Extensions section of its respective standards file.
-
-Design-phase semantics (what a commitment is; the four decision
-dimensions) are covered in [design-layer.md](design-layer.md).
-
-## Reading order
-
-A new author or agent encountering the workspace for the first time
-`SHOULD` read the files in this order:
-
-1. [rfc2119.md](rfc2119.md) — obligation vocabulary and workspace subset.
-2. [ears.md](ears.md) — sentence templates.
-3. [oft.md](oft.md) — item identity, keywords, linking,
-   coverage, plus workspace keywords and constraints.
-4. [design-layer.md](design-layer.md) — only when working on `dsn` items.
-
-## Anatomy of a complete spec item
-
-The following is a complete, conformant spec item. Annotations below point
-to the standard that governs each piece.
-
-    ### Login Credential Validation
-    `req~auth.login-validation~1`
-    Status: approved
-
-    When the user submits credentials, the system `SHALL` verify the
-    provided username and password against the credential store before
-    granting session access.
-
-    Rationale:
-    Unauthenticated access to any session-bearing endpoint is a critical
-    security vulnerability.
-
-    Comment:
-    The credential store interface is defined in dsn~credential-store~1.
-
-    Covers:
-    - feat~user-authentication~1
-
-    Needs: dsn, utest
-
-Where each piece comes from:
-
-| Piece | Source |
-|---|---|
-| The Markdown heading `### Login Credential Validation` | OFT item structure; any standard Markdown heading names the item. |
-| The ID `` `req~auth.login-validation~1` `` | OFT ID format; the `req` type is part of [our subset](oft.md#artifact-types--subset); the dotted name follows the [naming convention](oft.md#naming-convention--extension). |
-| `Status: approved` | OFT keyword. |
-| Sentence `When the user submits credentials, the system SHALL verify …` | EARS Event-driven template; `SHALL` is the RFC 2119 obligation verb, [backticked per the workspace rule](rfc2119.md#backticking--constraint). |
-| `Rationale:` and `Comment:` | OFT keywords. |
-| `Covers:` (bullet list) | OFT linking model. |
-| `Needs: dsn, utest` | OFT linking model; the chain shape (`req → dsn → utest`) is the [workspace coverage chain](oft.md#coverage-chain--constraint). |
-
-## Anatomy of a `dsn` item with workspace extensions
-
-A `dsn` may use workspace extension keywords that OFT does not define:
+A single `dsn` item using every OFT keyword and every workspace
+extension keyword. Most items use a subset — the table below names
+which pieces are required and which are optional, and which apply only
+to `dsn` items.
 
     ### Session Parser
     `dsn~parser.session~1`
     Status: approved
     Dimension: API Shape
 
-    The session parser reads a log file and returns a `Session` populated
-    with its events. Errors are raised as `ParseError`.
+    Description:
+    When the parser is invoked, it `SHALL` return a `Session` populated
+    with every event from the log file. While the file is malformed,
+    the parser `SHALL` raise `ParseError` rather than return a partial
+    session.
+
+    Rationale:
+    Separating success and failure channels lets callers treat a return
+    value as unambiguous — a `Session` is complete, or nothing is.
+
+    Comment:
+    The `ParserConfig` type lives in dsn~parser.config~1.
 
     Covers:
     - req~parse.session-discovery~1
+
+    Depends:
+    - dsn~parser.config~1
+
+    Tags: parser, io
 
     Needs: utest
     Interface: parser.parse_session(path: pathlib.Path) -> parser.Session
     AgentReview: Log output follows the human-readable format specified in
                  docs/log-format.md.
 
-Where each workspace-specific piece comes from:
+Every piece, by source and applicability:
 
-| Piece | Source |
-|---|---|
-| `Dimension: API Shape` | [`Dimension:` workspace extension keyword](oft.md#extension-keyword-dimension). Classifies the commitment; enables per-dimension projection. |
-| `Interface: …` | [`Interface:` workspace extension keyword](oft.md#extension-keyword-interface). The signature is machine-validated against the code. |
-| `AgentReview: …` | [`AgentReview:` workspace extension keyword](oft.md#extension-keyword-agentreview). Verified by the review skill on invocation. |
-| Combining `Needs:`, `Interface:`, and `AgentReview:` on one item | [Verification coverage rule](oft.md#verification-coverage--extension). |
+| Piece | Source | Presence |
+|---|---|---|
+| Heading `### Session Parser` | OFT item structure — any Markdown heading names the item. | Optional — an item `MAY` begin with just its ID line. Conventional for every item to carry a heading. |
+| ID `` `dsn~parser.session~1` `` | [OFT ID format](oft.md#specification-item-id); `dsn` is in the [workspace artifact subset](oft.md#artifact-types--subset); the dotted name follows the [naming convention](oft.md#naming-convention--extension). | Required on every item. |
+| `Status:` | [OFT keyword](oft.md#keyword-fields). | Required (workspace). Value is one of `draft` / `proposed` / `approved`. |
+| `Dimension:` | Workspace [extension keyword](oft.md#extension-keyword-dimension). Classifies the commitment; enables per-dimension projection. | Required on `dsn` items; invalid on other types. Comma-separated list of one or more dimensions. |
+| `Description:` | [OFT keyword](oft.md#keyword-fields). | Optional. When absent, non-keyword prose after the heading is the description automatically. `MUST` precede `Rationale:` and `Comment:`. |
+| Description prose — `When the parser is invoked, … SHALL return …` / `While the file is malformed, … SHALL raise …` | Content, not a keyword. Sentences are graded with [RFC 2119](rfc2119.md) obligation verbs ([backticked per the workspace rule](rfc2119.md#backticking--constraint)) and structured per [EARS](ears.md) templates (here, Event-driven and State-driven). | Required content of the item body. Style is conventional: `req` items typically use EARS sentences end-to-end; `dsn` items are more often descriptive prose with obligations for error semantics and behavior. |
+| `Rationale:` | [OFT keyword](oft.md#keyword-fields). | Optional; at most one per item by convention. |
+| `Comment:` | [OFT keyword](oft.md#keyword-fields). | Optional; at most one per item by convention. |
+| `Covers:` | [OFT linking model](oft.md#linking-model). Bullet list of upstream IDs. | Required when the item covers upstream items; root `feat` items omit it. |
+| `Depends:` | [OFT keyword](oft.md#keyword-fields). Ordering hint; does not affect coverage. | Optional. |
+| `Tags:` | [OFT keyword](oft.md#keyword-fields). Comma-separated labels. | Optional. |
+| `Needs:` | [OFT linking model](oft.md#linking-model); chain shape per [workspace coverage chain](oft.md#coverage-chain--constraint). | Optional; absence terminates the chain at this item. |
+| `Interface:` | Workspace [extension keyword](oft.md#extension-keyword-interface). Signature is machine-validated against the code. | Optional; `dsn`-only. |
+| `AgentReview:` | Workspace [extension keyword](oft.md#extension-keyword-agentreview). Verified by the review skill on invocation. | Optional; `dsn`-only. |
+
+Every `dsn` additionally `SHALL` carry at least one of `Needs:` /
+`Interface:` / `AgentReview:` — the
+[verification coverage rule](oft.md#verification-coverage--extension).
 
 ## What a valid file looks like as a whole
 
@@ -111,9 +79,9 @@ A spec file `SHALL`:
 - Use no [OFT forwarding syntax](oft.md#forwarding--constraint-forbidden).
 - For `dsn` items, carry a
   [`Dimension:` field](oft.md#extension-keyword-dimension) naming
-  one or more of the four design dimensions. Section headers within a
-  `dsn` file are free-form — authors may group by dimension, feature,
-  subsystem, or any other axis.
+  one or more design dimensions. Section headers within a `dsn` file
+  are free-form — authors may group by dimension, feature, subsystem,
+  or any other axis.
 
 Prose that is not part of any item is ignored by OFT and `MAY` be used
 freely for context, headings, or notes.

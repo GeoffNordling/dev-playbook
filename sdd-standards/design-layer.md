@@ -29,7 +29,7 @@ Two tests for whether something is a commitment:
 
 ## Decision dimensions
 
-A `dsn` commits decisions across one or more of four dimensions. Every `dsn`
+A `dsn` commits decisions across one or more dimensions. Every `dsn`
 `SHALL` commit to at least one dimension; a `dsn` with no dimensional
 commitment is not a design decision — it is narrative.
 

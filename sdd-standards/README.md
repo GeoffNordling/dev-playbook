@@ -61,7 +61,7 @@ Read in this order:
 | [ears.md](ears.md) | EARS sentence templates, plus the workspace adoption statement. |
 | [oft.md](oft.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, fenced-code-block constraint, naming convention, and file organization. |
 | [spec-format.md](spec-format.md) | Integration walkthrough showing how the three standards combine in a single spec file, plus the illustrative-examples authoring convention. |
-| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the four decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
+| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
 
 ## External references
 

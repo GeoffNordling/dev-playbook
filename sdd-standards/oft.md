@@ -452,10 +452,9 @@ verified.
 `Dimension:` is a workspace-defined keyword, not part of OFT. It is
 valid only on `dsn` items.
 
-Every `dsn` `SHALL` carry a `Dimension:` field naming one or more of the
-four design dimensions defined in
-[design-layer.md](design-layer.md#decision-dimensions):
-`Data`, `API Shape`, `Algorithms`, `Composition`.
+Every `dsn` `SHALL` carry a `Dimension:` field naming one or more of
+the design dimensions defined in
+[design-layer.md](design-layer.md#decision-dimensions).
 
 #### Format
 
