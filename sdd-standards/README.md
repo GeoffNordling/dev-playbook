@@ -4,10 +4,6 @@ Spec-driven development (SDD) is a project-level commitment. The human
 decides whether a project uses this workflow. When a project adopts SDD,
 all rules in this directory apply.
 
-This directory defines every standard a spec file in this workspace
-conforms to: three external standards (each colocating its workspace
-extensions), an integration walkthrough, and a design-layer companion.
-
 ## Core principles
 
 **Spec-anchored.** The spec and the code are co-maintained as peers — the
@@ -23,33 +19,12 @@ is a tracked action item; the default reconciliation is that the spec wins
 and code updates to match, but the human decides per case. Term from
 Breunig, *The Spec-Driven Development Triangle*.
 
-**Types of requirements.** Functional requirements are
-about behavior; design requirements are about organization and methods; technical requirements are about system qualities —
-performance, security, scalability, reliability. Technical requirements
-are valid spec items in the same format but are consciously omitted in
-this workspace, since our personal projects do not have meaningful technical
-constraints.
-
-## Composed from external standards
-
-The workspace spec format is built from three external standards, each
-contributing one layer:
-
-- **RFC 2119** — defines the obligation vocabulary (`MUST` / `SHALL` /
-  `SHOULD` / `MAY`) that grades how strong each requirement is.
-- **EARS** — defines sentence templates (*When / If / While / Where*)
-  that structure each requirement around its triggering condition.
-- **OFT Requirement-Enhanced Markdown** — defines a Markdown item
-  format with stable IDs and `Needs:` / `Covers:` links, turning a pile
-  of requirement prose into a traceable graph.
-
-We adopt each as-is, then subset, constrain, and extend it for the
-workspace. Each of the three primary files below restates its external
-standard and then, in a trailing Extensions section, documents the
-workspace decisions layered on top. A companion file,
-[design-layer.md](design-layer.md), covers the extra semantics that
-apply to design items. How the three primaries combine in a single spec
-file is shown by example [below](#anatomy-of-a-spec-item).
+**Types of requirements.** Functional requirements are about behavior;
+design requirements are about organization and methods; technical
+requirements are about system qualities — performance, security,
+scalability, reliability. Technical requirements are valid spec items in
+the same format but are consciously omitted in this workspace, since our
+personal projects do not have meaningful technical constraints.
 
 ## Files
 
@@ -57,73 +32,14 @@ Read in this order:
 
 | File | Purpose |
 |---|---|
-| [rfc2119.md](rfc2119.md) | RFC 2119 / RFC 8174 (BCP 14) obligation vocabulary, plus the workspace subset, backticking rule, and one-obligation-per-item rule. |
-| [ears.md](ears.md) | EARS sentence templates, plus the workspace adoption statement. |
-| [oft.md](oft.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, `Status:` constraint, fenced-code-block constraint, illustrative-examples convention, naming convention, and file organization. |
-| [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
+| [spec-standard.md](spec-standard.md) | The workspace spec standard — item anatomy, IDs, artifact types, coverage chain, keyword reference, prose rules (obligation vocabulary and sentence templates), file organization. |
+| [design-layer.md](design-layer.md) | Design-phase semantics — commitment framing and the four decision dimensions (`Data`, `API-Shape`, `Algorithms`, `Composition`). |
 
-## Anatomy of a spec item
-
-A single `dsn` item using every OFT keyword adopted by the workspace and
-every workspace extension keyword. Most items use a subset — the table
-below names which pieces are required and which are optional, and which
-apply only to `dsn` items.
-
-    ### Topic Classifier
-    `dsn~classifier.topic~1`
-    Dimension: API Shape, Algorithms
-
-    Description:
-    When an inbound message is submitted, the classifier `SHALL` return
-    a `TopicLabel` drawn from the fixed taxonomy. When the message
-    falls outside the taxonomy, the classifier `SHALL` return
-    `TopicLabel.OTHER` rather than its best guess.
-
-    Rationale:
-    A closed-taxonomy return type lets downstream routing be
-    exhaustive; free-form guesses break the routing contract.
-
-    Comment:
-    The `TopicLabel` enum lives in dsn~classifier.taxonomy~1.
-
-    Covers:
-    - req~classifier.label-fidelity~1
-
-    Depends:
-    - dsn~classifier.taxonomy~1
-
-    Tags: classifier, llm
-
-    Needs:
-    - utest
-
-    Interface: classifier.classify(message: str) -> classifier.TopicLabel
-    AgentReview: The system prompt at src/prompts/classifier.md
-                 instructs the model to return `OTHER` when the message
-                 is outside the taxonomy, rather than picking its
-                 closest guess.
-
-| Field | Scope | Required |
-|---|---|---|
-| Markdown heading | any item | **required** |
-| ID `type~name~rev` | any item | **required** |
-| `Dimension:` | any item | **required** — `Null` on non-`dsn` |
-| `Description:` | any item | **required** |
-| `Rationale:` | any item | optional |
-| `Comment:` | any item | optional |
-| `Covers:` | any item | required unless the item is a root `feat` |
-| `Depends:` | any item | optional |
-| `Tags:` | any item | optional |
-| `Needs:` | any item | optional — absence terminates the chain |
-| `Interface:` | `dsn` only | optional |
-| `AgentReview:` | `dsn` only | optional |
-
-Keyword definitions and ordering constraints live in [oft.md](oft.md).
-Description prose follows [rfc2119.md](rfc2119.md) obligation verbs
-and [ears.md](ears.md) sentence templates. Every `dsn` additionally
-`SHALL` carry at least one of `Needs:` / `Interface:` / `AgentReview:`
-— the
-[verification coverage rule](oft.md#verification-coverage--extension).
+The standard is inspired by three external works — RFC 2119 / BCP 14 for
+obligation vocabulary, EARS for sentence templates, and OpenFastTrace
+Requirement-Enhanced Markdown for the item format and linking model. The
+rules stated in `spec-standard.md` are the workspace's own; those works
+inspired the form but do not govern it.
 
 ## External references
 

@@ -1,11 +1,9 @@
 # Design Layer
 
 This file is about the *semantics* of design items (`dsn`) — what a design
-commitment is and which dimensions it can commit across. Mechanical rules
-for the `Interface:` / `AgentReview:` keywords and the verification-coverage
-rule live in the OFT [Extensions](oft.md#extensions) section.
-
-Obligation verbs in this document follow [rfc2119.md](rfc2119.md).
+commitment is and which dimensions it can commit across. Keyword formats,
+verification-termination rules, and the obligation vocabulary live in
+[spec-standard.md](spec-standard.md).
 
 ## Purpose
 
@@ -44,7 +42,7 @@ Examples: the `Session` entity and its owned `Event` children; the
 `ParserConfig` record; the distinction between a raw `Frame` and a
 derived `Segment`.
 
-### API Shape
+### API-Shape
 
 Signatures of public callables, classes, and methods. What callers name,
 invoke, and receive.
@@ -54,13 +52,13 @@ exposing `parse(path)` vs. a free function `parse(path, config)`; raising
 `ValidationError` vs. returning `Result[Session, Error]`.
 
 Error semantics (which exceptions are raised, under what conditions) fold
-into API Shape — raises are part of the contract.
+into API-Shape — raises are part of the contract.
 
 Module layout (where a symbol lives — `myapp.parser.SessionParser` vs.
-`myapp.session.Parser`) folds into API Shape; the fully-qualified symbol
+`myapp.session.Parser`) folds into API-Shape; the fully-qualified symbol
 path encodes the placement.
 
-Data-structure choice folds into API Shape when the signature pins it (e.g.,
+Data-structure choice folds into API-Shape when the signature pins it (e.g.,
 `-> list[Event]`); when the signature abstracts it (e.g.,
 `-> Iterable[Event]`), the structure choice drops below the public
 boundary and belongs to the implementation phase.
@@ -87,7 +85,7 @@ Examples: "parse, then validate, then persist — in that order"; "parsing
 and checksumming run in parallel and their results are joined";
 "validation errors short-circuit later stages."
 
-Two designs with identical Data, API Shape, and Algorithms can still commit
+Two designs with identical Data, API-Shape, and Algorithms can still commit
 to different Compositions and produce different integration-test outcomes.
 Composition is a first-class dimension, not a byproduct of the others.
 
@@ -103,14 +101,14 @@ and `SHALL` declare it via the `Dimension:` field described below.
 
 ## Dimension commitment
 
-Every `dsn` `SHALL` declare its dimension(s) in a
-[`Dimension:` field](oft.md#extension-keyword-dimension). The
-field takes a comma-separated list of one or more dimension names from
-`{Data, API Shape, Algorithms, Composition}`.
+Every `dsn` `SHALL` declare its dimension(s) in the
+[`Dimension:` field](spec-standard.md#68-dimension). The field takes a
+comma-separated list of one or more dimension names from
+`{Data, API-Shape, Algorithms, Composition}`.
 
 Most items name a single dimension. A list expresses decisions that
 genuinely commit across dimensions — e.g., a schema decision that also
-pins a return signature commits both `Data` and `API Shape`. Items that
+pins a return signature commits both `Data` and `API-Shape`. Items that
 span three or more dimensions are candidates for splitting; one
 commitment typically has one primary axis.
 
@@ -121,17 +119,17 @@ file organization. Authors remain free to group items by feature,
 subsystem, or any other axis; tools still project by dimension from the
 field value.
 
-## Related keyword and coverage rules
+## Related keyword and chain rules
 
 Mechanical rules that apply to every `dsn` but are keyword-level (not
-design-semantic) live alongside the OFT format:
+design-semantic) live in [spec-standard.md](spec-standard.md):
 
-- [Verification coverage](oft.md#verification-coverage--extension)
-  — every `dsn` `SHALL` carry at least one of `Needs:`, `Interface:`, or
-  `AgentReview:`.
-- [`Interface:` keyword](oft.md#extension-keyword-interface) —
+- [Verification termination](spec-standard.md#54-verification-termination)
+  — chains `SHOULD` terminate in a `utest`, an `itest`, or any item
+  carrying `AgentReview:`.
+- [`Interface:` keyword](spec-standard.md#69-interface) — design-phase
   structural commitment format.
-- [`AgentReview:` keyword](oft.md#extension-keyword-agentreview) —
-  non-testable commitment format.
-- [`Dimension:` keyword](oft.md#extension-keyword-dimension) —
-  item-level dimension classification format.
+- [`AgentReview:` keyword](spec-standard.md#610-agentreview) —
+  non-testable verification format.
+- [`Dimension:` keyword](spec-standard.md#68-dimension) — item-level
+  dimension classification format.

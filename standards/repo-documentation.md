@@ -2,10 +2,7 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in
-[sdd-standards/rfc2119.md](~/workspace/dev-playbook/sdd-standards/rfc2119.md),
-including the workspace subset and formatting rules in its
-[Extensions](~/workspace/dev-playbook/sdd-standards/rfc2119.md#extensions)
-section.
+[sdd-standards/spec-standard.md — Obligation vocabulary](~/workspace/dev-playbook/sdd-standards/spec-standard.md#71-obligation-vocabulary).
 
 ## Purpose
 
@@ -29,13 +26,13 @@ Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
 file. The distinction governs formatting conventions and cross-reference style.
 
-All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/oft.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored. The audience determines the wrapper:
+All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored. The audience determines the wrapper:
 
 | Audience | Cross-reference style |
 |---|---|
-| Human | Inline link with full path as target — e.g., `[OFT format](~/workspace/dev-playbook/sdd-standards/oft.md)`. |
+| Human | Inline link with full path as target — e.g., `[Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md)`. |
 | Human + Agent | Same as Human. |
-| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/oft.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/spec-standard.md` ``. No inline links; they add syntax noise without adding information for an agent. |
 
 ### Fenced code blocks
 
@@ -63,7 +60,7 @@ Whether the file is required or optional.
 | `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
 | `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
 | `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/dev-playbook/sdd-standards/README.md) for content conventions and [oft.md — File organization](~/workspace/dev-playbook/sdd-standards/oft.md#file-organization--extension) for file layout and splitting rules. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/dev-playbook/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/dev-playbook/sdd-standards/spec-standard.md#8-file-organization) for file layout and splitting rules. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. |
 

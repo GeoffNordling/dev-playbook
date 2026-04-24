@@ -50,10 +50,8 @@ Spec-driven development standards: philosophy, writing conventions, design layer
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| RFC 2119 | `sdd-standards/rfc2119.md` | Obligation vocabulary (`MUST` / `SHALL` / `SHOULD` / `MAY`) and the workspace subset |
-| EARS | `sdd-standards/ears.md` | Sentence templates (*When / If / While / Where*) for requirement prose |
-| OFT | `sdd-standards/oft.md` | Requirement-Enhanced Markdown item format, IDs, keywords, linking, and workspace extensions |
-| Design layer | `sdd-standards/design-layer.md` | Commitment scope, decision dimensions, per-`dsn` `Dimension:` classification, verification fields |
+| Spec standard | `sdd-standards/spec-standard.md` | Workspace spec standard: item anatomy, IDs, artifact types, coverage chain, keyword reference, obligation vocabulary, sentence templates, file organization |
+| Design layer | `sdd-standards/design-layer.md` | Commitment scope and the four design decision dimensions (`Data`, `API Shape`, `Algorithms`, `Composition`) |
 
 ### Agent configuration (dotfiles/)
 

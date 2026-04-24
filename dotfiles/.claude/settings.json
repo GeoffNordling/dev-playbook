@@ -14,8 +14,9 @@
   },
   "effortLevel": "xhigh",
   "voice": {
-    "enabled": true,
+    "enabled": false,
     "mode": "hold"
   },
-  "voiceEnabled": true
+  "voiceEnabled": false,
+  "theme": "light"
 }

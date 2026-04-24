@@ -2,10 +2,7 @@
 
 The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
 document are to be interpreted as described in
-[sdd-standards/rfc2119.md](~/workspace/dev-playbook/sdd-standards/rfc2119.md),
-including the workspace subset and formatting rules in its
-[Extensions](~/workspace/dev-playbook/sdd-standards/rfc2119.md#extensions)
-section.
+[sdd-standards/spec-standard.md — Obligation vocabulary](~/workspace/dev-playbook/sdd-standards/spec-standard.md#71-obligation-vocabulary).
 
 These are default Python conventions. Individual projects may supercede.
 
