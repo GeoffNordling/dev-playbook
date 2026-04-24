@@ -2,8 +2,10 @@
 
 EARS defines a small set of sentence templates that authors use to phrase
 requirements unambiguously. This workspace adopts EARS unchanged — no
-subset, no extensions, no constraints. [spec-format.md](spec-format.md)
-shows how EARS combines with the other standards in a full spec file.
+subset, no extensions, no constraints. The
+[anatomy of a spec item](README.md#anatomy-of-a-spec-item) in this
+directory's README shows how EARS combines with the other standards in
+a real item.
 
 EARS covers sentence *structure* only. Obligation strength, identity,
 rationale, and metadata are out of scope — obligation strength is handled

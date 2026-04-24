@@ -46,10 +46,10 @@ contributing one layer:
 We adopt each as-is, then subset, constrain, and extend it for the
 workspace. Each of the three primary files below restates its external
 standard and then, in a trailing Extensions section, documents the
-workspace decisions layered on top. Two companion files show how the
-three combine into a single spec file ([spec-format.md](spec-format.md))
-and what extra semantics apply to design items
-([design-layer.md](design-layer.md)).
+workspace decisions layered on top. A companion file,
+[design-layer.md](design-layer.md), covers the extra semantics that
+apply to design items. How the three primaries combine in a single spec
+file is shown by example [below](#anatomy-of-a-spec-item).
 
 ## Files
 
@@ -59,9 +59,69 @@ Read in this order:
 |---|---|
 | [rfc2119.md](rfc2119.md) | RFC 2119 / RFC 8174 (BCP 14) obligation vocabulary, plus the workspace subset, backticking rule, and one-obligation-per-item rule. |
 | [ears.md](ears.md) | EARS sentence templates, plus the workspace adoption statement. |
-| [oft.md](oft.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, fenced-code-block constraint, naming convention, and file organization. |
-| [spec-format.md](spec-format.md) | Integration walkthrough showing how the three standards combine in a single spec file, plus the illustrative-examples authoring convention. |
+| [oft.md](oft.md) | OpenFastTrace Requirement-Enhanced Markdown: item structure, IDs, keywords, linking, coverage, plus the workspace artifact-type subset, coverage chain, revision policy, verification coverage rule, `Interface:` / `AgentReview:` / `Dimension:` keywords, `Status:` constraint, fenced-code-block constraint, illustrative-examples convention, naming convention, and file organization. |
 | [design-layer.md](design-layer.md) | Design-phase semantics: commitment framing, the decision dimensions, and the per-`dsn` `Dimension:` classification rule. |
+
+## Anatomy of a spec item
+
+A single `dsn` item using every OFT keyword adopted by the workspace and
+every workspace extension keyword. Most items use a subset — the table
+below names which pieces are required and which are optional, and which
+apply only to `dsn` items.
+
+    ### Topic Classifier
+    `dsn~classifier.topic~1`
+    Dimension: API Shape, Algorithms
+
+    Description:
+    When an inbound message is submitted, the classifier `SHALL` return
+    a `TopicLabel` drawn from the fixed taxonomy. When the message
+    falls outside the taxonomy, the classifier `SHALL` return
+    `TopicLabel.OTHER` rather than its best guess.
+
+    Rationale:
+    A closed-taxonomy return type lets downstream routing be
+    exhaustive; free-form guesses break the routing contract.
+
+    Comment:
+    The `TopicLabel` enum lives in dsn~classifier.taxonomy~1.
+
+    Covers:
+    - req~classifier.label-fidelity~1
+
+    Depends:
+    - dsn~classifier.taxonomy~1
+
+    Tags: classifier, llm
+
+    Needs: utest
+    Interface: classifier.classify(message: str) -> classifier.TopicLabel
+    AgentReview: The system prompt at src/prompts/classifier.md
+                 instructs the model to return `OTHER` when the message
+                 is outside the taxonomy, rather than picking its
+                 closest guess.
+
+| Field | Scope | Required |
+|---|---|---|
+| Markdown heading | any item | optional — item `MAY` begin with the ID line |
+| ID `type~name~rev` | any item | **required** |
+| `Dimension:` | `dsn` only | **required** on `dsn`; invalid elsewhere |
+| `Description:` | any item | optional (prose after the heading is the description automatically) |
+| Body prose | any item | **required** |
+| `Rationale:` | any item | optional |
+| `Comment:` | any item | optional |
+| `Covers:` | any item | required unless the item is a root `feat` |
+| `Depends:` | any item | optional |
+| `Tags:` | any item | optional |
+| `Needs:` | any item | optional — absence terminates the chain |
+| `Interface:` | `dsn` only | optional |
+| `AgentReview:` | `dsn` only | optional |
+
+Keyword definitions and ordering constraints live in [oft.md](oft.md).
+Body prose follows [rfc2119.md](rfc2119.md) obligation verbs and
+[ears.md](ears.md) sentence templates. Every `dsn` additionally `SHALL`
+carry at least one of `Needs:` / `Interface:` / `AgentReview:` — the
+[verification coverage rule](oft.md#verification-coverage--extension).
 
 ## External references
 

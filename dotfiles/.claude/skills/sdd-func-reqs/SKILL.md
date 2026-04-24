@@ -12,7 +12,7 @@ Help the user write or update functional requirements for the project.
 
 Before starting, read this reference end to end. If it is missing, stop and tell the user:
 
-- [Spec format walkthrough](~/workspace/dev-playbook/sdd-standards/spec-format.md) — how RFC 2119 obligations, EARS sentence templates, OFT Requirement-Enhanced Markdown, and workspace extensions combine in a spec file. The walkthrough links into each per-standard document as needed.
+- [SDD standards index](~/workspace/dev-playbook/sdd-standards/README.md) — the reading list of standards files plus an [anatomy of a spec item](~/workspace/dev-playbook/sdd-standards/README.md#anatomy-of-a-spec-item) showing how RFC 2119 obligations, EARS sentence templates, OFT Requirement-Enhanced Markdown, and workspace extensions combine in one item.
 
 Throughout the rest of this skill it is referred to as the *spec format walkthrough*.
 
@@ -36,7 +36,7 @@ Use the interview pattern to collaborate with the user on requirements. Ask clar
 ## Drafting
 
 - Write requirements following the spec format walkthrough: EARS sentence templates with RFC 2119 modal verbs for prose, OFT Requirement-Enhanced Markdown for structure and traceability.
-- Every requirement gets a unique OFT specification item ID in `type~name~revision` format (e.g., `req~auth.login-validation~1`). Use `req` as the type. See the spec format walkthrough for naming rules and required keywords (`Status:`, `Covers:`, `Needs:`).
+- Every requirement gets a unique OFT specification item ID in `type~name~revision` format (e.g., `req~auth.login-validation~1`). Use `req` as the type. See the spec format walkthrough for naming rules and required keywords (`Covers:`, `Needs:`).
 - Ask the user whether anything belongs in an out-of-scope section. If yes, capture it. If no, include the section with an explicit `NA` so it is clear the question was asked and answered.
 - Present the draft to the user and iterate until they are satisfied.
 

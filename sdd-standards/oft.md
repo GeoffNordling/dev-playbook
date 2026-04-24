@@ -482,6 +482,19 @@ A `dsn` `MAY` combine `Dimension:` with `Needs:`, `Interface:`, and
 `AgentReview:`. `Dimension:` classifies the commitment; the verification
 fields name how it is checked.
 
+### Status keyword — constraint (omitted)
+
+Spec items in this workspace `SHALL NOT` carry a `Status:` field. Every
+committed item is implicitly accepted.
+
+Reason: OFT's `Status:` is informational for default reports — a `draft`
+item participates in coverage checks identically to an `approved` item.
+The only stricter behavior is the aspec XML report's shallow-coverage
+check, which this workspace does not rely on. Without a behavioral
+difference, maintaining the field adds bookkeeping without adding signal.
+Lifecycle state for in-progress work lives in branches and draft PRs,
+not at the item level.
+
 ### Fenced code blocks — constraint (forbidden)
 
 Spec files `SHALL NOT` contain fenced code blocks (triple backticks or
@@ -529,6 +542,21 @@ When split:
 OFT natively supports hierarchical organization (see
 [File discovery](#file-discovery)); file names and folder structure do
 not affect tracing.
+
+### Illustrative examples — extension (convention)
+
+A spec section that introduces non-trivial domain vocabulary `SHOULD`
+include a short illustrative example before the formal requirements.
+The example grounds the vocabulary in concrete terms so that
+requirements can reference it without re-explaining.
+
+- One scenario per section. If a second example is needed, the
+  section's vocabulary may be too overloaded and `SHOULD` be split.
+- The example `SHALL` appear after the section's prose introduction
+  and before the formal spec items.
+- Examples `SHALL` use indented code blocks (4-space indent) or
+  structured format that mirrors what the system actually produces or
+  consumes.
 
 ## Reference
 
