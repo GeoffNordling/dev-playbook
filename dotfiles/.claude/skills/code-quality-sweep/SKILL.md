@@ -8,8 +8,9 @@ effort: medium
 
 # Code Quality Sweep
 
-Sweep the current repository for instances of the anti-patterns cataloged at
-`~/workspace/dev-playbook/standards/code-quality-anti-patterns.md` and report
+Sweep the current repository for instances of the anti-patterns cataloged in
+the "Anti-Patterns" section of
+`~/workspace/dev-playbook/standards/python-conventions.md` and report
 every finding so the user can fix it.
 
 The sweep is stochastic, not exhaustive — it surfaces enough instances to
@@ -20,9 +21,9 @@ conversation with the user deciding each case (Step 4).
 
 ## Step 1 — Load the catalog
 
-Read `~/workspace/dev-playbook/standards/code-quality-anti-patterns.md`.
-Each heading below the intro is one anti-pattern with its pattern
-description, rationale, and rule. Treat the rules as authoritative.
+Read `~/workspace/dev-playbook/standards/python-conventions.md`. Each `###`
+heading under the "## Anti-Patterns" section is one anti-pattern with its
+pattern description, rationale, and rule. Treat the rules as authoritative.
 
 If the catalog is missing or empty, stop and tell the user.
 

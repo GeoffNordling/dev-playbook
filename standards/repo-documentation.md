@@ -1,9 +1,5 @@
 # Repo Documentation Standard
 
-The key words "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this
-document are to be interpreted as described in
-[sdd-standards/spec-standard.md — Obligation vocabulary](~/workspace/dev-playbook/sdd-standards/spec-standard.md#71-obligation-vocabulary).
-
 ## Purpose
 
 Define a consistent file hierarchy and scope boundary for every repository in the workspace, so that any human or agent can open a repo cold and immediately orient — what it is, how to operate it, and what's next.
@@ -12,7 +8,7 @@ Define a consistent file hierarchy and scope boundary for every repository in th
 
 **Scope is standardized; depth is not.** Every file has a defined scope (what goes in it), but depth varies by project. A CLI tool's README may be 10 lines. A simulation's may be 100. Both are conformant if the content stays within scope.
 
-**Presence is the status signal.** There are no explicit status fields. The presence or absence of optional files tells you what stage the project is in. An empty or missing ROADMAP.md means nothing is planned. A populated specs/ directory means the project is complex enough to warrant formal requirements.
+**Presence is the status signal.** There are no explicit status fields. The presence or absence of optional files tells you what stage the project is in. A missing ROADMAP.md means nothing is planned. A populated specs/ directory means the project is complex enough to warrant formal requirements.
 
 **No duplication across files.** Each piece of information has exactly one home. Files reference each other rather than repeating content.
 
@@ -24,24 +20,8 @@ Every file in the documentation hierarchy has two properties.
 
 Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
-file. The distinction governs formatting conventions and cross-reference style.
-
-All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored. The audience determines the wrapper:
-
-| Audience | Cross-reference style |
-|---|---|
-| Human | Inline link with full path as target — e.g., `[Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md)`. |
-| Human + Agent | Same as Human. |
-| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/spec-standard.md` ``. No inline links; they add syntax noise without adding information for an agent. |
-
-### Fenced code blocks
-
-Fenced code blocks delimited by triple backticks or `~~~` may contain `~/workspace/` paths in shell examples or sample output; `ref-check` skips them. For example:
-
-```bash
-# Run ref-check from any workspace repo:
-python3 ~/workspace/dev-playbook/tools/bin/ref-check .
-```
+file. The distinction governs formatting conventions and cross-reference style
+(see [Cross-References](#cross-references) below).
 
 ### Presence
 
@@ -63,6 +43,27 @@ Whether the file is required or optional.
 | `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/dev-playbook/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/dev-playbook/sdd-standards/spec-standard.md#8-file-organization) for file layout and splitting rules. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. |
+
+## Cross-References
+
+All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored.
+
+The file's audience determines the wrapper:
+
+| Audience | Cross-reference style |
+|---|---|
+| Human | Inline link with full path as target — e.g., `[Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md)`. |
+| Human + Agent | Same as Human. |
+| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/spec-standard.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+
+### Fenced code blocks
+
+Fenced code blocks delimited by triple backticks or `~~~` may contain `~/workspace/` paths in shell examples or sample output; `ref-check` skips them. For example:
+
+```bash
+# Run ref-check from any workspace repo:
+python3 ~/workspace/dev-playbook/tools/bin/ref-check .
+```
 
 ## Tactical Work
 

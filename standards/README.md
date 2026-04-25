@@ -8,5 +8,7 @@ Cross-project engineering standards that apply to all repositories in the worksp
 
 | Standard | Purpose |
 |----------|---------|
-| [repo-documentation.md](repo-documentation.md) | What files every repo should have and what each file's scope is |
+| [repo-documentation.md](repo-documentation.md) | What files every repo should have, their scope, and cross-reference style |
 | [skill-authoring.md](skill-authoring.md) | Conventions for writing Claude Code skills |
+| [python-conventions.md](python-conventions.md) | Default Python conventions and the anti-pattern catalog the `code-quality-sweep` skill scans for |
+| [testing-conventions.md](testing-conventions.md) | Default pytest conventions: structure, test doubles, fixtures |
