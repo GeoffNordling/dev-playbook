@@ -22,7 +22,6 @@ real items use a subset — the table below names what applies where.
 
     ### Topic Classifier
     `dsn~classifier.topic~1`
-    Dimension: API-Shape, Algorithms
 
     Description:
     When an inbound message is submitted, the classifier `SHALL` return
@@ -58,7 +57,6 @@ real items use a subset — the table below names what applies where.
 |---|---|---|
 | Markdown heading | any item | **required** |
 | ID `` `type~name~rev` `` | any item | **required** |
-| `Dimension:` | any item | **required** — `Null` on non-`dsn` |
 | `Description:` | any item | **required** |
 | `Rationale:` | any item | optional |
 | `Comment:` | any item | optional |
@@ -184,7 +182,7 @@ when the commitment is best checked by a review (e.g., an aspirational
 verifies via `Needs:` or `AgentReview:`.
 
 `Interface:` does **not** count as verification. It is a design-phase
-structural commitment (§6.9) — deterministically validated against the
+structural commitment (§6.8) — deterministically validated against the
 Python code, but it pins *structure*, not *behavior*. A requirement
 ties off only when its behavior is checked by a test or an agent
 review.
@@ -249,27 +247,7 @@ filtering.
 
     Tags: classifier, llm
 
-### 6.8 `Dimension:`
-
-Required on every item. Comma-separated list on a single line.
-
-On `dsn` items, the value names one or more of the four design
-dimensions — `Data`, `API-Shape`, `Algorithms`, `Composition`. See
-[design-layer.md](design-layer.md) for what each dimension means.
-
-    Dimension: Data
-    Dimension: API-Shape, Algorithms
-
-On non-`dsn` items, the value is `Null` — the classification does not
-apply:
-
-    Dimension: Null
-
-Dimension names are spelled exactly as above — case preserved, multi-word
-names hyphenated (`API-Shape`). A name outside the fixed set is invalid.
-Empty lists and repeated names within one field are invalid.
-
-### 6.9 `Interface:`
+### 6.8 `Interface:`
 
 Optional. Valid only on `dsn` items. A design-phase structural
 commitment: the human pins code shape so downstream agents implement
@@ -307,7 +285,7 @@ matching against the Python code. **It is not a chain terminator** —
 verification of behavior still comes from a test or `AgentReview:`
 (§5.4).
 
-### 6.10 `AgentReview:`
+### 6.9 `AgentReview:`
 
 Optional. Valid on any Markdown spec item — `feat`, `req`, or `dsn`.
 Prose describing what a review agent must check. The non-test arm of
@@ -342,8 +320,8 @@ than a review skill.
 
 - `Description:` before `Rationale:` before `Comment:`.
 - Relationship lists (`Covers:`, `Depends:`, `Needs:`, `Tags:`) and
-  extension keywords (`Dimension:`, `Interface:`, `AgentReview:`)
-  appear after the body.
+  extension keywords (`Interface:`, `AgentReview:`) appear after the
+  body.
 
 ## 7. Prose within a spec item
 

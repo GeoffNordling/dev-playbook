@@ -1,35 +1,32 @@
 # Design Layer
 
-This file is about the *semantics* of design items (`dsn`) — what a design
-commitment is and which dimensions it can commit across. Keyword formats,
-verification-termination rules, and the obligation vocabulary live in
-[spec-standard.md](spec-standard.md).
-
 ## Purpose
 
-Functional requirements describe behavior; design items record the decisions
-that shape the code fulfilling that behavior. A `dsn` is written after the
-behavior is settled.
+Functional requirements describe what the system does, not how. The space
+of correct implementations of any behavioral requirement is enormous — many
+entity shapes, many public surfaces, many algorithms, many sequencings of
+operations all satisfy the same requirement.
 
-A `dsn` records a **commitment** — a decision whose chosen option some other
-part of the system will rely on: callers, tests, downstream code. Decisions
-inside a module's private boundary (internal helpers, file layout, local
-control flow) are not commitments and belong to the implementation phase, not
-to the design item.
+An agent writing code directly from a functional requirement picks
+somewhere in that space. The pick is often not where a human with taste,
+project context, and vision would have landed. Code that meets the
+requirement but takes the wrong shape — wrong abstractions, wrong API,
+wrong ordering — is technically correct and practically wrong.
 
-Two tests for whether something is a commitment:
+The design layer is where the human narrows the space. A `dsn` encodes
+intuition the agent does not have on its own — what reads well in this
+codebase, what the project is converging toward, what trade-off this team
+prefers, what other parts of the system already do. The agent reads the
+`dsn` collection before writing code and treats each item as a constraint
+on the implementation.
 
-- **Would another part of the system change if the decision flipped?** If
-  yes, it is a commitment. If it is purely internal to one module, it is not.
-- **Could a reviewer or test observe the decision?** If the decision is
-  visible at a public boundary — signature, data schema, error semantic,
-  ordering of effects — it is a commitment.
+A `dsn` lives at the **public boundary** — what callers see, what
+downstream code reads, what subsequent stages depend on. Decisions that
+live entirely inside a module (internal helpers, local data structures,
+file layout, control flow) belong to the implementation phase and stay
+with the agent.
 
 ## Decision dimensions
-
-A `dsn` commits decisions across one or more dimensions. Every `dsn`
-`SHALL` commit to at least one dimension; a `dsn` with no dimensional
-commitment is not a design decision — it is narrative.
 
 ### Data
 
@@ -89,35 +86,26 @@ Two designs with identical Data, API-Shape, and Algorithms can still commit
 to different Compositions and produce different integration-test outcomes.
 Composition is a first-class dimension, not a byproduct of the others.
 
-## Dimensions may be null at the project level
+## Using the dimensions
 
-A pure-data library may have no Algorithms or Composition. A single-function
-tool may have no Composition. A CLI wrapper may have thin Algorithms. That
-is fine at the project level — the dimension table covers what a given
-project happens to need.
+When sitting down to write a `dsn` collection, walk through each axis
+in turn: what entities and shapes does this part of the system commit
+to (`Data`)? what surfaces do callers see (`API-Shape`)? what
+operations produce outputs from inputs (`Algorithms`)? how do those
+operations combine (`Composition`)? Pivoting attention to one axis at
+a time keeps the design from drifting into prose-shaped narrative.
 
-Every individual `dsn`, however, `SHALL` commit to at least one dimension
-and `SHALL` declare it via the `Dimension:` field described below.
+Not every project commits on every axis. A pure-data library may have
+no `Algorithms` or `Composition`. A single-function tool may have no
+`Composition`. A CLI wrapper may have thin `Algorithms`. The framework
+is a checklist, not an obligation.
 
-## Dimension commitment
-
-Every `dsn` `SHALL` declare its dimension(s) in the
-[`Dimension:` field](spec-standard.md#68-dimension). The field takes a
-comma-separated list of one or more dimension names from
-`{Data, API-Shape, Algorithms, Composition}`.
-
-Most items name a single dimension. A list expresses decisions that
-genuinely commit across dimensions — e.g., a schema decision that also
-pins a return signature commits both `Data` and `API-Shape`. Items that
-span three or more dimensions are candidates for splitting; one
-commitment typically has one primary axis.
-
-Reason: forcing classification at the moment of writing prevents
-post-hoc inference of dimension from prose, and gives downstream tools a
-deterministic anchor for per-dimension projection without constraining
-file organization. Authors remain free to group items by feature,
-subsystem, or any other axis; tools still project by dimension from the
-field value.
+`API-Shape` commitments often surface as `Interface:` declarations on
+the same `dsn` — a fully-qualified, annotated signature is the
+structural codification of an API-Shape decision. The two are not
+parallel commitments; the `Interface:` field is how an API-Shape
+decision is expressed when the human wants the agent bound to a
+specific signature.
 
 ## Related keyword and chain rules
 
@@ -127,9 +115,7 @@ design-semantic) live in [spec-standard.md](spec-standard.md):
 - [Verification termination](spec-standard.md#54-verification-termination)
   — chains `SHOULD` terminate in a `utest`, an `itest`, or any item
   carrying `AgentReview:`.
-- [`Interface:` keyword](spec-standard.md#69-interface) — design-phase
+- [`Interface:` keyword](spec-standard.md#68-interface) — design-phase
   structural commitment format.
-- [`AgentReview:` keyword](spec-standard.md#610-agentreview) —
+- [`AgentReview:` keyword](spec-standard.md#69-agentreview) —
   non-testable verification format.
-- [`Dimension:` keyword](spec-standard.md#68-dimension) — item-level
-  dimension classification format.

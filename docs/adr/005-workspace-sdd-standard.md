@@ -13,7 +13,7 @@ Three external sources inspired the standard:
 - **EARS** (Mavin et al., RE'09) — sentence templates.
 - **OFT Requirement-Enhanced Markdown** — item format, IDs, `Needs:`/`Covers:` linking model.
 
-None of the three covers the workspace's full scope. BCP 14 specifies only the verbs; EARS only the sentence templates; OFT only the linking model. The workspace also needs dimensional classification of design decisions, a non-test verification path for non-testable commitments, and design-phase structural commitments that downstream agents can implement against. The standard documents these workspace-specific choices directly and names the external sources as inspiration, not as constraints.
+None of the three covers the workspace's full scope. BCP 14 specifies only the verbs; EARS only the sentence templates; OFT only the linking model. The workspace also needs a way to structure design-layer thinking, a non-test verification path for non-testable commitments, and design-phase structural commitments that downstream agents can implement against. The standard documents these workspace-specific choices directly and names the external sources as inspiration, not as constraints.
 
 ## Decision
 
@@ -37,11 +37,7 @@ Verification termination is a `SHOULD`, not a `SHALL`. Every chain `SHOULD` term
 
 ### Four decision dimensions
 
-Design items commit decisions across one or more of four dimensions: `Data`, `API-Shape`, `Algorithms`, `Composition`. Multi-word names are hyphenated. Every `dsn` commits to at least one dimension; at the project level, any dimension may be null.
-
-### `Dimension:` as an item-level keyword
-
-`Dimension:` is a required keyword on every item. On `dsn`, the value is a comma-separated list drawn from the four-dimension set — items that genuinely commit across dimensions declare a list rather than split. On non-`dsn` items, the value is `Null`. Per-dimension projection reads the keyword; no section-header-based organization is used, and spec files remain free to group items by feature, subsystem, or any other axis.
+Design-layer thinking is structured around four axes — `Data`, `API-Shape`, `Algorithms`, `Composition`. The framework is a writing aid walked through during `dsn` authoring to keep each item from drifting into prose-shaped narrative. It is not encoded as metadata on the item; `design-layer.md` describes each axis.
 
 ### `AgentReview:` as non-test verification
 
@@ -72,11 +68,10 @@ A simple spec is a single Markdown file. A complex spec is a directory containin
 | Adopt an external standard unchanged (BCP 14, EARS, or OFT) | None of the three covers the workspace's full scope. A usable standard needs all three plus workspace-specific choices. |
 | Restate the external standards inside the workspace document | Duplicates what the primary sources already publish. Naming them as inspiration and writing workspace rules directly keeps the document focused on decisions the workspace controls. |
 | Split the workspace standard into per-source documents with workspace-specific sections appended | Readers reconcile "what the external standard says" with "what we do on top" on every lookup. A single document that states workspace rules directly is easier to read and maintain. |
-| Organize `dsn` files by dimension headers (`## Data`, `## API-Shape`, ...) | Forces one-dimension-per-item, clashes with feature-organized file layouts, produces empty-header boilerplate. A required `Dimension:` keyword preserves forced classification without constraining file organization. |
+| Encode dimension as item metadata (`Dimension:` keyword on every item) | Forced classification was a writing-time discipline aid, but encoding it as required metadata created redundancy with `Interface:` (which already implies API-Shape) and turned a writing heuristic into a grammar rule. The four dimensions live as a thinking framework in `design-layer.md` instead. |
 | Make verification termination a hard `SHALL` | Partial and aspirational chains are normal during active spec work; a hard rule produces false-positive lint noise. `SHOULD` plus explicit tool reporting gives developers the signal without the false alarm. |
 | Restrict `AgentReview:` to `dsn` only | Some non-testable commitments belong at `feat` or `req` level. Restricting `AgentReview:` to `dsn` forces a synthetic design item to exist solely to carry the review. |
 | Treat `Interface:` as a chain terminator | `Interface:` commits structure; a test or `AgentReview:` commits behavior. Conflating the two lets a structural commitment pose as behavioral verification, which is what the chain is trying to prevent. |
-| Require one dimension per `dsn` | Rules out commitments that genuinely span dimensions (a schema choice that also pins a return signature commits `Data` and `API-Shape`). The comma-separated list admits what is real; convention keeps most items single-dimensional. |
 | Start revisions at 1 | No material difference, and 0 is the common convention for this kind of versioning. |
 
 ## Consequences
@@ -98,5 +93,5 @@ ADR-004's other commitments (public-only testing enforcement via Ruff `SLF001` p
 
 ### Implementation
 
-- `sdd-tools` implements the standard: `spec-lint` enforces keyword well-formedness and dimension presence; `sdd-index`, `sdd-atlas`, `sdd-chain`, and `sdd-review` provide projections; `pytest-sdd` parses markers and `Interface:` declarations at collection time.
+- `sdd-tools` implements the standard: `spec-lint` enforces keyword well-formedness; `sdd-index`, `sdd-atlas`, `sdd-chain`, and `sdd-review` provide projections; `pytest-sdd` parses markers and `Interface:` declarations at collection time.
 - Greenfield `spec-tools` rewrite (GH issue #16) targets this standard.
