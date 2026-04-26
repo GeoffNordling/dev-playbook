@@ -41,3 +41,68 @@ Covers:
 
 Needs:
 - dsn
+
+## Design
+
+### SpecItem shape
+`dsn~model.spec-item~0`
+
+Description:
+The model `SHALL` represent each spec item as a `SpecItem` instance
+carrying one named field per standard-defined keyword. Required
+fields `SHALL` be non-optional; optional keyword fields `SHALL` be
+typed `<element-type> | None`; bullet-list keyword fields `SHALL`
+be `list[<element-type>]`. The artifact type of an item `SHALL` be
+derived from its id rather than stored as a separate field.
+
+Rationale:
+Typed accessors give every downstream consumer static help and a
+stable contract. A single flat `SpecItem` keeps the model uniform
+— consumers iterate items without type-switching — and an
+id-derived artifact type avoids redundant state that can drift.
+
+Comment:
+Per-field types:
+- heading: str
+- id: ItemId
+- description: str
+- rationale: str | None
+- comment: str | None
+- covers: list[ItemId]
+- depends: list[ItemId]
+- needs: list[str]
+- tags: list[str]
+- interface: list[str]
+- agent_review: list[str]
+
+Covers:
+- req~deserialize.fidelity~0
+
+Depends:
+- dsn~model.item-id~0
+
+Needs:
+- utest
+
+Interface: model.SpecItem(heading: str, id: model.ItemId, description: str, rationale: str | None, comment: str | None, covers: list[model.ItemId], depends: list[model.ItemId], needs: list[str], tags: list[str], interface: list[str], agent_review: list[str]) -> None
+
+### ItemId triple
+`dsn~model.item-id~0`
+
+Description:
+The model `SHALL` represent each spec-item identifier as an
+`ItemId` triple of artifact type, name, and revision, with the
+revision a non-negative integer.
+
+Rationale:
+Structured access to id components lets downstream consumers
+filter, group, and compare items by type or name without parsing
+the id string. The triple mirrors the standard's defined id form.
+
+Covers:
+- req~deserialize.fidelity~0
+
+Needs:
+- utest
+
+Interface: model.ItemId(artifact_type: str, name: str, revision: int) -> None
