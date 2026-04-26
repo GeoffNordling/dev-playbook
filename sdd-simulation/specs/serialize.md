@@ -27,9 +27,7 @@ Needs:
 
 Description:
 When the serializer writes a spec item, the output `SHALL` conform
-to the workspace spec standard — keyword ordering, indented code
-blocks rather than fenced, backticked obligation verbs, ID format,
-and field syntax.
+to the workspace spec standard.
 
 Rationale:
 Non-conformant output breaks the next parse and is useless to
@@ -45,9 +43,8 @@ Needs:
 `req~serialize.round-trip~0`
 
 Description:
-When the serializer writes a model that the deserializer produced
-from a conformant source, re-parsing the serialized output `SHALL`
-yield a model semantically equal to the original.
+When a spec model is serialized and re-deserialized, the resulting
+model `SHALL` equal the original.
 
 Rationale:
 Without this guarantee, programmatic edits silently mutate parts

@@ -39,20 +39,3 @@ Covers:
 
 Needs:
 - dsn
-
-### Index file resolution
-`req~discover.index~0`
-
-Description:
-Where a spec folder contains an `index.md`, the discoverer `SHALL`
-use that index as the authoritative list of files in that folder.
-
-Rationale:
-`index.md` is the standard's declared mechanism for folder contents;
-ignoring it would let unindexed files leak into traversal.
-
-Covers:
-- feat~discover~0
-
-Needs:
-- dsn

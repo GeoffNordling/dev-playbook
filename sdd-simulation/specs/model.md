@@ -22,25 +22,6 @@ Needs:
 
 ## Requirements
 
-### Standard-defined field access
-`req~model.fields~0`
-
-Description:
-For each artifact type defined by the standard, the model `SHALL`
-provide typed access — read and write — to every standard-defined
-field on items of that type.
-
-Rationale:
-Typed accessors give callers static help (autocomplete, type
-checks) and let analysis code remain coherent as the standard
-evolves.
-
-Covers:
-- feat~model~0
-
-Needs:
-- dsn
-
 ### Programmatic construction and navigation
 `req~model.navigation~0`
 
