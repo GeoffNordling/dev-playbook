@@ -48,21 +48,9 @@ Needs:
 `dsn~model.spec-item~0`
 
 Description:
-The model `SHALL` represent each spec item as a `SpecItem` instance
-carrying one named field per standard-defined keyword. Required
-fields `SHALL` be non-optional; optional keyword fields `SHALL` be
-typed `<element-type> | None`; bullet-list keyword fields `SHALL`
-be `list[<element-type>]`. The artifact type of an item `SHALL` be
-derived from its id rather than stored as a separate field.
+The model `SHALL` represent each spec item as a single `SpecItem`
+instance with the following typed fields:
 
-Rationale:
-Typed accessors give every downstream consumer static help and a
-stable contract. A single flat `SpecItem` keeps the model uniform
-— consumers iterate items without type-switching — and an
-id-derived artifact type avoids redundant state that can drift.
-
-Comment:
-Per-field types:
 - heading: str
 - id: ItemId
 - description: str
@@ -74,6 +62,13 @@ Per-field types:
 - tags: list[str]
 - interface: list[str]
 - agent_review: list[str]
+
+Field names mirror the keyword names defined in the spec standard.
+
+Rationale:
+Typed accessors give every downstream consumer static help and a
+stable contract. A single flat `SpecItem` keeps the model uniform
+— consumers iterate items without type-switching.
 
 Covers:
 - req~deserialize.fidelity~0
@@ -106,3 +101,27 @@ Needs:
 - utest
 
 Interface: model.ItemId(artifact_type: str, name: str, revision: int) -> None
+
+### Artifact type lives only in id
+`dsn~model.artifact-type-source~0`
+
+Description:
+The model `SHALL NOT` carry an `artifact_type` accessor on
+`SpecItem` separate from the one reachable via
+`SpecItem.id.artifact_type`. The id triple `SHALL` be the sole
+in-memory source of an item's artifact type.
+
+Rationale:
+A duplicate `artifact_type` field on `SpecItem` could drift from
+the id during construction or mutation. Pinning the id as the
+single source of truth removes that class of bug entirely.
+
+Covers:
+- req~deserialize.fidelity~0
+
+Depends:
+- dsn~model.spec-item~0
+- dsn~model.item-id~0
+
+Needs:
+- utest
