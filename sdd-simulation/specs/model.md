@@ -121,27 +121,3 @@ Needs:
 - utest
 
 Interface: model.ItemId(artifact_type: str, name: str, revision: int) -> None
-
-### Artifact type lives only in id
-`dsn~model.artifact-type-source~0`
-
-Description:
-The model `SHALL NOT` carry an `artifact_type` accessor on
-`SpecItem` separate from the one reachable via
-`SpecItem.id.artifact_type`. The id triple `SHALL` be the sole
-in-memory source of an item's artifact type.
-
-Rationale:
-A duplicate `artifact_type` field on `SpecItem` could drift from
-the id during construction or mutation. Pinning the id as the
-single source of truth removes that class of bug entirely.
-
-Covers:
-- req~deserialize.fidelity~0
-
-Depends:
-- dsn~model.spec-item~0
-- dsn~model.item-id~0
-
-Needs:
-- utest
