@@ -48,3 +48,23 @@ doesn't require this and it isn't universal — but for small focused
 libraries it appears to be the natural shape, because feat
 decomposition and module decomposition both follow "one cohesive
 capability per unit."
+
+# Spec-tools feature ideas
+
+Tool ideas surfaced while running the simulation. Track for issue
+#16 when real spec-tools development begins.
+
+## Tree structure visualizer
+
+A CLI that loads all specs in a project and renders a digestible
+tree of feats → reqs → dsns → tests, with each node annotated by
+coverage state (covered / uncovered / cross-file).
+
+Two modes:
+
+- **Detail** — every leaf shown by id and title (matches the ASCII
+  trees we drew during the simulation).
+- **Aggregate** — value counts by category, e.g., "5 reqs covered
+  by dsns, 3 uncovered; 2 cross-file dsn coverages" — analogous to
+  pandas' `value_counts`. Useful for scanning a large project's
+  coverage state at a glance without reading every item.
