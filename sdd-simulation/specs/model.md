@@ -22,19 +22,19 @@ Needs:
 
 ## Requirements
 
-### Programmatic construction and navigation
+### In-memory spec collection
 `req~model.navigation~0`
 
 Description:
-The model `SHALL` allow callers to construct items in memory,
-locate items by ID, and traverse coverage relationships
-(`Covers:`, `Needs:`, `Depends:`) without requiring access to the
+The model `SHALL` provide an in-memory container that holds a set
+of SpecItems and supports lookup by ID and traversal of coverage
+relationships (`Covers:`, `Needs:`, `Depends:`) independent of the
 on-disk spec files.
 
 Rationale:
 Analysis and edit tools must operate on a self-contained in-memory
-graph; round-trips through disk would couple every operation to
-parse and render performance.
+graph; routing every query through disk would couple each operation
+to parse and render performance.
 
 Covers:
 - feat~model~0
@@ -121,3 +121,43 @@ Needs:
 - utest
 
 Interface: model.ItemId(artifact_type: str, name: str, revision: int) -> None
+
+### Spec graph
+`dsn~model.graph~0`
+
+Description:
+The model `SHALL` expose a `SpecGraph` type that wraps a list of
+SpecItems and exposes ID lookup and coverage-graph traversal.
+`upstream(id)` returns the items that the given item covers (the
+items its `Covers:` line names); `downstream(id)` returns the
+items that cover the given item. `as_digraph()` returns a
+`networkx.DiGraph` view of the coverage relationships, with nodes
+keyed by `ItemId` and edges directed from each downstream item to
+the upstream items it covers.
+
+Rationale:
+A typed graph type centralizes the lookup and traversal logic that
+analysis tools would otherwise duplicate. Wrapping a caller-supplied
+list rather than owning storage lets callers choose when to pay for
+indexing — modules that only need to iterate items keep working
+with plain lists. Exposing the coverage relationships as a
+`networkx.DiGraph` lets analysis tools run standard graph
+algorithms (shortest paths, cycle detection, topological sort)
+directly; algorithm logic lives in the analysis tools that need it,
+keeping `SpecGraph` focused on storage and lookup.
+
+Covers:
+- req~model.navigation~0
+
+Depends:
+- dsn~model.spec-item~0
+- dsn~model.item-id~0
+
+Needs:
+- utest
+
+Interface: model.SpecGraph(items: list[model.SpecItem]) -> None
+Interface: model.SpecGraph.find(self, id: model.ItemId) -> model.SpecItem | None
+Interface: model.SpecGraph.upstream(self, id: model.ItemId) -> list[model.SpecItem]
+Interface: model.SpecGraph.downstream(self, id: model.ItemId) -> list[model.SpecItem]
+Interface: model.SpecGraph.as_digraph(self) -> networkx.DiGraph
