@@ -4,60 +4,44 @@ Observations about the workspace spec standard surfaced while running the
 simulation. Each entry names the friction; resolutions (if any) belong in
 the standard itself or in its ADRs.
 
-## 1. Cross-module behavioral properties have no clean home
+## 1. Cross-module behavioral properties: re-frame to find ownership
 
-`req~serialize.round-trip~0` spans serialize + deserialize. We parked it
-on serialize but it could equally live on deserialize or as its own feat.
-The standard's hierarchical chain doesn't accommodate "joint" properties.
+Round-trip preservation factually spans serialize + deserialize. First
+parked on `feat~serialize~0` (`req~serialize.round-trip~0`); felt
+arbitrary. Resolved by re-phrasing from the model's facet: "the model
+`SHALL` survive round-trip serialization." Moved to
+`req~model.round-trip~0`.
 
-## 2. Lossless parse + standard-conformant render does not imply round-trip
+The technique: cross-module properties often have one module that
+holds the *natural ownership stake* (here, the model — its design
+determines whether closure is achievable). Re-framing the prose
+toward that owner attaches the req cleanly. The chain stays
+hierarchical even though the test (`itest`) still spans modules.
 
-We expected `req~deserialize.fidelity~0` + `req~serialize.conformance~0`
-to imply round-trip, but they don't — formatting choices at render time
-can lose content the parser preserved. Round-trip is its own commitment.
+This works when an owner exists. When no module has a clearly
+stronger stake, the property fits better in a dedicated cross-module
+spec file (e.g., `specs/integration.md`) than shoe-horned into a
+module that doesn't quite fit. Reqs in such a file `MAY` call for
+`itest` rather than `utest`. The standard accommodates this
+mechanically — `itest` is a defined artifact type — but offers no
+convention for the file layout of cross-cutting concerns.
 
-## 3. Standard mandates `index.md` but is silent on tooling
+## 2. Consolidate coupled commitments into a single spec item
 
-Spec-standard §8 says folder-form specs `SHALL` contain `index.md`. It
-is framed for human/agent readers. Whether tools should consult it is
-left unstated; the simulation chose not to.
+When two commitments overlap factually but address different design
+dimensions (e.g., Data shape and API-Shape), keep them in one spec
+item. `dsn~model.spec-item~0` carries both a Data-dimension field
+list (`Description:`) and an API-Shape constructor signature
+(`Interface:`); they overlap factually but stay aligned because they
+are reviewed together at every edit.
 
-## 4. Cross-module dsn coverage navigates poorly
+Splitting factually-coupled commitments across separate spec items
+introduces drift risk — items can change independently, and no
+validator catches the divergence. Best practice: consolidate
+tightly-coupled commitments; only split when items genuinely change
+at independent rates or for independent reasons.
 
-`dsn~model.spec-item~0` and `dsn~model.item-id~0` live in `model.md`
-(the types they pin live in the model module) but cover
-`req~deserialize.fidelity~0` (in `deserialize.md`). The chain is
-well-formed, but a reader of `deserialize.md` sees `Needs: dsn` and
-gets no signpost that the dsns are in another file. The standard
-admits cross-file coverage but offers no convention for navigating
-it.
-
-## 5. Prose enumeration: duplication vs separate-dimension commitment
-
-When drafting `dsn~model.spec-item~0`, the field enumeration first
-appeared in `Comment:` — duplicate of `Interface:`, no validator,
-rot-prone. We removed it. But the field list also functions as a
-**Data-dimension** commitment that is conceptually distinct from the
-**API-Shape** commitment expressed by `Interface:`, so we re-added
-the enumeration in `Description:` as a normative bulleted list.
-
-Lesson: prose that duplicates `Interface:` is rot-prone when it is
-illustrative (`Comment:`) but normative when it commits to a
-different design dimension (`Description:`). The standard does not
-draw this line explicitly; authors have to.
-
-## 6. `Interface:` line goes stale when its upstream standard evolves
-
-`dsn~model.spec-item~0`'s `Interface:` enumerates every field of
-`SpecItem`, where each field corresponds to a keyword defined in
-`spec-standard.md`. `Interface:` validation checks code-against-dsn,
-but nothing checks dsn-against-standard. If the standard adds a
-keyword, the dsn must be revised manually. This is structural — any
-spec whose contract is parameterized over an external evolving
-standard inherits this manual sync — and worth flagging as a limit
-of in-spec validation rather than a fixable gap.
-
-## 7. Each module mapped 1:1 to a feat
+## 3. Each module mapped 1:1 to a feat
 
 In this simulation, every module has exactly one feat. The standard
 doesn't require this and it isn't universal — but for small focused

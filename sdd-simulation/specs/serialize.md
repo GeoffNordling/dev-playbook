@@ -39,19 +39,3 @@ Covers:
 Needs:
 - dsn
 
-### Round-trip preservation
-`req~serialize.round-trip~0`
-
-Description:
-When a spec model is serialized and re-deserialized, the resulting
-model `SHALL` equal the original.
-
-Rationale:
-Without this guarantee, programmatic edits silently mutate parts
-of the spec the caller did not intend to touch.
-
-Covers:
-- feat~serialize~0
-
-Needs:
-- itest

@@ -42,6 +42,26 @@ Covers:
 Needs:
 - dsn
 
+### Round-trip closure
+`req~model.round-trip~0`
+
+Description:
+The model `SHALL` survive round-trip serialization: when a
+`SpecItem` instance is serialized to text and that text is
+deserialized, the resulting `SpecItem` `SHALL` equal the original.
+
+Rationale:
+A model that cannot survive round-trip would silently lose
+information when callers persist their changes. Closure under
+round-trip is what makes the model usable as a programmable
+representation of specs.
+
+Covers:
+- feat~model~0
+
+Needs:
+- itest
+
 ## Design
 
 ### SpecItem shape
