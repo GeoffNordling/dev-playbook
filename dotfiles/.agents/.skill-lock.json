@@ -6,9 +6,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/marimo-team/skills.git",
       "skillPath": "skills/marimo-notebook/SKILL.md",
-      "skillFolderHash": "4e0b4ffd89cd350c0b99a97801bfb1e8ec5226e7",
+      "skillFolderHash": "9924f8f52c79265bbd676418fd5f180f6b26c501",
       "installedAt": "2026-03-13T13:19:45.074Z",
-      "updatedAt": "2026-03-13T13:19:45.074Z"
+      "updatedAt": "2026-04-28T20:43:02.238Z"
     },
     "marimo-batch": {
       "source": "marimo-team/skills",

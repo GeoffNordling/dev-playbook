@@ -216,18 +216,6 @@ def _(mo, condition):
     return
 ```
 
-## Marimo Variable Naming
-
-Variables in `for` loops that would conflict across cells need underscore prefix:
-
-```python
-# Use _name, _model to make them cell-private
-for _name, _model in items:
-    ...
-```
-
-You have a tendency to overdo `_prefix` variables. **Hard rule: never underscore-prefix imports.** Only use `_prefix` for loop variables or temporaries that would genuinely collide with another cell's named outputs. Overdoing underscores (e.g. `import re as _re`, `_result = ...`) makes code deeply unpythonic and harder to read for zero benefit. It's better to start without these _prefix variables and to only correct them once the `uvx marimo check` linter fails. 
-
 ## PEP 723 Dependencies
 
 Notebooks created via `marimo edit --sandbox` have these dependencies added to the top of the file automatically but it is a good practice to make sure these exist when creating a notebook too: 
@@ -250,7 +238,9 @@ When working on a notebook it is important to check if the notebook can run. Tha
 uvx marimo check <notebook.py>
 ```
 
-Make sure these are checked before handing a notebook back to the user.
+Make sure these are checked before handing a notebook back to the user. 
+
+**Important**: you have a tendency to over-do variables with an underscore prefix. You should only apply this to one or two variables at most. Consider creating a new variable instead of prefixing entire cells in marimo. 
 
 ## api docs
 
@@ -285,3 +275,7 @@ pytest <notebook.py>
 - For state management and reactivity [STATE.md](references/STATE.md)
 - For deployment of marimo notebooks [DEPLOYMENT.md](references/DEPLOYMENT.md)
 - For custom interactive widgets with anywidget [ANYWIDGET.md](references/ANYWIDGET.md)
+- For external editing and `--watch` mode [WATCHING.md](references/WATCHING.md)
+- For expensive notebooks (caching, lazy eval, mo.stop) [EXPENSIVE.md](references/EXPENSIVE.md)
+- For configuration (pyproject.toml, marimo.toml) [CONFIGURATION.md](references/CONFIGURATION.md)
+- For reactivity model (DAG, variable scoping, mutations) [REACTIVITY.md](references/REACTIVITY.md)
