@@ -1,13 +1,13 @@
 ---
-name: standardize-markdown
+name: doc-format
 description: Standardize formatting and style across a Markdown document
 disable-model-invocation: true
-model: sonnet
-effort: low
-argument-hint: "[path-or-preferences]"
+model: opus
+effort: xhigh
+argument-hint: "[doc-hint]"
 ---
 
-# Standardize Markdown
+# Doc Format
 
 Make the formatting and style of a Markdown document consistent throughout.
 This is a formatting-only pass — do not change the content, meaning, wording,
@@ -15,24 +15,21 @@ or structure of any section.
 
 ## Target
 
-Operate on the Markdown document most clearly in focus in the current
-conversation (the one being iteratively edited or discussed). If `$ARGUMENTS`
-is a path, operate on that file instead. If no document is clearly in focus,
-ask which file.
+`$ARGUMENTS` is a hint identifying which document to operate on. It need not
+be a literal path — it can be a path, a partial path, a filename fragment, or
+a description like "the auth setup doc."
 
-## Arguments
+- **Empty.** Operate on the Markdown document most clearly in focus in the
+  current conversation (the one being iteratively edited or discussed). If no
+  document is clearly in focus, ask which file.
+- **Non-empty.** Resolve the hint to a single `.md` file. If the hint matches
+  exactly one file, proceed. If it matches zero or multiple files, ask.
 
-`$ARGUMENTS` is optional and may be one of:
+## Convention Selection
 
-- **A file path.** Use that file as the target.
-- **A sentence of preferences.** Natural-language guidance for which
-  conventions to adopt (e.g., "flatten all nested bullets", "use bold
-  lead-ins on bullets", "no trailing periods").
-- **Empty.** Pick conventions automatically using the rule below.
-
-When no preferences are given, adopt the **majority (mode) style already
-present in the document** for each dimension. Where there is no clear
-majority, prefer the flatter, simpler option.
+For each formatting dimension below, adopt the **majority (mode) style
+already present in the document**. Where there is no clear majority, prefer
+the flatter, simpler option.
 
 ## Formatting Dimensions
 
@@ -57,15 +54,12 @@ per dimension and apply it everywhere.
 
 ## Workflow
 
-1. Read the entire target document.
-2. For each dimension above, determine the convention to apply:
-   - If `$ARGUMENTS` specifies a preference for that dimension, use it.
-   - Otherwise, adopt the majority (mode) style already present in the
-     document.
-   - If there is no clear majority, pick the flatter, simpler option.
-3. Edit the file in place to bring every section into line with the chosen
-   conventions.
-4. Report a short summary of the conventions chosen and what was changed.
+1. Resolve the target document from `$ARGUMENTS` per the **Target** rules.
+2. Read the entire target document.
+3. For each dimension, pick the convention per the **Convention Selection**
+   rule.
+4. Edit the file in place to bring every section into line.
+5. Report a short summary of the conventions chosen and what was changed.
 
 ## Rules
 
