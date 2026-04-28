@@ -141,18 +141,18 @@ When ordering constraints aren't natural, relabel samples post-hoc:
 # Simple relabeling based on component means
 def relabel_samples(idata):
     """Relabel mixture components by sorting means within each draw."""
-    mu = idata.posterior["mu"].values  # (chain, draw, component)
+    mu = idata["posterior"]["mu"].values  # (chain, draw, component)
 
     # Get sort indices for each draw
     sort_idx = np.argsort(mu, axis=-1)
 
     # Apply to all component-indexed variables
     for var in ["mu", "sigma", "w"]:
-        if var in idata.posterior:
-            vals = idata.posterior[var].values
+        if var in idata["posterior"].dataset:
+            vals = idata["posterior"][var].values
             # Gather along component axis using sort indices
             relabeled = np.take_along_axis(vals, sort_idx, axis=-1)
-            idata.posterior[var].values = relabeled
+            idata["posterior"][var].values = relabeled
 
     return idata
 ```
@@ -166,7 +166,7 @@ If you only care about **predictions** (not component interpretation), label swi
 ```python
 # Posterior predictive is invariant to label permutations
 with model:
-    pm.sample_posterior_predictive(idata, extend_inferencedata=True)
+    idata.update(pm.sample_posterior_predictive(idata))
 
 # This is unaffected by label switching
 az.plot_ppc(idata)
@@ -248,7 +248,7 @@ print(summary[["r_hat"]])
 
 ```python
 with model:
-    pm.sample_posterior_predictive(idata, extend_inferencedata=True)
+    idata.update(pm.sample_posterior_predictive(idata))
 
 # Check if mixture captures data distribution shape
 az.plot_ppc(idata, kind="kde")
@@ -277,7 +277,7 @@ az.plot_compare(comparison)
 
 **Caution**: LOO can be unreliable for mixture models due to high Pareto k values. Consider:
 - K-fold cross-validation when LOO diagnostics fail
-- WAIC as a secondary check
+- K-fold cross-validation as a secondary check
 - Domain knowledge about plausible number of components
 
 ### Assessing Component Separation
@@ -289,7 +289,7 @@ az.plot_posterior(idata, var_names=["mu"])
 # Check overlap between components
 # Well-separated components have non-overlapping HDIs
 summary = az.summary(idata, var_names=["mu"], hdi_prob=0.94)
-print(summary[["mean", "hdi_3%", "hdi_97%"]])
+print(summary[["mean", "eti_5.5%", "eti_94.5%"]])
 ```
 
 ---
@@ -298,4 +298,4 @@ print(summary[["mean", "hdi_3%", "hdi_97%"]])
 
 - [priors.md](priors.md) - Prior selection for mixture components
 - [diagnostics.md](diagnostics.md) - General convergence diagnostics
-- [gotchas.md](gotchas.md) - Common modeling pitfalls
+- [troubleshooting.md](troubleshooting.md) - Common modeling pitfalls

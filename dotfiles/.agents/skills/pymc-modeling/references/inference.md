@@ -318,7 +318,7 @@ with model:
 
     # Extract initial values
     init_vals = {
-        var.name: pathfinder_idata.posterior[var.name].mean(dim=["chain", "draw"]).values
+        var.name: pathfinder_idata["posterior"][var.name].mean(dim=["chain", "draw"]).values
         for var in model.free_RVs
     }
 

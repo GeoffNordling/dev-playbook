@@ -4,7 +4,7 @@ This guide covers ArviZ like an expert Bayesian modeler uses it: not just what e
 
 ## Table of Contents
 - [The Expert Workflow](#the-expert-workflow)
-- [InferenceData Fundamentals](#inferencedata-fundamentals)
+- [DataTree Fundamentals](#datatree-fundamentals)
 - [Phase 1: Immediate Post-Sampling Checks](#phase-1-immediate-post-sampling-checks)
 - [Phase 2: Deep Convergence Assessment](#phase-2-deep-convergence-assessment)
 - [Phase 3: Model Criticism](#phase-3-model-criticism)
@@ -30,63 +30,69 @@ An expert doesn't randomly try plots—they follow a systematic workflow:
 **Phase 2 (Deep)**: Are chains healthy? Rank plots, energy, autocorrelation, MCSE.
 **Phase 3 (Criticism)**: Does the model fit? PPC, LOO-PIT, residual analysis.
 **Phase 4 (Interpretation)**: What did we learn? Posteriors, forest plots, pair plots.
-**Phase 5 (Comparison)**: Which model is best? LOO-CV, WAIC, stacking.
+**Phase 5 (Comparison)**: Which model is best? LOO-CV, stacking.
 
 **Critical rule**: Never interpret parameters (Phase 4) until Phases 1-3 pass.
 
 ---
 
-## InferenceData Fundamentals
+## DataTree Fundamentals
 
-ArviZ uses `InferenceData`—an xarray-based container. Master this to unlock ArviZ's power.
+ArviZ 1.0 uses `DataTree` (from xarray-datatree) instead of `InferenceData`. The variable name `idata` is kept by convention. Access groups via dict syntax instead of attributes.
 
 ### Structure
 
 ```python
 import arviz as az
 
-# InferenceData groups:
-idata.posterior          # MCMC samples: (chain, draw, *dims)
-idata.posterior_predictive  # Predictions at observed points
-idata.prior              # Prior samples
-idata.prior_predictive   # Prior predictions
-idata.observed_data      # The actual data
-idata.sample_stats       # Sampler diagnostics (divergences, energy, etc.)
-idata.log_likelihood     # Pointwise log-likelihoods (for LOO/WAIC)
+# DataTree groups (access via dict syntax):
+dt = idata  # idata is actually a DataTree in ArviZ 1.0
+dt["posterior"]              # MCMC samples: (chain, draw, *dims)
+dt["posterior_predictive"]   # Predictions at observed points
+dt["prior"]                  # Prior samples
+dt["prior_predictive"]       # Prior predictions
+dt["observed_data"]          # The actual data
+dt["sample_stats"]           # Sampler diagnostics (divergences, energy, etc.)
+dt["log_likelihood"]         # Pointwise log-likelihoods (for LOO)
+
+# List available groups
+dt.children  # replaces .groups()
 ```
 
 ### Essential Operations
 
 ```python
 # Access a parameter (returns xarray.DataArray)
-beta = idata.posterior["beta"]
+beta = dt["posterior"].dataset["beta"]
+# Or shorthand (when group has a single dataset):
+beta = dt["posterior"]["beta"]
 
 # Convert to numpy
-beta_vals = idata.posterior["beta"].values  # shape: (chains, draws, *dims)
+beta_vals = dt["posterior"]["beta"].values  # shape: (chains, draws, *dims)
 
 # Flatten across chains
-beta_flat = idata.posterior["beta"].stack(sample=("chain", "draw")).values
+beta_flat = dt["posterior"]["beta"].stack(sample=("chain", "draw")).values
 
 # Select specific chains/draws
-idata.posterior["beta"].sel(chain=0, draw=slice(500, None))
+dt["posterior"]["beta"].sel(chain=0, draw=slice(500, None))
 
 # Compute statistics
-idata.posterior["beta"].mean(dim=["chain", "draw"])
-idata.posterior["beta"].quantile([0.025, 0.975], dim=["chain", "draw"])
+dt["posterior"]["beta"].mean(dim=["chain", "draw"])
+dt["posterior"]["beta"].quantile([0.025, 0.975], dim=["chain", "draw"])
 
 # Filter variables
-idata.posterior[["alpha", "beta"]]
+dt["posterior"][["alpha", "beta"]]
 ```
 
-### Combining InferenceData Objects
+### Combining DataTree Objects
 
 ```python
 # Add posterior predictive to existing idata
 with model:
-    pm.sample_posterior_predictive(idata, extend_inferencedata=True)
+    idata.update(pm.sample_posterior_predictive(idata))
 
-# Or manually extend
-idata.extend(pm.sample_posterior_predictive(idata))
+# Apply a function across all groups
+idata.map_over_datasets(some_function)  # replaces .map()
 
 # Merge separate idata objects
 idata_combined = az.concat([idata1, idata2], dim="chain")
@@ -103,7 +109,7 @@ idata = az.from_netcdf("results.nc")
 
 # Save with compression (for large files)
 idata.to_netcdf("results.nc", engine="h5netcdf",
-                encoding={var: {"zlib": True} for var in idata.posterior.data_vars})
+                encoding={var: {"zlib": True} for var in idata["posterior"].dataset.data_vars})
 ```
 
 ---
@@ -119,8 +125,9 @@ def quick_diagnostics(idata, var_names=None):
     """Run immediately after sampling."""
 
     # 1. Divergences (must be 0 or near 0)
-    n_div = idata.sample_stats["diverging"].sum().item()
-    n_samples = idata.sample_stats["diverging"].size
+    # In ArviZ 1.0, access DataTree groups via dict syntax
+    n_div = idata["sample_stats"].dataset["diverging"].sum().item()
+    n_samples = idata["sample_stats"].dataset["diverging"].size
     div_pct = 100 * n_div / n_samples
     print(f"Divergences: {n_div} ({div_pct:.2f}%)")
 
@@ -152,7 +159,7 @@ summary = az.summary(idata)
 
 # Key columns to check:
 # - mean, sd: posterior mean and standard deviation
-# - hdi_3%, hdi_97%: 94% highest density interval
+# - eti_5.5%, eti_94.5%: 89% equal-tailed interval (ArviZ 1.0 default)
 # - mcse_mean, mcse_sd: Monte Carlo standard error
 # - ess_bulk: effective sample size for the bulk of the distribution
 # - ess_tail: effective sample size for the tails (crucial for credible intervals)
@@ -201,11 +208,11 @@ az.plot_trace(idata, kind="rank_vlines")
 ### Checking Divergences
 
 ```python
-# Count divergences
-n_div = idata.sample_stats["diverging"].sum().item()
+# Count divergences (DataTree access pattern)
+n_div = idata["sample_stats"].dataset["diverging"].sum().item()
 
 # Percentage
-div_pct = 100 * idata.sample_stats["diverging"].mean().item()
+div_pct = 100 * idata["sample_stats"].dataset["diverging"].mean().item()
 
 # When did they occur? (during warmup vs sampling)
 # Divergences in sample_stats are from sampling phase only
@@ -331,7 +338,7 @@ The most important model criticism tool. Does the model generate data that looks
 ```python
 # First, generate posterior predictive samples
 with model:
-    pm.sample_posterior_predictive(idata, extend_inferencedata=True)
+    idata.update(pm.sample_posterior_predictive(idata))
 
 # Density overlay (default)
 az.plot_ppc(idata, kind="kde")
@@ -342,8 +349,9 @@ az.plot_ppc(idata, kind="cumulative")
 # Scatter plot (for continuous outcomes)
 az.plot_ppc(idata, kind="scatter")
 
-# Subsample for speed
-az.plot_ppc(idata, num_pp_samples=100)
+# Subset draws if needed for speed
+idata_subset = idata.sel(draw=slice(0, 100))
+az.plot_ppc(idata_subset, kind="cumulative")
 ```
 
 **What to look for (density/KDE):**
@@ -376,7 +384,7 @@ Sometimes you need to check specific features:
 # Define test statistics
 def tail_fraction(x):
     """Fraction of values > 95th percentile of observed data"""
-    threshold = np.percentile(idata.observed_data["y"].values, 95)
+    threshold = np.percentile(idata["observed_data"]["y"].values, 95)
     return (x > threshold).mean()
 
 def zero_fraction(x):
@@ -384,12 +392,12 @@ def zero_fraction(x):
     return (x == 0).mean()
 
 # Compute for observed data
-obs_stat = tail_fraction(idata.observed_data["y"].values)
+obs_stat = tail_fraction(idata["observed_data"]["y"].values)
 
 # Compute for each posterior predictive draw
 pp_stats = []
-for i in range(idata.posterior_predictive.dims["draw"]):
-    pp_sample = idata.posterior_predictive["y"].isel(draw=i).values.flatten()
+for i in range(idata["posterior_predictive"].dataset.dims["draw"]):
+    pp_sample = idata["posterior_predictive"]["y"].isel(draw=i).values.flatten()
     pp_stats.append(tail_fraction(pp_sample))
 
 # Compare
@@ -438,8 +446,8 @@ For regression models, check residuals:
 import numpy as np
 
 # Compute posterior mean predictions
-y_pred = idata.posterior_predictive["y"].mean(dim=["chain", "draw"])
-y_obs = idata.observed_data["y"]
+y_pred = idata["posterior_predictive"]["y"].mean(dim=["chain", "draw"])
+y_obs = idata["observed_data"]["y"]
 
 # Residuals
 residuals = y_obs - y_pred
@@ -617,14 +625,17 @@ Points above the 0.7 line are influential observations where LOO approximation i
 2. K-fold CV instead
 3. Investigating why these points are influential
 
-### az.waic: Widely Applicable Information Criterion
+### New LOO Functions in ArviZ 1.0
 
-```python
-waic_result = az.waic(idata)
-print(waic_result)
-```
-
-WAIC is an alternative to LOO. LOO is generally preferred (more robust), but WAIC is faster for large datasets.
+ArviZ 1.0 provides additional LOO utilities:
+- `az.loo_expectations()` - LOO expected values
+- `az.loo_metrics()` - compute multiple LOO metrics at once
+- `az.loo_r2()` - LOO-based R-squared
+- `az.loo_score()` - LOO scoring rules
+- `az.loo_kfold()` - K-fold cross-validation
+- `az.loo_moment_match()` - moment matching for high Pareto k observations
+- `az.loo_subsample()` - subsampled LOO for large datasets
+- `az.reloo()` - refit and recompute LOO for problematic observations
 
 ### az.compare: Model Comparison Table
 
@@ -676,8 +687,8 @@ weights = comparison["weight"]
 
 # Use weights for prediction averaging
 y_pred_avg = (
-    weights["linear"] * idata_linear.posterior_predictive["y"].mean(dim=["chain", "draw"]) +
-    weights["quadratic"] * idata_quad.posterior_predictive["y"].mean(dim=["chain", "draw"])
+    weights["linear"] * idata_linear["posterior_predictive"]["y"].mean(dim=["chain", "draw"]) +
+    weights["quadratic"] * idata_quad["posterior_predictive"]["y"].mean(dim=["chain", "draw"])
 )
 ```
 
@@ -690,8 +701,8 @@ y_pred_avg = (
 ```python
 import xarray as xr
 
-# Compute custom statistics
-posterior = idata.posterior
+# Compute custom statistics (DataTree access)
+posterior = idata["posterior"].dataset
 
 # Probability of effect > 0
 prob_positive = (posterior["beta"] > 0).mean(dim=["chain", "draw"])
@@ -726,7 +737,7 @@ summary = az.summary(
 )
 ```
 
-### Subsampling for Large InferenceData
+### Subsampling for Large DataTree Objects
 
 ```python
 # Thin samples (keep every nth)
@@ -734,7 +745,7 @@ idata_thin = idata.sel(draw=slice(None, None, 10))  # Keep every 10th
 
 # Random subset
 import numpy as np
-n_draws = idata.posterior.dims["draw"]
+n_draws = idata["posterior"].dataset.dims["draw"]
 keep_idx = np.random.choice(n_draws, size=500, replace=False)
 idata_subset = idata.sel(draw=keep_idx)
 ```
@@ -744,7 +755,7 @@ idata_subset = idata.sel(draw=keep_idx)
 ```python
 # Get flattened samples for external tools
 samples_dict = {
-    var: idata.posterior[var].stack(sample=("chain", "draw")).values
+    var: idata["posterior"][var].stack(sample=("chain", "draw")).values
     for var in ["alpha", "beta", "sigma"]
 }
 
@@ -795,7 +806,7 @@ az.plot_trace(idata, var_names=["theta"], compact=False)
 az.plot_pair(idata, var_names=["mu_group", "sigma_group"], divergences=True)
 ```
 
-**Fix:** Use non-centered parameterization (see [gotchas.md](gotchas.md))
+**Fix:** Use non-centered parameterization (see [troubleshooting.md](troubleshooting.md))
 
 ### Pattern: Poor Tail Sampling
 
@@ -860,8 +871,8 @@ az.style.use("arviz-darkgrid")  # or "arviz-whitegrid", "arviz-white"
 
 # Custom style
 az.rcParams["plot.max_subplots"] = 40
-az.rcParams["stats.hdi_prob"] = 0.94
-az.rcParams["stats.ic_scale"] = "log"  # for LOO/WAIC
+az.rcParams["stats.ci_prob"] = 0.89  # ArviZ 1.0 default: 0.89 ETI
+az.rcParams["stats.ic_scale"] = "log"  # for LOO
 ```
 
 ### Figure Sizing and Layout

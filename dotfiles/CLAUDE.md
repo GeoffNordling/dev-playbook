@@ -10,6 +10,6 @@
 - `.claude/skills/` — Claude Code skills
 - `.claude/rules/` — global rules (applied to every conversation)
 - `.claude/settings.json` — model, permissions, hooks
-- `.agents/skills/`, `.dhub/skills/` — externally managed skills
+- `.agents/skills/` — externally managed skills
 - `.bashrc.d/` — Bash snippets auto-sourced by Fedora's stock `~/.bashrc`
 - `bin/sync-dotfiles.sh` — Stow sync script

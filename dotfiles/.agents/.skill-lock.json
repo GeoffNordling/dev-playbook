@@ -18,6 +18,15 @@
       "skillFolderHash": "d2800038cd34bf3118014a940ab2dba74a39fd2e",
       "installedAt": "2026-03-13T13:19:45.303Z",
       "updatedAt": "2026-03-13T13:19:45.303Z"
+    },
+    "pymc-modeling": {
+      "source": "pymc-labs/pymc-modeling",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/pymc-labs/pymc-modeling.git",
+      "skillPath": "skills/pymc-modeling/SKILL.md",
+      "skillFolderHash": "83f41f700757c3225c189a78d186cebce312b13e",
+      "installedAt": "2026-04-28T21:07:18.001Z",
+      "updatedAt": "2026-04-28T21:07:18.001Z"
     }
   },
   "dismissed": {

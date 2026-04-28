@@ -12,20 +12,7 @@ Quick reference for post-sampling diagnostics and common issues. For comprehensi
 
 ---
 
-## Quick Symptom Reference
-
-| Symptom | Primary Cause | Solution |
-|---------|---------------|----------|
-| `ValueError: Shape mismatch` | Parameter vs observation dimensions | Index into group params: `alpha[group_idx]` |
-| `Initial evaluation failed: -inf` | Data outside distribution support | Check bounds; reduce jitter; use `init="adapt_diag"` |
-| `Mass matrix contains zeros` | Unscaled features or flat priors | Standardize predictors; use weakly informative priors |
-| High divergence count | Funnel geometry or hard boundaries | Non-centered parameterization; increase `target_accept` |
-| Poor GP convergence | Inappropriate lengthscale prior | InverseGamma prior based on data scale |
-| `TypeError` in model logic | Python `if/else` inside model | Use `pt.switch()` or `pytensor.ifelse` |
-| Slow sampling with discrete vars | NUTS incompatible with discrete | Marginalize discrete variables |
-| Inconsistent predictions | Different group factorization | Use `pd.Categorical` or `sort=True` in factorize |
-
----
+For model-building errors (shape mismatches, initialization failures, API issues), see [troubleshooting.md](troubleshooting.md).
 
 ## Quick Diagnostic Checklist
 
@@ -40,14 +27,14 @@ def check_sampling(idata, var_names=None):
     if var_names is None:
         var_names = ["~offset", "~raw"]
 
-    # 1. Divergences
-    n_div = idata.sample_stats["diverging"].sum().item()
-    n_samples = idata.sample_stats["diverging"].size
+    # 1. Divergences (DataTree access in ArviZ 1.0)
+    n_div = idata["sample_stats"].dataset["diverging"].sum().item()
+    n_samples = idata["sample_stats"].dataset["diverging"].size
     print(f"Divergences: {n_div} ({100*n_div/n_samples:.2f}%)")
 
     # 2. Summary with key diagnostics
     summary = az.summary(idata, var_names=var_names)
-    display_cols = ["mean", "sd", "hdi_3%", "hdi_97%", "ess_bulk", "ess_tail", "r_hat"]
+    display_cols = ["mean", "sd", "eti_5.5%", "eti_94.5%", "ess_bulk", "ess_tail", "r_hat"]
     print(summary[[c for c in display_cols if c in summary.columns]])
 
     # 3. Flag issues
@@ -76,7 +63,7 @@ az.plot_trace(idata, compact=True)
 az.plot_rank(idata, var_names=["beta", "sigma"])
 
 # 3. Pair plot with divergences (if any divergences)
-if idata.sample_stats["diverging"].sum() > 0:
+if idata["sample_stats"].dataset["diverging"].sum() > 0:
     az.plot_pair(idata, divergences=True)
 ```
 
@@ -230,7 +217,7 @@ az.plot_autocorr(idata, var_names=["beta"])
 **Diagnostic**:
 ```python
 with model:
-    pm.sample_posterior_predictive(idata, extend_inferencedata=True)
+    idata.update(pm.sample_posterior_predictive(idata))
 
 az.plot_ppc(idata, kind="cumulative")
 az.plot_loo_pit(idata, y="y")
@@ -269,37 +256,17 @@ print(f"Problematic observations: {bad_idx}")
 
 ### Computing Log-Likelihood with nutpie
 
-**Critical**: With nutpie sampler, log-likelihood is NOT stored automatically. You must compute it explicitly after sampling for LOO-CV and LOO-PIT to work.
+nutpie does not store log-likelihood automatically (it silently ignores `idata_kwargs`). Compute it explicitly after sampling. See SKILL.md § Inference for details.
 
-```python
-# After sampling with nutpie
-with model:
-    idata = pm.sample(nuts_sampler="nutpie", draws=1000, tune=1000)
-
-# ERROR: log_likelihood not found
-loo = az.loo(idata)  # TypeError: log likelihood not found
-
-# FIX: Compute log-likelihood explicitly
-with model:
-    pm.compute_log_likelihood(idata)
-
-# Now LOO-CV works
-loo = az.loo(idata, pointwise=True)
-az.plot_loo_pit(idata, y="y")
-```
-
-**Best practice**: Always compute log-likelihood after sampling with nutpie:
 ```python
 with model:
     idata = pm.sample(nuts_sampler="nutpie", ...)
     pm.compute_log_likelihood(idata)  # Required for LOO-CV
 ```
 
-**Note**: PyMC's native NUTS sampler stores log-likelihood automatically, but nutpie does not.
-
 ### plot_khat Requires LOO Object
 
-The `az.plot_khat()` function expects a LOO object (from `az.loo()`), not the InferenceData directly.
+The `az.plot_khat()` function expects a LOO object (from `az.loo()`), not the DataTree directly.
 
 ```python
 # ERROR: Incorrect khat data input
@@ -357,22 +324,11 @@ az.plot_compare(comparison)
 - `dse`: Standard error of difference
 - **Rule**: If `d_loo < 2*dse`, models are effectively equivalent
 
-### When to Use WAIC vs LOO
-
-- **LOO (default)**: More robust, handles outliers better
-- **WAIC**: Faster for large datasets, but less robust
-
-```python
-# WAIC alternative
-waic = az.waic(idata)
-```
-
 ---
 
 ## See Also
 
 - [troubleshooting.md](troubleshooting.md) - Comprehensive problem-solution guide
 - [arviz.md](arviz.md) - Comprehensive ArviZ usage guide
-- [gotchas.md](gotchas.md) - Common modeling pitfalls
 - [inference.md](inference.md) - Sampler selection and configuration
 - [priors.md](priors.md) - Prior selection guide

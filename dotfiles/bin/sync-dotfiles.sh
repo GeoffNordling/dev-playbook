@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sync dotfiles repo to $HOME using GNU Stow.
-# Manages: .claude/ (skills, rules, settings), .agents/, .dhub/
+# Manages: .claude/ (skills, rules, settings), .agents/, .bashrc.d/
 # Designed to run from cron every minute. Idempotent.
 #
 # 1. Removes broken symlinks (handles renames/deletions in the repo)
@@ -13,7 +13,7 @@ DOTFILES="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARGET="$HOME"
 
 # Directories that stow manages (relative to $TARGET)
-MANAGED_DIRS=(".claude" ".agents" ".dhub" ".bashrc.d")
+MANAGED_DIRS=(".claude" ".agents" ".bashrc.d")
 
 # Remove broken symlinks in managed directories
 for dir in "${MANAGED_DIRS[@]}"; do
