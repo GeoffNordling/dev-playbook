@@ -18,8 +18,7 @@ Run `ls` at the repo root to see the top-level file and directory structure.
 
 ## Step 2 — Discover what documentation exists
 
-Read the Files table in the repo documentation standard:
-`~/workspace/dev-playbook/standards/repo-documentation.md`
+Read the Files table in the [repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md).
 
 Check which of those files and directories exist in the current repo. Use
 separate tool calls or fault-tolerant commands (e.g., `ls dir1; ls dir2`)

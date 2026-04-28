@@ -14,7 +14,7 @@ The user provides free-form input describing what to implement or which area to 
 
 ## Critical Rules
 
-Do NOT modify tests. Tests were written by a separate agent session (`/sdd-red`) and represent the acceptance criteria derived from requirements. If a test seems wrong or unclear, stop and discuss with the user rather than changing it.
+Do NOT modify tests. Tests were written by a separate agent session (/sdd-red) and represent the acceptance criteria derived from requirements. If a test seems wrong or unclear, stop and discuss with the user rather than changing it.
 
 **Stop on test-imposed barriers.** When a failing test requires a change that
 would break other tests, or when the test suite has gaps that prevent clean
@@ -32,7 +32,7 @@ that deviate from the spec to accommodate test gaps are never acceptable.
 
 ## Workflow Context
 
-This skill is part of a spec-driven TDD workflow following SDD conventions. It typically runs in parallel with `/sdd-red` in a separate terminal — red produces tests, green implements against them. The user controls pacing across both agents.
+This skill is part of a spec-driven TDD workflow following SDD conventions. It typically runs in parallel with /sdd-red in a separate terminal — red produces tests, green implements against them. The user controls pacing across both agents.
 
 Check for test files the red agent has produced before starting each implementation batch.
 
@@ -78,7 +78,7 @@ When a bug arises during development:
 
 1. Flag to the user that the bug reveals a spec gap, describing the correct behavior
 2. Implement the fix
-3. Flag that a regression test is needed (`/sdd-red`)
+3. Flag that a regression test is needed (/sdd-red)
 
 Bugs are spec gaps, not just code errors. Each fix is an opportunity to make the spec more complete.
 

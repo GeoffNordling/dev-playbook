@@ -21,17 +21,17 @@ The user provides free-form input describing what feature or requirements to wri
 
 ## Critical Rule — Test Isolation
 
-Do NOT write real implementation code. Implementation happens in a separate agent session using `/sdd-green`.
+Do NOT write real implementation code. Implementation happens in a separate agent session using /sdd-green.
 
 Tests and implementation are written by separate agent contexts so that the tests express requirements independently from the code that satisfies them. This forces the implementation agent to write code that satisfies requirements as expressed in the tests, rather than writing tests that pass whatever code it happened to produce.
 
-**Stubs are created by the design phase.** The `/sdd-design` skill produces interface stubs whose signatures match each dsn's `Interface:` declarations exactly. `pytest-sdd`'s interface validator enforces this match at pytest collection time. Tests import from these stubs. If a stub is missing or its signature needs to change, propose a spec or design amendment to the user rather than creating or modifying stubs directly.
+**Stubs are created by the design phase.** The /sdd-design skill produces interface stubs whose signatures match each dsn's `Interface:` declarations exactly. `pytest-sdd`'s interface validator enforces this match at pytest collection time. Tests import from these stubs. If a stub is missing or its signature needs to change, propose a spec or design amendment to the user rather than creating or modifying stubs directly.
 
 **Modify the environment, don't work around it.** If the tests need something that doesn't exist (a fixture file, a directory structure, a test helper), create it. If a change requires updating the interface (adding a parameter, renaming a function), propose the change to the user. The functional spec and design spec are living documents; when the environment changes, update the specs to match. Always get user approval before modifying specs or interfaces.
 
 ## Workflow Context
 
-This skill is part of a spec-driven TDD workflow following SDD conventions. It typically runs in parallel with `/sdd-green` in a separate terminal — red produces tests, green implements against them. The user controls pacing across both agents.
+This skill is part of a spec-driven TDD workflow following SDD conventions. It typically runs in parallel with /sdd-green in a separate terminal — red produces tests, green implements against them. The user controls pacing across both agents.
 
 When your work is complete and approved, commit your changes and push the branch.
 

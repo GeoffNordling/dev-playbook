@@ -61,6 +61,8 @@ Files in the documentation hierarchy above (`CLAUDE.md`, `README.md`, `ROADMAP.m
 
 Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) use a target-based rule. The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
 
+This convention is borrowed from [Matt Pocock's published skills](https://github.com/mattpocock/skills); we install several of them, so aligning our authored skills with the same style keeps the ecosystem internally consistent.
+
 | Target | Style | Example |
 |---|---|---|
 | File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
