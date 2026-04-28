@@ -1,8 +1,5 @@
 # Deserialize
 
-Simulated specs for the `spec-tools` deserialize module. See
-[../README.md](../README.md) for the simulation's purpose.
-
 ## Feature
 
 ### Spec Deserialization

@@ -1,8 +1,5 @@
 # Discover
 
-Simulated specs for the `spec-tools` discover module. See
-[../README.md](../README.md) for the simulation's purpose.
-
 ## Feature
 
 ### Spec File Discovery

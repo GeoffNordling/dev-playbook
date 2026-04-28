@@ -53,6 +53,7 @@ Spec-driven development standards: philosophy, writing conventions, design layer
 |--------|----------|---------|
 | Spec standard | `sdd-standards/spec-standard.md` | Workspace spec standard: item anatomy, IDs, artifact types, coverage chain, keyword reference, obligation vocabulary, sentence templates, file organization |
 | Design layer | `sdd-standards/design-layer.md` | Commitment scope and the four design decision dimensions (`Data`, `API Shape`, `Algorithms`, `Composition`) |
+| Lessons | `sdd-standards/lessons.md` | Observations about the standard surfaced through use; resolutions land in the standard or its ADRs |
 
 ### Agent configuration (dotfiles/)
 
@@ -79,6 +80,15 @@ CLI utilities and shared libraries for workspace automation. See [tools/README.m
 |--------|----------|---------|
 | Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `skill-audit`, `test-privacy`, `workspace-backup`, `generate-pre-commit` |
 | Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |
+
+### Spec tools (spec-tools/)
+
+Programmatic representation of SDD spec artifacts: parse, traverse, modify, render. See [spec-tools/README.md](spec-tools/README.md).
+
+| Object | Location | Purpose |
+|--------|----------|---------|
+| Specs | `spec-tools/specs/` | `feat` / `req` / `dsn` items the package is built against |
+| Package | `spec-tools/src/spec_tools/` | In-memory model, deserialize, serialize, discover |
 
 ### SDD tools (sdd-tools/)
 

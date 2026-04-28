@@ -1,8 +1,5 @@
 # Model
 
-Simulated specs for the `spec-tools` model module. See
-[../README.md](../README.md) for the simulation's purpose.
-
 ## Feature
 
 ### In-memory Spec Model
