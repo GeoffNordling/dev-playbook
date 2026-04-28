@@ -1,55 +1,65 @@
 # Skills hygiene — working notes
 
-Working notes for an in-flight project to clean up the user's
-Claude Code / agent-skills setup. This file is the cold-start brief
-for any agent picking the work up later. Delete the file once task
-#27 (the external-skills workflow doc) is committed.
+A cold-start brief for any agent picking up the in-flight skills-hygiene
+cleanup. Read top-to-bottom and you should know the mission, current
+state, what's next in what order, why, and the background needed to act.
+
+Delete this file once #27 (the external-skills workflow doc) is committed.
 
 ## Mission
 
 Get the agent-skills ecosystem on this machine into a clean, documented
-state — authored skills refreshed, external skills installed via a
-proper dependency manager, duplicates removed, conventions reconciled,
-and a written workflow that stays good going forward.
+state — authored skills refreshed, external skills installed via a proper
+dependency manager, duplicates removed, conventions reconciled, and a
+written workflow that stays good going forward.
 
-## Where we are now (as of 2026-04-28)
+## Where we are now (2026-04-28)
 
-- All 12 of Matt's skills surveyed; 10 picked for adoption, 2 rejected.
-- Cross-reference convention question (#16) decided and implemented:
+- All 12 of Matt Pocock's skills surveyed; 10 picked for adoption,
+  2 rejected. Picks listed in Background.
+- Cross-reference convention decided and shipped:
   - Repo docs use uniform inline links with absolute `~/workspace/...`
     paths (audience-split rule removed).
-  - Skill bundles use Matt's target-based rule.
-  - `standards/repo-documentation.md` and `standards/skill-authoring.md`
-    updated and committed (`52f925b`).
-  - Authored skills swept for the new convention (5 files, 11 edits).
-    **Sweep is uncommitted** — pending user push.
-- Working notes have been rewritten as a cold-start brief because the
-  user is about to reset context.
+  - Skill bundles use a target-based rule (link = "go open this",
+    inline code = "this exists conceptually") borrowed from Matt's pattern.
+  - The rules now live in
+    [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+    and
+    [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md)
+    (committed in `52f925b`); authored skills swept to match (committed in
+    `b3cc9bd`).
 
-**Recommended next-step order:**
-1. **#23 Install Matt's skills** — cheap, file-placement only. The 6
-   that don't depend on his repo conventions (`tdd`, `caveman`,
-   `grill-me`, `grill-with-docs`, `improve-codebase-architecture`,
-   `zoom-out`) are immediately usable. The 4 convention-dependent ones
-   (`to-issues`, `to-prd`, `triage`, `setup-matt-pocock-skills`) can
-   install but wait on #15 for full utility.
-2. **#24 De-duplicate marimo-notebook** — quick housekeeping; no
+## What's next, in order
+
+1. **#24 De-duplicate `marimo-notebook`** — quick housekeeping; no
    dependency on other tasks.
-3. **#15 Plan adoption of Matt's repo conventions** — the biggest
-   piece. Walk Matt's prescribed conventions row-by-row, decide
+2. **#15 Plan adoption of Matt's repo conventions** — the biggest piece.
+   Walk Matt's prescribed conventions row-by-row, decide
    adopt-as-is / adapt / preserve-superset for each, plan retrofit of
-   active repos starting with dev-playbook itself.
-4. **#25 Refresh authored skills** (sdd-* content audit + skill-creator
-   vs write-a-skill comparison; cross-reference sweep portion already
-   done).
-5. **#26 Decide DHub ecosystem path**.
+   active repos starting with dev-playbook itself. Done before #23 so
+   that the convention-dependent skills land in a workspace already
+   configured for them.
+3. **#23 Install Matt's skills** — file-placement only, cheap. The 6
+   with no per-repo prerequisites (`tdd`, `caveman`, `grill-me`,
+   `grill-with-docs`, `improve-codebase-architecture`, `zoom-out`) are
+   immediately usable. The 4 convention-dependent ones (`to-issues`,
+   `to-prd`, `triage`, `setup-matt-pocock-skills`) become fully usable
+   once #15's retrofit reaches the target repo.
+4. **#25 Refresh authored skills** — sdd-* content audit and
+   skill-creator vs `write-a-skill` comparison. Cross-reference sweep
+   already done.
+5. **#26 Decide DHub ecosystem path** — consolidate or keep.
 6. **#27 Document external-skills workflow** — closes the project.
+
+Tasks #8 (survey Matt's skills) and #16 (cross-reference convention) are
+complete. #8's results live below in Background. #16's rules live in the
+two standards files linked above; no follow-up remains.
 
 ## Why now
 
-The user pivoted into this project after finishing a round of
-spec-tools work (committed and merged to main on 2026-04-28). Several
-forces motivate the cleanup:
+The user pivoted into this project after finishing a round of spec-tools
+work (committed and merged to main on 2026-04-28). Several forces motivate
+the cleanup:
 
 - The user's authored sdd-* skills are old, written before recent
   changes to the SDD standards and before lessons from the spec-tools
@@ -69,8 +79,8 @@ forces motivate the cleanup:
 
 ### The user's three skill ecosystems
 
-The user has GNU Stow managing `dotfiles/` symlinks into `$HOME`.
-There are three separate skill-loading conventions in play:
+The user has GNU Stow managing `dotfiles/` symlinks into `$HOME`. There
+are three separate skill-loading conventions in play:
 
 | Path under `dotfiles/` | Loaded by | Origin / management |
 |---|---|---|
@@ -100,47 +110,31 @@ What it does for us:
   `dotfiles/.agents/skills/<name>/`), and adds per-agent symlinks
   elsewhere as needed.
 - Maintains a lock file at `~/.agents/.skill-lock.json` (Stow-folded
-  to `dotfiles/.agents/.skill-lock.json`). Lock-file v3 records
-  source URL, ref, GitHub tree SHA (`skillFolderHash`), and install
+  to `dotfiles/.agents/.skill-lock.json`). Lock-file v3 records source
+  URL, ref, GitHub tree SHA (`skillFolderHash`), and install
   timestamps. The lock file is the source of truth for what's
   installed and pinned.
 
 The user is already using the CLI: marimo-team's `marimo-notebook` and
 `marimo-batch` were installed via this CLI on 2026-03-13.
 
-### The user's standards (relevant)
+### The user's standards
 
-- [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
-  — required and optional files in every repo (`CLAUDE.md`,
-  `README.md`, optional `ROADMAP.md`, `BUSINESS_CONTEXT.md`, `specs/`,
-  `docs/`, `docs/adr/`). Notably **no `CONTEXT.md`**.
-- Cross-reference convention: repo docs use uniform inline links with
-  absolute `~/workspace/...` paths (no audience split). Skill bundles
-  use a target-based rule (link = "go open this", inline code =
-  "this exists conceptually") borrowed from Matt's pattern. Linted by
-  `tools/bin/ref-check`.
-- Tactical work (bugs, tasks) lives in GitHub Issues. No `TODO.md` or
-  similar in-repo file.
-- [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md)
-  — default pytest conventions: structure, test doubles, fixtures.
-- [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md)
-  — frontmatter, file structure, body conventions. Defers to
-  `repo-documentation.md` for cross-reference style.
-- `sdd-standards/` — spec-driven-development standards (separate from
-  general standards).
+General standards live in
+[`~/workspace/dev-playbook/standards/`](~/workspace/dev-playbook/standards/)
+(repo documentation, testing conventions, skill authoring, and the
+cross-reference convention enforced by `tools/bin/ref-check`).
+Spec-driven-development standards live separately in
+[`~/workspace/dev-playbook/sdd-standards/`](~/workspace/dev-playbook/sdd-standards/).
+Read those for the current rules; #15 will amend them.
 
 ### The user's authored skills
 
-In `dotfiles/.claude/skills/`:
-
-- `agent-finished`, `code-quality-sweep`, `commit`, `doc-format`,
-  `doc-rewrite`, `em-dashes`, `orient`, `orient-workspace-meta`,
-  `prime-user-context`, `protocol-align-map-execute`, **`sdd-design`**,
-  **`sdd-func-reqs`**, **`sdd-green`**, **`sdd-red`**,
-  **`sdd-review`**, `skill-creator`.
-
-The bolded `sdd-*` ones are content-audit targets in #25. `skill-creator`
-gets compared to Matt's `write-a-skill` in #25.
+Authored skills live in `dotfiles/.claude/skills/`. Two are
+specifically called out by later tasks: the **sdd-\*** family
+(`sdd-design`, `sdd-func-reqs`, `sdd-green`, `sdd-red`, `sdd-review`)
+are content-audit targets in #25, and `skill-creator` gets compared
+against Matt's `write-a-skill` in #25.
 
 ### Matt Pocock's skills (12 total)
 
@@ -164,9 +158,9 @@ Final picks (10 adopt, 2 reject — accounts for all 12):
 
 - **Adopt:** `tdd`, `caveman`, `grill-me`, `grill-with-docs`,
   `improve-codebase-architecture`, `zoom-out`, `to-issues`, `to-prd`,
-  `triage`, `setup-matt-pocock-skills`
+  `triage`, `setup-matt-pocock-skills`.
 - **Reject:** `diagnose` ("too much"), `write-a-skill` (rejected as a
-  skill, but feeds the skill-creator comparison in #25)
+  skill, but feeds the skill-creator comparison in #25).
 
 Notes on classification:
 - `setup-matt-pocock-skills` is a one-time per-repo bootstrap, not a
@@ -175,34 +169,30 @@ Notes on classification:
 - The decision to adopt all 10 was made in advance: `tdd`,
   `grill-with-docs`, `improve-codebase-architecture`, `to-issues`,
   `to-prd`, and `triage` all read from Matt's domain docs / backlog
-  conventions, and the user does not want to run them in degraded
-  mode without those conventions in place. So adopting them implies
+  conventions, and the user does not want to run them in degraded mode
+  without those conventions in place. So adopting them implies
   adopting the conventions — see #15.
 
-## Plan — task list
+## Tasks
 
-Live status lives in the Claude Code task tracker. This file carries
-the reasoning. Each task points back to a section below.
+Live status lives in the Claude Code task tracker. The detail below
+carries the reasoning. Sections are in the recommended execution order.
 
-| # | Task | Status |
-|---|------|--------|
-| 8 | Survey Matt Pocock's skills | completed |
-| 16 | Compare Matt's md-linking convention | completed (standards updated, sweep done — uncommitted) |
-| 15 | Plan adoption of Matt's repo conventions | pending — biggest remaining piece |
-| 23 | Install chosen Matt skills | pending |
-| 24 | De-duplicate marimo-notebook | pending |
-| 25 | Refresh authored skills | partially done (cross-reference sweep complete; content audit pending) |
-| 26 | Decide DHub ecosystem path | pending |
-| 27 | Document external-skills workflow | pending — closes the project |
+### #24 De-duplicate marimo-notebook
 
-## Section per task
+**Status:** pending.
 
-### Survey Matt Pocock's skills (#8) — completed
+`marimo-notebook` exists in both:
+- `dotfiles/.agents/skills/marimo-notebook/` (Vercel-managed).
+- `dotfiles/.dhub/skills/marimo-team/marimo-notebook/` (older DHub).
 
-12 skills surveyed; 10 to adopt, 2 to reject. See "Matt Pocock's
-skills" in Background.
+Likely keep the Vercel copy (newer, lock-file-pinned, multi-agent).
+Remove the DHub duplicate. Update
+`dotfiles/.claude/rules/marimo.md` if the canonical path changes.
 
-### Plan adoption of Matt's repo conventions (#15) — pending
+### #15 Plan adoption of Matt's repo conventions
+
+**Status:** pending — biggest remaining piece.
 
 **Decision (made 2026-04-28):** adopt Matt's standard. The user does
 not want to run any of Matt's skills in degraded mode, so the
@@ -210,8 +200,8 @@ conventions those skills assume are coming with them.
 
 This task is about *how*, not *whether*. Plan the adoption so:
 - Documentation and scaffolding stay accurate end-to-end.
-- Any superset we already have (functionality Matt's standard
-  doesn't cover) is preserved.
+- Any superset we already have (functionality Matt's standard doesn't
+  cover) is preserved.
 - Active repos are retrofitted to the new convention with no broken
   cross-references or stale standards left behind.
 
@@ -283,53 +273,11 @@ Walk the table above row by row and decide:
   fork is the safer path so future `skills update` doesn't overwrite
   our edits.
 
-### Compare Matt's md-linking convention (#16) — completed
+### #23 Install chosen Matt skills
 
-**Decision (2026-04-28):**
-- **Repo docs** — use uniform inline links with absolute
-  `~/workspace/...` paths. The previous audience-split rule (Human
-  links / Agent backticks) was removed; it added complexity for token
-  savings the user judged not worth it.
-- **Skill bundles** — adopt Matt's target-based rule:
-  - Inline link with relative path → file inside the same skill bundle.
-  - Inline link with absolute `~/workspace/...` path → file at a
-    stable workspace location.
-  - Inline code → file in user's repo with varying location, or any
-    directory.
-  - Bare (no markup) → slash-skill invocations.
-- **Path style stays absolute** for ref-check compatibility. ref-check
-  is unchanged.
-
-**Implementation (committed in `52f925b`):**
-- Updated
-  [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md):
-  removed "Audience" → cross-reference-style coupling; replaced the
-  audience-based table with a single inline-link rule for repo docs;
-  added an "In skill bundles" subsection with the target-based table
-  and rationale (matches Matt for ecosystem consistency).
-- Updated
-  [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md):
-  added a Cross-References section that defers to the primary source.
-
-**Implementation — sweep (uncommitted, ready to commit):**
-- `orient/SKILL.md` — 1× backticked path → inline link.
-- `orient-workspace-meta/SKILL.md` — 2× backticked path → inline link.
-- `code-quality-sweep/SKILL.md` — 2× backticked path → inline link.
-- `sdd-red/SKILL.md` — 2× `` `/sdd-green` `` + 1× `` `/sdd-design` ``
-  → bare.
-- `sdd-green/SKILL.md` — 3× `` `/sdd-red` `` → bare.
-
-`ref-check` passes (38 references, all ok). `sync-dotfiles.sh` in
-`skill-creator/SKILL.md` stays backticked (script invocation, not a
-"go open this" reference).
-
-Matt's installed skills (`dotfiles/.agents/skills/`) already follow
-the new style by construction; no work needed there.
-
-### Install chosen Matt skills (#23) — pending
+**Status:** pending.
 
 For each picked skill: `npx skills add mattpocock/skills --skill <name>`.
-
 The CLI writes to `~/.agents/skills/<name>/`, which Stow-folds into
 `dotfiles/.agents/skills/`. The lock file at
 `dotfiles/.agents/.skill-lock.json` updates in place. Review the diff,
@@ -340,25 +288,16 @@ conventions for ours, or to remap `CONTEXT.md` reads), do that
 post-install in the dotfiles working tree and document the divergence
 so future `skills update` runs don't silently overwrite our edits.
 
-### De-duplicate marimo-notebook (#24) — pending
+### #25 Refresh authored skills
 
-`marimo-notebook` exists in both:
-- `dotfiles/.agents/skills/marimo-notebook/` (Vercel-managed)
-- `dotfiles/.dhub/skills/marimo-team/marimo-notebook/` (older DHub)
-
-Likely keep the Vercel copy (newer, lock-file-pinned, multi-agent).
-Remove the DHub duplicate. Update
-`dotfiles/.claude/rules/marimo.md` if the canonical path changes.
-
-### Refresh authored skills (#25) — partially done
+**Status:** partially done — cross-reference sweep complete; content
+audit pending.
 
 Audit user-authored skills in `dotfiles/.claude/skills/` against
 current practice and external inputs.
 
-**Cross-reference style sweep — done** (see #16 for details).
+**sdd-\* skills.** `sdd-{design,red,green,review,func-reqs}`. Inputs:
 
-**sdd-\* skills — pending.**
-`sdd-{design,red,green,review,func-reqs}`. Inputs:
 - [SDD standards index](~/workspace/dev-playbook/sdd-standards/README.md)
   — current standards.
 - `~/workspace/dev-playbook/sdd-standards/lessons.md` — lessons logged
@@ -370,14 +309,15 @@ current practice and external inputs.
 
 Identify what's stale vs. still load-bearing. Rewrite as needed.
 
-**`skill-creator` — pending.**
-`dotfiles/.claude/skills/skill-creator/`. Compare against Matt's
-`write-a-skill` (rejected for direct adoption but worth studying).
-Pull ideas about structure, progressive disclosure, bundled
+**`skill-creator`.** `dotfiles/.claude/skills/skill-creator/`. Compare
+against Matt's `write-a-skill` (rejected for direct adoption but worth
+studying). Pull ideas about structure, progressive disclosure, bundled
 resources, and any other patterns Matt uses that our skill doesn't.
 Update `skill-creator` with what fits.
 
-### Decide DHub ecosystem path (#26) — pending
+### #26 Decide DHub ecosystem path
+
+**Status:** pending.
 
 `dotfiles/.dhub/` is an older parallel skills system using
 `.version_cache.json` to track:
@@ -391,7 +331,9 @@ Decide:
 - Keep DHub as a separate documented track and refresh content in
   place.
 
-### Document external-skills workflow (#27) — pending
+### #27 Document external-skills workflow
+
+**Status:** pending — closes the project.
 
 The deliverable that closes this project. Short doc in dev-playbook
 explaining:
@@ -409,13 +351,13 @@ explaining:
 
 When committed, delete this working-notes file.
 
-## Conventions for working in this file
+## Working with this file
 
 - Update the per-task sections as decisions land. The task tracker
   carries status; the file carries the reasoning.
 - When a sub-instance of an existing theme surfaces (e.g. another
   Matt convention to evaluate), add it to the relevant section's
   table or list. Don't spawn a new top-level task for every example.
-- Keep the cold-start brief and "Where we are now" sections truthful
-  as the project evolves. A new agent should be able to read
-  top-to-bottom and pick up where things left off.
+- Keep the cold-start summary at the top truthful as the project
+  evolves. A new agent should be able to read top-to-bottom and pick
+  up where things left off.
