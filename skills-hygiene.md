@@ -36,27 +36,39 @@ standard, and a written workflow that stays good going forward.
   [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
   and
   [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md).
-- **Matt Pocock's skills surveyed.** 10 picked for adoption, 2 rejected.
-  Picks listed in Background.
+- **Matt Pocock's skills surveyed.** 9 picked for adoption, 3 rejected
+  (originally 10/2; `to-prd` moved to reject when its overlap with our
+  SDD spec layer surfaced — see #15 and the planned ADR-0006). Picks
+  listed in Background.
+- **Standards adoption decisions made (2026-04-28).** Walked Matt's
+  prescribed conventions row-by-row; per-convention decisions logged
+  in the #15 section below. Execution pending: standards amendments,
+  ADR rename to 4-digit, write `docs/adr/0006-no-matt-prd-workflow.md`,
+  uninstall `/to-prd`, run `setup-matt-pocock-skills` against
+  dev-playbook itself.
 
 ## What's next, in order
 
-1. **#15 Plan adoption of Matt's repo conventions** — the biggest piece.
-   Walk Matt's prescribed conventions row-by-row, decide
-   adopt-as-is / adapt / preserve-superset for each, plan retrofit of
-   active repos starting with dev-playbook itself. Done before #23 so
-   that the convention-dependent skills land in a workspace already
-   configured for them.
-2. **#23 Install Matt's skills** —
+1. **#15 execute** — Land standards amendments, rename ADRs to
+   4-digit, retrofit dev-playbook with `setup-matt-pocock-skills`,
+   write the no-PRD ADR. Concrete checklist in the #15 section below.
+   Done before #28 so the cookiecutter template propagates finalised
+   standards.
+2. **#28 update cookiecutter template** — Propagate the new
+   conventions (`docs/agents/`, `## Agent skills` block, ADR template
+   and 4-digit numbering) into `project-template/` so newly-generated
+   repos start compliant.
+3. **#23 install Matt's skills** —
    `npx skills@latest add mattpocock/skills --skill <name> -g -y` per
-   pick. The 6 with no per-repo prerequisites (`tdd`, `caveman`,
-   `grill-me`, `grill-with-docs`, `improve-codebase-architecture`,
-   `zoom-out`) are immediately usable. The 4 convention-dependent ones
-   (`to-issues`, `to-prd`, `triage`, `setup-matt-pocock-skills`) become
-   fully usable once #15's retrofit reaches the target repo.
-3. **#25 Refresh authored skills** — sdd-* content audit and
-   skill-creator vs `write-a-skill` comparison. Cross-reference sweep
-   already done.
+   pick. Install the 9 adopted skills (`tdd`, `caveman`, `grill-me`,
+   `grill-with-docs`, `improve-codebase-architecture`, `zoom-out`,
+   `to-issues`, `triage`, `setup-matt-pocock-skills`); skip `to-prd`.
+   The 3 convention-dependent ones (`to-issues`, `triage`,
+   `setup-matt-pocock-skills`) become fully usable once #15's retrofit
+   lands.
+4. **#25 refresh authored skills** — sdd-* content audit and
+   `skill-creator` vs `write-a-skill` comparison. Cross-reference
+   sweep already done.
 
 Closed tasks: #8 (survey Matt's skills, results in Background), #16
 (cross-reference convention), #24 (de-duplicate `marimo-notebook` —
@@ -132,21 +144,23 @@ came in two flavors: the unconditional 6 (no per-repo prerequisites)
 and the convention-dependent 4 (require `setup-matt-pocock-skills` to
 have been run in the target repo).
 
-Final picks (10 adopt, 2 reject — accounts for all 12):
+Final picks (9 adopt, 3 reject — accounts for all 12):
 
 - **Adopt:** `tdd`, `caveman`, `grill-me`, `grill-with-docs`,
-  `improve-codebase-architecture`, `zoom-out`, `to-issues`, `to-prd`,
-  `triage`, `setup-matt-pocock-skills`.
+  `improve-codebase-architecture`, `zoom-out`, `to-issues`, `triage`,
+  `setup-matt-pocock-skills`.
 - **Reject:** `diagnose` ("too much"), `write-a-skill` (rejected as a
-  skill, but feeds the skill-creator comparison in #25).
+  skill, but feeds the skill-creator comparison in #25), `to-prd`
+  (overlaps and conflicts with our SDD spec layer; see #15 and
+  ADR-0006 once written).
 
 Notes on classification:
 - `setup-matt-pocock-skills` is a one-time per-repo bootstrap, not a
   runtime skill. Frontmatter has `disable-model-invocation: true`. It
   scaffolds the per-repo files Matt's engineering skills read from.
-- The decision to adopt all 10 was made in advance: `tdd`,
-  `grill-with-docs`, `improve-codebase-architecture`, `to-issues`,
-  `to-prd`, and `triage` all read from Matt's domain docs / backlog
+- The decision to adopt the engineering picks was made in advance:
+  `tdd`, `grill-with-docs`, `improve-codebase-architecture`,
+  `to-issues`, and `triage` all read from Matt's domain docs / backlog
   conventions, and the user does not want to run them in degraded mode
   without those conventions in place. So adopting them implies
   adopting the conventions — see #15.
@@ -156,104 +170,99 @@ Notes on classification:
 Live status lives in the Claude Code task tracker. The detail below
 carries the reasoning. Sections are in the recommended execution order.
 
-### #15 Plan adoption of Matt's repo conventions
+### #15 Adopt Matt's repo conventions
 
-**Status:** pending — biggest remaining piece.
+**Status:** decisions made 2026-04-28; execution pending.
 
-**Decision (made 2026-04-28):** adopt Matt's standard. The user does
-not want to run any of Matt's skills in degraded mode, so the
-conventions those skills assume are coming with them.
+**Top-level decision:** adopt Matt's standard, with one rejection
+(PRD) and one adaptation (GitHub-only issue tracker). The user does
+not want to run Matt's skills in degraded mode, so the conventions
+those skills assume are coming with them — except where they conflict
+with workspace conventions we've committed to (notably SDD).
 
-This task is about *how*, not *whether*. Plan the adoption so:
-- Documentation and scaffolding stay accurate end-to-end.
-- Any superset we already have (functionality Matt's standard doesn't
-  cover) is preserved.
-- Active repos are retrofitted to the new convention with no broken
-  cross-references or stale standards left behind.
+#### Per-convention decisions
 
-#### Conventions Matt prescribes
-
-Built from `setup-matt-pocock-skills/SKILL.md` and the engineering
-skills' reads. Extend as more surface.
-
-| Convention | Source | Maps to in our standard |
+| Convention | Decision | Notes |
 |---|---|---|
-| `CONTEXT.md` at repo root (domain language / lexicon) | engineering skills | New file kind. Closest neighbor: `BUSINESS_CONTEXT.md` (different scope) and `specs/` (formal SDD) |
-| `CONTEXT-MAP.md` for monorepos pointing at per-context `CONTEXT.md` files | setup-matt-pocock-skills | New file kind |
-| `docs/adr/` for ADRs | setup-matt-pocock-skills | **Already in our standard** (optional, indexed by `docs/adr/README.md`) |
-| `docs/agents/` directory holding `backlog.md`, `triage-labels.md`, `domain.md` | setup-matt-pocock-skills | New directory and file kinds |
-| `## Agent skills` block in `CLAUDE.md` (or `AGENTS.md`) pointing at `docs/agents/*.md` | setup-matt-pocock-skills | New required block in `CLAUDE.md` |
-| Backlog backend: GitHub Issues, local markdown under `.scratch/<feature>/`, or "other" with freeform description | setup-matt-pocock-skills | We mandate GitHub Issues; need to either match or codify multi-backend support |
-| Triage label vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix` | setup-matt-pocock-skills, triage | New: we have no codified label vocabulary |
-| PRD format | to-prd, to-issues | New: user has never written a PRD |
-| Vertical-slice issue breakdown | to-issues | New: not codified |
-| Testing conventions inside `/tdd` skill body | tdd | Overlaps `standards/testing-conventions.md` |
+| `CONTEXT.md` (domain glossary at repo root) | Adopt | Lazy creation by `/grill-with-docs`; don't backfill upfront |
+| `CONTEXT-MAP.md` (multi-context monorepos) | Adopt as optional | dev-playbook stays single-context for now |
+| `docs/adr/` directory | Adopt | Plus our existing `docs/adr/README.md` index requirement |
+| ADR file naming | Adapt — rename | Existing `001-005` → `0001-0005` to match Matt's 4-digit convention |
+| ADR template | Adopt | 1-3 sentences; optional Status / Considered Options / Consequences |
+| ADR offer-criteria gate | Adopt | All three of: hard-to-reverse + surprising + real trade-off |
+| `docs/agents/` directory | Adopt | Per-repo agent config (issue-tracker, triage-labels, domain); distinct from workspace `standards/` |
+| `## Agent skills` block in `CLAUDE.md` | Adopt | Required when Matt's skills are configured for the repo |
+| Issue tracker backend | Adapt — GitHub-only | Drop `.scratch/` and "other" options; `setup-matt-pocock-skills` supports this as a built-in choice |
+| Triage label vocabulary (5 state + 2 category) | Adopt | New file `standards/triage-labels.md` |
+| PRD format and `/to-prd` workflow | **Reject** | Overlaps with SDD spec; document via `docs/adr/0006-no-matt-prd-workflow.md`; uninstall `/to-prd` |
+| Vertical-slice issue breakdown (tracer bullets, HITL/AFK, blocked-by) | Adopt | Combined with triage in single file `standards/issues-and-triage.md` |
+| `/tdd` testing conventions | Keep ours authoritative | Don't fork `/tdd`; one-line cross-reference in our standard |
+| Architecture vocabulary (Module/Interface/Depth/Seam/Adapter/Leverage/Locality) | Adopt implicitly | No standards change — vocabulary used in `improve-codebase-architecture` output |
 
-#### Our existing supersets (preserve)
+#### Forking decision
 
-Things we have that Matt's standard doesn't, and that we want to keep
-through the adoption.
+Do not fork any of Matt's skills. The only adaptation (GitHub-only)
+is supported by `setup-matt-pocock-skills` as a built-in choice.
+Revisit forking only if specific friction surfaces post-install.
 
-- **`BUSINESS_CONTEXT.md`** — distinct scope from `CONTEXT.md`
-  (business problem & stakeholders, not domain lexicon). Both can
-  coexist.
-- **`ROADMAP.md`** — strategic goals; Matt's standard has no
-  equivalent.
-- **`specs/` layer** — formal SDD requirements & design (see
-  `sdd-standards/`). Matt's standard has nothing comparable; this is
-  a workspace-specific superset.
-- **`standards/testing-conventions.md`** — separate, more prescriptive
-  than `/tdd`'s embedded conventions. Reconcile vs. replace TBD.
-- **`tools/bin/ref-check`** — link linter for our `~/workspace/...`
+#### Existing supersets preserved
+
+- **`BUSINESS_CONTEXT.md`** — distinct scope from `CONTEXT.md`. Both
+  can coexist.
+- **`ROADMAP.md`** — strategic goals; no Matt equivalent.
+- **`specs/` and `sdd-standards/`** — formal SDD requirements layer.
+  Matt rejects SDD; we keep it. The PRD rejection follows from this.
+- **`standards/testing-conventions.md`** — superset of `/tdd`; stays
+  authoritative.
+- **`tools/bin/ref-check`** — link linter for `~/workspace/...`
   cross-references.
-- **GNU Stow + dotfiles workflow** — orthogonal to Matt's standard;
-  unaffected.
+- **GNU Stow + dotfiles workflow** — orthogonal; unaffected.
 
-#### Per-convention adoption decisions (TBD)
+#### Execution checklist
 
-Walk the table above row by row and decide:
-- **Adopt as-is** — copy Matt's prescription verbatim into our standard.
-- **Adopt with our superset preserved** — Matt's prescription plus our
-  existing rule(s) on top.
-- **Adopt with adaptation** — Matt's prescription modified to fit our
-  workspace (e.g. backlog backend always GitHub for our repos, drop
-  the `.scratch/` option).
-
-#### Outputs
-
-- Amendments to
-  [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
-  — `CONTEXT.md`, `docs/agents/`, `## Agent skills` block, etc.
-- Possibly new files under `standards/` for triage labels and PRD
-  format.
-- Reconciliation pass on
-  [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md)
-  against `/tdd` (replace? merge? keep both?).
-- Retrofit plan for active repos. Order: dev-playbook itself first
-  (eat our own dog food), then `sdd-tools`, `sdd-simulation`,
-  `spec-tools`. For each: run `setup-matt-pocock-skills` (or fork it
-  if we adapted), backfill `CONTEXT.md`, and verify
-  `tools/bin/ref-check` still passes.
-- Decision on whether to use `setup-matt-pocock-skills` as-is or fork
-  it. If we adopt-with-adaptation on any of its scaffolded files, a
-  fork is the safer path so future `skills update` doesn't overwrite
-  our edits.
+1. Amend
+   [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+   — add `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/agents/` rows; update
+   `CLAUDE.md` scope to permit/require the `## Agent skills` block;
+   add 4-digit ADR numbering, 1-3-sentence template, and 3-criteria
+   offer-gate.
+2. Create `standards/triage-labels.md` — canonical 5-state + 2-category
+   vocabulary.
+3. Create `standards/issues-and-triage.md` — triage state machine plus
+   vertical-slice rules (tracer bullets, HITL/AFK, blocked-by).
+4. Add a one-line cross-reference in
+   [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md)
+   pointing at `/tdd` as the runtime workflow companion.
+5. Rename `docs/adr/00N-*.md` → `docs/adr/000N-*.md` for the existing
+   five ADRs; update the index in `docs/adr/README.md`.
+6. Write `docs/adr/0006-no-matt-prd-workflow.md` recording the PRD
+   rejection.
+7. Run `setup-matt-pocock-skills` against `~/workspace/dev-playbook/`
+   itself: single-context, GitHub backend, default labels. Scaffolds
+   `docs/agents/{issue-tracker,triage-labels,domain}.md` and the
+   `## Agent skills` block in `CLAUDE.md`.
+8. Edit the generated `docs/agents/issue-tracker.md` to drop the
+   "and PRDs" clause from Matt's seed (we don't use PRDs).
+9. Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
+   lazily on first ambiguity.
+10. Run `tools/bin/ref-check --all` and confirm clean.
 
 ### #23 Install chosen Matt skills
 
-**Status:** pending.
+**Status:** pending — depends on #15 landing.
 
-For each picked skill:
-`npx skills@latest add mattpocock/skills --skill <name> -g -y`. The CLI
-writes to `~/.agents/skills/<name>/`, which Stow-folds into
+Install each of the 9 adopted skills:
+`npx skills@latest add mattpocock/skills --skill <name> -g -y`.
+Skip `to-prd` (rejected — see ADR-0006). The CLI writes to
+`~/.agents/skills/<name>/`, which Stow-folds into
 `dotfiles/.agents/skills/`. The lock file at
 `dotfiles/.agents/.skill-lock.json` updates in place. Review the diff,
 then commit.
 
-If #15 decided we fork any skill (e.g. to swap Matt's testing
-conventions for ours, or to remap `CONTEXT.md` reads), do that
-post-install in the dotfiles working tree and document the divergence
-so future `skills update` runs don't silently overwrite our edits.
+No forking required (decided in #15). If post-install friction
+surfaces and we later fork a skill, do it in the dotfiles working
+tree and document the divergence so future `skills update` runs don't
+silently overwrite our edits.
 
 ### #25 Refresh authored skills
 
@@ -282,6 +291,36 @@ studying). Pull ideas about structure, progressive disclosure, bundled
 resources, and any other patterns Matt uses that our skill doesn't.
 Update `skill-creator` with what fits.
 
+### #28 Update cookiecutter project template
+
+**Status:** pending — depends on #15 landing.
+
+The cookiecutter at
+[`project-template/`](~/workspace/dev-playbook/project-template/)
+generates new repos. Once #15 finalises the conventions, the template
+must propagate them so newly-generated repos start in compliance.
+
+Concrete updates to
+`project-template/{{ cookiecutter.project_slug }}/`:
+
+- `CLAUDE.md` — add the `## Agent skills` block pointing at
+  `docs/agents/*.md`.
+- `docs/agents/` seed directory — bundle `issue-tracker.md` (GitHub
+  variant, with the "and PRDs" clause dropped), `triage-labels.md`
+  (default 5+2 vocabulary), and `domain.md` (single-context default,
+  copied from Matt's seed).
+- `docs/adr/` seed directory — empty except for `README.md` indexing
+  no ADRs yet.
+- Don't seed `CONTEXT.md` — keep lazy-creation discipline.
+- Verify `cookiecutter` still generates a valid repo end-to-end after
+  the changes.
+
+Cross-check the source files used to seed: they should ultimately
+match the canonical seeds bundled inside
+`dotfiles/.agents/skills/setup-matt-pocock-skills/` (post-#23) so the
+template doesn't drift from what `setup-matt-pocock-skills` would
+write into a fresh repo.
+
 ## Working with this file
 
 - Update the per-task sections as decisions land. The task tracker
@@ -292,4 +331,4 @@ Update `skill-creator` with what fits.
 - Keep the cold-start summary at the top truthful as the project
   evolves. A new agent should be able to read top-to-bottom and pick
   up where things left off.
-- Delete this file once #15, #23, and #25 are all complete.
+- Delete this file once #15, #23, #25, and #28 are all complete.
