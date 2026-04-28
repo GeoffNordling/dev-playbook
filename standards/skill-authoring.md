@@ -101,10 +101,15 @@ After the front matter, the body is Markdown.
 - Content decisions (what sections to include, what patterns to use) are
   made when authoring each skill, not prescribed by this standard.
 
+## Cross-References
+
+Skill bodies follow the workspace cross-reference standard. See the [skill-bundles section](~/workspace/dev-playbook/standards/repo-documentation.md#in-skill-bundles) for the target-based rules: inline links for files the reader should open, inline code for files mentioned by name, and bare invocations for slash-skills.
+
 ## References Directory
 
 For skills that need extensive reference material, place supplementary
-files in a `references/` subdirectory. Reference them from SKILL.md:
+files in a `references/` subdirectory. Reference them from SKILL.md per
+the cross-reference rule above:
 
 ```markdown
 See [UI.md](references/UI.md) for UI element details.

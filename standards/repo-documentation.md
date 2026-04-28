@@ -20,8 +20,7 @@ Every file in the documentation hierarchy has two properties.
 
 Who is expected to read the file. These are intended audiences, not access
 restrictions — a human may read CLAUDE.md; an agent may read a human-audience
-file. The distinction governs formatting conventions and cross-reference style
-(see [Cross-References](#cross-references) below).
+file.
 
 ### Presence
 
@@ -46,15 +45,29 @@ Whether the file is required or optional.
 
 ## Cross-References
 
-All cross-references `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links; anything else — e.g. backticked filenames like `conftest.py` or repo-relative paths — is treated as prose and ignored.
+Cross-references to a stable workspace location `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/dev-playbook/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links. Anything else — backticked filenames like `` `conftest.py` ``, repo-relative paths, slash-skill invocations like `/commit` — is treated as prose by `ref-check`.
 
-The file's audience determines the wrapper:
+How a reference is wrapped — inline link, inline code, or bare — depends on the file kind doing the referencing.
 
-| Audience | Cross-reference style |
-|---|---|
-| Human | Inline link with full path as target — e.g., `[Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md)`. |
-| Human + Agent | Same as Human. |
-| Agent | Full path as inline code — e.g., `` `~/workspace/dev-playbook/sdd-standards/spec-standard.md` ``. No inline links; they add syntax noise without adding information for an agent. |
+### In repo documentation
+
+Files in the documentation hierarchy above (`CLAUDE.md`, `README.md`, `ROADMAP.md`, `BUSINESS_CONTEXT.md`, files under `specs/` and `docs/`) use inline markdown links with the full path as the target:
+
+```markdown
+[Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+```
+
+### In skill bundles
+
+Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) use a target-based rule. The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
+
+| Target | Style | Example |
+|---|---|---|
+| File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
+| File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md)` |
+| File in the user's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
+| Directory | Inline code | `` `docs/adr/` `` |
+| Slash-skill invocation | Bare — no markup | `/commit` |
 
 ### Fenced code blocks
 
