@@ -4,62 +4,72 @@ A cold-start brief for any agent picking up the in-flight skills-hygiene
 cleanup. Read top-to-bottom and you should know the mission, current
 state, what's next in what order, why, and the background needed to act.
 
-Delete this file once #27 (the external-skills workflow doc) is committed.
-
 ## Mission
 
 Get the agent-skills ecosystem on this machine into a clean, documented
-state — authored skills refreshed, external skills installed via a proper
-dependency manager, duplicates removed, conventions reconciled, and a
-written workflow that stays good going forward.
+state — authored skills refreshed, external skills installed via a
+single dependency manager, conventions reconciled with Matt Pocock's
+standard, and a written workflow that stays good going forward.
 
 ## Where we are now (2026-04-28)
 
-- All 12 of Matt Pocock's skills surveyed; 10 picked for adoption,
-  2 rejected. Picks listed in Background.
-- Cross-reference convention decided and shipped:
-  - Repo docs use uniform inline links with absolute `~/workspace/...`
-    paths (audience-split rule removed).
-  - Skill bundles use a target-based rule (link = "go open this",
-    inline code = "this exists conceptually") borrowed from Matt's pattern.
-  - The rules now live in
-    [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
-    and
-    [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md)
-    (committed in `52f925b`); authored skills swept to match (committed in
-    `b3cc9bd`).
+- **Single skill registry.** The Vercel `skills` CLI is the only
+  installer. DHub has been decommissioned: `dhub-cli` PyPI tool
+  uninstalled, `dotfiles/.dhub/` removed, `.dhub` dropped from
+  `sync-dotfiles.sh` MANAGED_DIRS. Rationale: org-gated auth at
+  `pymc-labs--api.modal.run` (the prod registry restricts `dhub login`
+  to allowed GitHub orgs), single-vendor Modal infra risk, and every
+  DHub-published skill is also on GitHub and installable via Vercel.
+- **Skill management standard committed** in `58b25ae`:
+  [Skill management standard](~/workspace/dev-playbook/standards/skill-management.md)
+  covers locations, install/update/remove commands, and the
+  don't-edit-installed rule. Indexed in
+  [standards/README.md](~/workspace/dev-playbook/standards/README.md).
+- **External skills currently installed via Vercel**: `marimo-batch`,
+  `marimo-notebook`, `pymc-modeling`. Lock file at
+  `dotfiles/.agents/.skill-lock.json`.
+- **Cross-reference convention shipped earlier** (commit `52f925b`,
+  authored skills swept in `b3cc9bd`). Repo docs use uniform inline
+  links with absolute `~/workspace/...` paths; skill bundles use the
+  target-based rule (link = "go open this", inline code = "this exists
+  conceptually"). Rules in
+  [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+  and
+  [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md).
+- **Matt Pocock's skills surveyed.** 10 picked for adoption, 2 rejected.
+  Picks listed in Background.
 
 ## What's next, in order
 
-1. **#24 De-duplicate `marimo-notebook`** — quick housekeeping; no
-   dependency on other tasks.
-2. **#15 Plan adoption of Matt's repo conventions** — the biggest piece.
+1. **#15 Plan adoption of Matt's repo conventions** — the biggest piece.
    Walk Matt's prescribed conventions row-by-row, decide
    adopt-as-is / adapt / preserve-superset for each, plan retrofit of
    active repos starting with dev-playbook itself. Done before #23 so
    that the convention-dependent skills land in a workspace already
    configured for them.
-3. **#23 Install Matt's skills** — file-placement only, cheap. The 6
-   with no per-repo prerequisites (`tdd`, `caveman`, `grill-me`,
-   `grill-with-docs`, `improve-codebase-architecture`, `zoom-out`) are
-   immediately usable. The 4 convention-dependent ones (`to-issues`,
-   `to-prd`, `triage`, `setup-matt-pocock-skills`) become fully usable
-   once #15's retrofit reaches the target repo.
-4. **#25 Refresh authored skills** — sdd-* content audit and
+2. **#23 Install Matt's skills** —
+   `npx skills@latest add mattpocock/skills --skill <name> -g -y` per
+   pick. The 6 with no per-repo prerequisites (`tdd`, `caveman`,
+   `grill-me`, `grill-with-docs`, `improve-codebase-architecture`,
+   `zoom-out`) are immediately usable. The 4 convention-dependent ones
+   (`to-issues`, `to-prd`, `triage`, `setup-matt-pocock-skills`) become
+   fully usable once #15's retrofit reaches the target repo.
+3. **#25 Refresh authored skills** — sdd-* content audit and
    skill-creator vs `write-a-skill` comparison. Cross-reference sweep
    already done.
-5. **#26 Decide DHub ecosystem path** — consolidate or keep.
-6. **#27 Document external-skills workflow** — closes the project.
 
-Tasks #8 (survey Matt's skills) and #16 (cross-reference convention) are
-complete. #8's results live below in Background. #16's rules live in the
-two standards files linked above; no follow-up remains.
+Closed tasks: #8 (survey Matt's skills, results in Background), #16
+(cross-reference convention), #24 (de-duplicate `marimo-notebook` —
+content confirmed identical between Vercel and DHub before DHub was
+decommissioned), #26 (DHub ecosystem path — decommissioned), #27
+(external-skills workflow doc — committed as
+`standards/skill-management.md`).
 
 ## Why now
 
 The user pivoted into this project after finishing a round of spec-tools
-work (committed and merged to main on 2026-04-28). Several forces motivate
-the cleanup:
+work (committed and merged to main on 2026-04-28). Two motivators
+remain:
 
 - The user's authored sdd-* skills are old, written before recent
   changes to the SDD standards and before lessons from the spec-tools
@@ -67,66 +77,34 @@ the cleanup:
 - Matt Pocock published a public skills repository
   (github.com/mattpocock/skills). Several skills there are useful, and
   Matt's conventions are worth aligning with where we adopt his work.
-- An older parallel skills system (`.dhub/`, from PyMC Labs) has stale
-  content. At least one duplicate exists with the newer Vercel-managed
-  skills (`marimo-notebook` is in both `.agents/` and
-  `.dhub/marimo-team/`).
-- There is no written workflow for installing, updating, pinning, or
-  removing external skills. The decision-making and documentation gap
-  is itself one of the motivators.
 
 ## Background a fresh agent needs
 
-### The user's three skill ecosystems
+### Skill ecosystem on this machine
 
-The user has GNU Stow managing `dotfiles/` symlinks into `$HOME`. There
-are three separate skill-loading conventions in play:
+Two kinds of skills coexist in `dotfiles/`:
 
-| Path under `dotfiles/` | Loaded by | Origin / management |
+| Path under `dotfiles/` | Loaded by | Origin |
 |---|---|---|
-| `.claude/skills/` | Claude Code (only) | Authored by the user, hand-edited in dotfiles |
-| `.agents/skills/` | Multiple agents (claude-code, codex, cursor, amp, cline, gemini-cli, etc.) | Managed by Vercel-Labs `skills` CLI |
-| `.dhub/skills/` | DHub clients (PyMC Labs ecosystem) | Older bespoke version-cache system |
+| `.claude/skills/` | Claude Code only | Authored by the user, hand-edited |
+| `.agents/skills/` | ~50 agents (claude-code, codex, cursor, amp, gemini-cli, etc.) | Vercel `skills` CLI, pulled from GitHub |
 
-Stow tree-folding means `~/.claude/skills`, `~/.agents`, and `~/.dhub`
-are symlinks pointing into the user's `dotfiles/` git working tree.
-When a tool (or the user) writes to one of those paths, the file lands
-inside `dotfiles/` and is automatically git-tracked. **Edit the source
-in `dotfiles/`, never the symlink target.**
-
-### Vercel-Labs `skills` CLI
-
-`npm install -g skills` (currently at 1.5.2; we use it via
-`npx skills@latest …`). Marketed as "the open agent skills ecosystem",
-maintained by Vercel folks (`rauchg` and `quuu`). Supports 50+ AI
-agents.
-
-What it does for us:
-- `skills add <owner>/<repo> --list` — list skills in a remote repo
-  without installing.
-- `skills add <owner>/<repo> --skill <name>` — install one skill.
-- Default install is symlink mode: writes the canonical copy under
-  `~/.agents/skills/<name>/` (which Stow folds into
-  `dotfiles/.agents/skills/<name>/`), and adds per-agent symlinks
-  elsewhere as needed.
-- Maintains a lock file at `~/.agents/.skill-lock.json` (Stow-folded
-  to `dotfiles/.agents/.skill-lock.json`). Lock-file v3 records source
-  URL, ref, GitHub tree SHA (`skillFolderHash`), and install
-  timestamps. The lock file is the source of truth for what's
-  installed and pinned.
-
-The user is already using the CLI: marimo-team's `marimo-notebook` and
-`marimo-batch` were installed via this CLI on 2026-03-13.
+Stow tree-folding maps `~/.agents/` and `~/.claude/skills/` into the
+dotfiles repo. Edit the source in `dotfiles/`, never the symlink
+target. The
+[Skill management standard](~/workspace/dev-playbook/standards/skill-management.md)
+owns the install/update workflow.
 
 ### The user's standards
 
 General standards live in
 [`~/workspace/dev-playbook/standards/`](~/workspace/dev-playbook/standards/)
-(repo documentation, testing conventions, skill authoring, and the
-cross-reference convention enforced by `tools/bin/ref-check`).
-Spec-driven-development standards live separately in
+(repo documentation, testing conventions, skill authoring, skill
+management, Python conventions). Spec-driven-development standards live
+separately in
 [`~/workspace/dev-playbook/sdd-standards/`](~/workspace/dev-playbook/sdd-standards/).
-Read those for the current rules; #15 will amend them.
+Cross-references are linted by `tools/bin/ref-check --all`. Read those
+for the current rules; #15 will amend them.
 
 ### The user's authored skills
 
@@ -177,18 +155,6 @@ Notes on classification:
 
 Live status lives in the Claude Code task tracker. The detail below
 carries the reasoning. Sections are in the recommended execution order.
-
-### #24 De-duplicate marimo-notebook
-
-**Status:** pending.
-
-`marimo-notebook` exists in both:
-- `dotfiles/.agents/skills/marimo-notebook/` (Vercel-managed).
-- `dotfiles/.dhub/skills/marimo-team/marimo-notebook/` (older DHub).
-
-Likely keep the Vercel copy (newer, lock-file-pinned, multi-agent).
-Remove the DHub duplicate. Update
-`dotfiles/.claude/rules/marimo.md` if the canonical path changes.
 
 ### #15 Plan adoption of Matt's repo conventions
 
@@ -277,8 +243,9 @@ Walk the table above row by row and decide:
 
 **Status:** pending.
 
-For each picked skill: `npx skills add mattpocock/skills --skill <name>`.
-The CLI writes to `~/.agents/skills/<name>/`, which Stow-folds into
+For each picked skill:
+`npx skills@latest add mattpocock/skills --skill <name> -g -y`. The CLI
+writes to `~/.agents/skills/<name>/`, which Stow-folds into
 `dotfiles/.agents/skills/`. The lock file at
 `dotfiles/.agents/.skill-lock.json` updates in place. Review the diff,
 then commit.
@@ -315,42 +282,6 @@ studying). Pull ideas about structure, progressive disclosure, bundled
 resources, and any other patterns Matt uses that our skill doesn't.
 Update `skill-creator` with what fits.
 
-### #26 Decide DHub ecosystem path
-
-**Status:** pending.
-
-`dotfiles/.dhub/` is an older parallel skills system using
-`.version_cache.json` to track:
-- `pymc-labs/dhub-cli`
-- `pymc-labs/pymc-modeling`
-- `marimo-team/marimo-notebook` (duplicate, see #24)
-
-Decide:
-- Consolidate remaining DHub skills into the Vercel CLI flow (only
-  feasible if upstream sources are CLI-installable), **or**
-- Keep DHub as a separate documented track and refresh content in
-  place.
-
-### #27 Document external-skills workflow
-
-**Status:** pending — closes the project.
-
-The deliverable that closes this project. Short doc in dev-playbook
-explaining:
-
-- Where authored skills live (`dotfiles/.claude/skills/`).
-- Where external skills live (`dotfiles/.agents/skills/`,
-  `dotfiles/.dhub/skills/` if retained).
-- How the Vercel CLI installs and pins skills (lock file is the
-  source of truth).
-- Stow tree-folding integration (CLI writes land directly in
-  git-tracked dotfiles).
-- How to update / remove a skill.
-- Rationale for any DHub-vs-Vercel split decided in #26.
-- The fork-and-document pattern for skills we modify after install.
-
-When committed, delete this working-notes file.
-
 ## Working with this file
 
 - Update the per-task sections as decisions land. The task tracker
@@ -361,3 +292,4 @@ When committed, delete this working-notes file.
 - Keep the cold-start summary at the top truthful as the project
   evolves. A new agent should be able to read top-to-bottom and pick
   up where things left off.
+- Delete this file once #15, #23, and #25 are all complete.
