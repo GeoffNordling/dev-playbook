@@ -76,3 +76,7 @@ Use `unittest.mock` when you need to:
 - **Use fixtures for setup and teardown.** Standardize construction and cleanup through pytest fixtures rather than ad-hoc setup code in test bodies.
 - **Narrowest scope.** Use the narrowest fixture scope that works: function (default) > class > module > session. Shared state between tests causes flaky failures.
 - **Fixtures define the contract.** When writing tests before implementation, fixtures that construct objects (including fakes) serve as the interface contract for the green agent. Keep them minimal; only the parameters the spec implies.
+
+## See also
+
+The `/tdd` skill is the runtime workflow companion to this standard: red-green-refactor cycle, vertical-slice tracer bullets, and deep-modules patterns. This document is the canonical *what* (rules); `/tdd` is the *how* (workflow).

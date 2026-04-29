@@ -11,7 +11,7 @@ state — authored skills refreshed, external skills installed via a
 single dependency manager, conventions reconciled with Matt Pocock's
 standard, and a written workflow that stays good going forward.
 
-## Where we are now (2026-04-28)
+## Where we are now
 
 - **Single skill registry.** The Vercel `skills` CLI is the only
   installer. DHub has been decommissioned: `dhub-cli` PyPI tool
@@ -40,36 +40,34 @@ standard, and a written workflow that stays good going forward.
   (originally 10/2; `to-prd` moved to reject when its overlap with our
   SDD spec layer surfaced — see #15 and the planned ADR-0006). Picks
   listed in Background.
-- **Standards adoption decisions made (2026-04-28).** Walked Matt's
-  prescribed conventions row-by-row; per-convention decisions logged
-  in the #15 section below. Execution pending: standards amendments,
-  ADR rename to 4-digit, run `setup-matt-pocock-skills` against
-  dev-playbook, uninstall `/to-prd`, then write a retrospective
-  ADR-0006 covering both the Matt-conventions adoption and the PRD
-  rejection.
+- **Per-convention decisions logged.** See the #15 decisions table.
+- **Standards rewrite landed (#15 steps 1-4).** New
+  [Issue management standard](~/workspace/dev-playbook/standards/issue-management.md);
+  [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+  updated; `/tdd` cross-ref added in
+  [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md).
+  Steps 5-10 pending.
+- **`ref-check` has one known-broken link** — `repo-documentation.md`
+  points at `grill-with-docs`'s `ADR-FORMAT.md`, which resolves once #23
+  installs that skill.
 
 ## What's next, in order
 
-1. **#15 standards rewrite** — Amend `repo-documentation.md`; create
-   `triage-labels.md` and `issues-and-triage.md`; cross-reference
-   `testing-conventions.md` → `/tdd`. Steps 1-4 of the #15 checklist.
-2. **#15 dev-playbook implementation** — Rename existing ADRs to
+1. **#15 dev-playbook implementation** — Rename existing ADRs to
    4-digit; install and run `setup-matt-pocock-skills` against
    dev-playbook; edit the generated `issue-tracker.md`; defer
    `CONTEXT.md` creation; run `ref-check --all`. Steps 5-9 of the #15
    checklist.
-3. **#15 ADR tie-off** — Interview the user for reasons, then write
+2. **#15 ADR tie-off** — Interview the user for reasons, then write
    `docs/adr/0006-adopt-matt-pocock-conventions.md` retrospectively,
    covering both the broad adoption and the PRD rejection. Step 10.
-4. **#23 install remaining Matt skills, #28 update cookiecutter** —
+3. **#23 install remaining Matt skills, #28 update cookiecutter** —
    Install the other 8 adopted skills (skip `to-prd`); propagate the
-   conventions (`docs/agents/`, `## Agent skills` block, ADR template
-   and 4-digit numbering) into `project-template/` so newly-generated
-   repos start compliant.
-5. **#25 refresh authored skills** — sdd-* content audit and
+   conventions into `project-template/`.
+4. **#25 refresh authored skills** — sdd-* content audit and
    `skill-creator` vs `write-a-skill` comparison. Last so any
    conventions that shake out during the earlier phases inform the
-   audit. Cross-reference sweep already done.
+   audit.
 
 Closed tasks: #8 (survey Matt's skills, results in Background), #16
 (cross-reference convention), #24 (de-duplicate `marimo-notebook` —
@@ -81,8 +79,7 @@ decommissioned), #26 (DHub ecosystem path — decommissioned), #27
 ## Why now
 
 The user pivoted into this project after finishing a round of spec-tools
-work (committed and merged to main on 2026-04-28). Two motivators
-remain:
+work. Two motivators remain:
 
 - The user's authored sdd-* skills are old, written before recent
   changes to the SDD standards and before lessons from the spec-tools
@@ -173,7 +170,7 @@ carries the reasoning. Sections are in the recommended execution order.
 
 ### #15 Adopt Matt's repo conventions
 
-**Status:** decisions made 2026-04-28; execution pending.
+**Status:** decisions logged; standards rewrite (steps 1-4) done; steps 5-10 pending.
 
 **Top-level decision:** adopt Matt's standard, with one rejection
 (PRD) and one adaptation (GitHub-only issue tracker). The user does
@@ -194,9 +191,9 @@ with workspace conventions we've committed to (notably SDD).
 | `docs/agents/` directory | Adopt | Per-repo agent config (issue-tracker, triage-labels, domain); distinct from workspace `standards/` |
 | `## Agent skills` block in `CLAUDE.md` | Adopt | Required when Matt's skills are configured for the repo |
 | Issue tracker backend | Adapt — GitHub-only | Drop `.scratch/` and "other" options; `setup-matt-pocock-skills` supports this as a built-in choice |
-| Triage label vocabulary (5 state + 2 category) | Adopt | New file `standards/triage-labels.md` |
+| Triage label vocabulary (5 state + 2 category) | Adopt | Lives in new file `standards/issue-management.md` (vocabulary section) |
 | PRD format and `/to-prd` workflow | **Reject** | Overlaps with SDD spec; uninstall `/to-prd`; documented retrospectively in ADR-0006 alongside the broader Matt-conventions adoption |
-| Vertical-slice issue breakdown (tracer bullets, HITL/AFK, blocked-by) | Adopt | Combined with triage in single file `standards/issues-and-triage.md` |
+| Vertical-slice issue breakdown (tracer bullets, HITL/AFK, blocked-by) | Adopt | Lives in `standards/issue-management.md` (slice section); single-file consolidation with triage labels and state machine |
 | `/tdd` testing conventions | Keep ours authoritative | Don't fork `/tdd`; one-line cross-reference in our standard |
 | Architecture vocabulary (Module/Interface/Depth/Seam/Adapter/Leverage/Locality) | Adopt implicitly | No standards change — vocabulary used in `improve-codebase-architecture` output |
 
@@ -221,19 +218,15 @@ Revisit forking only if specific friction surfaces post-install.
 
 #### Execution checklist
 
-1. Amend
-   [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
-   — add `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/agents/` rows; update
-   `CLAUDE.md` scope to permit/require the `## Agent skills` block;
-   add 4-digit ADR numbering, 1-3-sentence template, and 3-criteria
-   offer-gate.
-2. Create `standards/triage-labels.md` — canonical 5-state + 2-category
-   vocabulary.
-3. Create `standards/issues-and-triage.md` — triage state machine plus
-   vertical-slice rules (tracer bullets, HITL/AFK, blocked-by).
-4. Add a one-line cross-reference in
+1. ✅ Amend
+   [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md).
+2. ✅ Create
+   [Issue management standard](~/workspace/dev-playbook/standards/issue-management.md).
+3. ✅ Cross-reference
    [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md)
-   pointing at `/tdd` as the runtime workflow companion.
+   → `/tdd`.
+4. ✅ Update
+   [standards index](~/workspace/dev-playbook/standards/README.md).
 5. Rename `docs/adr/00N-*.md` → `docs/adr/000N-*.md` for the existing
    five ADRs; update the index in `docs/adr/README.md`.
 6. Install `setup-matt-pocock-skills`
@@ -247,7 +240,9 @@ Revisit forking only if specific friction surfaces post-install.
    "and PRDs" clause from Matt's seed (we don't use PRDs).
 8. Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
    lazily on first ambiguity.
-9. Run `tools/bin/ref-check --all` and confirm clean.
+9. Run `tools/bin/ref-check --all`. The `grill-with-docs/ADR-FORMAT.md`
+   link in `repo-documentation.md` will still be broken at this point;
+   it resolves once #23 installs the skill.
 10. Write `docs/adr/0006-adopt-matt-pocock-conventions.md`
     retrospectively, capturing both (a) the broad decision to adopt
     Matt's conventions and (b) the rejection of the PRD workflow.
