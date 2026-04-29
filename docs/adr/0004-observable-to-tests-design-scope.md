@@ -1,11 +1,11 @@
-# ADR-004: Observable-to-Tests Design Scope and Machine-Validated Interfaces
+# ADR-0004: Observable-to-Tests Design Scope and Machine-Validated Interfaces
 
 **Date:** 2026-04-19
 **Status:** Accepted
 
 ## Context
 
-The custom SDD workflow established in [ADR-001](001-adopt-openfasttrace.md), [ADR-002](002-evaluate-spec-kit-retain-custom-sdd.md), and [ADR-003](003-evaluate-sdd-community-landscape.md) leaves three gaps that became apparent during use.
+The custom SDD workflow established in [ADR-0001](0001-adopt-openfasttrace.md), [ADR-0002](0002-evaluate-spec-kit-retain-custom-sdd.md), and [ADR-0003](0003-evaluate-sdd-community-landscape.md) leaves three gaps that became apparent during use.
 
 **The design-layer framing was imprecise.** The current [design-layer.md](../../sdd-standards/design-layer.md) presents design items as serving a *primary* role of "naming the interfaces that tests target" and a *secondary* role of recording design decisions. The split blurs what belongs in a dsn versus what belongs in code, particularly for greenfield work where committing to a specific class or function felt premature before the code existed. The same imprecision pushed authors toward verbose disclaimers about what a dsn was not constraining, which scaled poorly.
 
@@ -71,4 +71,4 @@ Brownfield reconnaissance output — why the design extends `FooParser` rather t
 - `sdd-func-reqs` and `sdd-issue-coordinate` are audited; substantive changes expected to be zero.
 - A follow-up issue is opened: `pytest-sdd` refactor for modular hosting of OFT parsing, coverage graph, `Interface:` parsing, introspection validator, test-privacy check, and reporting. Refactor plan is required before code.
 - Ruff `SLF001` is enabled in both `tools/pyproject.toml` and `sdd-tools/pyproject.toml`.
-- The deferred directions from [ADR-003](003-evaluate-sdd-community-landscape.md) (adversarial review, replanning phase, `dec` artifact type) remain open; none are addressed here.
+- The deferred directions from [ADR-0003](0003-evaluate-sdd-community-landscape.md) (adversarial review, replanning phase, `dec` artifact type) remain open; none are addressed here.

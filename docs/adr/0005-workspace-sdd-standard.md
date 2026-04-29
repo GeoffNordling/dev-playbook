@@ -1,4 +1,4 @@
-# ADR-005: Workspace SDD Standard
+# ADR-0005: Workspace SDD Standard
 
 **Date:** 2026-04-24
 **Status:** Accepted
@@ -81,15 +81,15 @@ A simple spec is a single Markdown file. A complex spec is a directory containin
 - `sdd-standards/` contains three files: `README.md`, `spec-standard.md`, `design-layer.md`.
 - Root `README.md`, the `standards/*.md` files (BCP 14 boilerplate), and the SDD skills (`sdd-red`, `sdd-review`) link to `spec-standard.md` anchors.
 
-### Changes from ADR-004
+### Changes from ADR-0004
 
-ADR-004's "Four principles for design items" framing (single role, observable-to-tests scope, commitment by naming, design-agent ownership of structure) is reabsorbed:
+ADR-0004's "Four principles for design items" framing (single role, observable-to-tests scope, commitment by naming, design-agent ownership of structure) is reabsorbed:
 
 - The commitment framing in `design-layer.md` replaces the four principles.
 - `Interface:` is now an optional `dsn` keyword (previously required on any `dsn` naming a public surface). The machinery — strict-equality signature validation at pytest collection time, the annotation convention — is unchanged.
 - `Interface:` is a structural commitment, not a verification field. Behavioral verification still terminates through a test or `AgentReview:`.
 
-ADR-004's other commitments (public-only testing enforcement via Ruff `SLF001` plus test-privacy AST check; the `Interface:` validator algorithm and annotation convention) stand unchanged.
+ADR-0004's other commitments (public-only testing enforcement via Ruff `SLF001` plus test-privacy AST check; the `Interface:` validator algorithm and annotation convention) stand unchanged.
 
 ### Implementation
 

@@ -41,37 +41,31 @@ standard, and a written workflow that stays good going forward.
   SDD spec layer surfaced — see #15 and the planned ADR-0006). Picks
   listed in Background.
 - **Per-convention decisions logged.** See the #15 decisions table.
-- **Standards rewrite landed (#15 steps 1-4).** New
-  [Issue management standard](~/workspace/dev-playbook/standards/issue-management.md);
-  [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
-  updated; `/tdd` cross-ref added in
-  [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md).
-  Steps 5-10 pending.
+- **#15 closed.** Standards rewrite landed (steps 1-4); ADR
+  rename to 4-digit done; `setup-matt-pocock-skills` installed and run
+  against dev-playbook (steps 6-7); `CONTEXT.md` deferred (step 8);
+  `ref-check` clean apart from the known #23-resolves link (step 9);
+  [ADR-0006](~/workspace/dev-playbook/docs/adr/0006-adopt-matt-pocock-conventions.md)
+  written retrospectively (step 10).
 - **`ref-check` has one known-broken link** — `repo-documentation.md`
   points at `grill-with-docs`'s `ADR-FORMAT.md`, which resolves once #23
   installs that skill.
 
 ## What's next, in order
 
-1. **#15 dev-playbook implementation** — Rename existing ADRs to
-   4-digit; install and run `setup-matt-pocock-skills` against
-   dev-playbook; edit the generated `issue-tracker.md`; defer
-   `CONTEXT.md` creation; run `ref-check --all`. Steps 5-9 of the #15
-   checklist.
-2. **#15 ADR tie-off** — Interview the user for reasons, then write
-   `docs/adr/0006-adopt-matt-pocock-conventions.md` retrospectively,
-   covering both the broad adoption and the PRD rejection. Step 10.
-3. **#23 install remaining Matt skills, #28 update cookiecutter** —
+1. **#23 install remaining Matt skills, #28 update cookiecutter** —
    Install the other 8 adopted skills (skip `to-prd`); propagate the
    conventions into `project-template/`.
-4. **#25 refresh authored skills** — sdd-* content audit and
+2. **#25 refresh authored skills** — sdd-* content audit and
    `skill-creator` vs `write-a-skill` comparison. Last so any
    conventions that shake out during the earlier phases inform the
    audit.
 
-Closed tasks: #8 (survey Matt's skills, results in Background), #16
-(cross-reference convention), #24 (de-duplicate `marimo-notebook` —
-content confirmed identical between Vercel and DHub before DHub was
+Closed tasks: #8 (survey Matt's skills, results in Background), #15
+(adopt Matt's repo conventions; see
+[ADR-0006](~/workspace/dev-playbook/docs/adr/0006-adopt-matt-pocock-conventions.md)),
+#16 (cross-reference convention), #24 (de-duplicate `marimo-notebook`
+— content confirmed identical between Vercel and DHub before DHub was
 decommissioned), #26 (DHub ecosystem path — decommissioned), #27
 (external-skills workflow doc — committed as
 `standards/skill-management.md`).
@@ -170,7 +164,7 @@ carries the reasoning. Sections are in the recommended execution order.
 
 ### #15 Adopt Matt's repo conventions
 
-**Status:** decisions logged; standards rewrite (steps 1-4) done; steps 5-10 pending.
+**Status:** closed.
 
 **Top-level decision:** adopt Matt's standard, with one rejection
 (PRD) and one adaptation (GitHub-only issue tracker). The user does
@@ -227,28 +221,28 @@ Revisit forking only if specific friction surfaces post-install.
    → `/tdd`.
 4. ✅ Update
    [standards index](~/workspace/dev-playbook/standards/README.md).
-5. Rename `docs/adr/00N-*.md` → `docs/adr/000N-*.md` for the existing
-   five ADRs; update the index in `docs/adr/README.md`.
-6. Install `setup-matt-pocock-skills`
+5. ✅ Rename `docs/adr/00N-*.md` → `docs/adr/000N-*.md` for the
+   existing five ADRs; update the index in `docs/adr/README.md`.
+6. ✅ Install `setup-matt-pocock-skills`
    (`npx skills@latest add mattpocock/skills --skill setup-matt-pocock-skills -g -y`)
    and run it against `~/workspace/dev-playbook/` itself:
    single-context, GitHub backend, default labels. Scaffolds
    `docs/agents/{issue-tracker,triage-labels,domain}.md` and the
    `## Agent skills` block in `CLAUDE.md`. The remaining 8 skills are
    installed later in #23.
-7. Edit the generated `docs/agents/issue-tracker.md` to drop the
+7. ✅ Edit the generated `docs/agents/issue-tracker.md` to drop the
    "and PRDs" clause from Matt's seed (we don't use PRDs).
-8. Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
+8. ✅ Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
    lazily on first ambiguity.
-9. Run `tools/bin/ref-check --all`. The `grill-with-docs/ADR-FORMAT.md`
-   link in `repo-documentation.md` will still be broken at this point;
-   it resolves once #23 installs the skill.
-10. Write `docs/adr/0006-adopt-matt-pocock-conventions.md`
+9. ✅ Run `tools/bin/ref-check --all`. The `grill-with-docs/ADR-FORMAT.md`
+   link in `repo-documentation.md` is still broken; it resolves once
+   #23 installs the skill.
+10. ✅ Write `docs/adr/0006-adopt-matt-pocock-conventions.md`
     retrospectively, capturing both (a) the broad decision to adopt
-    Matt's conventions and (b) the rejection of the PRD workflow.
-    Interview the user for reasons before drafting — do not pre-fill
-    the rationale. Split into two ADRs only if the reasoning diverges
-    enough to warrant it.
+    Matt's conventions and (b) the rejection of the PRD workflow. The
+    SDD-extension reasoning is the load-bearing rationale for the PRD
+    rejection; the "repo is software, in words" framing is the
+    rationale for the broad adoption.
 
 ### #23 Install chosen Matt skills
 

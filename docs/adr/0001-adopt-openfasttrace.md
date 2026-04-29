@@ -1,4 +1,4 @@
-# ADR-001: Adopt OpenFastTrace for Spec Traceability
+# ADR-0001: Adopt OpenFastTrace for Spec Traceability
 
 **Date:** 2026-04-09
 **Status:** Accepted

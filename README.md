@@ -64,7 +64,7 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 | Claude Code skills | `dotfiles/.claude/skills/` | Workflow automation, tool wrappers, etc. |
 | Global rules | `dotfiles/.claude/rules/` | Applied to every conversation |
 | Global settings | `dotfiles/.claude/settings.json` | Model, permissions, hooks |
-| Externally managed skills | `dotfiles/.agents/skills/`, `dotfiles/.dhub/skills/` | Externally managed skills |
+| Externally managed skills | `dotfiles/.agents/skills/` | Externally managed skills |
 
 ### Project template (project-template/)
 

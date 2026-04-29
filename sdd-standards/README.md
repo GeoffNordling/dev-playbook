@@ -10,7 +10,7 @@ all rules in this directory apply.
 spec has authority, and machine-verified traceability keeps them in sync.
 Code is primarily edited by agents rather than by hand. Term from
 Böckeler, *Three Schools of Spec-Driven Development Tools*; see
-[ADR-003](../docs/adr/003-evaluate-sdd-community-landscape.md) for the
+[ADR-0003](../docs/adr/0003-evaluate-sdd-community-landscape.md) for the
 landscape evaluation that led to this position.
 
 **SDD Triangle.** Spec, tests, and code do not stay automatically

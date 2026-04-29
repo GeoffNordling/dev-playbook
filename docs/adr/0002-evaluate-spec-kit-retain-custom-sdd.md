@@ -1,4 +1,4 @@
-# ADR-002: Evaluate GitHub Spec Kit; Retain Custom SDD Workflow
+# ADR-0002: Evaluate GitHub Spec Kit; Retain Custom SDD Workflow
 
 **Date:** 2026-04-12
 **Status:** Accepted
