@@ -50,26 +50,26 @@ standard, and a written workflow that stays good going forward.
 
 ## What's next, in order
 
-1. **#15 execute** — Land standards amendments, rename ADRs to
-   4-digit, retrofit dev-playbook with `setup-matt-pocock-skills`,
-   write the no-PRD ADR. Concrete checklist in the #15 section below.
-   Done before #28 so the cookiecutter template propagates finalised
-   standards.
-2. **#28 update cookiecutter template** — Propagate the new
+1. **#15 standards rewrite** — Amend `repo-documentation.md`; create
+   `triage-labels.md` and `issues-and-triage.md`; cross-reference
+   `testing-conventions.md` → `/tdd`. Steps 1-4 of the #15 checklist.
+2. **#15 dev-playbook implementation** — Rename existing ADRs to
+   4-digit; install and run `setup-matt-pocock-skills` against
+   dev-playbook; edit the generated `issue-tracker.md`; defer
+   `CONTEXT.md` creation; run `ref-check --all`. Steps 5-9 of the #15
+   checklist.
+3. **#15 ADR tie-off** — Interview the user for reasons, then write
+   `docs/adr/0006-adopt-matt-pocock-conventions.md` retrospectively,
+   covering both the broad adoption and the PRD rejection. Step 10.
+4. **#23 install remaining Matt skills, #28 update cookiecutter** —
+   Install the other 8 adopted skills (skip `to-prd`); propagate the
    conventions (`docs/agents/`, `## Agent skills` block, ADR template
    and 4-digit numbering) into `project-template/` so newly-generated
    repos start compliant.
-3. **#23 install Matt's skills** —
-   `npx skills@latest add mattpocock/skills --skill <name> -g -y` per
-   pick. Install the 9 adopted skills (`tdd`, `caveman`, `grill-me`,
-   `grill-with-docs`, `improve-codebase-architecture`, `zoom-out`,
-   `to-issues`, `triage`, `setup-matt-pocock-skills`); skip `to-prd`.
-   The 3 convention-dependent ones (`to-issues`, `triage`,
-   `setup-matt-pocock-skills`) become fully usable once #15's retrofit
-   lands.
-4. **#25 refresh authored skills** — sdd-* content audit and
-   `skill-creator` vs `write-a-skill` comparison. Cross-reference
-   sweep already done.
+5. **#25 refresh authored skills** — sdd-* content audit and
+   `skill-creator` vs `write-a-skill` comparison. Last so any
+   conventions that shake out during the earlier phases inform the
+   audit. Cross-reference sweep already done.
 
 Closed tasks: #8 (survey Matt's skills, results in Background), #16
 (cross-reference convention), #24 (de-duplicate `marimo-notebook` —
@@ -236,10 +236,13 @@ Revisit forking only if specific friction surfaces post-install.
    pointing at `/tdd` as the runtime workflow companion.
 5. Rename `docs/adr/00N-*.md` → `docs/adr/000N-*.md` for the existing
    five ADRs; update the index in `docs/adr/README.md`.
-6. Run `setup-matt-pocock-skills` against `~/workspace/dev-playbook/`
-   itself: single-context, GitHub backend, default labels. Scaffolds
+6. Install `setup-matt-pocock-skills`
+   (`npx skills@latest add mattpocock/skills --skill setup-matt-pocock-skills -g -y`)
+   and run it against `~/workspace/dev-playbook/` itself:
+   single-context, GitHub backend, default labels. Scaffolds
    `docs/agents/{issue-tracker,triage-labels,domain}.md` and the
-   `## Agent skills` block in `CLAUDE.md`.
+   `## Agent skills` block in `CLAUDE.md`. The remaining 8 skills are
+   installed later in #23.
 7. Edit the generated `docs/agents/issue-tracker.md` to drop the
    "and PRDs" clause from Matt's seed (we don't use PRDs).
 8. Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
@@ -256,7 +259,10 @@ Revisit forking only if specific friction surfaces post-install.
 
 **Status:** pending — depends on #15 landing.
 
-Install each of the 9 adopted skills:
+`setup-matt-pocock-skills` is already installed during #15 step 6.
+This task installs the remaining 8 adopted skills: `tdd`, `caveman`,
+`grill-me`, `grill-with-docs`, `improve-codebase-architecture`,
+`zoom-out`, `to-issues`, `triage`. One invocation per skill:
 `npx skills@latest add mattpocock/skills --skill <name> -g -y`.
 Skip `to-prd` (rejected — see ADR-0006). The CLI writes to
 `~/.agents/skills/<name>/`, which Stow-folds into
