@@ -43,9 +43,10 @@ standard, and a written workflow that stays good going forward.
 - **Standards adoption decisions made (2026-04-28).** Walked Matt's
   prescribed conventions row-by-row; per-convention decisions logged
   in the #15 section below. Execution pending: standards amendments,
-  ADR rename to 4-digit, write `docs/adr/0006-no-matt-prd-workflow.md`,
-  uninstall `/to-prd`, run `setup-matt-pocock-skills` against
-  dev-playbook itself.
+  ADR rename to 4-digit, run `setup-matt-pocock-skills` against
+  dev-playbook, uninstall `/to-prd`, then write a retrospective
+  ADR-0006 covering both the Matt-conventions adoption and the PRD
+  rejection.
 
 ## What's next, in order
 
@@ -194,7 +195,7 @@ with workspace conventions we've committed to (notably SDD).
 | `## Agent skills` block in `CLAUDE.md` | Adopt | Required when Matt's skills are configured for the repo |
 | Issue tracker backend | Adapt — GitHub-only | Drop `.scratch/` and "other" options; `setup-matt-pocock-skills` supports this as a built-in choice |
 | Triage label vocabulary (5 state + 2 category) | Adopt | New file `standards/triage-labels.md` |
-| PRD format and `/to-prd` workflow | **Reject** | Overlaps with SDD spec; document via `docs/adr/0006-no-matt-prd-workflow.md`; uninstall `/to-prd` |
+| PRD format and `/to-prd` workflow | **Reject** | Overlaps with SDD spec; uninstall `/to-prd`; documented retrospectively in ADR-0006 alongside the broader Matt-conventions adoption |
 | Vertical-slice issue breakdown (tracer bullets, HITL/AFK, blocked-by) | Adopt | Combined with triage in single file `standards/issues-and-triage.md` |
 | `/tdd` testing conventions | Keep ours authoritative | Don't fork `/tdd`; one-line cross-reference in our standard |
 | Architecture vocabulary (Module/Interface/Depth/Seam/Adapter/Leverage/Locality) | Adopt implicitly | No standards change — vocabulary used in `improve-codebase-architecture` output |
@@ -235,17 +236,21 @@ Revisit forking only if specific friction surfaces post-install.
    pointing at `/tdd` as the runtime workflow companion.
 5. Rename `docs/adr/00N-*.md` → `docs/adr/000N-*.md` for the existing
    five ADRs; update the index in `docs/adr/README.md`.
-6. Write `docs/adr/0006-no-matt-prd-workflow.md` recording the PRD
-   rejection.
-7. Run `setup-matt-pocock-skills` against `~/workspace/dev-playbook/`
+6. Run `setup-matt-pocock-skills` against `~/workspace/dev-playbook/`
    itself: single-context, GitHub backend, default labels. Scaffolds
    `docs/agents/{issue-tracker,triage-labels,domain}.md` and the
    `## Agent skills` block in `CLAUDE.md`.
-8. Edit the generated `docs/agents/issue-tracker.md` to drop the
+7. Edit the generated `docs/agents/issue-tracker.md` to drop the
    "and PRDs" clause from Matt's seed (we don't use PRDs).
-9. Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
+8. Defer `CONTEXT.md` creation — let `/grill-with-docs` create it
    lazily on first ambiguity.
-10. Run `tools/bin/ref-check --all` and confirm clean.
+9. Run `tools/bin/ref-check --all` and confirm clean.
+10. Write `docs/adr/0006-adopt-matt-pocock-conventions.md`
+    retrospectively, capturing both (a) the broad decision to adopt
+    Matt's conventions and (b) the rejection of the PRD workflow.
+    Interview the user for reasons before drafting — do not pre-fill
+    the rationale. Split into two ADRs only if the reasoning diverges
+    enough to warrant it.
 
 ### #23 Install chosen Matt skills
 
