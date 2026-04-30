@@ -45,3 +45,19 @@ cookiecutter path/to/dev-playbook/project-template
 - `tests/` directory ready for pytest
 - Git repo initialized with an initial commit
 - uv environment synced and pre-commit hooks installed
+
+## Next Step (Required)
+
+The cookiecutter does **not** seed the agent-skills configuration
+(`docs/agents/*.md` and the `## Agent skills` block in `CLAUDE.md`).
+That scaffolding is owned by [`/setup-matt-pocock-skills`](~/workspace/dev-playbook/dotfiles/.agents/skills/setup-matt-pocock-skills/SKILL.md),
+which is the canonical source and may evolve.
+
+After generating a repo, open it in Claude Code and run:
+
+```
+/setup-matt-pocock-skills
+```
+
+Until that runs, `CLAUDE.md` carries a STOP notice instructing agents
+to take no further actions in the repo.

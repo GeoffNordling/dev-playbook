@@ -43,3 +43,13 @@ uv run pytest
 ## Formatting
 
 - Do not use emdashes; use semicolons instead.
+
+## Agent skills
+
+> **STOP — agent-skills configuration is not yet scaffolded for this repo.**
+>
+> Before taking any further actions in this repo, run `/setup-matt-pocock-skills`
+> in Claude Code. The skill writes `docs/agents/{issue-tracker,triage-labels,domain}.md`
+> and replaces this section with the proper Agent skills block. Several engineering
+> skills (`/triage`, `/to-issues`, `/tdd`, `/grill-with-docs`, `/improve-codebase-architecture`,
+> `/zoom-out`) read from those files and produce degraded output without them.

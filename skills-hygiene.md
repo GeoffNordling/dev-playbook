@@ -53,16 +53,19 @@ standard, and a written workflow that stays good going forward.
   `improve-codebase-architecture`, `zoom-out`, `to-issues`, `triage`.
   `ref-check` now clean (65/65). Snyk rated `to-issues` and `triage`
   Med Risk; everything else Low.
+- **#28 closed.** Cookiecutter scope deliberately *narrowed*, not
+  expanded. The agent-skills config (`docs/agents/*.md` and
+  `## Agent skills` block) is owned by `/setup-matt-pocock-skills`,
+  which is the canonical source and may evolve; the cookiecutter
+  defers to it. Generated `CLAUDE.md` ships with a STOP placeholder
+  block, the post-gen hook prints a reminder banner, and the
+  template's own README/CLAUDE.md document the two-step workflow.
+  `CONTEXT.md`, `docs/adr/`, and `specs/` remain lazy.
 
 ## What's next, in order
 
-1. **#28 update cookiecutter** — Propagate the conventions into
-   `project-template/`. Now unblocked since the
-   `setup-matt-pocock-skills` seeds are installed (#23).
-2. **#25 refresh authored skills** — sdd-* content audit and
-   `skill-creator` vs `write-a-skill` comparison. Last so any
-   conventions that shake out during the earlier phases inform the
-   audit.
+1. **#25 refresh authored skills** — sdd-* content audit and
+   `skill-creator` vs `write-a-skill` comparison.
 
 Closed tasks: #8 (survey Matt's skills, results in Background), #15
 (adopt Matt's repo conventions; see
@@ -71,7 +74,8 @@ Closed tasks: #8 (survey Matt's skills, results in Background), #15
 #24 (de-duplicate `marimo-notebook` — content confirmed identical
 between Vercel and DHub before DHub was decommissioned), #26 (DHub
 ecosystem path — decommissioned), #27 (external-skills workflow doc —
-committed as `standards/skill-management.md`).
+committed as `standards/skill-management.md`), #28 (cookiecutter
+defers to `/setup-matt-pocock-skills` rather than seeding).
 
 ## Why now
 
@@ -297,33 +301,38 @@ Update `skill-creator` with what fits.
 
 ### #28 Update cookiecutter project template
 
-**Status:** pending — depends on #15 landing.
+**Status:** closed.
 
 The cookiecutter at
 [`project-template/`](~/workspace/dev-playbook/project-template/)
-generates new repos. Once #15 finalises the conventions, the template
-must propagate them so newly-generated repos start in compliance.
+generates new repos. The original plan was to seed the agent-skills
+config (`docs/agents/*.md` + `## Agent skills` block) inside the
+template so new repos started fully standard-conformant. During
+execution, the user flipped this: `setup-matt-pocock-skills` is the
+canonical owner of that scaffolding and may evolve, so duplicating its
+seeds inside the cookiecutter would create drift. The cookiecutter
+narrowed instead — it deliberately does *not* seed agent-skills config
+and defers to the skill via two reminder mechanisms:
 
-Concrete updates to
-`project-template/{{ cookiecutter.project_slug }}/`:
+- **Generated `CLAUDE.md`** carries a `## Agent skills` STOP placeholder
+  instructing agents to take no further actions until
+  `/setup-matt-pocock-skills` runs. The skill replaces the placeholder
+  in-place per its own SKILL.md ("update its contents in-place").
+- **`hooks/post_gen_project.py`** prints a 64-char banner pointing at
+  the same skill on stdout right after `cookiecutter` finishes.
 
-- `CLAUDE.md` — add the `## Agent skills` block pointing at
-  `docs/agents/*.md`.
-- `docs/agents/` seed directory — bundle `issue-tracker.md` (GitHub
-  variant, with the "and PRDs" clause dropped), `triage-labels.md`
-  (default 5+2 vocabulary), and `domain.md` (single-context default,
-  copied from Matt's seed).
-- `docs/adr/` seed directory — empty except for `README.md` indexing
-  no ADRs yet.
-- Don't seed `CONTEXT.md` — keep lazy-creation discipline.
-- Verify `cookiecutter` still generates a valid repo end-to-end after
-  the changes.
+The template's own `README.md` (a "Next Step (Required)" section) and
+`CLAUDE.md` (rules forbidding agent-skills/CONTEXT.md/docs/adr/specs
+seeding) document the workflow.
 
-Cross-check the source files used to seed: they should ultimately
-match the canonical seeds bundled inside
-`dotfiles/.agents/skills/setup-matt-pocock-skills/` (post-#23) so the
-template doesn't drift from what `setup-matt-pocock-skills` would
-write into a fresh repo.
+Smoke-tested with `uvx cookiecutter --no-input project-template -o /tmp`
+under both `scripts` (default) and `package+scripts+notebooks` layouts;
+generated repos contain the placeholder, the conditional CLAUDE.md
+content renders correctly, `uv sync` succeeds, the reminder banner
+prints.
+
+Lazy-creation discipline preserved for `CONTEXT.md`, `docs/adr/`, and
+`specs/` (SDD is opt-in per the SDD standards).
 
 ## Working with this file
 

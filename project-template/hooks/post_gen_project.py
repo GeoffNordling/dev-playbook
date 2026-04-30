@@ -28,3 +28,15 @@ if shutil.which("uv"):
 # Install pre-commit hooks
 if shutil.which("pre-commit"):
     subprocess.run(["pre-commit", "install"], check=True)
+
+# Final reminder: the agent-skills configuration is not seeded by this template;
+# it is scaffolded by /setup-matt-pocock-skills inside Claude Code.
+print()
+print("=" * 64)
+print(" Next step: open this repo in Claude Code and run:")
+print()
+print("     /setup-matt-pocock-skills")
+print()
+print(" This scaffolds docs/agents/* and the Agent skills block in")
+print(" CLAUDE.md. Until then, CLAUDE.md instructs agents to STOP.")
+print("=" * 64)
