@@ -3,7 +3,7 @@ name: sdd-red
 description: Write tests from spec (red phase)
 disable-model-invocation: true
 model: opus
-effort: high
+effort: xhigh
 ---
 
 # SDD Red

@@ -3,7 +3,7 @@ name: code-quality-sweep
 description: Stochastic agentic sweep of the current repository for the code quality anti-patterns cataloged in dev-playbook. Sub-agents flag, then the main agent remediates findings interactively with the user.
 disable-model-invocation: true
 model: opus
-effort: medium
+effort: xhigh
 ---
 
 # Code Quality Sweep

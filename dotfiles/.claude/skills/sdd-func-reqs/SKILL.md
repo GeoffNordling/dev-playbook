@@ -3,7 +3,7 @@ name: sdd-func-reqs
 description: Write or update functional requirements
 disable-model-invocation: true
 model: opus
-effort: high
+effort: xhigh
 ---
 
 # SDD Func Reqs

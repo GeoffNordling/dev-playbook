@@ -3,7 +3,7 @@ name: sdd-review
 description: Check AgentReview commitments against the code and report drift
 disable-model-invocation: true
 model: opus
-effort: high
+effort: xhigh
 ---
 
 # SDD Review
