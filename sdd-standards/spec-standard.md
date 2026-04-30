@@ -120,9 +120,11 @@ come through this document, not per-project.
 
 `feat`, `req`, and `dsn` are written as Markdown items in spec files.
 `utest` and `itest` are realized by pytest tests that carry an
-`@pytest.mark.req("req~...")` marker linking back to the item they
-cover — they are not themselves Markdown items. Spec-item keywords
-(below) apply to the three Markdown types.
+`@pytest.mark.covers("<id>")` marker naming the closest upstream item
+— the `feat`, `req`, or `dsn` that declared `Needs: utest` (or
+`Needs: itest`); typically a `dsn`. The marker is the test's
+`Covers:` line, in code. They are not themselves Markdown items.
+Spec-item keywords (below) apply to the three Markdown types.
 
 ## 5. Coverage chain
 
@@ -163,8 +165,8 @@ usage is a writing norm, not a system rule.
 
 A chain terminates in verification when its terminal items are one of:
 
-- a `utest` (pytest test covering a `req` or `dsn`),
-- an `itest` (pytest integration test covering a `req` or `dsn`), or
+- a `utest` (pytest test covering its closest upstream item),
+- an `itest` (pytest integration test covering its closest upstream item), or
 - a `feat`, `req`, or `dsn` carrying `AgentReview:`.
 
 A chain `SHOULD` terminate in verification. A commitment that nothing

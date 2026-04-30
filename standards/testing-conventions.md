@@ -10,7 +10,7 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 
 - **Mirror source structure.** Test files mirror the source directory layout: `src/auth/login.py` -> `tests/auth/test_login.py`. This scales naturally and avoids naming collisions.
 - **Conftest hierarchy.** Place `conftest.py` at each directory level for fixtures relevant to that scope. Root `conftest.py` holds shared fixtures; subdirectory `conftest.py` files hold domain-specific fixtures.
-- **Requirement markers.** Every test is marked with the requirement it covers: `@pytest.mark.req("req~area.name~1")`. This enables traceability verification via `pytest-sdd`. The marker value is the spec item ID of the `req` item the test covers; see [sdd-standards/spec-standard.md — IDs](~/workspace/dev-playbook/sdd-standards/spec-standard.md#3-ids) for the format.
+- **Coverage markers.** Every test is marked with the spec item it covers: `@pytest.mark.covers("<id>")`. The ID names the closest upstream item — whichever `feat`, `req`, or `dsn` declared `Needs: utest` (or `Needs: itest`); typically a `dsn`. This is the test's `Covers:` line, expressed in code, and enables traceability verification via `pytest-sdd`. See [sdd-standards/spec-standard.md — IDs](~/workspace/dev-playbook/sdd-standards/spec-standard.md#3-ids) for the format.
 
 ## Test Structure
 
