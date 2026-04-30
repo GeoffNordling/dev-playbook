@@ -10,6 +10,7 @@ feature reference (subagent execution, shell injection, hooks, etc.), see the
 .claude/skills/<skill-name>/
   SKILL.md          # required
   references/       # optional — supplementary docs loaded on demand
+  scripts/          # optional — helper scripts the skill invokes
 ```
 
 The directory name must match the `name` field in the front matter.
@@ -104,6 +105,25 @@ References are one level deep: files in `references/` `SHALL NOT` link to
 other reference files in the same skill bundle. The lazy-load pattern
 assumes a flat tree; nested references defeat the savings and confuse the
 loading agent.
+
+## Scripts Directory
+
+For skills that invoke helper scripts — deterministic operations, repeated
+logic, or steps where token cost or reliability matters — place them in
+a `scripts/` subdirectory. Reference them from SKILL.md per the
+cross-reference rule above:
+
+```markdown
+Run [check.py](scripts/check.py) to validate the result.
+```
+
+A skill-bundle `scripts/` directory is not the same as a project-root
+`scripts/`. The bundle's `scripts/` lives under
+`.claude/skills/<skill-name>/scripts/` and holds skill-internal helpers
+the agent invokes while running the skill. A repo's project-root
+`scripts/`, where it exists, holds project-level workspace scripts and
+is governed elsewhere. The two may coexist in the same repo without
+conflict; they are different paths and different concerns.
 
 ## Naming Conventions
 

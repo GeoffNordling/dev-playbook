@@ -26,6 +26,7 @@ Discuss with the user. Ask the questions the standard leaves to choice:
 - **Effort** — `low` / `medium` / `high` / `xhigh`?
 - **Arguments** — none, single free-form (`$ARGUMENTS`), or positional (`$0`/`$1`/...)?
 - **References** — does the body need supporting files under `references/`?
+- **Scripts** — does the skill invoke helper scripts that should live under `scripts/` (deterministic ops, repeated logic, places where reliability matters)?
 - **Tools** — does this skill need an `allowed-tools` restriction?
 
 ## 3. Write the description
@@ -44,6 +45,8 @@ See [skill-conventions.md — Required Fields](~/workspace/dev-playbook/standard
 ## 4. Decide on bundle layout
 
 Keep `SKILL.md` under ~100 lines. If the body would exceed that, has distinct sub-domains, or contains rarely-needed advanced material, spill into `references/`. References are one level deep — reference files do not link to other reference files.
+
+If the skill needs helper scripts, put them in `scripts/` and reference them with relative links from SKILL.md (`[check.py](scripts/check.py)`). The skill-bundle `scripts/` is distinct from any project-root `scripts/`; both may coexist.
 
 Place the skill bundle in the project's `.claude/skills/` if it's project-local, or in the dotfiles repo's `dotfiles/.claude/skills/` for cross-project skills.
 
