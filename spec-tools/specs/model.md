@@ -1,7 +1,5 @@
 # Model
 
-## Feature
-
 ### In-memory Spec Model
 `feat~model~0`
 
@@ -16,8 +14,6 @@ and round-tripping would be impossible.
 
 Needs:
 - req
-
-## Requirements
 
 ### In-memory spec collection
 `req~model.navigation~0`
@@ -58,8 +54,6 @@ Covers:
 
 Needs:
 - itest
-
-## Design
 
 ### SpecItem shape
 `dsn~model.spec-item~0`

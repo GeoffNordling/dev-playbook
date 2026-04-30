@@ -1,7 +1,5 @@
 # Discover
 
-## Feature
-
 ### Spec File Discovery
 `feat~discover~0`
 
@@ -17,8 +15,6 @@ consumers share one project-traversal surface.
 
 Needs:
 - req
-
-## Requirements
 
 ### Project root traversal
 `req~discover.traversal~0`
@@ -36,8 +32,6 @@ Covers:
 
 Needs:
 - dsn
-
-## Design
 
 ### Public find entry point
 `dsn~discover.find~0`

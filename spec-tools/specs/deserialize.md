@@ -1,7 +1,5 @@
 # Deserialize
 
-## Feature
-
 ### Spec Deserialization
 `feat~deserialize~0`
 
@@ -18,8 +16,6 @@ every downstream operation.
 
 Needs:
 - req
-
-## Requirements
 
 ### Lossless parse of standard-defined fields
 `req~deserialize.fidelity~0`
@@ -59,8 +55,6 @@ Covers:
 
 Needs:
 - dsn
-
-## Design
 
 ### Spec parse error
 `dsn~deserialize.parse-error~0`

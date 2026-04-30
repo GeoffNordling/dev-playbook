@@ -1,7 +1,5 @@
 # Serialize
 
-## Feature
-
 ### Spec Serialization
 `feat~serialize~0`
 
@@ -16,8 +14,6 @@ persisted as a conformant spec file.
 
 Needs:
 - req
-
-## Requirements
 
 ### Output conforms to the spec standard
 `req~serialize.conformance~0`
@@ -55,8 +51,6 @@ Covers:
 
 Needs:
 - dsn
-
-## Design
 
 ### Render to conformant markdown
 `dsn~serialize.render~0`

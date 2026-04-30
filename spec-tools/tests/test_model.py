@@ -1,3 +1,5 @@
+"""Tests for spec_tools.model."""
+
 from collections.abc import Iterable
 
 import networkx
@@ -12,6 +14,7 @@ def make_item(
     revision: int = 0,
     covers: Iterable[ItemId] = (),
 ) -> SpecItem:
+    """Build a SpecItem with placeholder fields; override `name`, `artifact_type`, `revision`, `covers` as needed."""
     return SpecItem(
         heading=name,
         id=ItemId(artifact_type=artifact_type, name=name, revision=revision),
@@ -27,7 +30,7 @@ def make_item(
     )
 
 
-@pytest.mark.req("req~deserialize.fidelity~0")
+@pytest.mark.covers("dsn~model.item-id~0")
 def test_item_id_exposes_constructor_fields():
     item_id = ItemId(artifact_type="dsn", name="model.item-id", revision=0)
 
@@ -36,7 +39,7 @@ def test_item_id_exposes_constructor_fields():
     assert item_id.revision == 0
 
 
-@pytest.mark.req("req~deserialize.fidelity~0")
+@pytest.mark.covers("dsn~model.item-id~0")
 def test_item_id_compares_by_value():
     same_a = ItemId(artifact_type="dsn", name="model.item-id", revision=0)
     same_b = ItemId(artifact_type="dsn", name="model.item-id", revision=0)
@@ -50,13 +53,13 @@ def test_item_id_compares_by_value():
     assert same_a != different_revision
 
 
-@pytest.mark.req("req~deserialize.fidelity~0")
+@pytest.mark.covers("dsn~model.item-id~0")
 def test_item_id_rejects_negative_revision():
     with pytest.raises(ValueError, match="revision"):
         ItemId(artifact_type="dsn", name="model.item-id", revision=-1)
 
 
-@pytest.mark.req("req~deserialize.fidelity~0")
+@pytest.mark.covers("dsn~model.spec-item~0")
 def test_spec_item_exposes_constructor_fields():
     item_id = ItemId(artifact_type="dsn", name="model.spec-item", revision=0)
     parent_id = ItemId(artifact_type="req", name="deserialize.fidelity", revision=0)
@@ -89,7 +92,7 @@ def test_spec_item_exposes_constructor_fields():
     assert spec_item.agent_review == []
 
 
-@pytest.mark.req("req~model.navigation~0")
+@pytest.mark.covers("dsn~model.graph~0")
 def test_spec_graph_find_returns_item_or_none():
     item = make_item("model.spec-item")
     other = make_item("model.item-id")
@@ -99,7 +102,7 @@ def test_spec_graph_find_returns_item_or_none():
     assert graph.find(other.id) is None
 
 
-@pytest.mark.req("req~model.navigation~0")
+@pytest.mark.covers("dsn~model.graph~0")
 def test_spec_graph_upstream_returns_items_named_in_covers():
     feat = make_item("model", artifact_type="feat")
     req = make_item("model.navigation", artifact_type="req", covers=[feat.id])
@@ -109,7 +112,7 @@ def test_spec_graph_upstream_returns_items_named_in_covers():
     assert graph.upstream(feat.id) == []
 
 
-@pytest.mark.req("req~model.navigation~0")
+@pytest.mark.covers("dsn~model.graph~0")
 def test_spec_graph_downstream_returns_items_that_cover_target():
     feat = make_item("model", artifact_type="feat")
     req_a = make_item("model.navigation", artifact_type="req", covers=[feat.id])
@@ -120,7 +123,7 @@ def test_spec_graph_downstream_returns_items_that_cover_target():
     assert graph.downstream(req_a.id) == []
 
 
-@pytest.mark.req("req~model.navigation~0")
+@pytest.mark.covers("dsn~model.graph~0")
 def test_spec_graph_as_digraph_nodes_keyed_by_id_with_coverage_edges():
     feat = make_item("model", artifact_type="feat")
     req = make_item("model.navigation", artifact_type="req", covers=[feat.id])

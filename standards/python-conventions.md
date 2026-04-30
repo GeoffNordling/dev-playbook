@@ -25,6 +25,12 @@ Rationale: a name tells you what something is called; a docstring tells you
 what it does. Readers (human and agent) should not have to read the body to
 learn the contract.
 
+**Exception: tests.** Pytest test functions follow a `test_<behavior>` naming
+convention literal enough that a docstring would just restate the name. Skip
+docstrings on test functions. Test-module-level helpers (factories, fixtures
+defined as plain functions) still need docstrings — their names are not
+similarly load-bearing.
+
 ## Fail Loudly
 
 When a value is required for the code to do its job, missing it is a bug —

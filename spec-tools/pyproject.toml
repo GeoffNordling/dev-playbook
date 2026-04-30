@@ -14,7 +14,7 @@ packages = ["src/spec_tools"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-    "req(id): spec-coverage marker linking the test to a `req~...` item",
+    "covers(id): spec-coverage marker naming the closest upstream spec item",
 ]
 
 [dependency-groups]
