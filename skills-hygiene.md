@@ -44,18 +44,21 @@ standard, and a written workflow that stays good going forward.
 - **#15 closed.** Standards rewrite landed (steps 1-4); ADR
   rename to 4-digit done; `setup-matt-pocock-skills` installed and run
   against dev-playbook (steps 6-7); `CONTEXT.md` deferred (step 8);
-  `ref-check` clean apart from the known #23-resolves link (step 9);
+  `ref-check` clean apart from the #23-resolves link at the time (step
+  9);
   [ADR-0006](~/workspace/dev-playbook/docs/adr/0006-adopt-matt-pocock-conventions.md)
   written retrospectively (step 10).
-- **`ref-check` has one known-broken link** — `repo-documentation.md`
-  points at `grill-with-docs`'s `ADR-FORMAT.md`, which resolves once #23
-  installs that skill.
+- **#23 closed.** All 8 adopted Matt skills installed via Vercel CLI:
+  `tdd`, `caveman`, `grill-me`, `grill-with-docs`,
+  `improve-codebase-architecture`, `zoom-out`, `to-issues`, `triage`.
+  `ref-check` now clean (65/65). Snyk rated `to-issues` and `triage`
+  Med Risk; everything else Low.
 
 ## What's next, in order
 
-1. **#23 install remaining Matt skills, #28 update cookiecutter** —
-   Install the other 8 adopted skills (skip `to-prd`); propagate the
-   conventions into `project-template/`.
+1. **#28 update cookiecutter** — Propagate the conventions into
+   `project-template/`. Now unblocked since the
+   `setup-matt-pocock-skills` seeds are installed (#23).
 2. **#25 refresh authored skills** — sdd-* content audit and
    `skill-creator` vs `write-a-skill` comparison. Last so any
    conventions that shake out during the earlier phases inform the
@@ -64,11 +67,11 @@ standard, and a written workflow that stays good going forward.
 Closed tasks: #8 (survey Matt's skills, results in Background), #15
 (adopt Matt's repo conventions; see
 [ADR-0006](~/workspace/dev-playbook/docs/adr/0006-adopt-matt-pocock-conventions.md)),
-#16 (cross-reference convention), #24 (de-duplicate `marimo-notebook`
-— content confirmed identical between Vercel and DHub before DHub was
-decommissioned), #26 (DHub ecosystem path — decommissioned), #27
-(external-skills workflow doc — committed as
-`standards/skill-management.md`).
+#16 (cross-reference convention), #23 (install 8 adopted Matt skills),
+#24 (de-duplicate `marimo-notebook` — content confirmed identical
+between Vercel and DHub before DHub was decommissioned), #26 (DHub
+ecosystem path — decommissioned), #27 (external-skills workflow doc —
+committed as `standards/skill-management.md`).
 
 ## Why now
 
@@ -246,23 +249,24 @@ Revisit forking only if specific friction surfaces post-install.
 
 ### #23 Install chosen Matt skills
 
-**Status:** pending — depends on #15 landing.
+**Status:** closed.
 
-`setup-matt-pocock-skills` is already installed during #15 step 6.
-This task installs the remaining 8 adopted skills: `tdd`, `caveman`,
-`grill-me`, `grill-with-docs`, `improve-codebase-architecture`,
-`zoom-out`, `to-issues`, `triage`. One invocation per skill:
-`npx skills@latest add mattpocock/skills --skill <name> -g -y`.
-Skip `to-prd` (rejected — see ADR-0006). The CLI writes to
+All 8 adopted skills installed via Vercel CLI (one invocation per
+skill: `npx skills@latest add mattpocock/skills --skill <name> -g -y`):
+`tdd`, `caveman`, `grill-me`, `grill-with-docs`,
+`improve-codebase-architecture`, `zoom-out`, `to-issues`, `triage`.
+Skipped `to-prd` (rejected — see ADR-0006). The CLI writes to
 `~/.agents/skills/<name>/`, which Stow-folds into
-`dotfiles/.agents/skills/`. The lock file at
-`dotfiles/.agents/.skill-lock.json` updates in place. Review the diff,
-then commit.
+`dotfiles/.agents/skills/`; symlinks land under
+`dotfiles/.claude/skills/`. The lock file at
+`dotfiles/.agents/.skill-lock.json` updated in place. `ref-check`
+clean (65/65). Snyk rated `to-issues` and `triage` Med Risk; the rest
+Low.
 
-No forking required (decided in #15). If post-install friction
-surfaces and we later fork a skill, do it in the dotfiles working
-tree and document the divergence so future `skills update` runs don't
-silently overwrite our edits.
+No forking done (decided in #15). If post-install friction surfaces
+and we later fork a skill, do it in the dotfiles working tree and
+document the divergence so future `skills update` runs don't silently
+overwrite our edits.
 
 ### #25 Refresh authored skills
 
