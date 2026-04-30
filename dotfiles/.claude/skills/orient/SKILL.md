@@ -20,10 +20,13 @@ Run `ls` at the repo root to see the top-level file and directory structure.
 
 Read the Files table in the [repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md).
 
-Check which of those files and directories exist in the current repo. Use
-separate tool calls or fault-tolerant commands (e.g., `ls dir1; ls dir2`)
-— never chain existence checks with `&&`, because one missing path will fail
-the entire command and cancel any parallel tool calls.
+Check existence with one `ls` call that always exits 0:
+
+```
+ls -d FILE1 FILE2 DIR1 ... 2>/dev/null; true
+```
+
+The trailing `; true` keeps the call green when paths are missing, so sibling parallel tool calls in the batch survive.
 
 ## Step 3 — Read what exists
 
