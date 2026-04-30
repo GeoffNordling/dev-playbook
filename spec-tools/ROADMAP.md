@@ -1,6 +1,6 @@
-# Notes
+# Roadmap
 
-Forward-looking ideas not yet promoted to specs. Track for issue #16.
+Forward-looking ideas for `spec-tools`, not yet promoted to specs. Track for issue #16.
 
 ## Coverage views
 
@@ -39,3 +39,11 @@ the node under each parent (loses identity, easy to miss), or
 annotate "also under X" (no longer really a tree, the eye can't
 see the cross-cuts at a glance). Any project that allows
 cross-cutting gets no use from tree, so it isn't worth building.
+
+## Test-failure partitioning
+
+Deterministic partitioning of test failures by root cause during
+SDD red/green phases. Distinguish `NotImplementedError` hits on
+stub items (expected red) from real assertion failures (unexpected
+red, requires diagnosis). A practical first cut keys off exception
+type and traceback shape; finer categories may emerge from use.
