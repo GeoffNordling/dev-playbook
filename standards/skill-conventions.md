@@ -35,7 +35,7 @@ Every skill must have all four of these:
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
-| `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, append a second sentence starting `Use when …` listing the trigger keywords, contexts, or file types — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
+| `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, the description `SHALL` include a second sentence beginning `Use when …` that lists the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
 | `disable-model-invocation` | `true` for skills invoked only by the user. `false` for skills Claude should auto-invoke when relevant. Always explicit — never rely on the default. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 

@@ -32,10 +32,10 @@ Discuss with the user. Ask the questions the standard leaves to choice:
 
 The description is the only metadata the model sees when deciding to load an auto-invocable skill. It is the matcher's input, not a comment for humans.
 
-For `disable-model-invocation: false`:
+For `disable-model-invocation: false`, both sentences are required:
 
 - First sentence: what the skill does, third person.
-- Second sentence: starts with `Use when …` and names trigger keywords, contexts, and file types verbatim. Be specific — generic descriptions get matched poorly.
+- Second sentence: `SHALL` start with `Use when …` and name trigger keywords, contexts, and file types verbatim. Be specific — generic descriptions get matched poorly. The audit (`tools/bin/internal-skill-audit`) hard-fails on missing `Use when …`.
 
 For `disable-model-invocation: true`, a short third-person label is enough; no triggers needed since the user invokes by name.
 

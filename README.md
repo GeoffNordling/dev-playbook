@@ -78,7 +78,7 @@ CLI utilities and shared libraries for workspace automation. See [tools/README.m
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `skill-audit`, `test-privacy`, `workspace-backup`, `generate-pre-commit` |
+| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `internal-skill-audit`, `test-privacy`, `workspace-backup`, `generate-pre-commit` |
 | Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |
 
 ### Spec tools (spec-tools/)

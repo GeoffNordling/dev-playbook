@@ -49,7 +49,7 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 | Tool | Standard | Purpose |
 |------|----------|---------|
 | `ref-check` | [repo-documentation.md](../standards/repo-documentation.md) | Broken cross-references in markdown |
-| `skill-audit` | [skill-conventions.md](../standards/skill-conventions.md) | Skill front matter conformance |
+| `internal-skill-audit` | [skill-conventions.md](../standards/skill-conventions.md) | Skill conformance (internal skills only; externally-managed skills are skipped) |
 | `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
 
 ##### `# /// pre-commit` metadata
@@ -58,10 +58,10 @@ Validation scripts embed pre-commit hook configuration as inline metadata, simil
 
 ```python
 # /// pre-commit
-# id = "skill-audit"
-# entry = "python3 tools/bin/skill-audit"
+# id = "internal-skill-audit"
+# entry = "python3 tools/bin/internal-skill-audit"
 # pass_filenames = false
-# files = "dotfiles/\\.claude/skills/"
+# always_run = true
 # standard = "standards/skill-conventions.md"
 # ///
 ```
@@ -116,12 +116,12 @@ ref-check [directory]
 
 Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok`, `broken`, or `external`). Exit code 1 if any broken references.
 
-### skill-audit
+### internal-skill-audit
 
-Audit all skill SKILL.md files for front matter conformance against [skill-conventions.md](../standards/skill-conventions.md).
+Audit internal skill bundles (real directories under `dotfiles/.claude/skills/`) for conformance against [skill-conventions.md](../standards/skill-conventions.md). Externally-managed skills — bundle directories that are symlinks, typically into `dotfiles/.agents/skills/` — are skipped, since their conformance is the upstream's concern.
 
 ```bash
-skill-audit [directory]
+internal-skill-audit [directory]
 ```
 
 One line per finding to stdout in `file:check: message` format. Exit code 1 if any issues found.
