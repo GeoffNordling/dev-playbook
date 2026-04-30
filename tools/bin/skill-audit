@@ -2,7 +2,7 @@
 """Audit skill SKILL.md files for front matter conformance.
 
 Scans all SKILL.md files under dotfiles/.claude/skills/ and checks them
-against the conventions in standards/skill-authoring.md.
+against the conventions in standards/skill-conventions.md.
 
 Usage:
     skill-audit [directory]
@@ -16,7 +16,7 @@ Usage:
 # entry = "python3 tools/bin/skill-audit"
 # pass_filenames = false
 # always_run = true
-# standard = "standards/skill-authoring.md"
+# standard = "standards/skill-conventions.md"
 # ///
 
 import argparse
@@ -199,7 +199,7 @@ def main():
 
     repo_root = Path(args.directory).resolve()
 
-    standard = repo_root / "standards" / "skill-authoring.md"
+    standard = repo_root / "standards" / "skill-conventions.md"
     if not standard.exists():
         print(
             f"skill-audit: governing standard not found: {standard}",

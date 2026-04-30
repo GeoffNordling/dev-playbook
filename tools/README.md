@@ -49,7 +49,7 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 | Tool | Standard | Purpose |
 |------|----------|---------|
 | `ref-check` | [repo-documentation.md](../standards/repo-documentation.md) | Broken cross-references in markdown |
-| `skill-audit` | [skill-authoring.md](../standards/skill-authoring.md) | Skill front matter conformance |
+| `skill-audit` | [skill-conventions.md](../standards/skill-conventions.md) | Skill front matter conformance |
 | `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
 
 ##### `# /// pre-commit` metadata
@@ -62,7 +62,7 @@ Validation scripts embed pre-commit hook configuration as inline metadata, simil
 # entry = "python3 tools/bin/skill-audit"
 # pass_filenames = false
 # files = "dotfiles/\\.claude/skills/"
-# standard = "standards/skill-authoring.md"
+# standard = "standards/skill-conventions.md"
 # ///
 ```
 
@@ -118,7 +118,7 @@ Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok`, 
 
 ### skill-audit
 
-Audit all skill SKILL.md files for front matter conformance against [skill-authoring.md](../standards/skill-authoring.md).
+Audit all skill SKILL.md files for front matter conformance against [skill-conventions.md](../standards/skill-conventions.md).
 
 ```bash
 skill-audit [directory]

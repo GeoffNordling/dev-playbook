@@ -1,6 +1,6 @@
 # Skill Management
 
-Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skills authored in this workspace, see [skill-authoring.md](~/workspace/dev-playbook/standards/skill-authoring.md).
+Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md).
 
 ## Locations
 
@@ -13,7 +13,7 @@ Stow links these directories into `~/` so the canonical content lives in the git
 
 ## Authored Skills
 
-Skills written for this workspace live in `dotfiles/.claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-authoring.md](~/workspace/dev-playbook/standards/skill-authoring.md) for the format.
+Skills written for this workspace live in `dotfiles/.claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md) for the format.
 
 ## Third-Party Skills
 

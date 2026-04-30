@@ -41,7 +41,7 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 | Object | Location | Purpose |
 |--------|----------|---------|
 | Repo documentation | `standards/repo-documentation.md` | Required/optional files for every repo and their scope |
-| Skill authoring | `standards/skill-authoring.md` | Conventions for writing Claude Code skills |
+| Skill conventions | `standards/skill-conventions.md` | Conventions for Claude Code skill bundles |
 | Python conventions | `standards/python-conventions.md` | Default Python conventions + the anti-pattern catalog the `code-quality-sweep` skill scans for |
 | Testing conventions | `standards/testing-conventions.md` | Default pytest conventions: structure, doubles, fixtures |
 

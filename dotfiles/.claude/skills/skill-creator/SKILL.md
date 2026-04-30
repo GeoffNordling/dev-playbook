@@ -10,14 +10,62 @@ effort: high
 
 Create a new Claude Code skill. The user describes what the skill should do via `$ARGUMENTS`.
 
-## Instructions
+## 1. Read the standard
 
-Read the [skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md) and follow it exactly. That standard defines front matter fields, file structure, naming conventions, model/effort selection, and the checklist to satisfy before shipping.
+Read [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md) before drafting. The standard is the source of truth for what a valid skill looks like — front matter, file structure, length, naming, references, checklist. This skill is the workflow over those conventions; the conventions live there, not here.
 
-## Workflow
+## 2. Gather requirements
 
-1. Read the skill authoring standard.
-2. Discuss the skill's purpose with the user. Clarify: what does the skill do, who invokes it (user or model), which model to pin (or none), and whether it needs arguments or references.
-3. Create the skill directory and `SKILL.md` under the appropriate `.claude/skills/` location. If the skill belongs to a specific project, place it there; otherwise use `~/workspace/dev-playbook/dotfiles/.claude/skills/`.
-4. Walk the checklist from the standard and confirm each item passes.
-5. Run `~/workspace/dev-playbook/dotfiles/bin/sync-dotfiles.sh` if the skill was added to dotfiles.
+Discuss with the user. Ask the questions the standard leaves to choice:
+
+- **Purpose** — what does this skill do? What problem does it solve? What's the success criterion?
+- **Use cases** — what specific scenarios should it handle? Any edge cases worth calling out?
+- **Invocation mode** — `disable-model-invocation: true` (user-only, slash-command) or `false` (Claude auto-invokes when relevant)?
+- **Triggers** (auto-invocable only) — what keywords, contexts, or file types should make Claude reach for it? These go into the description.
+- **Model** — `haiku` / `sonnet` / `opus`, or none (inherit session model)?
+- **Effort** — `low` / `medium` / `high` / `xhigh`?
+- **Arguments** — none, single free-form (`$ARGUMENTS`), or positional (`$0`/`$1`/...)?
+- **References** — does the body need supporting files under `references/`?
+- **Tools** — does this skill need an `allowed-tools` restriction?
+
+## 3. Write the description
+
+The description is the only metadata the model sees when deciding to load an auto-invocable skill. It is the matcher's input, not a comment for humans.
+
+For `disable-model-invocation: false`:
+
+- First sentence: what the skill does, third person.
+- Second sentence: starts with `Use when …` and names trigger keywords, contexts, and file types verbatim. Be specific — generic descriptions get matched poorly.
+
+For `disable-model-invocation: true`, a short third-person label is enough; no triggers needed since the user invokes by name.
+
+See [skill-conventions.md — Required Fields](~/workspace/dev-playbook/standards/skill-conventions.md#required-fields) for the format rules and worked examples.
+
+## 4. Decide on bundle layout
+
+Keep `SKILL.md` under ~100 lines. If the body would exceed that, has distinct sub-domains, or contains rarely-needed advanced material, spill into `references/`. References are one level deep — reference files do not link to other reference files.
+
+Place the skill bundle in the project's `.claude/skills/` if it's project-local, or in the dotfiles repo's `dotfiles/.claude/skills/` for cross-project skills.
+
+## 5. Draft
+
+Write `SKILL.md` and any reference files. Match the workspace conventions exactly. Concrete examples in the body land better than abstract rules — include one wherever it earns its keep.
+
+## 6. Review with the user
+
+Show the draft. Ask:
+
+- Does this cover the use cases you described?
+- Anything missing or unclear?
+- Should any section be more or less detailed?
+- Does the description's `Use when …` clause cover the contexts where you'd want the skill to fire?
+
+Revise based on feedback. Iterate until the user is satisfied.
+
+## 7. Walk the checklist
+
+Walk the checklist in [skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/skill-conventions.md#checklist) and confirm each item passes. Fix any failures before considering the skill done.
+
+## 8. Sync dotfiles
+
+If the skill landed under `dotfiles/`, run `~/workspace/dev-playbook/dotfiles/bin/sync-dotfiles.sh` to update the Stow symlinks. Restart Claude Code so the running session picks up the new skill — content is cached at startup.

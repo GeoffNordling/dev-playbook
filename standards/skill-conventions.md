@@ -1,6 +1,6 @@
-# Skill Authoring
+# Skill Conventions
 
-Conventions for writing Claude Code skills in this workspace. For the full
+Conventions for Claude Code skill bundles in this workspace. For the full
 feature reference (subagent execution, shell injection, hooks, etc.), see the
 [official skill documentation](https://code.claude.com/docs/en/skills).
 
@@ -35,15 +35,15 @@ Every skill must have all four of these:
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
-| `description` | One-line plain text, under 80 chars. Starts with a verb or noun phrase, no trailing period. |
+| `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, append a second sentence starting `Use when …` listing the trigger keywords, contexts, or file types — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
 | `disable-model-invocation` | `true` for skills invoked only by the user. `false` for skills Claude should auto-invoke when relevant. Always explicit — never rely on the default. |
-| `effort` | `low`, `medium`, `high`, or `xhigh`. See [Effort Selection](#effort-selection). |
+| `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
 ### Optional Fields
 
 | Field | When to include |
 |-------|-----------------|
-| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Include when the task's cognitive demand diverges from the session default. Omit to let the skill inherit the session model. See [Model Selection](#model-selection). |
+| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Include when the task's cognitive demand diverges from the session default. Omit to let the skill inherit the session model. |
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 
@@ -52,16 +52,6 @@ Every skill must have all four of these:
 - **`user-invocable`** — do not include this field. If a skill should not be
   user-invoked, use `disable-model-invocation: true` and rely on the skill's
   description to communicate its purpose.
-
-## Model Selection
-
-When authoring a skill, ask the user which model to pin. If the user says
-none, omit the `model` field entirely — the skill will inherit the session
-model.
-
-## Effort Selection
-
-When authoring a skill, ask the user which effort level to set. Valid values are `low`, `medium`, `high`, or `xhigh`.
 
 ## Arguments
 
@@ -77,18 +67,6 @@ Reference the variable in the body where the skill consumes it:
 ## Feedback: $ARGUMENTS
 ```
 
-For mode selection:
-
-```markdown
-## Mode: $0
-
-### Normal (default)
-...
-
-### Fast
-...
-```
-
 ## Body Format
 
 After the front matter, the body is Markdown.
@@ -99,7 +77,12 @@ After the front matter, the body is Markdown.
   sections should match the skill's complexity — no formula here, use
   judgment.
 - Content decisions (what sections to include, what patterns to use) are
-  made when authoring each skill, not prescribed by this standard.
+  made per skill, not prescribed by this standard.
+- Keep SKILL.md under ~100 lines. When content exceeds that, has distinct
+  sub-domains, or contains rarely-needed advanced material, spill into
+  `references/` and link from SKILL.md so the agent loads it on demand.
+- Avoid time-sensitive content (hardcoded version numbers, dates,
+  release-specific paths) — it goes stale faster than the skill is updated.
 
 ## Cross-References
 
@@ -117,14 +100,24 @@ See [UI.md](references/UI.md) for UI element details.
 
 The agent loads these on demand rather than paying the context cost upfront.
 
+References are one level deep: files in `references/` `SHALL NOT` link to
+other reference files in the same skill bundle. The lazy-load pattern
+assumes a flat tree; nested references defeat the savings and confuse the
+loading agent.
+
 ## Naming Conventions
 
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
   Good: `commit`, `ref-check`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
   Example: `sdd-func-reqs`, `sdd-design`, `sdd-red`, `sdd-green`.
-- **Descriptions**: start with a verb or noun phrase, no trailing period.
-  Good: `Write tests from spec (red phase)`.
+- **Descriptions**: see the [Required Fields](#required-fields) row for
+  format. Examples — good (auto-invocable):
+  `Write tests from a spec item before any implementation lands. Use when
+  starting the red phase of TDD, when a spec~* item has no covering tests,
+  or when the user asks for "spec-first" tests.` Good (user-only):
+  `Author a new Claude Code skill following workspace conventions`.
+  Bad (no triggers, generic): `Helps with tests`.
 
 ## Checklist
 
@@ -132,5 +125,11 @@ Before shipping a new skill:
 
 - [ ] Directory name matches `name` field
 - [ ] All four required front matter fields present
+- [ ] Description follows the format rules (auto-invocable skills include `Use when …`)
 - [ ] Body starts with an `# H1` title
+- [ ] SKILL.md under ~100 lines (or content beyond that lives in `references/`)
+- [ ] References are one level deep
 - [ ] Arguments use `$ARGUMENTS` or `$0`/`$1` per the conventions above
+- [ ] No time-sensitive content (versions, dates, release paths)
+- [ ] Concrete examples included where the rule benefits from one
+- [ ] Terminology consistent throughout the bundle

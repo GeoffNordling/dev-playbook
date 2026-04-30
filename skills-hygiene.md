@@ -35,7 +35,7 @@ standard, and a written workflow that stays good going forward.
   conceptually"). Rules in
   [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
   and
-  [Skill authoring standard](~/workspace/dev-playbook/standards/skill-authoring.md).
+  [Skill conventions](~/workspace/dev-playbook/standards/skill-conventions.md).
 - **Matt Pocock's skills surveyed.** 9 picked for adoption, 3 rejected
   (originally 10/2; `to-prd` moved to reject when its overlap with our
   SDD spec layer surfaced — see #15 and the planned ADR-0006). Picks
