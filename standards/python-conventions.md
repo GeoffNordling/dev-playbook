@@ -1,6 +1,7 @@
 # Python Conventions
 
-These are default Python conventions. Individual projects may supercede.
+Default Python conventions for projects in this workspace. Individual
+projects may supercede.
 
 ## Package Initialization
 
@@ -11,64 +12,41 @@ modules, not in `__init__.py`. Callers import from the specific submodule
 (`from pkg.sub import thing`), not from the package root.
 
 Rationale: a blank `__init__.py` has no import-time side effects, surfaces the
-true source of every name to readers and tooling, and avoids the circular-import
-traps that grow with populated package initializers.
+true source of every name to readers and tooling, and avoids the
+circular-import traps that grow with populated package initializers.
 
-## Anti-Patterns
+## Docstrings
 
-Claude naturally loves these anti-patterns. We catalog them here and run a
-proactive agentic sweep against the catalog as part of the PR workflow, so each
-pattern is caught before it accumulates.
+Every function, method, class, and module has a docstring. The docstring
+explains in plain English what the thing does. One short sentence is fine
+when the behavior is simple; longer when it isn't.
 
-The authoritative tool is
-`~/workspace/dev-playbook/dotfiles/.claude/skills/code-quality-sweep/SKILL.md`.
+Rationale: a name tells you what something is called; a docstring tells you
+what it does. Readers (human and agent) should not have to read the body to
+learn the contract.
 
-Each entry below names the anti-pattern, describes what to look for, and states
-the rule the sweep enforces. Entries are small and specific — one pattern per
-entry.
+## Fail Loudly
 
-### Non-blank `__init__.py`
+When a value is required for the code to do its job, missing it is a bug —
+the code raises rather than substituting a default. This applies to all the
+usual shapes that quietly hide a missing value:
 
-**Pattern.** A Python package's `__init__.py` contains any non-whitespace
-content — module docstring, imports, re-exports, `__all__`, anything.
-
-**Why it's wrong.** See the Package Initialization section above. Blank
-`__init__.py` files have no import-time side effects, surface the true source
-of every name, and avoid circular-import traps.
-
-**Rule.** Any `__init__.py` with non-whitespace content is a defect.
-
-### Unjustified defensive fallback
-
-**Pattern.** Code handles a missing, absent, or failed value by silently
-substituting a default, rather than failing loudly. Typical shapes:
-
-- `dict.get(key, default)` where `key` is always expected to be present
+- `dict.get(key, default)` where `key` is always expected to be present —
+  use `dict[key]` and let the `KeyError` surface.
 - `if x is None: return default` (or `x or default`) guarding a value that
-  should always exist
+  should always exist.
 - `try: ... except Exception: return default` swallowing errors into a
-  sentinel
+  sentinel.
 - `getattr(obj, "attr", default)` for an attribute the object is required to
-  have
+  have — use `obj.attr`.
 - Default parameter values that paper over state the caller should always
-  supply
+  supply.
 
-**Why it's wrong.** A fallback is only appropriate when the missing value is
-a legitimate runtime state, not a programming error. If the thing is required
-and always expected to be there, the code should fail fast and loud, not
-substitute a default.
+Some fallbacks are legitimate — the missing value is a real runtime state,
+not a programming error. When that's the case, leave an inline comment
+explaining *why* the fallback is intentional. The comment is the signal that
+the author thought about it.
 
-Some fallbacks *are* intentional. The anti-pattern is not
-defensive code in general; the anti-pattern is defensive code that Claude
-added as a reflex, without deciding whether the missing state is legitimate.
-
-**Rule.** Every defensive fallback must have an inline comment explaining
-*why* the fallback is intentional — specifically, what condition makes the
-missing value a legitimate runtime state rather than a code smell. A
-defensive fallback without such a comment is a defect.
-
-**Sweep behavior.** The sweep flags defensive fallbacks without an
-explanatory inline comment. It does NOT add comments to justify the
-fallbacks. That judgment — remove the fallback or justify it — belongs to a
-human. Silent comment-adding would destroy the signal the rule is designed
-to create.
+Rationale: a fallback that hides a bug delays the failure to a place far
+from the cause, where it's much harder to diagnose. Failing at the point of
+the missing value points straight at the defect.
