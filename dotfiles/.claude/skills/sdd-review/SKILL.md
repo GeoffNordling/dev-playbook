@@ -1,6 +1,6 @@
 ---
 name: sdd-review
-description: Check AgentReview commitments against the code and report drift
+description: Audit `AgentReview:` commitments across the project at scale and report drift
 disable-model-invocation: true
 model: opus
 effort: xhigh
@@ -8,34 +8,37 @@ effort: xhigh
 
 # SDD Review
 
-Walk every `AgentReview:` field across the project's design specs, compare each prose commitment against the current system state, and report which commitments are still honored, which are drifting, and which are broken. This is the non-test verification channel for design-layer commitments that cannot be deterministically unit-tested — see [spec-standard.md — Verification termination](~/workspace/dev-playbook/sdd-standards/spec-standard.md#54-verification-termination) for the field definition.
+Periodic maintenance audit of every `AgentReview:` commitment in the project. Dispatches review subagents per item and reports drift between the spec's commitment and the artifact (code, prompt, behavior) it names.
 
-This skill is reporting, not validation. It does not gate CI and does not block commits.
+This is not a development-flow skill. Inline `AgentReview:` checks for items being actively built happen in `sdd-implementation`. This skill is the project-wide sweep, run periodically rather than per cycle.
+
+## Read first
+
+- [Spec standard §6.9 `AgentReview:`](~/workspace/dev-playbook/sdd-standards/spec-standard.md#69-agentreview) — what `AgentReview:` is, when it is the right primitive, what its prose conveys.
 
 ## First steps
 
-1. **Run `sdd-review`** from the project root. Capture its output. Each `## \`dsn~...\`` block is one review target with a source location, its dimension(s), and one or more `- ` review prose bullets.
-2. **If the inventory is empty** (`No AgentReview: fields found`), tell the user so and stop. There is nothing to check.
-3. **Summarize the inventory for the user** — count of dsn items, count of review prose entries — before dispatching anything. Ask whether to proceed across the full inventory or a filtered subset (e.g., only items in a specific dimension or a specific subsystem).
+1. Read the project's `CLAUDE.md`.
+2. Confirm with the user the scope of this audit run — whole project or a subset (e.g., one area, items changed since last audit).
 
-## Dispatch one review agent per dsn record
+## Working with the spec collection
 
-For each `## \`dsn~...\`` record the user accepts, spawn an Explore or general-purpose agent with a focused prompt:
+We are bootstrapping `spec-tools`; the AgentReview inventory is not available programmatically yet. Until then, enumerate by grepping `specs/` for `AgentReview:` lines and reading the surrounding item context. A future revision of this skill will invoke `spec-tools` for the inventory directly.
 
-- Provide the dsn id, source location, dimension(s), and every review prose entry as context.
-- Tell the agent its job is to check whether the current code, prompts, docs, or configuration satisfy what the prose commits to. Paths named in the prose (e.g., `src/prompts/agent.md`) are the natural starting points — the agent reads the referenced artifact and compares it to the prose.
-- The agent reports one of three states per review: **ok** (commitment still honored), **drift** (related but weakened), **broken** (the referenced artifact no longer exists, no longer contains the expected content, or directly contradicts the prose).
-- Ask for file:line references to any evidence, and a one-paragraph justification per review.
+## Audit
 
-Parallelize dispatches when the records are independent — most reviews touch different files and can run concurrently.
+For each in-scope item carrying `AgentReview:`:
 
-## Report
+1. Read the item's `Description:`, every `AgentReview:` entry, and any artifact paths the prose names.
+2. Open the named artifacts. Verify the commitment in the prose holds — the model is instructed correctly, the prompt contains the directive, the convention is followed.
+3. For non-trivial verification, dispatch a subagent via the Agent tool with the item's `AgentReview:` text as the task description. Prefer read-only exploration agents.
+4. Record one of: **ok** (commitment still honored), **drift** (related but weakened), **broken** (the referenced artifact no longer exists, no longer contains the expected content, or directly contradicts the prose). Capture file:line references to any evidence and a one-paragraph justification per review.
 
-Aggregate the agents' findings into a single report back to the user:
+Parallelize dispatches when records are independent — most reviews touch different files and can run concurrently.
 
-- One section per dsn record, under the same `## \`dsn~...\`` heading the CLI emitted.
-- Within each section, one line per review — state badge (ok / drift / broken), the review prose, and the agent's evidence.
-- Close with a summary: total reviews, counts per state, and recommended next actions (which dsn items to update, which commitments to revise, which artifacts to fix).
+## Output
+
+A drift report listing each `AgentReview:` item and its status. For each finding name the item ID, the artifact, and the specific deviation. Close with a summary: total reviews, counts per state, and recommended next actions (which `dsn` items to update, which commitments to revise, which artifacts to fix).
 
 Do not auto-fix anything. This skill observes and reports; the user decides what to change.
 

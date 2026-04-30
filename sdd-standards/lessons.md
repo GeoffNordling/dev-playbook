@@ -90,28 +90,7 @@ single feat. The standard doesn't require this and it isn't
 universal, but feat decomposition and module decomposition both
 follow "one cohesive capability per unit," so they often line up.
 
-## 6. Interface pins earn their keep on trivial-looking dsns
-
-A dsn whose `Description:` merely restates the requirement still
-earns its keep through `Interface:`. The standard's §5.3 allowance
-to skip `dsn` applies when a req has neither a design decision nor
-an ownership assignment — but "no design decision" is a trap.
-Every public function carries at minimum the design decision of
-*its signature*, and that decision is exactly what a TDD red agent
-will most concretely act on.
-
-Without a pinned interface, the red agent writes skeletons and
-failing tests in an unbounded space — function name, parameter
-order, return type, module placement, all undetermined. The
-agent's first pick locks in the surface every later test and
-implementation carries. Recovering from a bad pick after green is
-more expensive than pinning the interface up front.
-
-A near-trivial dsn — Interface only, Description that just names
-the entry point — costs one item. Skipping it leaves the public
-surface to whatever the red agent rolls.
-
-## 7. Open question: should `Interface:` move out of `dsn`?
+## 6. Open question: should `Interface:` move out of `dsn`?
 
 Pinning the public surface of a simple requirement still requires
 creating a `dsn`, even when the dsn carries no design content

@@ -25,3 +25,22 @@ downstream code reads, what subsequent stages depend on. Decisions that
 live entirely inside a module (internal helpers, local data structures,
 file layout, control flow) belong to the implementation phase and stay
 with the agent.
+
+## When to write a design spec
+
+Write a `dsn` at every public module boundary — every entry point a
+caller, downstream module, or test will reach. Internal helpers,
+within-module data structures, and other implementation details stay
+with the implementation agent and do not need a `dsn`. The goal is to
+pin the surface a downstream consumer sees, not every function in the
+program.
+
+At a public boundary, a near-trivial `dsn` is fine: `Interface:` only,
+`Description:` that just names the entry point. One item per public
+surface. The value is that the surface is pinned before any test is
+written.
+
+Without a pinned `Interface:`, the implementation agent's first pick
+locks in the public surface every later test and implementation
+inherits. Recovering from a bad pick is more expensive than pinning
+up front.

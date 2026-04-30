@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Sync dotfiles repo to $HOME using GNU Stow.
 # Manages: .claude/ (skills, rules, settings), .agents/, .bashrc.d/
-# Designed to run from cron every minute. Idempotent.
+# Idempotent.
 #
 # 1. Removes broken symlinks (handles renames/deletions in the repo)
 # 2. Runs stow to create any new links
