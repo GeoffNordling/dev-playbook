@@ -18,7 +18,7 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 
 ## What does NOT belong here
 
-- Spec-driven development tools — those go in [`sdd-tools/`](../sdd-tools/)
+- Spec-driven development tools — those go in [`spec-tools/`](../spec-tools/)
 - Project-specific scripts — put them in that project's repo
 - Anything with a dedicated home elsewhere in this repo (standards, agent config, templates, shell aliases)
 
@@ -135,7 +135,7 @@ test-privacy                       # scans ./tests
 test-privacy path/to/tests [...]   # scans one or more explicit directories
 ```
 
-One line per finding to stdout in `file:line  rule  message` form. Exit code 0 if clean, 1 if any findings, 2 on tool error. Migrated from `sdd-tools`' `spec-privacy` pytest item; the SDD plugin no longer enforces this rule.
+One line per finding to stdout in `file:line  rule  message` form. Exit code 0 if clean, 1 if any findings, 2 on tool error.
 
 ### generate-pre-commit
 
