@@ -88,17 +88,3 @@ Programmatic representation of SDD spec artifacts: parse, traverse, modify, rend
 |--------|----------|---------|
 | Specs | `spec-tools/specs/` | `feat` / `req` / `dsn` items the package is built against |
 | Package | `spec-tools/src/spec_tools/` | In-memory model, deserialize, serialize, discover |
-
-### SDD tools (sdd-tools/)
-
-Deterministic validators and compressors for spec-driven development artifacts. See [sdd-tools/README.md](sdd-tools/README.md).
-
-| Object | Location | Purpose |
-|--------|----------|---------|
-| Package | `sdd-tools/src/sdd_tools/` | Validators (lint, coverage, interface) + compression / reporting CLIs |
-| pytest plugin | `sdd_tools.pytest_plugin` | hosts `spec-lint`, `spec-coverage`, `spec-interface` as `spec`-marked items |
-| CLI tool | `sdd-chain` (`sdd_tools.cli.chain`) | Render spec traceability chains with body text |
-| CLI tool | `sdd-index` (`sdd_tools.cli.index`) | Per-dimension one-line catalog of every `dsn` |
-| CLI tool | `sdd-atlas` (`sdd_tools.cli.atlas`) | Per-dimension full-body dump of every `dsn` |
-| CLI tool | `sdd-review` (`sdd_tools.cli.review`) | `AgentReview:` inventory for the review skill |
-| Vendored JAR | `sdd-tools/lib/openfasttrace-4.2.2.jar` | OpenFastTrace JAR (gitignored) |
