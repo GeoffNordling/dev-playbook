@@ -40,7 +40,6 @@ Each script is self-contained with a PEP 723 `# /// script` block. Skills refere
 
 Run automatically on every commit via pre-commit hooks. Each validation script:
 
-- Declares a `# /// pre-commit` metadata block (see below) with its hook config and the standard it enforces
 - Asserts its governing standard exists at startup — fails immediately if the standard has moved or been renamed
 - Exits 0 on success, 1 on failure, 2 on tool error
 - Writes machine-readable findings to stdout (one line per finding)
@@ -52,31 +51,11 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 | `internal-skill-audit` | [skill-conventions.md](../standards/skill-conventions.md) | Skill conformance (internal skills only; externally-managed skills are skipped) |
 | `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
 
-##### `# /// pre-commit` metadata
+Hook configuration lives in `.pre-commit-config.yaml` at the repo root and is the source of truth. To add a new validation script:
 
-Validation scripts embed pre-commit hook configuration as inline metadata, similar to PEP 723. The `generate-pre-commit` script reads these blocks to produce the generated section of `.pre-commit-config.yaml`.
-
-```python
-# /// pre-commit
-# id = "internal-skill-audit"
-# entry = "python3 tools/bin/internal-skill-audit"
-# pass_filenames = false
-# always_run = true
-# standard = "standards/skill-conventions.md"
-# ///
-```
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `id` | Yes | Hook identifier (used in `.pre-commit-config.yaml`) |
-| `entry` | Yes | Command to run |
-| `pass_filenames` | Yes | Whether pre-commit passes changed filenames as arguments |
-| `types` | No | File types that trigger the hook (e.g., `["markdown"]`) |
-| `always_run` | No | If `true`, run on every commit regardless of which files changed |
-| `files` | No | Regex pattern limiting which file paths trigger the hook |
-| `standard` | Yes | Path (relative to repo root) to the standards document this script enforces |
-
-After adding or modifying a `# /// pre-commit` block, run `python3 tools/bin/generate-pre-commit` to regenerate the hooks.
+1. Write the script under `bin/`.
+2. Add a `local` hook entry to `.pre-commit-config.yaml` with its `id`, `name`, `entry`, `language: system`, and the appropriate `pass_filenames` / `types` / `always_run` flags. Use the existing entries as a model.
+3. If the hook scans specific paths (e.g., `test-privacy spec-tools/tests`), pass them in the `entry`. Update the YAML when those paths change.
 
 #### Utility scripts
 
@@ -130,14 +109,6 @@ test-privacy path/to/tests [...]   # scans one or more explicit directories
 ```
 
 One line per finding to stdout in `file:line  rule  message` form. Exit code 0 if clean, 1 if any findings, 2 on tool error.
-
-### generate-pre-commit
-
-Scan `tools/bin/` for `# /// pre-commit` metadata blocks and regenerate the validation hooks section of `.pre-commit-config.yaml`. Run this after adding or changing a validation script.
-
-```bash
-generate-pre-commit [directory]
-```
 
 ### workspace-backup
 

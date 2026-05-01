@@ -15,13 +15,6 @@ Usage:
 # requires-python = ">=3.11"
 # dependencies = ["pyyaml"]
 # ///
-# /// pre-commit
-# id = "internal-skill-audit"
-# entry = "python3 tools/bin/internal-skill-audit"
-# pass_filenames = false
-# always_run = true
-# standard = "standards/skill-conventions.md"
-# ///
 
 import argparse
 import re

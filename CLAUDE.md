@@ -5,6 +5,7 @@
 - This is a public repository. Never commit secrets or confidential information.
 - See README.md for what belongs in this repo vs. other repos.
 - After adding or removing files under `dotfiles/`, run `dotfiles/bin/sync-dotfiles.sh` to update Stow symlinks.
+- `.pre-commit-config.yaml` is the source of truth for pre-commit hooks. Edit it directly to add, change, or remove a hook. When adding a new validation script under `tools/bin/`, add its hook entry to the YAML at the same time.
 
 ## LaTeX in Markdown
 

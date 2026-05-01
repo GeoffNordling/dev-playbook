@@ -78,7 +78,7 @@ CLI utilities for workspace automation. See [tools/README.md](tools/README.md) f
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `internal-skill-audit`, `test-privacy`, `workspace-backup`, `generate-pre-commit` |
+| Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `internal-skill-audit`, `test-privacy`, `workspace-backup` |
 
 ### Spec tools (spec-tools/)
 

@@ -12,13 +12,6 @@ Usage:
 # /// script
 # requires-python = ">=3.11"
 # ///
-# /// pre-commit
-# id = "ref-check"
-# entry = "python3 tools/bin/ref-check ."
-# pass_filenames = false
-# types = ["markdown"]
-# standard = "standards/repo-documentation.md"
-# ///
 
 import argparse
 import json
