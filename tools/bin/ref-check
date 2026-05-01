@@ -48,19 +48,16 @@ def find_md_files(root: Path) -> list[Path]:
 
 def classify_ref(target: Path, repo_root: Path) -> str:
     """Classify a resolved reference as ok, broken, or external."""
-    home = Path.home()
-    workspace = home / "workspace"
-    try:
-        rel_to_workspace = target.relative_to(workspace)
-    except ValueError:
-        return "broken"
+    workspace = Path.home() / "workspace"
+    rel_to_workspace = target.relative_to(workspace)
 
-    repo_name = repo_root.resolve().relative_to(workspace).parts[0]
+    repo_name = repo_root.name
     target_repo = rel_to_workspace.parts[0]
 
     if target_repo != repo_name:
         return "external"
-    if target.exists():
+    actual_path = repo_root / Path(*rel_to_workspace.parts[1:])
+    if actual_path.exists():
         return "ok"
     return "broken"
 
