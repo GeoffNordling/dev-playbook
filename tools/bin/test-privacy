@@ -55,8 +55,7 @@ class Finding:
 
     def render(self) -> str:
         return (
-            f"{self.file}:{self.line}  {self.rule}  {self.message}\n"
-            f"  fix: {self.fix}"
+            f"{self.file}:{self.line}  {self.rule}  {self.message}\n  fix: {self.fix}"
         )
 
 

@@ -74,12 +74,11 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 
 ### Tools (tools/)
 
-CLI utilities and shared libraries for workspace automation. See [tools/README.md](tools/README.md) for detailed usage and reference.
+CLI utilities for workspace automation. See [tools/README.md](tools/README.md) for detailed usage and reference.
 
 | Object | Location | Purpose |
 |--------|----------|---------|
 | Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `internal-skill-audit`, `test-privacy`, `workspace-backup`, `generate-pre-commit` |
-| Shared library | `tools/src/devtools_lib/` | Workspace discovery, git helpers |
 
 ### Spec tools (spec-tools/)
 

@@ -17,12 +17,39 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from devtools_lib.workspace import find_workplace, list_repos
+def find_workspace() -> Path:
+    """Auto-detect the workspace directory on Mac or Linux."""
+    candidates = [
+        Path("/Volumes/workplace"),
+        Path.home() / "workplace",
+        Path.home() / "workspace",
+    ]
+    for c in candidates:
+        if c.is_dir():
+            return c
+    print(
+        "Could not auto-detect workspace directory. Pass it as an argument.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 
-def human_size(num_bytes: int) -> str:
+def list_repos(workspace: Path) -> list[Path]:
+    """Return sorted git repo paths in a workspace directory."""
+    repos = []
+    for entry in sorted(workspace.iterdir()):
+        if not entry.is_dir():
+            continue
+        if entry.name.startswith("."):
+            continue
+        if not (entry / ".git").exists():
+            continue
+        repos.append(entry)
+    return repos
+
+
+def human_size(num_bytes: float) -> str:
     for unit in ("B", "KB", "MB", "GB", "TB"):
         if num_bytes < 1024:
             return f"{num_bytes:.1f} {unit}"
@@ -64,7 +91,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    workspace = args.workspace or find_workplace()
+    workspace = args.workspace or find_workspace()
     if not workspace.is_dir():
         print(f"Not a directory: {workspace}", file=sys.stderr)
         return 1
