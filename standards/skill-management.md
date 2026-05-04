@@ -6,10 +6,16 @@ Where Claude Code skills live in this workspace, and how they are installed, upd
 
 | Path under `dotfiles/` | Source | Editable |
 |---|---|---|
-| `.claude/skills/` | Authored in this workspace | Yes — these are the source |
+| `.claude/skills/` | Authored in this workspace, plus symlinks mirroring `.agents/skills/` | Yes for authored entries; symlinks are managed by `bin/sync-dotfiles.sh` |
 | `.agents/skills/` | Installed by the Vercel `skills` CLI | No — overwritten on update |
 
 Stow links these directories into `~/` so the canonical content lives in the git-tracked dotfiles tree.
+
+## Mirror rule
+
+Claude Code discovers skills only from `.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `.claude/skills/` pointing at it (`.claude/skills/<name>` → `../../.agents/skills/<name>`). `bin/sync-dotfiles.sh` enforces this on every run: it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
+
+After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror.
 
 ## Authored Skills
 
