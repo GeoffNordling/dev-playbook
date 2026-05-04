@@ -4,6 +4,7 @@ description: Author functional requirements (`feat` and `req` items) following t
 disable-model-invocation: true
 model: opus
 effort: xhigh
+argument-hint: "<issue-number>"
 ---
 
 # SDD Requirements
@@ -16,12 +17,13 @@ Author the project's functional requirements — `feat` (high-level capability) 
 
 ## First steps
 
-1. Check for `<project_root>/.claude/sdd-handoff.md`. If it exists, read it for issue context and scope.
-2. Read the project's existing specs if any:
+1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-requirements 18`). The issue is the per-session contract; without it there is no scope.
+2. Read GitHub issue #$ARGUMENTS — its body and the most recent `## Agent Brief` comment. The brief pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
+3. Read the project's existing specs if any:
    - `specs/functional_requirements.md` or, if folder-form, `specs/functional_requirements/index.md` and the files it lists.
    - `CONTEXT.md` if it exists, for domain vocabulary.
-3. Read the project's `CLAUDE.md`.
-4. Tell the user what you found and align on scope before drafting.
+4. Read the project's `CLAUDE.md`.
+5. Tell the user what you found and align on scope before drafting.
 
 ## Working with the spec collection
 

@@ -4,6 +4,7 @@ description: Implement features via vertical-slice TDD against committed `Interf
 disable-model-invocation: true
 model: opus
 effort: xhigh
+argument-hint: "<issue-number>"
 ---
 
 # SDD Implementation
@@ -20,12 +21,13 @@ When considering an `Interface:` amendment (see "Spec amendment" below), also re
 
 ## First steps
 
-1. Check for `<project_root>/.claude/sdd-handoff.md`. If it exists, read it.
-2. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or their flat-file equivalents).
-3. Read the project's `CLAUDE.md`.
-4. Read existing code under `src/` and existing tests under `tests/` — there may be partial work or stubs from prior cycles.
-5. Run the test suite to see the current state.
-6. Tell the user what you found and align on scope. Then move to the plan gate for the first chunk.
+1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-implementation 18`). The issue is the per-session contract; without it there is no scope.
+2. Read GitHub issue #$ARGUMENTS — its body and the most recent `## Agent Brief` comment. The brief pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
+3. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or their flat-file equivalents).
+4. Read the project's `CLAUDE.md`.
+5. Read existing code under `src/` and existing tests under `tests/` — there may be partial work or stubs from prior cycles.
+6. Run the test suite to see the current state.
+7. Tell the user what you found and align on scope. Then move to the plan gate for the first chunk.
 
 ## Working with the spec collection
 
@@ -84,3 +86,7 @@ The user decides whether to:
 Never edit a spec without an explicit approval gesture in this turn.
 
 Bugs that surface during implementation are spec gaps. Flag the gap to the user, propose the spec amendment that closes it, and wait for the same routing decision before changing the code.
+
+## Session handoff
+
+A chunk may not fit in one session — context fills, the user breaks for the day, an external blocker appears. Before stopping, update the issue body or post a comment documenting current state. Capture: which slices are done, which are next, any decisions made, any spec amendments pending. The next session's cold-start reads only the issue body and the most recent agent brief, so anything not written there is lost. Do not rely on the user to remember.

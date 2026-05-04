@@ -4,6 +4,7 @@ description: Author design items (`dsn`) and pin `Interface:` lines from approve
 disable-model-invocation: true
 model: opus
 effort: xhigh
+argument-hint: "<issue-number>"
 ---
 
 # SDD Design
@@ -18,14 +19,15 @@ Author the project's design layer — `dsn` items pinning `Interface:` lines and
 
 ## First steps
 
-1. Check for `<project_root>/.claude/sdd-handoff.md`. If it exists, read it for issue context and scope.
-2. Read the project's existing specs:
+1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-design 18`). The issue is the per-session contract; without it there is no scope.
+2. Read GitHub issue #$ARGUMENTS — its body and the most recent `## Agent Brief` comment. The brief pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
+3. Read the project's existing specs:
    - `specs/functional_requirements.md` or, if folder-form, `specs/functional_requirements/index.md` and the files it lists. Without approved requirements, designing is premature.
    - `specs/design.md` or, if folder-form, `specs/design/index.md` and the files it lists.
    - `docs/adr/` for prior architectural decisions in the area being designed (check `docs/adr/README.md` for the index).
-3. Read the project's `CLAUDE.md`.
-4. **Brownfield reconnaissance.** Read the existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record the reasoning in each `dsn`'s `Rationale:` when drafting.
-5. Tell the user what you found and align on scope.
+4. Read the project's `CLAUDE.md`.
+5. **Brownfield reconnaissance.** Read the existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record the reasoning in each `dsn`'s `Rationale:` when drafting.
+6. Tell the user what you found and align on scope.
 
 ## Working with the spec collection
 
