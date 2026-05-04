@@ -21,11 +21,14 @@ Needs:
 
 Description:
 When the discoverer is given a project root, it `SHALL` return the
-set of spec files reachable from that root. The discoverer
-`SHALL NOT` include `index.md` files (the navigation tables of
-folder-form spec directories) in the returned set. If the project
-root has no recognized spec layout, the discoverer `SHALL` raise
-to signal misconfiguration.
+set of spec files reachable from `<root>/specs/`. The admitted
+direct children of `specs/` are `design.md` or `design/`, and
+`functional_requirements.md` or `functional_requirements/`. The
+discoverer `SHALL NOT` include `index.md` files (the navigation
+tables of folder-form spec directories) in the returned set. If
+`<root>/specs/` is missing, empty, or contains any entry other than
+the admitted names, the discoverer `SHALL` raise to signal
+misconfiguration.
 
 Rationale:
 A single entry point that handles either layout removes a class of
