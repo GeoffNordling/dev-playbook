@@ -28,13 +28,10 @@ cd .claude/worktrees/<name>
 
 Any session — agent, human, fresh terminal — resumes by `cd .claude/worktrees/<name>`. The worktree persists across sessions.
 
-## After merge
+## Cleanup
 
-From the repo root:
+Run `worktree-sweep` from inside the repo. It prunes worktrees whose PR is merged with no local divergence; anything ambiguous (rejected PRs, unpushed commits, missing PRs) is reported for case-by-case handling.
 
 ```bash
-git worktree remove .claude/worktrees/<name>
-git branch -d <name>
+python3 ~/workspace/dev-playbook/tools/bin/worktree-sweep
 ```
-
-`-d` (lowercase) refuses to delete unmerged branches; this is the guardrail. `-D` is for explicitly abandoning unmerged work.

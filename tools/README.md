@@ -65,6 +65,7 @@ Run ad hoc on user demand. Not part of the pre-commit pipeline.
 |------|---------|
 | `py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
 | `workspace-backup` | Archive every workspace repo (with `.git/`) into a single dated .zip |
+| `worktree-sweep` | Prune `.claude/worktrees/` entries whose PR is merged with no local divergence; report ambiguous cases |
 
 ## Tool reference
 
@@ -122,6 +123,17 @@ workspace-backup --force              # overwrite existing output
 ```
 
 Skips hidden directories and non-repo subfolders. Symlinks are not followed.
+
+### worktree-sweep
+
+Walk `.claude/worktrees/` in the current repo and prune worktrees whose most-recent PR is merged with no local divergence. Anything else is reported for human triage. Implements the cleanup step of [issue-implementation.md](../standards/issue-implementation.md).
+
+```bash
+worktree-sweep            # apply prunes, report the rest
+worktree-sweep --dry-run  # report only
+```
+
+Auto-prune requires all three: PR state `MERGED`, local tip SHA matches the PR's `headRefOid`, and `git status --porcelain` is empty. Ambiguous categories: PR open (in-progress, skipped), PR closed without merge (rejected), no PR for branch, local tip diverges from PR head (unpushed commits or force-push). Exit code 1 if any errors during processing, 0 otherwise.
 
 ## Development
 
