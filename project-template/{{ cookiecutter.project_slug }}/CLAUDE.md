@@ -12,28 +12,21 @@ uv sync
 ```
 
 {% endif -%}
-## Lint / Format / Type Check
+## Make targets
 
 ```bash
-uv run ruff check .
-uv run ruff format .
-uv run mypy{% if 'package' in cookiecutter.project_layout %} src/{% endif %}{% if 'scripts' in cookiecutter.project_layout %} scripts/{% endif %}
-
+make check       # read-only: format --check + lint + typecheck + test
+make format      # apply formatter fixes
+make lint        # ruff lint
+make typecheck   # mypy
+make test        # pytest
 ```
 
-Or use the Makefile:
+`make check` is the "is this branch ready?" gate. It is read-only; if it
+complains about formatting, run `make format` to apply fixes.
 
-```bash
-make lint
-make format
-make typecheck
-```
-
-## Tests
-
-```bash
-uv run pytest
-```
+See [build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md)
+for the canonical target definitions.
 
 ## Code Style
 

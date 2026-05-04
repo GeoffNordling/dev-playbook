@@ -14,3 +14,4 @@ Cross-project engineering standards that apply to all repositories in the worksp
 | [skill-management.md](skill-management.md) | Where skills live and how third-party skills are installed |
 | [python-conventions.md](python-conventions.md) | Default Python conventions and the anti-pattern catalog the `code-quality-sweep` skill scans for |
 | [testing-conventions.md](testing-conventions.md) | Default pytest conventions: structure, test doubles, fixtures |
+| [build-conventions.md](build-conventions.md) | Standard `Makefile` targets (`format`, `lint`, `typecheck`, `test`, `check`) for Python sub-projects |

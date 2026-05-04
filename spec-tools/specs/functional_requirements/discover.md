@@ -21,36 +21,22 @@ Needs:
 
 Description:
 When the discoverer is given a project root, it `SHALL` return the
-set of spec files reachable from that root.
+set of spec files reachable from that root. The discoverer
+`SHALL NOT` include `index.md` files (the navigation tables of
+folder-form spec directories) in the returned set. If the project
+root has no recognized spec layout, the discoverer `SHALL` raise
+to signal misconfiguration.
 
 Rationale:
 A single entry point that handles either layout removes a class of
-duplicate logic from every consumer.
+duplicate logic from every consumer. Index files carry navigation
+metadata rather than spec content; the discoverer surfaces only
+spec content so consumers do not re-implement the filtering rule.
+A missing or unrecognized layout indicates a configuration error;
+raising lets callers handle the case explicitly.
 
 Covers:
 - feat~discover~0
 
 Needs:
 - dsn
-
-### Public find entry point
-`dsn~discover.find~0`
-
-Description:
-The discoverer `SHALL` expose a public `find` function that takes a
-project root and returns the spec files reachable from that root as
-a list of paths.
-
-Rationale:
-A single module-level entry point gives every consumer (parse,
-analysis, lint) one place to call and hides whether the project
-uses single-file or folder-form layout. Without it, each consumer
-would re-implement traversal.
-
-Covers:
-- req~discover.traversal~0
-
-Needs:
-- utest
-
-Interface: discover.find(root: pathlib.Path) -> list[pathlib.Path]

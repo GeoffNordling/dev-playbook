@@ -19,8 +19,9 @@ cd spec-tools && uv sync
 ## Development
 
 ```bash
-uv run pytest
-make lint
-make format
-make typecheck
+make check       # format --check + lint + typecheck + test
+make format      # apply formatter fixes
 ```
+
+See [build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md)
+for the standard target definitions.
