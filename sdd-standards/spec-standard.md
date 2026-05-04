@@ -91,12 +91,23 @@ reads as three grouping levels. They carry no structural meaning.
 ### 3.3 `revision`
 
 A non-negative integer starting at `0`. Incremented when the item's
-meaning changes in a way downstream items need to re-evaluate.
+meaning changes in a way committed downstream items need to
+re-evaluate. Specs and code are co-maintained as peers (see
+[README](README.md)); the revision is the formal trigger that forces
+both downstream spec items and the code that implements them to
+re-check themselves against the new meaning rather than drift
+silently.
 
-- **Bump** on semantic change: the requirement now means something
-  different than it did before.
+- **Bump** when the item's meaning changes *and* committed downstream
+  items (other spec items, or tests via `@pytest.mark.covers`)
+  already pin the prior revision.
 - **Do not bump** on cosmetic edits: typos, rewording that does not
   alter meaning, formatting.
+- **Do not bump** when no committed downstream items pin the prior
+  revision — typically during initial greenfield implementation,
+  while the spec is being shaken down for adequacy as the code is
+  first written. With nothing to re-evaluate, the bump is ceremony.
+  Edit the item in place and keep the revision at `0`.
 
 A revision bump voids every downstream `Covers:` link pinned to the
 previous revision. Each downstream author `SHALL` re-evaluate and
