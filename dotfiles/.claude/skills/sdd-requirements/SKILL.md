@@ -18,7 +18,7 @@ Author the project's functional requirements — `feat` (high-level capability) 
 ## First steps
 
 1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-requirements 18`). The issue is the per-session contract; without it there is no scope.
-2. Read GitHub issue #$ARGUMENTS — its body and the most recent `## Agent Brief` comment. The brief pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
+2. Run `gh-show $ARGUMENTS` to load the issue. The body sets the per-session contract; the most recent `## Agent Brief` comment pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
 3. Read the project's existing specs if any:
    - `specs/functional_requirements.md` or, if folder-form, `specs/functional_requirements/index.md` and the files it lists.
    - `CONTEXT.md` if it exists, for domain vocabulary.

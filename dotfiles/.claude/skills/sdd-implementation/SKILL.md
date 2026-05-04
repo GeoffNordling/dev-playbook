@@ -22,7 +22,7 @@ When considering an `Interface:` amendment (see "Spec amendment" below), also re
 ## First steps
 
 1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-implementation 18`). The issue is the per-session contract; without it there is no scope.
-2. Read GitHub issue #$ARGUMENTS — its body and the most recent `## Agent Brief` comment. The brief pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
+2. Run `gh-show $ARGUMENTS` to load the issue. The body sets the per-session contract; the most recent `## Agent Brief` comment pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
 3. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or their flat-file equivalents).
 4. Read the project's `CLAUDE.md`.
 5. Read existing code under `src/` and existing tests under `tests/` — there may be partial work or stubs from prior cycles.
