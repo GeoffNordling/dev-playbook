@@ -10,13 +10,27 @@ The branch lives in a worktree at `.claude/worktrees/<branch-name>/`. The worktr
 
 ## Setup (new work)
 
-From the repo root on `main`:
+1. From the repo root, ensure `main` is checked out:
 
-```bash
-git checkout main && git pull
-git worktree add .claude/worktrees/<name> -b <name>
-cd .claude/worktrees/<name>
-```
+   ```bash
+   git checkout main
+   ```
+
+2. Confirm local `main` matches `origin/main`:
+
+   ```bash
+   git rev-parse main
+   gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
+   ```
+
+   If the SHAs differ, stop and ask the user to `git pull`. The agent does not hold the SSH credential a pull requires.
+
+3. Create the worktree and enter it:
+
+   ```bash
+   git worktree add .claude/worktrees/<name> -b <name>
+   cd .claude/worktrees/<name>
+   ```
 
 ## In flight
 

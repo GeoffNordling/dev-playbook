@@ -10,6 +10,7 @@ build/
 .ruff_cache/
 .pytest_cache/
 .claude/idd-handoff.md
+.claude/worktrees/
 {% if 'notebooks' in cookiecutter.project_layout -%}
 __marimo__/
 *.log
