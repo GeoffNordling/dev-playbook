@@ -4,9 +4,7 @@ How issues are tracked, triaged, and broken down into deliverable units.
 
 ## Source of truth
 
-The operational rules live in three Matt Pocock skill bundles. The skills are
-the source of truth; this file exists only to point at them and to position
-issues against the other artifacts in the workspace.
+Triage and breakdown conventions come from three Matt Pocock skill bundles:
 
 - /triage — triage state machine, agent brief format, `.out-of-scope/`
   knowledge base.
@@ -14,6 +12,9 @@ issues against the other artifacts in the workspace.
 - /setup-matt-pocock-skills — per-repo configuration scaffolding
   (`docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`,
   `docs/agents/domain.md`).
+
+The implementation workflow — branch, worktree, PR — lives in
+[issue-implementation.md](~/workspace/dev-playbook/standards/issue-implementation.md).
 
 ## Scope
 

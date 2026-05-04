@@ -14,16 +14,18 @@ Author the project's functional requirements — `feat` (high-level capability) 
 ## Read first
 
 - [Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, prose rules (obligation vocabulary and EARS sentence templates), file organization. The full grammar.
+- [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
 
 ## First steps
 
 1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-requirements 18`). The issue is the per-session contract; without it there is no scope.
 2. Run `gh-show $ARGUMENTS` to load the issue. The body sets the per-session contract; the most recent `## Agent Brief` comment pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
-3. Read the project's existing specs if any:
+3. Set up the worktree for issue `$ARGUMENTS` per the [issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md). All subsequent steps run inside the worktree.
+4. Read the project's existing specs if any:
    - `specs/functional_requirements.md` or, if folder-form, `specs/functional_requirements/index.md` and the files it lists.
    - `CONTEXT.md` if it exists, for domain vocabulary.
-4. Read the project's `CLAUDE.md`.
-5. Tell the user what you found and align on scope before drafting.
+5. Read the project's `CLAUDE.md`.
+6. Tell the user what you found and align on scope before drafting.
 
 ## Working with the spec collection
 

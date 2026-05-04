@@ -1,0 +1,40 @@
+# Implementing a Tracked Issue
+
+The procedure for turning a tracked issue into a merged PR. One issue → one branch → one PR → one merge. Applies to every workspace repo.
+
+## Branch name
+
+`<issue#>-<slug>`. The slug is kebab-case, derived from the issue title; drop tracker prefixes (e.g. `spec-tools:`); keep it short.
+
+The branch lives in a worktree at `.claude/worktrees/<branch-name>/`. The worktree directory and the branch share the same name.
+
+## Setup (new work)
+
+From the repo root on `main`:
+
+```bash
+git checkout main && git pull
+git worktree add .claude/worktrees/<name> -b <name>
+cd .claude/worktrees/<name>
+```
+
+## In flight
+
+- Commit on the branch.
+- Push with `git push -u origin <name>`.
+- Open the PR with `gh pr create --body "Closes #<N> …"`. The `Closes #<N>` token is mandatory — merging the PR closes the issue.
+
+## Resuming work in progress
+
+Any session — agent, human, fresh terminal — resumes by `cd .claude/worktrees/<name>`. The worktree persists across sessions.
+
+## After merge
+
+From the repo root:
+
+```bash
+git worktree remove .claude/worktrees/<name>
+git branch -d <name>
+```
+
+`-d` (lowercase) refuses to delete unmerged branches; this is the guardrail. `-D` is for explicitly abandoning unmerged work.

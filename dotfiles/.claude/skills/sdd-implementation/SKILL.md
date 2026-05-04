@@ -16,6 +16,7 @@ Vertical-slice TDD against the `Interface:` declarations committed in the design
 - [Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
 - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
 - [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style, and the other code-level standards that apply to everything you write in this skill.
+- [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
 
 When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/dev-playbook/sdd-standards/lessons.md).
 
@@ -23,11 +24,12 @@ When considering an `Interface:` amendment (see "Spec amendment" below), also re
 
 1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-implementation 18`). The issue is the per-session contract; without it there is no scope.
 2. Run `gh-show $ARGUMENTS` to load the issue. The body sets the per-session contract; the most recent `## Agent Brief` comment pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
-3. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or their flat-file equivalents).
-4. Read the project's `CLAUDE.md`.
-5. Read existing code under `src/` and existing tests under `tests/` — there may be partial work or stubs from prior cycles.
-6. Run the test suite to see the current state.
-7. Tell the user what you found and align on scope. Then move to the plan gate for the first chunk.
+3. Set up the worktree for issue `$ARGUMENTS` per the [issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md). All subsequent steps run inside the worktree.
+4. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or their flat-file equivalents).
+5. Read the project's `CLAUDE.md`.
+6. Read existing code under `src/` and existing tests under `tests/` — there may be partial work or stubs from prior cycles.
+7. Run the test suite to see the current state.
+8. Tell the user what you found and align on scope. Then move to the plan gate for the first chunk.
 
 ## Working with the spec collection
 

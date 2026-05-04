@@ -2,6 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(gh-show:*)"
+    ],
+    "deny": [
+      "EnterWorktree",
+      "ExitWorktree"
     ]
   },
   "hooks": {
