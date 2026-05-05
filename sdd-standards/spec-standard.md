@@ -193,12 +193,19 @@ review.
 
 Each keyword is a case-sensitive label followed by a colon at the start
 of a line. Content may begin on the same line or on the line following,
-as shown in each subsection.
+as shown in each subsection. A keyword's content extends until the next
+keyword line, the next `###` heading, or end of file.
+
+A keyword line `SHALL` be followed by content of the form specified for
+that keyword. A keyword with no content `SHALL` be omitted entirely
+from the item rather than emitted with an empty body.
 
 ### 6.1 `Description:`
 
-Required. An explicit marker that opens the item body. Prose rules
-(obligation verbs, sentence templates) are in §7.
+The body of the item, in prose. Required, exactly one per item.
+Prose rules (obligation verbs, sentence templates) are in §7.
+
+Form: a `Description:` line followed by one or more body lines.
 
     Description:
     When the user submits credentials, the system `SHALL` verify them
@@ -206,57 +213,77 @@ Required. An explicit marker that opens the item body. Prose rules
 
 ### 6.2 `Rationale:`
 
-Optional. Why the requirement exists. At most one per item.
+Why the requirement exists. Optional, at most one per item.
+
+Form: a `Rationale:` line followed by one or more body lines.
+
+    Rationale:
+    Verifying credentials at the gateway prevents downstream services
+    from having to repeat the check on every request.
 
 ### 6.3 `Comment:`
 
-Optional. Caveats, implementation notes, or anything that fits neither
-description nor rationale. At most one per item.
+Caveats, implementation notes, or anything that fits neither
+description nor rationale. Optional, at most one per item.
+
+Form: a `Comment:` line followed by one or more body lines.
+
+    Comment:
+    The credential store is replicated; reads `MAY` lag the primary by
+    up to 100 ms.
 
 ### 6.4 `Covers:`
 
-Bullet list. Each entry names a full upstream ID *including revision*:
+Names the upstream items this item covers (§5). Required on non-root
+items, at most one per item. (See §5.2 for root semantics.)
+
+Form: a `Covers:` line followed by one or more
+`- type~name~revision` bullets.
 
     Covers:
     - feat~user-auth~0
     - feat~session~1
 
-Required except on root items (see §5.2).
-
 ### 6.5 `Depends:`
 
-Bullet list. Ordering hints between items; carries no coverage effect.
-Optional.
+Ordering hints between items; carries no coverage effect. Optional,
+at most one per item.
+
+Form: a `Depends:` line followed by one or more
+`- type~name~revision` bullets.
+
+    Depends:
+    - dsn~credential-store~0
 
 ### 6.6 `Needs:`
 
-Bullet list, even for a single entry. Names the downstream artifact
-types required to cover this item:
+Names the downstream artifact types required to cover this item.
+Chain semantics are in §5. Optional, at most one per item.
 
-    Needs:
-    - dsn
+Form: a `Needs:` line followed by one or more `- <artifact-type>`
+bullets.
 
     Needs:
     - utest
     - itest
 
-Chain semantics are in §5.
-
 ### 6.7 `Tags:`
 
-Comma-separated labels on a single line. Optional. Used by tooling for
-filtering.
+Free-form labels used by tooling for filtering. Optional, at most one
+per item.
+
+Form: a `Tags:` line with one or more comma-separated values on the
+same line.
 
     Tags: classifier, llm
 
 ### 6.8 `Interface:`
 
-Optional. Valid only on `dsn` items. A design-phase structural
-commitment: the human pins code shape so downstream agents implement
-against a fixed target.
+A design-phase structural commitment: the human pins code shape so
+downstream agents implement against a fixed target. Optional,
+repeatable. Valid only on `dsn` items.
 
-Each `Interface:` entry is a single line declaring one signature. A
-`dsn` `MAY` declare multiple entries.
+Form: each `Interface:` line declares one signature.
 
     Interface: parser.parse_session(path: pathlib.Path) -> parser.Session
     Interface: parser.SessionParser.__init__(self, config: parser.ParserConfig) -> None
@@ -289,16 +316,16 @@ verification of behavior still comes from a test or `AgentReview:`
 
 ### 6.9 `AgentReview:`
 
-Optional. Valid on any Markdown spec item — `feat`, `req`, or `dsn`.
 Prose describing what a review agent must check. The non-test arm of
-verification (§5.4).
+verification (§5.4). Optional, repeatable. Valid on any Markdown spec
+item — `feat`, `req`, or `dsn`.
 
-Each `AgentReview:` entry is a single declaration describing one thing
-to check. An item `MAY` declare multiple entries.
+Form: each `AgentReview:` line declares one thing to check; no
+hanging-indent continuation. When one entry would be uncomfortably
+long, split it into multiple entries rather than wrapping a single
+declaration across lines.
 
-    AgentReview: The agent's system prompt at src/prompts/agent.md
-                 contains a directive discouraging filler or polite
-                 conversation.
+    AgentReview: The agent's system prompt at src/prompts/agent.md contains a directive discouraging filler or polite conversation.
 
 File paths named in the prose let the review agent locate what to
 compare against.
