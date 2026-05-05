@@ -93,3 +93,14 @@ def test_find_raises_on_unexpected_directory_under_specs(tmp_path: pathlib.Path)
 
     with pytest.raises(ValueError, match="scratch"):
         find(tmp_path)
+
+
+@pytest.mark.covers("dsn~discover.find~0")
+def test_find_raises_on_non_markdown_file_inside_folder_form(tmp_path: pathlib.Path):
+    specs_dir = tmp_path / "specs"
+    (specs_dir / "design").mkdir(parents=True)
+    (specs_dir / "design" / "alpha.md").write_text("# alpha\n")
+    (specs_dir / "design" / "notes.txt").write_text("not a spec")
+
+    with pytest.raises(ValueError, match="notes.txt"):
+        find(tmp_path)

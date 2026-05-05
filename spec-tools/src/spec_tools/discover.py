@@ -23,6 +23,11 @@ def find(root: pathlib.Path) -> list[pathlib.Path]:
     for child in specs.iterdir():
         if child.name not in _ADMITTED_CHILDREN:
             raise ValueError(f"unexpected entry under specs/: {child.name}")
+    for entry in specs.rglob("*"):
+        if entry.is_dir():
+            continue
+        if entry.suffix != ".md":
+            raise ValueError(f"non-spec entry under specs/: {entry.relative_to(specs)}")
     spec_files = sorted(p for p in specs.rglob("*.md") if p.name != "index.md")
     if not spec_files:
         raise ValueError(f"specs/ at {root} contains no spec files")

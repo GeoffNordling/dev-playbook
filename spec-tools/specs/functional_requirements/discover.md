@@ -19,13 +19,15 @@ Needs:
 
 Description:
 When the discoverer is given a project root, it `SHALL` return the
-set of spec files reachable from `<root>/specs/`. The admitted
-direct children of `specs/` are `design.md` or `design/`, and
-`functional_requirements.md` or `functional_requirements/`. The
-discoverer `SHALL NOT` include `index.md` files (the navigation
-tables of folder-form spec directories) in the returned set. If
-`<root>/specs/` is missing, empty, or contains any entry other than
-the admitted names, the discoverer `SHALL` raise to signal
+set of spec files reachable from `<root>/specs/`. A spec file is
+any `.md` file other than `index.md`; the discoverer `SHALL NOT`
+include `index.md` files (folder-form navigation tables) in the
+returned set. The admitted direct children of `specs/` are
+`design.md` or `design/`, and `functional_requirements.md` or
+`functional_requirements/`. Folder-form directories `SHALL` contain
+only `.md` files and subdirectories, recursively. If
+`<root>/specs/` is missing, empty, or contains any entry that
+violates these rules, the discoverer `SHALL` raise to signal
 misconfiguration.
 
 Rationale:

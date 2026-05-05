@@ -358,10 +358,19 @@ than a review skill.
 
 ### Keyword ordering
 
-- `Description:` before `Rationale:` before `Comment:`.
-- Relationship lists (`Covers:`, `Depends:`, `Needs:`, `Tags:`) and
-  extension keywords (`Interface:`, `AgentReview:`) appear after the
-  body.
+Within an item, keywords appear in this exhaustive order. Items
+`MAY` omit any optional keyword; the remaining keywords keep their
+relative positions.
+
+1. `Description:`
+2. `Rationale:`
+3. `Comment:`
+4. `Covers:`
+5. `Depends:`
+6. `Tags:`
+7. `Needs:`
+8. `Interface:` (one line per occurrence)
+9. `AgentReview:` (one line per occurrence)
 
 ## 7. Prose within a spec item
 
@@ -409,6 +418,9 @@ body:
 
 - All spec files live under `/specs/` at the repository root, versioned
   alongside the code they describe.
+- The `/specs/` tree `SHALL` contain only spec files (`.md`) and
+  `index.md` navigation files. Nothing else belongs there at any
+  depth.
 - A simple spec is a single file (`design.md`,
   `functional_requirements.md`). A complex spec is a folder of files
   (`design/`, `functional_requirements/`) organized by feature or

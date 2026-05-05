@@ -4,8 +4,8 @@
 Description:
 The discoverer `SHALL` expose a public `find` function that takes a
 project root and returns the spec files reachable from that root as
-a list of paths. If the root has no recognized spec layout, `find`
-`SHALL` raise `ValueError`.
+a list of paths sorted lexicographically by path. If the root has
+no recognized spec layout, `find` `SHALL` raise `ValueError`.
 
 Rationale:
 A single module-level entry point gives every consumer (parse,

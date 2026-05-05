@@ -4,8 +4,10 @@
 Description:
 The serializer's public `render` function `SHALL` produce markdown
 that conforms to the workspace spec standard, for any well-formed
-list of SpecItems. Conformance holds by construction at output
-time.
+list of SpecItems. Within each item, keywords appear in canonical
+order: `Description:`, `Rationale:`, `Comment:`, `Covers:`,
+`Depends:`, `Tags:`, `Needs:`, `Interface:`, `AgentReview:`.
+Conformance holds by construction at output time.
 
 Rationale:
 A pure list-to-string transformation isolates the conformance
