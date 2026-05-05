@@ -1,5 +1,3 @@
-# Serialize
-
 ### Render to conformant markdown
 `dsn~serialize.render~0`
 
