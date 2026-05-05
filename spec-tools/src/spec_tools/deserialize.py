@@ -282,12 +282,6 @@ def _parse_id_triple(triple: str, line_index: int, path: pathlib.Path) -> ItemId
             f"ID triple must have three tilde-separated parts, got {triple!r}",
         )
     artifact_type, name, revision_text = parts
-    if not artifact_type or any(ch.isspace() for ch in name):
-        raise _id_syntax_error(
-            line_index,
-            path,
-            f"ID triple has empty type or whitespace in name: {triple!r}",
-        )
     try:
         revision = int(revision_text)
     except ValueError:

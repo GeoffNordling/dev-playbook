@@ -44,13 +44,21 @@ Interface: model.SpecItem(heading: str, id: model.ItemId, description: str, rati
 
 Description:
 The model `SHALL` represent each spec-item identifier as an
-`ItemId` triple of artifact type, name, and revision, with the
-revision a non-negative integer.
+`ItemId` triple of artifact type, name, and revision.
+`ItemId.__init__` `SHALL` raise `ValueError` on any violation of
+the ID-form rules in §3 of the workspace spec standard:
+`artifact_type` must be one of `feat`, `req`, `dsn`, `utest`, or
+`itest` (per §4); `name` must start with a letter and contain
+only letters, digits, `.`, `_`, or `-`, with no consecutive dots
+(per §3.2); `revision` must be a non-negative integer (per §3.3).
 
 Rationale:
 Structured access to id components lets downstream consumers
 filter, group, and compare items by type or name without parsing
 the id string. The triple mirrors the standard's defined id form.
+Construction-time validation prevents callers from building
+ItemIds that would render to non-conformant text and fail to
+parse.
 
 Covers:
 - req~deserialize.fidelity~0
@@ -59,6 +67,8 @@ Needs:
 - utest
 
 Interface: model.ItemId(artifact_type: str, name: str, revision: int) -> None
+
+AgentReview: `ItemId.__post_init__` enforces the ID-form rules in §3 of sdd-standards/spec-standard.md — artifact_type whitelist from §4, name charset and lead-character rule from §3.2, no consecutive dots in name from §3.2, non-negative integer revision from §3.3.
 
 ### Spec graph
 `dsn~model.graph~0`

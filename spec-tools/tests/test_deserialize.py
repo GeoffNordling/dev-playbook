@@ -151,6 +151,34 @@ def test_parse_raises_id_syntax_when_id_line_missing_backticks():
 
 @pytest.mark.covers("dsn~deserialize.parse~0")
 @pytest.mark.parametrize(
+    "fixture_name",
+    [
+        "bad/id_artifact_type_unknown.md",
+        "bad/id_artifact_type_empty.md",
+        "bad/id_name_lead_digit.md",
+        "bad/id_name_lead_dot.md",
+        "bad/id_name_lead_hyphen.md",
+        "bad/id_name_lead_underscore.md",
+        "bad/id_name_consecutive_dots.md",
+        "bad/id_name_empty.md",
+        "bad/id_name_invalid_char.md",
+        "bad/id_revision_non_integer.md",
+    ],
+)
+def test_parse_raises_id_syntax_for_section_3_violations(fixture_name: str):
+    fixture_path = load(fixture_name)
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "id-syntax"
+    assert error.path == fixture_path
+    assert error.line == 8
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+@pytest.mark.parametrize(
     "fixture_name, expected_line",
     [
         ("bad/empty_description.md", 10),

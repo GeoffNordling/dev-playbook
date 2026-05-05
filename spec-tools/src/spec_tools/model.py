@@ -1,8 +1,12 @@
 """In-memory model of SDD spec artifacts."""
 
+import re
 from dataclasses import dataclass
 
 import networkx
+
+_ARTIFACT_TYPES = frozenset({"feat", "req", "dsn", "utest", "itest"})
+_NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9._-]*$")
 
 
 @dataclass(frozen=True)
@@ -14,7 +18,21 @@ class ItemId:
     revision: int
 
     def __post_init__(self) -> None:
-        """Reject negative revisions."""
+        """Enforce the ID-form rules from §3 of the workspace spec standard."""
+        if self.artifact_type not in _ARTIFACT_TYPES:
+            raise ValueError(
+                f"artifact_type must be one of {sorted(_ARTIFACT_TYPES)}, "
+                f"got {self.artifact_type!r}"
+            )
+        if not _NAME_PATTERN.match(self.name):
+            raise ValueError(
+                "name must start with a letter and contain only "
+                f"letters, digits, '.', '_', or '-', got {self.name!r}"
+            )
+        if ".." in self.name:
+            raise ValueError(
+                f"name must not contain consecutive dots, got {self.name!r}"
+            )
         if self.revision < 0:
             raise ValueError(
                 f"revision must be a non-negative integer, got {self.revision}"

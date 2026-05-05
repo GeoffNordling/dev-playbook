@@ -43,6 +43,7 @@ Needs:
 Interface: deserialize.SpecParseError(path: pathlib.Path, line: int, rule_violated: str, message: str) -> None
 
 AgentReview: The deserializer's `rule_violated` taxonomy — recognized-keyword set, required-keyword set, and per-keyword body forms — matches the keyword definitions in §6 of sdd-standards/spec-standard.md.
+AgentReview: The deserializer's `id-syntax` rule fires on every violation of the ID-form rules in §3 of sdd-standards/spec-standard.md.
 
 ### Public parse entry point
 `dsn~deserialize.parse~0`

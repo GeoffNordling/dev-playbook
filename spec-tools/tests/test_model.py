@@ -59,6 +59,29 @@ def test_item_id_rejects_negative_revision():
         ItemId(artifact_type="dsn", name="model.item-id", revision=-1)
 
 
+@pytest.mark.covers("dsn~model.item-id~0")
+@pytest.mark.parametrize(
+    "artifact_type, name, match",
+    [
+        ("rqe", "ok", "artifact_type"),
+        ("FEAT", "ok", "artifact_type"),
+        ("", "ok", "artifact_type"),
+        ("dsn", "", "name"),
+        ("dsn", "1foo", "name"),
+        ("dsn", ".foo", "name"),
+        ("dsn", "-foo", "name"),
+        ("dsn", "_foo", "name"),
+        ("dsn", "foo bar", "name"),
+        ("dsn", "foo@bar", "name"),
+        ("dsn", "foo/bar", "name"),
+        ("dsn", "foo..bar", "consecutive dots"),
+    ],
+)
+def test_item_id_rejects_invalid_id_form(artifact_type: str, name: str, match: str):
+    with pytest.raises(ValueError, match=match):
+        ItemId(artifact_type=artifact_type, name=name, revision=0)
+
+
 @pytest.mark.covers("dsn~model.spec-item~0")
 @pytest.mark.parametrize(
     "field, bad_value",
