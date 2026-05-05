@@ -16,6 +16,12 @@ instance with the following typed fields:
 - interface: list[str]
 - agent_review: list[str]
 Field names mirror the keyword names defined in the spec standard.
+`SpecItem.__init__` `SHALL` raise `ValueError` if `heading` or
+`description` is empty, if `rationale` or `comment` is the empty
+string rather than `None`, or if any entry in `needs`, `tags`,
+`interface`, or `agent_review` is the empty string. These cases
+would otherwise yield non-conformant render output, since the
+deserializer rejects empty headings and empty keyword bodies.
 
 Rationale:
 Typed accessors give every downstream consumer static help and a

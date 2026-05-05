@@ -18,7 +18,7 @@ def make_item(
     return SpecItem(
         heading=name,
         id=ItemId(artifact_type=artifact_type, name=name, revision=revision),
-        description="",
+        description="placeholder description.",
         rationale=None,
         comment=None,
         covers=list(covers),
@@ -57,6 +57,39 @@ def test_item_id_compares_by_value():
 def test_item_id_rejects_negative_revision():
     with pytest.raises(ValueError, match="revision"):
         ItemId(artifact_type="dsn", name="model.item-id", revision=-1)
+
+
+@pytest.mark.covers("dsn~model.spec-item~0")
+@pytest.mark.parametrize(
+    "field, bad_value",
+    [
+        ("heading", ""),
+        ("description", ""),
+        ("rationale", ""),
+        ("comment", ""),
+        ("needs", [""]),
+        ("tags", [""]),
+        ("interface", [""]),
+        ("agent_review", [""]),
+    ],
+)
+def test_spec_item_rejects_ill_formed_field(field: str, bad_value: object):
+    kwargs: dict[str, object] = dict(
+        heading="X",
+        id=ItemId("dsn", "x", 0),
+        description="non-empty.",
+        rationale=None,
+        comment=None,
+        covers=[],
+        depends=[],
+        needs=[],
+        tags=[],
+        interface=[],
+        agent_review=[],
+    )
+    kwargs[field] = bad_value
+    with pytest.raises(ValueError, match=field):
+        SpecItem(**kwargs)  # type: ignore[arg-type]
 
 
 @pytest.mark.covers("dsn~model.spec-item~0")

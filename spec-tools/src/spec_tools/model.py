@@ -37,6 +37,23 @@ class SpecItem:
     interface: list[str]
     agent_review: list[str]
 
+    def __post_init__(self) -> None:
+        """Reject field values that would yield non-conformant render output."""
+        # `not s` on a `str` field rejects only "" (the sole falsy str value).
+        if not self.heading:
+            raise ValueError("heading must be a non-empty string")
+        if not self.description:
+            raise ValueError("description must be a non-empty string")
+        # `== ""` on `str | None` fields rejects "" while leaving None
+        # untouched; `not s` would wrongly reject None too.
+        if self.rationale == "":
+            raise ValueError("rationale must be None rather than the empty string")
+        if self.comment == "":
+            raise ValueError("comment must be None rather than the empty string")
+        for field_name in ("needs", "tags", "interface", "agent_review"):
+            if any(not entry for entry in getattr(self, field_name)):
+                raise ValueError(f"{field_name} must not contain empty-string entries")
+
 
 class SpecGraph:
     """Indexed view of a list of SpecItems with coverage-graph traversal."""
