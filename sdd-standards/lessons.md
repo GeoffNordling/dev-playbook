@@ -117,3 +117,33 @@ else — is a separate decision.
 Not deciding here. Park until enough trivial-Interface dsns
 accumulate to tell whether the discomfort is recurring or one bad
 case.
+
+## 7. Authoring phases need a closing review pass, like implementation's
+
+An ad-hoc audit of spec-tools' specs against its tests surfaced
+three categories of substantive findings — tests pinning unstated
+contracts, both spec and test silent on real boundary cases, and
+standard-mandated rules left to implicit enforcement — across
+functional requirements and design. None required deep insight;
+each was visible by reading the spec alongside the test that
+covers it. They slipped through because no authoring phase held
+its output up against a rubric before signing off.
+
+`sdd-implementation` already models the pattern in its
+"whole-chunk refactor pass" — once slices are green, look back
+across every module the chunk touched for refactor candidates
+that were not visible inside any single slice. Requirements and
+design lack the parallel.
+
+The friction lives in the skills, not the standard:
+`sdd-requirements` and `sdd-design` end on "iterate with the user
+until the draft is approved," with no structured self-check
+between draft and approval. A closing review pass — fixed
+checklist, run by the agent before signaling completion — is the
+natural addition. What goes on each phase's checklist is itself a
+design problem (e.g., for design: every `Interface:` matched by a
+behavioral commitment in `Description:`, every standard rule the
+design leans on named explicitly, every `Needs:` reachable
+downstream). Agents are unreliable at improvisational
+self-critique and reliable at running a rubric, so the pass
+should be structured, not freeform.
