@@ -39,6 +39,64 @@ class SpecParseError(Exception):
     message: str
 
 
+# ---------------------------------------------------------------------------
+# Error builders
+# ---------------------------------------------------------------------------
+
+
+def _id_syntax_error(
+    line_index: int, path: pathlib.Path, message: str
+) -> SpecParseError:
+    """Build an `id-syntax` error for the malformed ID at `line_index`."""
+    return SpecParseError(path, line_index + 1, "id-syntax", message)
+
+
+def _unknown_keyword_error(
+    keyword: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build an `unknown-keyword` error for `keyword` at `line_index`."""
+    message = f"keyword {keyword!r} is not defined by the spec standard"
+    return SpecParseError(path, line_index + 1, "unknown-keyword", message)
+
+
+def _duplicate_keyword_error(
+    keyword: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a `duplicate-keyword` error for `keyword` repeated at `line_index`."""
+    message = f"`{keyword}:` appears more than once within one item"
+    return SpecParseError(path, line_index + 1, "duplicate-keyword", message)
+
+
+def _missing_keyword_error(
+    keyword: str, heading: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a `missing-keyword` error for `keyword` absent from item `heading`."""
+    message = f"item {heading!r} is missing required `{keyword}:` keyword"
+    return SpecParseError(path, line_index + 1, "missing-keyword", message)
+
+
+def _empty_body_error(
+    keyword: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a `malformed-body` error for `keyword` declared with no content."""
+    message = (
+        f"`{keyword}:` is declared with no content; "
+        "omit the keyword entirely when it has no entries"
+    )
+    return SpecParseError(path, line_index + 1, "malformed-body", message)
+
+
+def _stray_line_error(line: str, line_index: int, path: pathlib.Path) -> SpecParseError:
+    """Build a `malformed-body` error for a non-blank, non-keyword line in an item."""
+    message = f"unexpected non-keyword line within item: {line!r}"
+    return SpecParseError(path, line_index + 1, "malformed-body", message)
+
+
+# ---------------------------------------------------------------------------
+# Public entry point
+# ---------------------------------------------------------------------------
+
+
 def parse(path: pathlib.Path) -> list[SpecItem]:
     """Parse the spec file at `path` into a list of SpecItems in source order.
 
@@ -54,6 +112,11 @@ def parse(path: pathlib.Path) -> list[SpecItem]:
         else:
             cursor += 1
     return items
+
+
+# ---------------------------------------------------------------------------
+# Item parser
+# ---------------------------------------------------------------------------
 
 
 def _parse_item(
@@ -79,22 +142,12 @@ def _parse_item(
             continue
         match = _KEYWORD_LINE.match(line)
         if match is None:
-            raise SpecParseError(
-                path=path,
-                line=cursor + 1,
-                rule_violated="malformed-body",
-                message=f"unexpected non-keyword line within item: {line!r}",
-            )
+            raise _stray_line_error(line, cursor, path)
         keyword = match.group("keyword")
         inline_value = match.group("inline")
         keyword_line = cursor
         if keyword not in _KNOWN_KEYWORDS:
-            raise SpecParseError(
-                path=path,
-                line=cursor + 1,
-                rule_violated="unknown-keyword",
-                message=f"keyword {keyword!r} is not defined by the spec standard",
-            )
+            raise _unknown_keyword_error(keyword, cursor, path)
         if keyword in _BLOCK_KEYWORDS:
             _check_duplicate(keyword, blocks, cursor, path)
             body, cursor = _capture_block(lines, cursor + 1)
@@ -115,10 +168,10 @@ def _parse_item(
             string_bullets[keyword] = entries
         elif keyword in _INLINE_KEYWORDS:
             _check_duplicate(keyword, inline, cursor, path)
-            tags = _split_inline_csv(inline_value)
-            if not tags:
+            entries = [e.strip() for e in inline_value.split(",") if e.strip()]
+            if not entries:
                 raise _empty_body_error(keyword, keyword_line, path)
-            inline[keyword] = tags
+            inline[keyword] = entries
             cursor += 1
         else:  # _REPEATED_KEYWORDS
             if not inline_value.strip():
@@ -126,12 +179,7 @@ def _parse_item(
             repeated.setdefault(keyword, []).append(inline_value)
             cursor += 1
     if "Description" not in blocks:
-        raise SpecParseError(
-            path=path,
-            line=start + 1,
-            rule_violated="missing-keyword",
-            message=f"item {heading!r} is missing required `Description:` keyword",
-        )
+        raise _missing_keyword_error("Description", heading, start, path)
     item = SpecItem(
         heading=heading,
         id=item_id,
@@ -146,6 +194,11 @@ def _parse_item(
         agent_review=repeated.get("AgentReview", []),
     )
     return item, cursor
+
+
+# ---------------------------------------------------------------------------
+# Body capture
+# ---------------------------------------------------------------------------
 
 
 def _capture_block(lines: list[str], start: int) -> tuple[str, int]:
@@ -190,40 +243,9 @@ def _capture_string_bullets(lines: list[str], start: int) -> tuple[list[str], in
     return entries, cursor
 
 
-def _split_inline_csv(inline: str) -> list[str]:
-    """Split a comma-separated inline value into trimmed, non-empty entries."""
-    return [entry.strip() for entry in inline.split(",") if entry.strip()]
-
-
-def _empty_body_error(
-    keyword: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build a `malformed-body` error for `keyword` declared with no content."""
-    return SpecParseError(
-        path=path,
-        line=line_index + 1,
-        rule_violated="malformed-body",
-        message=(
-            f"`{keyword}:` is declared with no content; "
-            "omit the keyword entirely when it has no entries"
-        ),
-    )
-
-
-def _check_duplicate(
-    keyword: str,
-    seen: Mapping[str, object],
-    line_index: int,
-    path: pathlib.Path,
-) -> None:
-    """Raise `duplicate-keyword` if `keyword` already has an entry in `seen`."""
-    if keyword in seen:
-        raise SpecParseError(
-            path=path,
-            line=line_index + 1,
-            rule_violated="duplicate-keyword",
-            message=f"`{keyword}:` appears more than once within one item",
-        )
+# ---------------------------------------------------------------------------
+# ID parsing
+# ---------------------------------------------------------------------------
 
 
 def _parse_id(line: str, line_index: int, path: pathlib.Path) -> ItemId:
@@ -264,13 +286,17 @@ def _parse_id_triple(triple: str, line_index: int, path: pathlib.Path) -> ItemId
         raise _id_syntax_error(line_index, path, str(exc)) from None
 
 
-def _id_syntax_error(
-    line_index: int, path: pathlib.Path, message: str
-) -> SpecParseError:
-    """Build a `SpecParseError` with `rule_violated="id-syntax"` for `line_index`."""
-    return SpecParseError(
-        path=path,
-        line=line_index + 1,
-        rule_violated="id-syntax",
-        message=message,
-    )
+# ---------------------------------------------------------------------------
+# Small helpers
+# ---------------------------------------------------------------------------
+
+
+def _check_duplicate(
+    keyword: str,
+    seen: Mapping[str, object],
+    line_index: int,
+    path: pathlib.Path,
+) -> None:
+    """Raise `duplicate-keyword` if `keyword` already has an entry in `seen`."""
+    if keyword in seen:
+        raise _duplicate_keyword_error(keyword, line_index, path)
