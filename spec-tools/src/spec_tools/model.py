@@ -42,18 +42,43 @@ class SpecGraph:
     """Indexed view of a list of SpecItems with coverage-graph traversal."""
 
     def __init__(self, items: list[SpecItem]) -> None:
-        """Build the ID index from `items`."""
-        self._items: dict[ItemId, SpecItem] = {item.id: item for item in items}
+        """Build the ID index from `items`.
+
+        Raises ValueError on duplicate ids, a `Covers:` reference to an id
+        absent from the list, or a coverage cycle.
+        """
+        index: dict[ItemId, SpecItem] = {}
+        for item in items:
+            if item.id in index:
+                raise ValueError(f"duplicate ItemId in items: {item.id}")
+            index[item.id] = item
+        for item in items:
+            for upstream_id in item.covers:
+                if upstream_id not in index:
+                    raise ValueError(
+                        f"item {item.id} covers {upstream_id}, "
+                        "which is not in the graph"
+                    )
+        digraph = networkx.DiGraph()
+        for item in items:
+            digraph.add_node(item.id)
+            for upstream_id in item.covers:
+                digraph.add_edge(item.id, upstream_id)
+        try:
+            cycle = networkx.find_cycle(digraph)
+        except networkx.NetworkXNoCycle:
+            cycle = None
+        if cycle is not None:
+            raise ValueError(f"coverage cycle: {cycle}")
+        self._items = index
+        self._digraph = digraph
 
     def find(self, id: ItemId) -> SpecItem | None:
         """Return the item with `id`, or None if absent."""
         return self._items.get(id)
 
     def upstream(self, id: ItemId) -> list[SpecItem]:
-        """Return the items that the item with `id` covers.
-
-        Raises KeyError if `id` or any of its covers is absent from the graph.
-        """
+        """Return the items that the item with `id` covers."""
         item = self._items[id]
         return [self._items[c] for c in item.covers]
 
@@ -67,9 +92,4 @@ class SpecGraph:
         Nodes are keyed by ItemId; edges run from each downstream item to the
         upstream items it covers.
         """
-        digraph = networkx.DiGraph()
-        for item in self._items.values():
-            digraph.add_node(item.id)
-            for upstream_id in item.covers:
-                digraph.add_edge(item.id, upstream_id)
-        return digraph
+        return self._digraph.copy()

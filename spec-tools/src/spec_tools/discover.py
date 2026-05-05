@@ -20,9 +20,13 @@ def find(root: pathlib.Path) -> list[pathlib.Path]:
     specs = root / "specs"
     if not specs.is_dir():
         raise ValueError(f"no specs/ directory at {root}")
-    for child in specs.iterdir():
-        if child.name not in _ADMITTED_CHILDREN:
-            raise ValueError(f"unexpected entry under specs/: {child.name}")
+    children = {child.name for child in specs.iterdir()}
+    for name in children:
+        if name not in _ADMITTED_CHILDREN:
+            raise ValueError(f"unexpected entry under specs/: {name}")
+    for stem in ("design", "functional_requirements"):
+        if f"{stem}.md" in children and stem in children:
+            raise ValueError(f"specs/ has both {stem}.md and {stem}/; pick one layout")
     for entry in specs.rglob("*"):
         if entry.is_dir():
             continue

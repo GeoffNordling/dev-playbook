@@ -4,7 +4,6 @@
 Description:
 The model `SHALL` represent each spec item as a single `SpecItem`
 instance with the following typed fields:
-
 - heading: str
 - id: ItemId
 - description: str
@@ -16,7 +15,6 @@ instance with the following typed fields:
 - tags: list[str]
 - interface: list[str]
 - agent_review: list[str]
-
 Field names mirror the keyword names defined in the spec standard.
 
 Rationale:
@@ -68,6 +66,10 @@ items that cover the given item. `as_digraph()` returns a
 `networkx.DiGraph` view of the coverage relationships, with nodes
 keyed by `ItemId` and edges directed from each downstream item to
 the upstream items it covers.
+If the input list contains two items with the same `ItemId`, an
+item whose `Covers:` references an `ItemId` not present in the
+list, or a coverage cycle, `SpecGraph.__init__` `SHALL` raise
+`ValueError`.
 
 Rationale:
 A typed graph type centralizes the lookup and traversal logic that

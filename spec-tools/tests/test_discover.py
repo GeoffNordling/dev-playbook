@@ -84,6 +84,20 @@ def test_find_raises_on_unexpected_file_under_specs(tmp_path: pathlib.Path):
 
 
 @pytest.mark.covers("dsn~discover.find~0")
+def test_find_raises_when_single_file_and_folder_form_both_present(
+    tmp_path: pathlib.Path,
+):
+    specs_dir = tmp_path / "specs"
+    specs_dir.mkdir()
+    (specs_dir / "design.md").write_text("# design\n")
+    (specs_dir / "design").mkdir()
+    (specs_dir / "design" / "alpha.md").write_text("# alpha\n")
+
+    with pytest.raises(ValueError, match="design"):
+        find(tmp_path)
+
+
+@pytest.mark.covers("dsn~discover.find~0")
 def test_find_raises_on_unexpected_directory_under_specs(tmp_path: pathlib.Path):
     specs_dir = tmp_path / "specs"
     (specs_dir / "design").mkdir(parents=True)

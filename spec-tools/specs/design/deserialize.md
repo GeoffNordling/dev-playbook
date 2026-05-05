@@ -5,16 +5,13 @@ Description:
 The deserializer `SHALL` raise a `SpecParseError` exception on each
 violation of the workspace spec standard, with the following typed
 fields:
-
 - path: pathlib.Path
 - line: int
 - rule_violated: str
 - message: str
-
 `line` is 1-indexed against the source file. `rule_violated` is one
 of the following stable string ids; callers dispatch on it to route
 or format errors by category:
-
 - `id-syntax` — the ID triple is missing or malformed (e.g., wrong
   number of tilde-separated parts, whitespace in `name`, negative
   revision).
@@ -27,6 +24,9 @@ or format errors by category:
 - `malformed-body` — a keyword's content does not match the form
   required for that keyword (e.g., a `Covers:` line followed by
   non-bullet content, an empty `Tags:` line).
+- `malformed-heading` — a line begins with `#` but is not a
+  conformant `### ` spec-item heading (wrong hash count, missing
+  space, or empty heading text).
 
 Rationale:
 A typed exception with structured fields gives callers (lint, IDEs,

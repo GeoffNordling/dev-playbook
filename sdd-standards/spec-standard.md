@@ -67,6 +67,11 @@ real items use a subset — the table below names what applies where.
 | `Interface:` | `dsn` only | optional |
 | `AgentReview:` | `feat`, `req`, `dsn` | optional |
 
+The heading line `SHALL` be exactly `### ` (three hashes, single
+space) followed by non-empty heading text. Other ATX heading levels
+(`#`, `##`, `####`+) and headings with no space after the hashes
+are not spec-item headings.
+
 Each piece has a dedicated section below: §3 IDs, §4 artifact types,
 §5 how items chain, §6 keyword formats, §7 prose inside the description.
 
@@ -217,6 +222,8 @@ The body of the item, in prose. Required, exactly one per item.
 Prose rules (obligation verbs, sentence templates) are in §7.
 
 Form: a `Description:` line followed by one or more body lines.
+The body `SHALL NOT` contain blank lines; a blank line terminates
+the body.
 
     Description:
     When the user submits credentials, the system `SHALL` verify them
@@ -227,6 +234,8 @@ Form: a `Description:` line followed by one or more body lines.
 Why the requirement exists. Optional, at most one per item.
 
 Form: a `Rationale:` line followed by one or more body lines.
+The body `SHALL NOT` contain blank lines; a blank line terminates
+the body.
 
     Rationale:
     Verifying credentials at the gateway prevents downstream services
@@ -238,6 +247,8 @@ Caveats, implementation notes, or anything that fits neither
 description nor rationale. Optional, at most one per item.
 
 Form: a `Comment:` line followed by one or more body lines.
+The body `SHALL NOT` contain blank lines; a blank line terminates
+the body.
 
     Comment:
     The credential store is replicated; reads `MAY` lag the primary by
@@ -283,8 +294,9 @@ bullets.
 Free-form labels used by tooling for filtering. Optional, at most one
 per item.
 
-Form: a `Tags:` line with one or more comma-separated values on the
-same line.
+Form: a `Tags:` line followed by a single space, then one or more
+non-empty tag values separated by `, ` (comma + single space). No
+leading or trailing whitespace within a tag; no empty entries.
 
     Tags: classifier, llm
 

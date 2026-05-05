@@ -124,6 +124,35 @@ def test_spec_graph_downstream_returns_items_that_cover_target():
 
 
 @pytest.mark.covers("dsn~model.graph~0")
+def test_spec_graph_rejects_duplicate_ids():
+    a = make_item("dup", artifact_type="dsn")
+    b = make_item("dup", artifact_type="dsn")
+
+    with pytest.raises(ValueError, match="duplicate"):
+        SpecGraph(items=[a, b])
+
+
+@pytest.mark.covers("dsn~model.graph~0")
+def test_spec_graph_rejects_covers_reference_to_missing_item():
+    ghost = ItemId(artifact_type="feat", name="ghost", revision=0)
+    item = make_item("orphan", artifact_type="req", covers=[ghost])
+
+    with pytest.raises(ValueError, match="ghost"):
+        SpecGraph(items=[item])
+
+
+@pytest.mark.covers("dsn~model.graph~0")
+def test_spec_graph_rejects_coverage_cycle():
+    a_id = ItemId(artifact_type="dsn", name="a", revision=0)
+    b_id = ItemId(artifact_type="dsn", name="b", revision=0)
+    a = make_item("a", covers=[b_id])
+    b = make_item("b", covers=[a_id])
+
+    with pytest.raises(ValueError, match="cycle"):
+        SpecGraph(items=[a, b])
+
+
+@pytest.mark.covers("dsn~model.graph~0")
 def test_spec_graph_as_digraph_nodes_keyed_by_id_with_coverage_edges():
     feat = make_item("model", artifact_type="feat")
     req = make_item("model.navigation", artifact_type="req", covers=[feat.id])

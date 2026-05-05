@@ -178,6 +178,67 @@ def test_parse_raises_malformed_body_for_empty_keyword_content(
 
 
 @pytest.mark.covers("dsn~deserialize.parse~0")
+@pytest.mark.parametrize(
+    "fixture_name",
+    [
+        "bad/heading_h1.md",
+        "bad/heading_h2.md",
+        "bad/heading_h4.md",
+        "bad/heading_no_space.md",
+        "bad/heading_empty_text.md",
+    ],
+)
+def test_parse_raises_malformed_heading_for_non_conformant_atx_headings(
+    fixture_name: str,
+):
+    fixture_path = load(fixture_name)
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "malformed-heading"
+    assert error.path == fixture_path
+    assert error.line == 1
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+@pytest.mark.parametrize(
+    "fixture_name",
+    [
+        "bad/tags_no_space_after_colon.md",
+        "bad/tags_double_space_after_colon.md",
+        "bad/tags_no_space_after_comma.md",
+        "bad/tags_space_before_comma.md",
+        "bad/tags_empty_entry.md",
+    ],
+)
+def test_parse_raises_malformed_body_for_non_canonical_tags(fixture_name: str):
+    fixture_path = load(fixture_name)
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "malformed-body"
+    assert error.path == fixture_path
+    assert error.line == 7
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_malformed_body_for_blank_line_in_description():
+    fixture_path = load("bad/blank_line_in_description.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "malformed-body"
+    assert error.path == fixture_path
+    assert error.line == 7
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
 def test_parse_raises_malformed_body_for_stray_prose_within_item():
     fixture_path = load("bad/stray_prose_in_item.md")
 

@@ -92,6 +92,17 @@ def _stray_line_error(line: str, line_index: int, path: pathlib.Path) -> SpecPar
     return SpecParseError(path, line_index + 1, "malformed-body", message)
 
 
+def _malformed_heading_error(
+    line: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a `malformed-heading` error for a non-conformant ATX heading."""
+    message = (
+        f"heading {line!r} does not match the required `### <text>` form "
+        "(three hashes, single space, non-empty text)"
+    )
+    return SpecParseError(path, line_index + 1, "malformed-heading", message)
+
+
 # ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
@@ -106,9 +117,12 @@ def parse(path: pathlib.Path) -> list[SpecItem]:
     items: list[SpecItem] = []
     cursor = 0
     while cursor < len(lines):
-        if lines[cursor].startswith(_HEADING_PREFIX):
+        line = lines[cursor]
+        if line.startswith(_HEADING_PREFIX) and line[len(_HEADING_PREFIX) :].strip():
             item, cursor = _parse_item(lines, cursor, path)
             items.append(item)
+        elif line.startswith("#"):
+            raise _malformed_heading_error(line, cursor, path)
         else:
             cursor += 1
     return items
@@ -168,9 +182,7 @@ def _parse_item(
             string_bullets[keyword] = entries
         elif keyword in _INLINE_KEYWORDS:
             _check_duplicate(keyword, inline, cursor, path)
-            entries = [e.strip() for e in inline_value.split(",") if e.strip()]
-            if not entries:
-                raise _empty_body_error(keyword, keyword_line, path)
+            entries = _parse_inline_tags(line, keyword, keyword_line, path)
             inline[keyword] = entries
             cursor += 1
         else:  # _REPEATED_KEYWORDS
@@ -202,21 +214,23 @@ def _parse_item(
 
 
 def _capture_block(lines: list[str], start: int) -> tuple[str, int]:
-    """Capture a block body until the next keyword, ### heading, or EOF.
+    """Capture a block body up to the first blank line, keyword, heading, or EOF.
 
-    Trailing blank lines (the canonical separator between keywords) are
-    discarded so block bodies round-trip with serialize.
+    A blank line inside the body is not allowed; blank lines terminate the
+    body. If the next non-blank line after the terminator is still body
+    content (rather than a keyword or heading), `_parse_item`'s stray-line
+    check raises `malformed-body`.
     """
     body: list[str] = []
     cursor = start
     while cursor < len(lines):
         line = lines[cursor]
+        if not line.strip():
+            break
         if line.startswith(_HEADING_PREFIX) or _KEYWORD_LINE.match(line):
             break
         body.append(line)
         cursor += 1
-    while body and not body[-1].strip():
-        body.pop()
     return "\n".join(body), cursor
 
 
@@ -300,3 +314,31 @@ def _check_duplicate(
     """Raise `duplicate-keyword` if `keyword` already has an entry in `seen`."""
     if keyword in seen:
         raise _duplicate_keyword_error(keyword, line_index, path)
+
+
+def _parse_inline_tags(
+    line: str, keyword: str, line_index: int, path: pathlib.Path
+) -> list[str]:
+    """Parse a `Tags: ...` line under the canonical `, `-separated form."""
+    prefix = f"{keyword}: "
+    if not line.startswith(prefix):
+        raise SpecParseError(
+            path,
+            line_index + 1,
+            "malformed-body",
+            f"`{keyword}:` must be followed by a single space, got {line!r}",
+        )
+    body = line[len(prefix) :]
+    if not body:
+        raise _empty_body_error(keyword, line_index, path)
+    entries = body.split(", ")
+    for entry in entries:
+        if not entry or entry != entry.strip() or "," in entry:
+            raise SpecParseError(
+                path,
+                line_index + 1,
+                "malformed-body",
+                f"`{keyword}:` entries must be non-empty and free of "
+                f"whitespace or extra commas, got {entry!r}",
+            )
+    return entries

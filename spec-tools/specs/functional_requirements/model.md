@@ -38,12 +38,10 @@ Needs:
 
 Description:
 The model `SHALL` survive round-trip in both directions:
-
 - A `SpecItem` serialized to text and deserialized `SHALL` equal the
   original `SpecItem`.
 - Canonically-formatted spec text deserialized to `SpecItem`s and
   re-serialized `SHALL` produce the original text byte-for-byte.
-
 "Canonically-formatted" means text produced by the serializer, or
 hand-authored text that already conforms to the canonical form.
 
