@@ -1,5 +1,3 @@
-# Model
-
 ### In-memory Spec Model
 `feat~model~0`
 
@@ -39,9 +37,15 @@ Needs:
 `req~model.round-trip~0`
 
 Description:
-The model `SHALL` survive round-trip serialization: when a
-`SpecItem` instance is serialized to text and that text is
-deserialized, the resulting `SpecItem` `SHALL` equal the original.
+The model `SHALL` survive round-trip in both directions:
+
+- A `SpecItem` serialized to text and deserialized `SHALL` equal the
+  original `SpecItem`.
+- Canonically-formatted spec text deserialized to `SpecItem`s and
+  re-serialized `SHALL` produce the original text byte-for-byte.
+
+"Canonically-formatted" means text produced by the serializer, or
+hand-authored text that already conforms to the canonical form.
 
 Rationale:
 A model that cannot survive round-trip would silently lose

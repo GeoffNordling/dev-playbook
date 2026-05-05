@@ -1,5 +1,3 @@
-# Discover
-
 ### Spec File Discovery
 `feat~discover~0`
 

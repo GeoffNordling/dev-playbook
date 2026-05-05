@@ -1,5 +1,3 @@
-# Model
-
 ### SpecItem shape
 `dsn~model.spec-item~0`
 

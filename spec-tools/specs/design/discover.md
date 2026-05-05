@@ -1,5 +1,3 @@
-# Discover
-
 ### Public find entry point
 `dsn~discover.find~0`
 

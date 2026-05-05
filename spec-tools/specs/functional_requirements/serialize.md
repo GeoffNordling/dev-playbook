@@ -1,5 +1,3 @@
-# Serialize
-
 ### Spec Serialization
 `feat~serialize~0`
 
