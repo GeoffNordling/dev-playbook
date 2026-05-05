@@ -59,11 +59,17 @@ def local_tip(worktree: Path) -> str:
 def gh_prs_for_branch(branch: str, repo_root: Path) -> list[dict]:
     _, out, _ = run(
         [
-            "gh", "pr", "list",
-            "--head", branch,
-            "--state", "all",
-            "--json", "number,state,headRefOid,mergedAt,closedAt",
-            "--limit", "10",
+            "gh",
+            "pr",
+            "list",
+            "--head",
+            branch,
+            "--state",
+            "all",
+            "--json",
+            "number,state,headRefOid,mergedAt,closedAt",
+            "--limit",
+            "10",
         ],
         cwd=repo_root,
     )
@@ -102,7 +108,8 @@ def main() -> int:
         description="Prune merged-PR worktrees from .claude/worktrees/."
     )
     parser.add_argument(
-        "--dry-run", action="store_true",
+        "--dry-run",
+        action="store_true",
         help="report what would be pruned without taking action",
     )
     args = parser.parse_args()
@@ -131,7 +138,9 @@ def main() -> int:
                 ambiguous.append((name, "detached HEAD"))
                 continue
             if branch != name:
-                ambiguous.append((name, f"directory name does not match branch ({branch})"))
+                ambiguous.append(
+                    (name, f"directory name does not match branch ({branch})")
+                )
                 continue
 
             try:
@@ -161,20 +170,26 @@ def main() -> int:
                 continue
 
             if not worktree_clean(wt):
-                ambiguous.append((name, f"PR #{number} merged but worktree has uncommitted changes"))
+                ambiguous.append(
+                    (name, f"PR #{number} merged but worktree has uncommitted changes")
+                )
                 continue
 
             head_oid = pr.get("headRefOid")
             if not head_oid:
-                ambiguous.append((name, f"PR #{number} merged but no headRefOid reported"))
+                ambiguous.append(
+                    (name, f"PR #{number} merged but no headRefOid reported")
+                )
                 continue
 
             tip = local_tip(wt)
             if tip != head_oid:
-                ambiguous.append((
-                    name,
-                    f"PR #{number} merged but local tip {tip[:7]} differs from PR head {head_oid[:7]} (unpushed commits or force-push divergence)",
-                ))
+                ambiguous.append(
+                    (
+                        name,
+                        f"PR #{number} merged but local tip {tip[:7]} differs from PR head {head_oid[:7]} (unpushed commits or force-push divergence)",
+                    )
+                )
                 continue
 
             if args.dry_run:
