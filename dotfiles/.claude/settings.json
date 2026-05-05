@@ -26,6 +26,7 @@
     "enabled": false,
     "mode": "hold"
   },
+  "autoMemoryEnabled": false,
   "theme": "light",
   "voiceEnabled": false
 }
