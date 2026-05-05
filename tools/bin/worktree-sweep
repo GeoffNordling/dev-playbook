@@ -114,11 +114,14 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    rc, out, _ = run(["git", "rev-parse", "--show-toplevel"], check=False)
+    rc, out, _ = run(
+        ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        check=False,
+    )
     if rc != 0:
         print("worktree-sweep: not in a git repository", file=sys.stderr)
         return 2
-    repo_root = Path(out.strip())
+    repo_root = Path(out.strip()).parent
 
     worktrees = find_worktrees(repo_root)
     if not worktrees:
