@@ -22,14 +22,12 @@ Commit locally. Do not narrate — just do it. Only speak up if something is une
 3. Do NOT stage unrelated changes — other agents may own those
 4. `git log --oneline -3` to match commit message style
 5. Commit with a concise message
-6. Tell the user to push.
 
 ### Fast
 
 1. `git add -A`
 2. `git diff --cached --stat` to build a one-line commit message
 3. Commit
-4. Tell the user to push.
 
 ## All Modes
 
