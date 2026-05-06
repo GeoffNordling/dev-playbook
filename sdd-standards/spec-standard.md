@@ -60,7 +60,7 @@ real items use a subset — the table below names what applies where.
 | `Description:` | any item | **required** |
 | `Rationale:` | any item | optional |
 | `Comment:` | any item | optional |
-| `Covers:` | any item | required unless the item is a root |
+| `Covers:` | any item | optional (see §5.2) |
 | `Depends:` | any item | optional |
 | `Tags:` | any item | optional |
 | `Needs:` | any item | optional mechanically — required for chain termination (§5.4) |
@@ -159,10 +159,12 @@ The chain is a directed graph built from two declarations per item:
 when:
 
 - An item without a `Covers:` line is a **root** — it sits at the top
-  of its chain. Every non-root item `SHALL` declare `Covers:`.
+  of its chain.
 - For every type named in an upstream item's `Needs:`, at least one
   downstream item of that type `SHALL` declare `Covers:` pointing at
-  the upstream.
+  the upstream. This is the rule that catches a non-root item that
+  forgets `Covers:` — well-formedness fails from the upstream side,
+  via its unsatisfied `Needs:`.
 - An item with no `Needs:` declaration terminates the chain below
   itself.
 
@@ -256,8 +258,10 @@ the body.
 
 ### 6.4 `Covers:`
 
-Names the upstream items this item covers (§5). Required on non-root
-items, at most one per item. (See §5.2 for root semantics.)
+Names the upstream items this item covers (§5). Optional, at most one
+per item. Chain well-formedness still requires this item to declare
+`Covers:` whenever an upstream item's `Needs:` expects coverage of this
+item's type — see §5.2.
 
 Form: a `Covers:` line followed by one or more
 `- type~name~revision` bullets.
