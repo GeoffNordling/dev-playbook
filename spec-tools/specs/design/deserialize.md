@@ -35,6 +35,15 @@ or format errors by category:
   4-space indented code blocks (§8). Detected by pre-scan, so a
   file containing both a fenced code block and another violation
   reports `fenced-code-block` regardless of which line is earlier.
+- `obligation-not-backticked` — an item's `Description:` body
+  contains a bare uppercase obligation verb (`SHALL`, `SHOULD`,
+  `MAY`, with optional `NOT`) outside backticks; §7.1 of the
+  workspace spec standard requires obligation verbs to be
+  backticked wherever they appear.
+- `obligation-mixed-levels` — an item's `Description:` body
+  mixes more than one obligation level among `SHALL` (incl.
+  `SHALL NOT`), `SHOULD` (incl. `SHOULD NOT`), and `MAY`; §7.1
+  permits one level per item.
 
 Rationale:
 A typed exception with structured fields gives callers (lint, IDEs,

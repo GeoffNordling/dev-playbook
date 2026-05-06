@@ -426,6 +426,35 @@ def test_parse_raises_unknown_keyword_for_uppercase_keyword():
 
 
 @pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_obligation_not_backticked_for_bare_uppercase_verb():
+    fixture_path = load("bad/obligation_not_backticked.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "obligation-not-backticked"
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_obligation_mixed_levels_for_shall_and_should():
+    fixture_path = load("bad/obligation_mixed_levels.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "obligation-mixed-levels"
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_accepts_shall_and_shall_not_as_same_level():
+    [item] = parse(load("good/obligation_same_level.md"))
+
+    assert item.id.name == "same-level"
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
 def test_parse_aborts_on_first_violation_only():
     fixture_path = load("bad/multiple_violations.md")
 

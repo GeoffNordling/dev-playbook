@@ -32,6 +32,14 @@ _KEYWORD_POSITION = {
     if field.name not in {"heading", "id"}
 }
 
+_OBLIGATION_VERB = re.compile(r"\b(SHALL|SHOULD|MAY)\b")
+_BACKTICK_SPAN = re.compile(r"`[^`\n]*`")
+# Obligation verb in normative use: a backticked verb followed by whitespace
+# and the start of a predicate (lowercase word). Mentions in citations like
+# `` `SHALL`, `SHOULD`, `MAY` `` are followed by punctuation, not lowercase
+# letters, so they aren't matched.
+_USED_OBLIGATION = re.compile(r"`(SHALL|SHOULD|MAY)(?:\s+NOT)?`\s+[a-z]")
+
 
 @dataclass
 class SpecParseError(Exception):
@@ -133,6 +141,30 @@ def _fenced_code_block_error(
     return SpecParseError(path, line_index + 1, "fenced-code-block", message)
 
 
+def _check_obligation_vocabulary(
+    body: str, line_index: int, path: pathlib.Path
+) -> None:
+    """Enforce §7.1: obligation verbs are backticked, one level per item."""
+    bare = _OBLIGATION_VERB.search(_BACKTICK_SPAN.sub("", body))
+    if bare is not None:
+        raise SpecParseError(
+            path,
+            line_index + 1,
+            "obligation-not-backticked",
+            f"unbackticked obligation verb {bare.group(0)!r} in `Description:`; "
+            "§7.1 requires obligation verbs to be wrapped in backticks",
+        )
+    levels = {match.group(1) for match in _USED_OBLIGATION.finditer(body)}
+    if len(levels) > 1:
+        raise SpecParseError(
+            path,
+            line_index + 1,
+            "obligation-mixed-levels",
+            f"`Description:` mixes obligation levels {sorted(levels)}; "
+            "§7.1 permits one level per item",
+        )
+
+
 # ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
@@ -209,6 +241,8 @@ def _parse_item(
             body, cursor = _capture_block(lines, cursor + 1)
             if not body:
                 raise _empty_body_error(keyword, keyword_line, path)
+            if keyword == "Description":
+                _check_obligation_vocabulary(body, keyword_line, path)
             blocks[keyword] = body
         elif keyword in _ID_BULLET_KEYWORDS:
             _check_duplicate(keyword, id_bullets, cursor, path)
