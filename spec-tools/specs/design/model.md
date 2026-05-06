@@ -39,6 +39,8 @@ Needs:
 
 Interface: model.SpecItem(heading: str, id: model.ItemId, description: str, rationale: str | None, comment: str | None, covers: list[model.ItemId], depends: list[model.ItemId], needs: list[str], tags: list[str], interface: list[str], agent_review: list[str]) -> None
 
+AgentReview: The `SpecItem` field order in `src/spec_tools/model.py` matches the on-disk item form defined by `sdd-standards/spec-standard.md`: `heading` first (the `### ` line per §2), `id` second (the backtick-wrapped ID triple per §2 and §3), then the keyword fields in the canonical order of §6, with snake_case fields mapping to PascalCase keywords (e.g. `agent_review` → `AgentReview`).
+
 ### ItemId triple
 `dsn~model.item-id~0`
 

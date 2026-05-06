@@ -26,6 +26,8 @@ Needs:
 
 Interface: serialize.render(items: list[model.SpecItem]) -> str
 
+AgentReview: The render function in `src/spec_tools/serialize.py` emits item sections in the canonical keyword order defined by §6 of `sdd-standards/spec-standard.md`, and the inline restatement of that order in this dsn's `Description:` matches §6 verbatim.
+
 ### Write rendered output to disk
 `dsn~serialize.write~0`
 
