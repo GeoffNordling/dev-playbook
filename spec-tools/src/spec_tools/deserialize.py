@@ -2,43 +2,104 @@
 
 import pathlib
 import re
-from collections.abc import Mapping
+from collections.abc import Callable
 from dataclasses import dataclass, fields
+from enum import Enum
+from typing import Any
 
 from spec_tools.model import ItemId, SpecItem
 
-_HEADING_PREFIX = "### "
-_KEYWORD_LINE = re.compile(r"^(?P<keyword>[A-Z][A-Za-z]+):\s*(?P<inline>.*)$")
-_BULLET_PREFIX = "- "
+# ---------------------------------------------------------------------------
+# Lexical primitives
+# ---------------------------------------------------------------------------
 
-_BLOCK_KEYWORDS = {"Description", "Rationale", "Comment"}
-_ID_BULLET_KEYWORDS = {"Covers", "Depends"}
-_STRING_BULLET_KEYWORDS = {"Needs"}
-_INLINE_KEYWORDS = {"Tags"}
-_REPEATED_KEYWORDS = {"Interface", "AgentReview"}
-_KNOWN_KEYWORDS = (
-    _BLOCK_KEYWORDS
-    | _ID_BULLET_KEYWORDS
-    | _STRING_BULLET_KEYWORDS
-    | _INLINE_KEYWORDS
-    | _REPEATED_KEYWORDS
-)
-# Canonical keyword order is the SpecItem field order; positions only need
-# monotonicity for the order check. `heading` and `id` are item-structure
-# fields, not keywords, so they're skipped.
-_KEYWORD_POSITION = {
-    "".join(part.title() for part in field.name.split("_")): index
-    for index, field in enumerate(fields(SpecItem))
-    if field.name not in {"heading", "id"}
-}
+_HEADING_PREFIX = "### "
+_BULLET_PREFIX = "- "
+_KEYWORD_LINE = re.compile(r"^(?P<keyword>[A-Z][A-Za-z]+):\s*(?P<inline>.*)$")
+_FENCE_PREFIXES = ("```", "~~~")
 
 _OBLIGATION_VERB = re.compile(r"\b(SHALL|SHOULD|MAY)\b")
 _BACKTICK_SPAN = re.compile(r"`[^`\n]*`")
-# Obligation verb in normative use: a backticked verb followed by whitespace
-# and the start of a predicate (lowercase word). Mentions in citations like
-# `` `SHALL`, `SHOULD`, `MAY` `` are followed by punctuation, not lowercase
-# letters, so they aren't matched.
+# An obligation verb in normative use is a backticked verb followed by
+# whitespace and a lowercase predicate. Citations like `` `SHALL`, `SHOULD`,
+# `MAY` `` are followed by punctuation, so they don't match.
 _USED_OBLIGATION = re.compile(r"`(SHALL|SHOULD|MAY)(?:\s+NOT)?`\s+[a-z]")
+
+_OPTIONAL_FIELD_DEFAULTS: dict[str, Any] = {
+    "rationale": None,
+    "comment": None,
+    "covers": [],
+    "depends": [],
+    "needs": [],
+    "tags": [],
+    "interface": [],
+    "agent_review": [],
+}
+
+
+# ---------------------------------------------------------------------------
+# Keyword registry
+# ---------------------------------------------------------------------------
+
+
+class _BodyForm(Enum):
+    """The five body shapes that §6 of the spec standard defines."""
+
+    BLOCK = "block"
+    ID_BULLETS = "id-bullets"
+    STRING_BULLETS = "string-bullets"
+    INLINE = "inline"
+    REPEATED = "repeated"
+
+
+@dataclass(frozen=True)
+class _Keyword:
+    """A keyword's parse contract: PascalCase label, SpecItem field, body form."""
+
+    name: str
+    field: str
+    body_form: _BodyForm
+
+
+_KEYWORDS: tuple[_Keyword, ...] = (
+    _Keyword("Description", "description", _BodyForm.BLOCK),
+    _Keyword("Rationale", "rationale", _BodyForm.BLOCK),
+    _Keyword("Comment", "comment", _BodyForm.BLOCK),
+    _Keyword("Covers", "covers", _BodyForm.ID_BULLETS),
+    _Keyword("Depends", "depends", _BodyForm.ID_BULLETS),
+    _Keyword("Needs", "needs", _BodyForm.STRING_BULLETS),
+    _Keyword("Tags", "tags", _BodyForm.INLINE),
+    _Keyword("Interface", "interface", _BodyForm.REPEATED),
+    _Keyword("AgentReview", "agent_review", _BodyForm.REPEATED),
+)
+
+
+def _validate_keyword_registry() -> None:
+    """Assert the registry's order and field names match SpecItem.
+
+    The keyword sequence above must equal SpecItem's field order (skipping
+    `heading` and `id`). Catching drift at module load preserves the §6
+    canonical-order guarantee that the AgentReview claim on
+    `dsn~model.spec-item~0` rests on.
+    """
+    expected = [f.name for f in fields(SpecItem) if f.name not in {"heading", "id"}]
+    actual = [kw.field for kw in _KEYWORDS]
+    if actual != expected:
+        raise RuntimeError(
+            f"keyword registry fields {actual} do not match "
+            f"SpecItem field order {expected}"
+        )
+
+
+_validate_keyword_registry()
+
+_KEYWORD_BY_NAME: dict[str, _Keyword] = {kw.name: kw for kw in _KEYWORDS}
+_KEYWORD_POSITION: dict[str, int] = {kw.name: i for i, kw in enumerate(_KEYWORDS)}
+
+
+# ---------------------------------------------------------------------------
+# Public error type
+# ---------------------------------------------------------------------------
 
 
 @dataclass
@@ -55,114 +116,31 @@ class SpecParseError(Exception):
     message: str
 
 
-# ---------------------------------------------------------------------------
-# Error builders
-# ---------------------------------------------------------------------------
+def _error(
+    rule: str, message: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a SpecParseError, converting a 0-indexed line into 1-indexed `line`."""
+    return SpecParseError(path, line_index + 1, rule, message)
 
 
 def _id_syntax_error(
     line_index: int, path: pathlib.Path, message: str
 ) -> SpecParseError:
     """Build an `id-syntax` error for the malformed ID at `line_index`."""
-    return SpecParseError(path, line_index + 1, "id-syntax", message)
-
-
-def _unknown_keyword_error(
-    keyword: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build an `unknown-keyword` error for `keyword` at `line_index`."""
-    message = f"keyword {keyword!r} is not defined by the spec standard"
-    return SpecParseError(path, line_index + 1, "unknown-keyword", message)
-
-
-def _duplicate_keyword_error(
-    keyword: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build a `duplicate-keyword` error for `keyword` repeated at `line_index`."""
-    message = f"`{keyword}:` appears more than once within one item"
-    return SpecParseError(path, line_index + 1, "duplicate-keyword", message)
-
-
-def _missing_keyword_error(
-    keyword: str, heading: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build a `missing-keyword` error for `keyword` absent from item `heading`."""
-    message = f"item {heading!r} is missing required `{keyword}:` keyword"
-    return SpecParseError(path, line_index + 1, "missing-keyword", message)
+    return _error("id-syntax", message, line_index, path)
 
 
 def _empty_body_error(
     keyword: str, line_index: int, path: pathlib.Path
 ) -> SpecParseError:
     """Build a `malformed-body` error for `keyword` declared with no content."""
-    message = (
+    return _error(
+        "malformed-body",
         f"`{keyword}:` is declared with no content; "
-        "omit the keyword entirely when it has no entries"
+        "omit the keyword entirely when it has no entries",
+        line_index,
+        path,
     )
-    return SpecParseError(path, line_index + 1, "malformed-body", message)
-
-
-def _stray_line_error(line: str, line_index: int, path: pathlib.Path) -> SpecParseError:
-    """Build a `malformed-body` error for a non-blank, non-keyword line in an item."""
-    message = f"unexpected non-keyword line within item: {line!r}"
-    return SpecParseError(path, line_index + 1, "malformed-body", message)
-
-
-def _malformed_heading_error(
-    line: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build a `malformed-heading` error for a non-conformant ATX heading."""
-    message = (
-        f"heading {line!r} does not match the required `### <text>` form "
-        "(three hashes, single space, non-empty text)"
-    )
-    return SpecParseError(path, line_index + 1, "malformed-heading", message)
-
-
-def _keyword_order_error(
-    keyword: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build a `keyword-order` error for `keyword` appearing out of canonical order."""
-    message = (
-        f"`{keyword}:` appears out of canonical order; "
-        "see §6 of the workspace spec standard"
-    )
-    return SpecParseError(path, line_index + 1, "keyword-order", message)
-
-
-def _fenced_code_block_error(
-    line: str, line_index: int, path: pathlib.Path
-) -> SpecParseError:
-    """Build a `fenced-code-block` error for a fenced code block marker."""
-    message = (
-        f"fenced code block marker {line!r} is forbidden by §8 of the "
-        "workspace spec standard; use a 4-space indented code block"
-    )
-    return SpecParseError(path, line_index + 1, "fenced-code-block", message)
-
-
-def _check_obligation_vocabulary(
-    body: str, line_index: int, path: pathlib.Path
-) -> None:
-    """Enforce §7.1: obligation verbs are backticked, one level per item."""
-    bare = _OBLIGATION_VERB.search(_BACKTICK_SPAN.sub("", body))
-    if bare is not None:
-        raise SpecParseError(
-            path,
-            line_index + 1,
-            "obligation-not-backticked",
-            f"unbackticked obligation verb {bare.group(0)!r} in `Description:`; "
-            "§7.1 requires obligation verbs to be wrapped in backticks",
-        )
-    levels = {match.group(1) for match in _USED_OBLIGATION.finditer(body)}
-    if len(levels) > 1:
-        raise SpecParseError(
-            path,
-            line_index + 1,
-            "obligation-mixed-levels",
-            f"`Description:` mixes obligation levels {sorted(levels)}; "
-            "§7.1 permits one level per item",
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -177,8 +155,14 @@ def parse(path: pathlib.Path) -> list[SpecItem]:
     """
     lines = path.read_text().splitlines()
     for index, line in enumerate(lines):
-        if line.startswith("```") or line.startswith("~~~"):
-            raise _fenced_code_block_error(line, index, path)
+        if line.startswith(_FENCE_PREFIXES):
+            raise _error(
+                "fenced-code-block",
+                f"fenced code block marker {line!r} is forbidden by §8 of the "
+                "workspace spec standard; use a 4-space indented code block",
+                index,
+                path,
+            )
     items: list[SpecItem] = []
     cursor = 0
     while cursor < len(lines):
@@ -187,7 +171,13 @@ def parse(path: pathlib.Path) -> list[SpecItem]:
             item, cursor = _parse_item(lines, cursor, path)
             items.append(item)
         elif line.startswith("#"):
-            raise _malformed_heading_error(line, cursor, path)
+            raise _error(
+                "malformed-heading",
+                f"heading {line!r} does not match the required `### <text>` form "
+                "(three hashes, single space, non-empty text)",
+                cursor,
+                path,
+            )
         else:
             cursor += 1
     return items
@@ -211,12 +201,15 @@ def _parse_item(
         raise _id_syntax_error(
             start, path, f"heading {heading!r} is missing its required ID line"
         )
-    item_id = _parse_id(lines[start + 1], start + 1, path)
-    blocks: dict[str, str] = {}
-    id_bullets: dict[str, list[ItemId]] = {}
-    string_bullets: dict[str, list[str]] = {}
-    inline: dict[str, list[str]] = {}
-    repeated: dict[str, list[str]] = {}
+    id_line = lines[start + 1].strip()
+    if not (id_line.startswith("`") and id_line.endswith("`")):
+        raise _id_syntax_error(
+            start + 1,
+            path,
+            f"expected backtick-wrapped ID triple, got {lines[start + 1]!r}",
+        )
+    item_id = _parse_id_triple(id_line[1:-1], start + 1, path)
+    field_values: dict[str, Any] = {}
     last_position = 0
     cursor = start + 2
     while cursor < len(lines) and not lines[cursor].startswith(_HEADING_PREFIX):
@@ -226,126 +219,195 @@ def _parse_item(
             continue
         match = _KEYWORD_LINE.match(line)
         if match is None:
-            raise _stray_line_error(line, cursor, path)
+            raise _error(
+                "malformed-body",
+                f"unexpected non-keyword line within item: {line!r}",
+                cursor,
+                path,
+            )
         keyword = match.group("keyword")
-        inline_value = match.group("inline")
-        keyword_line = cursor
-        if keyword not in _KNOWN_KEYWORDS:
-            raise _unknown_keyword_error(keyword, cursor, path)
+        if keyword not in _KEYWORD_BY_NAME:
+            raise _error(
+                "unknown-keyword",
+                f"keyword {keyword!r} is not defined by the spec standard",
+                cursor,
+                path,
+            )
         position = _KEYWORD_POSITION[keyword]
         if position < last_position:
-            raise _keyword_order_error(keyword, cursor, path)
+            raise _error(
+                "keyword-order",
+                f"`{keyword}:` appears out of canonical order; "
+                "see §6 of the workspace spec standard",
+                cursor,
+                path,
+            )
         last_position = position
-        if keyword in _BLOCK_KEYWORDS:
-            _check_duplicate(keyword, blocks, cursor, path)
-            body, cursor = _capture_block(lines, cursor + 1)
-            if not body:
-                raise _empty_body_error(keyword, keyword_line, path)
-            if keyword == "Description":
-                _check_obligation_vocabulary(body, keyword_line, path)
-            blocks[keyword] = body
-        elif keyword in _ID_BULLET_KEYWORDS:
-            _check_duplicate(keyword, id_bullets, cursor, path)
-            ids, cursor = _capture_id_bullets(lines, cursor + 1, path)
-            if not ids:
-                raise _empty_body_error(keyword, keyword_line, path)
-            id_bullets[keyword] = ids
-        elif keyword in _STRING_BULLET_KEYWORDS:
-            _check_duplicate(keyword, string_bullets, cursor, path)
-            entries, cursor = _capture_string_bullets(lines, cursor + 1)
-            if not entries:
-                raise _empty_body_error(keyword, keyword_line, path)
-            string_bullets[keyword] = entries
-        elif keyword in _INLINE_KEYWORDS:
-            _check_duplicate(keyword, inline, cursor, path)
-            entries = _parse_inline_tags(line, keyword, keyword_line, path)
-            inline[keyword] = entries
-            cursor += 1
-        else:  # _REPEATED_KEYWORDS
-            if not inline_value.strip():
-                raise _empty_body_error(keyword, keyword_line, path)
-            repeated.setdefault(keyword, []).append(inline_value)
-            cursor += 1
-    if "Description" not in blocks:
-        raise _missing_keyword_error("Description", heading, start, path)
-    item = SpecItem(
-        heading=heading,
-        id=item_id,
-        description=blocks["Description"],
-        rationale=blocks.get("Rationale"),
-        comment=blocks.get("Comment"),
-        covers=id_bullets.get("Covers", []),
-        depends=id_bullets.get("Depends", []),
-        needs=string_bullets.get("Needs", []),
-        tags=inline.get("Tags", []),
-        interface=repeated.get("Interface", []),
-        agent_review=repeated.get("AgentReview", []),
+        spec = _KEYWORD_BY_NAME[keyword]
+        cursor = _BODY_FORM_HANDLERS[spec.body_form](
+            spec, match, lines, cursor, path, field_values
+        )
+    if "description" not in field_values:
+        raise _error(
+            "missing-keyword",
+            f"item {heading!r} is missing required `Description:` keyword",
+            start,
+            path,
+        )
+    return (
+        SpecItem(
+            heading=heading, id=item_id, **(_OPTIONAL_FIELD_DEFAULTS | field_values)
+        ),
+        cursor,
     )
-    return item, cursor
 
 
 # ---------------------------------------------------------------------------
-# Body capture
+# Per-body-form handlers
 # ---------------------------------------------------------------------------
 
 
-def _capture_block(lines: list[str], start: int) -> tuple[str, int]:
-    """Capture a block body up to the first blank line, keyword, heading, or EOF.
+_Handler = Callable[
+    [_Keyword, re.Match[str], list[str], int, pathlib.Path, dict[str, Any]], int
+]
 
-    A blank line inside the body is not allowed; blank lines terminate the
-    body. If the next non-blank line after the terminator is still body
-    content (rather than a keyword or heading), `_parse_item`'s stray-line
-    check raises `malformed-body`.
-    """
-    body: list[str] = []
-    cursor = start
+
+def _check_not_duplicate(
+    spec: _Keyword,
+    field_values: dict[str, Any],
+    line_index: int,
+    path: pathlib.Path,
+) -> None:
+    """Raise `duplicate-keyword` if `spec`'s field already has a captured value."""
+    if spec.field in field_values:
+        raise _error(
+            "duplicate-keyword",
+            f"`{spec.name}:` appears more than once within one item",
+            line_index,
+            path,
+        )
+
+
+def _handle_block(
+    spec: _Keyword,
+    match: re.Match[str],
+    lines: list[str],
+    cursor: int,
+    path: pathlib.Path,
+    field_values: dict[str, Any],
+) -> int:
+    """Capture a Description / Rationale / Comment block body."""
+    keyword_line = cursor
+    _check_not_duplicate(spec, field_values, keyword_line, path)
+    body_lines: list[str] = []
+    cursor += 1
     while cursor < len(lines):
         line = lines[cursor]
         if not line.strip():
             break
         if line.startswith(_HEADING_PREFIX) or _KEYWORD_LINE.match(line):
             break
-        body.append(line)
+        body_lines.append(line)
         cursor += 1
-    return "\n".join(body), cursor
+    body = "\n".join(body_lines)
+    if not body:
+        raise _empty_body_error(spec.name, keyword_line, path)
+    if spec.name == "Description":
+        _check_obligation_vocabulary(body, keyword_line, path)
+    field_values[spec.field] = body
+    return cursor
 
 
-def _capture_id_bullets(
-    lines: list[str], start: int, path: pathlib.Path
-) -> tuple[list[ItemId], int]:
-    """Capture `- type~name~rev` bullets until the first non-bullet line."""
+def _handle_id_bullets(
+    spec: _Keyword,
+    match: re.Match[str],
+    lines: list[str],
+    cursor: int,
+    path: pathlib.Path,
+    field_values: dict[str, Any],
+) -> int:
+    """Capture a Covers / Depends bullet list of typed ItemIds."""
+    keyword_line = cursor
+    _check_not_duplicate(spec, field_values, keyword_line, path)
     ids: list[ItemId] = []
-    cursor = start
+    cursor += 1
     while cursor < len(lines) and lines[cursor].startswith(_BULLET_PREFIX):
         triple = lines[cursor][len(_BULLET_PREFIX) :]
         ids.append(_parse_id_triple(triple, cursor, path))
         cursor += 1
-    return ids, cursor
+    if not ids:
+        raise _empty_body_error(spec.name, keyword_line, path)
+    field_values[spec.field] = ids
+    return cursor
 
 
-def _capture_string_bullets(lines: list[str], start: int) -> tuple[list[str], int]:
-    """Capture `- entry` bullets until the first non-bullet line."""
+def _handle_string_bullets(
+    spec: _Keyword,
+    match: re.Match[str],
+    lines: list[str],
+    cursor: int,
+    path: pathlib.Path,
+    field_values: dict[str, Any],
+) -> int:
+    """Capture a Needs bullet list of strings."""
+    keyword_line = cursor
+    _check_not_duplicate(spec, field_values, keyword_line, path)
     entries: list[str] = []
-    cursor = start
+    cursor += 1
     while cursor < len(lines) and lines[cursor].startswith(_BULLET_PREFIX):
         entries.append(lines[cursor][len(_BULLET_PREFIX) :])
         cursor += 1
-    return entries, cursor
+    if not entries:
+        raise _empty_body_error(spec.name, keyword_line, path)
+    field_values[spec.field] = entries
+    return cursor
+
+
+def _handle_inline(
+    spec: _Keyword,
+    match: re.Match[str],
+    lines: list[str],
+    cursor: int,
+    path: pathlib.Path,
+    field_values: dict[str, Any],
+) -> int:
+    """Capture a Tags inline comma-separated list."""
+    keyword_line = cursor
+    _check_not_duplicate(spec, field_values, keyword_line, path)
+    field_values[spec.field] = _parse_inline_tags(
+        lines[cursor], spec.name, keyword_line, path
+    )
+    return cursor + 1
+
+
+def _handle_repeated(
+    spec: _Keyword,
+    match: re.Match[str],
+    lines: list[str],
+    cursor: int,
+    path: pathlib.Path,
+    field_values: dict[str, Any],
+) -> int:
+    """Capture one occurrence of a repeatable keyword (Interface / AgentReview)."""
+    inline_value = match.group("inline")
+    if not inline_value.strip():
+        raise _empty_body_error(spec.name, cursor, path)
+    field_values.setdefault(spec.field, []).append(inline_value)
+    return cursor + 1
+
+
+_BODY_FORM_HANDLERS: dict[_BodyForm, _Handler] = {
+    _BodyForm.BLOCK: _handle_block,
+    _BodyForm.ID_BULLETS: _handle_id_bullets,
+    _BodyForm.STRING_BULLETS: _handle_string_bullets,
+    _BodyForm.INLINE: _handle_inline,
+    _BodyForm.REPEATED: _handle_repeated,
+}
 
 
 # ---------------------------------------------------------------------------
-# ID parsing
+# ID-triple parsing
 # ---------------------------------------------------------------------------
-
-
-def _parse_id(line: str, line_index: int, path: pathlib.Path) -> ItemId:
-    """Parse a backtick-wrapped `` `type~name~rev` `` ID line into an ItemId."""
-    stripped = line.strip()
-    if not (stripped.startswith("`") and stripped.endswith("`")):
-        raise _id_syntax_error(
-            line_index, path, f"expected backtick-wrapped ID triple, got {line!r}"
-        )
-    return _parse_id_triple(stripped[1:-1], line_index, path)
 
 
 def _parse_id_triple(triple: str, line_index: int, path: pathlib.Path) -> ItemId:
@@ -371,19 +433,8 @@ def _parse_id_triple(triple: str, line_index: int, path: pathlib.Path) -> ItemId
 
 
 # ---------------------------------------------------------------------------
-# Small helpers
+# Inline-tag parsing
 # ---------------------------------------------------------------------------
-
-
-def _check_duplicate(
-    keyword: str,
-    seen: Mapping[str, object],
-    line_index: int,
-    path: pathlib.Path,
-) -> None:
-    """Raise `duplicate-keyword` if `keyword` already has an entry in `seen`."""
-    if keyword in seen:
-        raise _duplicate_keyword_error(keyword, line_index, path)
 
 
 def _parse_inline_tags(
@@ -392,11 +443,11 @@ def _parse_inline_tags(
     """Parse a `Tags: ...` line under the canonical `, `-separated form."""
     prefix = f"{keyword}: "
     if not line.startswith(prefix):
-        raise SpecParseError(
-            path,
-            line_index + 1,
+        raise _error(
             "malformed-body",
             f"`{keyword}:` must be followed by a single space, got {line!r}",
+            line_index,
+            path,
         )
     body = line[len(prefix) :]
     if not body:
@@ -404,11 +455,40 @@ def _parse_inline_tags(
     entries = body.split(", ")
     for entry in entries:
         if not entry or entry != entry.strip() or "," in entry:
-            raise SpecParseError(
-                path,
-                line_index + 1,
+            raise _error(
                 "malformed-body",
                 f"`{keyword}:` entries must be non-empty and free of "
                 f"whitespace or extra commas, got {entry!r}",
+                line_index,
+                path,
             )
     return entries
+
+
+# ---------------------------------------------------------------------------
+# Obligation-vocabulary check (§7.1)
+# ---------------------------------------------------------------------------
+
+
+def _check_obligation_vocabulary(
+    body: str, line_index: int, path: pathlib.Path
+) -> None:
+    """Enforce §7.1: obligation verbs are backticked, one level per item."""
+    bare = _OBLIGATION_VERB.search(_BACKTICK_SPAN.sub("", body))
+    if bare is not None:
+        raise _error(
+            "obligation-not-backticked",
+            f"unbackticked obligation verb {bare.group(0)!r} in `Description:`; "
+            "§7.1 requires obligation verbs to be wrapped in backticks",
+            line_index,
+            path,
+        )
+    levels = {match.group(1) for match in _USED_OBLIGATION.finditer(body)}
+    if len(levels) > 1:
+        raise _error(
+            "obligation-mixed-levels",
+            f"`Description:` mixes obligation levels {sorted(levels)}; "
+            "§7.1 permits one level per item",
+            line_index,
+            path,
+        )

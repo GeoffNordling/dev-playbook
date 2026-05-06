@@ -25,7 +25,7 @@ def _render_item(item: SpecItem) -> str:
         _id_bullets("Covers", item.covers),
         _id_bullets("Depends", item.depends),
         _bullets("Needs", item.needs),
-        _inline("Tags", item.tags),
+        f"Tags: {', '.join(item.tags)}" if item.tags else None,
         _repeated("Interface", item.interface),
         _repeated("AgentReview", item.agent_review),
     ]
@@ -53,11 +53,6 @@ def _bullets(keyword: str, items: list[str]) -> str | None:
 def _id_bullets(keyword: str, ids: list[ItemId]) -> str | None:
     """Format `Keyword:` followed by a bullet list of formatted IDs, or None when empty."""
     return _bullets(keyword, [_format_id(i) for i in ids])
-
-
-def _inline(keyword: str, items: list[str]) -> str | None:
-    """Format `Keyword: a, b, c` on a single line, or None when items is empty."""
-    return f"{keyword}: {', '.join(items)}" if items else None
 
 
 def _repeated(keyword: str, entries: list[str]) -> str | None:

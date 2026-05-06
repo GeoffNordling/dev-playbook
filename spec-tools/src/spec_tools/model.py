@@ -68,8 +68,14 @@ class SpecItem:
             raise ValueError("rationale must be None rather than the empty string")
         if self.comment == "":
             raise ValueError("comment must be None rather than the empty string")
-        for field_name in ("needs", "tags", "interface", "agent_review"):
-            if any(not entry for entry in getattr(self, field_name)):
+        list_fields = (
+            ("needs", self.needs),
+            ("tags", self.tags),
+            ("interface", self.interface),
+            ("agent_review", self.agent_review),
+        )
+        for field_name, entries in list_fields:
+            if any(not entry for entry in entries):
                 raise ValueError(f"{field_name} must not contain empty-string entries")
 
 

@@ -59,3 +59,68 @@ the author thought about it.
 Rationale: a fallback that hides a bug delays the failure to a place far
 from the cause, where it's much harder to diagnose. Failing at the point of
 the missing value points straight at the defect.
+
+## Module Layout
+
+A module's top-level statements appear in this order:
+
+1. The module docstring.
+2. `import` and `from ... import` statements.
+3. Plain-literal module constants (`UPPER_SNAKE_CASE` names whose values
+   are literals, tuples of literals, or `re.compile(...)` patterns).
+   Includes `_PRIVATE` constants.
+4. Type aliases, dataclasses, classes, and functions, interleaved with
+   *derived* constants — module-level `UPPER_SNAKE_CASE` names whose
+   values depend on a class, function, or enum defined in the file.
+   A derived constant goes immediately after the things it derives from,
+   in a labeled section.
+
+Don't define a constant next to its first user mid-file. Single-use
+constants still go at the top (or, for derived ones, in their grouped
+section near their dependencies) — never floating above one function.
+
+Rationale: a reader scanning a new module wants to find its dependencies and
+its tunable values without searching. Mixing constants into the body of the
+file hides them — a reader who doesn't already know the constant exists
+won't think to look for it past the first `def`. The cost of putting every
+constant at the top is one scroll; the cost of hiding one is a bug that
+slips past review because nobody saw it.
+
+## Helpers
+
+A helper function earns its place by doing one of these:
+
+- **Multi-use**: called from two or more sites. De-duplication is the
+  clearest justification.
+- **Substantial body**: the logic is long or intricate enough that lifting
+  it out makes the caller readable. A 1–2 line helper called once is
+  almost always pure relocation; inline it.
+- **Distinct concern at a different abstraction level**: the helper's job
+  belongs to a different layer than its caller (e.g., a regex-based
+  enforcement check inside a high-level dispatch loop). The name then
+  documents the layer boundary.
+- **Architectural pluggability**: an entry in a dispatch table, registry,
+  or strategy map. These look "single-use" by static call count but are
+  pluggable by design.
+
+A helper does **not** earn its place from:
+
+- "Symmetry with siblings" alone — three functions of the same shape, where
+  one is single-use and trivial, is not a reason to keep the trivial one.
+  Justify each on its own merits.
+- "It already existed" — the bar is the same for new helpers and for
+  helpers inherited from earlier work.
+- Speculative reuse — extract when the second caller appears, not in
+  anticipation of one.
+
+When a helper does earn its place, put it directly under the function that
+uses it (or, for helpers shared by several functions, in a clearly labeled
+section). Group related helpers into sections with a `# ---` banner so a
+reader can navigate by concern, not by call graph.
+
+Rationale: every helper costs the reader a jump. Helpers that genuinely
+encapsulate a concept pay that cost back; helpers that just relocate a few
+lines don't. Pinning the "earns its place" criteria explicitly keeps
+review consistent — without them, "should this be extracted?" becomes a
+matter of taste, and codebases drift toward over-factored or
+under-factored extremes depending on who reviewed last.
