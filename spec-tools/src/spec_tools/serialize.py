@@ -24,8 +24,8 @@ def _render_item(item: SpecItem) -> str:
         _block("Comment", item.comment),
         _id_bullets("Covers", item.covers),
         _id_bullets("Depends", item.depends),
-        _inline("Tags", item.tags),
         _bullets("Needs", item.needs),
+        _inline("Tags", item.tags),
         _repeated("Interface", item.interface),
         _repeated("AgentReview", item.agent_review),
     ]

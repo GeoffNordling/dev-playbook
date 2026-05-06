@@ -3,7 +3,7 @@
 import pathlib
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 from spec_tools.model import ItemId, SpecItem
 
@@ -23,16 +23,13 @@ _KNOWN_KEYWORDS = (
     | _INLINE_KEYWORDS
     | _REPEATED_KEYWORDS
 )
+# Canonical keyword order is the SpecItem field order; positions only need
+# monotonicity for the order check. `heading` and `id` are item-structure
+# fields, not keywords, so they're skipped.
 _KEYWORD_POSITION = {
-    "Description": 1,
-    "Rationale": 2,
-    "Comment": 3,
-    "Covers": 4,
-    "Depends": 5,
-    "Tags": 6,
-    "Needs": 7,
-    "Interface": 8,
-    "AgentReview": 9,
+    "".join(part.title() for part in field.name.split("_")): index
+    for index, field in enumerate(fields(SpecItem))
+    if field.name not in {"heading", "id"}
 }
 
 

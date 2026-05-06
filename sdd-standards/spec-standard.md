@@ -42,10 +42,10 @@ real items use a subset — the table below names what applies where.
     Depends:
     - dsn~classifier.taxonomy~1
 
-    Tags: classifier, llm
-
     Needs:
     - utest
+
+    Tags: classifier, llm
 
     Interface: classifier.classify(message: str) -> classifier.TopicLabel
     AgentReview: The system prompt at src/prompts/classifier.md
@@ -379,8 +379,8 @@ relative positions.
 3. `Comment:`
 4. `Covers:`
 5. `Depends:`
-6. `Tags:`
-7. `Needs:`
+6. `Needs:`
+7. `Tags:`
 8. `Interface:` (one line per occurrence)
 9. `AgentReview:` (one line per occurrence)
 
