@@ -209,6 +209,34 @@ def test_spec_graph_rejects_coverage_cycle():
 
 
 @pytest.mark.covers("dsn~model.graph~0")
+def test_spec_graph_accepts_empty_items_list():
+    graph = SpecGraph(items=[])
+
+    digraph = graph.as_digraph()
+    assert list(digraph.nodes) == []
+
+
+@pytest.mark.covers("dsn~model.graph~0")
+def test_spec_graph_upstream_raises_on_missing_id():
+    item = make_item("present")
+    graph = SpecGraph(items=[item])
+    missing_id = ItemId("dsn", "missing", 0)
+
+    with pytest.raises(ValueError, match="not in the graph"):
+        graph.upstream(missing_id)
+
+
+@pytest.mark.covers("dsn~model.graph~0")
+def test_spec_graph_downstream_raises_on_missing_id():
+    item = make_item("present")
+    graph = SpecGraph(items=[item])
+    missing_id = ItemId("dsn", "missing", 0)
+
+    with pytest.raises(ValueError, match="not in the graph"):
+        graph.downstream(missing_id)
+
+
+@pytest.mark.covers("dsn~model.graph~0")
 def test_spec_graph_as_digraph_nodes_keyed_by_id_with_coverage_edges():
     feat = make_item("model", artifact_type="feat")
     req = make_item("model.navigation", artifact_type="req", covers=[feat.id])

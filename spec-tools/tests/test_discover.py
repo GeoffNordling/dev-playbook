@@ -26,6 +26,8 @@ def test_find_returns_folder_form_specs_recursively(tmp_path: pathlib.Path):
     specs_dir = tmp_path / "specs"
     (specs_dir / "design").mkdir(parents=True)
     (specs_dir / "functional_requirements" / "nested").mkdir(parents=True)
+    (specs_dir / "design" / "index.md").write_text("# index\n")
+    (specs_dir / "functional_requirements" / "index.md").write_text("# index\n")
     design_alpha_path = specs_dir / "design" / "alpha.md"
     design_alpha_path.write_text("# alpha\n")
     design_beta_path = specs_dir / "design" / "beta.md"
@@ -110,9 +112,52 @@ def test_find_raises_on_unexpected_directory_under_specs(tmp_path: pathlib.Path)
 
 
 @pytest.mark.covers("dsn~discover.find~0")
+def test_find_returns_paths_sorted_lexicographically(tmp_path: pathlib.Path):
+    """Files created in non-alphabetical order still come back sorted."""
+    specs_dir = tmp_path / "specs"
+    (specs_dir / "design").mkdir(parents=True)
+    (specs_dir / "design" / "index.md").write_text("# index\n")
+    delta_path = specs_dir / "design" / "delta.md"
+    alpha_path = specs_dir / "design" / "alpha.md"
+    gamma_path = specs_dir / "design" / "gamma.md"
+    beta_path = specs_dir / "design" / "beta.md"
+    delta_path.write_text("# delta\n")
+    alpha_path.write_text("# alpha\n")
+    gamma_path.write_text("# gamma\n")
+    beta_path.write_text("# beta\n")
+
+    result = find(tmp_path)
+
+    assert result == [alpha_path, beta_path, delta_path, gamma_path]
+
+
+@pytest.mark.covers("dsn~discover.find~0")
+def test_find_raises_when_folder_form_missing_index_md(tmp_path: pathlib.Path):
+    specs_dir = tmp_path / "specs"
+    (specs_dir / "design").mkdir(parents=True)
+    (specs_dir / "design" / "alpha.md").write_text("# alpha\n")
+
+    with pytest.raises(ValueError, match="index.md"):
+        find(tmp_path)
+
+
+@pytest.mark.covers("dsn~discover.find~0")
+def test_find_raises_on_non_markdown_file_in_nested_folder(tmp_path: pathlib.Path):
+    specs_dir = tmp_path / "specs"
+    (specs_dir / "design" / "nested").mkdir(parents=True)
+    (specs_dir / "design" / "index.md").write_text("# index\n")
+    (specs_dir / "design" / "alpha.md").write_text("# alpha\n")
+    (specs_dir / "design" / "nested" / "deep.txt").write_text("not a spec")
+
+    with pytest.raises(ValueError, match="deep.txt"):
+        find(tmp_path)
+
+
+@pytest.mark.covers("dsn~discover.find~0")
 def test_find_raises_on_non_markdown_file_inside_folder_form(tmp_path: pathlib.Path):
     specs_dir = tmp_path / "specs"
     (specs_dir / "design").mkdir(parents=True)
+    (specs_dir / "design" / "index.md").write_text("# index\n")
     (specs_dir / "design" / "alpha.md").write_text("# alpha\n")
     (specs_dir / "design" / "notes.txt").write_text("not a spec")
 

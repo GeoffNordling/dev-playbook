@@ -23,6 +23,17 @@ _KNOWN_KEYWORDS = (
     | _INLINE_KEYWORDS
     | _REPEATED_KEYWORDS
 )
+_KEYWORD_POSITION = {
+    "Description": 1,
+    "Rationale": 2,
+    "Comment": 3,
+    "Covers": 4,
+    "Depends": 5,
+    "Tags": 6,
+    "Needs": 7,
+    "Interface": 8,
+    "AgentReview": 9,
+}
 
 
 @dataclass
@@ -103,6 +114,28 @@ def _malformed_heading_error(
     return SpecParseError(path, line_index + 1, "malformed-heading", message)
 
 
+def _keyword_order_error(
+    keyword: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a `keyword-order` error for `keyword` appearing out of canonical order."""
+    message = (
+        f"`{keyword}:` appears out of canonical order; "
+        "see §6 of the workspace spec standard"
+    )
+    return SpecParseError(path, line_index + 1, "keyword-order", message)
+
+
+def _fenced_code_block_error(
+    line: str, line_index: int, path: pathlib.Path
+) -> SpecParseError:
+    """Build a `fenced-code-block` error for a fenced code block marker."""
+    message = (
+        f"fenced code block marker {line!r} is forbidden by §8 of the "
+        "workspace spec standard; use a 4-space indented code block"
+    )
+    return SpecParseError(path, line_index + 1, "fenced-code-block", message)
+
+
 # ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
@@ -114,6 +147,9 @@ def parse(path: pathlib.Path) -> list[SpecItem]:
     Aborts on the first standard violation by raising `SpecParseError`.
     """
     lines = path.read_text().splitlines()
+    for index, line in enumerate(lines):
+        if line.startswith("```") or line.startswith("~~~"):
+            raise _fenced_code_block_error(line, index, path)
     items: list[SpecItem] = []
     cursor = 0
     while cursor < len(lines):
@@ -142,12 +178,17 @@ def _parse_item(
     by the item (typically the next `### heading` or end of file).
     """
     heading = lines[start][len(_HEADING_PREFIX) :]
+    if start + 1 >= len(lines):
+        raise _id_syntax_error(
+            start, path, f"heading {heading!r} is missing its required ID line"
+        )
     item_id = _parse_id(lines[start + 1], start + 1, path)
     blocks: dict[str, str] = {}
     id_bullets: dict[str, list[ItemId]] = {}
     string_bullets: dict[str, list[str]] = {}
     inline: dict[str, list[str]] = {}
     repeated: dict[str, list[str]] = {}
+    last_position = 0
     cursor = start + 2
     while cursor < len(lines) and not lines[cursor].startswith(_HEADING_PREFIX):
         line = lines[cursor]
@@ -162,6 +203,10 @@ def _parse_item(
         keyword_line = cursor
         if keyword not in _KNOWN_KEYWORDS:
             raise _unknown_keyword_error(keyword, cursor, path)
+        position = _KEYWORD_POSITION[keyword]
+        if position < last_position:
+            raise _keyword_order_error(keyword, cursor, path)
+        last_position = position
         if keyword in _BLOCK_KEYWORDS:
             _check_duplicate(keyword, blocks, cursor, path)
             body, cursor = _capture_block(lines, cursor + 1)

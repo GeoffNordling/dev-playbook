@@ -113,12 +113,22 @@ class SpecGraph:
         return self._items.get(id)
 
     def upstream(self, id: ItemId) -> list[SpecItem]:
-        """Return the items that the item with `id` covers."""
+        """Return the items that the item with `id` covers.
+
+        Raises ValueError if `id` is not present in the graph.
+        """
+        if id not in self._items:
+            raise ValueError(f"item {id} is not in the graph")
         item = self._items[id]
         return [self._items[c] for c in item.covers]
 
     def downstream(self, id: ItemId) -> list[SpecItem]:
-        """Return the items that cover the item with `id`."""
+        """Return the items that cover the item with `id`.
+
+        Raises ValueError if `id` is not present in the graph.
+        """
+        if id not in self._items:
+            raise ValueError(f"item {id} is not in the graph")
         return [item for item in self._items.values() if id in item.covers]
 
     def as_digraph(self) -> networkx.DiGraph:

@@ -27,6 +27,14 @@ or format errors by category:
 - `malformed-heading` — a line begins with `#` but is not a
   conformant `### ` spec-item heading (wrong hash count, missing
   space, or empty heading text).
+- `keyword-order` — within an item, a keyword appears earlier in
+  the file than another keyword that should follow it per the
+  canonical order in §6 of the workspace spec standard.
+- `fenced-code-block` — a line starts with a fenced code block
+  marker (triple-backtick or `~~~`); the standard mandates
+  4-space indented code blocks (§8). Detected by pre-scan, so a
+  file containing both a fenced code block and another violation
+  reports `fenced-code-block` regardless of which line is earlier.
 
 Rationale:
 A typed exception with structured fields gives callers (lint, IDEs,

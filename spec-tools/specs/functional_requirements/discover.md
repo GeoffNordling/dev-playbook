@@ -26,10 +26,12 @@ returned set. The admitted direct children of `specs/` are
 `design.md` or `design/`, and `functional_requirements.md` or
 `functional_requirements/`; for each pair, at most one of the two
 forms `SHALL` be present. Folder-form directories `SHALL` contain
-only `.md` files and subdirectories, recursively. If
-`<root>/specs/` is missing, empty, or contains any entry that
-violates these rules, the discoverer `SHALL` raise to signal
-misconfiguration.
+only `.md` files and subdirectories, recursively. A folder-form
+direct child of `specs/` (`design/` or `functional_requirements/`)
+`SHALL` contain an `index.md` at its top level (per §8 of the
+workspace spec standard). If `<root>/specs/` is missing, empty,
+or contains any entry that violates these rules, the discoverer
+`SHALL` raise to signal misconfiguration.
 
 Rationale:
 A single entry point that handles either layout removes a class of

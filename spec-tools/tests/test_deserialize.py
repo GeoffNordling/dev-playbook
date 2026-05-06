@@ -331,6 +331,113 @@ def test_parse_preserves_source_order_across_multiple_items():
 
 
 @pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_id_syntax_when_heading_at_eof():
+    fixture_path = load("bad/missing_id_line_eof.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "id-syntax"
+    assert error.line == 1
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_id_syntax_when_id_line_replaced_by_keyword():
+    fixture_path = load("bad/missing_id_line_followed_by_keyword.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "id-syntax"
+    assert error.line == 2
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_keyword_order_when_keywords_out_of_canonical_order():
+    fixture_path = load("bad/keyword_order.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "keyword-order"
+    assert error.line == 9
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+@pytest.mark.parametrize(
+    "fixture_name",
+    ["bad/fenced_code_block_backtick.md", "bad/fenced_code_block_tilde.md"],
+)
+def test_parse_raises_fenced_code_block_for_fence_markers(fixture_name: str):
+    fixture_path = load(fixture_name)
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "fenced-code-block"
+    assert error.line == 7
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+@pytest.mark.parametrize(
+    "fixture_name",
+    [
+        "bad/interface_continuation.md",
+        "bad/agent_review_continuation.md",
+    ],
+)
+def test_parse_raises_malformed_body_for_repeated_keyword_continuation(
+    fixture_name: str,
+):
+    fixture_path = load(fixture_name)
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "malformed-body"
+    assert error.line == 8
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_malformed_body_for_lowercase_keyword():
+    fixture_path = load("bad/keyword_lowercase.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "malformed-body"
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_raises_unknown_keyword_for_uppercase_keyword():
+    fixture_path = load("bad/keyword_uppercase.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "unknown-keyword"
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
+def test_parse_aborts_on_first_violation_only():
+    fixture_path = load("bad/multiple_violations.md")
+
+    with pytest.raises(SpecParseError) as exc_info:
+        parse(fixture_path)
+
+    error = exc_info.value
+    assert error.rule_violated == "id-syntax"
+    assert error.line == 2
+
+
+@pytest.mark.covers("dsn~deserialize.parse~0")
 def test_parse_minimal_item_yields_one_spec_item_with_default_optionals():
     items = parse(load("good/minimal.md"))
 

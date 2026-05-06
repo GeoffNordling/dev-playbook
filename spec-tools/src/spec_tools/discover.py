@@ -27,6 +27,8 @@ def find(root: pathlib.Path) -> list[pathlib.Path]:
     for stem in ("design", "functional_requirements"):
         if f"{stem}.md" in children and stem in children:
             raise ValueError(f"specs/ has both {stem}.md and {stem}/; pick one layout")
+        if stem in children and not (specs / stem / "index.md").is_file():
+            raise ValueError(f"folder-form spec dir specs/{stem}/ is missing index.md")
     for entry in specs.rglob("*"):
         if entry.is_dir():
             continue

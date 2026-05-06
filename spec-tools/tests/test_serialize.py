@@ -127,6 +127,27 @@ def test_render_separates_multiple_items_with_blank_line():
     )
 
 
+@pytest.mark.covers("dsn~serialize.render~0")
+def test_render_empty_list_returns_empty_string():
+    assert render([]) == ""
+
+
+@pytest.mark.covers("dsn~serialize.render~0")
+def test_render_single_tag_emits_single_inline_entry():
+    item = make_item(
+        heading="One Tag",
+        id=ItemId("dsn", "one-tag", 0),
+        description="Body.",
+        tags=["alpha"],
+    )
+
+    output = render([item])
+
+    assert output == (
+        "### One Tag\n`dsn~one-tag~0`\n\nDescription:\nBody.\n\nTags: alpha\n"
+    )
+
+
 @pytest.mark.covers("dsn~serialize.write~0")
 def test_write_persists_rendered_output(tmp_path: pathlib.Path):
     items = [

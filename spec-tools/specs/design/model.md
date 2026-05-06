@@ -85,7 +85,11 @@ the upstream items it covers.
 If the input list contains two items with the same `ItemId`, an
 item whose `Covers:` references an `ItemId` not present in the
 list, or a coverage cycle, `SpecGraph.__init__` `SHALL` raise
-`ValueError`.
+`ValueError`. An empty `items` list yields an empty graph with
+no nodes. `upstream(id)` and `downstream(id)` `SHALL` raise
+`ValueError` when `id` is not present in the graph; `find(id)`
+returns `None` instead, since absence is a routine query
+outcome.
 
 Rationale:
 A typed graph type centralizes the lookup and traversal logic that
