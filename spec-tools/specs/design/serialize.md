@@ -33,8 +33,11 @@ AgentReview: The render function in `src/spec_tools/serialize.py` emits item sec
 
 Description:
 The serializer's public `write` function `SHALL` persist a
-rendered spec file to a caller-specified path. Its behavior
-`SHALL` be equivalent to `path.write_text(render(items))`.
+rendered spec file to a caller-specified path. If `path` already
+exists, `write` `SHALL` replace its contents; the post-condition
+is `path.read_text() == render(items)` regardless of prior state.
+Its behavior `SHALL` be equivalent to
+`path.write_text(render(items))`.
 
 Rationale:
 A module-level write function is the natural Python stdlib idiom

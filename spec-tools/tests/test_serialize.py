@@ -149,6 +149,23 @@ def test_render_single_tag_emits_single_inline_entry():
 
 
 @pytest.mark.covers("dsn~serialize.write~0")
+def test_write_replaces_existing_file_contents(tmp_path: pathlib.Path):
+    target = tmp_path / "spec.md"
+    target.write_text("stale content from a previous version\n")
+    items = [
+        make_item(
+            heading="Fresh",
+            id=ItemId("dsn", "fresh", 0),
+            description="Replaced.",
+        )
+    ]
+
+    write(items, target)
+
+    assert target.read_text() == render(items)
+
+
+@pytest.mark.covers("dsn~serialize.write~0")
 def test_write_persists_rendered_output(tmp_path: pathlib.Path):
     items = [
         make_item(
