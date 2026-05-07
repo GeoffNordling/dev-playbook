@@ -2,10 +2,11 @@
 
 **Date:** 2026-05-07
 **Status:** Accepted
+**Source:** [How to Work and Compound with AI](https://eugeneyan.com/writing/working-with-ai/) (Eugene Yan)
 
 ## Context
 
-Audited this workspace against "How to Work and Compound with AI" (Eugene Yan). Three gaps to close, several practices to keep, several to reject.
+Audited this workspace against the source article above. Three gaps to close, several practices to keep, several to reject.
 
 | Gap | Effect |
 |---|---|
