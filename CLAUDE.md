@@ -2,7 +2,6 @@
 
 ## Rules
 
-- This is a public repository. Never commit secrets or confidential information.
 - See README.md for what belongs in this repo vs. other repos.
 - After adding or removing files under `dotfiles/`, run `dotfiles/bin/sync-dotfiles.sh` to update Stow symlinks.
 - `.pre-commit-config.yaml` is the source of truth for pre-commit hooks. Edit it directly to add, change, or remove a hook. When adding a new validation script under `tools/bin/`, add its hook entry to the YAML at the same time.
@@ -19,11 +18,6 @@ live elsewhere in the workspace and are not visible from this one:
 
 When editing anything under those paths, the audience is the population of
 workspace repos, not this repo.
-
-## LaTeX in Markdown
-
-- Use `\ast` instead of `*` in LaTeX superscripts (e.g., `$A^\ast$` not `$A^*$`). GitHub's Markdown parser consumes bare `*` as italic markup before the math renderer sees it.
-- Do not use `\;` for spacing in LaTeX equations. GitHub renders it as a visible semicolon. Use regular spaces instead.
 
 ## Agent skills
 
