@@ -221,6 +221,7 @@ from the item rather than emitted with an empty body.
 ### 6.1 `Description:`
 
 The body of the item, in prose. Required, exactly one per item.
+A single `Description:` block holds one prose body.
 Prose rules (obligation verbs, sentence templates) are in §7.
 
 Form: a `Description:` line followed by one or more body lines.
@@ -234,6 +235,7 @@ the body.
 ### 6.2 `Rationale:`
 
 Why the requirement exists. Optional, at most one per item.
+A single `Rationale:` block holds one prose body.
 
 Form: a `Rationale:` line followed by one or more body lines.
 The body `SHALL NOT` contain blank lines; a blank line terminates
@@ -247,6 +249,7 @@ the body.
 
 Caveats, implementation notes, or anything that fits neither
 description nor rationale. Optional, at most one per item.
+A single `Comment:` block holds one prose body.
 
 Form: a `Comment:` line followed by one or more body lines.
 The body `SHALL NOT` contain blank lines; a blank line terminates
@@ -259,9 +262,10 @@ the body.
 ### 6.4 `Covers:`
 
 Names the upstream items this item covers (§5). Optional, at most one
-per item. Chain well-formedness still requires this item to declare
-`Covers:` whenever an upstream item's `Needs:` expects coverage of this
-item's type — see §5.2.
+per item. A single `Covers:` block holds one or more upstream items.
+Chain well-formedness still requires this item to declare `Covers:`
+whenever an upstream item's `Needs:` expects coverage of this item's
+type — see §5.2.
 
 Form: a `Covers:` line followed by one or more
 `- type~name~revision` bullets.
@@ -273,7 +277,8 @@ Form: a `Covers:` line followed by one or more
 ### 6.5 `Depends:`
 
 Ordering hints between items; carries no coverage effect. Optional,
-at most one per item.
+at most one per item. A single `Depends:` block holds one or more
+dependencies.
 
 Form: a `Depends:` line followed by one or more
 `- type~name~revision` bullets.
@@ -284,7 +289,8 @@ Form: a `Depends:` line followed by one or more
 ### 6.6 `Needs:`
 
 Names the downstream artifact types required to cover this item.
-Chain semantics are in §5. Optional, at most one per item.
+Chain semantics are in §5. Optional, at most one per item. A single
+`Needs:` block holds one or more artifact types.
 
 Form: a `Needs:` line followed by one or more `- <artifact-type>`
 bullets.
@@ -296,7 +302,8 @@ bullets.
 ### 6.7 `Tags:`
 
 Free-form labels used by tooling for filtering. Optional, at most one
-per item.
+per item. A single `Tags:` block holds one or more comma-separated
+tags.
 
 Form: a `Tags:` line followed by a single space, then one or more
 non-empty tag values separated by `, ` (comma + single space). No
@@ -357,8 +364,10 @@ declaration across lines.
 File paths named in the prose let the review agent locate what to
 compare against.
 
-Use `AgentReview:` when a commitment cannot be deterministically
-tested:
+`AgentReview:` is often useful as a bridge between a fuzzy, semantic,
+natural-language specification and the deterministic, syntactic code
+that implements it. Use it when a commitment cannot be
+deterministically tested:
 
 - Behavioral requirements for LLM agents (e.g., "`SHALL NOT` attempt
   polite conversation for no reason").
