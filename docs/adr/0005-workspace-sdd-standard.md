@@ -94,4 +94,4 @@ ADR-0004's other commitments (public-only testing enforcement via Ruff `SLF001` 
 ### Implementation
 
 - `sdd-tools` implements the standard: `spec-lint` enforces keyword well-formedness; `sdd-index`, `sdd-atlas`, `sdd-chain`, and `sdd-review` provide projections; `pytest-sdd` parses markers and `Interface:` declarations at collection time.
-- Greenfield `spec-tools` rewrite (GH issue #16) targets this standard.
+- Greenfield `spec-tools` rewrite (GH issue GeoffNordling/spec-tools#9) targets this standard.

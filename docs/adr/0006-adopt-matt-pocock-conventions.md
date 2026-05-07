@@ -139,7 +139,7 @@ skills themselves.
 - The cookiecutter project template
   ([project-template/](~/workspace/dev-playbook/project-template/))
   must propagate these conventions so newly-generated repos start in
-  compliance. Tracked separately in #28.
+  compliance. Tracked separately in GeoffNordling/spec-tools#1.
 - The SDD-extension bet remains testable. If the extension fails to
   make SDD effective with current-state coding agents in real use,
   this ADR's PRD rejection should be revisited.
