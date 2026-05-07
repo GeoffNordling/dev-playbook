@@ -110,14 +110,6 @@ def main():
 
     repo_root = Path(args.directory).resolve()
 
-    standard = repo_root / "standards" / "repo-documentation.md"
-    if not standard.exists():
-        print(
-            f"ref-check: governing standard not found: {standard}",
-            file=sys.stderr,
-        )
-        sys.exit(2)
-
     md_files = find_md_files(repo_root)
 
     if not md_files:

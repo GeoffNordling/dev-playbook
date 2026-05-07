@@ -23,7 +23,7 @@ issue tracker.
 
 Distinct from:
 
-- [SDD spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md)
+- [SDD spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md)
   — formal requirements with traceability. Specs say what must be true;
   issues say what work delivers it.
 - `CONTEXT.md` — domain glossary.
@@ -37,6 +37,6 @@ Distinct from:
 | Strategic goals, aspirations | `ROADMAP.md` |
 | Business problem and stakeholders | `BUSINESS_CONTEXT.md` |
 | Domain glossary (terms, relationships) | `CONTEXT.md` |
-| Formal requirements with traceability | `specs/` (see [SDD standards](~/workspace/dev-playbook/sdd-standards/README.md)) |
+| Formal requirements with traceability | `specs/` (see [SDD standards](~/workspace/spec-tools/sdd-standards/README.md)) |
 | File hierarchy and ADR conventions | [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md) |
 | Testing rules | [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) |

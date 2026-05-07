@@ -1,5 +1,0 @@
-###NoSpace
-`dsn~example~0`
-
-Description:
-A description.

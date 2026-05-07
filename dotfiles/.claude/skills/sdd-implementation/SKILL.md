@@ -13,12 +13,12 @@ Vertical-slice TDD against the `Interface:` declarations committed in the design
 
 ## Read first
 
-- [Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
+- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
 - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
 - [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style, and the other code-level standards that apply to everything you write in this skill.
 - [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
 
-When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/dev-playbook/sdd-standards/lessons.md).
+When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md).
 
 ## First steps
 
@@ -79,11 +79,11 @@ When refactor pressure suggests a structural change bigger than one module — m
 
 When a refactor would change a committed `Interface:`, stop. Describe the proposed amendment to the user: which `dsn` is affected, what the new `Interface:` would look like, what motivated the change. Wait.
 
-Specs and code are co-maintained as peers ([sdd-standards/README](~/workspace/dev-playbook/sdd-standards/README.md)). Implementation legitimately surfaces spec inadequacies — that's the SDD Triangle in action — so amendments are a normal part of the workflow, not a failure mode.
+Specs and code are co-maintained as peers ([sdd-standards/README](~/workspace/spec-tools/sdd-standards/README.md)). Implementation legitimately surfaces spec inadequacies — that's the SDD Triangle in action — so amendments are a normal part of the workflow, not a failure mode.
 
 The user decides whether to:
 
-- Apply the amendment in this terminal — edit the spec (update `Interface:` lines; on the revision, follow [spec-standard §3.3](~/workspace/dev-playbook/sdd-standards/spec-standard.md#33-revision): bump only if committed downstream items pin the prior revision, and update those downstream `Covers:` lines if you do). Then continue with stub, test, implementation in that order. During initial greenfield implementation no pinned consumers exist yet — edit the item in place at revision `0` and do not propose a bump.
+- Apply the amendment in this terminal — edit the spec (update `Interface:` lines; on the revision, follow [spec-standard §3.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#33-revision): bump only if committed downstream items pin the prior revision, and update those downstream `Covers:` lines if you do). Then continue with stub, test, implementation in that order. During initial greenfield implementation no pinned consumers exist yet — edit the item in place at revision `0` and do not propose a bump.
 - Defer to a fresh `sdd-design` pass — do not edit the spec; pause this terminal until the design phase produces the amendment, then resume.
 - Reject the change and direct a different approach.
 

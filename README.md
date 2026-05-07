@@ -45,15 +45,12 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 | Python conventions | `standards/python-conventions.md` | Default Python conventions + the anti-pattern catalog the `code-quality-sweep` skill scans for |
 | Testing conventions | `standards/testing-conventions.md` | Default pytest conventions: structure, doubles, fixtures |
 
-### SDD standards (sdd-standards/)
+### SDD standards and spec-tools
 
-Spec-driven development standards: philosophy, writing conventions, design layer, tooling. See [sdd-standards/README.md](sdd-standards/README.md).
-
-| Object | Location | Purpose |
-|--------|----------|---------|
-| Spec standard | `sdd-standards/spec-standard.md` | Workspace spec standard: item anatomy, IDs, artifact types, coverage chain, keyword reference, obligation vocabulary, sentence templates, file organization |
-| Design layer | `sdd-standards/design-layer.md` | Commitment scope and the four design decision dimensions (`Data`, `API Shape`, `Algorithms`, `Composition`) |
-| Lessons | `sdd-standards/lessons.md` | Observations about the standard surfaced through use; resolutions land in the standard or its ADRs |
+The workspace SDD standard and its companion Python package now live in their
+own repo: [`~/workspace/spec-tools/`](~/workspace/spec-tools/). See
+[ADR-0001 in spec-tools](~/workspace/spec-tools/docs/adr/0001-extracted-from-dev-playbook.md)
+for the extraction record.
 
 ### Agent configuration (dotfiles/)
 
@@ -80,11 +77,3 @@ CLI utilities for workspace automation. See [tools/README.md](tools/README.md) f
 |--------|----------|---------|
 | Standalone scripts | `tools/bin/` | `py-outline`, `ref-check`, `internal-skill-audit`, `test-privacy`, `workspace-backup` |
 
-### Spec tools (spec-tools/)
-
-Programmatic representation of SDD spec artifacts: parse, traverse, modify, render. See [spec-tools/README.md](spec-tools/README.md).
-
-| Object | Location | Purpose |
-|--------|----------|---------|
-| Specs | `spec-tools/specs/` | `feat` / `req` / `dsn` items the package is built against |
-| Package | `spec-tools/src/spec_tools/` | In-memory model, deserialize, serialize, discover |

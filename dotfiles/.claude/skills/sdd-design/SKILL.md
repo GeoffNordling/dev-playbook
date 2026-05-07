@@ -13,9 +13,9 @@ Author the project's design layer — `dsn` items pinning `Interface:` lines and
 
 ## Read first
 
-- [Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md) — full grammar.
-- [Design layer](~/workspace/dev-playbook/sdd-standards/design-layer.md) — commitment framing and the four design dimensions (Data, API Shape, Algorithms, Composition).
-- [Lessons](~/workspace/dev-playbook/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
+- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
+- [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing and the four design dimensions (Data, API Shape, Algorithms, Composition).
+- [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
 - [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
 
 ## First steps

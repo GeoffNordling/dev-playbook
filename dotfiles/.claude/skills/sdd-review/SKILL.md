@@ -14,7 +14,7 @@ This is not a development-flow skill. Inline `AgentReview:` checks for items bei
 
 ## Read first
 
-- [Spec standard §6.9 `AgentReview:`](~/workspace/dev-playbook/sdd-standards/spec-standard.md#69-agentreview) — what `AgentReview:` is, when it is the right primitive, what its prose conveys.
+- [Spec standard §6.9 `AgentReview:`](~/workspace/spec-tools/sdd-standards/spec-standard.md#69-agentreview) — what `AgentReview:` is, when it is the right primitive, what its prose conveys.
 
 ## First steps
 

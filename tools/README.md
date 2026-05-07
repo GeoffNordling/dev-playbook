@@ -18,7 +18,7 @@ CLI utilities and shared libraries for workspace automation; lightweight, pragma
 
 ## What does NOT belong here
 
-- Spec-driven development tools — those go in [`spec-tools/`](../spec-tools/)
+- Spec-driven development tools — those go in [`~/workspace/spec-tools/`](~/workspace/spec-tools/)
 - Project-specific scripts — put them in that project's repo
 - Anything with a dedicated home elsewhere in this repo (standards, agent config, templates, shell aliases)
 
@@ -40,7 +40,6 @@ Each script is self-contained with a PEP 723 `# /// script` block. Skills refere
 
 Run automatically on every commit via pre-commit hooks. Each validation script:
 
-- Asserts its governing standard exists at startup — fails immediately if the standard has moved or been renamed
 - Exits 0 on success, 1 on failure, 2 on tool error
 - Writes machine-readable findings to stdout (one line per finding)
 - Writes a human-readable summary to stderr (one line)
@@ -55,7 +54,7 @@ Hook configuration lives in `.pre-commit-config.yaml` at the repo root and is th
 
 1. Write the script under `bin/`.
 2. Add a `local` hook entry to `.pre-commit-config.yaml` with its `id`, `name`, `entry`, `language: system`, and the appropriate `pass_filenames` / `types` / `always_run` flags. Use the existing entries as a model.
-3. If the hook scans specific paths (e.g., `test-privacy spec-tools/tests`), pass them in the `entry`. Update the YAML when those paths change.
+3. If the hook scans specific paths, pass them in the `entry`. Update the YAML when those paths change.
 
 #### Utility scripts
 

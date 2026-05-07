@@ -60,7 +60,7 @@ The ADR rules live in the updated
 
 **The PRD format and `/to-prd` workflow.** Matt's PRD layer overlaps
 with this workspace's spec-driven-development layer
-([sdd-standards/](~/workspace/dev-playbook/sdd-standards/)). They
+([sdd-standards/](~/workspace/spec-tools/sdd-standards/)). They
 cover the same ground — what to build and why, before code exists —
 with incompatible primitives (PRDs are prose; SDD specs are
 EARS-templated requirements with OFT traceability and machine-verified

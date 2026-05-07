@@ -13,7 +13,7 @@ Author the project's functional requirements — `feat` (high-level capability) 
 
 ## Read first
 
-- [Spec standard](~/workspace/dev-playbook/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, prose rules (obligation vocabulary and EARS sentence templates), file organization. The full grammar.
+- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, prose rules (obligation vocabulary and EARS sentence templates), file organization. The full grammar.
 - [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
 
 ## First steps
