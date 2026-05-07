@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Format and lint Python files after Edit|Write|MultiEdit.
 # Design notes (exit-code contract, why project-local ruff, fail-loud style):
-# see ~/workspace/dev-playbook/docs/adr/_scratch-compounding-with-ai.md.
+# see ~/workspace/dev-playbook/docs/adr/0007-compounding-with-ai.md.
 
 set -uo pipefail
 

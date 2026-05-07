@@ -8,3 +8,4 @@
 | [0004](0004-observable-to-tests-design-scope.md) | Observable-to-tests design scope and machine-validated interfaces | 2026-04-19 |
 | [0005](0005-workspace-sdd-standard.md) | Workspace SDD Standard | 2026-04-24 |
 | [0006](0006-adopt-matt-pocock-conventions.md) | Adopt Matt Pocock's conventions | 2026-04-29 |
+| [0007](0007-compounding-with-ai.md) | Compounding workflow with AI: global CLAUDE.md, hierarchy, edit-time verification | 2026-05-07 |
