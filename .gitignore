@@ -11,9 +11,6 @@ __pycache__/
 # per-issue git worktrees (see standards/issue-implementation.md)
 .claude/worktrees/
 
-# sdd-tools — vendored OpenFastTrace JAR
-deprecated/sdd-tools/lib/
-
 # dotfiles — machine-local and ephemeral files
 dotfiles/.claude/settings.local.json
 dotfiles/.claude/history.jsonl
