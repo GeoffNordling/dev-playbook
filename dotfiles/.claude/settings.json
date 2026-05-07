@@ -21,7 +21,7 @@
       }
     ]
   },
-  "effortLevel": "low",
+  "effortLevel": "xhigh",
   "voice": {
     "enabled": false,
     "mode": "hold"
