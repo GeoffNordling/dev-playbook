@@ -2,6 +2,14 @@
 
 Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md).
 
+## When to adopt third-party skills
+
+Adopt third-party skills only when their conventions integrate cleanly with existing canon. Otherwise harvest techniques into authored skills, not foreign skills into the toolbox.
+
+Pocock's skills (adopted in [ADR-0006](~/workspace/dev-playbook/docs/adr/0006-adopt-matt-pocock-conventions.md)) came with per-repo configuration that complemented existing standards. Superpowers' skills (declined in [ADR-0008](~/workspace/dev-playbook/docs/adr/0008-decline-superpowers.md)) came with a methodology that competed with existing canon. That asymmetry is the rule.
+
+Failure modes of piecemeal adoption from an opinionated framework: voice fragmentation across the toolbox, cross-reference fragility when only some skills from the bundle are installed, semantic drift on update (SHA-pinning catches byte-level changes, not meaning changes), and no clean convention boundary to separate "adopted skill" from "adopted worldview". If a specific gap becomes painful enough in real use, author a workspace-native skill incorporating the technique rather than importing the foreign skill.
+
 ## Locations
 
 | Path under `dotfiles/` | Source | Editable |
