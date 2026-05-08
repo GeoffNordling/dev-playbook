@@ -1,12 +1,4 @@
-"""Behavioral tests for tools/bin/ref-check.
-
-Each test fabricates a workspace under tmp_path, sets HOME so that the
-script's `~/workspace` resolves to the fake one, and invokes ref-check via
-subprocess. Assertions are on exit code and stderr — that's the contract
-callers rely on (pre-commit reads exit code; humans read stderr).
-"""
-
-from __future__ import annotations
+"""Behavioral tests for tools/bin/ref-check — assert on exit code and stderr."""
 
 import os
 import subprocess
@@ -31,7 +23,6 @@ def run_ref_check(
 
 
 def init_repo(path: Path) -> None:
-    path.mkdir(parents=True, exist_ok=True)
     subprocess.run(
         ["git", "init", "-q", "-b", "main", str(path)],
         check=True,
@@ -39,7 +30,7 @@ def init_repo(path: Path) -> None:
     )
 
 
-def commit_all(repo: Path, message: str = "init") -> None:
+def commit_all(repo: Path) -> None:
     subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
     subprocess.run(
         [
@@ -53,7 +44,7 @@ def commit_all(repo: Path, message: str = "init") -> None:
             "commit",
             "-q",
             "-m",
-            message,
+            "init",
         ],
         check=True,
     )
@@ -61,7 +52,6 @@ def commit_all(repo: Path, message: str = "init") -> None:
 
 @pytest.fixture
 def workspace(tmp_path: Path) -> Path:
-    """Empty fake workspace at <tmp_path>/workspace/. HOME → <tmp_path>."""
     ws = tmp_path / "workspace"
     ws.mkdir()
     return ws
@@ -161,14 +151,7 @@ def test_reference_inside_fenced_code_block_is_skipped(tmp_path, workspace):
 
 
 def test_worktree_resolves_in_repo_refs_to_worktree_working_copy(tmp_path, workspace):
-    """File present only in the worktree's working copy must resolve as ok.
-
-    This is the worktree-equivalence guarantee: same .md content yields the
-    same outcome whether scanned from the main checkout or a worktree of it.
-    Without using `git rev-parse --git-common-dir`, an in-repo reference from
-    a worktree falls through to absolute-path resolution and looks at the
-    main checkout — which does not have this file. The fix prevents that.
-    """
+    """File present only in the worktree's working copy must resolve as ok."""
     repo = workspace / "primary"
     init_repo(repo)
     write(repo / "README.md", "base")
