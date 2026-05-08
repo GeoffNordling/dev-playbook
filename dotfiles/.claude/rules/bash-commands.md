@@ -17,3 +17,14 @@ needs that kind of interaction:
 
 Do not try to run interactive commands yourself with the Bash tool in these
 cases, and do not suggest `!` as a workaround.
+
+## SSH-bound git operations
+
+If the remote is `git@github.com:...`, then `git fetch`, `git pull`, and
+`git push` all require the user's SSH key — hardware-token taps in this
+workspace. Treat them like any other interactive command:
+
+- For read-only checks (e.g. "does local `main` match `origin/main`?"), use
+  `gh api` instead — it goes over HTTPS with a PAT and needs no tap.
+  Example: `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`
+- For pushes, hand the command back to the user.
