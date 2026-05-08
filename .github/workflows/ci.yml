@@ -15,3 +15,9 @@ jobs:
         with:
           python-version: '3.11'
       - uses: pre-commit/action@v3.0.1
+        env:
+          # ref-check validates references to sibling repos under ~/workspace/.
+          # The CI runner only checks out this repo, so cross-repo references
+          # always resolve to non-existent paths. Local pre-commit is the
+          # strict gate; skip ref-check here.
+          SKIP: ref-check
