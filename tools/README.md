@@ -81,13 +81,13 @@ py-outline src/mypackage > structure.txt
 
 ### ref-check
 
-Scan all markdown files for `~/workspace/` cross-references and report their status as JSON Lines to stdout. Designed for agent consumption. Enforces the cross-reference conventions in [repo-documentation.md](../standards/repo-documentation.md).
+Scan every markdown file in the invoking repo for `~/workspace/` cross-references and report their status as JSON Lines to stdout. Resolves in-repo references against the working copy (worktree-safe via `git rev-parse --git-common-dir`); resolves cross-repo references against the absolute path on disk. Enforces the cross-reference conventions in [repo-documentation.md](../standards/repo-documentation.md).
 
 ```bash
-ref-check [directory]
+ref-check [--all] [directory]
 ```
 
-Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok`, `broken`, or `external`). Exit code 1 if any broken references.
+Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok` or `broken`). Default emits broken refs only; `--all` emits every reference. Exit code: 0 clean, 1 broken refs found, 2 cannot run (no .md files, or not a git repo).
 
 ### internal-skill-audit
 
