@@ -79,11 +79,11 @@ If a workspace-native session-flattener is ever warranted (e.g. for an "analyze 
 
 **Source:** https://github.com/wesm/agentsview ([agentsview.io](https://agentsview.io))
 **Author:** Wes McKinney
-**Audited:** 2026-05-08 — *trying today, will update*
+**Audited:** 2026-05-08 — *adopted, in regular use*
 
-Local-first session-intelligence and analytics CLI for coding agents. Reads session files from Claude Code, Codex, and 14 other agents and surfaces usage, cost, and behavior data. Also pitches itself as a 100x-faster `ccusage` replacement. Go binary, MIT licensed, ~900 stars, active (last push today). Solves at the analytics layer the same JSONL-shape problem `claude-code-transcripts` solves at the rendering layer — same edge-case inventory likely applies, but a Go reimplementation by an experienced data-tooling author may have already paid down some of that debt.
+Local-first session-intelligence and analytics CLI for coding agents. Reads session files from Claude Code, Codex, and 14 other agents and surfaces usage, cost, and behavior data. Also pitches itself as a 100x-faster `ccusage` replacement. Go binary, MIT licensed, ~900 stars, active. Solves at the analytics layer the same JSONL-shape problem `claude-code-transcripts` solves at the rendering layer — same edge-case inventory likely applies, but a Go reimplementation by an experienced data-tooling author may have already paid down some of that debt.
 
-Plan: install today, kick the tires, return to this entry with notes on whether it stays in the toolbox.
+In regular use as the workspace's session-analytics tool. Watching for: format-drift handling as Claude Code ships new content-block types, multi-agent coverage as Codex/Gemini sessions accumulate.
 
 ---
 
