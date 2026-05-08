@@ -86,6 +86,28 @@ won't think to look for it past the first `def`. The cost of putting every
 constant at the top is one scroll; the cost of hiding one is a bug that
 slips past review because nobody saw it.
 
+## Future Imports
+
+Do not add `from __future__ import …` to a file without explicit human
+approval. This applies to every name in `__future__`, including
+`annotations`.
+
+Most workspace projects target Python 3.11+, where the common future
+imports either do nothing (`generator_stop`, `division`, etc.) or change
+parse-time behavior in subtle ways (`annotations` → PEP 563 deferred
+evaluation). Agents add them reflexively as boilerplate; the import then
+costs one line forever and signals "this file relies on PEP-X" when it
+usually doesn't.
+
+Linters can't catch this. `F401` (unused-import) has a hardcoded
+carve-out for `__future__`, and `UP010` only fires when the import is
+*redundant for the target Python version* — not when it's defensible
+but pointless for this specific file. The judgment is human.
+
+If a future import is genuinely needed (e.g. a forward reference that
+would be a runtime error without `annotations`), the author asks the
+human and notes the reason at the import site.
+
 ## Helpers
 
 A helper function earns its place by doing one of these:
