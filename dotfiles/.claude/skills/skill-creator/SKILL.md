@@ -22,8 +22,8 @@ Discuss with the user. Ask the questions the standard leaves to choice:
 - **Use cases** — what specific scenarios should it handle? Any edge cases worth calling out?
 - **Invocation mode** — `disable-model-invocation: true` (user-only, slash-command) or `false` (Claude auto-invokes when relevant)?
 - **Triggers** (auto-invocable only) — what keywords, contexts, or file types should make Claude reach for it? These go into the description.
-- **Model** — `haiku` / `sonnet` / `opus`, or none (inherit session model)?
-- **Effort** — `low` / `medium` / `high` / `xhigh`?
+- **Model** — default to `opus` unless the user says otherwise (`haiku` / `sonnet` / `opus`, or none to inherit session model).
+- **Effort** — default to `xhigh` unless the user says otherwise (`low` / `medium` / `high` / `xhigh`).
 - **Arguments** — none, single free-form (`$ARGUMENTS`), or positional (`$0`/`$1`/...)?
 - **References** — does the body need supporting files under `references/`?
 - **Scripts** — does the skill invoke helper scripts that should live under `scripts/` (deterministic ops, repeated logic, places where reliability matters)?
