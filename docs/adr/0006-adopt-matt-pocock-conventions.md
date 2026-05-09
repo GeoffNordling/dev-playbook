@@ -1,7 +1,7 @@
 # ADR-0006: Adopt Matt Pocock's Conventions
 
 **Date:** 2026-04-29
-**Status:** Accepted
+**Status:** Superseded by [ADR-0009](0009-remove-pocock-direct-dependency.md) in part
 
 ## Context
 

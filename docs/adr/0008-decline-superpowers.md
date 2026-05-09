@@ -154,7 +154,10 @@ install Superpowers content as a foreign skill.
 - New workspace principle ("Adopt third-party skills only when their
   conventions integrate cleanly with existing canon. Otherwise harvest
   techniques into authored skills, not foreign skills into the toolbox.")
-  applies to future luminary-driven framework pulls.
+  applies to future luminary-driven framework pulls. The same rule was
+  re-applied to Pocock himself once spec-tools' growth changed the
+  convention landscape; see
+  [ADR-0009](0009-remove-pocock-direct-dependency.md).
 - Open follow-ups (deliberately deferred):
   - SessionStart hook as a workspace-wide priming mechanism, if a
     concrete priming need surfaces.

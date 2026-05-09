@@ -10,3 +10,4 @@
 | [0006](0006-adopt-matt-pocock-conventions.md) | Adopt Matt Pocock's conventions | 2026-04-29 |
 | [0007](0007-compounding-with-ai.md) | Compounding workflow with AI: global CLAUDE.md, hierarchy, edit-time verification | 2026-05-07 |
 | [0008](0008-decline-superpowers.md) | Decline Superpowers; catalog techniques worth remembering | 2026-05-08 |
+| [0009](0009-remove-pocock-direct-dependency.md) | Remove Pocock direct dependency; absorb conventions, lift engineering skills | 2026-05-09 |

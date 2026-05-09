@@ -6,6 +6,24 @@ This is **not authoritative**. Adoption decisions live in [`adr/`](adr/). Entrie
 
 ---
 
+## Matt Pocock skills
+
+**Source:** https://github.com/mattpocock/skills
+**Author:** Matt Pocock
+**Audited:** 2026-04-29 ([ADR-0006](adr/0006-adopt-matt-pocock-conventions.md)); revised 2026-05-09 ([ADR-0009](adr/0009-remove-pocock-direct-dependency.md))
+
+Bundle of agent skills covering issue management (`/triage`, `/to-issues`), grilling (`/grill-with-docs`, `/grill-me`), TDD (`/tdd`), architecture analysis (`/improve-codebase-architecture`), and small utilities (`/zoom-out`, `/caveman`). Distributed via the Vercel `skills` CLI; each skill ships with the per-repo conventions it expects (`docs/agents/{issue-tracker,triage-labels,domain}.md` files, an `## Agent skills` block in `CLAUDE.md`, `CONTEXT.md` glossary, `docs/adr/` with 4-digit numbering and offer-criteria gate, triage label vocabulary, vertical-slice issue rules).
+
+Initially adopted wholesale per [ADR-0006](adr/0006-adopt-matt-pocock-conventions.md) — skills *and* conventions, on the principle that running engineering skills without the per-repo files they expect produces degraded output. Direct dependency cut per [ADR-0009](adr/0009-remove-pocock-direct-dependency.md) once the conditions changed: spec-tools moved to its own repo and grew per-repo conventions of its own that overlapped Pocock's, so the "complements existing canon" condition from [ADR-0008](adr/0008-decline-superpowers.md) no longer held.
+
+Currently: ideas absorbed into authored standards (`standards/{architecture-vocabulary,module-design,dependency-taxonomy,issue-management,adr-conventions}.md`, format sections of `standards/repo-documentation.md`); engineering skills lifted into authored bundles in `dotfiles/.claude/skills/{grill-with-docs,triage,to-issues,improve-codebase-architecture}/`. `/zoom-out` and `/caveman` remain as direct Vercel dependencies — tiny utility skills where lift cost ≈ drop cost.
+
+### Watching going forward
+
+If Pocock publishes new skills or sharpens the existing bundle, route the question through the [ADR-0008](adr/0008-decline-superpowers.md) rule: do the conventions still complement existing canon, or do they compete with spec-tools / authored standards? If they complement, consider re-adopting; if they compete, harvest specific techniques into authored skills rather than reinstalling the dependency.
+
+---
+
 ## Superpowers
 
 **Source:** https://github.com/obra/superpowers
