@@ -17,17 +17,3 @@ live elsewhere in the workspace and are not visible from this one:
 
 When editing anything under those paths, the audience is the population of
 workspace repos, not this repo.
-
-## Agent skills
-
-### Issue tracker
-
-GitHub Issues, accessed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default 5-role canonical vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
