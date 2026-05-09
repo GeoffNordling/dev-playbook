@@ -13,7 +13,6 @@ live elsewhere in the workspace and are not visible from this one:
 
 - `standards/`, `sdd-standards/` — cross-project standards; apply to every
   workspace repo, not just this one
-- `project-template/` — cookiecutter that generates fresh repos elsewhere
 - `dotfiles/.claude/` — symlinked to `~/`, used by every project
 
 When editing anything under those paths, the audience is the population of

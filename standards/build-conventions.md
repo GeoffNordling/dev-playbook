@@ -3,9 +3,9 @@
 Conventions for the build-and-check surface that Python projects in this
 workspace expose to humans, agents, and CI.
 
-Scope: applies to Python sub-projects (e.g. `spec-tools`, projects generated
-from `project-template`). Meta repos that are not themselves Python projects
-(e.g. `dev-playbook` itself) do not need a Makefile.
+Scope: applies to Python sub-projects (e.g. `spec-tools`). Meta repos that are
+not themselves Python projects (e.g. `dev-playbook` itself) do not need a
+Makefile.
 
 ## Task runner
 

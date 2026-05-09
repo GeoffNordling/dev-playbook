@@ -63,12 +63,6 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 | Global settings | `dotfiles/.claude/settings.json` | Model, permissions, hooks |
 | Externally managed skills | `dotfiles/.agents/skills/` | Externally managed skills |
 
-### Project template (project-template/)
-
-| Object | Location | Purpose |
-|--------|----------|---------|
-| Cookiecutter template | `project-template/` | Bootstrap new Python projects with standard tooling |
-
 ### Tools (tools/)
 
 CLI utilities for workspace automation. See [tools/README.md](tools/README.md) for detailed usage and reference.
