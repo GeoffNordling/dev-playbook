@@ -11,11 +11,12 @@ Cross-project engineering standards that apply to all repositories in the worksp
 | [repo-documentation.md](repo-documentation.md) | What files every repo should have, their scope, CONTEXT.md format, and cross-reference style |
 | [adr-conventions.md](adr-conventions.md) | When to write an ADR, the template, numbering, and optional sections |
 | [issue-management.md](issue-management.md) | Issue tracker conventions, triage roles, agent brief format, vertical-slice breakdown rules |
+| [issue-implementation.md](issue-implementation.md) | Procedure for turning a tracked issue into a merged PR: branch naming, worktree layout, setup, and merge flow |
 | [skill-conventions.md](skill-conventions.md) | Conventions for Claude Code skill bundles |
 | [skill-management.md](skill-management.md) | Where skills live and how third-party skills are installed |
 | [architecture-vocabulary.md](architecture-vocabulary.md) | Shared vocabulary for module architecture: Module, Interface, Depth, Seam, Adapter, Leverage, Locality |
 | [module-design.md](module-design.md) | Module design rules: principles, deep modules, designing for testability |
 | [dependency-taxonomy.md](dependency-taxonomy.md) | Dependency categories (in-process, local-substitutable, remote-but-owned, true-external) and seam discipline |
-| [python-conventions.md](python-conventions.md) | Default Python conventions and the anti-pattern catalog the `code-quality-sweep` skill scans for |
+| [python-conventions.md](python-conventions.md) | Default Python conventions and anti-pattern catalog |
 | [testing-conventions.md](testing-conventions.md) | Default pytest conventions: structure, test doubles, fixtures |
 | [build-conventions.md](build-conventions.md) | Standard `Makefile` targets (`format`, `lint`, `typecheck`, `test`, `check`) for Python sub-projects |

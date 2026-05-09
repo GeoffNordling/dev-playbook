@@ -5,7 +5,7 @@ to merge in this workspace.
 
 ## Issue tracker
 
-Issues for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+Issues live as GitHub issues. Use the `gh` CLI for all operations.
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
 - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
