@@ -3,6 +3,8 @@
 **Date:** 2026-04-16
 **Status:** Accepted
 
+*Retroactively edited 2026-05-09 to retarget stale paths.*
+
 ## Context
 
 This workspace uses a custom spec-driven development (SDD) workflow built around RFC 2119 modal verbs, EARS sentence templates, OpenFastTrace traceability (see [ADR-0001](0001-adopt-openfasttrace.md)), and a set of Claude Code skills (`sdd-func-reqs`, `sdd-design`, `sdd-red`, `sdd-green`, `sdd-issue-coordinate`). [ADR-0002](0002-evaluate-spec-kit-retain-custom-sdd.md) evaluated GitHub Spec Kit specifically and retained the custom workflow.
@@ -79,8 +81,8 @@ Recorded here as potential future work, not adopted today:
 
 ## Consequences
 
-- `sdd-standards/overview.md` principles updated: the `Spec-as-source` principle is replaced by **Spec-anchored** (with Böckeler reference and a link back to this ADR); a new **SDD Triangle** principle replaces the "spec describes reality" principle (with Breunig reference); the universal "state what NOT to build" principle is removed; "non-functional requirements" is renamed to **technical requirements**.
-- `dotfiles/.claude/skills/sdd-func-reqs/SKILL.md` updated: the out-of-scope section is no longer prescribed unconditionally. The skill now asks the user and records `NA` when the answer is no.
+- `~/workspace/spec-tools/sdd-standards/overview.md` principles updated: the `Spec-as-source` principle is replaced by **Spec-anchored** (with Böckeler reference and a link back to this ADR); a new **SDD Triangle** principle replaces the "spec describes reality" principle (with Breunig reference); the universal "state what NOT to build" principle is removed; "non-functional requirements" is renamed to **technical requirements**.
+- `dotfiles/.claude/skills/sdd-requirements/SKILL.md` updated: the out-of-scope section is no longer prescribed unconditionally. The skill now asks the user and records `NA` when the answer is no.
 - [ADR-0002](0002-evaluate-spec-kit-retain-custom-sdd.md)'s "project-level principles document" as an idea worth adopting is reversed here; the "structured research phase" idea from ADR-0002 remains open.
 - No changes to OFT, `pytest-sdd`, `sdd-chain-text`, the red/green skills, the design skill (apart from the principles fixes above), or the issue-coordinate dispatcher.
 - The self-originated practices listed above remain self-originated. If a future evaluation finds community convergence on any of them, we should revisit whether our implementation still makes sense or should align with the community standard.
