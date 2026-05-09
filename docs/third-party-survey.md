@@ -34,7 +34,7 @@ Opinionated agentic skills framework that imposes a fixed methodology on coding 
 
 The orientation: "agents are undisciplined and will rationalize their way out of process unless bright-line rules stop them." Skills are shaped by that worldview throughout — Iron Laws, "Red Flags" rationalization tables, "your human partner" framing, ALL-CAPS XML tags. Prose is engineered using published research on persuasion (Cialdini; Meincke et al. 2025, N=28k showing compliance jumps 33% → 72% with authority/commitment/scarcity framing).
 
-Declined wholesale per [ADR-0008](adr/0008-decline-superpowers.md) because it conflicts with spec-tools SDD and the Pocock `/tdd` canonicalization from [ADR-0006](adr/0006-adopt-matt-pocock-conventions.md). But the framework contains a ton of good ideas worth tracking.
+Declined wholesale per [ADR-0008](adr/0008-decline-superpowers.md) because it conflicts with spec-tools SDD. But the framework contains a ton of good ideas worth tracking.
 
 ### Skills worth watching
 

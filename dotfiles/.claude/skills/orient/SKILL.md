@@ -33,16 +33,9 @@ The trailing `; true` keeps the call green when paths are missing, so sibling pa
 Read each file that exists. For specs and docs, read just enough to understand
 scope — do not chase cross-references or read every sub-file.
 
-For `docs/agents/*.md` (if present), read each in full. They are small and
-govern how subsequent steps operate the issue tracker, apply triage labels,
-and consume domain docs. The `## Agent skills` block in `CLAUDE.md` points at
-them.
-
 ## Step 4 — Check open issues
 
-Run `gh issue list` to see what tactical work is tracked. If
-`docs/agents/issue-tracker.md` specified a non-GitHub backend, follow its
-instructions instead.
+Run `gh issue list` to see what tactical work is tracked.
 
 ## Step 5 — Summarize
 

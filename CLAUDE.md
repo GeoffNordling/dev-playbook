@@ -11,8 +11,8 @@
 This is a meta repo. Most of what's authored here applies to *other* repos that
 live elsewhere in the workspace and are not visible from this one:
 
-- `standards/`, `sdd-standards/` — cross-project standards; apply to every
-  workspace repo, not just this one
+- `standards/` — cross-project standards; apply to every workspace repo,
+  not just this one
 - `dotfiles/.claude/` — symlinked to `~/`, used by every project
 
 When editing anything under those paths, the audience is the population of
