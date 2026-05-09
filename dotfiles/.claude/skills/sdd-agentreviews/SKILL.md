@@ -1,12 +1,12 @@
 ---
-name: sdd-review
+name: sdd-agentreviews
 description: Audit `AgentReview:` commitments across the project at scale and report drift
 disable-model-invocation: true
 model: opus
 effort: xhigh
 ---
 
-# SDD Review
+# SDD AgentReviews
 
 Periodic maintenance audit of every `AgentReview:` commitment in the project. Dispatches review subagents per item and reports drift between the spec's commitment and the artifact (code, prompt, behavior) it names.
 

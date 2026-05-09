@@ -22,7 +22,7 @@ Declined wholesale per [ADR-0008](adr/0008-decline-superpowers.md) because it co
 
 If a workspace-native version of any of these is ever warranted, these are the skills to revisit for inspiration:
 
-- **`requesting-code-review`** — self-contained code-review dispatch template. Could fill a gap if `/sdd-review` (which is `AgentReview:`-only) proves insufficient as the workspace's only review skill.
+- **`requesting-code-review`** — self-contained code-review dispatch template. Could fill a gap if `/sdd-agentreviews` (which is `AgentReview:`-only) proves insufficient as the workspace's only review skill.
 - **`verification-before-completion`** — "Iron Law": no completion claims without fresh verification evidence. Aligns with the "fail loud" `<behavior>` preference in the global CLAUDE.md.
 - **`systematic-debugging`** — 4-phase root-cause investigation. Bundles three reusable sub-patterns: root-cause-tracing, defense-in-depth, condition-based-waiting.
 - **`writing-skills`** — meta-skill for authoring skills. Two artifacts in this bundle are particularly valuable:
