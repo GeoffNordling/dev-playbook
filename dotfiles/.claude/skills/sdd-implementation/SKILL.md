@@ -67,11 +67,20 @@ Each slice is one test, one implementation, then a brief refactor.
 
 **Green.** Write the minimal implementation that makes the failing test pass. Do not add code for behaviors the next test will exercise. Run the test suite to confirm green.
 
-**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. See [refactoring.md](~/workspace/dev-playbook/dotfiles/.agents/skills/tdd/refactoring.md) for the catalogue. Run tests after each refactor step. Refactors that would change a committed `Interface:` are gated — see "Spec amendment" below.
+**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run tests after each refactor step. Refactors that would change a committed `Interface:` are gated — see "Spec amendment" below.
+
+Refactor candidate catalogue:
+
+- **Duplication** → Extract function/class
+- **Long methods** → Break into private helpers (keep tests on public interface)
+- **Shallow modules** → Combine or deepen
+- **Feature envy** → Move logic to where data lives
+- **Primitive obsession** → Introduce value objects
+- **Existing code** the new code reveals as problematic
 
 **`AgentReview:` inline.** When implementing a `feat` / `req` / `dsn` that carries `AgentReview:`, verify the commitment against the artifact (code, prompt, etc.) the prose names before declaring the slice done. Surface drift to the user.
 
-For test-quality patterns and mocking guidance, [tests.md](~/workspace/dev-playbook/dotfiles/.agents/skills/tdd/tests.md) and [mocking.md](~/workspace/dev-playbook/dotfiles/.agents/skills/tdd/mocking.md) from the /tdd skill bundle are useful background.
+For test-quality patterns and mocking guidance, see [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md).
 
 When refactor pressure suggests a structural change bigger than one module — multiple `dsn`s, a different decomposition entirely — ask the user to open a fresh terminal and invoke /improve-codebase-architecture there. Bring back its proposals through the spec-amendment path.
 

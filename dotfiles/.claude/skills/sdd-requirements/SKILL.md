@@ -37,7 +37,7 @@ Before drafting any spec text, present a written plan covering scope (which area
 
 ## Drafting
 
-- Use the interview pattern. Ask clarifying questions about behavior, scope, and edge cases before drafting. Surface ambiguities before encoding assumptions. Invoke /grill-me when an interview pass would be heavier than the inline questions in the conversation can carry.
+- Use the interview pattern. Ask clarifying questions about behavior, scope, and edge cases before drafting. Surface ambiguities before encoding assumptions.
 - Invoke /grill-with-docs when domain terminology is fuzzy or `CONTEXT.md` needs updating; that skill produces and sharpens domain docs as decisions land.
 - Write each item per the spec standard: backticked `type~name~revision` ID, `Description:` body using EARS templates and obligation vocabulary, `Covers:` for non-roots, `Needs:` for chain continuation.
 - One obligation level per item. If `SHALL` and `SHOULD` content mixes, split into separate items.

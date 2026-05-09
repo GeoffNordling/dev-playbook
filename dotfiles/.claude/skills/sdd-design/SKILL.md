@@ -42,9 +42,9 @@ Before drafting `dsn` text, present a plan covering scope (which requirements th
 ## Drafting
 
 - Walk the dimensions in canonical order: Data first, then API Shape, then Algorithms, then Composition.
-- When shaping public surfaces, first read [deep-modules.md](~/workspace/dev-playbook/dotfiles/.agents/skills/tdd/deep-modules.md) (small-interface-deep-implementation principle) and [interface-design.md](~/workspace/dev-playbook/dotfiles/.agents/skills/tdd/interface-design.md) (accept dependencies, return results, keep surface small) from the /tdd skill bundle.
+- When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small-interface-deep-implementation, accept dependencies, return results, keep surface small.
 - Write each `dsn` per the spec standard. `Interface:` lines fully qualify symbol paths and use the workspace annotation idiom (built-in generics, `X | None` for optional, no `typing.List`).
-- Use the interview pattern. Invoke /grill-me when stress-testing a non-obvious design decision.
+- Use the interview pattern.
 - For seam-finding or evaluating module depth at a scale larger than one item, **ask the user to open a fresh terminal** and invoke /improve-codebase-architecture there. Decisions return as edits to this design pass; the analysis itself does not pollute this context.
 - Reference relevant ADRs rather than re-explaining their reasoning. Propose a new ADR if a significant new architectural decision emerges.
 - Non-mandatory requirements (`SHOULD`, `MAY`) are optional in the design spec. Including one is a commitment to deliver it.
