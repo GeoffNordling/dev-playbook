@@ -66,17 +66,6 @@
         ]
       }
     ],
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/.claude/hooks/approve-dotfiles-edit.sh"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
