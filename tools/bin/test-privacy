@@ -17,8 +17,6 @@ writes a one-line summary to stderr.
 # requires-python = ">=3.11"
 # ///
 
-from __future__ import annotations
-
 import argparse
 import ast
 import os

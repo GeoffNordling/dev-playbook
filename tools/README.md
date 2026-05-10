@@ -49,6 +49,7 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 | `ref-check` | [repo-documentation.md](../standards/repo-documentation.md) | Broken cross-references in markdown |
 | `internal-skill-audit` | [skill-conventions.md](../standards/skill-conventions.md) | Skill conformance (internal skills only; externally-managed skills are skipped) |
 | `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
+| `no-future-annotations` | (rule documented in script docstring) | Bans `from __future__ import annotations` (dead weight on Python >= 3.11) |
 
 Hook configuration lives in `.pre-commit-config.yaml` at the repo root and is the source of truth. To add a new validation script:
 
@@ -106,6 +107,17 @@ Flag private-name access in test files. Enforces the "Access only public names" 
 ```bash
 test-privacy                       # scans ./tests
 test-privacy path/to/tests [...]   # scans one or more explicit directories
+```
+
+One line per finding to stdout in `file:line  rule  message` form. Exit code 0 if clean, 1 if any findings, 2 on tool error.
+
+### no-future-annotations
+
+Flag `from __future__ import annotations` in Python files. This workspace targets Python >= 3.11, where every motivation for the import (PEP 604 unions, builtin generics, forward references) is already met by the language. Scans `*.py` files plus extensionless files with a Python shebang; uses AST parsing so string literals don't trigger false positives.
+
+```bash
+no-future-annotations                 # scans current directory
+no-future-annotations path [...]      # scans explicit files or directories
 ```
 
 One line per finding to stdout in `file:line  rule  message` form. Exit code 0 if clean, 1 if any findings, 2 on tool error.

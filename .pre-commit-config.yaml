@@ -22,3 +22,9 @@ repos:
         language: system
         pass_filenames: false
         types: ['markdown']
+      - id: no-future-annotations
+        name: no-future-annotations
+        entry: python3 tools/bin/no-future-annotations
+        language: system
+        types: ['python']
+        exclude: dotfiles/\.(agents|dhub)/
