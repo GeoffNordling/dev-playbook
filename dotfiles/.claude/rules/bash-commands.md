@@ -18,6 +18,18 @@ needs that kind of interaction:
 Do not try to run interactive commands yourself with the Bash tool in these
 cases, and do not suggest `!` as a workaround.
 
+## Quote regex patterns with single quotes
+
+Backticks, `$`, `!`, and `\` inside `"..."` are interpreted by bash. A lone
+backtick in double quotes hangs with `unexpected EOF`. Use single quotes for
+any pattern argument:
+
+    grep -n '^`' file       # right
+    grep -n "^`" file       # wrong — bash waits for closing backtick
+
+When a `&&`-chained or parallel `Bash` call fails this way, siblings get
+cancelled too. Prefer single quotes by default for regex/pattern data.
+
 ## SSH-bound git operations
 
 If the remote is `git@github.com:...`, then `git fetch`, `git pull`, and
