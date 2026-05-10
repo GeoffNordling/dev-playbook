@@ -4,27 +4,36 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-        exclude: dotfiles/\.(agents|dhub)/
+        exclude: 'dotfiles/\.(agents|dhub)/'
       - id: ruff-format
-        exclude: dotfiles/\.(agents|dhub)/
+        exclude: 'dotfiles/\.(agents|dhub)/'
 
   - repo: local
     hooks:
-      - id: internal-skill-audit
-        name: internal-skill-audit
-        entry: python3 tools/bin/internal-skill-audit
+      - id: no-future-annotations
+        name: no-future-annotations
+        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/no-future-annotations
         language: system
         pass_filenames: false
         always_run: true
+
       - id: ref-check
         name: ref-check
-        entry: python3 tools/bin/ref-check .
+        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/ref-check
         language: system
         pass_filenames: false
         types: ['markdown']
-      - id: no-future-annotations
-        name: no-future-annotations
-        entry: python3 tools/bin/no-future-annotations
+
+      - id: test-privacy
+        name: test-privacy
+        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/test-privacy
         language: system
-        types: ['python']
-        exclude: dotfiles/\.(agents|dhub)/
+        pass_filenames: false
+        always_run: true
+
+      - id: internal-skill-audit
+        name: internal-skill-audit
+        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/internal-skill-audit
+        language: system
+        pass_filenames: false
+        always_run: true

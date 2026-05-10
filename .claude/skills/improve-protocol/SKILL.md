@@ -1,6 +1,7 @@
 ---
 name: improve-protocol
 description: Observe an executing agent and improve the protocol based on what you see
+disable-model-invocation: true
 model: opus
 effort: high
 ---

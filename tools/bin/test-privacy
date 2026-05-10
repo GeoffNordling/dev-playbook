@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Flag private-name access in test files.
 
-Walks each ``test_*.py`` file under the given directory and emits a finding
+Walks each ``test_*.py`` file under the given paths and emits a finding
 whenever a test imports or reaches into a private name (``_foo``) belonging
 to a non-test module. Dunder methods (``__init__`` etc.) are public.
 
 Usage:
-    test-privacy [directory ...]
+    test-privacy [path ...]
 
-Defaults to the ``tests/`` directory under the current working directory when
-no paths are given. Exits 0 if clean, 1 if any findings, 2 on tool error.
-Writes one finding per line to stdout in ``file:line  rule  message`` form;
-writes a one-line summary to stderr.
+Defaults to walking the current directory when no paths are given. Exits 0
+silently if no test files are found, so the same invocation is safe in any
+repo. Exits 0 if clean, 1 if any findings, 2 on tool error. Writes one
+finding per line to stdout in ``file:line  rule  message`` form; writes a
+one-line summary to stderr.
 """
 # /// script
 # requires-python = ">=3.11"
@@ -62,11 +63,11 @@ def main(argv: list[str] | None = None) -> int:
         "paths",
         nargs="*",
         type=Path,
-        help="test directories to scan (default: ./tests)",
+        help="files or directories to scan (default: walk current directory)",
     )
     args = parser.parse_args(argv)
 
-    paths = args.paths or [Path("tests")]
+    paths = args.paths or [Path(".")]
     files = _find_test_files(paths)
     if not files:
         print("test-privacy: no test files found", file=sys.stderr)

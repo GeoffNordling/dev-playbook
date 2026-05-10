@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Audit internal SKILL.md files for skill-conventions.md conformance.
 
-Scans skill bundles authored in this repo (real directories under
-dotfiles/.claude/skills/) against the conventions in
-standards/skill-conventions.md. Externally-managed skills (those whose
-bundle directory is a symlink, typically pointing into
-dotfiles/.agents/skills/) are skipped — their conformance is the
-upstream's concern.
+Scans skill bundles authored in this repo against the conventions in
+dev-playbook's standards/skill-conventions.md. Two skill roots are checked
+when present in the target directory:
+
+  - .claude/skills/             (project-level skills, any repo)
+  - dotfiles/.claude/skills/    (workspace-global skills, dev-playbook only)
+
+Externally-managed skills (those whose bundle directory is a symlink,
+typically pointing into dotfiles/.agents/skills/) are skipped — their
+conformance is the upstream's concern. Exits 0 silently when neither root
+exists, so the same invocation is safe in any repo.
 
 Usage:
     internal-skill-audit [directory]
@@ -291,30 +296,29 @@ def main():
 
     repo_root = Path(args.directory).resolve()
 
-    standard = repo_root / "standards" / "skill-conventions.md"
-    if not standard.exists():
-        print(
-            f"internal-skill-audit: governing standard not found: {standard}",
-            file=sys.stderr,
+    skill_roots = [
+        p
+        for p in (
+            repo_root / ".claude" / "skills",
+            repo_root / "dotfiles" / ".claude" / "skills",
         )
-        sys.exit(2)
+        if p.is_dir()
+    ]
 
-    skills_dir = repo_root / "dotfiles" / ".claude" / "skills"
-    if not skills_dir.is_dir():
-        print(
-            f"internal-skill-audit: skills directory not found: {skills_dir}",
-            file=sys.stderr,
-        )
-        sys.exit(2)
+    if not skill_roots:
+        print("internal-skill-audit: no skill roots found", file=sys.stderr)
+        sys.exit(0)
 
-    internal_skills, skipped = discover_internal_skills(skills_dir)
+    internal_skills: list[Path] = []
+    skipped = 0
+    for root in skill_roots:
+        roots_internal, roots_skipped = discover_internal_skills(root)
+        internal_skills.extend(roots_internal)
+        skipped += roots_skipped
 
     if not internal_skills:
-        print(
-            f"internal-skill-audit: no internal skills found in {skills_dir}",
-            file=sys.stderr,
-        )
-        sys.exit(2)
+        print("internal-skill-audit: no internal skills found", file=sys.stderr)
+        sys.exit(0)
 
     all_findings = []
     for skill_dir in internal_skills:

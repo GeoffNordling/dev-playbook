@@ -40,6 +40,10 @@ EXCLUDE_DIRS = {
     "node_modules",
     "build",
     "dist",
+    # Workspace conventions: code we don't police.
+    ".agents",  # externally-managed skills (dotfiles/.agents/)
+    ".dhub",  # externally-managed (dotfiles/.dhub/)
+    "deprecated",  # legacy code kept for reference
 }
 
 PYTHON_SHEBANG_PREFIXES = (
