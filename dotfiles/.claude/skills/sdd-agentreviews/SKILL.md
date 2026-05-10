@@ -15,15 +15,15 @@ Two invocation paths:
 - From `sdd-tdd`'s closing-the-phase step. The caller computes the in-scope item IDs from the branch diff and passes them in the invocation.
 - Directly by the user, scoped to whatever they specify (a focused area, items changed since a date, the whole project).
 
-## Read first
-
-- [Spec standard §6.9 `AgentReview:`](~/workspace/spec-tools/sdd-standards/spec-standard.md#69-agentreview) — what `AgentReview:` is, when it is the right primitive, what its prose conveys.
-
 ## First steps
 
-1. **Run `pwd` first.** When invoked from `sdd-tdd`, the caller already cd'd into the worktree, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
-2. Read the project's `CLAUDE.md`.
-3. **Determine scope.** If the invoking context provides an explicit list of item IDs (e.g., from `sdd-tdd`: "audit these items: dsn~..., req~..."), audit exactly that list. Otherwise ask the user — by area, by date range, whole project, etc.
+1. **Required reading — do not skip.** Use the Read tool on the file below before any other action. If it is missing or unreadable, stop and surface that to the user — do not proceed without the standard loaded.
+   - [Spec standard §6.9 `AgentReview:`](~/workspace/spec-tools/sdd-standards/spec-standard.md#69-agentreview) — what `AgentReview:` is, when it is the right primitive, what its prose conveys.
+
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard §6.9`.
+2. **Run `pwd`.** When invoked from `sdd-tdd`, the caller already cd'd into the worktree, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+3. Read the project's `CLAUDE.md`.
+4. **Determine scope.** If the invoking context provides an explicit list of item IDs (e.g., from `sdd-tdd`: "audit these items: dsn~..., req~..."), audit exactly that list. Otherwise ask the user — by area, by date range, whole project, etc.
 
 ## Working with the spec collection
 

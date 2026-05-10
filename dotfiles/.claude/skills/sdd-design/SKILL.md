@@ -11,26 +11,26 @@ argument-hint: "<issue-number>"
 
 Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements.
 
-## Read first
-
-- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
-- [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing and the four design dimensions (Data, API Shape, Algorithms, Composition).
-- [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
-- [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
-
 ## First steps
 
-1. **Run `pwd` first.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
-2. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-3. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-4. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
-5. Read the project's existing specs:
+1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
+   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
+   - [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing and the four design dimensions (Data, API Shape, Algorithms, Composition).
+   - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
+   - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
+
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, design-layer, lessons, workflow`.
+2. **Run `pwd`.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+3. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+4. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
+6. Read the project's existing specs:
    - `specs/functional_requirements.md` (or folder-form). Without approved requirements, designing is premature.
    - `specs/design.md` (or folder-form).
    - `docs/adr/` for prior decisions in the area being designed.
-6. Read the project's `CLAUDE.md`.
-7. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record reasoning in each `dsn`'s `Rationale:`.
-8. Tell the user what you found and align on scope.
+7. Read the project's `CLAUDE.md`.
+8. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record reasoning in each `dsn`'s `Rationale:`.
+9. Tell the user what you found and align on scope.
 
 ## Mandatory plan gate
 

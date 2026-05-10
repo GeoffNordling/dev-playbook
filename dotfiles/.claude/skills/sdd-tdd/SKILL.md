@@ -11,26 +11,26 @@ argument-hint: "<issue-number>"
 
 Vertical-slice TDD against the `Interface:` declarations committed in the design spec. Implementation proceeds in **chunks** — each chunk begins with a plan gate, runs an inner red/green/refactor loop per slice, and closes with a dedicated whole-chunk refactor pass and diff review.
 
-## Read first
-
-- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
-- [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioural focus.
-- [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
-- [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
-
-When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md).
-
 ## First steps
 
-1. **Run `pwd` first.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
-2. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-3. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-4. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
-5. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
-6. Read the project's `CLAUDE.md`.
-7. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
-8. Run the test suite to see the current state.
-9. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
+1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
+   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
+   - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioural focus.
+   - [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
+   - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
+
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, testing-conventions, python-conventions, workflow`.
+
+   When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) at that point.
+2. **Run `pwd`.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+3. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+4. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
+6. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
+7. Read the project's `CLAUDE.md`.
+8. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
+9. Run the test suite to see the current state.
+10. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
 
 ## Mandatory plan gate
 

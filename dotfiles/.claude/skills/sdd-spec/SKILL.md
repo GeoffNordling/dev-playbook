@@ -11,22 +11,22 @@ argument-hint: "<issue-number>"
 
 Author the project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — following the workspace SDD standards.
 
-## Read first
-
-- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, EARS prose rules, file organization. The full grammar.
-- [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
-
 ## First steps
 
-1. **Run `pwd` first.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
-2. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-3. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-4. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). All subsequent steps run inside it.
-5. Read the project's existing specs:
+1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
+   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, EARS prose rules, file organization. The full grammar.
+   - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
+
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, workflow`.
+2. **Run `pwd`.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+3. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+4. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). All subsequent steps run inside it.
+6. Read the project's existing specs:
    - `specs/functional_requirements.md` (or `specs/functional_requirements/index.md` for folder-form).
    - `CONTEXT.md` for domain vocabulary.
-6. Read the project's `CLAUDE.md`.
-7. Tell the user what you found and align on scope.
+7. Read the project's `CLAUDE.md`.
+8. Tell the user what you found and align on scope.
 
 ## Mandatory plan gate
 
