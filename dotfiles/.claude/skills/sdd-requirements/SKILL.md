@@ -7,42 +7,61 @@ effort: xhigh
 argument-hint: "<issue-number>"
 ---
 
-# SDD Requirements
+# SDD Spec
 
-Author the project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — following the workspace SDD standards. The user provides free-form input describing the area to specify or revise.
+Author the project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — following the workspace SDD standards.
 
 ## Read first
 
-- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, prose rules (obligation vocabulary and EARS sentence templates), file organization. The full grammar.
-- [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
+- [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, EARS prose rules, file organization. The full grammar.
+- [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
 ## First steps
 
-1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-requirements 18`). The issue is the per-session contract; without it there is no scope.
-2. Run `gh-show $ARGUMENTS` to load the issue. The body sets the per-session contract; the most recent `## Agent Brief` comment pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
-3. Set up the worktree for issue `$ARGUMENTS` per the [issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md). All subsequent steps run inside the worktree.
-4. Read the project's existing specs if any:
-   - `specs/functional_requirements.md` or, if folder-form, `specs/functional_requirements/index.md` and the files it lists.
-   - `CONTEXT.md` if it exists, for domain vocabulary.
+1. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+2. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+3. Resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). All subsequent steps run inside it.
+4. Read the project's existing specs:
+   - `specs/functional_requirements.md` (or `specs/functional_requirements/index.md` for folder-form).
+   - `CONTEXT.md` for domain vocabulary.
 5. Read the project's `CLAUDE.md`.
-6. Tell the user what you found and align on scope before drafting.
-
-## Working with the spec collection
-
-We are bootstrapping `spec-tools` itself; programmatic spec views are not available yet. Work directly with the markdown — read item bodies as needed and use the spec standard as your reference grammar. A future revision of this skill will invoke `spec-tools` for gap reports and aggregate views to identify uncovered requirements at a glance.
+6. Tell the user what you found and align on scope.
 
 ## Mandatory plan gate
 
-Before drafting any spec text, present a written plan covering scope (which areas you will specify) and approach (key behaviors to capture, ambiguities to resolve). Wait for explicit user approval. Silence is not approval.
+Before drafting any spec text, present a written plan covering scope (which areas you will specify) and approach (key behaviours to capture, ambiguities to resolve). Wait for explicit user approval. Silence is not approval.
 
 ## Drafting
 
-- Use the interview pattern. Ask clarifying questions about behavior, scope, and edge cases before drafting. Surface ambiguities before encoding assumptions.
-- Invoke /grill-with-docs when domain terminology is fuzzy or `CONTEXT.md` needs updating; that skill produces and sharpens domain docs as decisions land.
+- Use the interview pattern. Ask clarifying questions about behaviour, scope, and edge cases before drafting. Surface ambiguities before encoding assumptions.
+- Invoke /grill-with-docs when domain terminology is fuzzy or `CONTEXT.md` needs updating.
 - Write each item per the spec standard: backticked `type~name~revision` ID, `Description:` body using EARS templates and obligation vocabulary, `Covers:` for non-roots, `Needs:` for chain continuation.
 - One obligation level per item. If `SHALL` and `SHOULD` content mixes, split into separate items.
-- Out-of-scope sections: ask the user whether anything belongs there. If yes, capture it. If no, write the section with `NA` so the question is visibly answered.
+- Out-of-scope sections: ask the user whether anything belongs there. If yes, capture it. If no, write the section with `NA`.
+
+## Closing review pass
+
+Before declaring the phase done, run the rubric. Each item is a yes/no check.
+
+- [ ] Every `req` has a `Covers:` to a `feat` (or is a root)?
+- [ ] Every `Description:` uses an EARS sentence template?
+- [ ] Each item has exactly one obligation level (no `SHALL` mixed with `SHOULD`)?
+- [ ] Every item declares `Needs:` or carries `AgentReview:` (no silent chain termination)?
+- [ ] Every `feat`'s out-of-scope section is answered (`NA` is fine)?
+
+Surface failures and iterate until the rubric is clean.
+
+## Closing the phase
+
+When the user approves and the rubric passes:
+
+1. Run /commit to commit the spec markdown.
+2. Bump the issue's phase label:
+   ```bash
+   gh issue edit $ARGUMENTS --remove-label "phase/spec" --add-label "phase/design"
+   ```
+3. Report: phase done. The user re-invokes `/sdd <N>` when ready for design.
 
 ## Output
 
-Spec markdown only — no code, no tests, no design items. Iterate with the user until the draft is approved.
+Spec markdown only — no code, no tests, no design items.

@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""bootstrap-labels — ensure the workspace's GitHub label scheme exists in the current repo.
+
+Idempotent: existing labels are left as-is; missing ones are created. See
+~/workspace/dev-playbook/standards/workflow.md for the label scheme.
+"""
+
+import json
+import subprocess
+import sys
+
+LABELS: list[tuple[str, str, str]] = [
+    # (name, color, description)
+    ("bug", "d73a4a", "Something is broken"),
+    ("enhancement", "a2eeef", "New feature or improvement"),
+    ("sdd", "5319e7", "SDD ceremony applies (spec, design, TDD)"),
+    ("phase/spec", "0e8a16", "In requirements phase"),
+    ("phase/design", "1d76db", "In design phase"),
+    ("phase/build", "fbca04", "In TDD/implementation phase"),
+    ("phase/review", "b60205", "PR open, awaiting review"),
+    ("wontfix", "ffffff", "Will not be actioned"),
+]
+
+
+def existing() -> set[str]:
+    out = subprocess.run(
+        ["gh", "label", "list", "--json", "name", "--limit", "200"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return {item["name"] for item in json.loads(out.stdout)}
+
+
+def main() -> int:
+    have = existing()
+    created = 0
+    for name, color, desc in LABELS:
+        if name in have:
+            continue
+        subprocess.run(
+            ["gh", "label", "create", name, "--color", color, "--description", desc],
+            check=True,
+        )
+        created += 1
+    skipped = len(LABELS) - created
+    print(
+        f"bootstrap-labels: {created} created, {skipped} already present",
+        file=sys.stderr,
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

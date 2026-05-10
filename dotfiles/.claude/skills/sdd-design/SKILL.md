@@ -9,31 +9,27 @@ argument-hint: "<issue-number>"
 
 # SDD Design
 
-Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements. The user provides free-form input describing what to design.
+Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements.
 
 ## Read first
 
 - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
 - [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing and the four design dimensions (Data, API Shape, Algorithms, Composition).
 - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
-- [Issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md) — branch, worktree, and PR procedure for tracked issues.
+- [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
 ## First steps
 
-1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd-design 18`). The issue is the per-session contract; without it there is no scope.
-2. Run `gh-show $ARGUMENTS` to load the issue. The body sets the per-session contract; the most recent `## Agent Brief` comment pins category, scope, key interfaces, acceptance criteria, and out-of-scope boundaries.
-3. Set up the worktree for issue `$ARGUMENTS` per the [issue implementation workflow](~/workspace/dev-playbook/standards/issue-implementation.md). All subsequent steps run inside the worktree.
+1. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+2. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+3. Resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
 4. Read the project's existing specs:
-   - `specs/functional_requirements.md` or, if folder-form, `specs/functional_requirements/index.md` and the files it lists. Without approved requirements, designing is premature.
-   - `specs/design.md` or, if folder-form, `specs/design/index.md` and the files it lists.
-   - `docs/adr/` for prior architectural decisions in the area being designed (check `docs/adr/README.md` for the index).
+   - `specs/functional_requirements.md` (or folder-form). Without approved requirements, designing is premature.
+   - `specs/design.md` (or folder-form).
+   - `docs/adr/` for prior decisions in the area being designed.
 5. Read the project's `CLAUDE.md`.
-6. **Brownfield reconnaissance.** Read the existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record the reasoning in each `dsn`'s `Rationale:` when drafting.
+6. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record reasoning in each `dsn`'s `Rationale:`.
 7. Tell the user what you found and align on scope.
-
-## Working with the spec collection
-
-We are bootstrapping `spec-tools`; programmatic views are not available yet. Read existing `dsn` items directly and check coverage by hand against the approved requirements. A future revision of this skill will invoke `spec-tools` for slice views (downstream of a `req` to see which `dsn`s already cover it) and impact-analysis views (reverse slice from a `dsn` when contemplating a revision bump).
 
 ## Mandatory plan gate
 
@@ -44,13 +40,35 @@ Before drafting `dsn` text, present a plan covering scope (which requirements th
 - Walk the dimensions in canonical order: Data first, then API Shape, then Algorithms, then Composition.
 - When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small-interface-deep-implementation, accept dependencies, return results, keep surface small.
 - Write each `dsn` per the spec standard. `Interface:` lines fully qualify symbol paths and use the workspace annotation idiom (built-in generics, `X | None` for optional, no `typing.List`).
-- Use the interview pattern.
-- For seam-finding or evaluating module depth at a scale larger than one item, **ask the user to open a fresh terminal** and invoke /improve-codebase-architecture there. Decisions return as edits to this design pass; the analysis itself does not pollute this context.
+- Use the interview pattern. Invoke /grill-with-docs when public-boundary terminology needs sharpening.
+- For seam-finding or evaluating module depth larger than one item, **ask the user to open a fresh terminal** and invoke /improve-codebase-architecture there. Bring back its proposals through edits to this design pass.
 - Reference relevant ADRs rather than re-explaining their reasoning. Propose a new ADR if a significant new architectural decision emerges.
 - Non-mandatory requirements (`SHOULD`, `MAY`) are optional in the design spec. Including one is a commitment to deliver it.
-- Iterate with the user until the draft is approved.
 
-Stubs are not produced here. `sdd-implementation` creates them lazily on first contact with a test, matching each committed `Interface:` verbatim.
+Stubs are not produced here. `sdd-tdd` creates them lazily on first contact with a test, matching each committed `Interface:` verbatim.
+
+## Closing review pass
+
+Before declaring the phase done, run the rubric. Each item is a yes/no check.
+
+- [ ] Every `dsn` has a `Covers:` to a `req` (or is a root)?
+- [ ] Every `Interface:` is matched by a behavioural commitment in `Description:` (not a signature in isolation)?
+- [ ] Every `Interface:` uses the workspace annotation idiom (built-in generics, `X | None`, no `typing.List`)?
+- [ ] Every `dsn` declares `Needs:` or carries `AgentReview:`?
+- [ ] Every standard rule the design leans on is named explicitly (cited ADRs, `module-design.md`)?
+
+Surface failures and iterate until the rubric is clean.
+
+## Closing the phase
+
+When the user approves and the rubric passes:
+
+1. Run /commit to commit the design spec.
+2. Bump the issue's phase label:
+   ```bash
+   gh issue edit $ARGUMENTS --remove-label "phase/design" --add-label "phase/build"
+   ```
+3. Report: phase done. The user re-invokes `/sdd <N>` when ready to build.
 
 ## Output
 

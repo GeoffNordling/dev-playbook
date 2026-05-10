@@ -1,6 +1,6 @@
 ---
 name: sdd-agentreviews
-description: Audit `AgentReview:` commitments across the project at scale and report drift
+description: Verify `AgentReview:` commitments against the artifacts they name and report drift. Use as the final-check step when closing an SDD issue, or directly to audit a chosen scope.
 disable-model-invocation: true
 model: opus
 effort: xhigh
@@ -8,9 +8,12 @@ effort: xhigh
 
 # SDD AgentReviews
 
-Periodic maintenance audit of every `AgentReview:` commitment in the project. Dispatches review subagents per item and reports drift between the spec's commitment and the artifact (code, prompt, behavior) it names.
+Verify `AgentReview:` commitments against the artifact (code, prompt, behaviour) each names. Dispatches review subagents per item and reports drift.
 
-This is not a development-flow skill. Inline `AgentReview:` checks for items being actively built happen in `sdd-implementation`. This skill is the project-wide sweep, run periodically rather than per cycle.
+Two invocation paths:
+
+- From `sdd-tdd`'s closing-the-phase step. The caller computes the in-scope item IDs from the branch diff and passes them in the invocation.
+- Directly by the user, scoped to whatever they specify (a focused area, items changed since a date, the whole project).
 
 ## Read first
 
@@ -19,7 +22,7 @@ This is not a development-flow skill. Inline `AgentReview:` checks for items bei
 ## First steps
 
 1. Read the project's `CLAUDE.md`.
-2. Confirm with the user the scope of this audit run — whole project or a subset (e.g., one area, items changed since last audit).
+2. **Determine scope.** If the invoking context provides an explicit list of item IDs (e.g., from `sdd-tdd`: "audit these items: dsn~..., req~..."), audit exactly that list. Otherwise ask the user — by area, by date range, whole project, etc.
 
 ## Working with the spec collection
 
