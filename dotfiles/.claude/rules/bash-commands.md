@@ -18,15 +18,14 @@ needs that kind of interaction:
 Do not try to run interactive commands yourself with the Bash tool in these
 cases, and do not suggest `!` as a workaround.
 
-## Use absolute paths, not `cd`
+## Don't use `cd` in compound commands
 
-Pass an absolute path to the command, or use a path flag: `git -C <dir>`,
-`ls <dir>`, `make -C <dir>`. Keep the shell's working directory stable
-across the session.
+The harness flags `cd <relative> && … <redirect>` as "path resolution
+bypass" and shows the user a permission prompt. Rewrite the command —
+don't push the prompt onto the user.
 
-`cd` in compound commands is enforced against: `cd <relative> && … <redirect>`
-is flagged as "path resolution bypass" and prompts for manual approval. The
-prompt is correct — rewrite the command, don't ask the user to approve.
+A standalone `cd /abs/path` is fine, including at session start to anchor
+in a worktree.
 
 ## Quote regex patterns with single quotes
 
