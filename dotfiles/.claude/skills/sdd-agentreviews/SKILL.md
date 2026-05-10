@@ -21,8 +21,9 @@ Two invocation paths:
 
 ## First steps
 
-1. Read the project's `CLAUDE.md`.
-2. **Determine scope.** If the invoking context provides an explicit list of item IDs (e.g., from `sdd-tdd`: "audit these items: dsn~..., req~..."), audit exactly that list. Otherwise ask the user — by area, by date range, whole project, etc.
+1. **Run `pwd` first.** When invoked from `sdd-tdd`, the caller already cd'd into the worktree, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+2. Read the project's `CLAUDE.md`.
+3. **Determine scope.** If the invoking context provides an explicit list of item IDs (e.g., from `sdd-tdd`: "audit these items: dsn~..., req~..."), audit exactly that list. Otherwise ask the user — by area, by date range, whole project, etc.
 
 ## Working with the spec collection
 

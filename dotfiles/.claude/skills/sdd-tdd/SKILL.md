@@ -22,14 +22,15 @@ When considering an `Interface:` amendment (see "Spec amendment" below), also re
 
 ## First steps
 
-1. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-2. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-3. Resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
-4. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
-5. Read the project's `CLAUDE.md`.
-6. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
-7. Run the test suite to see the current state.
-8. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
+1. **Run `pwd` first.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+2. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+3. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+4. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
+5. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
+6. Read the project's `CLAUDE.md`.
+7. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
+8. Run the test suite to see the current state.
+9. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
 
 ## Mandatory plan gate
 

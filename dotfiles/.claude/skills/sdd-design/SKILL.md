@@ -20,16 +20,17 @@ Author the project's design layer — `dsn` items pinning `Interface:` lines and
 
 ## First steps
 
-1. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-2. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-3. Resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
-4. Read the project's existing specs:
+1. **Run `pwd` first.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+2. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+3. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+4. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
+5. Read the project's existing specs:
    - `specs/functional_requirements.md` (or folder-form). Without approved requirements, designing is premature.
    - `specs/design.md` (or folder-form).
    - `docs/adr/` for prior decisions in the area being designed.
-5. Read the project's `CLAUDE.md`.
-6. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record reasoning in each `dsn`'s `Rationale:`.
-7. Tell the user what you found and align on scope.
+6. Read the project's `CLAUDE.md`.
+7. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record reasoning in each `dsn`'s `Rationale:`.
+8. Tell the user what you found and align on scope.
 
 ## Mandatory plan gate
 

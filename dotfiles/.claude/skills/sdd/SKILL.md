@@ -15,10 +15,11 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
 
 ## First steps
 
-1. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
-2. Run `gh-show $ARGUMENTS` to load the issue.
-3. **Verify the `sdd` label.** If absent, refuse: "Issue #N is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
-4. **Read the `phase/*` label** and dispatch:
+1. **Run `pwd` first.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the repo.
+2. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
+3. Run `gh-show $ARGUMENTS` to load the issue.
+4. **Verify the `sdd` label.** If absent, refuse: "Issue #N is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
+5. **Read the `phase/*` label** and dispatch:
 
 | Label | Invoke |
 |---|---|

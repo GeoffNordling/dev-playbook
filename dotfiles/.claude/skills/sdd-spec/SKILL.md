@@ -18,14 +18,15 @@ Author the project's functional requirements — `feat` (high-level capability) 
 
 ## First steps
 
-1. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-2. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-3. Resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). All subsequent steps run inside it.
-4. Read the project's existing specs:
+1. **Run `pwd` first.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
+2. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
+3. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
+4. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). All subsequent steps run inside it.
+5. Read the project's existing specs:
    - `specs/functional_requirements.md` (or `specs/functional_requirements/index.md` for folder-form).
    - `CONTEXT.md` for domain vocabulary.
-5. Read the project's `CLAUDE.md`.
-6. Tell the user what you found and align on scope.
+6. Read the project's `CLAUDE.md`.
+7. Tell the user what you found and align on scope.
 
 ## Mandatory plan gate
 
