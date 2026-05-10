@@ -1,7 +1,7 @@
 ---
 name: sdd-design
-description: Author design items (`dsn`) and pin `Interface:` lines from approved functional requirements
-disable-model-invocation: true
+description: Author design items (`dsn`) and pin `Interface:` lines from approved functional requirements. Use when an SDD-mode issue is in `phase/design` and needs `dsn` items / `Interface:` declarations, or when the user asks to design the implementation surface for approved `feat`/`req` items.
+disable-model-invocation: false
 model: opus
 effort: xhigh
 argument-hint: "<issue-number>"

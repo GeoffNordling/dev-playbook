@@ -1,7 +1,7 @@
 ---
 name: sdd-agentreviews
-description: Verify `AgentReview:` commitments against the artifacts they name and report drift. Use as the final-check step when closing an SDD issue, or directly to audit a chosen scope.
-disable-model-invocation: true
+description: Verify `AgentReview:` commitments against the artifacts they name and report drift. Use when closing an SDD issue (final-check sweep before opening the PR), or when the user asks to audit `AgentReview:` lines for a chosen scope of items.
+disable-model-invocation: false
 model: opus
 effort: xhigh
 ---

@@ -1,7 +1,7 @@
 ---
 name: sdd-tdd
-description: Implement features via vertical-slice TDD against committed `Interface:` declarations
-disable-model-invocation: true
+description: Implement features via vertical-slice TDD against committed `Interface:` declarations. Use when an SDD-mode issue is in `phase/build` and the design has pinned `Interface:` lines, or when the user asks to drive implementation via red/green/refactor against an SDD spec.
+disable-model-invocation: false
 model: opus
 effort: xhigh
 argument-hint: "<issue-number>"

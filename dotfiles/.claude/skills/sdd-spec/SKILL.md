@@ -1,7 +1,7 @@
 ---
 name: sdd-spec
-description: Author functional requirements (`feat` and `req` items) following the workspace SDD standards
-disable-model-invocation: true
+description: Author functional requirements (`feat` and `req` items) following the workspace SDD standards. Use when an SDD-mode issue is in `phase/spec` and needs `feat`/`req` items written, or when the user asks to draft/extend functional requirements for a tracer-bullet issue.
+disable-model-invocation: false
 model: opus
 effort: xhigh
 argument-hint: "<issue-number>"
