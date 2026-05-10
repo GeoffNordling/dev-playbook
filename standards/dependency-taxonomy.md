@@ -1,26 +1,34 @@
 # Dependency Taxonomy
 
-When assessing a candidate for deepening, classify its dependencies. The category determines how the deepened module is tested across its seam.
+## Purpose
+
+Reference for the `/improve-codebase-architecture` skill. When the skill proposes deepening a module, classify its dependencies — the category determines how the deepened module is tested across its seam.
 
 Uses the vocabulary in [architecture-vocabulary.md](architecture-vocabulary.md).
 
 ## Categories
 
 ### 1. In-process
+*Pure computation, no I/O. Just merge and test directly.*
 
 Pure computation, in-memory state, no I/O. Always deepenable — merge the modules and test through the new interface directly. No adapter needed.
 
 ### 2. Local-substitutable
+*Dependency has a real test stand-in (PGLite, in-memory FS). Use it.*
 
 Dependencies that have local test stand-ins (PGLite for Postgres, in-memory filesystem). Deepenable if the stand-in exists. The deepened module is tested with the stand-in running in the test suite. The seam is internal; no port at the module's external interface.
 
 ### 3. Remote but owned (Ports & Adapters)
+*Your own service across a network. Define a port; inject HTTP for prod, in-memory for tests.*
+
+> 💡 **Ports & Adapters** (Cockburn, 2005; aka Hexagonal Architecture): the module talks to a small interface — the *port* — and transport-specific code lives in classes that implement it — the *adapters*. Swap adapters per environment.
 
 Your own services across a network boundary (microservices, internal APIs). Define a **port** (interface) at the seam. The deep module owns the logic; the transport is injected as an **adapter**. Tests use an in-memory adapter. Production uses an HTTP/gRPC/queue adapter.
 
 Recommendation shape: *"Define a port at the seam, implement an HTTP adapter for production and an in-memory adapter for testing, so the logic sits in one deep module even though it's deployed across a network."*
 
 ### 4. True external (Mock)
+*Third-party service you can't run in tests (Stripe, Twilio). Mock at the boundary.*
 
 Third-party services (Stripe, Twilio, etc.) you don't control. The deepened module takes the external dependency as an injected port; tests provide a mock adapter.
 
