@@ -1,5 +1,5 @@
 ---
-name: sdd-implementation
+name: sdd-tdd
 description: Implement features via vertical-slice TDD against committed `Interface:` declarations
 disable-model-invocation: true
 model: opus

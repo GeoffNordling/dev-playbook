@@ -52,7 +52,7 @@ one adaptation.
   required.
 
 The vocabulary and slice rules live in the new
-[Issue management standard](~/workspace/dev-playbook/standards/issue-management.md).
+[Issue management standard](~/workspace/dev-playbook/standards/workflow.md).
 The ADR rules live in the updated
 [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md).
 
@@ -126,7 +126,7 @@ skills themselves.
   reference to PRDs was removed.
 - New `## Agent skills` block in `CLAUDE.md`.
 - New
-  [Issue management standard](~/workspace/dev-playbook/standards/issue-management.md)
+  [Issue management standard](~/workspace/dev-playbook/standards/workflow.md)
   documenting the triage state machine, label vocabulary, and
   vertical-slice rules.
 - The [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)

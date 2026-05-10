@@ -1,5 +1,5 @@
 ---
-name: sdd-requirements
+name: sdd-spec
 description: Author functional requirements (`feat` and `req` items) following the workspace SDD standards
 disable-model-invocation: true
 model: opus

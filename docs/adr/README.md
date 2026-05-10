@@ -11,3 +11,4 @@
 | [0007](0007-compounding-with-ai.md) | Compounding workflow with AI: global CLAUDE.md, hierarchy, edit-time verification | 2026-05-07 |
 | [0008](0008-decline-superpowers.md) | Decline Superpowers; catalog techniques worth remembering | 2026-05-08 |
 | [0009](0009-remove-pocock-direct-dependency.md) | Remove Pocock direct dependency; absorb conventions, lift engineering skills | 2026-05-09 |
+| [0010](0010-issue-workflow-reorganization.md) | Issue workflow reorganization: phase labels, `/intake` and `/sdd` dispatcher, consolidate standards | 2026-05-10 |
