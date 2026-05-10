@@ -14,7 +14,7 @@ For the full workflow, label scheme, issue body template, and vertical-slice rul
 
 ## First step
 
-Run [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) to ensure the repo has the workflow's labels. Idempotent — silent if already present.
+Run [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) to reconcile the repo's labels with the workflow's scheme. Closed-world and idempotent — extras are deleted, drifted descriptions are corrected, and one line per label reports the action.
 
 ```bash
 python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels

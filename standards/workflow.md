@@ -29,7 +29,7 @@ The `phase/*` track is the visible state of the issue. An agent or human opening
 
 ## Bootstrapping labels
 
-Run [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) once per repo. It is idempotent — existing labels are left as-is, missing ones are created. `/intake` invokes it on every run, so labels appear automatically the first time the workflow is used in a new repo.
+Run [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) once per repo. It is closed-world and idempotent — canonical labels are created or corrected, anything else is deleted. `/intake` invokes it on every run, so labels are reconciled automatically the first time the workflow is used in a new repo.
 
 ```bash
 python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels

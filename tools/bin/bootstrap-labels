@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""bootstrap-labels — ensure the workspace's GitHub label scheme exists in the current repo.
+"""bootstrap-labels — enforce the workspace's GitHub label scheme in the current repo.
 
-Idempotent: existing labels are left as-is; missing ones are created. See
+Closed-world: labels in the canonical table are created or updated to match;
+labels not in the canonical table are deleted. Idempotent. See
 ~/workspace/dev-playbook/standards/workflow.md for the label scheme.
 """
 
@@ -11,43 +12,68 @@ import sys
 
 LABELS: list[tuple[str, str, str]] = [
     # (name, color, description)
-    ("bug", "d73a4a", "Something is broken"),
-    ("enhancement", "a2eeef", "New feature or improvement"),
+    ("bug", "d73a4a", "Something isn't working"),
+    ("enhancement", "a2eeef", "New feature or request"),
     ("sdd", "5319e7", "SDD ceremony applies (spec, design, TDD)"),
     ("phase/spec", "0e8a16", "In requirements phase"),
     ("phase/design", "1d76db", "In design phase"),
     ("phase/build", "fbca04", "In TDD/implementation phase"),
     ("phase/review", "b60205", "PR open, awaiting review"),
-    ("wontfix", "ffffff", "Will not be actioned"),
+    ("wontfix", "ffffff", "This will not be worked on"),
 ]
 
 
-def existing() -> set[str]:
+def existing() -> dict[str, str]:
     out = subprocess.run(
-        ["gh", "label", "list", "--json", "name", "--limit", "200"],
+        ["gh", "label", "list", "--json", "name,description", "--limit", "200"],
         check=True,
         capture_output=True,
         text=True,
     )
-    return {item["name"] for item in json.loads(out.stdout)}
+    return {item["name"]: item["description"] for item in json.loads(out.stdout)}
 
 
 def main() -> int:
     have = existing()
-    created = 0
+    canonical = {name for name, _, _ in LABELS}
+
     for name, color, desc in LABELS:
-        if name in have:
+        if name not in have:
+            subprocess.run(
+                [
+                    "gh",
+                    "label",
+                    "create",
+                    name,
+                    "--color",
+                    color,
+                    "--description",
+                    desc,
+                ],
+                check=True,
+                capture_output=True,
+            )
+            print(f"created   {name}")
+        elif have[name] != desc:
+            subprocess.run(
+                ["gh", "label", "edit", name, "--description", desc],
+                check=True,
+                capture_output=True,
+            )
+            print(f"updated   {name}")
+        else:
+            print(f"unchanged {name}")
+
+    for name in sorted(have):
+        if name in canonical:
             continue
         subprocess.run(
-            ["gh", "label", "create", name, "--color", color, "--description", desc],
+            ["gh", "label", "delete", name, "--yes"],
             check=True,
+            capture_output=True,
         )
-        created += 1
-    skipped = len(LABELS) - created
-    print(
-        f"bootstrap-labels: {created} created, {skipped} already present",
-        file=sys.stderr,
-    )
+        print(f"deleted   {name}")
+
     return 0
 
 

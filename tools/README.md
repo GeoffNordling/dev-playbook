@@ -68,7 +68,7 @@ Run ad hoc on user demand. Not part of the pre-commit pipeline.
 | `py-outline` | Print class/function structure of a Python package (signatures + docstrings) |
 | `workspace-backup` | Archive every workspace repo (with `.git/`) into a single dated .zip |
 | `worktree-sweep` | Prune `.claude/worktrees/` entries whose PR is merged with no local divergence; report ambiguous cases |
-| `bootstrap-labels` | Create the workspace's GitHub label scheme in the current repo (idempotent); auto-invoked by `/intake` |
+| `bootstrap-labels` | Enforce the workspace's GitHub label scheme in the current repo (closed-world, idempotent); auto-invoked by `/intake` |
 | `gh-show` (in `dotfiles/bin/`) | Print a GitHub issue or PR with body + comments in a compact, agent-friendly form |
 
 ## Tool reference
@@ -152,13 +152,13 @@ Auto-prune requires all three: PR state `MERGED`, local tip SHA matches the PR's
 
 ### bootstrap-labels
 
-Create the workspace's GitHub label scheme in the current repo. Idempotent: existing labels are left as-is; missing ones are created. The label scheme is defined in [workflow.md](../standards/workflow.md). `/intake` auto-invokes this on every run, so the labels appear automatically the first time the workflow is used in a new repo.
+Enforce the workspace's GitHub label scheme in the current repo. Closed-world and idempotent: canonical labels are created or have their descriptions corrected; any label not in the canonical table is deleted. Color drift is ignored. The label scheme is defined in [workflow.md](../standards/workflow.md). `/intake` auto-invokes this on every run, so the labels are reconciled automatically the first time the workflow is used in a new repo.
 
 ```bash
 bootstrap-labels
 ```
 
-Reads the current repo from `gh`'s context (`git remote -v`). Stdlib-only (no PEP 723 deps). Exits 0 on success.
+Emits one line per label: `created`, `updated`, `deleted`, or `unchanged`. Reads the current repo from `gh`'s context (`git remote -v`). Stdlib-only (no PEP 723 deps). Exits 0 on success.
 
 ### gh-show
 
