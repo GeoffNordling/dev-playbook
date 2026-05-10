@@ -4,6 +4,8 @@
 **Status:** Accepted
 **Issue:** [#9](https://github.com/GeoffNordling/dev-playbook/issues/9)
 
+> **Note:** The tooling described here was later extracted from `dev-playbook` into its own repo, [`~/workspace/spec-tools/`](~/workspace/spec-tools/) — `pytest-sdd`, the vendored OFT JAR, and the SDD standards now live there. See [`spec-tools` ADR-0001](~/workspace/spec-tools/docs/adr/0001-extracted-from-dev-playbook.md) for the extraction record. Paths in this ADR (e.g. `dev-playbook/sdd-tools/lib/`) are historical.
+
 ## Context
 
 This workspace uses spec-driven development (SDD). Specs live in `/specs/` in each project repo, written in markdown using EARS sentence templates and RFC 2119 modal verbs.
