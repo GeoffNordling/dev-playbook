@@ -23,7 +23,7 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
 
 | Label | Invoke |
 |---|---|
-| `phase/spec` | sdd-spec |
+| `phase/requirements` | sdd-requirements |
 | `phase/design` | sdd-design |
 | `phase/build` | sdd-tdd |
 | `phase/review` | Refuse: "PR is open for #N. Review and merge from there." |

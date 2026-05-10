@@ -29,7 +29,7 @@ Three orthogonal label tracks, plus `wontfix` for declined issues:
 |---|---|---|
 | Category | `bug`, `enhancement` | What kind of work it is |
 | Mode | `sdd` (presence) | Whether SDD ceremony applies |
-| Phase | `phase/spec`, `phase/design`, `phase/build`, `phase/review` | Where in the journey |
+| Phase | `phase/requirements`, `phase/design`, `phase/build`, `phase/review` | Where in the journey |
 
 Issues are born with all three tracks set. The phase advances as work progresses; the dispatcher reads the phase label to decide which skill to run.
 
@@ -42,8 +42,9 @@ Issues are born with all three tracks set. The phase advances as work progresses
 
 **Rename.**
 
-- `sdd-requirements` → `sdd-spec`
 - `sdd-implementation` → `sdd-tdd`
+
+`sdd-requirements` keeps its name — parallel to `sdd-design`, and matches the directory it writes to (`specs/functional_requirements/`).
 
 **Delete.**
 
@@ -58,7 +59,7 @@ Issues are born with all three tracks set. The phase advances as work progresses
 
 ### Closing review pass
 
-`sdd-spec` and `sdd-design` add a closing review pass — a fixed rubric the agent runs before declaring the phase done. Absorbs `lessons.md §7` (which is removed in `spec-tools`).
+`sdd-requirements` and `sdd-design` add a closing review pass — a fixed rubric the agent runs before declaring the phase done. Absorbs `lessons.md §7` (which is removed in `spec-tools`).
 
 ### AgentReview as final check
 
@@ -87,7 +88,7 @@ Where `/improve-codebase-architecture` fits in the SDD workflow beyond `sdd-desi
 |---|---|
 | Keep `/triage` as a separate skill | Solo creator + solo triager makes the boundary artificial. The skill content is purely classification, which `/intake` does in one step. |
 | Single `/intake-then-build` skill that runs every phase sequentially | Each phase is a distinct interaction mode (interview-heavy / reconnaissance-heavy / TDD-loop) and benefits from a fresh agent context. Merging blurs that. The dispatcher pattern keeps skills focused while presenting a single user-facing command. |
-| Phase as issue body section (e.g. `## Phase: design`) instead of label | Labels are filterable (`gh issue list --label phase/spec`); body sections are not. Labels are 1-line edits; body edits are diff-prone. |
+| Phase as issue body section (e.g. `## Phase: design`) instead of label | Labels are filterable (`gh issue list --label phase/requirements`); body sections are not. Labels are 1-line edits; body edits are diff-prone. |
 | Phase as comment marker | Comments accumulate; the latest phase marker has to be searched for. Labels are a single source of truth. |
 | Carry the AFK / HITL distinction forward | Solo developer is currently always HITL. The distinction can be re-introduced when AFK agents land — re-add the label, re-add a `/triage` step if needed. Not pre-specifying. |
 | Inline `gh label create …` in `workflow.md` instead of a script | Lives in agent context every time `workflow.md` loads. A script lives outside context, runs idempotently, and lets `/intake` auto-bootstrap missing labels. |
@@ -96,9 +97,9 @@ Where `/improve-codebase-architecture` fits in the SDD workflow beyond `sdd-desi
 ## Consequences
 
 - Two standards files removed (`issue-management.md`, `issue-implementation.md`); one added (`workflow.md`).
-- Two skills removed (`triage`, `to-issues`); two added (`intake`, `sdd` dispatcher); two renamed (`sdd-requirements` → `sdd-spec`, `sdd-implementation` → `sdd-tdd`).
-- Three skills edited (`sdd-spec`, `sdd-design`, `sdd-tdd`) to drop duplicated preludes, link to `workflow.md`, and (for spec/design) add a closing review pass.
-- `lessons.md §7` removed in `spec-tools` (separate commit) — content absorbed into `sdd-spec` and `sdd-design`.
-- New label vocabulary in target repos: `bug`, `enhancement`, `sdd`, `phase/{spec,design,build,review}`, `wontfix`. Bootstrap is automatic on first `/intake` invocation per repo.
+- Two skills removed (`triage`, `to-issues`); two added (`intake`, `sdd` dispatcher); one renamed (`sdd-implementation` → `sdd-tdd`).
+- Three skills edited (`sdd-requirements`, `sdd-design`, `sdd-tdd`) to drop duplicated preludes, link to `workflow.md`, and (for requirements/design) add a closing review pass.
+- `lessons.md §7` removed in `spec-tools` (separate commit) — content absorbed into `sdd-requirements` and `sdd-design`.
+- New label vocabulary in target repos: `bug`, `enhancement`, `sdd`, `phase/{requirements,design,build,review}`, `wontfix`. Bootstrap is automatic on first `/intake` invocation per repo.
 - Skill name `sdd-tdd` describes the methodology; phase label `phase/build` describes the journey state. The naming mismatch is accepted.
 - Where `/improve-codebase-architecture` fits in the SDD workflow remains an open question, to be discovered with use rather than pre-specified.

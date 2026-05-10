@@ -21,7 +21,7 @@ Three orthogonal label tracks plus a closing label:
 |---|---|---|
 | Category | `bug`, `enhancement` | What kind of work it is |
 | Mode | `sdd` (presence) | Whether SDD ceremony applies |
-| Phase | `phase/spec`, `phase/design`, `phase/build`, `phase/review` | Where in the journey |
+| Phase | `phase/requirements`, `phase/design`, `phase/build`, `phase/review` | Where in the journey |
 
 Closing: `wontfix` (apply, then `gh issue close`).
 
@@ -47,7 +47,7 @@ python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
    issue(s) born ready, labeled:
       bug | enhancement
       sdd? (presence)
-      phase/spec  (sdd) or phase/build (non-sdd)
+      phase/requirements  (sdd) or phase/build (non-sdd)
           │
    ┌──────┴──────┐
    ▼             ▼
@@ -61,7 +61,7 @@ python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
    │   runs the matching skill,
    │   bumps the label on success
    │             │
-   ├─ phase/spec   → sdd-spec   ─▶ phase/design
+   ├─ phase/requirements → sdd-requirements ─▶ phase/design
    ├─ phase/design → sdd-design ─▶ phase/build
    └─ phase/build  → sdd-tdd    ─▶ opens PR (phase/review)
                                      │
@@ -130,7 +130,7 @@ Publish issues in dependency order so the `Blocked by` field can reference real 
 
 | Label | Skill |
 |---|---|
-| `phase/spec` | `sdd-spec` |
+| `phase/requirements` | `sdd-requirements` |
 | `phase/design` | `sdd-design` |
 | `phase/build` | `sdd-tdd` |
 

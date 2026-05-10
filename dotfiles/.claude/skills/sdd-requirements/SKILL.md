@@ -1,13 +1,13 @@
 ---
-name: sdd-spec
-description: Author functional requirements (`feat` and `req` items) following the workspace SDD standards. Use when an SDD-mode issue is in `phase/spec` and needs `feat`/`req` items written, or when the user asks to draft/extend functional requirements for a tracer-bullet issue.
+name: sdd-requirements
+description: Author functional requirements (`feat` and `req` items) following the workspace SDD standards. Use when an SDD-mode issue is in `phase/requirements` and needs `feat`/`req` items written, or when the user asks to draft/extend functional requirements for a tracer-bullet issue.
 disable-model-invocation: false
 model: opus
 effort: xhigh
 argument-hint: "<issue-number>"
 ---
 
-# SDD Spec
+# SDD Requirements
 
 Author the project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — following the workspace SDD standards.
 
@@ -56,12 +56,13 @@ Surface failures and iterate until the rubric is clean.
 
 When the user approves and the rubric passes:
 
-1. Run /commit to commit the spec markdown.
-2. Bump the issue's phase label:
+1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined for the project (e.g., a greenfield repo with no tests yet), note the absence and continue. If any defined command fails, stop and surface the failure — it may have been introduced by this phase or pre-date it, but it must be visible and resolved before the phase closes. Do not commit or bump the phase label on a red tree.
+2. Run /commit to commit the spec markdown.
+3. Bump the issue's phase label:
    ```bash
-   gh issue edit $ARGUMENTS --remove-label "phase/spec" --add-label "phase/design"
+   gh issue edit $ARGUMENTS --remove-label "phase/requirements" --add-label "phase/design"
    ```
-3. Report: phase done. The user re-invokes `/sdd <N>` when ready for design.
+4. Report: phase done. The user re-invokes `/sdd <N>` when ready for design.
 
 ## Output
 

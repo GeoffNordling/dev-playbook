@@ -99,15 +99,16 @@ Bugs that surface during implementation are spec gaps. Flag the gap, propose the
 
 When all chunks are complete, the suite is green, lint/format/typecheck pass, and the user has approved every diff:
 
-1. Run /commit if there are uncommitted changes.
-2. **Final AgentReview sweep.** Compute the in-scope items, then invoke /sdd-agentreviews with that explicit list:
+1. **Final check sweep — leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). The chunk loop runs these per-chunk, but a final whole-tree pass catches cross-chunk regressions and any drift since the last chunk. All must pass; if anything fails, fix it and re-run. Do not push a red branch.
+2. **Final AgentReview sweep.** Compute the in-scope items, then invoke /sdd-agentreviews with that explicit list. Use a working-tree-inclusive diff so any uncommitted spec edits are still in scope:
    ```bash
-   git diff main...HEAD --name-only -- specs/
+   git diff main --name-only -- specs/
    ```
-   For each modified spec file, find spec items containing an `AgentReview:` line. Collect their IDs. Then invoke /sdd-agentreviews with the message: `Audit these items: <id-1>, <id-2>, ...`. Surface any drift to the user; resolve before opening the PR.
-3. Push (the user runs this — YubiKey tap required): `git push -u origin <branch>`.
-4. Open the PR: `gh pr create --body "Closes #<N> ..."`. The `Closes` token is mandatory.
-5. Bump the issue's phase label:
+   For each modified spec file, find spec items containing an `AgentReview:` line. Collect their IDs. Then invoke /sdd-agentreviews with the message: `Audit these items: <id-1>, <id-2>, ...`. Surface any drift to the user; resolve drift in the working tree before moving on so the fixes land in the close-out commit.
+3. Run /commit if there are uncommitted changes (covers drift fixes plus any leftovers).
+4. Push (the user runs this — YubiKey tap required): `git push -u origin <branch>`.
+5. Open the PR: `gh pr create --body "Closes #<N> ..."`. The `Closes` token is mandatory.
+6. Bump the issue's phase label:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase/build" --add-label "phase/review"
    ```

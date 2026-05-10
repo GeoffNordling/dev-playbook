@@ -64,12 +64,13 @@ Surface failures and iterate until the rubric is clean.
 
 When the user approves and the rubric passes:
 
-1. Run /commit to commit the design spec.
-2. Bump the issue's phase label:
+1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined for the project (e.g., a greenfield repo with no tests yet), note the absence and continue. If any defined command fails, stop and surface the failure — it may have been introduced by this phase or pre-date it, but it must be visible and resolved before the phase closes. Do not commit or bump the phase label on a red tree.
+2. Run /commit to commit the design spec.
+3. Bump the issue's phase label:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase/design" --add-label "phase/build"
    ```
-3. Report: phase done. The user re-invokes `/sdd <N>` when ready to build.
+4. Report: phase done. The user re-invokes `/sdd <N>` when ready to build.
 
 ## Output
 

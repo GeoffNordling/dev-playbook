@@ -15,7 +15,7 @@ LABELS: list[tuple[str, str, str]] = [
     ("bug", "d73a4a", "Something isn't working"),
     ("enhancement", "a2eeef", "New feature or request"),
     ("sdd", "5319e7", "SDD ceremony applies (spec, design, TDD)"),
-    ("phase/spec", "0e8a16", "In requirements phase"),
+    ("phase/requirements", "0e8a16", "In requirements phase"),
     ("phase/design", "1d76db", "In design phase"),
     ("phase/build", "fbca04", "In TDD/implementation phase"),
     ("phase/review", "b60205", "PR open, awaiting review"),

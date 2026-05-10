@@ -36,7 +36,7 @@ If the idea is a plan that crosses concerns or layers → break into vertical sl
 
 - **Category** — `bug` or `enhancement`.
 - **SDD?** — apply `sdd` if the repo uses SDD and this issue's implementation will follow the spec → design → TDD path. A trivial issue in an SDD repo may not need full ceremony — your call.
-- **First phase** — `phase/spec` if SDD, `phase/build` if not.
+- **First phase** — `phase/requirements` if SDD, `phase/build` if not.
 
 ### 4. Write the issue
 
@@ -49,7 +49,7 @@ gh issue create --title "..." --body "$(cat <<'EOF'
 ...body...
 EOF
 )"
-gh issue edit <num> --add-label "bug" --add-label "sdd" --add-label "phase/spec"
+gh issue edit <num> --add-label "bug" --add-label "sdd" --add-label "phase/requirements"
 ```
 
 For multi-issue plans, publish in dependency order so `Blocked by` references can use real issue numbers.
