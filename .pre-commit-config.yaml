@@ -1,3 +1,12 @@
+# Three-environment contract — every `local` hook entry MUST work in all three:
+#   1. dev-playbook locally        — .pre-commit-config.yaml is the real file
+#   2. consumer repos locally      — .pre-commit-config.yaml is a SYMLINK to (1)
+#   3. GitHub Actions runner       — repo checked out at an arbitrary path; no $HOME paths exist
+# Hardcoded absolute paths under $HOME break (3); cwd-relative paths break (2).
+# Pattern: resolve dev-playbook's root via `realpath .pre-commit-config.yaml`,
+# then build paths relative to that. The local hooks below follow this pattern.
+# If you change a hook entry, mentally walk all three environments before pushing.
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.7
@@ -10,30 +19,37 @@ repos:
 
   - repo: local
     hooks:
+      # Hook entries resolve dev-playbook's location via .pre-commit-config.yaml's
+      # realpath: in dev-playbook itself the file IS the real config; in consumer
+      # repos it's a symlink pointing back to dev-playbook. Either way, dirname
+      # of realpath gives the dev-playbook root. This makes the hooks work on
+      # the GitHub runner (arbitrary checkout path) and in consumer repos
+      # (symlinked config) without hardcoding an absolute path.
+
       - id: no-future-annotations
         name: no-future-annotations
-        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/no-future-annotations
+        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/no-future-annotations" "$@"' --
         language: system
         pass_filenames: false
         always_run: true
 
       - id: ref-check
         name: ref-check
-        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/ref-check
+        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/ref-check" "$@"' --
         language: system
         pass_filenames: false
         types: ['markdown']
 
       - id: test-privacy
         name: test-privacy
-        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/test-privacy
+        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/test-privacy" "$@"' --
         language: system
         pass_filenames: false
         always_run: true
 
       - id: internal-skill-audit
         name: internal-skill-audit
-        entry: python3 /home/geoff/workspace/dev-playbook/tools/bin/internal-skill-audit
+        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/internal-skill-audit" "$@"' --
         language: system
         pass_filenames: false
         always_run: true

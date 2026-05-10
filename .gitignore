@@ -12,19 +12,19 @@ __pycache__/
 .claude/worktrees/
 
 # dotfiles — machine-local and ephemeral files
-dotfiles/.claude/settings.local.json
-dotfiles/.claude/history.jsonl
-dotfiles/.claude/debug/
-dotfiles/.claude/file-history/
-dotfiles/.claude/session-env/
-dotfiles/.claude/paste-cache/
-dotfiles/.claude/cache/
-dotfiles/.claude/downloads/
-dotfiles/.claude/backups/
-dotfiles/.claude/shell-snapshots/
-dotfiles/.claude/plans/
-dotfiles/.claude/tasks/
-dotfiles/.claude/todos/
-dotfiles/.claude/sessions/
-dotfiles/.claude/plugins/
-dotfiles/.claude/projects/
+dotfiles/dot-claude/settings.local.json
+dotfiles/dot-claude/history.jsonl
+dotfiles/dot-claude/debug/
+dotfiles/dot-claude/file-history/
+dotfiles/dot-claude/session-env/
+dotfiles/dot-claude/paste-cache/
+dotfiles/dot-claude/cache/
+dotfiles/dot-claude/downloads/
+dotfiles/dot-claude/backups/
+dotfiles/dot-claude/shell-snapshots/
+dotfiles/dot-claude/plans/
+dotfiles/dot-claude/tasks/
+dotfiles/dot-claude/todos/
+dotfiles/dot-claude/sessions/
+dotfiles/dot-claude/plugins/
+dotfiles/dot-claude/projects/

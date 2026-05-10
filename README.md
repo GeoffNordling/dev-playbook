@@ -52,9 +52,9 @@ Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after add
 
 | Object | Location | Purpose |
 |--------|----------|---------|
-| Claude Code skills | `dotfiles/.claude/skills/` | Workflow automation, tool wrappers, etc. |
-| Global rules | `dotfiles/.claude/rules/` | Applied to every conversation |
-| Global settings | `dotfiles/.claude/settings.json` | Model, permissions, hooks |
+| Claude Code skills | `dotfiles/dot-claude/skills/` | Workflow automation, tool wrappers, etc. |
+| Global rules | `dotfiles/dot-claude/rules/` | Applied to every conversation |
+| Global settings | `dotfiles/dot-claude/settings.json` | Model, permissions, hooks |
 | Externally managed skills | `dotfiles/.agents/skills/` | Externally managed skills |
 
 ### Tools (tools/)

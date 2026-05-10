@@ -48,7 +48,7 @@ Keep `SKILL.md` under ~100 lines. If the body would exceed that, has distinct su
 
 If the skill needs helper scripts, put them in `scripts/` and reference them with relative links from SKILL.md (`[check.py](scripts/check.py)`). The skill-bundle `scripts/` is distinct from any project-root `scripts/`; both may coexist.
 
-Place the skill bundle in the project's `.claude/skills/` if it's project-local, or in the dotfiles repo's `dotfiles/.claude/skills/` for cross-project skills.
+Place the skill bundle in the project's `.claude/skills/` if it's project-local, or in the dotfiles repo's `dotfiles/dot-claude/skills/` for cross-project skills.
 
 ## 5. Draft
 

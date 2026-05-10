@@ -2,17 +2,17 @@
 
 Claude Code configuration — skills, rules, settings, and hooks — managed via GNU Stow.
 
-Stow symlinks the contents of this directory into `$HOME`, so `~/.claude/`, `~/.agents/`, and `~/.dhub/` all point back here.
+Stow links `.agents/`, `.bashrc.d/`, and `bin/` into `$HOME`. The contents of `dot-claude/` are stowed into `~/.claude/` separately (the source is named `dot-claude` rather than `.claude` so Claude Code's hardcoded protected-paths prompt does not fire when editing files under it).
 
 ## Structure
 
 ```
-.claude/
+dot-claude/
   skills/      Claude Code skills (SDD workflow, commit, tool wrappers, etc.)
   rules/       Global rules applied to every conversation
+  hooks/       Claude Code hook scripts
   settings.json          Global Claude Code settings (model, permissions, hooks)
 .agents/skills/    Externally managed skills
-.dhub/skills/      Externally managed skills
 .bashrc.d/         Bash snippets auto-sourced by Fedora's stock ~/.bashrc
 bin/
   sync-dotfiles.sh   Stow sync — run after adding or removing files

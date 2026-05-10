@@ -53,10 +53,26 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 
 Hook configuration lives in `.pre-commit-config.yaml` at this repo's root and is the **canonical workspace config**. Other workspace repos symlink it (`ln -s ~/workspace/dev-playbook/.pre-commit-config.yaml .pre-commit-config.yaml`) so any hook added here flows to every repo on the next commit. Each validator is responsible for finding its own targets from cwd and exiting 0 silently when there are none, so the same invocation is safe in a repo that has nothing to audit.
 
+#### Three-environment contract
+
+Every `local` hook entry runs in three environments and MUST work in all of them:
+
+1. **dev-playbook locally** — `.pre-commit-config.yaml` is the real file.
+2. **Consumer repos locally** — `.pre-commit-config.yaml` is a *symlink* back to dev-playbook.
+3. **GitHub Actions runner** — repo checked out at an arbitrary path; no `$HOME` paths exist.
+
+Hardcoded absolute paths under `$HOME` break (3). Cwd-relative paths break (2). The working pattern is to resolve dev-playbook's root via `realpath .pre-commit-config.yaml` and build the tool path from there, e.g.:
+
+```yaml
+entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/your-tool" "$@"' --
+```
+
+When changing a hook entry, walk all three environments before pushing. Past failures (CI 403/404 on `tools/bin/...`) trace back to skipping environment (3) in review.
+
 To add a new validation script:
 
 1. Write the script under `bin/`. Discover targets relative to cwd; exit 0 silently when none exist.
-2. Add a `local` hook entry to `.pre-commit-config.yaml` using an absolute path in `entry` (so the symlink resolves correctly from any consumer's cwd). Use the existing entries as a model for `language: system`, `pass_filenames`, `types`, `always_run`.
+2. Add a `local` hook entry to `.pre-commit-config.yaml`. Resolve the tool's path via `realpath .pre-commit-config.yaml` (consumer repos symlink the config back to dev-playbook; in dev-playbook itself `realpath` returns the local file). Use the existing entries as a model for `language: system`, `pass_filenames`, `types`, `always_run`.
 3. Run `pre-commit run --all-files` in dev-playbook and at least one consumer repo to confirm both pass.
 
 #### Utility scripts
@@ -96,7 +112,7 @@ Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok` o
 
 ### internal-skill-audit
 
-Audit internal skill bundles for conformance against [skill-conventions.md](../standards/skill-conventions.md). Walks two skill roots when present in the target directory: `.claude/skills/` (project-level skills, any repo) and `dotfiles/.claude/skills/` (workspace-global skills, dev-playbook only). Externally-managed skills — bundle directories that are symlinks, typically into `dotfiles/.agents/skills/` — are skipped, since their conformance is the upstream's concern.
+Audit internal skill bundles for conformance against [skill-conventions.md](../standards/skill-conventions.md). Walks two skill roots when present in the target directory: `.claude/skills/` (project-level skills, any repo) and `dotfiles/dot-claude/skills/` (workspace-global skills, dev-playbook only). Externally-managed skills — bundle directories that are symlinks, typically into `dotfiles/.agents/skills/` — are skipped, since their conformance is the upstream's concern.
 
 ```bash
 internal-skill-audit [directory]

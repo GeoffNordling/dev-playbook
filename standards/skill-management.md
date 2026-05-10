@@ -12,20 +12,20 @@ Failure modes of piecemeal adoption from an opinionated framework: voice fragmen
 
 | Path under `dotfiles/` | Source | Editable |
 |---|---|---|
-| `.claude/skills/` | Authored in this workspace, plus symlinks mirroring `.agents/skills/` | Yes for authored entries; symlinks are managed by `bin/sync-dotfiles.sh` |
+| `dot-claude/skills/` | Authored in this workspace, plus symlinks mirroring `.agents/skills/` | Yes for authored entries; symlinks are managed by `bin/sync-dotfiles.sh` |
 | `.agents/skills/` | Installed by the Vercel `skills` CLI | No — overwritten on update |
 
-Stow links these directories into `~/` so the canonical content lives in the git-tracked dotfiles tree.
+Stow links `dot-claude/` into `~/.claude/` and `.agents/` into `~/.agents/`, so Claude Code reads the canonical content from the git-tracked dotfiles tree.
 
 ## Mirror rule
 
-Claude Code discovers skills only from `.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `.claude/skills/` pointing at it (`.claude/skills/<name>` → `../../.agents/skills/<name>`). `bin/sync-dotfiles.sh` enforces this on every run: it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
+Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `dot-claude/skills/` pointing at it (`dot-claude/skills/<name>` → `../../.agents/skills/<name>`). `bin/sync-dotfiles.sh` enforces this on every run: it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
 
 After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror.
 
 ## Authored Skills
 
-Skills written for this workspace live in `dotfiles/.claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md) for the format.
+Skills written for this workspace live in `dotfiles/dot-claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md) for the format.
 
 ## Third-Party Skills
 

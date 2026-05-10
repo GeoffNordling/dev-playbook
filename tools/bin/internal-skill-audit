@@ -5,8 +5,8 @@ Scans skill bundles authored in this repo against the conventions in
 dev-playbook's standards/skill-conventions.md. Two skill roots are checked
 when present in the target directory:
 
-  - .claude/skills/             (project-level skills, any repo)
-  - dotfiles/.claude/skills/    (workspace-global skills, dev-playbook only)
+  - .claude/skills/                (project-level skills, any repo)
+  - dotfiles/dot-claude/skills/    (workspace-global skills, dev-playbook only)
 
 Externally-managed skills (those whose bundle directory is a symlink,
 typically pointing into dotfiles/.agents/skills/) are skipped — their
