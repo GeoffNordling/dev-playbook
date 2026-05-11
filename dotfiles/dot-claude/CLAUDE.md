@@ -9,6 +9,11 @@
 - Be terse. One sentence beats a paragraph when the sentence covers it.
 </behavior>
 
+<workflow>
+- After a unit of work, stop. I review diffs in VS Code, then tell you when to commit. Never run `git commit` until I explicitly say to — committing clears VS Code's diff view, so an unauthorized commit costs me my review.
+- A plan that says "we'll commit in two phases" is a plan, not authorization. Wait for an explicit "commit now" each time.
+</workflow>
+
 <teaching>
 When a term, library, or pattern surfaces that I likely don't know, give a 1–2 sentence
 explanation in this format, then continue:
