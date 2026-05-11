@@ -11,52 +11,86 @@ argument-hint: "<issue-number>"
 
 Author the project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — following the workspace SDD standards.
 
-## First steps
+The flow has three phases: context loading, interview-driven planning, skeleton-then-prose drafting. The interview is the value of this skill.<!--  -->
+
+## 1. Context loading
 
 1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
-   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — item anatomy, IDs, artifact types, coverage chain, keyword reference, EARS prose rules, file organization. The full grammar.
+   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
+   - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
    - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
-   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, workflow`.
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, lessons, workflow`.
 2. **Run `pwd`.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
 3. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
 4. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). All subsequent steps run inside it.
+5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
 6. Read the project's existing specs:
-   - `specs/functional_requirements.md` (or `specs/functional_requirements/index.md` for folder-form).
-   - `CONTEXT.md` for domain vocabulary.
+   - `specs/functional_requirements.md` (or folder-form).
+   - `CONTEXT.md` for domain vocabulary, if present.
 7. Read the project's `CLAUDE.md`.
-8. Tell the user what you found and align on scope.
 
-## Mandatory plan gate
+## 2. Area discovery interview
 
-Before drafting any spec text, present a written plan covering scope (which areas you will specify) and approach (key behaviours to capture, ambiguities to resolve). Wait for explicit user approval. Silence is not approval.
+Before any planning, ask the user which behavior areas matter. Start with this small list:
 
-## Drafting
+- **Success path.** The headline behavior the feat exists for.
+- **Edge / error behavior.** What counts as malformed; raise vs return-as-data; what's silently accepted.
+- **Scope boundary.** What's explicitly out of scope for this feat.
 
-- Use the interview pattern. Ask clarifying questions about behaviour, scope, and edge cases before drafting. Surface ambiguities before encoding assumptions.
+Other areas may surface naturally as the conversation goes — add them as they come up rather than enumerating up front.
+
+Surface these to the user with your judgment on which look load-bearing for this issue. Ask the user to confirm, add areas you missed, and drop areas they don't care about.
+
+## 3. Per-area preference interview
+
+For each flagged area, surface the real choices as options with brief pros/cons and a recommendation. Use the AskUserQuestion tool when the area has discrete options.
+
+## 4. Plan synthesis
+
+Present a plan for explicit approval:
+
+- **Scope.** Which behaviors this pass captures, and which `req` covers each.
+- **Skeletons.** For each planned `feat` / `req`: id + heading + role + `Covers:` + `Needs:`. No `Description:` prose yet.
+- **Decisions made.** Obligation level, granularity, edge-case treatment, etc., as resolved by interview.
+- **Decisions deferred.** Anything still open.
+
+Wait for approval before drafting prose.
+
+## 5. Drafting
+
+Principles:
+
+- **Skeleton holds.** The `Covers:` and `Needs:` lines from the plan are locked. Add prose now.
+- **Minimum viable shape.** Each `req` commits to one checkable behavior. Don't add a clause unless it adds a check.
+- **Behavior, not method.** Describe what holds, not how. Implementation choices belong in the design phase.
+- **One obligation level per item.** If `SHALL` and `SHOULD` content mixes, split into separate items.
+- **Non-mandatory inclusion is a commitment.** Including a `SHOULD` / `MAY` means you intend to deliver it.
+- **No roadmap in `Comment:`.** Comments describe the current item; future plans live on the GitHub tracker. Often, `Comment:` is omitted.
+
+Mechanics:
+
+- Write each item per the spec standard. `Description:` follows the spec standard's EARS templates and obligation vocabulary.
 - Invoke /grill-with-docs when domain terminology is fuzzy or `CONTEXT.md` needs updating.
-- Write each item per the spec standard: backticked `type~name~revision` ID, `Description:` body using EARS templates and obligation vocabulary, `Covers:` for non-roots, `Needs:` for chain continuation.
-- One obligation level per item. If `SHALL` and `SHOULD` content mixes, split into separate items.
-- Out-of-scope sections: ask the user whether anything belongs there. If yes, capture it. If no, write the section with `NA`.
+- Each `feat` has an out-of-scope section. Ask whether anything belongs there; if not, `NA` is fine.
+- Reference relevant ADRs rather than re-explaining them.
 
-## Closing review pass
+## 6. Closing review pass
 
-Before declaring the phase done, run the rubric. Each item is a yes/no check.
+Re-read each new `feat` / `req`:
 
-- [ ] Every `req` has a `Covers:` to a `feat` (or is a root)?
-- [ ] Every `Description:` uses an EARS sentence template?
-- [ ] Each item has exactly one obligation level (no `SHALL` mixed with `SHOULD`)?
-- [ ] Every item declares `Needs:` or carries `AgentReview:` (no silent chain termination)?
-- [ ] Every `feat`'s out-of-scope section is answered (`NA` is fine)?
+- [ ] Chains up to a `feat` via `Covers:` (or is a root). `Needs:` declares verification.
+- [ ] `Description:` conforms to the spec standard (EARS template, single obligation level).
+- [ ] Honors the section 5 principles: minimum viable shape, behavior not method, no roadmap in `Comment:`.
+- [ ] Every `feat`'s out-of-scope section is answered (`NA` is fine).
 
-Surface failures and iterate until the rubric is clean.
+Iterate until clean.
 
-## Closing the phase
+## 7. Closing the phase
 
 When the user approves and the rubric passes:
 
-1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined for the project (e.g., a greenfield repo with no tests yet), note the absence and continue. If any defined command fails, stop and surface the failure — it may have been introduced by this phase or pre-date it, but it must be visible and resolved before the phase closes. Do not commit or bump the phase label on a red tree.
+1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined, note the absence and continue. If any defined command fails, stop and surface it. Do not commit or bump the phase label on a red tree.
 2. Run /commit to commit the spec markdown.
 3. Bump the issue's phase label:
    ```bash
