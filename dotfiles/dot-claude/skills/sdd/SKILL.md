@@ -16,10 +16,16 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
 ## First steps
 
 1. **Run `pwd` first.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the repo.
-2. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
-3. Run `gh-show $ARGUMENTS` to load the issue.
-4. **Verify the `sdd` label.** If absent, refuse: "Issue #N is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
-5. **Read the `phase/*` label** and dispatch:
+2. **Confirm local `main` is current.** Compare local and remote `main` SHAs:
+   ```bash
+   git rev-parse main
+   gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
+   ```
+   If they differ, stop and tell the user: "Local `main` is behind `origin/main` — `git pull` on `main` before starting the phase (YubiKey tap required; the agent does not hold the SSH credential)." Do not proceed until the user confirms.
+3. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
+4. Run `gh-show $ARGUMENTS` to load the issue.
+5. **Verify the `sdd` label.** If absent, refuse: "Issue #N is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
+6. **Read the `phase/*` label** and dispatch:
 
 | Label | Invoke |
 |---|---|

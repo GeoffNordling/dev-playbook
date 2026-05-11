@@ -112,6 +112,7 @@ When all chunks are complete, the suite is green, lint/format/typecheck pass, an
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase/build" --add-label "phase/review"
    ```
+7. **Remind the user before exiting:** "After the PR merges, `git pull` on `main` (YubiKey tap required) and run `worktree-sweep` to clean up the worktree."
 
 ## Session handoff
 
