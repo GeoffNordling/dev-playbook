@@ -37,11 +37,11 @@
       "Bash(gh pr lock *)",
       "Bash(gh pr unlock *)"
     ],
-    "_denyNotes": "EnterWorktree/ExitWorktree denied so every session uses the manual worktree-per-issue flow in standards/issue-implementation.md (git worktree add .claude/worktrees/<name> + cd) — uniform across agents, humans, and fresh terminals.",
     "deny": [
       "EnterWorktree",
       "ExitWorktree"
-    ]
+    ],
+    "_denyNotes": "EnterWorktree/ExitWorktree denied so every session uses the manual worktree-per-issue flow in standards/issue-implementation.md (git worktree add .claude/worktrees/<name> + cd) — uniform across agents, humans, and fresh terminals."
   },
   "hooks": {
     "Stop": [
@@ -85,5 +85,6 @@
   },
   "autoMemoryEnabled": false,
   "theme": "light",
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "agentPushNotifEnabled": true
 }

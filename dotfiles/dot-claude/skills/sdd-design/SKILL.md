@@ -11,11 +11,13 @@ argument-hint: "<issue-number>"
 
 Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements.
 
-## First steps
+The flow has three phases: context loading, interview-driven planning, skeleton-then-prose drafting. The interview is the value of this skill.<!--  -->
+
+## 1. Context loading
 
 1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
    - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
-   - [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing and the four design dimensions (Data, API Shape, Algorithms, Composition).
+   - [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing.
    - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
    - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
@@ -29,42 +31,71 @@ Author the project's design layer — `dsn` items pinning `Interface:` lines and
    - `specs/design.md` (or folder-form).
    - `docs/adr/` for prior decisions in the area being designed.
 7. Read the project's `CLAUDE.md`.
-8. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies. Record reasoning in each `dsn`'s `Rationale:`.
-9. Tell the user what you found and align on scope.
+8. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies.
 
-## Mandatory plan gate
+## 2. Area discovery interview
 
-Before drafting `dsn` text, present a plan covering scope (which requirements the design pass will cover) and approach (the seams you anticipate, the public surfaces you intend to pin). Wait for explicit user approval.
+Before any planning, ask the user which design areas matter. Common areas:
 
-## Drafting
+- **Data shapes.** Field count and types on each proposed dataclass / exception.
+- **API shape.** Public function signatures, module structure.
+- **Exception strategy.** Plain `ValueError` vs structured exception types; raise-vs-return-as-data.
+- **Naming.** Type and symbol names — each name's semantic load should read clearly.
+- **CLI shape.** Subcommand dispatcher vs independent scripts; flag conventions.
+- **Cross-cutting infrastructure.** Loaders, central types, dispatchers, etc.
+- **Output format / packaging detail.** Whether the design pins these or leaves them to the build phase.
+- **Module decomposition.** One module per `feat` vs grouping; where new modules sit.
 
-- Walk the dimensions in canonical order: Data first, then API Shape, then Algorithms, then Composition.
+Surface these to the user with your judgment on which look load-bearing for this issue. Ask the user to confirm, add areas you missed, and drop areas they don't care about.
+
+## 3. Per-area preference interview
+
+For each flagged area, surface the real choices as options with brief pros/cons and a recommendation. Use the AskUserQuestion tool when the area has discrete options.
+
+## 4. Plan synthesis
+
+Present a plan for explicit approval:
+
+- **Scope.** Which requirements this pass covers, and which `dsn` satisfies each.
+- **Skeletons.** For each planned `dsn`: id + heading + role + proposed `Interface:` line(s) + `Covers:` + `Needs:` + `Depends:`. No prose yet.
+- **Decisions made.** Type names, exception strategy, CLI shape, etc., as resolved by interview.
+- **Decisions deferred.** Anything still open.
+
+Wait for approval before drafting prose.
+
+## 5. Drafting
+
+Principles:
+
+- **Skeleton holds.** The `Interface:`, `Covers:`, `Needs:`, `Depends:` lines from the plan are locked. Add prose now.
+- **Minimum viable shape.** Don't add a field, method, or new type unless you can name its caller. Prefer two fields over four.
+- **Don't pin implementation.** Output format, packaging, internal walk shape, file paths — leave to the build phase unless a req constrains them.
+- **No roadmap in `Comment:`.** Comments describe the current `dsn`; future plans live on the GitHub tracker. Often, `Comment:` is omitted.
+
+Mechanics:
+
 - When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small-interface-deep-implementation, accept dependencies, return results, keep surface small.
-- Write each `dsn` per the spec standard. `Interface:` lines fully qualify symbol paths and use the workspace annotation idiom (built-in generics, `X | None` for optional, no `typing.List`).
-- Use the interview pattern. Invoke /grill-with-docs when public-boundary terminology needs sharpening.
-- For seam-finding or evaluating module depth larger than one item, **ask the user to open a fresh terminal** and invoke /improve-codebase-architecture there. Bring back its proposals through edits to this design pass.
-- Reference relevant ADRs rather than re-explaining their reasoning. Propose a new ADR if a significant new architectural decision emerges.
+- Write each `dsn` per the spec standard. `Interface:` lines fully qualify symbol paths and follow the spec standard's annotation idiom.
+- Invoke /grill-with-docs when public-boundary terminology needs sharpening.
+- For seam-finding or evaluating module depth larger than one item, **ask the user to open a fresh terminal** and invoke /improve-codebase-architecture there. Bring back its proposals through edits.
+- Reference relevant ADRs rather than re-explaining them. Propose a new ADR for significant architectural decisions.
 - Non-mandatory requirements (`SHOULD`, `MAY`) are optional in the design spec. Including one is a commitment to deliver it.
 
-Stubs are not produced here. `sdd-tdd` creates them lazily on first contact with a test, matching each committed `Interface:` verbatim.
+## 6. Closing review pass
 
-## Closing review pass
+Re-read each new `dsn`:
 
-Before declaring the phase done, run the rubric. Each item is a yes/no check.
+- [ ] Chains up to a `req` via `Covers:` (or is a root). `Needs:` declares verification.
+- [ ] `Interface:` annotations and obligation prose conform to the spec standard.
+- [ ] Honors the section 5 principles: minimum viable shape, no implementation pinning, no roadmap in `Comment:`.
 
-- [ ] Every `dsn` has a `Covers:` to a `req` (or is a root)?
-- [ ] Every `Interface:` is matched by a behavioural commitment in `Description:` (not a signature in isolation)?
-- [ ] Every `Interface:` uses the workspace annotation idiom (built-in generics, `X | None`, no `typing.List`)?
-- [ ] Every `dsn` declares `Needs:` or carries `AgentReview:`?
-- [ ] Every standard rule the design leans on is named explicitly (cited ADRs, `module-design.md`)?
+Iterate until clean.
 
-Surface failures and iterate until the rubric is clean.
-
-## Closing the phase
+## 7. Closing the phase
 
 When the user approves and the rubric passes:
 
-1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined for the project (e.g., a greenfield repo with no tests yet), note the absence and continue. If any defined command fails, stop and surface the failure — it may have been introduced by this phase or pre-date it, but it must be visible and resolved before the phase closes. Do not commit or bump the phase label on a red tree.
+1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined, note the absence and continue. If any defined command fails, stop and surface it. Do not commit or bump the phase label on a red tree.
 2. Run /commit to commit the design spec.
 3. Bump the issue's phase label:
    ```bash
