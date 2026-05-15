@@ -17,5 +17,6 @@ Cross-project engineering standards that apply to all repositories in the worksp
 | [module-design.md](module-design.md) | Module design rules: principles, deep modules, designing for testability |
 | [dependency-taxonomy.md](dependency-taxonomy.md) | Dependency categories (in-process, local-substitutable, remote-but-owned, true-external) and seam discipline |
 | [python-conventions.md](python-conventions.md) | Default Python conventions and anti-pattern catalog |
+| [python-project-conventions.md](python-project-conventions.md) | Python project structure, `pyproject.toml` shape, and tool config |
 | [testing-conventions.md](testing-conventions.md) | Default pytest conventions: structure, test doubles, fixtures |
 | [build-conventions.md](build-conventions.md) | Standard `Makefile` targets (`format`, `lint`, `typecheck`, `test`, `check`) for Python sub-projects |

@@ -44,6 +44,48 @@ Whether the file is required or optional.
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. See [ADR conventions](#adr-conventions) for numbering, template, and offer-gate. |
 | `CONTEXT.md` | Human + Agent | Optional | Domain glossary at the repo root: canonical terms, their relationships, and illustrative scenarios. Created lazily as terminology ambiguity surfaces; do not pre-populate. See [CONTEXT.md format](#contextmd-format) for the structure. |
 | `<sub-project>/CLAUDE.md` | Agent | Optional | Sub-project rules within a repo, when the repo holds distinct sub-projects with divergent operating conventions. See [CLAUDE.md hierarchy](#claudemd-hierarchy). |
+| `.gitignore` | Tooling | Required | Git ignore rules. Every repo has one. See [.gitignore Baseline](#gitignore-baseline). |
+
+## README.md Baseline
+
+Every workspace repo's `README.md` starts from this baseline:
+
+````markdown
+# <repo-name>
+
+<one-line purpose>
+````
+
+This is the floor, not the ceiling. README depth varies by project — see
+"Scope is standardized; depth is not." A README `MAY` add prerequisites,
+quick-start, architecture overview, or examples as the project earns
+them.
+
+## CLAUDE.md Baseline
+
+Every workspace repo's `CLAUDE.md` starts from this baseline:
+
+````markdown
+# <repo-name>
+
+## Rules
+
+- See README.md for what this project is.
+
+## Build
+
+`make check` runs the full check surface. See
+[build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md).
+
+## Workflow
+
+Issue-to-PR flow per
+[workflow.md](~/workspace/dev-playbook/standards/workflow.md).
+````
+
+The `## Build` section applies only to Python repos. Meta/docs-only repos
+omit it. Project-specific operating rules accumulate under `## Rules` as
+the repo evolves.
 
 ## CLAUDE.md hierarchy
 
@@ -108,6 +150,29 @@ _Avoid_: Client, buyer, account
 ### Location
 
 One `CONTEXT.md` at the repo root.
+
+## .gitignore Baseline
+
+Every workspace repo's `.gitignore` includes these baseline entries:
+
+```
+.DS_Store
+__pycache__/
+*.pyc
+
+# python tooling caches
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# per-issue git worktrees — keeps the main checkout's `git status` clean;
+# does not affect commits/pushes from inside a worktree
+.claude/worktrees/
+```
+
+Repos `MAY` extend with project-specific paths. Python tooling entries
+are harmless in non-Python repos and stay for uniformity.
 
 ## Cross-References
 

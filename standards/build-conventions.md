@@ -49,6 +49,26 @@ Rationale: a single named entry point for "all checks" is the contract that
 issues, CI, and pre-push hooks reference. Without it, every consumer has to
 list the individual targets and stay in sync as the set evolves.
 
+## Pre-commit Config: Consumer Repo Opt-in
+
+Workspace repos opt into the shared pre-commit hook set by symlinking their
+`.pre-commit-config.yaml` to dev-playbook's:
+
+```bash
+ln -s ~/workspace/dev-playbook/.pre-commit-config.yaml .pre-commit-config.yaml
+```
+
+Rationale: one source of truth for hooks across the workspace. Updates to
+dev-playbook's config propagate to every consumer repo without per-repo
+maintenance. The shared config's hook entries resolve dev-playbook's path
+via `realpath` on the symlink, so the same `.pre-commit-config.yaml` works
+in dev-playbook itself, in symlinked consumers, and on the GitHub Actions
+runner (see the header comment in `.pre-commit-config.yaml` for the
+pattern).
+
+Meta repos that author the config (e.g. `dev-playbook` itself) keep the
+real file; everything else symlinks.
+
 ## Pre-commit vs. `make check`
 
 Pre-commit and `make check` are complementary, not duplicative.
