@@ -39,13 +39,6 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 
 Cross-project engineering standards. See [standards/README.md](standards/README.md) for the index.
 
-### SDD standards and spec-tools
-
-The workspace SDD standard and its companion Python package now live in their
-own repo: [`~/workspace/spec-tools/`](~/workspace/spec-tools/). See
-[ADR-0001 in spec-tools](~/workspace/spec-tools/docs/adr/0001-extracted-from-dev-playbook.md)
-for the extraction record.
-
 ### Agent configuration (dotfiles/)
 
 Symlinked to `$HOME` via GNU Stow. Run `dotfiles/bin/sync-dotfiles.sh` after adding or removing files.
