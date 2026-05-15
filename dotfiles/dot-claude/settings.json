@@ -85,6 +85,6 @@
   },
   "autoMemoryEnabled": false,
   "theme": "light",
-  "voiceEnabled": false,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": false
 }
