@@ -110,6 +110,8 @@ ref-check [--all] [directory]
 
 Each line is a JSON object with `source`, `line`, `target`, and `status` (`ok` or `broken`). Default emits broken refs only; `--all` emits every reference. Exit code: 0 clean, 1 broken refs found, 2 cannot run (no .md files, or not a git repo).
 
+Fragment anchors (`#heading-slug`) are stripped before resolution and are intentionally **not** validated — only the file's existence is checked. A link to a real file with a stale `#section` anchor reports `ok`. Validating heading slugs is out of scope.
+
 ### internal-skill-audit
 
 Audit internal skill bundles for conformance against [skill-conventions.md](../standards/skill-conventions.md). Walks two skill roots when present in the target directory: `.claude/skills/` (project-level skills, any repo) and `dotfiles/dot-claude/skills/` (workspace-global skills, dev-playbook only). Externally-managed skills — bundle directories that are symlinks, typically into `dotfiles/.agents/skills/` — are skipped, since their conformance is the upstream's concern.

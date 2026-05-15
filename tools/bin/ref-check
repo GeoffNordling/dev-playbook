@@ -7,6 +7,10 @@ broken. References inside the invoking repo are resolved against the working
 copy (worktree-safe). References to other workspace repos are resolved
 against the absolute on-disk path. Fenced code blocks are skipped.
 
+Fragment anchors (`#heading-slug`) are stripped before resolution and are
+NOT validated — only the file's existence is checked. Anchor validation is
+intentionally out of scope; a stale `#section` on a real file reports `ok`.
+
 Output:
     stdout — JSON Lines, one record per reference: {source, line, target, status}.
              Default: only status="broken" records. With --all: every reference.
