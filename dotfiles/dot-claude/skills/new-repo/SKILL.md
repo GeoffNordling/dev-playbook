@@ -72,14 +72,43 @@ standards rather than duplicating their content.
 
 ## 5. Initialize git and create the GitHub repo
 
+Initialize the local repo:
+
 ```bash
 git init --initial-branch=main ~/workspace/<name>
-gh repo create <name> --<public|private> --description "<purpose>" --source ~/workspace/<name>
+```
+
+`gh repo create` is not used — the workspace PAT lacks the repo-creation
+scope. Hand off creation to the user via the web UI. Pre-fill the name in
+the URL so they only have to set visibility and description:
+
+```
+Create the repo in your browser:
+
+    https://github.com/new?name=<name>
+
+Settings:
+- Name: <name>
+- Description: <purpose>
+- Visibility: <public|private>
+- Do NOT initialize with README, .gitignore, or LICENSE — the local
+  scaffold already has them.
+
+Tell me once it's created.
+```
+
+Wait for the user's confirmation. Then resolve the GitHub login and wire
+up the remote (SSH, matching the workspace convention):
+
+```bash
+gh api user --jq .login
+git -C ~/workspace/<name> remote add origin git@github.com:<login>/<name>.git
 ```
 
 ## 6. Bootstrap labels
 
-`cd ~/workspace/<name>` (standalone) then:
+Requires the GitHub repo to exist. `cd ~/workspace/<name>` (standalone)
+then:
 
 ```bash
 python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
