@@ -165,3 +165,32 @@ shape going forward.
   bundles (the body prose is Pocock's, in his register) is accepted in
   exchange for not having to author the four bundles from scratch.
   Revisit if the voice mismatch becomes load-bearing in real use.
+
+## Addendum — 2026-05-18
+
+The "Per-repo Pocock content removed from this repo" cleanup above scoped
+to dev-playbook. When `spec-tools` was scaffolded under the same era's
+conventions it carried its own `docs/agents/{issue-tracker,domain}.md`
+(no `triage-labels.md`), which persisted unnoticed until surfaced by
+issue #35.
+
+Audit and disposition:
+
+- **`issue-tracker.md`** — Pocock's tracker-abstraction layer ("when a
+  skill says 'publish to the issue tracker', create a GitHub issue").
+  Obsolete; the workspace declares GitHub Issues as the sole tracker in
+  [workflow.md](~/workspace/dev-playbook/standards/workflow.md). Deleted
+  with no migration.
+- **`domain.md`** — five agent-discipline rules (read `CONTEXT.md` and
+  relevant ADRs before exploring; proceed silently on missing optional
+  docs; use glossary vocabulary in outputs; explicit disposition for
+  off-glossary concepts; flag ADR conflicts with template). All five
+  were absent from the workspace canon at the time of this ADR. Absorbed
+  into the CLAUDE.md Baseline as a new `## Domain awareness` section in
+  [repo-documentation.md](~/workspace/dev-playbook/standards/repo-documentation.md),
+  then inlined into dev-playbook's and spec-tools' root `CLAUDE.md`. File
+  deleted from spec-tools.
+
+`docs/agents/` is now empty across the workspace. The standard remains
+silent on the directory — it was never listed in the Files table; the
+silence is the answer.
