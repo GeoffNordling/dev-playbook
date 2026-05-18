@@ -1,7 +1,4 @@
-# ADR-0010: Issue Workflow Reorganization
-
-**Date:** 2026-05-10
-**Status:** Accepted
+# Issue Workflow Reorganization
 
 ## Context
 

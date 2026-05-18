@@ -10,17 +10,17 @@ This is **not authoritative**. Adoption decisions live in [`adr/`](adr/). Entrie
 
 **Source:** https://github.com/mattpocock/skills
 **Author:** Matt Pocock
-**Audited:** 2026-04-29 ([ADR-0006](adr/0006-adopt-matt-pocock-conventions.md)); revised 2026-05-09 ([ADR-0009](adr/0009-remove-pocock-direct-dependency.md))
+**Audited:** 2026-04-29 ([ADR-0001](adr/0001-adopt-matt-pocock-conventions.md)); revised 2026-05-09 ([ADR-0004](adr/0004-remove-pocock-direct-dependency.md))
 
 Bundle of agent skills covering issue management (`/triage`, `/to-issues`), grilling (`/grill-with-docs`, `/grill-me`), TDD (`/tdd`), architecture analysis (`/improve-codebase-architecture`), and small utilities (`/zoom-out`, `/caveman`). Distributed via the Vercel `skills` CLI; each skill ships with the per-repo conventions it expects (`docs/agents/{issue-tracker,triage-labels,domain}.md` files, an `## Agent skills` block in `CLAUDE.md`, `CONTEXT.md` glossary, `docs/adr/` with 4-digit numbering and offer-criteria gate, triage label vocabulary, vertical-slice issue rules).
 
-Initially adopted wholesale per [ADR-0006](adr/0006-adopt-matt-pocock-conventions.md) — skills *and* conventions, on the principle that running engineering skills without the per-repo files they expect produces degraded output. Direct dependency cut per [ADR-0009](adr/0009-remove-pocock-direct-dependency.md) once the conditions changed: spec-tools moved to its own repo and grew per-repo conventions of its own that overlapped Pocock's, so the "complements existing canon" condition from [ADR-0008](adr/0008-decline-superpowers.md) no longer held.
+Initially adopted wholesale per [ADR-0001](adr/0001-adopt-matt-pocock-conventions.md) — skills *and* conventions, on the principle that running engineering skills without the per-repo files they expect produces degraded output. Direct dependency cut per [ADR-0004](adr/0004-remove-pocock-direct-dependency.md) once the conditions changed: spec-tools moved to its own repo and grew per-repo conventions of its own that overlapped Pocock's, so the "complements existing canon" condition from [ADR-0003](adr/0003-decline-superpowers.md) no longer held.
 
 Currently: ideas absorbed into authored standards (`standards/{architecture-vocabulary,module-design,dependency-taxonomy,issue-management,adr-conventions}.md`, format sections of `standards/repo-documentation.md`); engineering skills lifted into authored bundles in `dotfiles/dot-claude/skills/{grill-with-docs,triage,to-issues,improve-codebase-architecture}/`. `/zoom-out` and `/caveman` remain as direct Vercel dependencies — tiny utility skills where lift cost ≈ drop cost.
 
 ### Watching going forward
 
-If Pocock publishes new skills or sharpens the existing bundle, route the question through the [ADR-0008](adr/0008-decline-superpowers.md) rule: do the conventions still complement existing canon, or do they compete with spec-tools / authored standards? If they complement, consider re-adopting; if they compete, harvest specific techniques into authored skills rather than reinstalling the dependency.
+If Pocock publishes new skills or sharpens the existing bundle, route the question through the [ADR-0003](adr/0003-decline-superpowers.md) rule: do the conventions still complement existing canon, or do they compete with spec-tools / authored standards? If they complement, consider re-adopting; if they compete, harvest specific techniques into authored skills rather than reinstalling the dependency.
 
 ---
 
@@ -28,13 +28,13 @@ If Pocock publishes new skills or sharpens the existing bundle, route the questi
 
 **Source:** https://github.com/obra/superpowers
 **Author:** Jesse Vincent (Prime Radiant)
-**Audited:** 2026-05-08 ([ADR-0008](adr/0008-decline-superpowers.md))
+**Audited:** 2026-05-08 ([ADR-0003](adr/0003-decline-superpowers.md))
 
 Opinionated agentic skills framework that imposes a fixed methodology on coding agents — brainstorming → writing-plans → subagent-driven-development → TDD → code review → finishing. ~10k lines of markdown across 13 skills plus a SessionStart bootstrap hook that primes every session. Distributed as plugins for seven coding-agent harnesses (Claude Code, Codex CLI/App, Cursor, Gemini CLI, OpenCode, Factory Droid, GitHub Copilot CLI). Designed for wholesale adoption; piecemeal adoption is awkward by construction — skills cross-reference each other, voice is distinctive throughout, and the methodology is coupled to the skill set.
 
 The orientation: "agents are undisciplined and will rationalize their way out of process unless bright-line rules stop them." Skills are shaped by that worldview throughout — Iron Laws, "Red Flags" rationalization tables, "your human partner" framing, ALL-CAPS XML tags. Prose is engineered using published research on persuasion (Cialdini; Meincke et al. 2025, N=28k showing compliance jumps 33% → 72% with authority/commitment/scarcity framing).
 
-Declined wholesale per [ADR-0008](adr/0008-decline-superpowers.md) because it conflicts with spec-tools SDD. But the framework contains a ton of good ideas worth tracking.
+Declined wholesale per [ADR-0003](adr/0003-decline-superpowers.md) because it conflicts with spec-tools SDD. But the framework contains a ton of good ideas worth tracking.
 
 ### Skills worth watching
 

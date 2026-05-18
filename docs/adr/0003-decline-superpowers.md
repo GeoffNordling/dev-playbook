@@ -1,7 +1,4 @@
-# ADR-0008: Decline Superpowers, Catalog Techniques
-
-**Date:** 2026-05-08
-**Status:** Accepted
+# Decline Superpowers, Catalog Techniques
 
 ## Context
 
@@ -51,13 +48,13 @@ investments that Superpowers conflicts with:
   collection-time validation. Superpowers' `brainstorming` and
   `writing-plans` produce prose specs and plans without traceability or
   machine validation. This is the same prose-spec category
-  [ADR-0006](0006-adopt-matt-pocock-conventions.md) rejected for Matt
+  [ADR-0001](0001-adopt-matt-pocock-conventions.md) rejected for Matt
   Pocock's `/to-prd`. The reasoning applies identically.
 - **Matt Pocock's conventions** (adopted in
-  [ADR-0006](0006-adopt-matt-pocock-conventions.md)) — `/tdd`,
+  [ADR-0001](0001-adopt-matt-pocock-conventions.md)) — `/tdd`,
   `/to-issues`, `/triage`, the issue-tracker per-repo configuration, and
   the vertical-slice breakdown rules. Superpowers' `test-driven-development`
-  competes directly with `/tdd` (canonicalized in ADR-0006), and
+  competes directly with `/tdd` (canonicalized in ADR-0001), and
   Superpowers has no issue-tracker layer.
 
 Superpowers asks for retiring both. The case for that exchange is not
@@ -100,13 +97,13 @@ skills). We declined.
 
 This is the second luminary pull this workspace has audited (Pocock,
 now Superpowers). The pattern will recur. Promote the implicit rule
-from ADR-0006 into an explicit workspace principle:
+from ADR-0001 into an explicit workspace principle:
 
 > **Adopt third-party skills only when their conventions integrate
 > cleanly with existing canon. Otherwise harvest techniques into
 > authored skills, not foreign skills into the toolbox.**
 
-ADR-0006 implicitly applied this rule — Pocock's skills came with
+ADR-0001 implicitly applied this rule — Pocock's skills came with
 per-repo configuration that complemented existing standards.
 Superpowers' skills come with a methodology that competes with existing
 canon. That asymmetry is the rule, generalized.
@@ -138,7 +135,7 @@ install Superpowers content as a foreign skill.
 
 | Alternative | Why rejected |
 |---|---|
-| Adopt Superpowers wholesale | Retires the spec-tools SDD layer and the Pocock `/tdd` canonicalization from ADR-0006. The case for that exchange is not made by anything in Superpowers. |
+| Adopt Superpowers wholesale | Retires the spec-tools SDD layer and the Pocock `/tdd` canonicalization from ADR-0001. The case for that exchange is not made by anything in Superpowers. |
 | Adopt three gap-filler skills as third-party dependencies (`requesting-code-review`, `verification-before-completion`, `systematic-debugging`) | Voice fragmentation, cross-reference fragility, semantic drift on update, no clean convention boundary. Piecemeal adoption opens a can of SpaghettiOs. |
 | Copy skill prose into authored skills, citing the source | One-time copy that drifts from upstream as Superpowers updates. Worst of both worlds — neither tracked dependency nor independent authorship. |
 | Install only `superpowers:writing-skills` for `persuasion-principles.md` | Importing an opinionated meta-bundle imports its worldview about how skills should be authored. The principles can be cited from the upstream URL without installation. |
@@ -149,7 +146,7 @@ install Superpowers content as a foreign skill.
 
 - No changes to `dotfiles/.agents/.skill-lock.json`. No new third-party
   skills installed.
-- ADR-0008 stands as the workspace's documented position on Superpowers;
+- ADR-0003 stands as the workspace's documented position on Superpowers;
   future questions about it route here.
 - New workspace principle ("Adopt third-party skills only when their
   conventions integrate cleanly with existing canon. Otherwise harvest
@@ -157,7 +154,7 @@ install Superpowers content as a foreign skill.
   applies to future luminary-driven framework pulls. The same rule was
   re-applied to Pocock himself once spec-tools' growth changed the
   convention landscape; see
-  [ADR-0009](0009-remove-pocock-direct-dependency.md).
+  [ADR-0004](0004-remove-pocock-direct-dependency.md).
 - Open follow-ups (deliberately deferred):
   - SessionStart hook as a workspace-wide priming mechanism, if a
     concrete priming need surfaces.
@@ -168,8 +165,8 @@ install Superpowers content as a foreign skill.
     `standards/skill-conventions.md`, if persuasion-principle guidance
     becomes useful for future authored skills.
 - The SDD-extension bet (from
-  [ADR-0005](0005-workspace-sdd-standard.md), reaffirmed in
-  [ADR-0006](0006-adopt-matt-pocock-conventions.md)) remains testable.
+  [spec-tools ADR-0005](~/workspace/spec-tools/docs/adr/0005-workspace-sdd-standard.md), reaffirmed in
+  [ADR-0001](0001-adopt-matt-pocock-conventions.md)) remains testable.
   If conventional prose-spec workflows like Superpowers' `brainstorming` +
   `writing-plans` outperform spec-tools' SDD layer in practice with
   current-state coding agents, this ADR's wholesale rejection should be

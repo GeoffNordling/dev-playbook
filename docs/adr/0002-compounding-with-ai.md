@@ -1,8 +1,4 @@
-# ADR-0007: Compounding workflow with AI
-
-**Date:** 2026-05-07
-**Status:** Accepted
-**Source:** [How to Work and Compound with AI](https://eugeneyan.com/writing/working-with-ai/) (Eugene Yan)
+# Compounding workflow with AI
 
 ## Context
 
