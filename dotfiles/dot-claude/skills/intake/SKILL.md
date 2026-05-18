@@ -34,9 +34,10 @@ If the idea is a plan that crosses concerns or layers → break into vertical sl
 
 ### 3. For each issue, decide
 
-- **Category** — `bug` or `enhancement`.
-- **SDD?** — apply `sdd` if the repo uses SDD and this issue's implementation will follow the spec → design → TDD path. A trivial issue in an SDD repo may not need full ceremony — your call.
-- **First phase** — `phase/requirements` if SDD, `phase/build` if not.
+- **Category** — `bug`, `enhancement`, or `chore`.
+  - `chore` covers housekeeping (config tweaks, dep bumps, doc relocations, label-scheme audits) and watch-and-wait reminders (revisit-when-data-arrives tickets) — anything that doesn't change product behavior.
+- **SDD?** — apply `sdd` if the repo uses SDD and this issue's implementation will follow the spec → design → TDD path. A trivial issue in an SDD repo may not need full ceremony — your call. Chores skip `sdd` by default.
+- **First phase** — `phase/requirements` if SDD, `phase/build` if not. Chores typically carry no `phase/*` label; add `phase/build` only if the chore is substantial enough to want a real PR cycle visible in the phase view.
 
 ### 4. Write the issue
 

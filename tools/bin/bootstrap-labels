@@ -14,6 +14,11 @@ LABELS: list[tuple[str, str, str]] = [
     # (name, color, description)
     ("bug", "d73a4a", "Something isn't working"),
     ("enhancement", "a2eeef", "New feature or request"),
+    (
+        "chore",
+        "c5def5",
+        "Housekeeping or watch-and-wait reminder; no product behavior change",
+    ),
     ("sdd", "5319e7", "SDD ceremony applies (spec, design, TDD)"),
     ("phase/requirements", "0e8a16", "In requirements phase"),
     ("phase/design", "1d76db", "In design phase"),

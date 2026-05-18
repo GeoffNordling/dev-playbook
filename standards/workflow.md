@@ -19,13 +19,15 @@ Three orthogonal label tracks plus a closing label:
 
 | Track | Values | Meaning |
 |---|---|---|
-| Category | `bug`, `enhancement` | What kind of work it is |
+| Category | `bug`, `enhancement`, `chore` | What kind of work it is |
 | Mode | `sdd` (presence) | Whether SDD ceremony applies |
 | Phase | `phase/requirements`, `phase/design`, `phase/build`, `phase/review` | Where in the journey |
 
 Closing: `wontfix` (apply, then `gh issue close`).
 
 The `phase/*` track is the visible state of the issue. An agent or human opening the issue sees the current phase without exploring the codebase.
+
+`chore` covers housekeeping (config tweaks, dep bumps, doc relocations, label-scheme audits) and watch-and-wait reminders (revisit-when-data-arrives tickets). Chores skip `sdd` and the `phase/*` track by default — apply only the `chore` label and let the body explain. A chore may carry `phase/build` if it's substantial enough to want a real PR cycle visible in the phase view; otherwise leave un-phased.
 
 ## Bootstrapping labels
 
@@ -45,17 +47,18 @@ python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
           │
           ▼
    issue(s) born ready, labeled:
-      bug | enhancement
-      sdd? (presence)
+      bug | enhancement | chore
+      sdd? (presence; chores skip)
       phase/requirements  (sdd) or phase/build (non-sdd)
+      chores: typically no phase/* label
           │
-   ┌──────┴──────┐
-   ▼             ▼
- [sdd]        [non-sdd]
-   │             │
-   ▼             ▼
- /sdd <N>    plain chat:
- dispatcher  "work on issue N, no sdd"
+   ┌──────┴──────┬──────────────┐
+   ▼             ▼              ▼
+ [sdd]        [non-sdd]      [chore]
+   │             │              │
+   ▼             ▼              ▼
+ /sdd <N>    plain chat:    do whenever;
+ dispatcher  "work on issue N, no sdd"   no dispatcher
    │             │
    │   reads phase/* label,
    │   runs the matching skill,
