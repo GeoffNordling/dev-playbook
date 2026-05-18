@@ -42,8 +42,8 @@ The literal target body for `check` is:
     	uv run mypy <code-roots>
     	uv run pytest
 
-`<code-roots>` is the project's typed source directory or directories
-(typically `src/`, plus `scripts/` when present).
+`<code-roots>` is every first-party Python directory in the repo: `src/`,
+`tests/`, and `scripts/` when present.
 
 Rationale: a single named entry point for "all checks" is the contract that
 issues, CI, and pre-push hooks reference. Without it, every consumer has to
