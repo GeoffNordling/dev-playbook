@@ -9,23 +9,22 @@ argument-hint: "<issue-number>"
 
 # SDD Dispatcher
 
-Reads the issue's `phase/*` label and invokes the matching phase skill. The phase skill performs worktree setup, runs its phase logic, bumps the label on success, and exits.
-
-For the full workflow, label scheme, and worktree convention, see the [workflow standard](~/workspace/dev-playbook/standards/workflow.md).
+Reads the issue's `phase/*` label, resolves the issue's worktree, and invokes the matching phase skill. The phase skill runs its phase logic in that worktree, bumps the label on success, and exits.
 
 ## First steps
 
-1. **Run `pwd` first.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header.
-2. **Confirm local `main` is current.** Compare local and remote `main` SHAs:
+1. **Read the [workflow standard](~/workspace/dev-playbook/standards/workflow.md).** It defines the label scheme, worktree convention, and PR mechanics this dispatcher and its phase skills implement.
+2. **Run `pwd`.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header.
+3. **Confirm local `main` is current.** Compare local and remote `main` SHAs:
    ```bash
    git rev-parse main
    gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
    ```
    If they differ, stop and tell the user: "Local `main` is behind `origin/main` — `git pull` on `main` before starting the phase (YubiKey tap required; the agent does not hold the SSH credential)." Do not proceed until the user confirms.
-3. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
-4. Run `gh-show $ARGUMENTS` to load the issue.
-5. **Verify the `sdd` label.** If absent, refuse: "Issue #<issue-number> is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
-6. **Read the `phase/*` label** and dispatch:
+4. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
+5. Run `gh-show $ARGUMENTS` to load the issue.
+6. **Verify the `sdd` label.** If absent, refuse: "Issue #<issue-number> is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
+7. **Read the `phase/*` label** and dispatch:
 
 | Label | Invoke |
 |---|---|
@@ -37,10 +36,4 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
 
 ## Worktree resolution
 
-Worktrees live at `.claude/worktrees/<issue-number>-<slug>/`. Resolve by glob `.claude/worktrees/<issue-number>-*`:
-
-- Exactly one match → enter (`cd`).
-- Zero matches → create per the [worktree convention](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). The slug is the issue title, kebab-cased and truncated.
-- Multiple matches → error and ask the user.
-
-The phase skill inherits the worktree as its working directory.
+Resolve and enter the issue's worktree per [Branch and worktree](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree) in the workflow standard. The phase skill inherits the worktree as its working directory.

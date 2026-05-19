@@ -18,9 +18,8 @@ The dispatcher has already loaded the issue (its body IS the contract) and place
    - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
    - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioural focus.
    - [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
-   - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
-   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, testing-conventions, python-conventions, workflow`.
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, testing-conventions, python-conventions`.
 
    When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) at that point.
 2. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
@@ -95,14 +94,12 @@ Bugs that surface during implementation are spec gaps. Flag the gap, propose the
 When all chunks are complete, the suite is green, lint/format/typecheck pass, and the user has approved every diff:
 
 1. **Final check sweep — leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). The chunk loop runs these per-chunk, but a final whole-tree pass catches cross-chunk regressions and any drift since the last chunk. All must pass; if anything fails, fix it and re-run. Do not push a red branch.
-2. Run /commit if there are uncommitted changes.
-3. Push (the user runs this — YubiKey tap required): `git push -u origin <branch>`.
-4. Open the PR: `gh pr create --body "Closes #<issue-number> ..."`. The `Closes` token is mandatory.
-5. Bump the issue's phase label:
+2. **Re-read the [workflow standard](~/workspace/dev-playbook/standards/workflow.md) now** — fresh, even though you may have read it previously.Then commit, push, and open the PR exactly per its `## In flight` section.
+3. Bump the issue's phase label:
    ```bash
    gh issue edit <issue-number> --remove-label "phase/build" --add-label "phase/review"
    ```
-6. **Remind the user before exiting:** "After the PR merges, `git pull` on `main` (YubiKey tap required) and run `worktree-sweep` to clean up the worktree."
+4. **Before exiting, remind the user** of the post-merge cleanup described in the workflow standard's `## Cleanup` section.
 
 ## Session handoff
 

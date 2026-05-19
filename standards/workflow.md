@@ -179,10 +179,6 @@ python3 ~/workspace/dev-playbook/tools/bin/worktree-sweep
 
 It prunes worktrees whose PR is merged with no local divergence; ambiguous cases (rejected PRs, unpushed commits, missing PRs) are reported for case-by-case handling.
 
-## Bootstrapping spec-tools
-
-The SDD skills currently fall back to manual spec validation — `spec-tools` programmatic views are not yet available. Until they are, agents check by hand: `@pytest.mark.covers(...)` IDs exist in the spec, stub signatures match `Interface:` lines verbatim, every `Needs: utest` / `Needs: itest` is satisfied by at least one marker-bearing test.
-
 ## Open questions
 
 - Where `/improve-codebase-architecture` fits in the SDD workflow beyond `sdd-design`'s explicit escape hatch is left to discover with use. Refactor pressure inside `sdd-tdd` that crosses a committed `Interface:` routes through spec amendment back to `sdd-design`, not direct architecture work.

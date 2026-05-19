@@ -19,9 +19,8 @@ The dispatcher has already loaded the issue (its body IS the contract) and place
 1. **Required reading.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
    - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
    - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
-   - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
-   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, lessons, workflow`.
+   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, lessons`.
 2. Read the project's existing specs:
    - `specs/functional_requirements.md` (or folder-form).
    - `CONTEXT.md` for domain vocabulary, if present.
