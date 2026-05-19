@@ -141,3 +141,13 @@ skills themselves.
 - The SDD-extension bet remains testable. If the extension fails to
   make SDD effective with current-state coding agents in real use,
   this ADR's PRD rejection should be revisited.
+
+## Addendum — 2026-05-19
+
+The original `/to-prd` rejection (lines 60–80, 136) framed the concern as "two sources of authority for the same pre-implementation decisions." A 2026-05-19 re-audit of the upstream skill ([mattpocock/skills `engineering/to-prd`](https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md)) surfaced three concrete frictions beyond the original framing, which should anchor any future revisit:
+
+1. **Convention mismatch with post-ADR-0004 canon.** The skill's Process section depends on `/setup-matt-pocock-skills` (dropped in [ADR-0004](0004-remove-pocock-direct-dependency.md)) and applies a `ready-for-agent` triage label not present in the workspace's `phase/*` scheme (canonicalized in [workflow.md](~/workspace/dev-playbook/standards/workflow.md) and enforced by `bootstrap-labels`).
+2. **Slot collision with `/intake`.** Both `/to-prd` and the workspace's `/intake` skill want to be the "context → tracked work item" step. Adopting `/to-prd` would force a choice of which workflow is canonical for new work.
+3. **The "ephemeral PRD" lifecycle is not enforced by the skill.** Publishing the PRD as a GitHub issue creates a persistent artifact; the discipline of closing or archiving it once `feat`/`req` items exist is not in the skill and would erode under deadline pressure. The PRD template's *Implementation Decisions* and *Testing Decisions* sections in particular overlap `dsn` items and `Needs: utest/itest` markers — encoding those decisions in prose first means `/sdd-design` becomes downstream paperwork rather than the source of truth.
+
+The revisit clause above stands. These three frictions are the specific things any future revisit must address before reversing the rejection.

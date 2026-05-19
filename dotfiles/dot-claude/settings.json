@@ -78,7 +78,7 @@
       }
     ]
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "voice": {
     "enabled": false,
     "mode": "hold"
