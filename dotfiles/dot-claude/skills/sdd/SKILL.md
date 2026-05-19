@@ -15,7 +15,7 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
 
 ## First steps
 
-1. **Run `pwd` first.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the repo.
+1. **Run `pwd` first.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header.
 2. **Confirm local `main` is current.** Compare local and remote `main` SHAs:
    ```bash
    git rev-parse main
@@ -24,7 +24,7 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
    If they differ, stop and tell the user: "Local `main` is behind `origin/main` — `git pull` on `main` before starting the phase (YubiKey tap required; the agent does not hold the SSH credential)." Do not proceed until the user confirms.
 3. **Require an issue number.** If `$ARGUMENTS` is empty, stop and tell the user to invoke with an issue number (e.g., `/sdd 18`).
 4. Run `gh-show $ARGUMENTS` to load the issue.
-5. **Verify the `sdd` label.** If absent, refuse: "Issue #N is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
+5. **Verify the `sdd` label.** If absent, refuse: "Issue #<issue-number> is not SDD-mode. Work on it without the dispatcher — open the worktree and code directly."
 6. **Read the `phase/*` label** and dispatch:
 
 | Label | Invoke |
@@ -32,12 +32,12 @@ For the full workflow, label scheme, and worktree convention, see the [workflow 
 | `phase/requirements` | sdd-requirements |
 | `phase/design` | sdd-design |
 | `phase/build` | sdd-tdd |
-| `phase/review` | Refuse: "PR is open for #N. Review and merge from there." |
-| (none) / `wontfix` | Refuse: "No active phase on #N." |
+| `phase/review` | Refuse: "PR is open for #<issue-number>. Review and merge from there." |
+| (none) / `wontfix` | Refuse: "No active phase on #<issue-number>." |
 
 ## Worktree resolution
 
-Worktrees live at `.claude/worktrees/<issue#>-<slug>/`. Resolve by glob `.claude/worktrees/<N>-*`:
+Worktrees live at `.claude/worktrees/<issue-number>-<slug>/`. Resolve by glob `.claude/worktrees/<issue-number>-*`:
 
 - Exactly one match → enter (`cd`).
 - Zero matches → create per the [worktree convention](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree). The slug is the issue title, kebab-cased and truncated.

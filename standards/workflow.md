@@ -107,7 +107,7 @@ What should happen after the work is complete. Be specific about edge cases and 
 - Things that should NOT be changed
 - Adjacent features that are separate
 
-**Blocked by:** #N (or "None")
+**Blocked by:** #<issue-number> (or "None")
 ```
 
 Brief principles, applied when writing or revising:
@@ -129,7 +129,7 @@ Publish issues in dependency order so the `Blocked by` field can reference real 
 
 ## /sdd dispatcher
 
-`/sdd <issue>` reads the issue's `phase/*` label and invokes the matching phase skill. Each phase skill ends by bumping the label to the next phase.
+`/sdd <issue-number>` reads the issue's `phase/*` label and invokes the matching phase skill. Each phase skill ends by bumping the label to the next phase.
 
 | Label | Skill |
 |---|---|
@@ -137,18 +137,18 @@ Publish issues in dependency order so the `Blocked by` field can reference real 
 | `phase/design` | `sdd-design` |
 | `phase/build` | `sdd-tdd` |
 
-The dispatcher refuses if the `sdd` label is absent; non-SDD work happens in plain chat ("work on issue N, no sdd").
+The dispatcher refuses if the `sdd` label is absent; non-SDD work happens in plain chat ("work on issue <issue-number>, no sdd").
 
 ## Branch and worktree
 
-Branch name: `<issue#>-<slug>`. The slug is kebab-case from the issue title; drop tracker prefixes; keep it short.
+Branch name: `<issue-number>-<slug>`. The slug is kebab-case from the issue title; drop tracker prefixes; keep it short.
 
-The worktree lives at `.claude/worktrees/<issue#>-<slug>/`. The worktree directory and the branch share the same name.
+The worktree lives at `.claude/worktrees/<issue-number>-<slug>/`. The worktree directory and the branch share the same name.
 
-The dispatcher resolves the worktree by glob `.claude/worktrees/<N>-*`:
+The dispatcher resolves the worktree by glob `.claude/worktrees/<issue-number>-*`:
 
 - Exactly one match → enter (`cd`).
-- Zero matches → create (`git worktree add .claude/worktrees/<N>-<slug> -b <N>-<slug>`).
+- Zero matches → create (`git worktree add .claude/worktrees/<issue-number>-<slug> -b <issue-number>-<slug>`).
 - Multiple matches → error and ask the user.
 
 Before creating, confirm local `main` matches `origin/main`:
@@ -164,7 +164,7 @@ If the SHAs differ, ask the user to `git pull` (the agent does not hold the SSH 
 
 - Commit on the branch with /commit.
 - Push with `git push -u origin <name>` (user-driven; YubiKey tap required).
-- Open the PR with `gh pr create --body "Closes #<N> …"`. The `Closes #<N>` token is mandatory — merging the PR closes the issue.
+- Open the PR with `gh pr create --body "Closes #<issue-number> …"`. The `Closes #<issue-number>` token is mandatory — merging the PR closes the issue.
 - The phase label flips to `phase/review` when the PR opens.
 
 Sessions resume by `cd .claude/worktrees/<name>`; the worktree persists across sessions, agents, and terminals.

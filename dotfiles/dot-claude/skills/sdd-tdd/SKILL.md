@@ -1,10 +1,9 @@
 ---
 name: sdd-tdd
-description: Implement features via vertical-slice TDD against committed `Interface:` declarations. Use when an SDD-mode issue is in `phase/build` and the design has pinned `Interface:` lines, or when the user asks to drive implementation via red/green/refactor against an SDD spec.
+description: Use when the `/sdd` dispatcher routes a `phase/build` issue to this skill. Implements features via vertical-slice TDD against committed `Interface:` declarations. Not invoked directly. `/sdd` loads the issue and sets up the worktree first.
 disable-model-invocation: false
 model: opus
 effort: xhigh
-argument-hint: "<issue-number>"
 ---
 
 # SDD TDD
@@ -13,7 +12,9 @@ Vertical-slice TDD against the `Interface:` declarations committed in the design
 
 ## First steps
 
-1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
+The dispatcher has already loaded the issue (its body IS the contract) and placed you in its worktree.
+
+1. **Required reading.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
    - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
    - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioural focus.
    - [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
@@ -22,15 +23,11 @@ Vertical-slice TDD against the `Interface:` declarations committed in the design
    After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, testing-conventions, python-conventions, workflow`.
 
    When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) at that point.
-2. **Run `pwd`.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
-3. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-4. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
-6. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
-7. Read the project's `CLAUDE.md`.
-8. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
-9. Run the test suite to see the current state.
-10. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
+2. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
+3. Read the project's `CLAUDE.md`.
+4. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
+5. Run the test suite to see the current state.
+6. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
 
 ## Mandatory plan gate
 
@@ -100,10 +97,10 @@ When all chunks are complete, the suite is green, lint/format/typecheck pass, an
 1. **Final check sweep — leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). The chunk loop runs these per-chunk, but a final whole-tree pass catches cross-chunk regressions and any drift since the last chunk. All must pass; if anything fails, fix it and re-run. Do not push a red branch.
 2. Run /commit if there are uncommitted changes.
 3. Push (the user runs this — YubiKey tap required): `git push -u origin <branch>`.
-4. Open the PR: `gh pr create --body "Closes #<N> ..."`. The `Closes` token is mandatory.
+4. Open the PR: `gh pr create --body "Closes #<issue-number> ..."`. The `Closes` token is mandatory.
 5. Bump the issue's phase label:
    ```bash
-   gh issue edit $ARGUMENTS --remove-label "phase/build" --add-label "phase/review"
+   gh issue edit <issue-number> --remove-label "phase/build" --add-label "phase/review"
    ```
 6. **Remind the user before exiting:** "After the PR merges, `git pull` on `main` (YubiKey tap required) and run `worktree-sweep` to clean up the worktree."
 

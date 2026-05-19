@@ -1,10 +1,9 @@
 ---
 name: sdd-design
-description: Author design items (`dsn`) and pin `Interface:` lines from approved functional requirements. Use when an SDD-mode issue is in `phase/design` and needs `dsn` items / `Interface:` declarations, or when the user asks to design the implementation surface for approved `feat`/`req` items.
+description: Use when the `/sdd` dispatcher routes a `phase/design` issue to this skill. Authors design items (`dsn`) and pins `Interface:` lines from approved functional requirements. Not invoked directly. `/sdd` loads the issue and sets up the worktree first.
 disable-model-invocation: false
 model: opus
 effort: xhigh
-argument-hint: "<issue-number>"
 ---
 
 # SDD Design
@@ -15,23 +14,21 @@ The flow has three phases: context loading, interview-driven planning, skeleton-
 
 ## 1. Context loading
 
-1. **Required reading — do not skip.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
+The dispatcher has already loaded the issue (its body IS the contract) and placed you in its worktree.
+
+1. **Required reading.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
    - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
    - [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing.
    - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
    - [Workflow standard](~/workspace/dev-playbook/standards/workflow.md) — labels, worktree convention, PR mechanics, spec-tools bootstrap caveat.
 
    After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, design-layer, lessons, workflow`.
-2. **Run `pwd`.** The dispatcher cd's into the worktree before invoking this skill, but the env header's CWD was captured before that. Trust `pwd`, not the header — composing paths from a stale CWD lands outside the worktree.
-3. **Require an issue number** in `$ARGUMENTS`. If empty, stop and tell the user to invoke via `/sdd <N>`.
-4. Run `gh-show $ARGUMENTS` to load the issue. The body IS the contract.
-5. If `pwd` did not already show a worktree path, resolve the worktree per the [workflow standard](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree).
-6. Read the project's existing specs:
+2. Read the project's existing specs:
    - `specs/functional_requirements.md` (or folder-form). Without approved requirements, designing is premature.
    - `specs/design.md` (or folder-form).
    - `docs/adr/` for prior decisions in the area being designed.
-7. Read the project's `CLAUDE.md`.
-8. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies.
+3. Read the project's `CLAUDE.md`.
+4. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies.
 
 ## 2. Area discovery interview
 
@@ -99,9 +96,9 @@ When the user approves and the rubric passes:
 2. Run /commit to commit the design spec.
 3. Bump the issue's phase label:
    ```bash
-   gh issue edit $ARGUMENTS --remove-label "phase/design" --add-label "phase/build"
+   gh issue edit <issue-number> --remove-label "phase/design" --add-label "phase/build"
    ```
-4. Report: phase done. The user re-invokes `/sdd <N>` when ready to build.
+4. Report: phase done. The user re-invokes `/sdd <issue-number>` when ready to build.
 
 ## Output
 
