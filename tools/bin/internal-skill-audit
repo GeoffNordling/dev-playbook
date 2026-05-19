@@ -300,7 +300,7 @@ def main():
         p
         for p in (
             repo_root / ".claude" / "skills",
-            repo_root / "dotfiles" / ".claude" / "skills",
+            repo_root / "dotfiles" / "dot-claude" / "skills",
         )
         if p.is_dir()
     ]
