@@ -146,16 +146,15 @@ One line per finding to stdout in `file:line  rule  message` form. Exit code 0 i
 
 ### workspace-backup
 
-Archive every Git repo in a workspace into a single dated `.zip`, preserving each repo's `.git/` directory so the archive can fully replace the workspace if GitHub is lost. Each repo becomes a top-level folder inside the archive.
+Archive every Git repo in `~/workspace` into a single dated `.zip`, preserving each repo's `.git/` directory so the archive can fully replace the workspace if GitHub is lost. Each repo becomes a top-level folder inside the archive.
 
 ```bash
-workspace-backup                      # auto-detect workspace, write workspace-backup-YYYY-MM-DD.zip
-workspace-backup /path/to/workspace   # explicit workspace
+workspace-backup                      # archive ~/workspace → workspace-backup-YYYY-MM-DD.zip
 workspace-backup -o /tmp/snap.zip     # custom output path
 workspace-backup --force              # overwrite existing output
 ```
 
-Skips hidden directories and non-repo subfolders. Symlinks are not followed.
+Pinned to `~/workspace` — no auto-detection and no alternate-path argument. Fails loudly if `~/workspace` is missing rather than backing up the wrong directory. Skips hidden directories and non-repo subfolders. Symlinks are not followed.
 
 ### worktree-sweep
 

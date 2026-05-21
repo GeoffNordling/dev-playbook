@@ -80,11 +80,11 @@
   },
   "effortLevel": "xhigh",
   "voice": {
-    "enabled": false,
+    "enabled": true,
     "mode": "hold"
   },
   "autoMemoryEnabled": false,
   "theme": "light",
   "agentPushNotifEnabled": true,
-  "voiceEnabled": false
+  "voiceEnabled": true
 }

@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Archive every Git repo in a workspace into a single dated .zip.
+"""Archive every Git repo in ~/workspace into a single dated .zip.
 
 Each repo is stored as a top-level directory inside the archive, with its
 `.git/` folder intact — so a recovered zip is a drop-in replacement for the
 original workspace if GitHub is unavailable or credentials are compromised.
 
+Pinned to ~/workspace: no auto-detection, no alternate-path override. If
+~/workspace is missing the tool fails loudly rather than silently backing
+up the wrong directory.
+
 Usage:
-    workspace-backup                    # Auto-detect workspace, write to it
-    workspace-backup /path/to/workspace # Explicit workspace path
-    workspace-backup -o /tmp/snap.zip   # Custom output path
+    workspace-backup                  # archive ~/workspace
+    workspace-backup -o /tmp/snap.zip # custom output path
+    workspace-backup --force          # overwrite existing output
 """
 
 import argparse
@@ -18,21 +22,22 @@ from datetime import datetime
 from pathlib import Path
 
 
-def find_workspace() -> Path:
-    """Auto-detect the workspace directory on Mac or Linux."""
-    candidates = [
-        Path("/Volumes/workplace"),
-        Path.home() / "workplace",
-        Path.home() / "workspace",
-    ]
-    for c in candidates:
-        if c.is_dir():
-            return c
-    print(
-        "Could not auto-detect workspace directory. Pass it as an argument.",
-        file=sys.stderr,
-    )
-    sys.exit(1)
+def workspace_dir() -> Path:
+    """Return ~/workspace, or fail loudly if it is not a directory.
+
+    The tool is deliberately pinned to ~/workspace — no fallback to other
+    locations, no override. A missing workspace is an error, not something
+    to silently route around.
+    """
+    workspace = Path.home() / "workspace"
+    if not workspace.is_dir():
+        print(
+            f"Workspace not found at {workspace} — nothing archived. "
+            "This tool only backs up ~/workspace.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return workspace
 
 
 def list_repos(workspace: Path) -> list[Path]:
@@ -72,16 +77,10 @@ def add_repo(zf: zipfile.ZipFile, repo: Path, workspace: Path) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument(
-        "workspace",
-        nargs="?",
-        type=Path,
-        help="Workspace directory (default: auto-detected)",
-    )
-    parser.add_argument(
         "-o",
         "--output",
         type=Path,
-        help="Output zip path (default: <workspace>/workspace-backup-YYYY-MM-DD.zip)",
+        help="Output zip path (default: ~/workspace/workspace-backup-YYYY-MM-DD.zip)",
     )
     parser.add_argument(
         "-f",
@@ -91,10 +90,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    workspace = args.workspace or find_workspace()
-    if not workspace.is_dir():
-        print(f"Not a directory: {workspace}", file=sys.stderr)
-        return 1
+    workspace = workspace_dir()
 
     output = args.output or (
         workspace / f"workspace-backup-{datetime.now():%Y-%m-%d}.zip"
