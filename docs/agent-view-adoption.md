@@ -36,7 +36,7 @@ These constrain any workflow design.
 | # | Desire | Notes |
 |---|---|---|
 | N1 | Sessions push and open pull requests on their own. | Per U9: PR creation/merging are already PAT-reachable; only `git push` still taps. Reversible workspace policy choice; see Deferred. |
-| N2 | Skill-invocable entry into agent view (typing `/sdd 4` into the agent view input dispatches the skill). | Whether this works at all is an unknown — see U1. |
+| N2 | Skill-invocable entry into agent view (typing `/sdd 4` into the agent view input dispatches the skill). | Works: the launched session model-invokes the skill. Skill must have `disable-model-invocation: false`. |
 | N3 | Human review gate is configurable per skill or per invocation. Two modes: review-each-commit-diff vs review-only-the-PR. | Pure skill-design problem; agent view supports both natively (see "Design space"). |
 
 ## Scope notes
@@ -57,6 +57,8 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
   - `claude --bg [--name "X"] "<prompt>"` from a plain shell — starts a fresh detached session in cwd.
   - Typing into agent view's input — same as `claude --bg` but from within agent view; row gets auto-named from the prompt.
   - `/bg [optional final instruction]` from inside an already-attached session — backgrounds the current conversation (same transcript continues, just detached).
+- The prompt is delivered as the launched session's first user message; agent view itself does not parse slash commands.
+- A prompt starting with `/<skill>` causes the launched session to model-invoke that skill as its first action, subject to the skill's `disable-model-invocation` frontmatter. Skills with `disable-model-invocation: true` cannot be entered this way (the autocomplete picker also hides them).
 - Session display name controllable via `--name` at dispatch, or `Ctrl+R` interactively in agent view. Auto-generated from prompt otherwise.
 - Filters in agent view input: `a:<agent>`, `s:<state>` (including `s:blocked`), `#<PR-number>` or PR URL.
 
@@ -117,7 +119,6 @@ Run before any design or implementation decisions. Numbered for reference.
 
 | # | Unknown | Why it matters | Experiment |
 |---|---|---|---|
-| U1 | Typing `/sdd 4` into agent view's input — does the launched session invoke the skill, or see the literal string `"/sdd 4"`? | Determines whether the entire skill-dispatch model (N2, R8) survives in agent view. Foundational. | In a throwaway repo, type `/sdd 4` into the input. Peek the new row to see whether the skill ran or the prompt was treated as text. |
 | U2 | When agent view auto-isolates, what branch does the new worktree get? | Determines whether R3 (human-readable branch names) needs custom skill code or whether native naming is acceptable. | Dispatch a trivial session ("create foo.txt"), let auto-isolation fire, check `git -C .claude/worktrees/<dir> branch --show-current`. |
 | U3 | If a skill runs `git switch -c <issue>-<slug>` *before* the first edit, does auto-isolation create the worktree on that branch, or invent its own? | Determines whether a skill can force the branch name R3 wants without disabling auto-isolation. | Dispatch a skill that explicitly creates and switches to a named branch, then touches a file. Inspect the worktree's branch. |
 | U4 | Can `worktree.bgIsolation` live in user-global `~/.claude/settings.json`, or must it be per-project? | Determines whether the setting goes in dotfiles once or in every repo. | Put it in global only; dispatch a session in a fresh repo without project settings; observe whether auto-isolation fires. |
@@ -126,7 +127,7 @@ Run before any design or implementation decisions. Numbered for reference.
 | U7 | Does `/bg` from an interactive session preserve the branch and worktree state, or create a new worktree on backgrounding? | Affects whether a manual terminal session can be promoted into agent view mid-work. | Start `claude` in a manually-created worktree, run `/bg`, inspect the resulting agent-view session's worktree and branch. |
 | U8 | Can a session self-pin (`Ctrl+T` equivalent from inside a skill)? | If yes, long-running skills can keep themselves hot. If no, pinning is a manual user step. | Investigate `claude` CLI subcommands and any in-session primitives. |
 
-**Run U1 and U3 first** — they unblock the most. U1 tells us whether the skill-dispatch model survives at all. U3 tells us whether branch naming can stay native (no `bgIsolation: "none"` needed) or whether we need a manual escape.
+**Run U3 next** — it determines whether branch naming can stay native (no `bgIsolation: "none"` needed) or whether we need a manual escape.
 
 ## Skill-design space vs product-constraint space
 
@@ -187,7 +188,7 @@ Each depends on a deferred topic or an open experiment. Listed with their gating
 
 ## Next actions
 
-1. **Run experiments U1 and U3** in a throwaway repo. Append results to this file.
+1. **Run experiment U3** in a throwaway repo. Append results to this file.
 2. **Run U2, U4, U5** opportunistically.
 3. **Sandboxing pass.** Dedicated investigation; output is its own doc or ADR.
 4. **`git push` autonomy pass.** Dedicated investigation; output is its own doc or ADR.

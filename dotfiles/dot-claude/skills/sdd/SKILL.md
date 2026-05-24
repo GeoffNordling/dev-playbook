@@ -1,7 +1,7 @@
 ---
 name: sdd
 description: Dispatch SDD work to the correct phase skill based on the issue's phase label. Use when advancing an SDD-mode issue, when invoking the SDD workflow on a specific issue number, or when continuing work on a partially-completed SDD issue regardless of phase.
-disable-model-invocation: true
+disable-model-invocation: false
 model: opus
 effort: low
 argument-hint: "<issue-number>"
