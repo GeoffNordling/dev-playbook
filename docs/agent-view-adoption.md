@@ -1,25 +1,23 @@
 # Agent View Adoption
 
-Working document. Captures the state of our investigation into Claude Code's [agent view](https://code.claude.com/docs/en/agent-view) (`claude agents`) as the primary entry point for parallel multi-agent work in this workspace.
+Working document. Survey of Claude Code's [agent view](https://code.claude.com/docs/en/agent-view) (`claude agents`) as a candidate primary entry point for parallel multi-agent work in this workspace.
 
-**Not authoritative.** Adoption decisions live in [`adr/`](adr/). This doc collects requirements, knowns, unknowns, and the experiments that will close the gap.
-
-Last updated: 2026-05-23.
+**Not authoritative.** Adoption decisions live in [`adr/`](adr/). This doc collects requirements, capabilities, open questions, and the experiments that will close the gap.
 
 ## Purpose
 
-Today the workspace runs multi-agent work through a custom Bash-driven worktree convention (`standards/workflow.md` and the `sdd*` skills in `dotfiles/dot-claude/skills/`). Agent view ships with its own native worktree and dispatch model. Before adopting it, we need a firm understanding of what the product can and cannot do, separate from any decision about how we'll use it.
+Establish a firm understanding of what agent view can and cannot do, sized to support a workflow-design decision. The doc is structured so requirements drive the experiment list and the experiment list drives the eventual policy.
 
-## Stance
+## Design principles
 
-- We are **not** trying to make agent view fit the existing workflow.
-- We are **not** treating the existing workflow's behaviors as requirements by default — many of them are means, not ends.
-- The goal is to understand agent view's capabilities and constraints clearly enough that we can design a fresh workflow on top of it. Where native behavior covers a need, prefer native. Where it doesn't, decide consciously whether the need is real before adding custom layers.
-- Ideal end state: fully native, no custom worktree/dispatch code. Whether that's reachable depends on the unknowns below.
+- Prefer native agent view behavior where it covers a requirement.
+- Add a custom layer only when a requirement is established and no native path satisfies it.
+- Existing custom-workflow behaviors are means, not ends — validate each against the requirement it serves before keeping it.
+- Ideal end state: fully native, no custom worktree or dispatch code. Reachability depends on the open questions below.
 
 ## Requirements (must have)
 
-Confirmed in discussion. These constrain any workflow design.
+These constrain any workflow design.
 
 | # | Requirement |
 |---|---|
@@ -27,27 +25,26 @@ Confirmed in discussion. These constrain any workflow design.
 | R2 | Sessions commit on their own. Commit happens without a human keystroke per commit. |
 | R3 | Commit branches have human-readable names tied to the issue (readable from `git branch` alone). |
 | R4 | Each row in agent view has a human-readable title — issue, phase, and overall job legible at a glance. |
-| R5 | 1h idle-reaping of non-pinned sessions is acceptable. Reaping is process-level only — transcript, worktree, branch, and commits all persist; reattach respawns the session from saved state. Active work, blocked-on-input, attached-terminal, and long-running background processes all prevent reaping without any action. Pinning (`Ctrl+T`) is the explicit override for finished+idle sessions; whether a skill can self-pin is U8. |
-| R6 | Phase label on the GitHub issue (`phase/requirements` → `phase/design` → `phase/build` → `phase/review`) remains the externally-visible state machine. Survives any session/supervisor/agent-view crash; readable by humans and fresh agents in fresh terminals. |
-| R7 | The issue body remains the self-contained brief. Cold-start works because no session-local memory is required to resume. |
-| R8 | Skills remain the single point of behavior definition. Behavior changes propagate everywhere because there is one definition. |
+| R5 | 1h idle-reaping of non-pinned sessions is acceptable. Reaping is process-level only — transcript, worktree, branch, and commits all persist; reattach respawns the session from saved state. Active work, blocked-on-input, attached-terminal, and long-running background processes all prevent reaping without any action. Pinning (`Ctrl+T`) is the explicit override for finished-and-idle sessions; whether a skill can self-pin is U8. |
+| R6 | The GitHub issue's `phase/*` label is the externally-visible state machine (`phase/requirements` → `phase/design` → `phase/build` → `phase/review`). Survives any session, supervisor, or agent-view crash; readable by humans and fresh agents in fresh terminals. |
+| R7 | The issue body is the self-contained brief. Cold-start works because no session-local memory is required to resume. |
+| R8 | Skills are the single point of behavior definition. Behavior changes propagate everywhere because there is one definition. |
 | R9 | Pre-flight check that local `main` matches `origin/main` before branching for new work. (Couples to the YubiKey/PAT decision below — see Deferred.) |
 
 ## Nice-to-haves
 
 | # | Desire | Notes |
 |---|---|---|
-| N1 | Sessions push and open pull requests on their own. | Currently blocked by YubiKey gating of `git push` and possibly `gh pr create`. Reversible workspace policy choice; see Deferred. |
+| N1 | Sessions push and open pull requests on their own. | Per U9: PR creation/merging are already PAT-reachable; only `git push` still taps. Reversible workspace policy choice; see Deferred. |
 | N2 | Skill-invocable entry into agent view (typing `/sdd 4` into the agent view input dispatches the skill). | Whether this works at all is an unknown — see U1. |
 | N3 | Human review gate is configurable per skill or per invocation. Two modes: review-each-commit-diff vs review-only-the-PR. | Pure skill-design problem; agent view supports both natively (see "Design space"). |
 
-## Dropped or downgraded from prior workflow
+## Scope notes
 
-Behaviors the current custom flow has but the discussion concluded are not requirements going forward.
+Things explicitly outside the requirement set:
 
-- **Worktree directory name encodes the issue.** Worktrees may be opaquely named (e.g., agent-view's session-id-based dirs). Branch name still matters (R3); directory name doesn't.
-- **Worktree resumable from a plain terminal** (`cd .claude/worktrees/<name>` from any shell). Agent view is the primary entry point.
-- **`worktree-sweep` cleanup gating** (PR-merged + no divergence check). Open question whether this safety property must be preserved or whether `Ctrl+X` ×2 is enough — see "Decisions deferred until unknowns close."
+- Worktree directory naming is unconstrained. Branch naming is constrained by R3; directory naming is not.
+- Agent view is the primary entry point. Resumability from other shells is not a requirement.
 
 ## What we know about agent view
 
@@ -71,12 +68,12 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
   - Working directory is not a git repository and no `WorktreeCreate` hook is configured.
   - The write target is outside the working directory.
 - Disable knob: `worktree.bgIsolation: "none"` in `.claude/settings.json`. Documented as project-level; global applicability is an unknown (U4). Requires Claude Code v2.1.143+.
-- Cleanup interaction: `Ctrl+X` ×2 in agent view deletes Claude-*created* worktrees including uncommitted changes; **user-created** worktrees (via `git worktree add` in Bash) are left in place.
+- Cleanup interaction: `Ctrl+X` ×2 in agent view deletes Claude-*created* worktrees including uncommitted changes; user-*created* worktrees (via `git worktree add` in Bash) are left in place.
 
 ### Session lifetime
 
 - Sessions persist across machine sleep, supervisor restart, and Claude Code auto-update.
-- **Reaping is process-level, not data-level.** After ~1h of idle, the supervisor stops a non-pinned session's *process* to free resources. Transcript, worktree, branch, commits, and tool state all persist on disk. The next peek/reply/attach respawns the process from saved state; the only cost is a brief warmup latency.
+- Reaping is process-level, not data-level. After ~1h of idle, the supervisor stops a non-pinned session's *process* to free resources. Transcript, worktree, branch, commits, and tool state all persist on disk. The next peek/reply/attach respawns the process from saved state; the only cost is a brief warmup latency.
 - A session is **not eligible for reaping** while any of these holds:
   - Actively working (running a tool, generating).
   - Waiting on input (Needs input state — `AskUserQuestion`, permission prompt, blocking question).
@@ -103,6 +100,17 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
 - PR status dot per row: yellow (waiting on checks/review), green (passed), purple (merged), grey (draft/closed). Hyperlinked in supporting terminals.
 - Terminal tab title updates: `2 awaiting input · claude agents` when sessions are blocked.
 
+### GitHub auth surface
+
+Tap surface for the autonomous loop:
+
+- `git pull` — taps (SSH-bound to `git@github.com:...`).
+- `git push` — taps (same).
+- `gh pr create` / `gh pr merge` — no tap (PAT over HTTPS).
+- `gh api` / `gh issue *` / `gh label *` — no tap (PAT over HTTPS).
+
+Most GitHub operations are PAT-reachable; the only thing standing between today's auth and N1 is `git push`.
+
 ## What we don't know (experiments needed)
 
 Run before any design or implementation decisions. Numbered for reference.
@@ -117,66 +125,72 @@ Run before any design or implementation decisions. Numbered for reference.
 | U6 | What happens if you re-invoke `/sdd <N>` inside an already-attached session that's already in its worktree? | Cross-phase continuity may want this. The current dispatcher's `git worktree add` would fail (already exists); glob-resolution branch should succeed. Needs confirmation. | Dispatch `/sdd 4`, let it land in a worktree, attach, re-invoke `/sdd 4`. |
 | U7 | Does `/bg` from an interactive session preserve the branch and worktree state, or create a new worktree on backgrounding? | Affects whether a manual terminal session can be promoted into agent view mid-work. | Start `claude` in a manually-created worktree, run `/bg`, inspect the resulting agent-view session's worktree and branch. |
 | U8 | Can a session self-pin (`Ctrl+T` equivalent from inside a skill)? | If yes, long-running skills can keep themselves hot. If no, pinning is a manual user step. | Investigate `claude` CLI subcommands and any in-session primitives. |
-| U9 | Does `gh pr create` require a YubiKey tap, independent of the underlying `git push`? | Directly informs N1 (sessions push and open PRs on their own) and the YubiKey/PAT deferred decision. `gh` uses HTTPS+PAT per `dotfiles/dot-claude/rules/bash-commands.md` — so `gh pr create` itself likely doesn't tap, but a PR can't be opened for an unpushed branch, and `git push` does tap. Need to confirm the split. | On an already-pushed test branch, run `gh pr create --draft --title test --body test` and observe whether a tap is prompted. Then in a clean workspace, attempt the full `git push` + `gh pr create` flow and confirm which step taps. |
 
 **Run U1 and U3 first** — they unblock the most. U1 tells us whether the skill-dispatch model survives at all. U3 tells us whether branch naming can stay native (no `bgIsolation: "none"` needed) or whether we need a manual escape.
 
 ## Skill-design space vs product-constraint space
 
-A clean distinction worth holding onto: agent view *hosts* whatever behavior the skills implement. Several questions that feel like they're about agent view are actually about how we author skills on top of it.
+Agent view hosts whatever behavior the skills implement. Some workflow choices live in the skill layer; others are fixed by the product.
 
-### Skill-design choices (agent view supports either)
+### Skill-design space (either path is supported)
 
-- **Human review gate location.** Skill that calls `AskUserQuestion` at each commit → row shows "Needs input" → human peeks/replies. Skill that runs through to `gh pr create` → row shows green PR dot → human reviews on github.com. Both modes are first-class. The choice is per-skill, per-invocation, or per-parameter.
-- **Cross-phase continuity.** One session per issue lives across all phases (reattach + re-invoke `/sdd <N>` to advance) vs one session per phase (each phase dispatches fresh and lands on the same branch). Both work; tradeoffs are ergonomic. Decision can wait until we've used agent view for a real cycle.
+- **Human review gate location.** A skill that calls `AskUserQuestion` at each commit → row shows "Needs input" → human peeks/replies. A skill that runs through to `gh pr create` → row shows green PR dot → human reviews on github.com. Both modes are first-class. Choice is per-skill, per-invocation, or per-parameter.
+- **Cross-phase continuity.** One session per issue lives across all phases (reattach + re-invoke `/sdd <N>` to advance), or one session per phase (each phase dispatches fresh and lands on the same branch). Both work; the choice is ergonomic.
 
-### Product constraints (cannot be skilled around)
+### Product constraints (fixed)
 
 - 1h idle reaping for non-pinned sessions.
 - Permission mode inheritance rules at session birth.
-- One-time interactive acceptance for `bypassPermissions`/`auto`.
+- One-time interactive acceptance for `bypassPermissions` / `auto`.
 - Auto-isolation timing (before first edit) — only the *whether* is configurable via `bgIsolation`, not the *when*.
 - No master agent in agent view; input always dispatches a new session.
 
 ## Deferred topics
 
-Surfaced in discussion, not investigated. Worth their own dedicated passes before final workflow design.
+Each deserves its own dedicated pass before final workflow design.
 
-### Sandboxing and permissions deep dive
+### Sandboxing and permissions
 
-Sessions will run mostly unsupervised; the permission surface deserves explicit treatment at two layers:
+Sessions run mostly unsupervised. The permission surface needs explicit treatment at two layers:
 
-- **Claude Code permission system.** Current `dotfiles/dot-claude/settings.json` allow/deny scheme. What should the default be for autonomous sessions? `bypassPermissions` (faster, less safe), `acceptEdits` (curated), or default with explicit allowlist (current)? Per-skill overrides?
-- **OS-level sandboxing.** Network access, filesystem reach, process spawning. What sandboxing primitives are available on Fedora? Firejail? systemd-run with restrictions? Bubblewrap? Does Claude Code support invocation under a sandbox wrapper?
+- **Claude Code permission system.** Default permission mode for autonomous sessions: `bypassPermissions` (faster, less safe), `acceptEdits` (curated), or explicit allowlist. Per-skill overrides.
+- **OS-level sandboxing.** Network access, filesystem reach, process spawning. Available primitives on Fedora (Firejail, systemd-run with restrictions, Bubblewrap). Whether Claude Code can be invoked under a sandbox wrapper.
 
-### YubiKey vs PAT for git operations
+### `git push` autonomy
 
-Current policy: `git pull`, `git push` require YubiKey tap (SSH-bound). Whether `gh pr create` itself taps is U9.
+The single tap that gates N1. Three options:
 
-Tradeoff to evaluate:
-- **Keep YubiKey**: agents block on pulls/pushes/PRs, surface as "Needs input." Human-in-the-loop for every network-affecting git op. Slows autonomous flow; preserves R9 by forcing the human to refresh `main`.
-- **Add PAT for git over HTTPS**: agents pull/push/PR autonomously. Realizes N1. Cost: any compromised agent can push and open PRs in your name without a hardware tap.
+1. **Keep SSH-bound `git push`.** Agents block on push, surface as "Needs input," human taps. Realizes everything except the unattended push — agent prepares the PR step, human's tap unblocks it, agent continues. Lowest-friction safety preserve.
+2. **Switch the remote to HTTPS** (`https://github.com/...`) and let `git push` go over PAT. Realizes N1 fully. Cost: any compromised agent can push without a hardware tap; the PAT is the entire credential.
+3. **Per-remote split.** SSH (`origin`) for human-driven work, separate HTTPS remote (e.g., `origin-pat`) for agent-driven push. More machinery; finer-grained.
 
-Mitigations to consider if relaxing: scoped PAT, push-protection rules on the remote, branch protection requiring review on `main`, signed commits.
+**Mitigations under options 2 or 3:**
 
-## Decisions deferred until unknowns close
+- Branch protection on `main` requiring PR review + passing checks (prevents direct push to `main`).
+- Required signed commits.
+- Scoped PAT (only the repos in scope, only the permissions needed; no `admin`, no `delete_repo`).
+- Agents push to feature branches only; merges go through PR review.
 
-These are real decisions; we're not making them yet.
+R9 (main currency check) is independent of this decision — local `main` refresh still needs `git pull`, which taps under option 1 and PATs under options 2 or 3.
 
-- **Cleanup model.** `worktree-sweep` (PR-merged gating) vs `Ctrl+X` ×2 (trust the keystroke). If we go fully native and worktrees become Claude-created, sweep loses its safety property (Claude-created worktrees can be deleted with uncommitted changes via Ctrl+X).
-- **Worktree-creation mechanism.** Native auto-isolation vs Bash-driven `git worktree add`. Hinges on U2 + U3.
+## Open decisions
+
+Each depends on a deferred topic or an open experiment. Listed with their gating items.
+
+- **Cleanup policy.** Candidates: the `worktree-sweep` tool (gated on PR-merged + no local divergence), or trust `Ctrl+X` ×2. Under fully-native auto-isolation, worktrees are Claude-created and `Ctrl+X` deletes them with any uncommitted changes — that constraint shapes the choice.
+- **Worktree-creation mechanism.** Native auto-isolation, or Bash-driven `git worktree add`. Hinges on U2 + U3.
 - **`bgIsolation` setting location.** Hinges on U4.
-- **Cross-phase continuity model.** Skill-design choice; defer until lived experience.
-- **Human review gate default.** Skill-design choice; per-skill parameter likely.
+- **Cross-phase continuity model.** Skill-design choice; resolves after first lived cycle.
+- **Human review gate default.** Skill-design choice; likely a per-skill parameter.
 - **Session-naming mechanism.** Hinges on U5.
-- **Whether to keep `EnterWorktree`/`ExitWorktree` deny in `dotfiles/dot-claude/settings.json`.** Currently kept; becomes redundant if `bgIsolation: "none"` is used OR if we go fully native and embrace auto-isolation.
+- **`EnterWorktree` / `ExitWorktree` permission deny in `dotfiles/dot-claude/settings.json`.** Whether to retain. Becomes redundant under `bgIsolation: "none"` or full-native auto-isolation.
 
 ## Next actions
 
-1. **Run experiments U1 and U3** in a throwaway repo. Document results in this file.
+1. **Run experiments U1 and U3** in a throwaway repo. Append results to this file.
 2. **Run U2, U4, U5** opportunistically.
 3. **Sandboxing pass.** Dedicated investigation; output is its own doc or ADR.
-4. **YubiKey/PAT cost-benefit pass.** Dedicated investigation; output is its own doc or ADR.
-5. **Once U1–U5 are closed and sandboxing/YubiKey decisions made:** design the workflow policy (which dispatch surface, which skills survive, what `settings.json` looks like, whether `worktree-sweep` stays).
-6. **Migrate `standards/workflow.md` and `sdd*` skills** per the chosen policy. Update `dotfiles/dot-claude/settings.json` to match.
+4. **`git push` autonomy pass.** Dedicated investigation; output is its own doc or ADR.
+5. **Design the workflow policy** once U1–U5 close and the sandboxing + `git push` decisions land: dispatch surface, skill surface, `settings.json` shape, cleanup mechanism.
+6. **Apply the policy** to `standards/workflow.md`, the `sdd*` skills, and `dotfiles/dot-claude/settings.json`.
 7. **ADR** capturing the decision and its rationale.
