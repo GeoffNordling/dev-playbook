@@ -23,7 +23,7 @@ These constrain any workflow design.
 |---|---|
 | R1 | Multiple sessions run in parallel, each in its own worktree (so edits don't collide). |
 | R2 | Sessions commit on their own. Commit happens without a human keystroke per commit. |
-| R3 | Commit branches have human-readable names tied to the issue (readable from `git branch` alone). |
+| R3 | Given an issue reference, the user can locate the worktree and reattach to its session. The mechanism is open (branch name, display name, state.json grep, filter, custom tool); the capability is required. |
 | R4 | Each row in agent view has a human-readable title — issue, phase, and overall job legible at a glance. |
 | R5 | 1h idle-reaping of non-pinned sessions is acceptable. Reaping is process-level only — transcript, worktree, branch, and commits all persist; reattach respawns the session from saved state. Active work, blocked-on-input, attached-terminal, and long-running background processes all prevent reaping without any action. Pinning (`Ctrl+T`) is the explicit override for finished-and-idle sessions; whether a skill can self-pin is U8. |
 | R6 | The GitHub issue's `phase/*` label is the externally-visible state machine (`phase/requirements` → `phase/design` → `phase/build` → `phase/review`). Survives any session, supervisor, or agent-view crash; readable by humans and fresh agents in fresh terminals. |
@@ -59,17 +59,19 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
   - `/bg [optional final instruction]` from inside an already-attached session — backgrounds the current conversation (same transcript continues, just detached).
 - The prompt is delivered as the launched session's first user message; agent view itself does not parse slash commands.
 - A prompt starting with `/<skill>` causes the launched session to model-invoke that skill as its first action, subject to the skill's `disable-model-invocation` frontmatter. Skills with `disable-model-invocation: true` cannot be entered this way (the autocomplete picker also hides them).
-- Session display name controllable via `--name` at dispatch, or `Ctrl+R` interactively in agent view. Auto-generated from prompt otherwise.
+- Session display name controllable via `--name` at dispatch, or `Ctrl+R` interactively in agent view. Auto-generated from prompt otherwise — by a Haiku-class model, so not deterministic across repeated runs of the same prompt. `nameSource: "auto"` vs `"manual"` is recorded in `state.json`.
 - Filters in agent view input: `a:<agent>`, `s:<state>` (including `s:blocked`), `#<PR-number>` or PR URL.
 
 ### Worktree mechanism
 
 - Auto-isolation triggers **before first edit**, not at session start: Claude moves the session into a worktree under `.claude/worktrees/`.
+- Native naming scheme (observed in v2.1.150): the directory gets a 3-word adjective-adjective-noun slug (e.g., `quiet-exploring-waterfall`); the branch is that slug prefixed with `worktree-` (e.g., `worktree-quiet-exploring-waterfall`). Branched from current HEAD. No tie to the prompt, intent, session name, or any issue — does not satisfy R3.
 - Auto-isolation **skipped** when any of:
   - Session is already inside a linked git worktree (Claude-created or user-created via `git worktree add`).
   - Working directory is not a git repository and no `WorktreeCreate` hook is configured.
   - The write target is outside the working directory.
 - Disable knob: `worktree.bgIsolation: "none"` in `.claude/settings.json`. Documented as project-level; global applicability is an unknown (U4). Requires Claude Code v2.1.143+.
+- Override knob: the `WorktreeCreate` hook. Per the hooks reference it "replaces default git behavior"; a registered command receives the session context on stdin and prints the chosen worktree path to stdout. Whether the hook fires inside a git repo (not only outside git), what payload it gets, and whether a hook-created branch name is preserved are still unknowns — see U3.
 - Cleanup interaction: `Ctrl+X` ×2 in agent view deletes Claude-*created* worktrees including uncommitted changes; user-*created* worktrees (via `git worktree add` in Bash) are left in place.
 
 ### Session lifetime
@@ -85,9 +87,25 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
 - `Ctrl+T` is therefore the explicit override for the *finished + idle + nobody-attached* case where you specifically want the process to stay hot (e.g., to avoid the warmup latency on next attach).
 - Machine shutdown stops running sessions (they show as failed on next view); reattaching restarts them from state.
 
+### Session state on disk
+
+- `~/.claude/jobs/<short-id>/state.json` holds per-session metadata. Observed fields (v2.1.150):
+  - `intent` — raw text of the session's first prompt (e.g., `/caveman`, `/sdd 7`). Most direct lookup key for "which session is working on X."
+  - `name`, `nameSource` — display name shown in agent view rows. `auto` when generated from the prompt by the Haiku-class namer; `manual` after `--name` or `Ctrl+R`.
+  - `daemonShort` — 8-char short ID used by `claude attach`, `claude logs`, `claude stop`, `claude rm`; matches the directory name under `~/.claude/jobs/`.
+  - `sessionId`, `resumeSessionId` — full UUIDs; the transcript jsonl lives at `~/.claude/projects/<encoded-cwd>/<sessionId>.jsonl`.
+  - `originCwd`, `cwd` — original dispatch directory vs current working directory; `cwd` updates when auto-isolation moves the session into a worktree.
+  - `state`, `detail`, `tempo`, `inFlight`, `output.result` — runtime status fields driving agent view rows and the peek panel.
+  - `template`, `respawnFlags`, `backend`, `cliVersion`, `createdAt`, `updatedAt`, `firstTerminalAt` — infrastructural.
+- `~/.claude/jobs/<short-id>/timeline.jsonl` — append-only event log per session.
+- `~/.claude/jobs/pins.json` — the pin set.
+- `~/.claude/daemon.log`, `~/.claude/daemon/roster.json` — supervisor-level state.
+- Implication for R3 (lookup): grepping `intent` and `originCwd` across `~/.claude/jobs/*/state.json` is the most direct mechanism today. `claude agents --json` is the supported programmatic surface for the same data.
+
 ### Permissions
 
 - Background sessions read settings from the directory they run in (project `.claude/settings.json` applies normally).
+- Denying a built-in tool in `settings.json` (e.g., `deny: ["EnterWorktree"]`) removes that tool from the session's tool surface entirely — the model doesn't have it available to call, not just refused at call site. A session that needed `EnterWorktree` for auto-isolation under the deny improvised by writing to its job dir (`~/.claude/jobs/<id>/`), which sits outside the working directory and is exempt from the "write outside cwd" auto-isolation trigger.
 - Permission mode at session birth:
   - Dispatched from agent view input or `claude --bg`: uses directory's `defaultMode`, or dispatched subagent's `permissionMode` frontmatter.
   - `/bg` from existing session: keeps current mode (a session you put in `acceptEdits` stays there).
@@ -119,15 +137,14 @@ Run before any design or implementation decisions. Numbered for reference.
 
 | # | Unknown | Why it matters | Experiment |
 |---|---|---|---|
-| U2 | When agent view auto-isolates, what branch does the new worktree get? | Determines whether R3 (human-readable branch names) needs custom skill code or whether native naming is acceptable. | Dispatch a trivial session ("create foo.txt"), let auto-isolation fire, check `git -C .claude/worktrees/<dir> branch --show-current`. |
-| U3 | If a skill runs `git switch -c <issue>-<slug>` *before* the first edit, does auto-isolation create the worktree on that branch, or invent its own? | Determines whether a skill can force the branch name R3 wants without disabling auto-isolation. | Dispatch a skill that explicitly creates and switches to a named branch, then touches a file. Inspect the worktree's branch. |
+| U3 | What lookup affordances does agent view ship with, and what session-state files exist to support them? Sub-questions: (a) agent view input filters documented are `a:<agent>`, `s:<state>`, `#<PR>`, `@<repo>` — does anything else work (display-name substring, cwd, intent)? (b) What fields appear in `~/.claude/jobs/<id>/state.json` across session origins (agent view dispatch, `/bg` from interactive, `claude --bg`)? (c) What does `claude agents --json` output look like across the same set? | R3 is satisfiable by lookup, not naming. We need to see which native lookup paths exist before deciding whether anything custom is needed. | Dispatch 2–3 sessions with realistic-shaped prompts. Observe: row titles, state.json contents, `claude agents --json` output, and which filter strings narrow the list. |
 | U4 | Can `worktree.bgIsolation` live in user-global `~/.claude/settings.json`, or must it be per-project? | Determines whether the setting goes in dotfiles once or in every repo. | Put it in global only; dispatch a session in a fresh repo without project settings; observe whether auto-isolation fires. |
 | U5 | Can a session rename itself programmatically (e.g., set display name to `<issue>-<slug>` after loading the issue), or is naming only `--name` at dispatch and `Ctrl+R` interactively? | Determines whether R4 (human-readable rows) requires user keystrokes or can be automatic. | Inside a dispatched session, look for a `claude` subcommand, MCP-style hook, or skill primitive that renames the current session. |
 | U6 | What happens if you re-invoke `/sdd <N>` inside an already-attached session that's already in its worktree? | Cross-phase continuity may want this. The current dispatcher's `git worktree add` would fail (already exists); glob-resolution branch should succeed. Needs confirmation. | Dispatch `/sdd 4`, let it land in a worktree, attach, re-invoke `/sdd 4`. |
 | U7 | Does `/bg` from an interactive session preserve the branch and worktree state, or create a new worktree on backgrounding? | Affects whether a manual terminal session can be promoted into agent view mid-work. | Start `claude` in a manually-created worktree, run `/bg`, inspect the resulting agent-view session's worktree and branch. |
 | U8 | Can a session self-pin (`Ctrl+T` equivalent from inside a skill)? | If yes, long-running skills can keep themselves hot. If no, pinning is a manual user step. | Investigate `claude` CLI subcommands and any in-session primitives. |
 
-**Run U3 next** — it determines whether branch naming can stay native (no `bgIsolation: "none"` needed) or whether we need a manual escape.
+**Run U3 next** — it characterizes the lookup surface that R3 actually depends on.
 
 ## Skill-design space vs product-constraint space
 
@@ -184,7 +201,15 @@ Each depends on a deferred topic or an open experiment. Listed with their gating
 - **Cross-phase continuity model.** Skill-design choice; resolves after first lived cycle.
 - **Human review gate default.** Skill-design choice; likely a per-skill parameter.
 - **Session-naming mechanism.** Hinges on U5.
-- **`EnterWorktree` / `ExitWorktree` permission deny in `dotfiles/dot-claude/settings.json`.** Whether to retain. Becomes redundant under `bgIsolation: "none"` or full-native auto-isolation.
+- **`EnterWorktree` / `ExitWorktree` permission deny in `dotfiles/dot-claude/settings.json`.** Currently lifted (the `deny` array and the accompanying `_denyNotes` field were removed from the `permissions` object) so sessions can call `EnterWorktree` and native auto-isolation works. Permanent removal vs restoration depends on (a) what directory and branch names auto-isolation picks, (b) how the SDD dispatcher's manual `git worktree add` interacts with auto-isolation enabled (two paths competing for the same outcome), (c) how cleanup behaves under Claude-created vs user-created worktrees (`Ctrl+X` ×2 deletes Claude-created including uncommitted changes).
+  - **To restore:** in `dotfiles/dot-claude/settings.json`, add the following two fields back into the `permissions` object (alongside the existing `allow` array):
+    ```json
+    "deny": [
+      "EnterWorktree",
+      "ExitWorktree"
+    ],
+    "_denyNotes": "EnterWorktree/ExitWorktree denied so every session uses the manual worktree-per-issue flow in standards/workflow.md (git worktree add .claude/worktrees/<name> + cd) — uniform across agents, humans, and fresh terminals."
+    ```
 
 ## Next actions
 
