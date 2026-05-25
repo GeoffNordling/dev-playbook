@@ -1,4 +1,4 @@
-# Agent View Adoption
+# Claude Agents View Adoption
 
 We have committed to adopting Claude Code's [`claude agents`](https://code.claude.com/docs/en/agent-view) view as this workspace's parallel-session entry point. Today's workflow — `workflow.md` and the skills that implement it (especially the `/sdd-*` family) — pre-dates the feature and will be redesigned around it. This document is the survey that has to land first: agent view's abilities, limitations, and constraints in enough detail to design against.
 
