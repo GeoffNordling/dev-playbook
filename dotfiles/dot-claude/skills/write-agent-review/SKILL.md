@@ -12,17 +12,19 @@ An agent-review test hands the judge three things: subject document(s), standard
 
 The assertion is the load-bearing input. Write it so the judge has a clear semantic question to answer.
 
-## Five rules
+## Six rules
 
-1. **Only assert what's verifiable from the subjects and standards you hand the judge.** Think like the judge — it sees only what you show it. If a claim relies on data outside that view (code behavior, runtime state, external systems), the agent review can't reach it.
+1. **Audit the prescriptive surface, not the editorial.** A spec item's `Description:` is its prescriptive content — what the spec commits to. `Rationale:` and `Comment:` are editorial: they explain why or annotate but make no normative commitment. Agent-reviews audit `Description:` only (§2.4, §2.5, §3 of the workspace spec standard). If a load-bearing claim about another spec or standard appears in `Rationale:` or `Comment:`, the spec is malformed — fix the spec, don't write the test.
 
-2. **Name the specific normative element being audited.** Never just "the subject." Always something like "the X defined by `<id>`" — pin the judge to a specific element, not the whole subject.
+2. **Only assert what's verifiable from the subjects and standards you hand the judge.** Think like the judge — it sees only what you show it. If a claim relies on data outside that view (code behavior, runtime state, external systems), the agent review can't reach it.
 
-3. **Match the assertion's shape to what's falsifiable in the subject.** Identify what specific change to the subject (or its reference) would make it wrong in a way a reader could see. Phrase the assertion to ask about that change. If the subject contains an enumeration with citations, the falsifiable surface is incompleteness or wrong citations — ask about those. If the subject contains a single citation amid unverifiable behavioral commitments, the only falsifiable surface is citation accuracy — narrow to that.
+3. **Name the specific normative element being audited.** Never just "the subject." Always something like "the X defined by `<id>`" — pin the judge to a specific element, not the whole subject.
 
-4. **Sparse subjects warrant narrow assertions.** When the subject mostly defers to behavior or implementation, the prose surface is thin — narrow to what is actually checkable.
+4. **Match the assertion's shape to what's falsifiable in the subject.** Identify what specific change to the subject (or its reference) would make it wrong in a way a reader could see. Phrase the assertion to ask about that change. If the subject contains an enumeration with citations, the falsifiable surface is incompleteness or wrong citations — ask about those. If the subject contains a single citation amid unverifiable behavioral commitments, the only falsifiable surface is citation accuracy — narrow to that.
 
-5. **State scope explicitly only when it is narrower than the subject's own description implies.** Most assertions do not need an explicit scope clause.
+5. **Sparse subjects warrant narrow assertions.** When the subject mostly defers to behavior or implementation, the prose surface is thin — narrow to what is actually checkable.
+
+6. **State scope explicitly only when it is narrower than the subject's own description implies.** Most assertions do not need an explicit scope clause.
 
 ## One semantic focus per assertion
 
@@ -72,3 +74,4 @@ The behavioral claim is not verifiable from prose alone — it would require see
 - Asserting wholesale conformance for sparse subjects — the judge defaults to whichever surface is concretely checkable (often the subject's own form), not what you meant.
 - Spelling out a procedure for the judge in the assertion — the auditor template carries the procedure; the assertion carries the claim.
 - Stacking two semantic questions in one assertion — the judge's attention splits and one tends to drift.
+- Building an assertion around a claim that lives in `Rationale:` or `Comment:` — those keywords are non-prescriptive. If the claim is worth auditing, push it into `Description:` first; otherwise drop the test.
