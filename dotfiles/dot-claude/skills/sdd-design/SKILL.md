@@ -67,6 +67,7 @@ Principles:
 - **Minimum viable shape.** Don't add a field, method, or new type unless you can name its caller. Prefer two fields over four.
 - **Don't pin implementation.** Output format, packaging, internal walk shape, file paths — leave to the build phase unless a req constrains them.
 - **No roadmap in `Comment:`.** Comments describe the current `dsn`; future plans live on the GitHub tracker. Often, `Comment:` is omitted.
+- **No spec or standard references in `Rationale:`/`Comment:`.** Per spec standard §2.4/§2.5, `Rationale:` and `Comment:` are non-prescriptive: they `SHALL NOT` paraphrase or quote another item's obligation or a standard section. Avoid inline references to other specs (by ID or `§`) in `Rationale:`/`Comment:` even when purely structural — the structural relationship is already declared via `Covers:`, `Depends:`, or `Interface:` keywords. If a claim wants to live in `Rationale:`, push it into `Description:` instead.
 
 Mechanics:
 
@@ -83,6 +84,7 @@ Re-read each new `dsn`:
 
 - [ ] Chains up to a `req` via `Covers:` (or is a root). `Needs:` declares verification.
 - [ ] `Interface:` annotations and obligation prose conform to the spec standard.
+- [ ] `Rationale:` and `Comment:` carry no cross-references to other specs or `§` citations (§2.4, §2.5).
 - [ ] Honors the section 5 principles: minimum viable shape, no implementation pinning, no roadmap in `Comment:`.
 
 Iterate until clean.

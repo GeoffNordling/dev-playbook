@@ -63,6 +63,7 @@ Principles:
 - **One obligation level per item.** If `SHALL` and `SHOULD` content mixes, split into separate items.
 - **Non-mandatory inclusion is a commitment.** Including a `SHOULD` / `MAY` means you intend to deliver it.
 - **No roadmap in `Comment:`.** Comments describe the current item; future plans live on the GitHub tracker. Often, `Comment:` is omitted.
+- **No spec or standard references in `Rationale:`/`Comment:`.** Per spec standard §2.4/§2.5, `Rationale:` and `Comment:` are non-prescriptive: they `SHALL NOT` paraphrase or quote another item's obligation or a standard section. Avoid inline references to other specs (by ID or `§`) in `Rationale:`/`Comment:` even when purely structural — the structural relationship is already declared via the `Covers:` keyword. If a claim wants to live in `Rationale:`, push it into `Description:` instead.
 
 Mechanics:
 
@@ -77,6 +78,7 @@ Re-read each new `feat` / `req`:
 
 - [ ] Chains up to a `feat` via `Covers:` (or is a root). `Needs:` declares verification.
 - [ ] `Description:` conforms to the spec standard (EARS template, single obligation level).
+- [ ] `Rationale:` and `Comment:` carry no cross-references to other specs or `§` citations (§2.4, §2.5).
 - [ ] Honors the section 5 principles: minimum viable shape, behavior not method, no roadmap in `Comment:`.
 - [ ] Every `feat`'s out-of-scope section is answered (`NA` is fine).
 
