@@ -52,7 +52,7 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
   - `/bg [optional final instruction]` from inside an already-attached session — backgrounds the current conversation (same transcript continues, just detached).
 - The prompt is delivered as the launched session's first user message; agent view itself does not parse slash commands.
 - A prompt starting with `/<skill>` causes the launched session to model-invoke that skill as its first action, subject to the skill's `disable-model-invocation` frontmatter. Skills with `disable-model-invocation: true` cannot be entered this way (the autocomplete picker also hides them).
-- Session display name controllable via `--name` at dispatch, or `Ctrl+R` interactively in agent view. Auto-generated from prompt otherwise — by a Haiku-class model, so not deterministic across repeated runs of the same prompt. `nameSource: "auto"` vs `"manual"` is recorded in `state.json`.
+- Session display name controllable via `--name` at dispatch, or `Ctrl+R` interactively in agent view. Auto-generated from prompt otherwise — by a Haiku-class model, so not deterministic across repeated runs of the same prompt. `nameSource: "auto"` vs `"manual"` is recorded in `state.json`. **U5 confirmed these are the only paths:** no `claude` subcommand renames a running session (`attach`/`stop`/`logs`/`rm` don't, no other subcommand mentions naming); no in-session tool primitive renames the current session; editing the `name` field directly in `state.json` is ignored by the daemon (UI and `claude agents --json` continue to report the original name, `updatedAt` does not advance). State.json is a daemon-write-only checkpoint, not a config source.
 - Filters in agent view input: `a:<agent>`, `s:<state>` (including `s:blocked`), `#<PR-number>` or PR URL.
 
 ### Worktree mechanism
@@ -63,7 +63,7 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
   - Session is already inside a linked git worktree (Claude-created or user-created via `git worktree add`).
   - Working directory is not a git repository and no `WorktreeCreate` hook is configured.
   - The write target is outside the working directory.
-- Disable knob: `worktree.bgIsolation: "none"` in `.claude/settings.json`. Documented as project-level; global applicability is an unknown (U4). Requires Claude Code v2.1.143+.
+- Disable knob: `worktree.bgIsolation: "none"` in `.claude/settings.json`. **U4 confirmed global scope works:** setting `"worktree": {"bgIsolation": "none"}` in `~/.claude/settings.json` (with no project-level override in the test repo) suppressed auto-isolation for a background session dispatched from agent view typed input — the session wrote its probe file directly to the repo root, `cwd` stayed equal to `originCwd`, and `.claude/worktrees/` remained empty. The setting can live in dotfiles once. Requires Claude Code v2.1.143+.
 - Override knob: the `WorktreeCreate` hook. Per the hooks reference it "replaces default git behavior"; a registered command receives the session context on stdin and prints the chosen worktree path to stdout. Whether the hook fires inside a git repo (not only outside git), what payload it gets, and whether a hook-created branch name is preserved are still unknowns — see U3.
 - Cleanup interaction: `Ctrl+X` ×2 in agent view deletes Claude-*created* worktrees including uncommitted changes; user-*created* worktrees (via `git worktree add` in Bash) are left in place.
 
@@ -103,7 +103,7 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
 - `s:done` left both rows visible. Indistinguishable from "ignored" vs "matches both rows' `state: "done"`" from this single test.
 - `intent:U` and `intent:U324kl4532jlkljk24lkjr` both showed all rows. Either `intent:` is not a recognized prefix, or it is recognized but does not substring-search. Either way, intent-based lookup is not reachable from the input box.
 
-**Implication for R3.** The filter box is not on the access path for issue→session lookup, and the row counts this workflow targets are small enough that filtering is not a design requirement — visual scan of agent view's rows is the intended access pattern. That couples R3 to R4: row titles must be legible per-issue, and today's Haiku-paraphrase `name` does not guarantee the issue number appears. R4 in turn couples to U5 (can a session rename itself after loading the issue?). A programmatic fallback exists against `state.json` if visual scan proves insufficient: `jq 'select(.intent | contains("17"))' ~/.claude/jobs/*/state.json`.
+**Implication for R3.** The filter box is not on the access path for issue→session lookup, and the row counts this workflow targets are small enough that filtering is not a design requirement — visual scan of agent view's rows is the intended access pattern. That couples R3 to R4: row titles must be legible per-issue, and today's Haiku-paraphrase `name` does not guarantee the issue number appears. **U5 closed the post-dispatch fix:** a running session cannot rename itself. R4 from agent view typed input therefore narrows to three paths — accept Haiku names, `Ctrl+R` after dispatch (manual, one-time per row), or dispatch from a shell wrapper that passes `--name` (trades the primary-entry-point principle for an automatic title). A programmatic fallback against `state.json` exists if visual scan proves insufficient: `jq 'select(.intent | contains("17"))' ~/.claude/jobs/*/state.json`.
 
 ### Permissions
 
@@ -136,16 +136,7 @@ Most GitHub operations are PAT-reachable; the only thing standing between today'
 
 ## What we don't know (experiments needed)
 
-This list was drafted across earlier sessions and may not all hold up under fresh eyes. Treat each row as provisional — reassess whether the question is still right, whether the experiment is still worth running, and what new experiments belong here as understanding deepens.
-
-Run before any design or implementation decisions. Numbered for reference.
-
-| # | Unknown | Why it matters | Experiment |
-|---|---|---|---|
-| U4 | Can `worktree.bgIsolation` live in user-global `~/.claude/settings.json`, or must it be per-project? | Determines whether the setting goes in dotfiles once or in every repo. | Put it in global only; dispatch a session in a fresh repo without project settings; observe whether auto-isolation fires. |
-| U5 | Can a session rename itself programmatically (e.g., set display name to `<issue>-<slug>` after loading the issue), or is naming only `--name` at dispatch and `Ctrl+R` interactively? | Determines whether R4 (human-readable rows) requires user keystrokes or can be automatic. | Inside a dispatched session, look for a `claude` subcommand, MCP-style hook, or skill primitive that renames the current session. |
-
-**Run U5 next** — R3-by-visual-scan now depends on R4 (legible row titles), and U5 determines whether legibility can be automatic post-dispatch or whether it requires a manual keystroke per session.
+All platform-characterization experiments (U3, U4, U5) are closed; findings are folded into "What we know about agent view" above. Remaining open items are design choices, not facts about the platform — see the deferred topics below.
 
 ## Deferred topics
 
