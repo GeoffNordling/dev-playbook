@@ -134,10 +134,6 @@ Tap surface for the autonomous loop:
 
 Most GitHub operations are PAT-reachable; the only thing standing between today's auth and N1a is `git push`.
 
-## What we don't know (experiments needed)
-
-All platform-characterization experiments (U3, U4, U5) are closed; findings are folded into "What we know about agent view" above. Remaining open items are design choices, not facts about the platform — see the deferred topics below.
-
 ## Deferred topics
 
 Each deserves its own dedicated pass before final workflow design.
