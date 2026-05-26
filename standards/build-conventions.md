@@ -40,3 +40,5 @@ Pre-commit is fast and runs on every commit. Do not invoke `make check` from a p
 ## Continuous Integration
 
 The canonical workflow is [`dev-playbook/.github/workflows/ci.yml`](../.github/workflows/ci.yml). It runs two gates: pre-commit against `.pre-commit-config.yaml`, and `make check` in each Python sub-project's root. CI's Python version matches the `requires-python` floor in `pyproject.toml`. Consumer repos use the same workflow with the sibling checkout from [Pre-commit](#pre-commit) so the symlinked config resolves.
+
+The sibling-checkout step (`actions/checkout@v4` with `repository: GeoffNordling/dev-playbook`) runs unauthenticated on the consumer's runner, so **dev-playbook must remain a public repository**. Making it private would break CI for every consumer repo that symlinks the canonical config.
