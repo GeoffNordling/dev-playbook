@@ -12,6 +12,8 @@ Define a consistent file hierarchy and scope boundary for every repository in th
 
 **No duplication across files.** Each piece of information has exactly one home. Files reference each other rather than repeating content.
 
+**Voice and structure are standardized.** Every doc in this hierarchy follows [doc-conventions.md](doc-conventions.md) — declarative present tense, one rule per section, current-state only.
+
 ## Audience and Presence
 
 Every file in the documentation hierarchy has two properties.

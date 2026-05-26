@@ -1,6 +1,6 @@
 ---
 name: doc-rewrite
-description: Rewrite a Markdown document from scratch, preserving all content
+description: Rewrite a Markdown document from scratch, preserving content by default
 disable-model-invocation: true
 model: opus
 effort: xhigh
@@ -10,8 +10,9 @@ argument-hint: "[doc-hint]"
 # Doc Rewrite
 
 Rewrite the target Markdown document from scratch. Throw away the existing
-structure and rebuild it from the ground up, preserving every fact, rule,
-and example the source contains.
+structure and rebuild it from the ground up, preserving content by default —
+information is dropped only with the user's explicit approval, asked for
+during the workflow.
 
 Markdown documents only. Do not apply this skill to code.
 
@@ -28,12 +29,15 @@ a description like "the auth setup doc."
 
 ## Workflow
 
-1. **Read the entire document first**, top to bottom, before any edits.
-2. **Articulate the document's purpose.** This is the north
-   star for the rewrite — what the document is for, who it is for, and what
-   a reader should be able to do after reading it. Surface it explicitly
-   before rewriting so it can guide every structural choice.
-3. **Interview the user only when a genuine ambiguity would change the
+1. **Read the doc conventions** at
+   [doc-conventions.md](~/workspace/dev-playbook/standards/doc-conventions.md).
+   These are the patterns the rewrite applies.
+2. **Read the entire target document**, top to bottom, before any edits.
+3. **Articulate the document's purpose.** This is the north star for the
+   rewrite — what the document is for, who it is for, and what a reader
+   should be able to do after reading it. Surface it explicitly before
+   rewriting so it can guide every structural choice.
+4. **Interview the user only when a genuine ambiguity would change the
    rewrite.** Default is no interview. Ask when, and only when, the source
    leaves a question whose answer would materially redirect the rewrite —
    for example, the document's purpose is unclear and two readings produce
@@ -42,46 +46,31 @@ a description like "the auth setup doc."
    not visible in the document. Batch targeted questions into one round.
    Do not use the interview to confirm choices you can already make from
    the source, or to gather content the document does not contain.
-4. **Inventory the substantive content.** List every fact, rule, example,
-   constraint, and reference the document contains. Flag any item that
-   records a past decision no longer relevant given current state and next
-   steps — these are candidates for removal, not preservation.
-5. **Rewrite the document from scratch**, applying the patterns below.
-   Preserve every non-flagged item; exclude flagged stale items.
-6. **Verify against the inventory.** Confirm every non-flagged item is
-   present in the rewrite. If any item no longer fits, surface it
-   explicitly rather than silently dropping it.
-7. **Report** the one-sentence purpose, the structural changes made, items
-   removed as stale, and any items flagged as no-longer-fitting.
-
-## Patterns to Apply
-
-Apply each of these while rewriting.
-
-- **Open with a clear, concise statement of purpose.** State what the
-  document is for, who it is for, and what the reader should be able to do
-  after reading.
-- **Write for a cold-start reader.** Assume zero prior conversation context. The document must stand alone for a fresh agent in this repository.
-- **Lead each section with its most important point.** Setup,
-  qualifications, and background follow; the lede comes first.
-- **Name each concept on first use, and use that name consistently.** One
-  name per concept across the document.
-- **Group rules with their rationale and examples.** A rule, why it
-  exists, and what it looks like belong together in one place.
-- **Consolidate duplicates.** Each point lives in one authoritative
-  location.
-- **Emphasize current state and future next steps, not historical records.**
-  Past decisions that no longer constrain present or future work belong in
-  the report, not in the rewrite.
-- **Format consistently throughout.** Pick one convention per dimension —
-  heading levels, bullet style and nesting, casing and terminal
-  punctuation, emphasis, code spans, spacing — and apply it uniformly.
+5. **Inventory the substantive content.** List every fact, rule, example,
+   constraint, and reference the document contains. As you go, flag two
+   categories of candidates for removal:
+   - **Stale.** Items recording a past decision no longer relevant given
+     current state and next steps.
+   - **Ancillary.** Minor details, tangential examples, or asides that may
+     not earn their place in a tighter rewrite.
+6. **Ask the user about cuts before rewriting.** Present the flagged items
+   in one batch, grouped by category, and ask which to drop and which to
+   keep. Default-keep anything the user does not explicitly approve
+   cutting. Do not ask about items you intend to preserve.
+7. **Rewrite the document from scratch**, applying the doc conventions.
+   Preserve every item except those the user approved cutting in step 6.
+8. **Verify against the inventory.** Confirm every preserved item is
+   present in the rewrite. If any preserved item no longer fits, surface
+   it explicitly rather than silently dropping it.
+9. **Report** the one-sentence purpose, the structural changes made, items
+   dropped (with user approval), and any preserved items flagged as
+   no-longer-fitting.
 
 ## Rules
 
-- Preserve every currently-meaningful fact, rule, and example. Wording and
-  structure are free to change; information disappears only when surfaced
-  in the report.
+- **Default to preservation.** Wording and structure are free to change,
+  but information is preserved unless the user has explicitly approved
+  cutting it in workflow step 6.
 - Limit the rewrite to what the source contains. Reorganization,
   rephrasing, and surfacing implicit structure are in scope; inventing new
   rules or examples is not.
