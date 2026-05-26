@@ -8,6 +8,7 @@ Cross-project engineering standards that apply to all repositories in the worksp
 
 | Standard | Purpose |
 |----------|---------|
+| [standards-conventions.md](standards-conventions.md) | How standards files in this directory are written |
 | [repo-documentation.md](repo-documentation.md) | What files every repo should have, their scope, CONTEXT.md format, and cross-reference style |
 | [adr-conventions.md](adr-conventions.md) | When to write an ADR, the template, numbering, and optional sections |
 | [skill-conventions.md](skill-conventions.md) | Conventions for Claude Code skill bundles |
