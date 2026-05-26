@@ -80,7 +80,7 @@ Every workspace repo's `CLAUDE.md` starts from this baseline:
 ## Workflow
 
 Issue-to-PR flow per
-[workflow.md](~/workspace/dev-playbook/standards/workflow.md).
+[workflow.md](~/workspace/dev-playbook/workflow/workflow.md).
 
 ## Domain awareness
 

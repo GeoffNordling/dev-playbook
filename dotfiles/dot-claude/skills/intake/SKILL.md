@@ -10,7 +10,7 @@ effort: xhigh
 
 Single entry point for an idea. Produces one or many GitHub issues, each born ready: labeled with category, mode, and first phase; brief written into the body.
 
-For the full workflow, label scheme, issue body template, and vertical-slice rules, see the [workflow standard](~/workspace/dev-playbook/standards/workflow.md).
+For the full workflow, label scheme, issue body template, and vertical-slice rules, see the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md).
 
 ## First step
 
@@ -30,7 +30,7 @@ The user passes a free-form description. If terminology is fuzzy, scope is uncle
 
 If the idea is a single coherent piece of work → one issue.
 
-If the idea is a plan that crosses concerns or layers → break into vertical slices per the [vertical-slice rules](~/workspace/dev-playbook/standards/workflow.md#vertical-slice-rules-when-one-idea-becomes-many-issues). Quiz the user on granularity, dependencies, and HITL/AFK type before publishing.
+If the idea is a plan that crosses concerns or layers → break into vertical slices per the [vertical-slice rules](~/workspace/dev-playbook/workflow/workflow.md#vertical-slice-rules-when-one-idea-becomes-many-issues). Quiz the user on granularity, dependencies, and HITL/AFK type before publishing.
 
 ### 3. For each issue, decide
 
@@ -41,7 +41,7 @@ If the idea is a plan that crosses concerns or layers → break into vertical sl
 
 ### 4. Write the issue
 
-The issue body IS the agent brief. Use the [issue body format](~/workspace/dev-playbook/standards/workflow.md#issue-body-format-the-brief-is-the-body).
+The issue body IS the agent brief. Use the [issue body format](~/workspace/dev-playbook/workflow/workflow.md#issue-body-format-the-brief-is-the-body).
 
 ### 5. Publish
 

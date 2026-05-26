@@ -150,6 +150,24 @@ def test_reference_inside_fenced_code_block_is_skipped(tmp_path, workspace):
     assert "no cross-references found" in result.stderr
 
 
+def test_broken_refs_inside_adr_directory_are_skipped(tmp_path, workspace):
+    """ADRs are immutable historical records — broken refs in them are
+    expected staleness, not lint errors."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(repo / "other.md", "see ~/workspace/primary/target.md\n")
+    write(
+        repo / "docs" / "adr" / "0001-decision.md",
+        "see ~/workspace/primary/gone.md\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "all ok" in result.stderr
+
+
 def test_worktree_resolves_in_repo_refs_to_worktree_working_copy(tmp_path, workspace):
     """File present only in the worktree's working copy must resolve as ok."""
     repo = workspace / "primary"

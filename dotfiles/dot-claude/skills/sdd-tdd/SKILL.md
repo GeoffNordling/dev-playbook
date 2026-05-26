@@ -94,7 +94,7 @@ Bugs that surface during implementation are spec gaps. Flag the gap, propose the
 When all chunks are complete, the suite is green, lint/format/typecheck pass, and the user has approved every diff:
 
 1. **Final check sweep — leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). The chunk loop runs these per-chunk, but a final whole-tree pass catches cross-chunk regressions and any drift since the last chunk. All must pass; if anything fails, fix it and re-run. Do not push a red branch.
-2. **Re-read the [workflow standard](~/workspace/dev-playbook/standards/workflow.md) now** — fresh, even though you may have read it previously.Then commit, push, and open the PR exactly per its `## In flight` section.
+2. **Re-read the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md) now** — fresh, even though you may have read it previously.Then commit, push, and open the PR exactly per its `## In flight` section.
 3. Bump the issue's phase label:
    ```bash
    gh issue edit <issue-number> --remove-label "phase/build" --add-label "phase/review"

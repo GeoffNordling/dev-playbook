@@ -13,7 +13,7 @@ Reads the issue's `phase/*` label, resolves the issue's worktree, and invokes th
 
 ## First steps
 
-1. **Read the [workflow standard](~/workspace/dev-playbook/standards/workflow.md).** It defines the label scheme, worktree convention, and PR mechanics this dispatcher and its phase skills implement.
+1. **Read the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md).** It defines the label scheme, worktree convention, and PR mechanics this dispatcher and its phase skills implement.
 2. **Run `pwd`.** The env header's CWD was captured before this skill ran. Trust `pwd`, not the header.
 3. **Confirm local `main` is current.** Compare local and remote `main` SHAs:
    ```bash
@@ -36,4 +36,4 @@ Reads the issue's `phase/*` label, resolves the issue's worktree, and invokes th
 
 ## Worktree resolution
 
-Resolve and enter the issue's worktree per [Branch and worktree](~/workspace/dev-playbook/standards/workflow.md#branch-and-worktree) in the workflow standard. The phase skill inherits the worktree as its working directory.
+Resolve and enter the issue's worktree per [Branch and worktree](~/workspace/dev-playbook/workflow/workflow.md#branch-and-worktree) in the workflow standard. The phase skill inherits the worktree as its working directory.

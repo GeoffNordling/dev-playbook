@@ -159,5 +159,5 @@ R9 (main currency check) is independent of this decision — local `main` refres
       "EnterWorktree",
       "ExitWorktree"
     ],
-    "_denyNotes": "EnterWorktree/ExitWorktree denied so every session uses the manual worktree-per-issue flow in standards/workflow.md (git worktree add .claude/worktrees/<name> + cd) — uniform across agents, humans, and fresh terminals."
+    "_denyNotes": "EnterWorktree/ExitWorktree denied so every session uses the manual worktree-per-issue flow in workflow/workflow.md (git worktree add .claude/worktrees/<name> + cd) — uniform across agents, humans, and fresh terminals."
     ```

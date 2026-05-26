@@ -5,7 +5,10 @@ Scans every .md file under the invoking repo for ~/workspace/<repo>/... paths,
 resolves each to a file-or-directory on disk, and classifies it as ok or
 broken. References inside the invoking repo are resolved against the working
 copy (worktree-safe). References to other workspace repos are resolved
-against the absolute on-disk path. Fenced code blocks are skipped.
+against the absolute on-disk path. Fenced code blocks are skipped. Files
+inside any `adr/` directory are skipped as well — ADRs are immutable
+historical records, so broken refs in them are accepted as expected
+staleness, not lint errors.
 
 Fragment anchors (`#heading-slug`) are stripped before resolution and are
 NOT validated — only the file's existence is checked. Anchor validation is
@@ -41,6 +44,12 @@ EXCLUDE_DIRS = {
     ".ruff_cache",
     "__pycache__",
     "node_modules",
+    # ADRs are immutable historical records (per
+    # standards/adr-conventions.md). A file an ADR references may later
+    # move or be deleted; we cannot update the link without editing the
+    # ADR. ref-check treats broken refs inside docs/adr/ as expected
+    # staleness. References from other files TO ADRs are still validated.
+    "adr",
 }
 
 REF_PATTERN = re.compile(r"~/workspace/[^ )`\n]+")

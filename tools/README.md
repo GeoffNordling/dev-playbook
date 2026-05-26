@@ -158,7 +158,7 @@ Pinned to `~/workspace` — no auto-detection and no alternate-path argument. Fa
 
 ### worktree-sweep
 
-Walk `.claude/worktrees/` in the current repo and prune worktrees whose most-recent PR is merged with no local divergence. Anything else is reported for human triage. Implements the cleanup step of [workflow.md](../standards/workflow.md).
+Walk `.claude/worktrees/` in the current repo and prune worktrees whose most-recent PR is merged with no local divergence. Anything else is reported for human triage. Implements the cleanup step of [workflow.md](../workflow/workflow.md).
 
 ```bash
 worktree-sweep            # apply prunes, report the rest
@@ -169,7 +169,7 @@ Auto-prune requires all three: PR state `MERGED`, local tip SHA matches the PR's
 
 ### bootstrap-labels
 
-Enforce the workspace's GitHub label scheme in the current repo. Closed-world and idempotent: canonical labels are created or have their descriptions corrected; any label not in the canonical table is deleted. Color drift is ignored. The label scheme is defined in [workflow.md](../standards/workflow.md). `/intake` auto-invokes this on every run, so the labels are reconciled automatically the first time the workflow is used in a new repo.
+Enforce the workspace's GitHub label scheme in the current repo. Closed-world and idempotent: canonical labels are created or have their descriptions corrected; any label not in the canonical table is deleted. Color drift is ignored. The label scheme is defined in [workflow.md](../workflow/workflow.md). `/intake` auto-invokes this on every run, so the labels are reconciled automatically the first time the workflow is used in a new repo.
 
 ```bash
 bootstrap-labels
