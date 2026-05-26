@@ -62,7 +62,7 @@ def write(file: Path, content: str) -> None:
     file.write_text(content)
 
 
-def test_in_repo_ref_to_existing_file_is_ok(tmp_path, workspace):
+def test_in_repo_ref_to_existing_file_is_ok(tmp_path: Path, workspace: Path) -> None:
     repo = workspace / "primary"
     init_repo(repo)
     write(repo / "target.md", "x")
@@ -74,7 +74,7 @@ def test_in_repo_ref_to_existing_file_is_ok(tmp_path, workspace):
     assert "all ok" in result.stderr
 
 
-def test_in_repo_ref_to_missing_file_is_broken(tmp_path, workspace):
+def test_in_repo_ref_to_missing_file_is_broken(tmp_path: Path, workspace: Path) -> None:
     repo = workspace / "primary"
     init_repo(repo)
     write(repo / "docs.md", "see ~/workspace/primary/missing.md\n")
@@ -85,7 +85,7 @@ def test_in_repo_ref_to_missing_file_is_broken(tmp_path, workspace):
     assert "1/1 broken" in result.stderr
 
 
-def test_cross_repo_ref_to_existing_file_is_ok(tmp_path, workspace):
+def test_cross_repo_ref_to_existing_file_is_ok(tmp_path: Path, workspace: Path) -> None:
     repo = workspace / "primary"
     other = workspace / "other"
     init_repo(repo)
@@ -98,7 +98,9 @@ def test_cross_repo_ref_to_existing_file_is_ok(tmp_path, workspace):
     assert result.returncode == 0
 
 
-def test_cross_repo_ref_to_missing_file_is_broken(tmp_path, workspace):
+def test_cross_repo_ref_to_missing_file_is_broken(
+    tmp_path: Path, workspace: Path
+) -> None:
     repo = workspace / "primary"
     other = workspace / "other"
     init_repo(repo)
@@ -110,7 +112,9 @@ def test_cross_repo_ref_to_missing_file_is_broken(tmp_path, workspace):
     assert result.returncode == 1
 
 
-def test_cross_repo_ref_to_missing_repo_is_broken(tmp_path, workspace):
+def test_cross_repo_ref_to_missing_repo_is_broken(
+    tmp_path: Path, workspace: Path
+) -> None:
     repo = workspace / "primary"
     init_repo(repo)
     write(repo / "docs.md", "see ~/workspace/no-such-repo/foo.md\n")
@@ -120,7 +124,9 @@ def test_cross_repo_ref_to_missing_repo_is_broken(tmp_path, workspace):
     assert result.returncode == 1
 
 
-def test_reference_inside_inline_code_is_skipped(tmp_path, workspace):
+def test_reference_inside_inline_code_is_skipped(
+    tmp_path: Path, workspace: Path
+) -> None:
     """Backticked content is prose per repo-documentation.md — refs inside
     `~/workspace/<placeholder>` syntax must not be classified."""
     repo = workspace / "primary"
@@ -136,7 +142,9 @@ def test_reference_inside_inline_code_is_skipped(tmp_path, workspace):
     assert "no cross-references found" in result.stderr
 
 
-def test_reference_inside_fenced_code_block_is_skipped(tmp_path, workspace):
+def test_reference_inside_fenced_code_block_is_skipped(
+    tmp_path: Path, workspace: Path
+) -> None:
     repo = workspace / "primary"
     init_repo(repo)
     write(
@@ -150,7 +158,9 @@ def test_reference_inside_fenced_code_block_is_skipped(tmp_path, workspace):
     assert "no cross-references found" in result.stderr
 
 
-def test_broken_refs_inside_adr_directory_are_skipped(tmp_path, workspace):
+def test_broken_refs_inside_adr_directory_are_skipped(
+    tmp_path: Path, workspace: Path
+) -> None:
     """ADRs are immutable historical records — broken refs in them are
     expected staleness, not lint errors."""
     repo = workspace / "primary"
@@ -168,7 +178,9 @@ def test_broken_refs_inside_adr_directory_are_skipped(tmp_path, workspace):
     assert "all ok" in result.stderr
 
 
-def test_worktree_resolves_in_repo_refs_to_worktree_working_copy(tmp_path, workspace):
+def test_worktree_resolves_in_repo_refs_to_worktree_working_copy(
+    tmp_path: Path, workspace: Path
+) -> None:
     """File present only in the worktree's working copy must resolve as ok."""
     repo = workspace / "primary"
     init_repo(repo)
@@ -189,7 +201,7 @@ def test_worktree_resolves_in_repo_refs_to_worktree_working_copy(tmp_path, works
     assert result.returncode == 0, result.stderr
 
 
-def test_not_a_git_repo_exits_2(tmp_path, workspace):
+def test_not_a_git_repo_exits_2(tmp_path: Path, workspace: Path) -> None:
     not_a_repo = workspace / "no-git-here"
     not_a_repo.mkdir()
     write(not_a_repo / "docs.md", "irrelevant\n")

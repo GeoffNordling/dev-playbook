@@ -29,8 +29,10 @@ Use `AskUserQuestion` to gather, in one batch:
 Verify:
 
 - `~/workspace/<name>/` does not exist.
-- `~/workspace/dev-playbook/.pre-commit-config.yaml` exists (the symlink
-  target).
+- `~/workspace/dev-playbook/.pre-commit-config.yaml` exists. The relative
+  symlink materialized in step 4 (`../dev-playbook/.pre-commit-config.yaml`)
+  depends on both repos sitting as siblings under `~/workspace/`, which is
+  the workspace convention this skill assumes.
 
 Fail loudly if either check fails.
 
@@ -69,8 +71,38 @@ standards rather than duplicating their content.
 - `Makefile` — [build-conventions.md — Standard targets](~/workspace/dev-playbook/standards/build-conventions.md#standard-targets)
 - `src/<package>/__init__.py` — empty per [python-conventions.md — Package Initialization](~/workspace/dev-playbook/standards/python-conventions.md#package-initialization)
 - `tests/__init__.py` — empty
+- `tests/test_smoke.py` — a single test asserting the package imports:
 
-## 5. Initialize git and create the GitHub repo
+  ```python
+  def test_imports() -> None:
+      import <package>  # noqa: F401
+  ```
+
+  Seeded so `make check` has at least one test to collect (pytest exits
+  with code 5 otherwise). It also catches missing `__init__.py` and broken
+  imports going forward.
+
+Materializing `.github/workflows/ci.yml` is deferred to step 7 — the
+consumer-repo template needs the GitHub owner, which isn't resolved
+until step 6.
+
+## 5. Sync and verify the scaffold (Python stack only)
+
+```bash
+cd ~/workspace/<name>
+uv sync
+make check
+```
+
+`uv sync` creates `.venv/` and `uv.lock`. The lock file is committed.
+
+`make check` must pass on a fresh scaffold. If it doesn't, the standards'
+templates have drifted from current tooling behavior (ruff, mypy, pytest
+upgrades) and that's the right moment to fix the standards before the
+new repo inherits the breakage. Do not proceed past a failing `make
+check` — surface the failure for diagnosis.
+
+## 6. Initialize git and create the GitHub repo
 
 Initialize the local repo:
 
@@ -105,7 +137,17 @@ gh api user --jq .login
 git -C ~/workspace/<name> remote add origin git@github.com:<login>/<name>.git
 ```
 
-## 6. Bootstrap labels
+## 7. Materialize the CI workflow (Python stack only)
+
+Now that the GitHub login is resolved, write
+`~/workspace/<name>/.github/workflows/ci.yml` from the consumer-repo
+template in [build-conventions.md — Continuous Integration](~/workspace/dev-playbook/standards/build-conventions.md#continuous-integration).
+Fill in:
+
+- `path: <name>` (the new repo's checkout path)
+- `repository: <login>/dev-playbook` (the resolved owner from step 6)
+
+## 8. Bootstrap labels
 
 Requires the GitHub repo to exist. `cd ~/workspace/<name>` (standalone)
 then:
@@ -114,7 +156,7 @@ then:
 python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
 ```
 
-## 7. Initial commit
+## 9. Initial commit
 
 ```bash
 git -C ~/workspace/<name> add .
@@ -124,7 +166,7 @@ git -C ~/workspace/<name> commit -m "Initial scaffold"
 The initial commit is part of repo creation; no further authorization
 needed.
 
-## 8. Hand off the push
+## 10. Hand off the push
 
 Print the push command for the user — pushing requires their YubiKey
 tap. Do NOT run `git push`.

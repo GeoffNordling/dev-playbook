@@ -51,15 +51,15 @@ Run automatically on every commit via pre-commit hooks. Each validation script:
 | `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
 | `no-future-annotations` | (rule documented in script docstring) | Bans `from __future__ import annotations` (dead weight on Python >= 3.11) |
 
-Hook configuration lives in `.pre-commit-config.yaml` at this repo's root and is the **canonical workspace config**. Other workspace repos symlink it (`ln -s ~/workspace/dev-playbook/.pre-commit-config.yaml .pre-commit-config.yaml`) so any hook added here flows to every repo on the next commit. Each validator is responsible for finding its own targets from cwd and exiting 0 silently when there are none, so the same invocation is safe in a repo that has nothing to audit.
+Hook configuration lives in `.pre-commit-config.yaml` at this repo's root and is the **canonical workspace config**. Other workspace repos symlink it with a **relative** target (`ln -s ../dev-playbook/.pre-commit-config.yaml .pre-commit-config.yaml`) so any hook added here flows to every repo on the next commit. Relative is required so the symlink also resolves on a CI runner that checks dev-playbook out as a sibling — see [build-conventions.md — Pre-commit Config](../standards/build-conventions.md#pre-commit-config-consumer-repo-opt-in). Each validator is responsible for finding its own targets from cwd and exiting 0 silently when there are none, so the same invocation is safe in a repo that has nothing to audit.
 
 #### Three-environment contract
 
 Every `local` hook entry runs in three environments and MUST work in all of them:
 
 1. **dev-playbook locally** — `.pre-commit-config.yaml` is the real file.
-2. **Consumer repos locally** — `.pre-commit-config.yaml` is a *symlink* back to dev-playbook.
-3. **GitHub Actions runner** — repo checked out at an arbitrary path; no `$HOME` paths exist.
+2. **Consumer repos locally** — `.pre-commit-config.yaml` is a *relative symlink* back to dev-playbook (`../dev-playbook/.pre-commit-config.yaml`).
+3. **GitHub Actions runner** — repo checked out at an arbitrary path; no `$HOME` paths exist. Consumer repos check out dev-playbook as a sibling so the relative symlink resolves there too (see [build-conventions.md — Continuous Integration](../standards/build-conventions.md#continuous-integration)).
 
 Hardcoded absolute paths under `$HOME` break (3). Cwd-relative paths break (2). The working pattern is to resolve dev-playbook's root via `realpath .pre-commit-config.yaml` and build the tool path from there, e.g.:
 
@@ -191,8 +191,8 @@ Used by `/intake`, `/sdd`, and the SDD phase skills to load issue context at the
 
 ```bash
 cd tools && uv sync             # setup
-uv run ruff check .             # lint
-uv run ruff format .            # format
+make check                      # format-check + lint + typecheck + test
+make format                     # apply formatter fixes
 ```
 
-Python >= 3.11; ruff for lint + format. Line length 88 (ruff default). Ruff rules: E, W, F, I, UP, B, SIM, SLF (E501 ignored). Standalone scripts in `bin/` use PEP 723 inline metadata — their dependencies do not go in `pyproject.toml`. When adding a new tool, add it to the tables above.
+Standard targets per [build-conventions.md](../standards/build-conventions.md). Python >= 3.14; tooling config (ruff rules, mypy flags) per [python-project-conventions.md](../standards/python-project-conventions.md). Standalone scripts in `bin/` use PEP 723 inline metadata — their dependencies do not go in `pyproject.toml`, and they are out of scope for the project's `typecheck` target (their imports cannot be resolved against the project venv). When adding a new tool, add it to the tables above.

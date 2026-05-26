@@ -1,15 +1,28 @@
+# Single source of truth for pre-commit hooks across the workspace.
+# We have multiple repos under ~/workspace/, plus their CI runners, and we
+# want all of them running the same checks at the same versions. So this
+# one file lives in dev-playbook; every consumer repo symlinks to it (and
+# in CI checks dev-playbook out as a sibling so the symlink resolves there
+# too). One change here flows to every repo on the next commit.
+#
+# The three-environment contract below is how each hook entry stays
+# location-independent so the symlink trick works.
+#
 # Three-environment contract — every `local` hook entry MUST work in all three:
 #   1. dev-playbook locally        — .pre-commit-config.yaml is the real file
-#   2. consumer repos locally      — .pre-commit-config.yaml is a SYMLINK to (1)
-#   3. GitHub Actions runner       — repo checked out at an arbitrary path; no $HOME paths exist
+#   2. consumer repos locally      — .pre-commit-config.yaml is a RELATIVE SYMLINK
+#                                    (../dev-playbook/.pre-commit-config.yaml) to (1)
+#   3. GitHub Actions runner       — consumer repos check out dev-playbook as a
+#                                    sibling so the relative symlink resolves there too
 # Hardcoded absolute paths under $HOME break (3); cwd-relative paths break (2).
 # Pattern: resolve dev-playbook's root via `realpath .pre-commit-config.yaml`,
 # then build paths relative to that. The local hooks below follow this pattern.
+# See standards/build-conventions.md for the symlink and CI conventions.
 # If you change a hook entry, mentally walk all three environments before pushing.
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.7
+    rev: v0.15.14
     hooks:
       - id: ruff
         args: [--fix]

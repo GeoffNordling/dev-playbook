@@ -7,9 +7,14 @@ layout, `pyproject.toml`, and tool configuration. Sibling to:
 - [build-conventions.md](build-conventions.md) — Makefile and `make check`
 - [testing-conventions.md](testing-conventions.md) — pytest conventions
 
-Scope: applies to top-level Python repos. Sub-projects inside meta repos
-`MAY` deviate — e.g. `dev-playbook/tools/` uses `[tool.uv] package = false`
-because it is a script collection, not a packageable library.
+Scope: applies to top-level Python repos and to Python sub-projects inside
+meta repos (e.g. `dev-playbook/tools/`). Sub-projects `MAY` deviate on
+packaging details — e.g. `dev-playbook/tools/` uses `[tool.uv] package =
+false` because it is a script collection, not a packageable library. They
+`SHALL NOT` deviate on the lint, type-check, and test contract: every
+sub-project has the full `[tool.ruff]`, `[tool.mypy]`, and pytest config
+described below, and the standard targets defined in
+[build-conventions.md](build-conventions.md).
 
 ## Directory Layout
 
@@ -19,8 +24,11 @@ because it is a script collection, not a packageable library.
 ├── Makefile
 ├── README.md
 ├── CLAUDE.md
-├── .pre-commit-config.yaml      # symlink — see build-conventions.md
+├── .pre-commit-config.yaml      # relative symlink — see build-conventions.md
 ├── .gitignore
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # per build-conventions.md — Continuous Integration
 ├── src/
 │   └── <package>/
 │       └── __init__.py          # empty per python-conventions.md
@@ -41,7 +49,7 @@ The canonical shape, using `<repo>` and `<package>` placeholders:
 [project]
 name = "<repo>"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 dependencies = []
 
 [build-system]
@@ -56,13 +64,13 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
-    "mypy",
-    "pytest",
-    "ruff",
+    "mypy>=2.0",
+    "pytest>=9.0",
+    "ruff>=0.15.14",
 ]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py314"
 line-length = 88
 
 [tool.ruff.lint]
@@ -73,10 +81,11 @@ ignore = ["E501"]
 known-first-party = ["<package>"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.14"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
 check_untyped_defs = true
 disable_error_code = ["import-untyped"]
 ```
@@ -89,6 +98,10 @@ disable_error_code = ["import-untyped"]
   Lighter than full `strict = true`, which also turns on
   `disallow_untyped_calls` (chokes on every untyped third-party lib) and
   `disallow_any_generics` (noisy about every bare `list`/`dict`).
+- **`disallow_incomplete_defs = true`.** Pairs with the above: if a function
+  annotates *some* but not all of its parameters or return, mypy errors.
+  Without it, a half-annotated signature passes silently and yields no type
+  information for the unannotated slots.
 - **`disable_error_code = ["import-untyped"]`.** Allows imports from
   libraries without type stubs without forcing `# type: ignore` at each
   import. Add `types-*` stub packages to `dev` when a specific library
@@ -101,10 +114,11 @@ disable_error_code = ["import-untyped"]
 
 ## Dev Tooling Versions
 
-The standard `SHALL NOT` pin minimum versions of `mypy`, `pytest`, or
-`ruff`. Acquire versions via `uv add --dev` and let `uv.lock` record the
-resolution. Pinned versions in the standard rot faster than the standard
-is updated.
+The standard pins minimum versions of `mypy`, `pytest`, and `ruff` (see the
+`dev` group above). Consumer repos `SHALL` declare floors at least as high
+as the standard's; bumping the workspace floor is done by editing this file
+and propagating to consumer repos. Exact resolved versions are recorded in
+each repo's `uv.lock`.
 
 ## Project Scripts
 
