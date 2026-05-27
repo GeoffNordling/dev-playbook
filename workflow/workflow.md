@@ -19,6 +19,8 @@ Current system security constraints require user yubikey tap for both `git pull`
 
 Document and intentionally scope permissions granted to Claude Code agents.
 
+Incorporate Claude Code's /goal feature; very useful to maximize agent autonomy.
+
 Explore "sandboxing" methods (Claude Code native and third-party alternatives such as Pocock's sandcastle, etc.). Have not explored these at all yet. Not sure if they are useful.
 
 All state transitions, actions, metadata, for each issue, is tracked in a local SQLite DB so we can understand how our system performs.
@@ -31,33 +33,63 @@ The `/improve-codebase-architecture` skill seems very useful but was not integra
 
 Every issue is tagged with a tuple of labels: `(mode:*, phase/*)`. Both labels are always present. The state of an issue is the tuple. Each node below is one reachable `(mode, phase)` combination.
 
+Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, review})`. Four kinds:
+
+- `(agent, work)` — agent produces output (e.g., `sdd_build`, `build`)
+- `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec`, `agent_code`)
+- `(human, work)` — human produces output (e.g., `sdd_requirements`, `sdd_design`, `requirements`)
+- `(human, review)` — human reads and decides (e.g., `sdd_human_spec`, `human_code`)
+
 ```mermaid
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart LR
-    start([ ]) -->|mode:sdd| req_sdd[requirements sdd]
-    start -->|mode:direct| req_direct[requirements direct]
+    start([ ]) -->|mode:sdd| sdd_requirements[sdd requirements spec]
+    start -->|mode:direct| requirements[requirements]
 
     subgraph sdd[SDD path]
-        req_sdd -->|/sdd-design| design[design]
-        design -->|drafted| spec_review{spec-review}
-        spec_review -->|iterate| spec_review
-        spec_review -->|redesign| design
-        spec_review -->|approved| build_sdd[build sdd]
-        build_sdd -->|PR ready| cr_sdd{code-review sdd}
-        cr_sdd -->|iterate| cr_sdd
-        cr_sdd -->|rework| build_sdd
+        sdd_requirements -->|design| sdd_design[sdd design spec]
+        sdd_design -->|draft| sdd_agent_spec[agent spec review]
+        sdd_agent_spec -->|attach review| sdd_human_spec{human spec review}
+        sdd_human_spec -->|reject: iterate| sdd_agent_spec
+        sdd_human_spec -->|reject: redesign| sdd_design
+        sdd_human_spec -->|approve| sdd_build[sdd build]
+        sdd_build -->|open PR| sdd_agent_code[agent code review]
+        sdd_agent_code -->|attach review| sdd_human_code{human code review}
+        sdd_human_code -->|reject: iterate| sdd_agent_code
+        sdd_human_code -->|reject: rework| sdd_build
     end
 
     subgraph direct[Direct path]
-        req_direct -->|/build| build_direct[build direct]
-        build_direct -->|PR ready| cr_direct{code-review direct}
-        cr_direct -->|iterate| cr_direct
-        cr_direct -->|rework| build_direct
+        requirements -->|build| build[build]
+        build -->|open PR| agent_code[agent code review]
+        agent_code -->|attach review| human_code{human code review}
+        human_code -->|reject: iterate| agent_code
+        human_code -->|reject: rework| build
     end
 
-    cr_sdd -->|merged| done([merged])
-    cr_direct -->|merged| done
+    sdd_human_code -->|approve: merge| done([merged])
+    human_code -->|approve: merge| done
 ```
+
+Everything is human-invoked via "claude agents" view — subscription billing requires use of Claude Code interactive mode. Three modes of human engagement exist in theory; only two comply with the interactive mode constraint:
+
+- **Human in the loop (HITL)** — human is actively engaged throughout, spending real time and focus. Use this for stages that focus on extracting human intent. Examples: initial issue creation and writing specs.
+- **Finger on the wheel (FOTW)** — skill is designed to run hands-off; human is present only because billing requires it. Agent does the work; human invokes the skill and responds to escalations. Examples: implementing code, performing agent reviews.
+- **Hands off the wheel (AFK)** — agent runs autonomously, no human involvement. *Not available* under subscription billing. We would use this if we could.
+
+FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
+
+## Skills
+
+Placeholder — skill names and scope are still in flux. Each skill will have one row.
+
+| Skill | Description | Mode | Permissions set | Escalation triggers |
+|-------|-------------|------|-----------------|---------------------|
+| _TBD_ | _One sentence._ | HITL or FOTW | _Permissions granted to the skill (e.g. `acceptEdits`, allowed tools, denied tools)._ | _Conditions under which the agent escalates to the human (e.g. unexpected state, plan deviation)._ |
+
+Other edges are not skill-fired: issue creation (start edges) is `gh issue create` with the mode label; `reject: redesign` and `approve: merge` are `gh` label or PR changes.
+
+One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
 
 # Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
