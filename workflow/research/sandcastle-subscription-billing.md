@@ -299,6 +299,36 @@ gh issue view 507 --repo mattpocock/sandcastle --comments
 grep -rn "sandbox:" .sandcastle --include='*.ts'
 ```
 
+### 4.8 What the Docker sandbox actually isolates
+
+Closes §5 q4. Read: `src/sandboxes/docker.ts`,
+`src/DockerLifecycle.ts:156-170`, `src/SandboxFactory.ts:272-296`,
+`src/startSandbox.ts:127-156`, `.sandcastle/Dockerfile`.
+
+- **`docker run` flags** (`DockerLifecycle.ts:156-170`): identity
+  (`--user UID:GID`), mounts (`-v`), env (`-e`), opt-in `--network` /
+  `--group-add` / `--device` / `--cpus`. **No security hardening flags**
+  — Docker defaults only.
+- **Default mounts** (`startSandbox.ts:127-156` + `resolveGitMounts`):
+  worktree → `/home/agent/workspace` and `.git`. Host config dirs
+  (`~/.ssh`, `~/.aws`, `~/.claude`, etc.) are not mounted; the OAuth
+  token reaches the container via `-e`, not a mount.
+- **Network**: Docker's default bridge — full outbound internet, no
+  egress controls.
+- **Image** (`.sandcastle/Dockerfile`): Debian + git/curl/jq/gh/claude,
+  non-root `agent` user, `sleep infinity` entrypoint.
+- **Trust-model coupling** (`interactive.ts:388`,
+  `AgentProvider.ts:862-872`): inside any non-`noSandbox()` provider,
+  claude runs with `--dangerously-skip-permissions`. The mount surface
+  IS the policy.
+
+**Net over a permission-tightened bare-metal claude:** filesystem
+allow-list by mount (replaces deny-list permission curation) and
+unattended AFK operation (permissions are off inside the sandbox).
+
+**Not added in shipped form:** network egress control, quota protection,
+hardened kernel isolation, write protection on the repo.
+
 ## 5. Open questions for the fresh agent
 
 The investigator did **not** answer the following. Future research should.
@@ -339,15 +369,9 @@ The investigator did **not** answer the following. Future research should.
    `sandcastle docker build-image`) — the Dockerfile ships with Claude
    Code CLI baked in, per the README.
 
-4. **`noSandbox()` vs Docker for subscription billing** — §4.7 establishes
-   that subscription users' gravitation toward `noSandbox()` is a
-   runtime/setup preference (don't want a container on the host running
-   sandcastle), not an auth-technical block. The remaining behavioural
-   question is what the Docker sandbox *actually isolates* (network egress,
-   mounts, host filesystem reach, capabilities, credential surface) — which
-   matters for any subscription user who explicitly *does* want the
-   container as an isolation boundary and is willing to diverge from the
-   scaffolded API-key happy path. Not investigated here.
+4. ~~`noSandbox()` vs Docker for subscription billing~~ — **answered in
+   §4.8.** Net: filesystem allow-list + AFK are the two new
+   affordances; network/kernel/quota/write-protection are not added.
 
 5. **`~/.claude` bind-mount as an alternate auth path** — would mounting the
    host's `~/.claude` into the container (`mounts: [{ hostPath: "~/.claude",
