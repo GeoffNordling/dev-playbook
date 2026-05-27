@@ -81,5 +81,6 @@
   "autoMemoryEnabled": false,
   "theme": "light",
   "agentPushNotifEnabled": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
