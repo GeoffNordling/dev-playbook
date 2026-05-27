@@ -27,6 +27,8 @@ I'm interested in a lightweight web browser view of the system. Something visual
 
 The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
 
+Adversarial code-review nodes tentatively delegate to built-in `/code-review`; needs experimentation to confirm issue-context injection works.
+
 # Graph-based flow
 
 ## State machine
@@ -93,11 +95,18 @@ Three modes of human engagement exist in theory; only two are available under th
 
 FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
 
-Placeholder — skill names and scope are still in flux. Each skill will have one row.
+Direct-mode skills mirror SDD-mode skills by dropping the `sdd-` prefix (e.g., `/sdd-tdd` → `/tdd`).
 
-| Skill | Description | Mode | Permissions set | Escalation triggers |
-|-------|-------------|------|-----------------|---------------------|
-| _TBD_ | _One sentence._ | Pick on: {HITL, FOTW} | _Permissions granted to the skill (e.g. `acceptEdits`, allowed tools, denied tools)._ | _Conditions under which the agent escalates to the human (e.g. unexpected state, plan deviation)._ |
+| Node | Skill | Mode | Permissions set | Escalation triggers |
+|------|-------|------|-----------------|---------------------|
+| `create_issue` | `/intake` | HITL | TBD | TBD |
+| `sdd_requirements` | `/sdd-requirements` | HITL | TBD | TBD |
+| `sdd_design` | `/sdd-design` | HITL | TBD | TBD |
+| `sdd_build` | `/sdd-tdd` | FOTW | TBD | TBD |
+| `build` | `/tdd` *(new)* | FOTW | TBD | TBD |
+| `sdd_agent_spec` | `/sdd-agent-spec-review` *(new)* | FOTW | TBD | TBD |
+| `sdd_agent_code` | `/code-review` wrapper *(TBD)* | FOTW | TBD | TBD |
+| `agent_code` | `/code-review` wrapper *(TBD)* | FOTW | TBD | TBD |
 
 # Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
