@@ -95,13 +95,18 @@ Tool access is governed by a tiered settings hierarchy. Rules at every level mer
 | CLI args | `claude agents --permission-mode dontAsk …` | **Sets FOTW mode for dispatched sessions only**, leaving personal `claude` sessions in their normal mode. |
 | Local | `<repo>/.claude/settings.local.json` | Rare; gitignored personal exceptions. |
 | Project | `<repo>/.claude/settings.json` | Repo-specific allow rules. |
-| User | `~/.claude/settings.json` | Cross-cutting allow rules and `Skill()` gates. Stow-linked from `dotfiles/dot-claude/`. Benign for personal sessions — never sets mode. |
+| User | `~/.claude/settings.json` | `Skill()` gates for FOTW-entry skills, plus narrow backstop for built-in skills. Stow-linked from `dotfiles/dot-claude/`. Benign for personal sessions — never sets mode. |
 
-At runtime, the active skill's `allowed-tools` front-matter adds to the effective allow set for the skill's lifetime — this is the **per-skill permission set** referenced in the [skill table](#skills). Additive only; cannot override a deny.
+**Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to every session dispatched from that agent view (HITL and FOTW alike); personal `claude` sessions launched without the flag are unaffected. Trades upfront allow-list enumeration for runtime determinism.
 
-**Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to FOTW dispatches only. Trades upfront allow-list enumeration for runtime determinism — no surprise prompts during FOTW sessions.
+Allow rules are encoded at two levels:
 
-User-level allow rules cover cross-cutting tools (`Skill()` for our FOTW skills, `Bash(gh *)`, common filesystem commands) and are safe in personal sessions. Per-skill `allowed-tools` covers skill-internal needs only. Canonical rule syntax and edge cases: [permissions docs](https://code.claude.com/docs/en/permissions).
+- **User-level allow** holds only `Skill(name)` gates for the FOTW-entry skills the dispatcher launches, plus a narrow bash backstop for built-in skills whose front-matter we cannot author (e.g., `/code-review`'s internal `Bash(gh pr diff *)`).
+- **Per-skill `allowed-tools` front-matter** holds everything else for that skill — bash patterns, edits, and any sub-skills it invokes (`Skill(child)`) — declared in one line. This is the **per-skill permission set** referenced in the [skill table](#skills). Additive at runtime, scoped to the skill's lifetime; cannot override a deny.
+
+Edges fired by skills are covered by the firing skill's `allowed-tools`. Edges fired by the human (label changes, manual merge) need no encoding.
+
+Canonical rule syntax and edge cases: [permissions docs](https://code.claude.com/docs/en/permissions).
 
 ## Skills
 
