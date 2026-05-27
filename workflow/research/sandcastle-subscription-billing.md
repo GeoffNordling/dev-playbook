@@ -4,6 +4,28 @@ This document is for a future fresh agent who will re-investigate the question
 below. It records the goal, the evidence found, and the methods used. It
 deliberately avoids strong conclusions — verify everything yourself.
 
+## 0. User's verdict (and the meta-doubt)
+
+The user already runs each agent inside an isolated worktree via the
+Claude Agent dashboard and could enable `--dangerously-skip-permissions`
+for AFK but chooses not to. The two net-new affordances §4.8 identifies
+(filesystem allow-list by mount, AFK via implicit permissions-off)
+**don't appear valuable to the user.**
+
+**Meta-doubt:** the user holds a strong prior that sandcastle and
+Docker containers for agentic operations *are* valuable. A
+low-perceived-value conclusion therefore raises the posterior that
+something here is wrong or incomplete. A fresh agent should treat
+"sandcastle is barely useful for this user" as a signal to look
+harder, not as a closed finding.
+
+**Specific follow-up not done this session:** can sandcastle's Docker
+sandbox be tightened beyond defaults — most importantly with
+**blocked outbound network egress** (firewalled bridge, no-egress
+network, DNS allow-list)? §4.8 establishes `network` is opt-in but
+did not test whether layering meaningful restrictions is supported
+in practice. If it is, the value proposition shifts materially.
+
 ## 1. Goal and intent
 
 The user wants to use [Sandcastle](https://github.com/mattpocock/sandcastle)
