@@ -1,6 +1,6 @@
 # Workflow
 
-Standard worfklow for how ideas become merged PRs in a workspace repo.
+Standard workflow for how ideas become merged PRs in a workspace repo.
 
 # Main concepts that we need to flesh out in documentation somewhere in ~/workflow/ directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
@@ -11,17 +11,53 @@ GH Issue labels are defined in a central location and relayed to GH via [bootstr
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
-Aim for maximum "finger on the wheel" agentic development using Claude Code's "claude agents" view. Fully "hands off the wheel" AFK development is out of scope since we rely on "interactive" Claude Code sessions using "claude agents" view (documented in agent-view-adoption.md). UPDATE THIS REFERENCE IMMEDIATELY PER WORKSPACE FILE REFERENCE STANDARD
+Aim for maximum "finger on the wheel" agentic development using Claude Code's "claude agents" view. Fully "hands off the wheel" AFK development is out of scope since we rely on "interactive" Claude Code sessions using "claude agents" view (documented in [agent-view-adoption.md](~/workspace/dev-playbook/workflow/agent-view-adoption.md)).
 
-Since Claude Code "claude agents" view relies on worktrees, we need to understand how worktrees are created, entered, existed, and deleted. Our old workflow relied on manual worktree creation and cleanup; we now expect to use to "claude agents" native worktree tooling.
+Since Claude Code "claude agents" view relies on worktrees, we need to understand how worktrees are created, entered, exited, and deleted. Our old workflow relied on manual worktree creation and cleanup; we now expect to use to "claude agents" native worktree tooling.
 
-Current system security contraints require user yubikey tap for both `git pull` and `git push`. We are open to relaxing this requirement but will keep it in place tentatively while we develop the workflow.
+Current system security constraints require user yubikey tap for both `git pull` and `git push`. We are open to relaxing this requirement but will keep it in place tentatively while we develop the workflow.
 
 Document and intentionally scope permissions granted to Claude Code agents.
 
 Explore "sandboxing" methods (Claude Code native and third-party alternatives such as Pocock's sandcastle, etc.). Have not explored these at all yet. Not sure if they are useful.
 
+All state transitions, actions, metadata, for each issue, is tracked in a local SQLite DB so we can understand how our system performs.
+
+I'm interested in a lightweight web browser view of the system. Something visually appealing and parsimonious I can view in my browser. For example, a colorful view of the graph that indicates where all my open issues are and the states they are in. This would be a "live" view the same way Claude Code's "claude agents" view is live.
+
 The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
+
+# State machine graph
+
+Every issue is tagged with a tuple of labels: `(mode:*, phase/*)`. Both labels are always present. The state of an issue is the tuple. Each node below is one reachable `(mode, phase)` combination.
+
+```mermaid
+%%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
+flowchart LR
+    start([ ]) -->|mode:sdd| req_sdd[requirements sdd]
+    start -->|mode:direct| req_direct[requirements direct]
+
+    subgraph sdd[SDD path]
+        req_sdd -->|/sdd-design| design[design]
+        design -->|drafted| spec_review{spec-review}
+        spec_review -->|iterate| spec_review
+        spec_review -->|redesign| design
+        spec_review -->|approved| build_sdd[build sdd]
+        build_sdd -->|PR ready| cr_sdd{code-review sdd}
+        cr_sdd -->|iterate| cr_sdd
+        cr_sdd -->|rework| build_sdd
+    end
+
+    subgraph direct[Direct path]
+        req_direct -->|/build| build_direct[build direct]
+        build_direct -->|PR ready| cr_direct{code-review direct}
+        cr_direct -->|iterate| cr_direct
+        cr_direct -->|rework| build_direct
+    end
+
+    cr_sdd -->|merged| done([merged])
+    cr_direct -->|merged| done
+```
 
 # Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
