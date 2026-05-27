@@ -29,8 +29,6 @@ Will need a closed feedback loop to improve the workflow and skills over time. O
 
 The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
 
-Adversarial code-review nodes tentatively delegate to built-in `/code-review`; needs experimentation to confirm issue-context injection works.
-
 # Graph-based flow
 
 ## State machine
@@ -87,6 +85,24 @@ Only the human can set `/goal` — it's a UI command, not a skill, and agents ca
 
 All FOTW skills are launched under `/goal`; HITL skills never are. FOTW skills declare a terminal `DONE: …` line so the (text-only) evaluator can match deterministically. Pair action with proof and a stop-clause: `/goal Run /<skill> <args> until <DONE: line appears>, or stop after N turns.`
 
+## Permissions
+
+Tool access is governed by a tiered settings hierarchy. Rules at every level merge into one effective ruleset; **deny wins anywhere** — a deny at any level blocks the call regardless of allows elsewhere.
+
+| Level (highest precedence first) | File / Source | Our use |
+|---|---|---|
+| Managed | `/etc/claude-code/managed-settings.json` | Not used (not enterprise). |
+| CLI args | `claude agents --permission-mode dontAsk …` | **Sets FOTW mode for dispatched sessions only**, leaving personal `claude` sessions in their normal mode. |
+| Local | `<repo>/.claude/settings.local.json` | Rare; gitignored personal exceptions. |
+| Project | `<repo>/.claude/settings.json` | Repo-specific allow rules. |
+| User | `~/.claude/settings.json` | Cross-cutting allow rules and `Skill()` gates. Stow-linked from `dotfiles/dot-claude/`. Benign for personal sessions — never sets mode. |
+
+At runtime, the active skill's `allowed-tools` front-matter adds to the effective allow set for the skill's lifetime — this is the **per-skill permission set** referenced in the [skill table](#skills). Additive only; cannot override a deny.
+
+**Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to FOTW dispatches only. Trades upfront allow-list enumeration for runtime determinism — no surprise prompts during FOTW sessions.
+
+User-level allow rules cover cross-cutting tools (`Skill()` for our FOTW skills, `Bash(gh *)`, common filesystem commands) and are safe in personal sessions. Per-skill `allowed-tools` covers skill-internal needs only. Canonical rule syntax and edge cases: [permissions docs](https://code.claude.com/docs/en/permissions).
+
 ## Skills
 
 Three modes of human engagement exist in theory; only two are available under the [Dispatch](#dispatch) model:
@@ -107,8 +123,8 @@ Direct-mode skills mirror SDD-mode skills by dropping the `sdd-` prefix (e.g., `
 | `sdd_build` | `/sdd-tdd` | FOTW | TBD | TBD |
 | `build` | `/tdd` *(new)* | FOTW | TBD | TBD |
 | `sdd_agent_spec` | `/sdd-agent-spec-review` *(new)* | FOTW | TBD | TBD |
-| `sdd_agent_code` | `/code-review` wrapper *(TBD)* | FOTW | TBD | TBD |
-| `agent_code` | `/code-review` wrapper *(TBD)* | FOTW | TBD | TBD |
+| `sdd_agent_code` | `/load-issue` → `/code-review --comment` | FOTW | TBD | TBD |
+| `agent_code` | `/load-issue` → `/code-review --comment` | FOTW | TBD | TBD |
 
 # Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
