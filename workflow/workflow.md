@@ -1,85 +1,29 @@
 # Workflow
 
-How an idea becomes a merged PR in a workspace repo. One path; the same skills and conventions apply to every repo.
+Standard worfklow for how ideas become merged PRs in a workspace repo.
 
-## Issues are the unit of delivery
+# Main concepts that we need to flesh out in documentation somewhere in ~/workflow/ directory:
+All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
-Every actionable change flows through GitHub issues. Issues say what work delivers a change; the spec (when SDD applies) says what must be true. They are distinct.
+Workflow is based on a state machine using GH Issues. A workflow graph of nodes and edges is clearly defined in a central location.
 
-- [SDD specs](~/workspace/spec-tools/sdd-standards/spec-standard.md) — formal requirements with traceability.
-- `CONTEXT.md` — domain glossary.
-- `ROADMAP.md` — strategic goals.
-- `BUSINESS_CONTEXT.md` — business problem and stakeholders.
+GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels).
 
-Use the `gh` CLI for all issue operations; `gh` infers the repo from `git remote -v` automatically when run inside a clone.
+Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
-## Label scheme
+Aim for maximum "finger on the wheel" agentic development using Claude Code's "claude agents" view. Fully "hands off the wheel" AFK development is out of scope since we rely on "interactive" Claude Code sessions using "claude agents" view (documented in agent-view-adoption.md). UPDATE THIS REFERENCE IMMEDIATELY PER WORKSPACE FILE REFERENCE STANDARD
 
-Three orthogonal label tracks plus a closing label:
+Since Claude Code "claude agents" view relies on worktrees, we need to understand how worktrees are created, entered, existed, and deleted. Our old workflow relied on manual worktree creation and cleanup; we now expect to use to "claude agents" native worktree tooling.
 
-| Track | Values | Meaning |
-|---|---|---|
-| Category | `bug`, `enhancement`, `chore` | What kind of work it is |
-| Mode | `sdd` (presence) | Whether SDD ceremony applies |
-| Phase | `phase/requirements`, `phase/design`, `phase/build`, `phase/review` | Where in the journey |
+Current system security contraints require user yubikey tap for both `git pull` and `git push`. We are open to relaxing this requirement but will keep it in place tentatively while we develop the workflow.
 
-Closing: `wontfix` (apply, then `gh issue close`).
+Document and intentionally scope permissions granted to Claude Code agents.
 
-The `phase/*` track is the visible state of the issue. An agent or human opening the issue sees the current phase without exploring the codebase.
+Explore "sandboxing" methods (Claude Code native and third-party alternatives such as Pocock's sandcastle, etc.). Have not explored these at all yet. Not sure if they are useful.
 
-`chore` covers housekeeping (config tweaks, dep bumps, doc relocations, label-scheme audits) and watch-and-wait reminders (revisit-when-data-arrives tickets). Chores skip `sdd` and the `phase/*` track by default — apply only the `chore` label and let the body explain. A chore may carry `phase/build` if it's substantial enough to want a real PR cycle visible in the phase view; otherwise leave un-phased.
+The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
 
-## Bootstrapping labels
-
-Run [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) once per repo. It is closed-world and idempotent — canonical labels are created or corrected, anything else is deleted. `/intake` invokes it on every run, so labels are reconciled automatically the first time the workflow is used in a new repo.
-
-```bash
-python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
-```
-
-## The flow
-
-```
-        IDEA
-          │
-          ▼
-       /intake  ── if fuzzy → /grill-with-docs
-          │
-          ▼
-   issue(s) born ready, labeled:
-      bug | enhancement | chore
-      sdd? (presence; chores skip)
-      phase/requirements  (sdd) or phase/build (non-sdd)
-      chores: typically no phase/* label
-          │
-   ┌──────┴──────┬──────────────┐
-   ▼             ▼              ▼
- [sdd]        [non-sdd]      [chore]
-   │             │              │
-   ▼             ▼              ▼
- /sdd <N>    plain chat:    do whenever;
- dispatcher  "work on issue N, no sdd"   no dispatcher
-   │             │
-   │   reads phase/* label,
-   │   runs the matching skill,
-   │   bumps the label on success
-   │             │
-   ├─ phase/requirements → sdd-requirements ─▶ phase/design
-   ├─ phase/design → sdd-design ─▶ phase/build
-   └─ phase/build  → sdd-tdd    ─▶ opens PR (phase/review)
-                                     │
-   ┌─────────────────────────────────┘
-   ▼
-   PR open: body "Closes #N"
-   label: phase/review
-   │
-   ▼
-   human review + merge
-   │
-   ▼
-   issue auto-closes
-   worktree-sweep
-```
+# Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
 ## Issue body format (the brief is the body)
 
@@ -126,59 +70,3 @@ Break a plan into **tracer bullet** issues. Each issue is a thin vertical slice 
 - Prefer many thin slices over few thick ones.
 
 Publish issues in dependency order so the `Blocked by` field can reference real issue numbers.
-
-## /sdd dispatcher
-
-`/sdd <issue-number>` reads the issue's `phase/*` label and invokes the matching phase skill. Each phase skill ends by bumping the label to the next phase.
-
-| Label | Skill |
-|---|---|
-| `phase/requirements` | `sdd-requirements` |
-| `phase/design` | `sdd-design` |
-| `phase/build` | `sdd-tdd` |
-
-The dispatcher refuses if the `sdd` label is absent; non-SDD work happens in plain chat ("work on issue <issue-number>, no sdd").
-
-## Branch and worktree
-
-Branch name: `<issue-number>-<slug>`. The slug is kebab-case from the issue title; drop tracker prefixes; keep it short.
-
-The worktree lives at `.claude/worktrees/<issue-number>-<slug>/`. The worktree directory and the branch share the same name.
-
-The dispatcher resolves the worktree by glob `.claude/worktrees/<issue-number>-*`:
-
-- Exactly one match → enter (`cd`).
-- Zero matches → create (`git worktree add .claude/worktrees/<issue-number>-<slug> -b <issue-number>-<slug>`).
-- Multiple matches → error and ask the user.
-
-Before creating, confirm local `main` matches `origin/main`:
-
-```bash
-git rev-parse main
-gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
-```
-
-If the SHAs differ, ask the user to `git pull` (the agent does not hold the SSH credential).
-
-## In flight
-
-- Commit on the branch with /commit.
-- Push with `git push -u origin <name>` (user-driven; YubiKey tap required).
-- Open the PR with `gh pr create --body "Closes #<issue-number> …"`. The `Closes #<issue-number>` token is mandatory — merging the PR closes the issue.
-- The phase label flips to `phase/review` when the PR opens.
-
-Sessions resume by `cd .claude/worktrees/<name>`; the worktree persists across sessions, agents, and terminals.
-
-## Cleanup
-
-After merge, run [worktree-sweep](~/workspace/dev-playbook/tools/bin/worktree-sweep) from inside the repo:
-
-```bash
-python3 ~/workspace/dev-playbook/tools/bin/worktree-sweep
-```
-
-It prunes worktrees whose PR is merged with no local divergence; ambiguous cases (rejected PRs, unpushed commits, missing PRs) are reported for case-by-case handling.
-
-## Open questions
-
-- Where `/improve-codebase-architecture` fits in the SDD workflow beyond `sdd-design`'s explicit escape hatch is left to discover with use. Refactor pressure inside `sdd-tdd` that crosses a committed `Interface:` routes through spec amendment back to `sdd-design`, not direct architecture work.
