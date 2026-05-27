@@ -29,7 +29,9 @@ I'm interested in a lightweight web browser view of the system. Something visual
 
 The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
 
-# State machine graph
+# Graph-based flow
+
+## State machine
 
 Every issue is tagged with a tuple of labels: `(mode:*, phase/*)`. Both labels are always present. The state of an issue is the tuple. Each node below is one reachable `(mode, phase)` combination.
 
@@ -37,14 +39,15 @@ Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, r
 
 - `(agent, work)` — agent produces output (e.g., `sdd_build`, `build`)
 - `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec`, `agent_code`)
-- `(human, work)` — human produces output (e.g., `sdd_requirements`, `sdd_design`, `requirements`)
+- `(human, work)` — human produces output (e.g., `create_issue`, `sdd_requirements`, `sdd_design`)
 - `(human, review)` — human reads and decides (e.g., `sdd_human_spec`, `human_code`)
 
 ```mermaid
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart LR
-    start([ ]) -->|mode:sdd| sdd_requirements[sdd requirements spec]
-    start -->|mode:direct| requirements[requirements]
+    start([ ]) --> create_issue[create issue]
+    create_issue -->|mode:sdd| sdd_requirements[sdd requirements spec]
+    create_issue -->|mode:direct| build[build]
 
     subgraph sdd[SDD path]
         sdd_requirements -->|design| sdd_design[sdd design spec]
@@ -60,7 +63,6 @@ flowchart LR
     end
 
     subgraph direct[Direct path]
-        requirements -->|build| build[build]
         build -->|open PR| agent_code[agent code review]
         agent_code -->|attach review| human_code{human code review}
         human_code -->|reject: iterate| agent_code
@@ -71,6 +73,12 @@ flowchart LR
     human_code -->|approve: merge| done
 ```
 
+Some edges are not skill-fired: `start → create_issue` is `gh issue create`; the mode-branching edges out of `create_issue` are label changes; `reject: redesign` and `approve: merge` are `gh` label or PR changes.
+
+One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
+
+## Skills
+
 Everything is human-invoked via "claude agents" view — subscription billing requires use of Claude Code interactive mode. Three modes of human engagement exist in theory; only two comply with the interactive mode constraint:
 
 - **Human in the loop (HITL)** — human is actively engaged throughout, spending real time and focus. Use this for stages that focus on extracting human intent. Examples: initial issue creation and writing specs.
@@ -79,17 +87,11 @@ Everything is human-invoked via "claude agents" view — subscription billing re
 
 FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
 
-## Skills
-
 Placeholder — skill names and scope are still in flux. Each skill will have one row.
 
 | Skill | Description | Mode | Permissions set | Escalation triggers |
 |-------|-------------|------|-----------------|---------------------|
-| _TBD_ | _One sentence._ | HITL or FOTW | _Permissions granted to the skill (e.g. `acceptEdits`, allowed tools, denied tools)._ | _Conditions under which the agent escalates to the human (e.g. unexpected state, plan deviation)._ |
-
-Other edges are not skill-fired: issue creation (start edges) is `gh issue create` with the mode label; `reject: redesign` and `approve: merge` are `gh` label or PR changes.
-
-One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
+| _TBD_ | _One sentence._ | Pick on: {HITL, FOTW} | _Permissions granted to the skill (e.g. `acceptEdits`, allowed tools, denied tools)._ | _Conditions under which the agent escalates to the human (e.g. unexpected state, plan deviation)._ |
 
 # Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
