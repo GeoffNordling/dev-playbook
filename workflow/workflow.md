@@ -11,9 +11,7 @@ GH Issue labels are defined in a central location and relayed to GH via [bootstr
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
-Aim for maximum "finger on the wheel" agentic development using Claude Code's "claude agents" view. Fully "hands off the wheel" AFK development is out of scope since we rely on "interactive" Claude Code sessions using "claude agents" view (documented in [agent-view-adoption.md](~/workspace/dev-playbook/workflow/agent-view-adoption.md)).
-
-Since Claude Code "claude agents" view relies on worktrees, we need to understand how worktrees are created, entered, exited, and deleted. Our old workflow relied on manual worktree creation and cleanup; we now expect to use to "claude agents" native worktree tooling.
+Since Claude Code "claude agents" view relies on worktrees, we need to understand how worktrees are created, entered, exited, and deleted. Our old workflow relied on manual worktree creation and cleanup; we now expect to use to "claude agents" native worktree tooling. Make sure to have agents check that local Git is up-to-date with remote Git before launching new adventures.
 
 Current system security constraints require user yubikey tap for both `git pull` and `git push`. We are open to relaxing this requirement but will keep it in place tentatively while we develop the workflow.
 
@@ -77,13 +75,21 @@ Some edges are not skill-fired: `start → create_issue` is `gh issue create`; t
 
 One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
 
+## Dispatch
+
+The human dispatcher operates from Claude Code's "claude agents" dashboard (see [agent-view-adoption.md](~/workspace/dev-playbook/workflow/agent-view-adoption.md) for the view's capabilities and limits). Anthropic subscription billing requires interactive sessions, so every node entry is human-launched: the dispatcher types `/skill-name <args>` to spawn a new agent session that invokes the skill as its first action.
+
+Only the human can set `/goal` — it's a UI command, not a skill, and agents cannot invoke it. Prefixing an invocation with `/goal <condition>` lets the dispatcher set a completion condition; the runtime then runs the session until an evaluator confirms the condition holds. A single `/goal` session can chain multiple skill invocations.
+
+All FOTW skills are launched under `/goal`; HITL skills never are. FOTW skills declare a terminal `DONE: …` line so the (text-only) evaluator can match deterministically. Pair action with proof and a stop-clause: `/goal Run /<skill> <args> until <DONE: line appears>, or stop after N turns.`
+
 ## Skills
 
-Everything is human-invoked via "claude agents" view — subscription billing requires use of Claude Code interactive mode. Three modes of human engagement exist in theory; only two comply with the interactive mode constraint:
+Three modes of human engagement exist in theory; only two are available under the [Dispatch](#dispatch) model:
 
 - **Human in the loop (HITL)** — human is actively engaged throughout, spending real time and focus. Use this for stages that focus on extracting human intent. Examples: initial issue creation and writing specs.
 - **Finger on the wheel (FOTW)** — skill is designed to run hands-off; human is present only because billing requires it. Agent does the work; human invokes the skill and responds to escalations. Examples: implementing code, performing agent reviews.
-- **Hands off the wheel (AFK)** — agent runs autonomously, no human involvement. *Not available* under subscription billing. We would use this if we could.
+- **Hands off the wheel (AFK)** — agent runs autonomously, no human involvement. *Not available* — see [Dispatch](#dispatch). We would use this if we could.
 
 FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
 

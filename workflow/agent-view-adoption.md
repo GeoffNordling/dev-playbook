@@ -55,6 +55,15 @@ From the official docs (https://code.claude.com/docs/en/agent-view). Confidence:
 - Session display name controllable via `--name` at dispatch, or `Ctrl+R` interactively in agent view. Auto-generated from prompt otherwise — by a Haiku-class model, so not deterministic across repeated runs of the same prompt. `nameSource: "auto"` vs `"manual"` is recorded in `state.json`. **U5 confirmed these are the only paths:** no `claude` subcommand renames a running session (`attach`/`stop`/`logs`/`rm` don't, no other subcommand mentions naming); no in-session tool primitive renames the current session; editing the `name` field directly in `state.json` is ignored by the daemon (UI and `claude agents --json` continue to report the original name, `updatedAt` does not advance). State.json is a daemon-write-only checkpoint, not a config source.
 - Filters in agent view input: `a:<agent>`, `s:<state>` (including `s:blocked`), `#<PR-number>` or PR URL.
 
+### Goal-driven sessions
+
+- `/goal <condition>` is a Claude Code UI command (v2.1.139+). It sets a session-scoped completion condition; after each turn, a small fast model (default Haiku) judges the condition against the conversation transcript and either ends the session or starts another turn.
+- **User-only — cannot be invoked by an agent.** Confirmed via Skill-tool attempt: returns *"goal is a UI command, not a skill. Ask the user to run /goal themselves — it cannot be invoked via the Skill tool."* The runtime processes `/goal`, not the Skill surface.
+- **Dispatcher-position invocation.** Type `/goal <condition>` into agent view's input to dispatch a new background session with the goal pre-loaded. The condition itself becomes the first-turn directive — no separate prompt needed.
+- **Skill chaining works under a goal.** A single goal-driven session can invoke multiple skills sequentially. Verified in this workspace: a `/goal` session was instructed to invoke `/sdd-tdd` then `/sdd-design` and report contents; both `Skill(...)` calls succeeded in the same turn before the goal evaluator confirmed completion.
+- **Evaluator is text-only.** Judges only what the agent has surfaced in the transcript; does not call tools. Conditions must therefore name both the proof shape (e.g., a literal `DONE:` line the skill prints) and a stop-clause (e.g., "or stop after 30 turns") to bound runaway loops.
+- Survives `--resume`/`--continue` (with reset turn counter and timer); cleared by `/clear`. Disabled when `disableAllHooks` is set or the workspace is untrusted.
+
 ### Worktree mechanism
 
 - Auto-isolation triggers **before first edit**, not at session start: Claude moves the session into a worktree under `.claude/worktrees/`.
