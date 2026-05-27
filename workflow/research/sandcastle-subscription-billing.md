@@ -236,6 +236,69 @@ agent should re-read each to verify the path is unchanged.
 - Confirmed by Matt in #191 as documented-by-Anthropic-inside-Claude-Code-
   itself; this is not a hack/undocumented hole.
 
+### 4.7 Why subscription users gravitate to `noSandbox()` — runtime preference, not auth blocker
+
+§4.4's "in practice" paragraph could be misread as "subscription auth
+*forces* `noSandbox()`." It does not. The proposing issue for ADR 0015 makes
+clear the gravitation is a **runtime/setup preference** about not wanting a
+container on the host machine running sandcastle — orthogonal to which auth
+the agent uses.
+
+- **Issue #507 — "Allow `noSandbox()` in `run()` and `createSandbox()`"**:
+  - URL: https://github.com/mattpocock/sandcastle/issues/507
+  - The originating user `achtan`, after Matt's initial "subscription users
+    already have an AFK path via #191" objection, clarified the actual ask
+    (verbatim):
+    > "The OAuth token from #191 solves *auth*, not *runtime*. My ask is
+    > the runtime piece: I don't want a container on my machine at all.
+    > With `CLAUDE_CODE_OAUTH_TOKEN` I still need Docker/Podman running for
+    > `run()` to accept the provider — that's the part I'm trying to
+    > avoid."
+  - Matt's reply (verbatim):
+    > "Right, so you want to run AFK (with bypass perms) but you don't want
+    > a sandbox. I suppose I should allow this, especially since you might
+    > run Sandcastle from within a containerized environment already."
+  - A later commenter (`gt-ak8`) describes a different non-auth motivation
+    that also lands on `noSandbox()`:
+    > "Since the Claude Code desktop app turns out to support SSH
+    > connection, using a long living VM is a nice other way to have long
+    > running sessions locally. Definitely a use case where I am fine
+    > using no sandbox directly in the VM and let the agents do their
+    > thing."
+
+- **ADR 0015's audience is bundled, not auth-specific.** Re-read the "in
+  practice" paragraph: it lists subscription users *together with* "anyone
+  running Sandcastle inside an already-isolated environment — containerized
+  CI, VM, sandbox host." The second group has nothing to do with auth. The
+  shared property is "don't want a (nested) container on the host running
+  sandcastle," not subscription billing.
+
+- **Matt's own dogfooded workflows all use `noSandbox()`.** Every consumer
+  of the `claudeAgent()` factory from §4.3 passes `sandbox: noSandbox()`:
+  - `.sandcastle/agent-workflows/implement/implement.ts:18`
+  - `.sandcastle/agent-workflows/review/review.ts:30`
+  - `.sandcastle/agent-workflows/explore/explore.ts:39`
+  - `.sandcastle/agent-workflows/implement-pr/implement-pr.ts:29`
+  - `.sandcastle/agent-workflows/update-branch/update-branch.ts:70`
+  - Docker only appears in `.sandcastle/run.ts` (testing) and the
+    `test-podman.ts` / `test-vercel.ts` files. Caveat for a fresh agent:
+    this could be because Matt's own machine is already a trusted dev
+    environment, not because subscription forces it. Don't over-read.
+
+- **Env passthrough already wires Docker + subscription end-to-end.** §4.5
+  documents that `claudeCode({ env: { CLAUDE_CODE_OAUTH_TOKEN } })` reaches
+  the container via `docker run --env`. Nothing in the codebase blocks the
+  combination — the divergence is from the scaffolded happy path (which
+  assumes API key in `.env.example` / `InitService.ts`), not from technical
+  feasibility.
+
+Method to re-fetch:
+
+```bash
+gh issue view 507 --repo mattpocock/sandcastle --comments
+grep -rn "sandbox:" .sandcastle --include='*.ts'
+```
+
 ## 5. Open questions for the fresh agent
 
 The investigator did **not** answer the following. Future research should.
@@ -276,11 +339,15 @@ The investigator did **not** answer the following. Future research should.
    `sandcastle docker build-image`) — the Dockerfile ships with Claude
    Code CLI baked in, per the README.
 
-4. **`noSandbox()` vs Docker for subscription billing** — is there any
-   relevant behavioural difference beyond isolation/safety? ADR 0015 implies
-   subscription users frequently want `noSandbox()` for AFK runs (less setup),
-   but the user has not stated a preference between sandboxed vs host
-   execution. Worth asking them.
+4. **`noSandbox()` vs Docker for subscription billing** — §4.7 establishes
+   that subscription users' gravitation toward `noSandbox()` is a
+   runtime/setup preference (don't want a container on the host running
+   sandcastle), not an auth-technical block. The remaining behavioural
+   question is what the Docker sandbox *actually isolates* (network egress,
+   mounts, host filesystem reach, capabilities, credential surface) — which
+   matters for any subscription user who explicitly *does* want the
+   container as an isolation boundary and is willing to diverge from the
+   scaffolded API-key happy path. Not investigated here.
 
 5. **`~/.claude` bind-mount as an alternate auth path** — would mounting the
    host's `~/.claude` into the container (`mounts: [{ hostPath: "~/.claude",
