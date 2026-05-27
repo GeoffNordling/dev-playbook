@@ -7,7 +7,7 @@ All pre-existing documentation, workflow standards, skills, tooling, etc. is ope
 
 Workflow is based on a state machine using GH Issues. A workflow graph of nodes and edges is clearly defined in a central location.
 
-GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels).
+GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
@@ -29,6 +29,8 @@ Will need a closed feedback loop to improve the workflow and skills over time. O
 
 The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
 
+Plan a pass over all skills to align with this workflow: update existing skills, author the ones referenced here but not yet on disk (`/tdd`, `/sdd-agent-spec-review`, `/sdd-agent-code-review`, `/agent-code-review`), retire obsolete ones (`/sdd` dispatcher).
+
 # Graph-based flow
 
 ## State machine
@@ -37,43 +39,45 @@ Every issue is tagged with a tuple of labels: `(mode:*, phase/*)`. Both labels a
 
 Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, review})`. Four kinds:
 
-- `(agent, work)` — agent produces output (e.g., `sdd_build`, `build`)
-- `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec`, `agent_code`)
-- `(human, work)` — human produces output (e.g., `create_issue`, `sdd_requirements`, `sdd_design`)
-- `(human, review)` — human reads and decides (e.g., `sdd_human_spec`, `human_code`)
+- `(agent, work)` — agent produces output (e.g., `sdd_tdd`, `tdd`)
+- `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec_review`, `agent_code_review`)
+- `(human, work)` — human produces output (e.g., `intake`, `sdd_requirements`, `sdd_design`)
+- `(human, review)` — human reads and decides (e.g., `sdd_human_spec_review`, `human_code_review`)
 
 ```mermaid
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart LR
-    start([ ]) --> create_issue[create issue]
-    create_issue -->|mode:sdd| sdd_requirements[sdd requirements spec]
-    create_issue -->|mode:direct| build[build]
+    start([ ]) --> intake[intake]
+    intake -->|mode:sdd| sdd_requirements[sdd_requirements]
+    intake -->|mode:direct| tdd[tdd]
 
     subgraph sdd[SDD path]
-        sdd_requirements -->|design| sdd_design[sdd design spec]
-        sdd_design -->|draft| sdd_agent_spec[agent spec review]
-        sdd_agent_spec -->|attach review| sdd_human_spec{human spec review}
-        sdd_human_spec -->|reject: iterate| sdd_agent_spec
-        sdd_human_spec -->|reject: redesign| sdd_design
-        sdd_human_spec -->|approve| sdd_build[sdd build]
-        sdd_build -->|open PR| sdd_agent_code[agent code review]
-        sdd_agent_code -->|attach review| sdd_human_code{human code review}
-        sdd_human_code -->|reject: iterate| sdd_agent_code
-        sdd_human_code -->|reject: rework| sdd_build
+        sdd_requirements -->|design| sdd_design[sdd_design]
+        sdd_design -->|draft| sdd_agent_spec_review[sdd_agent_spec_review]
+        sdd_agent_spec_review -->|attach review| sdd_human_spec_review{sdd_human_spec_review}
+        sdd_human_spec_review -->|reject: iterate| sdd_agent_spec_review
+        sdd_human_spec_review -->|reject: redesign| sdd_design
+        sdd_human_spec_review -->|approve| sdd_tdd[sdd_tdd]
+        sdd_tdd -->|open PR| sdd_agent_code_review[sdd_agent_code_review]
+        sdd_agent_code_review -->|attach review| sdd_human_code_review{sdd_human_code_review}
+        sdd_human_code_review -->|reject: iterate| sdd_agent_code_review
+        sdd_human_code_review -->|reject: rework| sdd_tdd
     end
 
     subgraph direct[Direct path]
-        build -->|open PR| agent_code[agent code review]
-        agent_code -->|attach review| human_code{human code review}
-        human_code -->|reject: iterate| agent_code
-        human_code -->|reject: rework| build
+        tdd -->|open PR| agent_code_review[agent_code_review]
+        agent_code_review -->|attach review| human_code_review{human_code_review}
+        human_code_review -->|reject: iterate| agent_code_review
+        human_code_review -->|reject: rework| tdd
     end
 
-    sdd_human_code -->|approve: merge| done([merged])
-    human_code -->|approve: merge| done
+    sdd_human_code_review -->|approve: merge| done([merged])
+    human_code_review -->|approve: merge| done
 ```
 
-Some edges are not skill-fired: `start → create_issue` is `gh issue create`; the mode-branching edges out of `create_issue` are label changes; `reject: redesign` and `approve: merge` are `gh` label or PR changes.
+**Naming convention.** Nodes, slash-commands, and phase labels share the same identifier with different punctuation: nodes use underscores (mermaid prefers them), slash-commands and labels use hyphens (convention). E.g., `sdd_agent_spec_review` ↔ `/sdd-agent-spec-review` ↔ `phase/sdd-agent-spec-review`.
+
+Forward edges through work and review nodes are fired by those nodes' skills. Self-loops (`iterate`, `redesign`, `rework`) re-launch the relevant skill. Only `approve: merge` is fired outside any skill — the dispatcher merges via GitHub.
 
 One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
 
@@ -97,12 +101,18 @@ Tool access is governed by a tiered settings hierarchy. Rules at every level mer
 | Project | `<repo>/.claude/settings.json` | Repo-specific allow rules. |
 | User | `~/.claude/settings.json` | `Skill()` gates for FOTW-entry skills, plus narrow backstop for built-in skills. Stow-linked from `dotfiles/dot-claude/`. Benign for personal sessions — never sets mode. |
 
-**Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to every session dispatched from that agent view (HITL and FOTW alike); personal `claude` sessions launched without the flag are unaffected. Trades upfront allow-list enumeration for runtime determinism.
+**Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to every dispatched session (HITL and FOTW); personal `claude` sessions are unaffected. Trades upfront allow-list enumeration for runtime determinism.
 
 Allow rules are encoded at two levels:
 
-- **User-level allow** holds only `Skill(name)` gates for the FOTW-entry skills the dispatcher launches, plus a narrow bash backstop for built-in skills whose front-matter we cannot author (e.g., `/code-review`'s internal `Bash(gh pr diff *)`).
-- **Per-skill `allowed-tools` front-matter** holds everything else for that skill — bash patterns, edits, and any sub-skills it invokes (`Skill(child)`) — declared in one line. This is the **per-skill permission set** referenced in the [skill table](#skills). Additive at runtime, scoped to the skill's lifetime; cannot override a deny.
+- **User-level allow** holds only `Skill(name)` gates for dispatcher-launched skills, plus a narrow bash backstop for built-in skills (e.g., `/code-review`'s `Bash(gh pr diff *)`).
+- **Per-skill `allowed-tools` front-matter** holds everything else: bash, edits, sub-skills (`Skill(child)`). This is the **per-skill permission set** in the [skill table](#skills). Additive, scoped to the skill's lifetime; cannot override a deny.
+
+**Bash baseline.**
+
+- *Auto-allowed in every mode, no rule needed:* `ls`, `cat`, `echo`, `pwd`, `head`, `tail`, `grep`, `find`, `wc`, `which`, `diff`, `stat`, `du`, `cd`, read-only `git` forms.
+- *User-level allow for universally-trusted mutators:* `Bash(mkdir *)`, `Bash(touch *)`, `Bash(mv *)`, `Bash(cp *)`.
+- *`rm` is not yet user-allowed.* Worktree auto-isolation cwd-bounds each session — sufficient practical confinement (soft boundary, not an OS jail). Code-writing skills will likely need `rm`; not yet committed.
 
 Edges fired by skills are covered by the firing skill's `allowed-tools`. Edges fired by the human (label changes, manual merge) need no encoding.
 
@@ -118,18 +128,18 @@ Three modes of human engagement exist in theory; only two are available under th
 
 FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
 
-Direct-mode skills mirror SDD-mode skills by dropping the `sdd-` prefix (e.g., `/sdd-tdd` → `/tdd`).
+Direct-mode skills mirror SDD-mode skills by dropping the `sdd-` prefix (e.g., `/sdd-tdd` → `/tdd`). Bodies differ — SDD versions teach the SDD process.
 
-| Node | Skill | Mode | Permissions set | Escalation triggers |
-|------|-------|------|-----------------|---------------------|
-| `create_issue` | `/intake` | HITL | TBD | TBD |
-| `sdd_requirements` | `/sdd-requirements` | HITL | TBD | TBD |
-| `sdd_design` | `/sdd-design` | HITL | TBD | TBD |
-| `sdd_build` | `/sdd-tdd` | FOTW | TBD | TBD |
-| `build` | `/tdd` *(new)* | FOTW | TBD | TBD |
-| `sdd_agent_spec` | `/sdd-agent-spec-review` *(new)* | FOTW | TBD | TBD |
-| `sdd_agent_code` | `/load-issue` → `/code-review --comment` | FOTW | TBD | TBD |
-| `agent_code` | `/load-issue` → `/code-review --comment` | FOTW | TBD | TBD |
+| Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
+|-------|------|-----------------------------------|---------------------|
+| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Skill(grill-with-docs)` | TBD |
+| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Skill(grill-with-docs)` | TBD |
+| `/sdd-design` | HITL | `Bash(gh issue *)` `Skill(grill-with-docs)` `Skill(improve-codebase-architecture)` | TBD |
+| `/sdd-tdd` | FOTW | `Bash(gh issue view *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` | TBD |
+| `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
+| `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh api *)` | TBD |
+| `/sdd-agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
+| `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
 
 # Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
 
