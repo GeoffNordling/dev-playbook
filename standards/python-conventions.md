@@ -6,7 +6,7 @@ projects may supercede.
 For build/task-runner conventions (Makefile targets, `make check`), see
 [build-conventions.md](build-conventions.md).
 
-## Package Initialization
+## Package initialization
 
 `__init__.py` files are empty.
 
@@ -34,7 +34,7 @@ docstrings on test functions. Test-module-level helpers (factories, fixtures
 defined as plain functions) still need docstrings — their names are not
 similarly load-bearing.
 
-## Fail Loudly
+## Fail loudly
 
 When a value is required for the code to do its job, missing it is a bug —
 the code raises rather than substituting a default. This applies to all the
@@ -60,7 +60,7 @@ Rationale: a fallback that hides a bug delays the failure to a place far
 from the cause, where it's much harder to diagnose. Failing at the point of
 the missing value points straight at the defect.
 
-## Module Layout
+## Module layout
 
 A module's top-level statements appear in this order:
 
@@ -86,7 +86,7 @@ won't think to look for it past the first `def`. The cost of putting every
 constant at the top is one scroll; the cost of hiding one is a bug that
 slips past review because nobody saw it.
 
-## Future Imports
+## Future imports
 
 `from __future__ import annotations` is banned. Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`), builtin generics (`list[int]`), and string-quoted forward references. The `no-future-annotations` pre-commit hook auto-rejects the import. If a future import is truly necessary, ask user for permission.
 

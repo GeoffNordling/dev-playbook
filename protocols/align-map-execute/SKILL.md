@@ -29,7 +29,7 @@ their attention for genuinely ambiguous decisions.
 
 ---
 
-## Iterative Feedback
+## Iterative feedback
 
 Every phase is iterative. You produce work, surface it for the user to
 evaluate, and update based on their feedback. This cycle repeats within
@@ -49,7 +49,7 @@ start fresh from Phase 1.
 
 ---
 
-## Phase 1: Build the Shared Alignment
+## Phase 1: build the shared alignment
 
 The user gives you four things to start:
 
@@ -98,7 +98,7 @@ becomes difficult to read or evaluate in a single pass.
 
 ---
 
-## Phase 2: Build the Map
+## Phase 2: build the map
 
 Survey the scope. Then produce the **map** — always rendered as a 2D
 matrix with the facets as columns and the regions discovered by
@@ -139,7 +139,7 @@ itself stays small.
 
 ---
 
-## Phase 3: Execute
+## Phase 3: execute
 
 You drive the process — proposing regions, performing analysis, surfacing
 findings. The user evaluates and directs: what to fix, what to leave,
@@ -191,7 +191,7 @@ you can take longer stretches — the alignment earns you autonomy.
 
 ---
 
-## Protocol State Document
+## Protocol state document
 
 Persist the protocol state as `PROTOCOL_STATE.md` in the project repo.
 This is not a phase — it is a continuous obligation. Write or update

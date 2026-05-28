@@ -37,7 +37,7 @@ Meta repos that author the config (e.g. `dev-playbook` itself) keep the real fil
 
 Pre-commit is fast and runs on every commit. Do not invoke `make check` from a pre-commit hook — `make check` is whole-repo (including the test suite), so it runs at gate points like `pre-push` or CI instead.
 
-## Continuous Integration
+## Continuous integration
 
 The canonical workflow is [`dev-playbook/.github/workflows/ci.yml`](../.github/workflows/ci.yml). It runs two gates: pre-commit against `.pre-commit-config.yaml`, and `make check` in each Python sub-project's root. CI's Python version matches the `requires-python` floor in `pyproject.toml`. Consumer repos use the same workflow with the sibling checkout from [Pre-commit](#pre-commit) so the symlinked config resolves.
 

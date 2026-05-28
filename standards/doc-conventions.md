@@ -9,6 +9,14 @@ in the repo documentation hierarchy — `README.md`, `CLAUDE.md`, files under
 Declarative present tense. "The symlink is relative." Not "We make the
 symlink relative."
 
+## Heading casing
+
+H1 uses Title Case. H2 and below use sentence case.
+`# Repo Documentation Standard` at H1; `## Audience and presence` at H2.
+
+Proper nouns and code identifiers keep their native case at every level:
+`## CLAUDE.md baseline`, `## .gitignore baseline`, `### SSH-bound git operations`.
+
 ## Open with purpose
 
 State what the document is for and what a reader should be able to do after

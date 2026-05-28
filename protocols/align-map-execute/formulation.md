@@ -9,7 +9,7 @@ the problem, then execute while minimizing demands on human attention.
 
 ---
 
-## Base Loop
+## Base loop
 
 The simplest human-agent interaction loop:
 
@@ -81,7 +81,7 @@ Because $\dim(S) \gg C_h$, $F$, $A$, and $M$ must each be:
 
 ---
 
-## Stage 1: Build the Shared Alignment
+## Stage 1: build the shared alignment
 
 The human provides $O$, $S$, $F$, and $R$. The agent forms an
 initial alignment state $A$:
@@ -105,7 +105,7 @@ the approved alignment.
 
 ---
 
-## Stage 2: Build the Map
+## Stage 2: build the map
 
 The agent surveys $S$ and produces $M$ — the map of the work.
 $F$ defines the columns. The survey of $S$ reveals natural regions —
@@ -136,7 +136,7 @@ This continues until the human approves.
 
 ---
 
-## Stage 3: Write the Protocol State Document
+## Stage 3: write the protocol state document
 
 The agent persists the full protocol state as the **protocol state
 document** (`PROTOCOL_STATE.md` in the project repo). It contains:
@@ -156,7 +156,7 @@ conversation that produced it.
 
 ---
 
-## Stage 4: Execute
+## Stage 4: execute
 
 The agent and human collaborate to satisfy $H$ by executing work
 across the regions of $M$, updating $A$ and $M$ as understanding

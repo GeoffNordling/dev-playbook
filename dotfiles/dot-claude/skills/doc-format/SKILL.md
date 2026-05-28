@@ -25,13 +25,13 @@ a description like "the auth setup doc."
 - **Non-empty.** Resolve the hint to a single `.md` file. If the hint matches
   exactly one file, proceed. If it matches zero or multiple files, ask.
 
-## Convention Selection
+## Convention selection
 
 For each formatting dimension below, adopt the **majority (mode) style
 already present in the document**. Where there is no clear majority, prefer
 the flatter, simpler option.
 
-## Formatting Dimensions
+## Formatting dimensions
 
 Review the entire document and standardize each of these. Pick one convention
 per dimension and apply it everywhere.

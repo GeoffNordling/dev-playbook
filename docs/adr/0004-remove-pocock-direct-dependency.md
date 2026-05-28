@@ -128,7 +128,7 @@ remains, codified in `standards/repo-documentation.md`. The multi-context
 `CONTEXT-MAP.md` variant is dropped — single-context is the only supported
 shape going forward.
 
-## Alternatives Considered
+## Alternatives considered
 
 | Alternative | Why rejected |
 |---|---|

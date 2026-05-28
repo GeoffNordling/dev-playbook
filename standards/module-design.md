@@ -9,7 +9,7 @@ How to design modules with good interfaces. Drawn from Ousterhout's *A Philosoph
 - **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
 - **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a seam unless something actually varies across it.
 
-## Deep Modules
+## Deep modules
 
 From *A Philosophy of Software Design*:
 
@@ -43,7 +43,7 @@ When designing interfaces, ask:
 - Can I simplify the parameters?
 - Can I hide more complexity inside?
 
-## Designing for Testability
+## Designing for testability
 
 Good interfaces make testing natural:
 

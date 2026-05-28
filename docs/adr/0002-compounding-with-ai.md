@@ -1,4 +1,4 @@
-# Compounding workflow with AI
+# Compounding Workflow with AI
 
 ## Context
 
@@ -53,7 +53,7 @@ The edit-time hook closes the verification loop. Pre-commit was the only ruff ga
 
 Project-local ruff is the only stable answer. Each repo's `pyproject.toml` pins a specific ruff version; CI uses that pin. A global ruff would diverge in version, in selected rules, or in formatter behavior, producing edit-time → CI bounce. Walk-up resolution guarantees the hook uses the same ruff the project will.
 
-## Alternatives Considered
+## Alternatives considered
 
 | Alternative | Why not |
 |---|---|

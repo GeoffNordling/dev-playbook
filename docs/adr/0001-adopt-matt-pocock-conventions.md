@@ -104,7 +104,7 @@ produces lower-quality output than running them with the files in
 place. We adopt the conventions the skills assume, not just the
 skills themselves.
 
-## Alternatives Considered
+## Alternatives considered
 
 | Alternative | Why not |
 |---|---|

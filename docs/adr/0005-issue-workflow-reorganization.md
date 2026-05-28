@@ -79,7 +79,7 @@ The dispatcher resolves the worktree by glob `.claude/worktrees/<N>-*` from the 
 
 Where `/improve-codebase-architecture` fits in the SDD workflow beyond `sdd-design`'s explicit escape hatch is left to discover with use. It is not invoked from `sdd-tdd` — refactor pressure that crosses a committed `Interface:` routes through spec amendment back to `sdd-design`.
 
-## Alternatives Considered
+## Alternatives considered
 
 | Alternative | Why rejected |
 |---|---|

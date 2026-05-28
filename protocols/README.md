@@ -16,9 +16,9 @@ Protocols are written to be **frontier-invariant**. The capabilities of AI model
 |----------|-------------|
 | [Align, Map, Execute](align-map-execute/) | Human-agent collaborative work on tasks whose scope exceeds what the human can hold in mind |
 
-## Field Notes
+## Field notes
 
-### v0: Structure reduces variance
+### V0: structure reduces variance
 
 After completing v0 of Align, Map, Execute, we questioned whether the
 protocol describes anything beyond a well-run Claude Code session. The
@@ -41,7 +41,7 @@ improve each component.
 
 Structure reduces variance. That is the contribution.
 
-### v1: Facets and the map's matrix structure
+### V1: facets and the map's matrix structure
 
 The first execution of Align, Map, Execute revealed that the agent
 could not construct a useful map. The instruction said the map should be

@@ -16,7 +16,7 @@ sub-project has the full `[tool.ruff]`, `[tool.mypy]`, and pytest config
 described below, and the standard targets defined in
 [build-conventions.md](build-conventions.md).
 
-## Directory Layout
+## Directory layout
 
 ```
 <repo>/
@@ -36,7 +36,7 @@ described below, and the standard targets defined in
     └── __init__.py              # empty
 ```
 
-## Name Mapping
+## Name mapping
 
 The repo name is kebab-case (`spec-tools`); the package name is the
 snake-case transformation (`spec_tools`). Hyphens become underscores.
@@ -112,7 +112,7 @@ disable_error_code = ["import-untyped"]
   (line length) is ignored because line length is enforced by `ruff
   format`.
 
-## Dev Tooling Versions
+## Dev tooling versions
 
 The standard pins minimum versions of `mypy`, `pytest`, and `ruff` (see the
 `dev` group above). Consumer repos `SHALL` declare floors at least as high
@@ -120,7 +120,7 @@ as the standard's; bumping the workspace floor is done by editing this file
 and propagating to consumer repos. Exact resolved versions are recorded in
 each repo's `uv.lock`.
 
-## Project Scripts
+## Project scripts
 
 When a project exposes a CLI, add a `[project.scripts]` entry:
 
@@ -132,7 +132,7 @@ When a project exposes a CLI, add a `[project.scripts]` entry:
 This is lazy — only present when the project actually has a CLI. Repos
 that start as libraries do not need this section.
 
-## Initial Setup
+## Initial setup
 
 A new Python project initializes via `uv init --lib --package <repo>`,
 followed by overwriting the generated `pyproject.toml` with the shape

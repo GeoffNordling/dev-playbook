@@ -2,7 +2,7 @@
 
 Standard workflow for how ideas become merged PRs in a workspace repo.
 
-# Main concepts that we need to flesh out in documentation somewhere in ~/workflow/ directory:
+# Main Concepts That We Need to Flesh Out in Documentation Somewhere in ~/Workflow/ Directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
 GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, tests:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
@@ -23,7 +23,7 @@ The `/improve-codebase-architecture` skill seems very useful but was not integra
 
 Plan a pass over all skills to align with this workflow: update existing skills, author the ones referenced here but not yet on disk (`/tdd`, `/build`, `/sdd-agent-spec-review`, `/sdd-agent-code-review`, `/agent-code-review`), retire obsolete ones (`/sdd` dispatcher).
 
-# Graph-based flow
+# Graph-based Flow
 
 ## State machine
 
@@ -139,7 +139,7 @@ Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Dir
 | `/sdd-agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
 | `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
 
-# Old, pre-existing sections that need new consideration. We may delete or modify these based on how they fit into the new standard.
+# Old, Pre-existing Sections That Need New consideration. We May Delete or Modify These Based on How They Fit Into the New standard.
 
 ## Issue body format (the brief is the body)
 

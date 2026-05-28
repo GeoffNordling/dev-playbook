@@ -30,7 +30,7 @@ Space-separated, any order. Recognized keywords:
 3. Do NOT stage unrelated changes — other agents may own those
 4. `git log --oneline -3` to match commit message style
 
-## All Modes
+## All modes
 
 - Always stage `settings.json` changes — these are housekeeping, always include them
 - Never commit `.env` files, credentials, or secrets

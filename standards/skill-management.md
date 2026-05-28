@@ -23,11 +23,11 @@ Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.
 
 After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror.
 
-## Authored Skills
+## Authored skills
 
 Skills written for this workspace live in `dotfiles/dot-claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md) for the format.
 
-## Third-Party Skills
+## Third-party skills
 
 The Vercel `skills` CLI (npm package `skills`) is the canonical installer. It pulls from GitHub and pins each install to a tree SHA in `dotfiles/.agents/.skill-lock.json`. The lock file is the source of truth: each entry records source URL, skill path, tree SHA, and install timestamps.
 
@@ -50,6 +50,6 @@ npx skills@latest remove SKILL_NAME -g
 
 Don't edit files under `dotfiles/.agents/skills/` — they're overwritten on the next `skills update`. To diverge a skill's behavior, fork its source repo and reinstall pointing at your fork.
 
-## Decision Hub
+## Decision hub
 
 The Decision Hub registry (`dhub` CLI) is out of scope. Every skill available via DHub is also on GitHub and installable through the Vercel CLI.

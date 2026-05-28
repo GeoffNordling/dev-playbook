@@ -4,7 +4,7 @@ Conventions for Claude Code skill bundles in this workspace. For the full
 feature reference (subagent execution, shell injection, hooks, etc.), see the
 [official skill documentation](https://code.claude.com/docs/en/skills).
 
-## File Structure
+## File structure
 
 ```
 .claude/skills/<skill-name>/
@@ -15,7 +15,7 @@ feature reference (subagent execution, shell injection, hooks, etc.), see the
 
 The directory name must match the `name` field in the front matter.
 
-## Front Matter
+## Front matter
 
 ```yaml
 ---
@@ -29,7 +29,7 @@ argument-hint: "<hint>"             # optional
 ---
 ```
 
-### Required Fields
+### Required fields
 
 Every skill must have all four of these:
 
@@ -40,7 +40,7 @@ Every skill must have all four of these:
 | `disable-model-invocation` | `false` is the standard — per the [dispatch model](~/workspace/dev-playbook/workflow/workflow.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
-### Optional Fields
+### Optional fields
 
 | Field | When to include |
 |-------|-----------------|
@@ -48,7 +48,7 @@ Every skill must have all four of these:
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 
-### Fields We Do Not Use
+### Fields we do not use
 
 - **`user-invocable`** — do not include this field. If a skill should not be
   user-invoked, use `disable-model-invocation: true` and rely on the skill's
@@ -68,7 +68,7 @@ Reference the variable in the body where the skill consumes it:
 ## Feedback: $ARGUMENTS
 ```
 
-## Body Format
+## Body format
 
 After the front matter, the body is Markdown.
 
@@ -85,11 +85,11 @@ After the front matter, the body is Markdown.
 - Avoid time-sensitive content (hardcoded version numbers, dates,
   release-specific paths) — it goes stale faster than the skill is updated.
 
-## Cross-References
+## Cross-references
 
 Skill bodies follow the workspace cross-reference standard. See the [skill-bundles section](~/workspace/dev-playbook/standards/repo-documentation.md#in-skill-bundles) for the target-based rules: inline links for files the reader should open, inline code for files mentioned by name, and bare invocations for slash-skills.
 
-## References Directory
+## References directory
 
 For skills that need extensive reference material, place supplementary
 files in a `references/` subdirectory. Reference them from SKILL.md per
@@ -106,7 +106,7 @@ other reference files in the same skill bundle. The lazy-load pattern
 assumes a flat tree; nested references defeat the savings and confuse the
 loading agent.
 
-## Scripts Directory
+## Scripts directory
 
 For skills that invoke helper scripts — deterministic operations, repeated
 logic, or steps where token cost or reliability matters — place them in
@@ -125,7 +125,7 @@ the agent invokes while running the skill. A repo's project-root
 is governed elsewhere. The two may coexist in the same repo without
 conflict; they are different paths and different concerns.
 
-## Naming Conventions
+## Naming conventions
 
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
   Good: `commit`, `ref-check`. Bad: `do-the-commit-thing`.

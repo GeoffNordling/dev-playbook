@@ -81,7 +81,7 @@ and verify line numbers still match, or update against a newer SHA.
 
 ## 4. Evidence inventory
 
-### 4.1 Issue #191 — "Possible to use Claude subscription instead of ANTHROPIC_API_KEY?"
+### 4.1 Issue #191 — "possible to use Claude subscription instead of ANTHROPIC_API_KEY?"
 
 - URL: https://github.com/mattpocock/sandcastle/issues/191
 - State at time of investigation: **OPEN**, label **`wontfix`**, 20 comments,

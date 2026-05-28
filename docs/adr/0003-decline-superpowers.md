@@ -131,7 +131,7 @@ existing SDD or Pocock-derived skills, the route is to author a
 workspace-native skill in `dotfiles/.claude/skills/<name>/`, not to
 install Superpowers content as a foreign skill.
 
-## Alternatives Considered
+## Alternatives considered
 
 | Alternative | Why rejected |
 |---|---|

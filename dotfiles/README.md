@@ -1,4 +1,4 @@
-# dotfiles
+# Dotfiles
 
 Claude Code configuration — skills, rules, settings, and hooks — managed via GNU Stow.
 

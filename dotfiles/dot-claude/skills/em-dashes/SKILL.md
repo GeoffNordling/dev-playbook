@@ -11,7 +11,7 @@ effort: xhigh
 Replace every em dash in files changed during this session with the
 contextually appropriate punctuation.
 
-## Replacement Rules
+## Replacement rules
 
 Claude tends to produce em dashes in two situations. Each has a different
 correct replacement:

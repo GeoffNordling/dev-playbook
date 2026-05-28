@@ -14,7 +14,7 @@ Define a consistent file hierarchy and scope boundary for every repository in th
 
 **Voice and structure are standardized.** Every doc in this hierarchy follows [doc-conventions.md](doc-conventions.md) — declarative present tense, one rule per section, current-state only.
 
-## Audience and Presence
+## Audience and presence
 
 Every file in the documentation hierarchy has two properties.
 
@@ -48,7 +48,7 @@ Whether the file is required or optional.
 | `<sub-project>/CLAUDE.md` | Agent | Optional | Sub-project rules within a repo, when the repo holds distinct sub-projects with divergent operating conventions. See [CLAUDE.md hierarchy](#claudemd-hierarchy). |
 | `.gitignore` | Tooling | Required | Git ignore rules. Every repo has one. See [.gitignore Baseline](#gitignore-baseline). |
 
-## README.md Baseline
+## README.md baseline
 
 Every workspace repo's `README.md` starts from this baseline:
 
@@ -63,7 +63,7 @@ This is the floor, not the ceiling. README depth varies by project — see
 quick-start, architecture overview, or examples as the project earns
 them.
 
-## CLAUDE.md Baseline
+## CLAUDE.md baseline
 
 Every workspace repo's `CLAUDE.md` starts from this baseline:
 
@@ -103,11 +103,11 @@ A repository `MAY` add nested `CLAUDE.md` files at sub-project roots when the su
 
 Nested files follow the same scope as the root: operational instructions for an agent operating inside the sub-project. They `SHALL NOT` contain project description, architecture decisions, or roadmap — those belong elsewhere in the documentation hierarchy.
 
-## ADR Conventions
+## ADR conventions
 
 See [adr-conventions.md](adr-conventions.md).
 
-## CONTEXT.md Format
+## CONTEXT.md format
 
 ### Structure
 
@@ -159,7 +159,7 @@ _Avoid_: Client, buyer, account
 
 One `CONTEXT.md` at the repo root.
 
-## .gitignore Baseline
+## .gitignore baseline
 
 Every workspace repo's `.gitignore` includes these baseline entries:
 
@@ -182,7 +182,7 @@ __pycache__/
 Repos `MAY` extend with project-specific paths. Python tooling entries
 are harmless in non-Python repos and stay for uniformity.
 
-## Cross-References
+## Cross-references
 
 Cross-references to a stable workspace location `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/spec-tools/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links. Anything else — backticked filenames like `` `conftest.py` ``, repo-relative paths, slash-skill invocations like `/commit` — is treated as prose by `ref-check`.
 

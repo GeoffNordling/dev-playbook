@@ -18,7 +18,7 @@ Pure computation, in-memory state, no I/O. Always deepenable — merge the modul
 
 Dependencies that have local test stand-ins (PGLite for Postgres, in-memory filesystem). Deepenable if the stand-in exists. The deepened module is tested with the stand-in running in the test suite. The seam is internal; no port at the module's external interface.
 
-### 3. Remote but owned (Ports & Adapters)
+### 3. Remote but owned (ports & adapters)
 *Your own service across a network. Define a port; inject HTTP for prod, in-memory for tests.*
 
 > 💡 **Ports & Adapters** (Cockburn, 2005; aka Hexagonal Architecture): the module talks to a small interface — the *port* — and transport-specific code lives in classes that implement it — the *adapters*. Swap adapters per environment.
@@ -27,7 +27,7 @@ Your own services across a network boundary (microservices, internal APIs). Defi
 
 Recommendation shape: *"Define a port at the seam, implement an HTTP adapter for production and an in-memory adapter for testing, so the logic sits in one deep module even though it's deployed across a network."*
 
-### 4. True external (Mock)
+### 4. True external (mock)
 *Third-party service you can't run in tests (Stripe, Twilio). Mock at the boundary.*
 
 Third-party services (Stripe, Twilio, etc.) you don't control. The deepened module takes the external dependency as an injected port; tests provide a mock adapter.
