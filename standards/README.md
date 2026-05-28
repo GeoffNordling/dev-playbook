@@ -11,6 +11,7 @@ Cross-project engineering standards that apply to all repositories in the worksp
 | [doc-conventions.md](doc-conventions.md) | How Markdown documents in workspace repos are written (voice, structure, brevity, current-state-only) |
 | [repo-documentation.md](repo-documentation.md) | What files every repo should have, their scope, CONTEXT.md format, and cross-reference style |
 | [adr-conventions.md](adr-conventions.md) | When to write an ADR, the template, numbering, and optional sections |
+| [issue-conventions.md](issue-conventions.md) | Issue body format, brief principles, and vertical-slice rules — applied at intake |
 | [skill-conventions.md](skill-conventions.md) | Conventions for Claude Code skill bundles |
 | [skill-management.md](skill-management.md) | Where skills live and how third-party skills are installed |
 | [architecture-vocabulary.md](architecture-vocabulary.md) | Shared vocabulary for module architecture: Module, Interface, Depth, Seam, Adapter, Leverage, Locality |
