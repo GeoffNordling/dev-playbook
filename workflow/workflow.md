@@ -2,7 +2,7 @@
 
 Standard workflow for how ideas become merged PRs in a workspace repo.
 
-# Main Concepts That We Need to Flesh Out in Documentation Somewhere in ~/Workflow/ Directory:
+# Main Concepts That We Need to Flesh Out in Documentation Somewhere in ~/workflow/ Directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
 GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, tests:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).

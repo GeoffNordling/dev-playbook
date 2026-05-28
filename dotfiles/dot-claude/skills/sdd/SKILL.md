@@ -36,4 +36,4 @@ Reads the issue's `phase/*` label, resolves the issue's worktree, and invokes th
 
 ## Worktree resolution
 
-Resolve and enter the issue's worktree per [Branch and worktree](~/workspace/dev-playbook/workflow/workflow.md#branch-and-worktree) in the workflow standard. The phase skill inherits the worktree as its working directory.
+Resolve and enter the issue's worktree per the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md). The phase skill inherits the worktree as its working directory.

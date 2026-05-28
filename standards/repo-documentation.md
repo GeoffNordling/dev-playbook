@@ -41,7 +41,7 @@ Whether the file is required or optional.
 | `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
 | `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
 | `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/spec-tools/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/spec-tools/sdd-standards/spec-standard.md#8-file-organization) for file layout and splitting rules. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/spec-tools/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/spec-tools/sdd-standards/spec-standard.md#4-file-organization) for file layout and splitting rules. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. See [ADR conventions](#adr-conventions) for numbering, template, and offer-gate. |
 | `CONTEXT.md` | Human + Agent | Optional | Domain glossary at the repo root: canonical terms, their relationships, and illustrative scenarios. Created lazily as terminology ambiguity surfaces; do not pre-populate. See [CONTEXT.md format](#contextmd-format) for the structure. |
@@ -185,6 +185,8 @@ are harmless in non-Python repos and stay for uniformity.
 ## Cross-references
 
 Cross-references to a stable workspace location `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/spec-tools/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links. Anything else — backticked filenames like `` `conftest.py` ``, repo-relative paths, slash-skill invocations like `/commit` — is treated as prose by `ref-check`.
+
+VS Code does not expand `~/` in markdown links, so clicking these references from the editor fails ([vscode#103542](https://github.com/microsoft/vscode/issues/103542)). Accepted — agents are the primary audience, and the workspace-portable form is what `ref-check` lints.
 
 How a reference is wrapped — inline link, inline code, or bare — depends on the file kind doing the referencing.
 

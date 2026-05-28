@@ -81,7 +81,7 @@ Describe the proposed amendment to the user: which `dsn` is affected, what the n
 
 The user decides whether to:
 
-- Apply the amendment in this terminal — edit the spec (update `Interface:` lines; on revision, follow [spec-standard §3.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#33-revision)). Then continue with stub, test, implementation in that order. During initial greenfield implementation no pinned consumers exist yet — edit in place at revision `0` and do not bump.
+- Apply the amendment in this terminal — edit the spec (update `Interface:` lines; on revision, follow [spec-standard §2.2.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#223-revision)). Then continue with stub, test, implementation in that order. During initial greenfield implementation no pinned consumers exist yet — edit in place at revision `0` and do not bump.
 - Defer to a fresh `sdd-design` pass — do not edit the spec; pause this terminal until the design phase produces the amendment, then resume.
 - Reject the change and direct a different approach.
 
