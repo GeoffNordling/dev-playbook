@@ -295,6 +295,34 @@ def test_slug_strips_inline_code_in_heading(tmp_path: Path, workspace: Path) -> 
     assert result.returncode == 0
 
 
+def test_slug_keeps_intraword_underscores(tmp_path: Path, workspace: Path) -> None:
+    """Underscores flanked by word chars are literal, not emphasis — matching
+    GitHub's rendered-text anchors. `## load_issue helper` → `#load_issue-helper`."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## load_issue helper\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#load_issue-helper\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "all ok" in result.stderr
+
+
+def test_slug_strips_underscore_emphasis_at_word_boundaries(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A whole-word `_emphasis_` is real emphasis: markers drop, text stays."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## the _important_ part\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#the-important-part\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
 def test_reference_without_fragment_does_not_require_headings(
     tmp_path: Path, workspace: Path
 ) -> None:

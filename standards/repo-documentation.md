@@ -221,7 +221,7 @@ python3 ~/workspace/dev-playbook/tools/bin/ref-check .
 
 A cross-reference `MAY` append `#anchor` to target a specific heading in a markdown file. The anchor `MUST` match the heading's GitHub slug, computed as:
 
-1. Strip inline markdown from the heading text — backtick spans, link syntax `[text](url)`, and emphasis markers (`*`, `_`).
+1. Strip inline markdown from the heading text — backtick code spans (keep the text), link syntax `[text](url)` (keep `text`), and emphasis markers. Asterisk emphasis (`*`, `**`) is stripped anywhere, including mid-word. Underscore emphasis (`_`, `__`) is stripped only at word boundaries; underscores flanked by word characters (e.g. `foo_bar_baz`) are literal and kept. This mirrors GitHub, which derives the anchor from the heading's *rendered* text, where intraword underscores are not emphasis.
 2. Lowercase.
 3. Drop every character that is not a letter, digit, underscore, hyphen, or whitespace.
 4. Replace each whitespace character with `-`. Consecutive whitespace produces consecutive hyphens; no collapsing.
@@ -232,4 +232,5 @@ Examples:
 - `#### 2.2.3 revision` → `#223-revision`
 - `## Step 1 — See the shape` → `#step-1--see-the-shape`
 - `## Issue body format (the brief is the body)` → `#issue-body-format-the-brief-is-the-body`
+- `## load_issue helper` → `#load_issue-helper` (intraword underscores kept)
 
