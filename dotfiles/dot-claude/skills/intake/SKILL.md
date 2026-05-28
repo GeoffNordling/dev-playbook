@@ -13,14 +13,6 @@ Single entry point for an idea. Produces one or many GitHub issues, each born re
 
 For the full workflow, label scheme, issue body template, and vertical-slice rules, see the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md).
 
-## First step
-
-Run [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) to reconcile the repo's labels with the workflow's scheme. Closed-world and idempotent — extras are deleted, drifted descriptions are corrected, and one line per label reports the action.
-
-```bash
-python3 ~/workspace/dev-playbook/tools/bin/bootstrap-labels
-```
-
 ## Process
 
 ### 1. Understand the idea
