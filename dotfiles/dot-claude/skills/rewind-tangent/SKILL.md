@@ -3,7 +3,7 @@ name: rewind-tangent
 description: Prepare for a conversation rewind by drafting a "Message from the model" that brings past-self up to date after the rewind.
 disable-model-invocation: true
 model: opus
-effort: xhigh
+effort: medium
 argument-hint: "<rewind target>"
 ---
 
