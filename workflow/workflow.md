@@ -5,8 +5,6 @@ Standard workflow for how ideas become merged PRs in a workspace repo.
 # Main concepts that we need to flesh out in documentation somewhere in ~/workflow/ directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
-Workflow is based on a state machine using GH Issues. A workflow graph of nodes and edges is clearly defined in a central location.
-
 GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
@@ -15,15 +13,9 @@ Since Claude Code "claude agents" view relies on worktrees, we need to understan
 
 Current system security constraints require user yubikey tap for both `git pull` and `git push`. We are open to relaxing this requirement but will keep it in place tentatively while we develop the workflow.
 
-Document and intentionally scope permissions granted to Claude Code agents.
-
-Incorporate Claude Code's /goal feature; very useful to maximize agent autonomy.
-
-Explore "sandboxing" methods (Claude Code native and third-party alternatives such as Pocock's sandcastle, etc.). Have not explored these at all yet. Not sure if they are useful.
-
 All state transitions, actions, metadata, for each issue, is tracked in a local SQLite DB so we can understand how our system performs.
 
-I'm interested in a lightweight web browser view of the system. Something visually appealing and parsimonious I can view in my browser. For example, a colorful view of the graph that indicates where all my open issues are and the states they are in. This would be a "live" view the same way Claude Code's "claude agents" view is live.
+Interested in a lightweight web browser view of the system. Something visually appealing and parsimonious I can view in my browser. For example, a colorful view of the graph that indicates where all my open issues are across entire GH account, and the states they are in. This would be a "live" view the same way Claude Code's "claude agents" view is live.
 
 Will need a closed feedback loop to improve the workflow and skills over time. One idea: a skill to run at the of a workflow that looks back on the context, summarizes what went well, what went wrong, unexpected surprises, and lessons learned, then compresses and writes them to a database, with all associated metadata for the session. Another agent or workflow can watch at that higher level and guide workflow improvements over time.
 
@@ -83,9 +75,7 @@ One long-lived PR per issue, opened by the implementing skill on the `open PR` e
 
 ## Dispatch
 
-The human dispatcher operates from Claude Code's "claude agents" dashboard (see [agent-view-adoption.md](~/workspace/dev-playbook/workflow/agent-view-adoption.md) for the view's capabilities and limits). Anthropic subscription billing requires interactive sessions, so every node entry is human-launched: the dispatcher types `/skill-name <args>` to spawn a new agent session that invokes the skill as its first action.
-
-Only the human can set `/goal` — it's a UI command, not a skill, and agents cannot invoke it. Prefixing an invocation with `/goal <condition>` lets the dispatcher set a completion condition; the runtime then runs the session until an evaluator confirms the condition holds. A single `/goal` session can chain multiple skill invocations.
+The human dispatcher operates from Claude Code's "claude agents" dashboard (see [agent-view-adoption.md](~/workspace/dev-playbook/workflow/agent-view-adoption.md) for the view's capabilities and limits). Anthropic subscription billing requires interactive sessions, so every node entry is human-launched.
 
 All FOTW skills are launched under `/goal`; HITL skills never are. FOTW skills declare a terminal `DONE: …` line so the (text-only) evaluator can match deterministically. Pair action with proof and a stop-clause: `/goal Run /<skill> <args> until <DONE: line appears>, or stop after N turns.`
 
