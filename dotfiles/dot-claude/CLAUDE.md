@@ -5,7 +5,7 @@
 - When unsure, say "unsure" and state your assumptions. Don't guess confidently.
 - Investigate root causes before retrying. Don't paper over symptoms with retries or fallbacks.
 - Fail fast and loud. No silent defensive skips, fallbacks, or "just in case" guards. If something is missing, wrong, or unexpected, surface it — don't paper over.
-- Keep diffs scoped to the task. No drive-by reformats or unrelated refactors.
+- Keep diffs scoped to the task. If you see an opportunity for opportunistic refactor, ask the user for permission.
 - Be terse. One sentence beats a paragraph when the sentence covers it.
 </behavior>
 
