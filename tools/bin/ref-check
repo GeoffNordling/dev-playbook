@@ -10,9 +10,10 @@ inside any `adr/` directory are skipped as well — ADRs are immutable
 historical records, so broken refs in them are accepted as expected
 staleness, not lint errors.
 
-Fragment anchors (`#heading-slug`) are stripped before resolution and are
-NOT validated — only the file's existence is checked. Anchor validation is
-intentionally out of scope; a stale `#section` on a real file reports `ok`.
+Fragment anchors (`#heading-slug`) on .md targets are validated against the
+target's headings per the slug rule in `standards/repo-documentation.md`.
+Headings inside the target's fenced code blocks are ignored. Fragments on
+directories or non-.md targets are out of scope and treated as `ok`.
 
 Output:
     stdout — JSON Lines, one record per reference: {source, line, target, status}.
@@ -28,11 +29,13 @@ Usage:
 # ///
 
 import argparse
+import functools
 import json
 import os
 import re
 import subprocess
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 EXCLUDE_DIRS = {
@@ -55,6 +58,66 @@ EXCLUDE_DIRS = {
 REF_PATTERN = re.compile(r"~/workspace/[^ )`\n]+")
 FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
 INLINE_CODE_PATTERN = re.compile(r"`[^`\n]*`")
+HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
+
+# Slug rule: see standards/repo-documentation.md "Fragment anchors".
+SLUG_BACKTICK = re.compile(r"`([^`]*)`")
+SLUG_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+# Asterisk emphasis is stripped anywhere (it may be intraword); underscore
+# emphasis only at word boundaries, so intraword `foo_bar_baz` stays literal —
+# matching GitHub's rendered-text anchors.
+SLUG_STAR = re.compile(r"(\*{1,2})(.+?)\1")
+SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
+SLUG_DROP = re.compile(r"[^\w\s\-]", re.UNICODE)
+SLUG_WHITESPACE = re.compile(r"\s")
+
+
+def github_slug(heading_text: str) -> str:
+    """Compute the GitHub-style anchor slug for a heading.
+
+    Steps mirror standards/repo-documentation.md "Fragment anchors":
+    strip inline markdown (backticks, link syntax, emphasis), lowercase,
+    drop non-word/non-whitespace/non-hyphen chars, then whitespace -> "-".
+    """
+    text = SLUG_BACKTICK.sub(r"\1", heading_text)
+    text = SLUG_LINK.sub(r"\1", text)
+    text = SLUG_STAR.sub(r"\2", text)
+    text = SLUG_UNDERSCORE.sub(r"\2", text)
+    text = text.lower()
+    text = SLUG_DROP.sub("", text)
+    text = SLUG_WHITESPACE.sub("-", text)
+    return text
+
+
+def content_lines(filepath: Path) -> Iterator[tuple[int, str]]:
+    """Yield (line_number, line) for every line outside fenced code blocks.
+
+    The single place that knows how to skip ``` / ~~~ fences. Both reference
+    scanning (source files) and heading extraction (target files) consume it.
+    """
+    in_fence = False
+    with open(filepath, encoding="utf-8", errors="replace") as f:
+        for line_num, line in enumerate(f, start=1):
+            if FENCE_PATTERN.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            yield line_num, line
+
+
+@functools.cache
+def heading_slugs(filepath: Path) -> frozenset[str]:
+    """Return the set of GitHub slugs for every ATX heading in filepath.
+
+    Headings inside fenced code blocks are skipped. Cached by path so a
+    target referenced from many sources is only parsed once per run.
+    """
+    return frozenset(
+        github_slug(m.group(1))
+        for _, line in content_lines(filepath)
+        if (m := HEADING_PATTERN.match(line))
+    )
 
 
 def workspace_root() -> Path:
@@ -95,39 +158,55 @@ def find_md_files(root: Path) -> list[Path]:
     return sorted(results)
 
 
-def classify_ref(target: Path, repo_root: Path, repo_name: str) -> str:
-    """Return 'ok' if target resolves to an existing path, 'broken' otherwise."""
+def resolve_target(target: Path, repo_root: Path, repo_name: str) -> Path:
+    """Map a ~/workspace reference to the on-disk path that should hold it.
+
+    In-repo references resolve against repo_root — the working copy of the
+    invoking checkout, which may be a worktree — so edits resolve against
+    the worktree's state, not the main checkout. Cross-repo references use
+    the absolute on-disk path as written.
+    """
     rel = target.relative_to(workspace_root())
-    target_repo = rel.parts[0]
-    actual = repo_root / Path(*rel.parts[1:]) if target_repo == repo_name else target
-    return "ok" if actual.exists() else "broken"
+    if rel.parts[0] == repo_name:
+        return repo_root / Path(*rel.parts[1:])
+    return target
+
+
+def classify_ref(target: Path, fragment: str, repo_root: Path, repo_name: str) -> str:
+    """Return 'ok' if target (and fragment, if any) resolves; 'broken' otherwise.
+
+    File-existence failure short-circuits — anchor is not checked when the
+    file is missing. Fragments on directories or non-.md targets are out
+    of scope and treated as 'ok'.
+    """
+    actual = resolve_target(target, repo_root, repo_name)
+    if not actual.exists():
+        return "broken"
+    if not fragment:
+        return "ok"
+    if not actual.is_file() or actual.suffix.lower() != ".md":
+        return "ok"
+    return "ok" if fragment in heading_slugs(actual) else "broken"
 
 
 def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
     """Extract and classify every reference in one .md file."""
     results = []
     source = str(filepath.relative_to(repo_root))
-    in_fence = False
-    with open(filepath) as f:
-        for line_num, line in enumerate(f, start=1):
-            if FENCE_PATTERN.match(line):
-                in_fence = not in_fence
-                continue
-            if in_fence:
-                continue
-            stripped = INLINE_CODE_PATTERN.sub("", line)
-            for match in REF_PATTERN.finditer(stripped):
-                target_str = match.group(0)
-                path_str = target_str.split("#", 1)[0]
-                resolved = Path(path_str.replace("~", str(Path.home())))
-                results.append(
-                    {
-                        "source": source,
-                        "line": line_num,
-                        "target": target_str,
-                        "status": classify_ref(resolved, repo_root, repo_name),
-                    }
-                )
+    for line_num, line in content_lines(filepath):
+        stripped = INLINE_CODE_PATTERN.sub("", line)
+        for match in REF_PATTERN.finditer(stripped):
+            target_str = match.group(0)
+            path_str, _, fragment = target_str.partition("#")
+            resolved = Path(path_str.replace("~", str(Path.home())))
+            results.append(
+                {
+                    "source": source,
+                    "line": line_num,
+                    "target": target_str,
+                    "status": classify_ref(resolved, fragment, repo_root, repo_name),
+                }
+            )
     return results
 
 

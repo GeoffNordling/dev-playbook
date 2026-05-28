@@ -73,7 +73,7 @@ dev = [
 dev = [
     { name = "mypy", specifier = ">=2.0" },
     { name = "pytest", specifier = ">=9.0" },
-    { name = "ruff", specifier = ">=0.15.12" },
+    { name = "ruff", specifier = ">=0.15.14" },
 ]
 
 [[package]]
