@@ -5,7 +5,7 @@ Standard workflow for how ideas become merged PRs in a workspace repo.
 # Main Concepts That We Need to Flesh Out in Documentation Somewhere in ~/workflow/ Directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
-GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(<category>, mode:*, tests:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
+GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(category:*, mode:*, tests:*, phase:*)` scheme.
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
@@ -27,14 +27,27 @@ Plan a pass over all skills to align with this workflow: update existing skills,
 
 ## State machine
 
-Every issue is tagged with a four-tuple of labels: `(<category>, mode:*, tests:*, phase/*)`. All four are always present. The state of an issue is the `(mode, tests, phase)` sub-triple — each node below is one reachable combination. Category is required metadata but does not affect routing.
+Every issue is tagged with a four-tuple of labels: `(category:*, mode:*, tests:*, phase:*)`. All four are always present. The state of an issue is the `(mode, tests, phase)` sub-triple — each node below is one reachable combination. Category is required metadata but does not affect routing.
 
-- `<category>` — one of `bug` or `enhancement`. Picked at intake.
-  - `bug` — something is broken or incorrect.
-  - `enhancement` — new behavior or improvement. Covers everything that isn't a bug, including docs, config, refactors, and chores.
+- `category:*` — `category:bug` (broken or incorrect) or `category:enhancement` (new behavior or improvement; covers everything that isn't a bug, including docs, config, refactors, and chores). Picked at intake.
 - `mode:*` — `mode:sdd` or `mode:direct`. Picked at intake.
 - `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (routed to `tdd`), doc/config/work not touching tests goes `tests:no` (routed to `build`).
-- `phase/*` — the current node in the graph below.
+- `phase:*` — the current node in the graph below. The graph is the inventory; see [Naming](#naming).
+
+### Valid labels
+
+[bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) mints exactly these. Six fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
+
+| Dimension | Label | Meaning |
+|---|---|---|
+| Category | `category:bug` | Something is broken or incorrect. |
+| Category | `category:enhancement` | New behavior or improvement; covers everything that isn't a bug. |
+| Mode | `mode:sdd` | SDD path: spec → design → TDD ceremony. |
+| Mode | `mode:direct` | Direct path: no spec/design ceremony. |
+| Tests | `tests:yes` | Issue involves writing or modifying tests. |
+| Tests | `tests:no` | Issue does not touch tests. |
+
+### Node attributes
 
 Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, review})`. Four kinds:
 
@@ -77,7 +90,9 @@ flowchart LR
     human_code_review -->|approve: merge| done
 ```
 
-**Naming convention.** Nodes, slash-commands, and phase labels share the same identifier with different punctuation: nodes use underscores (mermaid prefers them), slash-commands and labels use hyphens (convention). E.g., `sdd_agent_spec_review` ↔ `/sdd-agent-spec-review` ↔ `phase/sdd-agent-spec-review`.
+### Naming
+
+Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_agent_spec_review` → label `phase:sdd-agent-spec-review`, command `/sdd-agent-spec-review`. The set of graph nodes IS the phase-label inventory.
 
 Forward edges through work and review nodes are fired by those nodes' skills. Self-loops (`iterate`, `redesign`, `rework`) re-launch the relevant skill. Only `approve: merge` is fired outside any skill — the dispatcher merges via GitHub.
 
