@@ -210,3 +210,246 @@ def test_not_a_git_repo_exits_2(tmp_path: Path, workspace: Path) -> None:
 
     assert result.returncode == 2
     assert "not a git repository" in result.stderr
+
+
+def test_anchor_matching_existing_heading_is_ok(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Real heading\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#real-heading\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "all ok" in result.stderr
+
+
+def test_anchor_missing_on_existing_file_is_broken(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Real heading\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#no-such-section\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/1 broken" in result.stderr
+
+
+def test_slug_handles_numbered_heading_with_periods(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """`### 2.2.3 revision` slugs to `223-revision` — periods drop, spaces hyphenate."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "### 2.2.3 revision\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#223-revision\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_slug_handles_parentheses_in_heading(tmp_path: Path, workspace: Path) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Issue body format (the brief is the body)\n")
+    write(
+        repo / "docs.md",
+        "see ~/workspace/primary/target.md#issue-body-format-the-brief-is-the-body\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_slug_handles_em_dash_in_heading(tmp_path: Path, workspace: Path) -> None:
+    """Em dashes drop; surrounding spaces produce a double hyphen (no collapsing)."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Step 1 — See the shape\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#step-1--see-the-shape\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_slug_strips_inline_code_in_heading(tmp_path: Path, workspace: Path) -> None:
+    """Backtick spans in a heading contribute their text content, not the backticks."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Without `fast` (default staging)\n")
+    write(
+        repo / "docs.md",
+        "see ~/workspace/primary/target.md#without-fast-default-staging\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_reference_without_fragment_does_not_require_headings(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """Existing behavior: file-only refs are validated against file existence."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "no headings at all in this file\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_heading_inside_fenced_block_in_target_is_ignored(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A `## Heading` inside a fenced code block in the target is not real."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "```\n## Fake heading\n```\n")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md#fake-heading\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+
+
+def test_fragment_on_non_markdown_target_is_out_of_scope(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A fragment on a non-.md target is treated as ok — anchors aren't a thing there."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "script.py", "print('hi')\n")
+    write(repo / "docs.md", "see ~/workspace/primary/script.py#some-fragment\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_fragment_on_directory_target_is_out_of_scope(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    (repo / "subdir").mkdir()
+    write(repo / "docs.md", "see ~/workspace/primary/subdir#anything\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_missing_file_with_fragment_is_broken_not_anchor_check(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """File-missing short-circuits: anchor never evaluated when file is absent."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "docs.md",
+        "see ~/workspace/primary/nope.md#make-believe-heading\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/1 broken" in result.stderr
+
+
+def test_multiple_headings_in_one_target_are_all_addressable(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """Every ATX heading level contributes a slug; a ref to any of them is ok."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "target.md",
+        "# Top\n## Middle\n### Inner\n#### Deepest\n",
+    )
+    write(
+        repo / "docs.md",
+        "see ~/workspace/primary/target.md#top\n"
+        "see ~/workspace/primary/target.md#middle\n"
+        "see ~/workspace/primary/target.md#inner\n"
+        "see ~/workspace/primary/target.md#deepest\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "all ok" in result.stderr
+
+
+def test_worktree_resolves_anchor_against_worktree_target(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """Anchor validation must use the worktree's copy of the target file.
+
+    A heading renamed in the worktree must resolve against the worktree
+    state, not the main checkout — otherwise edits within a worktree
+    would fail ref-check until merged.
+    """
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "README.md", "base")
+    commit_all(repo)
+
+    wt = repo / ".claude" / "worktrees" / "feature-x"
+    subprocess.run(
+        ["git", "-C", str(repo), "worktree", "add", "-q", str(wt), "-b", "feature-x"],
+        check=True,
+    )
+    write(wt / "target.md", "## Renamed in worktree\n")
+    write(wt / "docs.md", "see ~/workspace/primary/target.md#renamed-in-worktree\n")
+    assert not (repo / "target.md").exists()
+
+    result = run_ref_check(wt, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_same_file_self_anchor_resolves(tmp_path: Path, workspace: Path) -> None:
+    """A self-reference (source == target) with an anchor still validates."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "foo.md",
+        "See [the details below](~/workspace/primary/foo.md#details).\n\n## Details\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "all ok" in result.stderr
+
+
+def test_mixed_pass_and_fail_in_one_run_reports_only_the_broken(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """Default-mode output contains the broken ref only; summary counts both."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Real heading\n")
+    write(
+        repo / "docs.md",
+        "ok ref:     ~/workspace/primary/target.md#real-heading\n"
+        "broken ref: ~/workspace/primary/target.md#missing-heading\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/2 broken" in result.stderr
+    assert "#missing-heading" in result.stdout
+    assert "#real-heading" not in result.stdout

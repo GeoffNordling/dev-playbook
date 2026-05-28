@@ -41,7 +41,7 @@ Whether the file is required or optional.
 | `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
 | `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
 | `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/spec-tools/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/spec-tools/sdd-standards/spec-standard.md#8-file-organization) for file layout and splitting rules. |
+| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/spec-tools/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/spec-tools/sdd-standards/spec-standard.md#4-file-organization) for file layout and splitting rules. |
 | `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
 | `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. See [ADR conventions](#adr-conventions) for numbering, template, and offer-gate. |
 | `CONTEXT.md` | Human + Agent | Optional | Domain glossary at the repo root: canonical terms, their relationships, and illustrative scenarios. Created lazily as terminology ambiguity surfaces; do not pre-populate. See [CONTEXT.md format](#contextmd-format) for the structure. |
@@ -216,4 +216,20 @@ Fenced code blocks delimited by triple backticks or `~~~` may contain `~/workspa
 # Run ref-check from any workspace repo:
 python3 ~/workspace/dev-playbook/tools/bin/ref-check .
 ```
+
+### Fragment anchors
+
+A cross-reference `MAY` append `#anchor` to target a specific heading in a markdown file. The anchor `MUST` match the heading's GitHub slug, computed as:
+
+1. Strip inline markdown from the heading text — backtick spans, link syntax `[text](url)`, and emphasis markers (`*`, `_`).
+2. Lowercase.
+3. Drop every character that is not a letter, digit, underscore, hyphen, or whitespace.
+4. Replace each whitespace character with `-`. Consecutive whitespace produces consecutive hyphens; no collapsing.
+
+Examples:
+
+- `## Branch and worktree` → `#branch-and-worktree`
+- `#### 2.2.3 revision` → `#223-revision`
+- `## Step 1 — See the shape` → `#step-1--see-the-shape`
+- `## Issue body format (the brief is the body)` → `#issue-body-format-the-brief-is-the-body`
 
