@@ -5,7 +5,7 @@ Standard workflow for how ideas become merged PRs in a workspace repo.
 # Main concepts that we need to flesh out in documentation somewhere in ~/workflow/ directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
-GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
+GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, tests:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
@@ -21,17 +21,21 @@ Will need a closed feedback loop to improve the workflow and skills over time. O
 
 The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
 
-Plan a pass over all skills to align with this workflow: update existing skills, author the ones referenced here but not yet on disk (`/tdd`, `/sdd-agent-spec-review`, `/sdd-agent-code-review`, `/agent-code-review`), retire obsolete ones (`/sdd` dispatcher).
+Plan a pass over all skills to align with this workflow: update existing skills, author the ones referenced here but not yet on disk (`/tdd`, `/build`, `/sdd-agent-spec-review`, `/sdd-agent-code-review`, `/agent-code-review`), retire obsolete ones (`/sdd` dispatcher).
 
 # Graph-based flow
 
 ## State machine
 
-Every issue is tagged with a tuple of labels: `(mode:*, phase/*)`. Both labels are always present. The state of an issue is the tuple. Each node below is one reachable `(mode, phase)` combination.
+Every issue is tagged with a triple of labels: `(mode:*, tests:*, phase/*)`. All three are always present. The state of an issue is the triple. Each node below is one reachable `(mode, tests, phase)` combination.
+
+- `mode:*` — `mode:sdd` or `mode:direct`. Picked at intake.
+- `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (routed to `tdd`), doc/config/work not touching tests goes `tests:no` (routed to `build`).
+- `phase/*` — the current node in the graph below.
 
 Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, review})`. Four kinds:
 
-- `(agent, work)` — agent produces output (e.g., `sdd_tdd`, `tdd`)
+- `(agent, work)` — agent produces output (e.g., `sdd_tdd`, `tdd`, `build`)
 - `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec_review`, `agent_code_review`)
 - `(human, work)` — human produces output (e.g., `intake`, `sdd_requirements`, `sdd_design`)
 - `(human, review)` — human reads and decides (e.g., `sdd_human_spec_review`, `human_code_review`)
@@ -41,7 +45,8 @@ Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, r
 flowchart LR
     start([ ]) --> intake[intake]
     intake -->|mode:sdd| sdd_requirements[sdd_requirements]
-    intake -->|mode:direct| tdd[tdd]
+    intake -->|mode:direct, tests:yes| tdd[tdd]
+    intake -->|mode:direct, tests:no| build[build]
 
     subgraph sdd[SDD path]
         sdd_requirements -->|design| sdd_design[sdd_design]
@@ -58,9 +63,11 @@ flowchart LR
 
     subgraph direct[Direct path]
         tdd -->|open PR| agent_code_review[agent_code_review]
+        build -->|open PR| agent_code_review
         agent_code_review -->|attach review| human_code_review{human_code_review}
         human_code_review -->|reject: iterate| agent_code_review
         human_code_review -->|reject: rework| tdd
+        human_code_review -->|reject: rework| build
     end
 
     sdd_human_code_review -->|approve: merge| done([merged])
@@ -118,7 +125,7 @@ Three modes of human engagement exist in theory; only two are available under th
 
 FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
 
-Direct-mode skills mirror SDD-mode skills by dropping the `sdd-` prefix (e.g., `/sdd-tdd` → `/tdd`). Bodies differ — SDD versions teach the SDD process.
+Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Direct work; `/build` handles non-test work — docs, config, chores. Both feed shared `agent_code_review` and `human_code_review`.
 
 | Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------------|---------------------|
@@ -127,6 +134,7 @@ Direct-mode skills mirror SDD-mode skills by dropping the `sdd-` prefix (e.g., `
 | `/sdd-design` | HITL | `Bash(gh issue *)` `Skill(grill-with-docs)` `Skill(improve-codebase-architecture)` | TBD |
 | `/sdd-tdd` | FOTW | `Bash(gh issue view *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` | TBD |
 | `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
+| `/build` | FOTW | same as `/sdd-tdd` | TBD |
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh api *)` | TBD |
 | `/sdd-agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
 | `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |

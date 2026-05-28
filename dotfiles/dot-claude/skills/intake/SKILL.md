@@ -1,14 +1,15 @@
 ---
 name: intake
-description: Capture an idea (one issue or many) and triage at creation. Decides category, SDD-mode, first phase label, writes the brief into the issue body. Use when starting any new piece of work, capturing a bug report, splitting a plan into tracer-bullet issues, or breaking down a feature into deliverable units.
+description: Capture an idea (one issue or many) and triage at creation. Decides category, mode, tests, first phase label; writes the brief into the issue body. Use when starting any new piece of work, splitting a plan into tracer-bullet issues, or breaking down a feature into deliverable units.
 disable-model-invocation: false
 model: opus
 effort: xhigh
+allowed-tools: Bash(gh issue *), Bash(gh label *), Skill(grill-with-docs)
 ---
 
 # Intake
 
-Single entry point for an idea. Produces one or many GitHub issues, each born ready: labeled with category, mode, and first phase; brief written into the body.
+Single entry point for an idea. Produces one or many GitHub issues, each born ready: labeled with category, mode, tests, and first phase; brief written into the body.
 
 For the full workflow, label scheme, issue body template, and vertical-slice rules, see the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md).
 
@@ -34,10 +35,18 @@ If the idea is a plan that crosses concerns or layers → break into vertical sl
 
 ### 3. For each issue, decide
 
+Every issue carries the triple `(mode:*, tests:*, phase/*)` plus a category label. Pick each:
+
 - **Category** — `bug`, `enhancement`, or `chore`.
   - `chore` covers housekeeping (config tweaks, dep bumps, doc relocations, label-scheme audits) and watch-and-wait reminders (revisit-when-data-arrives tickets) — anything that doesn't change product behavior.
-- **SDD?** — apply `sdd` if the repo uses SDD and this issue's implementation will follow the spec → design → TDD path. A trivial issue in an SDD repo may not need full ceremony — your call. Chores skip `sdd` by default.
-- **First phase** — `phase/requirements` if SDD, `phase/build` if not. Chores typically carry no `phase/*` label; add `phase/build` only if the chore is substantial enough to want a real PR cycle visible in the phase view.
+- **Mode** — `mode:sdd` if the repo uses SDD and this issue warrants the spec → design → TDD ceremony; otherwise `mode:direct`. Chores are almost always `mode:direct`. A trivial issue in an SDD repo may not need full ceremony — your call.
+- **Tests** — `mode:sdd` always carries `tests:yes` automatically. For `mode:direct`, **ask the human**: does this work involve writing or modifying tests?
+  - `tests:yes` — testable behavior changes (most bugs, most enhancements).
+  - `tests:no` — docs, config, dep bumps, label-scheme audits, pure renames, anything without a runtime behavior to assert.
+- **First phase** — derived from mode + tests:
+  - `mode:sdd` → `phase/sdd-requirements`
+  - `mode:direct, tests:yes` → `phase/tdd`
+  - `mode:direct, tests:no` → `phase/build`
 
 ### 4. Write the issue
 
@@ -50,11 +59,21 @@ gh issue create --title "..." --body "$(cat <<'EOF'
 ...body...
 EOF
 )"
-gh issue edit <num> --add-label "bug" --add-label "sdd" --add-label "phase/requirements"
+gh issue edit <num> \
+  --add-label "<category>" \
+  --add-label "<mode>" \
+  --add-label "<tests>" \
+  --add-label "<phase>"
 ```
+
+Concrete examples:
+
+- SDD enhancement → `enhancement`, `mode:sdd`, `tests:yes`, `phase/sdd-requirements`
+- Direct bug with tests → `bug`, `mode:direct`, `tests:yes`, `phase/tdd`
+- Doc-only chore → `chore`, `mode:direct`, `tests:no`, `phase/build`
 
 For multi-issue plans, publish in dependency order so `Blocked by` references can use real issue numbers.
 
 ## Output
 
-Print the issue numbers and a one-line summary of each. Do NOT invoke `/sdd` automatically — let the user decide when to start work.
+Print the issue numbers and a one-line summary of each. Do NOT auto-launch the next-phase skill — the dispatcher decides when to start work.
