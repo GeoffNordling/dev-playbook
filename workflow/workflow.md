@@ -5,7 +5,7 @@ Standard workflow for how ideas become merged PRs in a workspace repo.
 # Main Concepts That We Need to Flesh Out in Documentation Somewhere in ~/workflow/ Directory:
 All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
 
-GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(mode:*, tests:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
+GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(<category>, mode:*, tests:*, phase/*)` scheme — `phase/*` values follow node IDs (with `_` → `-`).
 
 Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
 
@@ -27,8 +27,11 @@ Plan a pass over all skills to align with this workflow: update existing skills,
 
 ## State machine
 
-Every issue is tagged with a triple of labels: `(mode:*, tests:*, phase/*)`. All three are always present. The state of an issue is the triple. Each node below is one reachable `(mode, tests, phase)` combination.
+Every issue is tagged with a four-tuple of labels: `(<category>, mode:*, tests:*, phase/*)`. All four are always present. The state of an issue is the `(mode, tests, phase)` sub-triple — each node below is one reachable combination. Category is required metadata but does not affect routing.
 
+- `<category>` — one of `bug` or `enhancement`. Picked at intake.
+  - `bug` — something is broken or incorrect.
+  - `enhancement` — new behavior or improvement. Covers everything that isn't a bug, including docs, config, refactors, and chores.
 - `mode:*` — `mode:sdd` or `mode:direct`. Picked at intake.
 - `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (routed to `tdd`), doc/config/work not touching tests goes `tests:no` (routed to `build`).
 - `phase/*` — the current node in the graph below.
