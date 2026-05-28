@@ -23,22 +23,31 @@ Make is the task runner. Every Python sub-project `SHALL` have a `Makefile` at i
 
 ## Pre-commit
 
-The canonical hook set is [`dev-playbook/.pre-commit-config.yaml`](../.pre-commit-config.yaml).
-That file — including its header preamble explaining the three-environment
-contract — is the standard. Consumer repos opt in by symlinking it:
+dev-playbook publishes the canonical hook set as a **pre-commit hook repository**: the hook definitions live in [`dev-playbook/.pre-commit-hooks.yaml`](../.pre-commit-hooks.yaml), backed by the scripts in `tools/bin/`. Consumer repos reference them by URL and a pinned revision in their own `.pre-commit-config.yaml`, exactly as they reference any third-party hook (e.g. ruff):
 
-```bash
-ln -s ../dev-playbook/.pre-commit-config.yaml .pre-commit-config.yaml
+```yaml
+repos:
+  - repo: https://github.com/GeoffNordling/dev-playbook
+    rev: <commit-sha>
+    hooks:
+      - id: ref-check
+      - id: test-privacy
+      - id: no-future-annotations
+      - id: internal-skill-audit
 ```
 
-Make the symlink relative, not absolute. Absolute symlinks bake `$HOME` into the working tree and break on CI runners. The relative form resolves wherever the two repos sit as siblings — locally under `~/workspace/`, and on CI when dev-playbook is checked out alongside the consumer (see [Continuous Integration](#continuous-integration)).
+pre-commit clones dev-playbook into its own cache at the pinned `rev` and runs the hooks from there, so resolution is independent of where the consumer repo — or any of its worktrees — sits on disk. The hooks work uniformly in normal checkouts, in `.claude/worktrees/`, and on CI.
 
-Meta repos that author the config (e.g. `dev-playbook` itself) keep the real file; everything else symlinks.
+Pinning is deliberate. A consumer runs a known revision of the hooks, not whatever is on dev-playbook's default branch this minute. A change to the hook tools — any `tools/bin/` hook script or `.pre-commit-hooks.yaml` — therefore reaches a consumer only when that consumer bumps its pinned `rev`, a manual and reviewable step. `pre-commit autoupdate` rewrites the `rev` to the latest commit when you choose to update.
+
+dev-playbook consumes its own hooks from the working tree via a `repo: local` block in its `.pre-commit-config.yaml`, so hook edits are testable in place before release. The hook metadata therefore appears twice *within* dev-playbook — once in the published manifest, once in the local block — which is intentional: the manifest serves consumers, the local block dogfoods the working tree, and a hook change updates both. No other repo duplicates anything; consumers hold only a pinned pointer.
 
 Pre-commit is fast and runs on every commit. Do not invoke `make check` from a pre-commit hook — `make check` is whole-repo (including the test suite), so it runs at gate points like `pre-push` or CI instead.
 
 ## Continuous integration
 
-The canonical workflow is [`dev-playbook/.github/workflows/ci.yml`](../.github/workflows/ci.yml). It runs two gates: pre-commit against `.pre-commit-config.yaml`, and `make check` in each Python sub-project's root. CI's Python version matches the `requires-python` floor in `pyproject.toml`. Consumer repos use the same workflow with the sibling checkout from [Pre-commit](#pre-commit) so the symlinked config resolves.
+The canonical workflow is [`dev-playbook/.github/workflows/ci.yml`](../.github/workflows/ci.yml). It runs two gates: pre-commit against `.pre-commit-config.yaml`, and `make check` in each Python sub-project's root. CI's Python version matches the `requires-python` floor in `pyproject.toml`. The runner installs `uv` (via `astral-sh/setup-uv`) so `script` hooks with PEP 723 dependencies resolve.
 
-The sibling-checkout step (`actions/checkout@v4` with `repository: GeoffNordling/dev-playbook`) runs unauthenticated on the consumer's runner, so **dev-playbook must remain a public repository**. Making it private would break CI for every consumer repo that symlinks the canonical config.
+Consumer repos use the same workflow unchanged: pre-commit fetches the dev-playbook hook repo at its pinned `rev` the same way it fetches any remote hook.
+
+Because pre-commit clones dev-playbook over HTTPS unauthenticated — on every consumer's runner and on every developer's first run — **dev-playbook must remain a public repository**. Making it private would break hook resolution for every consumer.

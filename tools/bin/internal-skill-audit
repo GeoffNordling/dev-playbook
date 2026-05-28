@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 """Audit internal SKILL.md files for skill-conventions.md conformance.
 
 Scans skill bundles authored in this repo against the conventions in

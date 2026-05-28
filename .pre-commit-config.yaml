@@ -1,24 +1,8 @@
-# Single source of truth for pre-commit hooks across the workspace.
-# We have multiple repos under ~/workspace/, plus their CI runners, and we
-# want all of them running the same checks at the same versions. So this
-# one file lives in dev-playbook; every consumer repo symlinks to it (and
-# in CI checks dev-playbook out as a sibling so the symlink resolves there
-# too). One change here flows to every repo on the next commit.
-#
-# The three-environment contract below is how each hook entry stays
-# location-independent so the symlink trick works.
-#
-# Three-environment contract — every `local` hook entry MUST work in all three:
-#   1. dev-playbook locally        — .pre-commit-config.yaml is the real file
-#   2. consumer repos locally      — .pre-commit-config.yaml is a RELATIVE SYMLINK
-#                                    (../dev-playbook/.pre-commit-config.yaml) to (1)
-#   3. GitHub Actions runner       — consumer repos check out dev-playbook as a
-#                                    sibling so the relative symlink resolves there too
-# Hardcoded absolute paths under $HOME break (3); cwd-relative paths break (2).
-# Pattern: resolve dev-playbook's root via `realpath .pre-commit-config.yaml`,
-# then build paths relative to that. The local hooks below follow this pattern.
-# See standards/build-conventions.md for the symlink and CI conventions.
-# If you change a hook entry, mentally walk all three environments before pushing.
+# dev-playbook runs its own hooks from the working tree, so edits to the
+# tools/bin/ scripts are testable in place before release. Consumer repos do
+# NOT use this file — they reference the published manifest (.pre-commit-hooks.yaml)
+# by URL + pinned rev. The local block below therefore mirrors that manifest;
+# keep the two in sync. See standards/build-conventions.md.
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -32,37 +16,30 @@ repos:
 
   - repo: local
     hooks:
-      # Hook entries resolve dev-playbook's location via .pre-commit-config.yaml's
-      # realpath: in dev-playbook itself the file IS the real config; in consumer
-      # repos it's a symlink pointing back to dev-playbook. Either way, dirname
-      # of realpath gives the dev-playbook root. This makes the hooks work on
-      # the GitHub runner (arbitrary checkout path) and in consumer repos
-      # (symlinked config) without hardcoding an absolute path.
-
       - id: no-future-annotations
         name: no-future-annotations
-        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/no-future-annotations" "$@"' --
-        language: system
+        entry: tools/bin/no-future-annotations
+        language: script
         pass_filenames: false
         always_run: true
 
       - id: ref-check
         name: ref-check
-        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/ref-check" "$@"' --
-        language: system
+        entry: tools/bin/ref-check
+        language: script
         pass_filenames: false
-        types: ['markdown']
+        types: [markdown]
 
       - id: test-privacy
         name: test-privacy
-        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/test-privacy" "$@"' --
-        language: system
+        entry: tools/bin/test-privacy
+        language: script
         pass_filenames: false
         always_run: true
 
       - id: internal-skill-audit
         name: internal-skill-audit
-        entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/internal-skill-audit" "$@"' --
-        language: system
+        entry: tools/bin/internal-skill-audit
+        language: script
         pass_filenames: false
         always_run: true

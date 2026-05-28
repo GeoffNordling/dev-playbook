@@ -1,0 +1,45 @@
+# Canonical pre-commit hook definitions for the workspace.
+#
+# Consumer repos reference these by URL + pinned rev in their own
+# .pre-commit-config.yaml, exactly as they reference any third-party hook:
+#
+#   - repo: https://github.com/GeoffNordling/dev-playbook
+#     rev: <commit-sha>
+#     hooks:
+#       - id: ref-check
+#       - id: test-privacy
+#       - id: no-future-annotations
+#       - id: internal-skill-audit
+#
+# pre-commit clones this repo into its cache at the pinned rev and runs the
+# hook from there, so resolution is independent of where the consumer repo —
+# or any of its worktrees — sits on disk. The hook scripts live in tools/bin/.
+# See standards/build-conventions.md.
+
+- id: no-future-annotations
+  name: no-future-annotations
+  entry: tools/bin/no-future-annotations
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: ref-check
+  name: ref-check
+  entry: tools/bin/ref-check
+  language: script
+  pass_filenames: false
+  types: [markdown]
+
+- id: test-privacy
+  name: test-privacy
+  entry: tools/bin/test-privacy
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: internal-skill-audit
+  name: internal-skill-audit
+  entry: tools/bin/internal-skill-audit
+  language: script
+  pass_filenames: false
+  always_run: true
