@@ -1,101 +1,84 @@
 ---
 name: sdd-requirements
-description: Use when the `/sdd` dispatcher routes a `phase/requirements` issue to this skill. Authors functional requirements — `feat` and `req` items — per the workspace SDD standards. Not invoked directly. `/sdd` loads the issue and sets up the worktree first.
+description: Authors a project's functional requirements — `feat` and `req` spec items — through a structured interview, then leaves the tree green and advances the issue to design. Use when advancing a `phase:sdd-requirements` issue, when an SDD issue needs its functional requirements written or revised, or when the agents dashboard launches the requirements phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
+allowed-tools: Bash(gh issue *) Edit Write Skill(grill-with-docs) Skill(commit)
+argument-hint: "<issue-number>"
 ---
 
 # SDD Requirements
 
-Author the project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — following the workspace SDD standards.
+Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill.
 
-The flow has three phases: context loading, interview-driven planning, skeleton-then-prose drafting. The interview is the value of this skill.<!--  -->
+## Read first
 
-## 1. Context loading
+Before doing anything else, read end-to-end:
 
-The dispatcher has already loaded the issue (its body IS the contract) and placed you in its worktree.
+- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — the full `feat`/`req` grammar, EARS templates, obligation vocabulary, coverage chain.
+- [lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
 
-1. **Required reading.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
-   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
-   - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
+Then report: `READ: spec-standard.md, lessons.md`. Proceed only after.
 
-   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, lessons`.
-2. Read the project's existing specs:
-   - `specs/functional_requirements.md` (or folder-form).
-   - `CONTEXT.md` for domain vocabulary, if present.
-3. Read the project's `CLAUDE.md`.
+## 1. Load context
+
+Issue number arrives as `$ARGUMENTS`. Work happens on the issue's branch.
+
+- `gh issue view $ARGUMENTS` — the body is the contract.
+- Existing specs: `specs/functional_requirements.md` (or folder form).
+- `CONTEXT.md` for domain vocabulary, if present.
 
 ## 2. Area discovery interview
 
-Before any planning, ask the user which behavior areas matter. Start with this small list:
+Ask the user which behavior areas matter. Start small:
 
-- **Success path.** The headline behavior the feat exists for.
-- **Edge / error behavior.** What counts as malformed; raise vs return-as-data; what's silently accepted.
-- **Scope boundary.** What's explicitly out of scope for this feat.
+- **Success path.** The headline behavior the `feat` exists for.
+- **Edge / error behavior.** What counts as malformed; raise vs. return-as-data; what is silently accepted.
+- **Scope boundary.** What is explicitly out of scope for this `feat`.
 
-Other areas may surface naturally as the conversation goes — add them as they come up rather than enumerating up front.
+Add areas as they surface. Surface your read of which areas look load-bearing and why; ask the user to confirm, add, or drop.
 
-Surface these to the user with your judgment on which look load-bearing for this issue. Ask the user to confirm, add areas you missed, and drop areas they don't care about.
+## 3. Intent interview
 
-## 3. Per-area preference interview
-
-For each flagged area, surface the real choices as options with brief pros/cons and a recommendation. Use the AskUserQuestion tool when the area has discrete options.
+Invoke /grill-with-docs to reach shared understanding of the flagged areas. It interviews the user one question at a time, challenges fuzzy terms against `CONTEXT.md`, cross-references the code, and records resolved domain terms and decisions in `CONTEXT.md` / ADRs as they crystallize. Where an area has discrete options, surface them with AskUserQuestion — each option carrying a recommendation and the reason it is recommended.
 
 ## 4. Plan synthesis
 
-Present a plan for explicit approval:
+Present a plan for explicit approval, then wait:
 
 - **Scope.** Which behaviors this pass captures, and which `req` covers each.
-- **Skeletons.** For each planned `feat` / `req`: id + heading + role + `Covers:` + `Needs:`. No `Description:` prose yet.
-- **Decisions made.** Obligation level, granularity, edge-case treatment, etc., as resolved by interview.
+- **Skeletons.** Per planned `feat` / `req`: id + heading + role + `Covers:` + `Needs:`. No `Description:` prose yet.
+- **Decisions made.** Obligation level, granularity, edge-case treatment, as resolved by interview.
 - **Decisions deferred.** Anything still open.
-
-Wait for approval before drafting prose.
 
 ## 5. Drafting
 
-Principles:
+The skeleton holds — `Covers:` and `Needs:` from the plan are locked; add prose now.
 
-- **Skeleton holds.** The `Covers:` and `Needs:` lines from the plan are locked. Add prose now.
-- **Minimum viable shape.** Each `req` commits to one checkable behavior. Don't add a clause unless it adds a check.
-- **Behavior, not method.** Describe what holds, not how. Implementation choices belong in the design phase.
-- **One obligation level per item.** If `SHALL` and `SHOULD` content mixes, split into separate items.
-- **Non-mandatory inclusion is a commitment.** Including a `SHOULD` / `MAY` means you intend to deliver it.
-- **No roadmap in `Comment:`.** Comments describe the current item; future plans live on the GitHub tracker. Often, `Comment:` is omitted.
-- **No spec or standard references in `Rationale:`/`Comment:`.** Per spec standard §2.4/§2.5, `Rationale:` and `Comment:` are non-prescriptive: they `SHALL NOT` paraphrase or quote another item's obligation or a standard section. Avoid inline references to other specs (by ID or `§`) in `Rationale:`/`Comment:` even when purely structural — the structural relationship is already declared via the `Covers:` keyword. If a claim wants to live in `Rationale:`, push it into `Description:` instead.
+- **Minimum viable shape.** Each `req` commits to one checkable behavior. A clause earns its place only by adding a check.
+- **Behavior, not method.** Describe what holds; implementation choices belong to design.
+- **One obligation level per item.** If `SHALL` and `SHOULD` content mixes, split the item.
+- **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you include is one you intend to deliver.
+- Keep `Rationale:` and `Comment:` non-prescriptive per the spec standard; a claim that wants to prescribe belongs in `Description:`.
 
-Mechanics:
+## 6. Review pass
 
-- Write each item per the spec standard. `Description:` follows the spec standard's EARS templates and obligation vocabulary.
-- Invoke /grill-with-docs when domain terminology is fuzzy or `CONTEXT.md` needs updating.
-- Each `feat` has an out-of-scope section. Ask whether anything belongs there; if not, `NA` is fine.
-- Reference relevant ADRs rather than re-explaining them.
+Re-read each new `feat` / `req` and iterate until clean:
 
-## 6. Closing review pass
-
-Re-read each new `feat` / `req`:
-
-- [ ] Chains up to a `feat` via `Covers:` (or is a root). `Needs:` declares verification.
+- [ ] Chains up to a `feat` via `Covers:` (or is a root); `Needs:` declares verification.
 - [ ] `Description:` conforms to the spec standard (EARS template, single obligation level).
-- [ ] `Rationale:` and `Comment:` carry no cross-references to other specs or `§` citations (§2.4, §2.5).
-- [ ] Honors the section 5 principles: minimum viable shape, behavior not method, no roadmap in `Comment:`.
-- [ ] Every `feat`'s out-of-scope section is answered (`NA` is fine).
+- [ ] `Rationale:` / `Comment:` stay non-prescriptive.
+- [ ] Honors the section 5 principles.
 
-Iterate until clean.
-
-## 7. Closing the phase
+## 7. Close the phase
 
 When the user approves and the rubric passes:
 
-1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined, note the absence and continue. If any defined command fails, stop and surface it. Do not commit or bump the phase label on a red tree.
-2. Run /commit to commit the spec markdown.
-3. Bump the issue's phase label:
+1. **Final check sweep — leave the tree green.** Run the project's tests, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is undefined, note the absence and continue; if a defined command fails, stop and surface it.
+2. Run /commit.
+3. Advance the issue to the design phase — move its label from this node to the next:
    ```bash
-   gh issue edit <issue-number> --remove-label "phase/requirements" --add-label "phase/design"
+   gh issue edit $ARGUMENTS --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
    ```
-4. Report: phase done. The user re-invokes `/sdd <issue-number>` when ready for design.
-
-## Output
-
-Spec markdown only — no code, no tests, no design items.
+4. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the human launches /sdd-design from the dashboard when ready.

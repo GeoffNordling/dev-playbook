@@ -1,106 +1,93 @@
 ---
 name: sdd-design
-description: Use when the `/sdd` dispatcher routes a `phase/design` issue to this skill. Authors design items (`dsn`) and pins `Interface:` lines from approved functional requirements. Not invoked directly. `/sdd` loads the issue and sets up the worktree first.
+description: Authors the project's design layer — `dsn` items that pin `Interface:` lines and design commitments — from approved functional requirements, then leaves the tree green and hands the issue off to spec review. Use when advancing a `phase:sdd-design` issue, when an SDD issue needs its design items written or revised, or when the agents dashboard launches the design phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
+allowed-tools: Bash(gh issue *) Edit Write Skill(grill-with-docs) Skill(commit)
+argument-hint: "<issue-number>"
 ---
 
 # SDD Design
 
-Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements.
+Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill.
 
-The flow has three phases: context loading, interview-driven planning, skeleton-then-prose drafting. The interview is the value of this skill.<!--  -->
+## Read first
 
-## 1. Context loading
+Before doing anything else, read end-to-end:
 
-The dispatcher has already loaded the issue (its body IS the contract) and placed you in its worktree.
+- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — the full `dsn` grammar, `Interface:` annotation idiom, coverage chain.
+- [design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — what a `dsn` pins, and why design happens up front.
+- [lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
 
-1. **Required reading.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
-   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — full grammar.
-   - [Design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — commitment framing.
-   - [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
+Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only after.
 
-   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, design-layer, lessons`.
-2. Read the project's existing specs:
-   - `specs/functional_requirements.md` (or folder-form). Without approved requirements, designing is premature.
-   - `specs/design.md` (or folder-form).
-   - `docs/adr/` for prior decisions in the area being designed.
-3. Read the project's `CLAUDE.md`.
-4. **Brownfield reconnaissance.** Read existing code the area touches. For each new capability, work out whether it extends an existing module or introduces a new one, and what public surface each requirement implies.
+## 1. Load context
+
+Issue number arrives as `$ARGUMENTS`. Work happens on the issue's branch.
+
+- `gh issue view $ARGUMENTS` — the body is the contract.
+- Approved requirements: `specs/functional_requirements.md` (or folder form). Without them, designing is premature — stop and surface that.
+- Existing design: `specs/design.md` (or folder form).
+- `docs/adr/README.md` — the ADR index; from its descriptions, read only the ADRs relevant to the area being designed.
+- **Brownfield reconnaissance.** Read the existing code the area touches. For each new capability, work out whether it extends a module or introduces one, and what public surface each requirement implies.
 
 ## 2. Area discovery interview
 
-Before any planning, ask the user which design areas matter. Common areas:
+Ask the user which design areas matter. Common areas:
 
-- **Data shapes.** Field count and types on each proposed dataclass / exception.
-- **API shape.** Public function signatures, module structure.
-- **Exception strategy.** Plain `ValueError` vs structured exception types; raise-vs-return-as-data.
+- **Data shapes.** Fields and types on each proposed dataclass / exception.
+- **API shape.** Public signatures, module structure.
+- **Exception strategy.** Plain `ValueError` vs. structured types; raise-vs-return-as-data.
 - **Naming.** Type and symbol names — each name's semantic load should read clearly.
-- **CLI shape.** Subcommand dispatcher vs independent scripts; flag conventions.
-- **Cross-cutting infrastructure.** Loaders, central types, dispatchers, etc.
-- **Output format / packaging detail.** Whether the design pins these or leaves them to the build phase.
-- **Module decomposition.** One module per `feat` vs grouping; where new modules sit.
+- **CLI shape.** Subcommand dispatcher vs. independent scripts; flag conventions.
+- **Cross-cutting infrastructure.** Loaders, central types, dispatchers.
+- **Module decomposition.** One module per `feat` vs. grouping; where new modules sit.
 
-Surface these to the user with your judgment on which look load-bearing for this issue. Ask the user to confirm, add areas you missed, and drop areas they don't care about.
+Surface your read of which areas look load-bearing and why; ask the user to confirm, add, or drop.
 
-## 3. Per-area preference interview
+## 3. Intent interview
 
-For each flagged area, surface the real choices as options with brief pros/cons and a recommendation. Use the AskUserQuestion tool when the area has discrete options.
+Invoke /grill-with-docs to sharpen design intent and public-boundary terminology against the codebase, capturing significant decisions as ADRs as they crystallize. Where an area has discrete choices — interface shape, exception strategy, naming — surface them with AskUserQuestion, each option carrying a recommendation and the reason it is recommended.
 
 ## 4. Plan synthesis
 
-Present a plan for explicit approval:
+Present a plan for explicit approval, then wait:
 
 - **Scope.** Which requirements this pass covers, and which `dsn` satisfies each.
-- **Skeletons.** For each planned `dsn`: id + heading + role + proposed `Interface:` line(s) + `Covers:` + `Needs:` + `Depends:`. No prose yet.
-- **Decisions made.** Type names, exception strategy, CLI shape, etc., as resolved by interview.
+- **Skeletons.** Per planned `dsn`: id + heading + role + proposed `Interface:` line(s) + `Covers:` + `Needs:` + `Depends:`. No prose yet.
+- **Decisions made.** Type names, exception strategy, CLI shape, as resolved by interview.
 - **Decisions deferred.** Anything still open.
-
-Wait for approval before drafting prose.
 
 ## 5. Drafting
 
-Principles:
+The skeleton holds — `Interface:`, `Covers:`, `Needs:`, `Depends:` from the plan are locked; add prose now.
 
-- **Skeleton holds.** The `Interface:`, `Covers:`, `Needs:`, `Depends:` lines from the plan are locked. Add prose now.
-- **Minimum viable shape.** Don't add a field, method, or new type unless you can name its caller. Prefer two fields over four.
-- **Don't pin implementation.** Output format, packaging, internal walk shape, file paths — leave to the build phase unless a req constrains them.
-- **No roadmap in `Comment:`.** Comments describe the current `dsn`; future plans live on the GitHub tracker. Often, `Comment:` is omitted.
-- **No spec or standard references in `Rationale:`/`Comment:`.** Per spec standard §2.4/§2.5, `Rationale:` and `Comment:` are non-prescriptive: they `SHALL NOT` paraphrase or quote another item's obligation or a standard section. Avoid inline references to other specs (by ID or `§`) in `Rationale:`/`Comment:` even when purely structural — the structural relationship is already declared via `Covers:`, `Depends:`, or `Interface:` keywords. If a claim wants to live in `Rationale:`, push it into `Description:` instead.
+- When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small.
+- **Minimum viable shape.** Don't add a field, method, or type unless you can name its caller. Prefer two fields over four.
+- **Don't pin implementation.** Output format, packaging, internal walk shape, file paths — leave to the build phase unless a `req` constrains them.
+- Write each `dsn` per the spec standard; `Interface:` lines fully qualify symbol paths and follow its annotation idiom.
+- **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you design in is one you intend to deliver.
+- Keep `Rationale:` and `Comment:` non-prescriptive per the spec standard; a claim that wants to prescribe belongs in `Description:`.
+- Reference relevant ADRs rather than re-explaining them.
 
-Mechanics:
+## 6. Review pass
 
-- When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small-interface-deep-implementation, accept dependencies, return results, keep surface small.
-- Write each `dsn` per the spec standard. `Interface:` lines fully qualify symbol paths and follow the spec standard's annotation idiom.
-- Invoke /grill-with-docs when public-boundary terminology needs sharpening.
-- For seam-finding or evaluating module depth larger than one item, **ask the user to open a fresh terminal** and invoke /improve-codebase-architecture there. Bring back its proposals through edits.
-- Reference relevant ADRs rather than re-explaining them. Propose a new ADR for significant architectural decisions.
-- Non-mandatory requirements (`SHOULD`, `MAY`) are optional in the design spec. Including one is a commitment to deliver it.
+Re-read each new `dsn` and iterate until clean:
 
-## 6. Closing review pass
-
-Re-read each new `dsn`:
-
-- [ ] Chains up to a `req` via `Covers:` (or is a root). `Needs:` declares verification.
+- [ ] Chains up to a `req` via `Covers:` (or is a root); `Needs:` declares verification.
 - [ ] `Interface:` annotations and obligation prose conform to the spec standard.
-- [ ] `Rationale:` and `Comment:` carry no cross-references to other specs or `§` citations (§2.4, §2.5).
-- [ ] Honors the section 5 principles: minimum viable shape, no implementation pinning, no roadmap in `Comment:`.
+- [ ] `Rationale:` / `Comment:` stay non-prescriptive.
+- [ ] Honors the section 5 principles.
 
-Iterate until clean.
-
-## 7. Closing the phase
+## 7. Close the phase
 
 When the user approves and the rubric passes:
 
-1. **Final check sweep — leave the tree green.** Run the project's test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is not defined, note the absence and continue. If any defined command fails, stop and surface it. Do not commit or bump the phase label on a red tree.
-2. Run /commit to commit the design spec.
-3. Bump the issue's phase label:
+1. **Final check sweep — leave the tree green.** Run the project's tests, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is undefined, note the absence and continue; if a defined command fails, stop and surface it.
+2. Run /commit.
+3. Advance the issue to the spec-review phase — move its label from this node to the next:
    ```bash
-   gh issue edit <issue-number> --remove-label "phase/design" --add-label "phase/build"
+   gh issue edit $ARGUMENTS --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
    ```
-4. Report: phase done. The user re-invokes `/sdd <issue-number>` when ready to build.
-
-## Output
-
-Updated design spec markdown only — no stubs, no code, no tests.
+4. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the human launches /sdd-agent-spec-review from the dashboard when ready.

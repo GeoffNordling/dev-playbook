@@ -19,7 +19,7 @@ Interested in a lightweight web browser view of the system. Something visually a
 
 Will need a closed feedback loop to improve the workflow and skills over time. One idea: a skill to run at the of a workflow that looks back on the context, summarizes what went well, what went wrong, unexpected surprises, and lessons learned, then compresses and writes them to a database, with all associated metadata for the session. Another agent or workflow can watch at that higher level and guide workflow improvements over time.
 
-The `/improve-codebase-architecture` skill seems very useful but was not integrated in the old workflow. Look for opportunities to integrate into new workflow.
+`/improve-codebase-architecture` is a dedicated refactor stage — whole-codebase module deepening that mutates code and tests. It is its own concern, not part of the spec-authoring phases; whether the graph grows a standalone refactor node is deferred, out of scope for this pass.
 
 Plan a pass over all skills to align with this workflow: update existing skills, author the ones referenced here but not yet on disk (`/tdd`, `/build`, `/sdd-agent-spec-review`, `/sdd-agent-code-review`, `/agent-code-review`), retire obsolete ones (`/sdd` dispatcher).
 
@@ -94,7 +94,7 @@ flowchart LR
 
 Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_agent_spec_review` → label `phase:sdd-agent-spec-review`, command `/sdd-agent-spec-review`. The set of graph nodes IS the phase-label inventory.
 
-Forward edges through work and review nodes are fired by those nodes' skills. Self-loops (`iterate`, `redesign`, `rework`) re-launch the relevant skill. Only `approve: merge` is fired outside any skill — the dispatcher merges via GitHub.
+Each work or agent-review node's skill updates the issue's `phase:*` label to the next node when it finishes. A human-review node has no skill: the human decides, advancing the label on approve or setting it back to an earlier node on `reject` (`iterate`, `redesign`, `rework`). The human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
 
 One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
 
@@ -102,7 +102,9 @@ One long-lived PR per issue, opened by the implementing skill on the `open PR` e
 
 The human dispatcher operates from Claude Code's "claude agents" dashboard (see [agent-view-adoption.md](~/workspace/dev-playbook/workflow/agent-view-adoption.md) for the view's capabilities and limits). Anthropic subscription billing requires interactive sessions, so every node entry is human-launched.
 
-All FOTW skills are launched under `/goal`; HITL skills never are. FOTW skills declare a terminal `DONE: …` line so the (text-only) evaluator can match deterministically. Pair action with proof and a stop-clause: `/goal Run /<skill> <args> until <DONE: line appears>, or stop after N turns.`
+**One session, one node — nodes do not auto-advance.** A node skill does its work, commits, and updates the issue's `phase:*` label to the next node's label, then stops and returns control to the dashboard. It never launches the next node, and never begins the next node's work in the same session. The human reads the issue's new phase and launches the matching skill. Every transition stays human-gated and visible on the live dashboard.
+
+The two modes invoke differently. **FOTW skills run hands-off under `/goal`**, which pairs the action with proof and a stop-clause: `/goal Run /<skill> <args> until <DONE: line appears>, or stop after N turns.` So every FOTW skill closes by emitting a deterministic `DONE: …` line the (text-only) evaluator can match. **HITL skills are launched directly as `/<skill> <args>`** with the human engaged throughout; they close with a plain report to the human and need no `/goal` wrapper or `DONE:` line.
 
 ## Permissions
 
@@ -129,7 +131,7 @@ Allow rules are encoded at two levels:
 - *User-level allow for universally-trusted mutators:* `Bash(mkdir *)`, `Bash(touch *)`, `Bash(mv *)`, `Bash(cp *)`.
 - *`rm` is not yet user-allowed.* Worktree auto-isolation cwd-bounds each session — sufficient practical confinement (soft boundary, not an OS jail). Code-writing skills will likely need `rm`; not yet committed.
 
-Edges fired by skills are covered by the firing skill's `allowed-tools`. Edges fired by the human (label changes, manual merge) need no encoding.
+A transition a skill performs — the `phase:*` label update, plus any commit or PR action — is covered by that skill's `allowed-tools`. Transitions the human performs (label changes, manual merge) need no encoding.
 
 Canonical rule syntax and edge cases: [permissions docs](https://code.claude.com/docs/en/permissions).
 
@@ -141,15 +143,20 @@ Three modes of human engagement exist in theory; only two are available under th
 - **Finger on the wheel (FOTW)** — skill is designed to run hands-off; human is present only because billing requires it. Agent does the work; human invokes the skill and responds to escalations. Examples: implementing code, performing agent reviews.
 - **Hands off the wheel (AFK)** — agent runs autonomously, no human involvement. *Not available* — see [Dispatch](#dispatch). We would use this if we could.
 
-FOTW agents can escalate to the human at any time — typically when they encounter something unexpected or want to deviate from their initial plan.
-
 Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Direct work; `/build` handles non-test work — docs, config, chores. Both feed shared `agent_code_review` and `human_code_review`.
+
+### Node-skill contract
+
+Across modes, a node skill copies its `allowed-tools` verbatim from the [table](#skills) below. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics.
+
+- **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals, and the skill terminates with a plain report. Escalation is `—`: the human is already present.
+- **FOTW** — the skill runs hands-off, so it terminates with the deterministic `DONE:` line and declares its escalation triggers in the table, escalating whenever it meets something unexpected or wants to deviate from its plan.
 
 | Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------------|---------------------|
-| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Skill(grill-with-docs)` | TBD |
-| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Skill(grill-with-docs)` | TBD |
-| `/sdd-design` | HITL | `Bash(gh issue *)` `Skill(grill-with-docs)` `Skill(improve-codebase-architecture)` | TBD |
+| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Skill(grill-with-docs)` | — |
+| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | — |
+| `/sdd-design` | HITL | `Bash(gh issue *)` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | — |
 | `/sdd-tdd` | FOTW | `Bash(gh issue view *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` | TBD |
 | `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
 | `/build` | FOTW | same as `/sdd-tdd` | TBD |

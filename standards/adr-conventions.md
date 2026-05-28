@@ -2,6 +2,10 @@
 
 ADRs live in `docs/adr/` and use sequential 4-digit numbering: `0001-slug.md`, `0002-slug.md`, etc. Create the `docs/adr/` directory lazily — only when the first ADR is needed.
 
+## Index
+
+`docs/adr/README.md` is the ADR index: one line per ADR — number, title, and a one-sentence description of the decision — so a reader or skill can find the relevant ADRs without opening every file. Whoever adds, supersedes, or deprecates an ADR updates the index in the same change. Create it lazily alongside the first ADR.
+
 ## When to offer an ADR
 
 All three must be true:
