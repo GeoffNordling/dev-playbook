@@ -1,48 +1,81 @@
 #!/usr/bin/env python3
 """bootstrap-labels — enforce the workspace's GitHub label scheme in the current repo.
 
-Closed-world: labels in the canonical table are created or updated to match;
-labels not in the canonical table are deleted. Idempotent. See
-~/workspace/dev-playbook/standards/workflow.md for the label scheme.
+Closed-world: labels in the canonical set are created or updated to match;
+labels not in the canonical set are deleted. Idempotent. See
+~/workspace/dev-playbook/workflow/workflow.md (§Valid labels and §Naming) for
+the label scheme.
 """
 
 import json
 import subprocess
 import sys
 
-LABELS: list[tuple[str, str, str]] = [
-    # (name, color, description)
-    ("bug", "d73a4a", "Something isn't working"),
-    ("enhancement", "a2eeef", "New feature or request"),
-    (
-        "chore",
-        "c5def5",
-        "Housekeeping or watch-and-wait reminder; no product behavior change",
-    ),
-    ("sdd", "5319e7", "SDD ceremony applies (spec, design, TDD)"),
-    ("phase/requirements", "0e8a16", "In requirements phase"),
-    ("phase/design", "1d76db", "In design phase"),
-    ("phase/build", "fbca04", "In TDD/implementation phase"),
-    ("phase/review", "b60205", "PR open, awaiting review"),
-    ("wontfix", "ffffff", "This will not be worked on"),
+# Two-color scheme: metadata grey, phases yellow.
+META_COLOR = "cccccc"
+PHASE_COLOR = "fbca04"
+
+# Fixed-value labels — see workflow.md §Valid labels.
+# Format: (dimension, value); label name is "<dimension-lower>:<value>".
+METADATA: list[tuple[str, str]] = [
+    ("Category", "bug"),
+    ("Category", "enhancement"),
+    ("Mode", "sdd"),
+    ("Mode", "direct"),
+    ("Tests", "yes"),
+    ("Tests", "no"),
+]
+
+# Phase labels — one per graph node in workflow.md §State machine.
+# Names derived from node ids by `_` → `-` per workflow.md §Naming.
+PHASES: list[str] = [
+    "sdd-requirements",
+    "sdd-design",
+    "sdd-agent-spec-review",
+    "sdd-human-spec-review",
+    "sdd-tdd",
+    "sdd-agent-code-review",
+    "sdd-human-code-review",
+    "tdd",
+    "build",
+    "agent-code-review",
+    "human-code-review",
 ]
 
 
-def existing() -> dict[str, str]:
+def canonical_labels() -> list[tuple[str, str, str]]:
+    """Build (name, color, description) tuples for all canonical labels."""
+    result: list[tuple[str, str, str]] = []
+    for dim, value in METADATA:
+        name = f"{dim.lower()}:{value}"
+        desc = f"{dim}: {value}. See workflow.md."
+        result.append((name, META_COLOR, desc))
+    for value in PHASES:
+        name = f"phase:{value}"
+        desc = f"Phase: {value}. See workflow.md."
+        result.append((name, PHASE_COLOR, desc))
+    return result
+
+
+def existing() -> dict[str, dict[str, str]]:
     out = subprocess.run(
-        ["gh", "label", "list", "--json", "name,description", "--limit", "200"],
+        ["gh", "label", "list", "--json", "name,color,description", "--limit", "200"],
         check=True,
         capture_output=True,
         text=True,
     )
-    return {item["name"]: item["description"] for item in json.loads(out.stdout)}
+    return {
+        item["name"]: {"color": item["color"], "description": item["description"]}
+        for item in json.loads(out.stdout)
+    }
 
 
 def main() -> int:
     have = existing()
-    canonical = {name for name, _, _ in LABELS}
+    labels = canonical_labels()
+    canonical = {name for name, _, _ in labels}
 
-    for name, color, desc in LABELS:
+    for name, color, desc in labels:
         if name not in have:
             subprocess.run(
                 [
@@ -59,9 +92,12 @@ def main() -> int:
                 capture_output=True,
             )
             print(f"created   {name}")
-        elif have[name] != desc:
+        elif (
+            have[name]["description"] != desc
+            or have[name]["color"].lower() != color.lower()
+        ):
             subprocess.run(
-                ["gh", "label", "edit", name, "--description", desc],
+                ["gh", "label", "edit", name, "--color", color, "--description", desc],
                 check=True,
                 capture_output=True,
             )
