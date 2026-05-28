@@ -28,11 +28,11 @@ Long tangential explorations (document polishing, design iteration, prototyping,
    - Captured in a surviving file or commit → **throwaway** (past-self will see it by reading the file).
    - Not captured anywhere on disk → **candidate non-throwaway**.
 
-5. **Align with the user on the non-throwaway list.** Present the candidates concisely. Let the user confirm or trim.
+5. **Align with the user on open questions and the non-throwaway list.** Surface any uncertainties (e.g., is X a throwaway or not? is Y still relevant?) alongside the candidate non-throwaway items. **Stop and wait for explicit confirmation or trimming before continuing.** The message body in step 7 depends on what survives this step — drafting it before alignment is complete wastes work.
 
 6. **Commit all uncommitted work — mandatory.** Without a commit, the rewind risks losing disk state, and uncommitted changes can be accidentally reverted. The commit also gives past-self a concrete reference. Use `/commit` and label the commit specifically as a /rewind-tangent contribution.
 
-7. **Output two artifacts** in this order:
+7. **Output two artifacts** (only after step 5 alignment is complete), in this order:
    1. The "Message from the model" inside a fenced code block (so the user can copy it verbatim and paste it after rewinding).
    2. The verbatim text of the user message that comes right after the rewind target — this is what the user selects in the `/rewind` picker to land at the correct point. Label it `**Your /rewind selection target:**` and present it as a blockquote.
 
