@@ -61,6 +61,7 @@ The skeleton holds — `Covers:` and `Needs:` from the plan are locked; add pros
 - **One obligation level per item.** If `SHALL` and `SHOULD` content mixes, split the item.
 - **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you include is one you intend to deliver.
 - Keep `Rationale:` and `Comment:` non-prescriptive per the spec standard; a claim that wants to prescribe belongs in `Description:`.
+- **Mark the region work-in-progress.** Set `WIP: true` (§2.10) on each `feat` you author or reopen. Its cone reaches no verifiers yet, so the completeness rules would otherwise fail; the marker exempts the `feat` and everything beneath it until build lands the verifiers and removes it. Consistency still holds.
 
 ## 6. Review pass
 

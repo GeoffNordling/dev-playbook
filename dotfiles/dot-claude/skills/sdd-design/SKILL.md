@@ -70,6 +70,7 @@ The skeleton holds — `Interface:`, `Covers:`, `Needs:`, `Depends:` from the pl
 - **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you design in is one you intend to deliver.
 - Keep `Rationale:` and `Comment:` non-prescriptive per the spec standard; a claim that wants to prescribe belongs in `Description:`.
 - Reference relevant ADRs rather than re-explaining them.
+- **Keep the region work-in-progress.** Your `dsn`s reach no verifiers yet, so their region must carry `WIP: true` (§2.10) or completeness fails. Check the `feat` they cover: if it already bears the marker (requirements left it), leave it; if it does not — design may be the first phase to run on this region — mark the `feat` `WIP: true` yourself. The marker exempts the `feat` and everything beneath it; build removes it once verifiers land.
 
 ## 6. Review pass
 
