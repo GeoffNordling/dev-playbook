@@ -1,71 +1,82 @@
 ---
 name: sdd-tdd
-description: Use when the `/sdd` dispatcher routes a `phase/build` issue to this skill. Implements features via vertical-slice TDD against committed `Interface:` declarations. Not invoked directly. `/sdd` loads the issue and sets up the worktree first.
+description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then opens the PR and advances the issue to code review. Use when advancing a `phase:sdd-tdd` issue, when an SDD issue's design is approved and ready to build, or when the agents dashboard launches the build phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
+allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(git *) Edit Write Skill(commit)
+argument-hint: "<issue-number> [scope]"
 ---
 
 # SDD TDD
 
-Vertical-slice TDD against the `Interface:` declarations committed in the design spec. Implementation proceeds in **chunks** — each chunk begins with a plan gate, runs an inner red/green/refactor loop per slice, and closes with a dedicated whole-chunk refactor pass and diff review.
+Implement an SDD issue with vertical-slice TDD against its committed specs — every `feat`, `req`, and `dsn`, down to the `Interface:` lines the design pins — remove the `WIP:` markers as each region's verifiers land, then open the PR and hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
 
-## First steps
+Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The human reviews the finished work separately, not mid-build.
 
-The dispatcher has already loaded the issue (its body IS the contract) and placed you in its worktree.
+## Read first
 
-1. **Required reading.** Use the Read tool on each file below before any other action. If any file is missing or unreadable, stop and surface that to the user — do not proceed without the standards loaded.
-   - [Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format.
-   - [Testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioural focus.
-   - [Python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
+Before doing anything else, read end-to-end:
 
-   After reading, post exactly this confirmation line to the user before proceeding: `Loaded: spec-standard, testing-conventions, python-conventions`.
+- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format, the `WIP:` marker (§2.10).
+- [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
+- [python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
 
-   When considering an `Interface:` amendment (see "Spec amendment" below), also read [Lessons](~/workspace/spec-tools/sdd-standards/lessons.md) at that point.
-2. Read the project's specs (`specs/functional_requirements/` and `specs/design/`, or flat-file equivalents).
-3. Read the project's `CLAUDE.md`.
-4. Read existing code under `src/` and tests under `tests/` — there may be partial work or stubs from prior cycles.
-5. Run the test suite to see the current state.
-6. Tell the user what you found, align on scope, then move to the plan gate for the first chunk.
+Then report: `READ: spec-standard.md, testing-conventions.md, python-conventions.md`. Proceed only after.
 
-## Mandatory plan gate
+When modifying the spec comes into play (§6), also read [lessons](~/workspace/spec-tools/sdd-standards/lessons.md) at that point.
 
-A **chunk** is a coherent piece of implementation work — typically the slices that cover one `dsn`, or a small cluster of tightly related `dsn`s. Implementation proceeds one chunk at a time; every chunk starts with a plan.
+## 1. Load context
 
-Before starting a chunk, present a plan covering:
+`$ARGUMENTS` is the issue number, optionally followed by a scope restriction; below, `<issue>` is that number. Work happens on the issue's branch.
 
-- **Scope.** Which `dsn`(s) and which behaviours the chunk will cover.
-- **Slice ordering.** The sequence of inner red/green/refactor slices you intend to drive.
-- **Ambiguities.** Anything in the spec you anticipate needing to clarify.
+- `gh issue view <issue>` — the body is the contract.
+- The specs under `specs/functional_requirements/` and `specs/design/` (or flat-file equivalents).
+- Existing code under `src/` and tests under `tests/` — there may be partial work or stubs from a prior cycle.
+- Run the test suite to see the current state.
 
-Wait for explicit user approval. Silence is not approval.
+**Scope.** With no restriction, implement the whole issue. With one (specific `dsn`s or `req`s), implement exactly that — no more, no less: the human has split a large issue across sessions and handed you one slice. You never decide scope; that decision was made before you were launched, and you neither widen nor narrow it.
 
-## The chunk loop (outer)
+## 2. Plan the chunk
 
-For each approved chunk:
+A **chunk** is a coherent piece of implementation work — typically the slices covering one `dsn`, or a small cluster of tightly related `dsn`s. Implementation proceeds one chunk at a time.
 
-1. Run the inner slice loop until every behaviour in the chunk's scope is covered with passing tests.
-2. **Whole-chunk refactor pass.** With the suite green, step back and review every module the chunk touched for refactor candidates not visible inside any single slice — duplication across modules, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run the test suite after each refactor step. Refactors that would change a committed `Interface:` or that surface structural problems beyond one module's seam are gated — see "Spec amendment" below.
-3. Run the lint, format, and typecheck commands defined in `CLAUDE.md` or `Makefile`. Resolve any failures.
-4. Run /commit. Pause for the user's diff review and approval.
-5. Propose the plan for the next chunk and return to the plan gate. End the skill when the user signals no further chunks.
+Before each chunk, state your plan — to anchor the work and keep it visible to the watching human:
 
-## The slice loop (inner)
+- **Scope.** Which `dsn`(s) and behaviors the chunk covers.
+- **Slice ordering.** The sequence of red/green/refactor slices you'll drive.
+- **Ambiguities.** Anything in the spec you expect to resolve; if one blocks the next slice, escalate per §5.
+
+The plan is your map, not a gate — proceed without waiting for approval.
+
+## 3. The chunk loop (outer)
+
+For each chunk:
+
+1. Run the inner slice loop until every behavior in the chunk's scope is covered with passing tests.
+2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run the suite after each step. A refactor that would change a committed `Interface:`, or surface a structural problem beyond one module's seam, is an escalation — see §5.
+3. Run lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). Resolve failures.
+4. Commit the chunk with /commit.
+5. Move to the next chunk, or to §7 once the issue's scope is fully implemented.
+
+## 4. The slice loop (inner)
 
 Each slice is one test, one implementation, then a brief refactor.
 
-**Red.** Pick one observable behaviour under one `req~…` or `dsn~…`. Write a single failing test exercising that behaviour through the public surface declared by the relevant `dsn`'s `Interface:`. Mark every test with `@pytest.mark.covers("<id>")` naming the closest upstream item — typically the `dsn` whose `Needs: utest` / `Needs: itest` declared the obligation. Run the suite to confirm the test fails for the expected reason.
+**Red.** Pick one observable behavior under one `req~…` or `dsn~…`. Write a single failing test exercising it through the public surface declared by the relevant `dsn`'s `Interface:`. Mark every test with `@pytest.mark.covers("<id>")` naming the closest upstream item — typically the `dsn` whose `Needs: utest` / `Needs: itest` declared the obligation. Run the suite; confirm it fails for the expected reason.
 
-**Stub on first contact.** When a test imports a symbol that has no stub yet, create the stub matching its `Interface:` declaration verbatim — same parameter names, kinds, annotations, and return annotation. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Do not pre-stub symbols not yet under test.
+**Never modify a written test.** Once you've written a test, make it pass by changing code, not the test. If you feel the need to change the test, escalate (§5) — don't edit it yourself.
 
-**Green.** Write the minimal implementation that makes the failing test pass. Do not add code for behaviours the next test will exercise. Run the suite to confirm green.
+**Stub on first contact.** When a test imports a symbol with no stub yet, create the stub matching its `Interface:` declaration verbatim — same parameter names, kinds, annotations, return annotation. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
-**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run tests after each step. Refactors that would change a committed `Interface:` are gated — see "Spec amendment" below.
+**Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run the suite; confirm green.
+
+**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run the suite after each step. A refactor that would change a committed `Interface:` is an escalation — see §5.
 
 Refactor candidate catalogue:
 
 - **Duplication** → Extract function/class
-- **Long methods** → Break into private helpers (keep tests on public interface)
+- **Long methods** → Break into private helpers (keep tests on the public interface)
 - **Shallow modules** → Combine or deepen
 - **Feature envy** → Move logic to where data lives
 - **Primitive obsession** → Introduce value objects
@@ -73,34 +84,55 @@ Refactor candidate catalogue:
 
 For test-quality patterns and mocking guidance, see [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md).
 
-## Spec amendment
+## 5. Escalations
 
-When refactor pressure (per-slice or whole-chunk) would change a committed `Interface:`, or surfaces structural problems beyond what fits behind one module's seam, stop. The change goes through spec amendment — the SDD Triangle in action — not direct architecture work in this skill.
+You work without approval, but stop, surface the situation, and wait for the human's call whenever something falls outside the plan — anything unexpected, or any wish to deviate. In particular:
 
-Describe the proposed amendment to the user: which `dsn` is affected, what the new `Interface:` would look like, what motivated the change. Wait.
+- **Stuck test.** A slice's test won't pass after two implementation attempts.
+- **A written test looks wrong.** You want to change a test you already wrote — surface why; the human decides whether you mis-encoded it or the spec needs to change.
+- **The spec needs to change.** A committed `Interface:` no longer fits — refactor pressure or a bug fix would change it, or a structural problem won't sit behind one module's seam — or the spec underdetermines the next slice's behavior, so you can't write the assertion.
+- **The spec could be better.** You see a spec change that would improve the design, even though nothing is blocking you.
 
-The user decides whether to:
+The last two put a spec change on the table — handle it per §6.
 
-- Apply the amendment in this terminal — edit the spec (update `Interface:` lines; on revision, follow [spec-standard §2.2.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#223-revision)). Then continue with stub, test, implementation in that order. During initial greenfield implementation no pinned consumers exist yet — edit in place at revision `0` and do not bump.
-- Defer to a fresh `sdd-design` pass — do not edit the spec; pause this terminal until the design phase produces the amendment, then resume.
-- Reject the change and direct a different approach.
+## 6. Modifying the spec
 
-Never edit a spec without an explicit approval gesture in this turn.
+The implementation never edits the spec on its own. With a change on the table, describe which item is affected, the proposed change, and what motivated it. The human decides to:
 
-Bugs that surface during implementation are spec gaps. Flag the gap, propose the spec amendment that closes it, and wait for the same routing decision before changing the code.
+- **Apply here** — edit the spec (update `Interface:` lines; on revision follow [spec-standard §2.2.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#223-revision)). Then continue stub → test → implementation. During initial greenfield implementation no pinned consumers exist — edit in place at revision `0`, don't bump.
+- **Defer to a fresh `sdd-design` pass** — don't edit the spec; the issue routes back to design.
+- **Reject** and direct another approach.
 
-## Closing the phase
+Never edit the spec without an explicit approval gesture in the same turn. A bug found during implementation is a spec gap: surface it, propose the change that closes it, and wait for the routing call before touching code.
 
-When all chunks are complete, the suite is green, lint/format/typecheck pass, and the user has approved every diff:
+## 7. Close the phase
 
-1. **Final check sweep — leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). The chunk loop runs these per-chunk, but a final whole-tree pass catches cross-chunk regressions and any drift since the last chunk. All must pass; if anything fails, fix it and re-run. Do not push a red branch.
-2. **Re-read the [workflow standard](~/workspace/dev-playbook/workflow/workflow.md) now** — fresh, even though you may have read it previously.Then commit, push, and open the PR exactly per its `## In flight` section.
-3. Bump the issue's phase label:
+When your scope is fully implemented:
+
+1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from each `feat` whose cone is now fully covered by verifiers (spec-standard §2.10). Leave it on any `feat` whose cone is still unbuilt — including work outside your scope.
+2. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`), including the spec-graph gate. Feats still carrying `WIP:` stay exempt from completeness; the gate enforces it only over the cones you just un-marked, so a failure there means a missing verifier — fix it and re-run. Don't commit a red tree.
+3. **Commit** the remaining changes (marker removals included) with /commit.
+
+Now read the `WIP:` markers to tell whether the whole issue is done.
+
+**Issue complete** — no `feat` carries `WIP:`:
+
+1. **Push, then open the PR.** `git push` needs the human's YubiKey — hand them `git push -u origin <branch>` and wait for it to land. Then open the long-lived PR: `gh pr create --body "Closes #<issue> …"`. The `Closes #<issue>` token is mandatory — merging the PR closes the issue.
+2. **Advance to code review:**
    ```bash
-   gh issue edit <issue-number> --remove-label "phase/build" --add-label "phase/review"
+   gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-agent-code-review"
    ```
-4. **Before exiting, remind the user** of the post-merge cleanup described in the workflow standard's `## Cleanup` section.
+3. Emit the terminal line, then stop:
+   ```
+   DONE: implemented #<issue>, PR open, issue at phase:sdd-agent-code-review
+   ```
+   Do not begin the review — the human launches /sdd-agent-code-review separately.
 
-## Session handoff
+**Issue incomplete** — some `feat` still carries `WIP:`: your scope was one slice of a larger issue and more remains. Do not push, open a PR, or change the label. Instead:
 
-A chunk may not fit in one session. Before stopping, post a comment on the issue documenting current state: which slices are done, which are next, any decisions made, any spec amendments pending. The next session's cold-start reads the issue body and the most recent comment.
+1. Comment the state on the issue (`gh issue comment <issue>`): what you implemented, which `feat`s remain `WIP:`, decisions made.
+2. Emit the terminal line, then stop:
+   ```
+   STOPPED: built <scope> for #<issue>, issue stays at phase:sdd-tdd, WIP feats remain
+   ```
+   The human relaunches with the next scope.

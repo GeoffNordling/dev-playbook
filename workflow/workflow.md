@@ -157,7 +157,7 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Skill(grill-with-docs)` | — |
 | `/sdd-requirements` | HITL | `Bash(gh issue *)` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | — |
 | `/sdd-design` | HITL | `Bash(gh issue *)` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | — |
-| `/sdd-tdd` | FOTW | `Bash(gh issue view *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` | TBD |
+| `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; blocking ambiguity; test red after 2 attempts |
 | `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
 | `/build` | FOTW | same as `/sdd-tdd` | TBD |
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh api *)` | TBD |

@@ -28,7 +28,7 @@ User passes a free-form description. If terminology is fuzzy, scope is unclear, 
 
 ### 2. Decide one issue or many
 
-Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies.
+Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies. Size each slice to the context budget (issue conventions → vertical-slice rules): split anything whose build would push an agent past ~30% context. The build agent won't resize the work, so the split has to happen here.
 
 ### 3. For each issue, pick the four-tuple
 

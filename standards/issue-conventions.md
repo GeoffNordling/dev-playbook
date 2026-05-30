@@ -46,5 +46,6 @@ When one idea becomes many issues, break the plan into **tracer bullet** issues.
 - Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests).
 - A completed slice is demoable or verifiable on its own.
 - Prefer many thin slices over few thick ones.
+- **Size to the context budget.** Slice thin enough that building one issue keeps the agent well under ~30% of its context window. Split anything bigger.
 
 Publish issues in dependency order so the `Blocked by` field can reference real issue numbers.
