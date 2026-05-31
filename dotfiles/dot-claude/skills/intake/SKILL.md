@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Capture an idea (one issue or many) and triage at creation. Decides category, mode, tests, first phase label; writes the brief into the issue body. Use when starting any new piece of work, splitting a plan into tracer-bullet issues, or breaking down a feature into deliverable units.
+description: Capture an idea (one issue or many) and triage at creation. Decides category, mode, tests, first phase label; writes the brief into the issue body. Use when the agents dashboard launches intake for new work.
 disable-model-invocation: false
 model: opus
 effort: xhigh

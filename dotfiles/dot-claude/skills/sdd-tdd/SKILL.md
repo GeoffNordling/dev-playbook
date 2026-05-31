@@ -1,6 +1,6 @@
 ---
 name: sdd-tdd
-description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then opens the PR and advances the issue to code review. Use when advancing a `phase:sdd-tdd` issue, when an SDD issue's design is approved and ready to build, or when the agents dashboard launches the build phase.
+description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then opens the PR and advances the issue to code review. Use when the agents dashboard launches the build phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -31,7 +31,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 `$ARGUMENTS` is the issue number, optionally followed by a scope restriction; below, `<issue>` is that number. Work happens on the issue's branch.
 
 - `gh issue view <issue>` — the body is the contract.
-- The specs under `specs/functional_requirements/` and `specs/design/` (or flat-file equivalents).
+- The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing code under `src/` and tests under `tests/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state.
 

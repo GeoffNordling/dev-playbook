@@ -1,6 +1,6 @@
 ---
 name: sdd-design
-description: Authors the project's design layer — `dsn` items that pin `Interface:` lines and design commitments — from approved functional requirements, then leaves the tree green and hands the issue off to spec review. Use when advancing a `phase:sdd-design` issue, when an SDD issue needs its design items written or revised, or when the agents dashboard launches the design phase.
+description: Authors the project's design layer — `dsn` items that pin `Interface:` lines and design commitments — from approved functional requirements, then leaves the tree green and hands the issue off to spec review. Use when the agents dashboard launches the design phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -27,8 +27,8 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 Issue number arrives as `$ARGUMENTS`. Work happens on the issue's branch.
 
 - `gh issue view $ARGUMENTS` — the body is the contract.
-- Approved requirements: `specs/functional_requirements.md` (or folder form). Without them, designing is premature — stop and surface that.
-- Existing design: `specs/design.md` (or folder form).
+- Approved requirements: `specs/functional_requirements/`. Without them, designing is premature — stop and surface that.
+- Existing design: `specs/design/`.
 - `docs/adr/README.md` — the ADR index; from its descriptions, read only the ADRs relevant to the area being designed.
 - **Brownfield reconnaissance.** Read the existing code the area touches. For each new capability, work out whether it extends a module or introduces one, and what public surface each requirement implies.
 

@@ -1,6 +1,6 @@
 ---
 name: sdd-requirements
-description: Authors a project's functional requirements — `feat` and `req` spec items — through a structured interview, then leaves the tree green and advances the issue to design. Use when advancing a `phase:sdd-requirements` issue, when an SDD issue needs its functional requirements written or revised, or when the agents dashboard launches the requirements phase.
+description: Authors a project's functional requirements — `feat` and `req` spec items — through a structured interview, then leaves the tree green and advances the issue to design. Use when the agents dashboard launches the requirements phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -26,7 +26,7 @@ Then report: `READ: spec-standard.md, lessons.md`. Proceed only after.
 Issue number arrives as `$ARGUMENTS`. Work happens on the issue's branch.
 
 - `gh issue view $ARGUMENTS` — the body is the contract.
-- Existing specs: `specs/functional_requirements.md` (or folder form).
+- Existing specs: `specs/functional_requirements/`.
 - `CONTEXT.md` for domain vocabulary, if present.
 
 ## 2. Area discovery interview
