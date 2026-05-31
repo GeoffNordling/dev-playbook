@@ -161,6 +161,12 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
 | `/build` | FOTW | same as `/sdd-tdd` | TBD |
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
+| `/sdd-agent-code-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr comment *)` `Bash(make *)` | Green gate red (PR over red tree); PR/diff missing |
 | `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
+
+**Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run two passes in one FOTW goal: the native `/code-review` (an automated bug/regression review that posts its findings as a PR comment) followed by our skill (the spec-fidelity and convention findings the native pass does not cover, also a PR comment). Ours runs last so its label advance means both reviews are done, and so it can read the native comment and skip re-flagging. The goal chains them:
+
+```
+/goal Run /load-issue <issue>, then /code-review <pr>, then /sdd-agent-code-review <issue> — stop once all have run, or after N turns.
+```
 

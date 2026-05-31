@@ -20,9 +20,8 @@ Before doing anything else, read end-to-end:
 
 - [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format, the `WIP:` marker (§2.10).
 - [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
-- [python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style.
 
-Then report: `READ: spec-standard.md, testing-conventions.md, python-conventions.md`. Proceed only after.
+Then report: `READ: spec-standard.md, testing-conventions.md`. Proceed only after.
 
 When modifying the spec comes into play (§6), also read [lessons](~/workspace/spec-tools/sdd-standards/lessons.md) at that point.
 
@@ -32,7 +31,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 - `gh issue view <issue>` — the body is the contract.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
-- Existing code under `src/` and tests under `tests/` — there may be partial work or stubs from a prior cycle.
+- Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state.
 
 **Scope.** With no restriction, implement the whole issue. With one (specific `dsn`s or `req`s), implement exactly that — no more, no less: the human has split a large issue across sessions and handed you one slice. You never decide scope; that decision was made before you were launched, and you neither widen nor narrow it.

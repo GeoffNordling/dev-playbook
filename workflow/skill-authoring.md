@@ -18,6 +18,7 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Don't re-explain what `## Read first` taught.** Reference a spec concept; don't restate it — the agent has read the standard. (`sdd-tdd` §1 just locates the specs.)
 - **Keep useful interview aids even when they aren't spec fields** — a `feat`'s out-of-scope discussion sharpens what the feature *is*. (`sdd-requirements`)
 - **Name the spec location one way.** Always "The specs under `specs/functional_requirements/` and `specs/design/`" — the directory form, no "(or flat-file equivalents)" / "(or folder form)" hedge. (`sdd-agent-spec-review` §1)
+- **Order lists spec → test → code.** Everywhere this triad appears — reads, audit dimensions, context artifacts — keep that order: spec first, tests before code, behavior before style. Reads go spec-standard → testing-conventions → python-conventions; context goes specs → tests → code. Where python is absent (the build skills dropped it), it's just spec → test. (`sdd-agent-code-review`, `sdd-tdd`)
 
 ## Robustness
 
@@ -28,6 +29,7 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Guard against gaming the success signal.** When a check gates the work, forbid weakening the check to pass it. (`sdd-tdd`: never modify a written test — escalate instead.)
 - **Review nodes report, they don't fix.** A node that reviews another node's output stays read-only on it — no `Edit`/`Write` grant. Defects route back to the authoring node through the human's reject, not the reviewer's hand. (`sdd-agent-spec-review` attaches findings; it never edits the spec.)
 - **Separate the deliverable from the escalation.** When a node's whole job is to surface problems, say plainly that finding them is the output, not a reason to stop — otherwise the agent escalates on every defect. Escalation stays reserved for "can't produce the deliverable at all." (`sdd-agent-spec-review`: findings ride to the human in a comment; only a red consistency gate escalates.)
+- **Don't audit what a deterministic gate already enforces.** An agent reviewer's value is the judgment a check can't automate — verifier honesty, scope, design — not re-confirming green-gate invariants (`covers` markers present, spec items discharged, the tree builds). Don't narrate those guarantees either; spend the review on what the machine can't see. (`sdd-agent-code-review` §3 checks that verifiers are honest, not that they exist.)
 
 ## Mechanics
 
