@@ -17,13 +17,21 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Read only what's needed.** Skip what's auto-loaded (project `CLAUDE.md`); `## Read first` ends in a `READ:` line; conditional reads stay at their point of use. (`sdd-requirements`, `sdd-tdd`)
 - **Don't re-explain what `## Read first` taught.** Reference a spec concept; don't restate it — the agent has read the standard. (`sdd-tdd` §1 just locates the specs.)
 - **Keep useful interview aids even when they aren't spec fields** — a `feat`'s out-of-scope discussion sharpens what the feature *is*. (`sdd-requirements`)
+- **Name the spec location one way.** Always "The specs under `specs/functional_requirements/` and `specs/design/`" — the directory form, no "(or flat-file equivalents)" / "(or folder form)" hedge. (`sdd-agent-spec-review` §1)
 
 ## Robustness
 
 - **Check, don't assume prior-phase state.** A node may be the first to run on a region — check for what you need and establish it if absent. (`sdd-design` checks for the `WIP:` marker rather than trusting requirements to have left it.)
 - **Stub or mark only what you won't later delete.** Deferring beats throwaway scaffolding — the `WIP:` marker exempts an unfinished cone instead of writing verifiers you'd delete. (`sdd-requirements`, `sdd-design`; spec-standard §2.10)
+- **Decide only what's yours.** A node skill doesn't make calls that belong to a human or an upstream node — it takes them as input. (`sdd-tdd` is handed its scope; it never judges whether an issue is too big to build.)
+- **Make completion factual, not self-assessed.** Drive decisions off observable state and quantified thresholds, not the agent's sense of effort. (`sdd-tdd` reads `WIP:` markers to know the issue is done; a stuck test escalates after *two* attempts, not after "honest effort.")
+- **Guard against gaming the success signal.** When a check gates the work, forbid weakening the check to pass it. (`sdd-tdd`: never modify a written test — escalate instead.)
+- **Review nodes report, they don't fix.** A node that reviews another node's output stays read-only on it — no `Edit`/`Write` grant. Defects route back to the authoring node through the human's reject, not the reviewer's hand. (`sdd-agent-spec-review` attaches findings; it never edits the spec.)
+- **Separate the deliverable from the escalation.** When a node's whole job is to surface problems, say plainly that finding them is the output, not a reason to stop — otherwise the agent escalates on every defect. Escalation stays reserved for "can't produce the deliverable at all." (`sdd-agent-spec-review`: findings ride to the human in a comment; only a red consistency gate escalates.)
 
 ## Mechanics
 
 - **Permissions are per-skill, verified empirically.** Under `dontAsk`, `Edit`/`Write` are denied without a grant; copy `allowed-tools` verbatim from the `workflow.md` skill table.
-- **Close concretely:** leave the tree green → commit → advance the `phase:*` label → stop. HITL closes with a plain report; FOTW closes with the `DONE:` line. (all node skills)
+- **Description names the launch trigger, not every situation.** Skills are human-dispatched, so the front-matter `description` ends at "Use when the agents dashboard launches the `<phase>` phase" — drop the "when X, when Y" restatements. (`sdd-agent-spec-review`)
+- **Close concretely:** advance the `phase:*` label → stop. A work node first leaves the tree green and commits; a read-only review node changed nothing on disk, so it skips both. HITL closes with a plain report; FOTW closes with the `DONE:` line.
+- **FOTW skills don't gate on approval.** No mid-work "wait for the user" steps — the agent runs to its terminal line and escalates on exceptions; human review lives at the dedicated review nodes. HITL skills do gate — that's the line between the modes.

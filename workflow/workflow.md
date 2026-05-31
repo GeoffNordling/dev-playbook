@@ -147,7 +147,7 @@ Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Dir
 
 ### Node-skill contract
 
-Across modes, a node skill copies its `allowed-tools` verbatim from the [table](#skills) below. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics.
+Across modes, a node skill copies its `allowed-tools` verbatim from the [table](#skills) below. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](~/workspace/dev-playbook/workflow/skill-authoring.md).
 
 - **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals, and the skill terminates with a plain report. Escalation is `—`: the human is already present.
 - **FOTW** — the skill runs hands-off, so it terminates with the deterministic `DONE:` line and declares its escalation triggers in the table, escalating whenever it meets something unexpected or wants to deviate from its plan.
@@ -160,7 +160,7 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; blocking ambiguity; test red after 2 attempts |
 | `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
 | `/build` | FOTW | same as `/sdd-tdd` | TBD |
-| `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh api *)` | TBD |
+| `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` | Consistency gate red (malformed spec); specs absent/unreadable |
 | `/sdd-agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
 | `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
 
