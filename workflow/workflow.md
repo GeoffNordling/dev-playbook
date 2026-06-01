@@ -2,29 +2,6 @@
 
 Standard workflow for how ideas become merged PRs in a workspace repo.
 
-# Main Concepts That We Need to Flesh Out in Documentation Somewhere in ~/workflow/ Directory:
-All pre-existing documentation, workflow standards, skills, tooling, etc. is open for modification, deletion, and addition. We are re-writing the workflow and are not bound by prior convention.
-
-GH Issue labels are defined in a central location and relayed to GH via [bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels). The label set must be refreshed for the new `(category:*, mode:*, tests:*, phase:*)` scheme.
-
-Human and agents collaborate to move issues along the graph from beginning to end, with a spectrum of permissions and authority to take actions and transitions. This is supported by well-organized and factored /skills and /tools scripts. Many /skills and /tools will need modification to fit the new workflow.
-
-Since Claude Code "claude agents" view relies on worktrees, we need to understand how worktrees are created, entered, exited, and deleted. Our old workflow relied on manual worktree creation and cleanup; we now expect to use to "claude agents" native worktree tooling. Make sure to have agents check that local Git is up-to-date with remote Git before launching new adventures.
-
-Current system security constraints require user yubikey tap for both `git pull` and `git push`. We are open to relaxing this requirement but will keep it in place tentatively while we develop the workflow.
-
-All state transitions, actions, metadata, for each issue, is tracked in a local SQLite DB so we can understand how our system performs.
-
-Interested in a lightweight web browser view of the system. Something visually appealing and parsimonious I can view in my browser. For example, a colorful view of the graph that indicates where all my open issues are across entire GH account, and the states they are in. This would be a "live" view the same way Claude Code's "claude agents" view is live.
-
-Will need a closed feedback loop to improve the workflow and skills over time. One idea: a skill to run at the of a workflow that looks back on the context, summarizes what went well, what went wrong, unexpected surprises, and lessons learned, then compresses and writes them to a database, with all associated metadata for the session. Another agent or workflow can watch at that higher level and guide workflow improvements over time.
-
-`/improve-codebase-architecture` is a dedicated refactor stage — whole-codebase module deepening that mutates code and tests. It is its own concern, not part of the spec-authoring phases; whether the graph grows a standalone refactor node is deferred, out of scope for this pass.
-
-Plan a pass over all skills to align with this workflow: update existing skills, author the ones referenced here but not yet on disk (`/tdd`, `/build`, `/sdd-agent-spec-review`, `/sdd-agent-code-review`, `/agent-code-review`), retire obsolete ones (`/sdd` dispatcher).
-
-# Graph-based Flow
-
 ## State machine
 
 Every issue is tagged with a four-tuple of labels: `(category:*, mode:*, tests:*, phase:*)`. All four are always present. The state of an issue is the `(mode, tests, phase)` sub-triple — each node below is one reachable combination. Category is required metadata but does not affect routing.
@@ -47,7 +24,7 @@ Every issue is tagged with a four-tuple of labels: `(category:*, mode:*, tests:*
 | Tests | `tests:yes` | Issue involves writing or modifying tests. |
 | Tests | `tests:no` | Issue does not touch tests. |
 
-### Node attributes
+### Graph-based flow
 
 Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, review})`. Four kinds:
 
