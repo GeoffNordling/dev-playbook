@@ -27,7 +27,7 @@ These constrain any workflow design.
 |---|---|---|
 | N1a | Sessions push branches to `origin` on their own. | Not possible today: `git push` to `git@github.com:...` taps the YubiKey. Requires the `git push` autonomy decision — see Deferred. |
 | N1b | Sessions create, update, and merge pull requests on their own. | Works today. `gh pr create`, `gh pr edit`, `gh pr review`, `gh pr merge --auto` all go over HTTPS via the PAT — no tap. |
-| N2 | Skill-invocable entry into agent view (typing `/sdd 4` into the agent view input dispatches the skill). | Works: the launched session model-invokes the skill. Skill must have `disable-model-invocation: false`. |
+| N2 | Skill-invocable entry into agent view (typing `/sdd-tdd 4` into the agent view input dispatches the skill). | Works: the launched session model-invokes the skill. Skill must have `disable-model-invocation: false`. |
 | N3 | Human review gate is configurable per skill or per invocation. Two modes: review-each-commit-diff vs review-only-the-PR. | Pure skill-design problem; agent view supports both natively (see "Design space"). |
 
 **N1a × N1b interaction.** End-to-end autonomy (dispatch → commit → push → PR → merge) is gated only by N1a. An autonomous-mode agent runs to the point of `git push`, stops, and surfaces a "Needs input" row in agent view; after the user's YubiKey tap completes the push, downstream `gh pr create` / `gh pr merge --auto` proceeds without further intervention. The `git push` autonomy decision (Deferred) is what would close that one remaining gap.
