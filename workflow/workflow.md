@@ -68,12 +68,12 @@ flowchart LR
         sdd_requirements -->|design| sdd_design[sdd_design]
         sdd_design -->|draft| sdd_agent_spec_review[sdd_agent_spec_review]
         sdd_agent_spec_review -->|attach review| sdd_human_spec_review{sdd_human_spec_review}
-        sdd_human_spec_review -->|reject: iterate| sdd_agent_spec_review
-        sdd_human_spec_review -->|reject: redesign| sdd_design
+        sdd_human_spec_review -->|reject: review again| sdd_agent_spec_review
+        sdd_human_spec_review -->|reject: rework| sdd_design
         sdd_human_spec_review -->|approve| sdd_tdd[sdd_tdd]
         sdd_tdd -->|open PR| sdd_agent_code_review[sdd_agent_code_review]
         sdd_agent_code_review -->|attach review| sdd_human_code_review{sdd_human_code_review}
-        sdd_human_code_review -->|reject: iterate| sdd_agent_code_review
+        sdd_human_code_review -->|reject: review again| sdd_agent_code_review
         sdd_human_code_review -->|reject: rework| sdd_tdd
     end
 
@@ -81,7 +81,7 @@ flowchart LR
         tdd -->|open PR| agent_code_review[agent_code_review]
         build -->|open PR| agent_code_review
         agent_code_review -->|attach review| human_code_review{human_code_review}
-        human_code_review -->|reject: iterate| agent_code_review
+        human_code_review -->|reject: review again| agent_code_review
         human_code_review -->|reject: rework| tdd
         human_code_review -->|reject: rework| build
     end
@@ -94,7 +94,7 @@ flowchart LR
 
 Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_agent_spec_review` → label `phase:sdd-agent-spec-review`, command `/sdd-agent-spec-review`. The set of graph nodes IS the phase-label inventory.
 
-Each work or agent-review node's skill updates the issue's `phase:*` label to the next node when it finishes. A human-review node has no skill: the human decides, advancing the label on approve or setting it back to an earlier node on `reject` (`iterate`, `redesign`, `rework`). The human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
+Each work or agent-review node's skill updates the issue's `phase:*` label to the next node when it finishes. The three human-review nodes share one skill, `/human-review`: it reads the `phase:*` label to place itself, lays out the prior agent review and the artifact, and executes the human's verdict — advancing on approve (merging the PR at a code node), or routing the label back to an earlier node on `reject` (`review again`, `rework`). This is the one command whose name does not derive from a node id: it serves `sdd_human_spec_review`, `sdd_human_code_review`, and `human_code_review` at once. The human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
 
 One long-lived PR per issue, opened by the implementing skill on the `open PR` edge and merged on `approve: merge` via `gh pr merge`.
 
@@ -163,6 +163,7 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` | Consistency gate red (malformed spec); specs absent/unreadable |
 | `/sdd-agent-code-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr comment *)` `Bash(make *)` | Green gate red (PR over red tree); PR/diff missing |
 | `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
+| `/human-review` | HITL | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh issue comment *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr merge *)` | — |
 
 **Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run two passes in one FOTW goal: the native `/code-review` (an automated bug/regression review that posts its findings as a PR comment) followed by our skill (the spec-fidelity and convention findings the native pass does not cover, also a PR comment). Ours runs last so its label advance means both reviews are done, and so it can read the native comment and skip re-flagging. The goal chains them:
 

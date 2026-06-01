@@ -6,9 +6,10 @@ Conventions for writing the workflow node-skills — the `phase:*` skills in `do
 
 The body is read by an agent running one node who does not know the workflow model.
 
-- **Plain behavioral language.** No `FOTW`, `node`, `edge`, or "dashboard" in the body — that vocabulary lives here and in `workflow.md`, not in front of the executing agent. (`sdd-tdd`)
+- **Plain behavioral language.** No `FOTW`, `node`, `edge`, or "dashboard" in the body — that vocabulary lives here and in `workflow.md`, not in front of the executing agent. (`sdd-tdd`) The exception is a skill whose subject *is* the workflow itself: `/human-review` reads `workflow.md` up front and navigates by node, edge, and state, because that is its job.
 - **Positive, not by negation.** Say what a mode or step does, not "the one that isn't X."
 - **Recommendations carry their reason.** Where a skill has the agent recommend something to the human, require the recommendation *and why*. (`sdd-requirements` §3, `sdd-design` §3)
+- **Name the human's choices plainly, and few.** A verdict menu reads as `approve / review again / rework`, not insider terms like `iterate` / `redesign`; collapse near-synonyms into one option. (`human-review`)
 
 ## Content
 
@@ -19,6 +20,7 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Keep useful interview aids even when they aren't spec fields** — a `feat`'s out-of-scope discussion sharpens what the feature *is*. (`sdd-requirements`)
 - **Name the spec location one way.** Always "The specs under `specs/functional_requirements/` and `specs/design/`" — the directory form, no "(or flat-file equivalents)" / "(or folder form)" hedge. (`sdd-agent-spec-review` §1)
 - **Order lists spec → test → code.** Everywhere this triad appears — reads, audit dimensions, context artifacts — keep that order: spec first, tests before code, behavior before style. Reads go spec-standard → testing-conventions → python-conventions; context goes specs → tests → code. Where python is absent (the build skills dropped it), it's just spec → test. (`sdd-agent-code-review`, `sdd-tdd`)
+- **Reference the source; don't copy it.** Don't bake a snapshot of something authoritatively defined elsewhere — the graph, the label set, a standard's rules — into a skill body; the copy goes stale when the source moves. Make the source mandatory `## Read first`, then act from what was read. Source the *what and when* — routing, which edge goes where, when to merge — and let the agent read it from the diagram rather than restating it; but supply the *how*, the commands a transition draws on. (`human-review` routes from `workflow.md`'s graph instead of carrying a transition table, but keeps a small toolbox for the label move and the squash-merge.)
 
 ## Robustness
 

@@ -12,7 +12,7 @@ argument-hint: "<issue-number>"
 
 Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report; you never edit the spec. A defect routes back to design through the human's reject, not through your hand.
 
-Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding spec problems is the job, not a reason to stop — they go in the comment for the human, who decides at the next node whether to approve, iterate, or send the spec back to design.
+Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding spec problems is the job, not a reason to stop — they go in the comment for the human, who decides at the next node whether to approve, review it again, or send the spec back to design.
 
 ## Read first
 
@@ -66,7 +66,7 @@ Nothing changed on disk — there is no commit.
    ```
    DONE: reviewed spec for #<issue>, findings attached, issue at phase:sdd-human-spec-review
    ```
-   Do not act on your own findings — the human reads them and decides whether to approve, iterate, or route back to design.
+   Do not act on your own findings — the human reads them and decides whether to approve, review it again, or route back to design.
 
 ## 6. Escalations
 

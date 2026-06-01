@@ -14,7 +14,7 @@ Review an SDD issue's PR diff against its committed spec and the project's codin
 
 An automated bug-review pass (the native `/code-review`) runs before you and posts its own PR comment; you add the spec-fidelity and convention findings it does not cover, then advance the label.
 
-Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding code problems is the job, not a reason to stop — they go in the comment for the human, who decides at the next node whether to approve, iterate, or send the work back to build.
+Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding code problems is the job, not a reason to stop — they go in the comment for the human, who decides at the next node whether to approve, review it again, or send the work back to build.
 
 ## Read first
 
@@ -70,7 +70,7 @@ Nothing changed on disk — there is no commit.
    ```
    DONE: reviewed code for #<issue>, findings on the PR, issue at phase:sdd-human-code-review
    ```
-   Do not act on your own findings — the human reads them and decides whether to approve, iterate, or route back to build.
+   Do not act on your own findings — the human reads them and decides whether to approve, review it again, or route back to build.
 
 ## 6. Escalations
 
