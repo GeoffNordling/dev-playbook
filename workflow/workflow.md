@@ -104,7 +104,13 @@ The human dispatcher operates from Claude Code's "claude agents" dashboard (see 
 
 **One session, one node — nodes do not auto-advance.** A node skill does its work, commits, and updates the issue's `phase:*` label to the next node's label, then stops and returns control to the dashboard. It never launches the next node, and never begins the next node's work in the same session. The human reads the issue's new phase and launches the matching skill. Every transition stays human-gated and visible on the live dashboard.
 
-The two modes invoke differently. **FOTW skills run hands-off under `/goal`**, which pairs the action with proof and a stop-clause: `/goal Run /<skill> <args> until <DONE: line appears>, or stop after N turns.` So every FOTW skill closes by emitting a deterministic `DONE: …` line the (text-only) evaluator can match. **HITL skills are launched directly as `/<skill> <args>`** with the human engaged throughout; they close with a plain report to the human and need no `/goal` wrapper or `DONE:` line.
+The two modes invoke differently. **FOTW skills run hands-off under `/goal`**, which pairs the action with proof and a stop-clause. A FOTW skill yields control only by printing a **terminal line** — `DONE:` (work complete) or `ESCALATE:` (blocked, needs a human call) — and the goal condition stops on either:
+
+```
+/goal Run /<skill> <args> until it prints a terminal line — DONE: or ESCALATE: — or stop after N turns.
+```
+
+`/goal` re-drives the session after every turn until its condition holds, so *every* exit must be a recognized terminal line — a skill that merely paused to ask a question would be re-driven past it. The (text-only) evaluator matches the literal prefix, clears the goal, and the session idles, visible to the human at the dashboard. **HITL skills are launched directly as `/<skill> <args>`** with the human engaged throughout; they close with a plain report and need no `/goal` wrapper or terminal line.
 
 ## Permissions
 
@@ -150,24 +156,24 @@ Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Dir
 Across modes, a node skill copies its `allowed-tools` verbatim from the [table](#skills) below. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](~/workspace/dev-playbook/workflow/skill-authoring.md).
 
 - **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals, and the skill terminates with a plain report. Escalation is `—`: the human is already present.
-- **FOTW** — the skill runs hands-off, so it terminates with the deterministic `DONE:` line and declares its escalation triggers in the table, escalating whenever it meets something unexpected or wants to deviate from its plan.
+- **FOTW** — the skill runs hands-off, so it terminates by printing a deterministic terminal line and declares its escalation triggers in the table. The line is `DONE:` on success or `ESCALATE:` when blocked. Escalation is a terminal line, not an in-place wait: under `/goal` the session is re-driven each turn until a terminal line appears, so to escalate is to print `ESCALATE:` and yield.
 
 | Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------------|---------------------|
 | `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Skill(grill-with-docs)` | — |
 | `/sdd-requirements` | HITL | `Bash(gh issue *)` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | — |
-| `/sdd-design` | HITL | `Bash(gh issue *)` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | — |
-| `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; blocking ambiguity; test red after 2 attempts |
-| `/tdd` | FOTW | same as `/sdd-tdd` | TBD |
-| `/build` | FOTW | same as `/sdd-tdd` | TBD |
+| `/sdd-design` | HITL | same as `/sdd-requirements` | — |
+| `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(gh pr *)` `Bash(git *)` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; blocking ambiguity; issue too big for one session; test red after 2 attempts |
+| `/tdd` | FOTW | same as `/sdd-tdd` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts |
+| `/build` | FOTW | same as `/sdd-tdd` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged) |
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` | Consistency gate red (malformed spec); specs absent/unreadable |
 | `/sdd-agent-code-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr comment *)` `Bash(make *)` | Green gate red (PR over red tree); PR/diff missing |
-| `/agent-code-review` | FOTW | `Skill(load-issue)` `Skill(code-review)` | TBD |
+| `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing |
 | `/human-review` | HITL | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh issue comment *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr merge *)` | — |
 
 **Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run two passes in one FOTW goal: the native `/code-review` (an automated bug/regression review that posts its findings as a PR comment) followed by our skill (the spec-fidelity and convention findings the native pass does not cover, also a PR comment). Ours runs last so its label advance means both reviews are done, and so it can read the native comment and skip re-flagging. The goal chains them:
 
 ```
-/goal Run /load-issue <issue>, then /code-review <pr>, then /sdd-agent-code-review <issue> — stop once all have run, or after N turns.
+/goal Run /load-issue <issue>, then /code-review <pr>, then /sdd-agent-code-review <issue> — stop when /sdd-agent-code-review prints a terminal line (DONE: or ESCALATE:), or after N turns.
 ```
 

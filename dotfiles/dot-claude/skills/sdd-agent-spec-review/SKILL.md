@@ -70,7 +70,13 @@ Nothing changed on disk — there is no commit.
 
 ## 6. Escalations
 
-You work without approval, but stop, surface the situation, and wait for the human's call whenever you can't complete the review — anything unexpected, or any wish to deviate. In particular:
+You work without approval, but whenever you can't complete the review — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
+
+```
+ESCALATE: #<issue> — <what's blocking you and the call you need>
+```
+
+The human reads it, decides, and relaunches. In particular:
 
 - **Consistency gate red.** The check gate fails: the spec is malformed and design should not have closed it. Surface it; don't review a broken graph.
 - **Specs missing or unreadable.** There is no spec to review, or the issue isn't in the state this phase expects.

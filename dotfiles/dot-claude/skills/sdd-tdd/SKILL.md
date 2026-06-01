@@ -5,7 +5,7 @@ disable-model-invocation: false
 model: opus
 effort: xhigh
 allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(git *) Edit Write Skill(commit)
-argument-hint: "<issue-number> [scope]"
+argument-hint: "<issue-number>"
 ---
 
 # SDD TDD
@@ -27,14 +27,12 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 ## 1. Load context
 
-`$ARGUMENTS` is the issue number, optionally followed by a scope restriction; below, `<issue>` is that number. Work happens on the issue's branch.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Work happens on the issue's branch.
 
 - `gh issue view <issue>` — the body is the contract.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state.
-
-**Scope.** With no restriction, implement the whole issue. With one (specific `dsn`s or `req`s), implement exactly that — no more, no less: the human has split a large issue across sessions and handed you one slice. You never decide scope; that decision was made before you were launched, and you neither widen nor narrow it.
 
 ## 2. Plan the chunk
 
@@ -85,10 +83,17 @@ For test-quality patterns and mocking guidance, see [testing conventions](~/work
 
 ## 5. Escalations
 
-You work without approval, but stop, surface the situation, and wait for the human's call whenever something falls outside the plan — anything unexpected, or any wish to deviate. In particular:
+You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
+
+```
+ESCALATE: #<issue> — <what's blocking you and the call you need>
+```
+
+The human reads it, decides, and relaunches; you don't push past the blocker on your own. In particular:
 
 - **Stuck test.** A slice's test won't pass after two implementation attempts.
 - **A written test looks wrong.** You want to change a test you already wrote — surface why; the human decides whether you mis-encoded it or the spec needs to change.
+- **The issue is too big for one session.** You can see the whole spec won't be implemented in this build before context runs low — a sizing miss. Surface it so the human re-splits it into smaller issues at intake; don't truncate the work silently.
 - **The spec needs to change.** A committed `Interface:` no longer fits — refactor pressure or a bug fix would change it, or a structural problem won't sit behind one module's seam — or the spec underdetermines the next slice's behavior, so you can't write the assertion.
 - **The spec could be better.** You see a spec change that would improve the design, even though nothing is blocking you.
 
@@ -106,32 +111,18 @@ Never edit the spec without an explicit approval gesture in the same turn. A bug
 
 ## 7. Close the phase
 
-When your scope is fully implemented:
+With the whole issue implemented:
 
-1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from each `feat` whose cone is now fully covered by verifiers (spec-standard §2.10). Leave it on any `feat` whose cone is still unbuilt — including work outside your scope.
-2. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`), including the spec-graph gate. Feats still carrying `WIP:` stay exempt from completeness; the gate enforces it only over the cones you just un-marked, so a failure there means a missing verifier — fix it and re-run. Don't commit a red tree.
+1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every `feat` — each cone is now covered by verifiers (spec-standard §2.10). If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
+2. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`), including the spec-graph gate. With every `WIP:` removed, the gate enforces completeness over the whole graph — a failure there means a missing verifier; fix it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
-
-Now read the `WIP:` markers to tell whether the whole issue is done.
-
-**Issue complete** — no `feat` carries `WIP:`:
-
-1. **Push, then open the PR.** `git push` needs the human's YubiKey — hand them `git push -u origin <branch>` and wait for it to land. Then open the long-lived PR: `gh pr create --body "Closes #<issue> …"`. The `Closes #<issue>` token is mandatory — merging the PR closes the issue.
-2. **Advance to code review:**
+4. **Push, then open the PR.** `git push` needs the human's YubiKey — hand them `git push -u origin <branch>` and wait for it to land. Then open the long-lived PR: `gh pr create --body "Closes #<issue> …"`. The `Closes #<issue>` token is mandatory — merging the PR closes the issue.
+5. **Advance to code review:**
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-agent-code-review"
    ```
-3. Emit the terminal line, then stop:
+6. Emit the terminal line, then stop:
    ```
    DONE: implemented #<issue>, PR open, issue at phase:sdd-agent-code-review
    ```
    Do not begin the review — the human launches /sdd-agent-code-review separately.
-
-**Issue incomplete** — some `feat` still carries `WIP:`: your scope was one slice of a larger issue and more remains. Do not push, open a PR, or change the label. Instead:
-
-1. Comment the state on the issue (`gh issue comment <issue>`): what you implemented, which `feat`s remain `WIP:`, decisions made.
-2. Emit the terminal line, then stop:
-   ```
-   STOPPED: built <scope> for #<issue>, issue stays at phase:sdd-tdd, WIP feats remain
-   ```
-   The human relaunches with the next scope.
