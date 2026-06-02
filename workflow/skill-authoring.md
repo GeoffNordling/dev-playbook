@@ -7,7 +7,7 @@ Conventions for writing the workflow node-skills — the `phase:*` skills in `do
 The body is read by an agent running one node who does not know the workflow model.
 
 - **Plain behavioral language.** No `FOTW`, `node`, `edge`, or "dashboard" in the body — that vocabulary lives here and in `workflow.md`, not in front of the executing agent. The exception is a skill whose subject *is* the workflow itself: it reads `workflow.md` up front and navigates by node, edge, and state, because that is its job.
-- **Positive, not by negation.** Say what a mode or step does, not "the one that isn't X."
+- **Positive, not by negation.** Say what a mode or step does, not "the one that isn't X"; instruct toward the action to take, not away from the misstep to avoid. Negation earns its place only in an escalation trigger, where the misstep *is* the subject.
 - **Recommendations carry their reason.** Where a skill has the agent recommend something to the human, require the recommendation *and why*.
 - **Name the human's choices plainly, and few.** Word a verdict as a plain command the human already understands, not an insider term; collapse near-synonyms into one option.
 
@@ -15,6 +15,7 @@ The body is read by an agent running one node who does not know the workflow mod
 
 - **Author against the whole contract, not a salient part.** The most visible piece — a pinned interface, a headline item — is the public surface, not the whole of what's owed.
 - **Don't restate what the steps already enforce.** If the body did its job, a trailing "Output"/recap section is dead weight — omit it.
+- **An instruction earns its words by changing what the agent does.** Give the action and any real condition or branch, and cut what the agent would do the same way without it. Four paddings recur: the *obvious* (restating what the action already implies — "enter the worktree, where the code lives"), the *downstream why* (how a step serves a later phase the agent can't see — "release it so the next phase inherits the commits"), the *reassurance* (narrating a non-event — "you changed no source, so there's no commit"), and the *closed edge case* (guarding a scenario the design already settled — "a reboot won't lose the worktree"). Keep the conditions and escalations; drop the color.
 - **Read only what's needed.** Skip what's auto-loaded (project `CLAUDE.md`); `## Read first` ends in a `READ:` line; conditional reads stay at their point of use.
 - **Don't re-explain what `## Read first` taught.** Reference a concept from the standard; don't restate it — the agent has read it.
 - **Keep useful interview aids even when they aren't required fields** — discussing what's out of scope sharpens what the thing *is*, though "out of scope" is no field you fill.

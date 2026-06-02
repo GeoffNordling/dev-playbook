@@ -6,5 +6,5 @@ How an idea moves through this workspace to shipped code — the state machine, 
 
 | File | Purpose |
 |------|---------|
-| [workflow.md](workflow.md) | Current state machine: label scheme, the node graph, the dashboard dispatch model, permissions, and the per-skill table. |
-| [agent-view-adoption.md](agent-view-adoption.md) | Survey of Claude Code's agent view — abilities, limitations, constraints — as input to the redesign. |
+| [workflow.md](workflow.md) | The standard: label scheme, the node graph, the per-issue worktree model, the dashboard dispatch model, permissions, and the per-skill table. |
+| [skill-authoring.md](skill-authoring.md) | The authoring style behind the node-skills — voice, content, robustness, mechanics. |

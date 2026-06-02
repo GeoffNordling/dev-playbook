@@ -4,7 +4,7 @@ description: Authors a project's functional requirements — `feat` and `req` sp
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Edit Write Skill(grill-with-docs) Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
@@ -23,7 +23,9 @@ Then report: `READ: spec-standard.md, lessons.md`. Proceed only after.
 
 ## 1. Load context
 
-Issue number arrives as `$ARGUMENTS`. Work happens on the issue's branch.
+Issue number arrives as `$ARGUMENTS`.
+
+**Create the issue's worktree.** First confirm local `main` is current with origin — a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. If they differ, tell the human to pull `main` and stop. Otherwise create it: `EnterWorktree(name=issue-$ARGUMENTS)`, then `git branch -m worktree-issue-$ARGUMENTS issue-$ARGUMENTS`.
 
 - `gh issue view $ARGUMENTS` — the body is the contract.
 - Existing specs: `specs/functional_requirements/`.
@@ -78,8 +80,9 @@ When the user approves and the rubric passes:
 
 1. **Final check sweep — leave the tree green.** Run the project's tests, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is undefined, note the absence and continue; if a defined command fails, stop and surface it.
 2. Run /commit.
-3. Advance the issue to the design phase — move its label from this node to the next:
+3. **Release the worktree.** `ExitWorktree(keep)`.
+4. Advance the issue to the design phase — move its label from this node to the next:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
    ```
-4. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the human launches /sdd-design from the dashboard when ready.
+5. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the human launches /sdd-design from the dashboard when ready.

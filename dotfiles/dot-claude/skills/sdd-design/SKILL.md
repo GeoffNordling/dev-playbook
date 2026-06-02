@@ -4,7 +4,7 @@ description: Authors the project's design layer — `dsn` items that pin `Interf
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Edit Write Skill(grill-with-docs) Skill(commit)
+allowed-tools: Bash(gh issue *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
@@ -24,7 +24,9 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 ## 1. Load context
 
-Issue number arrives as `$ARGUMENTS`. Work happens on the issue's branch.
+Issue number arrives as `$ARGUMENTS`.
+
+**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-$ARGUMENTS)`. If it doesn't exist, tell the human and stop — don't start a fresh tree.
 
 - `gh issue view $ARGUMENTS` — the body is the contract.
 - Approved requirements: `specs/functional_requirements/`. Without them, designing is premature — stop and surface that.
@@ -87,8 +89,9 @@ When the user approves and the rubric passes:
 
 1. **Final check sweep — leave the tree green.** Run the project's tests, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is undefined, note the absence and continue; if a defined command fails, stop and surface it.
 2. Run /commit.
-3. Advance the issue to the spec-review phase — move its label from this node to the next:
+3. **Release the worktree.** `ExitWorktree(keep)`.
+4. Advance the issue to the spec-review phase — move its label from this node to the next:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
    ```
-4. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the human launches /sdd-agent-spec-review from the dashboard when ready.
+5. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the human launches /sdd-agent-spec-review from the dashboard when ready.

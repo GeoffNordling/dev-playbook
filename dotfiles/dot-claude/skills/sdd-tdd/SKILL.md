@@ -1,16 +1,16 @@
 ---
 name: sdd-tdd
-description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then opens the PR and advances the issue to code review. Use when the agents dashboard launches the build phase.
+description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then advances the issue to code review. Use when the agents dashboard launches the build phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(git *) Edit Write Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
 # SDD TDD
 
-Implement an SDD issue with vertical-slice TDD against its committed specs — every `feat`, `req`, and `dsn`, down to the `Interface:` lines the design pins — remove the `WIP:` markers as each region's verifiers land, then open the PR and hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
+Implement an SDD issue with vertical-slice TDD against its committed specs — every `feat`, `req`, and `dsn`, down to the `Interface:` lines the design pins — remove the `WIP:` markers as each region's verifiers land, then hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
 
 Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The human reviews the finished work separately, not mid-build.
 
@@ -27,7 +27,9 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 ## 1. Load context
 
-`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Work happens on the issue's branch.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
+
+**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If it doesn't exist, escalate (§5) — don't start a fresh tree.
 
 - `gh issue view <issue>` — the body is the contract.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
@@ -116,13 +118,13 @@ With the whole issue implemented:
 1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every `feat` — each cone is now covered by verifiers (spec-standard §2.10). If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
 2. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`), including the spec-graph gate. With every `WIP:` removed, the gate enforces completeness over the whole graph — a failure there means a missing verifier; fix it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
-4. **Push, then open the PR.** `git push` needs the human's YubiKey — hand them `git push -u origin <branch>` and wait for it to land. Then open the long-lived PR: `gh pr create --body "Closes #<issue> …"`. The `Closes #<issue>` token is mandatory — merging the PR closes the issue.
+4. **Release the worktree.** `ExitWorktree(keep)`.
 5. **Advance to code review:**
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-agent-code-review"
    ```
 6. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue>, PR open, issue at phase:sdd-agent-code-review
+   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /sdd-agent-code-review
    ```
-   Do not begin the review — the human launches /sdd-agent-code-review separately.
+   Do not push or begin the review — the human pushes the branch and launches /sdd-agent-code-review.

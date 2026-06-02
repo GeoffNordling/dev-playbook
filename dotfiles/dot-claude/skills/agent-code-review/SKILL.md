@@ -4,7 +4,7 @@ description: Reviews a direct-mode issue's PR diff against its issue brief and t
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr comment *) Bash(make *)
+allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr comment *) Bash(make *) EnterWorktree ExitWorktree
 argument-hint: "<issue-number>"
 ---
 
@@ -27,7 +27,9 @@ Then report: `READ: testing-conventions.md, python-conventions.md`. Proceed only
 
 ## 1. Load context
 
-`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Work happens on the issue's branch.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
+
+**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If it doesn't exist, escalate (§6) — don't start a fresh tree.
 
 - `gh issue view <issue>` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
@@ -58,13 +60,12 @@ Anchor each finding to its location with a blob link — `https://github.com/<ow
 
 ## 5. Close the phase
 
-Nothing changed on disk — there is no commit.
-
-1. Advance to human review:
+1. **Release the worktree.** `ExitWorktree(keep)`.
+2. Advance to human review:
    ```bash
    gh issue edit <issue> --remove-label "phase:agent-code-review" --add-label "phase:human-code-review"
    ```
-2. Emit the terminal line, then stop:
+3. Emit the terminal line, then stop:
    ```
    DONE: reviewed code for #<issue>, findings on the PR, issue at phase:human-code-review
    ```

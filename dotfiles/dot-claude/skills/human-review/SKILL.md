@@ -4,7 +4,7 @@ description: Administrative wrapper for any human-review phase — reads the wor
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr merge *)
+allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr merge *) Bash(git worktree *) Bash(git branch *)
 argument-hint: "<issue-number>"
 ---
 
@@ -22,7 +22,7 @@ Then report: `READ: workflow.md`. Proceed only after.
 
 ## 1. Place the issue
 
-`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Read its labels (`gh issue view <issue>`) and place its `phase:*` node in the graph. It should be a human-review node; its outgoing edges are the verdicts open to the human. If it isn't, you were launched on the wrong issue — say so and stop. (The session runs in the issue's worktree, so `gh pr view` / `gh pr diff` resolve its PR with no argument.)
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Read its labels (`gh issue view <issue>`) and place its `phase:*` node in the graph. It should be a human-review node; its outgoing edges are the verdicts open to the human. If it isn't, you were launched on the wrong issue — say so and stop. (You run from the main checkout, not the issue's worktree, so name the branch when you reach for its artifacts: `gh pr view issue-<issue>`, `gh pr diff issue-<issue>`, and read spec files at `.claude/worktrees/issue-<issue>/`.)
 
 ## 2. Stand by
 
@@ -36,7 +36,7 @@ The commands these draw on, reached for as the chosen edge needs them:
 
 - **Move the phase** — `gh issue edit <issue> --remove-label "phase:<from>" --add-label "phase:<to>"`.
 - **Record a reject reason** — `gh issue comment <issue> --body "<the human's reason>"`.
-- **Merge** (the `approve: merge` edge) — `gh pr merge --squash` on this branch's PR. Squash so main gains exactly one commit; give it a single message describing the issue's work end to end (pass `--subject`/`--body`, or rely on the PR title and body if they already read that way). The `Closes #<issue>` token in the PR closes the issue, so no label change follows.
+- **Merge** (the `approve: merge` edge) — `gh pr merge issue-<issue> --squash --delete-branch`. Squash so main gains exactly one commit; give it a single message describing the issue's work end to end (pass `--subject`/`--body`, or rely on the PR title and body if they already read that way). `--delete-branch` drops the branch from origin; the `Closes #<issue>` token in the PR closes the issue, so no label change follows. Then tear down the issue's now-merged local worktree: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
 
 ## 4. Close
 

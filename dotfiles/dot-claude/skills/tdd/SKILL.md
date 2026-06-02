@@ -1,16 +1,16 @@
 ---
 name: tdd
-description: Implements a direct-mode issue via vertical-slice TDD against the issue brief's acceptance criteria, then opens the PR and advances the issue to code review. Use when the agents dashboard launches the tdd phase.
+description: Implements a direct-mode issue via vertical-slice TDD against the issue brief's acceptance criteria, then advances the issue to code review. Use when the agents dashboard launches the tdd phase.
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(git *) Edit Write Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
 # TDD
 
-Implement a direct-mode issue with vertical-slice TDD against the issue brief — its acceptance criteria are the contract. Then open the PR and hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
+Implement a direct-mode issue with vertical-slice TDD against the issue brief — its acceptance criteria are the contract. Then hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
 
 Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The human reviews the finished work separately, not mid-build.
 
@@ -24,7 +24,9 @@ Then report: `READ: testing-conventions.md`. Proceed only after.
 
 ## 1. Load context
 
-`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Work happens on the issue's branch.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
+
+**Create the issue's worktree.** First confirm local `main` is current with origin — a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. If they differ, escalate (§5) so the human pulls `main`. Otherwise create it: `EnterWorktree(name=issue-<issue>)`, then `git branch -m worktree-issue-<issue> issue-<issue>`.
 
 - `gh issue view <issue>` — the body is the contract; its acceptance criteria are the behaviors you must discharge.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
@@ -91,6 +93,7 @@ The human reads it, decides, and relaunches; you don't push past the blocker on 
 - **A written test looks wrong.** You want to change a test you already wrote — surface why; the human decides whether you mis-encoded it or the brief needs to change.
 - **The brief is wrong or underdetermined.** Building reveals the brief is mistaken, or it doesn't pin down the next behavior tightly enough to write the assertion. The brief is the human's; you don't edit the issue — surface it and let the human amend the issue or redirect.
 - **The issue is too big for one session.** You can see the whole brief won't be implemented in this build before context runs low — a sizing miss. Surface it so the human re-splits it into smaller issues at intake; don't truncate the work silently.
+- **Main is behind origin.** The stale-base check at §1 shows local `main` isn't current with origin. Surface it so the human pulls `main`; the worktree must branch off current main.
 
 ## 6. Close the phase
 
@@ -98,13 +101,13 @@ With every acceptance criterion met by a passing test:
 
 1. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). Don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
-3. **Push, then open the PR.** `git push` needs the human's YubiKey — hand them `git push -u origin <branch>` and wait for it to land. Then open the long-lived PR: `gh pr create --body "Closes #<issue> …"`. The `Closes #<issue>` token is mandatory — merging the PR closes the issue.
+3. **Release the worktree.** `ExitWorktree(keep)`.
 4. **Advance to code review:**
    ```bash
    gh issue edit <issue> --remove-label "phase:tdd" --add-label "phase:agent-code-review"
    ```
 5. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue>, PR open, issue at phase:agent-code-review
+   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /agent-code-review
    ```
-   Do not begin the review — the human launches /agent-code-review separately.
+   Do not push or begin the review — the human pushes the branch and launches /agent-code-review.
