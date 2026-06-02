@@ -128,7 +128,7 @@ raised, to be checked against the plugin's actual current behavior in §5.
   commit; small tasks preserve context budget for verification (browser automation
   is context-expensive). It was noted that the agent tends to mark features
   complete without proper testing unless explicitly told to verify end-to-end as a
-  human user.
+  human.
 
 **Skepticism raised:**
 

@@ -84,6 +84,7 @@ After the front matter, the body is Markdown.
   `references/` and link from SKILL.md so the agent loads it on demand.
 - Avoid time-sensitive content (hardcoded version numbers, dates,
   release-specific paths) — it goes stale faster than the skill is updated.
+- Choose `user` vs `human` per the [doc-conventions rule](~/workspace/dev-playbook/standards/doc-conventions.md#choosing-between-user-and-human).
 
 ## Cross-references
 

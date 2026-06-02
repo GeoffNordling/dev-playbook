@@ -39,6 +39,22 @@ with no `src/`."
 
 Pick one name per concept and use it across the document.
 
+## Choosing between user and human
+
+When a clause involves a person, pick the word by what sits opposite them. If
+`agent` — or a workflow node or role — is the other half of the sentence, write
+`human`; if the sentence is simply a skill serving the person in front of it,
+write `user`. A `user` is always a `human`; the two are a register split, not
+synonyms.
+
+Workflow node, label, and mode names are fixed and always use `human`, even in
+prose: `human-review`, `phase:human-code-review`, `(human, work)`, HITL.
+
+See [CONTEXT.md](~/workspace/dev-playbook/CONTEXT.md) for the definitions of
+`human`, `user`, and `agent`, and for the homonyms the rule leaves untouched
+(the "User" settings tier, fixed Claude Code tokens, downstream end-users,
+`human-readable`).
+
 ## Current state and next steps only
 
 Describe what exists and what's planned next. Don't reference removed things,

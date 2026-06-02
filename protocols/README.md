@@ -23,7 +23,7 @@ Protocols are written to be **frontier-invariant**. The capabilities of AI model
 After completing v0 of Align, Map, Execute, we questioned whether the
 protocol describes anything beyond a well-run Claude Code session. The
 core loop — align on intent, search the space, present a summary, human
-directs, agent acts — is what a competent user already does intuitively.
+directs, agent acts — is what a competent human already does intuitively.
 
 The value is not in prescribing new behavior. It is in naming and
 structuring the objects. When the workflow is implicit, every session
