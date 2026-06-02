@@ -50,7 +50,7 @@ For each chunk:
 
 1. Run the inner slice loop until every behavior in the chunk's scope is covered with passing tests.
 2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run `make test` after each step. A refactor that surfaces a structural problem beyond one module's seam is an escalation — see §5.
-3. Run `make check`. Resolve failures.
+3. Run the gate — `make check`. Resolve failures.
 4. Commit the chunk with /commit.
 5. Move to the next chunk, or to §6 once the issue's scope is fully implemented.
 
@@ -99,7 +99,7 @@ The human reads it, decides, and relaunches; you don't push past the obstacle on
 
 With every acceptance criterion met by a passing test:
 
-1. **Leave the tree green.** Run `make check`. Don't commit a red tree.
+1. **Leave the tree green.** Run the gate — `make check`. Don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
 3. **Release the worktree.** `ExitWorktree(keep)`.
 4. **Advance to code review:**

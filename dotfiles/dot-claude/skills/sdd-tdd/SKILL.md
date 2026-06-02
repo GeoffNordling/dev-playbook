@@ -54,7 +54,7 @@ For each chunk:
 
 1. Run the inner slice loop until every behavior in the chunk's scope is covered with passing tests.
 2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run `make test` after each step. A refactor that would change a committed `Interface:`, or surface a structural problem beyond one module's seam, is an escalation — see §5.
-3. Run `make check`. Resolve failures.
+3. Run the gate — `make check`. Resolve failures.
 4. Commit the chunk with /commit.
 5. Move to the next chunk, or to §7 once the issue's scope is fully implemented.
 
@@ -116,7 +116,7 @@ Never edit the spec without an explicit approval gesture in the same turn. A bug
 With the whole issue implemented:
 
 1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every `feat` — each cone is now covered by verifiers (spec-standard §2.10). If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
-2. **Leave the tree green.** Run `make check` — in an SDD repo this includes the spec-graph gate. With every `WIP:` removed, the gate enforces completeness over the whole graph — a failure there means a missing verifier; fix it and re-run. Don't commit a red tree.
+2. **Leave the tree green.** Run the gate — `make check`. With every `WIP:` removed, it now enforces completeness over the whole spec graph: a red build means a missing verifier — add it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
 4. **Release the worktree.** `ExitWorktree(keep)`.
 5. **Advance to code review:**

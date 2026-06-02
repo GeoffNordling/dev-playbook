@@ -62,7 +62,7 @@ The human reads it, decides, and relaunches; you don't push past the obstacle on
 
 With every acceptance criterion satisfied:
 
-1. **Leave the tree green.** If the work touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` at the repo root); don't commit a red tree.
+1. **Leave the tree green.** If the work touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root); don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
 3. **Release the worktree.** `ExitWorktree(keep)`.
 4. **Advance to code review:**

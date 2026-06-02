@@ -40,7 +40,7 @@ Then report: `READ: spec-standard.md, testing-conventions.md, python-conventions
 
 ## 2. Green gate
 
-Run the project's gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root) — the full chain: format-check, lint, typecheck, test, and the spec-graph gate. Green: proceed to the audit. Red: build opened a PR over a red tree — escalate (§6) rather than review broken work.
+Run the gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root). Green: proceed to the audit. Red: build opened a PR over a red tree — escalate (§6) rather than review broken work.
 
 ## 3. Audit the change
 
