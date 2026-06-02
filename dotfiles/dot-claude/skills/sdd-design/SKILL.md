@@ -4,7 +4,7 @@ description: Authors the project's design layer — `dsn` items that pin `Interf
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit) AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 

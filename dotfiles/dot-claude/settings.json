@@ -5,7 +5,6 @@
       "Skill(build)",
       "Skill(sdd-tdd)",
       "Skill(open-pr)",
-      "Skill(load-issue)",
       "Skill(sdd-agent-spec-review)",
       "Skill(sdd-agent-code-review)",
       "Skill(agent-code-review)",
@@ -26,6 +25,7 @@
       "Bash(gh label list)",
       "Bash(gh label list *)",
       "Bash(gh label create *)",
+      "Bash(gh issue view *)",
       "Bash(gh issue create *)",
       "Bash(gh issue comment *)",
       "Bash(gh issue edit *)",
@@ -46,6 +46,9 @@
       "Bash(gh pr lock *)",
       "Bash(gh pr unlock *)"
     ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
   },
   "hooks": {
     "Stop": [
