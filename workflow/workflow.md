@@ -71,9 +71,9 @@ flowchart LR
 
 Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_agent_spec_review` → label `phase:sdd-agent-spec-review`, command `/sdd-agent-spec-review`. The set of graph nodes IS the phase-label inventory.
 
-Each work or agent-review node's skill updates the issue's `phase:*` label to the next node when it finishes. The three human-review nodes share one skill, `/human-review`: it reads the `phase:*` label to place itself, lays out the prior agent review and the artifact, and executes the human's verdict — advancing on approve (merging the PR at a code node), or routing the label back to an earlier node on `reject` (`review again`, `rework`). This is the one command whose name does not derive from a node id: it serves `sdd_human_spec_review`, `sdd_human_code_review`, and `human_code_review` at once. The human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
+Each work or agent-review node's skill updates the issue's `phase:*` label to the next node when it finishes. The three human-review nodes share one skill, `/human-review`: it reads the `phase:*` label to place itself, lays out the prior agent review and the artifact, and executes the human's verdict — advancing on approve (the human merges the PR at a code node), or routing the label back to an earlier node on `reject` (`review again`, `rework`). This is the one command whose name does not derive from a node id: it serves `sdd_human_spec_review`, `sdd_human_code_review`, and `human_code_review` at once. The human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
 
-One long-lived branch and PR per issue. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the PR opens on the `open PR` edge — after the human pushes the branch — and is merged on `approve: merge` via `gh pr merge`.
+One long-lived branch and PR per issue. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the PR opens on the `open PR` edge — after the human pushes the branch — and the human merges it on `approve: merge` in the GitHub UI.
 
 ## Worktrees and branches
 
@@ -92,13 +92,14 @@ An issue's phases run as separate sessions, but they build one continuous line o
 
 ### The two-tap boundary
 
-Only two operations touch the GitHub SSH remote and so need the human's YubiKey; both are the human's, in their own terminal. Everything else is tap-free and lives in a skill.
+Two operations touch the GitHub SSH remote and need the human's YubiKey — both the human's, in their own terminal. Merging the PR is the human's too, in the GitHub UI, though it takes no tap. Everything else is tap-free and lives in a skill.
 
 | | Tap | Owner |
 |---|---|---|
 | `git push` (publish the branch at `open PR`) | **yes** | human |
 | `git pull` (keep local `main` current) | **yes** | human |
-| `gh pr create` / `gh pr merge` / `gh api` / `gh issue` / `gh pr diff` | no | skills |
+| merge the PR (`approve: merge`, in the GitHub UI) | no | human |
+| `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | no | skills |
 | commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | no | skills |
 
 Consequences that shape the skills:
@@ -106,7 +107,7 @@ Consequences that shape the skills:
 - **The implementation phase never opens the PR.** It cannot push, and a finger-on-the-wheel skill cannot pause mid-run to wait for a tap. So it commits, releases the worktree, advances its label, and ends `DONE` with a reminder to push. The PR is created downstream, after the push.
 - **The push is the human's transition ritual.** Seeing implementation `DONE`, the human runs `git push -u origin issue-<N>` (one tap) and then launches the code-review phase.
 - **The PR is born at code review.** `/open-pr` (first link of the code-review goal) creates it with `gh pr create` once the branch is on origin — tap-free, in a skill. If the branch isn't pushed yet, `/open-pr` escalates rather than guessing.
-- **Cleanup is the merge node's job.** On `approve: merge`, `/human-review` runs `gh pr merge --squash --delete-branch` (drops the origin branch), then removes the local worktree and branch: `git worktree remove .claude/worktrees/issue-<N>` and `git branch -D issue-<N>`.
+- **The merge is the human's; cleanup is the merge node's.** The PAT cannot merge (`mergePullRequest` is forbidden), so on `approve: merge` the human squash-merges in the GitHub UI — dropping the origin branch and closing the issue via `Closes #<N>`. `/human-review` then tears down the local side: `git worktree remove .claude/worktrees/issue-<N>` and `git branch -D issue-<N>`.
 
 ## Dispatch
 
@@ -147,7 +148,7 @@ Allow rules live at two levels, split by one question — **who invokes the skil
 - *User-level allow for universally-trusted mutators:* `Bash(mkdir *)`, `Bash(touch *)`, `Bash(mv *)`, `Bash(cp *)`.
 - *`rm` is not yet user-allowed.* Each session works inside the issue's worktree (`.claude/worktrees/issue-<N>`), which cwd-bounds it — sufficient practical confinement (a soft boundary, not an OS jail). Code-writing skills will likely need `rm`; not yet committed.
 
-A transition a skill performs — the `phase:*` label update, plus any commit, worktree, or PR action — is covered by that skill's `allowed-tools`. Transitions the human performs (the two taps — `git push`, `git pull` — and the merge verdict) need no encoding.
+A transition a skill performs — the `phase:*` label update, plus any commit, worktree, or PR action — is covered by that skill's `allowed-tools`. Transitions the human performs (the two taps — `git push`, `git pull` — and the merge, in the GitHub UI) need no encoding.
 
 Canonical rule syntax and edge cases: [permissions docs](https://code.claude.com/docs/en/permissions).
 

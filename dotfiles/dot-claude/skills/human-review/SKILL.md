@@ -4,7 +4,7 @@ description: Administrative wrapper for any human-review phase — reads the wor
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr merge *) Bash(git worktree *) Bash(git branch *)
+allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git worktree *) Bash(git branch *)
 argument-hint: "<issue-number>"
 ---
 
@@ -36,7 +36,7 @@ The commands these draw on, reached for as the chosen edge needs them:
 
 - **Move the phase** — `gh issue edit <issue> --remove-label "phase:<from>" --add-label "phase:<to>"`.
 - **Record a reject reason** — `gh issue comment <issue> --body "<the human's reason>"`.
-- **Merge** (the `approve: merge` edge) — `gh pr merge issue-<issue> --squash --delete-branch`. Squash so main gains exactly one commit; give it a single message describing the issue's work end to end (pass `--subject`/`--body`, or rely on the PR title and body if they already read that way). `--delete-branch` drops the branch from origin; the `Closes #<issue>` token in the PR closes the issue, so no label change follows. Then tear down the issue's now-merged local worktree: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
+- **Merge** (the `approve: merge` edge) — the human squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Once they confirm it's merged, tear down the local side: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
 
 ## 4. Close
 
