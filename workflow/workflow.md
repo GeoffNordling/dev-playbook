@@ -191,5 +191,5 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 **Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run three steps in one FOTW goal: `/open-pr` creates the PR from the just-pushed branch (tap-free), the native `/code-review` posts its automated bug/regression findings as a PR comment, then our skill adds the spec-fidelity and convention findings the native pass does not cover (also a PR comment). Ours runs last so its label advance means all three are done, and so it can read the native comment and skip re-flagging. The goal chains them:
 
 ```
-/goal Run /load-issue <issue>, then /open-pr <issue>, then /code-review <pr>, then /sdd-agent-code-review <issue> — stop when /sdd-agent-code-review prints a terminal line (DONE: or ESCALATE:), or after N turns.
+/goal Run /open-pr <issue>, then /code-review <pr>, then /sdd-agent-code-review <issue> — stop when /sdd-agent-code-review prints a terminal line (DONE: or ESCALATE:), or after N turns.
 ```
