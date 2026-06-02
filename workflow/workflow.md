@@ -143,8 +143,10 @@ Tool access is governed by a tiered settings hierarchy. Rules at every level mer
 
 Allow rules live at two levels, split by one question — **who invokes the skill or tool:**
 
-- **Per-skill `allowed-tools` front-matter is self-sufficient under `dontAsk`.** A skill's own grants — bash, edits, the worktree tools (`EnterWorktree`, `ExitWorktree`), and sub-skills (`Skill(child)`) — run for the skill's lifetime with no settings.json duplicate, even for a tool that appears in settings.json nowhere. This is the **per-skill permission set** in the [skill table](#skills). Additive, scoped to the skill's lifetime; cannot override a deny.
+- **Per-skill `allowed-tools` front-matter is self-sufficient under `dontAsk`.** A skill's own grants — bash, edits, the worktree tools (`EnterWorktree`, `ExitWorktree`), and sub-skills (`Skill(child)`) — run for the skill's lifetime with no settings.json duplicate, even for a tool that appears in settings.json nowhere. This is the **per-skill permission set** in the [skill table](#skills). Additive, scoped to the skill's lifetime; cannot override a deny — and cannot reach the interactive-prompt tools the mode denies outright (below).
 - **User-level allow holds only the `Skill(name)` gates front-matter can't carry** — the skills `/goal` launches or chains. `/goal` drives a session with no front-matter of its own, so its `Skill(…)` call is gated by `dontAsk`, and a settings.json gate is the only place to allow it. A skill the human launches by typing `/<skill>` is never gated, and a sub-skill rides on its parent's front-matter — so neither needs an entry here. A narrow bash backstop for built-in skills (e.g., `/code-review`'s `Bash(gh pr diff *)`) lives here too.
+
+**Interactive-prompt tools are unavailable under `dontAsk`.** Any tool that hands control to the human and waits — `AskUserQuestion`, and plan mode's `ExitPlanMode` approval — is auto-denied by the mode itself, regardless of any `allowed-tools` grant or `permissions.allow` rule. The denial is structural to the mode, not a missing permission, so no allow can rescue it and no dispatched skill lists or reaches for these tools. A HITL skill still interviews and gates on approval — it does so in plain terminal prose: one question at a time, each recommendation carrying its reason, with the human answering on the next turn.
 
 **Bash baseline.**
 
@@ -171,14 +173,14 @@ Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Dir
 Across modes, a node skill copies its `allowed-tools` verbatim from the [table](#skills) below. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](~/workspace/dev-playbook/workflow/skill-authoring.md).
 
 - **Worktree.** Every file-touching node enters the issue's worktree before doing anything else and releases it with `ExitWorktree(keep)` at close, per [Worktrees](#worktrees-and-branches). First phases (`sdd_requirements`, `tdd`, `build`) create-and-rename; later phases adopt by path. `intake` touches no files and has no worktree.
-- **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals, and the skill terminates with a plain report. Escalation is `—`: the human is already present.
+- **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals — conducted as plain terminal prompts, per [Permissions](#permissions) — and the skill terminates with a plain report. Escalation is `—`: the human is already present.
 - **FOTW** — the skill runs hands-off, so it terminates by printing a deterministic terminal line and declares its escalation triggers in the table. The line is `DONE:` on success or `ESCALATE:` when stuck. Escalation is a terminal line, not an in-place wait: under `/goal` the session is re-driven each turn until a terminal line appears, so to escalate is to print `ESCALATE:` and yield.
 
 | Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------------|---------------------|
-| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Bash(gh api *)` `Skill(grill-with-docs)` `AskUserQuestion` | — |
-| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` `AskUserQuestion` | main behind origin (stale base) |
-| `/sdd-design` | HITL | `Bash(gh issue *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` `AskUserQuestion` | issue worktree missing |
+| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Bash(gh api *)` `Skill(grill-with-docs)` | — |
+| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | main behind origin (stale base) |
+| `/sdd-design` | HITL | `Bash(gh issue *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | issue worktree missing |
 | `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts; issue worktree missing |
 | `/tdd` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
 | `/build` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
@@ -186,7 +188,7 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` | Consistency gate red (malformed spec); specs absent/unreadable; issue worktree missing |
 | `/sdd-agent-code-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr comment *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |
 | `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |
-| `/human-review` | HITL | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh issue comment *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(git worktree *)` `Bash(git branch *)` `AskUserQuestion` | — |
+| `/human-review` | HITL | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh issue comment *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(git worktree *)` `Bash(git branch *)` | — |
 
 **Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run three steps in one FOTW goal: `/open-pr` creates the PR from the just-pushed branch (tap-free), the native `/code-review` posts its automated bug/regression findings as a PR comment, then our skill adds the spec-fidelity and convention findings the native pass does not cover (also a PR comment). Ours runs last so its label advance means all three are done, and so it can read the native comment and skip re-flagging. The goal chains them:
 

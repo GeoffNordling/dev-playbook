@@ -4,7 +4,7 @@ description: Administrative wrapper for any human-review phase — reads the wor
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git worktree *) Bash(git branch *) AskUserQuestion
+allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git worktree *) Bash(git branch *)
 argument-hint: "<issue-number>"
 ---
 
@@ -26,7 +26,7 @@ Then report: `READ: workflow.md`. Proceed only after.
 
 ## 2. Stand by
 
-Tell the human, in one line, which review this is and the verdicts the graph gives it — then wait; they review the artifact in their own tools. Don't dump diffs, specs, or findings to the terminal. When a question needs it, read what the prior agent review left — findings on the issue before a PR exists, on the PR once it does — or the artifact itself, and answer concisely. If something the graph says should be there is missing, tell the human; something upstream didn't run.
+Tell the human, in one line, which review this is and the verdicts the graph gives it — as plain terminal text, never the `AskUserQuestion` tool — then wait; they review the artifact in their own tools. Don't dump diffs, specs, or findings to the terminal. When a question needs it, read what the prior agent review left — findings on the issue before a PR exists, on the PR once it does — or the artifact itself, and answer concisely. If something the graph says should be there is missing, tell the human; something upstream didn't run.
 
 ## 3. Carry out the verdict
 
