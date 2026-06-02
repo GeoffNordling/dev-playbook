@@ -132,14 +132,14 @@ Tool access is governed by a tiered settings hierarchy. Rules at every level mer
 | CLI args | `claude agents --permission-mode dontAsk …` | **Sets FOTW mode for dispatched sessions only**, leaving personal `claude` sessions in their normal mode. |
 | Local | `<repo>/.claude/settings.local.json` | Rare; gitignored personal exceptions. |
 | Project | `<repo>/.claude/settings.json` | Repo-specific allow rules. |
-| User | `~/.claude/settings.json` | `Skill()` gates for FOTW-entry skills, plus narrow backstop for built-in skills. Stow-linked from `dotfiles/dot-claude/`. Benign for personal sessions — never sets mode. |
+| User | `~/.claude/settings.json` | `Skill()` gates for the skills `/goal` launches, plus narrow backstop for built-in skills. Stow-linked from `dotfiles/dot-claude/`. Benign for personal sessions — never sets mode. |
 
 **Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to every dispatched session (HITL and FOTW); personal `claude` sessions are unaffected. Trades upfront allow-list enumeration for runtime determinism.
 
-Allow rules are encoded at two levels:
+Allow rules live at two levels, split by one question — **who invokes the skill or tool:**
 
-- **User-level allow** holds only `Skill(name)` gates for dispatcher-launched skills, plus a narrow bash backstop for built-in skills (e.g., `/code-review`'s `Bash(gh pr diff *)`).
-- **Per-skill `allowed-tools` front-matter** holds everything else: bash, edits, the worktree tools (`EnterWorktree`, `ExitWorktree`), sub-skills (`Skill(child)`). This is the **per-skill permission set** in the [skill table](#skills). Additive, scoped to the skill's lifetime; cannot override a deny.
+- **Per-skill `allowed-tools` front-matter is self-sufficient under `dontAsk`.** A skill's own grants — bash, edits, the worktree tools (`EnterWorktree`, `ExitWorktree`), and sub-skills (`Skill(child)`) — run for the skill's lifetime with no settings.json duplicate, even for a tool that appears in settings.json nowhere. This is the **per-skill permission set** in the [skill table](#skills). Additive, scoped to the skill's lifetime; cannot override a deny.
+- **User-level allow holds only the `Skill(name)` gates front-matter can't carry** — the skills `/goal` launches or chains. `/goal` drives a session with no front-matter of its own, so its `Skill(…)` call is gated by `dontAsk`, and a settings.json gate is the only place to allow it. A skill the human launches by typing `/<skill>` is never gated, and a sub-skill rides on its parent's front-matter — so neither needs an entry here. A narrow bash backstop for built-in skills (e.g., `/code-review`'s `Bash(gh pr diff *)`) lives here too.
 
 **Bash baseline.**
 
