@@ -4,7 +4,7 @@ description: Authors a project's functional requirements — `feat` and `req` sp
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit) AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 

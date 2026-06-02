@@ -88,7 +88,7 @@ An issue's phases run as separate sessions, but they build one continuous line o
 
 ### The contract every file-touching phase follows
 
-- **Create** — the first phase opens the worktree, gated on a tap-free check that local `main` matches origin (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base escalates, since pulling is the human's. It creates with `EnterWorktree(name=issue-<N>)` and renames the branch to the bare `issue-<N>` — the `worktree-` prefix appears to be what agent view's cleanup keys on, so dropping it lets the worktree outlive a torn-down session.
+- **Create** — the first phase opens the worktree, gated on a tap-free check that local `main` matches origin (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base escalates, since pulling is the human's. It creates with `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the worktree's base is `origin/main` whatever branch the main checkout sits on, and the stale-base check above is what guards that base. It then renames the branch to the bare `issue-<N>` — the `worktree-` prefix appears to be what agent view's cleanup keys on, so dropping it lets the worktree outlive a torn-down session.
 - **Adopt** — every later phase re-enters the same worktree by path (`EnterWorktree(path=.claude/worktrees/issue-<N>)`) and inherits all prior commits. A missing worktree escalates: the issue's work is gone.
 - **Release** — every phase closes with `ExitWorktree(keep)`, which leaves the worktree and branch for the next phase. The merge node removes them when the issue lands.
 
@@ -176,9 +176,9 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 
 | Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------------|---------------------|
-| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Bash(gh api *)` `Skill(grill-with-docs)` | — |
-| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | main behind origin (stale base) |
-| `/sdd-design` | HITL | `Bash(gh issue *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | issue worktree missing |
+| `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Bash(gh api *)` `Skill(grill-with-docs)` `AskUserQuestion` | — |
+| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` `AskUserQuestion` | main behind origin (stale base) |
+| `/sdd-design` | HITL | `Bash(gh issue *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` `AskUserQuestion` | issue worktree missing |
 | `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts; issue worktree missing |
 | `/tdd` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
 | `/build` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
@@ -186,7 +186,7 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` | Consistency gate red (malformed spec); specs absent/unreadable; issue worktree missing |
 | `/sdd-agent-code-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr comment *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |
 | `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |
-| `/human-review` | HITL | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh issue comment *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr merge *)` `Bash(git worktree *)` `Bash(git branch *)` | — |
+| `/human-review` | HITL | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh issue comment *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(git worktree *)` `Bash(git branch *)` `AskUserQuestion` | — |
 
 **Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run three steps in one FOTW goal: `/open-pr` creates the PR from the just-pushed branch (tap-free), the native `/code-review` posts its automated bug/regression findings as a PR comment, then our skill adds the spec-fidelity and convention findings the native pass does not cover (also a PR comment). Ours runs last so its label advance means all three are done, and so it can read the native comment and skip re-flagging. The goal chains them:
 

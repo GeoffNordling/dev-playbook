@@ -47,6 +47,9 @@
       "Bash(gh pr unlock *)"
     ]
   },
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "hooks": {
     "Stop": [
       {

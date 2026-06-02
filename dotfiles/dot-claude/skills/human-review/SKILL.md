@@ -4,7 +4,7 @@ description: Administrative wrapper for any human-review phase — reads the wor
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git worktree *) Bash(git branch *)
+allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git worktree *) Bash(git branch *) AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 

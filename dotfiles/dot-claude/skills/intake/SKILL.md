@@ -4,7 +4,7 @@ description: Triage work at the front door — adopt a rushed, untriaged issue o
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh label *) Bash(gh api *) Skill(grill-with-docs)
+allowed-tools: Bash(gh issue *) Bash(gh label *) Bash(gh api *) Skill(grill-with-docs) AskUserQuestion
 ---
 
 # Intake
