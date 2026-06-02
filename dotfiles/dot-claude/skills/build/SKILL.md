@@ -4,7 +4,7 @@ description: Carries out a direct-mode issue that doesn't touch tests — docume
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
@@ -39,7 +39,7 @@ The plan is your map, not a gate — proceed without waiting for approval.
 Carry out the brief in coherent commits, keeping the tree green as you go:
 
 1. Make the changes for a coherent piece of the scope.
-2. Run the project's check gate (per `CLAUDE.md` / `Makefile`) — the existing tests, lint, format, and typecheck. You write no tests, but your change must not break the ones there. Resolve failures.
+2. If the piece touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root) — and resolve failures; you write no tests, but your change must not break the existing ones. A piece touching no Python sub-project has no `make` gate.
 3. Commit the piece with /commit.
 4. Move to the next piece, or to §5 once the issue's scope is fully carried out.
 
@@ -62,7 +62,7 @@ The human reads it, decides, and relaunches; you don't push past the obstacle on
 
 With every acceptance criterion satisfied:
 
-1. **Leave the tree green.** Run the project's check gate (per `CLAUDE.md` / `Makefile`). Don't commit a red tree.
+1. **Leave the tree green.** If the work touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` at the repo root); don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
 3. **Release the worktree.** `ExitWorktree(keep)`.
 4. **Advance to code review:**

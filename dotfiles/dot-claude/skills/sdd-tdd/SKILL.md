@@ -4,7 +4,7 @@ description: Implements an SDD issue via vertical-slice TDD against the committe
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
@@ -34,7 +34,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 - `gh issue view <issue>` — the body is the contract.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
-- Run the test suite to see the current state.
+- Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`, or the repo root when the `Makefile` is there).
 
 ## 2. Plan the chunk
 
@@ -53,8 +53,8 @@ The plan is your map, not a gate — proceed without waiting for approval.
 For each chunk:
 
 1. Run the inner slice loop until every behavior in the chunk's scope is covered with passing tests.
-2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run the suite after each step. A refactor that would change a committed `Interface:`, or surface a structural problem beyond one module's seam, is an escalation — see §5.
-3. Run lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). Resolve failures.
+2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run `make test` after each step. A refactor that would change a committed `Interface:`, or surface a structural problem beyond one module's seam, is an escalation — see §5.
+3. Run `make check`. Resolve failures.
 4. Commit the chunk with /commit.
 5. Move to the next chunk, or to §7 once the issue's scope is fully implemented.
 
@@ -62,15 +62,15 @@ For each chunk:
 
 Each slice is one test, one implementation, then a brief refactor.
 
-**Red.** Pick one observable behavior under one `req~…` or `dsn~…`. Write a single failing test exercising it through the public surface declared by the relevant `dsn`'s `Interface:`. Mark every test with `@pytest.mark.covers("<id>")` naming the closest upstream item — typically the `dsn` whose `Needs: utest` / `Needs: itest` declared the obligation. Run the suite; confirm it fails for the expected reason.
+**Red.** Pick one observable behavior under one `req~…` or `dsn~…`. Write a single failing test exercising it through the public surface declared by the relevant `dsn`'s `Interface:`. Mark every test with `@pytest.mark.covers("<id>")` naming the closest upstream item — typically the `dsn` whose `Needs: utest` / `Needs: itest` declared the obligation. Run `make test`; confirm it fails for the expected reason.
 
 **Never modify a written test.** Once you've written a test, make it pass by changing code, not the test. If you feel the need to change the test, escalate (§5) — don't edit it yourself.
 
 **Stub on first contact.** When a test imports a symbol with no stub yet, create the stub matching its `Interface:` declaration verbatim — same parameter names, kinds, annotations, return annotation. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
-**Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run the suite; confirm green.
+**Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 
-**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run the suite after each step. A refactor that would change a committed `Interface:` is an escalation — see §5.
+**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run `make test` after each step. A refactor that would change a committed `Interface:` is an escalation — see §5.
 
 Refactor candidate catalogue:
 
@@ -116,7 +116,7 @@ Never edit the spec without an explicit approval gesture in the same turn. A bug
 With the whole issue implemented:
 
 1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every `feat` — each cone is now covered by verifiers (spec-standard §2.10). If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
-2. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`), including the spec-graph gate. With every `WIP:` removed, the gate enforces completeness over the whole graph — a failure there means a missing verifier; fix it and re-run. Don't commit a red tree.
+2. **Leave the tree green.** Run `make check` — in an SDD repo this includes the spec-graph gate. With every `WIP:` removed, the gate enforces completeness over the whole graph — a failure there means a missing verifier; fix it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
 4. **Release the worktree.** `ExitWorktree(keep)`.
 5. **Advance to code review:**
