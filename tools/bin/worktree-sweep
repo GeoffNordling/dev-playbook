@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""Prune merged-PR worktrees from .claude/worktrees/.
+
+Walks .claude/worktrees/ in the current git repo. For each worktree, queries
+GitHub for the PR state of its branch. Auto-prunes worktrees whose most-recent
+PR is MERGED, whose local tip matches the PR's recorded head SHA, and whose
+working tree is clean. Anything else is reported for human triage.
+
+Run from any directory inside the repo.
+
+Usage:
+    worktree-sweep [--dry-run]
+"""
+# /// script
+# requires-python = ">=3.11"
+# ///
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+
+def run(cmd, *, cwd=None, check=True, timeout=60):
+    result = subprocess.run(
+        cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout
+    )
+    if check and result.returncode != 0:
+        raise RuntimeError(
+            f"{' '.join(cmd)} failed (rc={result.returncode}): {result.stderr.strip()}"
+        )
+    return result.returncode, result.stdout, result.stderr
+
+
+def find_worktrees(repo_root: Path) -> list[Path]:
+    base = repo_root / ".claude" / "worktrees"
+    if not base.is_dir():
+        return []
+    return sorted(p for p in base.iterdir() if p.is_dir() and (p / ".git").exists())
+
+
+def branch_of(worktree: Path) -> str | None:
+    _, out, _ = run(["git", "branch", "--show-current"], cwd=worktree, check=False)
+    name = out.strip()
+    return name or None
+
+
+def worktree_clean(worktree: Path) -> bool:
+    _, out, _ = run(["git", "status", "--porcelain"], cwd=worktree)
+    return out.strip() == ""
+
+
+def local_tip(worktree: Path) -> str:
+    _, out, _ = run(["git", "rev-parse", "HEAD"], cwd=worktree)
+    return out.strip()
+
+
+def gh_prs_for_branch(branch: str, repo_root: Path) -> list[dict]:
+    _, out, _ = run(
+        [
+            "gh",
+            "pr",
+            "list",
+            "--head",
+            branch,
+            "--state",
+            "all",
+            "--json",
+            "number,state,headRefOid,mergedAt,closedAt",
+            "--limit",
+            "10",
+        ],
+        cwd=repo_root,
+    )
+    return json.loads(out or "[]")
+
+
+def pick_relevant_pr(prs: list[dict]) -> dict | None:
+    """Decide which PR record drives the categorization.
+
+    If any PR is OPEN, the branch is in active use — return that one.
+    Else if any PR is MERGED, the branch's work landed — return that one.
+    Else return the most recent (closed-unmerged) PR if any.
+    """
+    if not prs:
+        return None
+    for pr in prs:
+        if pr["state"] == "OPEN":
+            return pr
+    for pr in prs:
+        if pr["state"] == "MERGED":
+            return pr
+    return prs[0]
+
+
+def prune(worktree: Path, branch: str, repo_root: Path) -> None:
+    # `git worktree remove` refuses if dirty; we already verified clean above.
+    run(["git", "worktree", "remove", str(worktree)], cwd=repo_root)
+    # `-D` not `-d`: squash/rebase merges leave the local branch tip
+    # un-mergeable from git's POV, so `-d` would refuse. The PR-state +
+    # headRefOid checks above are the application-level guardrail.
+    run(["git", "branch", "-D", branch], cwd=repo_root)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Prune merged-PR worktrees from .claude/worktrees/."
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="report what would be pruned without taking action",
+    )
+    args = parser.parse_args()
+
+    rc, out, _ = run(
+        ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        check=False,
+    )
+    if rc != 0:
+        print("worktree-sweep: not in a git repository", file=sys.stderr)
+        return 2
+    repo_root = Path(out.strip()).parent
+
+    worktrees = find_worktrees(repo_root)
+    if not worktrees:
+        print("No worktrees in .claude/worktrees/.")
+        return 0
+
+    pruned: list[tuple[str, str]] = []
+    ambiguous: list[tuple[str, str]] = []
+    in_progress: list[tuple[str, str]] = []
+    errors: list[tuple[str, str]] = []
+
+    for wt in worktrees:
+        name = wt.name
+        try:
+            branch = branch_of(wt)
+            if branch is None:
+                ambiguous.append((name, "detached HEAD"))
+                continue
+            if branch != name:
+                ambiguous.append(
+                    (name, f"directory name does not match branch ({branch})")
+                )
+                continue
+
+            try:
+                prs = gh_prs_for_branch(branch, repo_root)
+            except RuntimeError as e:
+                errors.append((name, f"gh lookup failed: {e}"))
+                continue
+
+            pr = pick_relevant_pr(prs)
+            if pr is None:
+                ambiguous.append((name, "no PR found for branch"))
+                continue
+
+            number = pr["number"]
+            state = pr["state"]
+
+            if state == "OPEN":
+                in_progress.append((name, f"PR #{number}"))
+                continue
+
+            if state == "CLOSED":
+                ambiguous.append((name, f"PR #{number} closed without merge"))
+                continue
+
+            if state != "MERGED":
+                ambiguous.append((name, f"PR #{number} unknown state {state}"))
+                continue
+
+            if not worktree_clean(wt):
+                ambiguous.append(
+                    (name, f"PR #{number} merged but worktree has uncommitted changes")
+                )
+                continue
+
+            head_oid = pr.get("headRefOid")
+            if not head_oid:
+                ambiguous.append(
+                    (name, f"PR #{number} merged but no headRefOid reported")
+                )
+                continue
+
+            tip = local_tip(wt)
+            if tip != head_oid:
+                ambiguous.append(
+                    (
+                        name,
+                        f"PR #{number} merged but local tip {tip[:7]} differs from PR head {head_oid[:7]} (unpushed commits or force-push divergence)",
+                    )
+                )
+                continue
+
+            if args.dry_run:
+                pruned.append((name, f"PR #{number} (dry-run, no action taken)"))
+            else:
+                try:
+                    prune(wt, branch, repo_root)
+                    pruned.append((name, f"PR #{number}"))
+                except RuntimeError as e:
+                    errors.append((name, f"prune failed: {e}"))
+
+        except Exception as e:  # noqa: BLE001
+            errors.append((name, f"unexpected error: {e}"))
+
+    def section(title: str, rows: list[tuple[str, str]]) -> None:
+        if not rows:
+            return
+        print(f"\n{title} ({len(rows)}):")
+        for n, detail in rows:
+            print(f"  {n}: {detail}")
+
+    section("Pruned", pruned)
+    section("Ambiguous (human decision required)", ambiguous)
+    section("In progress (PR open, skipped)", in_progress)
+    section("Errors", errors)
+
+    if not any([pruned, ambiguous, in_progress, errors]):
+        print("No actions taken.")
+
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

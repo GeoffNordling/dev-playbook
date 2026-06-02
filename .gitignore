@@ -1,0 +1,30 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# python tooling caches (any subpackage)
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# per-issue git worktrees (see standards/issue-implementation.md)
+.claude/worktrees/
+
+# dotfiles — machine-local and ephemeral files
+dotfiles/dot-claude/settings.local.json
+dotfiles/dot-claude/history.jsonl
+dotfiles/dot-claude/debug/
+dotfiles/dot-claude/file-history/
+dotfiles/dot-claude/session-env/
+dotfiles/dot-claude/paste-cache/
+dotfiles/dot-claude/cache/
+dotfiles/dot-claude/downloads/
+dotfiles/dot-claude/backups/
+dotfiles/dot-claude/shell-snapshots/
+dotfiles/dot-claude/plans/
+dotfiles/dot-claude/tasks/
+dotfiles/dot-claude/todos/
+dotfiles/dot-claude/sessions/
+dotfiles/dot-claude/plugins/
+dotfiles/dot-claude/projects/

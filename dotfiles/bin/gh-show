@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# gh-show NUMBER — print a GitHub issue or PR (number NUMBER) with its body
+# and all comments in human-readable form. Auto-detects issue vs PR.
+#
+# Exists because Claude Opus 4.7 (xhigh) was reaching for other gh
+# subcommands that errored out and burned tokens; this wrapper gives one
+# reliable command for the issue/PR + comments view.
+set -euo pipefail
+n="${1:?usage: gh-show NUMBER}"
+gh issue view "$n" --comments 2>/dev/null || gh pr view "$n" --comments

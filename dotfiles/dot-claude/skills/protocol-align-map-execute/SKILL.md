@@ -1,0 +1,1 @@
+../../../../protocols/align-map-execute/SKILL.md

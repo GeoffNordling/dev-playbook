@@ -1,0 +1,109 @@
+---
+name: intake
+description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea (one issue or many). Decides category, mode, tests; writes the brief into the issue body; advances the issue past intake. Use when the agents dashboard launches intake.
+disable-model-invocation: false
+model: opus
+effort: xhigh
+allowed-tools: Bash(gh issue *) Bash(gh label *) Bash(gh api *) Skill(grill-with-docs)
+---
+
+# Intake
+
+The front door for work. Input arrives under-formed and leaves as a ready issue — full four-tuple labels and a body brief, advanced to its first work node. Two entry forms:
+
+- **Capture** — the dispatcher passes a free-form idea as text. Intake creates one or many new issues, each born ready.
+- **Adopt** — the dispatcher passes the number or URL of an issue someone threw up rushed and incomplete. It sits untriaged at `phase:intake` — or carries no labels at all; treat both the same. Intake triages it in place and rewrites its body.
+
+## Read first
+
+Before doing anything else, read end-to-end:
+
+- [workflow standard](~/workspace/dev-playbook/workflow/workflow.md) — label scheme, state-machine graph.
+- [issue conventions](~/workspace/dev-playbook/standards/issue-conventions.md) — body format, brief principles, vertical-slice rules.
+
+Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
+
+## Process
+
+### 1. Read the input
+
+The dispatcher passes either a free-form idea (**capture**) or an existing issue number / URL (**adopt**).
+
+- **Capture** — the text passed in is the raw idea.
+- **Adopt** — `gh issue view <N>` and read its title and body as the raw idea. The stub is untriaged: it sits at `phase:intake`, or carries no labels at all — process it either way (`phase:intake` is the implied default). Note which labels, if any, it already carries; you will rewrite its body.
+
+Either way, if terminology is fuzzy, scope is unclear, or the idea spans concepts that should live in `CONTEXT.md`, invoke /grill-with-docs first to sharpen, then return.
+
+### 2. Decide one issue or many
+
+Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies. Size each slice to the context budget (issue conventions → vertical-slice rules): split anything whose build would push an agent past ~30% context. The build agent won't resize the work, so the split has to happen here. When **adopting** a stub that turns out to be a multi-issue plan, refine the stub into the first slice and create the rest as new issues.
+
+### 3. For each issue, pick the four-tuple
+
+- `category:*` — pick one.
+- `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.
+- `tests:*` — `mode:sdd` is always `tests:yes`. For `mode:direct`, ask the human.
+- `phase:*` — the first work node, implied by `(mode, tests)` per the state-machine graph. Intake always leaves the issue here, never at `phase:intake`.
+
+### 4. Draft the brief
+
+Per the issue conventions. When **adopting**, rewrite the stub's body into the brief format — structure what the human wrote, don't discard it.
+
+### 5. Land it
+
+**Capture** — create the issue at its first work node:
+
+```bash
+gh issue create \
+  --title "..." \
+  --label "<category>" \
+  --label "<mode>" \
+  --label "<tests>" \
+  --label "<phase>" \
+  --body "$(cat <<'EOF'
+...body...
+EOF
+)"
+```
+
+Multi-issue plans: create slices in dependency order so each blocker exists before the next slice links to it (wired in step 6).
+
+**Adopt** — set the four-tuple and overwrite the body on the existing issue:
+
+```bash
+gh issue edit <N> \
+  --add-label "<category>" \
+  --add-label "<mode>" \
+  --add-label "<tests>" \
+  --add-label "<phase>" \
+  --body "$(cat <<'EOF'
+...body...
+EOF
+)"
+```
+
+If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`; if it carried no labels, there is nothing to remove. Either way the issue ends at its first work node. A stub that was really a multi-issue plan: edit it into the first slice, then `gh issue create` the rest.
+
+### 6. Wire relationships
+
+When intake produced more than one issue, set the native relationships per [issue conventions → Relationships](~/workspace/dev-playbook/standards/issue-conventions.md). Neither has a `gh` subcommand, so use `gh api`; both endpoints take the target issue's internal `id` (not its number), so resolve that first. `{owner}`/`{repo}` are filled from the current repo.
+
+Mark each ordered slice **blocked-by** its predecessor:
+
+```bash
+blocker_id=$(gh api repos/{owner}/{repo}/issues/<blocker#> --jq .id)
+gh api --method POST repos/{owner}/{repo}/issues/<dependent#>/dependencies/blocked_by \
+  -F issue_id="$blocker_id"
+```
+
+If the slices roll up under a tracking epic, also add each as a **sub-issue** of it:
+
+```bash
+child_id=$(gh api repos/{owner}/{repo}/issues/<child#> --jq .id)
+gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues \
+  -F sub_issue_id="$child_id"
+```
+
+## Output
+
+Print issue numbers, a one-line summary of each, and the next-phase skill (`/sdd-requirements`, `/tdd`, or `/build`). Do NOT auto-launch — the dispatcher decides when to start work.

@@ -1,0 +1,31 @@
+[project]
+name = "dev-playbook-tools"
+version = "0.1.0"
+requires-python = ">=3.14"
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "mypy>=2.0",
+    "pytest>=9.0",
+    "ruff>=0.15.14",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.14"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disable_error_code = ["import-untyped"]

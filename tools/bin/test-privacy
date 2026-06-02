@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+"""Flag private-name access in test files.
+
+Walks each ``test_*.py`` file under the given paths and emits a finding
+whenever a test imports or reaches into a private name (``_foo``) belonging
+to a non-test module. Dunder methods (``__init__`` etc.) are public.
+
+Usage:
+    test-privacy [path ...]
+
+Defaults to walking the current directory when no paths are given. Exits 0
+silently if no test files are found, so the same invocation is safe in any
+repo. Exits 0 if clean, 1 if any findings, 2 on tool error. Writes one
+finding per line to stdout in ``file:line  rule  message`` form; writes a
+one-line summary to stderr.
+"""
+# /// script
+# requires-python = ">=3.11"
+# ///
+
+import argparse
+import ast
+import os
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+EXCLUDE_DIRS = {
+    ".git",
+    ".venv",
+    ".hatch",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pycache__",
+    "node_modules",
+}
+
+
+@dataclass(frozen=True)
+class Finding:
+    rule: str
+    file: Path
+    line: int
+    message: str
+    fix: str
+
+    def render(self) -> str:
+        return (
+            f"{self.file}:{self.line}  {self.rule}  {self.message}\n  fix: {self.fix}"
+        )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="test-privacy",
+        description=(
+            "Flag private-name access in test files. Enforces the "
+            "'Access only public names' rule from standards/testing-conventions.md."
+        ),
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        type=Path,
+        help="files or directories to scan (default: walk current directory)",
+    )
+    args = parser.parse_args(argv)
+
+    paths = args.paths or [Path(".")]
+    files = _find_test_files(paths)
+    if not files:
+        print("test-privacy: no test files found", file=sys.stderr)
+        return 0
+
+    findings: list[Finding] = []
+    for file in files:
+        findings.extend(_validate_file(file))
+
+    for f in findings:
+        print(f.render())
+
+    if findings:
+        print(
+            f"test-privacy: {len(findings)} finding(s) across {len(files)} files",
+            file=sys.stderr,
+        )
+        return 1
+    print(f"test-privacy: clean across {len(files)} files", file=sys.stderr)
+    return 0
+
+
+def _find_test_files(paths: list[Path]) -> list[Path]:
+    files: list[Path] = []
+    for base in paths:
+        if not base.exists():
+            continue
+        if base.is_file() and base.name.startswith("test_") and base.suffix == ".py":
+            files.append(base)
+            continue
+        for dirpath, dirnames, filenames in os.walk(base):
+            dirnames[:] = [d for d in dirnames if d not in EXCLUDE_DIRS]
+            for fname in filenames:
+                if fname.startswith("test_") and fname.endswith(".py"):
+                    files.append(Path(dirpath) / fname)
+    return sorted(files)
+
+
+def _validate_file(path: Path) -> list[Finding]:
+    try:
+        source = path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+    try:
+        tree = ast.parse(source, filename=str(path))
+    except SyntaxError:
+        return []
+    visitor = _PrivacyVisitor(path)
+    visitor.visit(tree)
+    return visitor.findings
+
+
+class _PrivacyVisitor(ast.NodeVisitor):
+    """Collect private-access findings within one test file's AST."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.findings: list[Finding] = []
+        self._imports: dict[str, str] = {}
+
+    def visit_Import(self, node: ast.Import) -> None:
+        for alias in node.names:
+            module = alias.name
+            local = alias.asname or alias.name.split(".")[0]
+            if not _is_test_module(module):
+                self._flag_private_segments(node, module)
+            self._imports[local] = module
+        self.generic_visit(node)
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+        module = node.module or ""
+        if module and not _is_test_module(module):
+            self._flag_private_segments(node, module)
+            for alias in node.names:
+                if _is_private(alias.name):
+                    self._add(
+                        node,
+                        rule="privacy.import-private",
+                        message=(
+                            f"imports private name '{alias.name}' from "
+                            f"non-test module '{module}'"
+                        ),
+                    )
+        for alias in node.names:
+            local = alias.asname or alias.name
+            self._imports[local] = module
+        self.generic_visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._imports.setdefault(node.name, "")
+        self.generic_visit(node)
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._imports.setdefault(node.name, "")
+        self.generic_visit(node)
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        self._imports.setdefault(node.name, "")
+        self.generic_visit(node)
+
+    def visit_Assign(self, node: ast.Assign) -> None:
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                self._imports.setdefault(target.id, "")
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        if _is_private(node.attr):
+            root = _root_name(node)
+            if root is not None:
+                source_module = self._imports.get(root)
+                if source_module and not _is_test_module(source_module):
+                    chain = _attribute_chain(node)
+                    self._add(
+                        node,
+                        rule="privacy.attribute-access",
+                        message=(
+                            f"reaches into private name '{node.attr}' on "
+                            f"non-test import '{root}' ({chain})"
+                        ),
+                    )
+        self.generic_visit(node)
+
+    def _flag_private_segments(self, node: ast.AST, module: str) -> None:
+        for segment in module.split("."):
+            if _is_private(segment):
+                self._add(
+                    node,
+                    rule="privacy.import-private",
+                    message=(
+                        f"imports through private module segment "
+                        f"'{segment}' in '{module}'"
+                    ),
+                )
+                return
+
+    def _add(self, node: ast.AST, *, rule: str, message: str) -> None:
+        self.findings.append(
+            Finding(
+                rule=rule,
+                file=self.path,
+                line=getattr(node, "lineno", 0),
+                message=message,
+                fix="exercise the private name through the public interface",
+            )
+        )
+
+
+def _is_private(name: str) -> bool:
+    return name.startswith("_") and not (name.startswith("__") and name.endswith("__"))
+
+
+def _is_test_module(module: str) -> bool:
+    for segment in module.split("."):
+        if segment == "tests" or segment.startswith("test_") or segment == "conftest":
+            return True
+    return False
+
+
+def _root_name(node: ast.Attribute) -> str | None:
+    current: ast.expr = node
+    while isinstance(current, ast.Attribute):
+        current = current.value
+    if isinstance(current, ast.Name):
+        return current.id
+    return None
+
+
+def _attribute_chain(node: ast.Attribute) -> str:
+    parts: list[str] = [node.attr]
+    current: ast.expr = node.value
+    while isinstance(current, ast.Attribute):
+        parts.append(current.attr)
+        current = current.value
+    if isinstance(current, ast.Name):
+        parts.append(current.id)
+    return ".".join(reversed(parts))
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
