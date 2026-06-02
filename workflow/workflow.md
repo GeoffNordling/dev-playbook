@@ -177,11 +177,11 @@ Across modes, a node skill copies its `allowed-tools` verbatim from the [table](
 | Skill | Mode | Permissions set (`allowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------------|---------------------|
 | `/intake` | HITL | `Bash(gh issue *)` `Bash(gh label *)` `Bash(gh api *)` `Skill(grill-with-docs)` | — |
-| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | main behind origin (stale base) |
-| `/sdd-design` | HITL | `Bash(gh issue *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | issue worktree missing |
-| `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(git *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts; issue worktree missing |
-| `/tdd` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
-| `/build` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
+| `/sdd-requirements` | HITL | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | main behind origin (stale base) |
+| `/sdd-design` | HITL | `Bash(gh issue *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(grill-with-docs)` `Skill(commit)` | issue worktree missing |
+| `/sdd-tdd` | FOTW | `Bash(gh issue *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts; issue worktree missing |
+| `/tdd` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
+| `/build` | FOTW | `Bash(gh issue *)` `Bash(gh api *)` `Bash(git *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` `Edit` `Write` `Skill(commit)` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
 | `/open-pr` | FOTW | `Bash(gh pr *)` `Bash(gh issue view *)` `Bash(gh api *)` `Bash(git *)` | branch not pushed to origin |
 | `/sdd-agent-spec-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue comment *)` `Bash(gh issue edit *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` | Consistency gate red (malformed spec); specs absent/unreadable; issue worktree missing |
 | `/sdd-agent-code-review` | FOTW | `Bash(gh issue view *)` `Bash(gh issue edit *)` `Bash(gh pr view *)` `Bash(gh pr diff *)` `Bash(gh pr comment *)` `Bash(make *)` `EnterWorktree` `ExitWorktree` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |

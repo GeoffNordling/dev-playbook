@@ -38,7 +38,7 @@ Then report: `READ: testing-conventions.md, python-conventions.md`. Proceed only
 
 ## 2. Green gate
 
-Run the project's check gate (per `CLAUDE.md` / `Makefile`) — the full chain: tests, lint, and typecheck. Green: proceed to the audit. Red: build opened a PR over a red tree — escalate (§6) rather than review broken work.
+If the change touches a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root). Green: proceed to the audit. Red: build opened a PR over a red tree — escalate (§6) rather than review broken work. A change touching no Python sub-project has no `make` gate; proceed to the audit.
 
 ## 3. Audit the change
 

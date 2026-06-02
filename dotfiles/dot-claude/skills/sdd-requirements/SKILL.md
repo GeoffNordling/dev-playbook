@@ -4,7 +4,7 @@ description: Authors a project's functional requirements — `feat` and `req` sp
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
@@ -78,7 +78,7 @@ Re-read each new `feat` / `req` and iterate until clean:
 
 When the user approves and the rubric passes:
 
-1. **Final check sweep — leave the tree green.** Run the project's tests, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). If a command is undefined, note the absence and continue; if a defined command fails, stop and surface it.
+1. **Leave the tree green.** Run the gate — `make check`; it builds and validates the spec graph. The region is `WIP:` (§5), so completeness is exempt and only **consistency** is enforced (§2.10) — a red build means the spec you just authored is malformed. Don't commit a red tree.
 2. Run /commit.
 3. **Release the worktree.** `ExitWorktree(keep)`.
 4. Advance the issue to the design phase — move its label from this node to the next:

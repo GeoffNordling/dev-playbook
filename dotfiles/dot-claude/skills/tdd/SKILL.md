@@ -4,7 +4,7 @@ description: Implements a direct-mode issue via vertical-slice TDD against the i
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) EnterWorktree ExitWorktree Edit Write Skill(commit)
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
@@ -30,7 +30,7 @@ Then report: `READ: testing-conventions.md`. Proceed only after.
 
 - `gh issue view <issue>` — the body is the contract; its acceptance criteria are the behaviors you must discharge.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
-- Run the test suite to see the current state.
+- Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`, or the repo root when the `Makefile` is there).
 
 ## 2. Plan the chunk
 
@@ -49,8 +49,8 @@ The plan is your map, not a gate — proceed without waiting for approval.
 For each chunk:
 
 1. Run the inner slice loop until every behavior in the chunk's scope is covered with passing tests.
-2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run the suite after each step. A refactor that surfaces a structural problem beyond one module's seam is an escalation — see §5.
-3. Run lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). Resolve failures.
+2. **Whole-chunk refactor pass.** With the suite green, review every module the chunk touched for refactor candidates not visible inside a single slice — cross-module duplication, deeper-module opportunities now that several call sites exist, abstraction misalignments, primitive obsession. Run `make test` after each step. A refactor that surfaces a structural problem beyond one module's seam is an escalation — see §5.
+3. Run the gate — `make check`. Resolve failures.
 4. Commit the chunk with /commit.
 5. Move to the next chunk, or to §6 once the issue's scope is fully implemented.
 
@@ -58,15 +58,15 @@ For each chunk:
 
 Each slice is one test, one implementation, then a brief refactor.
 
-**Red.** Pick one observable behavior the brief calls for. Write a single failing test exercising it through the public surface. Run the suite; confirm it fails for the expected reason.
+**Red.** Pick one observable behavior the brief calls for. Write a single failing test exercising it through the public surface. Run `make test`; confirm it fails for the expected reason.
 
 **Never modify a written test.** Once you've written a test, make it pass by changing code, not the test. If you feel the need to change the test, escalate (§5) — don't edit it yourself.
 
 **Stub on first contact.** When a test names a symbol that doesn't exist yet, create the stub it needs — you design the signature here, since the brief pins behavior, not interfaces. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
-**Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run the suite; confirm green.
+**Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 
-**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run the suite after each step. A refactor that surfaces a structural problem beyond one module's seam is an escalation — see §5.
+**Refactor.** With the suite green, look for refactor candidates inside the module: extract duplication, deepen modules, simplify primitives. Run `make test` after each step. A refactor that surfaces a structural problem beyond one module's seam is an escalation — see §5.
 
 Refactor candidate catalogue:
 
@@ -99,7 +99,7 @@ The human reads it, decides, and relaunches; you don't push past the obstacle on
 
 With every acceptance criterion met by a passing test:
 
-1. **Leave the tree green.** Run the full test suite, lint, format, and typecheck (per `CLAUDE.md` / `Makefile`). Don't commit a red tree.
+1. **Leave the tree green.** Run the gate — `make check`. Don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
 3. **Release the worktree.** `ExitWorktree(keep)`.
 4. **Advance to code review:**

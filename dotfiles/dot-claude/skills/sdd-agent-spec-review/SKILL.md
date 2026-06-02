@@ -36,7 +36,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 ## 2. Consistency gate
 
-Run the project's check gate (per `CLAUDE.md` / `Makefile`) — it builds the spec graph. The `feat`s under review are still `WIP:`, so completeness is exempt (§2.10); the build still enforces **consistency**, which never is. Green: proceed to the audit. Red: the graph is malformed and design should not have closed it — escalate (§6) rather than review a broken spec.
+Run the gate — `make check`; it builds and validates the spec graph. The `feat`s under review are still `WIP:`, so completeness is exempt and only **consistency** is enforced (§2.10). Green: proceed to the audit. Red: the graph is malformed and design should not have closed it — escalate (§6) rather than review a broken spec.
 
 ## 3. Audit the spec
 
