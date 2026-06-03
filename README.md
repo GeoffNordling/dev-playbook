@@ -36,7 +36,7 @@ One row per top-level directory. Follow the linked index for the contents of eac
 | [`standards/`](standards/README.md) | Cross-project engineering standards and conventions. |
 | [`workflow/`](workflow/README.md) | How an idea moves from intake to shipped code — the state machine, gates, and agent-autonomy decisions. |
 | [`protocols/`](protocols/README.md) | Augmented skills that decompose a complex problem formally before executing it (e.g. Align, Map, Execute). |
-| `dotfiles/` | Agent configuration (skills, rules, settings), Stow-symlinked into `$HOME`. Run `dotfiles/bin/sync-dotfiles.sh` after adding or removing files. |
+| `dotfiles/` | Agent configuration (skills, rules, settings), Stow-symlinked into `$HOME`. Run `dotfiles/bin/sync-dotfiles.sh` after adding or removing files — from the main checkout only; it relinks live `$HOME`, so it's a human step, never run from a per-issue worktree. |
 | [`tools/`](tools/README.md) | CLI utilities for workspace automation. |
 | `docs/` | Supplementary documentation and architecture decision records (`docs/adr/`). |
 
