@@ -4,13 +4,12 @@ description: Authors a project's functional requirements — `feat` and `req` sp
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
 # SDD Requirements
 
-Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the user's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
+Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill.
 
 ## Read first
 
@@ -43,7 +42,7 @@ Add areas as they surface. Surface your read of which areas look load-bearing an
 
 ## 3. Intent interview
 
-Invoke /grill-with-docs to reach shared understanding of the flagged areas. It interviews the user one question at a time, challenges fuzzy terms against `CONTEXT.md`, cross-references the code, and records resolved domain terms and decisions in `CONTEXT.md` / ADRs as they crystallize. Where an area has discrete options, lay them out in the terminal as plain text — not the `AskUserQuestion` tool — each option carrying a recommendation and the reason it is recommended.
+Invoke /grill-with-docs to reach shared understanding of the flagged areas. It interviews the user one question at a time, challenges fuzzy terms against `CONTEXT.md`, cross-references the code, and records resolved domain terms and decisions in `CONTEXT.md` / ADRs as they crystallize. Where an area has discrete options, present them — each option carrying a recommendation and the reason it is recommended.
 
 ## 4. Plan synthesis
 
@@ -80,9 +79,8 @@ When the user approves and the rubric passes:
 
 1. **Leave the tree green.** Run the gate — `make check`; it builds and validates the spec graph. The region is `WIP:` (§5), so completeness is exempt and only **consistency** is enforced (§2.10) — a red build means the spec you just authored is malformed. Don't commit a red tree.
 2. Run /commit.
-3. **Release the worktree.** `ExitWorktree(keep)`.
-4. Advance the issue to the design phase — move its label from this node to the next:
+3. Advance the issue to the design phase — move its label from this node to the next:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
    ```
-5. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the user launches /sdd-design from the dashboard when ready.
+4. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the user launches /sdd-design from the dashboard when ready.
