@@ -146,6 +146,8 @@ Tool access is governed by a tiered settings hierarchy. Rules at every level mer
 
 **Mode: `dontAsk`, set at agent-view startup** via `claude agents --permission-mode dontAsk`. Auto-deny anything not pre-approved; never prompt. Applies to every dispatched session (HITL and FOTW); personal `claude` sessions are unaffected. Trades upfront allow-list enumeration for runtime determinism.
 
+**Auto mode** — a permission mode (toggled like `acceptEdits`/`plan`) in which Claude judges for each tool call whether it is safe and self-approves rather than consulting a static allow-list; it replaces `dontAsk` in the reworked single-session model (#66).
+
 Allow rules live at two levels, split by one question — **who invokes the skill or tool:**
 
 - **Per-skill `allowed-tools` front-matter is self-sufficient under `dontAsk`.** A skill's own grants — bash, edits, the worktree tools (`EnterWorktree`, `ExitWorktree`), and sub-skills (`Skill(child)`) — run for the skill's lifetime with no settings.json duplicate, even for a tool that appears in settings.json nowhere. This is the **per-skill permission set** in the [skill table](#skills). Additive, scoped to the skill's lifetime; cannot override a deny — and cannot reach the interactive-prompt tools the mode denies outright (below).
