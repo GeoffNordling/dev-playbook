@@ -107,6 +107,6 @@ With every acceptance criterion met by a passing test:
    ```
 4. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /agent-code-review
+   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>)
    ```
-   Do not push or begin the review — the user pushes the branch and launches /agent-code-review.
+   Do not push or begin the review — the user pushes the branch and dispatches the next node.

@@ -105,4 +105,4 @@ gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues \
 
 ## Output
 
-Print issue numbers, a one-line summary of each, and the next-phase skill (`/sdd-requirements`, `/design`, `/tdd`, or `/build`). Do not auto-launch — the user decides when to start work.
+Print issue numbers, a one-line summary of each, and the `phase:*` label each landed at. Triage ends at the label — the user dispatches the next node.

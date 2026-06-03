@@ -92,4 +92,4 @@ When the user approves and the rubric passes:
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
    ```
-4. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user launches /sdd-agent-spec-review from the dashboard when ready.
+4. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user dispatches the next node when ready.
