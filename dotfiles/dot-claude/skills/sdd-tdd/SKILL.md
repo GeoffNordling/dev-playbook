@@ -124,6 +124,6 @@ With the whole issue implemented:
    ```
 5. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /sdd-agent-code-review
+   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>)
    ```
-   Do not push or begin the review — the user pushes the branch and launches /sdd-agent-code-review.
+   Do not push or begin the review — the user pushes the branch and dispatches the next node.

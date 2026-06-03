@@ -21,7 +21,7 @@ Stow links `dot-claude/` into `~/.claude/` and `.agents/` into `~/.agents/`, so 
 
 Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `dot-claude/skills/` pointing at it (`dot-claude/skills/<name>` → `../../.agents/skills/<name>`). `bin/sync-dotfiles.sh` enforces this on every run: it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
 
-After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror.
+After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree.
 
 ## Authored skills
 

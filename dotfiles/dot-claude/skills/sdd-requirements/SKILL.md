@@ -83,4 +83,4 @@ When the user approves and the rubric passes:
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
    ```
-4. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the user launches /sdd-design from the dashboard when ready.
+4. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the user dispatches the next node when ready.

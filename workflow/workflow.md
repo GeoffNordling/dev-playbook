@@ -136,6 +136,12 @@ The two modes invoke differently. **FOTW skills run hands-off under `/goal`**, w
 
 `/goal` is a human-only UI command; an agent cannot invoke it. It re-drives the session after every turn until its condition holds, so *every* exit must be a recognized terminal line — a skill that merely paused to ask a question would be re-driven past it. Its evaluator is text-only (it judges the transcript, calls no tools), which is why a condition must name both the proof shape (the literal `DONE:`/`ESCALATE:` line) and a turn cap. The evaluator matches the literal prefix, clears the goal, and the session idles, visible to the human at the dashboard. **HITL skills are launched directly as `/<skill> <args>`** with the human engaged throughout; they close with a plain report and need no `/goal` wrapper or terminal line.
 
+A committing FOTW node (`build`, `tdd`, `sdd-tdd`) prepends the commit token to the goal text — see [Permissions](#permissions):
+
+```
+/goal ⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /build <issue> until it prints a terminal line — DONE: or ESCALATE: — or stop after N turns.
+```
+
 ## Permissions
 
 The issue's session runs in **auto mode** — a permission mode (toggled like `acceptEdits`/`plan`, or set at launch) in which Claude judges each tool call's safety and self-approves rather than consulting a static allow-list. So there is no allow-list to enumerate or maintain; behavior is shaped in one direction only — by **denying** the few tools a node must never call, through the skill's `disallowed-tools` front-matter.
@@ -147,6 +153,8 @@ Tool access still merges from a tiered settings hierarchy where **deny wins anyw
 - **HITL nodes deny nothing.** The human is engaged, so the skill asks freely — auto mode leaves interactive prompts available.
 
 Two verified properties make this safe: a `disallowed-tools` deny **holds across `/goal` re-drives**, so it covers a FOTW node's entire autonomous run; and it **does not leak across `/clear`**, so each node starts with a clean pool — a write node following a read-only review node can write. The deny lasts only while the skill is active and would clear on a human message, which is why it targets autonomous (FOTW) nodes the human never interrupts; HITL nodes, where the human does step in, carry none.
+
+**The commit-authorization token.** The FOTW implementation nodes (`build`, `tdd`, `sdd-tdd`) commit via the `commit` skill with no human present to say "commit now", so auto mode's classifier — enforcing the deny on unattended commits — would block them. To lift the deny for exactly those sessions, the node's launch prompt carries the literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧`, which pre-authorizes `Skill(commit)` for that session — an uncommon bracketed string chosen so it cannot appear by accident, recognized as the lone commit exception. HITL nodes carry no token: the human is engaged and authorizes any commit in the moment. Read-only review nodes carry none either; they commit nothing. Delivery is per [Dispatch](#dispatch).
 
 The session is cwd-bound to the issue's worktree, which confines its file reach.
 
