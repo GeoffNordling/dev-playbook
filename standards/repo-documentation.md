@@ -206,7 +206,7 @@ Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/`
 |---|---|---|
 | File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
 | File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md)` |
-| File in the user's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
+| File in the human's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
 | Directory | Inline code | `` `docs/adr/` `` |
 | Slash-skill invocation | Bare — no markup | `/commit` |
 

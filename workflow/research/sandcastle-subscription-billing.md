@@ -4,19 +4,19 @@ This document is for a future fresh agent who will re-investigate the question
 below. It records the goal, the evidence found, and the methods used. It
 deliberately avoids strong conclusions — verify everything yourself.
 
-## 0. User's verdict (and the meta-doubt)
+## 0. Human's verdict (and the meta-doubt)
 
-The user already runs each agent inside an isolated worktree via the
+The human already runs each agent inside an isolated worktree via the
 Claude Agent dashboard and could enable `--dangerously-skip-permissions`
 for AFK but chooses not to. The two net-new affordances §4.8 identifies
 (filesystem allow-list by mount, AFK via implicit permissions-off)
-**don't appear valuable to the user.**
+**don't appear valuable to the human.**
 
-**Meta-doubt:** the user holds a strong prior that sandcastle and
+**Meta-doubt:** the human holds a strong prior that sandcastle and
 Docker containers for agentic operations *are* valuable. A
 low-perceived-value conclusion therefore raises the posterior that
 something here is wrong or incomplete. A fresh agent should treat
-"sandcastle is barely useful for this user" as a signal to look
+"sandcastle is barely useful for this human" as a signal to look
 harder, not as a closed finding.
 
 **Specific follow-up not done this session:** can sandcastle's Docker
@@ -28,7 +28,7 @@ in practice. If it is, the value proposition shifts materially.
 
 ## 1. Goal and intent
 
-The user wants to use [Sandcastle](https://github.com/mattpocock/sandcastle)
+The human wants to use [Sandcastle](https://github.com/mattpocock/sandcastle)
 **only** while authenticated against their Claude (Max/Pro) **subscription** —
 never an `ANTHROPIC_API_KEY`. Two modes are acceptable:
 
@@ -39,7 +39,7 @@ never an `ANTHROPIC_API_KEY`. Two modes are acceptable:
 
 What is **not** in scope:
 - Driving sandcastle from within an already-open Claude Code interactive
-  session. The user understands sandcastle launches *its own* `claude`
+  session. The human understands sandcastle launches *its own* `claude`
   subprocesses; their concern is only the billing/auth axis.
 - Anything using `ANTHROPIC_API_KEY`. API billing is off the table for cost
   reasons.
@@ -123,7 +123,7 @@ gh issue view 191 --repo mattpocock/sandcastle --comments
 
 - URL: https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan
 - **A fresh agent must read this themselves before drawing conclusions.** It is
-  the load-bearing document for whether the user's intended use (subscription-
+  the load-bearing document for whether the human's intended use (subscription-
   only) is policy-compliant in their use case. The investigator did not paste
   it into this document because Anthropic could update it; always read the
   live page.
@@ -178,7 +178,7 @@ The smoking gun. Sandcastle's own automation, checked into the repo, uses
 
 ### 4.5 Code paths verified
 
-The cells the user cares about correspond to specific source paths. A fresh
+The cells the human cares about correspond to specific source paths. A fresh
 agent should re-read each to verify the path is unchanged.
 
 - **Claude Code agent provider** — both modes wired:
@@ -252,8 +252,8 @@ agent should re-read each to verify the path is unchanged.
 ### 4.6 What `CLAUDE_CODE_OAUTH_TOKEN` is
 
 - Documented Claude Code env var. Tells `claude` to authenticate against the
-  user's Claude subscription rather than via `ANTHROPIC_API_KEY`.
-- Minted by running `claude setup-token` once on a host where the user is
+  human's Claude subscription rather than via `ANTHROPIC_API_KEY`.
+- Minted by running `claude setup-token` once on a host where the human is
   already logged in to Claude Code interactively.
 - Confirmed by Matt in #191 as documented-by-Anthropic-inside-Claude-Code-
   itself; this is not a hack/undocumented hole.
@@ -355,7 +355,7 @@ hardened kernel isolation, write protection on the repo.
 
 The investigator did **not** answer the following. Future research should.
 
-1. **Does Anthropic's June-15 policy doc actually permit the user's intended
+1. **Does Anthropic's June-15 policy doc actually permit the human's intended
    use?** Read https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan
    fresh — it may have been updated. The 2D matrix above does not encode
    policy, only the technical mechanism.
@@ -363,11 +363,11 @@ The investigator did **not** answer the following. Future research should.
 2. **Does headless subscription burn quota faster than interactive
    subscription?** The only evidence collected here is two anecdotal posts
    in issue #191 (`rcfrias`, `vi-vlasov`) and `plainlystated`'s
-   interpretation of the Anthropic doc. The user explicitly noted these are
+   interpretation of the Anthropic doc. The human explicitly noted these are
    "random people on the internet" and should not be trusted as primary
    evidence. **Anthropic does not appear to publish per-mode rate limits in
    the doc that was current at investigation time.** A controlled experiment
-   on the user's own subscription would be the only authoritative answer.
+   on the human's own subscription would be the only authoritative answer.
 
 3. **Does sandcastle's `interactive()` actually launch successfully against a
    subscription token end-to-end?** The investigator read the code but did

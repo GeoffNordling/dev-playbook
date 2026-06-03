@@ -10,11 +10,11 @@ argument-hint: "<issue-number>"
 
 # Agent Code Review
 
-Review a direct-mode issue's PR diff against its issue brief and the project's conventions, attach your findings to the PR, then advance it to human review. You audit and report; you never edit the code. A defect routes back to build through the human's reject, not through your hand.
+Review a direct-mode issue's PR diff against its issue brief and the project's conventions, attach your findings to the PR, then advance it to human review. You audit and report; you never edit the code. A defect routes back to build through the user's reject, not through your hand.
 
 An automated bug-review pass (the native `/code-review`) runs before you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover, then advance the label.
 
-Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding code problems is the job, not a reason to stop — they go in the comment for the human, who decides at the next node whether to approve, review it again, or send the work back to build.
+Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding code problems is the job, not a reason to stop — they go in the comment for the user, who decides at the next node whether to approve, review it again, or send the work back to build.
 
 ## 1. Load context
 
@@ -49,7 +49,7 @@ Read the change as a whole — the brief and the change together — against the
 
 ## 4. Attach findings
 
-Post one PR comment with `gh pr comment`. Group findings by severity so the human can act on them:
+Post one PR comment with `gh pr comment`. Group findings by severity so the user can act on them:
 
 - **Blocking** — a defect that should send the work back: a fidelity gap, a convention breach that matters, a bug.
 - **Suggestion** — an improvement that is not disqualifying.
@@ -67,7 +67,7 @@ Anchor each finding to its location with a blob link — `https://github.com/<ow
    ```
    DONE: reviewed code for #<issue>, findings on the PR, issue at phase:human-code-review
    ```
-   Do not act on your own findings — the human reads them and decides whether to approve, review it again, or route back to build.
+   Do not act on your own findings — the user reads them and decides whether to approve, review it again, or route back to build.
 
 ## 6. Escalations
 
@@ -77,9 +77,9 @@ You work without approval, but whenever you can't complete the review — anythi
 ESCALATE: #<issue> — <where you're stuck and the call you need>
 ```
 
-The human reads it, decides, and relaunches. In particular:
+The user reads it, decides, and relaunches. In particular:
 
 - **Green gate red.** The check gate fails: build opened a PR over a red tree. Surface it; don't review broken work.
 - **PR or diff missing.** There is no PR to review, or the issue isn't in the state this phase expects.
 
-Findings are not escalations. A code problem you can describe goes in the §4 comment and rides to the human at the next node; you escalate only when something stops you from producing the review at all.
+Findings are not escalations. A code problem you can describe goes in the §4 comment and rides to the user at the next node; you escalate only when something stops you from producing the review at all.

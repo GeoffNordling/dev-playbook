@@ -10,9 +10,9 @@ argument-hint: "<issue-number>"
 
 # SDD Agent Spec Review
 
-Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report; you never edit the spec. A defect routes back to design through the human's reject, not through your hand.
+Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report; you never edit the spec. A defect routes back to design through the user's reject, not through your hand.
 
-Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding spec problems is the job, not a reason to stop — they go in the comment for the human, who decides at the next node whether to approve, review it again, or send the spec back to design.
+Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding spec problems is the job, not a reason to stop — they go in the comment for the user, who decides at the next node whether to approve, review it again, or send the spec back to design.
 
 ## Read first
 
@@ -49,7 +49,7 @@ Read the whole spec against the brief and the standard. Assess each dimension an
 
 ## 4. Attach findings
 
-Post one comment with `gh issue comment <issue>`. Group findings by severity so the human can act on them:
+Post one comment with `gh issue comment <issue>`. Group findings by severity so the user can act on them:
 
 - **Blocking** — a defect that should send the spec back: a fidelity gap, a malformed item, an unsound chain.
 - **Suggestion** — an improvement that is not disqualifying.
@@ -67,7 +67,7 @@ Each finding names the item id and the brief element or standard rule it breache
    ```
    DONE: reviewed spec for #<issue>, findings attached, issue at phase:sdd-human-spec-review
    ```
-   Do not act on your own findings — the human reads them and decides whether to approve, review it again, or route back to design.
+   Do not act on your own findings — the user reads them and decides whether to approve, review it again, or route back to design.
 
 ## 6. Escalations
 
@@ -77,9 +77,9 @@ You work without approval, but whenever you can't complete the review — anythi
 ESCALATE: #<issue> — <where you're stuck and the call you need>
 ```
 
-The human reads it, decides, and relaunches. In particular:
+The user reads it, decides, and relaunches. In particular:
 
 - **Consistency gate red.** The check gate fails: the spec is malformed and design should not have closed it. Surface it; don't review a broken graph.
 - **Specs missing or unreadable.** There is no spec to review, or the issue isn't in the state this phase expects.
 
-Findings are not escalations. A spec problem you can describe goes in the §4 comment and rides to the human at the next node; you escalate only when something stops you from producing the review at all.
+Findings are not escalations. A spec problem you can describe goes in the §4 comment and rides to the user at the next node; you escalate only when something stops you from producing the review at all.
