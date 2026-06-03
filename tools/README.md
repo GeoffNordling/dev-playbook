@@ -40,21 +40,16 @@ Run automatically on every commit via pre-commit hooks. Each script exits 0 on s
 
 Run any script with `--help`; each script's docstring documents its behavior in full.
 
-### Three-environment contract
+### Two run environments
 
-Every `local` hook entry runs in three environments and MUST work in all of them:
+Each hook entry runs in two environments and MUST work in both:
 
-1. **dev-playbook locally** — `.pre-commit-config.yaml` is the real file.
-2. **Consumer repos locally** — `.pre-commit-config.yaml` is a relative symlink back to dev-playbook.
-3. **GitHub Actions runner** — repo checked out at an arbitrary path. Consumer repos check out dev-playbook as a sibling so the relative symlink resolves.
+1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](../.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
+2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [build-conventions.md — Pre-commit](../standards/build-conventions.md#pre-commit).
 
-Hardcoded `$HOME` paths break (3); cwd-relative paths break (2). Resolve dev-playbook's root via `realpath .pre-commit-config.yaml`:
+In both, pre-commit resolves the script by the relative `entry: tools/bin/<tool>` declared in [`.pre-commit-hooks.yaml`](../.pre-commit-hooks.yaml) (mirrored in the local block) against the dev-playbook checkout that holds it — no `$HOME` paths, no `realpath` indirection.
 
-```yaml
-entry: bash -c 'exec python3 "$(dirname "$(realpath .pre-commit-config.yaml)")/tools/bin/your-tool" "$@"' --
-```
-
-When adding a validator, test it in both dev-playbook and a consumer repo before pushing.
+When adding a validator, mirror it into both the manifest and the local block, and test it in dev-playbook and a consumer repo before pushing.
 
 ## Utility scripts
 

@@ -46,8 +46,30 @@ Pre-commit is fast and runs on every commit. Do not invoke `make check` from a p
 
 ## Continuous integration
 
-The canonical workflow is [`dev-playbook/.github/workflows/ci.yml`](../.github/workflows/ci.yml). It runs two gates: pre-commit against `.pre-commit-config.yaml`, and `make check` in each Python sub-project's root. CI's Python version matches the `requires-python` floor in `pyproject.toml`. The runner installs `uv` (via `astral-sh/setup-uv`) so `script` hooks with PEP 723 dependencies resolve.
+CI runs two gates on every push and pull request to `main`: pre-commit across the whole repo, and `make check` in each Python sub-project's root. CI's Python version matches the `requires-python` floor in `pyproject.toml`, and the runner installs `uv` (via `astral-sh/setup-uv`) so `script` hooks with PEP 723 dependencies resolve.
 
-Consumer repos use the same workflow unchanged: pre-commit fetches the dev-playbook hook repo at its pinned `rev` the same way it fetches any remote hook.
+CI sets `SKIP: ref-check` on the pre-commit gate. `ref-check` validates cross-repo references under `~/workspace/`, and a CI runner checks out only the one repo, so those references never resolve and the hook would always fail. Local pre-commit stays the strict gate for references.
+
+A consumer's workflow runs pre-commit as a plain shell step, which honors a step-level `working-directory:` — the `pre-commit/action` wrapper does not. pre-commit fetches the dev-playbook hook repo at its pinned `rev` the same way it fetches any remote hook:
+
+```yaml
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: astral-sh/setup-uv@v3
+      - run: |
+          pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure --color=always
+        env:
+          SKIP: ref-check
+      - run: make check
+```
+
+dev-playbook's own [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) is a self-hosting variant — it runs pre-commit via `pre-commit/action` and scopes `make check` to `working-directory: tools` for its sub-project layout. It is not the consumer template.
 
 Because pre-commit clones dev-playbook over HTTPS unauthenticated — on every consumer's runner and on every developer's first run — **dev-playbook must remain a public repository**. Making it private would break hook resolution for every consumer.

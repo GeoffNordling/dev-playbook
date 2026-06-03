@@ -31,7 +31,9 @@ Verify `~/workspace/<name>/` does not exist and `~/workspace/dev-playbook/` is p
 Read end-to-end before writing any files:
 
 - [repo-documentation.md](~/workspace/dev-playbook/standards/repo-documentation.md)
-- [build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md)
+- [build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md) — read the Pre-commit and Continuous integration sections; the new repo needs both a `.pre-commit-config.yaml` and a CI workflow.
+- [repo-settings.md](~/workspace/dev-playbook/standards/repo-settings.md) — the GitHub merge settings applied in step 7.
+- [doc-conventions.md](~/workspace/dev-playbook/standards/doc-conventions.md) — the voice for the `README.md` and `CLAUDE.md` you author.
 
 Python stack additionally:
 
@@ -43,7 +45,9 @@ Report which files were read.
 
 Create `~/workspace/<name>/` and scaffold the repo per the standards from step 3. For licenses other than Proprietary, write the canonical license text. For Python stacks, also seed `tests/test_smoke.py` with a single import test so `make check` has something to collect.
 
-Defer `.github/workflows/ci.yml` to step 7 — the consumer-repo template needs the GitHub owner, which isn't known until step 6.
+Scaffold `.pre-commit-config.yaml` for every stack — not just Python, since `ref-check` lints the markdown every repo has. Reference the dev-playbook hook repo by pinned `rev` (dev-playbook's current `main` commit) alongside the ruff hooks, per [build-conventions.md — Pre-commit](~/workspace/dev-playbook/standards/build-conventions.md#pre-commit).
+
+For Python stacks, also scaffold `.github/workflows/ci.yml` from the consumer workflow in [build-conventions.md — Continuous integration](~/workspace/dev-playbook/standards/build-conventions.md#continuous-integration), keeping the `SKIP: ref-check` env on the pre-commit gate. The workflow carries no repo-specific values, so nothing needs resolving after the repo exists. Meta/docs-only repos run no CI — local pre-commit is their gate.
 
 ## 5. Sync and verify (Python stack only)
 
@@ -69,11 +73,11 @@ Settings:
 Tell me once it's created.
 ```
 
-After the user confirms, resolve the GitHub login and wire up the SSH remote.
+After the user confirms, resolve the GitHub login and wire up the SSH remote. Then run `pre-commit install` so the hooks gate the initial commit (step 9).
 
-## 7. Materialize the CI workflow (Python stack only)
+## 7. Apply repository settings
 
-Write `.github/workflows/ci.yml` per the consumer-repo pattern in [build-conventions.md — Continuous Integration](~/workspace/dev-playbook/standards/build-conventions.md#continuous-integration), filling in the new repo's name and the resolved GitHub owner.
+Apply the merge settings from [repo-settings.md](~/workspace/dev-playbook/standards/repo-settings.md). They sit behind GitHub's Administration permission and can't be set by token, so the user sets them by hand. While they are still in the new repo's GitHub UI, print those settings as a checklist for them to apply now, and wait for confirmation before continuing.
 
 ## 8. Bootstrap labels
 
