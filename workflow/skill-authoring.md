@@ -1,6 +1,6 @@
 # Skill authoring
 
-Conventions for writing the workflow node-skills — the `phase:*` skills in `dotfiles/dot-claude/skills/`. [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) defines the graph, the dispatch model, and the Node-skill contract (allowed-tools, `## Read first`, terminate/escalate by mode); this captures the authoring *style* behind them.
+Conventions for writing the workflow node-skills — the `phase:*` skills in `dotfiles/dot-claude/skills/`. [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) defines the graph, the dispatch model, and the Node-skill contract (`disallowed-tools`, `## Read first`, terminate/escalate by mode); this captures the authoring *style* behind them.
 
 ## Voice
 
@@ -15,7 +15,7 @@ The body is read by an agent running one node who does not know the workflow mod
 
 - **Author against the whole contract, not a salient part.** The most visible piece — a pinned interface, a headline item — is the public surface, not the whole of what's owed.
 - **Don't restate what the steps already enforce.** If the body did its job, a trailing "Output"/recap section is dead weight — omit it.
-- **An instruction earns its words by changing what the agent does.** Give the action and any real condition or branch, and cut what the agent would do the same way without it. Four paddings recur: the *obvious* (restating what the action already implies — "enter the worktree, where the code lives"), the *downstream why* (how a step serves a later phase the agent can't see — "release it so the next phase inherits the commits"), the *reassurance* (narrating a non-event — "you changed no source, so there's no commit"), and the *closed edge case* (guarding a scenario the design already settled — "a reboot won't lose the worktree"). Keep the conditions and escalations; drop the color.
+- **An instruction earns its words by changing what the agent does.** Give the action and any real condition or branch, and cut what the agent would do the same way without it. Four paddings recur: the *obvious* (restating what the action already implies — "enter the worktree, where the code lives"), the *downstream why* (how a step serves a later phase the agent can't see — "commit so the human's push has something to publish"), the *reassurance* (narrating a non-event — "you changed no source, so there's no commit"), and the *closed edge case* (guarding a scenario the design already settled — "a reboot won't lose the worktree"). Keep the conditions and escalations; drop the color.
 - **Read only what's needed.** Skip what's auto-loaded (project `CLAUDE.md`); `## Read first` ends in a `READ:` line; conditional reads stay at their point of use.
 - **Don't re-explain what `## Read first` taught.** Reference a concept from the standard; don't restate it — the agent has read it.
 - **Keep useful interview aids even when they aren't required fields** — discussing what's out of scope sharpens what the thing *is*, though "out of scope" is no field you fill.
@@ -31,14 +31,15 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Decide only what's yours.** A node skill doesn't make calls that belong to a human or an upstream node — it takes them as input; handed a scope, it neither widens nor narrows it.
 - **Make completion factual, not self-assessed.** Drive decisions off observable state and quantified thresholds, not the agent's sense of effort — a step retries a fixed number of times, not until "honest effort" runs out.
 - **Guard against gaming the success signal.** When a check gates the work, forbid weakening the check to pass it — e.g. never edit a written test to make it go green; escalate instead.
-- **Review nodes report, they don't fix.** A node that reviews another node's output stays read-only on it — no `Edit`/`Write` grant. Defects route back to the authoring node through the human's reject, not the reviewer's hand.
+- **Review nodes report, they don't fix.** A node that reviews another node's output stays read-only on it — it denies `Edit`/`Write` (and `MultiEdit`/`NotebookEdit`). Defects route back to the authoring node through the human's reject, not the reviewer's hand.
 - **Separate the deliverable from the escalation.** When a node's whole job is to surface problems, say plainly that finding them is the output, not a reason to stop — otherwise the agent escalates on every defect. Escalation stays reserved for "can't produce the deliverable at all."
 - **Don't audit what a deterministic gate already enforces.** An agent reviewer's value is the judgment a check can't automate — verifier honesty, scope, design — not re-confirming what the gate already proves (items discharged, the tree builds). Don't narrate those guarantees either; spend the review on what the machine can't see.
 
 ## Mechanics
 
-- **Permissions are per-skill, verified empirically.** Under `dontAsk`, `Edit`/`Write` are denied without a grant; take `allowed-tools` from the `workflow.md` skill table.
-- **No interactive-prompt tools — and say so in the body.** `dontAsk` denies `AskUserQuestion` and plan mode's `ExitPlanMode` outright; no grant reaches them. So a dispatched skill never lists them in `allowed-tools`. And because the agent reaches for `AskUserQuestion` by reflex, a skill that interviews the human states the prohibition where it asks: pose the question as plain terminal text and wait, *not* the tool. This is the one sanctioned place a body names a tool to avoid — the positive-voice rule yields to the training reflex here.
+- **A node loads its own context.** It runs after `/clear` with nothing carried over, so it reads what it needs from the issue and the worktree it sits in — never from the prior node.
+- **Permissions are deny-only.** Auto mode self-approves safe calls, so a skill enumerates no allow-list — it copies its `disallowed-tools`, the few tools its role must never call, from the `workflow.md` skill table. Most skills deny nothing.
+- **A FOTW skill escalates, it doesn't ask.** The skill table denies `AskUserQuestion` to every FOTW node, so a hands-off run can't pause for the human — when it needs a human call it prints `ESCALATE:` and yields. A HITL skill is the reverse: the human is engaged, so it interviews freely via `AskUserQuestion` or plain terminal prompts and gates on the answers.
 - **Description names the launch trigger, not every situation.** Skills are human-dispatched, so the front-matter `description` ends at "Use when the agents dashboard launches the `<phase>` phase" — drop the "when X, when Y" restatements.
 - **Close concretely:** advance the `phase:*` label → stop. A work node first leaves the tree green and commits; a read-only review node changed nothing on disk, so it skips both. HITL closes with a plain report; FOTW closes by printing a terminal line — `DONE:` on success or `ESCALATE:` when stuck.
 - **FOTW skills don't gate on approval.** No mid-work "wait for the user" steps — the agent runs to its terminal line and escalates on exceptions; human review lives at the dedicated review nodes. HITL skills do gate — that's the line between the modes.

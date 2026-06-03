@@ -4,13 +4,12 @@ description: Authors the project's design layer — `dsn` items that pin `Interf
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
 # SDD Design
 
-Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the user's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
+Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill.
 
 ## Read first
 
@@ -24,11 +23,11 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 ## 1. Load context
 
-Issue number arrives as `$ARGUMENTS`.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-$ARGUMENTS)`. If it doesn't exist, tell the user and stop — don't start a fresh tree.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, tell the user and stop — don't start a fresh tree.
 
-- `gh issue view $ARGUMENTS` — the body is the contract.
+- `gh issue view <issue>` — the body is the contract.
 - Approved requirements: `specs/functional_requirements/`. Without them, designing is premature — stop and surface that.
 - Existing design: `specs/design/`.
 - `docs/adr/README.md` — the ADR index; from its descriptions, read only the ADRs relevant to the area being designed.
@@ -50,7 +49,7 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 ## 3. Intent interview
 
-Invoke /grill-with-docs to sharpen design intent and public-boundary terminology against the codebase, capturing significant decisions as ADRs as they crystallize. Where an area has discrete choices — interface shape, exception strategy, naming — surface them in the terminal as plain text — not the `AskUserQuestion` tool — each option carrying a recommendation and the reason it is recommended.
+Invoke /grill-with-docs to sharpen design intent and public-boundary terminology against the codebase, capturing significant decisions as ADRs as they crystallize. Where an area has discrete choices — interface shape, exception strategy, naming — surface them, each option carrying a recommendation and the reason it is recommended.
 
 ## 4. Plan synthesis
 
@@ -89,9 +88,8 @@ When the user approves and the rubric passes:
 
 1. **Leave the tree green.** Run the gate — `make check`; it builds and validates the spec graph. The region is `WIP:` (§5), so completeness is exempt and only **consistency** is enforced (§2.10) — a red build means the spec you just authored is malformed. Don't commit a red tree.
 2. Run /commit.
-3. **Release the worktree.** `ExitWorktree(keep)`.
-4. Advance the issue to the spec-review phase — move its label from this node to the next:
+3. Advance the issue to the spec-review phase — move its label from this node to the next:
    ```bash
-   gh issue edit $ARGUMENTS --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
+   gh issue edit <issue> --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
    ```
-5. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user launches /sdd-agent-spec-review from the dashboard when ready.
+4. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user launches /sdd-agent-spec-review from the dashboard when ready.

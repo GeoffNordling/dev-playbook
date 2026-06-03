@@ -4,7 +4,6 @@ description: Administrative wrapper for any human-review phase — reads the wor
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh issue comment *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git worktree *) Bash(git branch *)
 argument-hint: "<issue-number>"
 ---
 
@@ -22,11 +21,11 @@ Then report: `READ: workflow.md`. Proceed only after.
 
 ## 1. Place the issue
 
-`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Read its labels (`gh issue view <issue>`) and place its `phase:*` node in the graph. It should be a human-review node; its outgoing edges are the verdicts open to the user. If it isn't, you were launched on the wrong issue — say so and stop. (You run from the main checkout, not the issue's worktree, so name the branch when you reach for its artifacts: `gh pr view issue-<issue>`, `gh pr diff issue-<issue>`, and read spec files at `.claude/worktrees/issue-<issue>/`.)
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number. Read its labels (`gh issue view <issue>`) and place its `phase:*` node in the graph. It should be a human-review node; its outgoing edges are the verdicts open to the user. If it isn't, you were launched on the wrong issue — say so and stop. (The session sits in the issue's worktree on branch `issue-<issue>`, so `gh pr view`/`gh pr diff` resolve to its PR and the spec and code are in cwd.)
 
 ## 2. Stand by
 
-Tell the user, in one line, which review this is and the verdicts the graph gives it — as plain terminal text, never the `AskUserQuestion` tool — then wait; they review the artifact in their own tools. Don't dump diffs, specs, or findings to the terminal. When a question needs it, read what the prior agent review left — findings on the issue before a PR exists, on the PR once it does — or the artifact itself, and answer concisely. If something the graph says should be there is missing, tell the user; something upstream didn't run.
+Tell the user, in one line, which review this is and the verdicts the graph gives it, then wait; they review the artifact in their own tools. Don't dump diffs, specs, or findings to the terminal. When a question needs it, read what the prior agent review left — findings on the issue before a PR exists, on the PR once it does — or the artifact itself, and answer concisely. If something the graph says should be there is missing, tell the user; something upstream didn't run.
 
 ## 3. Carry out the verdict
 
@@ -36,7 +35,7 @@ The commands these draw on, reached for as the chosen edge needs them:
 
 - **Move the phase** — `gh issue edit <issue> --remove-label "phase:<from>" --add-label "phase:<to>"`.
 - **Record a reject reason** — `gh issue comment <issue> --body "<the user's reason>"`.
-- **Merge** (the `approve: merge` edge) — the user squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Once they confirm it's merged, tear down the local side: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
+- **Merge** (the `approve: merge` edge) — the user squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Once they confirm it's merged, step out of the worktree to the main checkout and tear down the local side: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
 
 ## 4. Close
 

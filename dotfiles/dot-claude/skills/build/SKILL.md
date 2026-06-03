@@ -4,7 +4,7 @@ description: Carries out a direct-mode issue that doesn't touch tests — docume
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(commit)
+disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 
@@ -18,7 +18,7 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Create the issue's worktree.** First confirm local `main` is current with origin — a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. If they differ, escalate (§4) so the user pulls `main`. Otherwise create it: `EnterWorktree(name=issue-<issue>)`, then `git branch -m worktree-issue-<issue> issue-<issue>`.
+**Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, escalate (§4) so the user pulls `main`), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — escalate (§4).
 
 - `gh issue view <issue>` — the body is the contract; its acceptance criteria are what you must satisfy.
 - The existing files the brief concerns — there may be partial work from a prior cycle.
@@ -64,12 +64,11 @@ With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** If the work touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root); don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
-3. **Release the worktree.** `ExitWorktree(keep)`.
-4. **Advance to code review:**
+3. **Advance to code review:**
    ```bash
    gh issue edit <issue> --remove-label "phase:build" --add-label "phase:agent-code-review"
    ```
-5. Emit the terminal line, then stop:
+4. Emit the terminal line, then stop:
    ```
    DONE: carried out #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /agent-code-review
    ```

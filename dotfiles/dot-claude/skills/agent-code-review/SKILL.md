@@ -4,7 +4,7 @@ description: Reviews a direct-mode issue's PR diff against its issue brief and t
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue edit *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr comment *) Bash(make *) EnterWorktree ExitWorktree
+disallowed-tools: AskUserQuestion Edit Write MultiEdit NotebookEdit
 argument-hint: "<issue-number>"
 ---
 
@@ -20,7 +20,7 @@ Work without waiting for approval: run the gate, audit, and post your findings o
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If it doesn't exist, escalate (§6) — don't start a fresh tree.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§6) — don't start a fresh tree.
 
 - `gh issue view <issue>` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
@@ -58,12 +58,11 @@ Anchor each finding to its location with a blob link — `https://github.com/<ow
 
 ## 5. Close the phase
 
-1. **Release the worktree.** `ExitWorktree(keep)`.
-2. Advance to human review:
+1. Advance to human review:
    ```bash
    gh issue edit <issue> --remove-label "phase:agent-code-review" --add-label "phase:human-code-review"
    ```
-3. Emit the terminal line, then stop:
+2. Emit the terminal line, then stop:
    ```
    DONE: reviewed code for #<issue>, findings on the PR, issue at phase:human-code-review
    ```

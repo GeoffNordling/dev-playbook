@@ -4,15 +4,14 @@ description: Triage work at the front door — adopt a rushed, untriaged issue o
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh label *) Bash(gh api *) Skill(grill-with-docs)
 ---
 
 # Intake
 
 The front door for work. Input arrives under-formed and leaves as a ready issue — full four-tuple labels and a body brief, advanced to its first work node. Two entry forms:
 
-- **Capture** — the dispatcher passes a free-form idea as text. Intake creates one or many new issues, each born ready.
-- **Adopt** — the dispatcher passes the number or URL of an issue someone threw up rushed and incomplete. It sits untriaged at `phase:intake` — or carries no labels at all; treat both the same. Intake triages it in place and rewrites its body.
+- **Capture** — the user passes a free-form idea as text. Intake creates one or many new issues, each born ready.
+- **Adopt** — the user passes the number or URL of an issue someone threw up rushed and incomplete. It sits untriaged at `phase:intake` — or carries no labels at all; treat both the same. Intake triages it in place and rewrites its body.
 
 ## Read first
 
@@ -25,14 +24,12 @@ Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
 
 ## Process
 
-**Asking the user.** Several steps below have you quiz or ask the user. Pose each question as plain text in the terminal and wait for their reply on the next turn — do not use the `AskUserQuestion` tool; it is denied in this run, so a question posed through it never reaches the user.
-
 ### 1. Read the input
 
-The dispatcher passes either a free-form idea (**capture**) or an existing issue number / URL (**adopt**).
+The user passes either a free-form idea (**capture**) or an existing issue number / URL (**adopt**).
 
 - **Capture** — the text passed in is the raw idea.
-- **Adopt** — `gh issue view <N>` and read its title and body as the raw idea. The stub is untriaged: it sits at `phase:intake`, or carries no labels at all — process it either way (`phase:intake` is the implied default). Note which labels, if any, it already carries; you will rewrite its body.
+- **Adopt** — `gh issue view <issue>` and read its title and body as the raw idea. The stub is untriaged: it sits at `phase:intake`, or carries no labels at all — process it either way (`phase:intake` is the implied default). Note which labels, if any, it already carries; you will rewrite its body.
 
 Either way, if terminology is fuzzy, scope is unclear, or the idea spans concepts that should live in `CONTEXT.md`, invoke /grill-with-docs first to sharpen, then return.
 
@@ -45,7 +42,7 @@ Single coherent piece → one issue. Plan crossing concerns or layers → break 
 - `category:*` — pick one.
 - `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.
 - `tests:*` — `mode:sdd` is always `tests:yes`. For `mode:direct`, ask the user.
-- `phase:*` — the first work node, implied by `(mode, tests)` per the state-machine graph. Intake always leaves the issue here, never at `phase:intake`.
+- `phase:*` — the first work node per the state-machine graph. `mode:sdd` starts at `sdd-requirements`. For `mode:direct`, decide whether the work needs a design pass: substantive work that wants solution exploration, prototyping, or tradeoff analysis starts at `design`; trivial work bypasses to its implementation node — `tdd` (`tests:yes`) or `build` (`tests:no`). Ask the user when the call isn't clear. Intake always leaves the issue at this node, never at `phase:intake`.
 
 ### 4. Draft the brief
 
@@ -73,7 +70,7 @@ Multi-issue plans: create slices in dependency order so each blocker exists befo
 **Adopt** — set the four-tuple and overwrite the body on the existing issue:
 
 ```bash
-gh issue edit <N> \
+gh issue edit <issue> \
   --add-label "<category>" \
   --add-label "<mode>" \
   --add-label "<tests>" \
@@ -108,4 +105,4 @@ gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues \
 
 ## Output
 
-Print issue numbers, a one-line summary of each, and the next-phase skill (`/sdd-requirements`, `/tdd`, or `/build`). Do NOT auto-launch — the dispatcher decides when to start work.
+Print issue numbers, a one-line summary of each, and the next-phase skill (`/sdd-requirements`, `/design`, `/tdd`, or `/build`). Do not auto-launch — the user decides when to start work.

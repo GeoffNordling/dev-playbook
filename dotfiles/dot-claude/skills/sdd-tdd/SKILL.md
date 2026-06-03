@@ -4,7 +4,7 @@ description: Implements an SDD issue via vertical-slice TDD against the committe
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(commit)
+disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 
@@ -29,12 +29,12 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If it doesn't exist, escalate (§5) — don't start a fresh tree.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
 - `gh issue view <issue>` — the body is the contract.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
-- Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`, or the repo root when the `Makefile` is there).
+- Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
 
 ## 2. Plan the chunk
 
@@ -118,12 +118,11 @@ With the whole issue implemented:
 1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every `feat` — each cone is now covered by verifiers (spec-standard §2.10). If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
 2. **Leave the tree green.** Run the gate — `make check`. With every `WIP:` removed, it now enforces completeness over the whole spec graph: a red build means a missing verifier — add it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
-4. **Release the worktree.** `ExitWorktree(keep)`.
-5. **Advance to code review:**
+4. **Advance to code review:**
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-agent-code-review"
    ```
-6. Emit the terminal line, then stop:
+5. Emit the terminal line, then stop:
    ```
    DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /sdd-agent-code-review
    ```

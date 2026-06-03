@@ -17,7 +17,7 @@ You are not the executor. The user launches every node in the dashboard; you nev
 
 The workflow is your subject, so know it cold:
 
-- [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) — the node graph, the dispatch model (HITL vs FOTW launch forms, the `/goal` wrapper, the compound code-review goal), the two-tap boundary, and the worktree model.
+- [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) — the node graph, the dispatch model (HITL vs FOTW launch forms, the `/goal` wrapper, the compound code-review goal), the agent-capability boundary, and the worktree model.
 
 Then report: `READ: workflow.md`. Proceed only after.
 
