@@ -4,7 +4,7 @@ description: Triage work at the front door — adopt a rushed, untriaged issue o
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh label *) Bash(gh api *) Skill(grill-with-docs) AskUserQuestion
+allowed-tools: Bash(gh issue *) Bash(gh label *) Bash(gh api *) Skill(grill-with-docs)
 ---
 
 # Intake
@@ -24,6 +24,8 @@ Before doing anything else, read end-to-end:
 Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
 
 ## Process
+
+**Asking the user.** Several steps below have you quiz or ask the user. Pose each question as plain text in the terminal and wait for their reply on the next turn — do not use the `AskUserQuestion` tool; it is denied in this run, so a question posed through it never reaches the human.
 
 ### 1. Read the input
 

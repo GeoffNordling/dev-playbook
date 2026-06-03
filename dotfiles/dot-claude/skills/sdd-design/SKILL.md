@@ -4,13 +4,13 @@ description: Authors the project's design layer — `dsn` items that pin `Interf
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit) AskUserQuestion
+allowed-tools: Bash(gh issue *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
 # SDD Design
 
-Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill.
+Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the human's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
 
 ## Read first
 
@@ -50,7 +50,7 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 ## 3. Intent interview
 
-Invoke /grill-with-docs to sharpen design intent and public-boundary terminology against the codebase, capturing significant decisions as ADRs as they crystallize. Where an area has discrete choices — interface shape, exception strategy, naming — surface them with AskUserQuestion, each option carrying a recommendation and the reason it is recommended.
+Invoke /grill-with-docs to sharpen design intent and public-boundary terminology against the codebase, capturing significant decisions as ADRs as they crystallize. Where an area has discrete choices — interface shape, exception strategy, naming — surface them in the terminal as plain text — not the `AskUserQuestion` tool — each option carrying a recommendation and the reason it is recommended.
 
 ## 4. Plan synthesis
 

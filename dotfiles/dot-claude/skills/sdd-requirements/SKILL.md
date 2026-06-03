@@ -4,13 +4,13 @@ description: Authors a project's functional requirements — `feat` and `req` sp
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit) AskUserQuestion
+allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(git *) Bash(make *) EnterWorktree ExitWorktree Edit Write Skill(grill-with-docs) Skill(commit)
 argument-hint: "<issue-number>"
 ---
 
 # SDD Requirements
 
-Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill.
+Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the human's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
 
 ## Read first
 
@@ -43,7 +43,7 @@ Add areas as they surface. Surface your read of which areas look load-bearing an
 
 ## 3. Intent interview
 
-Invoke /grill-with-docs to reach shared understanding of the flagged areas. It interviews the user one question at a time, challenges fuzzy terms against `CONTEXT.md`, cross-references the code, and records resolved domain terms and decisions in `CONTEXT.md` / ADRs as they crystallize. Where an area has discrete options, surface them with AskUserQuestion — each option carrying a recommendation and the reason it is recommended.
+Invoke /grill-with-docs to reach shared understanding of the flagged areas. It interviews the user one question at a time, challenges fuzzy terms against `CONTEXT.md`, cross-references the code, and records resolved domain terms and decisions in `CONTEXT.md` / ADRs as they crystallize. Where an area has discrete options, lay them out in the terminal as plain text — not the `AskUserQuestion` tool — each option carrying a recommendation and the reason it is recommended.
 
 ## 4. Plan synthesis
 
