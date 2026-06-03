@@ -84,7 +84,7 @@ One long-lived branch and PR per issue. The branch is built up across phases in 
 
 ## Worktrees and branches
 
-An issue runs in **one session** that builds a continuous line of work across its phases. Isolation — from other issues and from the main checkout — comes from giving each issue its own **git worktree**: a second working directory with its own branch, sharing the repo's object store. The session opens the worktree once and stays in it for the issue's life.
+An issue runs in **one session** that builds a continuous line of work across its phases. Isolation — from other issues and from the main checkout — comes from giving each issue its own **git worktree**. The session opens the worktree once and stays in it for the issue's life.
 
 ### The per-issue worktree
 
@@ -96,20 +96,20 @@ An issue runs in **one session** that builds a continuous line of work across it
 Every file-touching node ensures the session sits in the issue's worktree, then works in cwd:
 
 - **Open (first node).** Gated on a tap-free check that local `main` matches origin (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base escalates, since pulling is the human's. Open with `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is `origin/main` whatever branch the main checkout sits on. Then rename the branch to the bare `issue-<N>`: agent view's cleanup keys on the `worktree-` prefix, so dropping it lets the worktree outlive a torn-down session.
-- **Inherit (later nodes).** cwd is already the worktree, carried across `/clear` — work in it directly. A node that finds the worktree gone escalates: the issue's work is lost.
+- **Inherit (later nodes).** cwd is already the worktree, carried across `/clear`. Every later node confirms the worktree is present — escalating if it's gone, since the issue's work would be lost — then works in it directly.
 - **Tear down (merge node).** When the issue lands, step out of the worktree and remove it: `git worktree remove .claude/worktrees/issue-<N>` and `git branch -D issue-<N>`.
 
-### The two-tap boundary
+### The agent-capability boundary
 
-Two operations touch the GitHub SSH remote and need the human's YubiKey — both the human's, in their own terminal. Merging the PR is the human's too, in the GitHub UI, though it takes no tap. Everything else is tap-free and lives in a skill.
+What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API — the `gh` family and REST endpoints — but not pushing over the SSH remote, and not merging a PR (`mergePullRequest` is forbidden to it). So three operations fall to the human: `git push` and `git pull`, whose SSH remote needs a YubiKey tap in the human's own terminal, and merging the PR, in the GitHub UI. Everything the PAT authorizes — and all purely-local git, which needs no GitHub auth at all — the agent does inside a skill.
 
-| | Tap | Owner |
+| | Agent-capable | Owner |
 |---|---|---|
-| `git push` (publish the branch at `open PR`) | **yes** | human |
-| `git pull` (keep local `main` current) | **yes** | human |
+| `git push` (publish the branch at `open PR`) | no | human |
+| `git pull` (keep local `main` current) | no | human |
 | merge the PR (`approve: merge`, in the GitHub UI) | no | human |
-| `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | no | skills |
-| commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | no | skills |
+| `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | yes | skills |
+| commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | yes | skills |
 
 Consequences that shape the skills:
 
@@ -120,13 +120,13 @@ Consequences that shape the skills:
 
 ## Dispatch
 
-The human dispatcher operates from Claude Code's "claude agents" dashboard. **Each issue gets one session, launched once and held open for its whole traverse of the graph.** The launch prompt is the session's first user message; a prompt beginning `/<skill>` model-invokes that node's skill. The session runs in **auto mode** (see [Permissions](#permissions)). There is no master agent. The dashboard spans repos, so each issue's row reads `repo#N · phase` — one row per issue, its phase updating as it advances. Anthropic subscription billing requires interactive sessions, so the human is present to launch each node.
+The human dispatcher operates from Claude Code's "claude agents" dashboard. **Each issue gets one session, launched once and held open for its whole traverse of the graph.** The launch prompt is the session's first user message; a prompt beginning `/<skill>` model-invokes that node's skill. The session runs in **auto mode** (see [Permissions](#permissions)). Anthropic subscription billing requires interactive sessions, so the human is present to launch each node.
 
-**One session, many nodes — `/clear` between them.** A node skill works in the issue's worktree, commits, updates the `phase:*` label to the next node, and stops. Nodes do not auto-advance: the human reads the new phase, runs **`/clear`** to reset the session's context — cwd and worktree persist — then pastes the next node's launch command. Every transition stays human-gated and visible on the dashboard. Parallel issues run as independent sessions, each in its own worktree; git keeps them from colliding.
+**One session, many nodes — `/clear` between them.** A node skill works in the issue's worktree, commits, updates the `phase:*` label to the next node, and stops. Nodes do not auto-advance: the human reads the new phase, runs **`/clear`** to reset the session's context — cwd and worktree persist — then pastes the next node's launch command. Every transition stays human-gated and visible on the dashboard. Parallel issues run as independent sessions, each in its own worktree; worktrees keep them from colliding.
+
+**Ready means unblocked.** New issues launch only if they have no open blockers — every issue in its blocked-by set is closed (see [issue-conventions § Relationships](~/workspace/dev-playbook/standards/issue-conventions.md)). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label; the dispatcher checks it and lets a blocked issue wait. Hierarchy (sub-issues) is organizational and does not gate dispatch.
 
 **Re-orientation is minimal.** A node launched after `/clear` starts with a blank context. Its launch command carries only what the node needs — the skill and the issue number — and the skill reloads its own context from the issue (`gh issue view <N>`) and the worktree it already sits in. Nothing carries over from the cleared context.
-
-**Ready means unblocked.** Launch a work node only when the issue has no open blocker — every issue in its blocked-by set is closed (see [issue-conventions § Relationships](~/workspace/dev-playbook/standards/issue-conventions.md)). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label; the dispatcher checks it and lets a blocked issue wait. Hierarchy (sub-issues) is organizational and does not gate dispatch.
 
 The two modes invoke differently. **FOTW skills run hands-off under `/goal`**, which pairs the action with proof and a stop-clause. A FOTW skill yields control only by printing a **terminal line** — `DONE:` (work complete) or `ESCALATE:` (stuck, needs a human call) — and the goal condition stops on either:
 
@@ -148,7 +148,7 @@ Tool access still merges from a tiered settings hierarchy where **deny wins anyw
 
 Two verified properties make this safe: a `disallowed-tools` deny **holds across `/goal` re-drives**, so it covers a FOTW node's entire autonomous run; and it **does not leak across `/clear`**, so each node starts with a clean pool — a write node following a read-only review node can write. The deny lasts only while the skill is active and would clear on a human message, which is why it targets autonomous (FOTW) nodes the human never interrupts; HITL nodes, where the human does step in, carry none.
 
-The settings hierarchy still holds non-permission config — `worktree.baseRef: fresh` and the repo's hooks — but no permission allow-lists; auto mode plus per-node denies replace them. The session is cwd-bound to the issue's worktree, which confines its file reach (a soft boundary, not an OS jail).
+The session is cwd-bound to the issue's worktree, which confines its file reach.
 
 Canonical front-matter and syntax: [skills](https://code.claude.com/docs/en/skills.md), [permissions](https://code.claude.com/docs/en/permissions).
 
@@ -156,11 +156,9 @@ Canonical front-matter and syntax: [skills](https://code.claude.com/docs/en/skil
 
 Three modes of human engagement exist in theory; only two are available under the [Dispatch](#dispatch) model:
 
-- **Human in the loop (HITL)** — human is actively engaged throughout, spending real time and focus. Use this for stages that focus on extracting human intent. Examples: initial issue creation and writing specs.
-- **Finger on the wheel (FOTW)** — skill is designed to run hands-off; human is present only because billing requires it. Agent does the work; human invokes the skill and responds to escalations. Examples: implementing code, performing agent reviews.
+- **Human in the loop (HITL)** — human is actively engaged throughout, spending real time and focus. Use this for stages that focus on extracting human intent.
+- **Finger on the wheel (FOTW)** — skill is designed to run hands-off; human is present only because billing requires it. Agent does the work; human invokes the skill and responds to escalations.
 - **Hands off the wheel (AFK)** — agent runs autonomously, no human involvement. *Not available* — see [Dispatch](#dispatch). We would use this if we could.
-
-Direct-path work splits by `tests:*`. `/tdd` mirrors `/sdd-tdd` for testable Direct work; `/build` handles non-test work — docs, config, chores. Both feed shared `agent_code_review` and `human_code_review`.
 
 ### Node-skill contract
 
@@ -174,15 +172,15 @@ Across modes, a node skill declares the `disallowed-tools` its role calls for, c
 |-------|------|-----------------------------|---------------------|
 | `/intake` | HITL | — | — |
 | `/sdd-requirements` | HITL | — | main behind origin (stale base) |
-| `/sdd-design` | HITL | — | issue worktree missing |
+| `/sdd-design` | HITL | — | — |
 | `/design` | HITL | — | main behind origin (stale base) |
-| `/sdd-tdd` | FOTW | `AskUserQuestion` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts; issue worktree missing |
+| `/sdd-tdd` | FOTW | `AskUserQuestion` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts |
 | `/tdd` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
 | `/build` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
 | `/open-pr` | FOTW | `AskUserQuestion` | branch not pushed to origin |
-| `/sdd-agent-spec-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Consistency gate red (malformed spec); specs absent/unreadable; issue worktree missing |
-| `/sdd-agent-code-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |
-| `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing; issue worktree missing |
+| `/sdd-agent-spec-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Consistency gate red (malformed spec); specs absent/unreadable |
+| `/sdd-agent-code-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Green gate red (PR over red tree); PR/diff missing |
+| `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing |
 | `/human-review` | HITL | — | — |
 
 **Compound dispatch — the code-review nodes.** `sdd_agent_code_review` and `agent_code_review` each run three steps in one FOTW goal: `/open-pr` creates the PR from the just-pushed branch (tap-free), the native `/code-review` posts its automated bug/regression findings as a PR comment, then our skill adds the spec-fidelity and convention findings the native pass does not cover (also a PR comment). Ours runs last so its label advance means all three are done, and so it can read the native comment and skip re-flagging. The goal chains them:

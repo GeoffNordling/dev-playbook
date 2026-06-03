@@ -47,9 +47,6 @@
       "Bash(gh pr unlock *)"
     ]
   },
-  "worktree": {
-    "baseRef": "fresh"
-  },
   "hooks": {
     "Stop": [
       {
@@ -85,7 +82,11 @@
       }
     ]
   },
-  "effortLevel": "xhigh",
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "workflowKeywordTriggerEnabled": false,
+  "effortLevel": "high",
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -94,6 +95,5 @@
   "theme": "light",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "workflowKeywordTriggerEnabled": false
+  "voiceEnabled": true
 }
