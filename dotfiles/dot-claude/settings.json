@@ -86,7 +86,7 @@
     "baseRef": "fresh"
   },
   "workflowKeywordTriggerEnabled": false,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "voice": {
     "enabled": true,
     "mode": "hold"

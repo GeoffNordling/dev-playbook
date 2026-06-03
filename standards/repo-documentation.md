@@ -79,11 +79,6 @@ Every workspace repo's `CLAUDE.md` starts from this baseline:
 `make check` runs the full check surface. See
 [build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md).
 
-## Workflow
-
-Issue-to-PR flow per
-[workflow.md](~/workspace/dev-playbook/workflow/workflow.md).
-
 ## Domain awareness
 
 - Before exploring code, read `CONTEXT.md` and any ADRs in `docs/adr/` touching the area you'll work in. If `CONTEXT.md` is absent, proceed silently — don't flag it or suggest creating it.
