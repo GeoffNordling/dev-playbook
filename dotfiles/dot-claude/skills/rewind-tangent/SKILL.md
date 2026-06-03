@@ -70,7 +70,7 @@ After ~20 turns iterating on a mermaid diagram in `workflow/workflow.md`:
 
 A tangential iterative exploration of approximately 20 turns occurred from this point. The conversation was then rewound back to here. The current state of `workflow/workflow.md` is preferred to the graph you just drew — re-read it to pick up the final form: `flowchart LR` with ELK renderer, subgraph swim lanes, diamond gate nodes, self-loops labeled `iterate`. Committed as `1d3e738` on `workflow-standardization` (not a commit you authored).
 
-One ancillary insight not in the file: spec-review and code-review have asymmetric reviewer-of-record. Spec-review = agent checking the human's work product. Code-review = adversarial agent checking the agent's work + human checking both. Carry into Q4 (action authority).
+One ancillary insight not in the file: spec-review and code-review have asymmetric reviewer-of-record. Spec-review = agent checking the user's work product. Code-review = adversarial agent checking the agent's work + user checking both. Carry into Q4 (action authority).
 ```
 
 **Your /rewind selection target:**

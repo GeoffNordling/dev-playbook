@@ -12,24 +12,24 @@ Claude Code plugin to run pseudo-autonomous prototyping. Anything else, includin
 
 ## 1. Goal and purpose
 
-Enable a class of "vibe-coded" projects that the user wants to exist but does not
-have time to focus on. The user delegates an extreme amount of responsibility to
+Enable a class of "vibe-coded" projects that the human wants to exist but does not
+have time to focus on. The human delegates an extreme amount of responsibility to
 the agent, in an automated way, and stays at the level of a requirements-gatherer
 who reviews output and gives feedback — not an implementer.
 
 The operating loop is: **kick off → the agent does a lot of work (spends tokens)
-→ it comes back with something → the user reviews and reacts.** The official Ralph
+→ it comes back with something → the human reviews and reacts.** The official Ralph
 loop plugin is the chosen engine for the "does a lot of work" middle.
 
-## 2. The user's intentions about prototyping
+## 2. The human's intentions about prototyping
 
-- **Claude owns most of the work.** The user puts in very little effort.
-- **Pseudo-autonomous, not autonomous.** The user is *present* (attended-async):
+- **Claude owns most of the work.** The human puts in very little effort.
+- **Pseudo-autonomous, not autonomous.** The human is *present* (attended-async):
   available, not watching every step. They would prefer the agent have full AFK autonomy, but Claude Code subscription billing forces interaction sessions.
-- **Low confidence in the output by design.** Because the user did not invest
+- **Low confidence in the output by design.** Because the human did not invest
   effort, they will not trust the result. The output must stay **quarantined from
   production code until it is time** to integrate.
-- **The user is the requirements-gatherer / product designer.** Focus on *what*
+- **The human is the requirements-gatherer / product designer.** Focus on *what*
   and *how it should behave*, not *how it is built*; then review, test, and refine
   the requirements.
 
@@ -47,7 +47,7 @@ loop plugin is the chosen engine for the "does a lot of work" middle.
   sandbox was considered and rejected for now in favor of simplicity. Revisit only
   if a prototype turns executable + networked and is left unattended.)
 - **Worktree isolation via the Claude agents dashboard.** Each run is isolated in
-  its own git worktree; the user monitors from the dashboard.
+  its own git worktree; the human monitors from the dashboard.
 - **Prototypes live in their associated existing repos** — not in a separate
   prototypes repo, and not scattered ad hoc. Quarantine mechanism:
   - A **top-level `prototypes/<name>/` directory** on `main`, one self-contained
@@ -181,7 +181,7 @@ not provide these; you must add them in your prompt/setup):
 - Mega-PR review burden, compounding early mistakes, expert-out-of-loop, weak fit
   for complex/team codebases: these are **real risks of the *technique*** and are
   mitigated in our regime by (a) small tasks, (b) the quarantine in
-  `prototypes/<name>/`, (c) the user reviewing output as the requirements-gatherer,
+  `prototypes/<name>/`, (c) the human reviewing output as the requirements-gatherer,
   and (d) low-stakes prototype subject matter. They are not reasons the plugin is
   broken.
 - "Orchestrator + subagents in separate context windows" is a genuinely different
@@ -313,7 +313,7 @@ via a real repo/promotion when one earns it.
 **Auth / permissions:** subscription `CLAUDE_CODE_OAUTH_TOKEN`; broad
 `permissions.allow` list; no sandbox.
 
-**Default mode:** pseudo-autonomous and attended — the user kicks runs and reviews
+**Default mode:** pseudo-autonomous and attended — the human kicks runs and reviews
 output, graduating individual prototypes to longer unattended runs as trust grows.
 
 ## 9. Decisions locked this session

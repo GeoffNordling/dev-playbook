@@ -12,7 +12,7 @@ argument-hint: "<issue-number>"
 
 Implement an SDD issue with vertical-slice TDD against its committed specs — every `feat`, `req`, and `dsn`, down to the `Interface:` lines the design pins — remove the `WIP:` markers as each region's verifiers land, then hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
 
-Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The human reviews the finished work separately, not mid-build.
+Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The user reviews the finished work separately, not mid-build.
 
 ## Read first
 
@@ -40,7 +40,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 A **chunk** is a coherent piece of implementation work — typically the slices covering one `dsn`, or a small cluster of tightly related `dsn`s. Implementation proceeds one chunk at a time.
 
-Before each chunk, state your plan — to anchor the work and keep it visible to the watching human:
+Before each chunk, state your plan — to anchor the work and keep it visible to the watching user:
 
 - **Scope.** Which `dsn`(s) and behaviors the chunk covers.
 - **Slice ordering.** The sequence of red/green/refactor slices you'll drive.
@@ -91,11 +91,11 @@ You work without approval, but when something falls outside the plan — anythin
 ESCALATE: #<issue> — <where you're stuck and the call you need>
 ```
 
-The human reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
+The user reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
 
 - **Stuck test.** A slice's test won't pass after two implementation attempts.
-- **A written test looks wrong.** You want to change a test you already wrote — surface why; the human decides whether you mis-encoded it or the spec needs to change.
-- **The issue is too big for one session.** You can see the whole spec won't be implemented in this build before context runs low — a sizing miss. Surface it so the human re-splits it into smaller issues at intake; don't truncate the work silently.
+- **A written test looks wrong.** You want to change a test you already wrote — surface why; the user decides whether you mis-encoded it or the spec needs to change.
+- **The issue is too big for one session.** You can see the whole spec won't be implemented in this build before context runs low — a sizing miss. Surface it so the user re-splits it into smaller issues at intake; don't truncate the work silently.
 - **The spec needs to change.** A committed `Interface:` no longer fits — refactor pressure or a bug fix would change it, or a structural problem won't sit behind one module's seam — or the spec underdetermines the next slice's behavior, so you can't write the assertion.
 - **The spec could be better.** You see a spec change that would improve the design, even though nothing is stopping you.
 
@@ -103,7 +103,7 @@ The last two put a spec change on the table — handle it per §6.
 
 ## 6. Modifying the spec
 
-The implementation never edits the spec on its own. With a change on the table, describe which item is affected, the proposed change, and what motivated it. The human decides to:
+The implementation never edits the spec on its own. With a change on the table, describe which item is affected, the proposed change, and what motivated it. The user decides to:
 
 - **Apply here** — edit the spec (update `Interface:` lines; on revision follow [spec-standard §2.2.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#223-revision)). Then continue stub → test → implementation. During initial greenfield implementation no pinned consumers exist — edit in place at revision `0`, don't bump.
 - **Defer to a fresh `sdd-design` pass** — don't edit the spec; the issue routes back to design.
@@ -127,4 +127,4 @@ With the whole issue implemented:
    ```
    DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>), then launch /sdd-agent-code-review
    ```
-   Do not push or begin the review — the human pushes the branch and launches /sdd-agent-code-review.
+   Do not push or begin the review — the user pushes the branch and launches /sdd-agent-code-review.

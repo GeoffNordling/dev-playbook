@@ -10,7 +10,7 @@ argument-hint: "<issue-number>"
 
 # SDD Design
 
-Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the human's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
+Author the project's design layer — `dsn` items pinning `Interface:` lines and design commitments — from approved functional requirements, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the user's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
 
 ## Read first
 
@@ -26,7 +26,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 Issue number arrives as `$ARGUMENTS`.
 
-**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-$ARGUMENTS)`. If it doesn't exist, tell the human and stop — don't start a fresh tree.
+**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-$ARGUMENTS)`. If it doesn't exist, tell the user and stop — don't start a fresh tree.
 
 - `gh issue view $ARGUMENTS` — the body is the contract.
 - Approved requirements: `specs/functional_requirements/`. Without them, designing is premature — stop and surface that.
@@ -94,4 +94,4 @@ When the user approves and the rubric passes:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
    ```
-5. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the human launches /sdd-agent-spec-review from the dashboard when ready.
+5. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user launches /sdd-agent-spec-review from the dashboard when ready.

@@ -58,7 +58,7 @@ When adding a validator, test it in both dev-playbook and a consumer repo before
 
 ## Utility scripts
 
-Run ad hoc on user demand; not part of the pre-commit pipeline.
+Run ad hoc on human demand; not part of the pre-commit pipeline.
 
 | Script | Purpose |
 |--------|---------|

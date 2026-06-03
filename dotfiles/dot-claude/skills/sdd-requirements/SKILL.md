@@ -10,7 +10,7 @@ argument-hint: "<issue-number>"
 
 # SDD Requirements
 
-Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the human's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
+Author a project's functional requirements — `feat` (high-level capability) and `req` (functional requirement) items — through a structured interview, then leave the tree green and hand the issue off to the design phase. The interview is the value of this skill. Run every question in it as plain text in the terminal and wait for the user's reply — do not use the `AskUserQuestion` tool; it is denied in this run.
 
 ## Read first
 
@@ -25,7 +25,7 @@ Then report: `READ: spec-standard.md, lessons.md`. Proceed only after.
 
 Issue number arrives as `$ARGUMENTS`.
 
-**Create the issue's worktree.** First confirm local `main` is current with origin — a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. If they differ, tell the human to pull `main` and stop. Otherwise create it: `EnterWorktree(name=issue-$ARGUMENTS)`, then `git branch -m worktree-issue-$ARGUMENTS issue-$ARGUMENTS`.
+**Create the issue's worktree.** First confirm local `main` is current with origin — a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. If they differ, tell the user to pull `main` and stop. Otherwise create it: `EnterWorktree(name=issue-$ARGUMENTS)`, then `git branch -m worktree-issue-$ARGUMENTS issue-$ARGUMENTS`.
 
 - `gh issue view $ARGUMENTS` — the body is the contract.
 - Existing specs: `specs/functional_requirements/`.
@@ -85,4 +85,4 @@ When the user approves and the rubric passes:
    ```bash
    gh issue edit $ARGUMENTS --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
    ```
-5. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the human launches /sdd-design from the dashboard when ready.
+5. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the user launches /sdd-design from the dashboard when ready.

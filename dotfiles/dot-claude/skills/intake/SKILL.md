@@ -25,7 +25,7 @@ Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
 
 ## Process
 
-**Asking the user.** Several steps below have you quiz or ask the user. Pose each question as plain text in the terminal and wait for their reply on the next turn — do not use the `AskUserQuestion` tool; it is denied in this run, so a question posed through it never reaches the human.
+**Asking the user.** Several steps below have you quiz or ask the user. Pose each question as plain text in the terminal and wait for their reply on the next turn — do not use the `AskUserQuestion` tool; it is denied in this run, so a question posed through it never reaches the user.
 
 ### 1. Read the input
 
@@ -44,12 +44,12 @@ Single coherent piece → one issue. Plan crossing concerns or layers → break 
 
 - `category:*` — pick one.
 - `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.
-- `tests:*` — `mode:sdd` is always `tests:yes`. For `mode:direct`, ask the human.
+- `tests:*` — `mode:sdd` is always `tests:yes`. For `mode:direct`, ask the user.
 - `phase:*` — the first work node, implied by `(mode, tests)` per the state-machine graph. Intake always leaves the issue here, never at `phase:intake`.
 
 ### 4. Draft the brief
 
-Per the issue conventions. When **adopting**, rewrite the stub's body into the brief format — structure what the human wrote, don't discard it.
+Per the issue conventions. When **adopting**, rewrite the stub's body into the brief format — structure what the user wrote, don't discard it.
 
 ### 5. Land it
 

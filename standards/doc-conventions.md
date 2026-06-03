@@ -39,6 +39,30 @@ with no `src/`."
 
 Pick one name per concept and use it across the document.
 
+## Terminology: human vs user
+
+One actor — the dispatcher, reviewer, and approver — wears two names, chosen by
+voice. **Agent-facing instruction text says `user`**: the skill and rule bodies
+under `dotfiles/dot-claude/skills/` and `dotfiles/dot-claude/rules/`, read by the
+executing agent, name that person the way Claude Code does (`AskUserQuestion`).
+**Declarative documentation says `human`**: `workflow/`, `standards/`, `docs/`,
+`README.md`, and `CLAUDE.md` describe the system in third person, where the actor
+is the human dispatcher.
+
+Two overrides apply on top, wherever the token appears:
+
+- **Structural identifiers stay `human`** — graph node names (`human_code_review`,
+  `sdd_human_spec_review`, `sdd_human_code_review`), `phase:*-human-*` labels, and
+  the `/human-review` skill name and `# Human Review` title. Renaming them breaks
+  issue labels and dispatch routing.
+- **Platform tokens stay `user`** — the `~/.claude/` "User" settings tier, a
+  "user message", `user-invocable`.
+
+A skill serving a `*human*` node thus shows both words by design: its
+`# Human Review` title and `phase:human-code-review` references (structural)
+beside prose that says "the user" (agent-facing). That is the two layers meeting,
+not a missed replacement.
+
 ## Current state and next steps only
 
 Describe what exists and what's planned next. Don't reference removed things,

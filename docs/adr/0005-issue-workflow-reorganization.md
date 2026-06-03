@@ -60,7 +60,7 @@ Issues are born with all three tracks set. The phase advances as work progresses
 
 ### AgentReview as final check
 
-`/sdd-agentreviews` is reframed from a periodic project-wide audit into the final-check step of `sdd-tdd`. `sdd-tdd` computes the in-scope item IDs from the branch diff (`git diff main...HEAD -- specs/` filtered to items carrying `AgentReview:`) and passes them as an explicit list to the skill. The skill itself remains callable directly when the user wants a different scope. The `Maintenance routines` section in the workflow standard is dropped — the only entry was `/sdd-agentreviews` and it is no longer periodic.
+`/sdd-agentreviews` is reframed from a periodic project-wide audit into the final-check step of `sdd-tdd`. `sdd-tdd` computes the in-scope item IDs from the branch diff (`git diff main...HEAD -- specs/` filtered to items carrying `AgentReview:`) and passes them as an explicit list to the skill. The skill itself remains callable directly when the human wants a different scope. The `Maintenance routines` section in the workflow standard is dropped — the only entry was `/sdd-agentreviews` and it is no longer periodic.
 
 ### Tooling
 
@@ -84,7 +84,7 @@ Where `/improve-codebase-architecture` fits in the SDD workflow beyond `sdd-desi
 | Alternative | Why rejected |
 |---|---|
 | Keep `/triage` as a separate skill | Solo creator + solo triager makes the boundary artificial. The skill content is purely classification, which `/intake` does in one step. |
-| Single `/intake-then-build` skill that runs every phase sequentially | Each phase is a distinct interaction mode (interview-heavy / reconnaissance-heavy / TDD-loop) and benefits from a fresh agent context. Merging blurs that. The dispatcher pattern keeps skills focused while presenting a single user-facing command. |
+| Single `/intake-then-build` skill that runs every phase sequentially | Each phase is a distinct interaction mode (interview-heavy / reconnaissance-heavy / TDD-loop) and benefits from a fresh agent context. Merging blurs that. The dispatcher pattern keeps skills focused while presenting a single human-facing command. |
 | Phase as issue body section (e.g. `## Phase: design`) instead of label | Labels are filterable (`gh issue list --label phase/requirements`); body sections are not. Labels are 1-line edits; body edits are diff-prone. |
 | Phase as comment marker | Comments accumulate; the latest phase marker has to be searched for. Labels are a single source of truth. |
 | Carry the AFK / HITL distinction forward | Solo developer is currently always HITL. The distinction can be re-introduced when AFK agents land — re-add the label, re-add a `/triage` step if needed. Not pre-specifying. |

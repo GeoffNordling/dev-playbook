@@ -9,7 +9,7 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Plain behavioral language.** No `FOTW`, `node`, `edge`, or "dashboard" in the body — that vocabulary lives here and in `workflow.md`, not in front of the executing agent. The exception is a skill whose subject *is* the workflow itself: it reads `workflow.md` up front and navigates by node, edge, and state, because that is its job.
 - **Positive, not by negation.** Say what a mode or step does, not "the one that isn't X"; instruct toward the action to take, not away from the misstep to avoid. Negation earns its place only in an escalation trigger, where the misstep *is* the subject.
 - **Recommendations carry their reason.** Where a skill has the agent recommend something to the human, require the recommendation *and why*.
-- **Name the human's choices plainly, and few.** Word a verdict as a plain command the human already understands, not an insider term; collapse near-synonyms into one option.
+- **Name the user's choices plainly, and few.** A skill body speaks to the person at the keyboard as the `user` — per the [terminology rule](~/workspace/dev-playbook/standards/doc-conventions.md) — so word a verdict as a plain command they already understand, not an insider term; collapse near-synonyms into one option.
 
 ## Content
 

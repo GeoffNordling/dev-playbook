@@ -10,13 +10,13 @@ argument-hint: "<issue-number>"
 
 # Open PR
 
-Ensure the issue's pull request exists, so the review steps that follow have something to comment on. The branch is `issue-<issue>`; the human pushed it before launching this phase. You create the PR — a tap-free `gh` call — but you never push.
+Ensure the issue's pull request exists, so the review steps that follow have something to comment on. The branch is `issue-<issue>`; the user pushed it before launching this phase. You create the PR — a tap-free `gh` call — but you never push.
 
 ## Do
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-1. **Confirm the branch reached origin.** `gh api repos/{owner}/{repo}/branches/issue-<issue>`. A 404 means the human hasn't pushed yet — escalate (§Escalate); don't try to create a PR over a missing branch.
+1. **Confirm the branch reached origin.** `gh api repos/{owner}/{repo}/branches/issue-<issue>`. A 404 means the user hasn't pushed yet — escalate (§Escalate); don't try to create a PR over a missing branch.
 2. **Skip if the PR already exists.** `gh pr list --head issue-<issue> --state all --json number,state`. If it lists one, this phase has already run (a re-review) — leave it untouched and stop.
 3. **Create it.** `gh pr create --head issue-<issue> --title "$(gh issue view <issue> --json title -q .title)" --body "Closes #<issue>"`. The `Closes #<issue>` token is mandatory — merging the PR closes the issue. Take the default base branch.
 
