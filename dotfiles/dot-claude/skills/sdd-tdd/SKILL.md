@@ -34,7 +34,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 - `gh issue view <issue>` — the body is the contract.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
-- Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`, or the repo root when the `Makefile` is there).
+- Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
 
 ## 2. Plan the chunk
 

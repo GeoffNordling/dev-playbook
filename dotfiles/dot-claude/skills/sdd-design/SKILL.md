@@ -23,11 +23,11 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 ## 1. Load context
 
-Issue number arrives as `$ARGUMENTS`.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-$ARGUMENTS`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-$ARGUMENTS)`. If the worktree is gone, tell the user and stop — don't start a fresh tree.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, tell the user and stop — don't start a fresh tree.
 
-- `gh issue view $ARGUMENTS` — the body is the contract.
+- `gh issue view <issue>` — the body is the contract.
 - Approved requirements: `specs/functional_requirements/`. Without them, designing is premature — stop and surface that.
 - Existing design: `specs/design/`.
 - `docs/adr/README.md` — the ADR index; from its descriptions, read only the ADRs relevant to the area being designed.
@@ -90,6 +90,6 @@ When the user approves and the rubric passes:
 2. Run /commit.
 3. Advance the issue to the spec-review phase — move its label from this node to the next:
    ```bash
-   gh issue edit $ARGUMENTS --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
+   gh issue edit <issue> --remove-label "phase:sdd-design" --add-label "phase:sdd-agent-spec-review"
    ```
 4. Stop. Report that design is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user launches /sdd-agent-spec-review from the dashboard when ready.

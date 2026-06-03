@@ -22,11 +22,11 @@ Then report: `READ: spec-standard.md, lessons.md`. Proceed only after.
 
 ## 1. Load context
 
-Issue number arrives as `$ARGUMENTS`.
+`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Create the issue's worktree.** First confirm local `main` is current with origin — a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. If they differ, tell the user to pull `main` and stop. Otherwise create it: `EnterWorktree(name=issue-$ARGUMENTS)`, then `git branch -m worktree-issue-$ARGUMENTS issue-$ARGUMENTS`.
+**Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, tell the user to pull `main` and stop), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — tell the user and stop.
 
-- `gh issue view $ARGUMENTS` — the body is the contract.
+- `gh issue view <issue>` — the body is the contract.
 - Existing specs: `specs/functional_requirements/`.
 - `CONTEXT.md` for domain vocabulary, if present.
 
@@ -81,6 +81,6 @@ When the user approves and the rubric passes:
 2. Run /commit.
 3. Advance the issue to the design phase — move its label from this node to the next:
    ```bash
-   gh issue edit $ARGUMENTS --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
+   gh issue edit <issue> --remove-label "phase:sdd-requirements" --add-label "phase:sdd-design"
    ```
 4. Stop. Report that requirements is complete and the issue now sits at `phase:sdd-design`. Do not begin design work — the user launches /sdd-design from the dashboard when ready.
