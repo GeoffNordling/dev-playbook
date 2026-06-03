@@ -37,6 +37,7 @@ PHASES: list[str] = [
     "sdd-tdd",
     "sdd-agent-code-review",
     "sdd-human-code-review",
+    "design",
     "tdd",
     "build",
     "agent-code-review",
