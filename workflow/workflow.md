@@ -8,7 +8,7 @@ Every issue past intake carries the full four-tuple `(category:*, mode:*, tests:
 
 - `category:*` — `category:bug` (broken or incorrect) or `category:enhancement` (new behavior or improvement; covers everything that isn't a bug, including docs, config, refactors, and chores). Picked at intake.
 - `mode:*` — `mode:sdd` or `mode:direct`. Picked at intake.
-- `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (routed to `tdd`), doc/config/work not touching tests goes `tests:no` (routed to `build`).
+- `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (implemented at `tdd`), doc/config/work not touching tests goes `tests:no` (implemented at `build`).
 - `phase:*` — the current node in the graph below. An untriaged issue is at `phase:intake` — labelled so, or implied by carrying no labels at all. The graph is the inventory; see [Naming](#naming).
 
 Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](~/workspace/dev-playbook/standards/issue-conventions.md).
@@ -32,7 +32,7 @@ Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, r
 
 - `(agent, work)` — agent produces output (e.g., `sdd_tdd`, `tdd`, `build`)
 - `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec_review`, `agent_code_review`)
-- `(human, work)` — human produces output (e.g., `intake`, `sdd_requirements`, `sdd_design`)
+- `(human, work)` — human produces output (e.g., `intake`, `sdd_requirements`, `sdd_design`, `design`)
 - `(human, review)` — human reads and decides (e.g., `sdd_human_spec_review`, `human_code_review`)
 
 ```mermaid
@@ -40,8 +40,9 @@ Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, r
 flowchart LR
     new([new issue]) --> intake[intake]
     intake -->|mode:sdd| sdd_requirements[sdd_requirements]
-    intake -->|mode:direct, tests:yes| tdd[tdd]
-    intake -->|mode:direct, tests:no| build[build]
+    intake -->|mode:direct, needs design| design[design]
+    intake -->|mode:direct, no design, tests:yes| tdd[tdd]
+    intake -->|mode:direct, no design, tests:no| build[build]
 
     subgraph sdd[SDD path]
         sdd_requirements -->|design| sdd_design[sdd_design]
@@ -57,6 +58,8 @@ flowchart LR
     end
 
     subgraph direct[Direct path]
+        design -->|tests:yes| tdd
+        design -->|tests:no| build
         tdd -->|open PR| agent_code_review[agent_code_review]
         build -->|open PR| agent_code_review
         agent_code_review -->|attach review| human_code_review{human_code_review}
@@ -68,6 +71,8 @@ flowchart LR
     sdd_human_code_review -->|approve: merge| done([merged])
     human_code_review -->|approve: merge| done
 ```
+
+On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at code review.
 
 ### Naming
 
