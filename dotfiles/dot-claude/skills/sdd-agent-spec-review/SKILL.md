@@ -4,7 +4,7 @@ description: Reviews an SDD project's authored spec — its `feat`/`req`/`dsn` i
 disable-model-invocation: false
 model: opus
 effort: xhigh
-allowed-tools: Bash(gh issue view *) Bash(gh issue comment *) Bash(gh issue edit *) Bash(make *) EnterWorktree ExitWorktree
+disallowed-tools: AskUserQuestion Edit Write MultiEdit NotebookEdit
 argument-hint: "<issue-number>"
 ---
 
@@ -28,7 +28,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Enter the issue's worktree:** `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If it doesn't exist, escalate (§6) — don't start a fresh tree.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§6) — don't start a fresh tree.
 
 - `gh issue view <issue>` — the brief is your fidelity target: every acceptance criterion should land in the spec, and nothing in the spec should reach past the brief's scope.
 - The specs under `specs/functional_requirements/` and `specs/design/` — the full `feat`/`req`/`dsn` set under review.
@@ -58,12 +58,11 @@ Each finding names the item id and the brief element or standard rule it breache
 
 ## 5. Close the phase
 
-1. **Release the worktree.** `ExitWorktree(keep)`.
-2. Advance to human review:
+1. Advance to human review:
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-agent-spec-review" --add-label "phase:sdd-human-spec-review"
    ```
-3. Emit the terminal line, then stop:
+2. Emit the terminal line, then stop:
    ```
    DONE: reviewed spec for #<issue>, findings attached, issue at phase:sdd-human-spec-review
    ```

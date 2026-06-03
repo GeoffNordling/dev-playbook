@@ -4,7 +4,7 @@ description: Open the long-lived PR for an issue once its branch is on origin â€
 disable-model-invocation: false
 model: opus
 effort: low
-allowed-tools: Bash(gh pr *) Bash(gh issue view *) Bash(gh api *) Bash(git *)
+disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 
