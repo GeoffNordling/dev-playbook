@@ -11,6 +11,7 @@
 
 <workflow>
 - After a unit of work, stop. I review diffs in VS Code, then tell you when to commit. Never run `git commit` until I explicitly say to — committing clears VS Code's diff view, so an unauthorized commit costs me my review.
+  - **`⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` — the sole exception.** If this session's launch prompt contains that exact bracketed token, the `commit` skill (`Skill(commit)`) is pre-authorized to run autonomously for the whole session — no "commit now" needed, and no diff review to protect, because these are hands-off workflow nodes that commit to their own issue branch and get reviewed at the PR rather than in VS Code. The token authorizes the `commit` skill alone — never a raw ad-hoc `git commit`.
 - A plan that says "we'll commit in two phases" is a plan, not authorization. Wait for an explicit "commit now" each time.
 </workflow>
 
