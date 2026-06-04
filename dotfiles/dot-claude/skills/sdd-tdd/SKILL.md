@@ -106,7 +106,7 @@ The last two put a spec change on the table — handle it per §6.
 The implementation never edits the spec on its own. With a change on the table, describe which item is affected, the proposed change, and what motivated it. The user decides to:
 
 - **Apply here** — edit the spec (update `Interface:` lines; on revision follow [spec-standard §2.2.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#223-revision)). Then continue stub → test → implementation. During initial greenfield implementation no pinned consumers exist — edit in place at revision `0`, don't bump.
-- **Defer to a fresh `sdd-design` pass** — don't edit the spec; the issue routes back to design.
+- **Defer to a fresh `sdd-specs` pass** — don't edit the spec; the issue routes back to the spec phase.
 - **Reject** and direct another approach.
 
 Never edit the spec without an explicit approval gesture in the same turn. A bug found during implementation is a spec gap: surface it, propose the change that closes it, and wait for the routing call before touching code.
