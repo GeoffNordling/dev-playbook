@@ -42,7 +42,7 @@ Single coherent piece → one issue. Plan crossing concerns or layers → break 
 - `category:*` — pick one.
 - `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.
 - `tests:*` — `mode:sdd` is always `tests:yes`. For `mode:direct`, ask the user.
-- `phase:*` — the first work node per the state-machine graph. `mode:sdd` starts at `sdd-requirements`. For `mode:direct`, decide whether the work needs a design pass: substantive work that wants solution exploration, prototyping, or tradeoff analysis starts at `design`; trivial work bypasses to its implementation node — `tdd` (`tests:yes`) or `build` (`tests:no`). Ask the user when the call isn't clear. Intake always leaves the issue at this node, never at `phase:intake`.
+- `phase:*` — the first work node per the state-machine graph. `mode:sdd` starts at `sdd-specs`. For `mode:direct`, decide whether the work needs a design pass: substantive work that wants solution exploration, prototyping, or tradeoff analysis starts at `design`; trivial work bypasses to its implementation node — `tdd` (`tests:yes`) or `build` (`tests:no`). Ask the user when the call isn't clear. Intake always leaves the issue at this node, never at `phase:intake`.
 
 ### 4. Draft the brief
 

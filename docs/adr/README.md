@@ -8,3 +8,4 @@
 | [0004](0004-remove-pocock-direct-dependency.md) | Remove Pocock direct dependency; absorb conventions, lift engineering skills |
 | [0005](0005-issue-workflow-reorganization.md) | Issue workflow reorganization: phase labels, `/intake` and `/sdd` dispatcher, consolidate standards |
 | [0006](0006-harvest-pocock-prototype-and-handoff.md) | Harvest Pocock's `prototype` and `handoff` skills into authored bundles |
+| [0007](0007-merge-sdd-spec-authoring-phase.md) | Merge SDD spec authoring (`sdd_requirements` + `sdd_design`) into one `sdd_specs` phase |

@@ -32,24 +32,23 @@ Each node also has two attributes: `(actor ∈ {agent, human}, role ∈ {work, r
 
 - `(agent, work)` — agent produces output (e.g., `sdd_tdd`, `tdd`, `build`)
 - `(agent, review)` — agent reviews work, attaches findings (e.g., `sdd_agent_spec_review`, `agent_code_review`)
-- `(human, work)` — human produces output (e.g., `intake`, `sdd_requirements`, `sdd_design`, `design`)
+- `(human, work)` — human produces output (e.g., `intake`, `sdd_specs`, `design`)
 - `(human, review)` — human reads and decides (e.g., `sdd_human_spec_review`, `human_code_review`)
 
 ```mermaid
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart LR
     new([new issue]) --> intake[intake]
-    intake -->|mode:sdd| sdd_requirements[sdd_requirements]
+    intake -->|mode:sdd| sdd_specs[sdd_specs]
     intake -->|mode:direct, needs design| design[design]
     intake -->|mode:direct, no design, tests:yes| tdd[tdd]
     intake -->|mode:direct, no design, tests:no| build[build]
 
     subgraph sdd[SDD path]
-        sdd_requirements -->|design| sdd_design[sdd_design]
-        sdd_design -->|draft| sdd_agent_spec_review[sdd_agent_spec_review]
+        sdd_specs -->|draft| sdd_agent_spec_review[sdd_agent_spec_review]
         sdd_agent_spec_review -->|attach review| sdd_human_spec_review{sdd_human_spec_review}
         sdd_human_spec_review -->|reject: review again| sdd_agent_spec_review
-        sdd_human_spec_review -->|reject: rework| sdd_design
+        sdd_human_spec_review -->|reject: rework| sdd_specs
         sdd_human_spec_review -->|approve| sdd_tdd[sdd_tdd]
         sdd_tdd -->|open PR| sdd_agent_code_review[sdd_agent_code_review]
         sdd_agent_code_review -->|attach review| sdd_human_code_review{sdd_human_code_review}
@@ -179,8 +178,7 @@ Across modes, a node skill declares the `disallowed-tools` its role calls for, c
 | Skill | Mode | Denies (`disallowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------|---------------------|
 | `/intake` | HITL | — | — |
-| `/sdd-requirements` | HITL | — | main behind origin (stale base) |
-| `/sdd-design` | HITL | — | — |
+| `/sdd-specs` | HITL | — | main behind origin (stale base) |
 | `/design` | HITL | — | main behind origin (stale base) |
 | `/sdd-tdd` | FOTW | `AskUserQuestion` | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts |
 | `/tdd` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |

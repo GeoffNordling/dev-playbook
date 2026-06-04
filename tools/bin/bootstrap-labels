@@ -30,8 +30,7 @@ METADATA: list[tuple[str, str]] = [
 # Names derived from node ids by `_` → `-` per workflow.md §Naming.
 PHASES: list[str] = [
     "intake",
-    "sdd-requirements",
-    "sdd-design",
+    "sdd-specs",
     "sdd-agent-spec-review",
     "sdd-human-spec-review",
     "sdd-tdd",
