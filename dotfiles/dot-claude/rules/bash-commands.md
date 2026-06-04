@@ -18,6 +18,26 @@ needs that kind of interaction:
 Do not try to run interactive commands yourself with the Bash tool in these
 cases, and do not suggest `!` as a workaround.
 
+## Format hand-off commands as single paste-safe lines
+
+When you hand the user a command to run in **their own** terminal, copying from
+this chat is lossy: a paste can split one line into several, or merge several
+into one. So:
+
+- **Make each command one line.** Chain the steps with `&&` (and pipes as
+  needed) so the whole thing pastes and runs as a single line, even when it
+  soft-wraps on screen.
+- **State the line count.** Say "this is one line" so a soft-wrap isn't mistaken
+  for several commands.
+- **If it genuinely must be multiple lines** (independent commands where a
+  mid-way failure should not stop the rest, or a heredoc), number them and say
+  "run these N separately, in order."
+- One `&&`-chained line beats a stack of lines the user selects and pastes one
+  at a time — prefer it even for multi-step setup.
+
+This is about commands the **user** runs; it does not relax the `cd` rule below,
+which governs **your own** Bash tool calls.
+
 ## Never chain `cd` with another command
 
 `cd` may only appear as a **standalone** Bash call. Never combine it with
