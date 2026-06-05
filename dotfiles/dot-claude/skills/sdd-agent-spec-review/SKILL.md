@@ -4,7 +4,8 @@ description: Reviews an SDD project's authored spec — its `feat`/`req`/`dsn` i
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion Edit Write MultiEdit NotebookEdit
+disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
+allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---
 
@@ -49,7 +50,7 @@ Read the whole spec against the brief and the standard. Assess each dimension an
 
 ## 4. Attach findings
 
-Post one comment with `gh issue comment <issue>`. Group findings by severity so the user can act on them:
+Stage the comment body in a `/tmp` file (e.g. `/tmp/spec-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one comment with `gh issue comment <issue> --body-file <path>`. Group findings by severity so the user can act on them:
 
 - **Blocking** — a defect that should send the spec back: a fidelity gap, a malformed item, an unsound chain.
 - **Suggestion** — an improvement that is not disqualifying.

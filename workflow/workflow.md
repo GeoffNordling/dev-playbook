@@ -148,7 +148,7 @@ The issue's session runs in **auto mode** — a permission mode (toggled like `a
 Behavior is shaped from two sides, and **deny wins anywhere** — a deny at any level (a skill's `disallowed-tools`, a `permissions.deny` rule) blocks the call regardless of the classifier or any allow. To **forbid**, list the tool in the node skill's `disallowed-tools`; the per-node deny lists are what make a role's boundaries authoritative:
 
 - **FOTW nodes deny `AskUserQuestion`.** A hands-off skill must not stop to ask the human; it runs to a terminal line and escalates instead.
-- **Review nodes additionally deny `Edit Write MultiEdit NotebookEdit`.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review.
+- **Review nodes additionally deny `Edit MultiEdit NotebookEdit` outright and scope `Write` to deny the work under review (`Write(/**)`), permitting only `Write(//tmp/**)` for staging a comment body.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review — a scratch file in `/tmp` is the one write it may make.
 - **HITL nodes deny nothing.** The human is engaged, so the skill asks freely — auto mode leaves interactive prompts available.
 
 To **permit** something the classifier would otherwise block, add an entry to the `autoMode.allow` list in `settings.json`. Entries are natural-language descriptions, not tool patterns — the classifier reads them as rules — and are honored from user scope (`~/.claude/settings.json`) and project-local (`.claude/settings.local.json`), but not from checked-in project settings. The list's first entry is the literal string `"$defaults"`: it tells the classifier to keep its built-in rule set in force, so the entries you add **extend** the defaults rather than replace them.
@@ -186,8 +186,8 @@ Across modes, a node skill declares the `disallowed-tools` its role calls for, c
 | `/tdd` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
 | `/build` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
 | `/open-pr` | FOTW | `AskUserQuestion` | branch not pushed to origin |
-| `/sdd-agent-spec-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-agent-code-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Green gate red (PR over red tree); PR/diff missing |
+| `/sdd-agent-spec-review` | FOTW | `AskUserQuestion` `Edit` `MultiEdit` `NotebookEdit` `Write(/**)` (allows `Write(//tmp/**)`) | Consistency gate red (malformed spec); specs absent/unreadable |
+| `/sdd-agent-code-review` | FOTW | `AskUserQuestion` `Edit` `MultiEdit` `NotebookEdit` `Write(/**)` (allows `Write(//tmp/**)`) | Green gate red (PR over red tree); PR/diff missing |
 | `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing |
 | `/human-review` | HITL | — | — |
 

@@ -4,7 +4,8 @@ description: Reviews an SDD issue's PR diff against its committed spec and the p
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion Edit Write MultiEdit NotebookEdit
+disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
+allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---
 
@@ -53,7 +54,7 @@ Read the change as a whole — the spec and the code together — against the co
 
 ## 4. Attach findings
 
-Post one PR comment with `gh pr comment`. Group findings by severity so the user can act on them:
+Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one PR comment with `gh pr comment --body-file <path>`. Group findings by severity so the user can act on them:
 
 - **Blocking** — a defect that should send the work back: a fidelity gap, a convention breach that matters, a bug.
 - **Suggestion** — an improvement that is not disqualifying.
