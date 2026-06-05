@@ -34,7 +34,7 @@ Long tangential explorations (document polishing, design iteration, prototyping,
 
 7. **Output two artifacts** (only after step 5 alignment is complete), in this order:
    1. The "Tangential compaction summary" inside a fenced code block (so the user can copy it verbatim and paste it after rewinding).
-   2. The verbatim text of the user message that comes right after the rewind target — this is what the user selects in the `/rewind` picker to land at the correct point. Label it `**Your /rewind selection target:**` and present it as a blockquote.
+   2. The verbatim text of the **selection target** — the user-typed message picked per *Choosing the /rewind selection target* below. Label it `**Your /rewind selection target:**` and present it as a blockquote.
 
 ## Output format
 
@@ -58,7 +58,16 @@ A tangential iterative exploration of approximately <N> turns occurred from this
 - "Re-read the file" instructions must use full paths so past-self knows exactly what to load.
 - Multiple files may have changed — list them all.
 - If past-self's prior work at the rewind target was substantive (a draft, a diagram, a decision), explicitly say "the current state is preferred" so they don't try to redo it.
-- The `/rewind` selection target is the message *after* the rewind target turn, because Claude Code's `/rewind` lands the conversation at the state immediately before the selected message.
+
+## Choosing the /rewind selection target
+
+`/rewind` checkpoints **only at user-typed messages** — your replies and tool results are not selectable. Picking one restores the conversation to the state *just before that message was sent*: the picked message and everything after it are discarded.
+
+So the selection target is the **earliest user-typed message whose removal drops the whole tangent** — usually the user message that *opened* it. Mind the off-by-one: when the user says "rewind to where I told you to do X," that message is itself the target — picking it discards it and lands just before it, with the compaction summary standing in for it. The landing point the user describes and the message they pick are the same message seen from opposite sides.
+
+Derive it mechanically: find the last turn worth keeping, then take the first user-typed message after it.
+
+Edge case — a tangent that ran as your replies under a user message you want to keep (a long tool-loop with no user message of its own) can't be split off; that message is the only checkpoint. Target it and let the summary carry whatever intent still matters.
 
 ## Example
 
@@ -76,4 +85,18 @@ One ancillary insight not in the file: spec-review and code-review have asymmetr
 **Your /rewind selection target:**
 
 > The self edge is for review round look awkward on screen. Is there any way you can improve the way this displays visually?
+````
+
+And when the tangent was the work your replies did for an instruction that is itself discarded — e.g. ~14 turns building a skill the user told you to "get to it" on:
+
+````
+```
+**Tangential compaction summary:**
+
+A tangential exploration of ~14 turns occurred from this point — you built the `/code-diagrams` skill as designed above, committed as `bda0870` on `code-diagrams-skill` (not a commit you authored), then the conversation was rewound back to here. The committed files in `~/workspace/dev-playbook/dotfiles/dot-claude/skills/code-diagrams/` (`SKILL.md`, `references/diagram-contract.md`) are the final form — re-read them. Not yet pushed, synced, or end-to-end tested.
+```
+
+**Your /rewind selection target:**
+
+> Honestly I'm interested in you building this bro. Read /skill-creator and get to it.
 ````
