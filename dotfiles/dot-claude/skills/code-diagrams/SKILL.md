@@ -1,7 +1,7 @@
 ---
 name: code-diagrams
 description: Explores a Python package and writes a Markdown report holding two diagrams — a module dependency graph and a runtime UML sequence diagram — for a reader who has not read the code. Use when the user needs a zoomed-out view of an unfamiliar codebase to weigh a design decision, asks how modules interact / how objects are assembled / in what order they run, or is writing a spec or design against code they have not read.
-disable-model-invocation: false
+disable-model-invocation: true
 model: opus
 effort: medium
 argument-hint: "[focus or package path]"
