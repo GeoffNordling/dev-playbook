@@ -143,13 +143,15 @@ A committing FOTW node (`build`, `tdd`, `sdd-tdd`) prepends the commit token to 
 
 ## Permissions
 
-The issue's session runs in **auto mode** — a permission mode (toggled like `acceptEdits`/`plan`, or set at launch) in which Claude judges each tool call's safety and self-approves rather than consulting a static allow-list. So there is no allow-list to enumerate or maintain; behavior is shaped in one direction only — by **denying** the few tools a node must never call, through the skill's `disallowed-tools` front-matter.
+The issue's session runs in **auto mode** — a permission mode (toggled like `acceptEdits`/`plan`, or set at launch) in which a classifier judges each tool call and self-approves the safe ones, blocking whatever escalates beyond the request, targets unrecognized infrastructure, or looks driven by hostile content it read. Auto mode does not honor the tool-pattern `permissions.allow` list the way default mode does — on entry it drops broad and wildcarded `Bash(...)` allows — so a node's commands are weighed by the classifier, not waved through by a saved pattern.
 
-Tool access still merges from a tiered settings hierarchy where **deny wins anywhere** — a deny at any level (a skill's `disallowed-tools`, a `permissions.deny` rule) blocks the call regardless of allows elsewhere, and regardless of auto mode's own judgment. That is what makes the per-node deny lists authoritative:
+Behavior is shaped from two sides, and **deny wins anywhere** — a deny at any level (a skill's `disallowed-tools`, a `permissions.deny` rule) blocks the call regardless of the classifier or any allow. To **forbid**, list the tool in the node skill's `disallowed-tools`; the per-node deny lists are what make a role's boundaries authoritative:
 
 - **FOTW nodes deny `AskUserQuestion`.** A hands-off skill must not stop to ask the human; it runs to a terminal line and escalates instead.
 - **Review nodes additionally deny `Edit Write MultiEdit NotebookEdit`.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review.
 - **HITL nodes deny nothing.** The human is engaged, so the skill asks freely — auto mode leaves interactive prompts available.
+
+To **permit** something the classifier would otherwise block, add an entry to the `autoMode.allow` list in `settings.json`. Entries are natural-language descriptions, not tool patterns — the classifier reads them as rules — and are honored from user scope (`~/.claude/settings.json`) and project-local (`.claude/settings.local.json`), but not from checked-in project settings. The list's first entry is the literal string `"$defaults"`: it tells the classifier to keep its built-in rule set in force, so the entries you add **extend** the defaults rather than replace them.
 
 Two verified properties make this safe: a `disallowed-tools` deny **holds across `/goal` re-drives**, so it covers a FOTW node's entire autonomous run; and it **does not leak across `/clear`**, so each node starts with a clean pool — a write node following a read-only review node can write. The deny lasts only while the skill is active and would clear on a human message, which is why it targets autonomous (FOTW) nodes the human never interrupts; HITL nodes, where the human does step in, carry none.
 

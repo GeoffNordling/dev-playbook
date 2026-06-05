@@ -10,7 +10,7 @@ argument-hint: "<issue-number>"
 
 # SDD Agent Spec Review
 
-Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report; you never edit the spec. A defect routes back to design through the user's reject, not through your hand.
+Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report: you never modify the spec or code under review — a defect routes back to design through the user's reject, not your hand. Read-only is about the work under review, not the issue tracker: posting your findings comment and advancing the `phase:*` label with `gh` are this node's required outputs.
 
 Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding spec problems is the job, not a reason to stop — they go in the comment for the user, who decides at the next node whether to approve, review it again, or send the spec back to design.
 
