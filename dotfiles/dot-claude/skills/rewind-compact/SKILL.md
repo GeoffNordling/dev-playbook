@@ -1,6 +1,6 @@
 ---
 name: rewind-compact
-description: Perform a limited conversation rewind, compressing the rewind into a "Tangential compaction summary."
+description: Prepare a limited conversation rewind, compressing the discarded turns into a "Tangential compaction summary."
 disable-model-invocation: true
 model: opus
 effort: medium
@@ -9,11 +9,11 @@ argument-hint: "<rewind target>"
 
 # Rewind Compact
 
-Long tangential explorations (document polishing, design iteration, prototyping, etc.) can consume many turns whose outcome is fully captured on disk. Rewinding past them compacts the context — but past-self has no memory of what happened after the rewind target. This skill produces a parsimonious "Tangential compaction summary" that the user pastes in after rewinding, bring past-self up-to-date with minimal context usage.
+Long tangential explorations (document polishing, design iteration, prototyping, etc.) can consume many turns whose outcome is fully captured on disk. Rewinding past them compacts the context — but past-self has no memory of what happened after the rewind target. This skill produces a parsimonious "Tangential compaction summary" that the user pastes in after rewinding, bringing past-self up-to-date with minimal context usage.
 
 The `/rewind` command allows the user to select any previous **user-typed message** as a checkpoint — your replies and tool results are not selectable. Picking one rewinds the conversation to the state *just before the selected message was sent*: the picked message and everything after it are discarded.
 
-This skill relies on the concept of a **rewind target**: the specific **user-typed message** the user desires to rewind the conversation to. All relevant information between the **rewind target** and the current turn is compressed into the **Tangential compaction summary**, which user will copy to clipboard and add back to the context window after performing the `/rewind`.
+This skill relies on the concept of a **rewind target**: the specific **user-typed message** the user desires to rewind the conversation to. All relevant information between the **rewind target** and the current turn is compressed into the **Tangential compaction summary**, which the user will copy to clipboard and add back to the context window after performing the `/rewind`.
 
 ## Procedure
 
@@ -29,13 +29,14 @@ This skill relies on the concept of a **rewind target**: the specific **user-typ
    - Commits made (note IDs and branches).
    - Other persistent artifacts (GitHub issues, PRs).
 
-3. **Inventory in-conversation information** between the rewind target and now:
+4. **Inventory in-conversation information** between the rewind target and now:
    - Instructions, decisions, side notes, insights, asides.
+   - Include only what can't be recovered by re-reading the committed files — anything already captured on disk is dropped.
    - Prepare to summarize this information in a concise, compact form that conveys the important ideas without all the little details.
 
-4. **Output two artifacts**:
+5. **Output two artifacts**:
    1. The "Tangential compaction summary" inside a fenced code block (so the user can copy it verbatim and paste it after they invoke `/rewind`).
-   2. The verbatim text of the **rewind target**. Label it `**Your /rewind selection target:**` and present it as a blockquote.
+   2. The verbatim text of the **rewind target** — the message the user selects in `/rewind`. Label it `**Your /rewind selection target:**` and present it as a blockquote.
 
 ## Output format
 
@@ -43,9 +44,9 @@ This skill relies on the concept of a **rewind target**: the specific **user-typ
 ```
 **Tangential compaction summary:**
 
-A tangential iterative exploration of approximately <N> turns occurred from this point. The conversation was then rewound back to here. The current state of <file path> is now live — re-read it to bring yourself up to date.
+A tangential iterative exploration of approximately <N> turns occurred from this point. The conversation was then rewound back to here. The current state of <file path> is preferred — re-read it to bring yourself up to date.
 
-The following commits were made during the tangent:
+The following commits landed during the tangent (not commits you authored):
    - <commit-id> on <branch>.
    - <commit-id> on <branch>.
    - ...
@@ -55,7 +56,7 @@ The following commits were made during the tangent:
 
 **Your /rewind selection target:**
 
-Verbatim text of the exact **user-typed message** targeted for rewind.
+> <verbatim text of the rewind target>
 ````
 
 ## Notes
