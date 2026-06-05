@@ -26,6 +26,7 @@ Then report: `READ: workflow.md`. Proceed only after.
 1. **Read state, tap-free.** Labels only: `gh issue view <N> --json labels --jq '.labels[].name'`. Track position, not content — don't read the body. With several issues in flight, check each; think of each as a row `<repo>#<N> · <phase>`.
 2. **Place it on the graph.** The `phase:*` label is the current node; its outgoing edge — read with the issue's `mode`/`tests` — names the next node.
 3. **Emit the launch command** in the form the node's mode dictates (workflow.md Dispatch): a HITL node as `/<skill> <args>`; a FOTW node inside the `/goal … until it prints DONE: or ESCALATE: … N turns` wrapper. Hand over the literal command — the user launches it. Never auto-launch, never advance a label yourself.
+4. **Hand over any human git command.** Some transitions need a git action the dashboard agent can't do — the `git push` before a code-review node, or the `git pull` of `main` a stale-base escalation calls for. The node skills don't surface these; you do. Give the literal command, formatted to run from the user's `~/workspace/` cwd with `git -C <path>` (no `cd`, so their terminal stays put): branch ops target the worktree — `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push -u origin issue-<N>` — and `main` ops target the main checkout — `git -C ~/workspace/<repo> …`.
 
 ## Refine — fix the machinery for next time
 

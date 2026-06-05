@@ -107,6 +107,6 @@ With every acceptance criterion met by a passing test:
    ```
 4. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue> on issue-<issue> — push it (git push -u origin issue-<issue>)
+   DONE: implemented #<issue> on issue-<issue>, now at phase:agent-code-review — remember to push the branch
    ```
-   Do not push or begin the review — the user pushes the branch and dispatches the next node.
+   Do not push or begin the review yourself — you're done after the commit.
