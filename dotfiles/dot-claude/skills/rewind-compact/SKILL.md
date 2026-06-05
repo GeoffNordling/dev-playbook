@@ -1,6 +1,6 @@
 ---
 name: rewind-compact
-description: Prepare for a conversation rewind by drafting a "Tangential compaction summary" that brings past-self up to date after the rewind.
+description: Perform a limited conversation rewind, compressing the rewind into a "Tangential compaction summary."
 disable-model-invocation: true
 model: opus
 effort: medium
@@ -9,32 +9,33 @@ argument-hint: "<rewind target>"
 
 # Rewind Compact
 
-Long tangential explorations (document polishing, design iteration, prototyping, etc.) can consume many turns whose outcome is fully captured on disk. Rewinding past them compacts the context — but past-self has no memory of what happened after the rewind target. This skill produces a parsimonious "Tangential compaction summary" that the user pastes in after rewinding, bringing past-self up to date without re-loading all the throwaway iteration.
+Long tangential explorations (document polishing, design iteration, prototyping, etc.) can consume many turns whose outcome is fully captured on disk. Rewinding past them compacts the context — but past-self has no memory of what happened after the rewind target. This skill produces a parsimonious "Tangential compaction summary" that the user pastes in after rewinding, bring past-self up-to-date with minimal context usage.
 
-## Rewind target: $ARGUMENTS
+The `/rewind` command allows the user to select any previous **user-typed message** as a checkpoint — your replies and tool results are not selectable. Picking one rewinds the conversation to the state *just before the selected message was sent*: the picked message and everything after it are discarded.
+
+This skill relies on the concept of a **rewind target**: the specific **user-typed message** the user desires to rewind the conversation to. All relevant information between the **rewind target** and the current turn is compressed into the **Tangential compaction summary**, which user will copy to clipboard and add back to the context window after performing the `/rewind`.
 
 ## Procedure
 
-1. **Confirm the rewind target.** Scan backward to find the turn matching `$ARGUMENTS`. If ambiguous, ask the user.
+1. **Confirm the rewind target.** Scan backward to find the turn matching `$ARGUMENTS`, which is a semantic description of the point the user wants to rewind to.
+   - The **rewind target** is always a **user-typed message**. It is the point in the conversation that initiated the tangent.
+   - The **rewind target**, and all messages after it, will be deleted by this procedure.
 
-2. **Inventory state-on-disk changes** between the rewind target and now:
+2. **Commit all uncommitted work.**
+   - Use `/commit` and label the commit specifically as a /rewind-compact point.
+
+3. **Inventory state-on-disk changes** between the rewind target and now:
    - Files written or edited (list paths).
    - Commits made (note IDs and branches).
    - Other persistent artifacts (GitHub issues, PRs).
 
-3. **Inventory in-conversation information** the user conveyed during this span: instructions, decisions, side notes, insights, asides.
+3. **Inventory in-conversation information** between the rewind target and now:
+   - Instructions, decisions, side notes, insights, asides.
+   - Prepare to summarize this information in a concise, compact form that conveys the important ideas without all the little details.
 
-4. **Classify each in-conversation item:**
-   - Captured in a surviving file or commit → **throwaway** (past-self will see it by reading the file).
-   - Not captured anywhere on disk → **candidate non-throwaway**.
-
-5. **Align with the user on open questions and the non-throwaway list.** Surface any uncertainties (e.g., is X a throwaway or not? is Y still relevant?) alongside the candidate non-throwaway items. **Stop and wait for explicit confirmation or trimming before continuing.** The message body in step 7 depends on what survives this step — drafting it before alignment is complete wastes work.
-
-6. **Commit all uncommitted work — mandatory.** Without a commit, the rewind risks losing disk state, and uncommitted changes can be accidentally reverted. The commit also gives past-self a concrete reference. Use `/commit` and label the commit specifically as a /rewind-compact contribution.
-
-7. **Output two artifacts** (only after step 5 alignment is complete), in this order:
-   1. The "Tangential compaction summary" inside a fenced code block (so the user can copy it verbatim and paste it after rewinding).
-   2. The verbatim text of the **selection target** — the user-typed message picked per *Choosing the /rewind selection target* below. Label it `**Your /rewind selection target:**` and present it as a blockquote.
+4. **Output two artifacts**:
+   1. The "Tangential compaction summary" inside a fenced code block (so the user can copy it verbatim and paste it after they invoke `/rewind`).
+   2. The verbatim text of the **rewind target**. Label it `**Your /rewind selection target:**` and present it as a blockquote.
 
 ## Output format
 
@@ -42,14 +43,19 @@ Long tangential explorations (document polishing, design iteration, prototyping,
 ```
 **Tangential compaction summary:**
 
-A tangential iterative exploration of approximately <N> turns occurred from this point. The conversation was then rewound back to here. The current state of <file path> is preferred to <what you produced at this turn> — re-read it to pick up the final form: <brief description of current state>. Committed as <commit-id> on <branch> (not a commit you authored).
+A tangential iterative exploration of approximately <N> turns occurred from this point. The conversation was then rewound back to here. The current state of <file path> is now live — re-read it to bring yourself up to date.
 
-<Non-throwaway insights, parsimoniously stated. Omit this paragraph if everything was captured on disk.>
+The following commits were made during the tangent:
+   - <commit-id> on <branch>.
+   - <commit-id> on <branch>.
+   - ...
+
+<Other in-conversation information, parsimoniously stated. Omit this paragraph if everything was captured on disk.>
 ```
 
 **Your /rewind selection target:**
 
-> <verbatim text of the user message that comes right after the rewind target>
+Verbatim text of the exact **user-typed message** targeted for rewind.
 ````
 
 ## Notes
@@ -58,45 +64,3 @@ A tangential iterative exploration of approximately <N> turns occurred from this
 - "Re-read the file" instructions must use full paths so past-self knows exactly what to load.
 - Multiple files may have changed — list them all.
 - If past-self's prior work at the rewind target was substantive (a draft, a diagram, a decision), explicitly say "the current state is preferred" so they don't try to redo it.
-
-## Choosing the /rewind selection target
-
-`/rewind` checkpoints **only at user-typed messages** — your replies and tool results are not selectable. Picking one restores the conversation to the state *just before that message was sent*: the picked message and everything after it are discarded.
-
-So the selection target is the **earliest user-typed message whose removal drops the whole tangent** — usually the user message that *opened* it. Mind the off-by-one: when the user says "rewind to where I told you to do X," that message is itself the target — picking it discards it and lands just before it, with the compaction summary standing in for it. The landing point the user describes and the message they pick are the same message seen from opposite sides.
-
-Derive it mechanically: find the last turn worth keeping, then take the first user-typed message after it.
-
-Edge case — a tangent that ran as your replies under a user message you want to keep (a long tool-loop with no user message of its own) can't be split off; that message is the only checkpoint. Target it and let the summary carry whatever intent still matters.
-
-## Example
-
-After ~20 turns iterating on a mermaid diagram in `workflow/workflow.md`:
-
-````
-```
-**Tangential compaction summary:**
-
-A tangential iterative exploration of approximately 20 turns occurred from this point. The conversation was then rewound back to here. The current state of `workflow/workflow.md` is preferred to the graph you just drew — re-read it to pick up the final form: `flowchart LR` with ELK renderer, subgraph swim lanes, diamond gate nodes, self-loops labeled `iterate`. Committed as `1d3e738` on `workflow-standardization` (not a commit you authored).
-
-One ancillary insight not in the file: spec-review and code-review have asymmetric reviewer-of-record. Spec-review = agent checking the user's work product. Code-review = adversarial agent checking the agent's work + user checking both. Carry into Q4 (action authority).
-```
-
-**Your /rewind selection target:**
-
-> The self edge is for review round look awkward on screen. Is there any way you can improve the way this displays visually?
-````
-
-And when the tangent was the work your replies did for an instruction that is itself discarded — e.g. ~14 turns building a skill the user told you to "get to it" on:
-
-````
-```
-**Tangential compaction summary:**
-
-A tangential exploration of ~14 turns occurred from this point — you built the `/code-diagrams` skill as designed above, committed as `bda0870` on `code-diagrams-skill` (not a commit you authored), then the conversation was rewound back to here. The committed files in `~/workspace/dev-playbook/dotfiles/dot-claude/skills/code-diagrams/` (`SKILL.md`, `references/diagram-contract.md`) are the final form — re-read them. Not yet pushed, synced, or end-to-end tested.
-```
-
-**Your /rewind selection target:**
-
-> Honestly I'm interested in you building this bro. Read /skill-creator and get to it.
-````
