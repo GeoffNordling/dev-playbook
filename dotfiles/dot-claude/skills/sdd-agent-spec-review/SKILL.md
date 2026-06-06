@@ -4,13 +4,14 @@ description: Reviews an SDD project's authored spec — its `feat`/`req`/`dsn` i
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion Edit Write MultiEdit NotebookEdit
+disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
+allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---
 
 # SDD Agent Spec Review
 
-Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report; you never edit the spec. A defect routes back to design through the user's reject, not through your hand.
+Review an SDD project's authored spec — its `feat`, `req`, and `dsn` items — against the issue brief and the spec standard, attach your findings to the issue, then advance it to human review. You audit and report: you never modify the spec or code under review — a defect routes back to design through the user's reject, not your hand. Read-only is about the work under review, not the issue tracker: posting your findings comment and advancing the `phase:*` label with `gh` are this node's required outputs.
 
 Work without waiting for approval: run the gate, audit, and post your findings on your own, pausing only to escalate on the §6 triggers. Finding spec problems is the job, not a reason to stop — they go in the comment for the user, who decides at the next node whether to approve, review it again, or send the spec back to design.
 
@@ -49,7 +50,7 @@ Read the whole spec against the brief and the standard. Assess each dimension an
 
 ## 4. Attach findings
 
-Post one comment with `gh issue comment <issue>`. Group findings by severity so the user can act on them:
+Stage the comment body in a `/tmp` file (e.g. `/tmp/spec-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one comment with `gh issue comment <issue> --body-file <path>`. Group findings by severity so the user can act on them:
 
 - **Blocking** — a defect that should send the spec back: a fidelity gap, a malformed item, an unsound chain.
 - **Suggestion** — an improvement that is not disqualifying.

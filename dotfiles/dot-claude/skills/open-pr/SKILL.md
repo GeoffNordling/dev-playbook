@@ -27,5 +27,5 @@ This phase opens nothing else and advances no label — the review steps that fo
 The branch isn't on origin — the implementation is committed but unpushed. Print and stop:
 
 ```
-ESCALATE: #<issue> — branch issue-<issue> isn't on origin; push it first: git push -u origin issue-<issue>
+ESCALATE: #<issue> — branch issue-<issue> isn't on origin (needs pushing before the PR can open)
 ```

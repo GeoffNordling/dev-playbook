@@ -100,7 +100,7 @@ Every file-touching node ensures the session sits in the issue's worktree, then 
 
 ### The agent-capability boundary
 
-What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API — the `gh` family and REST endpoints — but not pushing over the SSH remote, and not merging a PR (`mergePullRequest` is forbidden to it). So three operations fall to the human: `git push` and `git pull`, whose SSH remote needs a YubiKey tap in the human's own terminal, and merging the PR, in the GitHub UI. Everything the PAT authorizes — and all purely-local git, which needs no GitHub auth at all — the agent does inside a skill.
+What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API — the `gh` family and REST endpoints — but not pushing over the SSH remote, and not merging a PR (`mergePullRequest` is forbidden to it). So three operations fall to the human: `git push` and `git pull`, whose SSH remote needs a YubiKey tap in the human's own terminal, and merging the PR, in the GitHub UI. Everything the PAT authorizes — and all purely-local git, which needs no GitHub auth at all — the agent does inside a skill. Under auto mode the PAT is necessary but not sufficient: the classifier must also pass each `gh` write, which the `autoMode.allow` entry in `settings.json` grants (see [Permissions](#permissions)).
 
 | | Agent-capable | Owner |
 |---|---|---|
@@ -113,7 +113,7 @@ What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API �
 Consequences that shape the skills:
 
 - **The implementation node never opens the PR.** It cannot push, and a finger-on-the-wheel skill cannot pause mid-run to wait for a tap. So it commits, advances its label, and ends `DONE` with a reminder to push. The PR is created downstream, after the push.
-- **The push is the human's transition ritual.** Seeing implementation `DONE`, the human runs `git push -u origin issue-<N>` (one tap), `/clear`s, and launches the code-review node.
+- **The push is the human's transition ritual.** Seeing implementation `DONE`, the human pushes the branch (one tap), `/clear`s, and launches the code-review node. The node skill only reminds — it doesn't hand over the push command; that's surfaced at dispatch, targeted at the issue's worktree.
 - **The PR is born at code review.** `/open-pr` (first link of the code-review goal) creates it with `gh pr create` once the branch is on origin — tap-free, in a skill. If the branch isn't pushed yet, `/open-pr` escalates rather than guessing.
 - **The merge is the human's; cleanup is the merge node's.** The PAT cannot merge (`mergePullRequest` is forbidden), so on `approve: merge` the human squash-merges in the GitHub UI — dropping the origin branch and closing the issue via `Closes #<N>`. `/human-review` then tears down the local side, per the worktree contract above.
 
@@ -143,13 +143,15 @@ A committing FOTW node (`build`, `tdd`, `sdd-tdd`) prepends the commit token to 
 
 ## Permissions
 
-The issue's session runs in **auto mode** — a permission mode (toggled like `acceptEdits`/`plan`, or set at launch) in which Claude judges each tool call's safety and self-approves rather than consulting a static allow-list. So there is no allow-list to enumerate or maintain; behavior is shaped in one direction only — by **denying** the few tools a node must never call, through the skill's `disallowed-tools` front-matter.
+The issue's session runs in **auto mode** — a permission mode (toggled like `acceptEdits`/`plan`, or set at launch) in which a classifier judges each tool call and self-approves the safe ones, blocking whatever escalates beyond the request, targets unrecognized infrastructure, or looks driven by hostile content it read. Auto mode does not honor the tool-pattern `permissions.allow` list the way default mode does — on entry it drops broad and wildcarded `Bash(...)` allows — so a node's commands are weighed by the classifier, not waved through by a saved pattern.
 
-Tool access still merges from a tiered settings hierarchy where **deny wins anywhere** — a deny at any level (a skill's `disallowed-tools`, a `permissions.deny` rule) blocks the call regardless of allows elsewhere, and regardless of auto mode's own judgment. That is what makes the per-node deny lists authoritative:
+Behavior is shaped from two sides, and **deny wins anywhere** — a deny at any level (a skill's `disallowed-tools`, a `permissions.deny` rule) blocks the call regardless of the classifier or any allow. To **forbid**, list the tool in the node skill's `disallowed-tools`; the per-node deny lists are what make a role's boundaries authoritative:
 
 - **FOTW nodes deny `AskUserQuestion`.** A hands-off skill must not stop to ask the human; it runs to a terminal line and escalates instead.
-- **Review nodes additionally deny `Edit Write MultiEdit NotebookEdit`.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review.
+- **Review nodes additionally deny `Edit MultiEdit NotebookEdit` outright and scope `Write` to deny the work under review (`Write(/**)`), permitting only `Write(//tmp/**)` for staging a comment body.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review — a scratch file in `/tmp` is the one write it may make.
 - **HITL nodes deny nothing.** The human is engaged, so the skill asks freely — auto mode leaves interactive prompts available.
+
+To **permit** something the classifier would otherwise block, add an entry to the `autoMode.allow` list in `settings.json`. Entries are natural-language descriptions, not tool patterns — the classifier reads them as rules — and are honored from user scope (`~/.claude/settings.json`) and project-local (`.claude/settings.local.json`), but not from checked-in project settings. The list's first entry is the literal string `"$defaults"`: it tells the classifier to keep its built-in rule set in force, so the entries you add **extend** the defaults rather than replace them.
 
 Two verified properties make this safe: a `disallowed-tools` deny **holds across `/goal` re-drives**, so it covers a FOTW node's entire autonomous run; and it **does not leak across `/clear`**, so each node starts with a clean pool — a write node following a read-only review node can write. The deny lasts only while the skill is active and would clear on a human message, which is why it targets autonomous (FOTW) nodes the human never interrupts; HITL nodes, where the human does step in, carry none.
 
@@ -184,8 +186,8 @@ Across modes, a node skill declares the `disallowed-tools` its role calls for, c
 | `/tdd` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
 | `/build` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
 | `/open-pr` | FOTW | `AskUserQuestion` | branch not pushed to origin |
-| `/sdd-agent-spec-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-agent-code-review` | FOTW | `AskUserQuestion` `Edit` `Write` `MultiEdit` `NotebookEdit` | Green gate red (PR over red tree); PR/diff missing |
+| `/sdd-agent-spec-review` | FOTW | `AskUserQuestion` `Edit` `MultiEdit` `NotebookEdit` `Write(/**)` (allows `Write(//tmp/**)`) | Consistency gate red (malformed spec); specs absent/unreadable |
+| `/sdd-agent-code-review` | FOTW | `AskUserQuestion` `Edit` `MultiEdit` `NotebookEdit` `Write(/**)` (allows `Write(//tmp/**)`) | Green gate red (PR over red tree); PR/diff missing |
 | `/agent-code-review` | FOTW | same as `/sdd-agent-code-review` | Green gate red (PR over red tree); PR/diff missing |
 | `/human-review` | HITL | — | — |
 
