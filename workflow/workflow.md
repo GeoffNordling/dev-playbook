@@ -100,7 +100,7 @@ Every file-touching node ensures the session sits in the issue's worktree, then 
 
 ### The agent-capability boundary
 
-What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API — the `gh` family and REST endpoints — but not pushing over the SSH remote, and not merging a PR (`mergePullRequest` is forbidden to it). So three operations fall to the human: `git push` and `git pull`, whose SSH remote needs a YubiKey tap in the human's own terminal, and merging the PR, in the GitHub UI. Everything the PAT authorizes — and all purely-local git, which needs no GitHub auth at all — the agent does inside a skill.
+What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API — the `gh` family and REST endpoints — but not pushing over the SSH remote, and not merging a PR (`mergePullRequest` is forbidden to it). So three operations fall to the human: `git push` and `git pull`, whose SSH remote needs a YubiKey tap in the human's own terminal, and merging the PR, in the GitHub UI. Everything the PAT authorizes — and all purely-local git, which needs no GitHub auth at all — the agent does inside a skill. Under auto mode the PAT is necessary but not sufficient: the classifier must also pass each `gh` write, which the `autoMode.allow` entry in `settings.json` grants (see [Permissions](#permissions)).
 
 | | Agent-capable | Owner |
 |---|---|---|
