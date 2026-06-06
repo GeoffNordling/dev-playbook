@@ -39,7 +39,21 @@ format_status=$?
 [[ $format_status -ne 0 ]] && fail_loud "ruff format failed on $file_path: $format_err"
 
 # Apply autofixes. Surface any remaining unfixable lints.
-lint_out=$("$ruff_bin" check --fix "$file_path" 2>&1)
+#
+# --ignore the four pyflakes name-binding rules: a multi-location refactor
+# (rename a symbol, move a definition) can only be expressed as a *sequence* of
+# single-location edits, so the file necessarily passes through intermediate
+# states where a binding is briefly unused or a name is briefly undefined. This
+# hook fires after every edit, so left enabled these rules misfire on those
+# transient states: `--fix` *deletes* the in-progress import/variable (F401,
+# F841) and the file then blocks on the cascading F811/F821. The net effect is
+# the file mutating destructively underneath an in-progress refactor (issue #78).
+# Pre-commit runs the full ruff rule set and stays the gate of record for these.
+# See ~/workspace/dev-playbook/docs/adr/0002-compounding-with-ai.md (issue #78
+# amendment). --ignore on the CLI extends the project's ignore list (it does not
+# replace it), so project-disabled rules stay disabled.
+edit_transient_rules="F401,F811,F821,F841"
+lint_out=$("$ruff_bin" check --fix --ignore "$edit_transient_rules" "$file_path" 2>&1)
 lint_status=$?
 if [[ $lint_status -ne 0 ]]; then
     echo "$lint_out" >&2
