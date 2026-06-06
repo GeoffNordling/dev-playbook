@@ -16,7 +16,7 @@ Audited this workspace against the source article above. Three gaps to close, se
 
 - **Global behavioral CLAUDE.md** at `dotfiles/.claude/CLAUDE.md` (Stow-linked to `~/.claude/CLAUDE.md`). XML-tagged: `<behavior>`, `<teaching>`, `<markdown>`. Holds universal preferences only — no operational rules (those stay in `~/.claude/rules/*.md`), no per-repo content.
 - **Nested CLAUDE.md as a documented hierarchy.** Repo-documentation standard now has a `## CLAUDE.md hierarchy` section and an Optional row for `<sub-project>/CLAUDE.md`. Nested files hold only the delta from the parent; same scope as the root (operational instructions, not project description).
-- **Edit-time Python verification.** PostToolUse hook on `Edit|Write|MultiEdit` runs `ruff format` then `ruff check --fix` on edited Python files. Format diffs apply silently; remaining unfixable lints reach Claude inline as system-reminder errors via exit-2 + stderr.
+- **Edit-time Python verification.** PostToolUse hook on `Edit|Write|MultiEdit` runs `ruff format` then `ruff check --fix` on edited Python files. Format diffs apply silently; remaining unfixable lints reach Claude inline as system-reminder errors via exit-2 + stderr. (Amended 2026-06-06 — the `check` step now ignores four name-binding rules at edit time; see [Amendment: edit-transient lint rules](#amendment-2026-06-06--edit-transient-lint-rules-issue-78).)
 - **Project-local ruff.** The hook walks up from the edited file looking for `.venv/bin/ruff` and uses whatever the project pinned. No global ruff. Editing Python outside any uv-managed project fails loud with a `uv sync` hint.
 - **Fail-loud as a behavioral preference.** Added to `<behavior>` in the global CLAUDE.md after a too-defensive first cut of the hook script. No silent defensive skips, no `|| true` fallbacks, no "just in case" guards.
 
@@ -78,3 +78,61 @@ Project-local ruff is the only stable answer. Each repo's `pyproject.toml` pins 
   - Worklog auto-post hook on substantial task completion.
   - `standards/agent-hooks.md` to be extracted if a second hook lands and shared conventions emerge.
 - The cookiecutter project template (`project-template/`) does not yet propagate any of these conventions. Cookiecutter-generated repos start with their own pyproject.toml + uv setup, which means the edit-time hook works for them out of the box. No template change needed for this ADR.
+
+## Amendment (2026-06-06) — edit-transient lint rules (issue #78)
+
+### Problem
+
+The edit-time hook fires after *every* `Edit`/`Write`, but a multi-location
+refactor (rename a symbol, move a definition) can only be expressed as a
+*sequence* of single-location edits. The file therefore necessarily passes
+through intermediate states where a binding is briefly unused or a name is
+briefly undefined. With the full rule set live on every edit, those transient
+states get "corrected" destructively:
+
+1. Edit the `import` to the new name; the new import is momentarily unused.
+2. `ruff check --fix` judges it unused (**F401**) and **deletes the import**.
+3. Subsequent edits reference a now-undefined name, cascading **F821**, and the
+   hook exits non-zero on each transient state.
+
+A routine rename became corruption the model had to detect and undo, rather than
+a clean series of edits.
+
+### Decision
+
+The edit-time `check` step now passes `--ignore F401,F811,F821,F841` — the four
+pyflakes name-binding rules a multi-step edit unavoidably passes through:
+
+| Rule | Meaning | Why edit-transient |
+|---|---|---|
+| F401 | unused import | the renamed import is unused until its call sites are updated; `--fix` *deletes* it |
+| F841 | unused local variable | the variable analogue of F401; `--fix` *deletes* the assignment |
+| F811 | redefinition of unused name | both old and new definitions coexist mid-move |
+| F821 | undefined name | a usage updated before its import/definition is briefly undefined |
+
+`--ignore` on the ruff CLI *extends* the project's configured ignore list rather
+than replacing it (verified on ruff 0.15.14), so a project's own disabled rules
+stay disabled.
+
+### Why this loses no coverage
+
+Pre-commit (the dev-playbook `ruff` + `ruff-format` hooks; `astral-sh/ruff-pre-commit`
+in consumer repos) runs the **full** rule set and stays the gate of record for
+these four. The edit-time hook was always *additive* fast feedback, not the
+enforcing gate — so relaxing four rules there changes only *when* a genuinely
+unused import is reported (commit time instead of mid-edit), never *whether*.
+Everything else still applies at edit time: `ruff format`, all other safe
+autofixes, and exit-2 blocking on any real unfixable lint (e.g. E711).
+
+### Considered but not done
+
+Moving *all* lint/checking out of the edit-time hook and onto pre-commit only.
+That would more fully honor "this should happen at pre-commit," but it discards
+the in-loop feedback ADR 0002 deliberately added (the model corrects without a
+commit round-trip). Deferred as a separate decision; the minimal fix above
+removes the corruption without giving that up.
+
+### Changed
+
+- `dotfiles/dot-claude/hooks/ruff-edit.sh` — `check --fix` gains
+  `--ignore F401,F811,F821,F841`, with a comment cross-referencing this amendment.
