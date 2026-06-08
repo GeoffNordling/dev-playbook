@@ -7,15 +7,31 @@
 type-hinted signatures, and first-line docstrings. Static analysis via griffe.
 
 Usage:
-    py-outline src/mypackage
-    py-outline src/mypackage > structure.txt
-    py-outline src/mypackage --search src   # extra search paths for griffe
+    griffe-outline src/mypackage
+    griffe-outline src/mypackage > structure.txt
+    griffe-outline src/mypackage --search src   # extra search paths for griffe
 """
 import argparse
 import sys
 from pathlib import Path
 
 import griffe
+
+
+def members_of_kind(parent, kind):
+    """Locally-defined members of ``parent`` whose resolved kind is ``kind``.
+
+    An imported or re-exported member is a griffe *alias* (``is_alias`` is
+    True); selecting only non-alias members keeps each member listed once, at
+    its real definition site, instead of again under every module that imports
+    it. The ``not m.is_alias`` guard short-circuits before ``.kind`` is read,
+    because resolving an unresolvable alias (e.g. ``from typing import
+    Protocol``) raises ``AliasResolutionError``.
+    """
+    return [
+        m for m in parent.members.values()
+        if not m.is_alias and m.kind.value == kind
+    ]
 
 
 def format_param(p):
@@ -59,8 +75,8 @@ def format_class(cls, indent=0):
         if first_line:
             print(f'{prefix}    """{first_line}"""')
 
-    attrs = [m for m in cls.members.values() if m.kind.value == "attribute"]
-    methods = [m for m in cls.members.values() if m.kind.value == "function"]
+    attrs = members_of_kind(cls, "attribute")
+    methods = members_of_kind(cls, "function")
 
     for attr in attrs:
         ann = f": {attr.annotation}" if attr.annotation is not None else ""
@@ -80,9 +96,9 @@ def format_class(cls, indent=0):
 def format_module(mod, path=""):
     full_path = f"{path}.{mod.name}" if path else mod.name
 
-    submodules = [m for m in mod.members.values() if m.kind.value == "module"]
-    classes = [m for m in mod.members.values() if m.kind.value == "class"]
-    functions = [m for m in mod.members.values() if m.kind.value == "function"]
+    submodules = members_of_kind(mod, "module")
+    classes = members_of_kind(mod, "class")
+    functions = members_of_kind(mod, "function")
 
     if classes or functions:
         header = f"{'=' * 60}\n{full_path}"
