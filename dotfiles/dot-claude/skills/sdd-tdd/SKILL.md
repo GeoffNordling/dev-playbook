@@ -119,7 +119,7 @@ Never edit the spec without an explicit approval gesture in the same turn. A bug
 
 With the whole issue implemented:
 
-1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every node that carries one — the `feat`s `sdd-specs` marked while authoring, and any bumped `req`/`dsn` a deferred revision-reconciliation marked (§1, §2; `WIP:` is valid on any node per spec-standard §2.10). Each marked cone is now covered by verifiers. If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
+1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every node that carries one. Each marked cone is now covered by verifiers. If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
 2. **Leave the tree green.** Run the gate — `make check`. With every `WIP:` removed, it now enforces completeness over the whole spec graph: a red build means a missing verifier — add it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
 4. **Advance to code review:**
