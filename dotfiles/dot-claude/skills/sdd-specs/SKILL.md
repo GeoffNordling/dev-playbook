@@ -29,7 +29,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 **Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, tell the user to pull `main` and stop), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — tell the user and stop.
 
-- `gh issue view <issue>` — the body is the contract.
+- `gh issue view <issue> --comments` — the body is the contract. On a rework re-entry from spec review, the comments carry the review's findings; treat the latest as the work list. The brief stays the contract — a comment that conflicts with it yields to it.
 - Existing specs: `specs/functional_requirements/` and `specs/design/`.
 - `CONTEXT.md` for domain vocabulary, if present.
 - `docs/adr/README.md` — the ADR index; from its descriptions, read only the ADRs relevant to the area.

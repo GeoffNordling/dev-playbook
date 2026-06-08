@@ -31,7 +31,8 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 **Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
-- `gh issue view <issue>` — the body is the contract.
+- `gh issue view <issue> --comments` — the body is the contract; comments may carry context the body doesn't.
+- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read its review comments (`gh pr view --comments`) and treat the latest review's findings as the work list. If `gh pr view` finds none, this is first implementation; work from the spec alone. The committed spec is authoritative — a finding that conflicts with it yields to it; one that requires changing it routes through §6.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
