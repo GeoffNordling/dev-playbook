@@ -28,11 +28,11 @@ Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) �
 
 ### Graph-based flow
 
-Each node has a `role ∈ {work, review}`, and a work node an `actor ∈ {agent, human}`. Three kinds:
+Each node is one of three kinds:
 
 - `(agent, work)` — agent produces output (e.g., `sdd_tdd`, `tdd`, `build`)
 - `(human, work)` — human produces output (e.g., `intake`, `sdd_specs`, `design`)
-- `review` — one node, two halves: an agent audits the work and attaches findings, then the human reads them and gives a verdict (e.g., `sdd_spec_review`, `code_pr_review`). See [Naming](#naming).
+- `mixed` — begins with an agent half running autonomously; when the human takes over, it continues as a human half in the same node (e.g., `sdd_spec_review`, `code_pr_review`). See [Naming](#naming).
 
 ```mermaid
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
@@ -70,7 +70,7 @@ On the direct path, intake also decides whether the work needs a **design** pass
 
 Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_spec_review` → label `phase:sdd-spec-review`, command `/sdd-spec-review`. The set of graph nodes IS the phase-label inventory.
 
-Each work node's skill updates the issue's `phase:*` label to the next node when it finishes. A **review** node is one skill, launched once, that runs its two halves in a single phase: the agent audit posts findings and yields without moving the label, then the human's verdict moves it — `approve` advances the issue (at a code node the human merges the PR), `reject: rework` routes the label back to the authoring or implementing node. Every command name derives from its node id; the human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
+Each work node's skill updates the issue's `phase:*` label to the next node when it finishes. A **mixed** node is one skill, launched once: its agent half runs autonomously and yields without moving the label, then the human takes over in the same phase and makes the transition. Every command name derives from its node id; the human launches every node (per [Dispatch](#dispatch)) — nothing launches itself.
 
 One long-lived branch and PR per issue. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the PR opens on the `open PR` edge — after the human pushes the branch — and the human merges it on `approve: merge` in the GitHub UI.
 
@@ -134,23 +134,21 @@ A committing FOTW node (`build`, `tdd`, `sdd-tdd`) prepends the commit token to 
 /goal ⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /build <issue> until it prints a terminal line — DONE: or ESCALATE: — or stop after N turns.
 ```
 
-**A review node launches under `/goal`, then hands off to the human.** Its agent half runs hands-off to a terminal line that flags `awaiting human review` — the goal stops there, and the label does *not* move. The human, in the same session (no `/clear`), reads the findings and converses with the still-active skill; the skill takes their verdict from plain conversation — `approve` or `rework` — and moves the label. No `/goal` re-drives the verdict half, so it can wait on the human; the deny that guarded the audit clears the moment the human speaks (see [Permissions](#permissions)).
-
 ## Permissions
 
 The issue's session runs in **auto mode** — a permission mode (toggled like `acceptEdits`/`plan`, or set at launch) in which a classifier judges each tool call and self-approves the safe ones, blocking whatever escalates beyond the request, targets unrecognized infrastructure, or looks driven by hostile content it read. Auto mode does not honor the tool-pattern `permissions.allow` list the way default mode does — on entry it drops broad and wildcarded `Bash(...)` allows — so a node's commands are weighed by the classifier, not waved through by a saved pattern.
 
 Behavior is shaped from two sides, and **deny wins anywhere** — a deny at any level (a skill's `disallowed-tools`, a `permissions.deny` rule) blocks the call regardless of the classifier or any allow. To **forbid**, list the tool in the node skill's `disallowed-tools`; the per-node deny lists are what make a role's boundaries authoritative:
 
-- **FOTW and review nodes deny `AskUserQuestion`.** A hands-off skill must not stop to ask the human; it runs to a terminal line and escalates instead. A review node's audit half is likewise hands-off, and its verdict half takes the verdict from plain conversation, not `AskUserQuestion` — so it denies the tool throughout.
-- **Review nodes additionally deny `Edit MultiEdit NotebookEdit` outright and scope `Write` to deny the work under review (`Write(/**)`), permitting only `Write(//tmp/**)` for staging a comment body.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review — a scratch file in `/tmp` is the one write it may make.
+- **FOTW and mixed nodes deny `AskUserQuestion`.** A hands-off skill must not stop to ask the human; it runs to a terminal line and escalates instead.
+- **A mixed node that reviews additionally denies `Edit MultiEdit NotebookEdit` outright and scopes `Write` to deny the work under review (`Write(/**)`), permitting only `Write(//tmp/**)` for staging a comment body.** The read-only guarantee: a reviewer reports findings, never rewrites the work under review — a scratch file in `/tmp` is the one write it may make. (Every mixed node today reviews; a non-review one would not carry this deny.)
 - **HITL nodes deny nothing.** The human is engaged, so the skill asks freely — auto mode leaves interactive prompts available.
 
 To **permit** something the classifier would otherwise block, add an entry to the `autoMode.allow` list in `settings.json`. Entries are natural-language descriptions, not tool patterns — the classifier reads them as rules — and are honored from user scope (`~/.claude/settings.json`) and project-local (`.claude/settings.local.json`), but not from checked-in project settings. The list's first entry is the literal string `"$defaults"`: it tells the classifier to keep its built-in rule set in force, so the entries you add **extend** the defaults rather than replace them.
 
-Two verified properties make this safe: a `disallowed-tools` deny **holds across `/goal` re-drives**, so it covers a FOTW node's entire autonomous run; and it **does not leak across `/clear`**, so each node starts with a clean pool — a write node following a read-only review node can write. The deny lasts only while the skill is active and would clear on a human message. For a fully autonomous (FOTW) work node the human never interrupts, so it holds the whole run; for a **review** node it guards the agent audit, then clears when the human steps in for the verdict — whose half stays read-only on the work by instruction. HITL work nodes, engaged from the start, carry none.
+Two verified properties make this safe: a `disallowed-tools` deny **holds across `/goal` re-drives**, so it covers a FOTW node's entire autonomous run; and it **does not leak across `/clear`**, so each node starts with a clean pool — a write node following a read-only mixed node can write. The deny lasts only while the skill is active and would clear on a human message. For a FOTW node, the human never interrupts, so it holds the whole run; for a **mixed** node it guards the agent half, then clears when the human takes over. HITL work nodes, engaged from the start, carry none.
 
-**The commit-authorization token.** The FOTW implementation nodes (`build`, `tdd`, `sdd-tdd`) commit via the `commit` skill with no human present to say "commit now", so auto mode's classifier — enforcing the deny on unattended commits — would block them. To lift the deny for exactly those sessions, the node's launch prompt carries the literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧`, which pre-authorizes `Skill(commit)` for that session — an uncommon bracketed string chosen so it cannot appear by accident, recognized as the lone commit exception. HITL nodes carry no token: the human is engaged and authorizes any commit in the moment. Read-only review nodes carry none either; they commit nothing. Delivery is per [Dispatch](#dispatch).
+**The commit-authorization token.** The FOTW implementation nodes (`build`, `tdd`, `sdd-tdd`) commit via the `commit` skill with no human present to say "commit now", so auto mode's classifier — enforcing the deny on unattended commits — would block them. To lift the deny for exactly those sessions, the node's launch prompt carries the literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧`, which pre-authorizes `Skill(commit)` for that session — an uncommon bracketed string chosen so it cannot appear by accident, recognized as the lone commit exception. HITL nodes carry no token: the human is engaged and authorizes any commit in the moment. Read-only mixed nodes carry none either; they commit nothing. Delivery is per [Dispatch](#dispatch).
 
 The session is cwd-bound to the issue's worktree, which confines its file reach.
 
@@ -164,6 +162,8 @@ Three modes of human engagement exist in theory; only two are available under th
 - **Finger on the wheel (FOTW)** — skill is designed to run hands-off; human is present only because billing requires it. Agent does the work; human invokes the skill and responds to escalations.
 - **Hands off the wheel (AFK)** — agent runs autonomously, no human involvement. *Not available* — see [Dispatch](#dispatch). We would use this if we could.
 
+A **mixed** node composes the two available modes in one node: an FOTW agent half, then an HITL human half once the human takes over.
+
 ### Node-skill contract
 
 Across modes, a node skill declares the `disallowed-tools` its role calls for, copied from the [table](#skills) below — every other tool access is auto mode's call. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](~/workspace/dev-playbook/workflow/skill-authoring.md).
@@ -171,7 +171,7 @@ Across modes, a node skill declares the `disallowed-tools` its role calls for, c
 - **Worktree.** Every file-touching node ensures the session is in the issue's worktree before doing anything else, per [Worktrees](#worktrees-and-branches): the issue's first node opens it (create-and-rename), later nodes inherit cwd across `/clear`. `intake` touches no files and uses no worktree.
 - **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts, per [Permissions](#permissions) — and the skill terminates with a plain report. Escalation is `—`: the human is already present.
 - **FOTW** — the skill runs hands-off, so it terminates by printing a deterministic terminal line and declares its escalation triggers in the table. The line is `DONE:` on success or `ESCALATE:` when stuck. Escalation is a terminal line, not an in-place wait: under `/goal` the session is re-driven each turn until a terminal line appears, so to escalate is to print `ESCALATE:` and yield.
-- **review** — a hybrid. Launched under `/goal`, the agent half audits hands-off and prints a `DONE: … awaiting human review` line — escalating from the audit by terminal line, like FOTW — without moving the label; the human then converses and gives the verdict through plain talk (not `AskUserQuestion`), which moves it. It carries the review deny set and never modifies the work under review in either half; its escalation triggers in the table are the audit half's.
+- **mixed** — a hybrid: the agent half runs autonomously under `/goal` (escalating by terminal line, like FOTW) and, on success, prints a `DONE:` line and yields without moving the label; the human then takes over in the same phase and makes the transition. Its escalation triggers in the table are the agent half's.
 
 | Skill | Mode | Denies (`disallowed-tools`) | Escalation triggers |
 |-------|------|-----------------------------|---------------------|
@@ -182,9 +182,9 @@ Across modes, a node skill declares the `disallowed-tools` its role calls for, c
 | `/tdd` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
 | `/build` | FOTW | `AskUserQuestion` | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
 | `/open-pr` | FOTW | `AskUserQuestion` | branch not pushed to origin |
-| `/sdd-spec-review` | review | `AskUserQuestion` `Edit` `MultiEdit` `NotebookEdit` `Write(/**)` (allows `Write(//tmp/**)`) | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-code-pr-review` | review | same as `/sdd-spec-review` | Green gate red (PR over red tree); PR/diff missing |
-| `/code-pr-review` | review | same as `/sdd-spec-review` | Green gate red (PR over red tree); PR/diff missing |
+| `/sdd-spec-review` | mixed | `AskUserQuestion` `Edit` `MultiEdit` `NotebookEdit` `Write(/**)` (allows `Write(//tmp/**)`) | Consistency gate red (malformed spec); specs absent/unreadable |
+| `/sdd-code-pr-review` | mixed | same as `/sdd-spec-review` | Green gate red (PR over red tree); PR/diff missing |
+| `/code-pr-review` | mixed | same as `/sdd-spec-review` | Green gate red (PR over red tree); PR/diff missing |
 
 **Compound dispatch — the code-review nodes.** `sdd_code_pr_review` and `code_pr_review` each open the same `/goal` with three steps: `/open-pr` creates the PR from the just-pushed branch (tap-free), the native `/code-review` posts its automated bug/regression findings as a PR comment, then our review skill adds the spec-fidelity and convention findings the native pass does not cover and yields `awaiting human review`. Ours runs last so it can read the native comment and skip re-flagging, and so reaching its terminal line means the audit is complete and the human's verdict is next. The goal chains them:
 
