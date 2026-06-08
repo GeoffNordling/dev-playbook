@@ -76,6 +76,11 @@ The skeleton holds — `Covers:`, `Needs:`, `Depends:`, and `Interface:` from th
 - **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you include is one you intend to deliver.
 - Keep `Rationale:` and `Comment:` non-prescriptive per the spec standard; a claim that wants to prescribe belongs in `Description:`. Reference relevant ADRs rather than re-explaining them.
 - **Mark the region work-in-progress.** Set `WIP: true` (§2.10) on each `feat` you author or reopen. Its cone reaches no verifiers yet, so completeness would otherwise fail; the marker exempts the `feat` and everything beneath it until build lands the verifiers and removes it. Consistency still holds.
+- **Reconcile a revision bump.** When an edit bumps an existing item's revision (§2.2.3), every committed adjacent reference now names the prior revision — a **stale reference** (target `(type, name)` present at another revision; reported by `SpecGraph.stale_references()`, not raised), distinct from a **dangling reference** (target `(type, name)` absent entirely, still a raised consistency breach). Reconcile the bump's adjacent references:
+  - **Spec-side bullets** — `Covers:` / `Depends:` in other spec items: re-point them to the new revision in-phase (the phase owns these files), re-evaluating that each adjacent item still fits the bumped item's new meaning.
+  - **Verifier markers** — each `@pytest.mark.covers` on the bumped node: decide with the user. If the test still validates the new meaning, re-point the marker now — the covers-string only, never test logic. If it needs rework, leave it stale and set `WIP: true` (§2.10) on the bumped node (or its `feat`) so the now-uncovered completeness gap is exempt and the gate stays green.
+
+  A deferred stale reference stays visible to `sdd-tdd` via `stale_references()`, which reconciles it when it reworks the test.
 
 ## 6. Review pass
 
