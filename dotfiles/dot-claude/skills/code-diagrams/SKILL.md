@@ -26,10 +26,10 @@ Create a self-ignoring scratch directory at the project root, then inventory the
 
 ```
 mkdir -p .code-diagrams && printf '*\n' > .code-diagrams/.gitignore
-~/workspace/dev-playbook/tools/bin/py-outline <package-path> > .code-diagrams/outline.txt
+~/workspace/dev-playbook/tools/bin/griffe-outline <package-path> > .code-diagrams/outline.txt
 ```
 
-The `*` ignores the whole directory — inventory, report, and the `.gitignore` itself — so the outputs stay visible in the editor but never reach a commit. `py-outline` is griffe static analysis: every module, class, function, and signature. It is the subagent's ground truth — do not read the package yourself.
+The `*` ignores the whole directory — inventory, report, and the `.gitignore` itself — so the outputs stay visible in the editor but never reach a commit. `griffe-outline` is griffe static analysis: every module, class, function, and signature. It is the subagent's ground truth — do not read the package yourself.
 
 ## Draw the relationships
 

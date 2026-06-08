@@ -7,9 +7,9 @@
 type-hinted signatures, and first-line docstrings. Static analysis via griffe.
 
 Usage:
-    py-outline src/mypackage
-    py-outline src/mypackage > structure.txt
-    py-outline src/mypackage --search src   # extra search paths for griffe
+    griffe-outline src/mypackage
+    griffe-outline src/mypackage > structure.txt
+    griffe-outline src/mypackage --search src   # extra search paths for griffe
 """
 import argparse
 import sys
@@ -80,7 +80,9 @@ def format_class(cls, indent=0):
 def format_module(mod, path=""):
     full_path = f"{path}.{mod.name}" if path else mod.name
 
-    submodules = [m for m in mod.members.values() if m.kind.value == "module"]
+    submodules = [
+        m for m in mod.members.values() if not m.is_alias and m.kind.value == "module"
+    ]
     classes = [m for m in mod.members.values() if m.kind.value == "class"]
     functions = [m for m in mod.members.values() if m.kind.value == "function"]
 
