@@ -31,16 +31,13 @@ METADATA: list[tuple[str, str]] = [
 PHASES: list[str] = [
     "intake",
     "sdd-specs",
-    "sdd-agent-spec-review",
-    "sdd-human-spec-review",
+    "sdd-spec-review",
     "sdd-tdd",
-    "sdd-agent-code-review",
-    "sdd-human-code-review",
+    "sdd-code-pr-review",
     "design",
     "tdd",
     "build",
-    "agent-code-review",
-    "human-code-review",
+    "code-pr-review",
 ]
 
 

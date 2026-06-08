@@ -20,7 +20,8 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 
 **Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, escalate (§4) so the user pulls `main`), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — escalate (§4).
 
-- `gh issue view <issue>` — the body is the contract; its acceptance criteria are what you must satisfy.
+- `gh issue view <issue> --comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't.
+- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read its review comments (`gh pr view --comments`) and treat the latest review's findings as the work list. If `gh pr view` finds none, this is first implementation; work from the brief alone. The brief stays the contract — where a finding conflicts with it, the brief wins.
 - The existing files the brief concerns — there may be partial work from a prior cycle.
 - Read the standard that governs the artifact you're changing, where one applies — e.g. [documentation conventions](~/workspace/dev-playbook/standards/doc-conventions.md) for docs, [build conventions](~/workspace/dev-playbook/standards/build-conventions.md) for the build or the pre-commit hooks.
 
@@ -48,7 +49,7 @@ Carry out the brief in coherent commits, keeping the tree green as you go:
 You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: #<issue> — <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · current phase: build · <where you're stuck and the call you need>
 ```
 
 The user reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
@@ -66,10 +67,9 @@ With every acceptance criterion satisfied:
 2. **Commit** the remaining changes with /commit.
 3. **Advance to code review:**
    ```bash
-   gh issue edit <issue> --remove-label "phase:build" --add-label "phase:agent-code-review"
+   gh issue edit <issue> --remove-label "phase:build" --add-label "phase:code-pr-review"
    ```
 4. Emit the terminal line, then stop:
    ```
-   DONE: carried out #<issue> on issue-<issue>, now at phase:agent-code-review — remember to push the branch
+   DONE: <repo>#<issue> · current phase: build · next phase: code-pr-review · commit <sha> · check green · unpushed
    ```
-   Do not push or begin the review yourself — you're done after the commit.

@@ -31,7 +31,8 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 
 **Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
-- `gh issue view <issue>` — the body is the contract.
+- `gh issue view <issue> --comments` — the body is the contract; comments may carry context the body doesn't.
+- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read its review comments (`gh pr view --comments`) and treat the latest review's findings as the work list. If `gh pr view` finds none, this is first implementation; work from the spec alone. The committed spec is authoritative — a finding that conflicts with it yields to it; one that requires changing it routes through §6.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
@@ -92,7 +93,7 @@ For test-quality patterns and mocking guidance, see [testing conventions](~/work
 You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: #<issue> — <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · current phase: sdd-tdd · <where you're stuck and the call you need>
 ```
 
 The user reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
@@ -124,10 +125,9 @@ With the whole issue implemented:
 3. **Commit** the remaining changes (marker removals included) with /commit.
 4. **Advance to code review:**
    ```bash
-   gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-agent-code-review"
+   gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-code-pr-review"
    ```
 5. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue> on issue-<issue>, now at phase:sdd-agent-code-review — remember to push the branch
+   DONE: <repo>#<issue> · current phase: sdd-tdd · next phase: sdd-code-pr-review · commit <sha> · check green · unpushed
    ```
-   Do not push or begin the review yourself — you're done after the commit.
