@@ -4,7 +4,7 @@ You are drawing the **relationships layer** of a Python package for a reader who
 
 ## Ground truth — do not re-derive
 
-Read the inventory file (py-outline output: every module, class, function, and signature). Treat it as authoritative for *what exists*. Do not rediscover structure by reading the whole package — read source only where you must to establish relationships the inventory cannot show: which module imports which, and how objects are constructed and wired at runtime.
+Read the inventory file (griffe-outline output: every module, class, function, and signature). Treat it as authoritative for *what exists*. Do not rediscover structure by reading the whole package — read source only where you must to establish relationships the inventory cannot show: which module imports which, and how objects are constructed and wired at runtime.
 
 ## Diagrams — produce three, named
 

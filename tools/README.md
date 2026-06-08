@@ -57,7 +57,7 @@ Run ad hoc on human demand; not part of the pre-commit pipeline.
 
 | Script | Purpose |
 |--------|---------|
-| `py-outline` | Print class/function structure of a Python package |
+| `griffe-outline` | Print class/function structure of a Python package |
 | `worktree-sweep` | Prune merged-PR worktrees in `.claude/worktrees/` |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `gh-show` (in `dotfiles/bin/`) | Print a GitHub issue or PR with body + comments |
