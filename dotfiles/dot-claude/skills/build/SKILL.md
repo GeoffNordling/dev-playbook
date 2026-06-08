@@ -67,9 +67,9 @@ With every acceptance criterion satisfied:
 2. **Commit** the remaining changes with /commit.
 3. **Advance to code review:**
    ```bash
-   gh issue edit <issue> --remove-label "phase:build" --add-label "phase:agent-code-review"
+   gh issue edit <issue> --remove-label "phase:build" --add-label "phase:code-pr-review"
    ```
 4. Emit the terminal line, then stop:
    ```
-   DONE: <repo>#<issue> · current phase: build · next phase: agent-code-review · commit <sha> · check green · unpushed
+   DONE: <repo>#<issue> · current phase: build · next phase: code-pr-review · commit <sha> · check green · unpushed
    ```

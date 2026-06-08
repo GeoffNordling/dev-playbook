@@ -125,9 +125,9 @@ With the whole issue implemented:
 3. **Commit** the remaining changes (marker removals included) with /commit.
 4. **Advance to code review:**
    ```bash
-   gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-agent-code-review"
+   gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-code-pr-review"
    ```
 5. Emit the terminal line, then stop:
    ```
-   DONE: <repo>#<issue> · current phase: sdd-tdd · next phase: sdd-agent-code-review · commit <sha> · check green · unpushed
+   DONE: <repo>#<issue> · current phase: sdd-tdd · next phase: sdd-code-pr-review · commit <sha> · check green · unpushed
    ```

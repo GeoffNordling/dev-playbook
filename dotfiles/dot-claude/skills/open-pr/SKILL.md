@@ -1,6 +1,6 @@
 ---
 name: open-pr
-description: Open the long-lived PR for an issue once its branch is on origin — idempotent, the first step of the code-review goal. Use when the agents dashboard launches the code-review phase.
+description: Open the long-lived PR for an issue once its branch is on origin — idempotent, the first step of the code-review goal. Use when the agents dashboard launches a code-review phase.
 disable-model-invocation: false
 model: opus
 effort: low

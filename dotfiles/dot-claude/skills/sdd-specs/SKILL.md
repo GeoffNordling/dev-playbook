@@ -100,9 +100,9 @@ When the user approves and the rubric passes:
 2. Run /commit.
 3. Advance the issue to spec review — move its label from this node to the next:
    ```bash
-   gh issue edit <issue> --remove-label "phase:sdd-specs" --add-label "phase:sdd-agent-spec-review"
+   gh issue edit <issue> --remove-label "phase:sdd-specs" --add-label "phase:sdd-spec-review"
    ```
 4. Report and stop:
    ```
-   <repo>#<issue> · current phase: sdd-specs · next phase: sdd-agent-spec-review · commit <sha> · check green · unpushed
+   <repo>#<issue> · current phase: sdd-specs · next phase: sdd-spec-review · commit <sha> · check green · unpushed
    ```

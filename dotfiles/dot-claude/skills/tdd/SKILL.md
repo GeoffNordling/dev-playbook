@@ -104,9 +104,9 @@ With every acceptance criterion met by a passing test:
 2. **Commit** the remaining changes with /commit.
 3. **Advance to code review:**
    ```bash
-   gh issue edit <issue> --remove-label "phase:tdd" --add-label "phase:agent-code-review"
+   gh issue edit <issue> --remove-label "phase:tdd" --add-label "phase:code-pr-review"
    ```
 4. Emit the terminal line, then stop:
    ```
-   DONE: <repo>#<issue> · current phase: tdd · next phase: agent-code-review · commit <sha> · check green · unpushed
+   DONE: <repo>#<issue> · current phase: tdd · next phase: code-pr-review · commit <sha> · check green · unpushed
    ```
