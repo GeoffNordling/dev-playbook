@@ -74,7 +74,7 @@ The skeleton holds — `Covers:`, `Needs:`, `Depends:`, and `Interface:` from th
 - **Leave implementation to build.** Output format, packaging, internal walk shape, file paths stay open unless a `req` constrains them.
 - When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. `Interface:` lines fully qualify symbol paths and follow the standard's annotation idiom.
 - **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you include is one you intend to deliver.
-- Keep `Rationale:` and `Comment:` non-prescriptive per the spec standard; a claim that wants to prescribe belongs in `Description:`. Reference relevant ADRs rather than re-explaining them.
+- `Rationale:` and `Comment:` are optional — write one only when there's a genuine "why" to record; omit it otherwise rather than filling it, since an empty or filler `Rationale:` is a defect per the spec standard. When you do write one, keep it non-prescriptive: a claim that wants to prescribe belongs in `Description:`. Reference relevant ADRs rather than re-explaining them.
 - **Mark the region work-in-progress.** Set `WIP: true` (§2.10) on each `feat` you author or reopen. Its cone reaches no verifiers yet, so completeness would otherwise fail; the marker exempts the `feat` and everything beneath it until build lands the verifiers and removes it. Consistency still holds.
 - **Reconcile a revision bump.** When an edit bumps an existing item's revision (§2.2.3), every committed adjacent reference now names the prior revision — a **stale reference** (target `(type, name)` present at another revision; reported by `SpecGraph.stale_references()`, not raised), distinct from a **dangling reference** (target `(type, name)` absent entirely, still a raised consistency breach). Reconcile the bump's adjacent references:
   - **Spec-side bullets** — `Covers:` / `Depends:` in other spec items: re-point them to the new revision in-phase (the phase owns these files), re-evaluating that each adjacent item still fits the bumped item's new meaning. If it does not, update the bumped item accordingly, bump its own
@@ -89,7 +89,7 @@ Re-read each new `feat` / `req` / `dsn` and iterate until clean:
 
 - [ ] Chains up via `Covers:` (or is a root); `Needs:` declares verification.
 - [ ] `Description:` conforms to the spec standard (EARS template, single obligation level); a `dsn`'s `Interface:` annotations follow its idiom.
-- [ ] `Rationale:` / `Comment:` stay non-prescriptive.
+- [ ] `Rationale:` / `Comment:` appear only where they carry a genuine why, and stay non-prescriptive.
 - [ ] Honors the section 5 principles.
 
 ## 7. Close the phase
