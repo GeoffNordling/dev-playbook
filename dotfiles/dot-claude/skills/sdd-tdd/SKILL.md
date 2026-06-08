@@ -35,6 +35,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
+- **Inherited stale references.** Consult the project's reported **stale references** (`SpecGraph.stale_references()`) and any `WIP:`-marked bumped nodes for markers a prior cycle's revision bump (§2.2.3) left naming a superseded revision — reported, not raised, and distinct from a **dangling reference**, whose `(type, name)` is absent entirely and still raises. Reconcile each per §2 before building new slices on the bumped item.
 
 ## 2. Plan the chunk
 
@@ -45,6 +46,7 @@ Before each chunk, state your plan — to anchor the work and keep it visible to
 - **Scope.** Which `dsn`(s) and behaviors the chunk covers.
 - **Slice ordering.** The sequence of red/green/refactor slices you'll drive.
 - **Ambiguities.** Anything in the spec you expect to resolve; if one stalls the next slice, escalate per §5.
+- **Stale-reference reconciliation.** For each inherited stale reference (§1), re-evaluate the marked test against the bumped item's new meaning: rework the test where the new meaning demands it, then re-point its `@pytest.mark.covers` marker to the current revision — the covers-string only; the test's logic changes only through that rework. The bumped node is then covered again, so the existing §7 `WIP:` removal closes it. (A rework that would change a committed `Interface:`, or a bumped meaning the spec underdetermines, is a spec change — route it through §6.)
 
 The plan is your map, not a gate — proceed without waiting for approval.
 
@@ -65,6 +67,8 @@ Each slice is one test, one implementation, then a brief refactor.
 **Red.** Pick one observable behavior under one `req~…` or `dsn~…`. Write a single failing test exercising it through the public surface declared by the relevant `dsn`'s `Interface:`. Mark every test with `@pytest.mark.covers("<id>")` naming the closest upstream item — typically the `dsn` whose `Needs: utest` / `Needs: itest` declared the obligation. Run `make test`; confirm it fails for the expected reason.
 
 **Never modify a written test.** Once you've written a test, make it pass by changing code, not the test. If you feel the need to change the test, escalate (§5) — don't edit it yourself.
+
+**Exception — inherited stale markers.** Re-pointing or reworking a *stale* marker inherited from a prior cycle's revision bump (§1, §2) is reconciliation, not editing a fresh slice's test: re-point its covers-string to the current revision, and rework the test only where the bumped meaning demands it (route to §6 if that rework would change a committed `Interface:` or the new meaning is underdetermined). This exception covers inherited stale markers alone — a test you wrote in this build's slices is still never modified; escalate (§5) instead.
 
 **Stub on first contact.** When a test imports a symbol with no stub yet, create the stub matching its `Interface:` declaration verbatim — same parameter names, kinds, annotations, return annotation. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
@@ -115,7 +119,7 @@ Never edit the spec without an explicit approval gesture in the same turn. A bug
 
 With the whole issue implemented:
 
-1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every `feat` — each cone is now covered by verifiers (spec-standard §2.10). If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
+1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every node that carries one. Each marked cone is now covered by verifiers. If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
 2. **Leave the tree green.** Run the gate — `make check`. With every `WIP:` removed, it now enforces completeness over the whole spec graph: a red build means a missing verifier — add it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
 4. **Advance to code review:**
