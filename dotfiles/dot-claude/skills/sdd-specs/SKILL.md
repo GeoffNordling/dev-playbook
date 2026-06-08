@@ -102,4 +102,7 @@ When the user approves and the rubric passes:
    ```bash
    gh issue edit <issue> --remove-label "phase:sdd-specs" --add-label "phase:sdd-agent-spec-review"
    ```
-4. Stop. Report that the spec is complete and the issue now sits at `phase:sdd-agent-spec-review`. Do not begin the review — the user dispatches the next node when ready.
+4. Report and stop:
+   ```
+   <repo>#<issue> · current phase: sdd-specs · next phase: sdd-agent-spec-review · commit <sha> · check green · unpushed
+   ```

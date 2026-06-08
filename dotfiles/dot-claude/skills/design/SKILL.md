@@ -80,4 +80,7 @@ When the user approves the approach:
    # tests:no
    gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"
    ```
-3. Stop. Report that design is complete and the issue now sits at its implementation phase. Do not begin building — the user dispatches the next node when ready.
+3. Report and stop:
+   ```
+   <repo>#<issue> · current phase: design · next phase: <tdd|build> · <one-line summary> · approach in issue
+   ```

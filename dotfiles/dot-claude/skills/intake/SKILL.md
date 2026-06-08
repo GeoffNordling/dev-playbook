@@ -105,4 +105,4 @@ gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues \
 
 ## Output
 
-Print issue numbers, a one-line summary of each, and the `phase:*` label each landed at. Triage ends at the label — the user dispatches the next node.
+Report one line per issue, in the standard form: `<repo>#<issue> · current phase: intake · next phase: <first work node> · <one-line summary> · brief in issue`.

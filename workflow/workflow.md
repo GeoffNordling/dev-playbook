@@ -104,7 +104,7 @@ What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API �
 
 | | Agent-capable | Owner |
 |---|---|---|
-| `git push` (publish the branch at `open PR`) | no | human |
+| `git push` (publish committed work to origin, after any committing phase) | no | human |
 | `git pull` (keep local `main` current) | no | human |
 | merge the PR (`approve: merge`, in the GitHub UI) | no | human |
 | `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | yes | skills |
@@ -112,8 +112,8 @@ What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API �
 
 Consequences that shape the skills:
 
-- **The implementation node never opens the PR.** It cannot push, and a finger-on-the-wheel skill cannot pause mid-run to wait for a tap. So it commits, advances its label, and ends `DONE` with a reminder to push. The PR is created downstream, after the push.
-- **The push is the human's transition ritual.** Seeing implementation `DONE`, the human pushes the branch (one tap), `/clear`s, and launches the code-review node. The node skill only reminds — it doesn't hand over the push command; that's surfaced at dispatch, targeted at the issue's worktree.
+- **The implementation node never opens the PR.** It cannot push, and a finger-on-the-wheel skill cannot pause mid-run to wait for a tap. So it commits, advances its label, and stops; the PR is created downstream, after the push.
+- **The push is the human's transition ritual.** Any committing node leaves its branch `unpushed`; the human pushes (one tap) before the next node. The dispatcher surfaces the push command, targeted at the issue's worktree — the node flags the state, not the command.
 - **The PR is born at code review.** `/open-pr` (first link of the code-review goal) creates it with `gh pr create` once the branch is on origin — tap-free, in a skill. If the branch isn't pushed yet, `/open-pr` escalates rather than guessing.
 - **The merge is the human's; cleanup is the merge node's.** The PAT cannot merge (`mergePullRequest` is forbidden), so on `approve: merge` the human squash-merges in the GitHub UI — dropping the origin branch and closing the issue via `Closes #<N>`. `/human-review` then tears down the local side, per the worktree contract above.
 

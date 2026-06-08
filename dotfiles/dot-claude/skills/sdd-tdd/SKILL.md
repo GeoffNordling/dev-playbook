@@ -92,7 +92,7 @@ For test-quality patterns and mocking guidance, see [testing conventions](~/work
 You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: #<issue> — <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · current phase: sdd-tdd · <where you're stuck and the call you need>
 ```
 
 The user reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
@@ -128,6 +128,5 @@ With the whole issue implemented:
    ```
 5. Emit the terminal line, then stop:
    ```
-   DONE: implemented #<issue> on issue-<issue>, now at phase:sdd-agent-code-review — remember to push the branch
+   DONE: <repo>#<issue> · current phase: sdd-tdd · next phase: sdd-agent-code-review · commit <sha> · check green · unpushed
    ```
-   Do not push or begin the review yourself — you're done after the commit.
