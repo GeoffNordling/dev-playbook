@@ -48,7 +48,17 @@ Single coherent piece → one issue. Plan crossing concerns or layers → break 
 
 Per the issue conventions. When **adopting**, rewrite the stub's body into the brief format — structure what the user wrote, don't discard it.
 
-### 5. Land it
+### 5. Confirm, then land
+
+Before writing anything to GitHub, reflect your read back to the user and land only on their nod — intake is HITL, and **adopt** *overwrites* the existing body, so the rewrite is never silent. In one message, show:
+
+- **Intent** — a one- or two-line restatement of the work as you understand it.
+- **The four-tuple** — `category` / `mode` / `tests` / first-work-node `phase`, each with a few words of why.
+- **The brief** — the body you drafted in §4 (for **adopt**, framed as the rewrite that will replace the stub).
+
+Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. (A deeper terminology or domain dispute is a `/grill-with-docs` matter per §1, not this beat.)
+
+On the nod:
 
 **Capture** — create the issue at its first work node:
 
