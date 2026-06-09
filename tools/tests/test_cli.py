@@ -1,54 +1,26 @@
 """Tests for workflow_state_data.cli — selector parsing and JSON emission."""
 
 import json
+from collections.abc import Callable
 from datetime import datetime
 
 import pytest
 
 from workflow_state_data.cli import main
-from workflow_state_data.core import IssueData, LabelEvent
+from workflow_state_data.core import IssueData
 
 
-def ts(value: str) -> datetime:
-    return datetime.fromisoformat(value)
-
-
-def issue(repo: str, number: int, phase: str) -> IssueData:
-    return IssueData(
-        repo=repo,
-        number=number,
-        title=f"Issue {number}",
-        state="open",
-        created_at=ts("2026-01-01T00:00:00+00:00"),
-        closed_at=None,
-        labels=("category:enhancement", "mode:direct", "tests:yes", f"phase:{phase}"),
-        events=(
-            LabelEvent("labeled", f"phase:{phase}", ts("2026-01-01T00:00:00+00:00")),
-        ),
-        comment_count=0,
-    )
-
-
-def untriaged(repo: str, number: int) -> IssueData:
-    return IssueData(
-        repo=repo,
-        number=number,
-        title=f"Issue {number}",
-        state="open",
-        created_at=ts("2026-01-01T00:00:00+00:00"),
-        closed_at=None,
-        labels=("wontfix",),
-        events=(),
-        comment_count=0,
-    )
-
-
-def test_main_emits_issue_records_json(capsys: pytest.CaptureFixture) -> None:
-    fetched = [issue("geoff/widgets", 1, "tdd"), untriaged("geoff/widgets", 2)]
+def test_main_emits_issue_records_json(
+    capsys: pytest.CaptureFixture,
+    ts: Callable[[str], datetime],
+    make_issue: Callable[..., IssueData],
+) -> None:
+    tracked = make_issue(number=1)
+    untriaged = make_issue(number=2, labels=("wontfix",), events=())
 
     exit_code = main(
         [],
-        fetch=lambda repos: fetched,
+        fetch=lambda repos: [tracked, untriaged],
         now=ts("2026-01-02T00:00:00+00:00"),
     )
 
@@ -60,10 +32,14 @@ def test_main_emits_issue_records_json(capsys: pytest.CaptureFixture) -> None:
 
 def test_live_flag_emits_open_issues_grouped_by_phase(
     capsys: pytest.CaptureFixture,
+    ts: Callable[[str], datetime],
+    make_issue: Callable[..., IssueData],
 ) -> None:
     fetched = [
-        issue("geoff/widgets", 1, "tdd"),
-        issue("geoff/gadgets", 3, "code-pr-review"),
+        make_issue(repo="geoff/widgets", number=1, title="Issue 1"),
+        make_issue(
+            phase="code-pr-review", repo="geoff/gadgets", number=3, title="Issue 3"
+        ),
     ]
 
     exit_code = main(
@@ -80,10 +56,11 @@ def test_live_flag_emits_open_issues_grouped_by_phase(
     }
 
 
-def test_repo_selector_narrows_fetch() -> None:
+def test_repo_selector_narrows_fetch(ts: Callable[[str], datetime]) -> None:
     fetched_with: list[list[str] | None] = []
 
     def fetch(repos: list[str] | None) -> list[IssueData]:
+        """Record the repos selector each fetch call receives."""
         fetched_with.append(repos)
         return []
 
@@ -96,8 +73,12 @@ def test_repo_selector_narrows_fetch() -> None:
     assert fetched_with == [["geoff/widgets", "geoff/gadgets"]]
 
 
-def test_issue_selector_filters_records(capsys: pytest.CaptureFixture) -> None:
-    fetched = [issue("geoff/widgets", 1, "tdd"), issue("geoff/widgets", 2, "tdd")]
+def test_issue_selector_filters_records(
+    capsys: pytest.CaptureFixture,
+    ts: Callable[[str], datetime],
+    make_issue: Callable[..., IssueData],
+) -> None:
+    fetched = [make_issue(number=1), make_issue(number=2)]
 
     exit_code = main(
         ["--repo", "geoff/widgets", "--issue", "2"],
@@ -110,7 +91,31 @@ def test_issue_selector_filters_records(capsys: pytest.CaptureFixture) -> None:
     assert [record["number"] for record in records] == [2]
 
 
-def test_issue_selector_requires_exactly_one_repo() -> None:
+def test_issue_selector_rejects_empty_elements(
+    ts: Callable[[str], datetime],
+) -> None:
+    with pytest.raises(SystemExit):
+        main(
+            ["--repo", "geoff/widgets", "--issue", "2,"],
+            fetch=lambda repos: [],
+            now=ts("2026-01-02T00:00:00+00:00"),
+        )
+
+
+def test_repo_selector_rejects_empty_elements(
+    ts: Callable[[str], datetime],
+) -> None:
+    with pytest.raises(SystemExit):
+        main(
+            ["--repo", "geoff/widgets,"],
+            fetch=lambda repos: [],
+            now=ts("2026-01-02T00:00:00+00:00"),
+        )
+
+
+def test_issue_selector_requires_exactly_one_repo(
+    ts: Callable[[str], datetime],
+) -> None:
     with pytest.raises(SystemExit):
         main(
             ["--issue", "2"],

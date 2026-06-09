@@ -15,6 +15,8 @@ class PersistentDoublePhaseError(Exception):
 
 @dataclass(frozen=True)
 class LabelEvent:
+    """One labeled/unlabeled timeline event: action, label name, timestamp."""
+
     action: Literal["labeled", "unlabeled"]
     label: str
     at: datetime
@@ -22,6 +24,8 @@ class LabelEvent:
 
 @dataclass(frozen=True)
 class IssueData:
+    """Everything fetched about one issue, ready for pure transformation."""
+
     repo: str
     number: int
     title: str
@@ -35,6 +39,8 @@ class IssueData:
 
 @dataclass(frozen=True)
 class PhaseVisit:
+    """One stay in a phase; an in-flight visit has no exit timestamp."""
+
     phase: str
     entered_at: datetime
     exited_at: datetime | None
@@ -44,9 +50,12 @@ class PhaseVisit:
 def reconstruct_phase_history(
     events: list[LabelEvent], until: datetime
 ) -> list[PhaseVisit]:
+    """Replay phase-label events into a list of visits; open visits run to until."""
+
     def visit(
         phase: str, entered_at: datetime, exited_at: datetime | None
     ) -> PhaseVisit:
+        """Build a PhaseVisit, measuring an open visit's duration to until."""
         end = exited_at if exited_at is not None else until
         return PhaseVisit(
             phase=phase,
@@ -87,6 +96,7 @@ def reconstruct_phase_history(
 
 
 def build_record(issue: IssueData, now: datetime) -> dict | None:
+    """Assemble one issue's JSON-ready metrics record, or None if out of scope."""
     # Scope rule: the tool only sees issues fully inside the canonical
     # workflow — any non-canonical label (current or historical) or an empty
     # phase history means silently omitted, not an error.
@@ -112,6 +122,8 @@ def build_record(issue: IssueData, now: datetime) -> dict | None:
     metadata = dict(
         label.split(":", 1) for label in issue.labels if not label.startswith("phase:")
     )
+    # An issue may legitimately carry no category:/mode:/tests: label, so the
+    # metadata lookups below deliberately fall back to None.
     return {
         "repo": issue.repo,
         "number": issue.number,
@@ -141,11 +153,19 @@ def build_record(issue: IssueData, now: datetime) -> dict | None:
 
 
 def live_view(records: list[dict]) -> dict:
+    """Group open issues by current phase: {phase: [{repo, number, title}]}."""
     view: dict[str, list[dict]] = {}
     for record in records:
         if record["state"] != "open":
             continue
-        view.setdefault(record["current_phase"], []).append(
+        # An open issue whose last phase label was removed without a
+        # replacement is in limbo; surface it deliberately under "no-phase".
+        phase = (
+            record["current_phase"]
+            if record["current_phase"] is not None
+            else "no-phase"
+        )
+        view.setdefault(phase, []).append(
             {
                 "repo": record["repo"],
                 "number": record["number"],

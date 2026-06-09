@@ -10,6 +10,7 @@ from workflow_state_data.github import fetch_issues
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
+    """Parse and validate CLI selectors into repos/issues lists."""
     parser = argparse.ArgumentParser(
         prog="workflow-state-data",
         description="Derive workflow metrics and live issue states from GitHub.",
@@ -29,6 +30,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     )
     args = parser.parse_args(argv)
     args.repos = args.repo.split(",") if args.repo else None
+    if args.repos is not None and not all(args.repos):
+        parser.error("--repo contains an empty element")
+    if args.issue is not None and not all(args.issue.split(",")):
+        parser.error("--issue contains an empty element")
     args.issues = [int(n) for n in args.issue.split(",")] if args.issue else None
     if args.issues is not None and (args.repos is None or len(args.repos) != 1):
         parser.error("--issue requires exactly one --repo")
@@ -40,6 +45,7 @@ def main(
     fetch: Callable[[list[str] | None], list[IssueData]] = fetch_issues,
     now: datetime | None = None,
 ) -> int:
+    """Fetch, reconstruct, and print issue records (or the live view) as JSON."""
     args = _parse_args(argv)
     now = now if now is not None else datetime.now(UTC)
     issues = fetch(args.repos)

@@ -23,6 +23,7 @@ from workflow_state_data.github import (
 
 
 def completed(returncode: int, stdout: str = "", stderr: str = "") -> object:
+    """A canned CompletedProcess standing in for one gh invocation."""
     return subprocess.CompletedProcess(
         args=["gh"], returncode=returncode, stdout=stdout, stderr=stderr
     )
@@ -38,6 +39,7 @@ def queued_runner(results: list[object]) -> Callable:
 
 
 def issue_node(**overrides: object) -> dict:
+    """A GraphQL issue node in the search-response shape, with overrides."""
     defaults: dict = {
         "id": "ID7",
         "number": 7,
@@ -121,6 +123,7 @@ def test_parse_issue_node_parses_closed_issue() -> None:
 
 
 def search_page(nodes: list[dict], end_cursor: str | None) -> dict:
+    """One page of GraphQL search results; a cursor marks a following page."""
     return {
         "search": {
             "pageInfo": {
@@ -148,6 +151,7 @@ def test_fetch_issues_paginates_search_results() -> None:
 
 
 def timeline_event(typename: str, label: str, at: str) -> dict:
+    """One labeled/unlabeled timeline node in the GraphQL response shape."""
     return {"__typename": typename, "label": {"name": label}, "createdAt": at}
 
 
@@ -220,6 +224,33 @@ def test_gh_graphql_fails_loud_on_graphql_errors_payload() -> None:
 
     with pytest.raises(GitHubError, match="Could not resolve"):
         gh_graphql("query {}", {}, runner=runner, sleep=lambda _: None)
+
+
+def test_gh_graphql_does_not_retry_on_unrelated_error_containing_429() -> None:
+    runner = queued_runner([completed(1, stderr="gh: node ID 429133 not found")])
+    sleeps: list[float] = []
+
+    with pytest.raises(GitHubError, match="not found"):
+        gh_graphql("query {}", {}, runner=runner, sleep=sleeps.append)
+
+    assert sleeps == []
+
+
+def test_gh_graphql_fails_loud_when_retry_after_rate_limit_also_fails() -> None:
+    runner = queued_runner(
+        [
+            completed(
+                1, stderr="gh: You have exceeded a secondary rate limit (HTTP 429)"
+            ),
+            completed(1, stderr="gh: HTTP 502 Bad gateway"),
+        ]
+    )
+    sleeps: list[float] = []
+
+    with pytest.raises(GitHubError, match="Bad gateway"):
+        gh_graphql("query {}", {}, runner=runner, sleep=sleeps.append)
+
+    assert len(sleeps) == 1
 
 
 def test_gh_graphql_retries_once_after_rate_limit() -> None:
