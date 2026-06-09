@@ -60,6 +60,7 @@ Run ad hoc on human demand; not part of the pre-commit pipeline.
 | `griffe-outline` | Print class/function structure of a Python package |
 | `worktree-sweep` | Prune merged-PR worktrees in `.claude/worktrees/` |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
+| `workflow-state-data` | Emit workflow metrics and live issue states as JSON, reconstructed from GitHub label timelines |
 | `gh-show` (in `dotfiles/bin/`) | Print a GitHub issue or PR with body + comments |
 
 Run any script with `--help`; each script's docstring documents its behavior in full.
