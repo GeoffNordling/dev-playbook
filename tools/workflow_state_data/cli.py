@@ -17,7 +17,8 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     )
     parser.add_argument(
         "--repo",
-        help="comma-separated owner/name list; default is account-wide",
+        help="comma-separated owner/name list; default scans repos owned by "
+        "the authenticated user (user:@me — not org or collaborator repos)",
     )
     parser.add_argument(
         "--issue",
@@ -29,12 +30,19 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="emit open issues grouped by current phase",
     )
     args = parser.parse_args(argv)
-    args.repos = args.repo.split(",") if args.repo else None
-    if args.repos is not None and not all(args.repos):
-        parser.error("--repo contains an empty element")
-    if args.issue is not None and not all(args.issue.split(",")):
-        parser.error("--issue contains an empty element")
-    args.issues = [int(n) for n in args.issue.split(",")] if args.issue else None
+    args.repos = None
+    if args.repo is not None:
+        args.repos = [repo.strip() for repo in args.repo.split(",")]
+        if not all(args.repos):
+            parser.error("--repo contains an empty element")
+    args.issues = None
+    if args.issue is not None:
+        numbers = [n.strip() for n in args.issue.split(",")]
+        if not all(numbers):
+            parser.error("--issue contains an empty element")
+        if not all(n.isdigit() for n in numbers):
+            parser.error("--issue contains a non-numeric element")
+        args.issues = [int(n) for n in numbers]
     if args.issues is not None and (args.repos is None or len(args.repos) != 1):
         parser.error("--issue requires exactly one --repo")
     return args
@@ -50,6 +58,16 @@ def main(
     now = now if now is not None else datetime.now(UTC)
     issues = fetch(args.repos)
     if args.issues is not None:
+        # Bulk runs silently omit untriaged/stale-labeled issues, but an
+        # explicitly requested number that the fetch never returned is an
+        # error — a typo or an issue outside the canonical workflow.
+        missing = sorted(set(args.issues) - {issue.number for issue in issues})
+        if missing:
+            raise SystemExit(
+                f"error: requested issue(s) not returned by the fetch: "
+                f"{', '.join(map(str, missing))} (nonexistent, untriaged, or "
+                f"outside the canonical workflow)"
+            )
         issues = [issue for issue in issues if issue.number in args.issues]
     records = [
         record

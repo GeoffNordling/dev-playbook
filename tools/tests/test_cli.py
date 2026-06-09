@@ -113,6 +113,61 @@ def test_repo_selector_rejects_empty_elements(
         )
 
 
+def test_repo_elements_are_stripped_of_surrounding_whitespace(
+    ts: Callable[[str], datetime],
+) -> None:
+    fetched_with: list[list[str] | None] = []
+
+    def fetch(repos: list[str] | None) -> list[IssueData]:
+        """Record the repos selector each fetch call receives."""
+        fetched_with.append(repos)
+        return []
+
+    main(
+        ["--repo", "geoff/widgets, geoff/gadgets"],
+        fetch=fetch,
+        now=ts("2026-01-02T00:00:00+00:00"),
+    )
+
+    assert fetched_with == [["geoff/widgets", "geoff/gadgets"]]
+
+
+def test_empty_repo_value_is_rejected_not_widened_to_account_scope(
+    ts: Callable[[str], datetime],
+) -> None:
+    with pytest.raises(SystemExit):
+        main(
+            ["--repo", ""],
+            fetch=lambda repos: [],
+            now=ts("2026-01-02T00:00:00+00:00"),
+        )
+
+
+def test_issue_selector_rejects_non_numeric_elements(
+    ts: Callable[[str], datetime],
+) -> None:
+    with pytest.raises(SystemExit):
+        main(
+            ["--repo", "geoff/widgets", "--issue", "7,abc"],
+            fetch=lambda repos: [],
+            now=ts("2026-01-02T00:00:00+00:00"),
+        )
+
+
+def test_requested_issue_absent_from_fetch_fails_loud(
+    ts: Callable[[str], datetime],
+    make_issue: Callable[..., IssueData],
+) -> None:
+    fetched = [make_issue(number=1)]
+
+    with pytest.raises(SystemExit, match="9"):
+        main(
+            ["--repo", "geoff/widgets", "--issue", "9"],
+            fetch=lambda repos: fetched,
+            now=ts("2026-01-02T00:00:00+00:00"),
+        )
+
+
 def test_issue_selector_requires_exactly_one_repo(
     ts: Callable[[str], datetime],
 ) -> None:
