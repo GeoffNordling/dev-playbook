@@ -119,6 +119,23 @@ def test_rework_bounce_produces_three_visits(
     assert history[2].exited_at is None
 
 
+def test_swap_straddling_a_second_boundary_is_tolerated(
+    ts: Callable[[str], datetime],
+) -> None:
+    events = [
+        LabelEvent("labeled", "phase:tdd", ts("2026-01-01T00:00:00+00:00")),
+        LabelEvent("labeled", "phase:code-pr-review", ts("2026-01-03T00:00:01+00:00")),
+        LabelEvent("unlabeled", "phase:tdd", ts("2026-01-03T00:00:02+00:00")),
+    ]
+
+    history = reconstruct_phase_history(events, until=ts("2026-01-04T00:00:00+00:00"))
+
+    assert [visit.phase for visit in history] == ["tdd", "code-pr-review"]
+    assert history[0].exited_at == ts("2026-01-03T00:00:02+00:00")
+    assert history[1].entered_at == ts("2026-01-03T00:00:02+00:00")
+    assert history[1].exited_at is None
+
+
 def test_persistent_double_phase_label_fails_loud(
     ts: Callable[[str], datetime],
 ) -> None:
@@ -129,6 +146,50 @@ def test_persistent_double_phase_label_fails_loud(
 
     with pytest.raises(PersistentDoublePhaseError):
         reconstruct_phase_history(events, until=ts("2026-01-03T00:00:00+00:00"))
+
+
+def test_label_added_after_until_is_ignored(
+    ts: Callable[[str], datetime],
+) -> None:
+    events = [
+        LabelEvent("labeled", "phase:tdd", ts("2026-01-01T00:00:00+00:00")),
+        LabelEvent("labeled", "phase:build", ts("2026-01-10T00:00:00+00:00")),
+        LabelEvent("unlabeled", "phase:tdd", ts("2026-01-10T00:00:00+00:00")),
+    ]
+
+    history = reconstruct_phase_history(events, until=ts("2026-01-05T00:00:00+00:00"))
+
+    assert [visit.phase for visit in history] == ["tdd"]
+    assert history[0].exited_at is None
+    assert history[0].duration_seconds == 4 * 86400.0
+
+
+def test_label_removed_after_until_is_ignored(
+    ts: Callable[[str], datetime],
+) -> None:
+    events = [
+        LabelEvent("labeled", "phase:tdd", ts("2026-01-01T00:00:00+00:00")),
+        LabelEvent("unlabeled", "phase:tdd", ts("2026-01-10T00:00:00+00:00")),
+    ]
+
+    history = reconstruct_phase_history(events, until=ts("2026-01-05T00:00:00+00:00"))
+
+    assert [visit.phase for visit in history] == ["tdd"]
+    assert history[0].exited_at is None
+    assert history[0].duration_seconds == 4 * 86400.0
+
+
+def test_double_phase_persisting_past_the_next_event_fails_loud(
+    ts: Callable[[str], datetime],
+) -> None:
+    events = [
+        LabelEvent("labeled", "phase:tdd", ts("2026-01-01T00:00:00+00:00")),
+        LabelEvent("labeled", "phase:code-pr-review", ts("2026-01-02T00:00:00+00:00")),
+        LabelEvent("labeled", "phase:build", ts("2026-01-03T00:00:00+00:00")),
+    ]
+
+    with pytest.raises(PersistentDoublePhaseError):
+        reconstruct_phase_history(events, until=ts("2026-01-04T00:00:00+00:00"))
 
 
 def test_build_record_assembles_identity_and_phase_history(

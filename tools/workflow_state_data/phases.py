@@ -36,4 +36,5 @@ CANONICAL_LABELS: frozenset[str] = METADATA_LABELS | {
 
 
 def is_backward(from_phase: str, to_phase: str) -> bool:
+    """Whether a transition moves to a lower-ranked phase — i.e. rework."""
     return PHASE_RANK[to_phase] < PHASE_RANK[from_phase]

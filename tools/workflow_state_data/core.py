@@ -47,6 +47,15 @@ class PhaseVisit:
     duration_seconds: float
 
 
+def _double_phase_error(
+    since: datetime, active: set[str]
+) -> PersistentDoublePhaseError:
+    """Error for a double-phase state that outlived the swap tolerance."""
+    return PersistentDoublePhaseError(
+        f"multiple phase labels active since {since.isoformat()}: {sorted(active)}"
+    )
+
+
 def reconstruct_phase_history(
     events: list[LabelEvent], until: datetime
 ) -> list[PhaseVisit]:
@@ -68,10 +77,17 @@ def reconstruct_phase_history(
     open_visit: tuple[str, datetime] | None = None
     active: set[str] = set()
 
-    phase_events = (e for e in events if e.label.startswith("phase:"))
-    # Phase-label swaps land as add/remove pairs at the same timestamp; apply
-    # each same-timestamp group atomically (API order preserved, no re-sort)
-    # so transient two-label/zero-label instants inside a group never surface.
+    # Events past until (labels edited on a closed issue — e.g. a human
+    # tidying the stale phase label the approve path leaves behind) are
+    # deliberately ignored: the history only covers the issue's lifetime.
+    phase_events = (e for e in events if e.label.startswith("phase:") and e.at <= until)
+    # Phase-label swaps usually land as add/remove pairs at the same timestamp,
+    # but gh dispatches the two mutations concurrently, so with GitHub's
+    # second-granularity timestamps a swap can straddle a boundary. Apply each
+    # same-timestamp group atomically (API order preserved, no re-sort) and
+    # tolerate a double-phase state for one group; fail loud only when it
+    # persists past the next group — that is a real double label, not a swap.
+    double_since: datetime | None = None
     for at, group in itertools.groupby(phase_events, key=lambda e: e.at):
         for event in group:
             phase = event.label.removeprefix("phase:")
@@ -80,9 +96,11 @@ def reconstruct_phase_history(
             else:
                 active.discard(phase)
         if len(active) > 1:
-            raise PersistentDoublePhaseError(
-                f"multiple phase labels active at {at.isoformat()}: {sorted(active)}"
-            )
+            if double_since is not None:
+                raise _double_phase_error(double_since, active)
+            double_since = at
+            continue
+        double_since = None
         settled = next(iter(active)) if active else None
         if open_visit is not None and settled == open_visit[0]:
             continue
@@ -90,6 +108,8 @@ def reconstruct_phase_history(
             visits.append(visit(open_visit[0], open_visit[1], at))
         open_visit = (settled, at) if settled is not None else None
 
+    if double_since is not None:
+        raise _double_phase_error(double_since, active)
     if open_visit is not None:
         visits.append(visit(open_visit[0], open_visit[1], None))
     return visits
