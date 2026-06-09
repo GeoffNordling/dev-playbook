@@ -48,7 +48,10 @@ def issue_node(**overrides: object) -> dict:
         "createdAt": "2026-01-01T00:00:00Z",
         "closedAt": None,
         "repository": {"nameWithOwner": "geoff/widgets"},
-        "labels": {"nodes": [{"name": "mode:direct"}, {"name": "phase:tdd"}]},
+        "labels": {
+            "pageInfo": {"hasNextPage": False},
+            "nodes": [{"name": "mode:direct"}, {"name": "phase:tdd"}],
+        },
         "comments": {"totalCount": 3},
         "timelineItems": {
             "pageInfo": {"hasNextPage": False, "endCursor": None},
@@ -78,6 +81,19 @@ def test_search_query_is_account_wide_and_phase_filtered() -> None:
     assert query.count("label:") == 1
     assert '"phase:tdd"' in query
     assert '"phase:sdd-code-pr-review"' in query
+
+
+def test_search_query_matches_metadata_labels_so_limbo_issues_are_found() -> None:
+    query = build_search_query(repos=None)
+
+    # An open issue whose phase label was removed without replacement still
+    # carries its metadata labels; searching on them keeps it fetchable.
+    assert '"category:bug"' in query
+    assert '"category:enhancement"' in query
+    assert '"mode:direct"' in query
+    assert '"mode:sdd"' in query
+    assert '"tests:yes"' in query
+    assert '"tests:no"' in query
 
 
 def test_search_query_narrows_to_given_repos() -> None:
@@ -122,10 +138,25 @@ def test_parse_issue_node_parses_closed_issue() -> None:
     assert issue.closed_at == datetime.fromisoformat("2026-01-05T00:00:00+00:00")
 
 
-def search_page(nodes: list[dict], end_cursor: str | None) -> dict:
+def test_parse_issue_node_fails_loud_on_truncated_label_list() -> None:
+    node = issue_node(
+        labels={
+            "pageInfo": {"hasNextPage": True},
+            "nodes": [{"name": "mode:direct"}],
+        }
+    )
+
+    with pytest.raises(GitHubError, match="label"):
+        parse_issue_node(node)
+
+
+def search_page(
+    nodes: list[dict], end_cursor: str | None, issue_count: int | None = None
+) -> dict:
     """One page of GraphQL search results; a cursor marks a following page."""
     return {
         "search": {
+            "issueCount": issue_count if issue_count is not None else len(nodes),
             "pageInfo": {
                 "hasNextPage": end_cursor is not None,
                 "endCursor": end_cursor,
@@ -148,6 +179,16 @@ def test_fetch_issues_paginates_search_results() -> None:
 
     assert [issue.number for issue in issues] == [7, 8]
     assert cursors == [None, "CUR1"]
+
+
+def test_fetch_issues_fails_loud_when_search_results_are_truncated() -> None:
+    # GitHub's search caps at 1000 results, signalled only as hasNextPage:
+    # false with issueCount still reporting the full match count.
+    def run_query(query: str, variables: dict) -> dict:
+        return search_page([issue_node()], None, issue_count=1500)
+
+    with pytest.raises(GitHubError, match="1500"):
+        fetch_issues(repos=None, run_query=run_query)
 
 
 def timeline_event(typename: str, label: str, at: str) -> dict:

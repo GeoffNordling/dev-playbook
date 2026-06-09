@@ -13,33 +13,40 @@ from datetime import datetime
 from typing import Literal, cast
 
 from workflow_state_data.core import IssueData, LabelEvent
-from workflow_state_data.phases import PHASE_RANK
+from workflow_state_data.phases import CANONICAL_LABELS
 
 _EVENT_ACTIONS = {"LabeledEvent": "labeled", "UnlabeledEvent": "unlabeled"}
 
-_ISSUE_FIELDS = """
-  id
-  number
-  title
-  state
-  createdAt
-  closedAt
-  repository { nameWithOwner }
-  labels(first: 50) { nodes { name } }
-  comments { totalCount }
-  timelineItems(itemTypes: [LABELED_EVENT, UNLABELED_EVENT], first: 250) {
+_TIMELINE_ARGS = "itemTypes: [LABELED_EVENT, UNLABELED_EVENT], first: 250"
+
+_TIMELINE_FIELDS = """
     pageInfo { hasNextPage endCursor }
     nodes {
       __typename
       ... on LabeledEvent { label { name } createdAt }
       ... on UnlabeledEvent { label { name } createdAt }
     }
-  }
+"""
+
+_ISSUE_FIELDS = f"""
+  id
+  number
+  title
+  state
+  createdAt
+  closedAt
+  repository {{ nameWithOwner }}
+  labels(first: 50) {{ pageInfo {{ hasNextPage }} nodes {{ name }} }}
+  comments {{ totalCount }}
+  timelineItems({_TIMELINE_ARGS}) {{
+{_TIMELINE_FIELDS}
+  }}
 """
 
 SEARCH_QUERY = f"""
 query($q: String!, $cursor: String) {{
-  search(type: ISSUE, query: $q, first: 50, after: $cursor) {{
+  search(type: ISSUE, query: $q, first: 100, after: $cursor) {{
+    issueCount
     pageInfo {{ hasNextPage endCursor }}
     nodes {{
       ... on Issue {{
@@ -50,21 +57,16 @@ query($q: String!, $cursor: String) {{
 }}
 """
 
-TIMELINE_QUERY = """
-query($id: ID!, $cursor: String) {
-  node(id: $id) {
-    ... on Issue {
-      timelineItems(itemTypes: [LABELED_EVENT, UNLABELED_EVENT], first: 250, after: $cursor) {
-        pageInfo { hasNextPage endCursor }
-        nodes {
-          __typename
-          ... on LabeledEvent { label { name } createdAt }
-          ... on UnlabeledEvent { label { name } createdAt }
-        }
-      }
-    }
-  }
-}
+TIMELINE_QUERY = f"""
+query($id: ID!, $cursor: String) {{
+  node(id: $id) {{
+    ... on Issue {{
+      timelineItems({_TIMELINE_ARGS}, after: $cursor) {{
+{_TIMELINE_FIELDS}
+      }}
+    }}
+  }}
+}}
 """
 
 
@@ -122,6 +124,15 @@ def fetch_issues(
             for node in search["nodes"]
         )
         if not search["pageInfo"]["hasNextPage"]:
+            # The search connection hard-caps at 1000 results and signals it
+            # only as hasNextPage: false — never partial output, so compare
+            # against the full match count.
+            if len(issues) < search["issueCount"]:
+                raise GitHubError(
+                    f"search returned {len(issues)} of {search['issueCount']} "
+                    f"matching issues (GitHub caps search at 1000 results); "
+                    f"narrow the scope with --repo"
+                )
             return issues
         cursor = search["pageInfo"]["endCursor"]
 
@@ -143,6 +154,14 @@ def _with_complete_timeline(node: dict, run_query: Callable[[str, dict], dict]) 
 
 def parse_issue_node(node: dict) -> IssueData:
     """Map one GraphQL issue node to IssueData."""
+    # The canonical label set is small (~15), so one page always suffices —
+    # but a truncated list would pass the scope gate on partial data, so
+    # uphold the never-partial-output contract here too.
+    if node["labels"]["pageInfo"]["hasNextPage"]:
+        raise GitHubError(
+            f"issue {node['repository']['nameWithOwner']}#{node['number']} "
+            f"has more than 50 labels; label list would be truncated"
+        )
     events = tuple(
         LabelEvent(
             action=cast(
@@ -169,9 +188,17 @@ def parse_issue_node(node: dict) -> IssueData:
 
 
 def build_search_query(repos: list[str] | None) -> str:
-    """Build the issue search string: scope qualifier + canonical phase labels."""
+    """Build the issue search string: scope qualifier + canonical labels.
+
+    Matching any canonical workflow label (not just phase:) keeps limbo
+    issues — phase label removed without replacement — fetchable via the
+    metadata labels they retain. Residual blind spot: an issue that lost
+    its phase label before metadata labels were ever stamped matches
+    nothing and stays invisible. Note the default user:@me scope covers
+    only repos the user owns, not org-owned or collaborator repos.
+    """
     scope = (
         " ".join(f"repo:{repo}" for repo in repos) if repos is not None else "user:@me"
     )
-    labels = ",".join(f'"phase:{phase}"' for phase in PHASE_RANK)
+    labels = ",".join(f'"{label}"' for label in sorted(CANONICAL_LABELS))
     return f"is:issue {scope} label:{labels}"
