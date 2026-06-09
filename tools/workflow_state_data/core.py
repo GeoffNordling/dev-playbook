@@ -138,3 +138,18 @@ def build_record(issue: IssueData, now: datetime) -> dict | None:
             for v in history
         ],
     }
+
+
+def live_view(records: list[dict]) -> dict:
+    view: dict[str, list[dict]] = {}
+    for record in records:
+        if record["state"] != "open":
+            continue
+        view.setdefault(record["current_phase"], []).append(
+            {
+                "repo": record["repo"],
+                "number": record["number"],
+                "title": record["title"],
+            }
+        )
+    return view
