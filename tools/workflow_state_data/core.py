@@ -1,9 +1,12 @@
 """Pure transforms: timeline label events + an observation time → phase history."""
 
 import itertools
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal
+
+from workflow_state_data.phases import CANONICAL_LABELS, is_backward
 
 
 class PersistentDoublePhaseError(Exception):
@@ -15,6 +18,19 @@ class LabelEvent:
     action: Literal["labeled", "unlabeled"]
     label: str
     at: datetime
+
+
+@dataclass(frozen=True)
+class IssueData:
+    repo: str
+    number: int
+    title: str
+    state: Literal["open", "closed"]
+    created_at: datetime
+    closed_at: datetime | None
+    labels: tuple[str, ...]
+    events: tuple[LabelEvent, ...]
+    comment_count: int
 
 
 @dataclass(frozen=True)
@@ -68,3 +84,57 @@ def reconstruct_phase_history(
     if open_visit is not None:
         visits.append(visit(open_visit[0], open_visit[1], None))
     return visits
+
+
+def build_record(issue: IssueData, now: datetime) -> dict | None:
+    # Scope rule: the tool only sees issues fully inside the canonical
+    # workflow — any non-canonical label (current or historical) or an empty
+    # phase history means silently omitted, not an error.
+    seen_labels = set(issue.labels) | {event.label for event in issue.events}
+    if not seen_labels <= CANONICAL_LABELS:
+        return None
+
+    until = issue.closed_at if issue.closed_at is not None else now
+    history = reconstruct_phase_history(list(issue.events), until)
+    if not history:
+        return None
+    last = history[-1]
+    current_phase = last.phase if last.exited_at is None else None
+    transitions = [
+        {
+            "from": prev.phase,
+            "to": nxt.phase,
+            "at": nxt.entered_at.isoformat(),
+            "backward": is_backward(prev.phase, nxt.phase),
+        }
+        for prev, nxt in itertools.pairwise(history)
+    ]
+    metadata = dict(
+        label.split(":", 1) for label in issue.labels if not label.startswith("phase:")
+    )
+    return {
+        "repo": issue.repo,
+        "number": issue.number,
+        "title": issue.title,
+        "state": issue.state,
+        "category": metadata.get("category"),
+        "mode": metadata.get("mode"),
+        "tests": metadata.get("tests"),
+        "created_at": issue.created_at.isoformat(),
+        "closed_at": issue.closed_at.isoformat() if issue.closed_at else None,
+        "current_phase": current_phase,
+        "lifetime_seconds": (until - issue.created_at).total_seconds(),
+        "transitions": transitions,
+        "rework_count": sum(1 for t in transitions if t["backward"]),
+        "phase_visits": dict(Counter(v.phase for v in history)),
+        "comments": {"issue": issue.comment_count, "total": issue.comment_count},
+        "phase_history": [
+            {
+                "phase": v.phase,
+                "entered_at": v.entered_at.isoformat(),
+                "exited_at": v.exited_at.isoformat() if v.exited_at else None,
+                "duration_seconds": v.duration_seconds,
+            }
+            for v in history
+        ],
+    }
