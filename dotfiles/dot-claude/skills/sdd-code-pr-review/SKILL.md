@@ -2,7 +2,6 @@
 name: sdd-code-pr-review
 description: Reviews an SDD issue's PR against its committed spec and the project conventions, attaches findings to the PR, then takes the user's verdict — approve to merge, or rework back to the implementer. Use when the agents dashboard launches the SDD code review phase.
 disable-model-invocation: false
-model: opus
 effort: xhigh
 disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(//tmp/**)
@@ -45,6 +44,8 @@ Run the gate — `make -C <subproject> check` (or `make check` when the `Makefil
 
 Read the change as a whole — the spec and the code together — against the conventions. Assess each dimension and collect what you find, pinning each finding to the file and line and the rule or spec item it breaches.
 
+**Know your cycle first.** The cycle number is the count of prior `## Code review — …` comments on the PR, plus one. Cycles 1 and 2 are full reviews across the dimensions below. From cycle 3 on, the review is a lockdown: its sole job is verifying the prior review's Blocking findings are fixed — don't hunt for new findings, though anything you notice incidentally still gets reported.
+
 - **Spec fidelity.** The gate already proves each spec item has a passing verifier; what it can't prove is that the verifier is honest. Reading spec and code together, check that each test genuinely exercises the behavior its `req`/`dsn` describes rather than passing vacuously, and that the code implements what the spec commits to without drifting past its scope.
 - **Testing conventions.** The tests conform to testing-conventions.md — structure, naming, behavioral focus.
 - **Python conventions.** The code conforms to python-conventions.md — docstrings, fail-loudly, annotation style.
@@ -54,10 +55,10 @@ Read the change as a whole — the spec and the code together — against the co
 
 Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one PR comment with `gh pr comment --body-file <path>`.
 
-- **Head it with the reviewed revision.** `## Code review — <sha>`, using the short HEAD sha (`git rev-parse --short HEAD`). On a re-review — the PR already carries a prior `## Code review — …` comment — head it `## Code review — <sha> (supersedes review of <prior-sha>)` and open with a one-line disposition of each prior finding (resolved / still open), so neither the user nor a later read treats the stale findings as live.
-- **Every finding is a problem plus its fix.** State the believed problem and the action it calls for, grouped by severity — **Blocking** (a fidelity gap, a convention breach that matters, a bug) or **Suggestion** (a non-disqualifying improvement). Write nothing that isn't actionable: no "acceptable as written", "no action needed", or "just noting". Where you are genuinely unsure, raise it as a question or risk, naming the decision the user faces.
+- **Head it with the reviewed revision and the cycle.** `## Code review — <sha> · cycle <n>`, using the short HEAD sha (`git rev-parse --short HEAD`) and the cycle number from §3. On a re-review — the PR already carries a prior `## Code review — …` comment — head it `## Code review — <sha> · cycle <n> (supersedes review of <prior-sha>)` and open with a one-line disposition of each prior finding (resolved / still open), so neither the user nor a later read treats the stale findings as live.
+- **Every finding is a problem plus its fix.** State the believed problem and the action it calls for, grouped by severity — **Blocking** (a fidelity gap, a convention breach that matters, a bug) or **Suggestion** (a non-disqualifying improvement). Write nothing that isn't actionable: no "acceptable as written", "no action needed", "just noting", and no explaining why a clean thing is clean — detail belongs to Blocking and Suggestion findings alone. Where you are genuinely unsure, raise it as a question or risk, naming the decision the user faces.
 - **A real problem outside this PR's scope** — highlight it and recommend a follow-up issue; never open one yourself.
-- Anchor each finding to its location with a blob link — `https://github.com/<owner>/<repo>/blob/<full-sha>/<path>#L<start>-L<end>`, using the full SHA from `git rev-parse HEAD` so GitHub renders a code preview — and name the rule or spec item it breaches. State which dimensions came back clean; if the whole diff is clean, say so plainly — a clean review is a real outcome.
+- Anchor each finding to its location with a blob link — `https://github.com/<owner>/<repo>/blob/<full-sha>/<path>#L<start>-L<end>`, using the full SHA from `git rev-parse HEAD` so GitHub renders a code preview — and name the rule or spec item it breaches. Enumerate the clean dimensions bare — names only, no per-dimension justification; if the whole diff is clean, say so plainly — a clean review is a real outcome.
 
 Then emit your terminal line and stop — the goal yields and the user takes over:
 
@@ -67,9 +68,9 @@ DONE: <repo>#<issue> · current phase: sdd-code-pr-review · findings on PR · a
 
 ## 5. Take the verdict
 
-The user has read the findings. Engage — answer questions, weigh the findings, help them think — but make no change to the code under review; a fix is the implementer's to make on rework. Act only on an explicit verdict:
+The user has read the findings. Engage — answer questions, weigh the findings, help them think — but make no change to the code under review; a fix is the implementer's to make on rework. Rework is Blocking-driven by default — Suggestions alone don't call for a rework lap. Act only on an explicit verdict:
 
-- **approve** — the work is ready to merge. The user squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Once they confirm it's merged, step out to the main checkout and tear down the local side: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
+- **approve** — the work is ready to merge. The user squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Worktree teardown is not yours — overwatch removes the local side after the user confirms the merge.
 - **rework** — the work goes back to the implementer. Record the deciding reason so the implementer reads it alongside your findings, then route back:
   ```bash
   gh issue comment <issue> --body "<the user's reason>"

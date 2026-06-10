@@ -2,7 +2,6 @@
 name: improve-python-code
 description: Review a Python file or codebase for organization, modularity, and maintainability improvements against workspace Python conventions, then apply changes for the user to review before committing.
 disable-model-invocation: true
-model: opus
 effort: xhigh
 argument-hint: "<path-or-name>"
 ---

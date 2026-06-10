@@ -89,7 +89,7 @@ Every file-touching node ensures the session sits in the issue's worktree, then 
 
 - **Open (first node).** Gated on a tap-free check that local `main` matches origin (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base escalates, since pulling is the human's. Open with `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is `origin/main` whatever branch the main checkout sits on. Then rename the branch to the bare `issue-<N>`: agent view's cleanup keys on the `worktree-` prefix, so dropping it lets the worktree outlive a torn-down session.
 - **Inherit (later nodes).** cwd is already the worktree, carried across `/clear`. Every later node confirms the worktree is present — escalating if it's gone, since the issue's work would be lost — then works in it directly.
-- **Tear down (code-review node, on `approve: merge`).** When the issue lands, step out of the worktree and remove it: `git worktree remove .claude/worktrees/issue-<N>` and `git branch -D issue-<N>`.
+- **Tear down (overwatch, post-merge).** When the issue lands, the overwatch dispatcher removes the local side — `git worktree remove .claude/worktrees/issue-<N>` and `git branch -D issue-<N>` — only after the human confirms the merge happened.
 
 ### The agent-capability boundary
 
@@ -108,7 +108,7 @@ Consequences that shape the skills:
 - **The implementation node never opens the PR.** It cannot push, and a finger-on-the-wheel skill cannot pause mid-run to wait for a tap. So it commits, advances its label, and stops; the PR is created downstream, after the push.
 - **The push is the human's transition ritual.** Any committing node leaves its branch `unpushed`; the human pushes (one tap) before the next node. The dispatcher surfaces the push command, targeted at the issue's worktree — the node flags the state, not the command.
 - **The PR is born at code review.** `/open-pr` (first link of the code-review goal) creates it with `gh pr create` once the branch is on origin — tap-free, in a skill. If the branch isn't pushed yet, `/open-pr` escalates rather than guessing.
-- **The merge is the human's; cleanup is the code-review node's.** The PAT cannot merge (`mergePullRequest` is forbidden), so on `approve: merge` the human squash-merges in the GitHub UI — dropping the origin branch and closing the issue via `Closes #<N>`. The code-review skill then tears down the local side, per the worktree contract above.
+- **The merge is the human's; cleanup is overwatch's.** The PAT cannot merge (`mergePullRequest` is forbidden), so on `approve: merge` the human squash-merges in the GitHub UI — dropping the origin branch and closing the issue via `Closes #<N>`. Overwatch then tears down the local side once the human confirms the merge, per the worktree contract above.
 
 ## Dispatch
 

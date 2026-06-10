@@ -2,7 +2,6 @@
 name: doc-rules
 description: Load the doc conventions before writing or editing any Markdown document in workspace repos
 disable-model-invocation: true
-model: opus
 effort: low
 ---
 

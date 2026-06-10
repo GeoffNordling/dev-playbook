@@ -2,7 +2,6 @@
 name: build
 description: Carries out a direct-mode issue that doesn't touch tests — documentation, configuration, chores — against the issue brief, then advances the issue to code review. Use when the agents dashboard launches the build phase.
 disable-model-invocation: false
-model: opus
 effort: xhigh
 disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"

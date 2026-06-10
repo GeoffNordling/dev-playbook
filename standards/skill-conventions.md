@@ -44,7 +44,7 @@ Every skill must have all four of these:
 
 | Field | When to include |
 |-------|-----------------|
-| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Due to Anthropic subscription billing, 'opus' is almost always the preferred choice. The human may approve other models when speed matters. |
+| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Optional — without the pin, the session model wins. Pin `sonnet`/`haiku` where a cheaper, faster model fits the work. The `opus` pins are deliberately absent *for now*: omitting them lets sessions default to Fable while Anthropic still allows it under subscription billing. That's temporary, not the long-term posture — when Fable leaves subscription usage, the `opus` pins come back (dev-playbook#90). |
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 

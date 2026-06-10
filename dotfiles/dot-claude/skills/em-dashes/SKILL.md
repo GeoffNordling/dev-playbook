@@ -2,7 +2,6 @@
 name: em-dashes
 description: Replace em dashes with contextually appropriate punctuation
 disable-model-invocation: true
-model: opus
 effort: xhigh
 ---
 
