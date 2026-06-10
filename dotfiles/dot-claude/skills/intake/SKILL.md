@@ -25,10 +25,8 @@ Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
 
 ### 1. Read the input
 
-The user passes either a free-form idea (**capture**) or an existing issue number / URL (**adopt**).
-
 - **Capture** — the text passed in is the raw idea.
-- **Adopt** — `gh issue view <issue>` and read its title and body as the raw idea. The stub is untriaged: it sits at `phase:intake`, or carries no labels at all — process it either way (`phase:intake` is the implied default). Note which labels, if any, it already carries; you will rewrite its body.
+- **Adopt** — `gh issue view <issue>` and read its title and body as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
 
 Either way, if terminology is fuzzy, scope is unclear, or the idea spans concepts that should live in `CONTEXT.md`, invoke /grill-with-docs first to sharpen, then return.
 
@@ -62,12 +60,8 @@ On the nod:
 **Capture** — create the issue at its first work node:
 
 ```bash
-gh issue create \
-  --title "..." \
-  --label "<category>" \
-  --label "<mode>" \
-  --label "<tests>" \
-  --label "<phase>" \
+gh issue create --title "..." \
+  --label "<category>" --label "<mode>" --label "<tests>" --label "<phase>" \
   --body "$(cat <<'EOF'
 ...body...
 EOF
@@ -80,10 +74,7 @@ Multi-issue plans: create slices in dependency order so each blocker exists befo
 
 ```bash
 gh issue edit <issue> \
-  --add-label "<category>" \
-  --add-label "<mode>" \
-  --add-label "<tests>" \
-  --add-label "<phase>" \
+  --add-label "<category>" --add-label "<mode>" --add-label "<tests>" --add-label "<phase>" \
   --body "$(cat <<'EOF'
 ...body...
 EOF
@@ -100,16 +91,14 @@ Mark each ordered slice **blocked-by** its predecessor:
 
 ```bash
 blocker_id=$(gh api repos/{owner}/{repo}/issues/<blocker#> --jq .id)
-gh api --method POST repos/{owner}/{repo}/issues/<dependent#>/dependencies/blocked_by \
-  -F issue_id="$blocker_id"
+gh api --method POST repos/{owner}/{repo}/issues/<dependent#>/dependencies/blocked_by -F issue_id="$blocker_id"
 ```
 
 If the slices roll up under a tracking epic, also add each as a **sub-issue** of it:
 
 ```bash
 child_id=$(gh api repos/{owner}/{repo}/issues/<child#> --jq .id)
-gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues \
-  -F sub_issue_id="$child_id"
+gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues -F sub_issue_id="$child_id"
 ```
 
 ## Output
