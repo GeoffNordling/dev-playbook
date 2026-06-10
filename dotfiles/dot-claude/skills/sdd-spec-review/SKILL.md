@@ -53,9 +53,9 @@ Read the whole spec against the brief and the standard. Assess each dimension an
 Stage the comment body in a `/tmp` file (e.g. `/tmp/spec-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one comment with `gh issue comment <issue> --body-file <path>`.
 
 - **Head it with the reviewed revision.** `## Spec review — <sha>`, using the short HEAD sha (`git rev-parse --short HEAD`). On a re-review — the issue already carries a prior `## Spec review — …` comment — head it `## Spec review — <sha> (supersedes review of <prior-sha>)` and open with a one-line disposition of each prior finding (resolved / still open), so neither the user nor a later read treats the stale findings as live.
-- **Every finding is a problem plus its fix.** State the believed problem and the action it calls for, grouped by severity — **Blocking** (a fidelity gap, a malformed item, an unsound chain) or **Suggestion** (a non-disqualifying improvement). Write nothing that isn't actionable: no "acceptable as written", "no action needed", or "just noting". Where you are genuinely unsure, raise it as a question or risk, naming the decision the user faces.
+- **Every finding is a problem plus its fix.** State the believed problem and the action it calls for, grouped by severity — **Blocking** (a fidelity gap, a malformed item, an unsound chain) or **Suggestion** (a non-disqualifying improvement). Write nothing that isn't actionable: no "acceptable as written", "no action needed", "just noting", and no explaining why a clean thing is clean — detail belongs to Blocking and Suggestion findings alone. Where you are genuinely unsure, raise it as a question or risk, naming the decision the user faces.
 - **A real problem outside this spec's scope** — highlight it and recommend a follow-up issue; never open one yourself.
-- Name the item id and the brief element or standard rule each finding breaches. State which dimensions came back clean; if the whole spec is clean, say so plainly — a clean review is a real outcome.
+- Name the item id and the brief element or standard rule each finding breaches. Enumerate the clean dimensions bare — names only, no per-dimension justification; if the whole spec is clean, say so plainly — a clean review is a real outcome.
 
 Then emit your terminal line and stop — the goal yields and the user takes over:
 
