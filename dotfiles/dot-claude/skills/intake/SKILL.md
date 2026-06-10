@@ -51,7 +51,7 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 
 - **Intent** — a one- or two-line restatement of the work as you understand it.
 - **The four-tuple** — `category` / `mode` / `tests` / first-work-node `phase`, each with a few words of why.
-- **The brief** — the body you drafted in §4 (for **adopt**, framed as the rewrite that will replace the stub).
+- **The brief, in miniature** — a few-line sketch of the §4 draft: scope, the load-bearing decisions, the shape of the acceptance criteria. Never the body verbatim — the full text lands on the issue, where it's read. For **adopt**, say in a line what the rewrite keeps and drops from the stub.
 
 Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. (A deeper terminology or domain dispute is a `/grill-with-docs` matter per §1, not this beat.)
 

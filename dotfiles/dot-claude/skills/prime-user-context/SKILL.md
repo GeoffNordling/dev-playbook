@@ -2,6 +2,7 @@
 name: prime-user-context
 description: Produce a structured primer for resuming work after a context switch
 disable-model-invocation: true
+model: sonnet
 effort: medium
 allowed-tools: Bash(git *) Bash(gh *)
 ---
