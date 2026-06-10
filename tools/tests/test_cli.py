@@ -7,7 +7,7 @@ from datetime import datetime
 import pytest
 
 from workflow_state_data.cli import main
-from workflow_state_data.core import IssueData
+from workflow_state_data.core import IssueData, LabelEvent
 
 
 def test_main_emits_issue_records_json(
@@ -164,6 +164,28 @@ def test_requested_issue_absent_from_fetch_fails_loud(
         main(
             ["--repo", "geoff/widgets", "--issue", "9"],
             fetch=lambda repos: fetched,
+            now=ts("2026-01-02T00:00:00+00:00"),
+        )
+
+
+def test_requested_issue_dropped_by_scope_rule_fails_loud(
+    ts: Callable[[str], datetime],
+    make_issue: Callable[..., IssueData],
+) -> None:
+    """A fetched issue scope-dropped for a historical non-canonical label errors."""
+    dropped = make_issue(
+        number=7,
+        events=(
+            LabelEvent("labeled", "phase:tdd", ts("2026-01-01T00:00:00+00:00")),
+            LabelEvent("labeled", "wontfix", ts("2026-01-01T01:00:00+00:00")),
+            LabelEvent("unlabeled", "wontfix", ts("2026-01-01T02:00:00+00:00")),
+        ),
+    )
+
+    with pytest.raises(SystemExit, match="7"):
+        main(
+            ["--repo", "geoff/widgets", "--issue", "7"],
+            fetch=lambda repos: [dropped],
             now=ts("2026-01-02T00:00:00+00:00"),
         )
 

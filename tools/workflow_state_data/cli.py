@@ -58,22 +58,24 @@ def main(
     now = now if now is not None else datetime.now(UTC)
     issues = fetch(args.repos)
     if args.issues is not None:
-        # Bulk runs silently omit untriaged/stale-labeled issues, but an
-        # explicitly requested number that the fetch never returned is an
-        # error — a typo or an issue outside the canonical workflow.
-        missing = sorted(set(args.issues) - {issue.number for issue in issues})
-        if missing:
-            raise SystemExit(
-                f"error: requested issue(s) not returned by the fetch: "
-                f"{', '.join(map(str, missing))} (nonexistent, untriaged, or "
-                f"outside the canonical workflow)"
-            )
         issues = [issue for issue in issues if issue.number in args.issues]
     records = [
         record
         for issue in issues
         if (record := build_record(issue, now=now)) is not None
     ]
+    if args.issues is not None:
+        # Bulk runs silently omit untriaged/stale-labeled issues, but an
+        # explicitly requested number that produced no record is an error —
+        # a typo, an issue the fetch never returned, or one scope-dropped by
+        # build_record for leaving the canonical workflow.
+        missing = sorted(set(args.issues) - {record["number"] for record in records})
+        if missing:
+            raise SystemExit(
+                f"error: requested issue(s) produced no record: "
+                f"{', '.join(map(str, missing))} (nonexistent, untriaged, or "
+                f"outside the canonical workflow)"
+            )
     output: object = live_view(records) if args.live else records
     print(json.dumps(output, indent=2))
     return 0
