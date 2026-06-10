@@ -60,6 +60,10 @@ Run ad hoc on human demand; not part of the pre-commit pipeline.
 | `griffe-outline` | Print class/function structure of a Python package |
 | `worktree-sweep` | Prune merged-PR worktrees in `.claude/worktrees/` |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
+| `workflow-state-data` | Emit workflow metrics and live issue states as JSON, reconstructed from GitHub label timelines |
 | `gh-show` (in `dotfiles/bin/`) | Print a GitHub issue or PR with body + comments |
 
 Run any script with `--help`; each script's docstring documents its behavior in full.
+
+> [!WARNING]
+> **`workflow-state-data` is unreviewed and untrusted.** It was produced end-to-end by an autonomous agent workflow; no human read its code or exercised any engineering judgment over its implementation. Treat it as completely untrustworthy — do not rely on its output, and read and vet the code yourself before using it for anything that matters.
