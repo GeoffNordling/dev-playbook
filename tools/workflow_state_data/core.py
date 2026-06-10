@@ -77,10 +77,22 @@ def reconstruct_phase_history(
     open_visit: tuple[str, datetime] | None = None
     active: set[str] = set()
 
+    def apply(event: LabelEvent) -> None:
+        """Apply one labeled/unlabeled event to the active phase set."""
+        phase = event.label.removeprefix("phase:")
+        if event.action == "labeled":
+            active.add(phase)
+        else:
+            active.discard(phase)
+
     # Events past until (labels edited on a closed issue — e.g. a human
     # tidying the stale phase label the approve path leaves behind) are
     # deliberately ignored: the history only covers the issue's lifetime.
-    phase_events = (e for e in events if e.label.startswith("phase:") and e.at <= until)
+    # They are kept aside because the terminal double-phase check below
+    # consults them.
+    phase_events = [e for e in events if e.label.startswith("phase:")]
+    lifetime_events = (e for e in phase_events if e.at <= until)
+    post_until_events = [e for e in phase_events if e.at > until]
     # Phase-label swaps usually land as add/remove pairs at the same timestamp,
     # but gh dispatches the two mutations concurrently, so with GitHub's
     # second-granularity timestamps a swap can straddle a boundary. Apply each
@@ -88,13 +100,9 @@ def reconstruct_phase_history(
     # tolerate a double-phase state for one group; fail loud only when it
     # persists past the next group — that is a real double label, not a swap.
     double_since: datetime | None = None
-    for at, group in itertools.groupby(phase_events, key=lambda e: e.at):
+    for at, group in itertools.groupby(lifetime_events, key=lambda e: e.at):
         for event in group:
-            phase = event.label.removeprefix("phase:")
-            if event.action == "labeled":
-                active.add(phase)
-            else:
-                active.discard(phase)
+            apply(event)
         if len(active) > 1:
             if double_since is not None:
                 raise _double_phase_error(double_since, active)
@@ -109,7 +117,21 @@ def reconstruct_phase_history(
         open_visit = (settled, at) if settled is not None else None
 
     if double_since is not None:
-        raise _double_phase_error(double_since, active)
+        # A swap bundled with a close dispatches its two mutations
+        # concurrently, so the resolving unlabel can land just past until.
+        # Consult the otherwise-ignored post-until events before declaring
+        # the double persistent; a resolved swap settles at until.
+        for event in post_until_events:
+            apply(event)
+            if len(active) <= 1:
+                break
+        if len(active) > 1:
+            raise _double_phase_error(double_since, active)
+        settled = next(iter(active)) if active else None
+        if open_visit is None or settled != open_visit[0]:
+            if open_visit is not None:
+                visits.append(visit(open_visit[0], open_visit[1], until))
+            open_visit = (settled, until) if settled is not None else None
     if open_visit is not None:
         visits.append(visit(open_visit[0], open_visit[1], None))
     return visits

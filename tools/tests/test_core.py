@@ -136,6 +136,24 @@ def test_swap_straddling_a_second_boundary_is_tolerated(
     assert history[1].exited_at is None
 
 
+def test_swap_straddling_closed_at_is_tolerated(
+    ts: Callable[[str], datetime],
+) -> None:
+    """A close-and-swap whose unlabeled half lands just past until still settles."""
+    events = [
+        LabelEvent("labeled", "phase:tdd", ts("2026-01-01T00:00:00+00:00")),
+        LabelEvent("labeled", "phase:code-pr-review", ts("2026-01-03T00:00:00+00:00")),
+        LabelEvent("unlabeled", "phase:tdd", ts("2026-01-03T00:00:01+00:00")),
+    ]
+
+    history = reconstruct_phase_history(events, until=ts("2026-01-03T00:00:00+00:00"))
+
+    assert [visit.phase for visit in history] == ["tdd", "code-pr-review"]
+    assert history[0].exited_at == ts("2026-01-03T00:00:00+00:00")
+    assert history[1].entered_at == ts("2026-01-03T00:00:00+00:00")
+    assert history[1].exited_at is None
+
+
 def test_persistent_double_phase_label_fails_loud(
     ts: Callable[[str], datetime],
 ) -> None:
