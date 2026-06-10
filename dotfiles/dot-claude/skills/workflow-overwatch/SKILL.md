@@ -38,6 +38,8 @@ Then report: `READ: workflow.md`. Proceed only after.
 
 6. **Show the board, inferred forward.** Close each turn with the board — one row per in-flight issue, `<repo>#<N> · <phase>`. Assume the single command you just handed over was executed; infer nothing beyond it — never a multi-step human procedure, never an irreversible or outward-facing action. A merge stays "awaiting verdict/merge" until the user confirms it merged.
 
+7. **Tear down after a confirmed merge.** Worktree teardown is yours, and only after the user *tells you* the merge happened — never on inference, and with no API verification step. Then run the cheap local cleanup: `git -C ~/workspace/<repo> worktree remove .claude/worktrees/issue-<N>` and `git -C ~/workspace/<repo> branch -D issue-<N>`.
+
 ## Refine — fix the machinery for next time
 
 This is the occasional job — only when a node trips over a defect in the workflow itself: a missing permission, a skill that can't be invoked, a stale instruction, a broken gate. Keep the running defect backlog in session context — no scratch file, no branch. When the user says so, file one GitHub issue from the accumulated list for a future implementer. You never implement while dispatching — the fix path is the issue, not a branch of your own.

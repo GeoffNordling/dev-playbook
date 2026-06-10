@@ -71,7 +71,7 @@ DONE: <repo>#<issue> · current phase: sdd-code-pr-review · findings on PR · a
 
 The user has read the findings. Engage — answer questions, weigh the findings, help them think — but make no change to the code under review; a fix is the implementer's to make on rework. Rework is Blocking-driven by default — Suggestions alone don't call for a rework lap. Act only on an explicit verdict:
 
-- **approve** — the work is ready to merge. The user squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Once they confirm it's merged, step out to the main checkout and tear down the local side: `git worktree remove .claude/worktrees/issue-<issue>` and `git branch -D issue-<issue>`.
+- **approve** — the work is ready to merge. The user squash-merges in the GitHub UI; you can't (the PAT can't merge). Their merge drops the origin branch and closes the issue via the PR's `Closes #<issue>`, so no label change follows. Worktree teardown is not yours — overwatch removes the local side after the user confirms the merge.
 - **rework** — the work goes back to the implementer. Record the deciding reason so the implementer reads it alongside your findings, then route back:
   ```bash
   gh issue comment <issue> --body "<the user's reason>"
