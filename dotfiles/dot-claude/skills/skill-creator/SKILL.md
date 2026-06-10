@@ -2,7 +2,6 @@
 name: skill-creator
 description: Author a new Claude Code skill following workspace conventions
 disable-model-invocation: true
-model: opus
 effort: xhigh
 ---
 

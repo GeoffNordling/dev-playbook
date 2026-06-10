@@ -44,7 +44,7 @@ Every skill must have all four of these:
 
 | Field | When to include |
 |-------|-----------------|
-| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Due to Anthropic subscription billing, 'opus' is almost always the preferred choice. The human may approve other models when speed matters. |
+| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Omit unless a skill truly needs a specific model — without the pin, the session model wins. |
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 

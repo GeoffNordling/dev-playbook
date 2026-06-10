@@ -2,7 +2,6 @@
 name: intake
 description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea (one issue or many). Decides category, mode, tests; writes the brief into the issue body; advances the issue past intake. Use when the agents dashboard launches intake.
 disable-model-invocation: false
-model: opus
 effort: xhigh
 ---
 

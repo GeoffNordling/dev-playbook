@@ -2,7 +2,6 @@
 name: write-agent-review
 description: Author an agent-review assertion that focuses the LLM judge on one semantic question about prose. Use when adding or updating a test under `tests/agent_review/`, when converting an agent-review stub to a real verifier, or when annotating a spec node with `agent-review` as a needs value.
 disable-model-invocation: false
-model: opus
 effort: xhigh
 ---
 

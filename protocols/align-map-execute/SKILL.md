@@ -2,7 +2,6 @@
 name: protocol-align-map-execute
 description: "Align, Map, Execute: structured human-agent collaboration on large-scope tasks"
 disable-model-invocation: true
-model: opus
 effort: xhigh
 ---
 

@@ -2,7 +2,6 @@
 name: workflow-overwatch
 description: Co-pilot for a user dispatching issues through the workflow from the agents dashboard. Reads issue state to give the next launch command, keeps a running backlog of workflow-machinery defects in session context, and files one GitHub issue from it when the user says so.
 disable-model-invocation: true
-model: opus
 effort: xhigh
 allowed-tools: Bash(gh issue *) Bash(gh api *) Bash(gh pr view *) Bash(gh pr diff *) Bash(git *) Edit Write Skill(commit) AskUserQuestion
 ---

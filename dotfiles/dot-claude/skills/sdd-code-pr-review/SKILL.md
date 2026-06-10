@@ -2,7 +2,6 @@
 name: sdd-code-pr-review
 description: Reviews an SDD issue's PR against its committed spec and the project conventions, attaches findings to the PR, then takes the user's verdict — approve to merge, or rework back to the implementer. Use when the agents dashboard launches the SDD code review phase.
 disable-model-invocation: false
-model: opus
 effort: xhigh
 disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(//tmp/**)

@@ -2,7 +2,6 @@
 name: sdd-spec-review
 description: Reviews an SDD project's authored spec against the issue brief and the spec standard, attaches findings to the issue, then takes the user's verdict — approve to TDD, or rework back to the spec author. Use when the agents dashboard launches the spec-review phase.
 disable-model-invocation: false
-model: opus
 effort: xhigh
 disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(//tmp/**)
