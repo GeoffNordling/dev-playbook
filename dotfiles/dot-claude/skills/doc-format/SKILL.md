@@ -2,6 +2,7 @@
 name: doc-format
 description: Standardize formatting and style across a Markdown document
 disable-model-invocation: true
+model: opus
 effort: xhigh
 argument-hint: "[doc-hint]"
 ---

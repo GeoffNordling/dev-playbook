@@ -2,6 +2,7 @@
 name: new-repo
 description: Scaffold a new workspace repo conformant to workspace standards.
 disable-model-invocation: true
+model: opus
 effort: xhigh
 ---
 

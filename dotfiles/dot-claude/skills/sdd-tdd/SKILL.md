@@ -2,6 +2,7 @@
 name: sdd-tdd
 description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then advances the issue to code review. Use when the agents dashboard launches the build phase.
 disable-model-invocation: false
+model: opus
 effort: xhigh
 disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"

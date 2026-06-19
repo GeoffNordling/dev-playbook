@@ -2,6 +2,7 @@
 name: orient
 description: Orient to the current repository. Use when invoked by the user.
 disable-model-invocation: false
+model: opus
 effort: xhigh
 allowed-tools: Bash(ls *) Bash(gh issue list *)
 argument-hint: "[focus]"

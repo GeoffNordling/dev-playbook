@@ -2,6 +2,7 @@
 name: commit
 description: Commit staged work locally with a clean message; the user pushes. Use when the user asks to commit changes or invokes /commit, or when a workflow skill needs to commit its work via Skill(commit).
 disable-model-invocation: false
+model: opus
 effort: low
 argument-hint: "[fast] [amend]"
 allowed-tools: Bash(git *)

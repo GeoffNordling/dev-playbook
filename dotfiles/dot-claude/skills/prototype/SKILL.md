@@ -2,6 +2,7 @@
 name: prototype
 description: Build throwaway code that answers one design question, then keep only the answer. Routes between a logic branch (a portable pure module driven by hand) and a presentation branch (several structurally-different variants on one switchable surface). Use when the user wants to prototype, sanity-check a state machine or data model, mock up alternatives, explore design options, or says "prototype this", "let me play with it", "try a few designs".
 disable-model-invocation: false
+model: opus
 effort: high
 ---
 

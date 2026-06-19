@@ -2,6 +2,7 @@
 name: small-steps
 description: Temporarily reduce conversation step size. Address one concern at a time iteratively; return to normal once all concerns resolve.
 disable-model-invocation: true
+model: opus
 effort: low
 ---
 

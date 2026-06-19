@@ -2,6 +2,7 @@
 name: doc-present-state
 description: Remind model to document only present-state, via forward-looking prose.
 disable-model-invocation: true
+model: opus
 effort: low
 ---
 

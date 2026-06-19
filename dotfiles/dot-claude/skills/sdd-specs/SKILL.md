@@ -2,6 +2,7 @@
 name: sdd-specs
 description: Authors a project's spec — its `feat`, `req`, and `dsn` items — as one hierarchy through a structured interview, then leaves the tree green and advances the issue to spec review. Use when the agents dashboard launches the spec phase.
 disable-model-invocation: false
+model: opus
 effort: xhigh
 argument-hint: "<issue-number>"
 ---
