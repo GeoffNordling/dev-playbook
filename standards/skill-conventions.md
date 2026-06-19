@@ -144,7 +144,7 @@ conflict; they are different paths and different concerns.
 Before shipping a new skill:
 
 - [ ] Directory name matches `name` field
-- [ ] All four required front matter fields present
+- [ ] All five required front matter fields present
 - [ ] Description follows the format rules (auto-invocable skills include `Use when …`)
 - [ ] Body starts with an `# H1` title
 - [ ] SKILL.md under ~100 lines (or content beyond that lives in `references/`)
