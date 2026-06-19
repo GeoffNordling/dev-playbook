@@ -2,6 +2,7 @@
 name: doc-rewrite
 description: Rewrite a Markdown document from scratch, preserving content by default
 disable-model-invocation: true
+model: opus
 effort: xhigh
 argument-hint: "[doc-hint]"
 ---

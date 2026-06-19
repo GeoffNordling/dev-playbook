@@ -2,6 +2,7 @@
 name: handoff
 description: Compact the current conversation into a handoff document for another agent to pick up.
 disable-model-invocation: true
+model: opus
 effort: medium
 argument-hint: "[what the next session will focus on]"
 ---

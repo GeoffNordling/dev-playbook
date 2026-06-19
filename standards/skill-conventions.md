@@ -31,20 +31,20 @@ argument-hint: "<hint>"             # optional
 
 ### Required fields
 
-Every skill must have all four of these:
+Every skill must have all five of these:
 
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, the description `SHALL` include a second sentence beginning `Use when …` that lists the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
 | `disable-model-invocation` | `false` is the standard — per the [dispatch model](~/workspace/dev-playbook/workflow/workflow.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
+| `model` | Pin the skill to a model: `haiku`, `sonnet`, or `opus`. Mandatory — always explicit, never rely on the session default. `opus` is the default choice; pin `sonnet`/`haiku` only where a cheaper, faster model demonstrably fits the work. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
 ### Optional fields
 
 | Field | When to include |
 |-------|-----------------|
-| `model` | Pin the skill to a specific model (`haiku`, `sonnet`, or `opus`). Optional — without the pin, the session model wins. Pin `sonnet`/`haiku` where a cheaper, faster model fits the work. The `opus` pins are deliberately absent *for now*: omitting them lets sessions default to Fable while Anthropic still allows it under subscription billing. That's temporary, not the long-term posture — when Fable leaves subscription usage, the `opus` pins come back (dev-playbook#90). |
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 
@@ -144,7 +144,7 @@ conflict; they are different paths and different concerns.
 Before shipping a new skill:
 
 - [ ] Directory name matches `name` field
-- [ ] All four required front matter fields present
+- [ ] All five required front matter fields present
 - [ ] Description follows the format rules (auto-invocable skills include `Use when …`)
 - [ ] Body starts with an `# H1` title
 - [ ] SKILL.md under ~100 lines (or content beyond that lives in `references/`)

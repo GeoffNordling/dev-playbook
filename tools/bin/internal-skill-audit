@@ -29,7 +29,7 @@ from pathlib import Path
 
 import yaml
 
-REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "effort")
+REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
 BANNED_FIELDS = ("user-invocable",)
 VALID_MODELS = ("haiku", "sonnet", "opus")
 VALID_EFFORTS = ("low", "medium", "high", "xhigh")

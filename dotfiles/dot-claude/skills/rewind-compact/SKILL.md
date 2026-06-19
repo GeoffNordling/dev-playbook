@@ -2,6 +2,7 @@
 name: rewind-compact
 description: Prepare a limited conversation rewind, compressing the discarded turns into a "Tangential compaction summary."
 disable-model-invocation: true
+model: opus
 effort: medium
 argument-hint: "<rewind target>"
 ---

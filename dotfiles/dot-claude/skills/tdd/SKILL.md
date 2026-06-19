@@ -2,6 +2,7 @@
 name: tdd
 description: Implements a direct-mode issue via vertical-slice TDD against the issue brief's acceptance criteria, then advances the issue to code review. Use when the agents dashboard launches the tdd phase.
 disable-model-invocation: false
+model: opus
 effort: xhigh
 disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"
