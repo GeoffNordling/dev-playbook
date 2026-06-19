@@ -18,7 +18,7 @@ Work without waiting for approval: plan, implement, refactor, and commit on your
 
 Before doing anything else, read end-to-end:
 
-- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format, the `WIP:` marker (§2.10).
+- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — keyword reference, coverage chain, ID format, the `WIP:` marker.
 - [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
 
 Then report: `READ: spec-standard.md, testing-conventions.md`. Proceed only after.
@@ -36,7 +36,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
-- **Inherited stale references.** Consult the project's reported **stale references** (`SpecGraph.stale_references()`) and any `WIP:`-marked bumped nodes for markers a prior cycle's revision bump (§2.2.3) left naming a superseded revision — reported, not raised, and distinct from a **dangling reference**, whose `(type, name)` is absent entirely and still raises. Reconcile each per §2 before building new slices on the bumped item.
+- **Inherited stale references.** Consult the project's reported **stale references** (`SpecGraph.stale_references()`) and any `WIP:`-marked bumped nodes for markers a prior cycle's revision bump left naming a superseded revision — reported, not raised, and distinct from a **dangling reference**, whose `(type, name)` is absent entirely and still raises. Reconcile each per §2 before building new slices on the bumped item.
 
 ## 2. Plan the chunk
 
@@ -110,7 +110,7 @@ The last two put a spec change on the table — handle it per §6.
 
 The implementation never edits the spec on its own. With a change on the table, describe which item is affected, the proposed change, and what motivated it. The user decides to:
 
-- **Apply here** — edit the spec (update `Interface:` lines; on revision follow [spec-standard §2.2.3](~/workspace/spec-tools/sdd-standards/spec-standard.md#223-revision)). Then continue stub → test → implementation. During initial greenfield implementation no pinned consumers exist — edit in place at revision `0`, don't bump.
+- **Apply here** — edit the spec (update `Interface:` lines; on revision follow the spec standard's [revision rules](~/workspace/spec-tools/sdd-standards/spec-standard.md)). Then continue stub → test → implementation. During initial greenfield implementation no pinned consumers exist — edit in place at revision `0`, don't bump.
 - **Defer to a fresh `sdd-specs` pass** — don't edit the spec; the issue routes back to the spec phase.
 - **Reject** and direct another approach.
 

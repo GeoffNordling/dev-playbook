@@ -75,11 +75,11 @@ The skeleton holds — `Covers:`, `Needs:`, `Depends:`, and `Interface:` from th
 - When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/module-design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. `Interface:` lines fully qualify symbol paths and follow the standard's annotation idiom.
 - **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you include is one you intend to deliver.
 - `Rationale:` and `Comment:` are optional — write one only when there's a genuine "why" to record; omit it otherwise rather than filling it, since an empty or filler `Rationale:` is a defect per the spec standard. When you do write one, keep it non-prescriptive: a claim that wants to prescribe belongs in `Description:`. Reference relevant ADRs rather than re-explaining them.
-- **Mark the region work-in-progress.** Set `WIP: true` (§2.10) on each `feat` you author or reopen. Its cone reaches no verifiers yet, so completeness would otherwise fail; the marker exempts the `feat` and everything beneath it until build lands the verifiers and removes it. Consistency still holds.
-- **Reconcile a revision bump.** When an edit bumps an existing item's revision (§2.2.3), every committed adjacent reference now names the prior revision — a **stale reference** (target `(type, name)` present at another revision; reported by `SpecGraph.stale_references()`, not raised), distinct from a **dangling reference** (target `(type, name)` absent entirely, still a raised consistency breach). Reconcile the bump's adjacent references:
+- **Mark the region work-in-progress.** Set `WIP: true` on each `feat` you author or reopen. Its cone reaches no verifiers yet, so completeness would otherwise fail; the marker exempts the `feat` and everything beneath it until build lands the verifiers and removes it. Consistency still holds.
+- **Reconcile a revision bump.** When an edit bumps an existing item's revision, every committed adjacent reference now names the prior revision — a **stale reference** (target `(type, name)` present at another revision; reported by `SpecGraph.stale_references()`, not raised), distinct from a **dangling reference** (target `(type, name)` absent entirely, still a raised consistency breach). Reconcile the bump's adjacent references:
   - **Spec-side bullets** — `Covers:` / `Depends:` in other spec items: re-point them to the new revision in-phase (the phase owns these files), re-evaluating that each adjacent item still fits the bumped item's new meaning. If it does not, update the bumped item accordingly, bump its own
   revision, and continue this cascade until bumping stops.
-  - **Verifier markers** — each `@pytest.mark.covers` on the bumped node: decide with the user. If the test still validates the new meaning, re-point the marker now — the covers-string only, never test logic. If it needs rework, leave it stale and set `WIP: true` (§2.10) on the bumped node (or its `feat`) so the now-uncovered completeness gap is exempt and the gate stays green.
+  - **Verifier markers** — each `@pytest.mark.covers` on the bumped node: decide with the user. If the test still validates the new meaning, re-point the marker now — the covers-string only, never test logic. If it needs rework, leave it stale and set `WIP: true` on the bumped node (or its `feat`) so the now-uncovered completeness gap is exempt and the gate stays green.
 
   A deferred stale reference stays visible to `sdd-tdd` via `stale_references()`, which reconciles it when it reworks the test.
 
@@ -96,7 +96,7 @@ Re-read each new `feat` / `req` / `dsn` and iterate until clean:
 
 When the user approves and the rubric passes:
 
-1. **Leave the tree green.** Run the gate — `make check`; it builds and validates the spec graph. The region is `WIP:` (§5), so completeness is exempt and only **consistency** is enforced (§2.10) — a red build means the spec you just authored is malformed. Don't commit a red tree.
+1. **Leave the tree green.** Run the gate — `make check`; its `spec-tools validate .` step builds and validates the spec graph (the project pins spec-tools as a dev dependency per the consumption model, putting the CLI in its environment). The region is `WIP:` (§5), so completeness is exempt and only **consistency** is enforced — a red build means the spec you just authored is malformed. Don't commit a red tree.
 2. Run /commit.
 3. Advance the issue to spec review — move its label from this node to the next:
    ```bash
