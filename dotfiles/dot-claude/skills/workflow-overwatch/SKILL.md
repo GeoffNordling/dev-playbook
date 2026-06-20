@@ -34,7 +34,7 @@ Then report: `READ: workflow.md`. Proceed only after.
 
    Push, pull, and the PR merge are the human's taps; never reach for a PAT-API path that would only be rejected.
 
-5. **Surface the open-command with every handoff.** Alongside each launch or push command, give the worktree open-command: `code -r <repo>/.claude/worktrees/issue-<N>`.
+5. **Surface the open-command with every handoff.** Alongside each launch or push command, give the worktree open-command: `code -r <repo>/.claude/worktrees/issue-<N>`. Surface it unprompted at the `code-pr-review` and `sdd-code-pr-review` handoffs too — both mixed nodes launched by the same compound `/open-pr` → `/code-review` → review `/goal`. That the PR doesn't exist yet is no reason to withhold the command: `/open-pr` lands the PR a turn or two later, and the open worktree window is where the user reviews it via the GitHub Pull Requests extension — so don't make them ask.
 
 6. **Show the board, inferred forward.** Close each turn with the board — one row per in-flight issue, `<repo>#<N> · <phase>`. Assume the single command you just handed over was executed; infer nothing beyond it — never a multi-step human procedure, never an irreversible or outward-facing action. A merge stays "awaiting verdict/merge" until the user confirms it merged.
 
