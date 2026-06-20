@@ -1,5 +1,7 @@
 # Ralph-Loop Prototyping — Session State & Plan
 
+> **⚠️ SUPERSEDED — STOP READING.** This document is superseded by the Workflow orchestrator, a native first-class Claude Code tool. If you are an agent, stop reading here.
+
 **Status:** In progress. This is a stateful handoff document compressing what was
 decided and learned in one working session. The plan is intentionally a *sketch*
 — it is to be developed further in a future session. A fresh agent should be
