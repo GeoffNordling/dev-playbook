@@ -231,3 +231,5 @@ Examples:
 - `## Issue body format (the brief is the body)` → `#issue-body-format-the-brief-is-the-body`
 - `## load_issue helper` → `#load_issue-helper` (intraword underscores kept)
 
+**Prefer a stable named anchor over a positional one.** A numbered fragment (`#223-revision`) or an in-prose heading-number citation (`§2.10`, `§2.2.3`) breaks silently the moment its target is renumbered or reordered — nothing flags the stale anchor. Where the target heading carries a stable named slug, cite that. Where the target numbers every heading positionally and exposes no stable anchor, name the **concept** the heading carries and drop the number, so a reader finds it by name rather than by a position that drifts.
+

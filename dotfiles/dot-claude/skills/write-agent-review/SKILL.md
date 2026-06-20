@@ -14,7 +14,7 @@ The assertion is the load-bearing input. Write it so the judge has a clear seman
 
 ## Six rules
 
-1. **Audit the prescriptive surface, not the editorial.** A spec item's `Description:` is its prescriptive content — what the spec commits to. `Rationale:` and `Comment:` are editorial: they explain why or annotate but make no normative commitment. Agent-reviews audit `Description:` only (§2.4, §2.5, §3 of the workspace spec standard). If a load-bearing claim about another spec or standard appears in `Rationale:` or `Comment:`, the spec is malformed — fix the spec, don't write the test.
+1. **Audit the prescriptive surface, not the editorial.** A spec item's `Description:` is its prescriptive content — what the spec commits to. `Rationale:` and `Comment:` are editorial: they explain why or annotate but make no normative commitment. Agent-reviews audit `Description:` only (the workspace spec standard's `Rationale:`, `Comment:`, and verifier sections). If a load-bearing claim about another spec or standard appears in `Rationale:` or `Comment:`, the spec is malformed — fix the spec, don't write the test.
 
 2. **Only assert what's verifiable from the subjects and standards you hand the judge.** Think like the judge — it sees only what you show it. If a claim relies on data outside that view (code behavior, runtime state, external systems), the agent review can't reach it.
 
@@ -58,13 +58,13 @@ The <section> citation in `<subject-id>` (<subject-file>) is accurate:
 
 **Enumeration faithfulness.** The subject enumerates rule ids each tied to a standard section:
 
-> The `rule_violated` enumeration defined by `dsn~deserialize.parse-error~0` in specs/design/deserialize.md faithfully implements §2 of spec-standard.md, scoped to rules detectable by inspecting a single spec file's syntax.
+> The `rule_violated` enumeration defined by `dsn~deserialize.parse-error~0` in specs/design/deserialize.md faithfully implements the spec-item grammar of spec-standard.md, scoped to rules detectable by inspecting a single spec file's syntax.
 
 The falsifiable surface is the enumeration's completeness and each entry's citation. One semantic focus (enumeration-vs-standard faithfulness), many items.
 
 **Citation accuracy.** The subject's content is mostly a behavioral commitment ("render produces conformant markdown") and one citation:
 
-> The §2 keyword-order citation in `dsn~serialize.render~0` (specs/design/serialize.md) is accurate: §2 of spec-standard.md defines a canonical keyword order.
+> The keyword-order citation in `dsn~serialize.render~0` (specs/design/serialize.md) is accurate: spec-standard.md defines a canonical keyword order.
 
 The behavioral claim is not verifiable from prose alone — it would require seeing the implementation. The only prose-checkable surface is the citation. Narrow to it.
 

@@ -19,7 +19,7 @@ The audit runs hands-off; finding spec problems is its output, not a reason to s
 
 Before doing anything else, read end-to-end:
 
-- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — the grammar you audit against: keyword reference, EARS templates, coverage chain, the consistency/completeness split (§1.3), the `WIP:` marker (§2.10).
+- [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — the grammar you audit against: keyword reference, EARS templates, coverage chain, the consistency/completeness split, the `WIP:` marker.
 - [design layer](~/workspace/spec-tools/sdd-standards/design-layer.md) — what a `dsn` pins, so you can judge whether the design is right-sized.
 - [lessons](~/workspace/spec-tools/sdd-standards/lessons.md) — accumulated observations about the standard from prior use.
 
@@ -37,7 +37,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 ## 2. Consistency gate
 
-Run the gate — `make check`; it builds and validates the spec graph. The `feat`s under review are still `WIP:`, so completeness is exempt and only **consistency** is enforced (§2.10). Green: proceed to the audit. Red: the graph is malformed and the author should not have closed it — escalate (§6) rather than review a broken spec.
+Run the gate — `make check`; its `spec-tools validate .` step builds and validates the spec graph (the project pins spec-tools as a dev dependency per the consumption model, putting the CLI in its environment). The `feat`s under review are still `WIP:`, so completeness is exempt and only **consistency** is enforced. Green: proceed to the audit. Red: the graph is malformed and the author should not have closed it — escalate (§6) rather than review a broken spec.
 
 ## 3. Audit the spec
 

@@ -89,6 +89,8 @@ After the front matter, the body is Markdown.
 
 Skill bodies follow the workspace cross-reference standard. See the [skill-bundles section](~/workspace/dev-playbook/standards/repo-documentation.md#in-skill-bundles) for the target-based rules: inline links for files the reader should open, inline code for files mentioned by name, and bare invocations for slash-skills.
 
+When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](~/workspace/dev-playbook/standards/repo-documentation.md#fragment-anchors)).
+
 ## References directory
 
 For skills that need extensive reference material, place supplementary
