@@ -86,12 +86,13 @@
     "baseRef": "fresh"
   },
   "workflowKeywordTriggerEnabled": false,
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
   "autoMemoryEnabled": false,
+  "skipWorkflowUsageWarning": true,
   "theme": "light",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
