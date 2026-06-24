@@ -22,3 +22,4 @@ In June 2026, Anthropic announced moving Agent SDK and `claude -p` usage off the
 | Recipe | Purpose |
 |--------|---------|
 | [Ralph loop](recipes/ralph-loop.md) | Grind a large, sequentially-decomposable goal to done by booting a fresh agent each iteration. |
+| [Scatter-gather](recipes/scatter-gather.md) | Fan out a batch of independent jobs as isolated agents in one parallel run, collecting one structured result per job in input order. |
