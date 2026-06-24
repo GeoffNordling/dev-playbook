@@ -47,6 +47,13 @@
       "Bash(gh pr unlock *)"
     ]
   },
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "allowWrite": ["~/workspace", "~/.cache", "~/.local", "~/.npm"],
+      "denyRead": ["~/.ssh", "~/.aws", "~/.gnupg", "~/.netrc"]
+    }
+  },
   "hooks": {
     "Stop": [
       {
