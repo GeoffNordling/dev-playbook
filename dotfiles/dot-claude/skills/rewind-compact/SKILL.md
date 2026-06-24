@@ -44,7 +44,7 @@ This skill relies on the concept of a **rewind target**: the specific **user-typ
 ```
 **Tangential compaction summary:**
 
-A tangential iterative exploration of approximately <N> turns occurred from this point. The conversation was then rewound back to here. The current state of <file path> is preferred — re-read it to bring yourself up to date.
+A tangential iterative exploration of roughly <N> turns occurred from this point. The conversation was then rewound back to here. The current state of <file path> is preferred — re-read it to bring yourself up to date.
 
 The following commits landed during the tangent (not commits you authored):
    - <commit-id> on <branch>.
@@ -61,7 +61,7 @@ The following commits landed during the tangent (not commits you authored):
 
 ## Notes
 
-- Count turns by scanning, not by asking the user.
+- Give a rough turn count from a quick glance back — don't ask the user, and don't enumerate; precision doesn't matter.
 - "Re-read the file" instructions must use full paths so past-self knows exactly what to load.
 - Multiple files may have changed — list them all.
 - If past-self's prior work at the rewind target was substantive (a draft, a diagram, a decision), explicitly say "the current state is preferred" so they don't try to redo it.
