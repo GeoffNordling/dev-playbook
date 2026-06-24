@@ -27,3 +27,15 @@ GitHub renders Markdown before LaTeX, so:
 - Use `\ast` not `*` in superscripts (e.g., `$A^\ast$` not `$A^*$`).
 - Don't use `\;` for spacing in equations — it renders as a visible semicolon. Use regular spaces.
 </markdown>
+
+<sandbox>
+Claude Code runs sandboxed here: Bash and file tools execute inside Bubblewrap
+(`bwrap`), so you have a restricted view of the filesystem. A file or directory
+may read back **empty or missing** even when it exists — be aware of this before
+concluding something is absent, and don't silently work around it.
+
+The sandbox config in the global user settings (`~/.claude/settings.json`,
+`sandbox` key) is the reference for what may be restricted. If a restriction is
+getting in your way, ask the user to expand the sandbox rather than route around
+it.
+</sandbox>
