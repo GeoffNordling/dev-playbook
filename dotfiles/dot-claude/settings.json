@@ -48,9 +48,9 @@
   },
   "sandbox": {
     "enabled": true,
-    "excludedCommands": ["gh", "gh *"],
+    "excludedCommands": ["gh", "gh *", "agentsview", "agentsview *"],
     "filesystem": {
-      "allowWrite": ["~/workspace", "~/.cache", "~/.local", "~/.npm"],
+      "allowWrite": ["~/workspace", "~/.cache", "~/.local", "~/.npm", "~/.agentsview"],
       "denyRead": ["~/.ssh", "~/.aws", "~/.gnupg", "~/.netrc"]
     }
   },
