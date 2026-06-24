@@ -76,6 +76,27 @@ permissions skipped leaves the file tools unbounded. The native sandbox is a
 boundary for shell commands and the network, not a safe jail for hands-off file
 editing.
 
+### Config-file phantoms (undocumented)
+
+Turning the sandbox on makes a set of config dotfiles — shell-init, git, editor,
+and Claude/tool config (`.bashrc`, `.gitconfig`, `.mcp.json`, `.claude/`, …) —
+appear inside it as empty **"phantoms"**: each reads back empty and shows up in
+`ls`/`git status` as a `/dev/null` character device owned by `nobody`. They exist
+only while the sandbox is on, are driven by no setting, and are undocumented by
+Anthropic — distinct from the deliberate `denyRead` masking above (which overlays
+an empty dir, not a device node).
+
+**Hypothesis:** a built-in credential/tamper guard — Claude Code blanks these by
+default so a sandboxed shell can't read secrets from tool config or be steered by
+attacker-planted shell-init, layered under the sandbox independent of the user
+`denyRead` list.
+
+The practical cost is context pollution: `git add -A` aborts on the device nodes
+and a plain `git status` lists them as untracked noise. The
+[commit skill](~/workspace/dev-playbook/dotfiles/dot-claude/skills/commit/SKILL.md)
+sidesteps both — staging with `git add --ignore-errors` and inspecting with
+`git status -uno` — so the phantoms never reach the agent's context.
+
 ## Sandcastle
 
 An **AFK multi-agent orchestration framework** that uses containers for
