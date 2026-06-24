@@ -11,11 +11,11 @@ export const meta = {
 //   schema  optional JSON Schema applied to every job's structured output (batch-level)
 //   jobs    [{ id, prompt }] — independent jobs; results return in this order, keyed by id
 //
-// The launcher hands args to the script as a JSON *string*, not a parsed object — verified
-// 2026-06-24: an object passed to Workflow({ args }) arrives with typeof args === 'string'.
-// Normalize once so the batch is reliably delivered however it is handed over (string or
-// object). A malformed string throws loud here rather than silently losing the batch — which
-// is exactly what bit the Ralph loop, whose script read args.goal without parsing.
+// args may reach the script either as a parsed object or as a JSON string, depending on
+// the launch path. Normalize once so the batch is reliably delivered however it is handed
+// over (string or object). A malformed string throws loud here rather than silently losing
+// the batch — which is exactly what bit the Ralph loop, whose script read args.goal without
+// parsing.
 const A = typeof args === 'string' ? JSON.parse(args) : (args ?? {})
 
 // model/effort are required because the batch runs under one fixed judge identity:

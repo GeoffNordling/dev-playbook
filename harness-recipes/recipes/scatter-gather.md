@@ -27,7 +27,7 @@ so scatter-gather is not for work that needs per-job model selection.
 
 The batch is one `parallel()` over the jobs — one `agent()` each:
 
-1. normalize `args` (the launcher delivers it as a JSON string — see below),
+1. normalize `args` (it may arrive as an object or a JSON string — see below),
 2. require `model` and `effort`, and guard the batch size, before fanning out,
 3. run every job concurrently as its own isolated `agent()`, with `model`,
    `effort`, and the batch `schema` pinned from args,
@@ -62,9 +62,9 @@ Seed the batch and launch the workflow, passing the batch as `args`:
       ]},
     })
 
-The launcher hands `args` to the script as a **JSON string**, not a parsed
-object, so the runtime parses it on the way in — pass a real object and the
-runtime tolerates either form. Launch by `scriptPath` to reach a build that is
+`args` may reach the script as a parsed object or as a JSON string, depending on
+the launch path, so the runtime normalizes it on the way in — pass a real object
+and either form is handled. Launch by `scriptPath` to reach a build that is
 not yet in the named registry (`~/.claude/workflows/`, which resolves to the main
 checkout); launch by `name: "scatter-gather"` once the file is synced there.
 Source: `dotfiles/dot-claude/workflows/scatter-gather.js`.
@@ -73,11 +73,11 @@ Source: `dotfiles/dot-claude/workflows/scatter-gather.js`.
 
 Tested directly this session by launching the workflow:
 
-- **Args arrive as a JSON string, and the runtime parses them.** A probe showed
-  `typeof args === 'string'` even when an object is passed to `Workflow({ args })`.
-  This reconciles the Ralph loop's caveat that named-launch args "did not take
-  effect": the args *are* delivered, but as a string, so a script that reads
-  `args.x` without parsing sees nothing. Parsing on the way in fixes it.
+- **The batch is reliably delivered and normalized.** The jobs arrived intact in
+  every run below, and the runtime's normalization handled `args` whether it came
+  through as an object or a JSON string — so the batch lands however it is handed
+  over. The exact form `args` takes is launch-path dependent and not pinned down
+  here; normalizing on the way in makes the recipe robust either way.
 - **Order and id-keying.** A three-job batch returned
   `[first → ALPHA, second → BRAVO, third → CHARLIE]` in input order, each entry
   keyed by its job id.
@@ -100,4 +100,5 @@ Not established here:
   live, since a real agent failure is hard to trigger on demand.
 - **Named-registry launch.** The runtime resolves named workflows from the main
   checkout, so a worktree build is reachable only by `scriptPath` until synced.
-  The string-delivery behavior is the same on both paths.
+  Arg delivery is expected to behave the same on both paths, but only `scriptPath`
+  was exercised here.
