@@ -5,7 +5,7 @@ What two tools — Anthropic's **native sandbox** (`/sandbox`) and Matt Pocock's
 and process, and which of those capabilities survive **interactive subscription
 billing**.
 
-Functional summary as of 2026-06-23, from Anthropic's
+Functional summary as of 2026-06-24, from Anthropic's
 [sandboxing](https://code.claude.com/docs/en/sandboxing) and
 [agent view](https://code.claude.com/docs/en/agent-view) docs and a read of the
 Sandcastle source.
@@ -70,6 +70,27 @@ with `/sandbox` or globally via `sandbox.enabled` in settings.
   That's machine-wide and blocks `gh`/`git`/`uv` too. There is no per-session or
   user-settings zero-egress switch.
 - Claude's own model API is not a shell subprocess, so none of this affects auth.
+
+**Unix sockets — all-or-nothing (the keyring trap):**
+
+- A third dimension the docs barely mention. With the optional **seccomp helper**
+  installed (`@anthropic-ai/sandbox-runtime`), the sandbox blocks *every* AF_UNIX
+  socket: `socket(AF_UNIX, …)` returns `EPERM` inside it. That severs any tool that
+  reaches a local daemon over a Unix socket — D-Bus, and through it the **system
+  keyring** (libsecret / Secret Service), plus the podman/docker socket, PipeWire,
+  and the rest of `$XDG_RUNTIME_DIR`. The socket file is still *visible* in-sandbox;
+  it's the `socket()`/`connect()` syscall that's denied, so the failure looks like
+  a cryptic "Operation not permitted," not a missing file.
+- There is no per-socket allow on Linux. `allowUnixSockets` (a path list) is
+  **macOS only** — "Ignored on Linux (seccomp cannot filter by path)." The lone
+  Linux lever is `allowAllUnixSockets: true`, which lifts the block for *every*
+  socket at once, including `/run/user/<uid>/docker.sock` — which the docs flag as
+  a sandbox-escape vector (the Docker/Podman socket ≈ host access). So you either
+  block all local sockets or trust all of them.
+- Practical fallout: a CLI whose credentials live in the keyring (e.g. `gh` after
+  `gh auth login`) can't read them in-sandbox and fails as *unauthenticated* (a
+  401), even though plain HTTPS egress works fine. Fix it per-tool by excluding
+  that tool from the sandbox — see [Our setup](#our-setup-and-decisions).
 
 **Caveat:** because it covers only the shell, running unattended with
 permissions skipped leaves the file tools unbounded. The native sandbox is a
@@ -189,6 +210,18 @@ zero-egress as the *container* case for a specific untrusted run — not a globa
   prompt-skip list that collapses to allow-all under our bypass mode, and the
   only real deny is machine-wide root managed settings that would break daily
   tooling. We left it out rather than imply a protection we don't have.
+- **`gh` runs outside the sandbox** (`sandbox.excludedCommands: ["gh", "gh *"]`).
+  Our GitHub token lives in the system keyring, reached over D-Bus's Unix socket —
+  which the seccomp filter blocks — so in-sandbox `gh` falls back to unauthenticated
+  and 401s. We can't open just the keyring socket on Linux (it's all-or-nothing),
+  and `allowAllUnixSockets` would also expose the podman socket. Excluding `gh` runs
+  it on the host, where it reads the keyring normally and the **token stays encrypted
+  at rest**, while the sandbox's Unix-socket block stays intact for every other
+  command. `gh` only ever talks to GitHub over HTTPS with a scoped PAT, and the
+  auto-mode classifier still reviews each call, so the unsandboxed surface is narrow.
+  Rejected alternatives: `allowAllUnixSockets` (opens the podman socket too) and a
+  file-based token via `gh auth login --insecure-storage` (keeps `gh` sandboxed but
+  writes the PAT in plaintext).
 - **Zero egress is a per-run container decision, never a global.** To run code
   we don't trust with no network, we isolate that one run in a container.
 
