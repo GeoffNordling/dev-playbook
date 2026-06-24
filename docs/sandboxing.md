@@ -92,6 +92,29 @@ plain `claude` session.
   The only option is turning networking off entirely, which also breaks Claude's
   auth. Limiting egress means building it yourself around the container.
 
+**Operating it interactively — the per-session cost:**
+
+Launching the TUI on subscription billing works, but each session carries setup
+and recurring friction, because the container is ephemeral and starts bare:
+
+- **The token doesn't suppress login.** `CLAUDE_CODE_OAUTH_TOKEN` (from `claude
+  setup-token`) reaches the container, but the interactive TUI ignores it for
+  auth and runs its own browser sign-in. Inside a container there's no browser,
+  so you finish it by hand (open a URL on the host), and a fresh container
+  forgets it — so it re-prompts every launch.
+- **Persistence is manual.** To sign in once instead of every time, mount a
+  dedicated persistent dir as the container's `~/.claude` so credentials survive
+  teardown. It must be a *separate* dir — never the host's real `~/.claude`,
+  whose `.credentials.json` would then be exposed to the open-network sandbox.
+- **Your setup isn't there.** The container has none of your global skills,
+  rules, or settings (they live in the unmounted host `~/.claude`). You stage in
+  what you want, and must pin the theme to match your terminal — the default
+  auto-detect misrenders illegibly in a container TTY.
+
+Net: complete filesystem isolation, paid for with a container build plus a
+re-login-and-restage ritual around each session. Worth it to run genuinely
+untrusted code; heavy for everyday work.
+
 ## What's achievable under interactive subscription billing
 
 | Capability | Native `/sandbox` | Sandcastle `interactive()` | Sandcastle `run()` (headless) |
@@ -103,7 +126,7 @@ plain `claude` session.
 | Multi-agent orchestration / AFK | ❌ | ❌ single session | ✅ — its purpose |
 | Remote/cloud execution | ❌ local only | ✅ | ✅ |
 | Isolation strength (untrusted code) | ⚠️ OS sandbox, weaker than a container | ✅ real container | ✅ |
-| Setup cost | low | high (Docker + image) | high |
+| Setup cost | low | high — image build + re-login/restage each launch | high |
 
 **For interactive subscription use:** Sandcastle's real strengths —
 orchestration, AFK fan-out, safe unattended runs — sit in the headless column
