@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -154,3 +155,136 @@ def test_prepare_raises_on_missing_reference_file(repo: Path) -> None:
 def test_prepare_raises_when_evidence_path_is_a_directory(repo: Path) -> None:
     with pytest.raises(OSError):
         prepare(CLAIM, ["docs"], None, "m", "high", str(repo))
+
+
+# --- prepare: the key contract (Chunk C) ---
+
+
+def key_for(root: Path, **overrides: Any) -> str:
+    """Compute a key for the canonical worked-example judgment, with overrides."""
+    args: dict[str, Any] = {
+        "claim": CLAIM,
+        "evidence": ["docs/errors.md"],
+        "reference": ["src/exceptions.py"],
+        "model": "claude-sonnet-4-6",
+        "effort": "high",
+        "root": str(root),
+    }
+    args.update(overrides)
+    return prepare(**args).key
+
+
+def test_key_is_stable_for_identical_inputs(repo: Path) -> None:
+    assert key_for(repo) == key_for(repo)
+
+
+def test_key_is_invariant_to_root(
+    repo: Path, tmp_path_factory: pytest.TempPathFactory
+) -> None:
+    other = tmp_path_factory.mktemp("other_root")
+    (other / "docs").mkdir()
+    (other / "src").mkdir()
+    (other / "docs" / "errors.md").write_text(EVIDENCE_TEXT)
+    (other / "src" / "exceptions.py").write_text(REFERENCE_TEXT)
+
+    assert key_for(repo) == key_for(other)
+
+
+def test_key_is_independent_of_file_list_order(repo: Path) -> None:
+    (repo / "extra.md").write_text("more evidence")
+
+    forward = key_for(repo, evidence=["docs/errors.md", "extra.md"])
+    reversed_ = key_for(repo, evidence=["extra.md", "docs/errors.md"])
+
+    assert forward == reversed_
+
+
+def test_key_changes_when_claim_changes(repo: Path) -> None:
+    assert key_for(repo) != key_for(repo, claim=CLAIM + " (amended)")
+
+
+def test_key_changes_when_a_files_bytes_change(repo: Path) -> None:
+    before = key_for(repo)
+
+    (repo / "docs" / "errors.md").write_text(EVIDENCE_TEXT + "\n- BazError")
+    after = key_for(repo)
+
+    assert before != after
+
+
+def test_key_changes_when_a_declared_relpath_changes(repo: Path) -> None:
+    (repo / "a.md").write_text("identical")
+    (repo / "b.md").write_text("identical")
+
+    assert key_for(repo, evidence=["a.md"], reference=[]) != key_for(
+        repo, evidence=["b.md"], reference=[]
+    )
+
+
+def test_key_changes_when_model_changes(repo: Path) -> None:
+    assert key_for(repo, model="claude-sonnet-4-6") != key_for(
+        repo, model="claude-opus-4-8"
+    )
+
+
+def test_key_changes_when_effort_changes(repo: Path) -> None:
+    assert key_for(repo, effort="high") != key_for(repo, effort="low")
+
+
+def test_key_changes_when_prompt_changes(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    before = key_for(repo)
+    monkeypatch.setattr("judgments.config.PROMPT", "a different instruction block")
+
+    assert key_for(repo) != before
+
+
+def test_key_changes_when_schema_changes(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    before = key_for(repo)
+    monkeypatch.setattr("judgments.config.SCHEMA", {"type": "string"})
+
+    assert key_for(repo) != before
+
+
+def test_key_distinguishes_evidence_from_reference(repo: Path) -> None:
+    # Same file, different role → different judgment → different key.
+    as_evidence = key_for(repo, evidence=["docs/errors.md"], reference=[])
+    as_reference = key_for(repo, evidence=[], reference=["docs/errors.md"])
+
+    assert as_evidence != as_reference
+
+
+def test_key_does_not_collide_across_claim_evidence_boundary(repo: Path) -> None:
+    # Naive concatenation of claim+bytes would collide; framed serialization must not.
+    (repo / "x.md").write_text("c")
+    left = key_for(repo, claim="ab", evidence=["x.md"], reference=[])
+
+    (repo / "x.md").write_text("bc")
+    right = key_for(repo, claim="a", evidence=["x.md"], reference=[])
+
+    assert left != right
+
+
+def test_key_and_prompt_come_from_a_single_read_per_file(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    reads: list[str] = []
+    real_read = Path.read_bytes
+
+    def counting_read(self: Path) -> bytes:
+        reads.append(self.as_posix())
+        return real_read(self)
+
+    monkeypatch.setattr(Path, "read_bytes", counting_read)
+
+    out = prepare(
+        CLAIM, ["docs/errors.md"], ["src/exceptions.py"], "m", "high", str(repo)
+    )
+
+    assert out.key and out.prompt
+    assert reads.count((repo / "docs" / "errors.md").as_posix()) == 1
+    assert reads.count((repo / "src" / "exceptions.py").as_posix()) == 1
+    assert len(reads) == 2

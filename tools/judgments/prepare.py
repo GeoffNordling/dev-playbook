@@ -42,10 +42,19 @@ def _read_each(root: str, relpaths: list[str]) -> Files:
     return pairs
 
 
-def _key(claim: str, evidence: Files, reference: Files) -> str:
-    """Hash an unambiguous, canonical JSON serialization of the judgment's inputs."""
+def _key(claim: str, model: str, effort: str, evidence: Files, reference: Files) -> str:
+    """Hash an unambiguous, canonical JSON serialization of the judgment's inputs.
+
+    Covers the claim, the configuration (model, effort, and the live PROMPT and
+    SCHEMA), and each file's (relpath, raw bytes). ``root`` and absolute paths are
+    deliberately absent, so the key is invariant to where the files were read from.
+    """
     payload = {
         "claim": claim,
+        "model": model,
+        "effort": effort,
+        "prompt": config.PROMPT,
+        "schema": config.SCHEMA,
         "evidence": [[relpath, data.hex()] for relpath, data in evidence],
         "reference": [[relpath, data.hex()] for relpath, data in reference],
     }
@@ -81,6 +90,6 @@ def prepare(
     evidence_pairs = _read_each(root, evidence)
     reference_pairs = _read_each(root, reference or [])
     return Prepared(
-        key=_key(claim, evidence_pairs, reference_pairs),
+        key=_key(claim, model, effort, evidence_pairs, reference_pairs),
         prompt=_render(claim, evidence_pairs, reference_pairs),
     )
