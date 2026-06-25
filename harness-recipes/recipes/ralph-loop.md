@@ -20,12 +20,13 @@ independent (parallelize those instead).
 
 Each iteration is one fresh `agent()` that:
 
-1. runs the project's checks and confirms the plan and progress files exist — if
-   checks are red on entry or a file is missing, the loop raises immediately (a
-   red entry means a prior iteration left the repo broken),
+1. runs the check gate, when one is configured, and confirms the plan and
+   progress files exist — if the gate is red on entry or a file is missing, the
+   loop raises immediately (a red entry means a prior iteration left the repo
+   broken),
 2. reads the plan and the progress log,
 3. implements the single next incomplete task,
-4. brings the checks back to green — never commits red,
+4. brings the gate back to green when one is configured — never commits red,
 5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
 6. commits via the `/commit` skill,
 7. reports whether the plan is complete.
