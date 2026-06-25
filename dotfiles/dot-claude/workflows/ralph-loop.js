@@ -10,11 +10,13 @@ export const meta = {
 //   maxIters      safety rail; throws if exceeded without completing
 //   planFile      the plan: a task list the agent works through and checks off
 //   progressFile  the running log appended each iteration
+//   checkCmd      the iteration check gate: a shell command meaning "green" (e.g. 'make check',
+//                 'make -C tools check', an && -chain); '' or whitespace-only means no gate
 //
 // NOTE (2026-06-25): the Workflow runtime's own docs are wrong here — they say objects/arrays
 // reach the script verbatim, but every args value actually arrives JSON-serialized to a string
 // (or undefined when omitted), so the contract is: the caller passes an object, this script parses it.
-const ARG_TYPES = { model: 'string', maxIters: 'number', planFile: 'string', progressFile: 'string' }
+const ARG_TYPES = { model: 'string', maxIters: 'number', planFile: 'string', progressFile: 'string', checkCmd: 'string' }
 
 function parseArgs(raw) {
   if (raw == null)
@@ -40,30 +42,41 @@ function parseArgs(raw) {
   return opts
 }
 
-const { model: MODEL, maxIters: MAX, planFile: PLAN, progressFile: PROGRESS } = parseArgs(args)
+const { model: MODEL, maxIters: MAX, planFile: PLAN, progressFile: PROGRESS, checkCmd: CHECK_RAW } = parseArgs(args)
+// Empty string (or whitespace-only) is the explicit "no gate" value — the caller opts out consciously.
+const CHECK = CHECK_RAW.trim()
 
 phase('Iterate')
 
-log(`ralph-loop config: model=${MODEL}, maxIters=${MAX}, planFile=${PLAN}, progressFile=${PROGRESS}`)
+log(`ralph-loop config: model=${MODEL}, maxIters=${MAX}, planFile=${PLAN}, progressFile=${PROGRESS}, checkCmd=${CHECK ? CHECK : '(none)'}`)
 
 const STATUS = {
   type: 'object', additionalProperties: false,
   required: ['done', 'blocker', 'summary'],
   properties: {
     done:    { type: 'boolean', description: 'true ONLY when every task in the plan is complete' },
-    blocker: { type: ['string', 'null'], description: 'one-line reason the loop must stop — checks red on entry, or a required file missing/unreadable; null if none' },
+    blocker: { type: ['string', 'null'], description: 'one-line reason the loop must stop — the check gate fails on entry, or a required file missing/unreadable; null if none' },
     summary: { type: 'string',  description: 'one line: what this iteration did' },
   },
 }
+
+// The check gate is loop config (the checkCmd arg), interpolated into the prompt here.
+// When set, the agent runs it at entry (step 1) and pre-commit (step 4); when empty, there is no gate.
+const step1 = CHECK
+  ? `Run \`${CHECK}\`. If it does not pass, or if ${PLAN} or ${PROGRESS} is missing or unreadable, set blocker to a one-line reason and STOP — do nothing else. Red on entry is not yours to fix; it means a prior iteration left the repo broken.`
+  : `This loop has no check gate, so there is nothing to run here. If ${PLAN} or ${PROGRESS} is missing or unreadable, set blocker to a one-line reason and STOP — do nothing else.`
+const step4 = CHECK
+  ? `Run \`${CHECK}\` again. If your work broke it, fix until it passes. Never commit red.`
+  : `This loop has no check gate, so there is nothing to run. Still, never commit work you believe is broken.`
 
 const PROMPT = `Work in the current directory — do not cd; use relative paths.
 
 The plan is in ${PLAN}; the running log of work so far is in ${PROGRESS}. Both must already exist.
 
-1. Run \`make check\`. If it does not pass, or if ${PLAN} or ${PROGRESS} is missing or unreadable, set blocker to a one-line reason and STOP — do nothing else. Red on entry is not yours to fix; it means a prior iteration left the repo broken.
+1. ${step1}
 2. Read ${PLAN} (the plan) and ${PROGRESS} (the log of what past iterations did).
 3. Find the next incomplete task in the plan and implement it — one task only, small enough to finish cleanly in this iteration.
-4. Run \`make check\` again. If your work broke it, fix until it passes. Never commit red.
+4. ${step4}
 5. Mark that task complete in ${PLAN}. Optionally record in Working notes an important, durable fact that future iterations would need. Append a one-line entry to ${PROGRESS}: what you did, and what is next.
 6. Commit this iteration's work by invoking the /commit skill.
 7. Report: summary = one line on what you did; done = true only if every task in the plan is now complete; blocker = null unless step 1 stopped you.`

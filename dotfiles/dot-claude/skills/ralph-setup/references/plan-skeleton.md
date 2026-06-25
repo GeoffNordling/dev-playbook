@@ -31,7 +31,7 @@ keeps it tight and current as it learns. -->
 ## Tasks
 
 <!-- Sequential. Each task is small enough for one iteration, independently
-committable, leaves `make check` green, and depends only on tasks above it. The
+committable, leaves the check gate green, and depends only on tasks above it. The
 agent does the first unchecked task only. Do not reorder once the loop runs. -->
 
 - [ ] <task — specific enough to execute without re-deriving the plan>
