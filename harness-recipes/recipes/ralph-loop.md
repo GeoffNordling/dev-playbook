@@ -1,71 +1,46 @@
 # Ralph loop
 
-A large goal ground out by booting a fresh agent each iteration until done. The
-goal is fixed on disk; each iteration is a new context window that reads the
-current state, does the next step, and records it. The loop itself runs in the
-Workflow runtime, outside any context window.
+A plan ground out by booting a fresh agent each iteration until done. The plan
+lives on disk as a task list; each iteration is a new context window that reads
+the current state, does the next task, and records it. The loop itself runs in
+the Workflow runtime, outside any context window.
 
 ## When to use it
 
-For a large task that splits into small, sequential, dependent steps — each step
-builds on the last, and no single step needs the whole task in context at once.
-The fixed goal lives in `GOAL.md`; the running log lives in `PROGRESS.md`; git
-carries the work. A fresh agent picks up from those each iteration, so the task
-can run far longer than any one context window holds.
+For a large task that splits into small, sequential tasks — each builds on the
+last, and no single task needs the whole thing in context at once. The plan (a
+task list) and a running log live on disk in files you name; git carries the
+work. A fresh agent picks up from those each iteration, so the task can run far
+longer than any one context window holds.
 
-Not for tasks that need the whole picture in mind at once, or whose steps are
+Not for tasks that need the whole picture in mind at once, or whose tasks are
 independent (parallelize those instead).
 
 ## How it works
 
-Each iteration is one fresh `agent()`:
+Each iteration is one fresh `agent()` that:
 
-1. read `GOAL.md` (the fixed goal) and `PROGRESS.md` (what came before),
-2. do the single next step,
-3. append one line to `PROGRESS.md` and commit,
-4. report whether the goal is done.
+1. runs the project's checks and confirms the plan and progress files exist — if
+   checks are red on entry or a file is missing, the loop raises immediately (a
+   red entry means a prior iteration left the repo broken),
+2. reads the plan and the progress log,
+3. implements the single next incomplete task,
+4. brings the checks back to green — never commits red,
+5. checks the task off in the plan and appends a line to the progress log,
+6. commits via the `/commit` skill,
+7. reports whether the plan is complete.
 
 The runtime repeats this until an agent reports done. No agent remembers the
-last — continuity lives entirely on disk. Isolated minds, shared world.
+last — continuity lives entirely on disk.
 
 ## Running it
 
-Launch from the target repo or worktree (agents inherit that cwd). Seed a
-`GOAL.md`, then call the workflow by name:
+Launch from the target repo or worktree (agents inherit that cwd). First seed the plan
+and progress files then call the workflow by name:
 
-    Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6 } })
+    Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md" } })
 
-Args, all optional: `goal` (inline, else `GOAL.md`), `model`, `maxIters`
-(default 50), `commit` (default true). Source:
-`dotfiles/dot-claude/workflows/ralph-loop.js`.
-
-## What we verified (2026-06-23)
-
-Tested directly this session, in an interactive session:
-
-- **Fresh context each iteration.** Later iterations continued a story they had
-  no memory of writing; the only link between them was disk.
-- **Disk carries state across iterations, in the launching session's directory.**
-  A worker inherits the session's working directory — relative-path writes landed
-  in that cwd, including inside a git worktree.
-- **The iteration prompt can be a file.** A worker performed a task whose
-  instructions existed only in an on-disk `.md`, never in the script.
-- **Per-iteration model is selectable.** A worker ran on Haiku (confirmed in its
-  transcript) while the launching session ran on Opus.
-- **No filesystem sandbox.** A worker read a file in a different repo, and wrote
-  to `/tmp` and into a `.git/` directory — all outside the worktree, unprompted.
-- **Permissions are mode-dependent.** With Auto Mode on, every worker file,
-  shell, and commit operation ran with no prompt — hands-off. With Auto Mode
-  off, the worker prompted on each edit and commit; approving each let the loop
-  finish, so an unattended loop would stall on the first prompt.
-- **A workflow can be launched by an agent**, not only by a human pressing a
-  button — including by its registered name. (Passing `args` to a named launch
-  did not take effect, though — seed `GOAL.md` or hardcode the script instead.)
-
-Frankly, not established:
-
-- What a worker does if a gate is *denied* mid-loop (we only ever approved
-  through), and what a truly unattended loop does when it stalls on a prompt.
-- The above assumes interactive Auto Mode; a stricter posture changes it.
-- Per Anthropic's docs (untested here): a workflow resumes only within the same
-  session.
+All four args are required — no defaults: `model` (worker model), `maxIters`
+(safety rail), `planFile` (the plan: a task list), `progressFile` (the running
+log). A missing or malformed arg throws. Source:
+[`ralph-loop.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/ralph-loop.js).
