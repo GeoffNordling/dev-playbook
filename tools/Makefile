@@ -10,7 +10,7 @@ lint:
 	uv run ruff check .
 
 typecheck:
-	uv run mypy tests/ workflow_state_data/
+	uv run mypy tests/ workflow_state_data/ skipcache/
 
 test:
 	uv run pytest
