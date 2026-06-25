@@ -26,7 +26,7 @@ Each iteration is one fresh `agent()` that:
 2. reads the plan and the progress log,
 3. implements the single next incomplete task,
 4. brings the checks back to green — never commits red,
-5. checks the task off in the plan and appends a line to the progress log,
+5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
 6. commits via the `/commit` skill,
 7. reports whether the plan is complete.
 
