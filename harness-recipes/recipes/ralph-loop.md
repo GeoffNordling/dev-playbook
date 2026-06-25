@@ -38,9 +38,11 @@ last — continuity lives entirely on disk.
 Launch from the target repo or worktree (agents inherit that cwd). First seed the plan
 and progress files then call the workflow by name:
 
-    Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md" } })
+    Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
 
-All four args are required — no defaults: `model` (worker model), `maxIters`
+All five args are required — no defaults: `model` (worker model), `maxIters`
 (safety rail), `planFile` (the plan: a task list), `progressFile` (the running
-log). A missing or malformed arg throws. Source:
+log), `checkCmd` (the check gate run at the start and end of each iteration — a
+shell command meaning "green", e.g. `make check` or `make -C tools check`; pass
+`""` for no checks). A missing or malformed arg throws. Source:
 [`ralph-loop.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/ralph-loop.js).
