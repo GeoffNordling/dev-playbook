@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from skipcache import filter, record
+from skipcache.seen import filter, record
 
 
 @pytest.fixture(autouse=True)
@@ -56,7 +56,7 @@ def test_recorded_keys_persist_across_processes(isolated_cache: Path) -> None:
     record(["abc"])
 
     tools_dir = Path(__file__).resolve().parents[1]
-    program = "import skipcache; print(skipcache.filter(['abc']).seen)"
+    program = "import skipcache.seen; print(skipcache.seen.filter(['abc']).seen)"
     result = subprocess.run(
         [sys.executable, "-c", program],
         cwd=tools_dir,
