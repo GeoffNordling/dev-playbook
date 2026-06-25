@@ -5,52 +5,65 @@ export const meta = {
   phases: [{ title: 'Scatter' }],
 }
 
-// args:
-//   model   REQUIRED worker model ('haiku' | 'sonnet' | 'opus' | ...); pinned to every job
-//   effort  REQUIRED reasoning effort ('low' | 'medium' | 'high' | 'xhigh' | 'max'); pinned to every job
-//   schema  optional JSON Schema applied to every job's structured output (batch-level)
-//   jobs    [{ id, prompt }] — independent jobs; results return in this order, keyed by id
+// args: a required JSON string of options. No defaults.
+//   model   worker model ('haiku' | 'sonnet' | 'opus' | ...); pinned to every job
+//   effort  reasoning effort ('low' | 'medium' | 'high' | 'xhigh' | 'max'); pinned to every job
+//   jobs    array of { id, prompt }; results return in this order, keyed by id
+//   schema  optional JSON Schema applied to every job's structured output
 //
-// args may reach the script either as a parsed object or as a JSON string, depending on
-// the launch path. Normalize once so the batch is reliably delivered however it is handed
-// over (string or object). A malformed string throws loud here rather than silently losing
-// the batch — which is exactly what bit the Ralph loop, whose script read args.goal without
-// parsing.
-const A = typeof args === 'string' ? JSON.parse(args) : (args ?? {})
+// NOTE (2026-06-25): the Workflow runtime's own docs are wrong here — they say objects/arrays
+// reach the script verbatim, but every args value actually arrives JSON-serialized to a string
+// (or undefined when omitted), so the contract is: the caller passes an object, this script parses it.
+const ARG_TYPES = { model: 'string', effort: 'string' }
+const ALLOWED = [...Object.keys(ARG_TYPES), 'jobs', 'schema']
 
-// model/effort are required because the batch runs under one fixed judge identity:
-// the first consumer (#98) content-addresses its cache on model + effort + prompt + schema,
-// so an inherited session value would silently corrupt the fingerprint. Throw loud instead.
-const MODEL  = A.model
-const EFFORT = A.effort
-const SCHEMA = A.schema
-const JOBS   = A.jobs ?? []
-
-if (!MODEL)  throw new Error('scatter-gather: args.model is required and must be pinned to the run — the runtime never inherits the session model.')
-if (!EFFORT) throw new Error('scatter-gather: args.effort is required and must be pinned to the run — the runtime never inherits the session effort.')
-
-if (!Array.isArray(JOBS)) throw new Error('scatter-gather: args.jobs must be an array of { id, prompt }.')
-
-// Pre-flight batch guard at the runtime's binding single-run limit. Scatter-gather spawns
-// one agent per job in a single parallel() call, so the binding ceiling is the
-// agent-lifetime cap (1000), not the larger 4096 per-call item cap. Fail before fanning
-// out rather than dying with an opaque error mid-run.
+// Pre-flight batch limit. Scatter-gather spawns one agent per job in a single parallel() call,
+// so the binding ceiling is the agent-lifetime cap (1000), not the larger 4096 per-call item cap.
 const MAX_JOBS = 1000
-if (JOBS.length > MAX_JOBS) {
-  throw new Error(`scatter-gather: batch of ${JOBS.length} jobs exceeds the runtime's single-run limit of ${MAX_JOBS} (one agent per job, the agent-lifetime cap) — split the batch and run it in parts.`)
+
+function parseArgs(raw) {
+  if (raw == null)
+    throw new Error(`scatter-gather: args is required — pass {model, effort, jobs} (schema optional)`)
+  if (typeof raw !== 'string')
+    throw new Error(`scatter-gather: args must be a JSON string, got ${typeof raw}`)
+  let opts
+  try { opts = JSON.parse(raw) }
+  catch (e) { throw new Error(`scatter-gather: args is not valid JSON (${e.message})`) }
+  if (opts === null || typeof opts !== 'object' || Array.isArray(opts))
+    throw new Error(`scatter-gather: args must decode to a JSON object`)
+  for (const k of Object.keys(ARG_TYPES))
+    if (!(k in opts))
+      throw new Error(`scatter-gather: missing required arg "${k}" — required: model, effort, jobs`)
+  for (const [k, v] of Object.entries(opts)) {
+    if (!ALLOWED.includes(k))
+      throw new Error(`scatter-gather: unknown arg "${k}" — allowed: ${ALLOWED.join(', ')}`)
+    if (k in ARG_TYPES && typeof v !== ARG_TYPES[k])
+      throw new Error(`scatter-gather: arg "${k}" must be ${ARG_TYPES[k]}, got ${typeof v}`)
+  }
+  // jobs (an array) and schema (optional) are validated here, not in the typed loop above:
+  // typeof can't distinguish an array from an object, and schema may be absent.
+  if (!Array.isArray(opts.jobs))
+    throw new Error(`scatter-gather: arg "jobs" is required and must be an array of {id, prompt}`)
+  if (opts.jobs.length > MAX_JOBS)
+    throw new Error(`scatter-gather: batch of ${opts.jobs.length} jobs exceeds the runtime's single-run limit of ${MAX_JOBS} (one agent per job, the agent-lifetime cap) — split the batch and run it in parts.`)
+  opts.jobs.forEach((job, i) => {
+    if (!job || typeof job.id !== 'string' || job.id === '' || typeof job.prompt !== 'string' || job.prompt === '')
+      throw new Error(`scatter-gather: jobs[${i}] must be { id: non-empty string, prompt: non-empty string } — the id keys the result`)
+  })
+  if ('schema' in opts && (opts.schema === null || typeof opts.schema !== 'object' || Array.isArray(opts.schema)))
+    throw new Error(`scatter-gather: arg "schema" must be a JSON Schema object when provided`)
+  return opts
 }
 
-for (const [i, job] of JOBS.entries()) {
-  if (!job || typeof job.id !== 'string' || job.id === '' || typeof job.prompt !== 'string' || job.prompt === '') {
-    throw new Error(`scatter-gather: jobs[${i}] must be { id: non-empty string, prompt: non-empty string } — the id keys the result, so it cannot be missing.`)
-  }
-}
+const { model: MODEL, effort: EFFORT, jobs: JOBS, schema: SCHEMA } = parseArgs(args)
 
 phase('Scatter')
 
-// Single fan-out: one isolated agent() per job. Catch inside the per-job thunk so a
-// thrown or skipped job yields { id, result: null } and keeps its id, rather than
-// dropping to a bare null (which parallel() would do on a throw) and losing the key.
+log(`scatter-gather: ${JOBS.length} job(s), model=${MODEL}, effort=${EFFORT}, schema=${SCHEMA ? 'yes' : 'no'}`)
+
+// Single fan-out: one isolated agent() per job. Catch inside the per-job thunk so a thrown or
+// skipped job yields { id, result: null } and keeps its id, rather than dropping to a bare null
+// (which parallel() returns on a throw) and losing the key.
 const results = await parallel(JOBS.map((job) => async () => {
   try {
     const result = await agent(job.prompt, {
