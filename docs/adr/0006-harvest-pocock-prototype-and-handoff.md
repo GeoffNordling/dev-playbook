@@ -26,3 +26,7 @@ Matt Pocock published two skills after [ADR-0004](0004-remove-pocock-direct-depe
 - `prototype`'s location convention currently also appears in `docs/ralph-loop-prototyping-plan.md`; lifting it out of that doc is a tracked follow-up, and its authoritative home (the skill vs. a row in the [repo-documentation](~/workspace/dev-playbook/standards/repo-documentation.md) Files table) is still open.
 - `handoff` discovery relies on the human relaying the temp path; a deterministic-path plus `/resume` convention is a deferred option if the relay proves annoying.
 - Third re-application of the [ADR-0003](0003-decline-superpowers.md) rule (after Pocock in ADR-0004).
+
+## Update (2026-06-25)
+
+The Consequences above reference `docs/ralph-loop-prototyping-plan.md`. That file no longer exists — the follow-up to lift `prototype`'s location convention out of it is resolved by the doc's deletion. The reference is left in place for historical record; this note exists so future agents stop flagging it as a broken link.
