@@ -8,5 +8,6 @@ layer calls the LLM, stores the fingerprints, and decides what to skip.
 
 from judgments.config import PROMPT, SCHEMA
 from judgments.model import Judgment
+from judgments.prepare import Prepared, prepare
 
-__all__ = ["PROMPT", "SCHEMA", "Judgment"]
+__all__ = ["PROMPT", "SCHEMA", "Judgment", "Prepared", "prepare"]
