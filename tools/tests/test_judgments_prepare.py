@@ -15,6 +15,7 @@ def write(root: Path, rel: str, text: str) -> None:
 
 
 def _forbidden_read(self: Path) -> bytes:
+    """Stand in for Path.read_bytes to assert no file is read; fails if called."""
     raise AssertionError(f"must not read {self}")
 
 

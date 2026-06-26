@@ -12,14 +12,6 @@ import json
 from pathlib import Path, PurePosixPath
 from typing import Any, NamedTuple
 
-
-class Judgment(NamedTuple):
-    """A judge's ruling on a claim: a verdict plus one paragraph of reasoning."""
-
-    verdict: bool
-    opinion: str
-
-
 # The general judge prompt. It is part of the content key, so editing it re-keys
 # (and therefore re-runs) every judgment everywhere -- by design.
 PROMPT = """\
@@ -72,6 +64,13 @@ SCHEMA: dict[str, Any] = {
     "required": ["verdict", "opinion"],
     "additionalProperties": False,
 }
+
+
+class Judgment(NamedTuple):
+    """A judge's ruling on a claim: a verdict plus one paragraph of reasoning."""
+
+    verdict: bool
+    opinion: str
 
 
 class Prepared(NamedTuple):
