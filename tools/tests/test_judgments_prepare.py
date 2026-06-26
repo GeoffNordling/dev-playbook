@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from judgments import PROMPT, Prepared, prepare
+from judgments.core import PROMPT, Prepared, prepare
 
 
 def write(root: Path, rel: str, text: str) -> None:

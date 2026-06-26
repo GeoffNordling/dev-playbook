@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from judgments import PROMPT, SCHEMA, Judgment
+from judgments.core import PROMPT, SCHEMA, Judgment
 
 VERBATIM_PROMPT = (Path(__file__).parent / "fixtures" / "judge_prompt.txt").read_text()
 
