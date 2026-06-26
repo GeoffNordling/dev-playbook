@@ -7,6 +7,6 @@ answer-relevant input changes, and the exact ``prompt`` text to hand the judge.
 It makes no LLM calls and does no caching itself.
 """
 
-from judgments.core import PROMPT, SCHEMA, Judgment
+from judgments.core import PROMPT, SCHEMA, Judgment, Prepared, prepare
 
-__all__ = ["PROMPT", "SCHEMA", "Judgment"]
+__all__ = ["PROMPT", "SCHEMA", "Judgment", "Prepared", "prepare"]

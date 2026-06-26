@@ -7,6 +7,9 @@ configuration (``PROMPT`` and ``SCHEMA``) that the downstream layer must run the
 judge under verbatim, because they are folded into the content key.
 """
 
+import hashlib
+import json
+from pathlib import Path, PurePosixPath
 from typing import Any, NamedTuple
 
 
@@ -69,3 +72,118 @@ SCHEMA: dict[str, Any] = {
     "required": ["verdict", "opinion"],
     "additionalProperties": False,
 }
+
+
+class Prepared(NamedTuple):
+    """What prepare() hands the caching layer: a content key and the judge prompt."""
+
+    key: str
+    prompt: str
+
+
+def prepare(
+    claim: str,
+    evidence: list[str],
+    reference: list[str] | None,
+    model: str,
+    effort: str,
+    root: str | Path,
+) -> Prepared:
+    """Derive the content key and the judge prompt for one judgment.
+
+    ``evidence`` and ``reference`` are paths relative to ``root``; each is read
+    exactly once, and both outputs come from that single read. ``root`` only
+    locates the files -- it enters neither the key nor the prompt, so the same
+    judgment under different roots yields the identical key and prompt. Raises if
+    a declared path is absolute, contains a ``..`` segment, or does not resolve
+    to a readable file under ``root``.
+    """
+    root_path = Path(root)
+    evidence_files = _read_all(evidence, root_path)
+    reference_files = _read_all(reference or [], root_path)
+    key = _content_key(claim, model, effort, evidence_files, reference_files)
+    prompt = _render_prompt(claim, evidence_files, reference_files)
+    return Prepared(key=key, prompt=prompt)
+
+
+def _read_all(paths: list[str], root: Path) -> list[tuple[str, bytes]]:
+    """Read each declared path once as (canonical relpath, raw bytes), sorted by path.
+
+    Canonicalizes the declared path and rejects -- before reading -- any path that
+    is absolute or escapes ``root`` via a ``..`` segment.
+    """
+    files = [
+        (relpath, (root / relpath).read_bytes())
+        for relpath in map(_canonical_relpath, paths)
+    ]
+    files.sort(key=lambda file: file[0])
+    return files
+
+
+def _canonical_relpath(declared: str) -> str:
+    """Normalize a declared path to a canonical relative POSIX form under root.
+
+    Collapses ``./`` and repeated slashes; raises on an absolute path or any
+    ``..`` segment, so reads stay strictly under ``root`` and each file keys
+    under exactly one path.
+    """
+    pure = PurePosixPath(declared)
+    if pure.is_absolute():
+        raise ValueError(f"path must be relative to root, got absolute: {declared!r}")
+    if ".." in pure.parts:
+        raise ValueError(f"path must stay under root, got '..' segment: {declared!r}")
+    return pure.as_posix()
+
+
+def _content_key(
+    claim: str,
+    model: str,
+    effort: str,
+    evidence_files: list[tuple[str, bytes]],
+    reference_files: list[tuple[str, bytes]],
+) -> str:
+    """Hex SHA-256 over a canonical, unambiguous serialization of the judgment.
+
+    Each file contributes its canonical relpath paired with the SHA-256 of its
+    raw bytes; ``root`` and absolute paths never enter. Canonical JSON
+    (sorted keys, length-delimited strings) keeps distinct judgments from
+    colliding into a false skip.
+    """
+    payload = {
+        "claim": claim,
+        "model": model,
+        "effort": effort,
+        "prompt": PROMPT,
+        "schema": SCHEMA,
+        "evidence": [[rel, _digest(data)] for rel, data in evidence_files],
+        "reference": [[rel, _digest(data)] for rel, data in reference_files],
+    }
+    serialized = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def _digest(data: bytes) -> str:
+    """Hex SHA-256 of raw file bytes -- an unambiguous stand-in for the content."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def _render_prompt(
+    claim: str,
+    evidence_files: list[tuple[str, bytes]],
+    reference_files: list[tuple[str, bytes]],
+) -> str:
+    """Build the self-contained, XML-tagged prompt from the already-read files."""
+    blocks = [_tag("instructions", PROMPT), _tag("claim", claim)]
+    blocks += [
+        _tag("evidence", data.decode("utf-8"), rel) for rel, data in evidence_files
+    ]
+    blocks += [
+        _tag("reference", data.decode("utf-8"), rel) for rel, data in reference_files
+    ]
+    return "\n\n".join(blocks)
+
+
+def _tag(name: str, content: str, path: str | None = None) -> str:
+    """Wrap content in an XML tag, carrying a relative path attribute when given."""
+    attribute = f' path="{path}"' if path is not None else ""
+    return f"<{name}{attribute}>\n{content}\n</{name}>"
