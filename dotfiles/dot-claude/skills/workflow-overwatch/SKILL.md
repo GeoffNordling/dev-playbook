@@ -63,9 +63,10 @@ Provide commands under **state once, then trust**. When the user needs to run a 
    | | | Handle | Purpose | Node | Notes |
    |---|---|---|---|---|---|
    | ✈️ | 💚 | `dev-playbook#103` | judgments library | ② · code-pr-review | agent reviewing → your verdict |
+   | 💤 | 💚 | `dev-playbook#105` | dispatch-graph edges | sdd-code-pr-review | findings posted → your verdict |
    | 💤 | ❌ | `dev-playbook#101` | judgment orchestration | ③ · design | blocked by #103 + JS-rework gate |
    | 💤 | 💚 | `dev-playbook#106` | rework reads inline comments | intake | launchable now |
-   | 💤 | ⏸️ | `claude-transcript-tool` | export Claude transcripts | Ralph | blocked on #105 |
+   | 💤 | ⏸️ | `claude-transcript-tool` | export Claude transcripts | Ralph | parked by choice — lower priority right now |
 
    🔍 Code review — open in VS Code (switch freely, one at a time):
        code -r dev-playbook/.claude/worktrees/issue-103
