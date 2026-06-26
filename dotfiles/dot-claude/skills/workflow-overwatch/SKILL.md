@@ -40,15 +40,15 @@ Provide commands under **state once, then trust**. When the user needs to run a 
 
    **The code-review exception — a standing list.** An issue in a review phase (`code-pr-review` or `sdd-code-pr-review`) is the exception to state-once: its open-command goes into the 🔍 **code-review access list**, shown under the board on *every* turn. The user reviews PRs in VS Code one at a time and switches between them on their own schedule; overwatch can't know when a given review will be opened, so the command must always be at hand, not stated once and dropped. An issue **joins** the list when it enters a review phase and **drops off** when the user gives its verdict and it leaves review. (The PR not existing yet is no reason to withhold the command: `/open-pr` lands it a turn or two later, and the open worktree window is where the user reviews it via the GitHub Pull Requests extension.)
 
-6. **Show the board.** Close each turn with the board: one row per in-flight issue. It carries two **orthogonal** dimensions, each its own column — **Activity** (is compute literally running right now?) and **Status** (where the issue stands, health-wise). Keep them separate; don't collapse them into one column.
+6. **Show the board.** Close each turn with the board: one row per in-flight work item. It carries two **orthogonal** dimensions, each its own column — **Activity** (is this session active right now?) and **Status** (where the issue stands, health-wise). Keep them separate; don't collapse them into one column.
 
    | Column | Contents |
    |---|---|
    | **Activity** | ✈️ or 💤 |
    | **Status** | 💚 / ❌ / ⏸️ / ❗ |
-   | **Handle** | `<repo>#<N>` |
+   | **Handle** | `<repo>#<N>`, or a plain session handle for non-issue work (e.g. `claude-transcript-tool`) |
    | **Purpose** | 2–4 word plain-language title of what the issue *is*, so the number need not be decoded |
-   | **Node** | current node / `phase:*` position (optionally with the work-item marker, e.g. `② · tdd`) |
+   | **Node** | current node / `phase:*` position |
    | **Notes** | blockers, the specific next action (incl. a pending human tap), dependencies |
 
    **Activity** (binary): ✈️ **in flight** — compute is actively running, an autonomous (FOTW) agent generating or a HITL node the user is actively driving. 💤 **grounded** — nothing running right now.
@@ -62,9 +62,9 @@ Provide commands under **state once, then trust**. When the user needs to run a 
    ```
    | | | Handle | Purpose | Node | Notes |
    |---|---|---|---|---|---|
-   | ✈️ | 💚 | `dev-playbook#103` | judgments library | ② · code-pr-review | agent reviewing → your verdict |
+   | ✈️ | 💚 | `dev-playbook#103` | judgments library | code-pr-review | agent reviewing → your verdict |
    | 💤 | 💚 | `dev-playbook#105` | dispatch-graph edges | sdd-code-pr-review | findings posted → your verdict |
-   | 💤 | ❌ | `dev-playbook#101` | judgment orchestration | ③ · design | blocked by #103 + JS-rework gate |
+   | 💤 | ❌ | `dev-playbook#101` | judgment orchestration | design | blocked by #103 + JS-rework gate |
    | 💤 | 💚 | `dev-playbook#106` | rework reads inline comments | intake | launchable now |
    | 💤 | ⏸️ | `claude-transcript-tool` | export Claude transcripts | Ralph | parked by choice — lower priority right now |
 
