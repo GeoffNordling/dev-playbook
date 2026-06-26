@@ -594,6 +594,24 @@ def test_symlink_escaping_root_is_rejected(tmp_path: Path) -> None:
         )
 
 
+def test_non_utf8_file_raises_naming_the_path(tmp_path: Path) -> None:
+    # The key hashes raw bytes but the prompt needs UTF-8 text; reject a
+    # non-decodable file at read time, with the offending path in the message.
+    (tmp_path / "bad.md").write_bytes(b"\xff\xfe\x00")
+
+    with pytest.raises(ValueError) as exc:
+        prepare(
+            claim="c",
+            evidence=["bad.md"],
+            reference=None,
+            model="m",
+            effort="high",
+            root=tmp_path,
+        )
+
+    assert "bad.md" in str(exc.value)
+
+
 # --- single read for both outputs ------------------------------------------
 
 

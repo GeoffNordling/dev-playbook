@@ -106,24 +106,43 @@ def prepare(
     return Prepared(key=key, prompt=prompt)
 
 
-def _read_all(paths: list[str], root: Path) -> list[tuple[str, bytes]]:
-    """Read each declared path once as (canonical relpath, raw bytes), sorted by path.
+class _ReadFile(NamedTuple):
+    """One file read once: its canonical relpath, raw bytes, and decoded text.
+
+    The key hashes ``data``; the prompt renders ``text``. Both come from the
+    same read, so the judge rules on exactly the bytes that were fingerprinted.
+    """
+
+    relpath: str
+    data: bytes
+    text: str
+
+
+def _read_all(paths: list[str], root: Path) -> list[_ReadFile]:
+    """Read each declared path once as a sorted list of _ReadFile, validated first.
 
     Every declared path is canonicalized and validated *before any file is read*,
     so one bad path in the list rejects the whole list without touching disk.
     Canonical relpaths are de-duplicated, so a file declared twice (e.g. ``a.md``
     and ``./a.md``) is read and keyed once. Each surviving path is confirmed to
     resolve to a real location under ``root`` -- a symlink whose target escapes
-    ``root`` is rejected rather than followed.
+    ``root`` is rejected rather than followed. Each file's bytes must decode as
+    UTF-8 (the prompt's domain); a non-decodable file is rejected at read time
+    with its path named, so the key and the prompt agree on what a valid file is.
     """
     relpaths = sorted({_canonical_relpath(p) for p in paths})
     root_resolved = root.resolve()
-    files: list[tuple[str, bytes]] = []
+    files: list[_ReadFile] = []
     for relpath in relpaths:
         target = root / relpath
         if not target.resolve().is_relative_to(root_resolved):
             raise ValueError(f"path escapes root via a symlink: {relpath!r}")
-        files.append((relpath, target.read_bytes()))
+        data = target.read_bytes()
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError as error:
+            raise ValueError(f"file is not valid UTF-8: {relpath!r}") from error
+        files.append(_ReadFile(relpath, data, text))
     return files
 
 
@@ -149,15 +168,16 @@ def _content_key(
     claim: str,
     model: str,
     effort: str,
-    evidence_files: list[tuple[str, bytes]],
-    reference_files: list[tuple[str, bytes]],
+    evidence_files: list[_ReadFile],
+    reference_files: list[_ReadFile],
 ) -> str:
     """Hex SHA-256 over a canonical, unambiguous serialization of the judgment.
 
     Each file contributes its canonical relpath paired with the SHA-256 of its
-    raw bytes; ``root`` and absolute paths never enter. Canonical JSON
-    (sorted keys, length-delimited strings) keeps distinct judgments from
-    colliding into a false skip.
+    raw bytes; ``root`` and absolute paths never enter. The serialization is
+    canonical JSON (sorted keys); JSON string quoting plus the fixed-width hex
+    digests keep the fields unambiguous, so distinct judgments cannot collide
+    into a false skip.
     """
     payload = {
         "claim": claim,
@@ -165,8 +185,8 @@ def _content_key(
         "effort": effort,
         "prompt": PROMPT,
         "schema": SCHEMA,
-        "evidence": [[rel, _digest(data)] for rel, data in evidence_files],
-        "reference": [[rel, _digest(data)] for rel, data in reference_files],
+        "evidence": [[f.relpath, _digest(f.data)] for f in evidence_files],
+        "reference": [[f.relpath, _digest(f.data)] for f in reference_files],
     }
     serialized = json.dumps(payload, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -179,17 +199,13 @@ def _digest(data: bytes) -> str:
 
 def _render_prompt(
     claim: str,
-    evidence_files: list[tuple[str, bytes]],
-    reference_files: list[tuple[str, bytes]],
+    evidence_files: list[_ReadFile],
+    reference_files: list[_ReadFile],
 ) -> str:
     """Build the self-contained, XML-tagged prompt from the already-read files."""
     blocks = [_tag("instructions", PROMPT), _tag("claim", claim)]
-    blocks += [
-        _tag("evidence", data.decode("utf-8"), rel) for rel, data in evidence_files
-    ]
-    blocks += [
-        _tag("reference", data.decode("utf-8"), rel) for rel, data in reference_files
-    ]
+    blocks += [_tag("evidence", f.text, f.relpath) for f in evidence_files]
+    blocks += [_tag("reference", f.text, f.relpath) for f in reference_files]
     return "\n\n".join(blocks)
 
 
