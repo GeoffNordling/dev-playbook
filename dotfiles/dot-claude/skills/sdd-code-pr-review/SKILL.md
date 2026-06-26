@@ -33,7 +33,7 @@ Then report: `READ: spec-standard.md, testing-conventions.md, python-conventions
 
 - `gh issue view <issue> --comments` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
-- `gh pr view --comments` — the native bug-review pass that ran before you, and any prior review cycle's findings; read them so you don't re-flag what they caught.
+- The PR's existing feedback — the native bug-review pass that ran before you, and any prior review cycle's findings; to avoid re-flagging what they caught, read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline/line-level diff comments alike, from both human and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/{pr}/comments`; review summaries are at `.../pulls/{pr}/reviews` — these endpoints are a non-binding hint.)
 - The committed specs under `specs/functional_requirements/` and `specs/design/` — what the code must implement.
 - The tests under `tests/` and code under `src/` — the full picture behind the diff.
 
