@@ -25,6 +25,8 @@ Then report: `READ: workflow.md`. Proceed only after.
 
 ## Navigate — the next command
 
+Provide commands under **state once, then trust**. When the user needs to run a command — a launch, a push, a pull, a YubiKey tap — state it once, clearly, in paste-safe single-line form, then assume it ran and move the board forward. Don't track taps, push/pull state, or whether a launch executed; don't re-surface a one-time command on a later turn, don't re-verify it landed (no API "did the push land" check), and don't ask "did you run it?" The trust is bounded: infer only the direct effect of the command you handed over — never a multi-step human procedure, and never an irreversible or outward-facing action. A merge stays open until the user says it merged; teardown waits for the user's word. The one exception is the code-review access list (item 5), a standing list rather than a one-time command.
+
 1. **Read state, tap-free.** Labels only: `gh issue view <N> --json labels --jq '.labels[].name'`. Track position, not content — don't read the body. With several issues in flight, check each; think of each as a row `<repo>#<N> · <phase>`.
 2. **Place it on the graph.** The `phase:*` label is the current node; its outgoing edge — read with the issue's `mode`/`tests` — names the next node.
 3. **Emit the launch command** in the form the node's mode dictates (workflow.md Dispatch): a HITL node as `/<skill> <args>`; a FOTW node inside the `/goal … until it prints DONE: or ESCALATE: … N turns` wrapper. Hand over the literal command — the user launches it. Never auto-launch, never advance a label yourself. The handoff is the command itself — no re-verifying the expected state first, no exposition on mechanics the user already knows.
@@ -34,9 +36,42 @@ Then report: `READ: workflow.md`. Proceed only after.
 
    Push, pull, and the PR merge are the human's taps; never reach for a PAT-API path that would only be rejected.
 
-5. **Surface the open-command with every handoff.** Alongside each launch or push command, give the worktree open-command: `code -r <repo>/.claude/worktrees/issue-<N>`. Surface it unprompted at the `code-pr-review` and `sdd-code-pr-review` handoffs too — both mixed nodes launched by the same compound `/open-pr` → `/code-review` → review `/goal`. That the PR doesn't exist yet is no reason to withhold the command: `/open-pr` lands the PR a turn or two later, and the open worktree window is where the user reviews it via the GitHub Pull Requests extension — so don't make them ask.
+5. **Surface the worktree open-command — `code -r <repo>/.claude/worktrees/issue-<N>`.** Alongside each launch or push handoff, give it once, under state-once-then-trust.
 
-6. **Show the board, inferred forward.** Close each turn with the board — one row per in-flight issue, `<repo>#<N> · <phase>`. Assume the single command you just handed over was executed; infer nothing beyond it — never a multi-step human procedure, never an irreversible or outward-facing action. A merge stays "awaiting verdict/merge" until the user confirms it merged.
+   **The code-review exception — a standing list.** An issue in a review phase (`code-pr-review` or `sdd-code-pr-review`) is the exception to state-once: its open-command goes into the 🔍 **code-review access list**, shown under the board on *every* turn. The user reviews PRs in VS Code one at a time and switches between them on their own schedule; overwatch can't know when a given review will be opened, so the command must always be at hand, not stated once and dropped. An issue **joins** the list when it enters a review phase and **drops off** when the user gives its verdict and it leaves review. (The PR not existing yet is no reason to withhold the command: `/open-pr` lands it a turn or two later, and the open worktree window is where the user reviews it via the GitHub Pull Requests extension.)
+
+6. **Show the board.** Close each turn with the board: one row per in-flight work item. It carries two **orthogonal** dimensions, each its own column — **Activity** (is this session active right now?) and **Status** (where the issue stands, health-wise). Keep them separate; don't collapse them into one column.
+
+   | Column | Contents |
+   |---|---|
+   | **Activity** | ✈️ or 💤 |
+   | **Status** | 💚 / ❌ / ⏸️ / ❗ |
+   | **Handle** | `<repo>#<N>`, or a plain session handle for non-issue work (e.g. `claude-transcript-tool`) |
+   | **Purpose** | 2–4 word plain-language title of what the issue *is*, so the number need not be decoded |
+   | **Node** | current node / `phase:*` position |
+   | **Notes** | blockers, the specific next action (incl. a pending human tap), dependencies |
+
+   **Activity** (binary): ✈️ **in flight** — compute is actively running, an autonomous (FOTW) agent generating or a HITL node the user is actively driving. 💤 **grounded** — nothing running right now.
+
+   **Status** (health): 💚 **healthy** — in progress or ready to advance; nothing wrong. ❌ **blocked** — cannot proceed; a dependency is unmet. ⏸️ **paused** — deliberately tabled. ❗ **escalated** — an agent stopped and is waiting for the user's attention.
+
+   Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A pending push/pull/merge/review tap is not its own glyph — it reads as 💤💚 ("grounded, healthy, ready for the next thing") with the action named in **Notes**.
+
+   The 🔍 code-review access list (item 5) renders directly under the table whenever ≥1 issue is in a review phase.
+
+   ```
+   | | | Handle | Purpose | Node | Notes |
+   |---|---|---|---|---|---|
+   | ✈️ | 💚 | `dev-playbook#103` | judgments library | code-pr-review | agent reviewing → your verdict |
+   | 💤 | 💚 | `dev-playbook#105` | dispatch-graph edges | sdd-code-pr-review | findings posted → your verdict |
+   | 💤 | ❌ | `dev-playbook#101` | judgment orchestration | design | blocked by #103 + JS-rework gate |
+   | 💤 | 💚 | `dev-playbook#106` | rework reads inline comments | intake | launchable now |
+   | 💤 | ⏸️ | `claude-transcript-tool` | export Claude transcripts | Ralph | parked by choice — lower priority right now |
+
+   🔍 Code review — open in VS Code (switch freely, one at a time):
+       code -r dev-playbook/.claude/worktrees/issue-103
+       code -r dev-playbook/.claude/worktrees/issue-105
+   ```
 
 7. **Tear down after a confirmed merge.** Worktree teardown is yours, and only after the user *tells you* the merge happened — never on inference, and with no API verification step. Then run the cheap local cleanup: `git -C ~/workspace/<repo> worktree remove .claude/worktrees/issue-<N>` and `git -C ~/workspace/<repo> branch -D issue-<N>`.
 
