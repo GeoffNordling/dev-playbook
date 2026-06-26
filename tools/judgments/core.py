@@ -120,12 +120,14 @@ class _ReadFile(NamedTuple):
 def _read_all(paths: list[str], root: Path) -> list[_ReadFile]:
     """Read each declared path once as a sorted list of _ReadFile, validated first.
 
-    Every declared path is canonicalized and validated *before any file is read*,
-    so one bad path in the list rejects the whole list without touching disk.
-    Canonical relpaths are de-duplicated, so a file declared twice (e.g. ``a.md``
-    and ``./a.md``) is read and keyed once. Each surviving path is confirmed to
-    resolve to a real location under ``root`` -- a symlink whose target escapes
-    ``root`` is rejected rather than followed. Each file's bytes must decode as
+    Each declared path is canonicalized *before any file is read*, so a path that
+    is absolute, contains ``..``, or is empty rejects the whole list without
+    reading anything. Containment under ``root`` is then checked per file, right
+    before that file is read -- a symlink whose target escapes ``root`` is
+    rejected rather than followed, so its bytes never enter the key or prompt
+    (though a valid earlier path may be read before a later escaping symlink is
+    rejected). Canonical relpaths are de-duplicated, so a file declared twice
+    (e.g. ``a.md`` and ``./a.md``) is read and keyed once. Each file's bytes must decode as
     UTF-8 (the prompt's domain); a non-decodable file is rejected at read time
     with its path named, so the key and the prompt agree on what a valid file is.
     """
