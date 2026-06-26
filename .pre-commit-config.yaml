@@ -43,3 +43,10 @@ repos:
         language: script
         pass_filenames: false
         always_run: true
+
+      - id: judgments-lint
+        name: judgments-lint
+        entry: tools/bin/judgments-lint
+        language: script
+        pass_filenames: false
+        always_run: true

@@ -1,0 +1,34 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml>=6.0"]
+# ///
+"""judgments-lint — pre-commit validator for a repo's judgment declarations.
+
+Thin shim over judgments.loader.lint: resolve the repo's [tool.judgments]
+config, run the loader's field validation plus the static evidence/reference
+path checks (relative + exists), print every error, and exit nonzero if any.
+A repo with no config validates nothing and exits 0. Fast and deterministic --
+no LLM, no hashing. See judgments.loader for the logic and its tests.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from judgments.loader import lint, resolve_root  # noqa: E402
+
+
+def main() -> int:
+    errors = lint(resolve_root())
+    for error in errors:
+        print(error, file=sys.stderr)
+    if errors:
+        print(f"judgments-lint: {len(errors)} error(s)", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

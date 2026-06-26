@@ -10,7 +10,7 @@ declared evidence/reference paths -- existence and path-format are the lint's an
 
 import re
 import tomllib
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import NamedTuple, TypeGuard
 
 import yaml
@@ -167,3 +167,39 @@ def by_id(declarations: list[Declaration], id: str) -> Declaration:
         if declaration.id == id:
             return declaration
     raise ValueError(f"unknown judgment id: {id!r}")
+
+
+def lint(root: Path | None) -> list[str]:
+    """Statically validate a repo's declarations; return all errors (empty if clean).
+
+    Runs the loader's field validation, then the static subset of ``prepare``'s
+    path rules -- each evidence/reference path must be relative (not absolute, no
+    ``..``) and exist. A repo with no ``[tool.judgments]`` config validates
+    nothing. A structural error short-circuits to that one error; otherwise every
+    offending path is reported, so one run surfaces them all.
+    """
+    if root is None:
+        return []
+    try:
+        declarations = load(root)
+    except (ValueError, yaml.YAMLError) as error:
+        return [str(error)]
+    errors: list[str] = []
+    for declaration in declarations:
+        for path in (*declaration.evidence, *declaration.reference):
+            problem = _path_problem(path, root)
+            if problem is not None:
+                errors.append(f"judgment {declaration.id!r}: {problem}")
+    return errors
+
+
+def _path_problem(path: str, root: Path) -> str | None:
+    """The static path defect (absolute / ``..`` / missing), or ``None`` if clean."""
+    pure = PurePosixPath(path)
+    if pure.is_absolute():
+        return f"evidence/reference path must be relative, got absolute: {path!r}"
+    if ".." in pure.parts:
+        return f"evidence/reference path must not contain '..': {path!r}"
+    if not (root / path).exists():
+        return f"evidence/reference path does not exist: {path!r}"
+    return None
