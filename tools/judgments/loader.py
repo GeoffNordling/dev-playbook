@@ -49,6 +49,7 @@ def resolve_root(start: Path | None = None) -> Path | None:
 def _has_judgments_table(pyproject: Path) -> bool:
     """Whether ``pyproject``'s parsed contents carry a ``[tool.judgments]`` table."""
     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    # a pyproject without a [tool] table is valid -- it just means no judgments
     return "judgments" in data.get("tool", {})
 
 
@@ -102,9 +103,22 @@ def _declaration_globs(root: Path) -> list[str]:
 
 
 def _parse_file(path: Path) -> list[Declaration]:
-    """Parse one declaration YAML file into validated :class:`Declaration` records."""
+    """Parse one declaration YAML file into validated :class:`Declaration` records.
+
+    Rejects a structurally-malformed file -- a non-mapping document, or a
+    ``judgments`` value that is not a list -- with the module's clear, file-named
+    ``ValueError`` before iterating, so a plausible typo surfaces as that uniform
+    error rather than a raw ``TypeError``/``AttributeError`` traceback.
+    """
     document = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    return [_to_declaration(item, path) for item in document.get("judgments", [])]
+    if not isinstance(document, dict):
+        raise ValueError(
+            f"{path}: top-level YAML must be a mapping with a 'judgments' key"
+        )
+    judgments = document.get("judgments", [])
+    if not isinstance(judgments, list):
+        raise ValueError(f"{path}: 'judgments' must be a list")
+    return [_to_declaration(item, path) for item in judgments]
 
 
 def _to_declaration(item: object, source: Path) -> Declaration:

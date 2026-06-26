@@ -196,6 +196,26 @@ def test_load_does_no_io_on_declared_evidence_paths(
     assert declarations[0].evidence == ["does/not/exist.md"]
 
 
+@pytest.mark.parametrize(
+    ("content", "expected"),
+    [
+        ("judgments:\n", "must be a list"),  # key present, null value
+        ("judgments: 5\n", "must be a list"),  # scalar, not a list
+        ("- a\n", "mapping"),  # top-level list, not a mapping
+    ],
+)
+def test_load_rejects_a_malformed_judgments_shape(
+    make_repo: Callable[[dict[str, str]], Path], content: str, expected: str
+) -> None:
+    # A structurally-malformed declaration file must raise the loader's clear,
+    # file-named ValueError -- not a raw TypeError/AttributeError that escapes the
+    # lint's and CLI's error handling and dumps a traceback.
+    repo = make_repo({"pyproject.toml": CONFIG, "judgments/a.yaml": content})
+
+    with pytest.raises(ValueError, match=expected):
+        load(repo)
+
+
 def test_load_rejects_tool_judgments_table_with_no_paths(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
