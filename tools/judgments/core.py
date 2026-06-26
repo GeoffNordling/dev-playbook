@@ -109,30 +109,40 @@ def prepare(
 def _read_all(paths: list[str], root: Path) -> list[tuple[str, bytes]]:
     """Read each declared path once as (canonical relpath, raw bytes), sorted by path.
 
-    Canonicalizes the declared path and rejects -- before reading -- any path that
-    is absolute or escapes ``root`` via a ``..`` segment.
+    Every declared path is canonicalized and validated *before any file is read*,
+    so one bad path in the list rejects the whole list without touching disk.
+    Canonical relpaths are de-duplicated, so a file declared twice (e.g. ``a.md``
+    and ``./a.md``) is read and keyed once. Each surviving path is confirmed to
+    resolve to a real location under ``root`` -- a symlink whose target escapes
+    ``root`` is rejected rather than followed.
     """
-    files = [
-        (relpath, (root / relpath).read_bytes())
-        for relpath in map(_canonical_relpath, paths)
-    ]
-    files.sort(key=lambda file: file[0])
+    relpaths = sorted({_canonical_relpath(p) for p in paths})
+    root_resolved = root.resolve()
+    files: list[tuple[str, bytes]] = []
+    for relpath in relpaths:
+        target = root / relpath
+        if not target.resolve().is_relative_to(root_resolved):
+            raise ValueError(f"path escapes root via a symlink: {relpath!r}")
+        files.append((relpath, target.read_bytes()))
     return files
 
 
 def _canonical_relpath(declared: str) -> str:
     """Normalize a declared path to a canonical relative POSIX form under root.
 
-    Collapses ``./`` and repeated slashes; raises on an absolute path or any
-    ``..`` segment, so reads stay strictly under ``root`` and each file keys
-    under exactly one path.
+    Collapses ``./`` and repeated slashes; raises on an absolute path, any
+    ``..`` segment, or a path with no real component (``""`` or ``.``), so reads
+    stay strictly under ``root`` and each file keys under exactly one path.
     """
     pure = PurePosixPath(declared)
     if pure.is_absolute():
         raise ValueError(f"path must be relative to root, got absolute: {declared!r}")
     if ".." in pure.parts:
         raise ValueError(f"path must stay under root, got '..' segment: {declared!r}")
-    return pure.as_posix()
+    canonical = pure.as_posix()
+    if canonical == ".":
+        raise ValueError(f"path must name a file under root, got empty: {declared!r}")
+    return canonical
 
 
 def _content_key(

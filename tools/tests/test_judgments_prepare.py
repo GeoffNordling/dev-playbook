@@ -429,6 +429,44 @@ def test_key_is_independent_of_evidence_order(tmp_path: Path) -> None:
     assert forward == reverse
 
 
+def test_duplicate_canonical_paths_key_like_single_occurrence(tmp_path: Path) -> None:
+    write(tmp_path, "a.md", "A")
+
+    once = prepare(
+        claim="c",
+        evidence=["a.md"],
+        reference=None,
+        model="m",
+        effort="high",
+        root=tmp_path,
+    ).key
+    twice = prepare(
+        claim="c",
+        evidence=["a.md", "./a.md"],
+        reference=None,
+        model="m",
+        effort="high",
+        root=tmp_path,
+    ).key
+
+    assert once == twice
+
+
+def test_duplicate_paths_render_a_single_tag(tmp_path: Path) -> None:
+    write(tmp_path, "a.md", "A")
+
+    out = prepare(
+        claim="c",
+        evidence=["a.md", "./a.md"],
+        reference=None,
+        model="m",
+        effort="high",
+        root=tmp_path,
+    )
+
+    assert out.prompt.count('<evidence path="a.md">') == 1
+
+
 # --- fail-loud path handling -----------------------------------------------
 
 
@@ -473,6 +511,86 @@ def test_dotdot_path_is_rejected_before_any_read(
             model="m",
             effort="high",
             root=tmp_path,
+        )
+
+
+def test_absolute_path_after_a_valid_path_is_rejected_before_any_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # A valid path precedes the bad one: validation must reject the whole list
+    # before reading *any* file, not just the offending entry.
+    write(tmp_path, "a.md", "A")
+    monkeypatch.setattr(Path, "read_bytes", _forbidden_read)
+
+    with pytest.raises(ValueError):
+        prepare(
+            claim="c",
+            evidence=["a.md", "/etc/passwd"],
+            reference=None,
+            model="m",
+            effort="high",
+            root=tmp_path,
+        )
+
+
+def test_dotdot_path_after_a_valid_path_is_rejected_before_any_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    write(tmp_path, "a.md", "A")
+    monkeypatch.setattr(Path, "read_bytes", _forbidden_read)
+
+    with pytest.raises(ValueError):
+        prepare(
+            claim="c",
+            evidence=["a.md", "../secret.md"],
+            reference=None,
+            model="m",
+            effort="high",
+            root=tmp_path,
+        )
+
+
+def test_empty_path_is_rejected(tmp_path: Path) -> None:
+    with pytest.raises(ValueError):
+        prepare(
+            claim="c",
+            evidence=[""],
+            reference=None,
+            model="m",
+            effort="high",
+            root=tmp_path,
+        )
+
+
+def test_dot_path_is_rejected(tmp_path: Path) -> None:
+    with pytest.raises(ValueError):
+        prepare(
+            claim="c",
+            evidence=["."],
+            reference=None,
+            model="m",
+            effort="high",
+            root=tmp_path,
+        )
+
+
+def test_symlink_escaping_root_is_rejected(tmp_path: Path) -> None:
+    # A symlink *under* root whose target is outside root must not be followed:
+    # its contents would otherwise leak into the key and the prompt.
+    root = tmp_path / "root"
+    root.mkdir()
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOP-SECRET-OUTSIDE-ROOT")
+    (root / "innocent.md").symlink_to(secret)
+
+    with pytest.raises(ValueError):
+        prepare(
+            claim="c",
+            evidence=["innocent.md"],
+            reference=None,
+            model="m",
+            effort="high",
+            root=root,
         )
 
 
