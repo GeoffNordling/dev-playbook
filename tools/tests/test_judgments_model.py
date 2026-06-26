@@ -1,11 +1,13 @@
-"""The judgment model and the fixed judge configuration (PROMPT, SCHEMA)."""
+"""The judgment model and the SCHEMA structured-output contract.
+
+PROMPT's exact text is pinned by the constant in ``judgments.core`` (and the
+issue brief, its source of truth); a golden copy here would only duplicate it.
+Its rendered role is covered behaviorally in ``test_judgments_prepare.py``.
+"""
 
 import json
-from pathlib import Path
 
-from judgments.core import PROMPT, SCHEMA, Judgment
-
-VERBATIM_PROMPT = (Path(__file__).parent / "fixtures" / "judge_prompt.txt").read_text()
+from judgments.core import SCHEMA, Judgment
 
 
 def test_judgment_holds_a_verdict_and_an_opinion() -> None:
@@ -13,10 +15,6 @@ def test_judgment_holds_a_verdict_and_an_opinion() -> None:
 
     assert judgment.verdict is True
     assert judgment.opinion == "the evidence supports the claim"
-
-
-def test_prompt_is_the_verbatim_judge_instructions() -> None:
-    assert PROMPT == VERBATIM_PROMPT
 
 
 def test_schema_declares_verdict_boolean_and_opinion_string() -> None:
