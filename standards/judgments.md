@@ -4,8 +4,8 @@ A **judgment** is a single yes/no question about one or more files, ruled on by
 an LLM judge — for example, *"docs/errors.md lists every exception type that
 src/exceptions.py raises."* A judgment is declared as data on disk; a fast,
 deterministic pytest gate then passes a judgment **iff its exact content has
-already been judged-and-passed**, and a separate judge skill fills the cache by
-actually running the judge on the misses. This standard is for a repo author
+already been judged-and-passed**, and a separate `run-judgments` skill fills the
+cache by actually running the judge on the misses. This standard is for a repo author
 adding judgments to their own repo.
 
 ## What a judgment is
@@ -111,7 +111,7 @@ the seen-set whether that exact content has been judged-and-passed:
 - **cache hit → the test passes.** The judgment's content has already been ruled
   true by the judge.
 - **cache miss → the test fails** with `judgment '<id>': cache miss`. The content
-  is new or changed and needs the judge skill to run it.
+  is new or changed and needs the `run-judgments` skill to run it.
 - an unknown `id`, or an unreadable evidence file, surfaces as a loud test error,
   never a silent pass.
 
