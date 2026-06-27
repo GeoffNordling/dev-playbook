@@ -20,12 +20,13 @@ independent (parallelize those instead).
 
 Each iteration is one fresh `agent()` that:
 
-1. runs the project's checks and confirms the plan and progress files exist — if
-   checks are red on entry or a file is missing, the loop raises immediately (a
-   red entry means a prior iteration left the repo broken),
+1. runs the check gate, when one is configured, and confirms the plan and
+   progress files exist — if the gate is red on entry or a file is missing, the
+   loop raises immediately (a red entry means a prior iteration left the repo
+   broken),
 2. reads the plan and the progress log,
 3. implements the single next incomplete task,
-4. brings the checks back to green — never commits red,
+4. brings the gate back to green when one is configured — never commits red,
 5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
 6. commits via the `/commit` skill,
 7. reports whether the plan is complete.
@@ -38,9 +39,11 @@ last — continuity lives entirely on disk.
 Launch from the target repo or worktree (agents inherit that cwd). First seed the plan
 and progress files then call the workflow by name:
 
-    Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md" } })
+    Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
 
-All four args are required — no defaults: `model` (worker model), `maxIters`
+All five args are required — no defaults: `model` (worker model), `maxIters`
 (safety rail), `planFile` (the plan: a task list), `progressFile` (the running
-log). A missing or malformed arg throws. Source:
+log), `checkCmd` (the check gate run at the start and end of each iteration — a
+shell command meaning "green", e.g. `make check` or `make -C tools check`; pass
+`""` for no checks). A missing or malformed arg throws. Source:
 [`ralph-loop.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/ralph-loop.js).

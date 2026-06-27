@@ -97,26 +97,42 @@ permissions skipped leaves the file tools unbounded. The native sandbox is a
 boundary for shell commands and the network, not a safe jail for hands-off file
 editing.
 
-### Config-file phantoms (undocumented)
+### Config-file protections and phantoms
 
-Turning the sandbox on makes a set of config dotfiles — shell-init, git, editor,
-and Claude/tool config (`.bashrc`, `.gitconfig`, `.mcp.json`, `.claude/`, …) —
-appear inside it as empty **"phantoms"**: each reads back empty and shows up in
-`ls`/`git status` as a `/dev/null` character device owned by `nobody`. They exist
-only while the sandbox is on, are driven by no setting, and are undocumented by
-Anthropic — distinct from the deliberate `denyRead` masking above (which overlays
-an empty dir, not a device node).
+Enabling the sandbox adds a layer of **harness built-in** file protections that
+sit beneath the allow/deny rules we configure — and, unlike those rules, are
+**not user-overridable**. Anthropic's
+[sandbox docs](https://code.claude.com/docs/en/sandboxing) describe them:
 
-**Hypothesis:** a built-in credential/tamper guard — Claude Code blanks these by
-default so a sandboxed shell can't read secrets from tool config or be steered by
-attacker-planted shell-init, layered under the sandbox independent of the user
-`denyRead` list.
+- **`settings.json` is write-denied at every scope** — user, project, local, and
+  the managed-settings directory — "so a sandboxed command cannot modify its own
+  policy."
+- **`.git/config` and `.git/hooks` writes are denied.** A linked git worktree
+  gets a carve-out — the sandbox allows writes to the main repo's shared `.git`
+  so `git commit` can update refs and the index — but "writes to `hooks/` and
+  `config` inside that directory remain denied."
 
-The practical cost is context pollution: `git add -A` aborts on the device nodes
-and a plain `git status` lists them as untracked noise. The
-[commit skill](~/workspace/dev-playbook/dotfiles/dot-claude/skills/commit/SKILL.md)
-sidesteps both — staging with `git add --ignore-errors` and inspecting with
-`git status -uno` — so the phantoms never reach the agent's context.
+No `allowWrite` entry re-enables a `settings.json` or `.git/config` write: the
+harness applies these above the configurable layer. The rules we *can* set —
+`allowWrite`/`denyWrite`/`denyRead`/`allowRead`, `sandbox.credentials`,
+`excludedCommands`, `allowedDomains`/`deniedDomains` — only widen or narrow
+access *within* what the built-ins already deny.
+
+Their visible side-effect is a set of **phantoms**: with the sandbox on, guarded
+config paths — `.git/config`, `.mcp.json`, and home-style dotfiles like
+`.bashrc`/`.gitconfig` — read back empty and surface in `ls`/`git status` as
+`/dev/null` character devices owned by `nobody`, many of which don't exist on the
+host. They're a side-effect of enabling the sandbox, not of any allow/deny rule
+we wrote; the device-node overlay (as opposed to the documented write-denial) is
+itself undocumented — and distinct from a configured `denyRead`, which overlays
+an empty dir rather than a device node.
+
+For `git` this carried two costs: a plain `git status` listed the phantom config
+paths as untracked noise, and `git commit` failed with "could not lock config
+file" because the `.git/config.lock` it needs was masked. Since these protections
+aren't user-overridable, the fix is to run git on the host — `git` is in
+`excludedCommands` (see [Our setup](#our-setup-and-decisions)), so git sees the
+real working tree and its `.git/config` writes succeed.
 
 ## Sandcastle
 
@@ -222,6 +238,24 @@ zero-egress as the *container* case for a specific untrusted run — not a globa
   Rejected alternatives: `allowAllUnixSockets` (opens the podman socket too) and a
   file-based token via `gh auth login --insecure-storage` (keeps `gh` sandboxed but
   writes the PAT in plaintext).
+- **`git` runs outside the sandbox** (`sandbox.excludedCommands: ["git", "git *"]`),
+  mirroring `gh`. The harness denies sandboxed writes to `.git/config`/`.git/hooks`
+  and overlays guarded config paths as phantoms (see
+  [Config-file protections](#config-file-protections-and-phantoms)) — protections
+  that are not user-overridable. Sandboxed, `git` both polluted `git status` with
+  phantom entries and failed `git commit` with "could not lock config file" when
+  `.git/config.lock` was masked; on the host it sees the real working tree and its
+  `.git/config` writes succeed. **This is a real widening of the unsandboxed
+  surface, not a free pass like `gh`.** `gh` is a single-purpose GitHub client;
+  `git` is a known LOLBin (a trusted installed binary repurposable to run arbitrary
+  code) — `-c core.pager=…`, `-c core.editor=…`, `core.fsmonitor`, hooks, and
+  `protocol.ext` are all arbitrary-command vectors — so excluding it runs that
+  surface on the host. Mitigations: auto-mode's classifier still reviews every git
+  call, these are our own repos, and the agent already runs git constantly.
+  Accepted given the ongoing context-pollution and config-lock cost. Rejected
+  alternative: widening `allowWrite` to re-permit `.git/config`/`settings.json`
+  writes — the docs show these protections are not user-overridable, so
+  exclude-git is the available lever.
 - **Zero egress is a per-run container decision, never a global.** To run code
   we don't trust with no network, we isolate that one run in a container.
 
