@@ -131,6 +131,8 @@ def test_judgment_cached(jid):
 
 So `pytest` is a fast gate: green means every judgment's current content is
 already cached as passing. Filling the cache — running the judge on the misses
-and recording the passes — is the judge skill's job, the only place an LLM ever
-runs. A judgment whose judge returns *false* is never recorded, so it stays a
+and recording the passes — is the job of the `run-judgments` skill, the only
+place an LLM ever runs. It has to be a skill — thin harness instructions —
+because subscription billing requires running the judges through the harness
+interactively. A judgment whose judge returns *false* is never recorded, so it stays a
 permanent miss (a permanent failing test) until the underlying content is fixed.
