@@ -54,8 +54,28 @@ def test_plan_reports_an_uncached_judgment_as_unseen(
     assert output["schema"] == SCHEMA
     assert output["seen"] == []
     assert output["unseen"] == [
-        {"id": "j1", "model": "claude-sonnet-4-6", "effort": "high"}
+        {
+            "id": "j1",
+            "model": "claude-sonnet-4-6",
+            "effort": "high",
+            "prompt": (
+                "Run the shell command `judgments-run render j1`. Its stdout is "
+                "your complete instructions and the material to judge -- follow it "
+                "and return your verdict."
+            ),
+        }
     ]
+
+
+def test_plan_attaches_a_render_dispatch_prompt_to_each_unseen_entry(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(["plan"])
+
+    assert exit_code == 0
+    output = json.loads(capsys.readouterr().out)
+    (job,) = output["unseen"]
+    assert "judgments-run render j1" in job["prompt"]
 
 
 def test_plan_with_no_config_emits_empty_lists(
