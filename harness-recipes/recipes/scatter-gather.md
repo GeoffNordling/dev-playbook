@@ -17,38 +17,40 @@ Ralph is one large task split into sequential, dependent steps, where disk carri
 state between iterations; scatter-gather is the opposite shape — parallel,
 independent jobs that share nothing and run at once. If a job needs another job's
 output, it is not a scatter-gather job.
-`model` and `effort` are pinned to the whole batch (one fixed identity per run),
-so this is not for work that needs per-job model selection.
+`model` and `effort` are pinned **per job** (each job runs under its own fixed
+identity), so a batch can mix instruments across its jobs.
 
 ## How it works
 
 The script validates args, then fans out once with `parallel()`:
 
-1. parse and validate `args` (a JSON string — see below): require `model`,
-   `effort`, and a `jobs` array, and guard the batch size, all before any agent
-   spawns,
-2. run every job concurrently as its own isolated `agent()`, with `model`,
-   `effort`, and the optional batch `schema` pinned from args,
+1. parse and validate `args` (a JSON string — see below): require a `jobs` array
+   whose every entry carries its own `model` and `effort`, and guard the batch
+   size, all before any agent spawns,
+2. run every job concurrently as its own isolated `agent()`, with that job's own
+   `model`/`effort` and the optional batch `schema` pinned from args,
 3. return `[{ id, result }]` — one entry per input job, in input order, keyed by
    the job's `id`.
 
-`model` and `effort` are required: the script throws if either is missing rather
-than inheriting the session's values, because the batch runs under one fixed
-identity. A job that throws or is skipped yields `{ id, result: null }` — the
-per-job catch keeps the `id` rather than dropping the key, so every input job has
-exactly one output entry. Two guards fail loud before any agent spawns: a missing
-required arg, and a batch larger than the runtime's single-run limit (1000, the
-agent-lifetime cap — one agent per job, so it binds before the 4096 per-call cap).
+`model` and `effort` are required **on every job**: the script throws, naming the
+offending job index and id, if either is missing rather than inheriting the
+session's values, because each job runs under its own fixed identity — there is no
+batch-level instrument and no default. A job that throws or is skipped yields
+`{ id, result: null }` — the per-job catch keeps the `id` rather than dropping the
+key, so every input job has exactly one output entry. The guards fail loud before
+any agent spawns: an unknown arg, a missing per-job `model`/`effort`, and a batch
+larger than the runtime's single-run limit (1000, the agent-lifetime cap — one
+agent per job, so it binds before the 4096 per-call cap).
 
 ## Running it
 
 Build the batch and call the workflow by name, passing the batch as `args`:
 
-    Workflow({ name: "scatter-gather", args: { model: "haiku", effort: "low", schema: SCHEMA, jobs: [
-      { id: "a", prompt: "..." },
-      { id: "b", prompt: "..." },
+    Workflow({ name: "scatter-gather", args: { schema: SCHEMA, jobs: [
+      { id: "a", prompt: "...", model: "haiku", effort: "low" },
+      { id: "b", prompt: "...", model: "opus",  effort: "high" },
     ]}})
 
-`model`, `effort`, and `jobs` are required — no defaults; `schema` is optional. A
-missing or malformed arg throws. Source:
+`jobs` is required — no defaults — and each job must carry its own `model` and
+`effort`; `schema` is optional. A missing or malformed arg throws. Source:
 [`scatter-gather.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/scatter-gather.js).
