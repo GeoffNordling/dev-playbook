@@ -12,7 +12,7 @@ CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 _OMIT = object()
 
 _DEFAULTS = {
-    "id": "errors-exhaustive",
+    "id": "j1",
     "claim": "docs/errors.md lists every exception type.",
     "evidence": "[docs/errors.md]",
     "reference": "[src/exceptions.py]",
@@ -69,7 +69,7 @@ def test_load_parses_a_valid_declaration(
 
     assert declarations == [
         Declaration(
-            id="errors-exhaustive",
+            id="j1",
             claim="docs/errors.md lists every exception type.",
             evidence=["docs/errors.md"],
             reference=["src/exceptions.py"],

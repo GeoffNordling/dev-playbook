@@ -12,7 +12,7 @@ CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 
 ONE_JUDGMENT = """\
 judgments:
-  - id: errors-exhaustive
+  - id: j1
     claim: docs/errors.md lists every exception src/exceptions.py raises.
     evidence: [docs/errors.md]
     reference: [src/exceptions.py]
@@ -59,12 +59,12 @@ def _record(root: Path) -> None:
 def test_passes_silently_when_the_judgment_is_cached(repo: Path) -> None:
     _record(repo)
 
-    assert_judgment_cached("errors-exhaustive")  # a cache hit does not raise
+    assert_judgment_cached("j1")  # a cache hit does not raise
 
 
 def test_fails_with_a_factual_cache_miss_when_uncached(repo: Path) -> None:
-    with pytest.raises(AssertionError, match="errors-exhaustive.*cache miss"):
-        assert_judgment_cached("errors-exhaustive")
+    with pytest.raises(AssertionError, match="j1.*cache miss"):
+        assert_judgment_cached("j1")
 
 
 def test_unknown_id_raises_a_loud_error_not_a_silent_pass(repo: Path) -> None:
@@ -76,4 +76,4 @@ def test_missing_evidence_file_raises_a_loud_error(repo: Path) -> None:
     (repo / "docs" / "errors.md").unlink()
 
     with pytest.raises(FileNotFoundError):
-        assert_judgment_cached("errors-exhaustive")
+        assert_judgment_cached("j1")

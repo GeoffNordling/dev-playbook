@@ -19,7 +19,7 @@ def judgment_yaml(
     """Render a one-judgment declaration with controllable evidence and model."""
     return (
         "judgments:\n"
-        "  - id: errors-exhaustive\n"
+        "  - id: j1\n"
         "    claim: a claim\n"
         f"    evidence: {evidence}\n"
         f"    model: {model}\n"

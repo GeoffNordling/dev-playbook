@@ -12,7 +12,7 @@ CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 
 ONE_JUDGMENT = """\
 judgments:
-  - id: errors-exhaustive
+  - id: j1
     claim: docs/errors.md lists every exception src/exceptions.py raises.
     evidence: [docs/errors.md]
     reference: [src/exceptions.py]
@@ -54,7 +54,7 @@ def test_plan_reports_an_uncached_judgment_as_unseen(
     assert output["schema"] == SCHEMA
     assert output["seen"] == []
     assert output["unseen"] == [
-        {"id": "errors-exhaustive", "model": "claude-sonnet-4-6", "effort": "high"}
+        {"id": "j1", "model": "claude-sonnet-4-6", "effort": "high"}
     ]
 
 
@@ -85,7 +85,7 @@ def test_render_prints_exactly_the_prepared_prompt(
         repo,
     ).prompt
 
-    exit_code = main(["render", "errors-exhaustive"])
+    exit_code = main(["render", "j1"])
 
     assert exit_code == 0
     assert capsys.readouterr().out == expected + "\n"
@@ -94,17 +94,17 @@ def test_render_prints_exactly_the_prepared_prompt(
 def test_record_then_plan_reports_the_judgment_as_seen(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    assert main(["record", "errors-exhaustive"]) == 0
+    assert main(["record", "j1"]) == 0
 
     assert main(["plan"]) == 0
     output = json.loads(capsys.readouterr().out)
-    assert output["seen"] == ["errors-exhaustive"]
+    assert output["seen"] == ["j1"]
     assert output["unseen"] == []
 
 
 def test_record_is_idempotent(repo: Path) -> None:
-    assert main(["record", "errors-exhaustive"]) == 0
-    assert main(["record", "errors-exhaustive"]) == 0
+    assert main(["record", "j1"]) == 0
+    assert main(["record", "j1"]) == 0
 
 
 def test_render_unknown_id_fails_loud(
