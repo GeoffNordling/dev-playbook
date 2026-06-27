@@ -1,0 +1,5 @@
+# Repo-root config for workspace-wide tooling that resolves from the repo root.
+# Not a Python package — dev-playbook's Python lives in tools/.
+
+[tool.judgments]
+paths = ["judgments/*.yaml"]

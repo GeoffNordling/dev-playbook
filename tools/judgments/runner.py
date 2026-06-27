@@ -20,19 +20,30 @@ from judgments.core import SCHEMA, Prepared, prepare
 from judgments.loader import Declaration, by_id, load, resolve_root
 from skipcache import seen
 
+_DISPATCH_PROMPT = (
+    "Run the shell command `judgments-run render {id}`. Its stdout is your complete "
+    "instructions and the material to judge -- follow it and return your verdict."
+)
+
 
 def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object]:
     """Partition the judgments by cache membership into a ``{schema, seen, unseen}``.
 
     ``seen`` is the sorted ids whose key is already cached; ``unseen`` is the
-    sorted-by-id list of ``{id, model, effort}`` the judge skill must still run.
+    sorted-by-id list of ``{id, model, effort, prompt}`` the judge skill must still
+    run -- each a ready-to-dispatch job whose ``prompt`` bootstraps a judge agent.
     """
     keyed = [(d, _prepared(d, root)) for d in declarations]
     cached = set(seen.filter([prepared.key for _, prepared in keyed]).seen)
     seen_ids = sorted(d.id for d, prepared in keyed if prepared.key in cached)
     unseen = sorted(
         (
-            {"id": d.id, "model": d.model, "effort": d.effort}
+            {
+                "id": d.id,
+                "model": d.model,
+                "effort": d.effort,
+                "prompt": _DISPATCH_PROMPT.format(id=d.id),
+            }
             for d, prepared in keyed
             if prepared.key not in cached
         ),
