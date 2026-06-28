@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""Flag any git-tracked ``__init__.py`` that is not empty.
+
+This workspace keeps every first-party ``__init__.py`` empty: no docstring, no
+code. Imports, re-exports, and ``__all__`` live in named modules, not in the
+package initializer (see standards/python-conventions.md). This hook holds the
+convention in place so it cannot regress silently.
+
+Discovers files through ``git ls-files``, so it scans exactly the tracked
+``__init__.py`` and nothing else -- ``.venv`` and other untracked or ignored
+files are never examined. A file is an offender when it contains any
+non-whitespace character; a 0-byte or whitespace-only file passes.
+
+Usage:
+    empty-init [path]
+
+``path`` is the git repository to scan (default: current directory), so the
+hook works the same in a normal checkout or a linked worktree. Exits 0 if every
+tracked ``__init__.py`` is empty, 1 if any is not, 2 on tool error. One offender
+per line to stdout in ``file  rule  message`` form; one-line summary to stderr.
+It reports and fails -- it never rewrites files.
+"""
+# /// script
+# requires-python = ">=3.11"
+# ///
+
+import argparse
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+RULE = "empty-init"
+MESSAGE = "`__init__.py` must be empty (no docstring, no code)"
+INIT_NAME = "__init__.py"
+
+
+class _GitError(Exception):
+    """git could not enumerate tracked files for the given path."""
+
+
+@dataclass(frozen=True)
+class Finding:
+    file: str
+
+    def render(self) -> str:
+        return f"{self.file}  {RULE}  {MESSAGE}"
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="empty-init",
+        description=(
+            "Flag any git-tracked `__init__.py` that is not empty. "
+            "Package initializers carry no docstring and no code."
+        ),
+    )
+    parser.add_argument(
+        "path",
+        nargs="?",
+        type=Path,
+        default=Path("."),
+        help="git repository to scan (default: current directory)",
+    )
+    args = parser.parse_args(argv)
+
+    try:
+        init_files = _tracked_init_files(args.path)
+    except _GitError as err:
+        print(f"{RULE}: {err}", file=sys.stderr)
+        return 2
+
+    findings = [Finding(rel) for rel in init_files if _has_content(args.path / rel)]
+
+    for f in findings:
+        print(f.render())
+
+    if findings:
+        print(
+            f"{RULE}: {len(findings)} non-empty `__init__.py` "
+            f"(of {len(init_files)} tracked)",
+            file=sys.stderr,
+        )
+        return 1
+    print(
+        f"{RULE}: clean across {len(init_files)} tracked `__init__.py`", file=sys.stderr
+    )
+    return 0
+
+
+def _tracked_init_files(root: Path) -> list[str]:
+    """Repo-relative paths of every tracked ``__init__.py`` under root."""
+    result = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise _GitError(result.stderr.strip() or "git ls-files failed")
+    tracked = result.stdout.split("\0")
+    return [rel for rel in tracked if rel and Path(rel).name == INIT_NAME]
+
+
+def _has_content(path: Path) -> bool:
+    """True when the file holds any non-whitespace character."""
+    return bool(path.read_text(encoding="utf-8").strip())
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
