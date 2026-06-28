@@ -1,4 +1,9 @@
-"""The seen-set: membership-only partition and idempotent recording of keys."""
+"""The seen-set: membership-only partition and idempotent recording of keys.
+
+A key is an opaque string the caller computed; this module only remembers which
+strings it has been told to remember. It never hashes, reads files, or
+canonicalizes, and carries no domain vocabulary.
+"""
 
 import os
 import sqlite3

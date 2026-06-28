@@ -63,6 +63,13 @@ def test_whitespace_only_init_passes(tmp_path: Path) -> None:
     assert result.stdout == ""
 
 
+def test_repo_self_scan_is_clean() -> None:
+    """Every tracked __init__.py in dev-playbook itself is empty."""
+    repo = Path(__file__).resolve().parents[2]
+    result = run(str(repo))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_gitignored_venv_init_is_not_scanned(tmp_path: Path) -> None:
     make_git_repo(
         tmp_path,
