@@ -225,6 +225,12 @@ session metadata.
   real sessions change.
 - `session messages` default page is **100** — always pass `--limit` and page on
   `last_ordinal + 1`.
+- **Client API (T2, in `transcript_export/client.py`):** `session_list()`,
+  `session_get(id)`, `session_messages(id, page=100)` each take an injectable
+  `runner: Callable = subprocess.run` (the github.py humble-boundary pattern);
+  `session_messages` returns the flat list of message rows (already paged to
+  exhaustion), the others return the raw dict payload. Failures raise
+  `AgentsViewError`. Reuse these in later tasks — do not re-shell `agentsview`.
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -236,7 +242,7 @@ session metadata.
   package (`__init__.py`) and a `tools/bin/transcript-export` entry that imports
   it and prints usage. Wire it into the `tools/` project so ruff/mypy/pytest see
   it. Add one trivial unit test. `make -C tools check` green.
-- [ ] **T2 — AgentsView client.** `client.py`: thin wrappers `session_list`,
+- [x] **T2 — AgentsView client.** `client.py`: thin wrappers `session_list`,
   `session_get`, `session_messages` (paged via `--from`/`--limit`,
   default-page-100 aware). Shell out to `agentsview`, parse JSON, **fail loud**
   on nonzero exit. Unit tests mock `subprocess`. Green.
