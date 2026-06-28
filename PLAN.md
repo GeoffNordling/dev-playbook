@@ -28,6 +28,16 @@ Design and Working notes below, where earlier iterations may leave important fac
 
 The authoritative design. Read it before implementing; the tasks implement it.
 
+### What AgentsView is
+
+AgentsView parses Claude Code's session logs into a queryable database, exposed
+through the `agentsview` CLI. Its daemon runs continuously in the background on
+this machine, so the data is **always available** — there is no setup or start
+step; just shell out to `agentsview`. Every subcommand accepts `--json` and
+prints one JSON object to stdout (and exits nonzero on error). This tool uses
+three read commands — `session list`, `session get`, `session messages` —
+detailed under Data source below.
+
 ### Goal
 
 A CLI tool that exports any Claude Code session into a faithful, **high-signal**,
@@ -150,10 +160,36 @@ records.)
 - Sub-agents are standalone `agent-<hex>` sessions, queried the same way and
   excluded from the default `session list`; recursion handles any nesting depth.
 
+### Finding example sessions for development
+
+To develop and sanity-check each messy case, pull a live example from the daemon.
+`agentsview session search <text> --json` searches message/tool content (each
+match carries a `session_id`); `agentsview session list --json` filters and sorts
+session metadata.
+
+- **One rich example with everything:** session
+  `d45168f9-7715-4631-afe2-074f8fa2df85` holds a 3-way rewind fork, a compaction,
+  two sub-agents, an interrupt, and a rejected tool call — a good single fixture
+  to eyeball end to end.
+- **Rewind/fork:** no content marker exists — find it structurally. In a
+  session's `messages`, locate a `source_parent_uuid` shared by ≥2 messages with
+  different `source_uuid`; that is a fork point (ordinals 128 / 135 / 145 in the
+  example above).
+- **Compaction:** `session list --json --sort compactions:desc` — the top
+  sessions carry the most compaction boundaries.
+- **Sub-agents:** `session list --json --include-children` surfaces `agent-*`
+  child sessions; each child's `source_session_id` is a parent that spawned one.
+- **Interrupt:** `session search "[Request interrupted by user]" --json`.
+- **Rejected tool call:**
+  `session search "The user doesn't want to proceed" --json --in tool_result`.
+
 ## Working notes
 
 - **Layout:** logic in a `tools/transcript_export/` package; CLI entry at
   `tools/bin/transcript-export`; tests in `tools/tests/`.
+- **Output / idempotency:** write one file per session, `<out_dir>/<id>.xml`;
+  re-running overwrites it (idempotent regenerate). Sub-agents are always nested
+  inline, never emitted as separate files.
 - **Check gate:** `make -C tools check` (ruff format-check, ruff lint, mypy
   typecheck, pytest). If it can't find ruff/pytest, run `uv sync` in `tools/`
   first. Every task must leave this green.
