@@ -298,7 +298,11 @@ def test_render_turn_rejects_compaction() -> None:
 
 
 def test_render_turn_rejects_interrupt() -> None:
-    m = msg(source_type="user", content="[Request interrupted by user]")
+    m = msg(
+        source_type="system",
+        source_subtype="interrupted",
+        content="[Request interrupted by user]",
+    )
     with pytest.raises(ValueError, match="non-turn message"):
         render_turn(m)
 
@@ -474,7 +478,12 @@ def test_render_compaction_rejects_non_compaction() -> None:
 
 
 def test_render_interrupted_emits_self_closing_with_ord() -> None:
-    m = msg(source_type="user", content="[Request interrupted by user]", ordinal=12)
+    m = msg(
+        source_type="system",
+        source_subtype="interrupted",
+        content="[Request interrupted by user]",
+        ordinal=12,
+    )
     assert classify(m) is MessageKind.INTERRUPT
     el = ET.fromstring(render_interrupted(m))
     assert el.tag == "interrupted"
@@ -501,7 +510,12 @@ def test_render_message_dispatches_compaction() -> None:
 
 
 def test_render_message_dispatches_interrupt() -> None:
-    m = msg(source_type="user", content="[Request interrupted by user]", ordinal=3)
+    m = msg(
+        source_type="system",
+        source_subtype="interrupted",
+        content="[Request interrupted by user]",
+        ordinal=3,
+    )
     assert ET.fromstring(render_message(m)).tag == "interrupted"
 
 

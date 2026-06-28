@@ -64,8 +64,26 @@ def test_assistant_message_starting_with_slash_is_still_assistant() -> None:
 
 
 def test_interrupt_marker_is_interrupt() -> None:
-    m = msg(source_type="user", content="[Request interrupted by user]")
+    # Real interrupt rows are source_type="system", source_subtype="interrupted",
+    # content="[Request interrupted by user]" (verified live, session 4a157204…).
+    # The interrupt must be recognized before the system->DROP rule swallows it.
+    m = msg(
+        source_type="system",
+        source_subtype="interrupted",
+        content="[Request interrupted by user]",
+    )
     assert classify(m) is MessageKind.INTERRUPT
+
+
+def test_interrupt_survives_keep_messages() -> None:
+    # The real-shaped interrupt (system-typed) must not be dropped by keep_messages,
+    # else no <interrupted/> ever renders.
+    m = msg(
+        source_type="system",
+        source_subtype="interrupted",
+        content="[Request interrupted by user]",
+    )
+    assert keep_messages([m]) == [m]
 
 
 def test_compaction_boundary_is_compaction_despite_system_type_and_assistant_role() -> (

@@ -40,9 +40,11 @@ class MessageKind(Enum):
 def classify(message: Message) -> MessageKind:
     """Resolve one message to its `MessageKind`, keyed off source_type/subtype.
 
-    Order matters: the compaction boundary is `source_type=system` but kept, so it
-    is recognized before the system->drop rule swallows it. Slash command and
-    interrupt are content refinements on a user turn. An unexpected `source_type`
+    Order matters: both the compaction boundary and an interrupt arrive as
+    `source_type=system` but are kept, so they are recognized before the
+    system->drop rule swallows them. A real interrupt is `source_type=system`,
+    `source_subtype="interrupted"`, `content="[Request interrupted by user]"`.
+    Slash command is a content refinement on a user turn. An unexpected `source_type`
     (not user/assistant/system) fails loud rather than being silently dropped.
 
     A `queued_command` preview (a user-typed prompt the harness records while the
@@ -53,12 +55,12 @@ def classify(message: Message) -> MessageKind:
     """
     if message.is_compact_boundary or message.source_subtype == "compact_boundary":
         return MessageKind.COMPACTION
+    if message.source_subtype == "interrupted" or message.content == INTERRUPT_MARKER:
+        return MessageKind.INTERRUPT
     if message.source_subtype == "queued_command":
         return MessageKind.DROP
     if message.source_type == "system":
         return MessageKind.DROP
-    if message.content == INTERRUPT_MARKER:
-        return MessageKind.INTERRUPT
     if message.source_type == "user":
         if message.content.startswith("/"):
             return MessageKind.SLASH_COMMAND

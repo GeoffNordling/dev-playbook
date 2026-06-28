@@ -93,7 +93,7 @@ the behaviour bugs, then test hygiene and docs.
   fork shape) into a loud crash instead of silent message loss. Tests:
   conservation holds on a multi-fork input; a constructed violation raises.
 
-- [ ] **F3 — Render interrupts (currently silently dropped).** Real interrupt
+- [x] **F3 — Render interrupts (currently silently dropped).** Real interrupt
   rows are `source_type="system"`, `source_subtype="interrupted"`,
   `content="[Request interrupted by user]"`. In `classify.py` the
   `source_type=="system" → DROP` branch runs **before** the interrupt check, so

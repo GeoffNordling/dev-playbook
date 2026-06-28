@@ -77,6 +77,27 @@ def test_render_several_recent_sessions_all_parse() -> None:
         assert root.attrib["id"] == sid
 
 
+def test_real_interrupt_session_renders_interrupted_tag() -> None:
+    # Real interrupt rows are source_type="system", source_subtype="interrupted".
+    # The system->DROP rule used to swallow them before the interrupt check, so no
+    # <interrupted/> ever rendered. Find a live session that has one and assert the
+    # tag survives into the export.
+    sid = next(
+        (
+            s["id"]
+            for s in session_list()["sessions"]
+            if any(
+                row.get("source_subtype") == "interrupted"
+                for row in session_messages(s["id"])
+            )
+        ),
+        None,
+    )
+    if sid is None:
+        pytest.skip("no live session with an interrupt row")
+    assert "<interrupted" in render_session(sid)
+
+
 def test_cli_writes_well_formed_file_for_recent_session(tmp_path: Path) -> None:
     code = main([str(tmp_path), "--recent", "1"])
 
