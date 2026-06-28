@@ -6,12 +6,16 @@ turn renderer emits one `<user>` / `<assistant>` element (a slash command is a
 `<user command="/cmd">args</user>` variant) with assistant thinking as a
 `<thinking>` child, and an assistant turn's `tool_calls[]` as nested
 `<tool-call>` elements. Timeline markers (`<compaction>`, `<interrupted/>`) and
-abandoned rewind branches (`<rewound-branch>`) render here too; sub-agent nesting
-lands in a later task. All text is entity-escaped, never CDATA. See PLAN.md for
-the authoritative schema.
+abandoned rewind branches (`<rewound-branch>`) render here too. A tool call that
+spawned a sub-agent nests the child as a `<subagent>` — but the fetch + recursion
+is impure, so these functions take an injected `render_subagent` callback (the
+`transcript` module supplies it); a pure render with no callback leaves the link
+unexpanded. All text is entity-escaped, never CDATA. See PLAN.md for the
+authoritative schema.
 """
 
 import re
+from collections.abc import Callable
 
 from transcript_export.classify import MessageKind, classify
 from transcript_export.forks import MessageNode
@@ -124,7 +128,10 @@ def _tool_outcome(result_content: str) -> str | None:
     return None
 
 
-def render_tool_call(tool_call: ToolCall) -> str:
+def render_tool_call(
+    tool_call: ToolCall,
+    render_subagent: Callable[[str], str] | None = None,
+) -> str:
     """Render one tool use as a `<tool-call>` with its `<args>` and `<output>`.
 
     `<args>` carries the full `input_json` (entity-escaped, never CDATA);
@@ -133,7 +140,10 @@ def render_tool_call(tool_call: ToolCall) -> str:
     (`result_content_length` — the only length we have for Read/ToolSearch, whose
     bodies come back empty) and `truncated` flagging whether we cut the inline
     body. An `outcome` attribute marks a rejected or errored call; a normal call
-    omits it.
+    omits it. When the call spawned a sub-agent (`subagent_session_id` set) and a
+    `render_subagent` callback is supplied, the child session is rendered inline
+    as a nested `<subagent>` after the `<output>`; with no callback the link is
+    left unexpanded (a pure render with no daemon access).
     """
     attrs = f'name="{escape(tool_call.tool_name)}" id="{escape(tool_call.tool_use_id)}"'
     outcome = _tool_outcome(tool_call.result_content)
@@ -142,17 +152,24 @@ def render_tool_call(tool_call: ToolCall) -> str:
     body = tool_call.result_content
     truncated = len(body) > TOOL_OUTPUT_TRUNCATION
     shown = body[:TOOL_OUTPUT_TRUNCATION]
+    subagent = ""
+    if render_subagent is not None and tool_call.subagent_session_id:
+        subagent = render_subagent(tool_call.subagent_session_id)
     return (
         f"<tool-call {attrs}>"
         f"<args>{escape(tool_call.input_json)}</args>"
         f'<output chars="{tool_call.result_content_length}" '
         f'truncated="{"true" if truncated else "false"}">'
         f"{escape(shown)}</output>"
+        f"{subagent}"
         f"</tool-call>"
     )
 
 
-def render_turn(message: Message) -> str:
+def render_turn(
+    message: Message,
+    render_subagent: Callable[[str], str] | None = None,
+) -> str:
     """Render one conversation turn as a `<user>` or `<assistant>` element.
 
     Dispatches on `classify`: a normal user turn, a slash command (rendered as a
@@ -160,9 +177,11 @@ def render_turn(message: Message) -> str:
     the rest), or an assistant turn carrying its per-message `model`, an optional
     `<thinking>` child before the prose, and one nested `<tool-call>` per
     `tool_calls[]` entry after it. The prose has its trailing inline tool markers
-    stripped (they duplicate the structural `<tool-call>` rendering). Timeline
-    markers (interrupt, compaction) and dropped plumbing are *not* turns — passing
-    one in fails loud, since they render through separate paths in later tasks.
+    stripped (they duplicate the structural `<tool-call>` rendering). A
+    `render_subagent` callback, when supplied, is threaded to each tool call so a
+    sub-agent spawn nests inline. Timeline markers (interrupt, compaction) and
+    dropped plumbing are *not* turns — passing one in fails loud, since they
+    render through separate paths.
     """
     kind = classify(message)
     text = strip_tool_markers(message.content, len(message.tool_calls))
@@ -185,7 +204,7 @@ def render_turn(message: Message) -> str:
             body += f"<thinking>{escape(message.thinking_text)}</thinking>"
         body += escape(text)
         for tool_call in message.tool_calls:
-            body += render_tool_call(tool_call)
+            body += render_tool_call(tool_call, render_subagent)
         return f"<assistant {attrs}>{body}</assistant>"
     raise ValueError(
         f"render_turn called on a non-turn message at ordinal {message.ordinal}: "
@@ -222,13 +241,17 @@ def render_interrupted(message: Message) -> str:
     return f'<interrupted ord="{message.ordinal}"/>'
 
 
-def render_message(message: Message) -> str:
+def render_message(
+    message: Message,
+    render_subagent: Callable[[str], str] | None = None,
+) -> str:
     """Dispatch one message to its renderer by kind; a `DROP` renders to nothing.
 
     The single entry point a transcript walk uses for a message that may be a turn,
     a compaction boundary, an interrupt, or dropped plumbing. Turns route to
-    `render_turn`; the two timeline markers to their renderers; a `DROP` message
-    yields the empty string so callers can append it unconditionally.
+    `render_turn` (which threads the `render_subagent` callback to their tool
+    calls); the two timeline markers to their renderers; a `DROP` message yields
+    the empty string so callers can append it unconditionally.
     """
     kind = classify(message)
     if kind is MessageKind.COMPACTION:
@@ -237,24 +260,31 @@ def render_message(message: Message) -> str:
         return render_interrupted(message)
     if kind is MessageKind.DROP:
         return ""
-    return render_turn(message)
+    return render_turn(message, render_subagent)
 
 
-def render_rewound_branch(node: MessageNode) -> str:
+def render_rewound_branch(
+    node: MessageNode,
+    render_subagent: Callable[[str], str] | None = None,
+) -> str:
     """Render one abandoned fork branch as a `<rewound-branch>`, in full fidelity.
 
     The branch is a `MessageNode` subtree from `reconstruct_forks`; its messages
     render in document order exactly as the live path would (`render_message` per
-    node, so markers and dropped plumbing behave identically). A *nested* fork
-    inside the abandoned branch — a node with more than one child — keeps its
+    node, so markers, dropped plumbing, and sub-agent spawns behave identically —
+    the `render_subagent` callback is threaded through). A *nested* fork inside
+    the abandoned branch — a node with more than one child — keeps its
     highest-ordinal child as this branch's inline continuation and wraps each
     lower-ordinal sibling in its own nested `<rewound-branch>`, mirroring the
     top-level live/abandoned split recursively.
     """
-    return f"<rewound-branch>{_render_node(node)}</rewound-branch>"
+    return f"<rewound-branch>{_render_node(node, render_subagent)}</rewound-branch>"
 
 
-def _render_node(node: MessageNode) -> str:
+def _render_node(
+    node: MessageNode,
+    render_subagent: Callable[[str], str] | None = None,
+) -> str:
     """Render a `MessageNode` and its descendants for a `<rewound-branch>`.
 
     The node's children are ordinal-sorted ascending (see `forks.build_node`); the
@@ -262,10 +292,10 @@ def _render_node(node: MessageNode) -> str:
     sibling is a divergence that nests as its own `<rewound-branch>` right at this
     fork point, before the inline continuation (chronological order).
     """
-    body = render_message(node.message)
+    body = render_message(node.message, render_subagent)
     if node.children:
         *forked, primary = node.children
         for head in forked:
-            body += render_rewound_branch(head)
-        body += _render_node(primary)
+            body += render_rewound_branch(head, render_subagent)
+        body += _render_node(primary, render_subagent)
     return body

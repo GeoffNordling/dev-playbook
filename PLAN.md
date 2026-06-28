@@ -309,6 +309,37 @@ session metadata.
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
   Delete the whole prototype dir in the final task.
+- **Sub-agent recursion + the session walk (T9, in `transcript_export/transcript.py`):**
+  `render_session(session_id, runner=subprocess.run)` is the **single
+  per-session entry point** — it `session_get`s the header, renders the body, and
+  wraps it in `<session …>…</session>`. **T10 must reuse `render_session`
+  unchanged** (just add CLI selection + write `<out_dir>/<id>.xml`); the full
+  live-path walk now lives here, not in the CLI. `_render_body` is the shared
+  walk for both `<session>` and nested `<subagent>`: it runs the pipeline
+  `keep_messages(normalize_messages(rows))` → `reconstruct_forks`, emits any
+  abandoned branch whose fork point is off the live path **up front**, then walks
+  the live path emitting `render_message` per node followed by
+  `render_rewound_branch` for each `abandoned_branches[source_uuid]` head.
+  Sub-agent expansion is threaded as an **injected callback**: `render_tool_call`
+  / `render_turn` / `render_message` / `render_rewound_branch` now take an
+  optional `render_subagent: Callable[[str], str] | None` (default None = pure
+  render, no expansion — keeps every earlier test green). `_subagent_renderer`
+  closes over `visited`/`depth` and returns that callback: it `session_get`s the
+  child for its `message_count` (→ `messages` attr, omitted if absent), renders
+  the body via `_render_body`, and emits `<subagent id messages>…</subagent>`.
+  **Guards:** `visited` (seeded with the root id) catches a cycle →
+  `<subagent id omitted="cycle"/>`; `depth+1 > MAX_SUBAGENT_DEPTH` (8) →
+  `omitted="depth"` — both self-closing placeholders, never silent drops. 10 new
+  unit tests drive `render_session` against a fake daemon (one runner dispatching
+  `get`/`messages` from a `{id: {"meta","rows"}}` map).
+- **Open pipeline-ordering question (revisit in T11 against the live daemon):**
+  `_render_body` runs `keep_messages` (drops plumbing + adjacent-repeat) **before**
+  `reconstruct_forks`. If a dropped message ever sits on the `source_parent_uuid`
+  chain of a kept one, the chain breaks and the live-path walk truncates. Not
+  observed in unit fixtures; confirm on a real rich session (e.g.
+  `d45168f9-7715-4631-afe2-074f8fa2df85`) and, if it bites, reconstruct forks on
+  the `normalize_messages` output and let `render_message` drop plumbing during
+  the walk instead.
 
 ## Tasks
 
@@ -347,7 +378,7 @@ session metadata.
 - [x] **T8 — Render: markers + rewound branches.** `<compaction>`,
   `<interrupted/>`, and `<rewound-branch>` (abandoned branch in full fidelity at
   its fork point). Unit tests. Green.
-- [ ] **T9 — Sub-agent recursion.** When a `tool_calls[]` entry has
+- [x] **T9 — Sub-agent recursion.** When a `tool_calls[]` entry has
   `subagent_session_id`, fetch that child session and render it nested inside the
   `<tool-call>` as `<subagent>`, recursively, with cycle + depth guards. Unit
   tests with a mocked parent→child. Green.
