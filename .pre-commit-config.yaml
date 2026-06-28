@@ -23,6 +23,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: empty-init
+        name: empty-init
+        entry: tools/bin/empty-init
+        language: script
+        pass_filenames: false
+        always_run: true
+
       - id: ref-check
         name: ref-check
         entry: tools/bin/ref-check
