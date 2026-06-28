@@ -163,10 +163,12 @@ dev-playbook-tools = { path = "../dev-playbook/tools", editable = true }
 Adjust `path` to wherever `dev-playbook` sits relative to the consumer. The
 dependency is `editable`, so the consumer always resolves against the current
 `tools/` source — nothing to re-publish or re-pin when the libraries change.
-`uv sync` builds and installs it with uv's own bundled build backend, so the
-install needs no network access. Afterwards `from judgments.pytest_support
-import assert_judgment_cached` resolves in the consumer's environment and
-`judgments-run` is on its venv PATH.
+`uv sync` builds the package with uv's own bundled build backend, so building
+it needs no network or PyPI access. Its one runtime dependency, `pyyaml`,
+resolves from uv's local cache whenever it is present (it almost always is);
+only a completely cold cache reaches PyPI for it. Afterwards `from
+judgments.pytest_support import assert_judgment_cached` resolves in the
+consumer's environment and `judgments-run` is on its venv PATH.
 
 ### 2. Declare the repo's judgments
 
