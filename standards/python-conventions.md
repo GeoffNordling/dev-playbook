@@ -8,11 +8,13 @@ For build/task-runner conventions (Makefile targets, `make check`), see
 
 ## Package initialization
 
-`__init__.py` files are empty.
+`__init__.py` files are empty: no docstring, no code — ideally 0 bytes.
 
 Imports, re-exports, `__all__` declarations, and any other code live in named
 modules, not in `__init__.py`. Callers import from the specific submodule
-(`from pkg.sub import thing`), not from the package root.
+(`from pkg.sub import thing`), not from the package root. The module docstring
+rule below is no exception — an `__init__.py` carries no docstring either; a
+package's overview belongs in its primary named module or a README.
 
 Rationale: a blank `__init__.py` has no import-time side effects, surfaces the
 true source of every name to readers and tooling, and avoids the
@@ -20,7 +22,8 @@ circular-import traps that grow with populated package initializers.
 
 ## Docstrings
 
-Every function, method, class, and module has a docstring. The docstring
+Every function, method, class, and module has a docstring — except
+`__init__.py`, which stays empty (see Package initialization). The docstring
 explains in plain English what the thing does. One short sentence is fine
 when the behavior is simple; longer when it isn't.
 
