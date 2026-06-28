@@ -60,7 +60,7 @@ def test_recorded_keys_persist_across_processes(isolated_cache: Path) -> None:
     result = subprocess.run(
         [sys.executable, "-c", program],
         cwd=tools_dir,
-        env={**os.environ, "PYTHONPATH": str(tools_dir)},
+        env={**os.environ, "PYTHONPATH": str(tools_dir / "src")},
         capture_output=True,
         text=True,
     )

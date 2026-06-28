@@ -75,6 +75,16 @@ def _prepared(declaration: Declaration, root: Path | None) -> Prepared:
     )
 
 
+def run_cli() -> int:
+    """Console-script entry point: run the CLI over this process's own argv.
+
+    Registered as the ``judgments-run`` console script and called by the
+    ``tools/bin/judgments-run`` pre-commit shim, so both channels run the same
+    ``main`` over ``sys.argv``.
+    """
+    return main(sys.argv[1:])
+
+
 def main(argv: list[str]) -> int:
     """Parse the subcommand, load declarations, and run it; nonzero on any error."""
     args = _parse_args(argv)
