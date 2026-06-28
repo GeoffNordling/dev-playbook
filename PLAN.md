@@ -249,6 +249,18 @@ session metadata.
   an abandoned branch are preserved as that head's `children`. T8 renders these
   as `<rewound-branch>` at their fork point; it consumes this structure rather
   than re-walking the tree.
+- **Classification (T5, in `transcript_export/classify.py`):** `MessageKind` enum
+  (`USER`/`ASSISTANT`/`SLASH_COMMAND`/`INTERRUPT`/`COMPACTION`/`DROP`),
+  `classify(message) -> MessageKind` (compaction-boundary check *before*
+  system->drop, since the boundary is `source_type=system` but kept; unexpected
+  `source_type` raises), `collapse_adjacent_repeats` (dedup rule 2), and
+  `keep_messages(messages)` = drop plumbing **then** rule 2 (order matters: a
+  plumbing message wedged between two copies of a real message must be removed
+  first so the copies become adjacent). `keep_messages` returns `list[Message]`,
+  not kinds — render tasks call `classify` per message; rule 1 stays upstream in
+  `normalize_messages`. Slash-command / interrupt are content refinements on a
+  user turn (`content.startswith("/")` / `content == "[Request interrupted by
+  user]"`).
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -272,7 +284,7 @@ session metadata.
   `source_parent_uuid`→`source_uuid`; compute the live path (ancestors of the
   highest-ordinal message); collect abandoned branches per fork point. Unit test
   with a multi-branch fixture (incl. a nested fork). Green.
-- [ ] **T5 — Record classification.** Key off `source_type`/`source_subtype`,
+- [x] **T5 — Record classification.** Key off `source_type`/`source_subtype`,
   **not** `role` (the compaction boundary is `role=assistant` but
   `source_type=system`). Classify each message: normal user/assistant; slash
   command (user `content` starts with `/`); interrupt
