@@ -60,12 +60,13 @@ def _render_body(
     Shared by the top-level `<session>` and every nested `<subagent>` — they
     differ only in the wrapper tag the caller adds. Fetches and normalizes the
     rows (rule 1), applies the keep/drop policy (rule 2 + plumbing), reconstructs
-    forks, then walks the live path root→tip: each live message renders through
-    `render_message`, followed by any rewind branches that fork off it. Branches
-    whose common parent is absent from this payload have no live message to trail,
-    so they are emitted up front. A `render_subagent` callback closed over this
-    session's `visited`/`depth` is threaded into every render so sub-agent spawns
-    expand inline.
+    forks, then walks the live path in ordinal order: before each live message it
+    emits any rewind branches it superseded (keyed by that message's
+    `source_uuid`), then the message itself through `render_message`. Branches are
+    keyed by their live sibling, which is always on the live path; a key that
+    isn't (a malformed payload) is emitted up front so nothing is lost. A
+    `render_subagent` callback closed over this session's `visited`/`depth` is
+    threaded into every render so sub-agent spawns expand inline.
     """
     rows = session_messages(session_id, runner=runner)
     messages = keep_messages(normalize_messages(rows))
@@ -79,9 +80,12 @@ def _render_body(
             for head in heads:
                 parts.append(render_rewound_branch(head, render_subagent))
     for message in fork.live_path:
+        # A live-path message always has a uuid (reconstruct_forks fails loud
+        # otherwise); the guard only narrows the type for the branch lookup.
+        if message.source_uuid is not None:
+            for head in fork.abandoned_branches.get(message.source_uuid, ()):
+                parts.append(render_rewound_branch(head, render_subagent))
         parts.append(render_message(message, render_subagent))
-        for head in fork.abandoned_branches.get(message.source_uuid, ()):
-            parts.append(render_rewound_branch(head, render_subagent))
     return "".join(parts)
 
 

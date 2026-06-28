@@ -54,13 +54,15 @@ def test_live_path_is_root_to_tip_of_highest_ordinal() -> None:
     assert uuids(result.live_path) == ["r", "a", "live"]
 
 
-def test_simple_fork_collects_abandoned_branch_at_parent() -> None:
+def test_simple_fork_collects_abandoned_branch_at_live_sibling() -> None:
+    # b and a share parent r; a (ord 10) outranks b (ord 5), so a is the live
+    # sibling b was abandoned for. The branch keys under a's uuid, not the parent's.
     messages = [msg(0, "r"), msg(5, "b", "r"), msg(10, "a", "r"), msg(20, "live", "a")]
 
     result = reconstruct_forks(messages)
 
-    assert set(result.abandoned_branches) == {"r"}
-    (head,) = result.abandoned_branches["r"]
+    assert set(result.abandoned_branches) == {"a"}
+    (head,) = result.abandoned_branches["a"]
     assert head.message.source_uuid == "b"
     assert head.children == ()
 
@@ -77,31 +79,32 @@ def test_three_way_rewind_keeps_two_abandoned_at_one_fork_point() -> None:
     result = reconstruct_forks(messages)
 
     assert uuids(result.live_path) == ["r", "live"]
-    heads = result.abandoned_branches["r"]
+    # Both abandoned heads converged on the live sibling, so they key under it.
+    heads = result.abandoned_branches["live"]
     # Sorted by ordinal: b1 (5) before b2 (8).
     assert [h.message.source_uuid for h in heads] == ["b1", "b2"]
 
 
-def test_root_level_fork_with_no_parent_keys_under_none() -> None:
-    # Two roots, no parent; the higher-ordinal one is the live branch head.
+def test_root_level_fork_with_no_parent_keys_under_live_sibling() -> None:
+    # Two roots, no parent; the higher-ordinal one (r2) is live and r1 keys under it.
     messages = [msg(5, "r1"), msg(10, "r2")]
 
     result = reconstruct_forks(messages)
 
     assert uuids(result.live_path) == ["r2"]
-    (head,) = result.abandoned_branches[None]
+    (head,) = result.abandoned_branches["r2"]
     assert head.message.source_uuid == "r1"
 
 
-def test_root_level_fork_with_absent_parent_keys_under_that_uuid() -> None:
-    # The shared parent "P" is absent from the payload (truncated history); each
-    # present child roots its own branch.
+def test_root_level_fork_with_absent_parent_keys_under_live_sibling() -> None:
+    # The shared parent "P" is absent from the payload (truncated history); c2
+    # (ord 10) is the live sibling, so c1 keys under c2's uuid.
     messages = [msg(5, "c1", "P"), msg(10, "c2", "P")]
 
     result = reconstruct_forks(messages)
 
     assert uuids(result.live_path) == ["c2"]
-    (head,) = result.abandoned_branches["P"]
+    (head,) = result.abandoned_branches["c2"]
     assert head.message.source_uuid == "c1"
 
 
@@ -119,7 +122,8 @@ def test_nested_fork_inside_abandoned_branch_is_preserved() -> None:
     result = reconstruct_forks(messages)
 
     assert uuids(result.live_path) == ["r", "a", "live"]
-    (head,) = result.abandoned_branches["r"]
+    # The outer fork (b1 vs a) keys under its live sibling a.
+    (head,) = result.abandoned_branches["a"]
     assert head.message.source_uuid == "b1"
     # The nested fork survives as the abandoned head's children, ordinal-sorted.
     assert [child.message.source_uuid for child in head.children] == ["b1a", "b1b"]
@@ -139,9 +143,10 @@ def test_stacked_forks_collect_one_branch_per_live_fork_point() -> None:
     result = reconstruct_forks(messages)
 
     assert uuids(result.live_path) == ["r", "a", "live"]
-    assert set(result.abandoned_branches) == {"r", "a"}
-    assert result.abandoned_branches["r"][0].message.source_uuid == "x"
-    assert result.abandoned_branches["a"][0].message.source_uuid == "y"
+    # Each fork keys under its own live sibling: x abandoned for a, y for live.
+    assert set(result.abandoned_branches) == {"a", "live"}
+    assert result.abandoned_branches["a"][0].message.source_uuid == "x"
+    assert result.abandoned_branches["live"][0].message.source_uuid == "y"
 
 
 def test_uuidless_message_fails_loud() -> None:
@@ -156,20 +161,12 @@ def test_uuidless_message_fails_loud() -> None:
         reconstruct_forks([msg(0, "r"), uuidless])
 
 
-@pytest.mark.xfail(
-    reason="KNOWN DEFECT (T12): on the real parsed messages API source_parent_uuid "
-    "points to raw sub-records (tool results) that are folded into messages and "
-    "never surfaced, so the parent->uuid tree never connects. The live-path walk "
-    "then collapses to the single highest-ordinal message and every other message "
-    "is mis-rendered as a <rewound-branch>. A fork-free stream must yield a full "
-    "live path and zero abandoned branches; reconstruct_forks needs an "
-    "ordinal-spine redesign. See PLAN.md T12.",
-    strict=True,
-)
 def test_forkfree_stream_with_nonresolving_parents_is_all_live() -> None:
     # Mirrors real data: every message has a distinct parent uuid that resolves to
     # NO message in the set (the parent is an unsurfaced raw record). With no
-    # shared parent there is no fork, so the whole stream is the live path.
+    # shared parent there is no fork, so the whole stream is the live path. (Under
+    # the abandoned parent->uuid tree design this collapsed to one live message and
+    # mis-rendered the rest as rewound branches; the ordinal spine fixes it — T12.)
     messages = [
         msg(0, "m0", "p0"),
         msg(1, "m1", "p1"),
@@ -181,3 +178,28 @@ def test_forkfree_stream_with_nonresolving_parents_is_all_live() -> None:
 
     assert uuids(result.live_path) == ["m0", "m1", "m2", "m3"]
     assert result.abandoned_branches == {}
+
+
+def test_real_fork_shape_only_shared_parent_amid_nonresolving_parents() -> None:
+    # The realistic shape: most messages carry a distinct, non-resolving parent
+    # uuid (an unsurfaced raw sub-record); a fork shows up *only* as a parent shared
+    # by two messages. Parent "P" is shared by f_old (ord 2) and f_live (ord 4);
+    # f_old_kid (ord 3) was written on the abandoned attempt and falls in its range
+    # [2, 4). Everything else stays on the live spine in ordinal order.
+    messages = [
+        msg(0, "m0", "x0"),
+        msg(1, "m1", "x1"),
+        msg(2, "f_old", "P"),
+        msg(3, "f_old_kid", "x2"),
+        msg(4, "f_live", "P"),
+        msg(5, "m5", "x3"),
+    ]
+
+    result = reconstruct_forks(messages)
+
+    assert uuids(result.live_path) == ["m0", "m1", "f_live", "m5"]
+    assert set(result.abandoned_branches) == {"f_live"}
+    (head,) = result.abandoned_branches["f_live"]
+    assert head.message.source_uuid == "f_old"
+    # The message written on the abandoned attempt rides the branch as its child.
+    assert [child.message.source_uuid for child in head.children] == ["f_old_kid"]

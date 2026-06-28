@@ -320,8 +320,9 @@ def test_subagent_messages_attribute_omitted_when_count_absent() -> None:
 
 
 def test_render_session_emits_rewound_branch_at_fork_point() -> None:
-    # Two assistants share parent u0; the higher-ordinal one is live, the other
-    # is the abandoned branch, emitted as <rewound-branch> right after u0.
+    # Two assistants share parent u0; the higher-ordinal one (u2) is live, the
+    # other (u1) is the abandoned branch, emitted as <rewound-branch> right before
+    # the live sibling it was superseded by — here just after u0, which precedes u2.
     sessions = {
         "s1": {
             "meta": {"id": "s1", "message_count": 3},

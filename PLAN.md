@@ -375,6 +375,25 @@ session metadata.
   before reconstruct_forks) — that was a symptom; the tree never connecting is the
   cause. The xfail test `test_forkfree_stream_with_nonresolving_parents_is_all_live`
   encodes the target contract.
+- **DONE in T12 — ordinal-spine fork reconstruction.** `forks.reconstruct_forks`
+  no longer walks a `source_parent_uuid`→`source_uuid` tree. It now sorts by
+  **ordinal** (the live spine), detects forks as a **shared `source_parent_uuid`**
+  (≥2 messages), and for each fork the **highest-ordinal sibling stays live** while
+  each lower sibling heads an abandoned branch owning the contiguous ordinal range
+  `[sibling_ord, next_sibling_ord)`. Internals: `_abandoned_ranges` (one range per
+  lower sibling), `_outermost` (drop ranges nested in another so they recurse
+  instead — outermost ranges are pairwise disjoint), `_segment` (spine = msgs not in
+  any outermost range; branches recurse via `_build_branch`→`_chain`), and `_chain`
+  threads a sub-spine into one `MessageNode` chain (next message = highest-ordinal
+  child; nested-fork branches = earlier children). **Contract change consumers must
+  know:** `abandoned_branches` is now keyed by the **live sibling's `source_uuid`**
+  (the message a branch was abandoned *for*) and typed `dict[str, …]` (no more
+  `None`/parent keys); the head-of-session never carries branches before it. The
+  `_render_body` walk now emits each fork point's `<rewound-branch>`es **before**
+  its live message (was: after the parent). MessageNode + `render_rewound_branch`
+  are unchanged. Verified on real session d45168f9: full live path (37 user + 231
+  assistant turns) with exactly the 2 documented abandoned branches, vs the old
+  near-all-rewound collapse.
 
 ## Tasks
 
@@ -423,7 +442,7 @@ session metadata.
 - [x] **T11 — Live-daemon integration tests.** Render a real recent session end
   to end against the live daemon; assert well-formed XML + structural invariants;
   exercise `list`/`get`/`messages`. Green.
-- [ ] **T12 — Fix fork reconstruction (ordinal-spine redesign).** T11 proved the
+- [x] **T12 — Fix fork reconstruction (ordinal-spine redesign).** T11 proved the
   current `reconstruct_forks` is broken on real data: `source_parent_uuid` points
   at unsurfaced raw sub-records, so the parent→uuid tree never connects, the live
   path collapses to one message, and a fork-free session renders almost entirely
