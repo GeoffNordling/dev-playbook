@@ -104,7 +104,7 @@ the behaviour bugs, then test hygiene and docs.
   `source_type="user"`, which never occurs and masked the bug. Verify a real
   interrupting session (e.g. a recent one) yields `<interrupted/>` in its export.
 
-- [ ] **F4 — Marker-stripping: handle bare markers, then fail loud on mismatch.**
+- [x] **F4 — Marker-stripping: handle bare markers, then fail loud on mismatch.**
   The prose marker-stripper's regex only matches `[ToolName: detail]` (with a
   colon), but `claude-haiku-4-5` emits bare `[ToolName]` (no colon), so its
   markers leak into prose (confirmed in real exports). (a) Broaden the pattern to
@@ -142,3 +142,11 @@ the behaviour bugs, then test hygiene and docs.
 ## Working notes
 
 Iterations may append durable facts here — keep them short.
+
+- F4: real bare markers are TitleCase (`[Bash]`, `[TaskList]`, `[Exiting Plan
+  Mode]`); lowercase bracket lines inside Bash heredocs (`[project]`, `[build]`)
+  are NOT markers. `_TOOL_MARKER` now requires an uppercase first letter and
+  allows spaces + optional `: detail`. Verified: 0 count-mismatches across 5064
+  real tool-bearing messages — so strip_tool_markers can safely raise on
+  count != tool_call_count. Subagent-test fixtures now auto-append a `[Task: …]`
+  marker per tool call (via `assistant_row`) to match the real shape.

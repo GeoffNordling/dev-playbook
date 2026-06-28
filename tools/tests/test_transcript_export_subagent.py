@@ -62,6 +62,13 @@ def assistant_row(
         row["source_parent_uuid"] = source_parent_uuid
     if tool_calls is not None:
         row["tool_calls"] = tool_calls
+        # Real assistant turns carry one inline `[ToolName: …]` marker per tool
+        # call, trailing the prose; the renderer strips them and fails loud if the
+        # count is off, so fixtures must mirror that shape.
+        markers = "\n".join(
+            f"[{tc.get('tool_name', 'Task')}: spawn]" for tc in tool_calls
+        )
+        row["content"] = f"{row['content']}\n{markers}" if row["content"] else markers
     return row
 
 

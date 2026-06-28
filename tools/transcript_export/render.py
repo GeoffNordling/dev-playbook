@@ -31,10 +31,15 @@ _REJECTION_PREFIX = "The user doesn't want to proceed"
 _ERROR_MARKER = "<tool_use_error>"
 """A failed tool call wraps its message in this block inside `result_content`."""
 
-_TOOL_MARKER = re.compile(r"^\[[A-Za-z][A-Za-z0-9_]*: .*\]$")
+_TOOL_MARKER = re.compile(r"^\[[A-Z][A-Za-z0-9_]*( [A-Za-z0-9_]+)*(: .*)?\]$")
 """One inline tool marker line in a turn's pre-rendered `content`, e.g.
-`[Bash: List worktrees]` or `[Tool: EnterWorktree]`. Verified (agentsview
-v0.34.5, 554 tool-bearing messages) to match exactly one line per tool call."""
+`[Bash: List worktrees]`, `[Tool: EnterWorktree]`, or — from `claude-haiku-4-5`
+and plan-mode turns — the bare `[Bash]` / `[TaskList]` / `[Exiting Plan Mode]`
+form with no colon-detail. The leading word is a TitleCase tool/action name
+(first letter uppercase), which excludes the lowercase bracketed lines that occur
+inside Bash command bodies (`[project]`, `[build]` in an emitted heredoc) — those
+must NOT be mistaken for markers. Verified across 5064 real tool-bearing messages
+to match exactly one line per tool call (agentsview v0.34.5)."""
 
 _XML_INVALID = re.compile("[^\t\n\r\x20-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]")
 """Characters XML 1.0 forbids outright (C0 controls other than tab/newline/CR,
@@ -111,16 +116,21 @@ def strip_tool_markers(content: str, tool_call_count: int) -> str:
     `tool_calls[]`, so we keep only the prose. The markers always trail the prose
     and there is exactly one marker line per tool call (verified live), so the
     block starts at the `tool_call_count`-th marker line from the end; everything
-    from there on is the marker block. With no tool calls — or, defensively, fewer
-    marker lines than tool calls — the content is returned unchanged so prose is
-    never eaten.
+    from there on is the marker block. With no tool calls the content is returned
+    unchanged. Otherwise the marker count must equal the tool-call count exactly:
+    a mismatch means our marker model is wrong for this turn, so we raise rather
+    than silently leak markers into prose (the old silent return-unchanged
+    fallback hid exactly that bug for bare `[ToolName]` markers).
     """
     if tool_call_count <= 0:
         return content
     lines = content.split("\n")
     marker_indices = [i for i, line in enumerate(lines) if _TOOL_MARKER.match(line)]
-    if len(marker_indices) < tool_call_count:
-        return content
+    if len(marker_indices) != tool_call_count:
+        raise ValueError(
+            f"tool-marker count {len(marker_indices)} != tool_call_count "
+            f"{tool_call_count}; marker model does not fit this turn's content"
+        )
     block_start = marker_indices[-tool_call_count]
     return "\n".join(lines[:block_start]).rstrip()
 

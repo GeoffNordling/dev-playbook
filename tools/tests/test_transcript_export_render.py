@@ -120,7 +120,7 @@ def test_render_turn_with_ansi_output_is_well_formed_xml() -> None:
     # happens before entity-escaping, so the document stays well-formed.
     m = msg(
         source_type="assistant",
-        content="ran it",
+        content="ran it\n[Bash: run it]\n$ ./run",
         model="claude-opus-4-8",
         tool_calls=[
             {
@@ -338,10 +338,47 @@ def test_strip_markers_noop_without_tool_calls() -> None:
     assert strip_tool_markers(content, 0) == content
 
 
-def test_strip_markers_leaves_prose_when_fewer_markers_than_calls() -> None:
-    # Defensive: never eat prose if the marker count is unexpectedly low.
+def test_strip_markers_removes_bare_marker_no_colon() -> None:
+    # claude-haiku-4-5 / plan-mode turns emit a bare `[TaskList]` with no detail.
+    content = "Waiting on the finder agents before I post the review.\n[TaskList]"
+    assert (
+        strip_tool_markers(content, 1)
+        == "Waiting on the finder agents before I post the review."
+    )
+
+
+def test_strip_markers_removes_bare_multiword_marker() -> None:
+    content = "Triage is ready. Plan written.\n[Exiting Plan Mode]"
+    assert strip_tool_markers(content, 1) == "Triage is ready. Plan written."
+
+
+def test_strip_markers_ignores_lowercase_brackets_in_bash_body() -> None:
+    # A Bash heredoc that writes a pyproject.toml emits lowercase `[project]`
+    # lines as command body; only the leading `[Bash: …]` marker is a marker, so
+    # the count still matches and the whole trailing block goes.
+    content = (
+        "Let me test the build.\n"
+        "[Bash: Test wheel build]\n"
+        "$ cat > pyproject.toml <<EOF\n"
+        "[project]\n"
+        'name = "demo"\n'
+        "EOF"
+    )
+    assert strip_tool_markers(content, 1) == "Let me test the build."
+
+
+def test_strip_markers_raises_on_count_mismatch() -> None:
+    # Fail loud rather than silently leak: marker count must equal the tool count.
     content = "Some prose with no markers."
-    assert strip_tool_markers(content, 1) == content
+    with pytest.raises(ValueError, match="marker model does not fit"):
+        strip_tool_markers(content, 1)
+
+
+def test_strip_markers_keeps_marker_shaped_prose_without_tool_calls() -> None:
+    # Broadening must not eat prose: a standalone marker-shaped line in a turn
+    # with no tool calls is left untouched.
+    content = "Consider [Bash: detail] as an example of the syntax."
+    assert strip_tool_markers(content, 0) == content
 
 
 def test_render_turn_strips_markers_from_assistant_prose() -> None:

@@ -11,6 +11,7 @@ on a machine without AgentsView (e.g. CI). That is an explicit, reasoned skip â€
 the data genuinely is not available â€” not a silent fallback.
 """
 
+import re
 import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -96,6 +97,31 @@ def test_real_interrupt_session_renders_interrupted_tag() -> None:
     if sid is None:
         pytest.skip("no live session with an interrupt row")
     assert "<interrupted" in render_session(sid)
+
+
+def test_real_bare_marker_session_renders_without_leaking_marker() -> None:
+    # claude-haiku-4-5 / plan-mode turns emit a bare `[ToolName]` marker (no
+    # colon-detail). The stripper used to miss these and silently leak them into
+    # prose. Find a live session whose assistant turn ends in a bare marker, render
+    # it, and assert that exact line is gone from the export.
+    bare = re.compile(r"^\[[A-Z][A-Za-z0-9_]*( [A-Za-z0-9_]+)*\]$")
+    target: tuple[str, str] | None = None
+    for s in session_list()["sessions"][:50]:
+        sid = s["id"]
+        for row in session_messages(sid):
+            if not row.get("tool_calls"):
+                continue
+            last = (row.get("content") or "").rstrip().split("\n")[-1]
+            if bare.match(last):
+                target = (sid, last)
+                break
+        if target is not None:
+            break
+    if target is None:
+        pytest.skip("no live session with a bare tool marker")
+    sid, marker_line = target
+    rendered = render_session(sid)  # raises if the marker model is wrong (F4)
+    assert f"\n{marker_line}\n" not in rendered
 
 
 def test_cli_writes_well_formed_file_for_recent_session(tmp_path: Path) -> None:
