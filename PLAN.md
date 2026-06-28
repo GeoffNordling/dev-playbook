@@ -133,7 +133,7 @@ the behaviour bugs, then test hygiene and docs.
   unreachable daemon means something is actually wrong — the suite must **fail
   loudly**, not skip and hide it.
 
-- [ ] **F7 — Document the tool in `tools/README.md`.** Add a `transcript-export`
+- [x] **F7 — Document the tool in `tools/README.md`.** Add a `transcript-export`
   row under the **Utility scripts** table (it's an ad-hoc, human-run tool, not a
   pre-commit validator): one line on purpose plus the command form
   (`transcript-export <out_dir> <session_id… | --recent N | --all>`), pointing at
