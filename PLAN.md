@@ -455,5 +455,5 @@ session metadata.
   (in `tests/test_transcript_export_forks.py`) to passing, add fixtures for a real
   fork shape, and re-run the live integration tests. See the Working note below.
   `make -C tools check` green.
-- [ ] **T13 — Retire the prototype.** Delete `tools/transcript-export-prototype/`;
+- [x] **T13 — Retire the prototype.** Delete `tools/transcript-export-prototype/`;
   update any README/pointers. `make -C tools check` green.
