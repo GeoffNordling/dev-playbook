@@ -239,6 +239,16 @@ session metadata.
   dicts. `Message` carries `source_parent_uuid` (None when absent) and `ordinal`
   for T4's tree/live-path walk; rule 2 (adjacent-repeat) is **not** applied yet —
   add it in T5.
+- **Fork reconstruction (T4, in `transcript_export/forks.py`):**
+  `reconstruct_forks(messages) -> ForkReconstruction` with `live_path:
+  tuple[Message, ...]` (root→tip ancestor chain of the highest-ordinal message)
+  and `abandoned_branches: dict[str | None, tuple[MessageNode, ...]]` keyed by
+  fork point — the live-path parent's `source_uuid`, or the absent/None parent
+  uuid for a root-level fork. `MessageNode` (message + ordinal-sorted children
+  tuple) carries each abandoned subtree in full fidelity, so nested forks inside
+  an abandoned branch are preserved as that head's `children`. T8 renders these
+  as `<rewound-branch>` at their fork point; it consumes this structure rather
+  than re-walking the tree.
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -258,7 +268,7 @@ session metadata.
   ordered list built from `session_messages`; collapse verbatim
   resume-duplicates by `source_uuid` (keep first). Unit tests with fixtures.
   Green.
-- [ ] **T4 — Fork reconstruction.** Build the tree from
+- [x] **T4 — Fork reconstruction.** Build the tree from
   `source_parent_uuid`→`source_uuid`; compute the live path (ancestors of the
   highest-ordinal message); collect abandoned branches per fork point. Unit test
   with a multi-branch fixture (incl. a nested fork). Green.
