@@ -18,7 +18,7 @@ judgments:
       standards/judgments.md accurately documents the judgment declaration
       format and the field rules that the judgments tooling validates.
     evidence:  [standards/judgments.md]
-    reference: [tools/judgments/loader.py, tools/judgments/instruments.py]
+    reference: [tools/src/judgments/loader.py, tools/src/judgments/instruments.py]
     model: claude-sonnet-4-6
     effort: high
 
@@ -29,7 +29,7 @@ judgments:
       the passing verdicts.
     evidence:  [dotfiles/dot-claude/skills/run-judgments/SKILL.md]
     reference:
-      - tools/judgments/runner.py
+      - tools/src/judgments/runner.py
       - dotfiles/dot-claude/workflows/scatter-gather.js
     model: claude-opus-4-8
     effort: high

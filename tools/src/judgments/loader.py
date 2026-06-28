@@ -9,6 +9,7 @@ declared evidence/reference paths -- existence and path-format are the lint's an
 """
 
 import re
+import sys
 import tomllib
 from pathlib import Path, PurePosixPath
 from typing import NamedTuple, TypeGuard
@@ -205,6 +206,23 @@ def lint(root: Path | None) -> list[str]:
             if problem is not None:
                 errors.append(f"judgment {declaration.id!r}: {problem}")
     return errors
+
+
+def lint_cli() -> int:
+    """Console-script entry point: lint the repo's judgments, report on stderr.
+
+    Resolves the repo root, runs :func:`lint`, prints every error and a summary
+    count to stderr, and returns 1 if there were any errors else 0. Registered as
+    the ``judgments-lint`` console script and called by the
+    ``tools/bin/judgments-lint`` pre-commit shim, so both channels behave alike.
+    """
+    errors = lint(resolve_root())
+    for error in errors:
+        print(error, file=sys.stderr)
+    if errors:
+        print(f"judgments-lint: {len(errors)} error(s)", file=sys.stderr)
+        return 1
+    return 0
 
 
 def _path_problem(path: str, root: Path) -> str | None:
