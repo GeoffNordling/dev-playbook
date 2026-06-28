@@ -17,6 +17,7 @@ authoritative schema.
 """
 
 import subprocess
+import xml.etree.ElementTree as ElementTree
 from collections.abc import Callable
 
 from transcript_export.classify import keep_messages
@@ -46,7 +47,25 @@ def render_session(session_id: str, runner: Callable = subprocess.run) -> str:
     """
     meta = session_get(session_id, runner=runner)
     body = _render_body(session_id, runner, visited=frozenset({session_id}), depth=0)
-    return f"{render_session_open(meta)}{body}</session>"
+    document = f"{render_session_open(meta)}{body}</session>"
+    _assert_well_formed(document, session_id)
+    return document
+
+
+def _assert_well_formed(document: str, session_id: str) -> None:
+    """Fail loud if the complete `<session>` document is not well-formed XML.
+
+    A rendered transcript is one XML document; a malformed one (unclosed tag,
+    stray close, illegal char) must crash at the source rather than ship. Parses
+    the whole top-level document with a strict parser and re-raises any failure
+    as a clear error. Validates only the complete document, not nested fragments.
+    """
+    try:
+        ElementTree.fromstring(document)
+    except ElementTree.ParseError as exc:
+        raise ValueError(
+            f"render_session produced malformed XML for session {session_id}: {exc}"
+        ) from exc
 
 
 def _render_body(

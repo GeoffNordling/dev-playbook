@@ -347,3 +347,34 @@ def test_render_session_emits_rewound_branch_at_fork_point() -> None:
     assert [k.tag for k in el] == ["user", "rewound-branch", "assistant"]
     assert el.find("rewound-branch/assistant").text == "first try"  # type: ignore[union-attr]
     assert el.findall("assistant")[-1].text == "second try"
+
+
+# --- F1: well-formedness guard ----------------------------------------------
+
+
+def test_render_session_well_formed_document_passes_through() -> None:
+    sessions = {
+        "s1": {
+            "meta": {"id": "s1", "project": "demo", "message_count": 1},
+            "rows": [user_row(ordinal=1, source_uuid="u0")],
+        }
+    }
+    # A normal render is well-formed and must pass the guard (no raise).
+    ET.fromstring(render_session("s1", runner=fake_daemon(sessions)))
+
+
+def test_render_session_raises_on_malformed_document(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sessions = {
+        "s1": {
+            "meta": {"id": "s1", "project": "demo", "message_count": 1},
+            "rows": [user_row(ordinal=1, source_uuid="u0")],
+        }
+    }
+    # Force a malformed open tag so the assembled document cannot parse; the
+    # guard must crash at the source rather than ship malformed XML.
+    monkeypatch.setattr(transcript, "render_session_open", lambda meta: "<session>")
+    monkeypatch.setattr(transcript, "_render_body", lambda *a, **k: "<user>hi")
+    with pytest.raises(ValueError, match="malformed XML"):
+        render_session("s1", runner=fake_daemon(sessions))

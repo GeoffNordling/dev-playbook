@@ -75,7 +75,7 @@ back to the search recipe):
 Ordered: structural fail-loud guards first (they protect everything after), then
 the behaviour bugs, then test hygiene and docs.
 
-- [ ] **F1 — XML well-formedness guard (production, fail-loud).** A rendered
+- [x] **F1 — XML well-formedness guard (production, fail-loud).** A rendered
   transcript is one `<session>…</session>` document. In `render_session`
   (`transcript.py`), after assembling the full document string and before
   returning it, parse it with a strict parser (`xml.etree.ElementTree.fromstring`)
