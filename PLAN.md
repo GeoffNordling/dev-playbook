@@ -261,6 +261,20 @@ session metadata.
   `normalize_messages`. Slash-command / interrupt are content refinements on a
   user turn (`content.startswith("/")` / `content == "[Request interrupted by
   user]"`).
+- **Rendering (T6, in `transcript_export/render.py`):** `escape(text)` covers all
+  five entities (`&` first to avoid double-escaping), reused for **both** element
+  text and attribute values; `render_session_open(meta)` emits the `<session …>`
+  open tag from a `session get` payload (`id` required/fail-loud, other attrs
+  omitted when None, zero counts kept; caller appends `</session>`);
+  `render_turn(message)` dispatches on `classify` to a `<user>` / slash-command
+  `<user command="/cmd">args</user>` / `<assistant ord model><thinking>…</thinking>prose</assistant>`
+  element, and **fails loud** on a non-turn (interrupt/compaction/drop) — those
+  route through separate marker paths. Live-verified the `session get` header keys
+  match the mapping (id/project/agent/cwd 1:1, git_branch/started_at/ended_at/
+  message_count/compaction_count renamed). **Turn-text marker stripping is NOT
+  done yet** (the `[ToolName: …]` / trailing `$` lines duplicating `tool_calls[]`)
+  — `render_turn` escapes `content` verbatim; add the stripping in T7, where the
+  structured tool-call equivalent makes it testable.
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -292,7 +306,7 @@ session metadata.
   (`source_subtype="compact_boundary"`); DROP = `source_type="system"` except the
   compaction summary (e.g. `task_notification`). Apply the two dedup rules from
   Reconstruction. Per the Keep/drop policy in Design. Unit tests. Green.
-- [ ] **T6 — Render: header + turns + thinking.** Entity-escaping helper;
+- [x] **T6 — Render: header + turns + thinking.** Entity-escaping helper;
   `<session>` header from `session_get`; `<user>`/`<assistant>` turns with `ord`;
   `<thinking>`. Pure function (model → XML string). Unit tests incl. escaping of
   `< > & "` and content that contains XML-looking text. Green.
