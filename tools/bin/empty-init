@@ -35,19 +35,23 @@ MESSAGE = "`__init__.py` must be empty (no docstring, no code)"
 INIT_NAME = "__init__.py"
 
 
-class _GitError(Exception):
-    """git could not enumerate tracked files for the given path."""
+class _ToolError(Exception):
+    """The hook could not complete its scan (git enumeration or file read failed)."""
 
 
 @dataclass(frozen=True)
 class Finding:
+    """A tracked ``__init__.py`` that holds disallowed content."""
+
     file: str
 
     def render(self) -> str:
+        """Format the finding as a ``file  rule  message`` line."""
         return f"{self.file}  {RULE}  {MESSAGE}"
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Scan tracked ``__init__.py`` and report any that are not empty."""
     parser = argparse.ArgumentParser(
         prog="empty-init",
         description=(
@@ -66,11 +70,10 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         init_files = _tracked_init_files(args.path)
-    except _GitError as err:
+        findings = [Finding(rel) for rel in init_files if _has_content(args.path / rel)]
+    except _ToolError as err:
         print(f"{RULE}: {err}", file=sys.stderr)
         return 2
-
-    findings = [Finding(rel) for rel in init_files if _has_content(args.path / rel)]
 
     for f in findings:
         print(f.render())
@@ -96,14 +99,21 @@ def _tracked_init_files(root: Path) -> list[str]:
         text=True,
     )
     if result.returncode != 0:
-        raise _GitError(result.stderr.strip() or "git ls-files failed")
+        raise _ToolError(result.stderr.strip() or "git ls-files failed")
     tracked = result.stdout.split("\0")
     return [rel for rel in tracked if rel and Path(rel).name == INIT_NAME]
 
 
 def _has_content(path: Path) -> bool:
-    """True when the file holds any non-whitespace character."""
-    return bool(path.read_text(encoding="utf-8").strip())
+    """True when the file holds any non-whitespace character.
+
+    Raises ``_ToolError`` when the file cannot be read as UTF-8 text.
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as err:
+        raise _ToolError(f"cannot read {path}: {err}") from err
+    return bool(text.strip())
 
 
 if __name__ == "__main__":

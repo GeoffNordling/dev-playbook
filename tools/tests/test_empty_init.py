@@ -70,6 +70,19 @@ def test_repo_self_scan_is_clean() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_unreadable_tracked_init_reports_tool_error(tmp_path: Path) -> None:
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    bad = tmp_path / "pkg" / "__init__.py"
+    bad.parent.mkdir(parents=True)
+    bad.write_bytes(b"\xff\xfe not valid utf-8")
+    subprocess.run(["git", "-C", str(tmp_path), "add", "-A"], check=True)
+
+    result = run(str(tmp_path))
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "empty-init" in result.stderr
+
+
 def test_gitignored_venv_init_is_not_scanned(tmp_path: Path) -> None:
     make_git_repo(
         tmp_path,
