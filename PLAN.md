@@ -231,6 +231,14 @@ session metadata.
   `session_messages` returns the flat list of message rows (already paged to
   exhaustion), the others return the raw dict payload. Failures raise
   `AgentsViewError`. Reuse these in later tasks — do not re-shell `agentsview`.
+- **Message model (T3, in `transcript_export/model.py`):** frozen `Message` and
+  `ToolCall` dataclasses + `message_from_row` / `tool_call_from_row` builders,
+  `collapse_resume_duplicates` (rule 1, keep-first by `source_uuid`), and
+  `normalize_messages(rows)` (map every row then apply rule 1, input order
+  preserved). Downstream tasks build on `Message` — do not re-parse raw row
+  dicts. `Message` carries `source_parent_uuid` (None when absent) and `ordinal`
+  for T4's tree/live-path walk; rule 2 (adjacent-repeat) is **not** applied yet —
+  add it in T5.
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -246,7 +254,7 @@ session metadata.
   `session_get`, `session_messages` (paged via `--from`/`--limit`,
   default-page-100 aware). Shell out to `agentsview`, parse JSON, **fail loud**
   on nonzero exit. Unit tests mock `subprocess`. Green.
-- [ ] **T3 — Message model + resume dedup.** A normalized message dataclass; an
+- [x] **T3 — Message model + resume dedup.** A normalized message dataclass; an
   ordered list built from `session_messages`; collapse verbatim
   resume-duplicates by `source_uuid` (keep first). Unit tests with fixtures.
   Green.
