@@ -50,38 +50,57 @@ class ForkReconstruction:
     abandoned_branches: dict[str | None, tuple[MessageNode, ...]]
 
 
+def _uuid(message: Message) -> str:
+    """The message's `source_uuid`, failing loud if it is absent.
+
+    Fork reconstruction runs on the kept list, where the uuid-less
+    `queued_command` previews have already been dropped (`keep_messages`). A None
+    here means that contract was violated upstream, so we raise rather than invent
+    an identity — a uuid-less node would otherwise masquerade as a rootless branch
+    head and render as a spurious rewound branch.
+    """
+    if message.source_uuid is None:
+        raise ValueError(
+            f"reconstruct_forks got a uuid-less message at ordinal "
+            f"{message.ordinal}; queued_command rows must be dropped first"
+        )
+    return message.source_uuid
+
+
 def reconstruct_forks(messages: list[Message]) -> ForkReconstruction:
     """Split the message list into its live path and abandoned branches.
 
-    Expects the resume-deduped list from `normalize_messages` (one message per
-    `source_uuid`). Returns an empty reconstruction for an empty list.
+    Expects the kept list from `keep_messages` (one message per `source_uuid`,
+    uuid-less `queued_command` previews already dropped). Returns an empty
+    reconstruction for an empty list.
     """
     if not messages:
         return ForkReconstruction(live_path=(), abandoned_branches={})
 
-    by_uuid = {message.source_uuid: message for message in messages}
+    by_uuid = {_uuid(message): message for message in messages}
     children_by_parent: dict[str | None, list[Message]] = {}
     for message in messages:
         children_by_parent.setdefault(message.source_parent_uuid, []).append(message)
 
     live_path = _live_path(messages, by_uuid)
-    live_uuids = {message.source_uuid for message in live_path}
+    live_uuids = {_uuid(message) for message in live_path}
 
     building: set[str] = set()
 
     def build_node(message: Message) -> MessageNode:
-        if message.source_uuid in building:
-            raise ValueError(f"cycle in message tree at {message.source_uuid}")
-        building.add(message.source_uuid)
+        uuid = _uuid(message)
+        if uuid in building:
+            raise ValueError(f"cycle in message tree at {uuid}")
+        building.add(uuid)
         children = sorted(
-            children_by_parent.get(message.source_uuid, ()),
-            key=lambda m: (m.ordinal, m.source_uuid),
+            children_by_parent.get(uuid, ()),
+            key=lambda m: (m.ordinal, _uuid(m)),
         )
         return MessageNode(message, tuple(build_node(child) for child in children))
 
     abandoned: dict[str | None, list[MessageNode]] = {}
     for message in messages:
-        if message.source_uuid in live_uuids:
+        if _uuid(message) in live_uuids:
             continue
         parent = message.source_parent_uuid
         is_branch_head = parent is None or parent in live_uuids or parent not in by_uuid
@@ -114,9 +133,10 @@ def _live_path(
     seen: set[str] = set()
     current: Message | None = live_tip
     while current is not None:
-        if current.source_uuid in seen:
-            raise ValueError(f"cycle in live path at {current.source_uuid}")
-        seen.add(current.source_uuid)
+        uuid = _uuid(current)
+        if uuid in seen:
+            raise ValueError(f"cycle in live path at {uuid}")
+        seen.add(uuid)
         chain.append(current)
         parent_uuid = current.source_parent_uuid
         current = by_uuid.get(parent_uuid) if parent_uuid is not None else None

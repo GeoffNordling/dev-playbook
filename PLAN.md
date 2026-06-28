@@ -343,23 +343,38 @@ session metadata.
   default sort `recent`) and slice. `main` injects `render` so the file-output
   path is unit-tested with a stub (no daemon); `runner` is threaded into both
   selection and rendering. The `bin/transcript-export` shim is unchanged.
-- **REAL-DATA BUG for T11 (found by a live `--recent 1` smoke test):**
-  `render_session` crashes `KeyError: 'source_uuid'` on real sessions. A live row
-  with `source_type="user"`, `source_subtype="queued_command"` (a queued prompt —
-  the very case dedup rule 2 targets) has **no `source_uuid`**, but
-  `message_from_row` (model.py) hard-indexes `row["source_uuid"]`. T11 must decide
-  the handling (keep the queued prompt with a synthetic/None uuid so rule-1 dedup
-  and the fork tree still work, or drop it) and add a fixture for it. Session
-  `774efbe3-81bc-46d6-8cec-7212621424c0` has one such row at ordinal 46. The unit
-  fixtures never exercised this because they always set `source_uuid`.
-- **Open pipeline-ordering question (revisit in T11 against the live daemon):**
-  `_render_body` runs `keep_messages` (drops plumbing + adjacent-repeat) **before**
-  `reconstruct_forks`. If a dropped message ever sits on the `source_parent_uuid`
-  chain of a kept one, the chain breaks and the live-path walk truncates. Not
-  observed in unit fixtures; confirm on a real rich session (e.g.
-  `d45168f9-7715-4631-afe2-074f8fa2df85`) and, if it bites, reconstruct forks on
-  the `normalize_messages` output and let `render_message` drop plumbing during
-  the walk instead.
+- **RESOLVED in T11 — `source_uuid` KeyError + control chars.** Two real-data
+  crashes are fixed: (1) a `source_subtype="queued_command"` preview row has **no
+  `source_uuid`** — `message_from_row` now reads `row.get("source_uuid")`
+  (`Message.source_uuid` is `str | None`), `collapse_resume_duplicates` skips
+  uuid-less rows (they can't be resume re-emissions), and `classify` **drops**
+  `queued_command` as plumbing (it is a preview re-emitted later as a real user
+  message; keeping it would orphan it from the fork tree). NOTE: the PLAN had
+  expected rule 2 to dedup these, but the preview has no uuid and is re-emitted —
+  dropping by subtype is correct, and rule 2 still guards other injection doubles.
+  (2) Real tool output carries ANSI/control bytes (bare ESC `0x1b`) that XML 1.0
+  forbids even as entities; `escape` now strips characters outside the XML 1.0
+  legal set (`_XML_INVALID`) before entity-escaping. `forks.reconstruct_forks`
+  now fails loud (`_uuid` helper) if a uuid-less message reaches it, since
+  `keep_messages` must drop them first.
+- **CRITICAL FINDING in T11 — fork reconstruction is broken on real data (→ T12).**
+  The whole `source_parent_uuid`→`source_uuid` tree premise is **false** for the
+  parsed messages API: a "message" aggregates several raw records, and the next
+  message's `source_parent_uuid` points at an *internal* raw record (a tool
+  result) of the previous message, not at its `source_uuid`. Measured: parent
+  resolves to a message in the set **0/62** times (774efbe3) and **2/196**
+  (d45168f9). Consequence: `_live_path` collapses to the single highest-ordinal
+  message and **every other message renders as a `<rewound-branch>`** (a fork-free
+  session: 25 wrappers + 1 real turn). The *fork signal that DOES survive* is a
+  **shared `source_parent_uuid`** — d45168f9's 3-way fork shows up as one parent
+  with children at ordinals 128/135/145, exactly the documented fork. Redesign
+  (T12): treat **ordinal order as the live spine**; detect forks as parents shared
+  by ≥2 messages; an abandoned sibling's branch is the contiguous ordinal range
+  `[sibling_ord, next_sibling_ord)`, with the highest-ordinal sibling staying on
+  the live path. This supersedes the old "pipeline-ordering" worry (keep_messages
+  before reconstruct_forks) — that was a symptom; the tree never connecting is the
+  cause. The xfail test `test_forkfree_stream_with_nonresolving_parents_is_all_live`
+  encodes the target contract.
 
 ## Tasks
 
@@ -405,8 +420,21 @@ session metadata.
 - [x] **T10 — CLI: selection + output.** Accept explicit ids, `--recent N`,
   `--all`; for each session render and write `<out_dir>/<id>.xml`. End-to-end
   wiring. Unit tests for selection logic (mocked `session_list`). Green.
-- [ ] **T11 — Live-daemon integration tests.** Render a real recent session end
+- [x] **T11 — Live-daemon integration tests.** Render a real recent session end
   to end against the live daemon; assert well-formed XML + structural invariants;
   exercise `list`/`get`/`messages`. Green.
-- [ ] **T12 — Retire the prototype.** Delete `tools/transcript-export-prototype/`;
+- [ ] **T12 — Fix fork reconstruction (ordinal-spine redesign).** T11 proved the
+  current `reconstruct_forks` is broken on real data: `source_parent_uuid` points
+  at unsurfaced raw sub-records, so the parent→uuid tree never connects, the live
+  path collapses to one message, and a fork-free session renders almost entirely
+  inside `<rewound-branch>` (e.g. 25 wrappers, 1 real turn). Redesign so the
+  **ordinal order is the live-path spine** and forks are detected by a
+  **shared `source_parent_uuid`** (≥2 messages, the actual fork signal); abandoned
+  branches occupy the contiguous ordinal range from each lower-ordinal sibling up
+  to the next sibling under that parent, the highest-ordinal sibling staying live.
+  Flip the `strict=True` xfail `test_forkfree_stream_with_nonresolving_parents_is_all_live`
+  (in `tests/test_transcript_export_forks.py`) to passing, add fixtures for a real
+  fork shape, and re-run the live integration tests. See the Working note below.
+  `make -C tools check` green.
+- [ ] **T13 — Retire the prototype.** Delete `tools/transcript-export-prototype/`;
   update any README/pointers. `make -C tools check` green.

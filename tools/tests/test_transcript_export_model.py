@@ -162,6 +162,39 @@ def test_fork_siblings_survive_resume_dedup() -> None:
     assert [m.source_uuid for m in kept] == ["a", "b"]
 
 
+def test_queued_command_row_has_no_source_uuid() -> None:
+    # A live `queued_command` preview row omits source_uuid entirely; the model
+    # must tolerate that (None) rather than KeyError on a hard index.
+    raw = {
+        "ordinal": 46,
+        "role": "user",
+        "source_type": "user",
+        "source_subtype": "queued_command",
+        "content": "do the thing",
+    }
+
+    msg = message_from_row(raw)
+
+    assert msg.source_uuid is None
+    assert msg.source_subtype == "queued_command"
+
+
+def test_collapse_resume_duplicates_keeps_every_uuidless_row() -> None:
+    # A uuid-less row can never be a resume re-emission (those are matched by
+    # source_uuid), so two distinct uuid-less previews must both survive rule 1 —
+    # collapsing them on a shared None key would wrongly merge separate prompts.
+    a = message_from_row(
+        {"ordinal": 1, "role": "user", "source_type": "user", "content": "first"}
+    )
+    b = message_from_row(
+        {"ordinal": 2, "role": "user", "source_type": "user", "content": "second"}
+    )
+
+    kept = collapse_resume_duplicates([a, b])
+
+    assert [m.content for m in kept] == ["first", "second"]
+
+
 def test_normalize_messages_preserves_order_and_dedups() -> None:
     rows = [
         row(ordinal=0, source_uuid="u1", content="a"),

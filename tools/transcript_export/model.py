@@ -38,7 +38,9 @@ class Message:
     Classification keys off `source_type`/`source_subtype` (not `role`): the
     compaction boundary is `role=assistant` but `source_type=system`. `ordinal`
     is a sparse global index; `source_parent_uuid` is None for a message with no
-    parent (the field is absent in the raw row).
+    parent (the field is absent in the raw row). `source_uuid` is None for a
+    `queued_command` preview row, which the live API emits without one; the
+    keep/drop policy drops it before fork reconstruction sees it.
     """
 
     ordinal: int
@@ -47,7 +49,7 @@ class Message:
     source_subtype: str | None
     is_system: bool
     is_compact_boundary: bool
-    source_uuid: str
+    source_uuid: str | None
     source_parent_uuid: str | None
     model: str | None
     thinking_text: str | None
@@ -72,10 +74,11 @@ def tool_call_from_row(raw: dict) -> ToolCall:
 def message_from_row(row: dict) -> Message:
     """Normalize one raw `session messages` row into a Message.
 
-    Required fields (`ordinal`, `role`, `source_type`, `source_uuid`, `content`)
-    are read directly so a malformed row fails loud; the genuinely-optional ones
-    (`source_subtype`, `source_parent_uuid`, `model`, `thinking_text`,
-    `tool_calls`) default to None / empty.
+    Required fields (`ordinal`, `role`, `source_type`, `content`) are read
+    directly so a malformed row fails loud; the genuinely-optional ones
+    (`source_subtype`, `source_uuid`, `source_parent_uuid`, `model`,
+    `thinking_text`, `tool_calls`) default to None / empty. `source_uuid` is
+    optional because a `queued_command` preview row legitimately lacks one.
     """
     return Message(
         ordinal=row["ordinal"],
@@ -84,7 +87,7 @@ def message_from_row(row: dict) -> Message:
         source_subtype=row.get("source_subtype"),
         is_system=row.get("is_system", False),
         is_compact_boundary=row.get("is_compact_boundary", False),
-        source_uuid=row["source_uuid"],
+        source_uuid=row.get("source_uuid"),
         source_parent_uuid=row.get("source_parent_uuid"),
         model=row.get("model"),
         thinking_text=row.get("thinking_text"),
@@ -98,11 +101,17 @@ def collapse_resume_duplicates(messages: list[Message]) -> list[Message]:
 
     A resumed session replays earlier messages with the same `source_uuid`, so the
     first occurrence is the original and any later one is a duplicate. Forks share
-    a parent but carry *different* `source_uuid`s, so they survive this pass.
+    a parent but carry *different* `source_uuid`s, so they survive this pass. A
+    message with no `source_uuid` (a `queued_command` preview) can never be a
+    resume re-emission, so it bypasses the dedup set untouched — collapsing
+    distinct uuid-less rows together would wrongly merge separate prompts.
     """
     seen: set[str] = set()
     kept: list[Message] = []
     for message in messages:
+        if message.source_uuid is None:
+            kept.append(message)
+            continue
         if message.source_uuid in seen:
             continue
         seen.add(message.source_uuid)

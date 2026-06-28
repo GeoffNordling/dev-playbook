@@ -103,6 +103,32 @@ def test_task_notification_system_message_is_dropped() -> None:
     assert classify(m) is MessageKind.DROP
 
 
+def test_queued_command_preview_is_dropped() -> None:
+    # The queued_command preview (a user-typed prompt recorded while the assistant
+    # is still working) carries no source_uuid and is re-emitted later as a real
+    # user message, so we drop the orphan preview.
+    m = msg(source_type="user", source_subtype="queued_command", content="do it")
+    assert classify(m) is MessageKind.DROP
+
+
+def test_keep_messages_drops_queued_command_preview() -> None:
+    msgs = [
+        msg(source_type="user", content="real", source_uuid="u1", ordinal=0),
+        msg(
+            source_type="user",
+            source_subtype="queued_command",
+            content="queued preview",
+            source_uuid="u2",
+            ordinal=1,
+        ),
+        msg(source_type="assistant", content="reply", source_uuid="u3", ordinal=2),
+    ]
+
+    kept = keep_messages(msgs)
+
+    assert [m.source_uuid for m in kept] == ["u1", "u3"]
+
+
 def test_unexpected_source_type_fails_loud() -> None:
     with pytest.raises(ValueError, match="unclassifiable"):
         classify(msg(source_type="tool", content="x"))

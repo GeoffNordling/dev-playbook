@@ -5,6 +5,8 @@ fields, never trimmed real sessions. A fork is two messages sharing a
 `source_parent_uuid` with different `source_uuid`s.
 """
 
+import pytest
+
 from transcript_export.forks import reconstruct_forks
 from transcript_export.model import Message, message_from_row
 
@@ -23,7 +25,7 @@ def msg(ordinal: int, uuid: str, parent: str | None = None) -> Message:
     return message_from_row(raw)
 
 
-def uuids(messages: tuple[Message, ...]) -> list[str]:
+def uuids(messages: tuple[Message, ...]) -> list[str | None]:
     return [m.source_uuid for m in messages]
 
 
@@ -140,3 +142,42 @@ def test_stacked_forks_collect_one_branch_per_live_fork_point() -> None:
     assert set(result.abandoned_branches) == {"r", "a"}
     assert result.abandoned_branches["r"][0].message.source_uuid == "x"
     assert result.abandoned_branches["a"][0].message.source_uuid == "y"
+
+
+def test_uuidless_message_fails_loud() -> None:
+    # keep_messages drops the uuid-less queued_command previews before fork
+    # reconstruction; one reaching here means that contract was broken upstream,
+    # so reconstruct_forks raises rather than inventing an identity for it.
+    uuidless = message_from_row(
+        {"ordinal": 3, "role": "user", "source_type": "user", "content": "orphan"}
+    )
+
+    with pytest.raises(ValueError, match="uuid-less"):
+        reconstruct_forks([msg(0, "r"), uuidless])
+
+
+@pytest.mark.xfail(
+    reason="KNOWN DEFECT (T12): on the real parsed messages API source_parent_uuid "
+    "points to raw sub-records (tool results) that are folded into messages and "
+    "never surfaced, so the parent->uuid tree never connects. The live-path walk "
+    "then collapses to the single highest-ordinal message and every other message "
+    "is mis-rendered as a <rewound-branch>. A fork-free stream must yield a full "
+    "live path and zero abandoned branches; reconstruct_forks needs an "
+    "ordinal-spine redesign. See PLAN.md T12.",
+    strict=True,
+)
+def test_forkfree_stream_with_nonresolving_parents_is_all_live() -> None:
+    # Mirrors real data: every message has a distinct parent uuid that resolves to
+    # NO message in the set (the parent is an unsurfaced raw record). With no
+    # shared parent there is no fork, so the whole stream is the live path.
+    messages = [
+        msg(0, "m0", "p0"),
+        msg(1, "m1", "p1"),
+        msg(2, "m2", "p2"),
+        msg(3, "m3", "p3"),
+    ]
+
+    result = reconstruct_forks(messages)
+
+    assert uuids(result.live_path) == ["m0", "m1", "m2", "m3"]
+    assert result.abandoned_branches == {}

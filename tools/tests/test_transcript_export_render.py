@@ -103,6 +103,42 @@ def test_escape_does_not_double_escape_ampersand() -> None:
     assert escape("&amp;") == "&amp;amp;"
 
 
+def test_escape_strips_xml_illegal_control_characters() -> None:
+    # Only the C0 control bytes XML 1.0 forbids are removed (the bare ESC 0x1b
+    # that opens an ANSI sequence, plus BEL and NUL); the printable `[31m` tail of
+    # the sequence is valid text and survives.
+    assert escape("red\x1b[31mtext\x07\x00end") == "red[31mtextend"
+
+
+def test_escape_keeps_tab_newline_and_carriage_return() -> None:
+    # The three whitespace controls XML 1.0 allows must survive.
+    assert escape("a\tb\nc\rd") == "a\tb\nc\rd"
+
+
+def test_render_turn_with_ansi_output_is_well_formed_xml() -> None:
+    # A turn whose tool output contains a raw ESC must still parse: the stripping
+    # happens before entity-escaping, so the document stays well-formed.
+    m = msg(
+        source_type="assistant",
+        content="ran it",
+        model="claude-opus-4-8",
+        tool_calls=[
+            {
+                "tool_name": "Bash",
+                "tool_use_id": "toolu_1",
+                "input_json": "{}",
+                "result_content": "\x1b[1;31mError\x1b[0m: boom",
+                "result_content_length": 20,
+            }
+        ],
+    )
+
+    out = render_turn(m)
+    el = ET.fromstring(out)
+
+    assert el.find("tool-call/output").text == "[1;31mError[0m: boom"  # type: ignore[union-attr]
+
+
 # --- header -----------------------------------------------------------------
 
 

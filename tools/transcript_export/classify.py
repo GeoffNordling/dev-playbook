@@ -44,9 +44,17 @@ def classify(message: Message) -> MessageKind:
     is recognized before the system->drop rule swallows it. Slash command and
     interrupt are content refinements on a user turn. An unexpected `source_type`
     (not user/assistant/system) fails loud rather than being silently dropped.
+
+    A `queued_command` preview (a user-typed prompt the harness records while the
+    assistant is still working, before re-emitting it as a real user message with
+    a `source_uuid` and parent linkage) is dropped: it carries no `source_uuid`,
+    so keeping it would orphan it from the fork tree, and the real re-emission
+    survives to connect the live path.
     """
     if message.is_compact_boundary or message.source_subtype == "compact_boundary":
         return MessageKind.COMPACTION
+    if message.source_subtype == "queued_command":
+        return MessageKind.DROP
     if message.source_type == "system":
         return MessageKind.DROP
     if message.content == INTERRUPT_MARKER:

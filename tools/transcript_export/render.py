@@ -36,6 +36,14 @@ _TOOL_MARKER = re.compile(r"^\[[A-Za-z][A-Za-z0-9_]*: .*\]$")
 `[Bash: List worktrees]` or `[Tool: EnterWorktree]`. Verified (agentsview
 v0.34.5, 554 tool-bearing messages) to match exactly one line per tool call."""
 
+_XML_INVALID = re.compile("[^\t\n\r\x20-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]")
+"""Characters XML 1.0 forbids outright (C0 controls other than tab/newline/CR,
+and the surrogate / non-character code points). Real tool output is full of them
+— ANSI colour codes carry a bare ESC (0x1b) — and they are illegal even as
+numeric entities, so they must be removed, not escaped. Stripping is a deliberate
+sanitization, not a silent fallback: these bytes are terminal-control noise an LLM
+reader has no use for, and `result_content_length` still records the true length."""
+
 _HEADER_FIELDS: tuple[tuple[str, str], ...] = (
     ("id", "id"),
     ("project", "project"),
@@ -59,8 +67,11 @@ def escape(text: str) -> str:
     Replaces all five predefined entities, `&` first so the ampersands the later
     replacements introduce are not double-escaped. Covering the full set keeps one
     helper safe in both positions — element text *and* double-quoted attributes —
-    so we never need CDATA.
+    so we never need CDATA. First strips characters XML 1.0 forbids (ANSI/control
+    bytes in tool output), which are illegal even as entities and would otherwise
+    make the whole document fail to parse.
     """
+    text = _XML_INVALID.sub("", text)
     return (
         text.replace("&", "&amp;")
         .replace("<", "&lt;")
