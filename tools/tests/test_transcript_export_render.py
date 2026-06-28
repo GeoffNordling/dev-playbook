@@ -10,9 +10,14 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from transcript_export.classify import MessageKind, classify
+from transcript_export.forks import MessageNode
 from transcript_export.model import Message, ToolCall, message_from_row
 from transcript_export.render import (
     escape,
+    render_compaction,
+    render_interrupted,
+    render_message,
+    render_rewound_branch,
     render_session_open,
     render_tool_call,
     render_turn,
@@ -409,3 +414,135 @@ def test_assistant_turn_embeds_tool_calls_after_prose() -> None:
     assert call is not None
     assert call.attrib["name"] == "Bash"
     assert call.find("output").text == "a\nb"  # type: ignore[union-attr]
+
+
+# --- timeline markers -------------------------------------------------------
+
+
+def test_render_compaction_emits_escaped_summary() -> None:
+    m = msg(
+        source_type="system",
+        source_subtype="compact_boundary",
+        content="Summary: a < b & more",
+    )
+    assert classify(m) is MessageKind.COMPACTION
+    el = ET.fromstring(render_compaction(m))
+    assert el.tag == "compaction"
+    assert not el.attrib
+    assert el.text == "Summary: a < b & more"
+
+
+def test_render_compaction_rejects_non_compaction() -> None:
+    with pytest.raises(ValueError, match="non-compaction"):
+        render_compaction(msg(source_type="user", content="hi"))
+
+
+def test_render_interrupted_emits_self_closing_with_ord() -> None:
+    m = msg(source_type="user", content="[Request interrupted by user]", ordinal=12)
+    assert classify(m) is MessageKind.INTERRUPT
+    el = ET.fromstring(render_interrupted(m))
+    assert el.tag == "interrupted"
+    assert el.attrib == {"ord": "12"}
+    assert (el.text or "") == ""
+
+
+def test_render_interrupted_rejects_non_interrupt() -> None:
+    with pytest.raises(ValueError, match="non-interrupt"):
+        render_interrupted(msg(source_type="user", content="not an interrupt"))
+
+
+# --- message dispatch -------------------------------------------------------
+
+
+def test_render_message_dispatches_turn() -> None:
+    el = ET.fromstring(render_message(msg(source_type="user", content="hi", ordinal=1)))
+    assert el.tag == "user"
+
+
+def test_render_message_dispatches_compaction() -> None:
+    m = msg(source_type="system", source_subtype="compact_boundary", content="s")
+    assert ET.fromstring(render_message(m)).tag == "compaction"
+
+
+def test_render_message_dispatches_interrupt() -> None:
+    m = msg(source_type="user", content="[Request interrupted by user]", ordinal=3)
+    assert ET.fromstring(render_message(m)).tag == "interrupted"
+
+
+def test_render_message_drops_plumbing_to_empty() -> None:
+    m = msg(source_type="system", source_subtype="task_notification", content="notice")
+    assert classify(m) is MessageKind.DROP
+    assert render_message(m) == ""
+
+
+# --- rewound branches -------------------------------------------------------
+
+
+def node(message: Message, *children: MessageNode) -> MessageNode:
+    """A MessageNode with its (already ordinal-sorted) children."""
+    return MessageNode(message, tuple(children))
+
+
+def test_rewound_branch_renders_linear_chain_in_order() -> None:
+    chain = node(
+        msg(source_type="user", content="ask", ordinal=1),
+        node(msg(source_type="assistant", content="answer", model="m", ordinal=2)),
+    )
+    el = ET.fromstring(render_rewound_branch(chain))
+    assert el.tag == "rewound-branch"
+    kids = list(el)
+    assert [k.tag for k in kids] == ["user", "assistant"]
+    assert kids[0].text == "ask"
+    assert kids[1].text == "answer"
+
+
+def test_rewound_branch_nests_inner_fork_as_rewound_branch() -> None:
+    # The abandoned branch root itself forks: the lower-ordinal child (branch-x)
+    # nests as its own <rewound-branch>; the highest-ordinal child continues inline.
+    inner = node(
+        msg(source_type="user", content="root", ordinal=1),
+        node(msg(source_type="assistant", content="branch-x", model="m", ordinal=5)),
+        node(msg(source_type="assistant", content="branch-y", model="m", ordinal=9)),
+    )
+    el = ET.fromstring(render_rewound_branch(inner))
+    kids = list(el)
+    assert [k.tag for k in kids] == ["user", "rewound-branch", "assistant"]
+    assert kids[0].text == "root"
+    assert list(kids[1])[0].text == "branch-x"
+    assert kids[2].text == "branch-y"
+
+
+def test_rewound_branch_skips_dropped_plumbing() -> None:
+    # A task_notification wedged into the abandoned chain renders to nothing.
+    chain = node(
+        msg(source_type="user", content="ask", ordinal=1),
+        node(
+            msg(
+                source_type="system",
+                source_subtype="task_notification",
+                content="notice",
+                ordinal=2,
+            ),
+            node(msg(source_type="assistant", content="answer", model="m", ordinal=3)),
+        ),
+    )
+    el = ET.fromstring(render_rewound_branch(chain))
+    assert [k.tag for k in el] == ["user", "assistant"]
+
+
+def test_rewound_branch_renders_marker_in_full_fidelity() -> None:
+    # Full fidelity: a compaction inside an abandoned branch still renders.
+    chain = node(
+        msg(source_type="user", content="ask", ordinal=1),
+        node(
+            msg(
+                source_type="system",
+                source_subtype="compact_boundary",
+                content="summary",
+                ordinal=2,
+            )
+        ),
+    )
+    el = ET.fromstring(render_rewound_branch(chain))
+    assert [k.tag for k in el] == ["user", "compaction"]
+    assert list(el)[1].text == "summary"

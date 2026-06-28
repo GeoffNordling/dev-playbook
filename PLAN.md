@@ -291,6 +291,20 @@ session metadata.
   appends one `render_tool_call` per `tool_calls[]` entry after thinking + prose.
   **Sub-agent nesting (`subagent_session_id` → `<subagent>` inside `<tool-call>`)
   is T9** — `render_tool_call` does not yet take child data.
+- **Markers + rewound branches (T8, in `transcript_export/render.py`):**
+  `render_compaction(message)` → `<compaction>summary</compaction>` (escaped
+  `content`, no attributes — matches the schema literally; fails loud on a
+  non-compaction); `render_interrupted(message)` → self-closing
+  `<interrupted ord="…"/>` (fails loud on a non-interrupt). `render_message(message)`
+  is the **single per-message dispatcher** a transcript walk uses: COMPACTION /
+  INTERRUPT → their renderers, DROP → `""` (so callers append unconditionally),
+  else `render_turn`. T10's live-path walk should reuse `render_message`, not
+  re-dispatch. `render_rewound_branch(node: MessageNode)` renders ONE abandoned
+  branch head as `<rewound-branch>` in full fidelity via `render_message` per node;
+  a **nested** fork (node with >1 child) keeps the highest-ordinal child inline and
+  wraps each lower-ordinal sibling in its own nested `<rewound-branch>` (recursive,
+  chronological order). T10 emits one `<rewound-branch>` per head in the
+  `abandoned_branches[fork_point]` tuple, at its fork point. 12 new unit tests.
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -330,7 +344,7 @@ session metadata.
   `<tool-call name id>` + `<args>` (`input_json`, escaped) + `<output chars
   truncated>` (`result_content`, truncate 2000; empty for Read/ToolSearch).
   Derive `outcome="rejected"|"error"` from the output text. Unit tests. Green.
-- [ ] **T8 — Render: markers + rewound branches.** `<compaction>`,
+- [x] **T8 — Render: markers + rewound branches.** `<compaction>`,
   `<interrupted/>`, and `<rewound-branch>` (abandoned branch in full fidelity at
   its fork point). Unit tests. Green.
 - [ ] **T9 — Sub-agent recursion.** When a `tool_calls[]` entry has

@@ -5,15 +5,16 @@ header maps a `session get` payload to the `<session>` element's attributes; the
 turn renderer emits one `<user>` / `<assistant>` element (a slash command is a
 `<user command="/cmd">args</user>` variant) with assistant thinking as a
 `<thinking>` child, and an assistant turn's `tool_calls[]` as nested
-`<tool-call>` elements. Timeline markers, rewound branches, and sub-agents land
-in later tasks; this module is the escaping + turn + tool-call core they build
-on. All text is entity-escaped, never CDATA. See PLAN.md for the authoritative
-schema.
+`<tool-call>` elements. Timeline markers (`<compaction>`, `<interrupted/>`) and
+abandoned rewind branches (`<rewound-branch>`) render here too; sub-agent nesting
+lands in a later task. All text is entity-escaped, never CDATA. See PLAN.md for
+the authoritative schema.
 """
 
 import re
 
 from transcript_export.classify import MessageKind, classify
+from transcript_export.forks import MessageNode
 from transcript_export.model import Message, ToolCall
 
 TOOL_OUTPUT_TRUNCATION = 2000
@@ -190,3 +191,81 @@ def render_turn(message: Message) -> str:
         f"render_turn called on a non-turn message at ordinal {message.ordinal}: "
         f"{kind} renders through a separate path"
     )
+
+
+def render_compaction(message: Message) -> str:
+    """Render a compaction boundary as `<compaction>summary</compaction>`.
+
+    The boundary's pre-rendered `content` is the compaction summary (per-compaction
+    token counts are an accepted loss). Fails loud on a non-compaction message,
+    which renders through a different path.
+    """
+    if classify(message) is not MessageKind.COMPACTION:
+        raise ValueError(
+            f"render_compaction called on a non-compaction message at ordinal "
+            f"{message.ordinal}"
+        )
+    return f"<compaction>{escape(message.content)}</compaction>"
+
+
+def render_interrupted(message: Message) -> str:
+    """Render a user interrupt as a self-closing `<interrupted ord="…"/>` marker.
+
+    An interrupt carries no content beyond the fixed marker text; only its position
+    (`ordinal`) is worth keeping. Fails loud on a non-interrupt message.
+    """
+    if classify(message) is not MessageKind.INTERRUPT:
+        raise ValueError(
+            f"render_interrupted called on a non-interrupt message at ordinal "
+            f"{message.ordinal}"
+        )
+    return f'<interrupted ord="{message.ordinal}"/>'
+
+
+def render_message(message: Message) -> str:
+    """Dispatch one message to its renderer by kind; a `DROP` renders to nothing.
+
+    The single entry point a transcript walk uses for a message that may be a turn,
+    a compaction boundary, an interrupt, or dropped plumbing. Turns route to
+    `render_turn`; the two timeline markers to their renderers; a `DROP` message
+    yields the empty string so callers can append it unconditionally.
+    """
+    kind = classify(message)
+    if kind is MessageKind.COMPACTION:
+        return render_compaction(message)
+    if kind is MessageKind.INTERRUPT:
+        return render_interrupted(message)
+    if kind is MessageKind.DROP:
+        return ""
+    return render_turn(message)
+
+
+def render_rewound_branch(node: MessageNode) -> str:
+    """Render one abandoned fork branch as a `<rewound-branch>`, in full fidelity.
+
+    The branch is a `MessageNode` subtree from `reconstruct_forks`; its messages
+    render in document order exactly as the live path would (`render_message` per
+    node, so markers and dropped plumbing behave identically). A *nested* fork
+    inside the abandoned branch — a node with more than one child — keeps its
+    highest-ordinal child as this branch's inline continuation and wraps each
+    lower-ordinal sibling in its own nested `<rewound-branch>`, mirroring the
+    top-level live/abandoned split recursively.
+    """
+    return f"<rewound-branch>{_render_node(node)}</rewound-branch>"
+
+
+def _render_node(node: MessageNode) -> str:
+    """Render a `MessageNode` and its descendants for a `<rewound-branch>`.
+
+    The node's children are ordinal-sorted ascending (see `forks.build_node`); the
+    last (highest-ordinal) child continues this branch inline, and every earlier
+    sibling is a divergence that nests as its own `<rewound-branch>` right at this
+    fork point, before the inline continuation (chronological order).
+    """
+    body = render_message(node.message)
+    if node.children:
+        *forked, primary = node.children
+        for head in forked:
+            body += render_rewound_branch(head)
+        body += _render_node(primary)
+    return body
