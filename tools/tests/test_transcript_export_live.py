@@ -6,13 +6,12 @@ exercise the three read commands the tool uses — `session list` / `get` /
 `messages` — and assert *structural* invariants only (well-formed XML, header
 present, ord attributes integral), never exact content: real sessions change.
 
-The whole module skips when no daemon is reachable, so the check gate stays green
-on a machine without AgentsView (e.g. CI). That is an explicit, reasoned skip —
-the data genuinely is not available — not a silent fallback.
+This machine always runs the AgentsView daemon, so an unreachable daemon means
+something is actually wrong. These tests therefore **fail loudly** rather than
+skip — a skip here would hide a real breakage behind a green gate.
 """
 
 import re
-import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -24,21 +23,16 @@ from transcript_export.transcript import render_session
 
 
 def _recent_ids(limit: int) -> list[str]:
-    """The newest session ids from the live daemon, or [] if it is unreachable."""
-    if shutil.which("agentsview") is None:
-        return []
-    try:
-        sessions = session_list()["sessions"]
-    except Exception:
-        return []
-    return [s["id"] for s in sessions[:limit]]
+    """The newest session ids from the live daemon.
+
+    No defensive guard: if the daemon is unreachable this raises, and the live
+    suite fails loudly, because on this machine an unreachable daemon is a real
+    fault, not an expected absence.
+    """
+    return [s["id"] for s in session_list()["sessions"][:limit]]
 
 
 _RECENT = _recent_ids(3)
-
-pytestmark = pytest.mark.skipif(
-    not _RECENT, reason="AgentsView daemon not reachable; skipping live integration"
-)
 
 
 def test_session_list_get_messages_round_trip() -> None:

@@ -127,7 +127,7 @@ the behaviour bugs, then test hygiene and docs.
   collapses; anything genuinely different is spared. Tests: a real triple-emission
   collapses to one; a same-prose / different-tool-result retry is preserved.
 
-- [ ] **F6 — Live tests fail (not skip) when the daemon is unreachable.** In
+- [x] **F6 — Live tests fail (not skip) when the daemon is unreachable.** In
   `tools/tests/test_transcript_export_live.py`, remove the
   `skipif(not _RECENT, …)` guard. This machine always runs the daemon, so an
   unreachable daemon means something is actually wrong — the suite must **fail
