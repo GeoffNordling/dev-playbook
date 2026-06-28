@@ -332,6 +332,26 @@ session metadata.
   `omitted="depth"` — both self-closing placeholders, never silent drops. 10 new
   unit tests drive `render_session` against a fake daemon (one runner dispatching
   `get`/`messages` from a `{id: {"meta","rows"}}` map).
+- **CLI (T10, in `transcript_export/cli.py`):** `main(argv, runner=subprocess.run,
+  render=render_session)` parses args, selects ids, then writes one
+  `<out_dir>/<id>.xml` per session (`mkdir(parents, exist_ok)` first — idempotent
+  overwrite). `_parse_args` enforces **exactly one** selection mode
+  (`sum([bool(ids), recent is not None, all]) != 1` → `parser.error`) and
+  `--recent N > 0`. `select_session_ids(explicit_ids, recent, select_all, runner)`
+  is the pure selection unit: explicit ids pass through with **no** daemon call;
+  `--recent`/`--all` read `session_list(runner)["sessions"]` (already newest-first,
+  default sort `recent`) and slice. `main` injects `render` so the file-output
+  path is unit-tested with a stub (no daemon); `runner` is threaded into both
+  selection and rendering. The `bin/transcript-export` shim is unchanged.
+- **REAL-DATA BUG for T11 (found by a live `--recent 1` smoke test):**
+  `render_session` crashes `KeyError: 'source_uuid'` on real sessions. A live row
+  with `source_type="user"`, `source_subtype="queued_command"` (a queued prompt —
+  the very case dedup rule 2 targets) has **no `source_uuid`**, but
+  `message_from_row` (model.py) hard-indexes `row["source_uuid"]`. T11 must decide
+  the handling (keep the queued prompt with a synthetic/None uuid so rule-1 dedup
+  and the fork tree still work, or drop it) and add a fixture for it. Session
+  `774efbe3-81bc-46d6-8cec-7212621424c0` has one such row at ordinal 46. The unit
+  fixtures never exercised this because they always set `source_uuid`.
 - **Open pipeline-ordering question (revisit in T11 against the live daemon):**
   `_render_body` runs `keep_messages` (drops plumbing + adjacent-repeat) **before**
   `reconstruct_forks`. If a dropped message ever sits on the `source_parent_uuid`
@@ -382,7 +402,7 @@ session metadata.
   `subagent_session_id`, fetch that child session and render it nested inside the
   `<tool-call>` as `<subagent>`, recursively, with cycle + depth guards. Unit
   tests with a mocked parent→child. Green.
-- [ ] **T10 — CLI: selection + output.** Accept explicit ids, `--recent N`,
+- [x] **T10 — CLI: selection + output.** Accept explicit ids, `--recent N`,
   `--all`; for each session render and write `<out_dir>/<id>.xml`. End-to-end
   wiring. Unit tests for selection logic (mocked `session_list`). Green.
 - [ ] **T11 — Live-daemon integration tests.** Render a real recent session end
