@@ -271,10 +271,26 @@ session metadata.
   element, and **fails loud** on a non-turn (interrupt/compaction/drop) — those
   route through separate marker paths. Live-verified the `session get` header keys
   match the mapping (id/project/agent/cwd 1:1, git_branch/started_at/ended_at/
-  message_count/compaction_count renamed). **Turn-text marker stripping is NOT
-  done yet** (the `[ToolName: …]` / trailing `$` lines duplicating `tool_calls[]`)
-  — `render_turn` escapes `content` verbatim; add the stripping in T7, where the
-  structured tool-call equivalent makes it testable.
+  message_count/compaction_count renamed).
+- **Tool-call rendering + marker stripping (T7, in `transcript_export/render.py`):**
+  `render_tool_call(tool_call)` emits `<tool-call name id [outcome]>` with `<args>`
+  (escaped `input_json`) and `<output chars truncated>` (escaped `result_content`,
+  cut at `TOOL_OUTPUT_TRUNCATION=2000`). `chars` = `result_content_length` (the
+  API's authoritative full length — verified to differ by a few chars from
+  `len(result_content)` due to whitespace trimming, and the *only* length for
+  empty Read/ToolSearch bodies); `truncated` = `len(result_content) > 2000`.
+  `outcome`: `"rejected"` when output starts with `"The user doesn't want to
+  proceed"`, else `"error"` when it contains `"<tool_use_error>"`, else omitted
+  (rejection checked first). `strip_tool_markers(content, tool_call_count)` removes
+  the trailing `[ToolName: detail]` / `$ command` block: there is **exactly one
+  `[Word: detail]` marker line per tool call** (live-verified across 554
+  tool-bearing messages — `_TOOL_MARKER` regex, zero mismatches), so it cuts at the
+  `tool_call_count`-th marker line from the end (handles multi-line `$` commands and
+  parallel calls); fewer markers than calls → content returned untouched (never eat
+  prose). `render_turn` now strips markers from prose and, for an assistant turn,
+  appends one `render_tool_call` per `tool_calls[]` entry after thinking + prose.
+  **Sub-agent nesting (`subagent_session_id` → `<subagent>` inside `<tool-call>`)
+  is T9** — `render_tool_call` does not yet take child data.
 - The reference prototype (`tools/transcript-export-prototype/render_transcript.py`)
   is **plain-text and uses `export`** — directional reference only. Do **not**
   copy its `export` usage or its dedup-by-`id` bug (dedup on `source_uuid`).
@@ -310,7 +326,7 @@ session metadata.
   `<session>` header from `session_get`; `<user>`/`<assistant>` turns with `ord`;
   `<thinking>`. Pure function (model → XML string). Unit tests incl. escaping of
   `< > & "` and content that contains XML-looking text. Green.
-- [ ] **T7 — Render: tool calls.** From each message's `tool_calls[]`:
+- [x] **T7 — Render: tool calls.** From each message's `tool_calls[]`:
   `<tool-call name id>` + `<args>` (`input_json`, escaped) + `<output chars
   truncated>` (`result_content`, truncate 2000; empty for Read/ToolSearch).
   Derive `outcome="rejected"|"error"` from the output text. Unit tests. Green.

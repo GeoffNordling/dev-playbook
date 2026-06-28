@@ -10,8 +10,14 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from transcript_export.classify import MessageKind, classify
-from transcript_export.model import Message, message_from_row
-from transcript_export.render import escape, render_session_open, render_turn
+from transcript_export.model import Message, ToolCall, message_from_row
+from transcript_export.render import (
+    escape,
+    render_session_open,
+    render_tool_call,
+    render_turn,
+    strip_tool_markers,
+)
 
 
 def msg(
@@ -24,6 +30,7 @@ def msg(
     model: str | None = None,
     thinking_text: str | None = None,
     ordinal: int = 0,
+    tool_calls: list[dict] | None = None,
 ) -> Message:
     """A message with the fields a turn needs; `role` defaults to source_type."""
     raw: dict = {
@@ -41,7 +48,41 @@ def msg(
         raw["model"] = model
     if thinking_text is not None:
         raw["thinking_text"] = thinking_text
+    if tool_calls is not None:
+        raw["tool_calls"] = tool_calls
     return message_from_row(raw)
+
+
+def tc(
+    *,
+    tool_name: str = "Bash",
+    tool_use_id: str = "toolu_1",
+    input_json: str = "{}",
+    result_content: str = "",
+    result_content_length: int | None = None,
+) -> ToolCall:
+    """A ToolCall fixture; `result_content_length` defaults to the body length."""
+    raw: dict = {
+        "tool_name": tool_name,
+        "tool_use_id": tool_use_id,
+        "input_json": input_json,
+        "result_content": result_content,
+        "result_content_length": (
+            result_content_length
+            if result_content_length is not None
+            else len(result_content)
+        ),
+    }
+    return message_from_row(
+        {
+            "ordinal": 0,
+            "role": "assistant",
+            "source_type": "assistant",
+            "source_uuid": "u1",
+            "content": "",
+            "tool_calls": [raw],
+        }
+    ).tool_calls[0]
 
 
 # --- escape -----------------------------------------------------------------
@@ -219,3 +260,152 @@ def test_render_turn_rejects_interrupt() -> None:
     m = msg(source_type="user", content="[Request interrupted by user]")
     with pytest.raises(ValueError, match="non-turn message"):
         render_turn(m)
+
+
+# --- marker stripping -------------------------------------------------------
+
+
+def test_strip_markers_removes_bash_marker_and_command_line() -> None:
+    content = (
+        "I'll list the worktrees.\n[Bash: List git worktrees]\n$ git worktree list"
+    )
+    assert strip_tool_markers(content, 1) == "I'll list the worktrees."
+
+
+def test_strip_markers_keeps_multiline_command_in_block() -> None:
+    # A bash command can span several lines; the whole trailing block goes.
+    content = 'Merging now.\n[Bash: Merge main]\n$ DP=/home/x\ngit -C "$DP" merge main'
+    assert strip_tool_markers(content, 1) == "Merging now."
+
+
+def test_strip_markers_with_no_prose_yields_empty() -> None:
+    content = "[Read: /a/b.py]"
+    assert strip_tool_markers(content, 1) == ""
+
+
+def test_strip_markers_handles_parallel_tool_calls() -> None:
+    content = "Reading both.\n[Read: /a]\n[Read: /b]"
+    assert strip_tool_markers(content, 2) == "Reading both."
+
+
+def test_strip_markers_noop_without_tool_calls() -> None:
+    content = "Just prose, no [brackets: here] stripped."
+    assert strip_tool_markers(content, 0) == content
+
+
+def test_strip_markers_leaves_prose_when_fewer_markers_than_calls() -> None:
+    # Defensive: never eat prose if the marker count is unexpectedly low.
+    content = "Some prose with no markers."
+    assert strip_tool_markers(content, 1) == content
+
+
+def test_render_turn_strips_markers_from_assistant_prose() -> None:
+    m = msg(
+        source_type="assistant",
+        content="Running the build.\n[Bash: run build]\n$ make build",
+        model="m",
+        tool_calls=[{"tool_name": "Bash", "tool_use_id": "t1", "input_json": "{}"}],
+    )
+    el = ET.fromstring(render_turn(m))
+    assert el.text == "Running the build."
+
+
+# --- tool-call rendering ----------------------------------------------------
+
+
+def test_tool_call_renders_name_id_args_and_output() -> None:
+    el = ET.fromstring(
+        render_tool_call(
+            tc(
+                tool_name="Bash",
+                tool_use_id="toolu_abc",
+                input_json='{"command": "ls"}',
+                result_content="file1\nfile2",
+            )
+        )
+    )
+    assert el.tag == "tool-call"
+    assert el.attrib["name"] == "Bash"
+    assert el.attrib["id"] == "toolu_abc"
+    assert "outcome" not in el.attrib
+    assert el.find("args").text == '{"command": "ls"}'  # type: ignore[union-attr]
+    out = el.find("output")
+    assert out is not None
+    assert out.text == "file1\nfile2"
+    assert out.attrib == {"chars": "11", "truncated": "false"}
+
+
+def test_tool_call_escapes_args_and_output() -> None:
+    el = ET.fromstring(
+        render_tool_call(
+            tc(input_json='{"q": "a < b & c"}', result_content="x > y & <z>")
+        )
+    )
+    assert el.find("args").text == '{"q": "a < b & c"}'  # type: ignore[union-attr]
+    assert el.find("output").text == "x > y & <z>"  # type: ignore[union-attr]
+
+
+def test_tool_call_truncates_long_output_at_2000() -> None:
+    body = "z" * 2500
+    el = ET.fromstring(render_tool_call(tc(result_content=body)))
+    out = el.find("output")
+    assert out is not None
+    assert out.attrib["truncated"] == "true"
+    assert out.attrib["chars"] == "2500"
+    assert len(out.text or "") == 2000
+
+
+def test_tool_call_empty_read_output_reports_full_length() -> None:
+    # Read/ToolSearch bodies come back empty; chars still reports the real size.
+    el = ET.fromstring(
+        render_tool_call(
+            tc(tool_name="Read", result_content="", result_content_length=8421)
+        )
+    )
+    out = el.find("output")
+    assert out is not None
+    assert (out.text or "") == ""
+    assert out.attrib == {"chars": "8421", "truncated": "false"}
+
+
+def test_tool_call_marks_rejected_outcome() -> None:
+    el = ET.fromstring(
+        render_tool_call(
+            tc(result_content="The user doesn't want to proceed with this tool use.")
+        )
+    )
+    assert el.attrib["outcome"] == "rejected"
+
+
+def test_tool_call_marks_error_outcome() -> None:
+    el = ET.fromstring(
+        render_tool_call(
+            tc(
+                result_content="<tool_use_error>File has not been read yet.</tool_use_error>"
+            )
+        )
+    )
+    assert el.attrib["outcome"] == "error"
+
+
+def test_assistant_turn_embeds_tool_calls_after_prose() -> None:
+    m = msg(
+        source_type="assistant",
+        content="Listing files.\n[Bash: list]\n$ ls",
+        model="m",
+        ordinal=7,
+        tool_calls=[
+            {
+                "tool_name": "Bash",
+                "tool_use_id": "toolu_x",
+                "input_json": '{"command": "ls"}',
+                "result_content": "a\nb",
+            }
+        ],
+    )
+    el = ET.fromstring(render_turn(m))
+    assert el.text == "Listing files."
+    call = el.find("tool-call")
+    assert call is not None
+    assert call.attrib["name"] == "Bash"
+    assert call.find("output").text == "a\nb"  # type: ignore[union-attr]
