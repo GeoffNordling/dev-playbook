@@ -85,7 +85,7 @@ the behaviour bugs, then test hygiene and docs.
   `<subagent>` fragment). All 5 known real exports are already well-formed, so
   this must not change current output. Test: a deliberately-broken document raises.
 
-- [ ] **F2 — Forks conservation guard (fail-loud).** `reconstruct_forks`
+- [x] **F2 — Forks conservation guard (fail-loud).** `reconstruct_forks`
   (`forks.py`) partitions messages into the live path plus abandoned branches.
   Add a check that **every input message lands in exactly one place** — live path
   or exactly one abandoned branch, none dropped, none duplicated — and **raise**

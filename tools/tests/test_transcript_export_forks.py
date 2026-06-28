@@ -7,7 +7,8 @@ fields, never trimmed real sessions. A fork is two messages sharing a
 
 import pytest
 
-from transcript_export.forks import reconstruct_forks
+import transcript_export.forks as forks
+from transcript_export.forks import MessageNode, reconstruct_forks
 from transcript_export.model import Message, message_from_row
 
 
@@ -147,6 +148,53 @@ def test_stacked_forks_collect_one_branch_per_live_fork_point() -> None:
     assert set(result.abandoned_branches) == {"a", "live"}
     assert result.abandoned_branches["a"][0].message.source_uuid == "x"
     assert result.abandoned_branches["live"][0].message.source_uuid == "y"
+
+
+def test_conservation_holds_on_multifork_input() -> None:
+    # Two forks plus a nested fork: every input uuid must surface exactly once
+    # across the live path and the abandoned-branch trees.
+    messages = [
+        msg(0, "r"),
+        msg(5, "b1", "r"),
+        msg(6, "b1a", "b1"),
+        msg(7, "b1b", "b1"),
+        msg(10, "a", "r"),
+        msg(15, "y", "a"),
+        msg(20, "live", "a"),
+    ]
+
+    result = reconstruct_forks(messages)
+
+    seen: list[str] = [u for u in uuids(result.live_path) if u is not None]
+
+    def collect(node: MessageNode) -> None:
+        if node.message.source_uuid is not None:
+            seen.append(node.message.source_uuid)
+        for child in node.children:
+            collect(child)
+
+    for heads in result.abandoned_branches.values():
+        for head in heads:
+            collect(head)
+
+    expected = [m.source_uuid for m in messages if m.source_uuid is not None]
+    assert sorted(seen) == sorted(expected)
+
+
+def test_conservation_violation_fails_loud(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Force the internal segmenter to drop a message; reconstruct_forks must catch
+    # the broken partition and raise rather than silently lose it.
+    def dropping_segment(
+        ordered: list[Message],
+    ) -> tuple[list[Message], dict[str, list[MessageNode]]]:
+        return ordered[:-1], {}
+
+    monkeypatch.setattr(forks, "_segment", dropping_segment)
+
+    with pytest.raises(ValueError, match="dropped or duplicated"):
+        reconstruct_forks([msg(0, "r"), msg(1, "a", "r")])
 
 
 def test_uuidless_message_fails_loud() -> None:

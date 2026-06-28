@@ -104,10 +104,43 @@ def reconstruct_forks(messages: list[Message]) -> ForkReconstruction:
     ordered = sorted(messages, key=lambda m: (m.ordinal, _uuid(m)))
 
     spine, abandoned = _segment(ordered)
-    return ForkReconstruction(
+    reconstruction = ForkReconstruction(
         live_path=tuple(spine),
         abandoned_branches={uuid: tuple(heads) for uuid, heads in abandoned.items()},
     )
+    _assert_conserved(reconstruction, ordered)
+    return reconstruction
+
+
+def _branch_uuids(node: MessageNode) -> list[str]:
+    """Every `source_uuid` in an abandoned branch, head plus all descendants."""
+    result = [_uuid(node.message)]
+    for child in node.children:
+        result.extend(_branch_uuids(child))
+    return result
+
+
+def _assert_conserved(
+    reconstruction: ForkReconstruction, inputs: list[Message]
+) -> None:
+    """Fail loud unless every input message lands in exactly one output slot.
+
+    Partitioning into the live path and abandoned branches must neither drop nor
+    duplicate any message: the multiset of output `source_uuid`s must equal the
+    input set exactly. A mis-partition (an unexpected/crossing fork shape) would
+    otherwise silently lose or repeat messages — raise instead.
+    """
+    output: list[str] = [_uuid(m) for m in reconstruction.live_path]
+    for heads in reconstruction.abandoned_branches.values():
+        for head in heads:
+            output.extend(_branch_uuids(head))
+
+    expected = sorted(_uuid(m) for m in inputs)
+    if sorted(output) != expected:
+        raise ValueError(
+            "reconstruct_forks dropped or duplicated messages: "
+            f"input uuids {expected} != output uuids {sorted(output)}"
+        )
 
 
 def _segment(
