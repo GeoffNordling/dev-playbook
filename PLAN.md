@@ -123,9 +123,19 @@ ACCEPTED LOSSES (consequences of messages-only, consciously accepted):
   `<rewound-branch>`. A plain tree walk, so it generalizes to nested/stacked
   forks. A fork's common parent may itself be absent from the payload; root each
   present child as its own branch head.
-- **Resume dedup:** collapse verbatim resume-duplicates by `source_uuid` (keep
-  the first occurrence). Distinct from forks, which have *different*
-  `source_uuid`s.
+- **Dedup (two rules):** (1) collapse verbatim resume re-emissions by
+  `source_uuid` — a resumed session re-emits earlier messages with the *same*
+  `source_uuid`; keep the first. (2) Collapse a message that exactly repeats the
+  immediately preceding kept message (same `role` + `content`) — queued-prompt /
+  injection doubles occur with a *different* `source_uuid`, so rule 1 misses
+  them. Forks are neither: same `source_parent_uuid`, *different* `source_uuid`,
+  *different* content.
+- **Turn text vs tool markers:** a message's `content` is pre-rendered prose
+  followed by inline tool markers — `[ToolName: detail]`, plus a trailing
+  `$ command` line for Bash. Those markers duplicate what we render structurally
+  from `tool_calls[]`, so strip the trailing marker / `$` lines and emit only the
+  prose as the turn text. Markers always trail the prose. `thinking_text` is a
+  separate field (already clean).
 
 ### Keep / drop policy (high-signal faithful)
 
@@ -135,13 +145,16 @@ telemetry, and duplicate injections of a real message. (Most plumbing record
 types never reach us anyway — we read the parsed message stream, not raw
 records.)
 
-- KEEP: user / assistant messages; assistant thinking; tool calls + args +
-  (partial) outputs; slash-command invocations (parse `<command-name>` →
-  one clean `command="…"` line); the compaction summary message; interrupts.
-- DROP: `is_system` plumbing — `source_subtype="task_notification"` sub-agent
-  notices, context-usage notices, `<local-command-caveat>`; the expanded-prompt
-  twin of a slash command; local-command stdout; harness telemetry. Dedup the
-  queued-prompt triple down to the real user message.
+- KEEP: user / assistant messages; assistant thinking (`thinking_text`); tool
+  calls + args + (partial) outputs; slash-command invocations (a user message
+  whose `content` starts with `/` — command is the first token, args the rest);
+  the compaction summary; interrupts.
+- DROP: `source_type="system"` plumbing **other than** the compaction summary —
+  in practice `source_subtype="task_notification"` (sub-agent completion notices).
+  The wrappers the raw export carries (`<command-name>` twins, `<local-command-*>`
+  blocks, context-usage notices) are **already stripped by the parsed API** and
+  never reach us, so there is nothing extra to filter. Then apply the two dedup
+  rules above.
 
 ### Verified behaviours (live exploration, agentsview v0.34.5)
 
@@ -187,6 +200,18 @@ session metadata.
 
 - **Layout:** logic in a `tools/transcript_export/` package; CLI entry at
   `tools/bin/transcript-export`; tests in `tools/tests/`.
+- **`tools/` is an existing `uv` project** (its own `pyproject.toml`, `Makefile`,
+  and sibling packages like `skipcache/`, `judgments/`). T1 *adds* a package
+  following those conventions — it does not create the project. The `Makefile`'s
+  `mypy` target lists packages **explicitly**; add `transcript_export/` to that
+  list or the new code is silently never typechecked.
+- **Header field mapping** (`session get` → `<session>` attributes): `git_branch`
+  → branch, `started_at` → started, `ended_at` → ended, `message_count` →
+  messages, `compaction_count` → compactions; id / project / agent / cwd map 1:1.
+- **Unit-test fixtures are small hand-authored JSON** dicts shaped like the
+  documented `messages` / `tool_calls` fields — do **not** capture and trim real
+  sessions for them. The live daemon is only for the T11 integration test and for
+  eyeballing the rich example session.
 - **Output / idempotency:** write one file per session, `<out_dir>/<id>.xml`;
   re-running overwrites it (idempotent regenerate). Sub-agents are always nested
   inline, never emitted as separate files.
@@ -223,12 +248,14 @@ session metadata.
   `source_parent_uuid`→`source_uuid`; compute the live path (ancestors of the
   highest-ordinal message); collect abandoned branches per fork point. Unit test
   with a multi-branch fixture (incl. a nested fork). Green.
-- [ ] **T5 — Record classification.** Classify each kept message: normal
-  user/assistant; slash command (parse `<command-name>`/`<command-args>`);
-  interrupt (`[Request interrupted by user]`); compaction summary
-  (`source_subtype="compact_boundary"`); and which messages to DROP
-  (`source_subtype="task_notification"` and other `is_system` plumbing, the
-  expanded-prompt twin). Per the Keep/drop policy in Design. Unit tests. Green.
+- [ ] **T5 — Record classification.** Key off `source_type`/`source_subtype`,
+  **not** `role` (the compaction boundary is `role=assistant` but
+  `source_type=system`). Classify each message: normal user/assistant; slash
+  command (user `content` starts with `/`); interrupt
+  (`[Request interrupted by user]`); compaction summary
+  (`source_subtype="compact_boundary"`); DROP = `source_type="system"` except the
+  compaction summary (e.g. `task_notification`). Apply the two dedup rules from
+  Reconstruction. Per the Keep/drop policy in Design. Unit tests. Green.
 - [ ] **T6 — Render: header + turns + thinking.** Entity-escaping helper;
   `<session>` header from `session_get`; `<user>`/`<assistant>` turns with `ord`;
   `<thinking>`. Pure function (model → XML string). Unit tests incl. escaping of
