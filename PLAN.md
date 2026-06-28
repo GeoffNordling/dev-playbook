@@ -116,7 +116,7 @@ the behaviour bugs, then test hygiene and docs.
   standalone `[Word: detail]`-shaped prose line). Verify no markers leak on a real
   haiku-model session.
 
-- [ ] **F5 — Dedup rule 2: match the whole message, not just text.**
+- [x] **F5 — Dedup rule 2: match the whole message, not just text.**
   `collapse_adjacent_repeats` (`classify.py`) collapses adjacent messages on
   `(role, content)` alone, so it can drop a genuinely distinct turn (e.g. a
   fail-then-pass retry with identical prose but a different tool result).

@@ -78,19 +78,29 @@ def collapse_adjacent_repeats(messages: list[Message]) -> list[Message]:
 
     Queued-prompt / injection doubles re-emit a real message with a *different*
     `source_uuid`, so the resume dedup (rule 1) misses them; here we collapse a
-    message that matches the immediately preceding kept message on both `role` and
-    `content`. Fork siblings differ in content, so they are never collapsed; a
-    non-adjacent repeat (A, B, A) is kept because only the immediate predecessor
-    is compared.
+    message that matches the immediately preceding kept message across **every**
+    readily-available distinguishing field — `role`, `content`, `tool_calls`
+    (including their result content), `thinking_text`, and `source_parent_uuid`.
+    The real machine artifact (re-emitted doubles) shares all of these, so it
+    still collapses; a genuinely distinct turn that merely shares prose (e.g. a
+    fail-then-pass retry with a different tool result) differs in one of these
+    fields and is preserved. A non-adjacent repeat (A, B, A) is kept because only
+    the immediate predecessor is compared.
     """
+
+    def fingerprint(message: Message) -> tuple[object, ...]:
+        return (
+            message.role,
+            message.content,
+            message.tool_calls,
+            message.thinking_text,
+            message.source_parent_uuid,
+        )
+
     kept: list[Message] = []
     for message in messages:
         previous = kept[-1] if kept else None
-        if (
-            previous is not None
-            and previous.role == message.role
-            and previous.content == message.content
-        ):
+        if previous is not None and fingerprint(previous) == fingerprint(message):
             continue
         kept.append(message)
     return kept

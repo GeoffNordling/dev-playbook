@@ -25,7 +25,10 @@ def msg(
     source_subtype: str | None = None,
     is_compact_boundary: bool = False,
     source_uuid: str = "u1",
+    source_parent_uuid: str | None = None,
     ordinal: int = 0,
+    thinking_text: str | None = None,
+    tool_calls: list[dict] | None = None,
 ) -> Message:
     """A message with `source_type`/`content` set; `role` defaults to source_type."""
     raw: dict = {
@@ -39,6 +42,12 @@ def msg(
         raw["source_subtype"] = source_subtype
     if is_compact_boundary:
         raw["is_compact_boundary"] = True
+    if source_parent_uuid is not None:
+        raw["source_parent_uuid"] = source_parent_uuid
+    if thinking_text is not None:
+        raw["thinking_text"] = thinking_text
+    if tool_calls is not None:
+        raw["tool_calls"] = tool_calls
     return message_from_row(raw)
 
 
@@ -181,6 +190,59 @@ def test_non_adjacent_repeat_is_kept() -> None:
     kept = collapse_adjacent_repeats([a, b, a2])
 
     assert [m.source_uuid for m in kept] == ["u1", "u2", "u3"]
+
+
+def _tc(*, tool_use_id: str, result_content: str) -> dict:
+    return {
+        "tool_name": "Bash",
+        "tool_use_id": tool_use_id,
+        "input_json": "{}",
+        "result_content": result_content,
+        "result_content_length": len(result_content),
+    }
+
+
+def test_real_triple_emission_collapses_to_one() -> None:
+    # The re-emitted queued/injection double shares every distinguishing field
+    # (content, tool_calls + their results, thinking, source_parent_uuid) and only
+    # differs in source_uuid, so the whole adjacent run collapses to one.
+    rows = [
+        msg(
+            source_type="user",
+            content="retry",
+            source_uuid=f"u{i}",
+            source_parent_uuid="p1",
+            ordinal=i,
+        )
+        for i in range(3)
+    ]
+
+    kept = collapse_adjacent_repeats(rows)
+
+    assert [m.source_uuid for m in kept] == ["u0"]
+
+
+def test_same_prose_different_tool_result_is_preserved() -> None:
+    # A fail-then-pass retry: identical prose, but the tool result differs, so the
+    # turns are genuinely distinct and must both survive.
+    fail = msg(
+        source_type="assistant",
+        content="running tests",
+        source_uuid="a1",
+        ordinal=0,
+        tool_calls=[_tc(tool_use_id="t1", result_content="FAILED")],
+    )
+    ok = msg(
+        source_type="assistant",
+        content="running tests",
+        source_uuid="a2",
+        ordinal=1,
+        tool_calls=[_tc(tool_use_id="t2", result_content="PASSED")],
+    )
+
+    kept = collapse_adjacent_repeats([fail, ok])
+
+    assert [m.source_uuid for m in kept] == ["a1", "a2"]
 
 
 def test_same_content_different_role_is_not_collapsed() -> None:
