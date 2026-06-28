@@ -232,7 +232,7 @@ session metadata.
 
 ## Tasks
 
-- [ ] **T1 — Scaffold + green build.** Create the `tools/transcript_export/`
+- [x] **T1 — Scaffold + green build.** Create the `tools/transcript_export/`
   package (`__init__.py`) and a `tools/bin/transcript-export` entry that imports
   it and prints usage. Wire it into the `tools/` project so ruff/mypy/pytest see
   it. Add one trivial unit test. `make -C tools check` green.
