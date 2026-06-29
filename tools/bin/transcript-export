@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""transcript-export — export a Claude Code session to an XML transcript.
+
+Thin shim over the transcript_export library: it reads AgentsView's parsed
+messages API and writes one XML transcript per session. See that package for the
+actual logic and its tests.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from transcript_export.cli import main  # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
