@@ -32,3 +32,7 @@ jobs:
           # pre-merge is the strict gate. The config-resolves guard beside it
           # still runs, so a missing [tool.judgments] config fails loud on CI.
           SKIP_JUDGMENTS: '1'
+          # The live transcript tests (tests/test_transcript_export_live.py) drive
+          # the local AgentsView daemon/CLI, which isn't installed on the CI
+          # runner; they run and fail loud locally. Skip the whole module here.
+          SKIP_LIVE_TRANSCRIPT: '1'

@@ -8,9 +8,14 @@ present, ord attributes integral), never exact content: real sessions change.
 
 This machine always runs the AgentsView daemon, so an unreachable daemon means
 something is actually wrong. These tests therefore **fail loudly** rather than
-skip — a skip here would hide a real breakage behind a green gate.
+skip — a skip here would hide a real breakage behind a green gate. The one
+exception is GH CI, where `agentsview` isn't installed at all: every test here
+needs the daemon, so CI sets `SKIP_LIVE_TRANSCRIPT=1` and the `pytestmark` below
+skips each of them individually (see .github/workflows/ci.yml), mirroring how the
+judgments cache-gate is skipped via `SKIP_JUDGMENTS`.
 """
 
+import os
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -32,11 +37,25 @@ def _recent_ids(limit: int) -> list[str]:
     return [s["id"] for s in session_list()["sessions"][:limit]]
 
 
-_RECENT = _recent_ids(3)
+# Every test here drives the real daemon. On GH CI agentsview isn't installed, so
+# CI sets SKIP_LIVE_TRANSCRIPT=1 and this mark skips each test individually (the
+# judgments-gate SKIP_JUDGMENTS pattern); locally the var is unset, so they run
+# and fail loud. The mark gates the *tests*; recent session ids are fetched lazily
+# by the fixture below, so importing this module never calls agentsview.
+pytestmark = pytest.mark.skipif(
+    os.environ.get("SKIP_LIVE_TRANSCRIPT") == "1",
+    reason="live transcript tests run locally only; agentsview isn't on GH CI",
+)
 
 
-def test_session_list_get_messages_round_trip() -> None:
-    sid = _RECENT[0]
+@pytest.fixture(scope="module")
+def recent_ids() -> list[str]:
+    """The three newest session ids from the live daemon."""
+    return _recent_ids(3)
+
+
+def test_session_list_get_messages_round_trip(recent_ids: list[str]) -> None:
+    sid = recent_ids[0]
 
     listing = session_list()
     assert any(s["id"] == sid for s in listing["sessions"])
@@ -49,8 +68,8 @@ def test_session_list_get_messages_round_trip() -> None:
     assert all("ordinal" in row for row in rows)
 
 
-def test_render_recent_session_is_well_formed_xml() -> None:
-    sid = _RECENT[0]
+def test_render_recent_session_is_well_formed_xml(recent_ids: list[str]) -> None:
+    sid = recent_ids[0]
 
     xml = render_session(sid)
     root = ET.fromstring(xml)  # raises on malformed output
@@ -63,11 +82,11 @@ def test_render_recent_session_is_well_formed_xml() -> None:
             int(el.attrib["ord"])
 
 
-def test_render_several_recent_sessions_all_parse() -> None:
+def test_render_several_recent_sessions_all_parse(recent_ids: list[str]) -> None:
     # Rendering a handful of real sessions exercises the messy realities (forks,
     # compaction, sub-agents, tool output with ANSI control bytes) that hand-built
     # fixtures cannot, and asserts each still produces valid XML.
-    for sid in _RECENT:
+    for sid in recent_ids:
         root = ET.fromstring(render_session(sid))
         assert root.attrib["id"] == sid
 
