@@ -15,7 +15,7 @@ authoritative schema.
 """
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
 from transcript_export.classify import MessageKind, classify
 from transcript_export.forks import MessageNode
@@ -107,32 +107,51 @@ def render_session_open(meta: dict) -> str:
     return f"<session {' '.join(attrs)}>"
 
 
-def strip_tool_markers(content: str, tool_call_count: int) -> str:
-    """Drop the trailing inline tool markers from a turn's pre-rendered text.
+def _marker_label(line: str) -> str:
+    """The leading label of a marker line: the text before the first `:`, or the
+    whole bracket contents for a bare marker. `[Bash: detail]` -> `Bash`,
+    `[TaskList]` -> `TaskList`, `[Exiting Plan Mode]` -> `Exiting Plan Mode`."""
+    inner = line.strip()[1:-1]
+    return inner.split(":", 1)[0].strip()
 
-    A turn's `content` is prose followed by one `[ToolName: detail]` marker per
-    tool call (and, for Bash, a trailing `$ command` line that may itself span
-    several lines). Those markers duplicate what we render structurally from
-    `tool_calls[]`, so we keep only the prose. The markers always trail the prose
-    and there is exactly one marker line per tool call (verified live), so the
-    block starts at the `tool_call_count`-th marker line from the end; everything
-    from there on is the marker block. With no tool calls the content is returned
-    unchanged. Otherwise the marker count must equal the tool-call count exactly:
-    a mismatch means our marker model is wrong for this turn, so we raise rather
-    than silently leak markers into prose (the old silent return-unchanged
-    fallback hid exactly that bug for bare `[ToolName]` markers).
+
+def strip_tool_markers(content: str, tool_names: Sequence[str]) -> str:
+    """Drop the trailing inline tool markers (and their inlined bodies), keeping
+    only the prose.
+
+    A turn's `content` is prose followed by, for each tool call, a
+    `[ToolName: detail]` (or bare `[ToolName]`) marker line that heads that call's
+    inlined command/output body. We render tool calls structurally from
+    `tool_calls[]`, so the whole trailing region — every marker and body — is
+    dropped. Markers and bodies interleave (`prose / M1 / body1 / M2 / body2 …`)
+    and a body (or prose) line can itself be marker-shaped, so we do *not* count
+    marker lines (that count is wrong whenever a body contains a bracketed line —
+    the bug this replaced). Instead we find where the trailing region begins: the
+    first *genuine* marker, i.e. the first marker line whose label matches the
+    first tool call. A marker-shaped line inside a body sits after that point (so
+    it is dropped, not miscounted); a marker-shaped line in the prose has a label
+    that won't match the tool (so it is left as prose). For a marker whose label
+    we cannot map to the tool name (e.g. `[Tool: X]`, `[Exiting Plan Mode]`) we
+    fall back to the first marker line.
+
+    With no tool calls the content is returned unchanged. We fail loud only on a
+    genuine misfit: tool calls exist but the content has no marker line at all.
     """
-    if tool_call_count <= 0:
+    if not tool_names:
         return content
     lines = content.split("\n")
     marker_indices = [i for i, line in enumerate(lines) if _TOOL_MARKER.match(line)]
-    if len(marker_indices) != tool_call_count:
+    if not marker_indices:
         raise ValueError(
-            f"tool-marker count {len(marker_indices)} != tool_call_count "
-            f"{tool_call_count}; marker model does not fit this turn's content"
+            f"expected a tool marker for each of {len(tool_names)} tool call(s) "
+            "but found none; marker model does not fit this turn's content"
         )
-    block_start = marker_indices[-tool_call_count]
-    return "\n".join(lines[:block_start]).rstrip()
+    first_tool = tool_names[0]
+    region_start = next(
+        (i for i in marker_indices if _marker_label(lines[i]) == first_tool),
+        marker_indices[0],
+    )
+    return "\n".join(lines[:region_start]).rstrip()
 
 
 def _tool_outcome(result_content: str) -> str | None:
@@ -205,7 +224,9 @@ def render_turn(
     render through separate paths.
     """
     kind = classify(message)
-    text = strip_tool_markers(message.content, len(message.tool_calls))
+    text = strip_tool_markers(
+        message.content, [tc.tool_name for tc in message.tool_calls]
+    )
     if kind is MessageKind.USER:
         return f'<user ord="{message.ordinal}">{escape(text)}</user>'
     if kind is MessageKind.SLASH_COMMAND:

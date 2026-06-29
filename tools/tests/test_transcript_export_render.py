@@ -314,48 +314,53 @@ def test_strip_markers_removes_bash_marker_and_command_line() -> None:
     content = (
         "I'll list the worktrees.\n[Bash: List git worktrees]\n$ git worktree list"
     )
-    assert strip_tool_markers(content, 1) == "I'll list the worktrees."
+    assert strip_tool_markers(content, ["Bash"]) == "I'll list the worktrees."
 
 
 def test_strip_markers_keeps_multiline_command_in_block() -> None:
     # A bash command can span several lines; the whole trailing block goes.
     content = 'Merging now.\n[Bash: Merge main]\n$ DP=/home/x\ngit -C "$DP" merge main'
-    assert strip_tool_markers(content, 1) == "Merging now."
+    assert strip_tool_markers(content, ["Bash"]) == "Merging now."
 
 
 def test_strip_markers_with_no_prose_yields_empty() -> None:
     content = "[Read: /a/b.py]"
-    assert strip_tool_markers(content, 1) == ""
+    assert strip_tool_markers(content, ["Read"]) == ""
 
 
 def test_strip_markers_handles_parallel_tool_calls() -> None:
     content = "Reading both.\n[Read: /a]\n[Read: /b]"
-    assert strip_tool_markers(content, 2) == "Reading both."
+    assert strip_tool_markers(content, ["Read", "Read"]) == "Reading both."
 
 
 def test_strip_markers_noop_without_tool_calls() -> None:
     content = "Just prose, no [brackets: here] stripped."
-    assert strip_tool_markers(content, 0) == content
+    assert strip_tool_markers(content, []) == content
 
 
 def test_strip_markers_removes_bare_marker_no_colon() -> None:
     # claude-haiku-4-5 / plan-mode turns emit a bare `[TaskList]` with no detail.
     content = "Waiting on the finder agents before I post the review.\n[TaskList]"
     assert (
-        strip_tool_markers(content, 1)
+        strip_tool_markers(content, ["TaskList"])
         == "Waiting on the finder agents before I post the review."
     )
 
 
 def test_strip_markers_removes_bare_multiword_marker() -> None:
+    # The marker label "Exiting Plan Mode" doesn't match the tool_name
+    # "ExitPlanMode", so this exercises the fall-back-to-first-marker path.
     content = "Triage is ready. Plan written.\n[Exiting Plan Mode]"
-    assert strip_tool_markers(content, 1) == "Triage is ready. Plan written."
+    assert (
+        strip_tool_markers(content, ["ExitPlanMode"])
+        == "Triage is ready. Plan written."
+    )
 
 
 def test_strip_markers_ignores_lowercase_brackets_in_bash_body() -> None:
     # A Bash heredoc that writes a pyproject.toml emits lowercase `[project]`
-    # lines as command body; only the leading `[Bash: …]` marker is a marker, so
-    # the count still matches and the whole trailing block goes.
+    # lines as command body; the leading `[Bash: …]` marker heads the region, so
+    # the whole trailing block (marker + body) goes regardless of body brackets.
     content = (
         "Let me test the build.\n"
         "[Bash: Test wheel build]\n"
@@ -364,21 +369,44 @@ def test_strip_markers_ignores_lowercase_brackets_in_bash_body() -> None:
         'name = "demo"\n'
         "EOF"
     )
-    assert strip_tool_markers(content, 1) == "Let me test the build."
+    assert strip_tool_markers(content, ["Bash"]) == "Let me test the build."
 
 
-def test_strip_markers_raises_on_count_mismatch() -> None:
-    # Fail loud rather than silently leak: marker count must equal the tool count.
+def test_strip_markers_ignores_marker_shaped_line_inside_tool_body() -> None:
+    # The real ord-206 bug: a tool call's inlined body contains a TitleCase
+    # marker-shaped line. It sits after the genuine marker, so it falls inside the
+    # stripped region and must not trip a (now removed) count check.
+    content = (
+        "Here's the demo.\n"
+        "[Bash: run the demo]\n"
+        "$ python demo.py\n"
+        "[Ideal use cases and criteria for this pattern]\n"
+        "done"
+    )
+    assert strip_tool_markers(content, ["Bash"]) == "Here's the demo."
+
+
+def test_strip_markers_anchors_past_marker_shaped_prose_line() -> None:
+    # A TitleCase marker-shaped line in the *prose* (before the tool call) must not
+    # be mistaken for the tool marker: anchoring on the first marker whose label
+    # matches the tool name skips it, so the prose (brackets and all) is preserved.
+    content = "Plan:\n[Overview]\nNow running it.\n[Bash: run it]\n$ ./run"
+    assert strip_tool_markers(content, ["Bash"]) == "Plan:\n[Overview]\nNow running it."
+
+
+def test_strip_markers_raises_when_tool_call_has_no_marker() -> None:
+    # Fail loud rather than silently leak: a tool call with no marker line at all
+    # means our marker model does not fit this turn.
     content = "Some prose with no markers."
     with pytest.raises(ValueError, match="marker model does not fit"):
-        strip_tool_markers(content, 1)
+        strip_tool_markers(content, ["Bash"])
 
 
 def test_strip_markers_keeps_marker_shaped_prose_without_tool_calls() -> None:
     # Broadening must not eat prose: a standalone marker-shaped line in a turn
     # with no tool calls is left untouched.
     content = "Consider [Bash: detail] as an example of the syntax."
-    assert strip_tool_markers(content, 0) == content
+    assert strip_tool_markers(content, []) == content
 
 
 def test_render_turn_strips_markers_from_assistant_prose() -> None:
