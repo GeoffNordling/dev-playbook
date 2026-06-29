@@ -89,7 +89,7 @@ def test_real_interrupt_session_renders_interrupted_tag() -> None:
         None,
     )
     if sid is None:
-        pytest.skip("no live session with an interrupt row")
+        pytest.fail("no live session has an interrupt row to verify against")
     assert "<interrupted" in render_session(sid)
 
 
@@ -100,7 +100,7 @@ def test_real_bare_marker_session_renders_without_leaking_marker() -> None:
     # it, and assert that exact line is gone from the export.
     bare = re.compile(r"^\[[A-Z][A-Za-z0-9_]*( [A-Za-z0-9_]+)*\]$")
     target: tuple[str, str] | None = None
-    for s in session_list()["sessions"][:50]:
+    for s in session_list()["sessions"]:
         sid = s["id"]
         for row in session_messages(sid):
             if not row.get("tool_calls"):
@@ -112,7 +112,7 @@ def test_real_bare_marker_session_renders_without_leaking_marker() -> None:
         if target is not None:
             break
     if target is None:
-        pytest.skip("no live session with a bare tool marker")
+        pytest.fail("no live session has a bare tool marker to verify against")
     sid, marker_line = target
     rendered = render_session(sid)  # raises if the marker model is wrong (F4)
     assert f"\n{marker_line}\n" not in rendered
