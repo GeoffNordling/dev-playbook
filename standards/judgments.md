@@ -4,8 +4,8 @@ A **judgment** is a single yes/no question about one or more files, ruled on by
 an LLM judge — for example, *"docs/errors.md lists every exception type that
 src/exceptions.py raises."* A judgment is declared as data on disk; a fast,
 deterministic pytest gate then passes a judgment **iff its exact content has
-already been judged-and-passed**, and a separate judge skill fills the cache by
-actually running the judge on the misses. This standard is for a repo author
+already been judged-and-passed**, and a separate `run-judgments` skill fills the
+cache by actually running the judge on the misses. This standard is for a repo author
 adding judgments to their own repo.
 
 ## What a judgment is
@@ -19,7 +19,7 @@ A judgment has four parts:
 
 A declaration sets a judgment's **case** — its claim, files, and instrument. It
 does not set the **judge**: every judgment is ruled through one fixed judge prompt
-and output schema (constants in [`tools/judgments/core.py`](~/workspace/dev-playbook/tools/judgments/core.py)),
+and output schema (constants in [`tools/src/judgments/core.py`](~/workspace/dev-playbook/tools/src/judgments/core.py)),
 uniform across all judgments, so there is nothing to declare for them.
 
 The claim, the contents of every evidence and reference file, the instrument, and
@@ -88,7 +88,7 @@ judgments**.
 
 A judgment's instrument is its `model` and `effort`. The valid values are the
 single source of truth in
-[`tools/judgments/instruments.py`](~/workspace/dev-playbook/tools/judgments/instruments.py)
+[`tools/src/judgments/instruments.py`](~/workspace/dev-playbook/tools/src/judgments/instruments.py)
 (`VALID_MODELS`, `VALID_EFFORTS`); a `model` or `effort` outside it is a
 fail-loud error.
 
@@ -111,7 +111,7 @@ the seen-set whether that exact content has been judged-and-passed:
 - **cache hit → the test passes.** The judgment's content has already been ruled
   true by the judge.
 - **cache miss → the test fails** with `judgment '<id>': cache miss`. The content
-  is new or changed and needs the judge skill to run it.
+  is new or changed and needs the `run-judgments` skill to run it.
 - an unknown `id`, or an unreadable evidence file, surfaces as a loud test error,
   never a silent pass.
 
@@ -131,6 +131,100 @@ def test_judgment_cached(jid):
 
 So `pytest` is a fast gate: green means every judgment's current content is
 already cached as passing. Filling the cache — running the judge on the misses
-and recording the passes — is the judge skill's job, the only place an LLM ever
-runs. A judgment whose judge returns *false* is never recorded, so it stays a
+and recording the passes — is the job of the `run-judgments` skill, the only
+place an LLM ever runs. It has to be a skill — thin harness instructions —
+because subscription billing requires running the judges through the harness
+interactively. A judgment whose judge returns *false* is never recorded, so it stays a
 permanent miss (a permanent failing test) until the underlying content is fixed.
+
+## Consuming judgments from another repo
+
+The judgments tooling lives in dev-playbook's `tools/` directory as an
+installable package, **`dev-playbook-tools`**, that exposes the `judgments` and
+`skipcache` import packages and the `judgments-run` / `judgments-lint` console
+scripts. Any repo on the same machine consumes it as a **local path
+dependency** — no network, no PyPI, no published index. The recipe below is
+end-to-end; the field rules, config, and gate it points at are the same ones a
+repo author uses above.
+
+### 1. Add the package as an editable path dependency
+
+In the consuming repo's `pyproject.toml`, depend on `dev-playbook-tools` and
+point a `[tool.uv.sources]` entry at dev-playbook's `tools/` directory on disk:
+
+```toml
+[dependency-groups]
+dev = ["dev-playbook-tools"]
+
+[tool.uv.sources]
+dev-playbook-tools = { path = "../dev-playbook/tools", editable = true }
+```
+
+Adjust `path` to wherever `dev-playbook` sits relative to the consumer. The
+dependency is `editable`, so the consumer always resolves against the current
+`tools/` source — nothing to re-publish or re-pin when the libraries change.
+`uv sync` builds the package with uv's own bundled build backend, so building
+it needs no network or PyPI access. Its one runtime dependency, `pyyaml`,
+resolves from uv's local cache whenever it is present (it almost always is);
+only a completely cold cache reaches PyPI for it. Afterwards `from
+judgments.pytest_support import assert_judgment_cached` resolves in the
+consumer's environment and `judgments-run` is on its venv PATH.
+
+### 2. Declare the repo's judgments
+
+Opt in exactly as a repo author does (see [Config and root
+resolution](#config-and-root-resolution) and [The YAML declaration
+format](#the-yaml-declaration-format)): a `[tool.judgments]` table in the
+consumer's own `pyproject.toml` and one or more declaration YAML files.
+
+```toml
+[tool.judgments]
+paths = ["judgments/*.yaml"]
+```
+
+The root is the consumer's own repo — the nearest ancestor with a
+`[tool.judgments]` table — and every evidence/reference path resolves against
+it.
+
+### 3. Gate the judgments in pytest
+
+Add the cache-gate as an ordinary test in the consumer's suite (see [The pytest
+cache-gate](#the-pytest-cache-gate)):
+
+```python
+import pytest
+from judgments.loader import load, resolve_root
+from judgments.pytest_support import assert_judgment_cached
+
+
+@pytest.mark.parametrize("jid", sorted(d.id for d in load(resolve_root())))
+def test_judgment_cached(jid):
+    assert_judgment_cached(jid)
+```
+
+The check is deterministic and offline; it reads the same machine-local seen-set
+the `run-judgments` skill fills, so it needs no LLM and no API key on CI.
+
+### 4. Lint the declarations on commit
+
+Add the `judgments-lint` pre-commit hook so malformed or stale declarations fail
+fast. It ships from dev-playbook's published hook manifest; reference it by URL
+and pinned `rev`, exactly as for the other dev-playbook hooks:
+
+```yaml
+- repo: https://github.com/GeoffNordling/dev-playbook
+  rev: <commit-sha>
+  hooks:
+    - id: judgments-lint
+```
+
+The hook runs from pre-commit's own clone of dev-playbook at the pinned `rev`
+and self-bootstraps its imports, so it needs neither the installed package nor a
+checkout path — it is independent of the editable dependency in step 1.
+
+### 5. Fill the cache with the run-judgments skill
+
+A cache miss — a failing gate — is filled by the global `run-judgments` skill:
+it runs the LLM judge on each miss and records the passing verdicts into the
+machine-local seen-set. The skill is available in any repo on the machine; run
+it whenever the cache-gate is red.

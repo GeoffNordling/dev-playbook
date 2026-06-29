@@ -24,3 +24,11 @@ jobs:
           SKIP: ref-check
       - run: make check
         working-directory: tools
+        env:
+          # The judgment cache-gate (tests/test_judgments_gate.py) reads a
+          # machine-local seen-set that only the interactive, subscription-billed
+          # run-judgments skill can fill; the CI runner has neither the judge nor
+          # the cache, so the gate can only pass locally. Skip it here -- local
+          # pre-merge is the strict gate. The config-resolves guard beside it
+          # still runs, so a missing [tool.judgments] config fails loud on CI.
+          SKIP_JUDGMENTS: '1'

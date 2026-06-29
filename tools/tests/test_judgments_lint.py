@@ -117,7 +117,7 @@ def _run_hook(repo: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, str(LINT_HOOK)],
         cwd=repo,
-        env={**os.environ, "PYTHONPATH": str(TOOLS_DIR)},
+        env={**os.environ, "PYTHONPATH": str(TOOLS_DIR / "src")},
         capture_output=True,
         text=True,
     )

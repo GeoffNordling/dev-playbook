@@ -6,8 +6,25 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
-[tool.uv]
-package = false
+# Console scripts so a consumer that installs this package resolves the
+# judgments CLIs on its venv PATH. They wrap the same library entry points the
+# tools/bin/ pre-commit shims call, so the two channels behave identically.
+[project.scripts]
+judgments-run = "judgments.runner:run_cli"
+judgments-lint = "judgments.loader:lint_cli"
+
+# uv's own build backend ships inside the uv binary, so building this package
+# (including the editable build a consumer's `uv sync` runs) needs no network
+# and no PyPI -- the package is consumable purely as a local path dependency.
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+# Flat src/ layout: only judgments and skipcache ship. The other top-level dirs
+# (workflow_state_data, tests, bin) stay outside src/, so an editable install
+# exposes the two libraries and nothing else to the consumer's environment.
+[tool.uv.build-backend]
+module-name = ["judgments", "skipcache"]
 
 [dependency-groups]
 dev = [
@@ -16,8 +33,10 @@ dev = [
     "ruff>=0.15.14",
 ]
 
+# src holds the packaged libraries; "." keeps the internal-only
+# workflow_state_data package and the tests importable from the tools root.
 [tool.pytest.ini_options]
-pythonpath = ["."]
+pythonpath = ["src", "."]
 
 [tool.ruff]
 target-version = "py314"
@@ -29,6 +48,8 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.14"
+mypy_path = "src"
+explicit_package_bases = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

@@ -15,20 +15,9 @@ no LLM, no hashing. See judgments.loader for the logic and its tests.
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from judgments.loader import lint, resolve_root  # noqa: E402
-
-
-def main() -> int:
-    errors = lint(resolve_root())
-    for error in errors:
-        print(error, file=sys.stderr)
-    if errors:
-        print(f"judgments-lint: {len(errors)} error(s)", file=sys.stderr)
-        return 1
-    return 0
-
+from judgments.loader import lint_cli  # noqa: E402
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(lint_cli())

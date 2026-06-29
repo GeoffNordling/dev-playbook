@@ -53,9 +53,12 @@ def test_plan_reports_an_uncached_judgment_as_unseen(
     output = json.loads(capsys.readouterr().out)
     assert output["schema"] == SCHEMA
     assert output["seen"] == []
-    assert output["unseen"] == [
-        {"id": "j1", "model": "claude-sonnet-4-6", "effort": "high"}
-    ]
+    (entry,) = output["unseen"]
+    assert entry.keys() == {"id", "model", "effort", "prompt"}
+    assert entry["id"] == "j1"
+    assert entry["model"] == "claude-sonnet-4-6"
+    assert entry["effort"] == "high"
+    assert "judgments-run render j1" in entry["prompt"]
 
 
 def test_plan_with_no_config_emits_empty_lists(
