@@ -86,15 +86,18 @@ def test_three_way_rewind_keeps_two_abandoned_at_one_fork_point() -> None:
     assert [h.message.source_uuid for h in heads] == ["b1", "b2"]
 
 
-def test_root_level_fork_with_no_parent_keys_under_live_sibling() -> None:
-    # Two roots, no parent; the higher-ordinal one (r2) is live and r1 keys under it.
+def test_parentless_roots_both_stay_live_not_a_fork() -> None:
+    # Two parentless messages are sequential session-roots (e.g. the opening
+    # prompt and a first follow-up), NOT a root-level rewind of each other: they
+    # name no parent rather than a shared one. Both must stay on the live path,
+    # else the first is buried in a <rewound-branch>. A real session that opened
+    # with two parentless user rows hit exactly this (see KNOWN-ISSUES).
     messages = [msg(5, "r1"), msg(10, "r2")]
 
     result = reconstruct_forks(messages)
 
-    assert uuids(result.live_path) == ["r2"]
-    (head,) = result.abandoned_branches["r2"]
-    assert head.message.source_uuid == "r1"
+    assert uuids(result.live_path) == ["r1", "r2"]
+    assert result.abandoned_branches == {}
 
 
 def test_root_level_fork_with_absent_parent_keys_under_live_sibling() -> None:

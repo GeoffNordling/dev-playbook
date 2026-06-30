@@ -171,16 +171,21 @@ def _segment(
 def _abandoned_ranges(ordered: list[Message]) -> list[_AbandonedRange]:
     """The abandoned ranges implied by every shared-parent fork in `ordered`.
 
-    A parent shared by ≥2 messages is a fork; its highest-ordinal sibling stays
-    live and each lower sibling heads a range running up to the next sibling.
+    A *concrete* parent shared by ≥2 messages is a fork; its highest-ordinal
+    sibling stays live and each lower sibling heads a range running up to the
+    next sibling. Parentless messages (`source_parent_uuid is None`) are skipped:
+    they are sequential session-roots that name *no* parent, not rewind siblings
+    of one another, so treating them as a fork would bury the opening message in
+    a `<rewound-branch>`. A genuine root-level fork still shares a concrete parent
+    uuid even when that parent is absent from the payload.
     """
     siblings_by_parent: dict[str | None, list[Message]] = {}
     for message in ordered:
         siblings_by_parent.setdefault(message.source_parent_uuid, []).append(message)
 
     ranges: list[_AbandonedRange] = []
-    for siblings in siblings_by_parent.values():
-        if len(siblings) < 2:
+    for parent, siblings in siblings_by_parent.items():
+        if parent is None or len(siblings) < 2:
             continue
         ordered_siblings = sorted(siblings, key=lambda m: m.ordinal)
         live_uuid = _uuid(ordered_siblings[-1])
