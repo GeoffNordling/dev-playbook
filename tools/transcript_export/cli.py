@@ -5,7 +5,7 @@ per session — re-running overwrites (idempotent regenerate). Three selection
 modes, exactly one per invocation: explicit ids, `--recent N` (the N
 most-recently-active sessions), or `--all` (every top-level session AgentsView
 lists). Selection reads the `session list` payload; rendering recurses through
-the AgentsView client. See PLAN.md for the authoritative design.
+the AgentsView client.
 """
 
 import argparse

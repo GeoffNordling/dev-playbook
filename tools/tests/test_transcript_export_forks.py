@@ -217,7 +217,7 @@ def test_forkfree_stream_with_nonresolving_parents_is_all_live() -> None:
     # NO message in the set (the parent is an unsurfaced raw record). With no
     # shared parent there is no fork, so the whole stream is the live path. (Under
     # the abandoned parent->uuid tree design this collapsed to one live message and
-    # mis-rendered the rest as rewound branches; the ordinal spine fixes it — T12.)
+    # mis-rendered the rest as rewound branches; the ordinal spine fixes it.)
     messages = [
         msg(0, "m0", "p0"),
         msg(1, "m1", "p1"),

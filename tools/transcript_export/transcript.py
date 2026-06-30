@@ -11,9 +11,8 @@ set guards against a cycle in the agent graph and a depth ceiling against
 pathological nesting; tripping either emits a self-closing placeholder rather
 than silently dropping the sub-agent.
 
-`render_session` is the single per-session entry point; T10 wires it into the
-CLI (selection + file output) and reuses it unchanged. See PLAN.md for the
-authoritative schema.
+`render_session` is the single per-session entry point; the CLI calls it for
+each selected session and writes the `<id>.xml` files.
 """
 
 import subprocess

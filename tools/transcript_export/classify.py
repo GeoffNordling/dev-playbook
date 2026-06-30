@@ -8,12 +8,11 @@ system->drop check keyed off role would never fire). Each message resolves to on
 than the compaction summary, e.g. sub-agent `task_notification` notices) becomes
 `DROP`.
 
-`keep_messages` applies the Design's keep/drop policy: drop every `DROP` message,
+`keep_messages` applies the keep/drop policy: drop every `DROP` message,
 then collapse adjacent repeats (dedup rule 2). Rule 1 (verbatim resume
 re-emissions, keyed on `source_uuid`) runs upstream in `normalize_messages`; rule
 2 catches queued-prompt / injection doubles, which re-emit a real message with a
-*different* `source_uuid` and so slip past rule 1. See PLAN.md for the
-authoritative design.
+*different* `source_uuid` and so slip past rule 1.
 """
 
 from enum import Enum

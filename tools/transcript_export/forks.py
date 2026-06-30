@@ -6,7 +6,7 @@ name the same parent. The parent itself is usually an *unsurfaced raw sub-record
 (a tool result folded into the previous message), so it is NOT a message we can
 see — an earlier design that chased a `source_parent_uuid`→`source_uuid` tree
 never connected on real data (the parent resolved to a message ~0% of the time)
-and is abandoned; see PLAN.md T12.
+and is abandoned (see the ordinal-spine decision in ARCHITECTURE.md).
 
 The live transcript is therefore just the messages in **ordinal order**: writing
 only ever continues on the live branch with ever-increasing global ordinals, so
@@ -16,8 +16,7 @@ occupies the contiguous ordinal range from that sibling up to the next sibling
 under the same parent. Those ranges are carved out of the spine and render as
 `<rewound-branch>` just before the live sibling that superseded them. A fork
 nested inside an abandoned range is handled by the same logic recursively and is
-preserved as the branch head's `children`. See PLAN.md for the authoritative
-design.
+preserved as the branch head's `children`.
 """
 
 from dataclasses import dataclass
