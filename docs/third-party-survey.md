@@ -16,7 +16,7 @@ Bundle of agent skills covering issue management (`/triage`, `/to-issues`), gril
 
 Initially adopted wholesale per [ADR-0001](adr/0001-adopt-matt-pocock-conventions.md) — skills *and* conventions, on the principle that running engineering skills without the per-repo files they expect produces degraded output. Direct dependency cut per [ADR-0004](adr/0004-remove-pocock-direct-dependency.md) once the conditions changed: spec-tools moved to its own repo and grew per-repo conventions of its own that overlapped Pocock's, so the "complements existing canon" condition from [ADR-0003](adr/0003-decline-superpowers.md) no longer held.
 
-Currently: ideas absorbed into authored standards (`standards/{architecture-vocabulary,module-design,dependency-taxonomy,issue-management,adr-conventions}.md`, format sections of `standards/repo-documentation.md`); engineering skills lifted into authored bundles in `dotfiles/dot-claude/skills/{grill-with-docs,triage,to-issues,improve-codebase-architecture}/`. `/zoom-out` and `/caveman` remain as direct Vercel dependencies — tiny utility skills where lift cost ≈ drop cost.
+Currently: Pocock's engineering ideas were absorbed into dev-playbook's own authored standards and skill bundles rather than kept as a dependency; the specific files have since been refactored and consolidated. `/zoom-out` and `/caveman` remain as direct Vercel dependencies — tiny utility skills where lift cost ≈ drop cost.
 
 ### Watching going forward
 

@@ -2,7 +2,7 @@
 
 Shared vocabulary for every suggestion about module architecture. Use these terms exactly — don't substitute "component," "service," "API," or "boundary." Consistent language is the whole point.
 
-## Terms
+## Language
 
 **Module**
 Anything with an interface and an implementation. Deliberately scale-agnostic — applies equally to a function, class, package, or tier-spanning slice.
