@@ -1,3 +1,9 @@
+---
+type: README
+title: Tools
+description: CLI utilities and shared libraries that automate cross-repo workspace tasks
+---
+
 # Tools
 
 CLI utilities and shared libraries for workspace automation; lightweight, pragmatic glue across a multi-repo workspace.

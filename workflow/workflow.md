@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Workflow
+description: The intake-to-merge state machine — phase labels, dispatch model, and the worktree contract each node follows
+---
+
 # Workflow
 
 Standard workflow for how ideas become merged PRs in a workspace repo.

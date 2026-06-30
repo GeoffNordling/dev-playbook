@@ -1,3 +1,9 @@
+---
+type: README
+title: dev-playbook
+description: The dev-playbook meta repo — workspace standards, workflow definitions, agent configuration, CLI tools, and reusable harness patterns
+---
+
 # dev-playbook
 
 Standards and tools for djinn wrangling across a multi-repo workspace.

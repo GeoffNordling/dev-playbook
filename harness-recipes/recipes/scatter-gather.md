@@ -1,3 +1,10 @@
+---
+type: Recipe Description
+title: Scatter-gather
+description: Running a batch of independent jobs in one parallel fan-out — one fresh agent per job, results in input order
+resource: /dotfiles/dot-claude/workflows/scatter-gather.js
+---
+
 # Scatter-gather
 
 A batch of independent jobs ground out in a single parallel fan-out — one fresh

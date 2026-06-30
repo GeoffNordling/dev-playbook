@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Build Conventions
+description: Standard Make targets and the pre-commit hook-repo model for Python sub-projects — format, lint, typecheck, test, check
+---
+
 # Build Conventions
 
 Conventions for the build-and-check surface that Python projects in this

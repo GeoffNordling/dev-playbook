@@ -1,3 +1,9 @@
+---
+type: README
+title: Harness recipes
+description: Reusable harness orchestration patterns — prose descriptions of multi-agent workflows backed by code and skills
+---
+
 # Harness recipes
 
 Reusable patterns — recipes — for getting leverage out of the Claude Code harness.

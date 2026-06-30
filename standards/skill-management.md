@@ -1,3 +1,9 @@
+---
+type: Guide
+title: Skill Management
+description: Where skills live, how third-party skills are installed, and the mirror rule between authored and installed
+---
+
 # Skill Management
 
 Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md).

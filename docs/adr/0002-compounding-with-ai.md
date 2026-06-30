@@ -1,3 +1,9 @@
+---
+type: ADR
+title: Compounding Workflow with AI
+description: Establish tiered instruction loading — a global behavioral CLAUDE.md, nested per-project variants, and edit-time Python linting via project-local ruff
+---
+
 # Compounding Workflow with AI
 
 ## Context

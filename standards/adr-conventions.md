@@ -1,3 +1,9 @@
+---
+type: Standard
+title: ADR Conventions
+description: When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
+---
+
 # ADR Conventions
 
 ADRs live in `docs/adr/` and use sequential 4-digit numbering: `0001-slug.md`, `0002-slug.md`, etc. Create the `docs/adr/` directory lazily — only when the first ADR is needed.

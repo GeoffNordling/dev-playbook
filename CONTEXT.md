@@ -1,3 +1,9 @@
+---
+type: Vocabulary
+title: Architecture Vocabulary
+description: The shared architecture vocabulary — Module, Interface, Depth, Seam, Adapter, Leverage, Locality — used exactly in every architecture suggestion
+---
+
 # Architecture Vocabulary
 
 Shared vocabulary for every suggestion about module architecture. Use these terms exactly — don't substitute "component," "service," "API," or "boundary." Consistent language is the whole point.

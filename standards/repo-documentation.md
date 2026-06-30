@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Repo Documentation Standard
+description: What files every repo carries — README, CLAUDE.md, specs, docs/adr, CONTEXT.md, ROADMAP.md — and their scope and audiences
+---
+
 # Repo Documentation Standard
 
 ## Purpose

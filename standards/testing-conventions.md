@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Testing Conventions
+description: Default pytest conventions — structure, behavioral focus, test doubles, fixtures, and humble objects
+---
+
 # Testing Conventions
 
 These are default testing conventions. Individual projects may supercede.

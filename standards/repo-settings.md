@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Repository Settings
+description: GitHub repository settings every repo should have — squash-only merges, PR message format, auto-deleted merged branches
+---
+
 # Repository Settings
 
 GitHub settings every repository in the workspace `SHALL` have.

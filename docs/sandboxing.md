@@ -1,3 +1,9 @@
+---
+type: Survey
+title: Sandboxing Claude agents
+description: Comparing native `/sandbox` against Sandcastle for isolating a Claude agent's filesystem, network, and processes
+---
+
 # Sandboxing Claude agents
 
 What two tools — Anthropic's **native sandbox** (`/sandbox`) and Matt Pocock's

@@ -1,3 +1,10 @@
+---
+type: Recipe Description
+title: Ralph loop
+description: Grinding a large task to done by booting a fresh agent each iteration, with plan and progress carried on disk
+resource: /dotfiles/dot-claude/workflows/ralph-loop.js
+---
+
 # Ralph loop
 
 A plan ground out by booting a fresh agent each iteration until done. The plan
@@ -37,7 +44,8 @@ last — continuity lives entirely on disk.
 ## Running it
 
 Launch from the target repo or worktree (agents inherit that cwd). First seed the plan
-and progress files then call the workflow by name:
+and progress files — the [`ralph-setup`](~/workspace/dev-playbook/dotfiles/dot-claude/skills/ralph-setup/SKILL.md)
+skill interviews you and writes them — then call the workflow by name:
 
     Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
 

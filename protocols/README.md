@@ -1,3 +1,9 @@
+---
+type: README
+title: Protocols
+description: Formal human–agent collaboration protocols — problem-decomposition algorithms and the skills that operationalize them
+---
+
 # Protocols
 
 We find it useful to approach complex problems by first decomposing them formally: name the primitives, define their relationships, and impose algorithmic structure. This organizes the mind, exposes gaps, and supports consistent implementation.

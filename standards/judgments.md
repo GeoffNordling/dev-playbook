@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Judgments
+description: LLM-judged assertions on files, declared in YAML, cached by content hash, proven through a pytest gate
+---
+
 # Judgments
 
 A **judgment** is a single yes/no question about one or more files, ruled on by

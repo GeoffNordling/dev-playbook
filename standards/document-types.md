@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Document Types
+description: The OKF document-type registry and the frontmatter profile every concept doc carries
+---
+
 # Document Types
 
 The registry of document types for this repo's Open Knowledge Format (OKF)

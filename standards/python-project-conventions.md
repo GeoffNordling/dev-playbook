@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Python Project Conventions
+description: Python project structure, pyproject.toml shape, directory layout, and dev-tool version requirements
+---
+
 # Python Project Conventions
 
 Conventions for the shape of a Python project in this workspace: directory

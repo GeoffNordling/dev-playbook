@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Issue Conventions
+description: GitHub issue body format — the body as agent brief, vertical-slice decomposition, blocked-by and sub-issue relationships
+---
+
 # Issue Conventions
 
 How GitHub Issues are authored in workspace repos. Applies at intake — when

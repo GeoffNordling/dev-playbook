@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Skill Conventions
+description: Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
+---
+
 # Skill Conventions
 
 Conventions for Claude Code skill bundles in this workspace. For the full

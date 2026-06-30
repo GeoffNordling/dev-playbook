@@ -1,3 +1,9 @@
+---
+type: Survey
+title: Third-Party Survey
+description: External frameworks, tools, and skills worth tracking — what each is, its status, and what to watch next
+---
+
 # Third-Party Survey
 
 Notes on external frameworks, tools, and skills worth remembering and checking up on periodically. Brief entries — what it is, where to find it, strengths, weaknesses, and where to look next.

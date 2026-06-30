@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Skill authoring
+description: Voice, content rules, and mechanics for authoring the workflow's phase node-skills
+---
+
 # Skill authoring
 
 Conventions for writing the workflow node-skills — the `phase:*` skills in `dotfiles/dot-claude/skills/`. [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) defines the graph, the dispatch model, and the Node-skill contract (`disallowed-tools`, `## Read first`, terminate/escalate by mode); this captures the authoring *style* behind them.
