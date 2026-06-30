@@ -170,7 +170,7 @@ TBD, see parked.)
 
 ## Progress
 - [x] A — cleanup & migration
-- [ ] B — `document-types.md` + exemplars
+- [x] B — `document-types.md` + exemplars
 - [ ] C — frontmatter on 37 docs
 - [ ] D — generate `index.md`
 - [ ] E — link conversion
