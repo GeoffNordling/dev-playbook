@@ -10,8 +10,7 @@ abandoned rewind branches (`<rewound-branch>`) render here too. A tool call that
 spawned a sub-agent nests the child as a `<subagent>` — but the fetch + recursion
 is impure, so these functions take an injected `render_subagent` callback (the
 `transcript` module supplies it); a pure render with no callback leaves the link
-unexpanded. All text is entity-escaped, never CDATA. See PLAN.md for the
-authoritative schema.
+unexpanded. All text is entity-escaped, never CDATA.
 """
 
 import re
@@ -23,7 +22,7 @@ from transcript_export.model import Message, ToolCall
 
 TOOL_OUTPUT_TRUNCATION = 2000
 """Max characters of a tool output we inline; longer bodies are cut and marked
-`truncated="true"`. See the Design's accepted-losses section in PLAN.md."""
+`truncated="true"`. See the Accepted losses section in ARCHITECTURE.md."""
 
 _REJECTION_PREFIX = "The user doesn't want to proceed"
 """A user-denied tool call's `result_content` opens with this sentence."""
@@ -61,9 +60,9 @@ _HEADER_FIELDS: tuple[tuple[str, str], ...] = (
     ("compactions", "compaction_count"),
 )
 """(attribute name, `session get` source key) for the `<session>` header, in
-document order. The renamed keys (git_branch→branch, *_at→started/ended,
-message_count→messages, compaction_count→compactions) match the Design; id /
-project / agent / cwd map 1:1."""
+document order. Some keys are renamed (git_branch→branch, *_at→started/ended,
+message_count→messages, compaction_count→compactions); id / project / agent /
+cwd map 1:1."""
 
 
 def escape(text: str) -> str:

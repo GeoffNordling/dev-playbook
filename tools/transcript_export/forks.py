@@ -6,7 +6,7 @@ name the same parent. The parent itself is usually an *unsurfaced raw sub-record
 (a tool result folded into the previous message), so it is NOT a message we can
 see — an earlier design that chased a `source_parent_uuid`→`source_uuid` tree
 never connected on real data (the parent resolved to a message ~0% of the time)
-and is abandoned; see PLAN.md T12.
+and is abandoned (see the ordinal-spine decision in ARCHITECTURE.md).
 
 The live transcript is therefore just the messages in **ordinal order**: writing
 only ever continues on the live branch with ever-increasing global ordinals, so
@@ -16,8 +16,7 @@ occupies the contiguous ordinal range from that sibling up to the next sibling
 under the same parent. Those ranges are carved out of the spine and render as
 `<rewound-branch>` just before the live sibling that superseded them. A fork
 nested inside an abandoned range is handled by the same logic recursively and is
-preserved as the branch head's `children`. See PLAN.md for the authoritative
-design.
+preserved as the branch head's `children`.
 """
 
 from dataclasses import dataclass
@@ -171,16 +170,21 @@ def _segment(
 def _abandoned_ranges(ordered: list[Message]) -> list[_AbandonedRange]:
     """The abandoned ranges implied by every shared-parent fork in `ordered`.
 
-    A parent shared by ≥2 messages is a fork; its highest-ordinal sibling stays
-    live and each lower sibling heads a range running up to the next sibling.
+    A *concrete* parent shared by ≥2 messages is a fork; its highest-ordinal
+    sibling stays live and each lower sibling heads a range running up to the
+    next sibling. Parentless messages (`source_parent_uuid is None`) are skipped:
+    they are sequential session-roots that name *no* parent, not rewind siblings
+    of one another, so treating them as a fork would bury the opening message in
+    a `<rewound-branch>`. A genuine root-level fork still shares a concrete parent
+    uuid even when that parent is absent from the payload.
     """
     siblings_by_parent: dict[str | None, list[Message]] = {}
     for message in ordered:
         siblings_by_parent.setdefault(message.source_parent_uuid, []).append(message)
 
     ranges: list[_AbandonedRange] = []
-    for siblings in siblings_by_parent.values():
-        if len(siblings) < 2:
+    for parent, siblings in siblings_by_parent.items():
+        if parent is None or len(siblings) < 2:
             continue
         ordered_siblings = sorted(siblings, key=lambda m: m.ordinal)
         live_uuid = _uuid(ordered_siblings[-1])
