@@ -33,17 +33,9 @@ Standards and tools for djinn wrangling across a multi-repo workspace.
 
 All repos live under a single root directory: `~/workspace/`. One meta repo governs everything else: **dev-playbook** (this repo).
 
-## What's here
+## Contents
 
-One row per top-level directory. Follow the linked index for the contents of each.
+See [`index.md`](index.md) for the full listing.
 
-| Directory | Purpose |
-|-----------|---------|
-| [`standards/`](standards/README.md) | Cross-project engineering standards and conventions. |
-| [`workflow/`](workflow/README.md) | How an idea moves from intake to shipped code — the state machine, gates, and agent-autonomy decisions. |
-| [`protocols/`](protocols/README.md) | Augmented skills that decompose a complex problem formally before executing it (e.g. Align, Map, Execute). |
-| `dotfiles/` | Agent configuration (skills, rules, settings), Stow-symlinked into `$HOME`. Run `dotfiles/bin/sync-dotfiles.sh` after adding or removing files — from the main checkout only; it relinks live `$HOME`, so it's a human step, never run from a per-issue worktree. |
-| [`tools/`](tools/README.md) | CLI utilities for workspace automation. |
-| [`harness-recipes/`](harness-recipes/README.md) | Reusable patterns for getting leverage out of the Claude Code harness. |
-| `docs/` | Supplementary documentation and architecture decision records (`docs/adr/`). |
+> **`dotfiles/`** — after adding or removing files, run `dotfiles/bin/sync-dotfiles.sh` from the main checkout only; it relinks live `$HOME`, so it's a human step, never run from a per-issue worktree.
 

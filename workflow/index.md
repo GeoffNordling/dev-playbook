@@ -1,0 +1,5 @@
+# workflow/ — index
+
+- [Workflow](README.md) — What the workflow/ directory holds — the intake-to-merge state machine and the standards defining each phase
+- [Skill authoring](skill-authoring.md) — Voice, content rules, and mechanics for authoring the workflow's phase node-skills
+- [Workflow](workflow.md) — The intake-to-merge state machine — phase labels, dispatch model, and the worktree contract each node follows

@@ -172,7 +172,7 @@ TBD, see parked.)
 - [x] A — cleanup & migration
 - [x] B — `document-types.md` + exemplars
 - [x] C — frontmatter on 37 docs
-- [ ] D — generate `index.md`
+- [x] D — generate `index.md` (9: root, standards/, docs/, docs/adr/, workflow/, protocols/, harness-recipes/, tools/, dotfiles/; each lists its README; protocols/ & harness-recipes/ recurse one level)
 - [ ] E — link conversion
 - [ ] F — standards rewrite
 - [ ] G — `ref-check` + type-lint + pre-commit

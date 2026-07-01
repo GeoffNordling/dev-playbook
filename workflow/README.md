@@ -10,7 +10,4 @@ How an idea moves through this workspace to shipped code — the state machine, 
 
 ## Contents
 
-| File | Purpose |
-|------|---------|
-| [workflow.md](workflow.md) | The standard: label scheme, the node graph, the per-issue worktree model, the dashboard dispatch model, permissions, and the per-skill table. |
-| [skill-authoring.md](skill-authoring.md) | The authoring style behind the node-skills — voice, content, robustness, mechanics. |
+See [`index.md`](index.md) for the full listing.
