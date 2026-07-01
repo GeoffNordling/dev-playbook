@@ -232,14 +232,91 @@ recurse one level into their sole subdir.)
 - Heavy edits: §3, §6, §13. Rest is light touch-ups. `repo-documentation.md` keeps
   its name and `type: Standard`; convert its own E-deferred links to `/`-root here.
 
-**G · Tooling** *(by hand / TDD — last)*
-- Rewrite `tools/bin/ref-check` for the two link classes: resolve `/`-from-root
-  against the checkout root (cwd; worktree-safe) and validate `~/workspace/<repo>/…`
-  citations against that repo's main checkout. Keep fenced-code + fragment-anchor
-  handling. Update its tests.
-- Implement the type-lint (concept `type` ∈ `document-types.md`); wire into
-  pre-commit (`.pre-commit-hooks.yaml` / `.pre-commit-config.yaml`).
-- Implement the `index.md` staleness checker (per F7); wire into pre-commit.
+**G · Tooling — pre-commit consolidation** *(by hand / TDD — last; human review/commit after)*
+
+Locked shape (approved this session): **3 concern groups → 6 hooks → 2 shared
+libraries.** Refactor freely toward it.
+
+**Directives (locked this session):**
+- Assume **every consumer repo adopts OKF** and makes the same refactors. Do NOT
+  gate or hedge for non-OKF repos; do NOT worry about consumers bumping their
+  pinned `rev`.
+- Add **no new applicability-skip gates** (the `exit 0`-when-target-absent pattern
+  the user dislikes): new checks assert unconditionally and fail loud. The existing
+  `exit 0`-when-absent gates in `test-privacy` and `internal-skill-audit` are
+  grandfathered — keep, add no more. ("0 violations = pass" is fine; it is not a gate.)
+- Publish everything in the manifest; mirror locally; keep the two in sync.
+
+**First step:** locate the existing hook tests (grep test files for `ref-check` /
+`test-privacy` / etc.) and mirror that harness. TDD: failing tests before each impl.
+
+**Shared libraries (NEW — where the code consolidation lives), under `tools/lib/`:**
+- **`md`** — markdown parse · YAML-frontmatter parse · link extraction · fenced-code
+  skip · GitHub-slug (per `repo-documentation.md` §Fragment anchors) · **concept-doc
+  vs. harness-owned path classification**. The harness-owned exclusion set must match
+  the Phase-F prose boundary (`repo-documentation.md` §The OKF bundle) exactly:
+  any-level `CLAUDE.md`, `SKILL.md` + skill `references/`/`scripts/`, `rules/*.md`,
+  `settings*.json`, `hooks/`, `.js`/`.py`, non-md config; reserved-typeless `index.md`;
+  transient `PLAN.md`. Consumed by `ref-check`, `okf-lint`, `internal-skill-audit`.
+- **`pyast`** — `.py` file-walk + exclude-dirs (`.git`, `.venv`, caches, …) + AST
+  helpers. Consumed by `python-lint`.
+- Import mechanism: `tools/bin/*` scripts add `Path(__file__).resolve().parent.parent`
+  to `sys.path` so `from lib import md` resolves from the pre-commit *clone*, not the
+  consumer cwd. Verify `uv run --script` + local-package import interplay early
+  (pyyaml is the only external dep).
+
+**Group 1 — Reference & bundle integrity** (markdown; on `md`):
+- **`ref-check`** — *rewrite* for the two link classes:
+  - Link `/`-from-root → resolve against the checkout root = **cwd** (pre-commit runs
+    at repo root; worktree-safe: cwd is the worktree root). Validate target file exists
+    + `#anchor` via GitHub-slug.
+  - Citation `~/workspace/<repo>/…` → expand `~`, resolve against that repo's main
+    checkout; validate file + anchor.
+  - Keep fenced-code skip + prose treatment (backticked names, bare `/slash-skills`).
+    Today it validates only `~/workspace/…` (53 refs) and **ignores `/`-root links** —
+    the rewrite must validate BOTH (the ~28 `/`-root links across the F files are
+    currently hand-verified only).
+  - Update tests: `/`-root resolution, worktree case, cross-repo citation, anchor
+    slugs, fenced skip.
+- **`okf-lint`** — **NEW**; merges type-lint + index-staleness into one bundle walk:
+  - *Type-lint*: every **concept doc** (markdown that is not harness-owned and not
+    `index.md`) has frontmatter `type` ∈ registry, plus `title` + `description`;
+    `resource` optional (required on `Recipe Description`). Registry = the backticked
+    names in the `## Types` table of `standards/document-types.md` (single source of
+    truth; **exact membership** — parse it, don't hardcode).
+  - *Index-staleness*: every directory holding concept docs has an `index.md` listing
+    the dir's README (if any) + each concept doc with a `description` **matching** the
+    child's frontmatter, linking child dirs' `index.md`, recursing into a subdir only
+    when it has no `index.md`. Fail on omission, stale/absent entry, or drifted
+    description. Root `index.md` MUST declare `okf_version`.
+  - Fails loud, **unconditionally** — no okf_version-absent skip gate.
+- **`internal-skill-audit`** — keep behavior; *optionally* refactor onto `md` if it
+  falls out cleanly (not required for the phase to land).
+
+**Group 2 — Python source conventions** (`.py`; on `pyast`):
+- **`ruff` + `ruff-format`** — external, unchanged (local config only).
+- **`python-lint`** — **NEW**; merges `no-future-annotations` + `empty-init` +
+  `test-privacy` into one hook, three rules over one `.py` walk: ban
+  `from __future__ import annotations`; `__init__.py` must be empty; no private-name
+  (`_foo`) access from `test_*.py` into non-test modules (dunders public). Exit
+  0 clean / 1 findings / 2 tool error; `file:line  rule  message` per finding.
+  Retire hook ids `no-future-annotations`, `empty-init`, `test-privacy` (delete those
+  three scripts) → replaced by `python-lint` in both yaml files. Migrate their tests.
+
+**Group 3 — Judgments** (standalone): **`judgments-lint`** — unchanged.
+
+**Manifest + config (keep in sync):**
+- `.pre-commit-hooks.yaml` (published): drop the 3 python entries, add `python-lint`
+  + `okf-lint`; keep `ref-check`, `internal-skill-audit`, `judgments-lint`; update the
+  header-comment hook list.
+- `.pre-commit-config.yaml` (local mirror): same set + the external ruff block.
+- New hook defs: `pass_filenames: false`; `okf-lint` and `python-lint` both
+  `always_run: true`.
+
+**Also in G:** grep docs/skills for the retired hook names + old tooling prose and
+update to the new names — at least `standards/build-conventions.md` (Pre-commit
+section) and the `new-repo` skill (scaffolds `.pre-commit-config.yaml`). Then
+`pre-commit run --all-files` + the test suite green before the checkpoint.
 
 ---
 
@@ -257,6 +334,6 @@ recurse one level into their sole subdir.)
 - [x] C — frontmatter on 37 docs
 - [x] D — generate `index.md` (9: root, standards/, docs/, docs/adr/, workflow/, protocols/, harness-recipes/, tools/, dotfiles/; each lists its README; protocols/ & harness-recipes/ recurse one level)
 - [x] E — link conversion (`~/workspace/dev-playbook/…` → `/`-root + relative → `/`-root; ADRs & F-targets `repo-documentation`/`skill-conventions` excluded; 54 `/`-links verified to resolve, `ref-check` green)
-- [ ] F — standards rewrite
-- [ ] G — `ref-check` + type-lint + pre-commit
+- [x] F — standards rewrite (`d97b0bd`: `repo-documentation.md` to the 13-section outline; `document-types`/`adr`/`skill` aligns; `/`-root Link rule extended to fixed-repo-root `CLAUDE.md`, self-ref converted; rules/skills stay `~/workspace/…` citations)
+- [ ] G — pre-commit consolidation: 6 hooks / 2 libs (`ref-check` rewrite, new `okf-lint` + `python-lint`, shared `md`/`pyast`)
 - [ ] Final — delete PLAN.md, open PR
