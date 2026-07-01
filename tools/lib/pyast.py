@@ -1,0 +1,106 @@
+"""Shared Python-source discovery and AST helpers for the pre-commit hooks.
+
+`python-lint` runs three rules over one walk of a repo's Python sources; this
+module is that walk. Discovery goes through `git ls-files`, so it is
+gitignore-aware and worktree-scoped in the same way as lib/md.find_md_files:
+from inside a worktree only that worktree's files are listed. Tracked-but-
+unpoliced trees (externally-managed skills, legacy code) are dropped by name
+via :data:`EXCLUDE_DIRS`.
+"""
+
+import ast
+import subprocess
+from pathlib import Path
+
+EXCLUDE_DIRS = {
+    ".git",
+    ".venv",
+    ".hatch",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pycache__",
+    "node_modules",
+    "build",
+    "dist",
+    # Workspace conventions: tracked code we don't police.
+    ".agents",  # externally-managed skills (dotfiles/.agents/)
+    ".dhub",  # externally-managed (dotfiles/.dhub/)
+    "deprecated",  # legacy code kept for reference
+}
+
+PYTHON_SHEBANG_PREFIXES = (
+    "#!/usr/bin/env python",
+    "#!/usr/bin/python",
+    "#!/usr/bin/env -S uv run --script",
+)
+
+
+def looks_python(path: Path) -> bool:
+    """True for a ``.py`` file or an extensionless file with a Python shebang.
+
+    The pre-commit hook scripts in ``tools/bin/`` are extensionless but are
+    Python, so a shebang sniff brings them into scope alongside ``.py`` files.
+    """
+    if path.suffix == ".py":
+        return True
+    if path.suffix:
+        return False
+    try:
+        with path.open("rb") as fh:
+            first = fh.readline(256).decode("utf-8", errors="replace")
+    except OSError:
+        return False
+    return any(first.startswith(s) for s in PYTHON_SHEBANG_PREFIXES)
+
+
+def find_python_files(root: Path) -> list[Path]:
+    """All Python files in ``root``'s git checkout, honoring ``.gitignore``.
+
+    ``--cached`` lists tracked files, ``--others`` untracked ones,
+    ``--exclude-standard`` drops anything ``.gitignore`` matches — so caches
+    and virtualenvs never appear. Paths under :data:`EXCLUDE_DIRS` are dropped
+    by name (those trees are tracked, so git lists them). A ``--cached`` entry
+    whose file was deleted from the working tree is skipped by ``is_file``.
+    """
+    result = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(root),
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "-z",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    files = []
+    for rel in result.stdout.split("\0"):
+        if not rel:
+            continue
+        if EXCLUDE_DIRS & set(Path(rel).parts):
+            continue
+        path = root / rel
+        if path.is_file() and looks_python(path):
+            files.append(path)
+    return sorted(files)
+
+
+def parse(path: Path) -> ast.Module | None:
+    """Parse ``path`` into an AST, or return None if it can't be read or parsed.
+
+    Read and syntax errors yield None rather than raising: a file that does not
+    parse cannot violate an AST-level rule, and syntax itself is ruff's job.
+    """
+    try:
+        source = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    try:
+        return ast.parse(source, filename=str(path))
+    except SyntaxError:
+        return None

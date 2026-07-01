@@ -16,16 +16,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: no-future-annotations
-        name: no-future-annotations
-        entry: tools/bin/no-future-annotations
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: empty-init
-        name: empty-init
-        entry: tools/bin/empty-init
+      - id: python-lint
+        name: python-lint
+        entry: tools/bin/python-lint
         language: script
         pass_filenames: false
         always_run: true
@@ -37,9 +30,9 @@ repos:
         pass_filenames: false
         types: [markdown]
 
-      - id: test-privacy
-        name: test-privacy
-        entry: tools/bin/test-privacy
+      - id: okf-lint
+        name: okf-lint
+        entry: tools/bin/okf-lint
         language: script
         pass_filenames: false
         always_run: true

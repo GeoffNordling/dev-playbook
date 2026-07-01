@@ -2,18 +2,28 @@
 """Check cross-references in markdown files.
 
 Scans the .md files in the invoking git checkout — discovered via
-`git ls-files`, so discovery honors `.gitignore` and is scoped to the
-current worktree — for ~/workspace/<repo>/... paths, resolves each to a
-file-or-directory on disk, and classifies it as ok or broken. References
-inside the invoking repo are resolved against the working copy
-(worktree-safe). References to other workspace repos are resolved
-against the absolute on-disk path. Fenced code blocks are skipped. Files
-inside any `adr/` directory are skipped as well — ADRs are immutable
-historical records, so broken refs in them are accepted as expected
-staleness, not lint errors.
+`git ls-files`, so discovery honors `.gitignore` and is scoped to the current
+worktree — and validates the two workspace cross-reference forms defined in
+standards/repo-documentation.md:
+
+  - **Link** — a root-absolute `/path` target, written only inside markdown
+    link syntax `[text](/path)`. It resolves against the invoking checkout's
+    own root (the current working directory), so a worktree validates against
+    its own working copy, not the main checkout.
+  - **Citation** — a `~/workspace/<repo>/...` path. A citation into the
+    invoking repo resolves against that same working copy (worktree-safe); a
+    citation into another workspace repo resolves against its absolute on-disk
+    path.
+
+Bare `/slash` tokens (e.g. `/commit`) and backticked filenames are prose, not
+Links — only `/` targets inside link syntax are checked, matching the standard.
+Fenced code blocks and inline code spans are skipped. Files inside any `adr/`
+directory are skipped as reference *sources* — ADRs are immutable historical
+records, so broken refs in them are accepted staleness, not lint errors;
+references *to* ADRs from other files are still validated.
 
 Fragment anchors (`#heading-slug`) on .md targets are validated against the
-target's headings per the slug rule in `standards/repo-documentation.md`.
+target's headings per the slug rule in standards/repo-documentation.md.
 Headings inside the target's fenced code blocks are ignored. Fragments on
 directories or non-.md targets are out of scope and treated as `ok`.
 
@@ -31,86 +41,20 @@ Usage:
 # ///
 
 import argparse
-import functools
 import json
-import re
 import subprocess
 import sys
-from collections.abc import Iterator
 from pathlib import Path
 
-# `git ls-files --exclude-standard` (see find_md_files) already drops
-# gitignored build dirs (.venv, caches, node_modules, ...) and never lists
-# .git, so the only directory we exclude by hand is `adr`:
-# ADRs are immutable historical records (per standards/adr-conventions.md).
-# A file an ADR references may later move or be deleted; we cannot update the
-# link without editing the ADR. ref-check treats broken refs inside docs/adr/
-# as expected staleness. References from other files TO ADRs are still validated.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from lib import md  # noqa: E402
+
+# ADRs are immutable historical records (per standards/adr-conventions.md). A
+# file an ADR references may later move or be deleted; we cannot update the link
+# without editing the ADR. ref-check treats broken refs inside docs/adr/ as
+# expected staleness. References from other files TO ADRs are still validated.
 EXCLUDE_DIRS = {"adr"}
-
-REF_PATTERN = re.compile(r"~/workspace/[^ )`\n]+")
-FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
-INLINE_CODE_PATTERN = re.compile(r"`[^`\n]*`")
-HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
-
-# Slug rule: see standards/repo-documentation.md "Fragment anchors".
-SLUG_BACKTICK = re.compile(r"`([^`]*)`")
-SLUG_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
-# Asterisk emphasis is stripped anywhere (it may be intraword); underscore
-# emphasis only at word boundaries, so intraword `foo_bar_baz` stays literal —
-# matching GitHub's rendered-text anchors.
-SLUG_STAR = re.compile(r"(\*{1,2})(.+?)\1")
-SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
-SLUG_DROP = re.compile(r"[^\w\s\-]", re.UNICODE)
-SLUG_WHITESPACE = re.compile(r"\s")
-
-
-def github_slug(heading_text: str) -> str:
-    """Compute the GitHub-style anchor slug for a heading.
-
-    Steps mirror standards/repo-documentation.md "Fragment anchors":
-    strip inline markdown (backticks, link syntax, emphasis), lowercase,
-    drop non-word/non-whitespace/non-hyphen chars, then whitespace -> "-".
-    """
-    text = SLUG_BACKTICK.sub(r"\1", heading_text)
-    text = SLUG_LINK.sub(r"\1", text)
-    text = SLUG_STAR.sub(r"\2", text)
-    text = SLUG_UNDERSCORE.sub(r"\2", text)
-    text = text.lower()
-    text = SLUG_DROP.sub("", text)
-    text = SLUG_WHITESPACE.sub("-", text)
-    return text
-
-
-def content_lines(filepath: Path) -> Iterator[tuple[int, str]]:
-    """Yield (line_number, line) for every line outside fenced code blocks.
-
-    The single place that knows how to skip ``` / ~~~ fences. Both reference
-    scanning (source files) and heading extraction (target files) consume it.
-    """
-    in_fence = False
-    with open(filepath, encoding="utf-8", errors="replace") as f:
-        for line_num, line in enumerate(f, start=1):
-            if FENCE_PATTERN.match(line):
-                in_fence = not in_fence
-                continue
-            if in_fence:
-                continue
-            yield line_num, line
-
-
-@functools.cache
-def heading_slugs(filepath: Path) -> frozenset[str]:
-    """Return the set of GitHub slugs for every ATX heading in filepath.
-
-    Headings inside fenced code blocks are skipped. Cached by path so a
-    target referenced from many sources is only parsed once per run.
-    """
-    return frozenset(
-        github_slug(m.group(1))
-        for _, line in content_lines(filepath)
-        if (m := HEADING_PATTERN.match(line))
-    )
 
 
 def workspace_root() -> Path:
@@ -140,100 +84,103 @@ def canonical_repo_name(repo_root: Path) -> str:
     return common.parent.name
 
 
-def find_md_files(root: Path) -> list[Path]:
-    """All .md files in root's git checkout, honoring .gitignore.
-
-    Uses `git ls-files` instead of a filesystem walk so discovery is both
-    gitignore-aware and worktree-scoped. From the root checkout, gitignored
-    `.claude/worktrees/` is excluded automatically; from inside a worktree,
-    git's per-worktree index lists only that worktree's files, so the root
-    checkout and any sibling worktrees are invisible by construction.
-
-    --cached lists tracked files, --others untracked ones, --exclude-standard
-    drops anything .gitignore matches. `adr/` dirs are tracked, so git lists
-    them — they're filtered here per EXCLUDE_DIRS. A --cached entry whose file
-    was deleted from the working tree is skipped by the is_file() guard.
-    """
-    result = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(root),
-            "ls-files",
-            "--cached",
-            "--others",
-            "--exclude-standard",
-            "-z",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    results = []
-    for rel in result.stdout.split("\0"):
-        if not rel.endswith(".md"):
-            continue
-        if EXCLUDE_DIRS & set(Path(rel).parts):
-            continue
-        path = root / rel
-        if path.is_file():
-            results.append(path)
-    return sorted(results)
+def source_files(repo_root: Path) -> list[Path]:
+    """All scannable .md files: every tracked/untracked .md minus adr sources."""
+    return [
+        p
+        for p in md.find_md_files(repo_root)
+        if not (EXCLUDE_DIRS & set(p.relative_to(repo_root).parts))
+    ]
 
 
-def resolve_target(target: Path, repo_root: Path, repo_name: str) -> Path:
-    """Map a ~/workspace reference to the on-disk path that should hold it.
+def resolve_citation(target: Path, repo_root: Path, repo_name: str) -> Path:
+    """Map a ~/workspace citation to the on-disk path that should hold it.
 
-    In-repo references resolve against repo_root — the working copy of the
-    invoking checkout, which may be a worktree — so edits resolve against
-    the worktree's state, not the main checkout. Cross-repo references use
-    the absolute on-disk path as written.
+    In-repo citations resolve against repo_root — the working copy of the
+    invoking checkout, which may be a worktree — so edits resolve against the
+    worktree's state, not the main checkout. Cross-repo citations use the
+    absolute on-disk path as written.
     """
     rel = target.relative_to(workspace_root())
-    if rel.parts[0] == repo_name:
+    if rel.parts and rel.parts[0] == repo_name:
         return repo_root / Path(*rel.parts[1:])
     return target
 
 
-def classify_ref(target: Path, fragment: str, repo_root: Path, repo_name: str) -> str:
-    """Return 'ok' if target (and fragment, if any) resolves; 'broken' otherwise.
+def status_of(actual: Path, fragment: str) -> str:
+    """Return 'ok' if actual (and fragment, if any) resolves; 'broken' otherwise.
 
-    File-existence failure short-circuits — anchor is not checked when the
-    file is missing. Fragments on directories or non-.md targets are out
-    of scope and treated as 'ok'.
+    File-existence failure short-circuits — the anchor is not checked when the
+    file is missing. Fragments on directories or non-.md targets are out of
+    scope and treated as 'ok'.
     """
-    actual = resolve_target(target, repo_root, repo_name)
     if not actual.exists():
         return "broken"
     if not fragment:
         return "ok"
     if not actual.is_file() or actual.suffix.lower() != ".md":
         return "ok"
-    return "ok" if fragment in heading_slugs(actual) else "broken"
+    return "ok" if fragment in md.heading_slugs(actual) else "broken"
 
 
 def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
-    """Extract and classify every reference in one .md file."""
+    """Extract and classify every Link and Citation in one .md file."""
     results = []
     source = str(filepath.relative_to(repo_root))
-    for line_num, line in content_lines(filepath):
-        stripped = INLINE_CODE_PATTERN.sub("", line)
-        for match in REF_PATTERN.finditer(stripped):
+
+    def record(target_str: str, line_num: int, actual: Path, fragment: str) -> None:
+        results.append(
+            {
+                "source": source,
+                "line": line_num,
+                "target": target_str,
+                "status": status_of(actual, fragment),
+            }
+        )
+
+    for line_num, line in md.content_lines(filepath):
+        stripped = md.INLINE_CODE_PATTERN.sub("", line)
+
+        # Links and in-link citations: only `/` and `~/workspace` targets that
+        # appear inside markdown link syntax.
+        for _text, target_str in [
+            (m.group(1), m.group(2)) for m in md.MD_LINK_PATTERN.finditer(stripped)
+        ]:
+            path_str, _, fragment = target_str.partition("#")
+            if target_str.startswith("~/workspace/"):
+                resolved = Path(path_str.replace("~", str(Path.home()), 1))
+                record(
+                    target_str,
+                    line_num,
+                    resolve_citation(resolved, repo_root, repo_name),
+                    fragment,
+                )
+            elif target_str.startswith("/"):
+                record(
+                    target_str,
+                    line_num,
+                    repo_root / path_str.lstrip("/"),
+                    fragment,
+                )
+
+        # Bare citations: `~/workspace/...` outside link syntax. Remove link
+        # spans first so an in-link citation is not counted twice.
+        remainder = md.MD_LINK_PATTERN.sub("", stripped)
+        for match in md.WORKSPACE_REF_PATTERN.finditer(remainder):
             target_str = match.group(0)
             path_str, _, fragment = target_str.partition("#")
-            resolved = Path(path_str.replace("~", str(Path.home())))
-            results.append(
-                {
-                    "source": source,
-                    "line": line_num,
-                    "target": target_str,
-                    "status": classify_ref(resolved, fragment, repo_root, repo_name),
-                }
+            resolved = Path(path_str.replace("~", str(Path.home()), 1))
+            record(
+                target_str,
+                line_num,
+                resolve_citation(resolved, repo_root, repo_name),
+                fragment,
             )
+
     return results
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -254,7 +201,7 @@ def main():
     repo_root = Path(args.directory).resolve()
     repo_name = canonical_repo_name(repo_root)
 
-    md_files = find_md_files(repo_root)
+    md_files = source_files(repo_root)
     if not md_files:
         print(f"ref-check: no .md files found in {repo_root}", file=sys.stderr)
         sys.exit(2)

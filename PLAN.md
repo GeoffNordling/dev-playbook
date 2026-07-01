@@ -325,6 +325,12 @@ section) and the `new-repo` skill (scaffolds `.pre-commit-config.yaml`). Then
 - Other workspace repos adopt OKF — later, separate effort.
 - **Before PR:** merge in the other outstanding branch and confirm it carries no
   OKF work (nothing to reconcile). Minor; end task.
+- **Before PR — re-run judgments.** Two `test_judgments_gate.py` judgments are
+  cache-missed because their evidence drifted in phases C/F:
+  `scatter-gather-recipe-matches-workflow` (`harness-recipes/recipes/scatter-gather.md`)
+  and `judgments-standard-matches-loader` (`standards/judgments.md`). Pre-existing,
+  not a Phase-G regression (G touched only `tools/` + the manifests/docs). Clear by
+  running `/run-judgments` to re-judge and record fresh passes.
 
 ---
 
@@ -335,5 +341,5 @@ section) and the `new-repo` skill (scaffolds `.pre-commit-config.yaml`). Then
 - [x] D — generate `index.md` (9: root, standards/, docs/, docs/adr/, workflow/, protocols/, harness-recipes/, tools/, dotfiles/; each lists its README; protocols/ & harness-recipes/ recurse one level)
 - [x] E — link conversion (`~/workspace/dev-playbook/…` → `/`-root + relative → `/`-root; ADRs & F-targets `repo-documentation`/`skill-conventions` excluded; 54 `/`-links verified to resolve, `ref-check` green)
 - [x] F — standards rewrite (`d97b0bd`: `repo-documentation.md` to the 13-section outline; `document-types`/`adr`/`skill` aligns; `/`-root Link rule extended to fixed-repo-root `CLAUDE.md`, self-ref converted; rules/skills stay `~/workspace/…` citations)
-- [ ] G — pre-commit consolidation: 6 hooks / 2 libs (`ref-check` rewrite, new `okf-lint` + `python-lint`, shared `md`/`pyast`)
+- [x] G — pre-commit consolidation: 6 hooks / 2 libs. Added `tools/lib/{md,pyast}.py` (+ empty `__init__`); rewrote `ref-check` onto `md` to validate BOTH link classes (Link `/`-root + Citation `~/workspace`; 151 refs green, was ~53 citations-only); new `okf-lint` (type-lint from `document-types.md` registry + index-staleness by nearest-owner coverage; clean on 37 concept docs / 9 indexes); new `python-lint` merging no-future-annotations + empty-init + test-privacy over one git-scoped `.py` walk (deleted the 3 old scripts + their 2 test files); both yaml manifests re-synced (drop 3, add `python-lint`+`okf-lint`, `always_run` on both); updated `build-conventions.md` Pre-commit/CI, `python-conventions.md`, `tools/README.md`. `pre-commit run --all-files` all 7 green; tools suite 379 pass (2 pre-existing judgment-gate cache misses only — see below).
 - [ ] Final — delete PLAN.md, open PR
