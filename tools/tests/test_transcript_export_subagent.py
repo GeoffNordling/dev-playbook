@@ -8,116 +8,15 @@ asserts structural invariants (well-formed XML, nesting, guard placeholders),
 never trimmed real sessions.
 """
 
-import json
-import subprocess
 import xml.etree.ElementTree as ET
-from collections.abc import Callable
 
 import pytest
+from transcript_fakes import assistant_row, fake_daemon, tc_row, user_row
 
 from transcript_export import transcript
 from transcript_export.model import tool_call_from_row
 from transcript_export.render import render_tool_call
 from transcript_export.transcript import render_session
-
-
-def tc_row(
-    *,
-    tool_name: str = "Task",
-    tool_use_id: str = "toolu_1",
-    input_json: str = "{}",
-    subagent_session_id: str | None = None,
-) -> dict:
-    """A raw `tool_calls[]` entry; `subagent_session_id` set marks a spawn."""
-    row: dict = {
-        "tool_name": tool_name,
-        "tool_use_id": tool_use_id,
-        "input_json": input_json,
-        "result_content": "",
-        "result_content_length": 0,
-    }
-    if subagent_session_id is not None:
-        row["subagent_session_id"] = subagent_session_id
-    return row
-
-
-def assistant_row(
-    *,
-    ordinal: int,
-    source_uuid: str,
-    source_parent_uuid: str | None = None,
-    content: str = "",
-    tool_calls: list[dict] | None = None,
-) -> dict:
-    """A raw assistant message row, optionally carrying tool calls."""
-    row: dict = {
-        "ordinal": ordinal,
-        "role": "assistant",
-        "source_type": "assistant",
-        "source_uuid": source_uuid,
-        "content": content,
-        "model": "m",
-    }
-    if source_parent_uuid is not None:
-        row["source_parent_uuid"] = source_parent_uuid
-    if tool_calls is not None:
-        row["tool_calls"] = tool_calls
-        # Real assistant turns carry one inline `[ToolName: …]` marker per tool
-        # call, trailing the prose; the renderer strips them and fails loud if the
-        # count is off, so fixtures must mirror that shape.
-        markers = "\n".join(
-            f"[{tc.get('tool_name', 'Task')}: spawn]" for tc in tool_calls
-        )
-        row["content"] = f"{row['content']}\n{markers}" if row["content"] else markers
-    return row
-
-
-def user_row(
-    *,
-    ordinal: int,
-    source_uuid: str,
-    source_parent_uuid: str | None = None,
-    content: str = "ask",
-) -> dict:
-    """A raw user message row."""
-    row: dict = {
-        "ordinal": ordinal,
-        "role": "user",
-        "source_type": "user",
-        "source_uuid": source_uuid,
-        "content": content,
-    }
-    if source_parent_uuid is not None:
-        row["source_parent_uuid"] = source_parent_uuid
-    return row
-
-
-def completed(stdout: str) -> object:
-    """A canned successful CompletedProcess carrying one JSON payload."""
-    return subprocess.CompletedProcess(args=["agentsview"], returncode=0, stdout=stdout)
-
-
-def fake_daemon(sessions: dict[str, dict]) -> Callable:
-    """A fake `subprocess.run` dispatching `session get`/`messages` from a map.
-
-    `sessions` maps a session id to `{"meta": {...}, "rows": [...]}`. `get`
-    returns the meta; `messages` returns rows with ordinal >= `--from` so paging
-    exhausts after the live rows (the second page comes back empty).
-    """
-
-    def runner(args: list[str], **kwargs: object) -> object:
-        cmd, sid = args[2], args[3]
-        entry = sessions[sid]
-        if cmd == "get":
-            return completed(json.dumps(entry["meta"]))
-        if cmd == "messages":
-            frm = int(args[args.index("--from") + 1])
-            rows = [r for r in entry["rows"] if r["ordinal"] >= frm]
-            return completed(json.dumps({"messages": rows, "count": len(rows)}))
-        raise AssertionError(f"unexpected agentsview command: {cmd}")
-
-    return runner
-
 
 # --- render.py callback threading -------------------------------------------
 

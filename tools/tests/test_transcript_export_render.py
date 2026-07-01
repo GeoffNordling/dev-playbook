@@ -268,6 +268,18 @@ def test_assistant_turn_without_thinking_has_no_thinking_child() -> None:
     assert el.text == "done"
 
 
+def test_assistant_turn_with_empty_thinking_has_no_thinking_child() -> None:
+    # Real rows sometimes carry thinking_text="" (empty, not absent); an empty
+    # string is falsy, so no <thinking> element is emitted, same as None.
+    el = ET.fromstring(
+        render_turn(
+            msg(source_type="assistant", content="done", thinking_text="", model="m")
+        )
+    )
+    assert el.find("thinking") is None
+    assert el.text == "done"
+
+
 def test_assistant_turn_without_model_omits_model_attribute() -> None:
     el = ET.fromstring(render_turn(msg(source_type="assistant", content="x")))
     assert "model" not in el.attrib
@@ -462,6 +474,24 @@ def test_tool_call_truncates_long_output_at_2000() -> None:
     assert out is not None
     assert out.attrib["truncated"] == "true"
     assert out.attrib["chars"] == "2500"
+    assert len(out.text or "") == 2000
+
+
+def test_tool_call_at_exactly_2000_is_not_truncated() -> None:
+    # The cut is len > 2000, so a body of exactly 2000 is inlined whole.
+    el = ET.fromstring(render_tool_call(tc(result_content="z" * 2000)))
+    out = el.find("output")
+    assert out is not None
+    assert out.attrib == {"chars": "2000", "truncated": "false"}
+    assert len(out.text or "") == 2000
+
+
+def test_tool_call_at_2001_is_truncated() -> None:
+    el = ET.fromstring(render_tool_call(tc(result_content="z" * 2001)))
+    out = el.find("output")
+    assert out is not None
+    assert out.attrib["truncated"] == "true"
+    assert out.attrib["chars"] == "2001"
     assert len(out.text or "") == 2000
 
 

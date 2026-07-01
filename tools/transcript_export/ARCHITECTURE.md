@@ -131,6 +131,35 @@ shape changed:
 - **A rewind partition that drops or duplicates a message** → `reconstruct_forks`'s conservation check raises; a uuid-less message reaching it raises too.
 - **A final document that isn't well-formed XML** → `render_session` raises before returning it.
 
+## What's tested
+
+The pure core is covered by deterministic, hand-authored fixtures — rows shaped like
+the daemon's documented output, never trimmed real sessions — so the whole suite runs
+with no daemon and no I/O:
+
+- **Per stage.** Each pipeline stage has its own fixtures: resume dedup (rule 1);
+  classification + adjacent-repeat dedup (rule 2); the ordinal-spine fork
+  reconstruction across linear / nested / stacked / parentless-root / real
+  non-resolving-parent shapes; and every render path (escaping, ANSI stripping, the
+  marker-stripping edge cases, tool-call outcomes, truncation, rewound branches).
+- **End to end.** One synthetic session exercising interrupt + compaction + a rewind
+  fork + tool output (ANSI + truncation) + a nested sub-agent is driven through
+  `render_session` against a fake daemon and asserted well-formed; the CLI write path
+  is covered the same way.
+- **Every fail-loud guard above** has a test that trips it.
+
+What the deterministic suite **cannot** see is the daemon *drifting*: the fixtures are
+frozen at `agentsview v0.34.5`'s shapes, so a future version that changed the marker
+format or row schema would pass unchanged. Two things watch for that, both outside the
+deterministic suite:
+
+- **Production** — the tool runs over every real session and fails loud the moment a
+  guard stops fitting (the guards above are the canaries).
+- **One local drift canary** (`test_transcript_export_live.py`) renders the few
+  most-recent *real* sessions and asserts each is still well-formed XML. It needs the
+  local daemon, so it's skipped on CI (`SKIP_LIVE_TRANSCRIPT`) and asserts nothing
+  content-specific, so it never flakes on which sessions happen to exist.
+
 ## Known limits & future fixes
 
 **Accepted losses** — deliberate, not worth fixing for approximate analysis:
@@ -146,7 +175,7 @@ shape changed:
 
 - **Marker over-strip via fallback.** An alias-label tool call — one whose marker label isn't the tool name (`[Exiting Plan Mode]`, `[Tool: X]`) — makes `strip_tool_markers` fall back to the *first* marker-shaped line. If some prose above that call is itself marker-shaped, the strip starts too early and eats a little prose. Narrow: it loses prose, never crashes. *Fix direction:* map alias labels to their tools, or have the daemon emit explicit tool spans.
 
-**Drift risks** — assumptions that hold today and are watched by the fail-loud canaries above:
+**Drift risks** — assumptions that hold today, watched in production and by the local drift canary (see *What's tested* above), not by the deterministic suite:
 
 - **The marker model is pinned to one daemon version** (`agentsview v0.34.5`, verified on 5064 tool-bearing messages). A new marker format would make `strip_tool_markers` fail loud on the gross case (tool calls but zero markers).
 - **The fork model assumes the ordinal spine** — that writes only ever continue with increasing global ordinals. The conservation guard catches lost or duplicated messages, but not a wrong-yet-conserved partition if that assumption ever breaks.
