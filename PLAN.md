@@ -152,6 +152,13 @@ TBD, see parked.)
   standard + the in/out-of-bundle boundary.
 - Align `standards/doc-conventions`, `standards/adr-conventions`,
   `standards/skill-conventions` to the new structure + link form.
+- **Deferred from E:** convert the intra-repo links in `repo-documentation.md` and
+  `skill-conventions.md` to `/`-from-root as part of these rewrites (E skipped
+  them; their `~/workspace/…` occurrences are partly *examples* of the link
+  standard, so they need prose-aware, not mechanical, handling).
+- **Terminology:** the boundary is concept-doc vs. harness-owned *within one
+  bundle*, NOT "out of the bundle." Fix that phrasing in
+  `standards/document-types.md` (line ~17) and everywhere the rewrite touches it.
 
 **G · Tooling** *(by hand / TDD — last)*
 - Rewrite `tools/bin/ref-check` for the two link classes; update its tests.
@@ -173,7 +180,7 @@ TBD, see parked.)
 - [x] B — `document-types.md` + exemplars
 - [x] C — frontmatter on 37 docs
 - [x] D — generate `index.md` (9: root, standards/, docs/, docs/adr/, workflow/, protocols/, harness-recipes/, tools/, dotfiles/; each lists its README; protocols/ & harness-recipes/ recurse one level)
-- [ ] E — link conversion
+- [x] E — link conversion (`~/workspace/dev-playbook/…` → `/`-root + relative → `/`-root; ADRs & F-targets `repo-documentation`/`skill-conventions` excluded; 54 `/`-links verified to resolve, `ref-check` green)
 - [ ] F — standards rewrite
 - [ ] G — `ref-check` + type-lint + pre-commit
 - [ ] Final — delete PLAN.md, open PR

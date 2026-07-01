@@ -23,4 +23,4 @@ We recognize programatic, API-based workflows as a supremely-powerful pattern in
 
 In June 2026, Anthropic announced moving Agent SDK and `claude -p` usage off the subscription pool, then [paused the change](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan). We treat the pause as temporary; Anthropic has a tendency to pull the rug out on customers.
 
-The recipes are listed in [`index.md`](index.md).
+The recipes are listed in [`index.md`](/harness-recipes/index.md).

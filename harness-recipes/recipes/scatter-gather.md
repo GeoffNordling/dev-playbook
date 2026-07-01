@@ -60,4 +60,4 @@ Build the batch and call the workflow by name, passing the batch as `args`:
 
 `jobs` is required — no defaults — and each job must carry its own `model` and
 `effort`; `schema` is optional. A missing or malformed arg throws. Source:
-[`scatter-gather.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/scatter-gather.js).
+[`scatter-gather.js`](/dotfiles/dot-claude/workflows/scatter-gather.js).

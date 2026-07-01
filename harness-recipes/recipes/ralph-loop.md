@@ -44,7 +44,7 @@ last — continuity lives entirely on disk.
 ## Running it
 
 Launch from the target repo or worktree (agents inherit that cwd). First seed the plan
-and progress files — the [`ralph-setup`](~/workspace/dev-playbook/dotfiles/dot-claude/skills/ralph-setup/SKILL.md)
+and progress files — the [`ralph-setup`](/dotfiles/dot-claude/skills/ralph-setup/SKILL.md)
 skill interviews you and writes them — then call the workflow by name:
 
     Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
@@ -54,4 +54,4 @@ All five args are required — no defaults: `model` (worker model), `maxIters`
 log), `checkCmd` (the check gate run at the start and end of each iteration — a
 shell command meaning "green", e.g. `make check` or `make -C tools check`; pass
 `""` for no checks). A missing or malformed arg throws. Source:
-[`ralph-loop.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/ralph-loop.js).
+[`ralph-loop.js`](/dotfiles/dot-claude/workflows/ralph-loop.js).

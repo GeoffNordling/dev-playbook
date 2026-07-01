@@ -6,7 +6,7 @@ description: Voice, content rules, and mechanics for authoring the workflow's ph
 
 # Skill authoring
 
-Conventions for writing the workflow node-skills — the `phase:*` skills in `dotfiles/dot-claude/skills/`. [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) defines the graph, the dispatch model, and the Node-skill contract (`disallowed-tools`, `## Read first`, terminate/escalate by mode); this captures the authoring *style* behind them.
+Conventions for writing the workflow node-skills — the `phase:*` skills in `dotfiles/dot-claude/skills/`. [workflow.md](/workflow/workflow.md) defines the graph, the dispatch model, and the Node-skill contract (`disallowed-tools`, `## Read first`, terminate/escalate by mode); this captures the authoring *style* behind them.
 
 ## Voice
 
@@ -15,7 +15,7 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Plain behavioral language.** No `FOTW`, `node`, `edge`, or "dashboard" in the body — that vocabulary lives here and in `workflow.md`, not in front of the executing agent. The exception is a skill whose subject *is* the workflow itself: it reads `workflow.md` up front and navigates by node, edge, and state, because that is its job.
 - **Positive, not by negation.** Say what a mode or step does, not "the one that isn't X"; instruct toward the action to take, not away from the misstep to avoid. Negation earns its place only in an escalation trigger, where the misstep *is* the subject.
 - **Recommendations carry their reason.** Where a skill has the agent recommend something to the human, require the recommendation *and why*.
-- **Name the user's choices plainly, and few.** A skill body speaks to the person at the keyboard as the `user` — per the [terminology rule](~/workspace/dev-playbook/standards/doc-conventions.md) — so word a verdict as a plain command they already understand, not an insider term; collapse near-synonyms into one option.
+- **Name the user's choices plainly, and few.** A skill body speaks to the person at the keyboard as the `user` — per the [terminology rule](/standards/doc-conventions.md) — so word a verdict as a plain command they already understand, not an insider term; collapse near-synonyms into one option.
 
 ## Content
 
@@ -28,7 +28,7 @@ The body is read by an agent running one node who does not know the workflow mod
 - **Name a location one way.** Use one consistent form for a fixed path — the directory form — and drop the "(or flat-file equivalent)" / "(or folder form)" hedges.
 - **Order lists spec → test → code.** Everywhere this triad appears — reads, audit dimensions, context artifacts — keep that order: spec first, tests before code, behavior before style. When a list omits one of them, keep the surviving order.
 - **Reference the source; don't copy it.** Don't bake a snapshot of something authoritatively defined elsewhere — a graph, a label set, a standard's rules — into a skill body; the copy goes stale when the source moves. Make the source mandatory `## Read first`, then act from what was read. Source the *what and when* — the routing and decisions the source already defines — and let the agent read them there rather than restating them; but supply the *how*, the commands an action draws on.
-- **Cite the concept, not the section number.** When a reference points at one section of the source, prefer a stable named anchor over a positional `§x.x` / heading-number citation — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](~/workspace/dev-playbook/standards/repo-documentation.md#fragment-anchors)).
+- **Cite the concept, not the section number.** When a reference points at one section of the source, prefer a stable named anchor over a positional `§x.x` / heading-number citation — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/repo-documentation.md#fragment-anchors)).
 - **A reduced variant mirrors its fuller sibling.** When one skill is a leaner version of another, keep the shared skeleton and swap the contract — e.g. an issue brief's acceptance criteria standing in for a committed spec, with the heavier machinery dropped. Map each mechanism in the fuller skill to its analog in the leaner one rather than inventing a new shape.
 
 ## Robustness

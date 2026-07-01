@@ -17,11 +17,11 @@ Every issue past intake carries the full four-tuple `(category:*, mode:*, tests:
 - `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (implemented at `tdd`), doc/config/work not touching tests goes `tests:no` (implemented at `build`).
 - `phase:*` — the current node in the graph below. An untriaged issue is at `phase:intake` — labelled so, or implied by carrying no labels at all. The graph is the inventory; see [Naming](#naming).
 
-Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](~/workspace/dev-playbook/standards/issue-conventions.md).
+Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](/standards/issue-conventions.md).
 
 ### Valid labels
 
-[bootstrap-labels](~/workspace/dev-playbook/tools/bin/bootstrap-labels) mints exactly these. Six fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
+[bootstrap-labels](/tools/bin/bootstrap-labels) mints exactly these. Six fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
 
 | Dimension | Label | Meaning |
 |---|---|---|
@@ -122,7 +122,7 @@ The human dispatcher operates from Claude Code's "claude agents" dashboard. **Ea
 
 **One session, many nodes — `/clear` between them.** A node skill works in the issue's worktree, commits, updates the `phase:*` label to the next node, and stops. Nodes do not auto-advance: the human reads the new phase, runs **`/clear`** to reset the session's context — cwd and worktree persist — then pastes the next node's launch command. Every transition stays human-gated and visible on the dashboard. Parallel issues run as independent sessions, each in its own worktree; worktrees keep them from colliding.
 
-**Ready means unblocked.** New issues launch only if they have no open blockers — every issue in its blocked-by set is closed (see [issue-conventions § Relationships](~/workspace/dev-playbook/standards/issue-conventions.md)). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label; the dispatcher checks it and lets a blocked issue wait. Hierarchy (sub-issues) is organizational and does not gate dispatch.
+**Ready means unblocked.** New issues launch only if they have no open blockers — every issue in its blocked-by set is closed (see [issue-conventions § Relationships](/standards/issue-conventions.md)). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label; the dispatcher checks it and lets a blocked issue wait. Hierarchy (sub-issues) is organizational and does not gate dispatch.
 
 **Re-orientation is minimal.** A node launched after `/clear` starts with a blank context. Its launch command carries only what the node needs — the skill and the issue number — and the skill reloads its own context from the issue (`gh issue view <N>`) and the worktree it already sits in. Nothing carries over from the cleared context.
 
@@ -172,7 +172,7 @@ A **mixed** node composes the two available modes in one node: an FOTW agent hal
 
 ### Node-skill contract
 
-Across modes, a node skill declares the `disallowed-tools` its role calls for, copied from the [table](#skills) below — every other tool access is auto mode's call. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](~/workspace/dev-playbook/workflow/skill-authoring.md).
+Across modes, a node skill declares the `disallowed-tools` its role calls for, copied from the [table](#skills) below — every other tool access is auto mode's call. When it has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. Mode fixes the rest — see [Dispatch](#dispatch) for the launch and termination mechanics. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](/workflow/skill-authoring.md).
 
 - **Worktree.** Every file-touching node ensures the session is in the issue's worktree before doing anything else, per [Worktrees](#worktrees-and-branches): the issue's first node opens it (create-and-rename), later nodes inherit cwd across `/clear`. `intake` touches no files and uses no worktree.
 - **HITL** — the human is engaged throughout, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts, per [Permissions](#permissions) — and the skill terminates with a plain report. Escalation is `—`: the human is already present.

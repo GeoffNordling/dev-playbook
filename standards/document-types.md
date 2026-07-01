@@ -15,7 +15,7 @@ This governs the *agent-navigated documentation* — the `.md` files an agent
 crawls and loads dynamically. Harness-owned files (`CLAUDE.md`, skill `SKILL.md`
 and their `references/`, `rules/`, `settings*.json`, `.js` workflows, Python
 code) are out of the bundle and carry no frontmatter. The full in/out boundary
-lives in [repo-documentation.md](repo-documentation.md).
+lives in [repo-documentation.md](/standards/repo-documentation.md).
 
 ## Types
 
