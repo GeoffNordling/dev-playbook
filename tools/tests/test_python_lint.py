@@ -204,6 +204,46 @@ def test_multiple_rules_report_together(tmp_path: Path) -> None:
     assert "no-future-annotations" in result.stdout
 
 
+# --- per-rule directory scope (restores each retired hook's original coverage) ---
+
+
+def test_empty_init_polices_deprecated_tree(tmp_path: Path) -> None:
+    """empty-init has no directory exclusions — a non-empty __init__.py under
+    deprecated/ is still an offender, as the retired empty-init hook enforced."""
+    repo = make_repo(tmp_path, {"deprecated/pkg/__init__.py": '"""nope."""\n'})
+    result = run(repo)
+    assert result.returncode == 1
+    assert "deprecated/pkg/__init__.py" in result.stdout
+    assert "empty-init" in result.stdout
+
+
+def test_future_rule_skips_deprecated_tree(tmp_path: Path) -> None:
+    """no-future-annotations keeps its original exclusions — deprecated/ (and
+    build/dist/.agents/.dhub) are not scanned for the banned import."""
+    repo = make_repo(
+        tmp_path,
+        {"deprecated/old.py": "from __future__ import annotations\n"},
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_privacy_rule_scans_deprecated_tree(tmp_path: Path) -> None:
+    """test-privacy's original exclusions were caches only — a private-access
+    violation under deprecated/ is still flagged."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "deprecated/thing.py": "def _secret():\n    return 1\n",
+            "deprecated/tests/test_thing.py": "from deprecated.thing import _secret\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 1
+    assert "privacy.import-private" in result.stdout
+    assert "deprecated/tests/test_thing.py" in result.stdout
+
+
 def test_repo_self_scan_is_clean() -> None:
     """The dev-playbook repo itself passes all three rules."""
     repo = Path(__file__).resolve().parents[2]

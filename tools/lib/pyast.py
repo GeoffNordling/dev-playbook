@@ -3,31 +3,16 @@
 `python-lint` runs three rules over one walk of a repo's Python sources; this
 module is that walk. Discovery goes through `git ls-files`, so it is
 gitignore-aware and worktree-scoped in the same way as lib/md.find_md_files:
-from inside a worktree only that worktree's files are listed. Tracked-but-
-unpoliced trees (externally-managed skills, legacy code) are dropped by name
-via :data:`EXCLUDE_DIRS`.
+from inside a worktree only that worktree's files are listed, and gitignored
+caches and virtualenvs never appear. Discovery returns every Python file git
+lists; which trees each rule polices is per-rule policy that lives in
+`python-lint`, not here — the three retired hooks had different scopes and the
+consolidation preserves each rather than imposing one shared exclusion set.
 """
 
 import ast
 import subprocess
 from pathlib import Path
-
-EXCLUDE_DIRS = {
-    ".git",
-    ".venv",
-    ".hatch",
-    ".pytest_cache",
-    ".mypy_cache",
-    ".ruff_cache",
-    "__pycache__",
-    "node_modules",
-    "build",
-    "dist",
-    # Workspace conventions: tracked code we don't police.
-    ".agents",  # externally-managed skills (dotfiles/.agents/)
-    ".dhub",  # externally-managed (dotfiles/.dhub/)
-    "deprecated",  # legacy code kept for reference
-}
 
 PYTHON_SHEBANG_PREFIXES = (
     "#!/usr/bin/env python",
@@ -59,9 +44,9 @@ def find_python_files(root: Path) -> list[Path]:
 
     ``--cached`` lists tracked files, ``--others`` untracked ones,
     ``--exclude-standard`` drops anything ``.gitignore`` matches — so caches
-    and virtualenvs never appear. Paths under :data:`EXCLUDE_DIRS` are dropped
-    by name (those trees are tracked, so git lists them). A ``--cached`` entry
-    whose file was deleted from the working tree is skipped by ``is_file``.
+    and virtualenvs never appear. A ``--cached`` entry whose file was deleted
+    from the working tree is skipped by ``is_file``. Every Python file git
+    lists is returned; the caller applies its own per-rule directory scoping.
     """
     result = subprocess.run(
         [
@@ -81,8 +66,6 @@ def find_python_files(root: Path) -> list[Path]:
     files = []
     for rel in result.stdout.split("\0"):
         if not rel:
-            continue
-        if EXCLUDE_DIRS & set(Path(rel).parts):
             continue
         path = root / rel
         if path.is_file() and looks_python(path):

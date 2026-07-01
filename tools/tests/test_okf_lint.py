@@ -203,6 +203,63 @@ def test_root_index_omitting_child_index_is_flagged(tmp_path: Path) -> None:
     assert "omits child index standards/index.md" in result.stdout
 
 
+def test_malformed_frontmatter_is_flagged_and_siblings_still_lint(
+    tmp_path: Path,
+) -> None:
+    """One doc's unparseable YAML yields a finding naming that doc, and the rest
+    of the bundle is still validated — no traceback, no silent mass un-linting."""
+    malformed = '---\ntitle: "unterminated\n---\n\n# S\n'
+    missing_type = "---\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
+    repo = make_bundle(
+        tmp_path,
+        {"standards/README.md": malformed, "README.md": missing_type},
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "standards/README.md" in result.stdout
+    assert "okf.frontmatter" in result.stdout
+    # The malformed doc did not abort the scan: the sibling problem is caught too.
+    assert "missing 'type'" in result.stdout
+
+
+def test_index_listing_non_concept_target_is_flagged(tmp_path: Path) -> None:
+    """A bullet whose target is harness/excluded is neither a concept nor a
+    child index — it is flagged, not silently dropped."""
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+        "- [Rules](/standards/rules/naming.md) — not a concept doc\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "standards/rules/naming.md" in result.stdout
+    assert "not a concept document" in result.stdout
+
+
+def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
+    """A concept listed by two bullets is flagged; last-wins collapsing can no
+    longer be used to hide a wrong description behind a correct duplicate."""
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Dupe](/standards/README.md) — Standards desc\n"
+        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "standards/README.md" in result.stdout
+    assert "more than once" in result.stdout
+
+
 def test_repo_self_scan_is_clean() -> None:
     """The dev-playbook bundle itself passes okf-lint."""
     repo = Path(__file__).resolve().parents[2]

@@ -625,3 +625,41 @@ def test_both_link_classes_counted_in_one_run(tmp_path: Path, workspace: Path) -
 
     assert result.returncode == 0, result.stderr
     assert "2 references, all ok" in result.stderr
+
+
+def test_citation_inside_link_text_is_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A ~/workspace citation in a link's *text* (not its target) is still a
+    citation and must be validated — the bare-citation pass strips link spans
+    to their text, not away entirely, so text stays scannable."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "docs.md",
+        "[see ~/workspace/primary/missing.md now](https://example.com)\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/1 broken" in result.stderr
+    assert "~/workspace/primary/missing.md" in result.stdout
+
+
+def test_citation_inside_link_text_resolving_is_ok(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """The happy path of the above: an existing citation in link text passes."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(
+        repo / "docs.md",
+        "[see ~/workspace/primary/target.md](https://example.com)\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert "all ok" in result.stderr

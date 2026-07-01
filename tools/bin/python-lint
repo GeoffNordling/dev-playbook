@@ -39,6 +39,33 @@ from lib import pyast  # noqa: E402
 FUTURE_MESSAGE = "`from __future__ import annotations` is banned (Python >= 3.11)"
 INIT_MESSAGE = "`__init__.py` must be empty (no docstring, no code)"
 
+# Per-rule directory scope. The three rules were separate hooks with different
+# reach, and consolidation preserves each rather than silently unifying them:
+#   - empty-init policed every tracked __init__.py (no directory exclusions);
+#   - test-privacy skipped only caches and virtualenvs;
+#   - no-future-annotations additionally skipped build artifacts and the
+#     externally-managed / legacy trees we don't police.
+# See standards/python-conventions.md. git ls-files already drops gitignored
+# caches; these name filters also cover the rare tracked copy. A file is scanned
+# by a rule when none of its parent directory names is in that rule's set.
+_CACHES = frozenset(
+    {
+        ".git",
+        ".venv",
+        ".hatch",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        "__pycache__",
+        "node_modules",
+    }
+)
+INIT_EXCLUDE: frozenset[str] = frozenset()
+PRIVACY_EXCLUDE = _CACHES
+FUTURE_EXCLUDE = _CACHES | frozenset(
+    {"build", "dist", ".agents", ".dhub", "deprecated"}
+)
+
 
 class ToolError(Exception):
     """The hook could not complete its scan."""
@@ -203,15 +230,21 @@ class _PrivacyVisitor(ast.NodeVisitor):
 
 def scan_file(path: Path, root: Path) -> list[Finding]:
     rel = str(path.relative_to(root))
+    dir_parts = set(Path(rel).parts[:-1])
     name = path.name
     findings: list[Finding] = []
-    if name == "__init__.py":
+    if name == "__init__.py" and not (INIT_EXCLUDE & dir_parts):
         findings.extend(check_empty_init(rel, path))
     tree = pyast.parse(path)
     if tree is None:
         return findings
-    findings.extend(check_no_future(rel, tree))
-    if name.startswith("test_") and path.suffix == ".py":
+    if not (FUTURE_EXCLUDE & dir_parts):
+        findings.extend(check_no_future(rel, tree))
+    if (
+        name.startswith("test_")
+        and path.suffix == ".py"
+        and not (PRIVACY_EXCLUDE & dir_parts)
+    ):
         findings.extend(check_test_privacy(rel, tree))
     return findings
 

@@ -36,8 +36,11 @@ Usage:
 import argparse
 import re
 import sys
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
+
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -105,8 +108,20 @@ def dir_of(rel: str) -> Dir:
     return PurePosixPath(rel).parts[:-1]
 
 
-def frontmatter_of(path: Path) -> dict | None:
-    return md.parse_frontmatter(path.read_text(encoding="utf-8"))[0]
+def frontmatter_of(path: Path) -> tuple[dict | None, str | None]:
+    """Parse a doc's frontmatter mapping, or capture why it could not be read.
+
+    Returns ``(mapping, None)`` on success — ``mapping`` is None when the file
+    simply carries no frontmatter. Returns ``(None, summary)`` when the file is
+    not valid UTF-8 or its YAML frontmatter is malformed, so one broken doc
+    becomes a finding against itself instead of a traceback that aborts the
+    whole scan and leaves every other file unlinted. The summary is collapsed
+    to a single line to keep the one-finding-per-line output contract.
+    """
+    try:
+        return md.parse_frontmatter(path.read_text(encoding="utf-8"))[0], None
+    except (OSError, UnicodeDecodeError, yaml.YAMLError) as err:
+        return None, " ".join(f"{type(err).__name__}: {err}".split())
 
 
 def check_types(
@@ -114,7 +129,10 @@ def check_types(
 ) -> list[Finding]:
     findings: list[Finding] = []
     for rel in concept_docs:
-        fm = frontmatter_of(repo_root / rel)
+        fm, err = frontmatter_of(repo_root / rel)
+        if err is not None:
+            findings.append(Finding(rel, "okf.frontmatter", err))
+            continue
         if fm is None:
             findings.append(Finding(rel, "okf.type", "no OKF frontmatter"))
             continue
@@ -149,15 +167,21 @@ def nearest_index(start: Dir, index_dirs: set[Dir], *, strict: bool) -> Dir:
     return ()
 
 
-def parse_index(path: Path) -> tuple[list[tuple[str, str | None]], list[str]]:
-    """Return (concept_links, child_index_links) listed in one index.md.
+def parse_index(
+    path: Path,
+) -> tuple[list[tuple[str, str | None]], list[str], list[str]]:
+    """Return (concept_links, child_index_links, invalid_targets) in one index.
 
-    concept_links are (target_relpath, description); child_index_links are the
-    directory-relpaths of linked child `index.md` files. Targets are
-    root-absolute `/paths`; fragments are stripped.
+    concept_links are (target_relpath, description), in listing order with
+    duplicates preserved so a repeated bullet can be flagged; child_index_links
+    are the directory-relpaths of linked child `index.md` files; invalid_targets
+    are bullet targets that are neither a concept doc nor a child index — a
+    harness/excluded path listed by mistake, surfaced rather than dropped.
+    Targets are root-absolute `/paths`; fragments are stripped.
     """
     concepts: list[tuple[str, str | None]] = []
     child_indexes: list[str] = []
+    invalid: list[str] = []
     for _, line in md.content_lines(path):
         m = INDEX_BULLET.match(line)
         if not m:
@@ -168,7 +192,9 @@ def parse_index(path: Path) -> tuple[list[tuple[str, str | None]], list[str]]:
             child_indexes.append(str(PurePosixPath(target).parent))
         elif md.classify(target) == "concept":
             concepts.append((target, description))
-    return concepts, child_indexes
+        else:
+            invalid.append(target)
+    return concepts, child_indexes, invalid
 
 
 def check_indexes(
@@ -198,11 +224,27 @@ def check_indexes(
     for rel in index_docs:
         d = dir_of(rel)
         index_path = repo_root / rel
-        listed_concepts, listed_children = parse_index(index_path)
+        listed_concepts, listed_children, invalid_targets = parse_index(index_path)
+
+        for bad in sorted(set(invalid_targets)):
+            findings.append(
+                Finding(
+                    rel, "okf.index", f"lists {bad} which is not a concept document"
+                )
+            )
+
+        # First occurrence wins for the description map; duplicate bullets are
+        # flagged separately so a doc cannot be listed twice to hide a wrong
+        # description behind a last-wins collapse.
+        listed_map: dict[str, str | None] = {}
+        for target, description in listed_concepts:
+            listed_map.setdefault(target, description)
+        listed_targets = set(listed_map)
+        counts = Counter(target for target, _ in listed_concepts)
+        for dup in sorted(t for t, c in counts.items() if c > 1):
+            findings.append(Finding(rel, "okf.index", f"lists {dup} more than once"))
 
         expected = owned_concepts[d]
-        listed_map = dict(listed_concepts)
-        listed_targets = set(listed_map)
 
         for missing in sorted(expected - listed_targets):
             findings.append(Finding(rel, "okf.index", f"omits concept doc {missing}"))
@@ -215,7 +257,9 @@ def check_indexes(
             findings.append(Finding(rel, "okf.index", f"lists {extra} which {reason}"))
         for target in sorted(expected & listed_targets):
             listed_desc = listed_map[target]
-            fm = frontmatter_of(repo_root / target)
+            # A frontmatter error here is already reported by check_types (target
+            # is a concept doc); fm is None, so the drift check below is skipped.
+            fm, _ = frontmatter_of(repo_root / target)
             actual_desc = fm.get("description") if fm else None
             if listed_desc is None:
                 findings.append(
@@ -243,8 +287,12 @@ def check_indexes(
                 )
             )
 
-    root_fm = frontmatter_of(repo_root / "index.md")
-    if not root_fm or "okf_version" not in root_fm:
+    # The root index.md is typeless (not a concept doc), so check_types never
+    # sees it; its frontmatter error, if any, is caught only here.
+    root_fm, root_err = frontmatter_of(repo_root / "index.md")
+    if root_err is not None:
+        findings.append(Finding("index.md", "okf.frontmatter", root_err))
+    elif not root_fm or "okf_version" not in root_fm:
         findings.append(
             Finding("index.md", "okf.index", "root index.md must declare okf_version")
         )

@@ -163,9 +163,11 @@ def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
                     fragment,
                 )
 
-        # Bare citations: `~/workspace/...` outside link syntax. Remove link
-        # spans first so an in-link citation is not counted twice.
-        remainder = md.MD_LINK_PATTERN.sub("", stripped)
+        # Bare citations: `~/workspace/...` outside link syntax. Replace each
+        # link span with its text (not nothing) so a citation living in the
+        # link *text* stays scannable, while the target — already handled by
+        # the in-link pass above — is dropped and not counted twice.
+        remainder = md.MD_LINK_PATTERN.sub(r"\1", stripped)
         for match in md.WORKSPACE_REF_PATTERN.finditer(remainder):
             target_str = match.group(0)
             path_str, _, fragment = target_str.partition("#")
