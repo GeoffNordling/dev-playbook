@@ -11,11 +11,13 @@ bundle, and the frontmatter profile every concept document carries. The
 type-lint (a pre-commit hook) asserts that every concept document's `type` is
 one of the names below.
 
-This governs the *agent-navigated documentation* — the `.md` files an agent
-crawls and loads dynamically. Harness-owned files (`CLAUDE.md`, skill `SKILL.md`
-and their `references/`, `rules/`, `settings*.json`, `.js` workflows, Python
-code) are out of the bundle and carry no frontmatter. The full in/out boundary
-lives in [repo-documentation.md](/standards/repo-documentation.md).
+This governs **concept documents** — the prose `.md` files an agent crawls and
+loads to understand something. Harness-owned files (`CLAUDE.md`, skill `SKILL.md`
+and their `references/`, `rules/`, `settings*.json`, `hooks/`, `.js` workflows,
+Python code) are in the bundle too, but a tool consumes them as configuration or
+runs them as code rather than reading them as prose, so they are not concept
+documents and carry no OKF frontmatter. The full concept-doc/harness-owned
+boundary lives in [repo-documentation.md](/standards/repo-documentation.md#the-okf-bundle).
 
 ## Types
 
@@ -38,7 +40,7 @@ Every concept document opens with a YAML frontmatter block:
 
 - **`type`** — REQUIRED. Exactly one of the names above.
 - **`title`** — the human title.
-- **`description`** — the one-line summary that powers triage and the generated
+- **`description`** — the one-line summary that powers triage and the authored
   `index.md` listings: a sentence fragment naming what the document *is* or what
   it *governs*, present tense, no trailing period, leading with the
   distinguishing noun, roughly one breath (~20 words).

@@ -10,7 +10,7 @@
 - [Module Design](/standards/module-design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
 - [Python Conventions](/standards/python-conventions.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
 - [Python Project Conventions](/standards/python-project-conventions.md) — Python project structure, pyproject.toml shape, directory layout, and dev-tool version requirements
-- [Repo Documentation Standard](/standards/repo-documentation.md) — What files every repo carries — README, CLAUDE.md, specs, docs/adr, CONTEXT.md, ROADMAP.md — and their scope and audiences
+- [Repo Documentation Standard](/standards/repo-documentation.md) — Repo file hierarchy and scope — README, CLAUDE.md, index.md, docs/adr, CONTEXT.md — plus the OKF concept-doc/harness-owned bundle boundary
 - [Repository Settings](/standards/repo-settings.md) — GitHub repository settings every repo should have — squash-only merges, PR message format, auto-deleted merged branches
 - [Skill Conventions](/standards/skill-conventions.md) — Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
 - [Skill Management](/standards/skill-management.md) — Where skills live, how third-party skills are installed, and the mirror rule between authored and installed

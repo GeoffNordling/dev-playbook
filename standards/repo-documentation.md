@@ -1,24 +1,41 @@
 ---
 type: Standard
 title: Repo Documentation Standard
-description: What files every repo carries — README, CLAUDE.md, specs, docs/adr, CONTEXT.md, ROADMAP.md — and their scope and audiences
+description: Repo file hierarchy and scope — README, CLAUDE.md, index.md, docs/adr, CONTEXT.md — plus the OKF concept-doc/harness-owned bundle boundary
 ---
 
 # Repo Documentation Standard
 
 ## Purpose
 
-Define a consistent file hierarchy and scope boundary for every repository in the workspace, so that any human or agent can open a repo cold and immediately orient — what it is, how to operate it, and what's next.
+Define a consistent file hierarchy and scope boundary for every repository in the workspace, so that any human or agent can open a repo cold and immediately orient — what it is, how to operate it, and where to find the rest.
+
+A repo's agent-navigated documentation is one Open Knowledge Format (OKF) bundle: every concept document declares its `type`, `title`, and `description` in frontmatter, so an agent triages by frontmatter and navigates by the per-directory `index.md` listings, loading full bodies only where relevant. [The OKF bundle](#the-okf-bundle) defines the boundary; [document-types.md](/standards/document-types.md) defines the types.
 
 ## Principles
 
 **Scope is standardized; depth is not.** Every file has a defined scope (what goes in it), but depth varies by project. A CLI tool's README may be 10 lines. A simulation's may be 100. Both are conformant if the content stays within scope.
 
-**Presence is the status signal.** There are no explicit status fields. The presence or absence of optional files tells you what stage the project is in. A missing ROADMAP.md means nothing is planned. A populated specs/ directory means the project is complex enough to warrant formal requirements.
+**Presence is the status signal.** There are no explicit status fields. The presence or absence of optional files tells you what stage the project is in. A missing `CONTEXT.md` means no domain terms have needed pinning yet; a populated `specs/` directory means the project is complex enough to warrant formal requirements.
+
+**Triage by frontmatter.** Every concept document opens with OKF frontmatter — `type`, `title`, `description`. An agent reads the frontmatter (and the directory's `index.md`) to decide what a document is and whether to open it, before paying the context cost of the body.
 
 **No duplication across files.** Each piece of information has exactly one home. Files reference each other rather than repeating content.
 
-**Voice and structure are standardized.** Every doc in this hierarchy follows [doc-conventions.md](doc-conventions.md) — declarative present tense, one rule per section, current-state only.
+**Voice and structure are standardized.** Every doc in this hierarchy follows [doc-conventions.md](/standards/doc-conventions.md) — declarative present tense, one rule per section, current-state only.
+
+## The OKF bundle
+
+This repo's agent-navigated documentation is one [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog) bundle. The bundle is the whole repository: an agent triages a document by its frontmatter and navigates between documents by the per-directory `index.md` listings, loading full bodies only when a document is relevant.
+
+Not every file in the repo is a **concept document**. The bundle divides in two:
+
+- **Concept documents** — prose knowledge you read to *understand* something: standards, guides, surveys, ADRs, READMEs, the domain vocabulary. Each carries OKF frontmatter (`type` + `title` + `description`, per [document-types.md](/standards/document-types.md)) and is subject to the type-lint.
+- **Harness-owned files** — files a tool *consumes as configuration or runs as code*, not prose a reader loads to learn: `CLAUDE.md`, skill `SKILL.md` and their `references/`, `rules/`, `settings*.json`, `hooks/`, `.js` workflows, and Python under `tools/`. These carry no OKF frontmatter and are not type-linted. They keep whatever format their consumer requires — a `SKILL.md` keeps its Claude Code frontmatter (`name`, `model`, …), not OKF frontmatter.
+
+The test is *how the file is used*, not where it sits: everything is in the repo, hence in the bundle; harness-owned files are simply in-bundle non-concept-documents. `CLAUDE.md` is the worked example — it is prose a human could read, but an agent's harness loads it as operating configuration, so it is harness-owned and carries no OKF frontmatter.
+
+See [document-types.md](/standards/document-types.md) for the concept-document type registry and the frontmatter field profile.
 
 ## Audience and presence
 
@@ -41,24 +58,54 @@ Whether the file is required or optional.
 
 ## Files
 
-| File | Audience | Presence | Scope |
-|---|---|---|---|
-| `CLAUDE.md` | Agent | Required | How to operate in this repo: build/run/test commands, rules, pointers to other docs. `SHALL NOT` contain what the project is, why it exists, or developer profile information. |
-| `README.md` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions, roadmap items, or architecture decisions. |
-| `ROADMAP.md` | Human + Agent | Optional | Strategy: broad goals and aspirations for the project. No priority ordering, timelines, or assignees. `SHALL NOT` contain actionable work items — those belong in GitHub Issues. |
-| `BUSINESS_CONTEXT.md` | Human + Agent | Optional | Domain context for corporate/business projects: the business problem, stakeholders, and why the project exists. Not applicable to non-corporate projects. |
-| `specs/` | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. See the [SDD standards index](~/workspace/spec-tools/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/spec-tools/sdd-standards/spec-standard.md#4-file-organization) for file layout and splitting rules. |
-| `docs/` | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md. |
-| `docs/adr/` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, indexed by `docs/adr/README.md`. See [ADR conventions](#adr-conventions) for numbering, template, and offer-gate. |
-| `CONTEXT.md` | Human + Agent | Optional | Domain glossary at the repo root: canonical terms, their relationships, and illustrative scenarios. Created lazily as terminology ambiguity surfaces; do not pre-populate. See [CONTEXT.md format](#contextmd-format) for the structure. |
-| `<sub-project>/CLAUDE.md` | Agent | Optional | Sub-project rules within a repo, when the repo holds distinct sub-projects with divergent operating conventions. See [CLAUDE.md hierarchy](#claudemd-hierarchy). |
-| `.gitignore` | Tooling | Required | Git ignore rules. Every repo has one. See [.gitignore Baseline](#gitignore-baseline). |
+| File | Type | Audience | Presence | Scope |
+|---|---|---|---|---|
+| `CLAUDE.md` | Harness-owned | Agent | Required | How to operate in this repo: build/run/test commands, rules, pointers to other docs. `SHALL NOT` contain what the project is, why it exists, or developer profile information. |
+| `README.md` | `README` | Human + Agent | Required | What the project does, prerequisites, how to run it. `SHALL NOT` contain agent instructions or architecture decisions. |
+| `index.md` | — (typeless) | Human + Agent | Optional | Per-directory navigational listing: the directory's README, its concept documents (each with its `description`), and links to child indexes. Present in any directory that holds concept documents; carries no OKF frontmatter. See [index.md](#indexmd). |
+| `specs/` | — (SDD) | Human + Agent | Optional | Functional requirements and optionally system design, as flat files or hierarchical folders. Governed by the SDD standards, not this OKF profile. See the [SDD standards index](~/workspace/spec-tools/sdd-standards/README.md) for content conventions and [spec-standard.md — File organization](~/workspace/spec-tools/sdd-standards/spec-standard.md#4-file-organization) for file layout and splitting rules. |
+| `docs/` | Concept docs | Human + Agent | Optional | Supplementary documentation that does not belong in README, specs, or CLAUDE.md — guides, surveys, and the ADR subdirectory. Each file is a concept document with its own `type`. |
+| `docs/adr/` | `ADR` | Human + Agent | Optional | Architectural decision records. One per file, immutable once written, listed by `docs/adr/index.md`. See [ADR conventions](#adr-conventions) for numbering, template, and offer-gate. |
+| `CONTEXT.md` | `Vocabulary` | Human + Agent | Optional | Domain glossary at the repo root: canonical terms, their relationships, and illustrative scenarios. Created lazily as terminology ambiguity surfaces; do not pre-populate. See [CONTEXT.md format](#contextmd-format) for the structure. |
+| `<sub-project>/CLAUDE.md` | Harness-owned | Agent | Optional | Sub-project rules within a repo, when the repo holds distinct sub-projects with divergent operating conventions. See [CLAUDE.md hierarchy](#claudemd-hierarchy). |
+| `.gitignore` | Harness-owned | Tooling | Required | Git ignore rules. Every repo has one. See [.gitignore baseline](#gitignore-baseline). |
+
+## index.md
+
+Every directory that holds concept documents carries an `index.md`: a navigational listing that lets an agent see what a directory contains — and read each document's one-line `description` — without opening every file. `index.md` is **typeless**: it carries no OKF `type` and is not itself a concept document.
+
+### Content
+
+An `index.md` lists, for its own directory:
+
+- the directory's `README.md` (if present), then
+- each concept document, as a markdown link carrying the document's frontmatter `description`.
+
+For child directories, it links the child's own `index.md` rather than reaching into it. A subdirectory is recursed into inline **only when it has no `index.md` of its own** — otherwise the listing delegates to that child index.
+
+The repository root `index.md` additionally declares the bundle's OKF version in frontmatter (its only frontmatter key):
+
+```yaml
+---
+okf_version: "0.1"
+---
+```
+
+### Authored, not generated
+
+`index.md` files are **authored**, not produced by a committed generator. A staleness checker (a pre-commit hook, alongside `ref-check` and the type-lint) fails the commit when an index omits a concept document in its directory, lists one that no longer exists, or gives a description that no longer matches the child's frontmatter. The check keeps hand-authored indexes honest without a generator owning the file.
 
 ## README.md baseline
 
 Every workspace repo's `README.md` starts from this baseline:
 
 ````markdown
+---
+type: README
+title: <repo-name>
+description: <one-line summary of what the repo is>
+---
+
 # <repo-name>
 
 <one-line purpose>
@@ -71,6 +118,8 @@ them.
 
 ## CLAUDE.md baseline
 
+`CLAUDE.md` is harness-owned — an agent's harness loads it as operating
+configuration, not as prose to learn from — so it carries no OKF frontmatter.
 Every workspace repo's `CLAUDE.md` starts from this baseline:
 
 ````markdown
@@ -106,7 +155,7 @@ Nested files follow the same scope as the root: operational instructions for an 
 
 ## ADR conventions
 
-See [adr-conventions.md](adr-conventions.md).
+See [adr-conventions.md](/standards/adr-conventions.md).
 
 ## CONTEXT.md format
 
@@ -185,23 +234,37 @@ are harmless in non-Python repos and stay for uniformity.
 
 ## Cross-references
 
-Cross-references to a stable workspace location `SHALL` use the full path starting with `~/workspace/` — e.g., `~/workspace/spec-tools/sdd-standards/spec-standard.md`. The `ref-check` tool (`~/workspace/dev-playbook/tools/bin/ref-check`) lints every reference in this form and reports broken links. Anything else — backticked filenames like `` `conftest.py` ``, repo-relative paths, slash-skill invocations like `/commit` — is treated as prose by `ref-check`.
+A cross-reference points from one document to another. Which form it takes depends on whether the target lives in the **same bundle** (this repo) or in **another repo**. Both forms are inline — there is no separate citations section.
 
-VS Code does not expand `~/` in markdown links, so clicking these references from the editor fails ([vscode#103542](https://github.com/microsoft/vscode/issues/103542)). Accepted — agents are the primary audience, and the workspace-portable form is what `ref-check` lints.
+### Link — same bundle
 
-How a reference is wrapped — inline link, inline code, or bare — depends on the file kind doing the referencing.
-
-### In repo documentation
-
-Files in the documentation hierarchy above (`CLAUDE.md`, `README.md`, `ROADMAP.md`, `BUSINESS_CONTEXT.md`, files under `specs/` and `docs/`) use inline markdown links with the full path as the target:
+A reference to another document in *this* repo uses a **root-absolute path**: a target beginning with `/`, interpreted relative to the bundle root (the repo root).
 
 ```markdown
-[Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
+[doc-conventions.md](/standards/doc-conventions.md)
 ```
+
+A root-absolute link resolves against the reader's *own* checkout root — the current working directory's repo — so it is **worktree-safe**: it points at the copy of the file that matches the checkout the reader is already in, whether that's the main checkout or a per-issue worktree. A same-repo reference `SHALL NOT` be written as `~/workspace/<this-repo>/…` — from inside a worktree that absolute path silently jumps to the main checkout, yielding a different (possibly stale) copy than the one the reader is working in.
+
+The deciding factor is whether the referencing file has a **fixed repo root** — a single repo it is always read from. Concept documents do, and so does a repo's own `CLAUDE.md` (Claude Code only loads it when the session is already inside that repo), so both use the Link form for same-repo targets. Files with **no fixed repo root** — skills and global `~/.claude/` config such as `rules/`, loaded across arbitrary repos — have no root for `/` to resolve against, so they use the Citation form even for a same-repo target (see [In skill bundles](#in-skill-bundles)).
+
+### Citation — another repo
+
+A reference to a document in a *different* repo uses its **full workspace path**, beginning with `~/workspace/`:
+
+```markdown
+[SDD standards index](~/workspace/spec-tools/sdd-standards/README.md)
+```
+
+A cross-repo citation always resolves to that repo's canonical main checkout, which is the intended behavior — you reference another repo's published state, not whatever worktree you happen to have open. `~/workspace/<repo>` is self-describing: the repo name is in the path, so no external convention is needed to interpret it.
+
+VS Code does not expand `~/` in markdown links, and it resolves a leading `/` against the filesystem root rather than the bundle root, so neither form is clickable from the editor ([vscode#103542](https://github.com/microsoft/vscode/issues/103542)). Accepted — agents are the primary audience, and both forms are what the `ref-check` linter (`/tools/bin/ref-check`) validates. Anything else — backticked filenames like `` `conftest.py` ``, slash-skill invocations like `/commit` — is treated as prose by `ref-check`.
 
 ### In skill bundles
 
-Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) use a target-based rule. The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
+Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) are harness-owned, not concept documents, and they follow a **target-based** rule instead of the bundle Link/Citation split. The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
+
+A skill has **no fixed repo root**. The same skill can be invoked from a session in any repo's checkout, so there is no stable bundle root for a `/`-absolute Link to resolve against. A skill therefore cites a workspace document by its full `~/workspace/<repo>/…` path even when that document lives in the same repo as the skill bundle — the root-absolute Link form is unavailable to it.
 
 | Target | Style | Example |
 |---|---|---|
@@ -213,7 +276,7 @@ Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/`
 
 ### Fenced code blocks
 
-Fenced code blocks delimited by triple backticks or `~~~` may contain `~/workspace/` paths in shell examples or sample output; `ref-check` skips them. For example:
+Fenced code blocks delimited by triple backticks or `~~~` may contain `~/workspace/` paths or `/`-root paths in shell examples or sample output; `ref-check` skips them. For example:
 
 ```bash
 # Run ref-check from any workspace repo:
@@ -238,4 +301,3 @@ Examples:
 - `## load_issue helper` → `#load_issue-helper` (intraword underscores kept)
 
 **Prefer a stable named anchor over a positional one.** A numbered fragment (`#223-revision`) or an in-prose heading-number citation (`§2.10`, `§2.2.3`) breaks silently the moment its target is renumbered or reordered — nothing flags the stale anchor. Where the target heading carries a stable named slug, cite that. Where the target numbers every heading positionally and exposes no stable anchor, name the **concept** the heading carries and drop the number, so a reader finds it by name rather than by a position that drifts.
-
