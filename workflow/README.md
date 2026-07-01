@@ -8,6 +8,4 @@ description: What the workflow/ directory holds — the intake-to-merge state ma
 
 How an idea moves through this workspace to shipped code — the state machine, gates, and agent-autonomy decisions that sit between intake and delivery.
 
-## Contents
-
-See [`index.md`](index.md) for the full listing.
+The full contents are listed in [`index.md`](index.md).

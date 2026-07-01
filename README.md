@@ -33,9 +33,9 @@ Standards and tools for djinn wrangling across a multi-repo workspace.
 
 All repos live under a single root directory: `~/workspace/`. One meta repo governs everything else: **dev-playbook** (this repo).
 
-## Contents
+## What's here
 
-See [`index.md`](index.md) for the full listing.
+The top-level directories are listed in [`index.md`](index.md).
 
 > **`dotfiles/`** — after adding or removing files, run `dotfiles/bin/sync-dotfiles.sh` from the main checkout only; it relinks live `$HOME`, so it's a human step, never run from a per-issue worktree.
 

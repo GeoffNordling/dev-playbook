@@ -6,6 +6,4 @@ description: The architecture decision records directory — numbered, immutable
 
 # Architecture Decision Records
 
-## Contents
-
-See [`index.md`](index.md) for the full listing.
+The architecture decision records are listed in [`index.md`](index.md).

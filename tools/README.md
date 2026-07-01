@@ -39,10 +39,10 @@ Run automatically on every commit via pre-commit hooks. Each script exits 0 on s
 
 | Script | Standard | Purpose |
 |--------|----------|---------|
-| `ref-check` | [repo-documentation.md](../standards/repo-documentation.md) | Broken cross-references in markdown |
-| `internal-skill-audit` | [skill-conventions.md](../standards/skill-conventions.md) | Skill conformance |
-| `test-privacy` | [testing-conventions.md](../standards/testing-conventions.md) | Private-name access in test files |
-| `no-future-annotations` | [python-conventions.md — Future Imports](../standards/python-conventions.md#future-imports) | Bans `from __future__ import annotations` |
+| `ref-check` | [repo-documentation.md](/standards/repo-documentation.md) | Broken cross-references in markdown |
+| `internal-skill-audit` | [skill-conventions.md](/standards/skill-conventions.md) | Skill conformance |
+| `test-privacy` | [testing-conventions.md](/standards/testing-conventions.md) | Private-name access in test files |
+| `no-future-annotations` | [python-conventions.md — Future Imports](/standards/python-conventions.md#future-imports) | Bans `from __future__ import annotations` |
 
 Run any script with `--help`; each script's docstring documents its behavior in full.
 
@@ -50,10 +50,10 @@ Run any script with `--help`; each script's docstring documents its behavior in 
 
 Each hook entry runs in two environments and MUST work in both:
 
-1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](../.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
-2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [build-conventions.md — Pre-commit](../standards/build-conventions.md#pre-commit).
+1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
+2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [build-conventions.md — Pre-commit](/standards/build-conventions.md#pre-commit).
 
-In both, pre-commit resolves the script by the relative `entry: tools/bin/<tool>` declared in [`.pre-commit-hooks.yaml`](../.pre-commit-hooks.yaml) (mirrored in the local block) against the dev-playbook checkout that holds it — no `$HOME` paths, no `realpath` indirection.
+In both, pre-commit resolves the script by the relative `entry: tools/bin/<tool>` declared in [`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml) (mirrored in the local block) against the dev-playbook checkout that holds it — no `$HOME` paths, no `realpath` indirection.
 
 When adding a validator, mirror it into both the manifest and the local block, and test it in dev-playbook and a consumer repo before pushing.
 

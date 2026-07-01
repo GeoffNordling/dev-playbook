@@ -29,7 +29,7 @@ Make is the task runner. Every Python sub-project `SHALL` have a `Makefile` at i
 
 ## Pre-commit
 
-dev-playbook publishes the canonical hook set as a **pre-commit hook repository**: the hook definitions live in [`dev-playbook/.pre-commit-hooks.yaml`](../.pre-commit-hooks.yaml), backed by the scripts in `tools/bin/`. Consumer repos reference them by URL and a pinned revision in their own `.pre-commit-config.yaml`, exactly as they reference any third-party hook (e.g. ruff):
+dev-playbook publishes the canonical hook set as a **pre-commit hook repository**: the hook definitions live in [`dev-playbook/.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml), backed by the scripts in `tools/bin/`. Consumer repos reference them by URL and a pinned revision in their own `.pre-commit-config.yaml`, exactly as they reference any third-party hook (e.g. ruff):
 
 ```yaml
 repos:
@@ -76,6 +76,6 @@ jobs:
       - run: make check
 ```
 
-dev-playbook's own [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) is a self-hosting variant — it runs pre-commit via `pre-commit/action` and scopes `make check` to `working-directory: tools` for its sub-project layout. It is not the consumer template.
+dev-playbook's own [`.github/workflows/ci.yml`](/.github/workflows/ci.yml) is a self-hosting variant — it runs pre-commit via `pre-commit/action` and scopes `make check` to `working-directory: tools` for its sub-project layout. It is not the consumer template.
 
 Because pre-commit clones dev-playbook over HTTPS unauthenticated — on every consumer's runner and on every developer's first run — **dev-playbook must remain a public repository**. Making it private would break hook resolution for every consumer.

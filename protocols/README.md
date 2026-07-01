@@ -16,9 +16,7 @@ Both documents live side-by-side in the protocol directory. The skill is symlink
 
 Protocols are written to be **frontier-invariant**. The capabilities of AI models advance rapidly — what an agent cannot do reliably today it may do well tomorrow. A protocol that encodes assumptions about current capability becomes obsolete with each advance. Instead, protocols define relationships between abstract objects (scope, capability, step size) and let the operational parameters adjust as the frontier moves. The algorithm is general; the specifics of each application may change.
 
-## Contents
-
-See [`index.md`](index.md) for the full listing.
+The protocols are listed in [`index.md`](index.md).
 
 ## Field notes
 

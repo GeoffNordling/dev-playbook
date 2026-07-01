@@ -9,9 +9,9 @@ description: Python project structure, pyproject.toml shape, directory layout, a
 Conventions for the shape of a Python project in this workspace: directory
 layout, `pyproject.toml`, and tool configuration. Sibling to:
 
-- [python-conventions.md](python-conventions.md) — code-level conventions
-- [build-conventions.md](build-conventions.md) — Makefile and `make check`
-- [testing-conventions.md](testing-conventions.md) — pytest conventions
+- [python-conventions.md](/standards/python-conventions.md) — code-level conventions
+- [build-conventions.md](/standards/build-conventions.md) — Makefile and `make check`
+- [testing-conventions.md](/standards/testing-conventions.md) — pytest conventions
 
 Scope: applies to top-level Python repos and to Python sub-projects inside
 meta repos (e.g. `dev-playbook/tools/`). Sub-projects `MAY` deviate on
@@ -20,7 +20,7 @@ false` because it is a script collection, not a packageable library. They
 `SHALL NOT` deviate on the lint, type-check, and test contract: every
 sub-project has the full `[tool.ruff]`, `[tool.mypy]`, and pytest config
 described below, and the standard targets defined in
-[build-conventions.md](build-conventions.md).
+[build-conventions.md](/standards/build-conventions.md).
 
 ## Directory layout
 

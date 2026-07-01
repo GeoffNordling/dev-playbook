@@ -19,7 +19,7 @@ collected in one shot — judging a set of candidates, classifying a list, or
 answering the same question against different inputs. Each job is its own isolated
 `agent()`; none can see another's work.
 
-This is the parallel-independent counterpart to the [Ralph loop](ralph-loop.md).
+This is the parallel-independent counterpart to the [Ralph loop](/harness-recipes/recipes/ralph-loop.md).
 Ralph is one large task split into sequential, dependent steps, where disk carries
 state between iterations; scatter-gather is the opposite shape — parallel,
 independent jobs that share nothing and run at once. If a job needs another job's
