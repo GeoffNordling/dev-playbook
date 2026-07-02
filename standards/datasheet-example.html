@@ -56,13 +56,60 @@ Bo,bo@x.io
   <li><strong>Key</strong> — the column set that defines row identity.</li>
   <li><strong>First-wins</strong> — of identical-key rows, the earliest
       survives.</li>
+  <li><strong>Seen keys</strong> — the pass's memory of keys already
+      encountered; it grows with each unique row.</li>
 </ul>
 
 <h2>Shape</h2>
 <p>One command-line entry point (<span title="tools/bin/csv-dedupe">csv-dedupe</span>)
-drives a three-step flow: parse arguments, stream rows through the first-wins
-pass, write the result. The pass is a pure function; only the edges touch
-files.</p>
+streams the input CSV through the first-wins pass and writes the deduplicated
+CSV. The pass is a pure function; only the edges touch files.</p>
+<!-- DOT source:
+digraph csv_dedupe {
+  rankdir=LR;
+  node [shape=box, fontname="Helvetica", fontsize=12];
+  edge [fontname="Helvetica", fontsize=10];
+  in    [label="input CSV"];
+  pass  [label="first-wins pass"];
+  out   [label="deduplicated CSV"];
+  in -> pass  [label="rows"];
+  pass -> out [label="unique rows"];
+}
+-->
+<svg width="430pt" height="44pt"
+ viewBox="0.00 0.00 430.00 44.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 40)">
+<title>csv_dedupe</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-40 425.5,-40 425.5,4 -4,4"/>
+<g id="node1" class="node">
+<title>in</title>
+<polygon fill="none" stroke="black" points="70.75,-36 0,-36 0,0 70.75,0 70.75,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="35.38" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00">input CSV</text>
+</g>
+<g id="node2" class="node">
+<title>pass</title>
+<polygon fill="none" stroke="black" points="219.5,-36 127.75,-36 127.75,0 219.5,0 219.5,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="173.62" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00">first&#45;wins pass</text>
+</g>
+<g id="edge1" class="edge">
+<title>in&#45;&gt;pass</title>
+<path fill="none" stroke="black" d="M71.11,-18C84.74,-18 100.75,-18 115.96,-18"/>
+<polygon fill="black" stroke="black" points="115.88,-21.5 125.88,-18 115.88,-14.5 115.88,-21.5"/>
+<text xml:space="preserve" text-anchor="middle" x="99.25" y="-20.5" font-family="Helvetica,sans-Serif" font-size="10.00">rows</text>
+</g>
+<g id="node3" class="node">
+<title>out</title>
+<polygon fill="none" stroke="black" points="421.5,-36 308,-36 308,0 421.5,0 421.5,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="364.75" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00">deduplicated CSV</text>
+</g>
+<g id="edge2" class="edge">
+<title>pass&#45;&gt;out</title>
+<path fill="none" stroke="black" d="M219.93,-18C242.76,-18 270.92,-18 296.25,-18"/>
+<polygon fill="black" stroke="black" points="296.15,-21.5 306.15,-18 296.15,-14.5 296.15,-21.5"/>
+<text xml:space="preserve" text-anchor="middle" x="263.75" y="-20.5" font-family="Helvetica,sans-Serif" font-size="10.00">unique rows</text>
+</g>
+</g>
+</svg>
 <details>
   <summary>Module roster</summary>
   <p>cli.py — argument parsing and file I/O. dedupe.py — the pure first-wins
@@ -86,6 +133,8 @@ order, and the empty-file case. The command-line path is untested.</p>
     <li>First-wins ordering (Concepts) lets input order silently decide which
         duplicate survives — a reordered export changes output with no
         warning.</li>
+    <li>Seen-key memory (Concepts) grows with every unique row — a very large
+        input grows it without bound.</li>
   </ol>
 </div>
 

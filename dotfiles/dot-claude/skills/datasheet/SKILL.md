@@ -17,6 +17,17 @@ skill is the procedure; the standard is the contract.
 
 `$ARGUMENTS` names the subject and/or scope paths.
 
+## Read first
+
+Before doing anything else, read end-to-end:
+
+- [Datasheet Standard](~/workspace/dev-playbook/standards/datasheet.md) — the
+  contract the sheet must satisfy.
+- [datasheet-example.html](~/workspace/dev-playbook/standards/datasheet-example.html)
+  — the structure to match, not the size.
+
+Then report: `READ: datasheet.md, datasheet-example.html`. Proceed only after.
+
 ## Resolve subject and scope
 
 The scope is an explicit manifest of paths and globs; the subject names the
@@ -50,10 +61,7 @@ If the scope holds no Python package, skip this step.
 
 ## Generate
 
-Read the standard (the contract the sheet must satisfy) and its example
-([datasheet-example.html](~/workspace/dev-playbook/standards/datasheet-example.html)
-— the structure to match, not the size). Write the sheet to
-`docs/datasheets/<subject>.html` under these rules:
+Write the sheet to `docs/datasheets/<subject>.html` under these rules:
 
 - **Structure from the inventory.** The inventory is authoritative for what
   exists — modules, classes, functions, signatures. Read source freely for

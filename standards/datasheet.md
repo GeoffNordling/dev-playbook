@@ -165,5 +165,6 @@ The one section allowed opinion, fenced five ways:
 [datasheet-example.html](/standards/datasheet-example.html) is a complete,
 minimal datasheet for a fictional tool — read it in full before generating. It
 sets the structure — stamp comment first, both stamp forms, section order,
-labels, anchors, one collapsed block — not the size: a real system may spend
-the full budget. The optional diagram slot is unused there.
+labels, anchors, one collapsed block, and a Shape diagram in the prescribed
+form (inline SVG, DOT source in a comment beside it) — not the size: a real
+system may spend the full budget.
