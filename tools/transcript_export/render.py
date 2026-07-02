@@ -22,7 +22,7 @@ from transcript_export.model import Message, ToolCall
 
 TOOL_OUTPUT_TRUNCATION = 2000
 """Max characters of a tool output we inline; longer bodies are cut and marked
-`truncated="true"`. See the Accepted losses section in ARCHITECTURE.md."""
+`truncated="true"`."""
 
 _REJECTION_PREFIX = "The user doesn't want to proceed"
 """A user-denied tool call's `result_content` opens with this sentence."""
