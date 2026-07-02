@@ -31,9 +31,9 @@ Then report: `READ: datasheet.md, datasheet-example.html`. Proceed only after.
 ## Resolve subject and scope
 
 The scope is an explicit manifest of paths and globs; the subject names the
-sheet. Take both from `$ARGUMENTS` where given. If the scope is ambiguous,
-propose a manifest and confirm with the user. If no subject was given,
-propose one and confirm. Do not proceed on a guessed manifest.
+sheet. Take both from `$ARGUMENTS`. If either is missing or ambiguous, stop
+and report exactly what is needed — never proceed on a guessed manifest or
+subject.
 
 ## Check existing sheets
 
