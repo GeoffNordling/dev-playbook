@@ -140,7 +140,11 @@ identity card that opens the fact rail. The [example](#example) shows both.
 
 Concepts are the owner's vocabulary, not the code's. Each chip names
 something the owner needs in order to direct future work or to read the rest
-of this sheet; the defining phrase is one clause. A concept earns its place
+of this sheet; the defining phrase is one clause. Terms come from the files:
+when the files name the thing — an identifier, a docstring phrase, an
+emitted element — the chip uses that name, anchored to its defining site. A
+term the files don't supply is the generator's coinage and wears a dashed
+border (`chip coined`). A concept earns its place
 only when another part of the sheet leans on it — the exhibit, a diagram
 node, an Assessment item. A concept nothing else references is a souvenir of
 reading the code; cut it.
