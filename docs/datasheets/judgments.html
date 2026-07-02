@@ -1,0 +1,426 @@
+<!--datasheet-stamp
+subject: judgments
+scope:
+  - tools/src/judgments/
+  - tools/src/skipcache/
+  - tools/bin/judgments-lint
+  - tools/bin/judgments-run
+  - tools/tests/test_judgments_*.py
+  - tools/tests/test_loader.py
+  - tools/tests/test_runner.py
+  - tools/tests/test_pytest_support.py
+  - tools/tests/test_skipcache.py
+commit: 4c5c891
+generated: 2026-07-02
+generator: claude-opus-4-8
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>judgments — datasheet</title>
+<style>
+  :root {
+    --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --run:#15803d; --run-bg:#f0fdf4; --run-line:#86efac;
+    --slate-bg:#f1f5f9; --slate-line:#cbd5e1;
+    --opinion:#b45309; --opinion-bg:#fffbeb; --opinion-line:#fcd34d;
+    --chip-ink:#3730a3; --chip-bg:#eef2ff; --chip-line:#c7d2fe;
+  }
+  * { box-sizing:border-box; }
+  body { font:15px/1.45 system-ui, sans-serif; color:var(--ink); background:#f8fafc; margin:0; }
+  .page { max-width:none; margin:0 auto; padding:1rem 1.5rem 2rem; }
+
+  .layout { display:grid; grid-template-columns:320px 1fr; gap:1rem; align-items:start; }
+  .main p { max-width:80ch; }
+  .rail { position:sticky; top:1rem; display:flex; flex-direction:column; gap:1rem; }
+  .main { display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:stretch; }
+  .main .card { min-width:0; }
+  .span2 { grid-column:span 2; }
+  .assess ol { columns:2; column-gap:2.5rem; }
+  .assess li { break-inside:avoid; }
+  @media (max-width:1500px) {
+    .main { grid-template-columns:1fr; }
+    .span2 { grid-column:auto; }
+    .assess ol { columns:1; }
+  }
+
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:.9rem 1.1rem; box-shadow:0 1px 2px rgba(15,23,42,.05); }
+  .card h2 { font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 .55rem; }
+
+  .identity .subject { font-size:1.25rem; font-weight:700; margin-bottom:.3rem; }
+  .identity .meta { color:var(--muted); font-size:.78rem; line-height:1.6; }
+  .identity .meta code { background:var(--slate-bg); padding:0 .35em; border-radius:4px; }
+
+  .badge { display:inline-block; border-radius:999px; padding:0 .6em; font-size:.75rem;
+    font-weight:600; border:1px solid; }
+  .badge.run, .badge.captured { color:var(--run); background:var(--run-bg); border-color:var(--run-line); }
+  .badge.notrun, .badge.constructed { color:#475569; background:var(--slate-bg); border-color:var(--slate-line); }
+  .badge.opinion { color:var(--opinion); background:var(--opinion-bg); border-color:var(--opinion-line); }
+
+  .chip { display:inline-block; background:var(--chip-bg); border:1px solid var(--chip-line);
+    color:var(--chip-ink); border-radius:999px; padding:0 .5em; font-size:.8rem; font-weight:600; }
+  .chip.coined { border-style:dashed; }
+  .concept { margin:0 0 .35rem; font-size:.82rem; }
+  .concept .def { color:var(--muted); }
+
+  .cell { border-top:1px solid var(--line); padding:.35rem 0; font-size:.82rem; }
+  .cell:first-of-type { border-top:none; padding-top:0; }
+  .cell .k { display:inline-block; width:4.4em; font-size:.68rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted); }
+  .cell code { font-size:.78rem; }
+  .none { color:#94a3b8; }
+
+  .testrow { font-size:.82rem; margin-bottom:.25rem; }
+  .testrow .n { font-weight:700; color:var(--run); }
+  .testrow .gated { font-weight:700; color:var(--opinion); }
+
+  pre.term { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:.75rem .9rem;
+    font-size:.82rem; line-height:1.5; overflow-x:auto; margin:.6rem 0 .4rem; }
+  pre.term .p { color:#4ade80; }
+  .aside { color:var(--muted); font-size:.82rem; margin:.2rem 0 0; }
+
+  .assess { background:var(--opinion-bg); border-color:var(--opinion-line); }
+  .assess ol { margin:.2rem 0 0 1.2rem; padding:0; }
+  .assess li { margin-bottom:.45rem; font-size:.9rem; }
+  .assess li strong { display:block; }
+  .assess li span { color:#78716c; }
+
+  svg { max-width:100%; height:auto; }
+  .legend { display:flex; gap:1.1rem; font-size:.72rem; color:var(--muted); margin:0 0 .5rem; }
+  .legend span { display:inline-flex; align-items:center; gap:.35em; }
+  .legend i { width:.75em; height:.75em; border-radius:3px; border:1px solid; }
+  .legend .in { background:#e0f2fe; border-color:#38bdf8; }
+  .legend .int { background:#f1f5f9; border-color:#94a3b8; }
+  .legend .out { background:#dcfce7; border-color:#4ade80; }
+  .apirr { display:block; margin:.2rem 0 .1rem; }
+  .apirr text { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .apilist { margin:.55rem 0 0; border-top:1px solid var(--line); padding-top:.5rem; }
+  .apilist .sig { font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:.78rem; color:#334155; padding:.12rem 0; }
+  details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
+  details summary { cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="layout">
+
+<aside class="rail">
+
+  <header class="card identity">
+    <div class="subject">judgments</div>
+    <div class="meta">datasheet · commit <code>4c5c891</code><br>
+    2026-07-02 · claude-opus-4-8<br>
+    scope: tools/src/judgments/, tools/src/skipcache/, tools/bin/judgments-{run,lint}, tools/tests/test_{judgments_*,loader,runner,pytest_support,skipcache}.py</div>
+  </header>
+
+  <section class="card">
+    <h2>Concepts</h2>
+    <div class="concept"><span class="chip" title="tools/src/judgments/loader.py:24 Declaration.claim">Claim</span> <span class="def">the plain-English proposition a judge rules true or false</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgments/core.py:83 prepare()">Evidence / reference</span> <span class="def">the files a claim is judged on; reference is context only, not itself ruled on</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgments/core.py:168 _content_key">Content key</span> <span class="def">a SHA-256 over the claim, instrument, and file bytes — the cache identity; any change re-keys</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgments/instruments.py">Instrument</span> <span class="def">the model + effort a judge runs under, folded into the key</span></div>
+    <div class="concept"><span class="chip" title="tools/src/skipcache/seen.py">Seen-set</span> <span class="def">the local store of keys already judged-and-passed</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgments/pytest_support.py:15 assert_judgment_cached">Cache-gate</span> <span class="def">the pytest assertion that fails until a judgment's current content is in the seen-set</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Touch surface</h2>
+    <div class="cell"><span class="k">Reads</span> a repo's <code>pyproject.toml</code> (<code>[tool.judgments]</code>), the declaration YAML it globs, and each judgment's evidence/reference files</div>
+    <div class="cell"><span class="k">Writes</span> the seen-set store (<code>~/.cache/skipcache/seen.sqlite</code>) — only <code>record</code>; plan, render, lint never write</div>
+    <div class="cell"><span class="k">Spawns</span> <span class="none">none</span></div>
+    <div class="cell"><span class="k">Net</span> <span class="none">none</span></div>
+    <div class="cell"><span class="k">Env</span> <code>XDG_CACHE_HOME</code> — seen-set location (else <code>$HOME/.cache</code>); <code>SKIP_JUDGMENTS</code> — skips the repo's own gate on CI</div>
+    <div class="cell"><span class="k">Deps</span> PyYAML; stdlib <code>sqlite3</code>, <code>hashlib</code>, <code>tomllib</code>, <code>argparse</code></div>
+  </section>
+
+  <section class="card">
+    <h2>Tests</h2>
+    <div class="testrow"><span class="n">✓ 30</span> keying &amp; prompt — content-key stability, root-invariance, per-input sensitivity, path canonicalization; fail-loud on absolute / <code>..</code> / symlink-escape / non-UTF-8; single read</div>
+    <div class="testrow"><span class="n">✓ 18</span> loading &amp; validation — root resolution, glob discovery, field rules, duplicate-id, malformed-shape</div>
+    <div class="testrow"><span class="n">✓ 34</span> the rest, offline — CLI plan/render/record, the lint hook (subprocess), the seen-set (persistence, opaque keys, XDG path), the gate helper, the verdict schema</div>
+    <div class="testrow"><span class="gated">⚠ gated</span> the repo's own judgment gate — one case per declared judgment, skipped on GH CI (no LLM or cache there); passes only where a human ran the judge. A never-skipped guard asserts the config resolves everywhere</div>
+  </section>
+
+</aside>
+
+<main class="main">
+
+  <section class="card">
+    <h2>Purpose</h2>
+    <p>Turns plain-English claims about a repo's files into cache-gated,
+    LLM-judged checks — a project can assert things ordinary tests can't ("the
+    README documents every flag") and have a judge model rule on them. The
+    deterministic half — keying, prompt rendering, the seen-set — runs offline
+    in pytest; the expensive judge runs only on a cache miss, and a recorded
+    pass is never re-judged until the claim or its files change.</p>
+  </section>
+
+  <section class="card">
+    <h2>Behavior <span class="badge run">verified: run</span> <span class="badge constructed">exhibit: constructed</span></h2>
+    <pre class="term"><span class="p">$</span> judgments-run plan
+{"schema": {…}, "seen": [],
+ "unseen": [{"id": "readme-documents-flags", "model": "claude-opus-4-8",
+   "effort": "high", "prompt": "Run `judgments-run render readme-documents-flags` …"}]}
+<span class="p">$</span> judgments-run record readme-documents-flags   <span class="p">#</span> after the judge rules it true
+<span class="p">$</span> judgments-run plan
+{"schema": {…}, "seen": ["readme-documents-flags"], "unseen": []}</pre>
+    <p class="aside">The declaration (a claim plus its evidence/reference files)
+    is fabricated for the demo, so the exhibit is constructed; the
+    plan→record→plan run is live. First <code>plan</code> flags the judgment
+    unseen with a ready-to-dispatch prompt; once a pass is recorded, the same
+    content reads back seen and the cache-gate goes green.</p>
+  </section>
+
+  <section class="card span2">
+    <h2>API</h2>
+    <svg class="apirr" viewBox="0 0 620 232" width="100%" style="max-width:600px" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="rrarw" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <!-- judgments-run track -->
+      <circle cx="14" cy="100" r="4" fill="#64748b"/>
+      <line x1="14" y1="100" x2="38" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="40" y="84" width="134" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="107" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">judgments-run</text>
+      <line x1="174" y1="100" x2="196" y2="100" stroke="#64748b" stroke-width="2"/>
+      <circle cx="196" cy="100" r="3.5" fill="#64748b"/>
+      <!-- top branch: plan -->
+      <path d="M196,100 C214,100 218,48 236,48" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="238" y="32" width="58" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="267" y="52" text-anchor="middle" font-size="12.5" fill="#1e293b">plan</text>
+      <path d="M296,48 C360,48 388,100 452,100" fill="none" stroke="#64748b" stroke-width="2"/>
+      <!-- mid branch: render <id> -->
+      <line x1="196" y1="100" x2="238" y2="100" stroke="#64748b" stroke-width="2"/>
+      <rect x="238" y="84" width="68" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="272" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">render</text>
+      <line x1="306" y1="100" x2="322" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="324" y="84" width="52" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="350" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;id&gt;</text>
+      <line x1="376" y1="100" x2="452" y2="100" stroke="#64748b" stroke-width="2"/>
+      <!-- bottom branch: record <id>... -->
+      <path d="M196,100 C214,100 218,152 236,152" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="238" y="136" width="68" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="272" y="156" text-anchor="middle" font-size="12.5" fill="#1e293b">record</text>
+      <line x1="306" y1="152" x2="322" y2="152" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="324" y="136" width="52" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="350" y="156" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;id&gt;</text>
+      <path d="M374,136 C374,120 326,120 326,136" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <text x="350" y="114" text-anchor="middle" font-size="10" fill="#94a3b8">1+</text>
+      <path d="M376,152 C412,152 416,100 452,100" fill="none" stroke="#64748b" stroke-width="2"/>
+      <!-- converge + end -->
+      <circle cx="452" cy="100" r="3.5" fill="#64748b"/>
+      <line x1="452" y1="100" x2="478" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <line x1="482" y1="92" x2="482" y2="108" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="488" y1="92" x2="488" y2="108" stroke="#64748b" stroke-width="2.5"/>
+      <!-- judgments-lint track -->
+      <circle cx="14" cy="200" r="4" fill="#64748b"/>
+      <line x1="14" y1="200" x2="38" y2="200" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="40" y="184" width="130" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="105" y="204" text-anchor="middle" font-size="12.5" fill="#1e293b">judgments-lint</text>
+      <line x1="170" y1="200" x2="196" y2="200" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <line x1="200" y1="192" x2="200" y2="208" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="206" y1="192" x2="206" y2="208" stroke="#64748b" stroke-width="2.5"/>
+    </svg>
+    <div class="apilist">
+      <div class="sig">assert_judgment_cached(id: str) -&gt; None</div>
+      <div class="sig">prepare(claim, evidence, reference, model, effort, root) -&gt; Prepared</div>
+      <div class="sig">load(root) -&gt; list[Declaration] · resolve_root(start=None) -&gt; Path | None</div>
+      <div class="sig">lint(root) -&gt; list[str]</div>
+      <div class="sig">plan(decls, root) -&gt; dict · render(decl, root) -&gt; str · record(decls, root) -&gt; None</div>
+      <div class="sig">seen.filter(keys) -&gt; Partition · seen.record(keys) -&gt; None</div>
+    </div>
+    <p class="aside">Both CLIs above, the importable library below.
+    <code>judgments-run</code> takes exactly one subcommand; <code>&lt;id&gt;</code>
+    repeats for <code>record</code>. <code>judgments-lint</code> takes no
+    arguments. Exit <code>judgments-run</code>: <code>0</code> ok ·
+    <code>1</code> bad config / unknown id / unreadable file · <code>2</code>
+    usage. <code>judgments-lint</code>: <code>0</code> clean · <code>1</code>
+    errors.</p>
+  </section>
+
+  <section class="card span2">
+    <h2>Shape</h2>
+    <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
+    <!-- DOT source:
+    digraph judgments {
+      rankdir=LR;
+      bgcolor="transparent";
+      node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12,
+            color="#94a3b8", fillcolor="#f1f5f9", fontcolor="#1e293b"];
+      edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#475569"];
+      in     [label="declarations", fillcolor="#e0f2fe", color="#38bdf8"];
+      load   [label="load"];
+      prep   [label="prepare"];
+      seen   [label="seen-set", shape=cylinder];
+      record [label="record"];
+      render [label="judge prompt", fillcolor="#dcfce7", color="#4ade80"];
+      plan   [label="plan JSON", fillcolor="#dcfce7", color="#4ade80"];
+      gate   [label="gate pass/fail", fillcolor="#dcfce7", color="#4ade80"];
+      in     -> load   [label="YAML + files"];
+      load   -> prep   [label="declaration"];
+      prep   -> render [label="prompt"];
+      prep   -> plan   [label="key"];
+      prep   -> gate   [label="key"];
+      prep   -> record [label="key"];
+      record -> seen   [label="pass"];
+      seen   -> plan   [label="seen/unseen"];
+      seen   -> gate   [label="hit/miss"];
+    }
+    -->
+<svg width="825pt" height="152pt"
+ viewBox="0.00 0.00 825.00 152.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 148.11)">
+<title>judgments</title>
+<!-- in -->
+<g id="node1" class="node">
+<title>in</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M69.25,-98.11C69.25,-98.11 12,-98.11 12,-98.11 6,-98.11 0,-92.11 0,-86.11 0,-86.11 0,-74.11 0,-74.11 0,-68.11 6,-62.11 12,-62.11 12,-62.11 69.25,-62.11 69.25,-62.11 75.25,-62.11 81.25,-68.11 81.25,-74.11 81.25,-74.11 81.25,-86.11 81.25,-86.11 81.25,-92.11 75.25,-98.11 69.25,-98.11"/>
+<text xml:space="preserve" text-anchor="middle" x="40.62" y="-75.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">declarations</text>
+</g>
+<!-- load -->
+<g id="node2" class="node">
+<title>load</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M215.5,-98.11C215.5,-98.11 185.5,-98.11 185.5,-98.11 179.5,-98.11 173.5,-92.11 173.5,-86.11 173.5,-86.11 173.5,-74.11 173.5,-74.11 173.5,-68.11 179.5,-62.11 185.5,-62.11 185.5,-62.11 215.5,-62.11 215.5,-62.11 221.5,-62.11 227.5,-68.11 227.5,-74.11 227.5,-74.11 227.5,-86.11 227.5,-86.11 227.5,-92.11 221.5,-98.11 215.5,-98.11"/>
+<text xml:space="preserve" text-anchor="middle" x="200.5" y="-75.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">load</text>
+</g>
+<!-- in&#45;&gt;load -->
+<g id="edge1" class="edge">
+<title>in&#45;&gt;load</title>
+<path fill="none" stroke="#64748b" d="M81.46,-80.11C106.11,-80.11 137.57,-80.11 161.81,-80.11"/>
+<polygon fill="#64748b" stroke="#64748b" points="161.55,-83.61 171.55,-80.11 161.55,-76.61 161.55,-83.61"/>
+<text xml:space="preserve" text-anchor="middle" x="127.38" y="-82.61" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">YAML + files</text>
+</g>
+<!-- prep -->
+<g id="node3" class="node">
+<title>prep</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M356,-98.11C356,-98.11 322.75,-98.11 322.75,-98.11 316.75,-98.11 310.75,-92.11 310.75,-86.11 310.75,-86.11 310.75,-74.11 310.75,-74.11 310.75,-68.11 316.75,-62.11 322.75,-62.11 322.75,-62.11 356,-62.11 356,-62.11 362,-62.11 368,-68.11 368,-74.11 368,-74.11 368,-86.11 368,-86.11 368,-92.11 362,-98.11 356,-98.11"/>
+<text xml:space="preserve" text-anchor="middle" x="339.38" y="-75.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">prepare</text>
+</g>
+<!-- load&#45;&gt;prep -->
+<g id="edge2" class="edge">
+<title>load&#45;&gt;prep</title>
+<path fill="none" stroke="#64748b" d="M227.89,-80.11C248.13,-80.11 276.39,-80.11 299.26,-80.11"/>
+<polygon fill="#64748b" stroke="#64748b" points="299.14,-83.61 309.14,-80.11 299.14,-76.61 299.14,-83.61"/>
+<text xml:space="preserve" text-anchor="middle" x="269.12" y="-82.61" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">declaration</text>
+</g>
+<!-- record -->
+<g id="node5" class="node">
+<title>record</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M491.88,-62.11C491.88,-62.11 461.88,-62.11 461.88,-62.11 455.88,-62.11 449.88,-56.11 449.88,-50.11 449.88,-50.11 449.88,-38.11 449.88,-38.11 449.88,-32.11 455.88,-26.11 461.88,-26.11 461.88,-26.11 491.88,-26.11 491.88,-26.11 497.88,-26.11 503.88,-32.11 503.88,-38.11 503.88,-38.11 503.88,-50.11 503.88,-50.11 503.88,-56.11 497.88,-62.11 491.88,-62.11"/>
+<text xml:space="preserve" text-anchor="middle" x="476.88" y="-39.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">record</text>
+</g>
+<!-- prep&#45;&gt;record -->
+<g id="edge6" class="edge">
+<title>prep&#45;&gt;record</title>
+<path fill="none" stroke="#64748b" d="M368.45,-72.65C388.78,-67.25 416.47,-59.89 438.65,-54"/>
+<polygon fill="#64748b" stroke="#64748b" points="439.45,-57.41 448.21,-51.46 437.65,-50.65 439.45,-57.41"/>
+<text xml:space="preserve" text-anchor="middle" x="401" y="-69.94" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">key</text>
+</g>
+<!-- render -->
+<g id="node6" class="node">
+<title>render</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M507.75,-116.11C507.75,-116.11 446,-116.11 446,-116.11 440,-116.11 434,-110.11 434,-104.11 434,-104.11 434,-92.11 434,-92.11 434,-86.11 440,-80.11 446,-80.11 446,-80.11 507.75,-80.11 507.75,-80.11 513.75,-80.11 519.75,-86.11 519.75,-92.11 519.75,-92.11 519.75,-104.11 519.75,-104.11 519.75,-110.11 513.75,-116.11 507.75,-116.11"/>
+<text xml:space="preserve" text-anchor="middle" x="476.88" y="-93.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">judge prompt</text>
+</g>
+<!-- prep&#45;&gt;render -->
+<g id="edge3" class="edge">
+<title>prep&#45;&gt;render</title>
+<path fill="none" stroke="#64748b" d="M368.45,-83.84C384.05,-85.91 403.98,-88.56 422.43,-91.01"/>
+<polygon fill="#64748b" stroke="#64748b" points="421.8,-94.46 432.17,-92.3 422.72,-87.52 421.8,-94.46"/>
+<text xml:space="preserve" text-anchor="middle" x="401" y="-92.15" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">prompt</text>
+</g>
+<!-- plan -->
+<g id="node7" class="node">
+<title>plan</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M798.5,-109.11C798.5,-109.11 748,-109.11 748,-109.11 742,-109.11 736,-103.11 736,-97.11 736,-97.11 736,-85.11 736,-85.11 736,-79.11 742,-73.11 748,-73.11 748,-73.11 798.5,-73.11 798.5,-73.11 804.5,-73.11 810.5,-79.11 810.5,-85.11 810.5,-85.11 810.5,-97.11 810.5,-97.11 810.5,-103.11 804.5,-109.11 798.5,-109.11"/>
+<text xml:space="preserve" text-anchor="middle" x="773.25" y="-86.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">plan JSON</text>
+</g>
+<!-- prep&#45;&gt;plan -->
+<g id="edge4" class="edge">
+<title>prep&#45;&gt;plan</title>
+<path fill="none" stroke="#64748b" d="M368.13,-98.18C386.09,-108.65 410.44,-120.62 434,-125.11 536.76,-144.71 659.37,-120.87 725.09,-104.35"/>
+<polygon fill="#64748b" stroke="#64748b" points="725.63,-107.82 734.44,-101.94 723.88,-101.04 725.63,-107.82"/>
+<text xml:space="preserve" text-anchor="middle" x="548.25" y="-134.61" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">key</text>
+</g>
+<!-- gate -->
+<g id="node8" class="node">
+<title>gate</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M804.5,-48.11C804.5,-48.11 742,-48.11 742,-48.11 736,-48.11 730,-42.11 730,-36.11 730,-36.11 730,-24.11 730,-24.11 730,-18.11 736,-12.11 742,-12.11 742,-12.11 804.5,-12.11 804.5,-12.11 810.5,-12.11 816.5,-18.11 816.5,-24.11 816.5,-24.11 816.5,-36.11 816.5,-36.11 816.5,-42.11 810.5,-48.11 804.5,-48.11"/>
+<text xml:space="preserve" text-anchor="middle" x="773.25" y="-25.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">gate pass/fail</text>
+</g>
+<!-- prep&#45;&gt;gate -->
+<g id="edge5" class="edge">
+<title>prep&#45;&gt;gate</title>
+<path fill="none" stroke="#64748b" d="M360.07,-61.67C377.85,-46.38 405.52,-25.8 434,-17.11 530.84,12.44 650.53,-3.67 718.46,-17.37"/>
+<polygon fill="#64748b" stroke="#64748b" points="717.73,-20.79 728.23,-19.4 719.15,-13.94 717.73,-20.79"/>
+<text xml:space="preserve" text-anchor="middle" x="548.25" y="-3.38" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">key</text>
+</g>
+<!-- seen -->
+<g id="node4" class="node">
+<title>seen</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M638.5,-58.84C638.5,-60.64 624.66,-62.11 607.62,-62.11 590.59,-62.11 576.75,-60.64 576.75,-58.84 576.75,-58.84 576.75,-29.38 576.75,-29.38 576.75,-27.58 590.59,-26.11 607.62,-26.11 624.66,-26.11 638.5,-27.58 638.5,-29.38 638.5,-29.38 638.5,-58.84 638.5,-58.84"/>
+<path fill="none" stroke="#94a3b8" d="M638.5,-58.84C638.5,-57.03 624.66,-55.56 607.62,-55.56 590.59,-55.56 576.75,-57.03 576.75,-58.84"/>
+<text xml:space="preserve" text-anchor="middle" x="607.62" y="-39.84" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">seen&#45;set</text>
+</g>
+<!-- seen&#45;&gt;plan -->
+<g id="edge8" class="edge">
+<title>seen&#45;&gt;plan</title>
+<path fill="none" stroke="#64748b" d="M638.64,-52.73C662.64,-59.63 696.75,-69.42 724.49,-77.39"/>
+<polygon fill="#64748b" stroke="#64748b" points="723.52,-80.76 734.1,-80.15 725.46,-74.03 723.52,-80.76"/>
+<text xml:space="preserve" text-anchor="middle" x="684.25" y="-75.7" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">seen/unseen</text>
+</g>
+<!-- seen&#45;&gt;gate -->
+<g id="edge9" class="edge">
+<title>seen&#45;&gt;gate</title>
+<path fill="none" stroke="#64748b" d="M638.64,-41.54C660.9,-39.64 691.85,-36.99 718.36,-34.72"/>
+<polygon fill="#64748b" stroke="#64748b" points="718.62,-38.21 728.29,-33.87 718.03,-31.24 718.62,-38.21"/>
+<text xml:space="preserve" text-anchor="middle" x="684.25" y="-42.47" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">hit/miss</text>
+</g>
+<!-- record&#45;&gt;seen -->
+<g id="edge7" class="edge">
+<title>record&#45;&gt;seen</title>
+<path fill="none" stroke="#64748b" d="M504.24,-44.11C521.83,-44.11 545.32,-44.11 565.36,-44.11"/>
+<polygon fill="#64748b" stroke="#64748b" points="565.18,-47.61 575.18,-44.11 565.18,-40.61 565.18,-47.61"/>
+<text xml:space="preserve" text-anchor="middle" x="548.25" y="-46.61" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">pass</text>
+</g>
+</g>
+</svg>
+    <p class="aside">One input — a repo's judgment declarations — flows through
+    the loader and <span title="tools/src/judgments/core.py:83">prepare</span>
+    into the seen-set; the three <code>judgments-run</code> subcommands and the
+    pytest gate read or write that store. The judge itself is external: prepare
+    renders the prompt, but no node here calls an LLM.</p>
+    <details>
+      <summary>Module roster</summary>
+      <p>loader.py — root resolution, glob discovery, field validation.
+      core.py — prepare: single-read keying and prompt rendering, plus the
+      fixed PROMPT and SCHEMA folded into the key. instruments.py — the valid
+      model and effort sets. runner.py — the plan/render/record CLI.
+      pytest_support.py — the cache-gate helper. skipcache/seen.py — the SQLite
+      seen-set, a keys-only membership store carrying no domain vocabulary.</p>
+    </details>
+  </section>
+
+  <section class="card assess span2">
+    <h2>Assessment <span class="badge opinion">opinion</span></h2>
+    <ol>
+      <li><strong>A pass certifies exact bytes, not the claim's spirit</strong><span>the content key folds in every evidence byte, so any edit to a judged file re-keys and forces a re-judge — a stale pass can't mask changed content, but a cosmetic edit re-charges the judge (Content key).</span></li>
+      <li><strong>The gate is only as strong as the machine it runs on</strong><span>the seen-set is local and only the interactive run-judgments skill fills it; on CI the gate is skipped, so nothing verifies judgments there (Seen-set, Cache-gate).</span></li>
+      <li><strong>A recorded verdict is trusted, never re-checked</strong><span>recording a key asserts a pass, but nothing in scope runs the LLM or validates its ruling — a wrongly-recorded pass is invisible (Cache-gate).</span></li>
+      <li><strong>The model roster is hand-maintained</strong><span>a config is rejected if its model isn't in the frozen set, so a newly-shipped model fails validation until someone edits the list (Instrument).</span></li>
+      <li><strong>Evidence-vs-reference rides on prompt wording alone</strong><span>the two key differently, but only the instructions' prose tells the judge not to rule on reference material (Evidence / reference).</span></li>
+    </ol>
+  </section>
+
+</main>
+
+</div>
+</div>
+</body>
+</html>

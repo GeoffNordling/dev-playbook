@@ -1,0 +1,422 @@
+<!--datasheet-stamp
+subject: workspace-scripts
+scope:
+  - tools/bin/bootstrap-labels
+  - tools/bin/griffe-outline
+commit: 4c5c891
+generated: 2026-07-02
+generator: claude-sonnet-5
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>workspace-scripts — datasheet</title>
+<style>
+  :root {
+    --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --run:#15803d; --run-bg:#f0fdf4; --run-line:#86efac;
+    --slate-bg:#f1f5f9; --slate-line:#cbd5e1;
+    --opinion:#b45309; --opinion-bg:#fffbeb; --opinion-line:#fcd34d;
+    --chip-ink:#3730a3; --chip-bg:#eef2ff; --chip-line:#c7d2fe;
+  }
+  * { box-sizing:border-box; }
+  body { font:15px/1.45 system-ui, sans-serif; color:var(--ink); background:#f8fafc; margin:0; }
+  .page { max-width:none; margin:0 auto; padding:1rem 1.5rem 2rem; }
+
+  .layout { display:grid; grid-template-columns:320px 1fr; gap:1rem; align-items:start; }
+  .main p { max-width:80ch; }
+  .rail { position:sticky; top:1rem; display:flex; flex-direction:column; gap:1rem; }
+  .main { display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:stretch; }
+  .main .card { min-width:0; }
+  .span2 { grid-column:span 2; }
+  .assess ol { columns:2; column-gap:2.5rem; }
+  .assess li { break-inside:avoid; }
+  @media (max-width:1500px) {
+    .main { grid-template-columns:1fr; }
+    .span2 { grid-column:auto; }
+    .assess ol { columns:1; }
+  }
+
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:.9rem 1.1rem; box-shadow:0 1px 2px rgba(15,23,42,.05); }
+  .card h2 { font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 .55rem; }
+
+  .identity .subject { font-size:1.25rem; font-weight:700; margin-bottom:.3rem; }
+  .identity .meta { color:var(--muted); font-size:.78rem; line-height:1.6; }
+  .identity .meta code { background:var(--slate-bg); padding:0 .35em; border-radius:4px; }
+
+  .badge { display:inline-block; border-radius:999px; padding:0 .6em; font-size:.75rem;
+    font-weight:600; border:1px solid; }
+  .badge.run, .badge.captured { color:var(--run); background:var(--run-bg); border-color:var(--run-line); }
+  .badge.notrun, .badge.constructed { color:#475569; background:var(--slate-bg); border-color:var(--slate-line); }
+  .badge.opinion { color:var(--opinion); background:var(--opinion-bg); border-color:var(--opinion-line); }
+
+  .chip { display:inline-block; background:var(--chip-bg); border:1px solid var(--chip-line);
+    color:var(--chip-ink); border-radius:999px; padding:0 .5em; font-size:.8rem; font-weight:600; }
+  .chip.coined { border-style:dashed; }
+  .concept { margin:0 0 .35rem; font-size:.82rem; }
+  .concept .def { color:var(--muted); }
+
+  .cell { border-top:1px solid var(--line); padding:.35rem 0; font-size:.82rem; }
+  .cell:first-of-type { border-top:none; padding-top:0; }
+  .cell .k { display:inline-block; width:4.4em; font-size:.68rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted); }
+  .cell code { font-size:.78rem; }
+  .none { color:#94a3b8; }
+
+  .testrow { font-size:.82rem; margin-bottom:.25rem; }
+  .testrow .n { font-weight:700; color:var(--run); }
+  .testrow .gated { font-weight:700; color:var(--opinion); }
+
+  pre.term { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:.75rem .9rem;
+    font-size:.82rem; line-height:1.5; overflow-x:auto; margin:.6rem 0 .4rem; }
+  pre.term .p { color:#4ade80; }
+  .aside { color:var(--muted); font-size:.82rem; margin:.2rem 0 0; }
+
+  .assess { background:var(--opinion-bg); border-color:var(--opinion-line); }
+  .assess ol { margin:.2rem 0 0 1.2rem; padding:0; }
+  .assess li { margin-bottom:.45rem; font-size:.9rem; }
+  .assess li strong { display:block; }
+  .assess li span { color:#78716c; }
+
+  svg { max-width:100%; height:auto; }
+  .legend { display:flex; gap:1.1rem; font-size:.72rem; color:var(--muted); margin:0 0 .5rem; }
+  .legend span { display:inline-flex; align-items:center; gap:.35em; }
+  .legend i { width:.75em; height:.75em; border-radius:3px; border:1px solid; }
+  .legend .in { background:#e0f2fe; border-color:#38bdf8; }
+  .legend .int { background:#f1f5f9; border-color:#94a3b8; }
+  .legend .out { background:#dcfce7; border-color:#4ade80; }
+  .apirr { display:block; margin:.2rem 0 .1rem; }
+  .apirr text { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .apilist { margin:.55rem 0 0; border-top:1px solid var(--line); padding-top:.5rem; }
+  .apilist .sig { font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:.78rem; color:#334155; padding:.12rem 0; }
+  details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
+  details summary { cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="layout">
+
+<aside class="rail">
+
+  <header class="card identity">
+    <div class="subject">workspace-scripts</div>
+    <div class="meta">datasheet · commit <code>4c5c891</code><br>
+    2026-07-02 · claude-sonnet-5<br>
+    scope: tools/bin/bootstrap-labels, tools/bin/griffe-outline</div>
+  </header>
+
+  <section class="card">
+    <h2>Concepts</h2>
+    <div class="concept"><span class="chip" title="tools/bin/bootstrap-labels:44 canonical_labels()">Canonical label set</span> <span class="def">the fixed list of metadata + phase labels a repo's labels must match</span></div>
+    <div class="concept"><span class="chip" title="tools/bin/bootstrap-labels:4">Closed-world</span> <span class="def">labels in the set are created or updated; anything else in the repo is deleted</span></div>
+    <div class="concept"><span class="chip" title="tools/bin/griffe-outline:6">Structure report</span> <span class="def">the class/function/signature/docstring listing griffe-outline prints for a package</span></div>
+    <div class="concept"><span class="chip" title="tools/bin/griffe-outline:25 members_of_kind()">Alias</span> <span class="def">a re-exported name skipped so each member lists once, at its real definition site</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Touch surface</h2>
+    <div class="cell"><span class="k">Reads</span> the repo's existing GitHub labels — name, color, description (bootstrap-labels, <code>gh label list</code>); a Python package's source tree, via static analysis, never executed (griffe-outline)</div>
+    <div class="cell"><span class="k">Writes</span> the repo's live GitHub labels — creates, edits, deletes to match the canonical set (bootstrap-labels); the structure report to stdout (griffe-outline)</div>
+    <div class="cell"><span class="k">Spawns</span> <code>gh</code> — one process per label list/create/edit/delete (bootstrap-labels); <span class="none">none</span> (griffe-outline)</div>
+    <div class="cell"><span class="k">Net</span> GitHub API, indirectly through <code>gh</code>'s own calls (bootstrap-labels); <span class="none">none at runtime</span> — <code>uv run --script</code> may fetch griffe from PyPI on first use, cached after (griffe-outline)</div>
+    <div class="cell"><span class="k">Env</span> <span class="none">none read directly</span> by either script — <code>gh</code> (bootstrap-labels' subprocess) resolves its own auth outside this script's control</div>
+    <div class="cell"><span class="k">Deps</span> <code>gh</code> CLI, external binary, must be authenticated (bootstrap-labels); <code>griffe</code>, pinned by inline script metadata, installed on first run (griffe-outline)</div>
+  </section>
+
+  <section class="card">
+    <h2>Tests</h2>
+    <div class="testrow"><span class="gated">None.</span> no test file references either script</div>
+  </section>
+
+</aside>
+
+<main class="main">
+
+  <section class="card">
+    <h2>Purpose</h2>
+    <p>Two independent, single-file utility scripts with no shared code between
+    them. bootstrap-labels enforces the workspace's GitHub label scheme in the
+    current repo — a closed-world sync that creates, updates, and deletes to
+    match a canonical set. griffe-outline prints a Python package's
+    class/function structure — signatures and first-line docstrings — for
+    documentation and quick inspection, without executing any of it.</p>
+  </section>
+
+  <section class="card">
+    <h2>Behavior</h2>
+    <p><strong>griffe-outline</strong> <span class="badge run">verified: run</span> <span class="badge captured">exhibit: captured</span></p>
+    <pre class="term"><span class="p">$</span> griffe-outline tools/lib
+============================================================
+lib.pyast
+  Shared Python-source discovery and AST helpers for the pre-commit hooks.
+============================================================
+
+def looks_python(path: Path) -&gt; bool
+    """True for a ``.py`` file or an extensionless file with a Python shebang."""
+
+def find_python_files(root: Path) -&gt; list[Path]
+    """All Python files in ``root``'s git checkout, honoring ``.gitignore``."""
+
+def parse(path: Path) -&gt; ast.Module | None
+    """Parse ``path`` into an AST, or return None if it can't be read or parsed."""</pre>
+    <p class="aside">A real run against the real <code>tools/lib</code> package;
+    showing 14 of 44 lines — one of its two modules (lib.pyast) in full.</p>
+
+    <p><strong>bootstrap-labels</strong> <span class="badge notrun">verified: not-run</span> <span class="badge constructed">exhibit: constructed</span></p>
+    <pre class="term"><span class="p">$</span> bootstrap-labels
+created   category:bug
+unchanged phase:intake
+deleted   ready-for-agent</pre>
+    <p class="aside">Not run — this would mutate the repo's live GitHub
+    labels. Constructed from the script's own print format; <code>category:bug</code>
+    and <code>phase:intake</code> are real canonical names (Canonical label set),
+    <code>ready-for-agent</code> is a real stale label this workspace's own docs
+    flag as inconsistent with the phase scheme (<code title="docs/adr/0001-adopt-matt-pocock-conventions.md:155">ADR-0001</code>).</p>
+  </section>
+
+  <section class="card span2">
+    <h2>API</h2>
+    <p><strong>bootstrap-labels</strong></p>
+    <svg class="apirr" viewBox="0 0 270 70" width="100%" style="max-width:260px" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="rrarwA" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <circle cx="16" cy="35" r="4" fill="#64748b"/>
+      <line x1="16" y1="35" x2="42" y2="35" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwA)"/>
+      <rect x="44" y="19" width="168" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="128" y="39" text-anchor="middle" font-size="12.5" fill="#1e293b">bootstrap-labels</text>
+      <line x1="212" y1="35" x2="234" y2="35" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwA)"/>
+      <line x1="238" y1="27" x2="238" y2="43" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="244" y1="27" x2="244" y2="43" stroke="#64748b" stroke-width="2.5"/>
+    </svg>
+    <p class="aside">No flags, no arguments — every invocation is identical.
+    Exit <code>0</code> ok · <code>1</code> on any <code>gh</code> failure (uncaught).</p>
+
+    <p><strong>griffe-outline</strong></p>
+    <svg class="apirr" viewBox="0 0 660 150" width="100%" style="max-width:640px" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="rrarwB" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <circle cx="16" cy="110" r="4" fill="#64748b"/>
+      <line x1="16" y1="110" x2="42" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwB)"/>
+      <rect x="44" y="94" width="132" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="110" y="114" text-anchor="middle" font-size="12.5" fill="#1e293b">griffe-outline</text>
+      <line x1="176" y1="110" x2="196" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwB)"/>
+      <rect x="198" y="94" width="96" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="246" y="114" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;package&gt;</text>
+      <line x1="294" y1="110" x2="314" y2="110" stroke="#64748b" stroke-width="2"/>
+      <circle cx="314" cy="110" r="3.5" fill="#64748b"/>
+      <path d="M314,110 C348,110 348,55 382,55" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwB)"/>
+      <rect x="384" y="39" width="92" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="430" y="59" text-anchor="middle" font-size="12.5" fill="#1e293b">--search</text>
+      <line x1="476" y1="55" x2="494" y2="55" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwB)"/>
+      <rect x="496" y="39" width="78" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="535" y="59" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;path&gt;</text>
+      <path d="M574,39 C574,17 384,17 384,39" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwB)"/>
+      <text x="479" y="14" text-anchor="middle" font-size="10" fill="#94a3b8">repeatable</text>
+      <path d="M574,55 C608,55 614,80 614,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="314" y1="110" x2="614" y2="110" stroke="#64748b" stroke-width="2"/>
+      <circle cx="614" cy="110" r="3.5" fill="#64748b"/>
+      <line x1="614" y1="110" x2="636" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#rrarwB)"/>
+      <line x1="640" y1="102" x2="640" y2="118" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="646" y1="102" x2="646" y2="118" stroke="#64748b" stroke-width="2.5"/>
+    </svg>
+    <p class="aside"><code>&lt;package&gt;</code> required; <code>--search &lt;path&gt;</code>
+    optional, repeatable. Exit <code>0</code> ok · <code>1</code> load failure ·
+    <code>2</code> usage error. Neither script is importable — both are
+    standalone entry points, not part of a package, so no signature list applies.</p>
+  </section>
+
+  <section class="card span2">
+    <h2>Shape</h2>
+    <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
+    <!-- DOT source:
+    digraph workspace_scripts {
+      rankdir=LR;
+      bgcolor="transparent";
+      nodesep=0.35;
+      ranksep=0.5;
+      node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12,
+            color="#94a3b8", fillcolor="#f1f5f9", fontcolor="#1e293b"];
+      edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#475569"];
+
+      subgraph cluster_bl {
+        label="bootstrap-labels";
+        labeljust="l";
+        fontsize=11;
+        fontcolor="#64748b";
+        color="#e2e8f0";
+        style="rounded";
+        bl_have  [label="existing labels", fillcolor="#e0f2fe", color="#38bdf8"];
+        bl_canon [label="canonical set"];
+        bl_sync  [label="diff & apply"];
+        bl_out   [label="synced labels", fillcolor="#dcfce7", color="#4ade80"];
+        bl_have  -> bl_sync [label="gh label list"];
+        bl_canon -> bl_sync [label="canonical_labels()"];
+        bl_sync  -> bl_out  [label="gh label create/edit/delete"];
+      }
+
+      subgraph cluster_go {
+        label="griffe-outline";
+        labeljust="l";
+        fontsize=11;
+        fontcolor="#64748b";
+        color="#e2e8f0";
+        style="rounded";
+        go_src  [label="package source", fillcolor="#e0f2fe", color="#38bdf8"];
+        go_load [label="griffe.load"];
+        go_fmt  [label="format_module"];
+        go_out  [label="structure report", fillcolor="#dcfce7", color="#4ade80"];
+        go_src  -> go_load [label="source tree"];
+        go_load -> go_fmt  [label="module object"];
+        go_fmt  -> go_out  [label="text"];
+      }
+    }
+    -->
+    <svg width="721pt" height="242pt"
+ viewBox="0.00 0.00 721.00 242.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 238)">
+<title>workspace_scripts</title>
+<g id="clust1" class="cluster">
+<title>cluster_bl</title>
+<path fill="none" stroke="#e2e8f0" d="M24.12,-8C24.12,-8 542.25,-8 542.25,-8 548.25,-8 554.25,-14 554.25,-20 554.25,-20 554.25,-131 554.25,-131 554.25,-137 548.25,-143 542.25,-143 542.25,-143 24.12,-143 24.12,-143 18.12,-143 12.12,-137 12.12,-131 12.12,-131 12.12,-20 12.12,-20 12.12,-14 18.12,-8 24.12,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="55.38" y="-128.55" font-family="Times,serif" font-size="11.00" fill="#64748b">bootstrap&#45;labels</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_go</title>
+<path fill="none" stroke="#e2e8f0" d="M20,-151C20,-151 693.25,-151 693.25,-151 699.25,-151 705.25,-157 705.25,-163 705.25,-163 705.25,-214 705.25,-214 705.25,-220 699.25,-226 693.25,-226 693.25,-226 20,-226 20,-226 14,-226 8,-220 8,-214 8,-214 8,-163 8,-163 8,-157 14,-151 20,-151"/>
+<text xml:space="preserve" text-anchor="middle" x="45.25" y="-211.55" font-family="Times,serif" font-size="11.00" fill="#64748b">griffe&#45;outline</text>
+</g>
+<!-- bl_have -->
+<g id="node1" class="node">
+<title>bl_have</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M100.62,-52C100.62,-52 32.12,-52 32.12,-52 26.12,-52 20.12,-46 20.12,-40 20.12,-40 20.12,-28 20.12,-28 20.12,-22 26.12,-16 32.12,-16 32.12,-16 100.62,-16 100.62,-16 106.62,-16 112.62,-22 112.62,-28 112.62,-28 112.62,-40 112.62,-40 112.62,-46 106.62,-52 100.62,-52"/>
+<text xml:space="preserve" text-anchor="middle" x="66.38" y="-29.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">existing labels</text>
+</g>
+<!-- bl_sync -->
+<g id="node3" class="node">
+<title>bl_sync</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M294,-87C294,-87 242.75,-87 242.75,-87 236.75,-87 230.75,-81 230.75,-75 230.75,-75 230.75,-63 230.75,-63 230.75,-57 236.75,-51 242.75,-51 242.75,-51 294,-51 294,-51 300,-51 306,-57 306,-63 306,-63 306,-75 306,-75 306,-81 300,-87 294,-87"/>
+<text xml:space="preserve" text-anchor="middle" x="268.38" y="-64.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">diff &amp; apply</text>
+</g>
+<!-- bl_have&#45;&gt;bl_sync -->
+<g id="edge1" class="edge">
+<title>bl_have&#45;&gt;bl_sync</title>
+<path fill="none" stroke="#64748b" d="M112.9,-41.7C141.57,-46.58 179.34,-53.07 212.75,-59 214.89,-59.38 217.07,-59.77 219.27,-60.16"/>
+<polygon fill="#64748b" stroke="#64748b" points="218.41,-63.56 228.87,-61.9 219.65,-56.68 218.41,-63.56"/>
+<text xml:space="preserve" text-anchor="middle" x="173.75" y="-61.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">gh label list</text>
+</g>
+<!-- bl_canon -->
+<g id="node2" class="node">
+<title>bl_canon</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M97.62,-113C97.62,-113 35.12,-113 35.12,-113 29.12,-113 23.12,-107 23.12,-101 23.12,-101 23.12,-89 23.12,-89 23.12,-83 29.12,-77 35.12,-77 35.12,-77 97.62,-77 97.62,-77 103.62,-77 109.62,-83 109.62,-89 109.62,-89 109.62,-101 109.62,-101 109.62,-107 103.62,-113 97.62,-113"/>
+<text xml:space="preserve" text-anchor="middle" x="66.38" y="-90.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">canonical set</text>
+</g>
+<!-- bl_canon&#45;&gt;bl_sync -->
+<g id="edge2" class="edge">
+<title>bl_canon&#45;&gt;bl_sync</title>
+<path fill="none" stroke="#64748b" d="M109.79,-89.49C141.79,-85.33 185.73,-79.61 219.08,-75.28"/>
+<polygon fill="#64748b" stroke="#64748b" points="219.43,-78.76 228.9,-74 218.53,-71.82 219.43,-78.76"/>
+<text xml:space="preserve" text-anchor="middle" x="173.75" y="-88.35" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">canonical_labels()</text>
+</g>
+<!-- bl_out -->
+<g id="node4" class="node">
+<title>bl_out</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M534.25,-87C534.25,-87 468.75,-87 468.75,-87 462.75,-87 456.75,-81 456.75,-75 456.75,-75 456.75,-63 456.75,-63 456.75,-57 462.75,-51 468.75,-51 468.75,-51 534.25,-51 534.25,-51 540.25,-51 546.25,-57 546.25,-63 546.25,-63 546.25,-75 546.25,-75 546.25,-81 540.25,-87 534.25,-87"/>
+<text xml:space="preserve" text-anchor="middle" x="501.5" y="-64.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">synced labels</text>
+</g>
+<!-- bl_sync&#45;&gt;bl_out -->
+<g id="edge3" class="edge">
+<title>bl_sync&#45;&gt;bl_out</title>
+<path fill="none" stroke="#64748b" d="M306.25,-69C343.73,-69 402.23,-69 445.24,-69"/>
+<polygon fill="#64748b" stroke="#64748b" points="445.14,-72.5 455.14,-69 445.14,-65.5 445.14,-72.5"/>
+<text xml:space="preserve" text-anchor="middle" x="379.88" y="-71.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">gh label create/edit/delete</text>
+</g>
+<!-- go_src -->
+<g id="node5" class="node">
+<title>go_src</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M104.75,-196C104.75,-196 28,-196 28,-196 22,-196 16,-190 16,-184 16,-184 16,-172 16,-172 16,-166 22,-160 28,-160 28,-160 104.75,-160 104.75,-160 110.75,-160 116.75,-166 116.75,-172 116.75,-172 116.75,-184 116.75,-184 116.75,-190 110.75,-196 104.75,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="66.38" y="-173.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">package source</text>
+</g>
+<!-- go_load -->
+<g id="node6" class="node">
+<title>go_load</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M290.62,-196C290.62,-196 246.12,-196 246.12,-196 240.12,-196 234.12,-190 234.12,-184 234.12,-184 234.12,-172 234.12,-172 234.12,-166 240.12,-160 246.12,-160 246.12,-160 290.62,-160 290.62,-160 296.62,-160 302.62,-166 302.62,-172 302.62,-172 302.62,-184 302.62,-184 302.62,-190 296.62,-196 290.62,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="268.38" y="-173.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">griffe.load</text>
+</g>
+<!-- go_src&#45;&gt;go_load -->
+<g id="edge4" class="edge">
+<title>go_src&#45;&gt;go_load</title>
+<path fill="none" stroke="#64748b" d="M117.07,-178C149.38,-178 191.17,-178 222.48,-178"/>
+<polygon fill="#64748b" stroke="#64748b" points="222.41,-181.5 232.41,-178 222.41,-174.5 222.41,-181.5"/>
+<text xml:space="preserve" text-anchor="middle" x="173.75" y="-180.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">source tree</text>
+</g>
+<!-- go_fmt -->
+<g id="node7" class="node">
+<title>go_fmt</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M537.25,-196C537.25,-196 465.75,-196 465.75,-196 459.75,-196 453.75,-190 453.75,-184 453.75,-184 453.75,-172 453.75,-172 453.75,-166 459.75,-160 465.75,-160 465.75,-160 537.25,-160 537.25,-160 543.25,-160 549.25,-166 549.25,-172 549.25,-172 549.25,-184 549.25,-184 549.25,-190 543.25,-196 537.25,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="501.5" y="-173.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">format_module</text>
+</g>
+<!-- go_load&#45;&gt;go_fmt -->
+<g id="edge5" class="edge">
+<title>go_load&#45;&gt;go_fmt</title>
+<path fill="none" stroke="#64748b" d="M302.98,-178C339.42,-178 398.24,-178 442.23,-178"/>
+<polygon fill="#64748b" stroke="#64748b" points="442.13,-181.5 452.13,-178 442.13,-174.5 442.13,-181.5"/>
+<text xml:space="preserve" text-anchor="middle" x="379.88" y="-180.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">module object</text>
+</g>
+<!-- go_out -->
+<g id="node8" class="node">
+<title>go_out</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M685.25,-196C685.25,-196 613.75,-196 613.75,-196 607.75,-196 601.75,-190 601.75,-184 601.75,-184 601.75,-172 601.75,-172 601.75,-166 607.75,-160 613.75,-160 613.75,-160 685.25,-160 685.25,-160 691.25,-160 697.25,-166 697.25,-172 697.25,-172 697.25,-184 697.25,-184 697.25,-190 691.25,-196 685.25,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="649.5" y="-173.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">structure report</text>
+</g>
+<!-- go_fmt&#45;&gt;go_out -->
+<g id="edge6" class="edge">
+<title>go_fmt&#45;&gt;go_out</title>
+<path fill="none" stroke="#64748b" d="M549.5,-178C562.46,-178 576.68,-178 590.19,-178"/>
+<polygon fill="#64748b" stroke="#64748b" points="589.83,-181.5 599.83,-178 589.83,-174.5 589.83,-181.5"/>
+<text xml:space="preserve" text-anchor="middle" x="575.5" y="-180.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">text</text>
+</g>
+</g>
+</svg>
+    <p class="aside">Two unconnected tracks sharing a directory, not a
+    pipeline: <span title="tools/bin/bootstrap-labels">bootstrap-labels</span>
+    (top) syncs GitHub labels; <span title="tools/bin/griffe-outline">griffe-outline</span>
+    (bottom) turns a package into a structure report. Neither touches the
+    other's inputs or outputs.</p>
+    <details>
+      <summary>Canonical labels</summary>
+      <p>Metadata (grey): category:bug, category:enhancement, mode:sdd,
+      mode:direct, tests:yes, tests:no. Phase (yellow): phase:intake,
+      phase:sdd-specs, phase:sdd-spec-review, phase:sdd-tdd,
+      phase:sdd-code-pr-review, phase:design, phase:tdd, phase:build,
+      phase:code-pr-review.</p>
+    </details>
+  </section>
+
+  <section class="card assess span2">
+    <h2>Assessment <span class="badge opinion">opinion</span></h2>
+    <ol>
+      <li><strong>No tests guard either script</strong><span>a change to the label-sync logic or the structure-report format has nothing to catch a regression (Tests).</span></li>
+      <li><strong>A `gh` failure can leave label sync half-applied</strong><span>creates/updates run in one pass and deletions in a second; an uncaught failure partway through a pass leaves the repo's labels in whatever state the prior calls reached (Closed-world).</span></li>
+      <li><strong>Every invocation mutates the repo's live labels immediately</strong><span>there's no preview of what a sync would create, edit, or delete before it happens (Canonical label set).</span></li>
+      <li><strong>An unresolvable alias vanishes from the structure report with no note</strong><span>anything griffe can't resolve is silently dropped, so a re-exported name can be missing with nothing flagging it was skipped (Alias).</span></li>
+      <li><strong>griffe-outline's one dependency arrives over the network on first use</strong><span><code>uv run --script</code> fetches griffe from PyPI the first time it runs on a machine, despite the tool otherwise never touching the network.</span></li>
+    </ol>
+  </section>
+
+</main>
+
+</div>
+</div>
+</body>
+</html>

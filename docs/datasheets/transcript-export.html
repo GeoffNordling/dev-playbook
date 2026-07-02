@@ -1,0 +1,393 @@
+<!--datasheet-stamp
+subject: transcript-export
+scope:
+  - tools/transcript_export/ (excludes ARCHITECTURE.md)
+  - tools/bin/transcript-export
+  - tools/tests/test_transcript_export*.py
+  - tools/tests/transcript_fakes.py
+commit: 4c5c891
+generated: 2026-07-02
+generator: claude-opus-4-8
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>transcript-export — datasheet</title>
+<style>
+  :root {
+    --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --run:#15803d; --run-bg:#f0fdf4; --run-line:#86efac;
+    --slate-bg:#f1f5f9; --slate-line:#cbd5e1;
+    --opinion:#b45309; --opinion-bg:#fffbeb; --opinion-line:#fcd34d;
+    --chip-ink:#3730a3; --chip-bg:#eef2ff; --chip-line:#c7d2fe;
+  }
+  * { box-sizing:border-box; }
+  body { font:15px/1.45 system-ui, sans-serif; color:var(--ink); background:#f8fafc; margin:0; }
+  .page { max-width:none; margin:0 auto; padding:1rem 1.5rem 2rem; }
+
+  .layout { display:grid; grid-template-columns:320px 1fr; gap:1rem; align-items:start; }
+  .main p { max-width:80ch; }
+  .rail { position:sticky; top:1rem; display:flex; flex-direction:column; gap:1rem; }
+  .main { display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:stretch; }
+  .main .card { min-width:0; }
+  .span2 { grid-column:span 2; }
+  .assess ol { columns:2; column-gap:2.5rem; }
+  .assess li { break-inside:avoid; }
+  @media (max-width:1500px) {
+    .main { grid-template-columns:1fr; }
+    .span2 { grid-column:auto; }
+    .assess ol { columns:1; }
+  }
+
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:.9rem 1.1rem; box-shadow:0 1px 2px rgba(15,23,42,.05); }
+  .card h2 { font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 .55rem; }
+
+  .identity .subject { font-size:1.25rem; font-weight:700; margin-bottom:.3rem; }
+  .identity .meta { color:var(--muted); font-size:.78rem; line-height:1.6; }
+  .identity .meta code { background:var(--slate-bg); padding:0 .35em; border-radius:4px; }
+
+  .badge { display:inline-block; border-radius:999px; padding:0 .6em; font-size:.75rem;
+    font-weight:600; border:1px solid; }
+  .badge.run, .badge.captured { color:var(--run); background:var(--run-bg); border-color:var(--run-line); }
+  .badge.notrun, .badge.constructed { color:#475569; background:var(--slate-bg); border-color:var(--slate-line); }
+  .badge.opinion { color:var(--opinion); background:var(--opinion-bg); border-color:var(--opinion-line); }
+
+  .chip { display:inline-block; background:var(--chip-bg); border:1px solid var(--chip-line);
+    color:var(--chip-ink); border-radius:999px; padding:0 .5em; font-size:.8rem; font-weight:600; }
+  .chip.coined { border-style:dashed; }
+  .concept { margin:0 0 .35rem; font-size:.82rem; }
+  .concept .def { color:var(--muted); }
+
+  .cell { border-top:1px solid var(--line); padding:.35rem 0; font-size:.82rem; }
+  .cell:first-of-type { border-top:none; padding-top:0; }
+  .cell .k { display:inline-block; width:4.4em; font-size:.68rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted); }
+  .cell code { font-size:.78rem; }
+  .none { color:#94a3b8; }
+
+  .testrow { font-size:.82rem; margin-bottom:.25rem; }
+  .testrow .n { font-weight:700; color:var(--run); }
+  .testrow .gated { font-weight:700; color:var(--opinion); }
+
+  pre.term { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:.75rem .9rem;
+    font-size:.82rem; line-height:1.5; overflow-x:auto; margin:.6rem 0 .4rem; }
+  pre.term .p { color:#4ade80; }
+  .aside { color:var(--muted); font-size:.82rem; margin:.2rem 0 0; }
+
+  .assess { background:var(--opinion-bg); border-color:var(--opinion-line); }
+  .assess ol { margin:.2rem 0 0 1.2rem; padding:0; }
+  .assess li { margin-bottom:.45rem; font-size:.9rem; }
+  .assess li strong { display:block; }
+  .assess li span { color:#78716c; }
+
+  svg { max-width:100%; height:auto; }
+  .legend { display:flex; gap:1.1rem; font-size:.72rem; color:var(--muted); margin:0 0 .5rem; }
+  .legend span { display:inline-flex; align-items:center; gap:.35em; }
+  .legend i { width:.75em; height:.75em; border-radius:3px; border:1px solid; }
+  .legend .in { background:#e0f2fe; border-color:#38bdf8; }
+  .legend .int { background:#f1f5f9; border-color:#94a3b8; }
+  .legend .out { background:#dcfce7; border-color:#4ade80; }
+  .apirr { display:block; margin:.2rem 0 .1rem; }
+  .apirr text { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .apilist { margin:.55rem 0 0; border-top:1px solid var(--line); padding-top:.5rem; }
+  .apilist .sig { font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:.78rem; color:#334155; padding:.12rem 0; }
+  details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
+  details summary { cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="layout">
+
+<aside class="rail">
+
+  <header class="card identity">
+    <div class="subject">transcript-export</div>
+    <div class="meta">datasheet · commit <code>4c5c891</code><br>
+    2026-07-02 · claude-opus-4-8<br>
+    scope: tools/transcript_export/ (excl. ARCHITECTURE.md), tools/bin/transcript-export, tools/tests/test_transcript_export*.py, tools/tests/transcript_fakes.py</div>
+  </header>
+
+  <section class="card">
+    <h2>Concepts</h2>
+    <div class="concept"><span class="chip" title="tools/transcript_export/client.py — an agentsview session id">Session</span> <span class="def">a Claude Code conversation, the unit exported by id</span></div>
+    <div class="concept"><span class="chip" title="tools/transcript_export/classify.py:keep_messages">Keep/drop</span> <span class="def">omits harness plumbing, collapses duplicate re-emissions</span></div>
+    <div class="concept"><span class="chip" title="tools/transcript_export/render.py:render_rewound_branch; forks.py">Rewound branch</span> <span class="def">an abandoned rewind, rendered before the turn that superseded it</span></div>
+    <div class="concept"><span class="chip coined" title="tools/transcript_export/forks.py — the ordinal-order live-branch rule">Ordinal-wins</span> <span class="def">highest-ordinal sibling of a shared parent is the branch that stayed live</span></div>
+    <div class="concept"><span class="chip" title="tools/transcript_export/transcript.py:_subagent_renderer">Sub-agent recursion</span> <span class="def">a spawned child session expanded inline as nested subagent</span></div>
+    <div class="concept"><span class="chip" title="tools/transcript_export/client.py:AgentsViewError; transcript.py:_assert_well_formed">Fail loud</span> <span class="def">any daemon error or malformed output aborts the whole export</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Touch surface</h2>
+    <div class="cell"><span class="k">Reads</span> the AgentsView session store via the <code>agentsview</code> CLI (<code>session list/get/messages</code>), read-only</div>
+    <div class="cell"><span class="k">Writes</span> one <code>&lt;id&gt;.xml</code> per session into <code>&lt;out_dir&gt;</code>, overwrites; prints each path</div>
+    <div class="cell"><span class="k">Spawns</span> the <code>agentsview</code> CLI subprocess, one per API call</div>
+    <div class="cell"><span class="k">Net</span> <span class="none">none</span></div>
+    <div class="cell"><span class="k">Env</span> <span class="none">none</span> — test-only <code>SKIP_LIVE_TRANSCRIPT</code> gates the live canary</div>
+    <div class="cell"><span class="k">Deps</span> <span class="none">none</span> — Python stdlib only; needs the <code>agentsview</code> binary on PATH</div>
+  </section>
+
+  <section class="card">
+    <h2>Tests</h2>
+    <div class="testrow"><span class="n">✓</span> 128 unit — classify, keep/drop, resume and adjacent dedup, fork reconstruction, XML render, sub-agent nesting, CLI, against a fake daemon</div>
+    <div class="testrow"><span class="n">✓</span> 7 end-to-end — a full synthetic session through the orchestrator, asserted well-formed and ordered</div>
+    <div class="testrow"><span class="gated">gated</span> 1 live canary — the 3 newest real sessions, well-formed only; skipped on CI</div>
+  </section>
+
+</aside>
+
+<main class="main">
+
+  <section class="card">
+    <h2>Purpose</h2>
+    <p>Turns a Claude Code session into one self-contained XML transcript a
+    model can read — the whole conversation, including the branches a rewind
+    abandoned and the sub-agents a turn spawned. It exists so a session can be
+    archived, searched, or replayed to a model without the live daemon. It
+    reshapes AgentsView's already-parsed messages; it never reads the raw logs.</p>
+  </section>
+
+  <section class="card">
+    <h2>Behavior <span class="badge run">verified: run</span> <span class="badge constructed">exhibit: constructed</span></h2>
+    <pre class="term"><span class="p">$</span> transcript-export out/ 9c0c13d6-…
+out/9c0c13d6-….xml
+
+out/9c0c13d6-….xml:
+&lt;session id="9c0c13d6-…" project="dev_playbook" agent="claude"
+         branch="main" messages="3" compactions="0"&gt;
+  &lt;user ord="0" command="/model"&gt;&lt;/user&gt;
+  &lt;user ord="1"&gt;Fastest way to screenshot to clipboard on Fedora?&lt;/user&gt;
+  &lt;assistant ord="2" model="claude-sonnet-5"&gt;Ctrl+Shift+PrtScn selects
+    an area straight to the clipboard.&lt;/assistant&gt;
+&lt;/session&gt;</pre>
+    <p class="aside">A real session is private, so the input is a small faithful
+    stand-in and the run is live; one file per id is printed, and the header,
+    per-turn <code>ord</code>/<code>model</code>, and slash-command form are the
+    real schema.</p>
+  </section>
+
+  <section class="card span2">
+    <h2>API</h2>
+    <svg class="apirr" viewBox="0 0 700 188" width="100%" style="max-width:660px" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="rrarw" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <circle cx="16" cy="100" r="4" fill="#64748b"/>
+      <line x1="16" y1="100" x2="40" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="44" y="84" width="152" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="120" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">transcript-export</text>
+      <line x1="196" y1="100" x2="214" y2="100" stroke="#64748b" stroke-width="2"/>
+      <rect x="214" y="84" width="92" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="260" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;out_dir&gt;</text>
+      <line x1="306" y1="100" x2="324" y2="100" stroke="#64748b" stroke-width="2"/>
+      <circle cx="328" cy="100" r="3.5" fill="#64748b"/>
+      <line x1="328" y1="100" x2="382" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="384" y="84" width="128" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="448" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;session_id&gt;</text>
+      <path d="M500,84 C500,62 396,62 396,84" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <text x="448" y="55" text-anchor="middle" font-size="10" fill="#94a3b8">one or more</text>
+      <line x1="512" y1="100" x2="600" y2="100" stroke="#64748b" stroke-width="2"/>
+      <path d="M328,100 C356,100 356,44 382,44" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="384" y="28" width="90" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="429" y="48" text-anchor="middle" font-size="12.5" fill="#1e293b">--recent</text>
+      <line x1="474" y1="44" x2="486" y2="44" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="488" y="28" width="40" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="508" y="48" text-anchor="middle" font-size="12.5" fill="#1e293b">N</text>
+      <path d="M528,44 C568,44 600,66 600,100" fill="none" stroke="#64748b" stroke-width="2"/>
+      <path d="M328,100 C356,100 356,152 382,152" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="384" y="136" width="72" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="420" y="156" text-anchor="middle" font-size="12.5" fill="#1e293b">--all</text>
+      <path d="M456,152 C540,152 600,130 600,100" fill="none" stroke="#64748b" stroke-width="2"/>
+      <circle cx="600" cy="100" r="3.5" fill="#64748b"/>
+      <line x1="600" y1="100" x2="652" y2="100" stroke="#64748b" stroke-width="2"/>
+      <line x1="658" y1="92" x2="658" y2="108" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="664" y1="92" x2="664" y2="108" stroke="#64748b" stroke-width="2.5"/>
+    </svg>
+    <div class="apilist">
+      <div class="sig">render_session(session_id: str, runner=subprocess.run) -&gt; str</div>
+      <div class="sig">main(argv: list[str], runner=subprocess.run, render=render_session) -&gt; int</div>
+    </div>
+    <p class="aside">Command grammar above, importable rendering entry below:
+    pick sessions three mutually-exclusive ways, session ids repeatable. Exit
+    <code>0</code> ok · <code>2</code> usage error · nonzero on any daemon or XML failure.</p>
+  </section>
+
+  <section class="card span2">
+    <h2>Shape</h2>
+    <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
+    <!-- DOT source:
+    digraph transcript_export {
+      rankdir=LR;
+      bgcolor="transparent";
+      node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12,
+            color="#94a3b8", fillcolor="#f1f5f9", fontcolor="#1e293b"];
+      edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#475569"];
+      in     [label="session id", fillcolor="#e0f2fe", color="#38bdf8"];
+      fetch  [label="agentsview"];
+      norm   [label="normalize"];
+      keep   [label="keep/drop"];
+      forks  [label="reconstruct forks"];
+      render [label="render"];
+      check  [label="well-formed gate"];
+      out    [label="XML transcript", fillcolor="#dcfce7", color="#4ade80"];
+      in -> fetch      [label="id"];
+      fetch -> norm    [label="raw rows"];
+      norm -> keep     [label="messages"];
+      keep -> forks    [label="kept"];
+      forks -> render  [label="live path"];
+      render -> check  [label="document"];
+      check -> out     [label="valid XML"];
+      render -> fetch  [label="subagent id", constraint=false, style=dashed];
+    }
+    -->
+<svg width="1132pt" height="74pt"
+ viewBox="0.00 0.00 1132.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 69.67)">
+<title>transcript_export</title>
+<!-- in -->
+<g id="node1" class="node">
+<title>in</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M58,-65.67C58,-65.67 12,-65.67 12,-65.67 6,-65.67 0,-59.67 0,-53.67 0,-53.67 0,-41.67 0,-41.67 0,-35.67 6,-29.67 12,-29.67 12,-29.67 58,-29.67 58,-29.67 64,-29.67 70,-35.67 70,-41.67 70,-41.67 70,-53.67 70,-53.67 70,-59.67 64,-65.67 58,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="35" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">session id</text>
+</g>
+<!-- fetch -->
+<g id="node2" class="node">
+<title>fetch</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M178.25,-65.67C178.25,-65.67 125.5,-65.67 125.5,-65.67 119.5,-65.67 113.5,-59.67 113.5,-53.67 113.5,-53.67 113.5,-41.67 113.5,-41.67 113.5,-35.67 119.5,-29.67 125.5,-29.67 125.5,-29.67 178.25,-29.67 178.25,-29.67 184.25,-29.67 190.25,-35.67 190.25,-41.67 190.25,-41.67 190.25,-53.67 190.25,-53.67 190.25,-59.67 184.25,-65.67 178.25,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="151.88" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">agentsview</text>
+</g>
+<!-- in&#45;&gt;fetch -->
+<g id="edge1" class="edge">
+<title>in&#45;&gt;fetch</title>
+<path fill="none" stroke="#64748b" d="M70.47,-47.67C80.37,-47.67 91.36,-47.67 101.95,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="101.71,-51.17 111.71,-47.67 101.71,-44.17 101.71,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="91.75" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">id</text>
+</g>
+<!-- norm -->
+<g id="node3" class="node">
+<title>norm</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M322.5,-65.67C322.5,-65.67 278,-65.67 278,-65.67 272,-65.67 266,-59.67 266,-53.67 266,-53.67 266,-41.67 266,-41.67 266,-35.67 272,-29.67 278,-29.67 278,-29.67 322.5,-29.67 322.5,-29.67 328.5,-29.67 334.5,-35.67 334.5,-41.67 334.5,-41.67 334.5,-53.67 334.5,-53.67 334.5,-59.67 328.5,-65.67 322.5,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="300.25" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">normalize</text>
+</g>
+<!-- fetch&#45;&gt;norm -->
+<g id="edge2" class="edge">
+<title>fetch&#45;&gt;norm</title>
+<path fill="none" stroke="#64748b" d="M190.57,-47.67C210.06,-47.67 233.99,-47.67 254.42,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="254.16,-51.17 264.16,-47.67 254.16,-44.17 254.16,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="228.12" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">raw rows</text>
+</g>
+<!-- keep -->
+<g id="node4" class="node">
+<title>keep</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M472.75,-65.67C472.75,-65.67 427.5,-65.67 427.5,-65.67 421.5,-65.67 415.5,-59.67 415.5,-53.67 415.5,-53.67 415.5,-41.67 415.5,-41.67 415.5,-35.67 421.5,-29.67 427.5,-29.67 427.5,-29.67 472.75,-29.67 472.75,-29.67 478.75,-29.67 484.75,-35.67 484.75,-41.67 484.75,-41.67 484.75,-53.67 484.75,-53.67 484.75,-59.67 478.75,-65.67 472.75,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="450.12" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">keep/drop</text>
+</g>
+<!-- norm&#45;&gt;keep -->
+<g id="edge3" class="edge">
+<title>norm&#45;&gt;keep</title>
+<path fill="none" stroke="#64748b" d="M334.81,-47.67C355.27,-47.67 381.68,-47.67 403.97,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="403.68,-51.17 413.68,-47.67 403.68,-44.17 403.68,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="375" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">messages</text>
+</g>
+<!-- forks -->
+<g id="node5" class="node">
+<title>forks</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M630.5,-65.67C630.5,-65.67 551.5,-65.67 551.5,-65.67 545.5,-65.67 539.5,-59.67 539.5,-53.67 539.5,-53.67 539.5,-41.67 539.5,-41.67 539.5,-35.67 545.5,-29.67 551.5,-29.67 551.5,-29.67 630.5,-29.67 630.5,-29.67 636.5,-29.67 642.5,-35.67 642.5,-41.67 642.5,-41.67 642.5,-53.67 642.5,-53.67 642.5,-59.67 636.5,-65.67 630.5,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="591" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">reconstruct forks</text>
+</g>
+<!-- keep&#45;&gt;forks -->
+<g id="edge4" class="edge">
+<title>keep&#45;&gt;forks</title>
+<path fill="none" stroke="#64748b" d="M485.1,-47.67C498.02,-47.67 513.19,-47.67 527.91,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="527.52,-51.17 537.52,-47.67 527.52,-44.17 527.52,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="512.12" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">kept</text>
+</g>
+<!-- render -->
+<g id="node6" class="node">
+<title>render</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M757.25,-65.67C757.25,-65.67 727.25,-65.67 727.25,-65.67 721.25,-65.67 715.25,-59.67 715.25,-53.67 715.25,-53.67 715.25,-41.67 715.25,-41.67 715.25,-35.67 721.25,-29.67 727.25,-29.67 727.25,-29.67 757.25,-29.67 757.25,-29.67 763.25,-29.67 769.25,-35.67 769.25,-41.67 769.25,-41.67 769.25,-53.67 769.25,-53.67 769.25,-59.67 763.25,-65.67 757.25,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="742.25" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">render</text>
+</g>
+<!-- forks&#45;&gt;render -->
+<g id="edge5" class="edge">
+<title>forks&#45;&gt;render</title>
+<path fill="none" stroke="#64748b" d="M642.95,-47.67C662.76,-47.67 685.05,-47.67 703.4,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="703.3,-51.17 713.3,-47.67 703.3,-44.17 703.3,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="678.88" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">live path</text>
+</g>
+<!-- render&#45;&gt;fetch -->
+<g id="edge8" class="edge">
+<title>render&#45;&gt;fetch</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="5,2" d="M715.15,-39.07C695.42,-32.93 667.54,-25.01 642.5,-20.67 477.62,7.87 431.27,5.52 266,-20.67 244.65,-24.06 221.36,-29.34 201.5,-34.33"/>
+<polygon fill="#64748b" stroke="#64748b" points="200.83,-30.89 192.02,-36.76 202.57,-37.67 200.83,-30.89"/>
+<text xml:space="preserve" text-anchor="middle" x="450.12" y="-3.98" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">subagent id</text>
+</g>
+<!-- check -->
+<g id="node7" class="node">
+<title>check</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M940.5,-65.67C940.5,-65.67 860,-65.67 860,-65.67 854,-65.67 848,-59.67 848,-53.67 848,-53.67 848,-41.67 848,-41.67 848,-35.67 854,-29.67 860,-29.67 860,-29.67 940.5,-29.67 940.5,-29.67 946.5,-29.67 952.5,-35.67 952.5,-41.67 952.5,-41.67 952.5,-53.67 952.5,-53.67 952.5,-59.67 946.5,-65.67 940.5,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="900.25" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">well&#45;formed gate</text>
+</g>
+<!-- render&#45;&gt;check -->
+<g id="edge6" class="edge">
+<title>render&#45;&gt;check</title>
+<path fill="none" stroke="#64748b" d="M769.71,-47.67C788.02,-47.67 813.17,-47.67 836.45,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="836.17,-51.17 846.17,-47.67 836.17,-44.17 836.17,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="808.62" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">document</text>
+</g>
+<!-- out -->
+<g id="node8" class="node">
+<title>out</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M1111.75,-65.67C1111.75,-65.67 1044,-65.67 1044,-65.67 1038,-65.67 1032,-59.67 1032,-53.67 1032,-53.67 1032,-41.67 1032,-41.67 1032,-35.67 1038,-29.67 1044,-29.67 1044,-29.67 1111.75,-29.67 1111.75,-29.67 1117.75,-29.67 1123.75,-35.67 1123.75,-41.67 1123.75,-41.67 1123.75,-53.67 1123.75,-53.67 1123.75,-59.67 1117.75,-65.67 1111.75,-65.67"/>
+<text xml:space="preserve" text-anchor="middle" x="1077.88" y="-43.4" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">XML transcript</text>
+</g>
+<!-- check&#45;&gt;out -->
+<g id="edge7" class="edge">
+<title>check&#45;&gt;out</title>
+<path fill="none" stroke="#64748b" d="M952.99,-47.67C974.18,-47.67 998.75,-47.67 1020.4,-47.67"/>
+<polygon fill="#64748b" stroke="#64748b" points="1020.24,-51.17 1030.24,-47.67 1020.24,-44.17 1020.24,-51.17"/>
+<text xml:space="preserve" text-anchor="middle" x="992.25" y="-50.17" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">valid XML</text>
+</g>
+</g>
+</svg>
+    <p class="aside">One entry point (<span title="tools/transcript_export/transcript.py:render_session">render_session</span>)
+    drives the agentsview client, then normalize, keep/drop, and fork
+    reconstruction feed the renderer; the dashed edge is the sub-agent
+    recursion, and only the endpoints leave the process.</p>
+    <details>
+      <summary>Module roster</summary>
+      <p>client.py — the agentsview subprocess boundary (session list/get/messages,
+      paged to exhaustion). model.py — normalizes raw rows into frozen
+      Message/ToolCall records and collapses resume re-emissions. classify.py —
+      per-message kind and the keep/drop policy. forks.py — rewind-fork
+      reconstruction into a live path plus rewound branches. render.py — pure XML
+      rendering of turns, tool calls, thinking, and timeline markers. transcript.py
+      — the impure orchestrator that fetches, reconstructs, renders, and recurses
+      into sub-agents. cli.py — session selection and file writing.</p>
+    </details>
+  </section>
+
+  <section class="card assess span2">
+    <h2>Assessment <span class="badge opinion">opinion</span></h2>
+    <ol>
+      <li><strong>A missing sub-agent aborts the whole export</strong><span>a spawned child not in the local store makes the fetch fail loud, so one broken link loses the entire transcript, not just that branch (Fail loud, Sub-agent recursion).</span></li>
+      <li><strong>Fork order rests on an untested assumption</strong><span>reconstruction trusts that the highest-ordinal sibling stayed live; if that ever fails, branches are relabeled or buried silently (Ordinal-wins).</span></li>
+      <li><strong>The real daemon shape is pinned by one canary</strong><span>every other test uses hand-built rows frozen at agentsview v0.34.5, so a schema drift is caught only by the live test, which CI skips (Tests).</span></li>
+      <li><strong>Tool output is truncated and sanitized</strong><span>bodies over 2000 chars are cut and illegal control bytes stripped, so the transcript is a lossy view (chars still records true length).</span></li>
+      <li><strong>Keep/drop can silently discard a real turn</strong><span>anything typed as a system row, or an exact adjacent repeat, is dropped; a genuine message matching those shapes disappears (Keep/drop).</span></li>
+    </ol>
+  </section>
+
+</main>
+
+</div>
+</div>
+</body>
+</html>
