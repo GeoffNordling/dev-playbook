@@ -83,6 +83,12 @@ generator: claude-opus-4-8
   .assess li span { color:#78716c; }
 
   svg { max-width:100%; height:auto; }
+  .legend { display:flex; gap:1.1rem; font-size:.72rem; color:var(--muted); margin:0 0 .5rem; }
+  .legend span { display:inline-flex; align-items:center; gap:.35em; }
+  .legend i { width:.75em; height:.75em; border-radius:3px; border:1px solid; }
+  .legend .in { background:#e0f2fe; border-color:#38bdf8; }
+  .legend .int { background:#f1f5f9; border-color:#94a3b8; }
+  .legend .out { background:#dcfce7; border-color:#4ade80; }
   details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
   details summary { cursor:pointer; }
 </style>
@@ -105,6 +111,12 @@ generator: claude-opus-4-8
     <div class="concept"><span class="chip">Key</span> <span class="def">the column set that defines row identity</span></div>
     <div class="concept"><span class="chip">First-wins</span> <span class="def">of identical-key rows, the earliest survives</span></div>
     <div class="concept"><span class="chip">Seen keys</span> <span class="def">the pass's memory; grows with each unique row</span></div>
+  </section>
+
+  <section class="card">
+    <h2>API</h2>
+    <div class="cell"><span class="k">CLI</span> <code>csv-dedupe [--key COLS] &lt;input.csv&gt;</code> → stdout</div>
+    <div class="cell"><span class="k">Exit</span> <code>0</code> ok · <code>2</code> usage error</div>
   </section>
 
   <section class="card">
@@ -151,6 +163,7 @@ Bo,bo@x.io</pre>
 
   <section class="card span2">
     <h2>Shape</h2>
+    <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
     <!-- DOT source:
     digraph csv_dedupe {
       rankdir=LR;

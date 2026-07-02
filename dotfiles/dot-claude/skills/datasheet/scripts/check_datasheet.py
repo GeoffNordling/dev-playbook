@@ -3,7 +3,7 @@
 
 Checks only the machine-checkable rules:
 - the stamp comment opens the file and carries every required field
-- the seven H2 sections appear in the standard's order (fact rail, then main)
+- the eight H2 sections appear in the standard's order (fact rail, then main)
 - both Behavior labels are present
 - word budgets: visible layer (outside <details>, excluding the <header>
   stamp block and <style>) <= 1000; collapsed layer (inside <details>) <= 1000
@@ -18,6 +18,7 @@ from html.parser import HTMLParser
 REQUIRED_STAMP_FIELDS = ("subject", "scope", "commit", "generated", "generator")
 SECTION_ORDER = (
     "Concepts",
+    "API",
     "Touch surface",
     "Tests",
     "Purpose",

@@ -59,8 +59,8 @@ The document has two layers:
 The visual form is fixed, and the [example](#example) is its normative
 embodiment: a sheet copies the example's stylesheet and card markup verbatim
 and varies only the content. The layout is a fact rail beside a main grid:
-the rail (narrow, sticky) holds identity, Concepts, Touch surface, and Tests
-for constant-position lookup; the main grid pairs Purpose and Behavior side
+the rail (narrow, sticky) holds identity, Concepts, the API surface, Touch
+surface, and Tests for constant-position lookup; the main grid pairs Purpose and Behavior side
 by side, then gives Shape and Assessment each a full-width band; on narrow
 windows the main grid collapses to one column. Color is semantics, never
 decoration — green marks the verified, amber marks opinion and coverage
@@ -122,11 +122,12 @@ affirmative blank is the signal, silence is a violation.
 |---|---|---|---|
 | Stamp | file head + rail header | E | Subject name, scope manifest, git commit covered, generation date, generator model. Budget-exempt. |
 | Concepts | rail | E | The vocabulary the owner needs (typically 3–7) — a chip and one defining phrase each. |
+| API | rail | E | The public call surface — CLI signature and flags, or importable functions with signatures; "None." when nothing is exported. |
 | Touch surface | rail | E | Six fixed cells — Reads, Writes, Spawns, Net, Env, Deps — each concrete or an explicit "none". |
 | Tests | rail | E | Rows: what is verified (green), what is gated or missing (amber). "None." when no tests exist. |
 | Purpose | main | E | What the system is for and why it exists. Three sentences or fewer. |
 | Behavior | main | E | One worked example: an invocation, its input, its output. |
-| Shape | main, full band | E | The flow between major parts — the diagram carries it. |
+| Shape | main, full band | E | A dataflow diagram — the primary input moving through real, named parts to the output. |
 | Assessment | main, full band | J | What the owner should worry about. |
 
 ### Stamp
@@ -148,6 +149,15 @@ border (`chip coined`). A concept earns its place
 only when another part of the sheet leans on it — the exhibit, a diagram
 node, an Assessment item. A concept nothing else references is a souvenir of
 reading the code; cut it.
+
+### API
+
+The public call surface, and only what a consumer is meant to invoke — never
+internal helpers or private names (a leading underscore is private). For a
+command-line tool: the invocation signature, its flags, and the exit codes a
+caller scripts against. For a library: the public functions and classes with
+their type-hinted signatures. A system that exposes nothing to call states
+"None." — an affirmative blank, like any absent section.
 
 ### Touch surface
 
@@ -181,16 +191,33 @@ and construct a small exhibit (`verified: run`, `exhibit: constructed`).
 
 ### Shape
 
-The diagram carries the section; prose is one caption sentence naming the
-entry point. Every node names a concept or artifact the sheet already
-discusses — the diagram draws relationships among the sheet's vocabulary and
-never introduces entities of its own. Edges are labeled with the data that
-flows across them; the input and output endpoints are tinted (blue in, green
-out). Node and edge labels count against the visible budget. The medium is
-Graphviz: DOT rendered to SVG, inlined, with the DOT source embedded as an
-HTML comment beside it. A diagram that fails to render is a generation
-failure, not a degraded datasheet. Optional depth — a module roster, a
-schema — goes in a collapsed block at the card's foot.
+Shape is a **dataflow diagram** and only that: how does the primary input move
+through the system's parts to become the primary output? Not module
+dependencies, not call graphs, not API interaction — the API has its own
+section. Fixing the lens keeps the diagram out of the infinite space of what it
+could otherwise depict.
+
+Every node is a **real, named part** the sheet already discusses — a command, a
+module, a store. Aggregate or category nodes the reader cannot point to in the
+code ("workflow tools", "shared logic") are banned; if the flow cannot be drawn
+without inventing a hub to join everything, the scope is a grab-bag, and the
+diagram must show that rather than fake a unity. Edges are the data in motion,
+each labeled with what crosses it.
+
+Color is fixed, and a **legend in the card states it**: the input endpoint is
+tinted blue, the terminal output(s) green, internal parts slate — the reader
+never guesses what a color means.
+
+When the scope is several independent tools rather than one pipeline, each is
+drawn as its **own disconnected track** — separate blue→…→green chains, no hub
+joining them. The disconnection is honest information: it tells the owner the
+scope is N independent things, not one system.
+
+The medium is Graphviz: DOT rendered to SVG, inlined, with the DOT source in an
+adjacent HTML comment. Node and edge labels count against the visible budget. A
+diagram that fails to render is a generation failure, not a degraded datasheet.
+The caption is one sentence naming the entry point; optional depth — a module
+roster, a schema — goes in a collapsed block at the card's foot.
 
 ### Assessment
 
