@@ -6,7 +6,7 @@ re-emissions a resumed session produces. A resume replays earlier messages with
 the *same* `source_uuid`, so keeping the first occurrence per `source_uuid` drops
 the duplicates while leaving genuine forks (same parent, *different*
 `source_uuid`) untouched. The adjacent-repeat dedup (rule 2) and fork
-reconstruction land in later tasks; see PLAN.md for the authoritative design.
+reconstruction run downstream.
 """
 
 from dataclasses import dataclass
