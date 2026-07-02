@@ -101,6 +101,12 @@ class TestClassify:
             ("protocols/align-map-execute/SKILL.md", "harness"),
             ("dotfiles/dot-claude/rules/bash-commands.md", "harness"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
+            (
+                "standards/agentic-box/templates/greenfield-cli/box/contract.md",
+                "concept",
+            ),
+            ("standards/agentic-box/templates/greenfield-cli/box/README.md", "concept"),
+            ("standards/agentic-box/templates/greenfield-cli/index.md", "index"),
             (".pre-commit-config.yaml", "harness"),
             ("tools/bin/ref-check", "harness"),
         ],

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(box/**)",
+      "Bash(git push:*)",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "defaultMode": "acceptEdits"
+  }
+}

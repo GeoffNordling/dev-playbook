@@ -2,6 +2,7 @@
 
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
 - [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
+- [Agentic Box](/standards/agentic-box.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
 - [Build Conventions](/standards/build-conventions.md) — Standard Make targets and the pre-commit hook-repo model for Python sub-projects — format, lint, typecheck, test, check
 - [Datasheet Standard](/standards/datasheet.md) — The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
 - [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, declarative present tense
@@ -16,3 +17,7 @@
 - [Skill Conventions](/standards/skill-conventions.md) — Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
 - [Skill Management](/standards/skill-management.md) — Where skills live, how third-party skills are installed, and the mirror rule between authored and installed
 - [Testing Conventions](/standards/testing-conventions.md) — Default pytest conventions — structure, behavioral focus, test doubles, fixtures, and humble objects
+
+## Directories
+
+- [agentic-box/templates/greenfield-cli/](/standards/agentic-box/templates/greenfield-cli/index.md) — The worked greenfield-CLI box template
