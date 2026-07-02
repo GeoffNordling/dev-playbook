@@ -74,7 +74,6 @@ Run ad hoc on human demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
-| `worktree-sweep` | Prune merged-PR worktrees in `.claude/worktrees/` |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `workflow-state-data` | Emit workflow metrics and live issue states as JSON, reconstructed from GitHub label timelines |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --recent N \| --all>` |
