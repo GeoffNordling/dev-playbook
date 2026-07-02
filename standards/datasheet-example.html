@@ -1,0 +1,93 @@
+<!--datasheet-stamp
+subject: csv-dedupe
+scope:
+  - tools/csv_dedupe/
+  - tools/bin/csv-dedupe
+  - tools/tests/test_csv_dedupe*.py
+commit: 3fa9c21
+generated: 2026-07-01
+generator: claude-opus-4-8
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>csv-dedupe — datasheet</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; }
+  header { color: #555; font-size: 0.85rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; }
+  .badge { background: #eef; border: 1px solid #99c; border-radius: 3px; padding: 0 0.4em; font-size: 0.8rem; }
+  .opinion { background: #fff7e6; border-left: 4px solid #e6a700; padding: 0.5rem 1rem; }
+  pre { background: #f6f6f6; padding: 0.75rem; overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<header>
+  <strong>csv-dedupe</strong> · datasheet ·
+  scope: tools/csv_dedupe/, tools/bin/csv-dedupe, tools/tests/test_csv_dedupe*.py ·
+  commit 3fa9c21 · 2026-07-01 · claude-opus-4-8
+</header>
+
+<h2>Purpose</h2>
+<p>Removes duplicate rows from CSV files so downstream reports never
+double-count. Exists because exported data arrives with repeated records and
+no upstream fix is available.</p>
+
+<h2>Behavior</h2>
+<p><span class="badge">verified: run</span>
+   <span class="badge">exhibit: captured</span></p>
+<pre>
+$ cat contacts.csv
+name,email
+Ada,ada@x.io
+Ada,ada@x.io
+Bo,bo@x.io
+$ csv-dedupe --key email contacts.csv
+name,email
+Ada,ada@x.io
+Bo,bo@x.io
+</pre>
+<p>Rows sharing a key keep only their first occurrence
+(<span title="tools/csv_dedupe/dedupe.py:41">first-wins</span>).</p>
+
+<h2>Concepts</h2>
+<ul>
+  <li><strong>Key</strong> — the column set that defines row identity.</li>
+  <li><strong>First-wins</strong> — of identical-key rows, the earliest
+      survives.</li>
+</ul>
+
+<h2>Shape</h2>
+<p>One command-line entry point (<span title="tools/bin/csv-dedupe">csv-dedupe</span>)
+drives a three-step flow: parse arguments, stream rows through the first-wins
+pass, write the result. The pass is a pure function; only the edges touch
+files.</p>
+<details>
+  <summary>Module roster</summary>
+  <p>cli.py — argument parsing and file I/O. dedupe.py — the pure first-wins
+  pass.</p>
+</details>
+
+<h2>Touch surface</h2>
+<p>Reads the input CSV named on the command line; writes the deduplicated CSV
+to stdout. No network, no environment variables, no subprocesses, no
+third-party dependencies.</p>
+
+<h2>Tests</h2>
+<p>The pure pass is covered against hand-built rows: key selection, first-wins
+order, and the empty-file case. The command-line path is untested.</p>
+
+<h2>Assessment <span class="badge">opinion</span></h2>
+<div class="opinion">
+  <ol>
+    <li>The untested command-line path (Tests) is where all file handling
+        lives — an argument or I/O regression ships unseen.</li>
+    <li>First-wins ordering (Concepts) lets input order silently decide which
+        duplicate survives — a reordered export changes output with no
+        warning.</li>
+  </ol>
+</div>
+
+</body>
+</html>
