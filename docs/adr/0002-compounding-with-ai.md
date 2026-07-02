@@ -6,6 +6,8 @@ description: Establish tiered instruction loading — a global behavioral CLAUDE
 
 # Compounding Workflow with AI
 
+**Status:** The edit-time ruff hook decisions (the "Edit-time Python verification" and "Project-local ruff" adopt bullets, the matching "global-ruff fallback" alternative, and the 2026-06-06 amendment) are superseded by [ADR-0008](0008-retire-edit-time-ruff-hook.md) in part (issue #127). The tiered-instruction decisions stand.
+
 ## Context
 
 Audited this workspace against the source article above. Three gaps to close, several practices to keep, several to reject.

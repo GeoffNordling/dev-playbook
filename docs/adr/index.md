@@ -8,3 +8,4 @@
 - [Issue Workflow Reorganization](/docs/adr/0005-issue-workflow-reorganization.md) — Reorganize the issue workflow around phase-on-issue labels, merging triage and creation into `/intake` and adding an `/sdd` dispatcher
 - [Harvest Pocock's `prototype` and `handoff` Skills](/docs/adr/0006-harvest-pocock-prototype-and-handoff.md) — Harvest Pocock's prototype and handoff skills into authored bundles rather than taking a direct dependency
 - [Merge SDD Spec Authoring into One Phase](/docs/adr/0007-merge-sdd-spec-authoring-phase.md) — Merge sdd-requirements and sdd-design into a single sdd-specs phase authoring the whole feat/req/dsn hierarchy in one interview
+- [Retire the Edit-Time ruff Hook for a Single Pre-commit Gate](/docs/adr/0008-retire-edit-time-ruff-hook.md) — Remove the edit-time PostToolUse ruff hook so pre-commit is the single ruff gate over every authored .py
