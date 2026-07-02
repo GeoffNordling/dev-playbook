@@ -33,6 +33,7 @@ Title Case; acronyms stay upper.
 | `Protocol` | A formal algorithm for structured human–agent collaboration. |
 | `Vocabulary` | The canonical definitions of the workspace's domain terms (lives in `CONTEXT.md`). |
 | `Recipe Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
+| `Box Artifact` | One file of an [agentic-box](/standards/agentic-box.md) definition — contract, charter, emissions spec, or prompt — consumed by a boxed agent as mission configuration. A box `README.md` stays `type: README`. |
 
 ## Frontmatter profile
 
