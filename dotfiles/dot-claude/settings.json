@@ -73,17 +73,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/dot-claude/hooks/ruff-edit.sh"
-          }
-        ]
-      }
     ]
   },
   "worktree": {
