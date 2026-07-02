@@ -56,6 +56,16 @@ The document has two layers:
   budget: **1,000 additional words**. Collapsed content deepens the story; it
   never completes it — nothing in the visible layer may depend on it.
 
+The visual form is fixed, and the [example](#example) is its normative
+embodiment: a sheet copies the example's stylesheet and card markup verbatim
+and varies only the content. The layout is a fact rail beside a main grid:
+the rail (narrow, sticky) holds identity, Concepts, Touch surface, and Tests
+for constant-position lookup; the main grid pairs Purpose and Behavior side
+by side, then gives Shape and Assessment each a full-width band; on narrow
+windows the main grid collapses to one column. Color is semantics, never
+decoration — green marks the verified, amber marks opinion and coverage
+gaps, indigo chips mark concepts, slate is neutral.
+
 The ceiling is independent of scope: a whole-repository datasheet and a
 single-tool datasheet share the same maximum, and a larger scope raises the
 altitude of description rather than the word count. The ceiling is not a
@@ -82,6 +92,11 @@ Blessed:
 Same fact — but the blessed sentence is about a behavior, means something to
 the owner, and demotes the identifier to a parenthetical.
 
+Structure over prose: anything enumerable — concepts, touched paths, test
+coverage — renders as chips, labeled cells, or rows, never as a paragraph.
+Prose is reserved for what only a sentence can say: purpose, what an exhibit
+demonstrates, a judgment's consequence.
+
 ## Content classes
 
 Every section is one of two classes, and the accuracy standard differs:
@@ -97,27 +112,51 @@ Every section is one of two classes, and the accuracy standard differs:
 
 ## Sections
 
-Every section always appears, in this order. A section whose subject is absent
-states that plainly ("None.") — presence with an affirmative blank is the
-signal, silence is a violation.
+Every section always appears, in a fixed place. The fact rail holds the
+lookup sections under the identity header; the main grid holds the narrative
+sections. The markup follows the same order — rail, then main. A section
+whose subject is absent states that plainly ("None.") — presence with an
+affirmative blank is the signal, silence is a violation.
 
-| Section | Class | Contents |
-|---|---|---|
-| Stamp | E | Subject name, scope manifest, git commit covered, generation date, generator model. Budget-exempt. |
-| Purpose | E | What the system is for and why it exists. Three sentences or fewer. |
-| Behavior | E | One worked example: an invocation, its input, its output. |
-| Concepts | E | The vocabulary the system thinks in — its domain nouns and verbs (typically 3–7), one defining sentence each. |
-| Shape | E | Entry points, the flow between major parts, the public surface. Optionally one diagram. |
-| Touch surface | E | Everything read, written, spawned, or called: filesystem paths, env vars, subprocesses, network, external services, third-party dependencies. |
-| Tests | E | What is verified and at what level — the suite's shape, not its file list. "None." when no tests exist. |
-| Assessment | J | What the owner should worry about. |
+| Section | Place | Class | Contents |
+|---|---|---|---|
+| Stamp | file head + rail header | E | Subject name, scope manifest, git commit covered, generation date, generator model. Budget-exempt. |
+| Concepts | rail | E | The vocabulary the owner needs (typically 3–7) — a chip and one defining phrase each. |
+| Touch surface | rail | E | Six fixed cells — Reads, Writes, Spawns, Net, Env, Deps — each concrete or an explicit "none". |
+| Tests | rail | E | Rows: what is verified (green), what is gated or missing (amber). "None." when no tests exist. |
+| Purpose | main | E | What the system is for and why it exists. Three sentences or fewer. |
+| Behavior | main | E | One worked example: an invocation, its input, its output. |
+| Shape | main, full band | E | The flow between major parts — the diagram carries it. |
+| Assessment | main, full band | J | What the owner should worry about. |
 
 ### Stamp
 
 The stamp exists in two forms carrying the same fields: a YAML block inside an
 HTML comment that opens the file — the first thing in it, before the doctype —
-so a datasheet's identity is readable from its opening lines alone; and a
-compact rendered header in the document. The [example](#example) shows both.
+so a datasheet's identity is readable from its opening lines alone; and the
+identity card that opens the fact rail. The [example](#example) shows both.
+
+### Concepts
+
+Concepts are the owner's vocabulary, not the code's. Each chip names
+something the owner needs in order to direct future work or to read the rest
+of this sheet; the defining phrase is one clause. A concept earns its place
+only when another part of the sheet leans on it — the exhibit, a diagram
+node, an Assessment item. A concept nothing else references is a souvenir of
+reading the code; cut it.
+
+### Touch surface
+
+Six fixed cells — Reads, Writes, Spawns, Net, Env, Deps — each holding the
+concrete surface: paths, commands, variables, packages, with qualifiers kept
+to a word or two ("overwrites", "test-only"). An empty cell states "none"
+explicitly.
+
+### Tests
+
+Rows, not paragraphs. Each row is a count or mark plus what that
+verification covers — the suite's shape, never its file list. Verified
+coverage is green; gated, skipped, or absent coverage is amber.
 
 ### Behavior
 
@@ -138,13 +177,16 @@ and construct a small exhibit (`verified: run`, `exhibit: constructed`).
 
 ### Shape
 
-Shape may include at most one diagram, only when it says more than the same
-words would. Every node names a concept the prose already discusses — a
-diagram draws relationships among the sheet's vocabulary and never introduces
-entities of its own. Node and edge labels count against the visible budget.
-The medium is Graphviz: DOT rendered to SVG, inlined, with the DOT source
-embedded as an HTML comment beside it. A diagram that fails to render is a
-generation failure, not a degraded datasheet.
+The diagram carries the section; prose is one caption sentence naming the
+entry point. Every node names a concept or artifact the sheet already
+discusses — the diagram draws relationships among the sheet's vocabulary and
+never introduces entities of its own. Edges are labeled with the data that
+flows across them; the input and output endpoints are tinted (blue in, green
+out). Node and edge labels count against the visible budget. The medium is
+Graphviz: DOT rendered to SVG, inlined, with the DOT source embedded as an
+HTML comment beside it. A diagram that fails to render is a generation
+failure, not a degraded datasheet. Optional depth — a module roster, a
+schema — goes in a collapsed block at the card's foot.
 
 ### Assessment
 
@@ -157,14 +199,16 @@ The one section allowed opinion, fenced five ways:
    banned.
 3. Consequence first, mechanism as support — the language rule applies to
    opinions too.
-4. At most five items, each at most two sentences. Ranking is the point.
+4. At most five items, each a bolded consequence headline over at most one
+   supporting line. Ranking is the point.
 5. "Nothing concerning." is a legal answer and must be stated affirmatively.
 
 ## Example
 
 [datasheet-example.html](/standards/datasheet-example.html) is a complete,
-minimal datasheet for a fictional tool — read it in full before generating. It
-sets the structure — stamp comment first, both stamp forms, section order,
-labels, anchors, one collapsed block, and a Shape diagram in the prescribed
-form (inline SVG, DOT source in a comment beside it) — not the size: a real
-system may spend the full budget.
+minimal datasheet for a fictional tool — read it in full before generating.
+It is normative for form: copy its stylesheet and card markup verbatim — the
+stamp comment first, the rail and main regions, the chips, cells, rows,
+badges, and the Shape diagram in the prescribed form (inline SVG, DOT source
+in a comment beside it) — and vary only the content. It does not set the
+size: a real system may spend the full budget.
