@@ -1,7 +1,7 @@
 ---
 type: Survey
 title: Sandboxing Claude agents
-description: Comparing native `/sandbox` against Sandcastle for isolating a Claude agent's filesystem, network, and processes
+description: Comparing sandbox solutions for isolating a Claude agent's filesystem, network, and processes
 ---
 
 # Sandboxing Claude agents
