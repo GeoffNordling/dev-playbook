@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1"
+  },
   "permissions": {
     "allow": [
       "Skill(tdd)",
@@ -46,14 +49,8 @@
       "Bash(gh pr unlock *)"
     ]
   },
-  "sandbox": {
-    "enabled": true,
-    "excludedCommands": ["gh", "gh *", "agentsview", "agentsview *", "git", "git *"],
-    "filesystem": {
-      "allowWrite": ["~/workspace", "~/.cache", "~/.local", "~/.npm", "~/.agentsview"],
-      "denyRead": ["~/.ssh", "~/.aws", "~/.gnupg", "~/.netrc"]
-    }
-  },
+  "model": "sonnet",
+  "disableClaudeAiConnectors": true,
   "hooks": {
     "Stop": [
       {
@@ -93,6 +90,33 @@
     "baseRef": "fresh"
   },
   "workflowKeywordTriggerEnabled": false,
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "allowWrite": [
+        "~/workspace",
+        "~/.cache",
+        "~/.local",
+        "~/.npm",
+        "~/.agentsview"
+      ],
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.gnupg",
+        "~/.netrc"
+      ]
+    },
+    "excludedCommands": [
+      "gh",
+      "gh *",
+      "agentsview",
+      "agentsview *",
+      "git",
+      "git *"
+    ]
+  },
+  "feedbackSurveyRate": 0,
   "effortLevel": "xhigh",
   "voice": {
     "enabled": true,
@@ -109,10 +133,5 @@
       "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The workflow's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure."
     ]
   },
-  "voiceEnabled": true,
-  "disableClaudeAiConnectors": true,
-  "feedbackSurveyRate": 0,
-  "env": {
-    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1"
-  }
+  "voiceEnabled": true
 }
