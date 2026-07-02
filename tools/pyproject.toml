@@ -21,7 +21,7 @@ requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
 # Flat src/ layout: only judgments and skipcache ship. The other top-level dirs
-# (workflow_state_data, tests, bin) stay outside src/, so an editable install
+# (tests, bin) stay outside src/, so an editable install
 # exposes the two libraries and nothing else to the consumer's environment.
 [tool.uv.build-backend]
 module-name = ["judgments", "skipcache"]
@@ -34,7 +34,7 @@ dev = [
 ]
 
 # src holds the packaged libraries; "." keeps the internal-only
-# workflow_state_data package and the tests importable from the tools root.
+# transcript_export package and the tests importable from the tools root.
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
 

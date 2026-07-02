@@ -3,6 +3,7 @@
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
 - [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
 - [Build Conventions](/standards/build-conventions.md) — Standard Make targets and the pre-commit hook-repo model for Python sub-projects — format, lint, typecheck, test, check
+- [Datasheet Standard](/standards/datasheet.md) — The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
 - [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, declarative present tense
 - [Document Types](/standards/document-types.md) — The OKF document-type registry and the frontmatter profile every concept doc carries
 - [Issue Conventions](/standards/issue-conventions.md) — GitHub issue body format — the body as agent brief, vertical-slice decomposition, blocked-by and sub-issue relationships

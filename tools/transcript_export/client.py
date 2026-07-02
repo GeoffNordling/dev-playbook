@@ -5,7 +5,7 @@ Thin wrappers over the `agentsview` CLI's three read commands — `session list`
 the command prints to stdout, and fails loud on a nonzero exit. The
 deterministic parts (argument building, message paging) are separable and
 tested with an injected fake runner; only the subprocess call itself is the
-humble boundary. See ARCHITECTURE.md for the data-source contract.
+humble boundary.
 """
 
 import json

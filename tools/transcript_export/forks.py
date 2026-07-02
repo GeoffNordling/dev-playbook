@@ -6,7 +6,7 @@ name the same parent. The parent itself is usually an *unsurfaced raw sub-record
 (a tool result folded into the previous message), so it is NOT a message we can
 see — an earlier design that chased a `source_parent_uuid`→`source_uuid` tree
 never connected on real data (the parent resolved to a message ~0% of the time)
-and is abandoned (see the ordinal-spine decision in ARCHITECTURE.md).
+and is abandoned.
 
 The live transcript is therefore just the messages in **ordinal order**: writing
 only ever continues on the live branch with ever-increasing global ordinals, so

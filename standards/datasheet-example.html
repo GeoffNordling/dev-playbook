@@ -1,0 +1,326 @@
+<!--datasheet-stamp
+subject: redact
+scope:
+  - tools/redact/
+  - tools/bin/redact
+  - tools/tests/test_redact*.py
+commit: 7c4e0a2
+generated: 2026-07-02
+generator: claude-opus-4-8
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>redact — datasheet</title>
+<style>
+  :root {
+    --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --run:#15803d; --run-bg:#f0fdf4; --run-line:#86efac;
+    --slate-bg:#f1f5f9; --slate-line:#cbd5e1;
+    --opinion:#b45309; --opinion-bg:#fffbeb; --opinion-line:#fcd34d;
+    --chip-ink:#3730a3; --chip-bg:#eef2ff; --chip-line:#c7d2fe;
+  }
+  * { box-sizing:border-box; }
+  body { font:15px/1.45 system-ui, sans-serif; color:var(--ink); background:#f8fafc; margin:0; }
+  .page { max-width:none; margin:0 auto; padding:1rem 1.5rem 2rem; }
+
+  .layout { display:grid; grid-template-columns:320px 1fr; gap:1rem; align-items:start; }
+  .main p { max-width:80ch; }
+  .rail { position:sticky; top:1rem; display:flex; flex-direction:column; gap:1rem; }
+  .main { display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:stretch; }
+  .main .card { min-width:0; }
+  .span2 { grid-column:span 2; }
+  .assess ol { columns:2; column-gap:2.5rem; }
+  .assess li { break-inside:avoid; }
+  @media (max-width:1500px) {
+    .main { grid-template-columns:1fr; }
+    .span2 { grid-column:auto; }
+    .assess ol { columns:1; }
+  }
+
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:.9rem 1.1rem; box-shadow:0 1px 2px rgba(15,23,42,.05); }
+  .card h2 { font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 .55rem; }
+
+  .identity .subject { font-size:1.25rem; font-weight:700; margin-bottom:.3rem; }
+  .identity .meta { color:var(--muted); font-size:.78rem; line-height:1.6; }
+  .identity .meta code { background:var(--slate-bg); padding:0 .35em; border-radius:4px; }
+
+  .badge { display:inline-block; border-radius:999px; padding:0 .6em; font-size:.75rem;
+    font-weight:600; border:1px solid; }
+  .badge.run, .badge.captured { color:var(--run); background:var(--run-bg); border-color:var(--run-line); }
+  .badge.notrun, .badge.constructed { color:#475569; background:var(--slate-bg); border-color:var(--slate-line); }
+  .badge.opinion { color:var(--opinion); background:var(--opinion-bg); border-color:var(--opinion-line); }
+
+  .chip { display:inline-block; background:var(--chip-bg); border:1px solid var(--chip-line);
+    color:var(--chip-ink); border-radius:999px; padding:0 .5em; font-size:.8rem; font-weight:600; }
+  .chip.coined { border-style:dashed; }
+  .concept { margin:0 0 .35rem; font-size:.82rem; }
+  .concept .def { color:var(--muted); }
+
+  .cell { border-top:1px solid var(--line); padding:.35rem 0; font-size:.82rem; }
+  .cell:first-of-type { border-top:none; padding-top:0; }
+  .cell .k { display:inline-block; width:4.4em; font-size:.68rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted); }
+  .cell code { font-size:.78rem; }
+  .none { color:#94a3b8; }
+
+  .testrow { font-size:.82rem; margin-bottom:.25rem; }
+  .testrow .n { font-weight:700; color:var(--run); }
+  .testrow .gated { font-weight:700; color:var(--opinion); }
+
+  pre.term { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:.75rem .9rem;
+    font-size:.82rem; line-height:1.5; overflow-x:auto; margin:.6rem 0 .4rem; }
+  pre.term .p { color:#4ade80; }
+  .aside { color:var(--muted); font-size:.82rem; margin:.2rem 0 0; }
+
+  .assess { background:var(--opinion-bg); border-color:var(--opinion-line); }
+  .assess ol { margin:.2rem 0 0 1.2rem; padding:0; }
+  .assess li { margin-bottom:.45rem; font-size:.9rem; }
+  .assess li strong { display:block; }
+  .assess li span { color:#78716c; }
+
+  svg { max-width:100%; height:auto; }
+  .legend { display:flex; gap:1.1rem; font-size:.72rem; color:var(--muted); margin:0 0 .5rem; }
+  .legend span { display:inline-flex; align-items:center; gap:.35em; }
+  .legend i { width:.75em; height:.75em; border-radius:3px; border:1px solid; }
+  .legend .in { background:#e0f2fe; border-color:#38bdf8; }
+  .legend .int { background:#f1f5f9; border-color:#94a3b8; }
+  .legend .out { background:#dcfce7; border-color:#4ade80; }
+  .apirr { display:block; margin:.2rem 0 .1rem; }
+  .apirr text { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .apilist { margin:.55rem 0 0; border-top:1px solid var(--line); padding-top:.5rem; }
+  .apilist .sig { font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:.78rem; color:#334155; padding:.12rem 0 0; }
+  .apilist .doc { font-size:.72rem; color:var(--muted); margin:0 0 .4rem .9rem; }
+  details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
+  details summary { cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="layout">
+
+<aside class="rail">
+
+  <header class="card identity">
+    <div class="subject">redact</div>
+    <div class="meta">datasheet · commit <code>7c4e0a2</code><br>
+    2026-07-02 · claude-opus-4-8<br>
+    scope: tools/redact/, tools/bin/redact, tools/tests/test_redact*.py</div>
+  </header>
+
+  <section class="card">
+    <h2>Concepts</h2>
+    <div class="concept"><span class="chip" title="tools/redact/rules.py Rule">Rule</span> <span class="def">a labeled pattern that marks text to hide</span></div>
+    <div class="concept"><span class="chip" title="tools/redact/rules.py:load_rules">Rule set</span> <span class="def">the ordered rules; first match wins</span></div>
+    <div class="concept"><span class="chip" title="tools/redact/core.py Redaction.hits">Hit</span> <span class="def">a span a rule matched</span></div>
+    <div class="concept"><span class="chip coined" title="tools/redact/core.py:31">Mask</span> <span class="def">the placeholder written over a hit (code: "replacement")</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Touch surface</h2>
+    <div class="cell"><span class="k">Reads</span> the input file(s) or stdin; a rules file (<code>--rules</code>, else <code>$REDACT_RULES</code>)</div>
+    <div class="cell"><span class="k">Writes</span> redacted text to stdout; a hit count to stderr</div>
+    <div class="cell"><span class="k">Spawns</span> <span class="none">none</span></div>
+    <div class="cell"><span class="k">Net</span> <span class="none">none</span></div>
+    <div class="cell"><span class="k">Env</span> <code>REDACT_RULES</code> — default rules path</div>
+    <div class="cell"><span class="k">Deps</span> <span class="none">none — stdlib only</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Tests</h2>
+    <div class="testrow"><span class="n">✓</span> pure pass — rule matching, overlapping hits, empty input, hit count</div>
+    <div class="testrow"><span class="gated">untested</span> the CLI plumbing — file vs stdin, rules loading</div>
+  </section>
+
+</aside>
+
+<main class="main">
+
+  <section class="card">
+    <h2>Purpose</h2>
+    <p>Strips secrets and PII from text before it is shared, so a log or
+    transcript can go into an issue or chat without leaking. Exists because
+    people paste sensitive output by hand, and a machine pass catches what an
+    eye misses.</p>
+  </section>
+
+  <section class="card">
+    <h2>Behavior <span class="badge run">verified: run</span> <span class="badge constructed">exhibit: constructed</span></h2>
+    <pre class="term"><span class="p">$</span> printf 'user=ada db_pass=hunter2 ok\n' | redact --stdin
+user=ada db_pass=«redacted:password» ok</pre>
+    <p class="aside">A real secret can't be committed, so the input is
+    synthetic; the transform is a live run — one hit, masked by its rule's
+    label (<span title="tools/redact/core.py:31">mask</span>).</p>
+  </section>
+
+  <section class="card span2">
+    <h2>API</h2>
+    <svg class="apirr" viewBox="0 0 700 160" width="100%" style="max-width:680px" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="rrarw" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <circle cx="16" cy="104" r="4" fill="#64748b"/>
+      <line x1="16" y1="104" x2="42" y2="104" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="44" y="88" width="84" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="86" y="108" text-anchor="middle" font-size="12.5" fill="#1e293b">redact</text>
+      <line x1="128" y1="104" x2="148" y2="104" stroke="#64748b" stroke-width="2"/>
+      <circle cx="148" cy="104" r="3.5" fill="#64748b"/>
+      <path d="M148,104 C185,104 185,52 222,52" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="224" y="36" width="76" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="262" y="56" text-anchor="middle" font-size="12.5" fill="#1e293b">--rules</text>
+      <line x1="300" y1="52" x2="314" y2="52" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="316" y="36" width="56" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="344" y="56" text-anchor="middle" font-size="12.5" fill="#1e293b">FILE</text>
+      <path d="M372,52 C400,52 405,80 405,104" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="148" y1="104" x2="405" y2="104" stroke="#64748b" stroke-width="2"/>
+      <circle cx="405" cy="104" r="3.5" fill="#64748b"/>
+      <line x1="405" y1="104" x2="430" y2="104" stroke="#64748b" stroke-width="2"/>
+      <circle cx="430" cy="104" r="3.5" fill="#64748b"/>
+      <path d="M430,104 C465,104 465,52 502,52" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="504" y="36" width="66" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="537" y="56" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;file&gt;</text>
+      <path d="M568,36 C568,18 506,18 506,36" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <text x="537" y="14" text-anchor="middle" font-size="10" fill="#94a3b8">one or more</text>
+      <path d="M570,52 C608,52 630,72 630,104" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="430" y1="104" x2="486" y2="104" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="488" y="88" width="76" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="526" y="108" text-anchor="middle" font-size="12.5" fill="#1e293b">--stdin</text>
+      <line x1="564" y1="104" x2="630" y2="104" stroke="#64748b" stroke-width="2"/>
+      <circle cx="630" cy="104" r="3.5" fill="#64748b"/>
+      <line x1="630" y1="104" x2="656" y2="104" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <line x1="660" y1="96" x2="660" y2="112" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="666" y1="96" x2="666" y2="112" stroke="#64748b" stroke-width="2.5"/>
+    </svg>
+    <div class="apilist">
+      <div class="sig">Rule(pattern: str, label: str)</div>
+      <div class="doc">A secret pattern and the label its matches collapse to.</div>
+      <div class="sig">load_rules(path: Path) -&gt; list[Rule]</div>
+      <div class="doc">Read a rules file into a list of Rule.</div>
+      <div class="sig">redact_text(text: str, rules: list[Rule]) -&gt; Redaction</div>
+      <div class="doc">Mask every rule match in text; report how many were hit.</div>
+      <div class="sig">Redaction(text: str, hits: int)</div>
+      <div class="doc">The masked text and the number of secrets redacted.</div>
+    </div>
+    <p class="aside">Command grammar above, importable surface below —
+    <code>--rules</code> optional, exactly one input source required,
+    <code>&lt;file&gt;</code> repeatable. Exit <code>0</code> ok ·
+    <code>2</code> usage error.</p>
+  </section>
+
+  <section class="card span2">
+    <h2>Data flow</h2>
+    <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
+    <!-- DOT source:
+    digraph redact {
+      rankdir=LR;
+      bgcolor="transparent";
+      node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12,
+            color="#94a3b8", fillcolor="#f1f5f9", fontcolor="#1e293b"];
+      edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#475569"];
+      in    [label="input text", fillcolor="#e0f2fe", color="#38bdf8"];
+      rules [label="rule set"];
+      scan  [label="scan"];
+      mask  [label="mask hits"];
+      out   [label="redacted text", fillcolor="#dcfce7", color="#4ade80"];
+      in -> scan    [label="raw"];
+      rules -> scan [label="patterns"];
+      scan -> mask  [label="hits"];
+      mask -> out   [label="masked"];
+    }
+    -->
+    <svg width="470pt" height="98pt"
+ viewBox="0.00 0.00 470.00 98.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 94)">
+<title>redact</title>
+<!-- in -->
+<g id="node1" class="node">
+<title>in</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M52,-90C52,-90 12,-90 12,-90 6,-90 0,-84 0,-78 0,-78 0,-66 0,-66 0,-60 6,-54 12,-54 12,-54 52,-54 52,-54 58,-54 64,-60 64,-66 64,-66 64,-78 64,-78 64,-84 58,-90 52,-90"/>
+<text xml:space="preserve" text-anchor="middle" x="32" y="-67.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">input text</text>
+</g>
+<!-- scan -->
+<g id="node3" class="node">
+<title>scan</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M177.25,-63C177.25,-63 147.25,-63 147.25,-63 141.25,-63 135.25,-57 135.25,-51 135.25,-51 135.25,-39 135.25,-39 135.25,-33 141.25,-27 147.25,-27 147.25,-27 177.25,-27 177.25,-27 183.25,-27 189.25,-33 189.25,-39 189.25,-39 189.25,-51 189.25,-51 189.25,-57 183.25,-63 177.25,-63"/>
+<text xml:space="preserve" text-anchor="middle" x="162.25" y="-40.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">scan</text>
+</g>
+<!-- in&#45;&gt;scan -->
+<g id="edge1" class="edge">
+<title>in&#45;&gt;scan</title>
+<path fill="none" stroke="#64748b" d="M64.37,-65.4C82.31,-61.62 104.91,-56.86 123.77,-52.89"/>
+<polygon fill="#64748b" stroke="#64748b" points="124.41,-56.33 133.47,-50.85 122.97,-49.48 124.41,-56.33"/>
+<text xml:space="preserve" text-anchor="middle" x="99.62" y="-63.42" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">raw</text>
+</g>
+<!-- rules -->
+<g id="node2" class="node">
+<title>rules</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M47.5,-36C47.5,-36 16.5,-36 16.5,-36 10.5,-36 4.5,-30 4.5,-24 4.5,-24 4.5,-12 4.5,-12 4.5,-6 10.5,0 16.5,0 16.5,0 47.5,0 47.5,0 53.5,0 59.5,-6 59.5,-12 59.5,-12 59.5,-24 59.5,-24 59.5,-30 53.5,-36 47.5,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="32" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">rule set</text>
+</g>
+<!-- rules&#45;&gt;scan -->
+<g id="edge2" class="edge">
+<title>rules&#45;&gt;scan</title>
+<path fill="none" stroke="#64748b" d="M59.89,-23.66C78.39,-27.56 103.23,-32.79 123.69,-37.09"/>
+<polygon fill="#64748b" stroke="#64748b" points="122.85,-40.49 133.36,-39.13 124.29,-33.64 122.85,-40.49"/>
+<text xml:space="preserve" text-anchor="middle" x="99.62" y="-38" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">patterns</text>
+</g>
+<!-- mask -->
+<g id="node4" class="node">
+<title>mask</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M295.25,-63C295.25,-63 253,-63 253,-63 247,-63 241,-57 241,-51 241,-51 241,-39 241,-39 241,-33 247,-27 253,-27 253,-27 295.25,-27 295.25,-27 301.25,-27 307.25,-33 307.25,-39 307.25,-39 307.25,-51 307.25,-51 307.25,-57 301.25,-63 295.25,-63"/>
+<text xml:space="preserve" text-anchor="middle" x="274.12" y="-40.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">mask hits</text>
+</g>
+<!-- scan&#45;&gt;mask -->
+<g id="edge3" class="edge">
+<title>scan&#45;&gt;mask</title>
+<path fill="none" stroke="#64748b" d="M189.57,-45C201.45,-45 215.81,-45 229.25,-45"/>
+<polygon fill="#64748b" stroke="#64748b" points="229.23,-48.5 239.23,-45 229.23,-41.5 229.23,-48.5"/>
+<text xml:space="preserve" text-anchor="middle" x="215.12" y="-47.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">hits</text>
+</g>
+<!-- out -->
+<g id="node5" class="node">
+<title>out</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M450,-63C450,-63 389.75,-63 389.75,-63 383.75,-63 377.75,-57 377.75,-51 377.75,-51 377.75,-39 377.75,-39 377.75,-33 383.75,-27 389.75,-27 389.75,-27 450,-27 450,-27 456,-27 462,-33 462,-39 462,-39 462,-51 462,-51 462,-57 456,-63 450,-63"/>
+<text xml:space="preserve" text-anchor="middle" x="419.88" y="-40.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">redacted text</text>
+</g>
+<!-- mask&#45;&gt;out -->
+<g id="edge4" class="edge">
+<title>mask&#45;&gt;out</title>
+<path fill="none" stroke="#64748b" d="M307.74,-45C324.91,-45 346.37,-45 365.86,-45"/>
+<polygon fill="#64748b" stroke="#64748b" points="365.84,-48.5 375.84,-45 365.84,-41.5 365.84,-48.5"/>
+<text xml:space="preserve" text-anchor="middle" x="342.5" y="-47.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">masked</text>
+</g>
+</g>
+</svg>
+    <p class="aside">One entry point (<span title="tools/bin/redact">redact</span>)
+    scans the input text against the rule set and masks every hit; only the
+    endpoints touch the outside.</p>
+    <details>
+      <summary>Module roster</summary>
+      <p>cli.py — argument parsing and file/stdin I/O. core.py — the pure
+      scan-and-mask pass. rules.py — the Rule type and load_rules.</p>
+    </details>
+  </section>
+
+  <section class="card assess span2">
+    <h2>Assessment <span class="badge opinion">opinion</span></h2>
+    <ol>
+      <li><strong>Unlisted secret formats pass through in the clear</strong><span>a rule catches only what its pattern describes, so a novel token shape is never masked (Rule).</span></li>
+      <li><strong>Rule order silently decides the label</strong><span>first match wins, so a reordered rule set relabels or drops overlapping hits (Rule set).</span></li>
+      <li><strong>The command-line path ships unverified</strong><span>file-vs-stdin and rules loading have no test; a plumbing regression is invisible (Tests).</span></li>
+      <li><strong>A pass reports a count, not a miss</strong><span>the hit count confirms what was masked, never what slipped through (Hit).</span></li>
+    </ol>
+  </section>
+
+</main>
+
+</div>
+</div>
+</body>
+</html>
