@@ -1,10 +1,18 @@
+---
+type: Standard
+title: ADR Conventions
+description: When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
+---
+
 # ADR Conventions
 
 ADRs live in `docs/adr/` and use sequential 4-digit numbering: `0001-slug.md`, `0002-slug.md`, etc. Create the `docs/adr/` directory lazily — only when the first ADR is needed.
 
 ## Index
 
-`docs/adr/README.md` is the ADR index: one line per ADR — number, title, and a one-sentence description of the decision — so a reader or skill can find the relevant ADRs without opening every file. Whoever adds, supersedes, or deprecates an ADR updates the index in the same change. Create it lazily alongside the first ADR.
+The ADR listing lives in `docs/adr/index.md` — one line per ADR, carrying the ADR's `description` — so a reader or skill can find the relevant ADRs without opening every file. It follows the [index.md](/standards/repo-documentation.md#indexmd) rules, and the staleness checker fails any commit that adds, renames, or removes an ADR without updating the index in the same change. Create it lazily alongside the first ADR.
+
+`docs/adr/README.md` is a short narrative orientation for the directory, not the listing.
 
 ## When to offer an ADR
 
@@ -29,6 +37,12 @@ If a decision is easy to reverse, skip it — you'll just reverse it. If it's no
 ## Template
 
 ```md
+---
+type: ADR
+title: {Short title of the decision}
+description: {One-line summary of the decision, for triage and the index}
+---
+
 # {Short title of the decision}
 
 {1-3 sentences: what's the context, what did we decide, and why.}
@@ -36,11 +50,13 @@ If a decision is easy to reverse, skip it — you'll just reverse it. If it's no
 
 That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
+An ADR is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/document-types.md)). The `description` is the ADR's triage line and feeds `docs/adr/index.md`; on a one-sentence ADR it will echo the body — that's fine, the description is the triage surface and the body is the record.
+
 ## Optional sections
 
 Only include these when they add genuine value. Most ADRs won't need them.
 
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited.
+- **`status`** — an optional extra frontmatter key beyond the required three (`proposed | accepted | deprecated | superseded by ADR-NNNN`). Useful when decisions are revisited.
 - **Considered Options** — only when the rejected alternatives are worth remembering.
 - **Consequences** — only when non-obvious downstream effects need to be called out.
 

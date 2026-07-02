@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Doc Conventions
+description: How Markdown docs are written — voice, structure, brevity, current-state-only, declarative present tense
+---
+
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Applies to every doc

@@ -481,3 +481,185 @@ def test_mixed_pass_and_fail_in_one_run_reports_only_the_broken(
     assert "1/2 broken" in result.stderr
     assert "#missing-heading" in result.stdout
     assert "#real-heading" not in result.stdout
+
+
+# --- Link class: root-absolute `/path` targets inside markdown link syntax ---
+
+
+def test_root_link_to_existing_file_is_ok(tmp_path: Path, workspace: Path) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "standards" / "target.md", "x")
+    write(repo / "docs.md", "see [target](/standards/target.md)\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert "all ok" in result.stderr
+
+
+def test_root_link_to_missing_file_is_broken(tmp_path: Path, workspace: Path) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "docs.md", "see [gone](/standards/gone.md)\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/1 broken" in result.stderr
+    assert "/standards/gone.md" in result.stdout
+
+
+def test_root_link_anchor_matching_heading_is_ok(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Real heading\n")
+    write(repo / "docs.md", "see [x](/target.md#real-heading)\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_root_link_anchor_missing_is_broken(tmp_path: Path, workspace: Path) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "## Real heading\n")
+    write(repo / "docs.md", "see [x](/target.md#no-such-heading)\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/1 broken" in result.stderr
+
+
+def test_bare_slash_token_is_prose_not_a_link(tmp_path: Path, workspace: Path) -> None:
+    """`/commit` and other bare slash tokens are slash-skills/prose, not Links —
+    a `/` target is only checked inside markdown link syntax."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "docs.md", "run /commit then /open-pr to finish /nonexistent\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "no cross-references found" in result.stderr
+
+
+def test_root_link_inside_inline_code_is_skipped(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "docs.md", "the linter lives at `/tools/bin/ref-check`\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "no cross-references found" in result.stderr
+
+
+def test_root_link_inside_fenced_block_is_skipped(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "docs.md", "intro\n```\n[x](/gone.md)\n```\nend\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+    assert "no cross-references found" in result.stderr
+
+
+def test_root_link_resolves_against_worktree_working_copy(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A `/`-root Link resolves against the invoking worktree's own root, so a
+    file present only in the worktree resolves as ok."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "README.md", "base")
+    commit_all(repo)
+
+    wt = repo / ".claude" / "worktrees" / "feature-x"
+    subprocess.run(
+        ["git", "-C", str(repo), "worktree", "add", "-q", str(wt), "-b", "feature-x"],
+        check=True,
+    )
+    write(wt / "target.md", "only here")
+    write(wt / "docs.md", "see [target](/target.md)\n")
+    assert not (repo / "target.md").exists()
+
+    result = run_ref_check(wt, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_root_link_to_directory_with_fragment_is_out_of_scope(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    (repo / "standards").mkdir()
+    write(repo / "docs.md", "see [dir](/standards#anything)\n")
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0
+
+
+def test_both_link_classes_counted_in_one_run(tmp_path: Path, workspace: Path) -> None:
+    """A Link and a Citation on the same file both count toward the total."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(
+        repo / "docs.md",
+        "a [link](/target.md) and a citation ~/workspace/primary/target.md\n",
+    )
+
+    result = run_ref_check(repo, tmp_path, "--all")
+
+    assert result.returncode == 0, result.stderr
+    assert "2 references, all ok" in result.stderr
+
+
+def test_citation_inside_link_text_is_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A ~/workspace citation in a link's *text* (not its target) is still a
+    citation and must be validated — the bare-citation pass strips link spans
+    to their text, not away entirely, so text stays scannable."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "docs.md",
+        "[see ~/workspace/primary/missing.md now](https://example.com)\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "1/1 broken" in result.stderr
+    assert "~/workspace/primary/missing.md" in result.stdout
+
+
+def test_citation_inside_link_text_resolving_is_ok(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """The happy path of the above: an existing citation in link text passes."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(
+        repo / "docs.md",
+        "[see ~/workspace/primary/target.md](https://example.com)\n",
+    )
+
+    result = run_ref_check(repo, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert "all ok" in result.stderr

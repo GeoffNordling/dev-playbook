@@ -1,3 +1,9 @@
+---
+type: ADR
+title: Decline Superpowers, Catalog Techniques
+description: Decline the Superpowers framework wholesale, cataloguing its techniques for later harvest into authored workspace skills
+---
+
 # Decline Superpowers, Catalog Techniques
 
 ## Context

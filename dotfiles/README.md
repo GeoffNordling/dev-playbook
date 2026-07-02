@@ -1,3 +1,9 @@
+---
+type: README
+title: Dotfiles
+description: Claude Code configuration — skills, rules, settings, hooks — managed via GNU Stow, symlinked into home
+---
+
 # Dotfiles
 
 Claude Code configuration — skills, rules, settings, and hooks — managed via GNU Stow.

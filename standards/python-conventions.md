@@ -1,10 +1,16 @@
+---
+type: Standard
+title: Python Conventions
+description: Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
+---
+
 # Python Conventions
 
 Default Python conventions for projects in this workspace. Individual
 projects may supercede.
 
 For build/task-runner conventions (Makefile targets, `make check`), see
-[build-conventions.md](build-conventions.md).
+[build-conventions.md](/standards/build-conventions.md).
 
 ## Package initialization
 
@@ -91,7 +97,7 @@ slips past review because nobody saw it.
 
 ## Future imports
 
-`from __future__ import annotations` is banned. Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`), builtin generics (`list[int]`), and string-quoted forward references. The `no-future-annotations` pre-commit hook auto-rejects the import. If a future import is truly necessary, ask the human for permission.
+`from __future__ import annotations` is banned. Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`), builtin generics (`list[int]`), and string-quoted forward references. The `python-lint` pre-commit hook (its `no-future-annotations` rule) auto-rejects the import. If a future import is truly necessary, ask the human for permission.
 
 ## Helpers
 

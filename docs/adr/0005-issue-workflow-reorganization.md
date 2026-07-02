@@ -1,3 +1,9 @@
+---
+type: ADR
+title: Issue Workflow Reorganization
+description: Reorganize the issue workflow around phase-on-issue labels, merging triage and creation into `/intake` and adding an `/sdd` dispatcher
+---
+
 # Issue Workflow Reorganization
 
 ## Context

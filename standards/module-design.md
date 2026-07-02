@@ -1,6 +1,12 @@
+---
+type: Guide
+title: Module Design
+description: How to design modules with good interfaces — deep modules, the deletion test, designing for testability
+---
+
 # Module Design
 
-How to design modules with good interfaces. Drawn from Ousterhout's *A Philosophy of Software Design* and Feathers' *Working Effectively with Legacy Code*. Uses the vocabulary in [architecture-vocabulary.md](architecture-vocabulary.md).
+How to design modules with good interfaces. Drawn from Ousterhout's *A Philosophy of Software Design* and Feathers' *Working Effectively with Legacy Code*. Uses the vocabulary in [CONTEXT.md](/CONTEXT.md).
 
 ## Principles
 

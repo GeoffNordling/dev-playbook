@@ -1,3 +1,9 @@
+---
+type: Standard
+title: Skill Conventions
+description: Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
+---
+
 # Skill Conventions
 
 Conventions for Claude Code skill bundles in this workspace. For the full
@@ -16,6 +22,11 @@ feature reference (subagent execution, shell injection, hooks, etc.), see the
 The directory name must match the `name` field in the front matter.
 
 ## Front matter
+
+A skill bundle is harness-owned — Claude Code loads `SKILL.md` as configuration,
+not as prose to learn from — so it is not an OKF concept document. Its front
+matter is the Claude Code skill schema below, **not** the OKF `type`/`title`/`description`
+profile. See [the OKF bundle boundary](/standards/repo-documentation.md#the-okf-bundle).
 
 ```yaml
 ---
@@ -37,7 +48,7 @@ Every skill must have all five of these:
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, the description `SHALL` include a second sentence beginning `Use when …` that lists the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
-| `disable-model-invocation` | `false` is the standard — per the [dispatch model](~/workspace/dev-playbook/workflow/workflow.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
+| `disable-model-invocation` | `false` is the standard — per the [dispatch model](/workflow/workflow.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
 | `model` | Pin the skill to a model: `haiku`, `sonnet`, or `opus`. Mandatory — always explicit, never rely on the session default. `opus` is the default choice; pin `sonnet`/`haiku` only where a cheaper, faster model demonstrably fits the work. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
@@ -87,9 +98,9 @@ After the front matter, the body is Markdown.
 
 ## Cross-references
 
-Skill bodies follow the workspace cross-reference standard. See the [skill-bundles section](~/workspace/dev-playbook/standards/repo-documentation.md#in-skill-bundles) for the target-based rules: inline links for files the reader should open, inline code for files mentioned by name, and bare invocations for slash-skills.
+Skill bodies follow the workspace cross-reference standard. See the [skill-bundles section](/standards/repo-documentation.md#in-skill-bundles) for the target-based rules: inline links for files the reader should open, inline code for files mentioned by name, and bare invocations for slash-skills. That section also carries the authoritative rationale — a skill has no fixed repo root, so it cites workspace documents by their full `~/workspace/<repo>/…` path rather than the root-absolute Link form used inside a concept-doc bundle.
 
-When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](~/workspace/dev-playbook/standards/repo-documentation.md#fragment-anchors)).
+When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/repo-documentation.md#fragment-anchors)).
 
 ## References directory
 

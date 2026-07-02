@@ -6,26 +6,20 @@
 #   - repo: https://github.com/GeoffNordling/dev-playbook
 #     rev: <commit-sha>
 #     hooks:
+#       - id: python-lint
 #       - id: ref-check
-#       - id: test-privacy
-#       - id: no-future-annotations
+#       - id: okf-lint
 #       - id: internal-skill-audit
+#       - id: judgments-lint
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
 # hook from there, so resolution is independent of where the consumer repo —
-# or any of its worktrees — sits on disk. The hook scripts live in tools/bin/.
-# See standards/build-conventions.md.
+# or any of its worktrees — sits on disk. The hook scripts live in tools/bin/
+# and share primitives from tools/lib/. See standards/build-conventions.md.
 
-- id: no-future-annotations
-  name: no-future-annotations
-  entry: tools/bin/no-future-annotations
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: empty-init
-  name: empty-init
-  entry: tools/bin/empty-init
+- id: python-lint
+  name: python-lint
+  entry: tools/bin/python-lint
   language: script
   pass_filenames: false
   always_run: true
@@ -37,9 +31,9 @@
   pass_filenames: false
   types: [markdown]
 
-- id: test-privacy
-  name: test-privacy
-  entry: tools/bin/test-privacy
+- id: okf-lint
+  name: okf-lint
+  entry: tools/bin/okf-lint
   language: script
   pass_filenames: false
   always_run: true

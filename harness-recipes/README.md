@@ -1,3 +1,9 @@
+---
+type: README
+title: Harness recipes
+description: Reusable harness orchestration patterns — prose descriptions of multi-agent workflows backed by code and skills
+---
+
 # Harness recipes
 
 Reusable patterns — recipes — for getting leverage out of the Claude Code harness.
@@ -17,9 +23,4 @@ We recognize programatic, API-based workflows as a supremely-powerful pattern in
 
 In June 2026, Anthropic announced moving Agent SDK and `claude -p` usage off the subscription pool, then [paused the change](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan). We treat the pause as temporary; Anthropic has a tendency to pull the rug out on customers.
 
-## Recipes
-
-| Recipe | Purpose |
-|--------|---------|
-| [Ralph loop](recipes/ralph-loop.md) | Grind a large, sequentially-decomposable goal to done by booting a fresh agent each iteration. |
-| [Scatter-gather](recipes/scatter-gather.md) | Fan out a batch of independent jobs as isolated agents in one parallel run, collecting one structured result per job in input order. |
+The recipes are listed in [`index.md`](/harness-recipes/index.md).

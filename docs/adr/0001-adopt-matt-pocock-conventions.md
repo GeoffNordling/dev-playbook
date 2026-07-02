@@ -1,3 +1,9 @@
+---
+type: ADR
+title: Adopt Matt Pocock's Conventions
+description: Adopt Matt Pocock's repository conventions wholesale — 4-digit ADRs, per-repo agent config, triage vocabulary, vertical-slice discipline — rejecting only his PRD format
+---
+
 # Adopt Matt Pocock's Conventions
 
 **Status:** Superseded by [ADR-0004](0004-remove-pocock-direct-dependency.md) in part

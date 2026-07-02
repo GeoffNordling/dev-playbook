@@ -1,3 +1,9 @@
+---
+type: Protocol
+title: Align, Map, Execute
+description: A protocol for collaborative work — compressing a large task scope into human-sized decision points across staged align, map, execute
+---
+
 # Align, Map, Execute
 
 A frontier-invariant protocol for human-agent collaborative work.

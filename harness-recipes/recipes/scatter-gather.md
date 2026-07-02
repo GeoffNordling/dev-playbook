@@ -1,3 +1,10 @@
+---
+type: Recipe Description
+title: Scatter-gather
+description: Running a batch of independent jobs in one parallel fan-out — one fresh agent per job, results in input order
+resource: /dotfiles/dot-claude/workflows/scatter-gather.js
+---
+
 # Scatter-gather
 
 A batch of independent jobs ground out in a single parallel fan-out — one fresh
@@ -12,7 +19,7 @@ collected in one shot — judging a set of candidates, classifying a list, or
 answering the same question against different inputs. Each job is its own isolated
 `agent()`; none can see another's work.
 
-This is the parallel-independent counterpart to the [Ralph loop](ralph-loop.md).
+This is the parallel-independent counterpart to the [Ralph loop](/harness-recipes/recipes/ralph-loop.md).
 Ralph is one large task split into sequential, dependent steps, where disk carries
 state between iterations; scatter-gather is the opposite shape — parallel,
 independent jobs that share nothing and run at once. If a job needs another job's
@@ -53,4 +60,4 @@ Build the batch and call the workflow by name, passing the batch as `args`:
 
 `jobs` is required — no defaults — and each job must carry its own `model` and
 `effort`; `schema` is optional. A missing or malformed arg throws. Source:
-[`scatter-gather.js`](~/workspace/dev-playbook/dotfiles/dot-claude/workflows/scatter-gather.js).
+[`scatter-gather.js`](/dotfiles/dot-claude/workflows/scatter-gather.js).
