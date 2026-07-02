@@ -1,7 +1,7 @@
 ---
 name: datasheet
-description: Generate or refresh a datasheet — the fixed-section, budgeted HTML report defined by the workspace datasheet standard — for a user-chosen subject and file scope.
-disable-model-invocation: true
+description: Use when told to generate or refresh a datasheet — the fixed-section, budgeted HTML report defined by the workspace datasheet standard — for a user-chosen subject and file scope.
+disable-model-invocation: false
 model: opus
 effort: xhigh
 argument-hint: "[subject and/or scope paths]"
