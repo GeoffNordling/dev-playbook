@@ -23,7 +23,7 @@ SECTION_ORDER = (
     "Purpose",
     "Behavior",
     "API",
-    "Shape",
+    "Data flow",
     "Assessment",
 )
 VISIBLE_BUDGET = 1000

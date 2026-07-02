@@ -61,7 +61,7 @@ embodiment: a sheet copies the example's stylesheet and card markup verbatim
 and varies only the content. The layout is a fact rail beside a main grid:
 the rail (narrow, sticky) holds identity, Concepts, Touch surface, and Tests
 for constant-position lookup; the main grid pairs Purpose and Behavior side by
-side, then gives API, Shape, and Assessment each a full-width band; on narrow
+side, then gives API, Data flow, and Assessment each a full-width band; on narrow
 windows the main grid collapses to one column. Color is semantics, never
 decoration — green marks the verified, amber marks opinion and coverage
 gaps, indigo chips mark concepts, slate is neutral.
@@ -127,7 +127,7 @@ affirmative blank is the signal, silence is a violation.
 | Purpose | main | E | What the system is for and why it exists. Three sentences or fewer. |
 | Behavior | main | E | One worked example: an invocation, its input, its output. |
 | API | main, full band | E | The public call surface — a railroad diagram of the command grammar, a signature list for an importable surface, or both; "None." when nothing is exported. |
-| Shape | main, full band | E | A dataflow diagram — the primary input moving through real, named parts to the output. |
+| Data flow | main, full band | E | A dataflow diagram — the primary input moving through real, named parts to the output. |
 | Assessment | main, full band | J | What the owner should worry about. |
 
 ### Stamp
@@ -201,17 +201,22 @@ one of two forms, or both:
   the command, its flags — are filled pills; placeholders (`<arg>`) are plain
   boxes. The medium is inline, hand-built SVG; Graphviz does not draw
   railroads. The exit codes a caller scripts against sit beside it.
-- **An importable surface** renders as a **signature list**: the public
-  functions and classes with their type-hinted signatures, one per monospace
-  row.
+- **An importable surface** renders as a **signature list**: each public
+  function or class as a monospace row — its type-hinted signature, with the
+  first-line docstring on a muted line beneath. Signature and summary both come
+  from `griffe-outline`, the same tool the exhibit runs, so no new extraction is
+  needed.
 
-A tool that is a CLI over a library shows both. A system that exposes nothing
-to call states "None." A railroad that fails to render is a generation
-failure, exactly as with the Shape diagram.
+A tool that is a CLI over a library shows both. When only one form applies, the
+absent one is named with its reason in a single sentence — "No importable
+surface: these are standalone scripts, not a library" — never left as silence;
+the affirmative-blank rule governs each half, not only the whole section. A
+system that exposes nothing to call states "None." A railroad that fails to
+render is a generation failure, exactly as with the dataflow diagram.
 
-### Shape
+### Data flow
 
-Shape is a **dataflow diagram** and only that: how does the primary input move
+This is a **dataflow diagram** and only that: how does the primary input move
 through the system's parts to become the primary output? Not module
 dependencies, not call graphs, not API interaction — the API has its own
 section. Fixing the lens keeps the diagram out of the infinite space of what it
@@ -260,6 +265,6 @@ The one section allowed opinion, fenced five ways:
 minimal datasheet for a fictional tool — read it in full before generating.
 It is normative for form: copy its stylesheet and card markup verbatim — the
 stamp comment first, the rail and main regions, the chips, cells, rows,
-badges, and the Shape diagram in the prescribed form (inline SVG, DOT source
+badges, and the dataflow diagram in the prescribed form (inline SVG, DOT source
 in a comment beside it) — and vary only the content. It does not set the
 size: a real system may spend the full budget.

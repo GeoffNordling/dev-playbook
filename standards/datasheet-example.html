@@ -93,7 +93,8 @@ generator: claude-opus-4-8
   .apirr text { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
   .apilist { margin:.55rem 0 0; border-top:1px solid var(--line); padding-top:.5rem; }
   .apilist .sig { font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size:.78rem; color:#334155; padding:.12rem 0; }
+    font-size:.78rem; color:#334155; padding:.12rem 0 0; }
+  .apilist .doc { font-size:.72rem; color:var(--muted); margin:0 0 .4rem .9rem; }
   details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
   details summary { cursor:pointer; }
 </style>
@@ -198,9 +199,13 @@ user=ada db_pass=«redacted:password» ok</pre>
     </svg>
     <div class="apilist">
       <div class="sig">Rule(pattern: str, label: str)</div>
+      <div class="doc">A secret pattern and the label its matches collapse to.</div>
       <div class="sig">load_rules(path: Path) -&gt; list[Rule]</div>
+      <div class="doc">Read a rules file into a list of Rule.</div>
       <div class="sig">redact_text(text: str, rules: list[Rule]) -&gt; Redaction</div>
+      <div class="doc">Mask every rule match in text; report how many were hit.</div>
       <div class="sig">Redaction(text: str, hits: int)</div>
+      <div class="doc">The masked text and the number of secrets redacted.</div>
     </div>
     <p class="aside">Command grammar above, importable surface below —
     <code>--rules</code> optional, exactly one input source required,
@@ -209,7 +214,7 @@ user=ada db_pass=«redacted:password» ok</pre>
   </section>
 
   <section class="card span2">
-    <h2>Shape</h2>
+    <h2>Data flow</h2>
     <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
     <!-- DOT source:
     digraph redact {
