@@ -18,11 +18,11 @@ from html.parser import HTMLParser
 REQUIRED_STAMP_FIELDS = ("subject", "scope", "commit", "generated", "generator")
 SECTION_ORDER = (
     "Concepts",
-    "API",
     "Touch surface",
     "Tests",
     "Purpose",
     "Behavior",
+    "API",
     "Shape",
     "Assessment",
 )

@@ -59,9 +59,9 @@ The document has two layers:
 The visual form is fixed, and the [example](#example) is its normative
 embodiment: a sheet copies the example's stylesheet and card markup verbatim
 and varies only the content. The layout is a fact rail beside a main grid:
-the rail (narrow, sticky) holds identity, Concepts, the API surface, Touch
-surface, and Tests for constant-position lookup; the main grid pairs Purpose and Behavior side
-by side, then gives Shape and Assessment each a full-width band; on narrow
+the rail (narrow, sticky) holds identity, Concepts, Touch surface, and Tests
+for constant-position lookup; the main grid pairs Purpose and Behavior side by
+side, then gives API, Shape, and Assessment each a full-width band; on narrow
 windows the main grid collapses to one column. Color is semantics, never
 decoration — green marks the verified, amber marks opinion and coverage
 gaps, indigo chips mark concepts, slate is neutral.
@@ -122,11 +122,11 @@ affirmative blank is the signal, silence is a violation.
 |---|---|---|---|
 | Stamp | file head + rail header | E | Subject name, scope manifest, git commit covered, generation date, generator model. Budget-exempt. |
 | Concepts | rail | E | The vocabulary the owner needs (typically 3–7) — a chip and one defining phrase each. |
-| API | rail | E | The public call surface — CLI signature and flags, or importable functions with signatures; "None." when nothing is exported. |
 | Touch surface | rail | E | Six fixed cells — Reads, Writes, Spawns, Net, Env, Deps — each concrete or an explicit "none". |
 | Tests | rail | E | Rows: what is verified (green), what is gated or missing (amber). "None." when no tests exist. |
 | Purpose | main | E | What the system is for and why it exists. Three sentences or fewer. |
 | Behavior | main | E | One worked example: an invocation, its input, its output. |
+| API | main, full band | E | The public call surface — a railroad diagram of the command grammar, a signature list for an importable surface, or both; "None." when nothing is exported. |
 | Shape | main, full band | E | A dataflow diagram — the primary input moving through real, named parts to the output. |
 | Assessment | main, full band | J | What the owner should worry about. |
 
@@ -145,19 +145,12 @@ of this sheet; the defining phrase is one clause. Terms come from the files:
 when the files name the thing — an identifier, a docstring phrase, an
 emitted element — the chip uses that name, anchored to its defining site. A
 term the files don't supply is the generator's coinage and wears a dashed
-border (`chip coined`). A concept earns its place
+border (`chip coined`) — the coinage still anchors to where the concept lives
+in the code; the dashed border marks that the *name* is the generator's, not
+that the concept is ungrounded. A concept earns its place
 only when another part of the sheet leans on it — the exhibit, a diagram
 node, an Assessment item. A concept nothing else references is a souvenir of
 reading the code; cut it.
-
-### API
-
-The public call surface, and only what a consumer is meant to invoke — never
-internal helpers or private names (a leading underscore is private). For a
-command-line tool: the invocation signature, its flags, and the exit codes a
-caller scripts against. For a library: the public functions and classes with
-their type-hinted signatures. A system that exposes nothing to call states
-"None." — an affirmative blank, like any absent section.
 
 ### Touch surface
 
@@ -181,13 +174,40 @@ the demonstration is cut. Two labels, both mandatory:
 - **verified:** `run` — the invocation was executed during generation — or
   `not-run`, with one sentence saying why (e.g. unsafe, private information, not runnable, needs
   credentials).
-- **exhibit:** `captured` — real output, elisions marked honestly ("showing 14
-  of 3,400 lines") — or `constructed` — a synthetic illustration, which may be
-  informed by a real run.
+- **exhibit:** `captured` — a real scenario really run: genuine input and the
+  output it actually produced, elisions marked honestly ("showing 14 of 3,400
+  lines") — or `constructed` — a synthetic illustration, which may be informed
+  by a real run. Fabricating the input makes an exhibit `constructed`, never
+  `captured`, even when the command really executed.
 
-Exhibit content is committed forever; nothing unvetted for sensitivity goes
-in. When real output is too large or too private, run live for verification
-and construct a small exhibit (`verified: run`, `exhibit: constructed`).
+The input is a real, recognizable artifact of the owner's world — when the
+system operates on something outside its own scope (a package, a repo, a
+file), pick a genuine one, never a toy invented for the demo. Exhibit content
+is committed forever; nothing unvetted for sensitivity goes in. When the real
+input is too large or too private to commit — a secret, a customer record —
+run live for verification and construct a small, faithful exhibit
+(`verified: run`, `exhibit: constructed`).
+
+### API
+
+The public call surface, and only what a consumer is meant to invoke — never
+internal helpers or private names (a leading underscore is private). It takes
+one of two forms, or both:
+
+- **A command grammar** renders as a **railroad diagram** — the syntax-diagram
+  convention (SQLite, JSON.org, EBNF): a left-to-right track with required
+  tokens on the line, optional flags as bypass branches, mutually-exclusive
+  modes as parallel branches, and repeatable parts as loops. Literal tokens —
+  the command, its flags — are filled pills; placeholders (`<arg>`) are plain
+  boxes. The medium is inline, hand-built SVG; Graphviz does not draw
+  railroads. The exit codes a caller scripts against sit beside it.
+- **An importable surface** renders as a **signature list**: the public
+  functions and classes with their type-hinted signatures, one per monospace
+  row.
+
+A tool that is a CLI over a library shows both. A system that exposes nothing
+to call states "None." A railroad that fails to render is a generation
+failure, exactly as with the Shape diagram.
 
 ### Shape
 
