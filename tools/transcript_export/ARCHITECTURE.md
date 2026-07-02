@@ -1,3 +1,9 @@
+---
+type: Guide
+title: Transcript Export Architecture
+description: A map of the transcript_export system at altitude — pipeline, code layout, load-bearing bets, and known limits
+---
+
 # transcript_export — architecture
 
 *A map of the system at altitude: the pipeline, where code lives, the load-bearing
