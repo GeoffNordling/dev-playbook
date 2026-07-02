@@ -138,3 +138,56 @@ The post-hoc check is bounded and artifact-only:
 4. Run the describer workflow over the agent's territory and diff its account
    against the emissions. Divergence between the agent's story and an outside
    reader's is the highest-value audit signal.
+
+## When a box pays
+
+A box carries setup cost: frozen tests, walls, a gate, an emissions spec. It
+earns that cost only when three conditions hold together:
+
+- the agent writes with blast radius, so walls matter;
+- done-ness is mechanically checkable, so a gate matters;
+- the mission repeats or runs unattended, so a sealed template beats a fresh
+  conversation each time.
+
+Work that fails the test is cheaper run as an ordinary supervised agent. A
+read-only survey has no blast radius and no mechanical definition of done — its
+acceptance test is a human's eye — so it is fan-out agent work, not a box.
+
+Authoring a standard is never box work. The standard is the contract, and the
+human's judgment is its only acceptance test; there is no gate for "the owner
+likes it now." A box executes against a ratified contract, it does not produce
+one. The standard document and the box charter are the same move at different
+scales — alignment crystallized once into a referenceable artifact, then
+consumed many times without further conversation.
+
+## Open questions
+
+Unresolved. Recorded for future revisions and worked examples to close, not
+because the answers are known.
+
+- **Multi-repo boxes.** A box lives in one worktree, which is one repository. A
+  mission spanning repositories is decomposed instead: a read-only pass reads
+  across all of them (walls are trivial — read anywhere, write only to a
+  report), a human ratifies the result, and a single-writable-repo box is
+  instantiated per repository and run in parallel. Whether an atomic cross-repo
+  write ever forces one box over many worktrees is open; none has appeared in
+  this workspace.
+- **Empirical ground truth.** A gate built on CI passing across many
+  repositories, rather than on a local suite. Unspecified.
+- **Emission-quality gating.** Emissions are gated on existence today. An
+  LLM-judge check on their substance — that `DEVIATIONS` and `UPSTREAM` say
+  something real rather than filling the format — would raise the floor. The
+  workspace has a judgments library for exactly this; not yet integrated.
+- **Box-type template library.** Which box types earn a committed template, and
+  where the instantiation tooling lives. One template exists (greenfield-cli).
+- **Consumer-repo instantiation debt.** An instantiated box's `box/*.md` files
+  owe `index.md` entries in the consumer repo; that is the instantiation
+  tooling's job, and the tooling does not exist yet.
+- **Operator-dotfiles leak.** A box session inherits the operator's global
+  `~/.claude/CLAUDE.md`. A box aims to be self-contained, so this ambient
+  context is an unstated dependency that eventually needs a wall or a stated
+  assumption.
+- **Prototype-box shakedown.** Run a sealed box once with a cheap model before
+  the expensive run. The throwaway output is not the point; the run surfaces
+  box defects — an ambiguous contract, a missing wall — while they are cheap to
+  fix.
