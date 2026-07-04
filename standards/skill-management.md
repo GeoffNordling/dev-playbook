@@ -54,7 +54,7 @@ npx skills@latest list -g
 npx skills@latest remove SKILL_NAME -g
 ```
 
-Don't edit files under `dotfiles/.agents/skills/` — they're overwritten on the next `skills update`. To diverge a skill's behavior, fork its source repo and reinstall pointing at your fork.
+Files under `dotfiles/.agents/skills/` are overwritten on the next `skills update`; edits there do not survive. To diverge a skill's behavior, fork its source repo and reinstall pointing at the fork.
 
 ## Decision hub
 

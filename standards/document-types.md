@@ -27,7 +27,7 @@ Title Case; acronyms stay upper.
 | `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work. |
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `ADR` | An immutable, numbered record of one architectural decision and its rationale. |
-| `Guide` | A teaching or procedure doc you read to learn how to do or think about something, not to be measured against. |
+| `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Protocol` | A formal algorithm for structured human–agent collaboration. |
 | `Vocabulary` | The canonical definitions of the workspace's domain terms (lives in `CONTEXT.md`). |

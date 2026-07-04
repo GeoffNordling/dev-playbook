@@ -4,7 +4,7 @@
 - [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
 - [Agentic Box](/standards/agentic-box.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
 - [Datasheet Standard](/standards/datasheet.md) — The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
-- [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, declarative present tense
+- [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Document Types](/standards/document-types.md) — The OKF document-type registry and the frontmatter profile every concept doc carries
 - [Issue Conventions](/standards/issue-conventions.md) — GitHub issue body format — the body as agent brief, vertical-slice decomposition, blocked-by and sub-issue relationships
 - [Module Design](/standards/module-design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability

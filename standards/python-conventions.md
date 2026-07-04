@@ -33,9 +33,9 @@ Every function, method, class, and module has a docstring — except
 explains in plain English what the thing does. One short sentence is fine
 when the behavior is simple; longer when it isn't.
 
-Rationale: a name tells you what something is called; a docstring tells you
-what it does. Readers (human and agent) should not have to read the body to
-learn the contract.
+Rationale: a name says what something is called; a docstring says what it
+does. Readers (human and agent) should not have to read the body to learn
+the contract.
 
 **Exception: tests.** Pytest test functions follow a `test_<behavior>` naming
 convention literal enough that a docstring would just restate the name. Skip

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Doc Conventions
-description: How Markdown docs are written — voice, structure, brevity, current-state-only, declarative present tense
+description: How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 ---
 
 # Doc Conventions
@@ -13,6 +13,14 @@ in the repo documentation hierarchy.
 
 Declarative present tense. "The symlink is relative." Not "We make the
 symlink relative."
+
+State rules in the positive: what to do, where a thing lives. "Runnables
+live in `scripts/`", not "don't put runnables elsewhere". A prohibition
+appears only when the prohibition itself is the rule.
+
+No second person in declarative docs. "You" belongs to agent-facing
+instruction files — skills, box artifacts — that direct an executor; a
+standard states facts.
 
 ## Heading casing
 
@@ -33,6 +41,14 @@ Each rule lives in the lead sentence of its section. If the lead carries the
 rule, the section can stop there. Section size matches topic size.
 
 State each rule once. Consolidate any duplicates.
+
+## One concern per document
+
+A document covers one concern. When a file accumulates several — distinct
+questions a reader might arrive with — it splits into a directory of
+single-concern documents with an `index.md`, per the
+[OKF SPEC](/standards/references/okf-spec.md). A reader crawling for one
+answer loads one small file, not a monolith that covers everything.
 
 ## Lead with the edge case when reach is surprising
 
@@ -81,4 +97,4 @@ Write for someone careful enough to follow a single sentence.
 ## Brevity
 
 Choose brevity over completeness. A doc that's read beats a doc that's
-complete. Trim further than your instinct says.
+complete. Trim further than instinct says.
