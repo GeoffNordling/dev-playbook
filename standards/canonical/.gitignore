@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# python tooling caches
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# per-issue git worktrees — keeps the main checkout's `git status` clean;
+# does not affect commits/pushes from inside a worktree
+.claude/worktrees/

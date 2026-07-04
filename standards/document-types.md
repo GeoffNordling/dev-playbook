@@ -12,12 +12,11 @@ type-lint (a pre-commit hook) asserts that every concept document's `type` is
 one of the names below.
 
 This governs **concept documents** — the prose `.md` files an agent crawls and
-loads to understand something. Harness-owned files (`CLAUDE.md`, skill `SKILL.md`
-and their `references/`, `rules/`, `settings*.json`, `hooks/`, `.js` workflows,
-Python code) are in the bundle too, but a tool consumes them as configuration or
-runs them as code rather than reading them as prose, so they are not concept
-documents and carry no OKF frontmatter. The full concept-doc/harness-owned
-boundary lives in [repo-documentation.md](/standards/repo-documentation.md#the-okf-bundle).
+loads to understand something. Harness-owned files are in the bundle too, but a
+tool consumes them as configuration or runs them as code rather than reading
+them as prose, so they are not concept documents and carry no OKF frontmatter.
+The boundary and the harness-owned list live in
+[repo-documentation.md](/standards/repo-documentation.md#the-okf-bundle).
 
 ## Types
 

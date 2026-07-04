@@ -61,7 +61,7 @@ A `tools/bin/` script imports them by adding its parent (`tools/`) to `sys.path`
 Each hook entry runs in two environments and MUST work in both:
 
 1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
-2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [build-conventions.md — Pre-commit](/standards/build-conventions.md#pre-commit).
+2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [build-conventions.md — The hook repo and rollout](/standards/build-conventions.md#the-hook-repo-and-rollout).
 
 In both, pre-commit resolves the script by the relative `entry: tools/bin/<tool>` declared in [`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml) (mirrored in the local block) against the dev-playbook checkout that holds it — no `$HOME` paths, no `realpath` indirection.
 

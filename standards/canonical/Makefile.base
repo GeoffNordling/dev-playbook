@@ -1,0 +1,3 @@
+.PHONY: check
+check:
+	uvx pre-commit run --all-files
