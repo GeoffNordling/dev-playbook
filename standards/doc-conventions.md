@@ -17,10 +17,10 @@ symlink relative."
 ## Heading casing
 
 H1 uses Title Case. H2 and below use sentence case.
-`# Repo Documentation Standard` at H1; `## Audience and presence` at H2.
+`# File Skeleton` at H1; `## Authored, not generated` at H2.
 
 Proper nouns and code identifiers keep their native case at every level:
-`## CLAUDE.md baseline`, `## .gitignore baseline`, `### SSH-bound git operations`.
+`# CLAUDE.md Content`, `## pyproject.toml`, `### SSH-bound git operations`.
 
 ## Open with purpose
 

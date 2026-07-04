@@ -10,7 +10,7 @@ ADRs live in `docs/adr/` and use sequential 4-digit numbering: `0001-slug.md`, `
 
 ## Index
 
-The ADR listing lives in `docs/adr/index.md` — one line per ADR, carrying the ADR's `description` — so a reader or skill can find the relevant ADRs without opening every file. It follows the [index.md](/standards/repo-documentation.md#indexmd) rules, and the staleness checker fails any commit that adds, renames, or removes an ADR without updating the index in the same change. Create it lazily alongside the first ADR.
+The ADR listing lives in `docs/adr/index.md` — one line per ADR, carrying the ADR's `description` — so a reader or skill can find the relevant ADRs without opening every file. It follows the [indexes.md](/standards/docs/indexes.md) rules, and the staleness checker fails any commit that adds, renames, or removes an ADR without updating the index in the same change. Create it lazily alongside the first ADR.
 
 `docs/adr/README.md` is a short narrative orientation for the directory, not the listing.
 

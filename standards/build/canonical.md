@@ -7,7 +7,7 @@ description: The canonical artifacts — the single-source files under standards
 # Canonical Artifacts
 
 The standard's machine-checkable content lives **once**, as files in
-dev-playbook under [`standards/canonical/`](/standards/canonical/index.md),
+dev-playbook under `standards/canonical/`,
 shipped inside every hook clone
 ([distribution.md](/standards/build/distribution.md)). Prose points at them
 and does not restate their contents — the files are the standard. Each
@@ -24,11 +24,9 @@ place, and `repo-audit` enforces them equal to the canonical source:
 | [.gitignore](/standards/canonical/.gitignore) | baseline lines present |
 
 `standards/canonical/` is quoted material: hooks and tree rules skip it —
-its `pyproject.toml` is a template, not a second project. The directory also
-holds the documentation baselines ([CLAUDE.md](/standards/canonical/CLAUDE.md),
-[CONTEXT.md](/standards/canonical/CONTEXT.md)), which are floors per
-[repo-documentation.md](/standards/repo-documentation.md), not byte-compared
-artifacts.
+its `pyproject.toml` is a template, not a second project. Every file in the
+directory is compared against by `repo-audit`; a file that no tool checks
+does not belong there.
 
 ## One config serves every repo
 

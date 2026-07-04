@@ -8,7 +8,7 @@ effort: low
 
 # Run Judgments
 
-A **judgment** is a specific yes/no question about specific files, ruled on by an LLM judge. Judgments are declared as YAML and gated by deterministic pytests. See `standards/judgments.md` for the declaration format. Tests pass iff the judgment's exact content has already been judged-and-passed (its key is cached); misses fail. This skill runs the judgment workflow — it dispatches each uncached judgment to the `scatter-gather` agent workflow for an LLM-judged verdict. Passes are recorded in the cache. Failures indicate potential bugs the same way a failed Python test does; they escalate for correction.
+A **judgment** is a specific yes/no question about specific files, ruled on by an LLM judge. Judgments are declared as YAML and gated by deterministic pytests. See `standards/judgments/declarations.md` for the declaration format. Tests pass iff the judgment's exact content has already been judged-and-passed (its key is cached); misses fail. This skill runs the judgment workflow — it dispatches each uncached judgment to the `scatter-gather` agent workflow for an LLM-judged verdict. Passes are recorded in the cache. Failures indicate potential bugs the same way a failed Python test does; they escalate for correction.
 
 This is a thin implementation skill for the judgment workflow, relying on deterministic CLI commands. It only runs the workflow, partitions the verdicts, records the passes, and escalates the failures.
 

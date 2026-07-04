@@ -16,7 +16,7 @@ loads to understand something. Harness-owned files are in the bundle too, but a
 tool consumes them as configuration or runs them as code rather than reading
 them as prose, so they are not concept documents and carry no OKF frontmatter.
 The boundary and the harness-owned list live in
-[repo-documentation.md](/standards/repo-documentation.md#the-okf-bundle).
+[bundle.md](/standards/docs/bundle.md).
 
 ## Types
 

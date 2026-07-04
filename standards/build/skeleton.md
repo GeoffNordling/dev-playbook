@@ -13,16 +13,16 @@ forbids.
 
 | Entry | Presence | Rule |
 |---|---|---|
-| `README.md` | Required | scope and baseline per [repo-documentation.md](/standards/repo-documentation.md) |
-| `CLAUDE.md` | Required | scope and baseline per repo-documentation.md |
-| `index.md` | Required | at the root; further indexes wherever concept docs live; content per repo-documentation.md |
+| `README.md` | Required | content per [readme-content.md](/standards/docs/readme-content.md) |
+| `CLAUDE.md` | Required | content per [claude-content.md](/standards/docs/claude-content.md) |
+| `index.md` | Required | at the root; further indexes wherever concept docs live; content per [indexes.md](/standards/docs/indexes.md) |
 | `.gitignore` | Required | contains the canonical baseline lines; `MAY` extend |
 | `.pre-commit-config.yaml` | Required | contains the canonical blocks; `MAY` append further hooks |
 | `Makefile` | Required | contains the canonical targets for the repo's layers |
 | `.github/workflows/ci.yml` | Required | byte-identical to the canonical thin CI |
 | `scripts/` | Optional | sole home for checked-in runnables, any language; `bin/` and `tools/` are forbidden at the root |
-| `CONTEXT.md` | Optional | root only; format per repo-documentation.md |
-| `docs/`, `docs/adr/`, `specs/` | Optional | scope per repo-documentation.md |
+| `CONTEXT.md` | Optional | root only; content per [context-content.md](/standards/docs/context-content.md) |
+| `docs/`, `docs/adr/`, `specs/` | Optional | scope per the [file map](/standards/docs/bundle.md#files) |
 | `.claude/` | Optional | harness-owned; `worktrees/` gitignored |
 
 ## python layer
