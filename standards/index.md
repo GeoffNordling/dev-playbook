@@ -3,7 +3,6 @@
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
 - [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
 - [Agentic Box](/standards/agentic-box.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
-- [Build Conventions](/standards/build-conventions.md) — The layered repo standard — layer skeletons, the Python project shape, universal make check, the hook-repo rollout, thin CI, and repo-audit
 - [Datasheet Standard](/standards/datasheet.md) — The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
 - [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, declarative present tense
 - [Document Types](/standards/document-types.md) — The OKF document-type registry and the frontmatter profile every concept doc carries
@@ -20,4 +19,6 @@
 ## Directories
 
 - [agentic-box/templates/greenfield-cli/](/standards/agentic-box/templates/greenfield-cli/index.md) — The worked greenfield-CLI box template
+- [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement
 - [canonical/](/standards/canonical/index.md) — The canonical artifacts and documentation baselines — the single-source files of the build standard
+- [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading

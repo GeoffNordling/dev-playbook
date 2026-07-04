@@ -2,7 +2,7 @@
 # tools/bin/ scripts are testable in place before release. Consumer repos do
 # NOT use this file — they reference the published manifest (.pre-commit-hooks.yaml)
 # by URL + pinned rev. The local block below therefore mirrors that manifest;
-# keep the two in sync. See standards/build-conventions.md.
+# keep the two in sync. See standards/build/distribution.md.
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit

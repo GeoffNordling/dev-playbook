@@ -7,8 +7,7 @@ description: How Markdown docs are written — voice, structure, brevity, curren
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Applies to every doc
-in the repo documentation hierarchy — `README.md`, `CLAUDE.md`, files under
-`standards/`, `specs/`, `docs/`.
+in the repo documentation hierarchy.
 
 ## Voice
 
@@ -72,8 +71,8 @@ Do: "X is the source of truth."
 ## Point at canonical artifacts
 
 When a real file IS the standard, the doc directs the reader to it.
-`build-conventions.md` notes that the canonical pre-commit hook set is
-`.pre-commit-config.yaml` and points there.
+The build standard's `canonical.md` names each canonical artifact and points
+at the file instead of restating its contents.
 
 ## Trust the reader
 

@@ -8,7 +8,7 @@ description: Content and scope of the documentation files — README, CLAUDE.md,
 
 ## Purpose
 
-Define the content and scope of every documentation file in a workspace repository, so that any human or agent can open a repo cold and immediately orient — what it is, how to operate it, and where to find the rest. Which files must exist is declared once, in [build-conventions.md — File skeleton](/standards/build-conventions.md#file-skeleton); this document governs what goes inside them.
+Define the content and scope of every documentation file in a workspace repository, so that any human or agent can open a repo cold and immediately orient — what it is, how to operate it, and where to find the rest. Which files must exist is declared once, in the build standard's [file skeleton](/standards/build/skeleton.md); this document governs what goes inside them.
 
 A repo's agent-navigated documentation is one Open Knowledge Format (OKF) bundle: every concept document declares its `type`, `title`, and `description` in frontmatter, so an agent triages by frontmatter and navigates by the per-directory `index.md` listings, loading full bodies only where relevant. [The OKF bundle](#the-okf-bundle) defines the boundary; [document-types.md](/standards/document-types.md) defines the types.
 
@@ -26,7 +26,7 @@ A repo's agent-navigated documentation is one Open Knowledge Format (OKF) bundle
 
 ## The OKF bundle
 
-This repo's agent-navigated documentation is one [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog) bundle, per the [OKF SPEC](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md). The bundle is the whole repository: an agent triages a document by its frontmatter and navigates between documents by the per-directory `index.md` listings, loading full bodies only when a document is relevant.
+This repo's agent-navigated documentation is one [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog) bundle, per the [OKF SPEC](/standards/references/okf-spec.md). The bundle is the whole repository: an agent triages a document by its frontmatter and navigates between documents by the per-directory `index.md` listings, loading full bodies only when a document is relevant.
 
 Not every file in the repo is a **concept document**. The bundle divides in two:
 
@@ -46,7 +46,7 @@ file.
 ## Files
 
 Presence (required vs optional) is not restated here — it lives in the
-build-conventions skeleton tables.
+build standard's [skeleton tables](/standards/build/skeleton.md).
 
 | File | Type | Audience | Scope |
 |---|---|---|---|
@@ -102,7 +102,7 @@ Every workspace repo's `CLAUDE.md` starts from the canonical baseline,
 [/standards/canonical/CLAUDE.md](/standards/canonical/CLAUDE.md).
 
 The `## Build` section is universal — every repo has `make check` (see
-[build-conventions.md](/standards/build-conventions.md)). Project-specific
+[make.md](/standards/build/make.md)). Project-specific
 operating rules accumulate under `## Rules` as the repo evolves.
 
 ## CLAUDE.md hierarchy
@@ -144,7 +144,7 @@ One `CONTEXT.md` at the repo root.
 
 The baseline entries are a canonical artifact — this document does not
 restate them (see
-[build-conventions.md — Canonical artifacts](/standards/build-conventions.md#canonical-artifacts)).
+[canonical.md](/standards/build/canonical.md)).
 Repos `MAY` extend with project-specific paths.
 
 ## Cross-references

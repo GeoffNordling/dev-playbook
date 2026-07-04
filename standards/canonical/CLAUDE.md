@@ -7,7 +7,7 @@
 ## Build
 
 `make check` runs the full check surface. See
-[build-conventions.md](~/workspace/dev-playbook/standards/build-conventions.md).
+[make.md](~/workspace/dev-playbook/standards/build/make.md).
 
 ## Domain awareness
 
