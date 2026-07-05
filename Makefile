@@ -8,6 +8,6 @@ lint:
 typecheck:
 	uv run mypy src tests
 test:
-	uv run pytest --deselect "tests/test_judgments_gate.py::test_judgment_cached[judgments-standard-matches-loader]" --deselect "tests/test_judgments_gate.py::test_judgment_cached[run-judgments-skill-matches-tooling]"
+	uv run pytest
 check: format-check lint typecheck test
 	uvx pre-commit run --all-files

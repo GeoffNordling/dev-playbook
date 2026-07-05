@@ -90,18 +90,10 @@ last.
   test_ref_check invokes ref-check via `python3` explicitly, which still
   works), or carve out a std-lib-script exception in the standard/audit.
   Do NOT change their shebangs before task 6.
-- STALE MANIFEST (discovered in task 3, NOT fixed — out of scope, no task
-  covers it): `.pre-commit-hooks.yaml` still declares every `entry: tools/bin/X`
-  and its header comment still says "hook scripts live in tools/bin/ ... share
-  primitives from tools/lib/". This contradicts distribution.md, which already
-  says scripts back the hooks from `scripts/`. `validate-manifest` only checks
-  YAML schema, not that entry files exist, so the gate stays green despite the
-  staleness. Fixing it is a published-contract change (a consumer rev bump per
-  distribution.md) — flag for the human / a future task. Task 6 as written only
-  swaps `.pre-commit-config.yaml`, not the manifest. Because of this, task 3's
-  scripts/README.md describes the manifest `entry:` mechanism generically rather
-  than quoting a path, so it is accurate under either the current (stale) or the
-  eventual (scripts/) manifest.
+- STALE MANIFEST — RESOLVED in task 5: `.pre-commit-hooks.yaml` now declares
+  every `entry: scripts/X` and its header comment names `scripts/` and
+  `src/dev_playbook/`. (It had still pointed at the deleted `tools/bin/`
+  paths after task 1; consumers only see this at their next rev bump.)
 - Task 4 landed: added `## Build` to CLAUDE.md (placed right after the H1, so a
   cold-landing agent hits build mechanics before the project-specific `## Rules`;
   no OKF frontmatter, it's harness-owned) and added `## Example dialogue` +
@@ -130,7 +122,7 @@ last.
 - [x] 2. Canonical ci.yml and .python-version
 - [x] 3. Rewrite scripts/README.md
 - [x] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
-- [ ] 5. Judgments: declare two new judgments, fill the cache, full pytest green
+- [x] 5. Judgments: declare two new judgments, fill the cache, full pytest green
 - [ ] 6. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
 
 ---

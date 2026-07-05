@@ -34,3 +34,52 @@ judgments:
       - dotfiles/dot-claude/workflows/scatter-gather.js
     model: claude-opus-4-8
     effort: high
+
+  - id: build-standard-matches-artifacts
+    claim: |
+      The standards/build/ documents promise exactly what ships: every
+      concrete statement they make about the canonical artifacts in
+      standards/canonical/ and about the published hook manifest
+      (.pre-commit-hooks.yaml) — file names, hook ids, targets, commands,
+      pins, entry paths — is true of those files as they exist today.
+    evidence:
+      - standards/build/index.md
+      - standards/build/layers.md
+      - standards/build/skeleton.md
+      - standards/build/make.md
+      - standards/build/python.md
+      - standards/build/ci.md
+      - standards/build/aws.md
+      - standards/build/canonical.md
+      - standards/build/distribution.md
+      - standards/build/enforcement.md
+    reference:
+      - standards/canonical/Makefile.base
+      - standards/canonical/Makefile.python
+      - standards/canonical/Makefile.aws
+      - standards/canonical/ci.yml
+      - standards/canonical/pyproject.toml
+      - .pre-commit-hooks.yaml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: repo-audit-subset-of-standard
+    claim: |
+      scripts/repo-audit enforces only what the documented standard states:
+      every check it performs corresponds to a requirement stated in the
+      standards/build/ documents. The standard may state more than the tool
+      checks; the tool must not check more than the standard states.
+    evidence:  [scripts/repo-audit]
+    reference:
+      - standards/build/index.md
+      - standards/build/layers.md
+      - standards/build/skeleton.md
+      - standards/build/make.md
+      - standards/build/python.md
+      - standards/build/ci.md
+      - standards/build/aws.md
+      - standards/build/canonical.md
+      - standards/build/distribution.md
+      - standards/build/enforcement.md
+    model: claude-opus-4-8
+    effort: high

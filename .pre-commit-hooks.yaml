@@ -15,47 +15,47 @@
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
 # hook from there, so resolution is independent of where the consumer repo —
-# or any of its worktrees — sits on disk. The hook scripts live in tools/bin/
-# and share primitives from tools/lib/. See standards/build/distribution.md.
+# or any of its worktrees — sits on disk. The hook scripts live in scripts/
+# and share primitives from src/dev_playbook/. See standards/build/distribution.md.
 
 - id: repo-audit
   name: repo-audit
-  entry: tools/bin/repo-audit
+  entry: scripts/repo-audit
   language: script
   pass_filenames: false
   always_run: true
 
 - id: python-lint
   name: python-lint
-  entry: tools/bin/python-lint
+  entry: scripts/python-lint
   language: script
   pass_filenames: false
   always_run: true
 
 - id: ref-check
   name: ref-check
-  entry: tools/bin/ref-check
+  entry: scripts/ref-check
   language: script
   pass_filenames: false
   types: [markdown]
 
 - id: okf-lint
   name: okf-lint
-  entry: tools/bin/okf-lint
+  entry: scripts/okf-lint
   language: script
   pass_filenames: false
   always_run: true
 
 - id: internal-skill-audit
   name: internal-skill-audit
-  entry: tools/bin/internal-skill-audit
+  entry: scripts/internal-skill-audit
   language: script
   pass_filenames: false
   always_run: true
 
 - id: judgments-lint
   name: judgments-lint
-  entry: tools/bin/judgments-lint
+  entry: scripts/judgments-lint
   language: script
   pass_filenames: false
   always_run: true
