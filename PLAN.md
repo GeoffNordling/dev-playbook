@@ -116,6 +116,29 @@ last.
   repo-audit as `scripts/python-lint`/`scripts/ref-check` script-shebang
   findings — leave for task 6 as the note above says.
 
+- Task 6 landed (final task): the repo now conforms and enforces conformance on
+  itself. `.gitignore` already carried every canonical pattern (no change).
+  `.pre-commit-config.yaml` swapped to the canonical shape —
+  `default_install_hook_types: [pre-commit, pre-push]`; ruff-pre-commit v0.15.20
+  with `ruff-check`/`ruff-format` (no args/excludes; pyproject `extend-exclude`
+  covers dotfiles/.agents); the shellcheck-py v0.11.0.1 block; and ONE
+  `- repo: local` block with canonical `make-check` (pre-push) FIRST, then the
+  six dogfood hooks that mirror the published manifest (repo-audit, python-lint,
+  ref-check, okf-lint, internal-skill-audit, judgments-lint) plus local-only
+  validate-manifest. In self_mode repo-audit skips the pinned dev-playbook
+  segment (REV_PLACEHOLDER) and instead checks `published - local` is empty.
+  Script-shebang findings resolved by flipping `scripts/python-lint` and
+  `scripts/ref-check` from `#!/usr/bin/env python3` to
+  `#!/usr/bin/env -S uv run --script` (both already had the PEP 723 block; tests
+  invoke them via explicit `python3`, so the shebang change is test-invisible).
+  shellcheck ran for the first time and found exactly the pre-scouted 3: SC2148
+  in aliases.sh + worktree.sh (fixed with a `# shellcheck shell=bash` directive
+  line, since sourced files have no shebang) and SC2207 at worktree.sh:32 (fixed
+  by replacing the unquoted `COMPREPLY=( $(compgen ...) )` split with
+  `mapfile -t COMPREPLY < <(compgen ...)`). `scripts/repo-audit` now exits 0;
+  `make check` green (409 pass, 0 deselected) with repo-audit + shellcheck in the
+  hook suite. PLAN complete.
+
 ## Tasks
 
 - [x] 1. The move: consolidate `tools/` into the standard layout
@@ -123,7 +146,7 @@ last.
 - [x] 3. Rewrite scripts/README.md
 - [x] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
 - [x] 5. Judgments: declare two new judgments, fill the cache, full pytest green
-- [ ] 6. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
+- [x] 6. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
 
 ---
 

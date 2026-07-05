@@ -1,21 +1,37 @@
 # dev-playbook runs its own hooks from the working tree, so edits to the
-# scripts/ hooks are testable in place before release. Consumer repos do
-# NOT use this file — they reference the published manifest (.pre-commit-hooks.yaml)
-# by URL + pinned rev. The local block below therefore mirrors that manifest;
-# keep the two in sync. See standards/build/distribution.md.
-
+# scripts/ hooks are testable in place before release. Consumer repos do NOT
+# use this file — they reference the published manifest (.pre-commit-hooks.yaml)
+# by URL + pinned rev. dev-playbook is the hook repo itself, so the canonical
+# template's pinned dev-playbook block is replaced here by the `- repo: local`
+# dogfood block below; it mirrors that manifest, so keep the two in sync.
+# See standards/build/distribution.md.
+default_install_hook_types: [pre-commit, pre-push]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.14
+    rev: v0.15.20
     hooks:
-      - id: ruff
-        args: [--fix]
-        exclude: 'dotfiles/\.(agents|dhub)/'
+      - id: ruff-check
       - id: ruff-format
-        exclude: 'dotfiles/\.(agents|dhub)/'
-
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
   - repo: local
     hooks:
+      - id: make-check
+        name: make check
+        entry: make check
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+      - id: repo-audit
+        name: repo-audit
+        entry: scripts/repo-audit
+        language: script
+        pass_filenames: false
+        always_run: true
+
       - id: python-lint
         name: python-lint
         entry: scripts/python-lint

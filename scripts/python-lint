@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 """Lint Python sources against the workspace conventions.
 
 Three rules over one walk of a repo's Python files (discovered via

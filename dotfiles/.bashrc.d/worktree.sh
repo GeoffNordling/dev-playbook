@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Git worktree navigation. Sourced by ~/.bashrc via ~/.bashrc.d/* loader.
 #
 # Worktrees live at <repo>/.claude/worktrees/<branch-name>/ per
@@ -29,6 +30,6 @@ _cdwt() {
     [ -d "$wt_dir" ] || return
     local names
     names="$(ls "$wt_dir" 2>/dev/null)"
-    COMPREPLY=( $(compgen -W "$names" -- "${COMP_WORDS[1]}") )
+    mapfile -t COMPREPLY < <(compgen -W "$names" -- "${COMP_WORDS[1]}")
 }
 complete -F _cdwt cdwt

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 """Check cross-references in markdown files.
 
 Deterministic checker for the workspace cross-reference grammar; the grammar
