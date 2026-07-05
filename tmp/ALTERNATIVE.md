@@ -47,7 +47,7 @@ remove still exists, that is a finding, not a style choice.
 - [ ] 7. Retire `tools/`; Makefile canonical
 - [ ] 8. Canonical ci.yml and .python-version
 - [ ] 9. Rewrite scripts/README.md; CLAUDE.md `## Build`; CONTEXT.md sections
-- [ ] 10. Judgments: declare D1/D2, fill the cache, full pytest green
+- [ ] 10. Judgments: declare two new judgments, fill the cache, full pytest green
 - [ ] 11. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
 
 ---

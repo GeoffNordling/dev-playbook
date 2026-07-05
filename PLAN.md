@@ -52,22 +52,13 @@ last.
   what remains. It is EXPECTED to report findings until task 6 completes.
 - Any executable script you create or edit pins `requires-python = ">=3.14"`
   in its PEP 723 block (must equal the repo's `.python-version`).
-- The abandoned single-shot prototype of this migration is commit `95fd487`
-  (kept reachable as ref `refs/archive/prototype-phase4`). Consulting
-  `git show 95fd487:<path>` for mechanical detail is legitimate — but this
-  plan deviates from the prototype deliberately (enforcement timing, task
-  order), so on any conflict THIS PLAN WINS.
 - Autonomy: task cards state the goal and hard-won facts; the route is
   yours. Investigate before changing, fail loud on surprises, and record
   durable discoveries in Working notes for later iterations.
 
 ## Working notes
 
-- Prototype diff: `git show 95fd487:<path>` / ref `refs/archive/prototype-phase4`.
-- uv cache is warm — `uv lock`/`uv sync` work offline in the sandbox.
-- The sandbox has no network. Anything needing a download is a blocker to
-  report, not to work around.
-- Hook envs for task 6 are pre-cached and verified green in-sandbox:
+- Hook envs for task 6 are already installed and verified working:
   ruff-pre-commit v0.15.20 (ruff-check, ruff-format) and shellcheck-py
   v0.11.0.1.
 - shellcheck pre-scout (task 6): exactly 3 findings across the 4 tracked
@@ -83,7 +74,7 @@ last.
 - [ ] 2. Canonical ci.yml and .python-version
 - [ ] 3. Rewrite scripts/README.md
 - [ ] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
-- [ ] 5. Judgments: declare D1/D2, fill the cache, full pytest green
+- [ ] 5. Judgments: declare two new judgments, fill the cache, full pytest green
 - [ ] 6. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
 
 ---
@@ -113,11 +104,11 @@ renames):
 - `from lib import X` → `from dev_playbook import X` (same for `from lib.X …`)
 - bare `judgments`, `skipcache`, `transcript_export` imports →
   `dev_playbook.`-prefixed.
-- Seds miss string-form refs: the prototype found
-  `"import skipcache.seen; …"` inside a subprocess program string in
-  test_skipcache.py. After rewriting, audit with bare-name greps for each of
-  `lib`, `judgments`, `skipcache`, `transcript_export` over the three trees
-  and judge every hit individually.
+- Seds miss string-form refs: test_skipcache.py holds
+  `"import skipcache.seen; …"` inside a subprocess program string, and there
+  may be others like it. After rewriting, audit with bare-name greps for each
+  of `lib`, `judgments`, `skipcache`, `transcript_export` over the three
+  trees and judge every hit individually.
 
 **Path shims** (`sys.path.insert` lines in scripts): after the move a
 script's `parents[1]` is the repo root. Known adjustments — python-lint,
@@ -155,9 +146,7 @@ exactly; additions are free. Carry these extras from `tools/pyproject.toml`:
 Do NOT carry `[tool.uv.build-backend] module-name` — uv_build's default for
 project name `dev-playbook` is exactly `src/dev_playbook`.
 
-Then `uv lock` and `uv sync` at the root (both worked in-sandbox from the
-warm uv cache; if the network is genuinely needed, that is a blocker to
-report, not to work around). Commit `uv.lock`.
+Then `uv lock` and `uv sync` at the root. Commit `uv.lock`.
 
 **Root Makefile**: replace the transitional content with the canonical
 Python form (`standards/canonical/Makefile.python`, `<code-roots>` =
@@ -232,21 +221,23 @@ requires (see standards/build/ for what each section is for).
 **Done when:** repo-audit reports zero doc-shape findings; `make check`
 green.
 
-### Task 5 — Judgments: declare D1/D2, fill the cache, full pytest green
+### Task 5 — Judgments: declare two new judgments, fill the cache, full pytest green
 
 **Goal.** The judgment layer catches drift the deterministic checks cannot.
 Declare two new judgments, evaluate everything, and drop the pytest
 deselects.
 
-- **D1**: the standards/build/ prose is consistent with the canonical
-  artifacts in standards/canonical/ AND the published hook manifest
-  (.pre-commit-hooks.yaml). Docs promise exactly what ships.
-- **D2**: repo-audit's checks are a subset of the documented standard —
-  the tool enforces nothing the standards/build/ docs don't state.
-- Declarations live in `judgments/*.yaml` (see `[tool.judgments]` in
-  pyproject.toml); follow the existing `doc-consistency.yaml` shape —
-  judgments-lint validates them. Choose clear ids; D1/D2 are working labels,
-  not required names.
+The two judgments to declare:
+
+- **Docs promise exactly what ships**: the standards/build/ prose is
+  consistent with the canonical artifacts in standards/canonical/ AND the
+  published hook manifest (.pre-commit-hooks.yaml).
+- **The tool enforces only what the docs state**: repo-audit's checks are
+  a subset of the documented standard in standards/build/.
+
+Declarations live in `judgments/*.yaml` (see `[tool.judgments]` in
+pyproject.toml); follow the existing `doc-consistency.yaml` shape —
+judgments-lint validates them. Choose clear ids in that file's style.
 - Invoke the `/run-judgments` skill to evaluate and fill the cache. That
   covers the two long-pending misses (`judgments-standard-matches-loader`,
   `run-judgments-skill-matches-tooling`) plus the new declarations.
@@ -273,13 +264,10 @@ conforming repo can afford to enforce conformance on itself.
   okf-lint, internal-skill-audit, judgments-lint, validate-manifest), all
   entries `scripts/X`. dev-playbook is the hook repo itself, so the pinned
   dev-playbook block from the canonical template is replaced by the dogfood
-  local block (repo-audit's self-mode expects exactly this). The prototype's
-  accepted config is at `git show 95fd487:.pre-commit-config.yaml` — a
-  sound reference, but verify entries against THIS plan.
+  local block (repo-audit's self-mode expects exactly this).
 - shellcheck runs for the FIRST TIME EVER on the repo's tracked shell
-  files. Findings are in scope — fix them. If the shellcheck (or new ruff)
-  hook environment cannot install in the sandbox, that is a blocker to
-  report (environments should have been pre-cached before launch).
+  files. Findings are in scope — fix them. The shellcheck and ruff hook
+  environments are already installed (see Working notes).
 - Run `scripts/repo-audit`: fix any stragglers until it exits 0.
 
 **Done when:** repo-audit exits 0; `make check` green; the commit passes
