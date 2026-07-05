@@ -90,6 +90,18 @@ last.
   test_ref_check invokes ref-check via `python3` explicitly, which still
   works), or carve out a std-lib-script exception in the standard/audit.
   Do NOT change their shebangs before task 6.
+- STALE MANIFEST (discovered in task 3, NOT fixed — out of scope, no task
+  covers it): `.pre-commit-hooks.yaml` still declares every `entry: tools/bin/X`
+  and its header comment still says "hook scripts live in tools/bin/ ... share
+  primitives from tools/lib/". This contradicts distribution.md, which already
+  says scripts back the hooks from `scripts/`. `validate-manifest` only checks
+  YAML schema, not that entry files exist, so the gate stays green despite the
+  staleness. Fixing it is a published-contract change (a consumer rev bump per
+  distribution.md) — flag for the human / a future task. Task 6 as written only
+  swaps `.pre-commit-config.yaml`, not the manifest. Because of this, task 3's
+  scripts/README.md describes the manifest `entry:` mechanism generically rather
+  than quoting a path, so it is accurate under either the current (stale) or the
+  eventual (scripts/) manifest.
 - Task 2 landed: `.github/workflows/ci.yml` and root `.python-version` are now
   byte-identical to their canonical artifacts (verified with `cmp`). repo-audit
   dropped to 11 findings (from 14 post-task-1: -ci.yml, -.python-version, and
@@ -105,7 +117,7 @@ last.
 
 - [x] 1. The move: consolidate `tools/` into the standard layout
 - [x] 2. Canonical ci.yml and .python-version
-- [ ] 3. Rewrite scripts/README.md
+- [x] 3. Rewrite scripts/README.md
 - [ ] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
 - [ ] 5. Judgments: declare two new judgments, fill the cache, full pytest green
 - [ ] 6. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
