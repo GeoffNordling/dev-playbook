@@ -238,11 +238,14 @@ The two judgments to declare:
 Declarations live in `judgments/*.yaml` (see `[tool.judgments]` in
 pyproject.toml); follow the existing `doc-consistency.yaml` shape —
 judgments-lint validates them. Choose clear ids in that file's style.
-- Invoke the `/run-judgments` skill to evaluate and fill the cache. That
-  covers the two long-pending misses (`judgments-standard-matches-loader`,
-  `run-judgments-skill-matches-tooling`) plus the new declarations.
-- Remove the two `--deselect` flags from the Makefile `test` target. The
-  Makefile should now byte-match the canonical form.
+
+Then:
+
+1. Invoke the `/run-judgments` skill to evaluate and fill the cache. That
+   covers the two long-pending misses (`judgments-standard-matches-loader`,
+   `run-judgments-skill-matches-tooling`) plus the new declarations.
+2. Remove the two `--deselect` flags from the Makefile `test` target. The
+   Makefile should now byte-match the canonical form.
 
 **Done when:** full `uv run pytest` green with zero deselects; `make check`
 green; repo-audit no longer reports a Makefile finding.
