@@ -90,11 +90,21 @@ last.
   test_ref_check invokes ref-check via `python3` explicitly, which still
   works), or carve out a std-lib-script exception in the standard/audit.
   Do NOT change their shebangs before task 6.
+- Task 2 landed: `.github/workflows/ci.yml` and root `.python-version` are now
+  byte-identical to their canonical artifacts (verified with `cmp`). repo-audit
+  dropped to 11 findings (from 14 post-task-1: -ci.yml, -.python-version, and
+  -uv.lock now that the lockfile is tracked). The 11 remaining all map to later
+  tasks: .pre-commit canonical-block ×4 + self-audit "repo-audit missing" +
+  script-shebang ×2 (task 6); CLAUDE.md `## Build` + CONTEXT.md `## Example
+  dialogue`/`## Flagged ambiguities` (task 4); Makefile canonical-block (the
+  deselect deviation, task 5). Note: the task-1 shebang surprise now surfaces in
+  repo-audit as `scripts/python-lint`/`scripts/ref-check` script-shebang
+  findings — leave for task 6 as the note above says.
 
 ## Tasks
 
 - [x] 1. The move: consolidate `tools/` into the standard layout
-- [ ] 2. Canonical ci.yml and .python-version
+- [x] 2. Canonical ci.yml and .python-version
 - [ ] 3. Rewrite scripts/README.md
 - [ ] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
 - [ ] 5. Judgments: declare two new judgments, fill the cache, full pytest green

@@ -1,38 +1,16 @@
-name: CI
-
+name: ci
 on:
-  pull_request:
-    branches: [main]
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-      - uses: astral-sh/setup-uv@v3
-      - uses: pre-commit/action@v3.0.1
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v8
+      - run: uvx pre-commit run --all-files --show-diff-on-failure --color=always
         env:
-          # ref-check validates references to sibling repos under ~/workspace/.
-          # The CI runner only checks out this repo, so cross-repo references
-          # always resolve to non-existent paths. Local pre-commit is the
-          # strict gate; skip ref-check here.
           SKIP: ref-check
-      - run: make check
-        working-directory: tools
-        env:
-          # The judgment cache-gate (tests/test_judgments_gate.py) reads a
-          # machine-local seen-set that only the interactive, subscription-billed
-          # run-judgments skill can fill; the CI runner has neither the judge nor
-          # the cache, so the gate can only pass locally. Skip it here -- local
-          # pre-merge is the strict gate. The config-resolves guard beside it
-          # still runs, so a missing [tool.judgments] config fails loud on CI.
-          SKIP_JUDGMENTS: '1'
-          # The live transcript tests (tests/test_transcript_export_live.py) drive
-          # the local AgentsView daemon/CLI, which isn't installed on the CI
-          # runner; they run and fail loud locally. Skip the whole module here.
-          SKIP_LIVE_TRANSCRIPT: '1'
