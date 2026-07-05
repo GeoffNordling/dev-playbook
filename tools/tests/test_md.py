@@ -86,6 +86,8 @@ class TestClassify:
         "relpath, kind",
         [
             ("PLAN.md", "excluded"),
+            ("PROGRESS.md", "excluded"),
+            ("tmp/ALTERNATIVE.md", "excluded"),
             ("dotfiles/.agents/skills/x/SKILL.md", "excluded"),
             ("dotfiles/.dhub/whatever.md", "excluded"),
             ("index.md", "index"),

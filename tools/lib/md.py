@@ -131,7 +131,9 @@ def classify(relpath: str) -> str:
     Returns one of:
 
     - ``"excluded"`` — out of the bundle entirely: the transient ``PLAN.md``
-      and anything under externally-managed ``.agents``/``.dhub`` trees.
+      and ``PROGRESS.md`` (ralph-loop plan/progress pair), the root ``tmp/``
+      scratch tree, and anything under externally-managed
+      ``.agents``/``.dhub`` trees.
     - ``"index"`` — a directory listing (``index.md``): typeless, validated as
       an index rather than as a concept document.
     - ``"concept"`` — a prose concept document that carries OKF frontmatter and
@@ -147,7 +149,9 @@ def classify(relpath: str) -> str:
     name = parts[-1]
     dirparts = parts[:-1]
 
-    if name == "PLAN.md":
+    if name in {"PLAN.md", "PROGRESS.md"}:
+        return "excluded"
+    if parts[0] == "tmp":
         return "excluded"
     if any(seg in {".agents", ".dhub", ".git"} for seg in parts):
         return "excluded"
