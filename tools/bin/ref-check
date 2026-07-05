@@ -37,13 +37,12 @@ Usage:
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from lib import md  # noqa: E402
+from lib import gitrepo, md  # noqa: E402
 
 # ADR sources are exempt: ADRs are immutable, so their outbound references
 # are accepted staleness. References TO ADRs are still validated.
@@ -65,29 +64,6 @@ def has_fixed_repo_root(relpath: str) -> bool:
 
 def workspace_root() -> Path:
     return Path.home() / "workspace"
-
-
-def canonical_repo_name(repo_root: Path) -> str:
-    """Repo name from git, identical for main checkout and any worktree of it.
-
-    Uses `git rev-parse --git-common-dir`, which points at the shared .git
-    directory regardless of which worktree you're standing in. The parent of
-    that directory is the repo's canonical on-disk name.
-
-    Exits 2 if `repo_root` is not inside a git repo.
-    """
-    result = subprocess.run(
-        ["git", "-C", str(repo_root), "rev-parse", "--git-common-dir"],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        print(f"ref-check: not a git repository: {repo_root}", file=sys.stderr)
-        sys.exit(2)
-    common = Path(result.stdout.strip())
-    if not common.is_absolute():
-        common = (repo_root / common).resolve()
-    return common.parent.name
 
 
 def source_files(repo_root: Path) -> list[Path]:
@@ -210,7 +186,11 @@ def main() -> None:
     args = parser.parse_args()
 
     repo_root = Path(args.directory).resolve()
-    repo_name = canonical_repo_name(repo_root)
+    try:
+        repo_name = gitrepo.canonical_repo_name(repo_root)
+    except gitrepo.NotAGitRepository:
+        print(f"ref-check: not a git repository: {repo_root}", file=sys.stderr)
+        sys.exit(2)
 
     md_files = source_files(repo_root)
     if not md_files:

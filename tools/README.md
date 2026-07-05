@@ -39,20 +39,22 @@ Run automatically on every commit via pre-commit hooks. Each script exits 0 on s
 
 | Script | Standard | Purpose |
 |--------|----------|---------|
+| `repo-audit` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
 | `python-lint` | [python-conventions.md](/standards/python-conventions.md), [testing-conventions.md](/standards/testing-conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
 | `ref-check` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `internal-skill-audit` | [skill-conventions.md](/standards/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
-`python-lint`, `ref-check`, and `okf-lint` assert unconditionally and fail loud; they do not skip themselves when a target kind is absent. Run any script with `--help`; each script's docstring documents its behavior in full.
+`repo-audit`, `python-lint`, `ref-check`, and `okf-lint` assert unconditionally and fail loud; they do not skip themselves when a target kind is absent. Run any script with `--help`; each script's docstring documents its behavior in full.
 
 ## Shared libraries (`lib/`)
 
 The validators share their markdown and Python primitives rather than redefining them per script:
 
 - `lib/md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-check` and `okf-lint`.
-- `lib/pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint`.
+- `lib/pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint` and `repo-audit`.
+- `lib/gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-check` and `repo-audit`.
 
 A `tools/bin/` script imports them by adding its parent (`tools/`) to `sys.path`, so `from lib import md` resolves from the pre-commit clone that holds the script, not the consumer's working directory.
 

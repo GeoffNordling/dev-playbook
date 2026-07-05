@@ -6,6 +6,7 @@
 #   - repo: https://github.com/GeoffNordling/dev-playbook
 #     rev: <commit-sha>
 #     hooks:
+#       - id: repo-audit
 #       - id: python-lint
 #       - id: ref-check
 #       - id: okf-lint
@@ -16,6 +17,13 @@
 # hook from there, so resolution is independent of where the consumer repo —
 # or any of its worktrees — sits on disk. The hook scripts live in tools/bin/
 # and share primitives from tools/lib/. See standards/build/distribution.md.
+
+- id: repo-audit
+  name: repo-audit
+  entry: tools/bin/repo-audit
+  language: script
+  pass_filenames: false
+  always_run: true
 
 - id: python-lint
   name: python-lint
