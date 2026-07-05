@@ -1,0 +1,226 @@
+#!/usr/bin/env -S uv run --script
+"""Sweep the workspace: GitHub repo settings and stale dev-playbook pins.
+
+The on-demand sweep venue of the enforcement standard — the checks that
+live outside any single commit. For every git repo under the workspace
+root:
+
+  - **settings** — read the repo's GitHub settings over `gh api` and
+    compare them against the expected values (squash-only merges, PR
+    title/body commit message, auto-deleted merged branches). A repo the
+    API cannot reach, or with no GitHub origin, is reported loudly.
+  - **pin** — read the dev-playbook `rev` pinned in the repo's
+    `.pre-commit-config.yaml` and compare it against the hook repo's local
+    `main`. Stale pins are reported but are not failures: a consumer
+    catches up when its pin is deliberately bumped.
+
+Output:
+    stdout — one line per repo per fact, ``repo  kind  message``.
+    stderr — one human-readable summary line.
+    exit   — 0 clean, 1 settings findings, 2 cannot run.
+
+Usage:
+    sweep [--workspace DIR] [--pins-only | --settings-only]
+"""
+# /// script
+# requires-python = ">=3.11"
+# ///
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
+CANONICAL_CONFIG = HOOK_REPO_ROOT / "standards" / "canonical" / ".pre-commit-config.yaml"
+
+# Expected GitHub settings, as the repos API reports them. The sweep only
+# reads; the merge settings are set by hand per the repo-settings standard.
+EXPECTED_SETTINGS = {
+    "allow_squash_merge": True,
+    "allow_merge_commit": False,
+    "allow_rebase_merge": False,
+    "delete_branch_on_merge": True,
+    "squash_merge_commit_title": "PR_TITLE",
+    "squash_merge_commit_message": "PR_BODY",
+}
+
+REMOTE_SLUG_PATTERN = re.compile(
+    r"^(?:git@github\.com:|https://github\.com/)([^/\s]+/[^/\s]+?)(?:\.git)?$"
+)
+
+
+class ToolError(Exception):
+    """The sweep could not run at all."""
+
+
+@dataclass(frozen=True)
+class Line:
+    repo: str
+    kind: str  # "settings" | "pin" | "remote"
+    message: str
+    finding: bool
+    stale: bool = False
+
+    def render(self) -> str:
+        return f"{self.repo}  {self.kind}  {self.message}"
+
+
+def hook_repo_url() -> str:
+    """The published hook-repo URL, read from the canonical config's pinned block."""
+    text = CANONICAL_CONFIG.read_text(encoding="utf-8")
+    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
+    if not match:
+        raise ToolError(f"no pinned block in {CANONICAL_CONFIG}")
+    return match.group(1)
+
+
+def hook_repo_main() -> str:
+    result = subprocess.run(
+        ["git", "-C", str(HOOK_REPO_ROOT), "rev-parse", "main"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise ToolError(f"cannot resolve main in {HOOK_REPO_ROOT}: {result.stderr.strip()}")
+    return result.stdout.strip()
+
+
+def workspace_repos(workspace: Path) -> list[Path]:
+    if not workspace.is_dir():
+        raise ToolError(f"workspace root not found: {workspace}")
+    return sorted(
+        entry for entry in workspace.iterdir() if (entry / ".git").exists()
+    )
+
+
+def origin_slug(repo: Path) -> str | None:
+    """``owner/name`` from the repo's GitHub origin, or None if there is none."""
+    result = subprocess.run(
+        ["git", "-C", str(repo), "remote", "get-url", "origin"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    match = REMOTE_SLUG_PATTERN.match(result.stdout.strip())
+    return match.group(1) if match else None
+
+
+def pinned_rev(config_text: str, url: str) -> str | None:
+    lines = config_text.splitlines()
+    for i, line in enumerate(lines):
+        if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
+            for follower in lines[i + 1 : i + 3]:
+                match = re.match(r"^\s*rev:\s*(\S+)", follower)
+                if match:
+                    return match.group(1)
+    return None
+
+
+def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
+    """One pin line per consumer repo; None for the hook repo itself."""
+    if (repo / ".pre-commit-hooks.yaml").is_file():
+        return None  # the hook repo dogfoods from its working tree, no pin
+    name = repo.name
+    config = repo / ".pre-commit-config.yaml"
+    if not config.is_file():
+        return Line(name, "pin", "no .pre-commit-config.yaml", finding=False)
+    rev = pinned_rev(config.read_text(encoding="utf-8"), url)
+    if rev is None:
+        return Line(name, "pin", "no dev-playbook pin", finding=False)
+    current = main_sha == rev or (len(rev) >= 7 and main_sha.startswith(rev))
+    if current:
+        return Line(name, "pin", "current", finding=False)
+    return Line(
+        name,
+        "pin",
+        f"{rev} (hook repo main is {main_sha[:12]})",
+        finding=False,
+        stale=True,
+    )
+
+
+def fetch_settings(slug: str) -> dict | None:
+    try:
+        result = subprocess.run(
+            ["gh", "api", f"repos/{slug}"],
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError as err:
+        raise ToolError("gh not found on PATH") from err
+    if result.returncode != 0:
+        return None
+    return json.loads(result.stdout)
+
+
+def check_settings(repo: Path) -> list[Line]:
+    name = repo.name
+    slug = origin_slug(repo)
+    if slug is None:
+        return [Line(name, "remote", "no GitHub origin; settings unchecked", finding=True)]
+    settings = fetch_settings(slug)
+    if settings is None:
+        return [Line(name, "settings", f"unreachable via gh api ({slug})", finding=True)]
+    return [
+        Line(
+            name,
+            "settings",
+            f"{field} is {settings.get(field)!r} (want {want!r})",
+            finding=True,
+        )
+        for field, want in EXPECTED_SETTINGS.items()
+        if settings.get(field) != want
+    ]
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="sweep",
+        description="Report GitHub settings drift and stale dev-playbook pins.",
+    )
+    parser.add_argument(
+        "--workspace",
+        type=Path,
+        default=Path.home() / "workspace",
+        help="workspace root holding the repos (default: ~/workspace)",
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--pins-only", action="store_true", help="skip the gh api checks")
+    mode.add_argument("--settings-only", action="store_true", help="skip the pin checks")
+    args = parser.parse_args(argv)
+
+    try:
+        repos = workspace_repos(args.workspace.resolve())
+        url = hook_repo_url()
+        main_sha = hook_repo_main() if not args.settings_only else ""
+        lines: list[Line] = []
+        for repo in repos:
+            if not args.settings_only:
+                pin = check_pin(repo, url, main_sha)
+                if pin is not None:
+                    lines.append(pin)
+            if not args.pins_only:
+                lines.extend(check_settings(repo))
+    except ToolError as err:
+        print(f"sweep: {err}", file=sys.stderr)
+        return 2
+
+    for line in lines:
+        print(line.render())
+
+    findings = sum(1 for line in lines if line.finding)
+    stale = sum(1 for line in lines if line.stale)
+    print(
+        f"sweep: {len(repos)} repos, {findings} settings finding(s), {stale} stale pin(s)",
+        file=sys.stderr,
+    )
+    return 1 if findings else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -76,6 +76,7 @@ Run ad hoc on human demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
+| `sweep` | On-demand workspace sweep: GitHub settings drift via `gh api` ([repo-settings.md](/standards/repo-settings.md)) and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --recent N \| --all>` |
 

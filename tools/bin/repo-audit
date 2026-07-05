@@ -630,16 +630,17 @@ def check_self(root: Path) -> list[Finding]:
         {hook for repo, hook in hook_ids(config.read_text(encoding="utf-8")) if repo == "local"}
         if config.is_file()
         else set()
-    ) - {"make-check"}
-    if local != published:
-        missing = ", ".join(sorted(published - local)) or "none"
-        extra = ", ".join(sorted(local - published)) or "none"
+    )
+    # Subset, not equality: every published hook must be dogfooded, while
+    # local-only hooks (make-check, validate-manifest) are free additions.
+    missing = published - local
+    if missing:
         findings.append(
             Finding(
                 ".pre-commit-config.yaml",
                 "self-audit",
-                f"dogfood local hooks must mirror the published manifest "
-                f"(missing: {missing}; extra: {extra})",
+                f"dogfood local hooks must cover the published manifest "
+                f"(missing: {', '.join(sorted(missing))})",
             )
         )
     return findings
