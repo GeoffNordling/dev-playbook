@@ -23,7 +23,7 @@ Usage:
     python-lint [directory]
 """
 # /// script
-# requires-python = ">=3.11"
+# requires-python = ">=3.14"
 # ///
 
 import argparse

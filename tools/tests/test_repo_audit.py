@@ -16,7 +16,7 @@ CANONICAL = Path(__file__).resolve().parents[2] / "standards" / "canonical"
 UV_SCRIPT = (
     "#!/usr/bin/env -S uv run --script\n"
     "# /// script\n"
-    '# requires-python = ">=3.11"\n'
+    '# requires-python = ">=3.14"\n'
     "# ///\n"
     'print("hi")\n'
 )
@@ -481,6 +481,34 @@ def test_executable_script_without_pep723_fails(tmp_path: Path) -> None:
     assert "PEP 723" in result.stdout
 
 
+def test_script_python_floor_mismatch_fails(tmp_path: Path) -> None:
+    files = scripts_only_files()
+    files["scripts/tool.py"] = UV_SCRIPT.replace('">=3.14"', '">=3.11"')
+    result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
+    assert result.returncode == 1
+    assert "scripts/tool.py  script-python" in result.stdout
+    assert '">=3.14"' in result.stdout
+
+
+def test_script_python_floor_missing_fails(tmp_path: Path) -> None:
+    files = scripts_only_files()
+    files["scripts/tool.py"] = UV_SCRIPT.replace('# requires-python = ">=3.14"\n', "")
+    result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
+    assert result.returncode == 1
+    assert "scripts/tool.py  script-python" in result.stdout
+
+
+def test_makefile_roots_require_real_py_files(tmp_path: Path) -> None:
+    # scripts/ holding only extensionless executables earns no <code-roots>
+    # slot — mypy exits 2 on a directory without .py files.
+    files = scripts_only_files()
+    del files["scripts/tool.py"]
+    files["scripts/tool"] = UV_SCRIPT
+    files["Makefile"] = canonical("Makefile.python").replace("<code-roots>", "tests")
+    result = run(make_repo(tmp_path, files, executable=("scripts/tool",)))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_non_executable_helper_module_not_checked(tmp_path: Path) -> None:
     files = scripts_only_files()
     files["scripts/helper.py"] = "X = 1\n"
@@ -567,8 +595,11 @@ def hook_repo_files() -> dict[str, str]:
         + "".join(f"      - id: {h}\n" for h in ("repo-audit", "okf-lint"))
     )
     files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-lint\n"
+    # is_file(): tools that treat the canonical pyproject.toml template as a
+    # real project drop cache dirs (e.g. .ruff_cache/) into standards/canonical/.
     for name in CANONICAL.iterdir():
-        files[f"standards/canonical/{name.name}"] = name.read_text()
+        if name.is_file():
+            files[f"standards/canonical/{name.name}"] = name.read_text()
     return files
 
 

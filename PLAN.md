@@ -1,4 +1,4 @@
-# Plan: dev-playbook self-alignment to its own build standard (Phase 4)
+# Plan: dev-playbook self-alignment to its own build standard
 
 A Ralph loop works this file top to bottom. Each iteration, a fresh agent with
 no memory reads this plan and the progress log, does the first unchecked task,
@@ -67,6 +67,15 @@ last.
 - uv cache is warm — `uv lock`/`uv sync` work offline in the sandbox.
 - The sandbox has no network. Anything needing a download is a blocker to
   report, not to work around.
+- Hook envs for task 6 are pre-cached and verified green in-sandbox:
+  ruff-pre-commit v0.15.20 (ruff-check, ruff-format) and shellcheck-py
+  v0.11.0.1.
+- shellcheck pre-scout (task 6): exactly 3 findings across the 4 tracked
+  .sh files — SC2148 in dotfiles/.bashrc.d/aliases.sh and
+  dotfiles/.bashrc.d/worktree.sh (sourced files, no shebang: add a
+  `# shellcheck shell=bash` directive line), SC2207 in worktree.sh:32
+  (unquoted compgen split in COMPREPLY). sync-dotfiles.sh and
+  standards/agentic-box/templates/greenfield-cli/box/gate.sh are clean.
 
 ## Tasks
 

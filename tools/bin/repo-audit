@@ -26,7 +26,7 @@ Usage:
     repo-audit [directory]
 """
 # /// script
-# requires-python = ">=3.11"
+# requires-python = ">=3.14"
 # ///
 
 import argparse
@@ -222,7 +222,7 @@ def check_precommit_config(root: Path, self_mode: bool) -> list[Finding]:
     return findings
 
 
-def check_makefile(root: Path, layers: Layers) -> list[Finding]:
+def check_makefile(root: Path, layers: Layers, python_files: list[Path]) -> list[Finding]:
     path = root / "Makefile"
     if not path.is_file():
         return []
@@ -234,7 +234,13 @@ def check_makefile(root: Path, layers: Layers) -> list[Finding]:
     for name in fragments:
         text = canonical_text(name)
         if name == "Makefile.python":
-            roots = " ".join(r for r in MYPY_ROOTS if (root / r).is_dir())
+            # mypy exits 2 on a directory holding no .py files (extensionless
+            # scripts don't count), so a root earns its <code-roots> slot only
+            # when it actually contains one.
+            py_dirs = {
+                p.relative_to(root).parts[0] for p in python_files if p.suffix == ".py"
+            }
+            roots = " ".join(r for r in MYPY_ROOTS if r in py_dirs)
             text = text.replace("<code-roots>", roots)
         if find_run(consumer, text.splitlines(), 0) is None:
             findings.append(
@@ -535,6 +541,11 @@ def check_doc_shapes(root: Path) -> list[Finding]:
 def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[Finding]:
     if not layers.scripts_python:
         return []
+    # Each script's PEP 723 floor must equal the repo's interpreter pin; with
+    # no .python-version yet there is nothing to compare against (its absence
+    # is already a presence finding in a python repo).
+    pin = root / ".python-version"
+    floor = f">={pin.read_text(encoding='utf-8').strip()}" if pin.is_file() else None
     findings = []
     for path in python_files:
         rel = path.relative_to(root)
@@ -557,6 +568,24 @@ def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[
                     f"missing PEP 723 inline metadata block ('{PEP723_OPEN}')",
                 )
             )
+        elif floor is not None:
+            declared = next(
+                (
+                    m.group(1)
+                    for line in lines
+                    if (m := re.match(r'#\s*requires-python\s*=\s*"([^"]*)"', line.strip()))
+                ),
+                None,
+            )
+            if declared != floor:
+                findings.append(
+                    Finding(
+                        str(rel),
+                        "script-python",
+                        f'PEP 723 requires-python must be "{floor}"'
+                        " (the repo's .python-version floor)",
+                    )
+                )
     return findings
 
 
@@ -659,7 +688,7 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_canonical_bytes(root),
         *check_gitignore(root),
         *check_precommit_config(root, self_mode),
-        *check_makefile(root, layers),
+        *check_makefile(root, layers, python_files),
         *check_pyproject(root, layers, repo_name),
         *check_src_package(root, layers, files, repo_name),
         *check_cdk(root, layers, repo_name),
