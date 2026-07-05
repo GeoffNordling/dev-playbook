@@ -1,18 +1,24 @@
 <!--datasheet-stamp
 subject: lint-suite
 scope:
-  - tools/bin/okf-lint
-  - tools/bin/python-lint
-  - tools/bin/ref-check
-  - tools/bin/internal-skill-audit
-  - tools/lib/
-  - tools/tests/test_okf_lint.py
-  - tools/tests/test_python_lint.py
-  - tools/tests/test_ref_check.py
-  - tools/tests/test_md.py
-commit: 4c5c891
-generated: 2026-07-02
-generator: claude-sonnet-5
+  - scripts/okf-lint
+  - scripts/python-lint
+  - scripts/ref-check
+  - scripts/internal-skill-audit
+  - scripts/repo-audit
+  - scripts/sweep
+  - src/dev_playbook/md.py
+  - src/dev_playbook/pyast.py
+  - src/dev_playbook/gitrepo.py
+  - tests/test_okf_lint.py
+  - tests/test_python_lint.py
+  - tests/test_ref_check.py
+  - tests/test_md.py
+  - tests/test_repo_audit.py
+  - tests/test_sweep.py
+commit: c961d57
+generated: 2026-07-05
+generator: claude-fable-5
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +105,8 @@ generator: claude-sonnet-5
   .apirr text { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
   .apilist { margin:.55rem 0 0; border-top:1px solid var(--line); padding-top:.5rem; }
   .apilist .sig { font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size:.78rem; color:#334155; padding:.12rem 0; }
+    font-size:.78rem; color:#334155; padding:.12rem 0 0; }
+  .apilist .doc { font-size:.72rem; color:var(--muted); margin:0 0 .4rem .9rem; }
   details { margin-top:.5rem; font-size:.85rem; color:var(--muted); }
   details summary { cursor:pointer; }
 </style>
@@ -112,37 +119,37 @@ generator: claude-sonnet-5
 
   <header class="card identity">
     <div class="subject">lint-suite</div>
-    <div class="meta">datasheet · commit <code>4c5c891</code><br>
-    2026-07-02 · claude-sonnet-5<br>
-    scope: tools/bin/{okf-lint,python-lint,ref-check,internal-skill-audit}, tools/lib/, tools/tests/test_{okf_lint,python_lint,ref_check,md}.py</div>
+    <div class="meta">datasheet · commit <code>c961d57</code><br>
+    2026-07-05 · claude-fable-5<br>
+    scope: scripts/{okf-lint, python-lint, ref-check, internal-skill-audit,
+    repo-audit, sweep}, src/dev_playbook/{md,pyast,gitrepo}.py, their tests</div>
   </header>
 
   <section class="card">
     <h2>Concepts</h2>
-    <div class="concept"><span class="chip" title="tools/bin/python-lint:74-79 class Finding">Finding</span> <span class="def">one flagged violation — file, rule id, message — the shape every gate's output shares</span></div>
-    <div class="concept"><span class="chip" title="tools/lib/md.py:129 def classify">classify</span> <span class="def">splits a markdown path into concept / index / harness / excluded</span></div>
-    <div class="concept"><span class="chip coined" title="tools/bin/python-lint:17-20, okf-lint:23-26, ref-check:30-34 (Output docstrings)">Gate contract</span> <span class="def">one finding per stdout line, one summary line on stderr, a numeric exit code</span></div>
-    <div class="concept"><span class="chip coined" title="tools/lib/md.py:169 find_md_files; tools/lib/pyast.py:42 find_python_files">Worktree-scoped discovery</span> <span class="def">file listing via <code>git ls-files</code>, so a worktree only ever sees its own files</span></div>
-    <div class="concept"><span class="chip coined" title="tools/bin/okf-lint, python-lint, ref-check, internal-skill-audit">Gate</span> <span class="def">one independently-invocable lint CLI in this suite</span></div>
+    <div class="concept"><span class="chip" title="scripts/okf-lint docstring">finding line</span> <span class="def">one violation per stdout line; any hit flips the exit code to 1</span></div>
+    <div class="concept"><span class="chip" title="scripts/repo-audit docstring">layer</span> <span class="def">a feature set inferred from disk facts; each adds rules to check</span></div>
+    <div class="concept"><span class="chip" title="scripts/repo-audit:46">canonical artifact</span> <span class="def">a reference file carried in the hook clone that working copies must match</span></div>
+    <div class="concept"><span class="chip" title="src/dev_playbook/md.py:lines_outside_fences">fence-aware parsing</span> <span class="def">markdown rules see only lines outside code fences and frontmatter</span></div>
+    <div class="concept"><span class="chip" title="src/dev_playbook/pyast.py:find_python_files">gitignore-aware discovery</span> <span class="def">file walks take the checkout's index, never the raw tree</span></div>
+    <div class="concept"><span class="chip" title="scripts/repo-audit docstring">self-audit</span> <span class="def">hook-repo-only rules: published manifest and dogfood block must mirror</span></div>
   </section>
 
   <section class="card">
     <h2>Touch surface</h2>
-    <div class="cell"><span class="k">Reads</span> tracked/untracked files via <code>git ls-files</code> — .md (okf-lint, ref-check), .py/shebang (python-lint), <code>SKILL.md</code> under two skill roots (internal-skill-audit); <code>standards/docs/document-types.md</code> as okf-lint's type registry</div>
-    <div class="cell"><span class="k">Writes</span> stdout — one finding per line (JSON Lines for ref-check); stderr — one summary line; nothing to disk</div>
-    <div class="cell"><span class="k">Spawns</span> <code>git ls-files</code> (discovery); <code>git rev-parse --git-common-dir</code> (ref-check's worktree-name resolution)</div>
-    <div class="cell"><span class="k">Net</span> <span class="none">none</span></div>
+    <div class="cell"><span class="k">Reads</span> the target checkout (gitignore-aware); the hook clone's canonical artifacts (repo-audit); every repo under <code>~/workspace</code> (sweep)</div>
+    <div class="cell"><span class="k">Writes</span> findings to stdout, one summary line to stderr — nothing on disk</div>
+    <div class="cell"><span class="k">Spawns</span> <code>git</code> (discovery, pinned revs); <code>gh</code> (sweep only)</div>
+    <div class="cell"><span class="k">Net</span> <span class="none">none</span> — except sweep, which reads GitHub settings via <code>gh api</code></div>
     <div class="cell"><span class="k">Env</span> <span class="none">none</span></div>
-    <div class="cell"><span class="k">Deps</span> <code>pyyaml</code> (okf-lint, internal-skill-audit, via inline uv-script metadata); python-lint and ref-check are stdlib-only</div>
+    <div class="cell"><span class="k">Deps</span> pyyaml (okf-lint, internal-skill-audit); otherwise stdlib — each script self-runs under uv (PEP 723)</div>
   </section>
 
   <section class="card">
     <h2>Tests</h2>
-    <div class="testrow"><span class="n">✓ 14</span> okf-lint: type-lint + index-staleness rules, malformed-frontmatter recovery, a self-scan of this repo</div>
-    <div class="testrow"><span class="n">✓ 21</span> python-lint: all three rules, gitignore honoring, deprecated-tree scoping, a self-scan</div>
-    <div class="testrow"><span class="n">✓ 39</span> ref-check: link/citation resolution, anchor slugging, ADR exclusion, worktree-relative resolution</div>
-    <div class="testrow"><span class="n">✓ 13</span> lib/md.py: slug algorithm, fence skipping, link extraction, frontmatter parsing, the classify taxonomy</div>
-    <div class="testrow"><span class="gated">untested</span> internal-skill-audit (no test file in this scope); lib/pyast.py (only exercised indirectly, via python-lint's tests)</div>
+    <div class="testrow"><span class="n">179 ✓</span> repo-audit rules (53), markdown primitives (41), references (40), Python conventions (21), OKF bundle (14), sweep (10)</div>
+    <div class="testrow"><span class="gated">untested</span> internal-skill-audit — no dedicated suite</div>
+    <div class="testrow"><span class="gated">indirect</span> the git and AST helpers are verified only through their consumers</div>
   </section>
 
 </aside>
@@ -151,271 +158,406 @@ generator: claude-sonnet-5
 
   <section class="card">
     <h2>Purpose</h2>
-    <p>Blocks a commit before a documentation or Python-source convention silently drifts: four
-    independent gates each walk one lens over the repo — OKF frontmatter and index freshness,
-    Python source hygiene, cross-reference integrity, and this repo's own <code>SKILL.md</code>
-    conformance — and print one line per violation. They share only two small discovery helpers
-    and the same finding-line output shape (<span title="tools/bin/python-lint:17-20">Gate
-    contract</span>), because pre-commit is the last cheap moment to catch a broken link or a
-    stray convention before it ships.</p>
+    <p>The enforcement arm of the workspace standards: six pre-commit hooks
+    that catch drift — repo structure, Python conventions, markdown health,
+    skill conformance, workspace hygiene — in any consumer checkout. It exists
+    so a standard is a gate, not a document: a repo violating the build or
+    docs standards cannot commit. Consumers pin a rev of this hook repo, and
+    the canonical artifacts travel inside the clone.</p>
   </section>
 
   <section class="card">
     <h2>Behavior <span class="badge run">verified: run</span> <span class="badge captured">exhibit: captured</span></h2>
-    <pre class="term"><span class="p">$</span> tools/bin/internal-skill-audit .
-dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md:body-length:warn: SKILL.md body is 251 lines (&gt;100); consider spilling into references/
-dotfiles/dot-claude/skills/sdd-tdd/SKILL.md:body-length:warn: SKILL.md body is 124 lines (&gt;100); consider spilling into references/
-dotfiles/dot-claude/skills/tdd/SKILL.md:body-length:warn: SKILL.md body is 103 lines (&gt;100); consider spilling into references/
-internal-skill-audit: 34 internal skills, 0 error(s), 3 warning(s) (skipped 5 external)</pre>
-    <p class="aside">A live scan of this very repository's skill bundles, the gate's real
-    input — three skills exceed the 100-line body-length guideline. These are warnings, not
-    errors, so the gate still exits 0 (<span title="tools/bin/internal-skill-audit:330">check_body_length</span>).</p>
+    <pre class="term"><span class="p">$</span> scripts/repo-audit
+repo-audit: clean (layers: base, python, src, scripts)</pre>
+    <p class="aside">A live audit of this repository: four layers inferred
+    from disk facts, every rule those layers carry checked, no deviations —
+    exit 0. A violation would print one finding line per rule hit and exit 1
+    (<span title="scripts/repo-audit docstring">layer</span>).</p>
   </section>
 
   <section class="card span2">
     <h2>API</h2>
-    <svg class="apirr" viewBox="0 0 620 170" width="100%" style="max-width:620px" xmlns="http://www.w3.org/2000/svg">
+    <svg class="apirr" viewBox="0 0 720 340" width="100%" style="max-width:700px" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="rrarw" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
           <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
         </marker>
       </defs>
-
-      <circle cx="16" cy="100" r="4" fill="#64748b"/>
-      <line x1="16" y1="100" x2="42" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <circle cx="46" cy="100" r="3.5" fill="#64748b"/>
-
-      <path d="M46,100 C65,100 65,20 86,20" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <path d="M46,100 C60,100 60,60 86,60" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <line x1="46" y1="100" x2="86" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <path d="M46,100 C60,100 60,140 86,140" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-
-      <rect x="90" y="4" width="90" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
-      <text x="135" y="24" text-anchor="middle" font-size="12.5" fill="#1e293b">okf-lint</text>
-      <rect x="90" y="44" width="112" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
-      <text x="146" y="64" text-anchor="middle" font-size="12.5" fill="#1e293b">python-lint</text>
-      <rect x="90" y="84" width="98" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
-      <text x="139" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">ref-check</text>
-      <rect x="90" y="124" width="184" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
-      <text x="182" y="144" text-anchor="middle" font-size="12.5" fill="#1e293b">internal-skill-audit</text>
-
-      <path d="M180,20 C250,20 250,100 316,100" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <path d="M202,60 C260,60 260,100 316,100" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <line x1="188" y1="100" x2="316" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <path d="M274,140 C296,140 296,100 316,100" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-
-      <circle cx="320" cy="100" r="3.5" fill="#64748b"/>
-      <line x1="320" y1="100" x2="346" y2="100" stroke="#64748b" stroke-width="2"/>
-      <circle cx="350" cy="100" r="3.5" fill="#64748b"/>
-
-      <line x1="350" y1="100" x2="496" y2="100" stroke="#64748b" stroke-width="2"/>
-      <path d="M350,100 C370,100 370,58 388,58" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <rect x="390" y="42" width="112" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
-      <text x="446" y="62" text-anchor="middle" font-size="12" fill="#1e293b">&lt;directory&gt;</text>
-      <text x="446" y="90" text-anchor="middle" font-size="10" fill="#94a3b8">(default: .)</text>
-      <path d="M502,58 C522,58 522,90 500,100" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <circle cx="500" cy="100" r="3.5" fill="#64748b"/>
-
-      <line x1="500" y1="100" x2="530" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
-      <line x1="536" y1="88" x2="536" y2="112" stroke="#64748b" stroke-width="2.5"/>
-      <line x1="542" y1="88" x2="542" y2="112" stroke="#64748b" stroke-width="2.5"/>
+      <!-- row A: the five checkout linters, uniform grammar -->
+      <circle cx="14" cy="110" r="4" fill="#64748b"/>
+      <line x1="14" y1="110" x2="34" y2="110" stroke="#64748b" stroke-width="2"/>
+      <circle cx="34" cy="110" r="3.5" fill="#64748b"/>
+      <path d="M34,110 C50,110 48,30 64,30" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <path d="M34,110 C50,110 48,70 64,70" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <line x1="34" y1="110" x2="64" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <path d="M34,110 C50,110 48,150 64,150" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <path d="M34,110 C50,110 48,190 64,190" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="66" y="14" width="150" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="141" y="34" text-anchor="middle" font-size="12.5" fill="#1e293b">okf-lint</text>
+      <rect x="66" y="54" width="150" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="141" y="74" text-anchor="middle" font-size="12.5" fill="#1e293b">python-lint</text>
+      <rect x="66" y="94" width="150" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="141" y="114" text-anchor="middle" font-size="12.5" fill="#1e293b">ref-check</text>
+      <rect x="66" y="134" width="150" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="141" y="154" text-anchor="middle" font-size="11" fill="#1e293b">internal-skill-audit</text>
+      <rect x="66" y="174" width="150" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="141" y="194" text-anchor="middle" font-size="12.5" fill="#1e293b">repo-audit</text>
+      <!-- ref-check's optional --all, on its own branch -->
+      <line x1="216" y1="110" x2="232" y2="110" stroke="#64748b" stroke-width="2"/>
+      <circle cx="232" cy="110" r="3.5" fill="#64748b"/>
+      <path d="M232,110 C248,110 246,74 262,74" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="264" y="58" width="60" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="294" y="78" text-anchor="middle" font-size="12.5" fill="#1e293b">--all</text>
+      <path d="M324,74 C340,74 338,110 354,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="232" y1="110" x2="354" y2="110" stroke="#64748b" stroke-width="2"/>
+      <!-- rejoin -->
+      <path d="M216,30 L338,30 C354,30 352,110 368,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <path d="M216,70 L338,70 C354,70 352,110 368,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="354" y1="110" x2="368" y2="110" stroke="#64748b" stroke-width="2"/>
+      <path d="M216,150 L338,150 C354,150 352,110 368,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <path d="M216,190 L338,190 C354,190 352,110 368,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <circle cx="368" cy="110" r="3.5" fill="#64748b"/>
+      <!-- optional <dir> -->
+      <circle cx="384" cy="110" r="3.5" fill="#64748b"/>
+      <path d="M384,110 C400,110 398,74 414,74" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="416" y="58" width="60" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="446" y="78" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;dir&gt;</text>
+      <path d="M476,74 C492,74 490,110 506,110" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="384" y1="110" x2="506" y2="110" stroke="#64748b" stroke-width="2"/>
+      <circle cx="506" cy="110" r="3.5" fill="#64748b"/>
+      <line x1="506" y1="110" x2="532" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <line x1="538" y1="102" x2="538" y2="118" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="544" y1="102" x2="544" y2="118" stroke="#64748b" stroke-width="2.5"/>
+      <!-- row B: sweep -->
+      <circle cx="14" cy="268" r="4" fill="#64748b"/>
+      <line x1="14" y1="268" x2="42" y2="268" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="44" y="252" width="80" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="84" y="272" text-anchor="middle" font-size="12.5" fill="#1e293b">sweep</text>
+      <line x1="124" y1="268" x2="140" y2="268" stroke="#64748b" stroke-width="2"/>
+      <circle cx="140" cy="268" r="3.5" fill="#64748b"/>
+      <path d="M140,268 C156,268 154,232 170,232" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="172" y="216" width="110" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="227" y="236" text-anchor="middle" font-size="12" fill="#1e293b">--workspace</text>
+      <line x1="282" y1="232" x2="296" y2="232" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="298" y="216" width="56" height="32" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="326" y="236" text-anchor="middle" font-size="12.5" fill="#1e293b">&lt;dir&gt;</text>
+      <path d="M354,232 C370,232 368,268 384,268" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="140" y1="268" x2="384" y2="268" stroke="#64748b" stroke-width="2"/>
+      <circle cx="384" cy="268" r="3.5" fill="#64748b"/>
+      <circle cx="400" cy="268" r="3.5" fill="#64748b"/>
+      <path d="M400,268 C416,268 414,232 430,232" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="432" y="216" width="104" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="484" y="236" text-anchor="middle" font-size="12" fill="#1e293b">--pins-only</text>
+      <path d="M536,232 C552,232 550,268 566,268" fill="none" stroke="#64748b" stroke-width="2"/>
+      <path d="M400,268 C416,268 414,304 430,304" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <rect x="432" y="288" width="128" height="32" rx="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="496" y="308" text-anchor="middle" font-size="12" fill="#1e293b">--settings-only</text>
+      <path d="M560,304 C576,304 574,268 590,268" fill="none" stroke="#64748b" stroke-width="2"/>
+      <line x1="400" y1="268" x2="590" y2="268" stroke="#64748b" stroke-width="2"/>
+      <circle cx="590" cy="268" r="3.5" fill="#64748b"/>
+      <line x1="590" y1="268" x2="616" y2="268" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
+      <line x1="622" y1="260" x2="622" y2="276" stroke="#64748b" stroke-width="2.5"/>
+      <line x1="628" y1="260" x2="628" y2="276" stroke="#64748b" stroke-width="2.5"/>
     </svg>
     <div class="apilist">
-      <div class="sig">md.github_slug(heading_text: str) -&gt; str</div>
-      <div class="sig">md.lines_outside_fences(text: str) -&gt; Iterator[tuple[int, str]]</div>
-      <div class="sig">md.content_lines(filepath: Path) -&gt; Iterator[tuple[int, str]]</div>
-      <div class="sig">md.heading_slugs(filepath: Path) -&gt; frozenset[str]</div>
-      <div class="sig">md.markdown_links(line: str) -&gt; list[tuple[str, str]]</div>
-      <div class="sig">md.parse_frontmatter(text: str) -&gt; tuple[dict | None, str]</div>
-      <div class="sig">md.classify(relpath: str) -&gt; str</div>
-      <div class="sig">md.find_md_files(root: Path) -&gt; list[Path]</div>
-      <div class="sig">pyast.looks_python(path: Path) -&gt; bool</div>
-      <div class="sig">pyast.find_python_files(root: Path) -&gt; list[Path]</div>
-      <div class="sig">pyast.parse(path: Path) -&gt; ast.Module | None</div>
+      <div class="sig">canonical_repo_name(repo_root: Path) -&gt; str</div>
+      <div class="doc">Repo name from git, identical for main checkout and any worktree of it.</div>
+      <div class="sig">git_files(root: Path, tracked_only: bool = False) -&gt; list[str]</div>
+      <div class="doc">Relative paths of files in root's checkout, honoring .gitignore.</div>
+      <div class="sig">github_slug(heading_text: str) -&gt; str</div>
+      <div class="doc">Compute the GitHub-style anchor slug for a heading.</div>
+      <div class="sig">lines_outside_fences(text: str) -&gt; Iterator[tuple[int, str]]</div>
+      <div class="doc">Yield (line_number, line) for every line of text outside a fence.</div>
+      <div class="sig">content_lines(filepath: Path) -&gt; Iterator[tuple[int, str]]</div>
+      <div class="doc">Yield (line_number, line) for every line of a file outside a fence.</div>
+      <div class="sig">heading_slugs(filepath: Path) -&gt; frozenset[str]</div>
+      <div class="doc">The set of GitHub slugs for every ATX heading in the file.</div>
+      <div class="sig">markdown_links(line: str) -&gt; list[tuple[str, str]]</div>
+      <div class="doc">(text, target) for every inline [text](target) link on a line.</div>
+      <div class="sig">parse_frontmatter(text: str) -&gt; tuple[dict | None, str]</div>
+      <div class="doc">Split leading YAML frontmatter from the body.</div>
+      <div class="sig">classify(relpath: str) -&gt; str</div>
+      <div class="doc">Classify a repo-relative path within the OKF bundle taxonomy.</div>
+      <div class="sig">find_md_files(root: Path) -&gt; list[Path]</div>
+      <div class="doc">All .md files in root's git checkout, honoring .gitignore.</div>
+      <div class="sig">looks_python(path: Path) -&gt; bool</div>
+      <div class="doc">True for a .py file or an extensionless file with a Python shebang.</div>
+      <div class="sig">find_python_files(root: Path) -&gt; list[Path]</div>
+      <div class="doc">All Python files in root's git checkout, honoring .gitignore.</div>
+      <div class="sig">parse(path: Path) -&gt; ast.Module | None</div>
+      <div class="doc">Parse a file into an AST, or None if it can't be read or parsed.</div>
     </div>
-    <p class="aside">Every gate takes the same optional <code>&lt;directory&gt;</code> (default
-    <code>.</code>); ref-check alone also accepts <code>--all</code> (dump every reference, not
-    just broken ones) before it — not drawn, to keep the shared grammar honest. Exit
-    <code>0</code> clean · <code>1</code> findings/broken · <code>2</code> cannot run, except
-    internal-skill-audit, which only distinguishes <code>0</code> from <code>1</code> — warnings
-    never fail it. <code>lib/</code>'s signatures below are importable by any of the four.</p>
+    <p class="aside">Command grammar above — five linters share
+    <code>tool [&lt;dir&gt;]</code>; sweep has its own track. Exit <code>0</code>
+    clean · <code>1</code> findings · <code>2</code> cannot run, uniform across
+    all six. Importable surface below: the shared primitives
+    (<span title="src/dev_playbook/md.py">md</span>,
+    <span title="src/dev_playbook/pyast.py">pyast</span>,
+    <span title="src/dev_playbook/gitrepo.py">gitrepo</span>) every linter
+    builds on.</p>
   </section>
 
   <section class="card span2">
-    <h2>Shape</h2>
+    <h2>Data flow</h2>
     <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
-    <!-- DOT source:
-    digraph lint_suite {
+    <!-- DOT source: .datasheet/flow.dot
+    digraph lintsuite {
       rankdir=LR;
-      bgcolor="transparent";
-      node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12,
-            color="#94a3b8", fillcolor="#f1f5f9", fontcolor="#1e293b"];
-      edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#475569"];
-
-      repo     [label="repo checkout", fillcolor="#e0f2fe", color="#38bdf8"];
-      findmd   [label="find_md_files"];
-      findpy   [label="find_python_files"];
-      classify [label="classify"];
-      okf      [label="okf-lint"];
-      pyl      [label="python-lint"];
-      refc     [label="ref-check"];
-      ska      [label="internal-skill-audit"];
-      out      [label="findings", fillcolor="#dcfce7", color="#4ade80"];
-
-      repo -> findmd [label="git ls-files *.md"];
-      repo -> findpy [label="git ls-files *.py"];
-      repo -> ska    [label="skill dirs"];
-
-      findmd -> classify [label="md files"];
-      classify -> okf    [label="concept/index docs"];
-      findmd -> refc     [label="md files"];
-      findpy -> pyl      [label="py files"];
-
-      okf  -> out [label="findings"];
-      pyl  -> out [label="findings"];
-      refc -> out [label="findings"];
-      ska  -> out [label="findings"];
+      okfin [OKF docs] -> okf [okf-lint] -> okfout [findings]      (fenced-aware lines / rule hits)
+      pyin [Python sources] -> pyl [python-lint] -> pyout [findings]  (AST / rule hits)
+      refin [markdown links] -> ref [ref-check] -> refout [reference records]  (targets + anchors / JSON lines)
+      skin [SKILL.md files] -> ska [internal-skill-audit] -> skout [findings]  (frontmatter + body / rule hits)
+      tree [repo tree] + canon [canonical artifacts] -> ra [repo-audit] -> raout [findings]  (layer facts, reference bytes / deviations)
+      ws [workspace clones] + gh [GitHub settings] -> sw [sweep] -> swout [per-repo facts]  (pinned revs, gh api / stale-drifted)
     }
     -->
-    <svg width="812pt" height="186pt"
- viewBox="0.00 0.00 812.00 186.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 182)">
-<title>lint_suite</title>
+    <svg width="550pt" height="422pt"
+ viewBox="0.00 0.00 550.00 422.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 418)">
+<title>lintsuite</title>
+<!-- okfin -->
 <g id="node1" class="node">
-<title>repo</title>
-<path fill="#e0f2fe" stroke="#38bdf8" d="M79,-82C79,-82 12,-82 12,-82 6,-82 0,-76 0,-70 0,-70 0,-58 0,-58 0,-52 6,-46 12,-46 12,-46 79,-46 79,-46 85,-46 91,-52 91,-58 91,-58 91,-70 91,-70 91,-76 85,-82 79,-82"/>
-<text xml:space="preserve" text-anchor="middle" x="45.5" y="-59.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">repo checkout</text>
+<title>okfin</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M78.62,-36C78.62,-36 33.38,-36 33.38,-36 27.38,-36 21.38,-30 21.38,-24 21.38,-24 21.38,-12 21.38,-12 21.38,-6 27.38,0 33.38,0 33.38,0 78.62,0 78.62,0 84.62,0 90.62,-6 90.62,-12 90.62,-12 90.62,-24 90.62,-24 90.62,-30 84.62,-36 78.62,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">OKF docs</text>
 </g>
+<!-- okf -->
 <g id="node2" class="node">
-<title>findmd</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M277.25,-136C277.25,-136 214,-136 214,-136 208,-136 202,-130 202,-124 202,-124 202,-112 202,-112 202,-106 208,-100 214,-100 214,-100 277.25,-100 277.25,-100 283.25,-100 289.25,-106 289.25,-112 289.25,-112 289.25,-124 289.25,-124 289.25,-130 283.25,-136 277.25,-136"/>
-<text xml:space="preserve" text-anchor="middle" x="245.62" y="-113.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">find_md_files</text>
-</g>
-<g id="edge1" class="edge">
-<title>repo&#45;&gt;findmd</title>
-<path fill="none" stroke="#64748b" d="M91.46,-76.25C120.84,-84.26 159.39,-94.77 190.47,-103.24"/>
-<polygon fill="#64748b" stroke="#64748b" points="189.52,-106.61 200.08,-105.86 191.36,-99.85 189.52,-106.61"/>
-<text xml:space="preserve" text-anchor="middle" x="141.62" y="-99.92" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">git ls&#45;files *.md</text>
-</g>
-<g id="node3" class="node">
-<title>findpy</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M287,-82C287,-82 204.25,-82 204.25,-82 198.25,-82 192.25,-76 192.25,-70 192.25,-70 192.25,-58 192.25,-58 192.25,-52 198.25,-46 204.25,-46 204.25,-46 287,-46 287,-46 293,-46 299,-52 299,-58 299,-58 299,-70 299,-70 299,-76 293,-82 287,-82"/>
-<text xml:space="preserve" text-anchor="middle" x="245.62" y="-59.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">find_python_files</text>
-</g>
-<g id="edge2" class="edge">
-<title>repo&#45;&gt;findpy</title>
-<path fill="none" stroke="#64748b" d="M91.46,-64C117.76,-64 151.41,-64 180.47,-64"/>
-<polygon fill="#64748b" stroke="#64748b" points="180.26,-67.5 190.26,-64 180.26,-60.5 180.26,-67.5"/>
-<text xml:space="preserve" text-anchor="middle" x="141.62" y="-66.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">git ls&#45;files *.py</text>
-</g>
-<g id="node8" class="node">
-<title>ska</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M415.5,-36C415.5,-36 329,-36 329,-36 323,-36 317,-30 317,-24 317,-24 317,-12 317,-12 317,-6 323,0 329,0 329,0 415.5,0 415.5,0 421.5,0 427.5,-6 427.5,-12 427.5,-12 427.5,-24 427.5,-24 427.5,-30 421.5,-36 415.5,-36"/>
-<text xml:space="preserve" text-anchor="middle" x="372.25" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">internal&#45;skill&#45;audit</text>
-</g>
-<g id="edge3" class="edge">
-<title>repo&#45;&gt;ska</title>
-<path fill="none" stroke="#64748b" d="M91.42,-51.82C97.31,-50.42 103.28,-49.11 109,-48 175.23,-35.19 252,-27.2 305.29,-22.71"/>
-<polygon fill="#64748b" stroke="#64748b" points="305.44,-26.21 315.12,-21.9 304.87,-19.23 305.44,-26.21"/>
-<text xml:space="preserve" text-anchor="middle" x="141.62" y="-50.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">skill dirs</text>
-</g>
-<g id="node4" class="node">
-<title>classify</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M489.25,-177C489.25,-177 457.5,-177 457.5,-177 451.5,-177 445.5,-171 445.5,-165 445.5,-165 445.5,-153 445.5,-153 445.5,-147 451.5,-141 457.5,-141 457.5,-141 489.25,-141 489.25,-141 495.25,-141 501.25,-147 501.25,-153 501.25,-153 501.25,-165 501.25,-165 501.25,-171 495.25,-177 489.25,-177"/>
-<text xml:space="preserve" text-anchor="middle" x="473.38" y="-154.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">classify</text>
-</g>
-<g id="edge4" class="edge">
-<title>findmd&#45;&gt;classify</title>
-<path fill="none" stroke="#64748b" d="M289.62,-125.81C331.3,-133.38 393.95,-144.76 433.99,-152.03"/>
-<polygon fill="#64748b" stroke="#64748b" points="433.2,-155.44 443.66,-153.78 434.45,-148.55 433.2,-155.44"/>
-<text xml:space="preserve" text-anchor="middle" x="372.25" y="-152.64" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">md files</text>
-</g>
-<g id="node7" class="node">
-<title>refc</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M582,-131C582,-131 541.25,-131 541.25,-131 535.25,-131 529.25,-125 529.25,-119 529.25,-119 529.25,-107 529.25,-107 529.25,-101 535.25,-95 541.25,-95 541.25,-95 582,-95 582,-95 588,-95 594,-101 594,-107 594,-107 594,-119 594,-119 594,-125 588,-131 582,-131"/>
-<text xml:space="preserve" text-anchor="middle" x="561.62" y="-108.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">ref&#45;check</text>
-</g>
-<g id="edge6" class="edge">
-<title>findmd&#45;&gt;refc</title>
-<path fill="none" stroke="#64748b" d="M289.42,-115.94C298.52,-115.57 308.08,-115.23 317,-115 387.31,-113.21 469.07,-112.9 517.74,-112.91"/>
-<polygon fill="#64748b" stroke="#64748b" points="517.57,-116.41 527.57,-112.91 517.57,-109.41 517.57,-116.41"/>
-<text xml:space="preserve" text-anchor="middle" x="372.25" y="-117.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">md files</text>
-</g>
-<g id="node6" class="node">
-<title>pyl</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M585.38,-82C585.38,-82 537.88,-82 537.88,-82 531.88,-82 525.88,-76 525.88,-70 525.88,-70 525.88,-58 525.88,-58 525.88,-52 531.88,-46 537.88,-46 537.88,-46 585.38,-46 585.38,-46 591.38,-46 597.38,-52 597.38,-58 597.38,-58 597.38,-70 597.38,-70 597.38,-76 591.38,-82 585.38,-82"/>
-<text xml:space="preserve" text-anchor="middle" x="561.62" y="-59.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">python&#45;lint</text>
-</g>
-<g id="edge7" class="edge">
-<title>findpy&#45;&gt;pyl</title>
-<path fill="none" stroke="#64748b" d="M299.18,-64C359.29,-64 456.77,-64 514.19,-64"/>
-<polygon fill="#64748b" stroke="#64748b" points="513.95,-67.5 523.95,-64 513.95,-60.5 513.95,-67.5"/>
-<text xml:space="preserve" text-anchor="middle" x="372.25" y="-66.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">py files</text>
-</g>
-<g id="node5" class="node">
 <title>okf</title>
-<path fill="#f1f5f9" stroke="#94a3b8" d="M664,-178C664,-178 634,-178 634,-178 628,-178 622,-172 622,-166 622,-166 622,-154 622,-154 622,-148 628,-142 634,-142 634,-142 664,-142 664,-142 670,-142 676,-148 676,-154 676,-154 676,-166 676,-166 676,-172 670,-178 664,-178"/>
-<text xml:space="preserve" text-anchor="middle" x="649" y="-155.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">okf&#45;lint</text>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M300,-36C300,-36 270,-36 270,-36 264,-36 258,-30 258,-24 258,-24 258,-12 258,-12 258,-6 264,0 270,0 270,0 300,0 300,0 306,0 312,-6 312,-12 312,-12 312,-24 312,-24 312,-30 306,-36 300,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="285" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">okf&#45;lint</text>
 </g>
+<!-- okfin&#45;&gt;okf -->
+<g id="edge1" class="edge">
+<title>okfin&#45;&gt;okf</title>
+<path fill="none" stroke="#64748b" d="M90.98,-18C132.59,-18 202.84,-18 246.13,-18"/>
+<polygon fill="#64748b" stroke="#64748b" points="246.07,-21.5 256.07,-18 246.07,-14.5 246.07,-21.5"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-20.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">fenced&#45;aware lines</text>
+</g>
+<!-- okfout -->
+<g id="node3" class="node">
+<title>okfout</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M504.75,-36C504.75,-36 470.75,-36 470.75,-36 464.75,-36 458.75,-30 458.75,-24 458.75,-24 458.75,-12 458.75,-12 458.75,-6 464.75,0 470.75,0 470.75,0 504.75,0 504.75,0 510.75,0 516.75,-6 516.75,-12 516.75,-12 516.75,-24 516.75,-24 516.75,-30 510.75,-36 504.75,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="487.75" y="-13.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">findings</text>
+</g>
+<!-- okf&#45;&gt;okfout -->
+<g id="edge2" class="edge">
+<title>okf&#45;&gt;okfout</title>
+<path fill="none" stroke="#64748b" d="M312.24,-18C346.61,-18 407.16,-18 447.12,-18"/>
+<polygon fill="#64748b" stroke="#64748b" points="447.05,-21.5 457.05,-18 447.05,-14.5 447.05,-21.5"/>
+<text xml:space="preserve" text-anchor="middle" x="386.75" y="-20.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">rule hits</text>
+</g>
+<!-- pyin -->
+<g id="node4" class="node">
+<title>pyin</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M93.25,-90C93.25,-90 18.75,-90 18.75,-90 12.75,-90 6.75,-84 6.75,-78 6.75,-78 6.75,-66 6.75,-66 6.75,-60 12.75,-54 18.75,-54 18.75,-54 93.25,-54 93.25,-54 99.25,-54 105.25,-60 105.25,-66 105.25,-66 105.25,-78 105.25,-78 105.25,-84 99.25,-90 93.25,-90"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-67.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">Python sources</text>
+</g>
+<!-- pyl -->
+<g id="node5" class="node">
+<title>pyl</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M308.75,-90C308.75,-90 261.25,-90 261.25,-90 255.25,-90 249.25,-84 249.25,-78 249.25,-78 249.25,-66 249.25,-66 249.25,-60 255.25,-54 261.25,-54 261.25,-54 308.75,-54 308.75,-54 314.75,-54 320.75,-60 320.75,-66 320.75,-66 320.75,-78 320.75,-78 320.75,-84 314.75,-90 308.75,-90"/>
+<text xml:space="preserve" text-anchor="middle" x="285" y="-67.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">python&#45;lint</text>
+</g>
+<!-- pyin&#45;&gt;pyl -->
+<g id="edge3" class="edge">
+<title>pyin&#45;&gt;pyl</title>
+<path fill="none" stroke="#64748b" d="M105.7,-72C144.78,-72 199.27,-72 237.7,-72"/>
+<polygon fill="#64748b" stroke="#64748b" points="237.56,-75.5 247.56,-72 237.56,-68.5 237.56,-75.5"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">AST</text>
+</g>
+<!-- pyout -->
+<g id="node6" class="node">
+<title>pyout</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M504.75,-90C504.75,-90 470.75,-90 470.75,-90 464.75,-90 458.75,-84 458.75,-78 458.75,-78 458.75,-66 458.75,-66 458.75,-60 464.75,-54 470.75,-54 470.75,-54 504.75,-54 504.75,-54 510.75,-54 516.75,-60 516.75,-66 516.75,-66 516.75,-78 516.75,-78 516.75,-84 510.75,-90 504.75,-90"/>
+<text xml:space="preserve" text-anchor="middle" x="487.75" y="-67.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">findings</text>
+</g>
+<!-- pyl&#45;&gt;pyout -->
+<g id="edge4" class="edge">
+<title>pyl&#45;&gt;pyout</title>
+<path fill="none" stroke="#64748b" d="M320.97,-72C356.14,-72 410.3,-72 447.06,-72"/>
+<polygon fill="#64748b" stroke="#64748b" points="446.83,-75.5 456.83,-72 446.83,-68.5 446.83,-75.5"/>
+<text xml:space="preserve" text-anchor="middle" x="386.75" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">rule hits</text>
+</g>
+<!-- refin -->
+<g id="node7" class="node">
+<title>refin</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M93.62,-144C93.62,-144 18.38,-144 18.38,-144 12.38,-144 6.38,-138 6.38,-132 6.38,-132 6.38,-120 6.38,-120 6.38,-114 12.38,-108 18.38,-108 18.38,-108 93.62,-108 93.62,-108 99.62,-108 105.62,-114 105.62,-120 105.62,-120 105.62,-132 105.62,-132 105.62,-138 99.62,-144 93.62,-144"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">markdown links</text>
+</g>
+<!-- ref -->
+<g id="node8" class="node">
+<title>ref</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M305.38,-144C305.38,-144 264.62,-144 264.62,-144 258.62,-144 252.62,-138 252.62,-132 252.62,-132 252.62,-120 252.62,-120 252.62,-114 258.62,-108 264.62,-108 264.62,-108 305.38,-108 305.38,-108 311.38,-108 317.38,-114 317.38,-120 317.38,-120 317.38,-132 317.38,-132 317.38,-138 311.38,-144 305.38,-144"/>
+<text xml:space="preserve" text-anchor="middle" x="285" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">ref&#45;check</text>
+</g>
+<!-- refin&#45;&gt;ref -->
 <g id="edge5" class="edge">
-<title>classify&#45;&gt;okf</title>
-<path fill="none" stroke="#64748b" d="M501.5,-159.16C530.72,-159.32 577.43,-159.59 610.23,-159.78"/>
-<polygon fill="#64748b" stroke="#64748b" points="610.1,-163.28 620.12,-159.84 610.14,-156.28 610.1,-163.28"/>
-<text xml:space="preserve" text-anchor="middle" x="561.62" y="-162.23" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">concept/index docs</text>
+<title>refin&#45;&gt;ref</title>
+<path fill="none" stroke="#64748b" d="M105.98,-126C146.14,-126 202.43,-126 240.9,-126"/>
+<polygon fill="#64748b" stroke="#64748b" points="240.72,-129.5 250.72,-126 240.72,-122.5 240.72,-129.5"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-128.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">targets + anchors</text>
 </g>
+<!-- refout -->
 <g id="node9" class="node">
-<title>out</title>
-<path fill="#dcfce7" stroke="#4ade80" d="M791.75,-106C791.75,-106 757.75,-106 757.75,-106 751.75,-106 745.75,-100 745.75,-94 745.75,-94 745.75,-82 745.75,-82 745.75,-76 751.75,-70 757.75,-70 757.75,-70 791.75,-70 791.75,-70 797.75,-70 803.75,-76 803.75,-82 803.75,-82 803.75,-94 803.75,-94 803.75,-100 797.75,-106 791.75,-106"/>
-<text xml:space="preserve" text-anchor="middle" x="774.75" y="-83.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">findings</text>
+<title>refout</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M530.25,-144C530.25,-144 445.25,-144 445.25,-144 439.25,-144 433.25,-138 433.25,-132 433.25,-132 433.25,-120 433.25,-120 433.25,-114 439.25,-108 445.25,-108 445.25,-108 530.25,-108 530.25,-108 536.25,-108 542.25,-114 542.25,-120 542.25,-120 542.25,-132 542.25,-132 542.25,-138 536.25,-144 530.25,-144"/>
+<text xml:space="preserve" text-anchor="middle" x="487.75" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">reference records</text>
 </g>
+<!-- ref&#45;&gt;refout -->
+<g id="edge6" class="edge">
+<title>ref&#45;&gt;refout</title>
+<path fill="none" stroke="#64748b" d="M317.81,-126C345.52,-126 386.59,-126 421.3,-126"/>
+<polygon fill="#64748b" stroke="#64748b" points="421.28,-129.5 431.28,-126 421.28,-122.5 421.28,-129.5"/>
+<text xml:space="preserve" text-anchor="middle" x="386.75" y="-128.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">JSON lines</text>
+</g>
+<!-- skin -->
+<g id="node10" class="node">
+<title>skin</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M90.62,-198C90.62,-198 21.38,-198 21.38,-198 15.38,-198 9.38,-192 9.38,-186 9.38,-186 9.38,-174 9.38,-174 9.38,-168 15.38,-162 21.38,-162 21.38,-162 90.62,-162 90.62,-162 96.62,-162 102.62,-168 102.62,-174 102.62,-174 102.62,-186 102.62,-186 102.62,-192 96.62,-198 90.62,-198"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-175.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">SKILL.md files</text>
+</g>
+<!-- ska -->
+<g id="node11" class="node">
+<title>ska</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M328.25,-198C328.25,-198 241.75,-198 241.75,-198 235.75,-198 229.75,-192 229.75,-186 229.75,-186 229.75,-174 229.75,-174 229.75,-168 235.75,-162 241.75,-162 241.75,-162 328.25,-162 328.25,-162 334.25,-162 340.25,-168 340.25,-174 340.25,-174 340.25,-186 340.25,-186 340.25,-192 334.25,-198 328.25,-198"/>
+<text xml:space="preserve" text-anchor="middle" x="285" y="-175.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">internal&#45;skill&#45;audit</text>
+</g>
+<!-- skin&#45;&gt;ska -->
+<g id="edge7" class="edge">
+<title>skin&#45;&gt;ska</title>
+<path fill="none" stroke="#64748b" d="M102.94,-180C136.05,-180 181.21,-180 218.15,-180"/>
+<polygon fill="#64748b" stroke="#64748b" points="217.82,-183.5 227.82,-180 217.82,-176.5 217.82,-183.5"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-182.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">frontmatter + body</text>
+</g>
+<!-- skout -->
+<g id="node12" class="node">
+<title>skout</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M504.75,-198C504.75,-198 470.75,-198 470.75,-198 464.75,-198 458.75,-192 458.75,-186 458.75,-186 458.75,-174 458.75,-174 458.75,-168 464.75,-162 470.75,-162 470.75,-162 504.75,-162 504.75,-162 510.75,-162 516.75,-168 516.75,-174 516.75,-174 516.75,-186 516.75,-186 516.75,-192 510.75,-198 504.75,-198"/>
+<text xml:space="preserve" text-anchor="middle" x="487.75" y="-175.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">findings</text>
+</g>
+<!-- ska&#45;&gt;skout -->
 <g id="edge8" class="edge">
-<title>okf&#45;&gt;out</title>
-<path fill="none" stroke="#64748b" d="M676.47,-150.55C691.95,-144.51 711.56,-135.96 727.75,-126 733.77,-122.3 739.85,-117.87 745.53,-113.36"/>
-<polygon fill="#64748b" stroke="#64748b" points="747.42,-116.35 752.9,-107.28 742.96,-110.95 747.42,-116.35"/>
-<text xml:space="preserve" text-anchor="middle" x="710.88" y="-145.49" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">findings</text>
+<title>ska&#45;&gt;skout</title>
+<path fill="none" stroke="#64748b" d="M340.59,-180C374.21,-180 416.55,-180 447,-180"/>
+<polygon fill="#64748b" stroke="#64748b" points="446.93,-183.5 456.93,-180 446.93,-176.5 446.93,-183.5"/>
+<text xml:space="preserve" text-anchor="middle" x="386.75" y="-182.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">rule hits</text>
 </g>
+<!-- tree -->
+<g id="node13" class="node">
+<title>tree</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M75.62,-306C75.62,-306 36.38,-306 36.38,-306 30.38,-306 24.38,-300 24.38,-294 24.38,-294 24.38,-282 24.38,-282 24.38,-276 30.38,-270 36.38,-270 36.38,-270 75.62,-270 75.62,-270 81.62,-270 87.62,-276 87.62,-282 87.62,-282 87.62,-294 87.62,-294 87.62,-300 81.62,-306 75.62,-306"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-283.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">repo tree</text>
+</g>
+<!-- ra -->
+<g id="node15" class="node">
+<title>ra</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M308,-279C308,-279 262,-279 262,-279 256,-279 250,-273 250,-267 250,-267 250,-255 250,-255 250,-249 256,-243 262,-243 262,-243 308,-243 308,-243 314,-243 320,-249 320,-255 320,-255 320,-267 320,-267 320,-273 314,-279 308,-279"/>
+<text xml:space="preserve" text-anchor="middle" x="285" y="-256.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">repo&#45;audit</text>
+</g>
+<!-- tree&#45;&gt;ra -->
 <g id="edge9" class="edge">
-<title>pyl&#45;&gt;out</title>
-<path fill="none" stroke="#64748b" d="M597.49,-67.96C635.04,-72.23 694.67,-79.01 734.01,-83.48"/>
-<polygon fill="#64748b" stroke="#64748b" points="733.44,-86.94 743.77,-84.59 734.23,-79.98 733.44,-86.94"/>
-<text xml:space="preserve" text-anchor="middle" x="649" y="-79.01" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">findings</text>
+<title>tree&#45;&gt;ra</title>
+<path fill="none" stroke="#64748b" d="M88.09,-284.3C126.88,-279.69 193.53,-271.76 238.18,-266.45"/>
+<polygon fill="#64748b" stroke="#64748b" points="238.56,-269.93 248.08,-265.27 237.74,-262.98 238.56,-269.93"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-281.77" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">layer facts</text>
 </g>
+<!-- canon -->
+<g id="node14" class="node">
+<title>canon</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M100,-252C100,-252 12,-252 12,-252 6,-252 0,-246 0,-240 0,-240 0,-228 0,-228 0,-222 6,-216 12,-216 12,-216 100,-216 100,-216 106,-216 112,-222 112,-228 112,-228 112,-240 112,-240 112,-246 106,-252 100,-252"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-229.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">canonical artifacts</text>
+</g>
+<!-- canon&#45;&gt;ra -->
 <g id="edge10" class="edge">
-<title>refc&#45;&gt;out</title>
-<path fill="none" stroke="#64748b" d="M594.33,-109.95C627.61,-106.65 681.43,-101.05 727.75,-95 729.91,-94.72 732.13,-94.42 734.37,-94.11"/>
-<polygon fill="#64748b" stroke="#64748b" points="734.66,-97.6 744.06,-92.7 733.66,-90.67 734.66,-97.6"/>
-<text xml:space="preserve" text-anchor="middle" x="649" y="-109.51" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">findings</text>
+<title>canon&#45;&gt;ra</title>
+<path fill="none" stroke="#64748b" d="M112.24,-240.57C150.96,-245.18 202.1,-251.26 238.48,-255.59"/>
+<polygon fill="#64748b" stroke="#64748b" points="237.89,-259.04 248.24,-256.75 238.72,-252.09 237.89,-259.04"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-254.77" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">reference bytes</text>
 </g>
+<!-- raout -->
+<g id="node16" class="node">
+<title>raout</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M504.75,-279C504.75,-279 470.75,-279 470.75,-279 464.75,-279 458.75,-273 458.75,-267 458.75,-267 458.75,-255 458.75,-255 458.75,-249 464.75,-243 470.75,-243 470.75,-243 504.75,-243 504.75,-243 510.75,-243 516.75,-249 516.75,-255 516.75,-255 516.75,-267 516.75,-267 516.75,-273 510.75,-279 504.75,-279"/>
+<text xml:space="preserve" text-anchor="middle" x="487.75" y="-256.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">findings</text>
+</g>
+<!-- ra&#45;&gt;raout -->
 <g id="edge11" class="edge">
-<title>ska&#45;&gt;out</title>
-<path fill="none" stroke="#64748b" d="M427.89,-14.71C474.99,-13.05 544.6,-13.4 604,-25 650.63,-34.11 701.37,-54.42 735.11,-69.53"/>
-<polygon fill="#64748b" stroke="#64748b" points="733.51,-72.65 744.07,-73.61 736.42,-66.28 733.51,-72.65"/>
-<text xml:space="preserve" text-anchor="middle" x="561.62" y="-27.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">findings</text>
+<title>ra&#45;&gt;raout</title>
+<path fill="none" stroke="#64748b" d="M320.05,-261C355.18,-261 409.92,-261 447.01,-261"/>
+<polygon fill="#64748b" stroke="#64748b" points="446.87,-264.5 456.87,-261 446.87,-257.5 446.87,-264.5"/>
+<text xml:space="preserve" text-anchor="middle" x="386.75" y="-263.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">deviations</text>
+</g>
+<!-- ws -->
+<g id="node17" class="node">
+<title>ws</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M100,-414C100,-414 12,-414 12,-414 6,-414 0,-408 0,-402 0,-402 0,-390 0,-390 0,-384 6,-378 12,-378 12,-378 100,-378 100,-378 106,-378 112,-384 112,-390 112,-390 112,-402 112,-402 112,-408 106,-414 100,-414"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-391.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">workspace clones</text>
+</g>
+<!-- sw -->
+<g id="node19" class="node">
+<title>sw</title>
+<path fill="#f1f5f9" stroke="#94a3b8" d="M300,-387C300,-387 270,-387 270,-387 264,-387 258,-381 258,-375 258,-375 258,-363 258,-363 258,-357 264,-351 270,-351 270,-351 300,-351 300,-351 306,-351 312,-357 312,-363 312,-363 312,-375 312,-375 312,-381 306,-387 300,-387"/>
+<text xml:space="preserve" text-anchor="middle" x="285" y="-364.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">sweep</text>
+</g>
+<!-- ws&#45;&gt;sw -->
+<g id="edge12" class="edge">
+<title>ws&#45;&gt;sw</title>
+<path fill="none" stroke="#64748b" d="M112.24,-389.43C153.92,-384.47 209.99,-377.8 246.55,-373.45"/>
+<polygon fill="#64748b" stroke="#64748b" points="246.68,-376.96 256.19,-372.31 245.85,-370.01 246.68,-376.96"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-389.77" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">pinned revs</text>
+</g>
+<!-- gh -->
+<g id="node18" class="node">
+<title>gh</title>
+<path fill="#e0f2fe" stroke="#38bdf8" d="M92.88,-360C92.88,-360 19.12,-360 19.12,-360 13.12,-360 7.12,-354 7.12,-348 7.12,-348 7.12,-336 7.12,-336 7.12,-330 13.12,-324 19.12,-324 19.12,-324 92.88,-324 92.88,-324 98.88,-324 104.88,-330 104.88,-336 104.88,-336 104.88,-348 104.88,-348 104.88,-354 98.88,-360 92.88,-360"/>
+<text xml:space="preserve" text-anchor="middle" x="56" y="-337.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">GitHub settings</text>
+</g>
+<!-- gh&#45;&gt;sw -->
+<g id="edge13" class="edge">
+<title>gh&#45;&gt;sw</title>
+<path fill="none" stroke="#64748b" d="M105.14,-347.73C147.25,-352.73 207.56,-359.91 246.25,-364.51"/>
+<polygon fill="#64748b" stroke="#64748b" points="245.68,-367.97 256.02,-365.67 246.5,-361.02 245.68,-367.97"/>
+<text xml:space="preserve" text-anchor="middle" x="170.88" y="-362.77" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">gh api</text>
+</g>
+<!-- swout -->
+<g id="node20" class="node">
+<title>swout</title>
+<path fill="#dcfce7" stroke="#4ade80" d="M520.12,-387C520.12,-387 455.38,-387 455.38,-387 449.38,-387 443.38,-381 443.38,-375 443.38,-375 443.38,-363 443.38,-363 443.38,-357 449.38,-351 455.38,-351 455.38,-351 520.12,-351 520.12,-351 526.12,-351 532.12,-357 532.12,-363 532.12,-363 532.12,-375 532.12,-375 532.12,-381 526.12,-387 520.12,-387"/>
+<text xml:space="preserve" text-anchor="middle" x="487.75" y="-364.73" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">per&#45;repo facts</text>
+</g>
+<!-- sw&#45;&gt;swout -->
+<g id="edge14" class="edge">
+<title>sw&#45;&gt;swout</title>
+<path fill="none" stroke="#64748b" d="M312.24,-369C342.46,-369 392.91,-369 431.82,-369"/>
+<polygon fill="#64748b" stroke="#64748b" points="431.72,-372.5 441.72,-369 431.72,-365.5 431.72,-372.5"/>
+<text xml:space="preserve" text-anchor="middle" x="386.75" y="-371.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#475569">stale / drifted</text>
 </g>
 </g>
 </svg>
-    <p class="aside">Four independent tracks converge only at the finding-line output: okf-lint
-    alone routes the shared markdown list through <span title="tools/lib/md.py:129">classify</span>
-    before checking it; internal-skill-audit scans its own skill directories directly, sharing
-    no discovery code with the other three.</p>
+
+    <p class="aside">Six independent tracks — each hook is its own pipeline
+    from one slice of the checkout to its findings stream; only repo-audit
+    and sweep take a second input (canonical artifacts; GitHub settings).</p>
     <details>
       <summary>Module roster</summary>
-      <p>okf-lint — OKF frontmatter type-lint + index-staleness. python-lint — no-future-annotations,
-      empty-init, test-privacy. ref-check — Link/Citation resolution and fragment-anchor checks.
-      internal-skill-audit — SKILL.md front-matter and body-shape conformance. lib/md.py — markdown
-      primitives (fences, slugs, frontmatter, classify, discovery) shared by okf-lint and ref-check.
-      lib/pyast.py — Python-file discovery and AST parsing, used by python-lint.</p>
+      <p>md.py — fence-aware markdown reading: frontmatter, links, heading
+      slugs, the OKF path taxonomy. pyast.py — Python file discovery and AST
+      parsing. gitrepo.py — repo naming and gitignore-honoring file listing.
+      Each executable script is standalone; the six hooks share only these
+      three modules.</p>
     </details>
   </section>
 
   <section class="card assess span2">
     <h2>Assessment <span class="badge opinion">opinion</span></h2>
     <ol>
-      <li><strong>internal-skill-audit breaks the suite's own output contract</strong><span>it has no test file in this scope, and — alone among the four — its exit code never separates "warnings only" from "clean" (Tests, Gate contract).</span></li>
-      <li><strong>classify is a single point of failure for okf-lint</strong><span>a path it mis-buckets (concept vs. index vs. harness) silently mis-scopes both the type-lint and the index-staleness check in the same pass (classify).</span></li>
-      <li><strong>Three of the four gates only see what git already knows</strong><span>okf-lint, ref-check, and python-lint discover files through <code>git ls-files</code>, so an untracked or freshly-renamed file is invisible until it's added; internal-skill-audit alone scans the filesystem directly (Worktree-scoped discovery).</span></li>
-      <li><strong>lib/pyast.py has no test file of its own</strong><span>its two functions are exercised only indirectly, through python-lint's tests — a discovery regression there could hide behind unrelated rule failures (Tests).</span></li>
-      <li><strong>A clean exit only covers the rules that exist</strong><span>all four gates report zero findings on this repo today (Behavior); that says nothing about a convention nobody has encoded as a rule yet.</span></li>
+      <li><strong>A clean audit is only as strong as layer inference</strong><span>repo-audit checks the rules of the layers it infers from disk facts, so a layer that fails to infer is silently not audited (layer).</span></li>
+      <li><strong>One parser bug moves three tools at once</strong><span>okf-lint, ref-check, and repo-audit's doc checks all read files through the same primitives, so a fencing edge case shifts them together (fence-aware parsing).</span></li>
+      <li><strong>The skill auditor ships unverified</strong><span>internal-skill-audit has no dedicated suite; a regression there surfaces only in real commits (Tests).</span></li>
+      <li><strong>Output formats split by tool</strong><span>five tools emit text finding lines while ref-check emits JSON records — a consumer scripting one shape breaks on the other (finding line, API).</span></li>
+      <li><strong>Workspace hygiene is visible only when GitHub is</strong><span>sweep's settings rows arrive over gh api, so offline or unauthenticated runs can't see settings drift (Touch surface).</span></li>
     </ol>
   </section>
 
