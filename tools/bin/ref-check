@@ -1,37 +1,32 @@
 #!/usr/bin/env python3
 """Check cross-references in markdown files.
 
-Scans the .md files in the invoking git checkout — discovered via
-`git ls-files`, so discovery honors `.gitignore` and is scoped to the current
-worktree — and validates the two workspace cross-reference forms defined in
-standards/repo-documentation.md:
+Deterministic checker for the workspace cross-reference grammar; the grammar
+itself — the two forms, which files use which, and why — is defined in the
+docs standards, not here. Scans the .md files in the invoking git checkout
+(`git ls-files`, so discovery honors `.gitignore` and is scoped to the
+current worktree) and checks:
 
-  - **Link** — a root-absolute `/path` target, written only inside markdown
-    link syntax `[text](/path)`. It resolves against the invoking checkout's
-    own root (the current working directory), so a worktree validates against
-    its own working copy, not the main checkout.
-  - **Citation** — a `~/workspace/<repo>/...` path. A citation into the
-    invoking repo resolves against that same working copy (worktree-safe); a
-    citation into another workspace repo resolves against its absolute on-disk
-    path.
+  - **Link** — `[text](/path)`: target must exist under the invoking
+    checkout's own root; a worktree validates its own working copy.
+  - **Citation** — `~/workspace/<repo>/...`: cross-repo targets resolve at
+    their absolute path; same-repo targets resolve against the invoking
+    checkout. A same-repo Citation from a source with a fixed repo root is
+    a `wrong-form` finding; sources matching ROOTLESS_SEGMENTS are exempt.
+  - `#fragment` anchors on .md targets must match a heading slug
+    (`lib.md.github_slug`); fragments on directories or non-.md targets are
+    out of scope and treated as ok.
 
-Bare `/slash` tokens (e.g. `/commit`) and backticked filenames are prose, not
-Links — only `/` targets inside link syntax are checked, matching the standard.
-Fenced code blocks and inline code spans are skipped. Files inside any `adr/`
-directory are skipped as reference *sources* — ADRs are immutable historical
-records, so broken refs in them are accepted staleness, not lint errors;
-references *to* ADRs from other files are still validated.
-
-Fragment anchors (`#heading-slug`) on .md targets are validated against the
-target's headings per the slug rule in standards/repo-documentation.md.
-Headings inside the target's fenced code blocks are ignored. Fragments on
-directories or non-.md targets are out of scope and treated as `ok`.
+Not scanned: fenced code blocks and inline code spans, bare `/slash` tokens
+outside link syntax, and files under any `adr/` directory as sources
+(references *to* ADRs are still validated).
 
 Output:
-    stdout — JSON Lines, one record per reference: {source, line, target, status}.
-             Default: only status="broken" records. With --all: every reference.
+    stdout — JSON Lines, one record per reference: {source, line, target, status};
+             status is "ok", "broken", or "wrong-form". Default: only
+             non-"ok" records. With --all: every reference.
     stderr — one human-readable summary line.
-    exit   — 0 clean, 1 broken refs found, 2 cannot run.
+    exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
     ref-check [--all] [directory]
@@ -50,11 +45,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from lib import md  # noqa: E402
 
-# ADRs are immutable historical records (per standards/adr-conventions.md). A
-# file an ADR references may later move or be deleted; we cannot update the link
-# without editing the ADR. ref-check treats broken refs inside docs/adr/ as
-# expected staleness. References from other files TO ADRs are still validated.
+# ADR sources are exempt: ADRs are immutable, so their outbound references
+# are accepted staleness. References TO ADRs are still validated.
 EXCLUDE_DIRS = {"adr"}
+
+# Path segments marking sources with no fixed repo root (skills and rules
+# ship into ~/.claude; box artifacts are stamped into a target repo).
+ROOTLESS_SEGMENTS = {"skills", "rules", "box"}
+
+
+def has_fixed_repo_root(relpath: str) -> bool:
+    """True when a source file is always read from one repo, so `/` resolves.
+
+    Rootless files use the Citation form even for same-repo targets, per the
+    cross-reference standard.
+    """
+    return not (ROOTLESS_SEGMENTS & set(Path(relpath).parts))
 
 
 def workspace_root() -> Path:
@@ -93,7 +99,13 @@ def source_files(repo_root: Path) -> list[Path]:
     ]
 
 
-def resolve_citation(target: Path, repo_root: Path, repo_name: str) -> Path:
+def is_same_repo_citation(resolved: Path, repo_name: str) -> bool:
+    """True when a ~/workspace citation targets the invoking repo itself."""
+    rel = resolved.relative_to(workspace_root())
+    return bool(rel.parts) and rel.parts[0] == repo_name
+
+
+def citation_actual(resolved: Path, repo_root: Path, repo_name: str) -> Path:
     """Map a ~/workspace citation to the on-disk path that should hold it.
 
     In-repo citations resolve against repo_root — the working copy of the
@@ -101,10 +113,10 @@ def resolve_citation(target: Path, repo_root: Path, repo_name: str) -> Path:
     worktree's state, not the main checkout. Cross-repo citations use the
     absolute on-disk path as written.
     """
-    rel = target.relative_to(workspace_root())
+    rel = resolved.relative_to(workspace_root())
     if rel.parts and rel.parts[0] == repo_name:
         return repo_root / Path(*rel.parts[1:])
-    return target
+    return resolved
 
 
 def status_of(actual: Path, fragment: str) -> str:
@@ -127,16 +139,29 @@ def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
     """Extract and classify every Link and Citation in one .md file."""
     results = []
     source = str(filepath.relative_to(repo_root))
+    fixed_root = has_fixed_repo_root(source)
 
-    def record(target_str: str, line_num: int, actual: Path, fragment: str) -> None:
+    def record(target_str: str, line_num: int, status: str) -> None:
         results.append(
             {
                 "source": source,
                 "line": line_num,
                 "target": target_str,
-                "status": status_of(actual, fragment),
+                "status": status,
             }
         )
+
+    def citation_status(path_str: str, fragment: str) -> str:
+        """Status for a ~/workspace citation.
+
+        A same-repo citation from a fixed-root source is `wrong-form` and
+        short-circuits the existence check — the form is the actionable
+        error. Everything else resolves and checks as usual.
+        """
+        resolved = Path(path_str.replace("~", str(Path.home()), 1))
+        if fixed_root and is_same_repo_citation(resolved, repo_name):
+            return "wrong-form"
+        return status_of(citation_actual(resolved, repo_root, repo_name), fragment)
 
     for line_num, line in md.content_lines(filepath):
         stripped = md.INLINE_CODE_PATTERN.sub("", line)
@@ -148,20 +173,10 @@ def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
         ]:
             path_str, _, fragment = target_str.partition("#")
             if target_str.startswith("~/workspace/"):
-                resolved = Path(path_str.replace("~", str(Path.home()), 1))
-                record(
-                    target_str,
-                    line_num,
-                    resolve_citation(resolved, repo_root, repo_name),
-                    fragment,
-                )
+                record(target_str, line_num, citation_status(path_str, fragment))
             elif target_str.startswith("/"):
-                record(
-                    target_str,
-                    line_num,
-                    repo_root / path_str.lstrip("/"),
-                    fragment,
-                )
+                actual = repo_root / path_str.lstrip("/")
+                record(target_str, line_num, status_of(actual, fragment))
 
         # Bare citations: `~/workspace/...` outside link syntax. Replace each
         # link span with its text (not nothing) so a citation living in the
@@ -171,13 +186,7 @@ def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
         for match in md.WORKSPACE_REF_PATTERN.finditer(remainder):
             target_str = match.group(0)
             path_str, _, fragment = target_str.partition("#")
-            resolved = Path(path_str.replace("~", str(Path.home()), 1))
-            record(
-                target_str,
-                line_num,
-                resolve_citation(resolved, repo_root, repo_name),
-                fragment,
-            )
+            record(target_str, line_num, citation_status(path_str, fragment))
 
     return results
 
@@ -210,19 +219,27 @@ def main() -> None:
 
     total = 0
     broken = 0
+    wrong_form = 0
     for filepath in md_files:
         for ref in scan_file(filepath, repo_root, repo_name):
             total += 1
             if ref["status"] == "broken":
                 broken += 1
-            if args.all or ref["status"] == "broken":
+            elif ref["status"] == "wrong-form":
+                wrong_form += 1
+            if args.all or ref["status"] != "ok":
                 print(json.dumps(ref))
 
     if total == 0:
         print(f"ref-check: no cross-references found in {repo_root}", file=sys.stderr)
         sys.exit(0)
-    if broken:
-        print(f"ref-check: {broken}/{total} broken", file=sys.stderr)
+    issues = broken + wrong_form
+    if issues:
+        print(
+            f"ref-check: {issues}/{total} need fixing "
+            f"({broken} broken, {wrong_form} wrong-form)",
+            file=sys.stderr,
+        )
         sys.exit(1)
     print(f"ref-check: {total} references, all ok", file=sys.stderr)
     sys.exit(0)

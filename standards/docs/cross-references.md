@@ -28,7 +28,8 @@ already in, whether that's the main checkout or a per-issue worktree. A
 same-repo reference `SHALL NOT` be written as `~/workspace/<this-repo>/…` —
 from inside a worktree that absolute path silently jumps to the main
 checkout, yielding a different (possibly stale) copy than the one the
-reader is working in.
+reader is working in. `ref-check` enforces this: a same-repo citation in a
+fixed-root file fails as `wrong-form`, whether or not the target exists.
 
 The deciding factor is whether the referencing file has a **fixed repo
 root** — a single repo it is always read from. Concept documents do, and so

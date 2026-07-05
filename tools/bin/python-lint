@@ -45,7 +45,7 @@ INIT_MESSAGE = "`__init__.py` must be empty (no docstring, no code)"
 #   - test-privacy skipped only caches and virtualenvs;
 #   - no-future-annotations additionally skipped build artifacts and the
 #     externally-managed / legacy trees we don't police.
-# See standards/python-conventions.md. git ls-files already drops gitignored
+# Rules per the workspace Python standard. git ls-files already drops gitignored
 # caches; these name filters also cover the rare tracked copy. A file is scanned
 # by a rule when none of its parent directory names is in that rule's set.
 _CACHES = frozenset(

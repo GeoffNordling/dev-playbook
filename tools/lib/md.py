@@ -27,7 +27,7 @@ MD_LINK_PATTERN = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
 # Bare ~/workspace/<repo>/... citations, matched outside code spans/fences.
 WORKSPACE_REF_PATTERN = re.compile(r"~/workspace/[^ )`\n]+")
 
-# Slug rule: see standards/repo-documentation.md "Fragment anchors".
+# Inline-markdown stripping for heading slugs; see github_slug.
 SLUG_BACKTICK = re.compile(r"`([^`]*)`")
 SLUG_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 # Asterisk emphasis is stripped anywhere (it may be intraword); underscore
@@ -42,8 +42,7 @@ SLUG_WHITESPACE = re.compile(r"\s")
 def github_slug(heading_text: str) -> str:
     """Compute the GitHub-style anchor slug for a heading.
 
-    Steps mirror standards/repo-documentation.md "Fragment anchors":
-    strip inline markdown (backticks, link syntax, emphasis), lowercase,
+    Strip inline markdown (backticks, link syntax, emphasis), lowercase,
     drop non-word/non-whitespace/non-hyphen chars, then whitespace -> "-".
     """
     text = SLUG_BACKTICK.sub(r"\1", heading_text)
@@ -141,8 +140,8 @@ def classify(relpath: str) -> str:
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
       ``references/``/``scripts/``, ``rules/``, and every non-``.md`` file.
 
-    The concept/harness split is the Phase-F boundary in
-    standards/repo-documentation.md "The OKF bundle"; keep the two in step.
+    The concept/harness split mirrors the bundle boundary in the docs
+    standard; keep the two in step.
     """
     parts = PurePosixPath(relpath).parts
     name = parts[-1]
