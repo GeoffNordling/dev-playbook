@@ -27,7 +27,7 @@ A judgment has four parts:
 A declaration sets a judgment's **case** — its claim, files, and
 instrument. It does not set the **judge**: every judgment is ruled through
 one fixed judge prompt and output schema (constants in
-[`tools/src/judgments/core.py`](/tools/src/judgments/core.py)), uniform
+[`src/dev_playbook/judgments/core.py`](/src/dev_playbook/judgments/core.py)), uniform
 across all judgments, so there is nothing to declare for them.
 
 The claim, the contents of every evidence and reference file, the
@@ -101,6 +101,6 @@ If no `[tool.judgments]` table is found anywhere up the tree, there are
 
 A judgment's instrument is its `model` and `effort`. The valid values are
 the single source of truth in
-[`tools/src/judgments/instruments.py`](/tools/src/judgments/instruments.py)
+[`src/dev_playbook/judgments/instruments.py`](/src/dev_playbook/judgments/instruments.py)
 (`VALID_MODELS`, `VALID_EFFORTS`); a `model` or `effort` outside it is a
 fail-loud error.

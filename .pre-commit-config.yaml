@@ -1,5 +1,5 @@
 # dev-playbook runs its own hooks from the working tree, so edits to the
-# tools/bin/ scripts are testable in place before release. Consumer repos do
+# scripts/ hooks are testable in place before release. Consumer repos do
 # NOT use this file — they reference the published manifest (.pre-commit-hooks.yaml)
 # by URL + pinned rev. The local block below therefore mirrors that manifest;
 # keep the two in sync. See standards/build/distribution.md.
@@ -18,35 +18,35 @@ repos:
     hooks:
       - id: python-lint
         name: python-lint
-        entry: tools/bin/python-lint
+        entry: scripts/python-lint
         language: script
         pass_filenames: false
         always_run: true
 
       - id: ref-check
         name: ref-check
-        entry: tools/bin/ref-check
+        entry: scripts/ref-check
         language: script
         pass_filenames: false
         types: [markdown]
 
       - id: okf-lint
         name: okf-lint
-        entry: tools/bin/okf-lint
+        entry: scripts/okf-lint
         language: script
         pass_filenames: false
         always_run: true
 
       - id: internal-skill-audit
         name: internal-skill-audit
-        entry: tools/bin/internal-skill-audit
+        entry: scripts/internal-skill-audit
         language: script
         pass_filenames: false
         always_run: true
 
       - id: judgments-lint
         name: judgments-lint
-        entry: tools/bin/judgments-lint
+        entry: scripts/judgments-lint
         language: script
         pass_filenames: false
         always_run: true

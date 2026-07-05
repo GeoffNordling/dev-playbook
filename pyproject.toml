@@ -1,5 +1,63 @@
-# Repo-root config for workspace-wide tooling that resolves from the repo root.
-# Not a Python package — dev-playbook's Python lives in tools/.
+[project]
+name = "dev-playbook"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "pyyaml>=6.0",
+]
 
+# Console scripts so a consumer that installs this package resolves the
+# judgments CLIs on its venv PATH. They wrap the same library entry points the
+# scripts/ pre-commit shims call, so the two channels behave identically.
+[project.scripts]
+judgments-run = "dev_playbook.judgments.runner:run_cli"
+judgments-lint = "dev_playbook.judgments.loader:lint_cli"
+
+# uv's own build backend ships inside the uv binary, so building this package
+# (including the editable build a consumer's `uv sync` runs) needs no network
+# and no PyPI -- the single package is discovered at src/dev_playbook.
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+# Workspace-wide tooling that resolves from the repo root reads this table.
 [tool.judgments]
 paths = ["judgments/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# src/ exposes the dev_playbook package; tests/ carries a bare-imported
+# transcript_fakes helper two suites pull in.
+pythonpath = ["src", "tests"]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.0",
+    "pytest>=9.0",
+    "ruff>=0.15.20",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+# Externally-managed vendored trees; ruff-pre-commit passes --force-exclude so
+# this holds under the hook as well as under `uv run ruff`.
+extend-exclude = ["dotfiles/.agents", "dotfiles/.dhub"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["dev_playbook"]
+
+[tool.mypy]
+python_version = "3.14"
+mypy_path = ["src", "tests"]
+explicit_package_bases = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disable_error_code = ["import-untyped"]

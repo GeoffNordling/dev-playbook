@@ -1,0 +1,744 @@
+#!/usr/bin/env -S uv run --script
+"""Audit a repo's structure against the workspace build standard.
+
+Deterministic checker for the layered build standard; the standard itself —
+layers, skeleton, canonical artifacts — is defined in the standards tree of
+the hook repo, not here. Layer membership is inferred from facts on disk,
+then each layer's requirements are checked: required files present,
+forbidden files absent, working copies matching the canonical artifacts
+shipped with this script's clone, name mapping (repo → project → package),
+doc shape, script shebangs, and — in the hook repo itself — the self-audit
+of the canonical directory and the dogfood hook mirror.
+
+Canonical compares come in four strengths, chosen per artifact by the
+standard: byte-identical files, verbatim line blocks (extra lines may
+surround a block; the hook repo's own `rev` pin is consumer-chosen and
+matches any value), baseline .gitignore patterns (comments and order free),
+and parsed pyproject.toml values (settings the canonical file pins must
+match exactly; additions are free).
+
+Output:
+    stdout — one finding per line, ``path  rule  message``.
+    stderr — one human-readable summary line, including the inferred layers.
+    exit   — 0 clean, 1 findings, 2 cannot run.
+
+Usage:
+    repo-audit [directory]
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import argparse
+import json
+import os
+import re
+import sys
+import tomllib
+from dataclasses import dataclass
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook import gitrepo, md, pyast  # noqa: E402
+
+HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_DIR = HOOK_REPO_ROOT / "standards" / "canonical"
+
+# Every canonical artifact this script compares against. The hook repo's
+# self-audit fails when standards/canonical/ and this manifest drift.
+CANONICAL_MANIFEST = frozenset(
+    {
+        "ci.yml",
+        ".python-version",
+        ".pre-commit-config.yaml",
+        "pyproject.toml",
+        "Makefile.base",
+        "Makefile.python",
+        "Makefile.aws",
+        ".gitignore",
+    }
+)
+
+# The consumer chooses this pin; the block compare accepts any value there.
+REV_PLACEHOLDER = "<pinned-sha>"
+
+BASE_REQUIRED = (
+    "README.md",
+    "CLAUDE.md",
+    "index.md",
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    "Makefile",
+    ".github/workflows/ci.yml",
+)
+MYPY_ROOTS = ("src", "tests", "scripts")
+LOCKFILES = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb")
+# The same two roots internal-skill-audit scans.
+SKILL_ROOTS = (".claude/skills", "dotfiles/dot-claude/skills")
+UV_SHEBANG = "#!/usr/bin/env -S uv run --script"
+PEP723_OPEN = "# /// script"
+CONTEXT_SECTIONS = (
+    "## Language",
+    "## Relationships",
+    "## Example dialogue",
+    "## Flagged ambiguities",
+)
+
+
+class ToolError(Exception):
+    """The audit could not complete its scan."""
+
+
+@dataclass(frozen=True)
+class Finding:
+    path: str
+    rule: str
+    message: str
+
+    def render(self) -> str:
+        return f"{self.path}  {self.rule}  {self.message}"
+
+
+@dataclass(frozen=True)
+class Layers:
+    python: bool
+    src: bool
+    scripts_python: bool
+    aws: bool
+    js: bool
+
+    def names(self) -> list[str]:
+        flags = [
+            ("python", self.python),
+            ("src", self.src),
+            ("scripts", self.scripts_python),
+            ("aws", self.aws),
+            ("js", self.js),
+        ]
+        return ["base"] + [name for name, on in flags if on]
+
+
+def infer_layers(root: Path, python_files: list[Path]) -> Layers:
+    return Layers(
+        python=(root / "pyproject.toml").is_file(),
+        src=(root / "src").is_dir(),
+        scripts_python=any(
+            p.relative_to(root).parts[:1] == ("scripts",) for p in python_files
+        ),
+        aws=(root / "cdk.json").is_file(),
+        js=(root / "package.json").is_file(),
+    )
+
+
+def project_name(repo_name: str) -> str:
+    return repo_name.lower()
+
+
+def package_name(repo_name: str) -> str:
+    return project_name(repo_name).replace("-", "_")
+
+
+def in_canonical(rel: str) -> bool:
+    """True for paths under standards/canonical/ — quoted material, not tree."""
+    return rel.startswith("standards/canonical/")
+
+
+def canonical_text(name: str) -> str:
+    try:
+        return (CANONICAL_DIR / name).read_text(encoding="utf-8")
+    except OSError as err:
+        raise ToolError(f"cannot read canonical artifact: {err}") from err
+
+
+def canonical_raw(name: str) -> bytes:
+    try:
+        return (CANONICAL_DIR / name).read_bytes()
+    except OSError as err:
+        raise ToolError(f"cannot read canonical artifact: {err}") from err
+
+
+# --- verbatim line-block compares (.pre-commit-config.yaml, Makefile) ---
+
+
+def line_matches(canon: str, actual: str) -> bool:
+    canon, actual = canon.rstrip(), actual.rstrip()
+    if REV_PLACEHOLDER in canon:
+        prefix = canon[: canon.index(REV_PLACEHOLDER)]
+        return actual.startswith(prefix) and bool(actual[len(prefix) :].strip())
+    return canon == actual
+
+
+def find_run(consumer: list[str], block: list[str], start: int) -> int | None:
+    """Index of the first contiguous run matching ``block`` at or after start."""
+    n = len(block)
+    for i in range(start, len(consumer) - n + 1):
+        if all(line_matches(block[j], consumer[i + j]) for j in range(n)):
+            return i
+    return None
+
+
+def config_segments(text: str) -> list[list[str]]:
+    """Split the canonical pre-commit config at each repo entry.
+
+    Consumers may append hooks inside a block and whole repo blocks between
+    blocks; each canonical segment must still appear verbatim, in order.
+    """
+    segments: list[list[str]] = []
+    current: list[str] = []
+    for line in text.splitlines():
+        if line.startswith("  - repo:") and current:
+            segments.append(current)
+            current = []
+        current.append(line)
+    if current:
+        segments.append(current)
+    return segments
+
+
+def check_precommit_config(root: Path, self_mode: bool) -> list[Finding]:
+    path = root / ".pre-commit-config.yaml"
+    if not path.is_file():
+        return []
+    consumer = path.read_text(encoding="utf-8").splitlines()
+    findings = []
+    pos = 0
+    for segment in config_segments(canonical_text(".pre-commit-config.yaml")):
+        if self_mode and any(REV_PLACEHOLDER in line for line in segment):
+            # The hook repo dogfoods from its working tree instead of a pin;
+            # the self-audit checks the dogfood block against the manifest.
+            continue
+        found = find_run(consumer, segment, pos)
+        if found is None:
+            findings.append(
+                Finding(
+                    ".pre-commit-config.yaml",
+                    "canonical-block",
+                    f"canonical block missing or out of order: '{segment[0].strip()}'",
+                )
+            )
+        else:
+            pos = found + len(segment)
+    return findings
+
+
+def check_makefile(root: Path, layers: Layers, python_files: list[Path]) -> list[Finding]:
+    path = root / "Makefile"
+    if not path.is_file():
+        return []
+    consumer = path.read_text(encoding="utf-8").splitlines()
+    fragments = ["Makefile.python" if layers.python else "Makefile.base"]
+    if layers.aws:
+        fragments.append("Makefile.aws")
+    findings = []
+    for name in fragments:
+        text = canonical_text(name)
+        if name == "Makefile.python":
+            # mypy exits 2 on a directory holding no .py files (extensionless
+            # scripts don't count), so a root earns its <code-roots> slot only
+            # when it actually contains one.
+            py_dirs = {
+                p.relative_to(root).parts[0] for p in python_files if p.suffix == ".py"
+            }
+            roots = " ".join(r for r in MYPY_ROOTS if r in py_dirs)
+            text = text.replace("<code-roots>", roots)
+        if find_run(consumer, text.splitlines(), 0) is None:
+            findings.append(
+                Finding(
+                    "Makefile",
+                    "canonical-block",
+                    f"canonical {name} targets missing (verbatim; extras may follow)",
+                )
+            )
+    return findings
+
+
+# --- presence, forbidden, byte compares ---
+
+
+def check_presence(
+    root: Path, layers: Layers, files: list[str], tracked: set[str]
+) -> list[Finding]:
+    findings = []
+    for rel in BASE_REQUIRED:
+        if not (root / rel).is_file():
+            findings.append(Finding(rel, "required-file", "required in every repo"))
+    if layers.python:
+        if not (root / ".python-version").is_file():
+            findings.append(
+                Finding(".python-version", "required-file", "required in a python repo")
+            )
+        if "uv.lock" not in tracked:
+            findings.append(
+                Finding("uv.lock", "required-file", "must be committed in a python repo")
+            )
+    if (layers.src or layers.scripts_python) and not any(
+        rel.startswith("tests/") for rel in files
+    ):
+        findings.append(
+            Finding(
+                "tests/",
+                "required-file",
+                "required once src/ exists or scripts/ holds Python",
+            )
+        )
+    if layers.js and not any(name in tracked for name in LOCKFILES):
+        findings.append(
+            Finding(
+                "package.json",
+                "required-file",
+                "a committed lockfile must sit alongside package.json",
+            )
+        )
+    if layers.aws and not layers.src:
+        findings.append(Finding("cdk.json", "layer-shape", "the aws layer requires src/"))
+    return findings
+
+
+def check_forbidden(
+    root: Path, layers: Layers, files: list[str], tracked: set[str]
+) -> list[Finding]:
+    findings = []
+    for name in ("bin", "tools"):
+        if (root / name).is_dir():
+            findings.append(
+                Finding(
+                    f"{name}/",
+                    "forbidden",
+                    "checked-in runnables live in scripts/, not a root bin/ or tools/",
+                )
+            )
+    for rel in files:
+        if in_canonical(rel):
+            continue
+        base = Path(rel).name
+        if base == "requirements.txt":
+            findings.append(
+                Finding(rel, "forbidden", "dependencies live in pyproject.toml + uv.lock")
+            )
+        elif base == "pyproject.toml" and rel != "pyproject.toml":
+            findings.append(
+                Finding(rel, "forbidden", "one Python project per repo, at the root")
+            )
+        elif base == "CONTEXT.md" and rel != "CONTEXT.md":
+            findings.append(
+                Finding(rel, "forbidden", "CONTEXT.md lives at the repo root only")
+            )
+    if layers.aws:
+        if (root / "app.py").is_file():
+            findings.append(
+                Finding(
+                    "app.py",
+                    "forbidden",
+                    "the CDK entry is src/<package>/app.py, not a root app.py",
+                )
+            )
+        if any(rel.startswith("cdk.out/") for rel in tracked):
+            findings.append(
+                Finding("cdk.out/", "forbidden", "synth output is gitignored, never committed")
+            )
+    return findings
+
+
+def check_canonical_bytes(root: Path) -> list[Finding]:
+    findings = []
+    pairs = ((".github/workflows/ci.yml", "ci.yml"), (".python-version", ".python-version"))
+    for rel, canon in pairs:
+        path = root / rel
+        if path.is_file() and path.read_bytes() != canonical_raw(canon):
+            findings.append(
+                Finding(rel, "canonical-bytes", f"must be byte-identical to the canonical {canon}")
+            )
+    return findings
+
+
+def gitignore_patterns(text: str) -> list[str]:
+    lines = (line.strip() for line in text.splitlines())
+    return [line for line in lines if line and not line.startswith("#")]
+
+
+def check_gitignore(root: Path) -> list[Finding]:
+    path = root / ".gitignore"
+    if not path.is_file():
+        return []
+    have = set(gitignore_patterns(path.read_text(encoding="utf-8")))
+    return [
+        Finding(".gitignore", "canonical-block", f"missing baseline pattern '{pattern}'")
+        for pattern in gitignore_patterns(canonical_text(".gitignore"))
+        if pattern not in have
+    ]
+
+
+# --- pyproject.toml: pinned values, parsed ---
+
+
+def toml_get(data: dict, dotted: str) -> object | None:
+    current: object = data
+    for key in dotted.split("."):
+        if not isinstance(current, dict) or key not in current:
+            return None
+        current = current[key]
+    return current
+
+
+def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]:
+    path = root / "pyproject.toml"
+    if not layers.python or not path.is_file():
+        return []
+    try:
+        consumer = tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as err:
+        return [Finding("pyproject.toml", "canonical-value", f"does not parse: {err}")]
+    canon = tomllib.loads(canonical_text("pyproject.toml"))
+    findings = []
+
+    def pin(dotted: str, expected: object) -> None:
+        actual = toml_get(consumer, dotted)
+        if actual != expected:
+            findings.append(
+                Finding(
+                    "pyproject.toml",
+                    "canonical-value",
+                    f"{dotted} must be {expected!r}, got {actual!r}",
+                )
+            )
+
+    pin("project.name", project_name(repo_name))
+    pin("project.requires-python", toml_get(canon, "project.requires-python"))
+    pin(
+        "tool.pytest.ini_options.testpaths",
+        toml_get(canon, "tool.pytest.ini_options.testpaths"),
+    )
+    pin("tool.ruff.target-version", toml_get(canon, "tool.ruff.target-version"))
+    pin("tool.ruff.line-length", toml_get(canon, "tool.ruff.line-length"))
+    pin("tool.ruff.lint.select", toml_get(canon, "tool.ruff.lint.select"))
+    pin("tool.ruff.lint.ignore", toml_get(canon, "tool.ruff.lint.ignore"))
+    pin("tool.ruff.lint.isort.known-first-party", [package_name(repo_name)])
+    mypy = toml_get(canon, "tool.mypy")
+    assert isinstance(mypy, dict)
+    for key, expected in mypy.items():
+        pin(f"tool.mypy.{key}", expected)
+
+    floors = toml_get(canon, "dependency-groups.dev")
+    assert isinstance(floors, list)
+    dev = toml_get(consumer, "dependency-groups.dev")
+    dev = dev if isinstance(dev, list) else []
+    for floor in floors:
+        if floor not in dev:
+            findings.append(
+                Finding(
+                    "pyproject.toml",
+                    "canonical-value",
+                    f"dependency-groups.dev must contain {floor!r}",
+                )
+            )
+
+    if layers.src:
+        build = toml_get(canon, "build-system")
+        assert isinstance(build, dict)
+        for key, expected in build.items():
+            pin(f"build-system.{key}", expected)
+    else:
+        if toml_get(consumer, "build-system") is not None:
+            findings.append(
+                Finding(
+                    "pyproject.toml",
+                    "canonical-value",
+                    "a scripts-only repo (no src/) omits [build-system]",
+                )
+            )
+        pin("tool.uv.package", False)
+    return findings
+
+
+# --- name mapping, cdk, docs, scripts, skills ---
+
+
+def check_src_package(
+    root: Path, layers: Layers, files: list[str], repo_name: str
+) -> list[Finding]:
+    if not layers.src:
+        return []
+    pkg = package_name(repo_name)
+    children = {
+        Path(rel).parts[1]
+        for rel in files
+        if rel.startswith("src/") and len(Path(rel).parts) > 1
+    }
+    findings = []
+    for extra in sorted(children - {pkg}):
+        findings.append(
+            Finding(
+                f"src/{extra}",
+                "name-mapping",
+                f"src/ holds exactly one package, named '{pkg}'",
+            )
+        )
+    if pkg not in children:
+        findings.append(
+            Finding(
+                f"src/{pkg}/",
+                "name-mapping",
+                f"src/ holds exactly one package, named '{pkg}'",
+            )
+        )
+    if layers.aws and not (root / "src" / pkg / "app.py").is_file():
+        findings.append(
+            Finding(f"src/{pkg}/app.py", "required-file", "the aws layer's CDK entry")
+        )
+    return findings
+
+
+def check_cdk(root: Path, layers: Layers, repo_name: str) -> list[Finding]:
+    if not layers.aws:
+        return []
+    expected = f"uv run python -m {package_name(repo_name)}.app"
+    try:
+        data = json.loads((root / "cdk.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as err:
+        return [Finding("cdk.json", "canonical-value", f"does not parse: {err}")]
+    actual = data.get("app")
+    if actual != expected:
+        return [
+            Finding("cdk.json", "canonical-value", f"app must be {expected!r}, got {actual!r}")
+        ]
+    return []
+
+
+def body_lines(path: Path) -> list[str]:
+    """A doc's lines outside frontmatter and fenced code, right-stripped."""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if text.startswith("---\n"):
+        end = text.find("\n---\n", 4)
+        if end != -1:
+            text = text[end + 5 :]
+    return [line.rstrip() for _, line in md.lines_outside_fences(text)]
+
+
+def check_doc_shapes(root: Path) -> list[Finding]:
+    findings = []
+    readme = root / "README.md"
+    if readme.is_file() and not any(
+        re.match(r"^# +\S", line) for line in body_lines(readme)
+    ):
+        findings.append(Finding("README.md", "doc-shape", "missing an H1 title"))
+    claude = root / "CLAUDE.md"
+    if claude.is_file() and "## Build" not in body_lines(claude):
+        findings.append(
+            Finding("CLAUDE.md", "doc-shape", "missing the universal '## Build' section")
+        )
+    context = root / "CONTEXT.md"
+    if context.is_file():
+        lines = body_lines(context)
+        findings.extend(
+            Finding("CONTEXT.md", "doc-shape", f"missing section '{section}'")
+            for section in CONTEXT_SECTIONS
+            if section not in lines
+        )
+    return findings
+
+
+def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[Finding]:
+    if not layers.scripts_python:
+        return []
+    # Each script's PEP 723 floor must equal the repo's interpreter pin; with
+    # no .python-version yet there is nothing to compare against (its absence
+    # is already a presence finding in a python repo).
+    pin = root / ".python-version"
+    floor = f">={pin.read_text(encoding='utf-8').strip()}" if pin.is_file() else None
+    findings = []
+    for path in python_files:
+        rel = path.relative_to(root)
+        if rel.parts[:1] != ("scripts",) or not os.access(path, os.X_OK):
+            continue
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        if not lines or lines[0].rstrip() != UV_SHEBANG:
+            findings.append(
+                Finding(
+                    str(rel),
+                    "script-shebang",
+                    f"executable Python in scripts/ opens with '{UV_SHEBANG}'",
+                )
+            )
+        if not any(line.strip() == PEP723_OPEN for line in lines):
+            findings.append(
+                Finding(
+                    str(rel),
+                    "script-shebang",
+                    f"missing PEP 723 inline metadata block ('{PEP723_OPEN}')",
+                )
+            )
+        elif floor is not None:
+            declared = next(
+                (
+                    m.group(1)
+                    for line in lines
+                    if (m := re.match(r'#\s*requires-python\s*=\s*"([^"]*)"', line.strip()))
+                ),
+                None,
+            )
+            if declared != floor:
+                findings.append(
+                    Finding(
+                        str(rel),
+                        "script-python",
+                        f'PEP 723 requires-python must be "{floor}"'
+                        " (the repo's .python-version floor)",
+                    )
+                )
+    return findings
+
+
+def hook_ids(config_text: str) -> list[tuple[str | None, str]]:
+    """(repo, id) for each hook reference in a pre-commit config."""
+    pairs: list[tuple[str | None, str]] = []
+    current: str | None = None
+    for line in config_text.splitlines():
+        repo = re.match(r"^\s*-\s*repo:\s*(\S+)", line)
+        if repo:
+            current = repo.group(1)
+            continue
+        hook = re.match(r"^\s*-\s*id:\s*(\S+)", line)
+        if hook:
+            pairs.append((current, hook.group(1)))
+    return pairs
+
+
+def check_skills_hook(root: Path) -> list[Finding]:
+    if not any((root / skill_root).is_dir() for skill_root in SKILL_ROOTS):
+        return []
+    config = root / ".pre-commit-config.yaml"
+    if not config.is_file():
+        return []
+    ids = {hook for _, hook in hook_ids(config.read_text(encoding="utf-8"))}
+    if "internal-skill-audit" in ids:
+        return []
+    return [
+        Finding(
+            ".pre-commit-config.yaml",
+            "skills-hook",
+            "this repo authors skills: append the internal-skill-audit hook",
+        )
+    ]
+
+
+# --- hook-repo self-audit ---
+
+
+def check_self(root: Path) -> list[Finding]:
+    findings = []
+    canon_dir = root / "standards" / "canonical"
+    present = (
+        {p.name for p in canon_dir.iterdir() if p.is_file()}
+        if canon_dir.is_dir()
+        else set()
+    )
+    for name in sorted(present - CANONICAL_MANIFEST):
+        findings.append(
+            Finding(
+                f"standards/canonical/{name}",
+                "self-audit",
+                "no repo-audit compare covers this canonical artifact",
+            )
+        )
+    for name in sorted(CANONICAL_MANIFEST - present):
+        findings.append(
+            Finding(
+                f"standards/canonical/{name}",
+                "self-audit",
+                "canonical artifact missing from standards/canonical/",
+            )
+        )
+    manifest = root / ".pre-commit-hooks.yaml"
+    published = {
+        m.group(1)
+        for m in re.finditer(r"^- +id:\s*(\S+)", manifest.read_text(encoding="utf-8"), re.M)
+    }
+    config = root / ".pre-commit-config.yaml"
+    local = (
+        {hook for repo, hook in hook_ids(config.read_text(encoding="utf-8")) if repo == "local"}
+        if config.is_file()
+        else set()
+    )
+    # Subset, not equality: every published hook must be dogfooded, while
+    # local-only hooks (make-check, validate-manifest) are free additions.
+    missing = published - local
+    if missing:
+        findings.append(
+            Finding(
+                ".pre-commit-config.yaml",
+                "self-audit",
+                f"dogfood local hooks must cover the published manifest "
+                f"(missing: {', '.join(sorted(missing))})",
+            )
+        )
+    return findings
+
+
+def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
+    files = gitrepo.git_files(root)
+    tracked = set(gitrepo.git_files(root, tracked_only=True))
+    python_files = pyast.find_python_files(root)
+    layers = infer_layers(root, python_files)
+    self_mode = (root / ".pre-commit-hooks.yaml").is_file()
+
+    findings = [
+        *check_presence(root, layers, files, tracked),
+        *check_forbidden(root, layers, files, tracked),
+        *check_canonical_bytes(root),
+        *check_gitignore(root),
+        *check_precommit_config(root, self_mode),
+        *check_makefile(root, layers, python_files),
+        *check_pyproject(root, layers, repo_name),
+        *check_src_package(root, layers, files, repo_name),
+        *check_cdk(root, layers, repo_name),
+        *check_doc_shapes(root),
+        *check_scripts(root, layers, python_files),
+        *check_skills_hook(root),
+    ]
+    if self_mode:
+        findings += check_self(root)
+    return findings, layers
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="repo-audit",
+        description="Audit a repo's structure against the workspace build standard.",
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="repository root to audit (default: current directory)",
+    )
+    args = parser.parse_args(argv)
+    root = Path(args.directory).resolve()
+
+    try:
+        repo_name = gitrepo.canonical_repo_name(root)
+    except gitrepo.NotAGitRepository:
+        print(f"repo-audit: not a git repository: {root}", file=sys.stderr)
+        return 2
+    try:
+        findings, layers = audit(root, repo_name)
+    except ToolError as err:
+        print(f"repo-audit: {err}", file=sys.stderr)
+        return 2
+
+    for finding in sorted(findings, key=lambda f: (f.path, f.rule, f.message)):
+        print(finding.render())
+
+    layer_list = ", ".join(layers.names())
+    if findings:
+        print(
+            f"repo-audit: {len(findings)} finding(s) (layers: {layer_list})",
+            file=sys.stderr,
+        )
+        return 1
+    print(f"repo-audit: clean (layers: {layer_list})", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

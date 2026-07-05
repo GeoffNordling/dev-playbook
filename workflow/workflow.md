@@ -21,7 +21,7 @@ Issue **relationships** â€” hierarchy (sub-issues) and dependency (blocked-by) â
 
 ### Valid labels
 
-[bootstrap-labels](/tools/bin/bootstrap-labels) mints exactly these. Six fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
+[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Six fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
 
 | Dimension | Label | Meaning |
 |---|---|---|

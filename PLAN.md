@@ -67,10 +67,33 @@ last.
   `# shellcheck shell=bash` directive line), SC2207 in worktree.sh:32
   (unquoted compgen split in COMPREPLY). sync-dotfiles.sh and
   standards/agentic-box/templates/greenfield-cli/box/gate.sh are clean.
+- Task 1 landed: `tools/` is gone. Package is `src/dev_playbook/` (lib files
+  flattened to the package root: md/pyast/gitrepo; judgments/, skipcache/,
+  transcript_export/ as subpackages). 11 executables + README.md + index.md
+  in `scripts/`; 26 files in `tests/`. One root `pyproject.toml` (project
+  `dev-playbook`, package `dev_playbook`), root `Makefile`, root `uv.lock`.
+  Scripts insert `parents[1] / "src"` on sys.path; sweep/repo-audit use
+  `HOOK_REPO_ROOT = parents[1]`. `uv sync` builds the editable install.
+- Post-move `scripts/repo-audit` = 14 findings; 12 map cleanly to later
+  tasks — ci.yml bytes + .python-version (task 2); CLAUDE.md `## Build` +
+  CONTEXT.md `## Example dialogue`/`## Flagged ambiguities` (task 4);
+  Makefile deselect deviation (task 5); pre-commit canonical blocks x4 +
+  self-audit "repo-audit missing from dogfood" (task 6). The `uv.lock`
+  required-file finding is only because the new lockfile is untracked at
+  audit time; it clears once committed.
+- SURPRISE not in task 1's predicted list: `scripts/python-lint` and
+  `scripts/ref-check` open with `#!/usr/bin/env python3` (both are
+  pure-stdlib with no PEP 723 deps), so check_scripts' `script-shebang`
+  rule flags them now that they live in `scripts/`. TASK 6 must resolve:
+  either convert both to `#!/usr/bin/env -S uv run --script` + an empty
+  PEP 723 block (they run dependency-free, so this is low-risk — note
+  test_ref_check invokes ref-check via `python3` explicitly, which still
+  works), or carve out a std-lib-script exception in the standard/audit.
+  Do NOT change their shebangs before task 6.
 
 ## Tasks
 
-- [ ] 1. The move: consolidate `tools/` into the standard layout
+- [x] 1. The move: consolidate `tools/` into the standard layout
 - [ ] 2. Canonical ci.yml and .python-version
 - [ ] 3. Rewrite scripts/README.md
 - [ ] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
