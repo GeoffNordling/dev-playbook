@@ -32,9 +32,9 @@ only a pinned pointer.
 
 A change to the standard — hook code, canonical artifact, version pin —
 reaches a consumer only when the consumer's pinned `rev` moves
-(`pre-commit autoupdate`). **A standard change is complete only when every
-repo's pin is current**: the sweep across all repos is part of the change,
-same-day and agent-driven, not a someday follow-up. Staleness is
-self-enforcing — `repo-audit` compares the `rev` in the consumer's config
-against the revision of the clone it is running from, so a stale pin is red
-at the next commit, in every `make check`, and in CI.
+(`pre-commit autoupdate`). A stale pin is not an error: the consumer keeps
+running the standard as of its pin and catches up when the pin is bumped.
+Staleness is detected on demand — the sweep
+([enforcement.md](/standards/build/enforcement.md)) compares each consumer's
+pinned `rev` against dev-playbook's current `main` — never by a commit
+hook.

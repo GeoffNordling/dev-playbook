@@ -25,7 +25,7 @@ BASE_BUNDLE: dict[str, str] = {
         "---\ntype: README\ntitle: Standards\ndescription: Standards desc\n---\n\n"
         "# Standards\n"
     ),
-    "standards/document-types.md": (
+    "standards/docs/document-types.md": (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
@@ -36,7 +36,7 @@ BASE_BUNDLE: dict[str, str] = {
     "standards/index.md": (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
     ),
 }
 
@@ -124,7 +124,7 @@ def test_recipe_description_requires_resource(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
         "- [Ralph](/standards/ralph.md) — A loop\n"
     )
     repo = make_bundle(
@@ -147,7 +147,7 @@ def test_index_omitting_a_concept_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "omits concept doc standards/document-types.md" in result.stdout
+    assert "omits concept doc standards/docs/document-types.md" in result.stdout
 
 
 def test_index_listing_missing_file_is_flagged(tmp_path: Path) -> None:
@@ -165,7 +165,7 @@ def test_index_description_drift_is_flagged(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — WRONG description\n"
-        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
@@ -230,7 +230,7 @@ def test_index_listing_non_concept_target_is_flagged(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
         "- [Rules](/standards/rules/naming.md) — not a concept doc\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
@@ -249,7 +249,7 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Dupe](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 

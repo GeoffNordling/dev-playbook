@@ -4,9 +4,9 @@
 Two checks over one walk of the bundle:
 
   - **Type-lint** — every concept document carries frontmatter with a `type`
-    drawn from the registry in standards/document-types.md, plus `title` and
+    drawn from the registry document (`REGISTRY_DOC` below), plus `title` and
     `description`. `resource` is optional in general and required on a
-    `Recipe Description`. The registry is parsed from the document-types.md
+    `Recipe Description`. The registry is parsed from the registry document's
     `## Types` table, so that document is the single source of truth.
 
   - **Index-staleness** — every `index.md` lists exactly the concept documents
@@ -14,8 +14,8 @@ Two checks over one walk of the bundle:
     its directory), each with a `description` matching the child's frontmatter,
     and links each child directory's own `index.md`. A directory with no
     `index.md` is absorbed into its nearest ancestor index. The repository root
-    `index.md` additionally declares `okf_version`. See
-    standards/repo-documentation.md "index.md" and "The OKF bundle".
+    `index.md` additionally declares `okf_version`. The prose standard for
+    these rules lives in this repo's standards/ tree.
 
 The concept-document/harness-owned split comes from lib/md.classify. This hook
 asserts unconditionally and fails loud — there is no applicability skip.
@@ -46,7 +46,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from lib import md  # noqa: E402
 
-REGISTRY_DOC = "standards/document-types.md"
+REGISTRY_DOC = "standards/docs/document-types.md"
 RESOURCE_REQUIRED_TYPES = {"Recipe Description"}
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # An index bullet: `- [Title](/root-absolute) — description`. The description
@@ -74,7 +74,7 @@ class Finding:
 
 
 def parse_registry(repo_root: Path) -> set[str]:
-    """Parse the allowed concept-document types from document-types.md.
+    """Parse the allowed concept-document types from the registry document.
 
     Reads the backticked name in the first column of every row of the
     `## Types` table. Raises ToolError if the document or table is absent.

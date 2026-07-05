@@ -41,7 +41,7 @@ Run automatically on every commit via pre-commit hooks. Each script exits 0 on s
 |--------|----------|---------|
 | `python-lint` | [python-conventions.md](/standards/python-conventions.md), [testing-conventions.md](/standards/testing-conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
 | `ref-check` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
-| `okf-lint` | [document-types.md](/standards/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
+| `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `internal-skill-audit` | [skill-conventions.md](/standards/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 

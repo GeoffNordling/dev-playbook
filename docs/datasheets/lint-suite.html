@@ -128,7 +128,7 @@ generator: claude-sonnet-5
 
   <section class="card">
     <h2>Touch surface</h2>
-    <div class="cell"><span class="k">Reads</span> tracked/untracked files via <code>git ls-files</code> — .md (okf-lint, ref-check), .py/shebang (python-lint), <code>SKILL.md</code> under two skill roots (internal-skill-audit); <code>standards/document-types.md</code> as okf-lint's type registry</div>
+    <div class="cell"><span class="k">Reads</span> tracked/untracked files via <code>git ls-files</code> — .md (okf-lint, ref-check), .py/shebang (python-lint), <code>SKILL.md</code> under two skill roots (internal-skill-audit); <code>standards/docs/document-types.md</code> as okf-lint's type registry</div>
     <div class="cell"><span class="k">Writes</span> stdout — one finding per line (JSON Lines for ref-check); stderr — one summary line; nothing to disk</div>
     <div class="cell"><span class="k">Spawns</span> <code>git ls-files</code> (discovery); <code>git rev-parse --git-common-dir</code> (ref-check's worktree-name resolution)</div>
     <div class="cell"><span class="k">Net</span> <span class="none">none</span></div>

@@ -28,7 +28,7 @@ Not every file in the repo is a concept document. The bundle divides in two:
 - **Concept documents** — prose knowledge a reader loads to *understand*
   something: standards, guides, surveys, ADRs, READMEs, the domain
   vocabulary. Each carries OKF frontmatter (`type` + `title` +
-  `description`, per [document-types.md](/standards/document-types.md)) and
+  `description`, per [document-types.md](/standards/docs/document-types.md)) and
   is subject to the type-lint.
 - **Harness-owned files** — files a tool *consumes as configuration or runs
   as code*, not prose a reader loads to learn: `CLAUDE.md`, skill `SKILL.md`

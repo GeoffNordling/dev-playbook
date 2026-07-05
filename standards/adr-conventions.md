@@ -50,7 +50,7 @@ description: {One-line summary of the decision, for triage and the index}
 
 That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
-An ADR is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/document-types.md)). The `description` is the ADR's triage line and feeds `docs/adr/index.md`; on a one-sentence ADR it will echo the body — that's fine, the description is the triage surface and the body is the record.
+An ADR is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/docs/document-types.md)). The `description` is the ADR's triage line and feeds `docs/adr/index.md`; on a one-sentence ADR it will echo the body — that's fine, the description is the triage surface and the body is the record.
 
 ## Optional sections
 

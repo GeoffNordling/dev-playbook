@@ -14,7 +14,7 @@ description: The enforcement map — the venues where checks fire and the tool t
 | push | `git push` | `make check`, via the pre-push-stage hook |
 | agent | before every commit and before opening every PR | `make check` |
 | CI | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
-| sweep | on demand | GitHub settings per [repo-settings.md](/standards/repo-settings.md), via `gh api` |
+| sweep | on demand | GitHub settings per [repo-settings.md](/standards/repo-settings.md) via `gh api`, and stale dev-playbook pins |
 
 `make check` runs **before push and before PR** — stated explicitly even
 though a PR can only contain pushed commits, so the push gate already
@@ -29,7 +29,7 @@ the table lists only what falls outside that pattern.
 
 | Tool | Owns | Venues |
 |---|---|---|
-| repo-audit | structure: presence, canonical bytes, forbidden files, layer shape, pin freshness | hook pattern |
+| repo-audit | structure: presence, canonical bytes, forbidden files, layer shape | hook pattern |
 | ruff-check / ruff-format | Python lint + formatting | hook pattern, plus `lint`/`format-check` targets |
 | python-lint | workspace Python-source rules | hook pattern |
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
@@ -39,4 +39,4 @@ the table lists only what falls outside that pattern.
 | internal-skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | `make check` only — never CI |
 | pytest | tests + judgments stage-1 cache gate | `make check` only — never CI |
-| `gh api` sweep | GitHub settings ([repo-settings.md](/standards/repo-settings.md)) | sweep |
+| `gh api` sweep | GitHub settings ([repo-settings.md](/standards/repo-settings.md)), stale pins | sweep |
