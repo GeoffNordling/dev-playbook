@@ -1,5 +1,22 @@
 # dev-playbook
 
+## Build
+
+The repo carries Python tooling — the published pre-commit hook scripts and the
+workspace CLIs — laid out per the [build standard](/standards/build/index.md):
+the importable package is `src/dev_playbook/`, executables live in `scripts/`,
+and tests in `tests/`, over a single root `pyproject.toml`.
+
+- **`make check`** is the gate — format-check, lint, typecheck, and test, then
+  the full pre-commit suite (`uvx pre-commit run --all-files`). Green `check`
+  means the repo passes everything it can verify locally.
+- Stages run alone: `make format` (mutating), `make lint` (ruff),
+  `make typecheck` (mypy over `src tests`), `make test` (pytest).
+- **uv** owns the environment: `uv sync` builds the editable install of
+  `dev_playbook`; run tools through `uv run …` so they use the project venv.
+- Run one file or case: `uv run pytest tests/test_md.py::TestGithubSlug` (or
+  narrow with `-k <expr>`).
+
 ## Rules
 
 - See README.md for what belongs in this repo vs. other repos.

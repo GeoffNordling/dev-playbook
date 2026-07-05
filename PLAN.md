@@ -102,6 +102,17 @@ last.
   scripts/README.md describes the manifest `entry:` mechanism generically rather
   than quoting a path, so it is accurate under either the current (stale) or the
   eventual (scripts/) manifest.
+- Task 4 landed: added `## Build` to CLAUDE.md (placed right after the H1, so a
+  cold-landing agent hits build mechanics before the project-specific `## Rules`;
+  no OKF frontmatter, it's harness-owned) and added `## Example dialogue` +
+  `## Flagged ambiguities` to CONTEXT.md (inserted after `## Relationships`, before
+  the pre-existing extra `## Rejected framings`, to match the standard's section
+  order). The doc-shape audit (repo-audit `check_doc_shapes`) only tests for the
+  exact heading strings as lines outside frontmatter/fences — content is not
+  inspected — but the sections were written for real. repo-audit dropped 11→8: the
+  8 remaining are Makefile canonical-block (task 5) + pre-commit canonical-block ×4
+  / self-audit / script-shebang ×2 (task 6). `make check` green (405 pass, 2
+  deselected).
 - Task 2 landed: `.github/workflows/ci.yml` and root `.python-version` are now
   byte-identical to their canonical artifacts (verified with `cmp`). repo-audit
   dropped to 11 findings (from 14 post-task-1: -ci.yml, -.python-version, and
@@ -118,7 +129,7 @@ last.
 - [x] 1. The move: consolidate `tools/` into the standard layout
 - [x] 2. Canonical ci.yml and .python-version
 - [x] 3. Rewrite scripts/README.md
-- [ ] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
+- [x] 4. CLAUDE.md `## Build`; CONTEXT.md missing sections
 - [ ] 5. Judgments: declare two new judgments, fill the cache, full pytest green
 - [ ] 6. Canonical .gitignore + .pre-commit-config.yaml; wire enforcement; repo-audit exit 0
 
