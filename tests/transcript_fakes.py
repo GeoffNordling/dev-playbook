@@ -139,7 +139,10 @@ def fake_daemon(sessions: dict[str, dict]) -> Callable:
         )
 
     def runner(args: list[str], **kwargs: object) -> object:
-        cmd, sid = args[2], args[3]
+        # Locate the subcommand relative to "session" so the fake is agnostic to
+        # leading global flags (e.g. the injected `--server <url>`).
+        base = args.index("session")
+        cmd, sid = args[base + 1], args[base + 2]
         entry = sessions[sid]
         if cmd == "get":
             return completed(json.dumps(entry["meta"]))
