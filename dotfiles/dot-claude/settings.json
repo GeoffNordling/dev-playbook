@@ -49,7 +49,7 @@
       "Bash(gh pr unlock *)"
     ]
   },
-  "model": "sonnet",
+  "model": "claude-fable-5[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "Stop": [
@@ -81,6 +81,9 @@
   "workflowKeywordTriggerEnabled": false,
   "sandbox": {
     "enabled": true,
+    "network": {
+        "allowedDomains": ["127.0.0.1"]
+      },
     "filesystem": {
       "allowWrite": [
         "~/workspace",
