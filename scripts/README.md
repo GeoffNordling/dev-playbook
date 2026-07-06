@@ -57,7 +57,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | Script | Standard | Purpose |
 |--------|----------|---------|
 | `repo-audit` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
-| `python-lint` | [python-conventions.md](/standards/python-conventions.md), [testing-conventions.md](/standards/testing-conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
+| `python-lint` | [python-style.md](/standards/python-style.md), [testing-conventions.md](/standards/testing-conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
 | `ref-check` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `internal-skill-audit` | [skill-conventions.md](/standards/skill-conventions.md) | Skill conformance |

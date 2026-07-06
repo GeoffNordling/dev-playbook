@@ -36,11 +36,11 @@ Read the change as a whole — the brief and the change together — against the
 
 **Know your cycle first.** The cycle number is the count of prior `## Code review — …` comments on the PR, plus one. Cycles 1 and 2 are full reviews across the dimensions below. From cycle 3 on, the review is a lockdown: its sole job is verifying the prior review's Blocking findings are fixed — don't hunt for new findings, though anything you notice incidentally still gets reported.
 
-**When the change includes code** — read [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) and [python conventions](~/workspace/dev-playbook/standards/python-conventions.md) first; the build agent saw neither, so enforcing them is yours alone:
+**When the change includes code** — read [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) and [python style](~/workspace/dev-playbook/standards/python-style.md) first; the build agent saw neither, so enforcing them is yours alone:
 
 - **Brief fidelity.** Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
 - **Testing conventions.** Where the change includes tests, they conform to testing-conventions.md — structure, naming, behavioral focus.
-- **Python conventions.** The code conforms to python-conventions.md — docstrings, fail-loudly, annotation style.
+- **Python style.** The code conforms to python-style.md — docstrings, fail-loudly, annotation style.
 - **Code quality.** Deep modules behind small surfaces, clear naming, no dead code or needless duplication — the engineering judgment the standards don't spell out.
 
 **When the change is docs or text only** — read [documentation conventions](~/workspace/dev-playbook/standards/doc-conventions.md) first:

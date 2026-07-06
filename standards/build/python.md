@@ -12,7 +12,7 @@ multiple projects uses a
 [uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) — one root
 `uv.lock`, members declared in the root `pyproject.toml` — and amends this
 standard first. Code-level conventions live in
-[python-conventions.md](/standards/python-conventions.md); pytest
+[python-style.md](/standards/python-style.md); pytest
 conventions in [testing-conventions.md](/standards/testing-conventions.md).
 
 ## Name mapping

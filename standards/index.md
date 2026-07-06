@@ -7,7 +7,7 @@
 - [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Issue Conventions](/standards/issue-conventions.md) — GitHub issue body format — the body as agent brief, vertical-slice decomposition, blocked-by and sub-issue relationships
 - [Module Design](/standards/module-design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
-- [Python Conventions](/standards/python-conventions.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
+- [Python Style](/standards/python-style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
 - [Repository Settings](/standards/repo-settings.md) — GitHub repository settings every repo should have — squash-only merges, PR message format, auto-deleted merged branches
 - [Skill Conventions](/standards/skill-conventions.md) — Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
 - [Skill Management](/standards/skill-management.md) — Where skills live, how third-party skills are installed, and the mirror rule between authored and installed

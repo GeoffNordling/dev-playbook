@@ -1,10 +1,10 @@
 ---
 type: Standard
-title: Python Conventions
+title: Python Style
 description: Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
 ---
 
-# Python Conventions
+# Python Style
 
 Default Python conventions for projects in this workspace. Individual
 projects may supercede.
