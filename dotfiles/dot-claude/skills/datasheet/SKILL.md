@@ -54,7 +54,7 @@ in scope:
 
 ```
 mkdir -p .datasheet && printf '*\n' > .datasheet/.gitignore
-~/workspace/dev-playbook/tools/bin/griffe-outline <package-path> >> .datasheet/outline.txt
+~/workspace/dev-playbook/scripts/griffe-outline <package-path> >> .datasheet/outline.txt
 ```
 
 If the scope holds no Python package, skip this step.

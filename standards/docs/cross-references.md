@@ -60,7 +60,7 @@ VS Code does not expand `~/` in markdown links, and it resolves a leading
 form is clickable from the editor
 ([vscode#103542](https://github.com/microsoft/vscode/issues/103542)).
 Accepted — agents are the primary audience, and both forms are what the
-`ref-check` linter (`/tools/bin/ref-check`) validates. Anything else —
+`ref-check` linter (`/scripts/ref-check`) validates. Anything else —
 backticked filenames like `` `conftest.py` ``, slash-skill invocations like
 `/commit` — is treated as prose by `ref-check`.
 
@@ -72,7 +72,7 @@ Fenced code blocks delimited by triple backticks or `~~~` may contain
 
 ```bash
 # Run ref-check from any workspace repo:
-python3 ~/workspace/dev-playbook/tools/bin/ref-check .
+~/workspace/dev-playbook/scripts/ref-check .
 ```
 
 ## Fragment anchors
