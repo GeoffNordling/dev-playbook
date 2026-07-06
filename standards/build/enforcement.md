@@ -29,7 +29,7 @@ the table lists only what falls outside that pattern.
 
 | Tool | Owns | Venues |
 |---|---|---|
-| repo-audit | structure: presence, canonical bytes, forbidden files, layer shape | hook pattern |
+| repo-audit | structure: presence, forbidden files, layer shape, canonical compares, doc shape, script shebangs, name mapping | hook pattern |
 | ruff-check / ruff-format | Python lint + formatting | hook pattern, plus `lint`/`format-check` targets |
 | python-lint | workspace Python-source rules | hook pattern |
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |

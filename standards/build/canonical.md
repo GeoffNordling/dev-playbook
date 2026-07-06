@@ -20,8 +20,9 @@ place, and `repo-audit` enforces them equal to the canonical source:
 | [.python-version](/standards/build/canonical/.python-version) | whole file, byte-identical |
 | [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml) | canonical blocks present verbatim; extra hooks may follow |
 | [Makefile.base](/standards/build/canonical/Makefile.base) / [Makefile.python](/standards/build/canonical/Makefile.python) / [Makefile.aws](/standards/build/canonical/Makefile.aws) | the repo's layer-matching targets present verbatim; extra targets may follow |
-| [pyproject.toml](/standards/build/canonical/pyproject.toml) | canonical blocks present verbatim |
+| [pyproject.toml](/standards/build/canonical/pyproject.toml) | pinned values match, parsed from TOML; additions are free |
 | [.gitignore](/standards/build/canonical/.gitignore) | baseline lines present |
+| [CLAUDE.md.standards](/standards/build/canonical/CLAUDE.md.standards) | block present verbatim in the repo's `CLAUDE.md` — [claude-content.md](/standards/claude-code/claude-content.md) |
 
 `standards/build/canonical/` is quoted material: hooks and tree rules skip it —
 its `pyproject.toml` is a template, not a second project. Every file in the

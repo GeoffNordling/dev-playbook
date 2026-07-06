@@ -71,4 +71,5 @@ _Avoid_: Bill, payment request
 
 ## Location
 
-One `CONTEXT.md` at the repo root.
+One `CONTEXT.md` at the repo root, created lazily as terminology ambiguity
+surfaces — never pre-populated.

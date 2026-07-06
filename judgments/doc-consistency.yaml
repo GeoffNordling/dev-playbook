@@ -59,6 +59,7 @@ judgments:
       - standards/build/canonical/Makefile.aws
       - standards/build/canonical/ci.yml
       - standards/build/canonical/pyproject.toml
+      - standards/build/canonical/CLAUDE.md.standards
       - .pre-commit-hooks.yaml
     model: claude-opus-4-8
     effort: high
@@ -116,5 +117,25 @@ judgments:
       - scripts/ref-check
       - judgments/doc-consistency.yaml
       - .pre-commit-config.yaml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-claude-code
+    claim: |
+      standards/claude-code.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the Claude Code harness-files
+      standard, and no cell misrepresents what its targets do.
+    evidence:  [standards/claude-code.md]
+    reference:
+      - standards/standard/format.md
+      - standards/claude-code/files.md
+      - standards/claude-code/claude-content.md
+      - standards/skill-conventions.md
+      - standards/skill-management.md
+      - scripts/repo-audit
+      - scripts/internal-skill-audit
+      - standards/build/canonical/.pre-commit-config.yaml
+      - standards/build/canonical/CLAUDE.md.standards
     model: claude-opus-4-8
     effort: high

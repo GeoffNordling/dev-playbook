@@ -57,6 +57,7 @@ CANONICAL_MANIFEST = frozenset(
         "Makefile.python",
         "Makefile.aws",
         ".gitignore",
+        "CLAUDE.md.standards",
     }
 )
 
@@ -515,6 +516,24 @@ def body_lines(path: Path) -> list[str]:
     return [line.rstrip() for _, line in md.lines_outside_fences(text)]
 
 
+def check_claude_standards(root: Path) -> list[Finding]:
+    path = root / "CLAUDE.md"
+    if not path.is_file():
+        return []
+    consumer = path.read_text(encoding="utf-8").splitlines()
+    block = canonical_text("CLAUDE.md.standards").splitlines()
+    if find_run(consumer, block, 0) is None:
+        return [
+            Finding(
+                "CLAUDE.md",
+                "canonical-block",
+                "canonical '## Standards' block missing"
+                " (verbatim; the CLAUDE.md.standards artifact)",
+            )
+        ]
+    return []
+
+
 def check_doc_shapes(root: Path) -> list[Finding]:
     findings = []
     readme = root / "README.md"
@@ -522,11 +541,6 @@ def check_doc_shapes(root: Path) -> list[Finding]:
         re.match(r"^# +\S", line) for line in body_lines(readme)
     ):
         findings.append(Finding("README.md", "doc-shape", "missing an H1 title"))
-    claude = root / "CLAUDE.md"
-    if claude.is_file() and "## Build" not in body_lines(claude):
-        findings.append(
-            Finding("CLAUDE.md", "doc-shape", "missing the universal '## Build' section")
-        )
     context = root / "CONTEXT.md"
     if context.is_file():
         lines = body_lines(context)
@@ -692,6 +706,7 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_pyproject(root, layers, repo_name),
         *check_src_package(root, layers, files, repo_name),
         *check_cdk(root, layers, repo_name),
+        *check_claude_standards(root),
         *check_doc_shapes(root),
         *check_scripts(root, layers, python_files),
         *check_skills_hook(root),

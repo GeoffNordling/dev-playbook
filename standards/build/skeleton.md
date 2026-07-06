@@ -14,7 +14,7 @@ forbids.
 | Entry | Presence | Rule |
 |---|---|---|
 | `README.md` | Required | content per [readme-content.md](/standards/docs/readme-content.md) |
-| `CLAUDE.md` | Required | content per [claude-content.md](/standards/docs/claude-content.md) |
+| `CLAUDE.md` | Required | content per [claude-content.md](/standards/claude-code/claude-content.md) |
 | `index.md` | Required | at the root; further indexes wherever concept docs live; content per [indexes.md](/standards/docs/indexes.md) |
 | `.gitignore` | Required | contains the canonical baseline lines; `MAY` extend |
 | `.pre-commit-config.yaml` | Required | contains the canonical blocks; `MAY` append further hooks |
@@ -22,8 +22,10 @@ forbids.
 | `.github/workflows/ci.yml` | Required | byte-identical to the canonical thin CI |
 | `scripts/` | Optional | sole home for checked-in runnables, any language; `bin/` and `tools/` are forbidden at the root |
 | `CONTEXT.md` | Optional | root only; content per [context-content.md](/standards/docs/context-content.md) |
-| `docs/`, `docs/adr/`, `specs/` | Optional | scope per the [file map](/standards/docs/bundle.md#files) |
-| `.claude/` | Optional | harness-owned; `worktrees/` gitignored |
+| `docs/` | Optional | guides and surveys that outgrow the README, each an OKF concept doc |
+| `docs/adr/` | Optional | ADRs per [adr-conventions.md](/standards/adr-conventions.md) |
+| `specs/` | Optional | governed by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md), not the OKF profile |
+| `.claude/` | Optional | Claude Code files per [the harness-files standard](/standards/claude-code/index.md); `worktrees/` gitignored |
 
 ## python layer
 
