@@ -143,7 +143,8 @@ def classify(relpath: str) -> str:
       ``references/``/``scripts/``, ``rules/``, and every non-``.md`` file.
 
     The concept/harness split mirrors the bundle boundary in the docs
-    standard; keep the two in step.
+    standard and the Claude Code file registry
+    (standards/claude-code/files.md); keep them in step.
     """
     parts = PurePosixPath(relpath).parts
     name = parts[-1]

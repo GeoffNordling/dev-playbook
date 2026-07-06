@@ -17,7 +17,7 @@ every repo — run the full hook suite — and layers add prerequisites:
 | `format` (mutating) | python | `uv run ruff format .` |
 | `format-check` | python | `uv run ruff format --check .` |
 | `lint` | python | `uv run ruff check .` |
-| `typecheck` | python | `uv run mypy <code-roots>` — whichever of `src tests scripts` exist |
+| `typecheck` | python | `uv run mypy <code-roots>` — whichever of `src tests scripts` hold `.py` files |
 | `test` | python | `uv run pytest` |
 | `synth` / `diff` / `deploy` | aws | `npx cdk synth` / `npx cdk diff` / `npx cdk deploy` |
 

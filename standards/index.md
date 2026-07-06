@@ -14,6 +14,7 @@ a level.
 - [Meta-Standard](/standards/standard.md) — Card for the meta-standard — how standards are declared as cards, cataloged, and kept honest
 - [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
 - [Build](/standards/build.md) — Card for the build standard — how a repository is laid out, built, and checked
+- [Claude Code Harness Files](/standards/claude-code.md) — Card for the Claude Code harness-files standard — which repo files the harness consumes and what each contains
 - [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
 - [Agentic Box](/standards/agentic-box.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
 - [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
@@ -29,5 +30,6 @@ a level.
 
 - [agentic-box/templates/greenfield-cli/](/standards/agentic-box/templates/greenfield-cli/index.md) — The worked greenfield-CLI box template
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement
+- [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard — the member registry and the CLAUDE.md content standard
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading

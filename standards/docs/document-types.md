@@ -15,8 +15,9 @@ This governs **concept documents** — the prose `.md` files an agent crawls and
 loads to understand something. Harness-owned files are in the bundle too, but a
 tool consumes them as configuration or runs them as code rather than reading
 them as prose, so they are not concept documents and carry no OKF frontmatter.
-The boundary and the harness-owned list live in
-[bundle.md](/standards/docs/bundle.md).
+The boundary rule lives in [bundle.md](/standards/docs/bundle.md); the
+Claude Code file set is enumerated in
+[the harness-files registry](/standards/claude-code/files.md).
 
 ## Types
 

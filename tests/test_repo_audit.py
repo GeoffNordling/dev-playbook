@@ -57,7 +57,7 @@ def make_repo(
 def base_files() -> dict[str, str]:
     return {
         "README.md": "# Sample Repo\n\nOne line of purpose.\n",
-        "CLAUDE.md": "## Build\n\nRun `make check`.\n",
+        "CLAUDE.md": canonical("CLAUDE.md.standards"),
         "index.md": "# Index\n",
         ".gitignore": canonical(".gitignore"),
         ".pre-commit-config.yaml": canonical(".pre-commit-config.yaml").replace(
@@ -255,12 +255,29 @@ def test_readme_without_h1_fails(tmp_path: Path) -> None:
     assert "README.md  doc-shape" in result.stdout
 
 
-def test_claude_md_without_build_section_fails(tmp_path: Path) -> None:
+def test_claude_md_missing_standards_block_fails(tmp_path: Path) -> None:
     files = base_files()
     files["CLAUDE.md"] = "## Rules\n\n- be good\n"
     result = run(make_repo(tmp_path, files))
-    assert "CLAUDE.md  doc-shape" in result.stdout
-    assert "## Build" in result.stdout
+    assert result.returncode == 1
+    assert "CLAUDE.md  canonical-block" in result.stdout
+    assert "## Standards" in result.stdout
+
+
+def test_claude_md_drifted_standards_block_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["CLAUDE.md"] = files["CLAUDE.md"].replace(
+        "navigated by index", "navigated by vibes"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "CLAUDE.md  canonical-block" in result.stdout
+
+
+def test_claude_md_prose_around_standards_block_passes(tmp_path: Path) -> None:
+    files = base_files()
+    files["CLAUDE.md"] += "\n## Rules\n\n- be good\n"
+    assert run(make_repo(tmp_path, files)).returncode == 0
 
 
 def test_context_md_with_all_sections_passes(tmp_path: Path) -> None:
