@@ -19,7 +19,8 @@ def list_runner(ids: list[str]) -> Callable:
     """A fake subprocess.run answering `session list` with the given ids."""
 
     def runner(args: list[str], **kwargs: object) -> object:
-        assert args[1:3] == ["session", "list"]
+        base = args.index("session")
+        assert args[base : base + 2] == ["session", "list"]
         payload = {"sessions": [{"id": sid} for sid in ids], "total": len(ids)}
         return subprocess.CompletedProcess(
             args=args, returncode=0, stdout=json.dumps(payload)

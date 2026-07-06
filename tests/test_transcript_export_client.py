@@ -12,6 +12,7 @@ from collections.abc import Callable
 import pytest
 
 from dev_playbook.transcript_export.client import (
+    DAEMON_URL,
     AgentsViewError,
     session_get,
     session_list,
@@ -49,7 +50,10 @@ def test_session_list_builds_argv_and_parses_payload() -> None:
     result = session_list(runner=runner)
 
     assert result == payload
-    assert calls == [["agentsview", "session", "list", "--format", "json"]]
+    # Every command targets the standing daemon via `--server`, never auto-start.
+    assert calls == [
+        ["agentsview", "--server", DAEMON_URL, "session", "list", "--format", "json"]
+    ]
 
 
 def test_session_get_builds_argv_and_parses_payload() -> None:
@@ -60,7 +64,9 @@ def test_session_get_builds_argv_and_parses_payload() -> None:
     result = session_get("s1", runner=runner)
 
     assert result == payload
-    assert calls == [["agentsview", "session", "get", "s1", "--json"]]
+    assert calls == [
+        ["agentsview", "--server", DAEMON_URL, "session", "get", "s1", "--json"]
+    ]
 
 
 def test_session_messages_pages_until_empty_batch() -> None:

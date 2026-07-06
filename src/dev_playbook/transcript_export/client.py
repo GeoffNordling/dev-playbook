@@ -17,14 +17,30 @@ DEFAULT_PAGE = 100
 """`session messages` returns at most this many rows per call (the CLI default),
 so we always pass --limit and page on last_ordinal + 1."""
 
+DAEMON_URL = "http://127.0.0.1:8080"
+"""The always-running local agentsview daemon (its default listen address).
+
+We pass this as `--server` on every command so the CLI acts as a pure *client*
+of the daemon instead of auto-starting its own server. The auto-start path opens
+the sqlite archive writable, which fails whenever the standing daemon already
+holds the write lock (`~/.agentsview/db.write.lock`) — the exact spurious failure
+tracked in issue #135. As a read-only client of the running daemon, we never
+contend for that lock."""
+
 
 class AgentsViewError(Exception):
     """Any agentsview CLI failure — fail loud, never partial output."""
 
 
 def _run(args: list[str], runner: Callable = subprocess.run) -> dict:
-    """Run one agentsview command; parse its JSON stdout. Fail loud on nonzero."""
-    result = runner(["agentsview", *args], capture_output=True, text=True)
+    """Run one agentsview command against the running daemon; parse its JSON stdout.
+
+    Every command targets the standing daemon via `--server` (see `DAEMON_URL`)
+    so the CLI never auto-starts a competing server. Fail loud on nonzero.
+    """
+    result = runner(
+        ["agentsview", "--server", DAEMON_URL, *args], capture_output=True, text=True
+    )
     if result.returncode != 0:
         raise AgentsViewError(
             f"agentsview {' '.join(args)} failed (rc={result.returncode}): "
