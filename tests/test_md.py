@@ -87,7 +87,7 @@ class TestClassify:
         [
             ("PLAN.md", "excluded"),
             ("PROGRESS.md", "excluded"),
-            ("tmp/ALTERNATIVE.md", "excluded"),
+            ("tmp/SCRATCH.md", "excluded"),
             ("dotfiles/.agents/skills/x/SKILL.md", "excluded"),
             ("dotfiles/.dhub/whatever.md", "excluded"),
             ("index.md", "index"),
