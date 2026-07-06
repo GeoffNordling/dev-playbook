@@ -1,9 +1,21 @@
 # standards/ — index
 
+The catalog: every standard has a card here (`type: Standard Card`), and
+each card's cells point at the files that define, audit, enforce, and adopt
+it. See [Standards and Standard Cards](/standards/standard/format.md).
+Ordered by level of abstraction — meta first — then alphabetically within
+a level.
+
+> **Temporary:** most entries below predate the card format and have no
+> standard card yet; cataloging them is tracked in
+> [issue #133](https://github.com/GeoffNordling/dev-playbook/issues/133).
+
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
+- [Meta-Standard](/standards/standard.md) — Card for the meta-standard — how standards are declared as cards, cataloged, and kept honest
+- [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
+- [Build](/standards/build.md) — Card for the build standard — how a repository is laid out, built, and checked
 - [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
 - [Agentic Box](/standards/agentic-box.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
-- [Datasheet Standard](/standards/datasheet.md) — The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
 - [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Issue Conventions](/standards/issue-conventions.md) — GitHub issue body format — the body as agent brief, vertical-slice decomposition, blocked-by and sub-issue relationships
 - [Module Design](/standards/module-design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
@@ -18,5 +30,4 @@
 - [agentic-box/templates/greenfield-cli/](/standards/agentic-box/templates/greenfield-cli/index.md) — The worked greenfield-CLI box template
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
-- [judgments/](/standards/judgments/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading

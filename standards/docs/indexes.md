@@ -34,6 +34,18 @@ okf_version: "0.1"
 ---
 ```
 
+## Ordering
+
+Within each group of an index — the concept documents after `README.md`,
+and the child-directory links — the default order is **alphabetical by
+link title**, case-insensitive. `README.md` always comes first.
+
+An index may use a different, meaningful order **only when its intro prose
+declares what that order is** — for example "listed in reading order",
+"in ADR number order", or "ordered by level of abstraction". An undeclared
+deviation from alphabetical is a defect: a reader cannot distinguish
+unstated meaning from entropy.
+
 ## Authored, not generated
 
 `index.md` files are **authored**, not produced by a committed generator. A

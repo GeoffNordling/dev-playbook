@@ -2,7 +2,7 @@
 # whether a document still accurately describes the code or workflow it
 # documents -- a semantic drift guard the deterministic gate cannot check. The
 # gate is green only once each judgment's current content has been
-# judged-and-passed and recorded (see standards/judgments/).
+# judged-and-passed and recorded (see instruments/judgments/).
 judgments:
   - id: scatter-gather-recipe-matches-workflow
     claim: |
@@ -15,10 +15,10 @@ judgments:
 
   - id: judgments-standard-matches-loader
     claim: |
-      standards/judgments/declarations.md accurately documents the judgment
+      instruments/judgments/declarations.md accurately documents the judgment
       declaration format and the field rules that the judgments tooling
       validates.
-    evidence:  [standards/judgments/declarations.md]
+    evidence:  [instruments/judgments/declarations.md]
     reference: [src/dev_playbook/judgments/loader.py, src/dev_playbook/judgments/instruments.py]
     model: claude-sonnet-4-6
     effort: high
@@ -39,7 +39,7 @@ judgments:
     claim: |
       The standards/build/ documents promise exactly what ships: every
       concrete statement they make about the canonical artifacts in
-      standards/canonical/ and about the published hook manifest
+      standards/build/canonical/ and about the published hook manifest
       (.pre-commit-hooks.yaml) — file names, hook ids, targets, commands,
       pins, entry paths — is true of those files as they exist today.
     evidence:
@@ -54,11 +54,11 @@ judgments:
       - standards/build/distribution.md
       - standards/build/enforcement.md
     reference:
-      - standards/canonical/Makefile.base
-      - standards/canonical/Makefile.python
-      - standards/canonical/Makefile.aws
-      - standards/canonical/ci.yml
-      - standards/canonical/pyproject.toml
+      - standards/build/canonical/Makefile.base
+      - standards/build/canonical/Makefile.python
+      - standards/build/canonical/Makefile.aws
+      - standards/build/canonical/ci.yml
+      - standards/build/canonical/pyproject.toml
       - .pre-commit-hooks.yaml
     model: claude-opus-4-8
     effort: high
@@ -81,5 +81,40 @@ judgments:
       - standards/build/canonical.md
       - standards/build/distribution.md
       - standards/build/enforcement.md
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-build
+    claim: |
+      standards/build.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the build standard, and no cell
+      misrepresents what its targets do.
+    evidence:  [standards/build.md]
+    reference:
+      - standards/standard/format.md
+      - standards/build/index.md
+      - standards/build/canonical.md
+      - scripts/repo-audit
+      - scripts/sweep
+      - standards/build/canonical/.pre-commit-config.yaml
+      - standards/build/canonical/Makefile.base
+      - standards/build/canonical/ci.yml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-standard
+    claim: |
+      standards/standard.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the meta-standard, and no cell
+      misrepresents what its targets do.
+    evidence:  [standards/standard.md]
+    reference:
+      - standards/standard/format.md
+      - scripts/okf-lint
+      - scripts/ref-check
+      - judgments/doc-consistency.yaml
+      - .pre-commit-config.yaml
     model: claude-opus-4-8
     effort: high

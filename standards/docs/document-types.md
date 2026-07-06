@@ -20,20 +20,22 @@ The boundary and the harness-owned list live in
 
 ## Types
 
-Title Case; acronyms stay upper.
+Title Case; acronyms stay upper. Listed alphabetically.
 
 | Type | What it is |
 |------|------------|
-| `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work. |
-| `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `ADR` | An immutable, numbered record of one architectural decision and its rationale. |
+| `Box Artifact` | One file of an [agentic-box](/standards/agentic-box.md) definition — contract, charter, emissions spec, or prompt — consumed by a boxed agent as mission configuration. A box `README.md` stays `type: README`. |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
-| `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
+| `Instrument Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Protocol` | A formal algorithm for structured human–agent collaboration. |
-| `Vocabulary` | The canonical definitions of the workspace's domain terms (lives in `CONTEXT.md`). |
+| `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `Box Artifact` | One file of an [agentic-box](/standards/agentic-box.md) definition — contract, charter, emissions spec, or prompt — consumed by a boxed agent as mission configuration. A box `README.md` stays `type: README`. |
+| `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work. |
+| `Standard Card` | The thin catalog record for one standard — four pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
+| `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
+| `Vocabulary` | The canonical definitions of the workspace's domain terms (lives in `CONTEXT.md`). |
 
 ## Frontmatter profile
 
