@@ -21,9 +21,9 @@ Before doing anything else, read end-to-end:
 
 - [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — how to read the committed `feat`/`req`/`dsn` and `Interface:` lines you check the code against.
 - [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
-- [python conventions](~/workspace/dev-playbook/standards/python-conventions.md) — docstring rules, fail-loudly, annotation style. The build agent never saw this standard; enforcing it is yours alone.
+- [python style](~/workspace/dev-playbook/standards/python-style.md) — docstring rules, fail-loudly, annotation style. The build agent never saw this standard; enforcing it is yours alone.
 
-Then report: `READ: spec-standard.md, testing-conventions.md, python-conventions.md`. Proceed only after.
+Then report: `READ: spec-standard.md, testing-conventions.md, python-style.md`. Proceed only after.
 
 ## 1. Load context
 
@@ -49,7 +49,7 @@ Read the change as a whole — the spec and the code together — against the co
 
 - **Spec fidelity.** The gate already proves each spec item has a passing verifier; what it can't prove is that the verifier is honest. Reading spec and code together, check that each test genuinely exercises the behavior its `req`/`dsn` describes rather than passing vacuously, and that the code implements what the spec commits to without drifting past its scope.
 - **Testing conventions.** The tests conform to testing-conventions.md — structure, naming, behavioral focus.
-- **Python conventions.** The code conforms to python-conventions.md — docstrings, fail-loudly, annotation style.
+- **Python style.** The code conforms to python-style.md — docstrings, fail-loudly, annotation style.
 - **Code quality.** Deep modules behind small surfaces, clear naming, no dead code or needless duplication — the engineering judgment the standards don't spell out.
 
 ## 4. Attach findings

@@ -106,7 +106,7 @@ engine-independent: nothing under `box/` may assume which engine runs the box.
 2. **Internal tests are agent-owned.** They must exist and pass in the gate,
    but no human reviews them. The describer agent reads them afterward as
    evidence of where the agent saw risk.
-3. **Pin what you'd file a bug over.** Boundary tests assert structure, not
+3. **Pin only bug-worthy behavior.** Boundary tests assert structure, not
    bytes, wherever the human is indifferent; one byte-exact anchor fixture
    exists to catch drift, not to pin style. Overpinning turns harmless agent
    choices into failures; underpinning lets defects through silently.

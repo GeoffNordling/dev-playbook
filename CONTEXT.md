@@ -45,6 +45,22 @@ What maintainers get from depth. Change, bugs, knowledge, and verification conce
 - An **Adapter** sits at a **Seam** and satisfies the **Interface**.
 - **Depth** produces **Leverage** for callers and **Locality** for maintainers.
 
+## Example dialogue
+
+> **Dev:** "I want to swap the Postgres store for an in-memory fake in tests. Is the fake a new **Module**?"
+> **Reviewer:** "No — the store is one **Module** with one **Interface**. The fake is another **Adapter** at the same **Seam**: you're altering behavior at a place you don't edit."
+> **Dev:** "So the **Seam** is the store's **Interface**?"
+> **Reviewer:** "The **Seam** is *where* that **Interface** lives — the call site you can redirect — not the **Interface** itself. Keep the **Interface** small and the **Module** stays **deep**: one small surface, a lot of behavior behind it."
+> **Dev:** "And that depth is worth it because…?"
+> **Reviewer:** "It's the same **Depth** paying out twice — **Leverage** for the callers (the fake pays back across every test) and **Locality** for us (a store bug is fixed in one **Implementation**, not chased across call sites)."
+
+## Flagged ambiguities
+
+- "boundary" was used for both the location of an interface and the interface itself — resolved: say **Seam** for the location, **Interface** for the surface. "boundary" is retired (collides with DDD's bounded context).
+- "component" / "service" / "unit" all floated as names for the same thing — resolved: **Module** is the single scale-agnostic term; the others are aliases to avoid.
+- "depth" was read two ways — the implementation-to-interface line ratio (Ousterhout) vs. leverage at the interface — resolved: **Depth** here means leverage (see Rejected framings).
+- "interface" was narrowed to the type signature or a class's public methods — resolved: **Interface** includes every fact a caller must know (invariants, ordering, error modes, config), not just the signature.
+
 ## Rejected framings
 
 - **Depth as ratio of implementation-lines to interface-lines** (Ousterhout): rewards padding the implementation. We use depth-as-leverage instead.

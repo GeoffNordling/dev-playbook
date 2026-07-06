@@ -1,0 +1,123 @@
+#!/usr/bin/env -S uv run --script
+"""bootstrap-labels — enforce the workspace's GitHub label scheme in the current repo.
+
+Closed-world: labels in the canonical set are created or updated to match;
+labels not in the canonical set are deleted. Idempotent. See
+~/workspace/dev-playbook/workflow/workflow.md (§Valid labels and §Naming) for
+the label scheme.
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import json
+import subprocess
+import sys
+
+# Two-color scheme: metadata grey, phases yellow.
+META_COLOR = "cccccc"
+PHASE_COLOR = "fbca04"
+
+# Fixed-value labels — see workflow.md §Valid labels.
+# Format: (dimension, value); label name is "<dimension-lower>:<value>".
+METADATA: list[tuple[str, str]] = [
+    ("Category", "bug"),
+    ("Category", "enhancement"),
+    ("Mode", "sdd"),
+    ("Mode", "direct"),
+    ("Tests", "yes"),
+    ("Tests", "no"),
+]
+
+# Phase labels — one per graph node in workflow.md §State machine.
+# Names derived from node ids by `_` → `-` per workflow.md §Naming.
+PHASES: list[str] = [
+    "intake",
+    "sdd-specs",
+    "sdd-spec-review",
+    "sdd-tdd",
+    "sdd-code-pr-review",
+    "design",
+    "tdd",
+    "build",
+    "code-pr-review",
+]
+
+
+def canonical_labels() -> list[tuple[str, str, str]]:
+    """Build (name, color, description) tuples for all canonical labels."""
+    result: list[tuple[str, str, str]] = []
+    for dim, value in METADATA:
+        name = f"{dim.lower()}:{value}"
+        desc = f"{dim}: {value}. See workflow.md."
+        result.append((name, META_COLOR, desc))
+    for value in PHASES:
+        name = f"phase:{value}"
+        desc = f"Phase: {value}. See workflow.md."
+        result.append((name, PHASE_COLOR, desc))
+    return result
+
+
+def existing() -> dict[str, dict[str, str]]:
+    out = subprocess.run(
+        ["gh", "label", "list", "--json", "name,color,description", "--limit", "200"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return {
+        item["name"]: {"color": item["color"], "description": item["description"]}
+        for item in json.loads(out.stdout)
+    }
+
+
+def main() -> int:
+    have = existing()
+    labels = canonical_labels()
+    canonical = {name for name, _, _ in labels}
+
+    for name, color, desc in labels:
+        if name not in have:
+            subprocess.run(
+                [
+                    "gh",
+                    "label",
+                    "create",
+                    name,
+                    "--color",
+                    color,
+                    "--description",
+                    desc,
+                ],
+                check=True,
+                capture_output=True,
+            )
+            print(f"created   {name}")
+        elif (
+            have[name]["description"] != desc
+            or have[name]["color"].lower() != color.lower()
+        ):
+            subprocess.run(
+                ["gh", "label", "edit", name, "--color", color, "--description", desc],
+                check=True,
+                capture_output=True,
+            )
+            print(f"updated   {name}")
+        else:
+            print(f"unchanged {name}")
+
+    for name in sorted(have):
+        if name in canonical:
+            continue
+        subprocess.run(
+            ["gh", "label", "delete", name, "--yes"],
+            check=True,
+            capture_output=True,
+        )
+        print(f"deleted   {name}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

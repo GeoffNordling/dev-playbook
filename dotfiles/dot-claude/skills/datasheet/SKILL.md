@@ -10,7 +10,7 @@ argument-hint: "[subject and/or scope paths]"
 # Datasheet
 
 Produces one datasheet conformant to the
-[Datasheet Standard](~/workspace/dev-playbook/standards/datasheet.md): a
+[Datasheet Standard](~/workspace/dev-playbook/instruments/datasheet.md): a
 fixed-section, budgeted HTML report at `docs/datasheets/<subject>.html` that
 gives the system's owner trust and direction without reading the code. This
 skill is the procedure; the standard is the contract.
@@ -21,9 +21,9 @@ skill is the procedure; the standard is the contract.
 
 Before doing anything else, read end-to-end:
 
-- [Datasheet Standard](~/workspace/dev-playbook/standards/datasheet.md) — the
+- [Datasheet Standard](~/workspace/dev-playbook/instruments/datasheet.md) — the
   contract the sheet must satisfy.
-- [datasheet-example.html](~/workspace/dev-playbook/standards/datasheet-example.html)
+- [datasheet-example.html](~/workspace/dev-playbook/instruments/datasheet-example.html)
   — the structure to match, not the size.
 
 Then report: `READ: datasheet.md, datasheet-example.html`. Proceed only after.
@@ -54,7 +54,7 @@ in scope:
 
 ```
 mkdir -p .datasheet && printf '*\n' > .datasheet/.gitignore
-~/workspace/dev-playbook/tools/bin/griffe-outline <package-path> >> .datasheet/outline.txt
+~/workspace/dev-playbook/scripts/griffe-outline <package-path> >> .datasheet/outline.txt
 ```
 
 If the scope holds no Python package, skip this step.

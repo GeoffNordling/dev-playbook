@@ -22,7 +22,7 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 
 - **Arrange-Act-Assert.** Every test has three clear sections: set up the conditions, perform the action, verify the result. Separate them with blank lines for readability.
 - **One concept per test.** Each test verifies one behavior or scenario. Multiple assertions are fine when they all verify aspects of the same concept.
-- **Descriptive names.** Test names read like behavior descriptions: `test_login_rejects_expired_token`, not `test_login_2`. The name should tell you what the test does without reading the body.
+- **Descriptive names.** Test names read like behavior descriptions: `test_login_rejects_expired_token`, not `test_login_2`. The name alone conveys what the test verifies.
 - **No logic in tests.** No if/else, no try/except in test bodies. Tests are boring and linear.
 
 ## Behavioral focus
@@ -49,7 +49,7 @@ When testing systems with non-deterministic components (LLM calls, network reque
 
 ## Test doubles
 
-There are three kinds of test doubles. Choose the lightest one that verifies the behavior you care about.
+There are three kinds of test doubles. Choose the lightest one that verifies the behavior under test.
 
 ### Real objects (integration tests)
 
@@ -62,7 +62,7 @@ A fake is a working, simplified implementation of a real interface, built for te
 **Prefer fakes when:**
 - The dependency has state or logic that tests need to exercise (stores, queues, caches).
 - Multiple tests share the same dependency; a fake is written once and reused across the suite.
-- You want tests that survive refactoring; fakes couple to the interface, not the implementation.
+- Tests need to survive refactoring; fakes couple to the interface, not the implementation.
 
 Fakes live in the test directory (e.g., `tests/fakes.py` or alongside the tests that use them). They only implement the methods that callers actually use; they do not replicate production complexity.
 
@@ -70,12 +70,12 @@ Fakes live in the test directory (e.g., `tests/fakes.py` or alongside the tests 
 
 ### Mocks (side effects, failures, thin boundaries)
 
-Use `unittest.mock` when you need to:
+Use `unittest.mock` to:
 - **Verify a side effect happened**; an email was sent, a metric was recorded, an audit log was written. The interaction itself is the observable outcome.
 - **Simulate failure modes** that are hard to trigger with a fake; network timeouts, disk full, API 500s.
 - **Stub a non-deterministic or expensive boundary**; the LLM client, an external API, a cloud service. The Humble Object pattern identifies these boundaries.
 
-**Do not mock internal implementation details.** If you need to mock deep inside your own code to test something, the design likely needs refactoring; extract an interface and use a fake instead. When you must isolate a function-level dependency within your own code, mock at the boundary (the function's entry point), not deep in the call chain.
+**Do not mock internal implementation details.** Needing a mock deep inside the code under test signals a design problem — extract an interface and use a fake instead. Where a function-level dependency genuinely must be isolated, mock at the boundary (the function's entry point), not deep in the call chain.
 
 ## Fixtures and setup
 

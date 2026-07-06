@@ -26,7 +26,7 @@ The directory name must match the `name` field in the front matter.
 A skill bundle is harness-owned — Claude Code loads `SKILL.md` as configuration,
 not as prose to learn from — so it is not an OKF concept document. Its front
 matter is the Claude Code skill schema below, **not** the OKF `type`/`title`/`description`
-profile. See [the OKF bundle boundary](/standards/repo-documentation.md#the-okf-bundle).
+profile. See [the OKF bundle boundary](/standards/docs/bundle.md).
 
 ```yaml
 ---
@@ -98,9 +98,19 @@ After the front matter, the body is Markdown.
 
 ## Cross-references
 
-Skill bodies follow the workspace cross-reference standard. See the [skill-bundles section](/standards/repo-documentation.md#in-skill-bundles) for the target-based rules: inline links for files the reader should open, inline code for files mentioned by name, and bare invocations for slash-skills. That section also carries the authoritative rationale — a skill has no fixed repo root, so it cites workspace documents by their full `~/workspace/<repo>/…` path rather than the root-absolute Link form used inside a concept-doc bundle.
+Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) are harness-owned, not concept documents, and they follow a **target-based** rule instead of the bundle Link/Citation split ([cross-references.md](/standards/docs/cross-references.md)). The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
 
-When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/repo-documentation.md#fragment-anchors)).
+A skill has **no fixed repo root**. The same skill can be invoked from a session in any repo's checkout, so there is no stable bundle root for a `/`-absolute Link to resolve against. A skill therefore cites a workspace document by its full `~/workspace/<repo>/…` path even when that document lives in the same repo as the skill bundle.
+
+| Target | Style | Example |
+|---|---|---|
+| File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
+| File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md)` |
+| File in the human's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
+| Directory | Inline code | `` `docs/adr/` `` |
+| Slash-skill invocation | Bare — no markup | `/commit` |
+
+When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/docs/cross-references.md#fragment-anchors)).
 
 ## References directory
 

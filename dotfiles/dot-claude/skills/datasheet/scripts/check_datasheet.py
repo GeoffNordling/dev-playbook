@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mechanical conformance checks for a datasheet (standards/datasheet.md).
+"""Mechanical conformance checks for a datasheet (instruments/datasheet.md).
 
 Checks only the machine-checkable rules:
 - the stamp comment opens the file and carries every required field

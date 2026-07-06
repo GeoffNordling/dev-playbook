@@ -1,0 +1,229 @@
+#!/usr/bin/env -S uv run --script
+"""Check cross-references in markdown files.
+
+Deterministic checker for the workspace cross-reference grammar; the grammar
+itself — the two forms, which files use which, and why — is defined in the
+docs standards, not here. Scans the .md files in the invoking git checkout
+(`git ls-files`, so discovery honors `.gitignore` and is scoped to the
+current worktree) and checks:
+
+  - **Link** — `[text](/path)`: target must exist under the invoking
+    checkout's own root; a worktree validates its own working copy.
+  - **Citation** — `~/workspace/<repo>/...`: cross-repo targets resolve at
+    their absolute path; same-repo targets resolve against the invoking
+    checkout. A same-repo Citation from a source with a fixed repo root is
+    a `wrong-form` finding; sources matching ROOTLESS_SEGMENTS are exempt.
+  - `#fragment` anchors on .md targets must match a heading slug
+    (`dev_playbook.md.github_slug`); fragments on directories or non-.md targets are
+    out of scope and treated as ok.
+
+Not scanned: fenced code blocks and inline code spans, bare `/slash` tokens
+outside link syntax, and files under any `adr/` directory as sources
+(references *to* ADRs are still validated).
+
+Output:
+    stdout — JSON Lines, one record per reference: {source, line, target, status};
+             status is "ok", "broken", or "wrong-form". Default: only
+             non-"ok" records. With --all: every reference.
+    stderr — one human-readable summary line.
+    exit   — 0 clean, 1 findings, 2 cannot run.
+
+Usage:
+    ref-check [--all] [directory]
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook import gitrepo, md  # noqa: E402
+
+# ADR sources are exempt: ADRs are immutable, so their outbound references
+# are accepted staleness. References TO ADRs are still validated.
+EXCLUDE_DIRS = {"adr"}
+
+# Path segments marking sources with no fixed repo root (skills and rules
+# ship into ~/.claude; box artifacts are stamped into a target repo).
+ROOTLESS_SEGMENTS = {"skills", "rules", "box"}
+
+
+def has_fixed_repo_root(relpath: str) -> bool:
+    """True when a source file is always read from one repo, so `/` resolves.
+
+    Rootless files use the Citation form even for same-repo targets, per the
+    cross-reference standard.
+    """
+    return not (ROOTLESS_SEGMENTS & set(Path(relpath).parts))
+
+
+def workspace_root() -> Path:
+    return Path.home() / "workspace"
+
+
+def source_files(repo_root: Path) -> list[Path]:
+    """All scannable .md files: every tracked/untracked .md minus adr sources."""
+    return [
+        p
+        for p in md.find_md_files(repo_root)
+        if not (EXCLUDE_DIRS & set(p.relative_to(repo_root).parts))
+    ]
+
+
+def is_same_repo_citation(resolved: Path, repo_name: str) -> bool:
+    """True when a ~/workspace citation targets the invoking repo itself."""
+    rel = resolved.relative_to(workspace_root())
+    return bool(rel.parts) and rel.parts[0] == repo_name
+
+
+def citation_actual(resolved: Path, repo_root: Path, repo_name: str) -> Path:
+    """Map a ~/workspace citation to the on-disk path that should hold it.
+
+    In-repo citations resolve against repo_root — the working copy of the
+    invoking checkout, which may be a worktree — so edits resolve against the
+    worktree's state, not the main checkout. Cross-repo citations use the
+    absolute on-disk path as written.
+    """
+    rel = resolved.relative_to(workspace_root())
+    if rel.parts and rel.parts[0] == repo_name:
+        return repo_root / Path(*rel.parts[1:])
+    return resolved
+
+
+def status_of(actual: Path, fragment: str) -> str:
+    """Return 'ok' if actual (and fragment, if any) resolves; 'broken' otherwise.
+
+    File-existence failure short-circuits — the anchor is not checked when the
+    file is missing. Fragments on directories or non-.md targets are out of
+    scope and treated as 'ok'.
+    """
+    if not actual.exists():
+        return "broken"
+    if not fragment:
+        return "ok"
+    if not actual.is_file() or actual.suffix.lower() != ".md":
+        return "ok"
+    return "ok" if fragment in md.heading_slugs(actual) else "broken"
+
+
+def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
+    """Extract and classify every Link and Citation in one .md file."""
+    results = []
+    source = str(filepath.relative_to(repo_root))
+    fixed_root = has_fixed_repo_root(source)
+
+    def record(target_str: str, line_num: int, status: str) -> None:
+        results.append(
+            {
+                "source": source,
+                "line": line_num,
+                "target": target_str,
+                "status": status,
+            }
+        )
+
+    def citation_status(path_str: str, fragment: str) -> str:
+        """Status for a ~/workspace citation.
+
+        A same-repo citation from a fixed-root source is `wrong-form` and
+        short-circuits the existence check — the form is the actionable
+        error. Everything else resolves and checks as usual.
+        """
+        resolved = Path(path_str.replace("~", str(Path.home()), 1))
+        if fixed_root and is_same_repo_citation(resolved, repo_name):
+            return "wrong-form"
+        return status_of(citation_actual(resolved, repo_root, repo_name), fragment)
+
+    for line_num, line in md.content_lines(filepath):
+        stripped = md.INLINE_CODE_PATTERN.sub("", line)
+
+        # Links and in-link citations: only `/` and `~/workspace` targets that
+        # appear inside markdown link syntax.
+        for _text, target_str in [
+            (m.group(1), m.group(2)) for m in md.MD_LINK_PATTERN.finditer(stripped)
+        ]:
+            path_str, _, fragment = target_str.partition("#")
+            if target_str.startswith("~/workspace/"):
+                record(target_str, line_num, citation_status(path_str, fragment))
+            elif target_str.startswith("/"):
+                actual = repo_root / path_str.lstrip("/")
+                record(target_str, line_num, status_of(actual, fragment))
+
+        # Bare citations: `~/workspace/...` outside link syntax. Replace each
+        # link span with its text (not nothing) so a citation living in the
+        # link *text* stays scannable, while the target — already handled by
+        # the in-link pass above — is dropped and not counted twice.
+        remainder = md.MD_LINK_PATTERN.sub(r"\1", stripped)
+        for match in md.WORKSPACE_REF_PATTERN.finditer(remainder):
+            target_str = match.group(0)
+            path_str, _, fragment = target_str.partition("#")
+            record(target_str, line_num, citation_status(path_str, fragment))
+
+    return results
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Repository root to scan (default: current directory)",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Emit JSON for every reference, not just broken ones",
+    )
+    args = parser.parse_args()
+
+    repo_root = Path(args.directory).resolve()
+    try:
+        repo_name = gitrepo.canonical_repo_name(repo_root)
+    except gitrepo.NotAGitRepository:
+        print(f"ref-check: not a git repository: {repo_root}", file=sys.stderr)
+        sys.exit(2)
+
+    md_files = source_files(repo_root)
+    if not md_files:
+        print(f"ref-check: no .md files found in {repo_root}", file=sys.stderr)
+        sys.exit(2)
+
+    total = 0
+    broken = 0
+    wrong_form = 0
+    for filepath in md_files:
+        for ref in scan_file(filepath, repo_root, repo_name):
+            total += 1
+            if ref["status"] == "broken":
+                broken += 1
+            elif ref["status"] == "wrong-form":
+                wrong_form += 1
+            if args.all or ref["status"] != "ok":
+                print(json.dumps(ref))
+
+    if total == 0:
+        print(f"ref-check: no cross-references found in {repo_root}", file=sys.stderr)
+        sys.exit(0)
+    issues = broken + wrong_form
+    if issues:
+        print(
+            f"ref-check: {issues}/{total} need fixing "
+            f"({broken} broken, {wrong_form} wrong-form)",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    print(f"ref-check: {total} references, all ok", file=sys.stderr)
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
