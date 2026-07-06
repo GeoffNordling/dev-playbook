@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Instrument Spec
 title: The Cache Gate
 description: The deterministic pytest gate — green iff every judgment's exact content is already judged-and-passed
 ---
@@ -18,9 +18,9 @@ def test_errors_exhaustive():
 ```
 
 `assert_judgment_cached(id)` resolves the root
-([declarations.md — Config and root resolution](/standards/judgments/declarations.md#config-and-root-resolution)),
+([declarations.md — Config and root resolution](/instruments/judgments/declarations.md#config-and-root-resolution)),
 keys the named judgment
-([declarations.md — What a judgment is](/standards/judgments/declarations.md#what-a-judgment-is)),
+([declarations.md — What a judgment is](/instruments/judgments/declarations.md#what-a-judgment-is)),
 and asks the seen-set whether that exact content has been
 judged-and-passed:
 

@@ -2,7 +2,7 @@
 
 Every fixture is a git repo (discovery and the repo-name mapping both go
 through git) with all files staged, since "committed" requirements read the
-index. Fixtures copy the real canonical artifacts from standards/canonical/,
+index. Fixtures copy the real canonical artifacts from standards/build/canonical/,
 so these tests also pin that the canonical files themselves stay auditable.
 """
 
@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "repo-audit"
-CANONICAL = Path(__file__).resolve().parents[1] / "standards" / "canonical"
+CANONICAL = Path(__file__).resolve().parents[1] / "standards" / "build" / "canonical"
 
 UV_SCRIPT = (
     "#!/usr/bin/env -S uv run --script\n"
@@ -596,10 +596,10 @@ def hook_repo_files() -> dict[str, str]:
     )
     files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-lint\n"
     # is_file(): tools that treat the canonical pyproject.toml template as a
-    # real project drop cache dirs (e.g. .ruff_cache/) into standards/canonical/.
+    # real project drop cache dirs (e.g. .ruff_cache/) into standards/build/canonical/.
     for name in CANONICAL.iterdir():
         if name.is_file():
-            files[f"standards/canonical/{name.name}"] = name.read_text()
+            files[f"standards/build/canonical/{name.name}"] = name.read_text()
     return files
 
 
@@ -619,14 +619,14 @@ def test_hook_repo_dogfood_drift_fails(tmp_path: Path) -> None:
 
 def test_hook_repo_unknown_canonical_artifact_fails(tmp_path: Path) -> None:
     files = hook_repo_files()
-    files["standards/canonical/mystery.cfg"] = "x\n"
+    files["standards/build/canonical/mystery.cfg"] = "x\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "standards/canonical/mystery.cfg  self-audit" in result.stdout
+    assert "standards/build/canonical/mystery.cfg  self-audit" in result.stdout
 
 
 def test_canonical_dir_exempt_from_tree_rules(tmp_path: Path) -> None:
     # hook_repo_files copies the canonical pyproject.toml template into
-    # standards/canonical/ — it must not trip the one-pyproject rule.
+    # standards/build/canonical/ — it must not trip the one-pyproject rule.
     result = run(make_repo(tmp_path, hook_repo_files()))
-    assert "standards/canonical/pyproject.toml" not in result.stdout
+    assert "standards/build/canonical/pyproject.toml" not in result.stdout

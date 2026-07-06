@@ -3,7 +3,7 @@
 dev-playbook is a consumer of its judgments tooling: the parametrized test
 below is its gate. Green means every declared judgment's current content has
 already been judged-and-passed (its key is cached); a miss fails until the
-run-judgments skill judges it and records the pass. See standards/judgments.md.
+run-judgments skill judges it and records the pass. See instruments/judgments.md.
 
 The gate does an offline cache check only -- but the cache it reads is
 machine-local and only the interactive, subscription-billed run-judgments skill

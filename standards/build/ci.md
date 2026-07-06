@@ -7,7 +7,7 @@ description: Thin CI — the byte-identical workflow that runs exactly the hook 
 # Thin CI
 
 Every repo carries the identical workflow, byte-for-byte the canonical
-[ci.yml](/standards/canonical/ci.yml): one job, one real step —
+[ci.yml](/standards/build/canonical/ci.yml): one job, one real step —
 `pre-commit run --all-files` with `SKIP: ref-check` — on every push and PR
 to `main`.
 

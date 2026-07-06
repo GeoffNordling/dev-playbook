@@ -35,7 +35,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
-CANONICAL_CONFIG = HOOK_REPO_ROOT / "standards" / "canonical" / ".pre-commit-config.yaml"
+CANONICAL_CONFIG = HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
 
 # Expected GitHub settings, as the repos API reports them. The sweep only
 # reads; the merge settings are set by hand per the repo-settings standard.

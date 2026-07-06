@@ -1,6 +1,6 @@
 ---
-type: Standard
-title: Datasheet Standard
+type: Instrument Spec
+title: The Datasheet
 description: The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
 ---
 
@@ -261,7 +261,7 @@ The one section allowed opinion, fenced five ways:
 
 ## Example
 
-[datasheet-example.html](/standards/datasheet-example.html) is a complete,
+[datasheet-example.html](/instruments/datasheet-example.html) is a complete,
 minimal datasheet for a fictional tool — read it in full before generating.
 It is normative for form: copy its stylesheet and card markup verbatim — the
 stamp comment first, the rail and main regions, the chips, cells, rows,

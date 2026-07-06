@@ -61,7 +61,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `ref-check` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `internal-skill-audit` | [skill-conventions.md](/standards/skill-conventions.md) | Skill conformance |
-| `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `judgments-lint` | [declarations.md](/instruments/judgments/declarations.md) | Judgment declaration validity |
 
 `repo-audit`, `python-lint`, `ref-check`, and `okf-lint` assert unconditionally
 and fail loud; they do not skip themselves when a target kind is absent. Run

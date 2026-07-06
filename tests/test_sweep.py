@@ -15,7 +15,9 @@ from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "sweep"
 HOOK_REPO = Path(__file__).resolve().parents[1]
-CANONICAL_CONFIG = HOOK_REPO / "standards" / "canonical" / ".pre-commit-config.yaml"
+CANONICAL_CONFIG = (
+    HOOK_REPO / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
+)
 
 FAKE_GH = """\
 #!/usr/bin/env python3

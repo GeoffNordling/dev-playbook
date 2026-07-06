@@ -43,10 +43,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from dev_playbook import gitrepo, md, pyast  # noqa: E402
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
-CANONICAL_DIR = HOOK_REPO_ROOT / "standards" / "canonical"
+CANONICAL_DIR = HOOK_REPO_ROOT / "standards" / "build" / "canonical"
 
 # Every canonical artifact this script compares against. The hook repo's
-# self-audit fails when standards/canonical/ and this manifest drift.
+# self-audit fails when standards/build/canonical/ and this manifest drift.
 CANONICAL_MANIFEST = frozenset(
     {
         "ci.yml",
@@ -140,8 +140,8 @@ def package_name(repo_name: str) -> str:
 
 
 def in_canonical(rel: str) -> bool:
-    """True for paths under standards/canonical/ — quoted material, not tree."""
-    return rel.startswith("standards/canonical/")
+    """True for paths under standards/build/canonical/ — quoted material, not tree."""
+    return rel.startswith("standards/build/canonical/")
 
 
 def canonical_text(name: str) -> str:
@@ -627,7 +627,7 @@ def check_skills_hook(root: Path) -> list[Finding]:
 
 def check_self(root: Path) -> list[Finding]:
     findings = []
-    canon_dir = root / "standards" / "canonical"
+    canon_dir = root / "standards" / "build" / "canonical"
     present = (
         {p.name for p in canon_dir.iterdir() if p.is_file()}
         if canon_dir.is_dir()
@@ -636,7 +636,7 @@ def check_self(root: Path) -> list[Finding]:
     for name in sorted(present - CANONICAL_MANIFEST):
         findings.append(
             Finding(
-                f"standards/canonical/{name}",
+                f"standards/build/canonical/{name}",
                 "self-audit",
                 "no repo-audit compare covers this canonical artifact",
             )
@@ -644,9 +644,9 @@ def check_self(root: Path) -> list[Finding]:
     for name in sorted(CANONICAL_MANIFEST - present):
         findings.append(
             Finding(
-                f"standards/canonical/{name}",
+                f"standards/build/canonical/{name}",
                 "self-audit",
-                "canonical artifact missing from standards/canonical/",
+                "canonical artifact missing from standards/build/canonical/",
             )
         )
     manifest = root / ".pre-commit-hooks.yaml"

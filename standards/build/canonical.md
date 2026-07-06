@@ -1,13 +1,13 @@
 ---
 type: Standard
 title: Canonical Artifacts
-description: The canonical artifacts — the single-source files under standards/canonical/ and how each repo copy is compared
+description: The canonical artifacts — the single-source files under standards/build/canonical/ and how each repo copy is compared
 ---
 
 # Canonical Artifacts
 
 The standard's machine-checkable content lives **once**, as files in
-dev-playbook under `standards/canonical/`,
+dev-playbook under `standards/build/canonical/`,
 shipped inside every hook clone
 ([distribution.md](/standards/build/distribution.md)). Prose points at them
 and does not restate their contents — the files are the standard. Each
@@ -16,21 +16,21 @@ place, and `repo-audit` enforces them equal to the canonical source:
 
 | Artifact | Compared how |
 |---|---|
-| [ci.yml](/standards/canonical/ci.yml) | whole file, byte-identical |
-| [.python-version](/standards/canonical/.python-version) | whole file, byte-identical |
-| [.pre-commit-config.yaml](/standards/canonical/.pre-commit-config.yaml) | canonical blocks present verbatim; extra hooks may follow |
-| [Makefile.base](/standards/canonical/Makefile.base) / [Makefile.python](/standards/canonical/Makefile.python) / [Makefile.aws](/standards/canonical/Makefile.aws) | the repo's layer-matching targets present verbatim; extra targets may follow |
-| [pyproject.toml](/standards/canonical/pyproject.toml) | canonical blocks present verbatim |
-| [.gitignore](/standards/canonical/.gitignore) | baseline lines present |
+| [ci.yml](/standards/build/canonical/ci.yml) | whole file, byte-identical |
+| [.python-version](/standards/build/canonical/.python-version) | whole file, byte-identical |
+| [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml) | canonical blocks present verbatim; extra hooks may follow |
+| [Makefile.base](/standards/build/canonical/Makefile.base) / [Makefile.python](/standards/build/canonical/Makefile.python) / [Makefile.aws](/standards/build/canonical/Makefile.aws) | the repo's layer-matching targets present verbatim; extra targets may follow |
+| [pyproject.toml](/standards/build/canonical/pyproject.toml) | canonical blocks present verbatim |
+| [.gitignore](/standards/build/canonical/.gitignore) | baseline lines present |
 
-`standards/canonical/` is quoted material: hooks and tree rules skip it —
+`standards/build/canonical/` is quoted material: hooks and tree rules skip it —
 its `pyproject.toml` is a template, not a second project. Every file in the
 directory is compared against by `repo-audit`; a file that no tool checks
 does not belong there.
 
 ## One config serves every repo
 
-The canonical [.pre-commit-config.yaml](/standards/canonical/.pre-commit-config.yaml)
+The canonical [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
 carries the dev-playbook hook set, the ruff and shellcheck hooks at canonical
 revs, and the pre-push `make check` hook, installing both the commit and
 push stages. It serves every repo unchanged: a hook with no matching files

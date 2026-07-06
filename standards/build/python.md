@@ -23,7 +23,7 @@ inside that package as subpackages.
 
 ## pyproject.toml
 
-The canonical shape is [/standards/canonical/pyproject.toml](/standards/canonical/pyproject.toml),
+The canonical shape is [/standards/build/canonical/pyproject.toml](/standards/build/canonical/pyproject.toml),
 with `<repo>` and `<package>` placeholders. It pins: the `uv_build` backend,
 pytest `testpaths`, the `dev` dependency group (mypy, pytest, ruff floors),
 the ruff target/line-length/rule selection, and the mypy strictness set.
