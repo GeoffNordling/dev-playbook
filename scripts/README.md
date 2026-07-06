@@ -76,6 +76,7 @@ them per script. The library is the installed `dev_playbook` package:
 - `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-check` and `okf-lint`.
 - `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint` and `repo-audit`.
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-check` and `repo-audit`.
+- `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries. Consumed by `file-graph`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
 loading/validation and the plan/render/record runner, behind `judgments-lint`
@@ -111,6 +112,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 
 | Script | Purpose |
 |--------|---------|
+| `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout |
 | `judgments-run` | Plan / render / record over a repo's judgment declarations (driven by the `/run-judgments` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
 | `sweep` | On-demand workspace sweep: GitHub settings drift via `gh api` ([repo-settings.md](/standards/repo-settings.md)) and stale dev-playbook pins |
