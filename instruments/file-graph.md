@@ -101,5 +101,13 @@ construction. The reference implementation is `dev_playbook.filegraph`
 behind the [file-graph](/scripts/file-graph) script. The machine layer of
 the artifact is one JSON document — nodes, edges, ignored-pattern counts,
 and query results as separate keys — regenerated in full on each run,
-never hand-edited. The human-facing report over that data is designed
-next.
+never hand-edited.
+
+The human-facing layer over that JSON is an interactive visualization: a
+force-directed graph coloring nodes by bucket or by reach distance from the
+root `CLAUDE.md`, encoding each file's family as its shape, with search,
+shortest-path tracing between two files, and in-place reading of any file's
+source. Like the datasheet it is a single self-contained HTML file that
+renders from `file://` with no external requests. A working prototype lives
+at `instruments/file-graph-viz/`; unlike the datasheet its form is not yet
+pinned to a normative example.
