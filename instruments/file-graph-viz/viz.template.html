@@ -1,84 +1,99 @@
 <title>File Graph — dev-playbook</title>
 <style>
   :root {
-    --bg: #0f1117; --panel: #171a22; --panel2: #1e222c; --edge: #2a2f3a;
-    --text: #e6e8ee; --muted: #9aa2b1; --dim: #6b7280;
+    --bg:#f4f5f8; --stage:#ffffff; --panel:#ffffff; --panel2:#f3f5f9; --edge:#dde1e9;
+    --text:#1b2130; --muted:#5b6577; --dim:#94a0b2; --accent:#4f46e5;
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
-    font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-  #app { display: grid; grid-template-columns: 1fr 340px; height: 100vh; }
-  #stage { position: relative; overflow: hidden; }
-  canvas { display: block; width: 100%; height: 100%; }
-  #side { background: var(--panel); border-left: 1px solid var(--edge);
-    overflow-y: auto; padding: 16px; }
-  h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .2px; }
-  .sub { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
-  .panel { background: var(--panel2); border: 1px solid var(--edge); border-radius: 8px;
-    padding: 11px 12px; margin-bottom: 12px; }
-  .panel h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .8px;
-    color: var(--muted); margin: 0 0 9px; font-weight: 600; }
-  .row { display: flex; align-items: center; gap: 8px; margin: 3px 0; cursor: default; }
-  .row.click { cursor: pointer; }
-  .row.off { opacity: .32; }
-  .sw { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
-  .row .name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .row .num { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .bar { height: 6px; border-radius: 3px; margin-top: 2px; }
-  .toggle { display: flex; gap: 6px; margin-bottom: 12px; }
-  .toggle button { flex: 1; background: var(--panel2); color: var(--muted);
-    border: 1px solid var(--edge); border-radius: 6px; padding: 7px 6px; cursor: pointer;
-    font-size: 12px; }
-  .toggle button.on { background: #2d3550; color: #fff; border-color: #3d4a6e; }
-  .big { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .big .u { font-size: 12px; color: var(--muted); font-weight: 400; }
-  .kv { display: flex; justify-content: space-between; margin: 2px 0; }
-  .kv .k { color: var(--muted); }
-  .defect { font-size: 11px; margin: 4px 0; }
-  .defect .st { display: inline-block; font-size: 10px; padding: 0 5px; border-radius: 3px;
-    margin-right: 5px; vertical-align: 1px; }
-  .st.broken { background: #7f1d1d; color: #fecaca; }
-  .st.wrong-form { background: #78350f; color: #fde68a; }
-  .defect .p { color: var(--muted); word-break: break-all; }
-  #hud { position: absolute; left: 12px; top: 12px; background: rgba(23,26,34,.92);
-    border: 1px solid var(--edge); border-radius: 8px; padding: 9px 11px; max-width: 62%;
-    pointer-events: none; font-size: 12px; backdrop-filter: blur(4px); }
-  #hud .path { font-weight: 600; word-break: break-all; }
-  #hud .meta { color: var(--muted); margin-top: 3px; }
-  #hud.hidden { display: none; }
-  .hint { position: absolute; right: 12px; bottom: 10px; color: var(--dim); font-size: 11px;
-    pointer-events: none; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font:13px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  #app { display:grid; grid-template-columns:1fr 348px; height:100vh; }
+  #stage { position:relative; overflow:hidden; background:var(--stage); }
+  svg#c { display:block; width:100%; height:100%; cursor:grab; background:var(--stage); }
+  svg#c:active { cursor:grabbing; }
+  #side { background:var(--panel); border-left:1px solid var(--edge); overflow-y:auto; padding:16px; }
+  h1 { font-size:15px; margin:0 0 2px; letter-spacing:.2px; }
+  .sub { color:var(--muted); font-size:12px; margin-bottom:14px; }
+  .panel { background:var(--panel); border:1px solid var(--edge); border-radius:8px;
+    padding:11px 12px; margin-bottom:12px; position:relative; }
+  .panel h2 { font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted);
+    margin:0 0 9px; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .panel.key.active { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .tag { font-size:9px; letter-spacing:.5px; color:var(--accent); border:1px solid var(--accent);
+    border-radius:4px; padding:1px 5px; opacity:0; white-space:nowrap; }
+  .panel.key.active .tag { opacity:1; }
+  .row { display:flex; align-items:center; gap:8px; margin:2px 0; }
+  .glyph { flex:0 0 16px; text-align:center; font-size:13px; line-height:1; }
+  .row .name { flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .num { color:var(--muted); font-variant-numeric:tabular-nums; font-size:11px; }
+  .bar { height:6px; border-radius:3px; margin:2px 0 2px 24px; }
+  .selrow { cursor:pointer; border-radius:5px; padding:1px 4px; margin-left:-4px; }
+  .selrow:hover { background:rgba(79,70,229,.07); }
+  .selrow.selected { background:rgba(79,70,229,.14); outline:1px solid var(--accent); }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--text);
+    border:1px solid var(--edge); border-radius:20px; padding:3px 9px; cursor:pointer; }
+  .chip:hover { background:rgba(79,70,229,.07); }
+  .chip.selected { background:rgba(79,70,229,.14); border-color:var(--accent); }
+  .seglabel { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
+  .seg { display:flex; margin-bottom:12px; border:1px solid var(--edge); border-radius:7px; overflow:hidden; }
+  .seg button { flex:1; background:var(--panel); color:var(--muted); border:0; border-left:1px solid var(--edge);
+    padding:8px 6px; cursor:pointer; font-size:12px; }
+  .seg button:first-child { border-left:0; }
+  .seg button.on { background:var(--accent); color:#fff; }
+  .big { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .big .u { font-size:12px; color:var(--muted); font-weight:400; }
+  .kv { display:flex; justify-content:space-between; margin:2px 0; }
+  .kv .k { color:var(--muted); }
+  .eline { display:inline-block; width:20px; height:0; vertical-align:middle; margin-right:2px; }
+  .defect { font-size:11px; margin:4px 0; }
+  .defect .st { display:inline-block; font-size:10px; padding:0 5px; border-radius:3px; margin-right:5px; vertical-align:1px; }
+  .st.broken { background:#fee2e2; color:#b91c1c; } .st.wrong-form { background:#fef3c7; color:#b45309; }
+  .defect .p { color:var(--muted); word-break:break-all; }
+  #hud { position:absolute; left:12px; top:12px; background:rgba(255,255,255,.96); border:1px solid var(--edge);
+    border-radius:8px; padding:9px 11px; max-width:60%; pointer-events:none; font-size:12px;
+    box-shadow:0 2px 10px rgba(20,25,40,.08); }
+  #hud .path { font-weight:600; word-break:break-all; } #hud .meta { color:var(--muted); margin-top:3px; }
+  #hud.hidden { display:none; }
+  .hint { position:absolute; right:12px; bottom:10px; color:var(--dim); font-size:11px; pointer-events:none; }
+  .node { cursor:pointer; }
 </style>
 
 <div id="app">
   <div id="stage">
-    <canvas id="c"></canvas>
+    <svg id="c"><rect id="bg" fill="transparent" pointer-events="all"></rect><g id="viewport"><g id="edges"></g><g id="nodes"></g></g></svg>
     <div id="hud" class="hidden"></div>
-    <div class="hint">drag nodes · hover to trace · scroll panel for detail</div>
+    <div class="hint">scroll = zoom · drag = pan · click a legend to isolate · hover = trace</div>
   </div>
   <div id="side">
     <h1>File Graph</h1>
     <div class="sub" id="subline"></div>
 
-    <div class="toggle">
-      <button id="mBucket" class="on">Color by bucket</button>
-      <button id="mReach">Reach from CLAUDE.md</button>
+    <div class="seglabel">Node color</div>
+    <div class="seg">
+      <button id="mBucket" class="on">bucket</button>
+      <button id="mReach">reach from CLAUDE.md</button>
     </div>
 
     <div class="panel">
-      <h2>Reachability from harness context</h2>
+      <h2>Shape = file family</h2>
+      <div class="chips" id="shapekey"></div>
+    </div>
+
+    <div class="panel key active" id="bucketPanel">
+      <h2>Node color · bucket <span class="tag">on graph</span></h2>
+      <div id="buckets"></div>
+    </div>
+
+    <div class="panel key" id="reachPanel">
+      <h2>Node color · reach from CLAUDE.md <span class="tag">on graph</span></h2>
       <div class="big" id="reachBig"></div>
       <div id="rings"></div>
     </div>
 
     <div class="panel">
-      <h2>Nodes by bucket</h2>
-      <div id="buckets"></div>
-    </div>
-
-    <div class="panel">
       <h2>Edges</h2>
-      <div id="edgeForms"></div>
+      <div id="edgeLegend"></div>
       <div style="height:8px"></div>
       <div id="edgeStatus"></div>
     </div>
@@ -100,252 +115,255 @@
   </div>
 </div>
 
+<script>__D3__</script>
 <script>
 const DATA = __DATA__;
 
-const BUCKET_COLOR = {
-  "concept": "#6366f1",
-  "index": "#a855f7",
-  "harness-session": "#ef4444",
-  "harness-skill-authored": "#f59e0b",
-  "harness-skill-thirdparty": "#14b8a6",
-  "code": "#3b82f6",
-  "config": "#22c55e",
-  "unclassified": "#ec4899",
+// ---- encoding: shape = file family, color = detail (bucket, test-split) ----
+const BUCKET = {
+  "harness-session":          { color:"#dc2626", shape:"doc" },
+  "concept":                  { color:"#4f46e5", shape:"doc" },
+  "index":                    { color:"#d97706", shape:"doc" },
+  "harness-skill-authored":   { color:"#ea580c", shape:"skill" },
+  "harness-skill-thirdparty": { color:"#0d9488", shape:"skill" },
+  "code":                     { color:"#2563eb", shape:"code" },
+  "code-test":                { color:"#9333ea", shape:"code" },
+  "config":                   { color:"#16a34a", shape:"config" },
+  "unclassified":             { color:"#db2777", shape:"other" },
 };
-const BUCKET_ORDER = ["harness-session","harness-skill-authored","harness-skill-thirdparty",
-  "concept","index","code","config","unclassified"];
-// reach distance -> color (hot near seeds, cool far), unreached = dim slate
-const DIST_COLOR = ["#f43f5e","#fb7185","#fb923c","#fbbf24","#a3e635","#34d399","#22d3ee"];
-const UNREACHED = "#3a4150";
+const CKEY_ORDER = ["harness-session","concept","index","harness-skill-authored",
+  "harness-skill-thirdparty","code","code-test","config","unclassified"];
+const CKEY_LABEL = { "code-test":"code · test" };
+const SHAPE_SYMBOL = { doc:d3.symbolCircle, code:d3.symbolSquare, config:d3.symbolTriangle,
+  star:d3.symbolStar, skill:d3.symbolStar, other:d3.symbolCross };
+const SHAPE_GLYPH = { doc:"●", code:"■", config:"▲", skill:"★", other:"✖" };
+const SHAPE_LABEL = { doc:"prose / doc", code:"code", config:"config", skill:"skill", other:"unclassified" };
+const SHAPE_ORDER = ["doc","code","config","skill","other"];
 
+const DIST_COLOR = ["#e11d48","#f97316","#eab308","#84cc16","#22c55e","#0ea5e9","#6366f1"];
+const UNREACHED = "#c3c9d4";
+
+// edges: three classes only
+const E_REF = "#8792a6", E_BUNDLE = "#8b5cf6", E_WRONG = "#f59e0b";
+function edgeClass(e){ return e.status === "wrong-form" ? "wrong" : e.form === "bundle" ? "bundle" : "ref"; }
+function edgeColor(e){ const c = edgeClass(e); return c === "wrong" ? E_WRONG : c === "bundle" ? E_BUNDLE : E_REF; }
+function edgeDash(e){ return e.form === "bundle" ? "3,3" : null; }
+function edgeBaseOp(e){ const c = edgeClass(e); return c === "wrong" ? 0.75 : c === "bundle" ? 0.45 : 0.13; }
+
+// ---- test-code heuristic (within the code bucket) ----
+function isTest(p){
+  return /(^|\/)tests?\//.test(p) || /(^|\/)test_[^/]*$/.test(p)
+      || /_test\.[a-z]+$/.test(p) || /\.test\.[a-z]+$/.test(p) || /(^|\/)conftest\.py$/.test(p);
+}
+function ckeyOf(path, bucket){ return (bucket === "code" && isTest(path)) ? "code-test" : bucket; }
+
+// ---- data → nodes + links ----
 const reach = DATA.queries.reachability;
-const reached = reach.reached;                 // {path: dist}
-const seeds = new Set(reach.seeds);
-const orphans = DATA.queries.orphans;          // {path: bucket}
+const reached = reach.reached, seeds = new Set(reach.seeds);
+const orphans = DATA.queries.orphans;
 
-// ---- build node + link arrays ----
-const nodes = Object.entries(DATA.nodes).map(([path, bucket], i) => ({
-  path, bucket, i, dist: (path in reached ? reached[path] : null),
-  seed: seeds.has(path), deg: 0,
-  x: Math.cos(i) * 240 + 400 + (i % 7) * 3,
-  y: Math.sin(i * 1.3) * 240 + 300 + (i % 5) * 3,
-  vx: 0, vy: 0, fx: null, fy: null,
-}));
+const nodes = Object.entries(DATA.nodes).map(([path, bucket]) => {
+  const ckey = ckeyOf(path, bucket);
+  return { path, bucket, ckey, deg:0, seed:seeds.has(path),
+    dist:(path in reached ? reached[path] : null),
+    shape:(BUCKET[ckey] || BUCKET.unclassified).shape };
+});
 const byPath = new Map(nodes.map(n => [n.path, n]));
-
 const links = [];
 for (const e of DATA.edges) {
   const s = byPath.get(e.source), t = byPath.get(e.target);
-  if (s && t && s !== t) {
-    links.push({ s, t, form: e.form, status: e.status });
-    s.deg++; t.deg++;
-  }
+  if (s && t && s !== t) { links.push({ source:s, target:t, form:e.form, status:e.status }); s.deg++; t.deg++; }
 }
 const nbr = new Map(nodes.map(n => [n, new Set()]));
-for (const l of links) { nbr.get(l.s).add(l.t); nbr.get(l.t).add(l.s); }
-for (const n of nodes) n.r = 3 + Math.sqrt(n.deg) * 1.25;
+for (const l of links) { nbr.get(l.source).add(l.target); nbr.get(l.target).add(l.source); }
+for (const n of nodes) { n.r = 3.2 + Math.sqrt(n.deg) * 1.3; n.area = Math.PI * n.r * n.r; }
 
-// ---- canvas + hidpi ----
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
-function resize() {
-  const st = document.getElementById("stage").getBoundingClientRect();
-  W = st.width; H = st.height;
-  canvas.width = W * DPR; canvas.height = H * DPR;
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-}
-window.addEventListener("resize", resize); resize();
+const ckeyCounts = {}, shapeCounts = {};
+for (const n of nodes) { ckeyCounts[n.ckey] = (ckeyCounts[n.ckey] || 0) + 1; shapeCounts[n.shape] = (shapeCounts[n.shape] || 0) + 1; }
 
-// ---- force sim (cooling alpha + friction + velocity clamp, then freeze) ----
-const CHARGE = 700, LINK_K = 0.08, LINK_LEN = 30, CENTER_K = 0.015;
-const FRICTION = 0.6, MAXV = 12, ALPHA_DECAY = 0.022, ALPHA_FREEZE = 0.004;
-let alpha = 1;
-function reheat(a = 0.4) { if (alpha < a) alpha = a; }
-function tick() {
-  alpha += (0 - alpha) * ALPHA_DECAY;   // exponential cool toward 0
-  const cx = W / 2, cy = H / 2, N = nodes.length;
-  for (let a = 0; a < N; a++) {
-    const na = nodes[a];
-    for (let b = a + 1; b < N; b++) {
-      const nb = nodes[b];
-      let dx = na.x - nb.x, dy = na.y - nb.y;
-      let d2 = dx * dx + dy * dy;
-      if (d2 < 0.01) { dx = (a - b) * 0.1 + 0.01; dy = 0.03; d2 = dx * dx + dy * dy; }
-      const d = Math.sqrt(d2), f = (CHARGE * alpha) / d2;
-      const fx = (dx / d) * f, fy = (dy / d) * f;
-      na.vx += fx; na.vy += fy; nb.vx -= fx; nb.vy -= fy;
-    }
-  }
-  for (const l of links) {
-    const dx = l.t.x - l.s.x, dy = l.t.y - l.s.y;
-    const d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-    const f = LINK_K * (d - LINK_LEN) * alpha;
-    const fx = (dx / d) * f, fy = (dy / d) * f;
-    l.s.vx += fx; l.s.vy += fy; l.t.vx -= fx; l.t.vy -= fy;
-  }
-  for (const n of nodes) {
-    if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = n.vy = 0; continue; }
-    n.vx += (cx - n.x) * CENTER_K * alpha;
-    n.vy += (cy - n.y) * CENTER_K * alpha;
-    const v = Math.sqrt(n.vx * n.vx + n.vy * n.vy);
-    if (v > MAXV) { n.vx = (n.vx / v) * MAXV; n.vy = (n.vy / v) * MAXV; }
-    n.x += n.vx; n.y += n.vy;
-    n.vx *= FRICTION; n.vy *= FRICTION;
-  }
-}
-
-// ---- render ----
 let mode = "bucket";
-let hover = null;
-function nodeColor(n) {
-  if (mode === "reach") return n.dist == null ? UNREACHED : DIST_COLOR[Math.min(n.dist, 6)];
-  return dimmed.has(n.bucket) ? UNREACHED : (BUCKET_COLOR[n.bucket] || "#888");
+function colorFor(d){
+  if (mode === "reach") return d.dist == null ? UNREACHED : DIST_COLOR[Math.min(d.dist, 6)];
+  return (BUCKET[d.ckey] || BUCKET.unclassified).color;
 }
-const dimmed = new Set();   // buckets toggled off in legend
 
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  const active = hover ? nbr.get(hover) : null;
-  // edges
-  for (const l of links) {
-    const lit = hover && (l.s === hover || l.t === hover);
-    if (l.status !== "ok") { ctx.strokeStyle = l.status === "broken" ? "rgba(244,63,94,.55)" : "rgba(245,158,11,.5)"; }
-    else ctx.strokeStyle = lit ? "rgba(210,220,240,.85)" : "rgba(120,130,150,.10)";
-    ctx.lineWidth = lit ? 1.4 : 0.7;
-    ctx.beginPath(); ctx.moveTo(l.s.x, l.s.y); ctx.lineTo(l.t.x, l.t.y); ctx.stroke();
+// ---- svg + zoom + pan ----
+const stage = document.getElementById("stage");
+const svg = d3.select("#c"), bg = d3.select("#bg");
+const viewport = d3.select("#viewport");
+const edgeG = d3.select("#edges"), nodeG = d3.select("#nodes");
+let W = stage.clientWidth, H = stage.clientHeight;
+bg.attr("width", W).attr("height", H);
+
+const zoom = d3.zoom().scaleExtent([0.12, 6]).on("zoom", (ev) => viewport.attr("transform", ev.transform));
+svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(W / 2, H / 2).scale(0.72));
+window.addEventListener("resize", () => { W = stage.clientWidth; H = stage.clientHeight; bg.attr("width", W).attr("height", H); });
+
+// ---- draw ----
+const link = edgeG.selectAll("line").data(links).join("line")
+  .attr("stroke", edgeColor).attr("stroke-dasharray", edgeDash)
+  .attr("stroke-opacity", edgeBaseOp).attr("stroke-width", 0.9);
+
+const sym = d3.symbol();
+const node = nodeG.selectAll("g.node").data(nodes).join("g").attr("class", "node");
+node.append("path")
+  .attr("d", d => sym.type(SHAPE_SYMBOL[d.shape]).size(d.area * 2.4)())
+  .attr("fill", colorFor)
+  .attr("stroke", d => d.seed ? "#0f172a" : "rgba(15,23,42,.35)")
+  .attr("stroke-width", d => d.seed ? 2.2 : 0.6);
+
+// ---- simulation ----
+const sim = d3.forceSimulation(nodes)
+  .force("charge", d3.forceManyBody().strength(-150).distanceMax(430))
+  .force("link", d3.forceLink(links).distance(30).strength(0.35))
+  .force("x", d3.forceX(0).strength(0.05))
+  .force("y", d3.forceY(0).strength(0.05))
+  .force("collide", d3.forceCollide().radius(d => d.r + 2.5))
+  .on("tick", () => {
+    link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+node.call(d3.drag()
+  .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+  .on("drag",  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+  .on("end",   (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+// ---- selection (click a legend to isolate) + hover trace ----
+let sel = null;  // { id, kind:'node'|'edge', test }
+function applyState(){
+  if (!sel) {
+    node.style("opacity", 1);
+    link.attr("stroke", edgeColor).attr("stroke-opacity", edgeBaseOp).attr("stroke-width", 0.9);
+  } else if (sel.kind === "node") {
+    node.style("opacity", n => sel.test(n) ? 1 : 0.09);
+    link.attr("stroke", edgeColor)
+        .attr("stroke-opacity", e => (sel.test(e.source) && sel.test(e.target)) ? edgeBaseOp(e) : 0.03)
+        .attr("stroke-width", 0.9);
+  } else {
+    node.style("opacity", 0.5);
+    link.attr("stroke", edgeColor)
+        .attr("stroke-opacity", e => sel.test(e) ? Math.max(0.8, edgeBaseOp(e)) : 0.03)
+        .attr("stroke-width", e => sel.test(e) ? 1.6 : 0.9);
   }
-  // nodes
-  for (const n of nodes) {
-    const faded = hover && n !== hover && !(active && active.has(n));
-    ctx.globalAlpha = faded ? 0.22 : 1;
-    ctx.fillStyle = nodeColor(n);
-    ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 6.2832); ctx.fill();
-    if (n.seed) {
-      ctx.globalAlpha = faded ? 0.3 : 1;
-      ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 2.5, 0, 6.2832); ctx.stroke();
-    }
-    if (n === hover) {
-      ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 3, 0, 6.2832); ctx.stroke();
-    }
-  }
-  ctx.globalAlpha = 1;
 }
-function frame() { if (alpha > ALPHA_FREEZE) tick(); draw(); requestAnimationFrame(frame); }
-// settle the layout before the first paint, then freeze; interaction re-heats it
-for (let i = 0; i < 320; i++) tick();
-alpha = 0;
-frame();
-
-// ---- interaction ----
-function pick(mx, my) {
-  let best = null, bestD = Infinity;
-  for (const n of nodes) {
-    const dx = n.x - mx, dy = n.y - my, d = Math.sqrt(dx * dx + dy * dy);
-    if (d < n.r + 5 && d < bestD) { best = n; bestD = d; }
-  }
-  return best;
+function markRows(){
+  document.querySelectorAll(".selrow,.chip").forEach(el =>
+    el.classList.toggle("selected", !!sel && el.dataset.selid === sel.id));
 }
-let drag = null;
-canvas.addEventListener("mousemove", (e) => {
-  const r = canvas.getBoundingClientRect();
-  const mx = e.clientX - r.left, my = e.clientY - r.top;
-  if (drag) { drag.fx = mx; drag.fy = my; reheat(0.3); return; }
-  hover = pick(mx, my);
-  const hud = document.getElementById("hud");
-  if (hover) {
-    hud.classList.remove("hidden");
-    const dtxt = hover.dist == null ? "unreachable from CLAUDE.md"
-      : (hover.dist === 0 ? "seed (harness context)" : hover.dist + " hop" + (hover.dist>1?"s":"") + " from CLAUDE.md");
-    hud.innerHTML = `<div class="path">${hover.path}</div>`
-      + `<div class="meta">${hover.bucket} &middot; ${hover.deg} edge${hover.deg===1?"":"s"} &middot; ${dtxt}</div>`;
-  } else hud.classList.add("hidden");
-});
-canvas.addEventListener("mousedown", (e) => {
-  const r = canvas.getBoundingClientRect();
-  drag = pick(e.clientX - r.left, e.clientY - r.top);
-  if (drag) { drag.fx = drag.x; drag.fy = drag.y; reheat(0.3); }
-});
-window.addEventListener("mouseup", () => { if (drag) { drag.fx = drag.fy = null; drag = null; } });
+function setSel(id, kind, test){
+  sel = (sel && sel.id === id) ? null : { id, kind, test };
+  markRows(); applyState();
+}
+bg.on("click", () => { if (sel) { sel = null; markRows(); applyState(); } });
 
-// ---- mode buttons ----
+const hud = document.getElementById("hud");
+node.on("pointerenter", (ev, d) => {
+  const near = nbr.get(d);
+  node.style("opacity", n => (n === d || near.has(n)) ? 1 : 0.1);
+  link.attr("stroke", e => (e.source === d || e.target === d) ? "#334155" : edgeColor(e))
+      .attr("stroke-opacity", e => (e.source === d || e.target === d) ? 0.9 : 0.03)
+      .attr("stroke-width", e => (e.source === d || e.target === d) ? 1.6 : 0.9);
+  const dtxt = d.dist == null ? "unreachable from CLAUDE.md"
+    : d.dist === 0 ? "seed (harness context)"
+    : d.dist + " hop" + (d.dist > 1 ? "s" : "") + " from CLAUDE.md";
+  hud.classList.remove("hidden");
+  hud.innerHTML = `<div class="path">${d.path}</div><div class="meta">`
+    + `${CKEY_LABEL[d.ckey] || d.ckey} &middot; ${d.deg} edge${d.deg === 1 ? "" : "s"} &middot; ${dtxt}</div>`;
+}).on("pointerleave", () => { hud.classList.add("hidden"); applyState(); });
+
+// ---- mode toggle ----
 const mB = document.getElementById("mBucket"), mR = document.getElementById("mReach");
-mB.onclick = () => { mode = "bucket"; mB.classList.add("on"); mR.classList.remove("on"); };
-mR.onclick = () => { mode = "reach"; mR.classList.add("on"); mB.classList.remove("on"); };
+const bucketPanel = document.getElementById("bucketPanel"), reachPanel = document.getElementById("reachPanel");
+function setMode(m){
+  mode = m;
+  node.select("path").attr("fill", colorFor);
+  mB.classList.toggle("on", m === "bucket"); mR.classList.toggle("on", m === "reach");
+  bucketPanel.classList.toggle("active", m === "bucket");
+  reachPanel.classList.toggle("active", m === "reach");
+}
+mB.onclick = () => setMode("bucket");
+mR.onclick = () => setMode("reach");
 
-// ---- sidebar population ----
+// ---- sidebar ----
 const census = DATA.queries.census;
-const nb = census.nodes_by_bucket;
 const total = nodes.length, nreached = Object.keys(reached).length;
 document.getElementById("subline").textContent =
   `${DATA.repo} · ${total} files · ${links.length} internal edges · ${DATA.queries.defects.length} defects`;
 
-document.getElementById("reachBig").innerHTML =
-  `${nreached}<span class="u"> / ${total} reached</span> &nbsp; `
-  + `<span class="big" style="color:var(--muted)">${reach.unreached.length}<span class="u"> unreachable</span></span>`;
+// shape key — clickable chips (isolate by family)
+document.getElementById("shapekey").innerHTML = SHAPE_ORDER.filter(s => shapeCounts[s]).map(s =>
+  `<span class="chip selrow" data-selid="shape:${s}"><b style="font-size:13px">${SHAPE_GLYPH[s]}</b> ${SHAPE_LABEL[s]}</span>`).join("");
 
+// bucket color key — clickable rows
+document.getElementById("buckets").innerHTML = CKEY_ORDER.filter(b => ckeyCounts[b]).map(b => {
+  const m = BUCKET[b];
+  return `<div class="row selrow" data-selid="ckey:${b}"><span class="glyph" style="color:${m.color}">${SHAPE_GLYPH[m.shape]}</span>`
+    + `<span class="name">${CKEY_LABEL[b] || b}</span><span class="num">${ckeyCounts[b]}</span></div>`;
+}).join("");
+
+// reach color key — clickable rows
+document.getElementById("reachBig").innerHTML = `${nreached}<span class="u"> / ${total} reached</span>`;
 const rbd = reach.reached_by_distance;
 const maxRing = Math.max(...Object.values(rbd), reach.unreached.length);
-let ringsHtml = "";
+let rings = "";
 for (let d = 0; d <= 6; d++) {
   const c = rbd[d] || 0; if (!c && d > 0) continue;
-  ringsHtml += `<div class="row"><span class="sw" style="background:${DIST_COLOR[d]}"></span>`
-    + `<span class="name">${d === 0 ? "seeds" : d + " hop" + (d>1?"s":"")}</span>`
-    + `<span class="num">${c}</span></div>`
-    + `<div class="bar" style="width:${Math.max(4, c/maxRing*100)}%;background:${DIST_COLOR[d]}"></div>`;
+  rings += `<div class="row selrow" data-selid="dist:${d}"><span class="glyph" style="color:${DIST_COLOR[d]}">●</span>`
+    + `<span class="name">${d === 0 ? "seeds" : d + " hop" + (d > 1 ? "s" : "")}</span><span class="num">${c}</span></div>`
+    + `<div class="bar" style="width:${Math.max(4, c / maxRing * 100)}%;background:${DIST_COLOR[d]}"></div>`;
 }
-ringsHtml += `<div class="row" style="margin-top:8px"><span class="sw" style="background:${UNREACHED}"></span>`
+rings += `<div class="row selrow" data-selid="dist:none" style="margin-top:6px"><span class="glyph" style="color:${UNREACHED}">●</span>`
   + `<span class="name">unreachable</span><span class="num">${reach.unreached.length}</span></div>`
-  + `<div class="bar" style="width:${reach.unreached.length/maxRing*100}%;background:${UNREACHED}"></div>`;
-// unreached breakdown
+  + `<div class="bar" style="width:${reach.unreached.length / maxRing * 100}%;background:${UNREACHED}"></div>`;
 const ubb = reach.unreached_by_bucket;
-ringsHtml += `<div style="margin-top:7px;color:var(--muted);font-size:11px">unreachable: `
-  + BUCKET_ORDER.filter(b => ubb[b]).map(b => `${ubb[b]}&nbsp;${b.replace("harness-","")}`).join(" · ") + `</div>`;
-document.getElementById("rings").innerHTML = ringsHtml;
+rings += `<div style="margin-top:7px;color:var(--muted);font-size:11px">unreachable: `
+  + CKEY_ORDER.filter(b => ubb[b]).map(b => `${ubb[b]}&nbsp;${b.replace("harness-", "")}`).join(" · ") + `</div>`;
+document.getElementById("rings").innerHTML = rings;
 
-let bh = "";
-for (const b of BUCKET_ORDER) {
-  if (!nb[b]) continue;
-  bh += `<div class="row click" data-b="${b}"><span class="sw" style="background:${BUCKET_COLOR[b]}"></span>`
-    + `<span class="name">${b}</span><span class="num">${nb[b]}</span></div>`;
-}
-const bucketsEl = document.getElementById("buckets");
-bucketsEl.innerHTML = bh;
-bucketsEl.querySelectorAll(".row").forEach(row => {
-  row.onclick = () => {
-    const b = row.dataset.b;
-    if (dimmed.has(b)) { dimmed.delete(b); row.classList.remove("off"); }
-    else { dimmed.add(b); row.classList.add("off"); }
-  };
-});
-
-document.getElementById("edgeForms").innerHTML = Object.entries(census.edges_by_form)
-  .sort((a,b) => b[1]-a[1])
-  .map(([f,c]) => `<div class="kv"><span class="k">${f}</span><span>${c}</span></div>`).join("");
+// edge legend — clickable rows
+function eline(color, dash){ return `<span class="eline" style="border-top:2px ${dash ? "dashed" : "solid"} ${color}"></span>`; }
+document.getElementById("edgeLegend").innerHTML =
+  `<div class="row selrow" data-selid="edge:ref">${eline(E_REF)}<span class="name">reference</span>`
+    + `<span class="num">link · citation · relative · prose · code-ref</span></div>`
+  + `<div class="row selrow" data-selid="edge:bundle">${eline(E_BUNDLE, true)}<span class="name">bundle</span>`
+    + `<span class="num">skill → member</span></div>`
+  + `<div class="row selrow" data-selid="edge:wrong">${eline(E_WRONG)}<span class="name">wrong-form</span>`
+    + `<span class="num">defect edge</span></div>`;
 document.getElementById("edgeStatus").innerHTML = Object.entries(census.edges_by_status)
-  .map(([s,c]) => `<div class="kv"><span class="k" style="color:${s==='ok'?'#22c55e':s==='broken'?'#f43f5e':'#f59e0b'}">${s}</span><span>${c}</span></div>`).join("");
+  .map(([s, c]) => `<div class="kv"><span class="k" style="color:${s === "ok" ? "#16a34a" : s === "broken" ? "#dc2626" : "#d97706"}">${s}</span><span>${c}</span></div>`).join("");
 
-const orphanCounts = {};
-for (const b of Object.values(orphans)) orphanCounts[b] = (orphanCounts[b] || 0) + 1;
+// orphans
+const oc = {}; for (const [p, b] of Object.entries(orphans)) { const k = ckeyOf(p, b); oc[k] = (oc[k] || 0) + 1; }
 document.getElementById("orphanHdr").textContent = `Orphans (${Object.keys(orphans).length})`;
-document.getElementById("orphans").innerHTML = BUCKET_ORDER.filter(b => orphanCounts[b])
-  .map(b => `<div class="row"><span class="sw" style="background:${BUCKET_COLOR[b]}"></span>`
-    + `<span class="name">${b}</span><span class="num">${orphanCounts[b]}</span></div>`).join("")
+document.getElementById("orphans").innerHTML = CKEY_ORDER.filter(b => oc[b]).map(b =>
+  `<div class="row"><span class="glyph" style="color:${BUCKET[b].color}">${SHAPE_GLYPH[BUCKET[b].shape]}</span>`
+  + `<span class="name">${CKEY_LABEL[b] || b}</span><span class="num">${oc[b]}</span></div>`).join("")
   + `<div style="color:var(--dim);font-size:11px;margin-top:6px">files with no edges at all</div>`;
 
+// defects
 const defects = DATA.queries.defects;
 document.getElementById("defectHdr").textContent = `Defects (${defects.length})`;
 document.getElementById("defects").innerHTML = defects.map(d =>
-  `<div class="defect"><span class="st ${d.status}">${d.status}</span>`
-  + `<span class="p">${d.source} → ${d.target}</span></div>`).join("");
+  `<div class="defect"><span class="st ${d.status}">${d.status}</span><span class="p">${d.source} → ${d.target}</span></div>`).join("");
 
+// components
 const comps = DATA.queries.components;
 document.getElementById("components").innerHTML =
-  `<div class="big">${comps.length}<span class="u"> component${comps.length===1?"":"s"} · ${comps.reduce((a,c)=>a+c.length,0)} docs</span></div>`
+  `<div class="big">${comps.length}<span class="u"> component${comps.length === 1 ? "" : "s"} · ${comps.reduce((a, c) => a + c.length, 0)} docs</span></div>`
   + `<div style="color:var(--dim);font-size:11px;margin-top:4px">`
-  + (comps.length === 1 ? "the whole concept+index bundle is one connected web" : "sizes: " + comps.map(c=>c.length).sort((a,b)=>b-a).join(", "))
-  + `</div>`;
+  + (comps.length === 1 ? "the whole concept+index bundle is one connected web" : "sizes: " + comps.map(c => c.length).sort((a, b) => b - a).join(", ")) + `</div>`;
+
+// ---- wire legend clicks (delegate) ----
+document.querySelectorAll("[data-selid]").forEach(el => {
+  const id = el.dataset.selid;
+  el.addEventListener("click", () => {
+    const [kind, val] = id.split(":");
+    if (kind === "ckey")  setSel(id, "node", n => n.ckey === val);
+    else if (kind === "shape") setSel(id, "node", n => n.shape === val);
+    else if (kind === "dist")  setSel(id, "node", n => val === "none" ? n.dist == null : n.dist === +val);
+    else if (kind === "edge")  setSel(id, "edge", e => edgeClass(e) === val);
+  });
+});
 </script>
