@@ -117,17 +117,35 @@ def test_session_messages_guards_against_a_non_advancing_cursor() -> None:
     assert len(calls) == 2
 
 
-def test_run_fails_loud_on_nonzero_exit() -> None:
+def test_infrastructure_failure_stays_a_bare_agentsview_error() -> None:
     calls: list[list[str]] = []
+    # A daemon-down / connection failure is not a missing session; it must
+    # surface loudly as a bare AgentsViewError, never be mistaken for an
+    # unresolvable subagent link.
     runner = recording_runner(
-        [completed(1, stderr="agentsview: no such session 'nope'")], calls
+        [completed(1, stderr="error: connection refused (is the daemon running?)")],
+        calls,
     )
 
-    with pytest.raises(AgentsViewError, match="no such session") as excinfo:
-        session_get("nope", runner=runner)
+    with pytest.raises(AgentsViewError, match="connection refused") as excinfo:
+        session_get("s1", runner=runner)
 
-    # A generic failure stays a bare AgentsViewError; only "not found" on stderr
-    # escalates to SessionNotFound.
+    assert not isinstance(excinfo.value, SessionNotFound)
+
+
+def test_infrastructure_not_found_is_not_escalated_to_session_not_found() -> None:
+    calls: list[list[str]] = []
+    # An infrastructure "not found" (host, config file, missing binary) carries
+    # the words "not found" but names no session; escalating it to
+    # SessionNotFound would silently swallow a real fault as an unresolvable
+    # link, so it must stay a bare AgentsViewError.
+    runner = recording_runner(
+        [completed(1, stderr="error: host not found: 127.0.0.1:8080")], calls
+    )
+
+    with pytest.raises(AgentsViewError) as excinfo:
+        session_get("s1", runner=runner)
+
     assert not isinstance(excinfo.value, SessionNotFound)
 
 

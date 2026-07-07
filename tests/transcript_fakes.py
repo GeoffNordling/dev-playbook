@@ -125,7 +125,9 @@ def system_row(
     return row
 
 
-def fake_daemon(sessions: dict[str, dict]) -> Callable:
+def fake_daemon(
+    sessions: dict[str, dict], evicted: frozenset[str] = frozenset()
+) -> Callable:
     """A fake `subprocess.run` dispatching `session get`/`messages` from a map.
 
     `sessions` maps a session id to `{"meta": {...}, "rows": [...]}`. `get` returns
@@ -133,6 +135,8 @@ def fake_daemon(sessions: dict[str, dict]) -> Callable:
     after the live rows (the next page comes back empty). A lookup for an id absent
     from the map exits nonzero with `... not found`, mirroring the daemon's response
     for a linked-but-uningested subagent (which the client maps to SessionNotFound).
+    An id in `evicted` answers `get` from the map but fails `messages` not-found,
+    modelling a session pruned between the two calls.
     """
 
     def completed(stdout: str) -> object:
@@ -159,6 +163,8 @@ def fake_daemon(sessions: dict[str, dict]) -> Callable:
         if cmd == "get":
             return completed(json.dumps(entry["meta"]))
         if cmd == "messages":
+            if sid in evicted:
+                return not_found(sid)
             frm = int(args[args.index("--from") + 1])
             rows = [r for r in entry["rows"] if r["ordinal"] >= frm]
             return completed(json.dumps({"messages": rows, "count": len(rows)}))

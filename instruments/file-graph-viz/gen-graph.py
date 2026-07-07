@@ -23,7 +23,6 @@ Run from anywhere; writes file-graph.json beside this script.
 
 import json
 import sys
-from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -43,23 +42,9 @@ edges = [
     if not e["source"].startswith(EXCLUDE)
     and not (e["kind"] == "internal" and e["target"].startswith(EXCLUDE))
 ]
-known = set(nodes)
-touched = {e["source"] for e in edges if e["kind"] == "internal"}
-touched |= {e["target"] for e in edges if e["kind"] == "internal"}
-
 graph["nodes"] = nodes
 graph["edges"] = edges
-graph["queries"] = {
-    "census": {
-        "nodes_by_bucket": dict(Counter(nodes.values()).most_common()),
-        "edges_by_form": dict(Counter(e["form"] for e in edges).most_common()),
-        "edges_by_status": dict(Counter(e["status"] for e in edges).most_common()),
-    },
-    "reachability": filegraph.reachability(nodes, edges, [SEED]),
-    "components": filegraph.components(nodes, edges),
-    "orphans": {r: nodes[r] for r in sorted(known - touched)},
-    "defects": [e for e in edges if e["status"] != "ok"],
-}
+graph["queries"] = filegraph.compute_queries(nodes, edges, [SEED])
 
 out = Path(__file__).parent / "file-graph.json"
 out.write_text(json.dumps(graph, indent=1) + "\n")

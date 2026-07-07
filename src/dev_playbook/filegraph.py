@@ -72,12 +72,15 @@ def bucket(relpath: str, repo_root: Path) -> str:
     suffix = PurePosixPath(relpath).suffix
     if suffix in CODE_EXTENSIONS:
         return "code"
-    if (repo_root / relpath).stat().st_mode & 0o111:
-        return "code"  # extensionless executables: hook and script entry points
     if suffix in CONFIG_EXTENSIONS or name.startswith(".") or name in CONFIG_NAMES:
         return "config"
     if relpath.startswith("standards/build/canonical/"):
         return "config"  # canonical templates: Makefile.base, CLAUDE.md.standards
+    if (repo_root / relpath).stat().st_mode & 0o111:
+        # Extensionless executables (hook and script entry points). Checked
+        # after the extension buckets so an executable *.yaml/*.json stays
+        # config rather than being mislabeled code.
+        return "code"
     return "unclassified"
 
 
@@ -185,11 +188,16 @@ def markdown_edges(relpath: str, repo_root: Path, repo_name: str) -> list[dict]:
             }
         )
 
-    frontmatter, _ = md.parse_frontmatter(text)
+    frontmatter, body = md.parse_frontmatter(text)
     if frontmatter and isinstance(frontmatter.get("resource"), str):
         add(frontmatter["resource"], "resource", 0)
 
-    for line_num, line in md.lines_outside_fences(text):
+    # Scan the body only: frontmatter is structured YAML, not prose, so a value
+    # like ``resource: ~/workspace/...`` must not be re-extracted as a phantom
+    # citation edge. The offset keeps reported line numbers absolute.
+    offset = text.count("\n", 0, len(text) - len(body))
+    for line_num, line in md.lines_outside_fences(body):
+        line_num += offset
         stripped = md.INLINE_CODE_PATTERN.sub("", line)
         for _label, target in md.MD_LINK_PATTERN.findall(stripped):
             if target.startswith("~/workspace/"):
@@ -249,25 +257,38 @@ def path_token_edges(
 
 
 def bundle_edges(files: list[str]) -> list[dict]:
-    """Structural edges: ``SKILL.md`` is the hub of its bundle directory."""
+    """Structural edges: ``SKILL.md`` is the hub of its bundle directory.
+
+    A file belongs to its *nearest* ``SKILL.md`` — the deepest hub directory
+    that contains it — so a nested bundle's files are not also claimed by an
+    outer bundle.
+    """
     hubs = {
         str(PurePosixPath(rel).parent): rel
         for rel in files
         if PurePosixPath(rel).name == "SKILL.md"
     }
-    return [
-        {
-            "source": hub,
-            "target": rel,
-            "kind": "internal",
-            "form": "bundle",
-            "line": 0,
-            "status": "ok",
-        }
-        for hub_dir, hub in hubs.items()
-        for rel in files
-        if rel != hub and rel.startswith(hub_dir + "/")
-    ]
+    edges = []
+    for rel in files:
+        containing = [
+            hub_dir
+            for hub_dir, hub in hubs.items()
+            if rel != hub and rel.startswith(hub_dir + "/")
+        ]
+        if not containing:
+            continue
+        hub_dir = max(containing, key=len)  # nearest bundle wins
+        edges.append(
+            {
+                "source": hubs[hub_dir],
+                "target": rel,
+                "kind": "internal",
+                "form": "bundle",
+                "line": 0,
+                "status": "ok",
+            }
+        )
+    return edges
 
 
 # --- queries -----------------------------------------------------------------
@@ -345,6 +366,28 @@ def components(nodes: dict[str, str], edges: list[dict]) -> list[list[str]]:
     return sorted(result, key=len, reverse=True)
 
 
+def compute_queries(nodes: dict[str, str], edges: list[dict], seeds: list[str]) -> dict:
+    """Assemble the spec's five query results over a (possibly filtered) graph.
+
+    Shared by :func:`build_graph` and the viz's ``gen-graph`` so the census,
+    reachability, components, orphans, and defects shapes cannot drift apart.
+    """
+    known = set(nodes)
+    touched = {e["source"] for e in edges if e["kind"] == "internal"}
+    touched |= {e["target"] for e in edges if e["kind"] == "internal"}
+    return {
+        "census": {
+            "nodes_by_bucket": dict(Counter(nodes.values()).most_common()),
+            "edges_by_form": dict(Counter(e["form"] for e in edges).most_common()),
+            "edges_by_status": dict(Counter(e["status"] for e in edges).most_common()),
+        },
+        "reachability": reachability(nodes, edges, seeds),
+        "components": components(nodes, edges),
+        "orphans": {rel: nodes[rel] for rel in sorted(known - touched)},
+        "defects": [e for e in edges if e["status"] != "ok"],
+    }
+
+
 # --- orchestration -----------------------------------------------------------
 
 
@@ -377,25 +420,11 @@ def build_graph(repo_root: Path) -> dict:
     edges.extend(bundle_edges(files))
 
     seeds = sorted(rel for rel, b in nodes.items() if b == "harness-session")
-    touched = {e["source"] for e in edges if e["kind"] == "internal"}
-    touched |= {e["target"] for e in edges if e["kind"] == "internal"}
     return {
         "repo": repo_name,
         "root": str(repo_root),
         "nodes": nodes,
         "edges": edges,
         "ignored": ignored_census(repo_root),
-        "queries": {
-            "census": {
-                "nodes_by_bucket": dict(Counter(nodes.values()).most_common()),
-                "edges_by_form": dict(Counter(e["form"] for e in edges).most_common()),
-                "edges_by_status": dict(
-                    Counter(e["status"] for e in edges).most_common()
-                ),
-            },
-            "reachability": reachability(nodes, edges, seeds),
-            "components": components(nodes, edges),
-            "orphans": {rel: nodes[rel] for rel in sorted(known - touched)},
-            "defects": [e for e in edges if e["status"] != "ok"],
-        },
+        "queries": compute_queries(nodes, edges, seeds),
     }

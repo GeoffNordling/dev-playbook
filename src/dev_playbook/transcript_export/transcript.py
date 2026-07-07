@@ -139,21 +139,23 @@ def _subagent_renderer(
             return f'<subagent id="{ident}" omitted="depth"/>'
         try:
             meta = session_get(subagent_session_id, runner=runner)
+            body = _render_body(
+                subagent_session_id,
+                runner,
+                visited=visited | {subagent_session_id},
+                depth=depth + 1,
+            )
         except SessionNotFound:
             # The daemon stamps parent tool calls with subagent ids for async
             # background agents, but those transcripts live in the session's tmp
             # task dir and are never ingested — so this id is unresolvable by
             # construction, an expected runtime state, not a fault. Emit a
-            # fail-visible placeholder rather than crash the whole render. Only
-            # SessionNotFound is caught; a daemon-down AgentsViewError still
-            # propagates loud.
+            # fail-visible placeholder rather than crash the whole render. Both
+            # the header and the message fetch are guarded: an id present at
+            # `get` can still be evicted before `messages`, and that race must
+            # yield the same placeholder. Only SessionNotFound is caught; a
+            # daemon-down AgentsViewError still propagates loud.
             return f'<subagent id="{ident}" omitted="unarchived"/>'
-        body = _render_body(
-            subagent_session_id,
-            runner,
-            visited=visited | {subagent_session_id},
-            depth=depth + 1,
-        )
         count = meta.get("message_count")
         messages_attr = "" if count is None else f' messages="{escape(str(count))}"'
         return f'<subagent id="{ident}"{messages_attr}>{body}</subagent>'

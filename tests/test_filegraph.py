@@ -341,3 +341,96 @@ def test_files_with_no_edges_are_orphans_by_bucket(tmp_path: Path) -> None:
     graph = filegraph.build_graph(repo)
 
     assert graph["queries"]["orphans"] == {"lonely.py": "code"}
+
+
+def test_frontmatter_resource_is_not_also_a_phantom_citation(
+    tmp_path: Path,
+) -> None:
+    repo = graph_repo(
+        tmp_path,
+        {
+            "a.md": "---\nresource: ~/workspace/repo/b.md\n---\nbody\n",
+            "b.md": "target",
+        },
+    )
+
+    graph = filegraph.build_graph(repo)
+
+    # The resource declaration is one edge, not a resource edge plus a phantom
+    # ``wrong-form`` citation re-scanned out of the YAML frontmatter.
+    assert [e["form"] for e in graph["edges"]] == ["resource"]
+    assert edge(graph, "resource") == {
+        "source": "a.md",
+        "target": "b.md",
+        "kind": "internal",
+        "form": "resource",
+        "line": 0,
+        "status": "ok",
+    }
+    assert graph["queries"]["defects"] == []
+
+
+def test_executable_bit_only_buckets_extensionless_files_as_code(
+    tmp_path: Path,
+) -> None:
+    repo = graph_repo(
+        tmp_path,
+        {
+            "deploy.yaml": "steps: []\n",  # +x with a config extension stays config
+            "hook": "#!/bin/sh\necho hi\n",  # +x extensionless is a script entry point
+        },
+    )
+    (repo / "deploy.yaml").chmod(0o755)
+    (repo / "hook").chmod(0o755)
+
+    graph = filegraph.build_graph(repo)
+
+    assert graph["nodes"]["deploy.yaml"] == "config"
+    assert graph["nodes"]["hook"] == "code"
+
+
+def test_nested_bundle_files_attach_only_to_the_nearest_skill(
+    tmp_path: Path,
+) -> None:
+    repo = graph_repo(
+        tmp_path,
+        {
+            "skills/a/SKILL.md": "outer",
+            "skills/a/notes.md": "outer's own file",
+            "skills/a/b/SKILL.md": "inner",
+            "skills/a/b/deep.md": "inner's file",
+        },
+    )
+
+    graph = filegraph.build_graph(repo)
+
+    bundle = sorted(
+        (e["source"], e["target"]) for e in graph["edges"] if e["form"] == "bundle"
+    )
+    # deep.md attaches only to the inner SKILL.md, never doubly to the outer.
+    assert bundle == [
+        ("skills/a/SKILL.md", "skills/a/b/SKILL.md"),
+        ("skills/a/SKILL.md", "skills/a/notes.md"),
+        ("skills/a/b/SKILL.md", "skills/a/b/deep.md"),
+    ]
+
+
+def test_compute_queries_matches_build_graph_queries(tmp_path: Path) -> None:
+    repo = graph_repo(
+        tmp_path,
+        {
+            "CLAUDE.md": "start at [a](/a.md)",
+            "a.md": "then [b](/b.md)",
+            "b.md": "the end",
+        },
+    )
+
+    graph = filegraph.build_graph(repo)
+    seeds = sorted(r for r, b in graph["nodes"].items() if b == "harness-session")
+
+    # build_graph and gen-graph share this helper, so the query shapes cannot
+    # drift: the same (nodes, edges, seeds) reproduce build_graph's queries.
+    assert (
+        filegraph.compute_queries(graph["nodes"], graph["edges"], seeds)
+        == graph["queries"]
+    )

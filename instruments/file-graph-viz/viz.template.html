@@ -169,6 +169,12 @@
 const DATA = __DATA__;
 const CONTENTS = __CONTENTS__;   // { path: rawText | null } — for the click-to-read viewer
 
+// Escape any file path / edge endpoint before interpolating it into innerHTML.
+// Paths come from arbitrary repos and may contain &, <, > that must render as
+// text, not markup. (The click-to-read viewer already uses textContent.)
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
 // ---- encoding: shape = file family, color = detail (bucket, test-split) ----
 const BUCKET = {
   "harness-session":          { color:"#dc2626", shape:"doc" },
@@ -404,7 +410,7 @@ function onNodeClick(d){
 const pathBody = document.getElementById("pathBody");
 function epChip(d, color, label){
   return `<div class="ep"><span class="dot" style="border-color:${color}"></span>`
-    + `<b>${label}</b>&nbsp;<span class="p">${d ? d.path : "—"}</span></div>`;
+    + `<b>${label}</b>&nbsp;<span class="p">${d ? esc(d.path) : "—"}</span></div>`;
 }
 function updatePathPanel(){
   let h;
@@ -422,7 +428,7 @@ function updatePathPanel(){
     } else {
       h += `<div style="margin:9px 0 3px"><span class="big">${pathHi.hops}<span class="u"> hop${pathHi.hops === 1 ? "" : "s"} apart</span></span></div>`
         + `<div class="pathseq">` + pathHi.seq.map((n, i) =>
-            `<div class="s"><span class="i">${i}</span><span class="n">${n.path}</span></div>`).join("") + `</div>`;
+            `<div class="s"><span class="i">${i}</span><span class="n">${esc(n.path)}</span></div>`).join("") + `</div>`;
     }
     h += `<div style="margin-top:9px"><button class="btn" id="pathClear">clear</button></div>`;
   } else {
@@ -478,7 +484,7 @@ node.on("pointerenter", (ev, d) => {
     : d.dist === 0 ? "seed (harness context)"
     : d.dist + " hop" + (d.dist > 1 ? "s" : "") + " from CLAUDE.md";
   hud.classList.remove("hidden");
-  hud.innerHTML = `<div class="path">${d.path}</div><div class="meta">`
+  hud.innerHTML = `<div class="path">${esc(d.path)}</div><div class="meta">`
     + `${CKEY_LABEL[d.ckey] || d.ckey} &middot; ${d.deg} edge${d.deg === 1 ? "" : "s"} &middot; ${dtxt}</div>`;
 }).on("pointerleave", () => { hud.classList.add("hidden"); applyState(); });
 
@@ -555,7 +561,7 @@ document.getElementById("orphans").innerHTML = CKEY_ORDER.filter(b => oc[b]).map
 const defects = DATA.queries.defects;
 document.getElementById("defectHdr").textContent = `Defects (${defects.length})`;
 document.getElementById("defects").innerHTML = defects.map(d =>
-  `<div class="defect"><span class="st ${d.status}">${d.status}</span><span class="p">${d.source} → ${d.target}</span></div>`).join("");
+  `<div class="defect"><span class="st ${d.status}">${d.status}</span><span class="p">${esc(d.source)} → ${esc(d.target)}</span></div>`).join("");
 
 // components
 const comps = DATA.queries.components;

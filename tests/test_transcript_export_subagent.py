@@ -223,6 +223,33 @@ def test_unarchived_subagent_renders_placeholder() -> None:
     assert len(sub) == 0  # self-closing placeholder, not expanded
 
 
+def test_subagent_evicted_between_get_and_messages_renders_placeholder() -> None:
+    # The eviction race: the child's `session get` succeeds (header present) but
+    # its `session messages` then fails not-found because the daemon pruned it
+    # between the two calls. The body fetch is guarded together with the header,
+    # so the parent still renders a placeholder instead of crashing the export.
+    sessions = {
+        "parent": {
+            "meta": {"id": "parent", "message_count": 1},
+            "rows": [
+                assistant_row(
+                    ordinal=1,
+                    source_uuid="u1",
+                    content="x",
+                    tool_calls=[tc_row(subagent_session_id="child")],
+                )
+            ],
+        },
+        "child": {"meta": {"id": "child", "message_count": 1}, "rows": []},
+    }
+    runner = fake_daemon(sessions, evicted=frozenset({"child"}))
+    el = ET.fromstring(render_session("parent", runner=runner))
+    sub = el.find("assistant/tool-call/subagent")
+    assert sub is not None
+    assert sub.attrib == {"id": "child", "omitted": "unarchived"}
+    assert len(sub) == 0  # self-closing placeholder, not expanded
+
+
 def test_subagent_messages_attribute_omitted_when_count_absent() -> None:
     sessions = {
         "parent": {
