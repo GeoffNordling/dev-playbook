@@ -5943,7 +5943,7 @@ const DATA = {
   ".gitignore:.venv/": 2268,
   ".gitignore:__pycache__/": 47,
   ".gitignore:.mypy_cache/": 18,
-  ".gitignore:.ruff_cache/": 10,
+  ".gitignore:.ruff_cache/": 11,
   ".gitignore:.pytest_cache/": 5,
   "standards/build/canonical/.gitignore:.ruff_cache/": 2,
   "/home/geoff/workspace/dev-playbook/.git/info/exclude:**/.claude/scheduled_tasks.json": 1,
@@ -5977,16 +5977,10 @@ const DATA = {
   },
   "reachability": {
    "seeds": [
-    "CLAUDE.md",
-    "dotfiles/dot-claude/CLAUDE.md",
-    "dotfiles/dot-claude/rules/bash-commands.md",
-    "dotfiles/dot-claude/rules/edit-in-dev-playbook.md"
+    "CLAUDE.md"
    ],
    "reached": {
     "CLAUDE.md": 0,
-    "dotfiles/dot-claude/CLAUDE.md": 0,
-    "dotfiles/dot-claude/rules/bash-commands.md": 0,
-    "dotfiles/dot-claude/rules/edit-in-dev-playbook.md": 0,
     "standards/build/distribution.md": 1,
     "standards/docs/index.md": 1,
     "standards/index.md": 1,
@@ -6082,7 +6076,7 @@ const DATA = {
     "scripts/file-graph": 6
    },
    "reached_by_distance": {
-    "0": 4,
+    "0": 1,
     "1": 3,
     "2": 28,
     "3": 39,
@@ -6096,7 +6090,8 @@ const DATA = {
     "harness-skill-thirdparty": 31,
     "config": 14,
     "concept": 10,
-    "index": 7
+    "index": 7,
+    "harness-session": 3
    },
    "unreached": [
     ".claude/skills/improve-protocol/SKILL.md",
@@ -6147,6 +6142,9 @@ const DATA = {
     "dotfiles/.bashrc.d/worktree.sh",
     "dotfiles/.stow-local-ignore",
     "dotfiles/README.md",
+    "dotfiles/dot-claude/CLAUDE.md",
+    "dotfiles/dot-claude/rules/bash-commands.md",
+    "dotfiles/dot-claude/rules/edit-in-dev-playbook.md",
     "dotfiles/dot-claude/settings.json",
     "dotfiles/dot-claude/skills/build/SKILL.md",
     "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
@@ -6552,7 +6550,10 @@ const SHAPE_GLYPH = { doc:"●", code:"■", config:"▲", skill:"★", other:"�
 const SHAPE_LABEL = { doc:"prose / doc", code:"code", config:"config", skill:"skill", other:"unclassified" };
 const SHAPE_ORDER = ["doc","code","config","skill","other"];
 
-const DIST_COLOR = ["#e11d48","#f97316","#eab308","#84cc16","#22c55e","#0ea5e9","#6366f1"];
+// continuous reach ramp: green (near CLAUDE.md) → yellow/orange → red (far)
+const maxDist = Math.max(1, ...Object.keys(DATA.queries.reachability.reached_by_distance).map(Number));
+const distScale = d3.interpolateHsl(d3.hsl(142, 0.55, 0.40), d3.hsl(2, 0.72, 0.50));
+function distColor(d){ return distScale(Math.min(d, maxDist) / maxDist); }
 const UNREACHED = "#c3c9d4";
 
 // edges: three classes only
@@ -6588,14 +6589,18 @@ for (const e of DATA.edges) {
 }
 const nbr = new Map(nodes.map(n => [n, new Set()]));
 for (const l of links) { nbr.get(l.source).add(l.target); nbr.get(l.target).add(l.source); }
-for (const n of nodes) { n.r = 3.2 + Math.sqrt(n.deg) * 1.3; n.area = Math.PI * n.r * n.r; }
+for (const n of nodes) {
+  n.hero = (n.path === "CLAUDE.md");   // the real, central harness-injected entry point
+  n.r = n.hero ? 11 : 3.2 + Math.sqrt(n.deg) * 1.3;
+  n.area = Math.PI * n.r * n.r;
+}
 
 const ckeyCounts = {}, shapeCounts = {};
 for (const n of nodes) { ckeyCounts[n.ckey] = (ckeyCounts[n.ckey] || 0) + 1; shapeCounts[n.shape] = (shapeCounts[n.shape] || 0) + 1; }
 
 let mode = "bucket";
 function colorFor(d){
-  if (mode === "reach") return d.dist == null ? UNREACHED : DIST_COLOR[Math.min(d.dist, 6)];
+  if (mode === "reach") return d.dist == null ? UNREACHED : distColor(d.dist);
   return (BUCKET[d.ckey] || BUCKET.unclassified).color;
 }
 
@@ -6618,11 +6623,22 @@ const link = edgeG.selectAll("line").data(links).join("line")
 
 const sym = d3.symbol();
 const node = nodeG.selectAll("g.node").data(nodes).join("g").attr("class", "node");
+// hero marker (root CLAUDE.md): a dotted target ring behind it, mode-independent
+node.filter(d => d.hero).append("circle")
+  .attr("r", d => d.r + 6).attr("fill", "none")
+  .attr("stroke", "#1b2130").attr("stroke-opacity", 0.6)
+  .attr("stroke-width", 1.5).attr("stroke-dasharray", "2,3");
 node.append("path")
   .attr("d", d => sym.type(SHAPE_SYMBOL[d.shape]).size(d.area * 2.4)())
   .attr("fill", colorFor)
   .attr("stroke", d => d.seed ? "#0f172a" : "rgba(15,23,42,.35)")
   .attr("stroke-width", d => d.seed ? 2.2 : 0.6);
+// permanent label on the hero so the entry point is unmistakable
+node.filter(d => d.hero).append("text").text("CLAUDE.md")
+  .attr("x", d => d.r + 8).attr("y", 4.5).attr("font-size", 12.5).attr("font-weight", 700)
+  .attr("fill", "#0f172a").attr("stroke", "#ffffff").attr("stroke-width", 3.5)
+  .attr("paint-order", "stroke").attr("pointer-events", "none")
+  .style("font-family", "ui-sans-serif, system-ui, sans-serif");
 
 // ---- simulation ----
 const sim = d3.forceSimulation(nodes)
@@ -6722,9 +6738,9 @@ const maxRing = Math.max(...Object.values(rbd), reach.unreached.length);
 let rings = "";
 for (let d = 0; d <= 6; d++) {
   const c = rbd[d] || 0; if (!c && d > 0) continue;
-  rings += `<div class="row selrow" data-selid="dist:${d}"><span class="glyph" style="color:${DIST_COLOR[d]}">●</span>`
+  rings += `<div class="row selrow" data-selid="dist:${d}"><span class="glyph" style="color:${distColor(d)}">●</span>`
     + `<span class="name">${d === 0 ? "seeds" : d + " hop" + (d > 1 ? "s" : "")}</span><span class="num">${c}</span></div>`
-    + `<div class="bar" style="width:${Math.max(4, c / maxRing * 100)}%;background:${DIST_COLOR[d]}"></div>`;
+    + `<div class="bar" style="width:${Math.max(4, c / maxRing * 100)}%;background:${distColor(d)}"></div>`;
 }
 rings += `<div class="row selrow" data-selid="dist:none" style="margin-top:6px"><span class="glyph" style="color:${UNREACHED}">●</span>`
   + `<span class="name">unreachable</span><span class="num">${reach.unreached.length}</span></div>`
