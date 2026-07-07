@@ -105,7 +105,11 @@
       "agentsview",
       "agentsview *",
       "git",
-      "git *"
+      "git *",
+      "make check",
+      "make check *",
+      "uv run pytest",
+      "uv run pytest *"
     ]
   },
   "feedbackSurveyRate": 0,

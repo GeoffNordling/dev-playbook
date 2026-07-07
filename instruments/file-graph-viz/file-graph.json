@@ -1,0 +1,6409 @@
+{
+ "repo": "dev-playbook",
+ "root": "/home/geoff/workspace/dev-playbook/.claude/worktrees/2026-07-06-file-graph-instrument",
+ "nodes": {
+  ".claude/skills/improve-protocol/SKILL.md": "harness-skill-authored",
+  ".github/workflows/ci.yml": "config",
+  ".gitignore": "config",
+  ".pre-commit-config.yaml": "config",
+  ".pre-commit-hooks.yaml": "config",
+  ".python-version": "config",
+  "CLAUDE.md": "harness-session",
+  "CONTEXT.md": "concept",
+  "Makefile": "config",
+  "README.md": "concept",
+  "docs/adr/0001-adopt-matt-pocock-conventions.md": "concept",
+  "docs/adr/0002-compounding-with-ai.md": "concept",
+  "docs/adr/0003-decline-superpowers.md": "concept",
+  "docs/adr/0004-remove-pocock-direct-dependency.md": "concept",
+  "docs/adr/0005-issue-workflow-reorganization.md": "concept",
+  "docs/adr/0006-harvest-pocock-prototype-and-handoff.md": "concept",
+  "docs/adr/0007-merge-sdd-spec-authoring-phase.md": "concept",
+  "docs/adr/0008-retire-edit-time-ruff-hook.md": "concept",
+  "docs/adr/README.md": "concept",
+  "docs/adr/index.md": "index",
+  "docs/datasheets/judgments.html": "config",
+  "docs/datasheets/lint-suite.html": "config",
+  "docs/datasheets/tools.html": "config",
+  "docs/datasheets/transcript-export.html": "config",
+  "docs/datasheets/workspace-scripts.html": "config",
+  "docs/index.md": "index",
+  "docs/sandboxing.md": "concept",
+  "docs/third-party-survey.md": "concept",
+  "dotfiles/.agents/.skill-lock.json": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/caveman/SKILL.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-batch/SKILL.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-batch/references/starting-point.py": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/SKILL.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/ANYWIDGET.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/CONFIGURATION.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/DEPLOYMENT.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/EXPENSIVE.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/EXPORTS.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/PYTEST.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/REACTIVITY.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/SQL.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/STATE.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/TOP-LEVEL-IMPORTS.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/UI.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/marimo-notebook/references/WATCHING.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/SKILL.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/arviz.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/bart.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/causal.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/gp.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/inference.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/priors.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/pymc-modeling/references/workflow.md": "harness-skill-thirdparty",
+  "dotfiles/.agents/skills/zoom-out/SKILL.md": "harness-skill-thirdparty",
+  "dotfiles/.bashrc.d/aliases.sh": "code",
+  "dotfiles/.bashrc.d/worktree.sh": "code",
+  "dotfiles/.stow-local-ignore": "config",
+  "dotfiles/README.md": "concept",
+  "dotfiles/bin/sync-dotfiles.sh": "code",
+  "dotfiles/dot-claude/CLAUDE.md": "harness-session",
+  "dotfiles/dot-claude/rules/bash-commands.md": "harness-session",
+  "dotfiles/dot-claude/rules/edit-in-dev-playbook.md": "harness-session",
+  "dotfiles/dot-claude/settings.json": "config",
+  "dotfiles/dot-claude/skills/build/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/code-pr-review/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/commit/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/datasheet/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/datasheet/scripts/check_datasheet.py": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/design/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/doc-format/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/doc-present-state/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/doc-rewrite/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/doc-rules/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/em-dashes/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/grill-with-docs/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/handoff/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/improve-python-code/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/intake/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/open-pr/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/orient-workspace-meta/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/orient/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/prime-user-context/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/prototype/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/prototype/references/logic.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/prototype/references/presentation.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/ralph-setup/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/rewind-compact/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/run-judgments/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/sdd-specs/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/skill-creator/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/small-steps/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/tdd/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/workflow-overwatch/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/write-agent-review/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/workflows/ralph-loop.js": "code",
+  "dotfiles/dot-claude/workflows/scatter-gather.js": "code",
+  "dotfiles/index.md": "index",
+  "harness-recipes/README.md": "concept",
+  "harness-recipes/index.md": "index",
+  "harness-recipes/recipes/ralph-loop.md": "concept",
+  "harness-recipes/recipes/scatter-gather.md": "concept",
+  "index.md": "index",
+  "instruments/datasheet-example.html": "config",
+  "instruments/datasheet.md": "concept",
+  "instruments/file-graph.md": "concept",
+  "instruments/format.md": "concept",
+  "instruments/index.md": "index",
+  "instruments/judgments/cache-gate.md": "concept",
+  "instruments/judgments/consuming.md": "concept",
+  "instruments/judgments/declarations.md": "concept",
+  "instruments/judgments/index.md": "index",
+  "judgments/doc-consistency.yaml": "config",
+  "protocols/README.md": "concept",
+  "protocols/align-map-execute/SKILL.md": "harness-skill-authored",
+  "protocols/align-map-execute/formulation.md": "concept",
+  "protocols/index.md": "index",
+  "pyproject.toml": "config",
+  "scripts/README.md": "concept",
+  "scripts/bootstrap-labels": "code",
+  "scripts/file-graph": "code",
+  "scripts/griffe-outline": "code",
+  "scripts/index.md": "index",
+  "scripts/internal-skill-audit": "code",
+  "scripts/judgments-lint": "code",
+  "scripts/judgments-run": "code",
+  "scripts/okf-lint": "code",
+  "scripts/python-lint": "code",
+  "scripts/ref-check": "code",
+  "scripts/repo-audit": "code",
+  "scripts/sweep": "code",
+  "scripts/transcript-export": "code",
+  "src/dev_playbook/__init__.py": "code",
+  "src/dev_playbook/filegraph.py": "code",
+  "src/dev_playbook/gitrepo.py": "code",
+  "src/dev_playbook/judgments/__init__.py": "code",
+  "src/dev_playbook/judgments/core.py": "code",
+  "src/dev_playbook/judgments/instruments.py": "code",
+  "src/dev_playbook/judgments/loader.py": "code",
+  "src/dev_playbook/judgments/pytest_support.py": "code",
+  "src/dev_playbook/judgments/runner.py": "code",
+  "src/dev_playbook/md.py": "code",
+  "src/dev_playbook/pyast.py": "code",
+  "src/dev_playbook/skipcache/__init__.py": "code",
+  "src/dev_playbook/skipcache/seen.py": "code",
+  "src/dev_playbook/transcript_export/__init__.py": "code",
+  "src/dev_playbook/transcript_export/classify.py": "code",
+  "src/dev_playbook/transcript_export/cli.py": "code",
+  "src/dev_playbook/transcript_export/client.py": "code",
+  "src/dev_playbook/transcript_export/forks.py": "code",
+  "src/dev_playbook/transcript_export/model.py": "code",
+  "src/dev_playbook/transcript_export/render.py": "code",
+  "src/dev_playbook/transcript_export/transcript.py": "code",
+  "standards/README.md": "concept",
+  "standards/adr-conventions.md": "concept",
+  "standards/agentic-box.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/README.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/charter.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/contract.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/emissions.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/fixtures/README.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/gate.sh": "code",
+  "standards/agentic-box/templates/greenfield-cli/box/prompt.md": "concept",
+  "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/conftest.py": "code",
+  "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/test_cli.py": "code",
+  "standards/agentic-box/templates/greenfield-cli/dot-claude/settings.json": "config",
+  "standards/agentic-box/templates/greenfield-cli/index.md": "index",
+  "standards/build.md": "concept",
+  "standards/build/aws.md": "concept",
+  "standards/build/canonical.md": "concept",
+  "standards/build/canonical/.gitignore": "config",
+  "standards/build/canonical/.pre-commit-config.yaml": "config",
+  "standards/build/canonical/.python-version": "config",
+  "standards/build/canonical/CLAUDE.md.standards": "config",
+  "standards/build/canonical/Makefile.aws": "config",
+  "standards/build/canonical/Makefile.base": "config",
+  "standards/build/canonical/Makefile.python": "config",
+  "standards/build/canonical/ci.yml": "config",
+  "standards/build/canonical/pyproject.toml": "config",
+  "standards/build/ci.md": "concept",
+  "standards/build/distribution.md": "concept",
+  "standards/build/enforcement.md": "concept",
+  "standards/build/index.md": "index",
+  "standards/build/layers.md": "concept",
+  "standards/build/make.md": "concept",
+  "standards/build/python.md": "concept",
+  "standards/build/skeleton.md": "concept",
+  "standards/claude-code.md": "concept",
+  "standards/claude-code/claude-content.md": "concept",
+  "standards/claude-code/files.md": "concept",
+  "standards/claude-code/index.md": "index",
+  "standards/doc-conventions.md": "concept",
+  "standards/docs/bundle.md": "concept",
+  "standards/docs/context-content.md": "concept",
+  "standards/docs/cross-references.md": "concept",
+  "standards/docs/document-types.md": "concept",
+  "standards/docs/index.md": "index",
+  "standards/docs/indexes.md": "concept",
+  "standards/docs/readme-content.md": "concept",
+  "standards/index.md": "index",
+  "standards/issue-conventions.md": "concept",
+  "standards/module-design.md": "concept",
+  "standards/python-style.md": "concept",
+  "standards/references/index.md": "index",
+  "standards/references/okf-spec.md": "concept",
+  "standards/repo-settings.md": "concept",
+  "standards/skill-conventions.md": "concept",
+  "standards/skill-management.md": "concept",
+  "standards/standard.md": "concept",
+  "standards/standard/format.md": "concept",
+  "standards/testing-conventions.md": "concept",
+  "tests/conftest.py": "code",
+  "tests/test_filegraph.py": "code",
+  "tests/test_judgments_gate.py": "code",
+  "tests/test_judgments_lint.py": "code",
+  "tests/test_judgments_model.py": "code",
+  "tests/test_judgments_prepare.py": "code",
+  "tests/test_loader.py": "code",
+  "tests/test_md.py": "code",
+  "tests/test_okf_lint.py": "code",
+  "tests/test_pytest_support.py": "code",
+  "tests/test_python_lint.py": "code",
+  "tests/test_ref_check.py": "code",
+  "tests/test_repo_audit.py": "code",
+  "tests/test_runner.py": "code",
+  "tests/test_skipcache.py": "code",
+  "tests/test_sweep.py": "code",
+  "tests/test_transcript_export.py": "code",
+  "tests/test_transcript_export_classify.py": "code",
+  "tests/test_transcript_export_client.py": "code",
+  "tests/test_transcript_export_e2e.py": "code",
+  "tests/test_transcript_export_forks.py": "code",
+  "tests/test_transcript_export_live.py": "code",
+  "tests/test_transcript_export_model.py": "code",
+  "tests/test_transcript_export_render.py": "code",
+  "tests/test_transcript_export_subagent.py": "code",
+  "tests/transcript_fakes.py": "code",
+  "uv.lock": "config",
+  "workflow/README.md": "concept",
+  "workflow/index.md": "index",
+  "workflow/skill-authoring.md": "concept",
+  "workflow/workflow.md": "concept"
+ },
+ "edges": [
+  {
+   "source": ".claude/skills/improve-protocol/SKILL.md",
+   "target": "protocols/align-map-execute/formulation.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": ".claude/skills/improve-protocol/SKILL.md",
+   "target": "protocols/align-map-execute/SKILL.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": ".pre-commit-config.yaml",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": ".pre-commit-hooks.yaml",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "CLAUDE.md",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 27,
+   "status": "ok"
+  },
+  {
+   "source": "CLAUDE.md",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "CLAUDE.md",
+   "target": "standards/docs/index.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "README.md",
+   "target": "index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "README.md",
+   "target": "dotfiles/bin/sync-dotfiles.sh",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 40,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 60,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "standards/repo-documentation.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 62,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "~/workspace/spec-tools/sdd-standards/",
+   "kind": "external",
+   "form": "citation",
+   "line": 68,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 134,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "standards/repo-documentation.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 137,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 139,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 155,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 155,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0002-compounding-with-ai.md",
+   "target": "docs/adr/0008-retire-edit-time-ruff-hook.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0002-compounding-with-ai.md",
+   "target": "docs/adr/0002-compounding-with-ai.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 27,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "docs/third-party-survey.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 17,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 57,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 60,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 163,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 165,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "~/workspace/spec-tools/docs/adr/0005-workspace-sdd-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 176,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 177,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "dotfiles/.agents/.skill-lock.json",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 153,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0003-decline-superpowers.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 173,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 141,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 167,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 188,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/repo-documentation.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 196,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 206,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 206,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 60,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 68,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/adr-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 72,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/module-design.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 82,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "dotfiles/bin/sync-dotfiles.sh",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 92,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/module-design.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 99,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/adr-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 103,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 111,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/skill-management.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 113,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/module-design.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 119,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 121,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "target": "dotfiles/.agents/.skill-lock.json",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 151,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "target": "docs/third-party-survey.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 11,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "target": "standards/repo-documentation.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 32,
+   "status": "wrong-form"
+  },
+  {
+   "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0007-merge-sdd-spec-authoring-phase.md",
+   "target": "docs/adr/0005-issue-workflow-reorganization.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0008-retire-edit-time-ruff-hook.md",
+   "target": "docs/adr/0002-compounding-with-ai.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/README.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0002-compounding-with-ai.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0005-issue-workflow-reorganization.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0007-merge-sdd-spec-authoring-phase.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/index.md",
+   "target": "docs/adr/0008-retire-edit-time-ruff-hook.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "src/dev_playbook/pyast.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "src/dev_playbook/gitrepo.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "tests/test_okf_lint.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "tests/test_python_lint.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "tests/test_ref_check.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "tests/test_md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "tests/test_repo_audit.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "tests/test_sweep.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "src/dev_playbook/gitrepo.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 130,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/lint-suite.html",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 133,
+   "status": "ok"
+  },
+  {
+   "source": "docs/datasheets/workspace-scripts.html",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 179,
+   "status": "ok"
+  },
+  {
+   "source": "docs/index.md",
+   "target": "docs/sandboxing.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "docs/index.md",
+   "target": "docs/third-party-survey.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "docs/index.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "docs/sandboxing.md",
+   "target": "docs/sandboxing.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 99,
+   "status": "ok"
+  },
+  {
+   "source": "docs/sandboxing.md",
+   "target": "docs/sandboxing.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 140,
+   "status": "ok"
+  },
+  {
+   "source": "docs/sandboxing.md",
+   "target": "docs/sandboxing.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 250,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0004-remove-pocock-direct-dependency.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 37,
+   "status": "ok"
+  },
+  {
+   "source": "docs/third-party-survey.md",
+   "target": "docs/adr/0003-decline-superpowers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 43,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/.skill-lock.json",
+   "target": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/.skill-lock.json",
+   "target": "dotfiles/.agents/skills/marimo-batch/SKILL.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/.skill-lock.json",
+   "target": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-batch/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-batch/references/starting-point.py",
+   "kind": "internal",
+   "form": "relative",
+   "line": 63,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/STATE.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 144,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/PYTEST.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 261,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/SQL.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 271,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/UI.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 272,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/TOP-LEVEL-IMPORTS.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 273,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/EXPORTS.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 274,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/STATE.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 275,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/DEPLOYMENT.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 276,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/ANYWIDGET.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 277,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/WATCHING.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 278,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/EXPENSIVE.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 279,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/CONFIGURATION.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 280,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/REACTIVITY.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 281,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 105,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 190,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 191,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 220,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 238,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 240,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 242,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 276,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/model-evaluation/SKILL.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 276,
+   "status": "broken"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 283,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 299,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 315,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/prior-elicitation/SKILL.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 320,
+   "status": "broken"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 380,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 393,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 406,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 431,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 437,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 467,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 471,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/causal.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 498,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 504,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-extras/SKILL.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 507,
+   "status": "broken"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 517,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 809,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 331,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 332,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 333,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 334,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 345,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 299,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 300,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 301,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 476,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 477,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 478,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 479,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 565,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 921,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 922,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 923,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/README.md",
+   "target": "dotfiles/bin/sync-dotfiles.sh",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 30,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/build/SKILL.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/build/SKILL.md",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 46,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/datasheet/SKILL.md",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/datasheet/SKILL.md",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/datasheet/SKILL.md",
+   "target": "instruments/datasheet-example.html",
+   "kind": "internal",
+   "form": "citation",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/datasheet/SKILL.md",
+   "target": "scripts/griffe-outline",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 57,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/datasheet/scripts/check_datasheet.py",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 2,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/design/SKILL.md",
+   "target": "standards/module-design.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/design/SKILL.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 58,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/doc-rewrite/SKILL.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 33,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/doc-rules/SKILL.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/grill-with-docs/SKILL.md",
+   "target": "standards/docs/context-content.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 55,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/grill-with-docs/SKILL.md",
+   "target": "standards/adr-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 67,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/improve-python-code/SKILL.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 28,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 89,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/orient-workspace-meta/SKILL.md",
+   "target": "README.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/orient-workspace-meta/SKILL.md",
+   "target": "scripts/README.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/orient/SKILL.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 32,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/prototype/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/prototype/references/logic.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/prototype/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/prototype/references/presentation.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/prototype/SKILL.md",
+   "target": "standards/adr-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 44,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+   "target": "harness-recipes/recipes/ralph-loop.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 64,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 65,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/design-layer.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/lessons.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/design-layer.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/lessons.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
+   "target": "standards/module-design.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 75,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
+   "target": "docs/adr/README.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 35,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/lessons.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 89,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
+   "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 113,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 43,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 70,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
+   "target": "dotfiles/bin/sync-dotfiles.sh",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 74,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/tdd/SKILL.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/tdd/SKILL.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 81,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/workflow-overwatch/SKILL.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/index.md",
+   "target": "dotfiles/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/README.md",
+   "target": "harness-recipes/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/index.md",
+   "target": "harness-recipes/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/index.md",
+   "target": "harness-recipes/recipes/ralph-loop.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/index.md",
+   "target": "harness-recipes/recipes/scatter-gather.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/recipes/ralph-loop.md",
+   "target": "dotfiles/dot-claude/workflows/ralph-loop.js",
+   "kind": "internal",
+   "form": "resource",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/recipes/ralph-loop.md",
+   "target": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 47,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/recipes/ralph-loop.md",
+   "target": "dotfiles/dot-claude/workflows/ralph-loop.js",
+   "kind": "internal",
+   "form": "link",
+   "line": 57,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/recipes/scatter-gather.md",
+   "target": "dotfiles/dot-claude/workflows/scatter-gather.js",
+   "kind": "internal",
+   "form": "resource",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/recipes/scatter-gather.md",
+   "target": "harness-recipes/recipes/ralph-loop.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "harness-recipes/recipes/scatter-gather.md",
+   "target": "dotfiles/dot-claude/workflows/scatter-gather.js",
+   "kind": "internal",
+   "form": "link",
+   "line": 63,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "CONTEXT.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "docs/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "dotfiles/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "harness-recipes/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "instruments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "protocols/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "scripts/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "index.md",
+   "target": "workflow/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/datasheet.md",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 59,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/datasheet.md",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 138,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/datasheet.md",
+   "target": "instruments/datasheet-example.html",
+   "kind": "internal",
+   "form": "link",
+   "line": 264,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 40,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 55,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 56,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "link",
+   "line": 57,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 68,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 70,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/file-graph.md",
+   "target": "scripts/file-graph",
+   "kind": "internal",
+   "form": "link",
+   "line": 101,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/format.md",
+   "target": "instruments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/index.md",
+   "target": "instruments/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/index.md",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/index.md",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/index.md",
+   "target": "instruments/judgments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/cache-gate.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/cache-gate.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/consuming.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/consuming.md",
+   "target": "instruments/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/consuming.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 46,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/consuming.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 49,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/consuming.md",
+   "target": "instruments/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 63,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/declarations.md",
+   "target": "instruments/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/declarations.md",
+   "target": "src/dev_playbook/judgments/core.py",
+   "kind": "internal",
+   "form": "link",
+   "line": 30,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/declarations.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 67,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/declarations.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 68,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/declarations.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 71,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/declarations.md",
+   "target": "src/dev_playbook/judgments/instruments.py",
+   "kind": "internal",
+   "form": "link",
+   "line": 104,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/index.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/index.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/index.md",
+   "target": "instruments/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "instruments/judgments/index.md",
+   "target": "instruments/judgments/consuming.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "harness-recipes/recipes/scatter-gather.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "harness-recipes/recipes/scatter-gather.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "dotfiles/dot-claude/workflows/scatter-gather.js",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "src/dev_playbook/judgments/loader.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "src/dev_playbook/judgments/instruments.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "src/dev_playbook/judgments/runner.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 33,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "dotfiles/dot-claude/workflows/scatter-gather.js",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 46,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/layers.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 47,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 48,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/make.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 49,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 50,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/ci.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 51,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/aws.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 52,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 53,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 54,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/enforcement.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 55,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/ci.yml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 60,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/pyproject.toml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 61,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 75,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/layers.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 76,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 77,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/make.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 78,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 79,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/ci.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 80,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/aws.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 81,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 82,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 83,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/enforcement.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 84,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 90,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 94,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 96,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 97,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 98,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 101,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/ci.yml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 103,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 109,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 113,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 115,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/claude-code.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 125,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/claude-code.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 129,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 131,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 132,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/claude-code/claude-content.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 133,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 134,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/skill-management.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 135,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 138,
+   "status": "ok"
+  },
+  {
+   "source": "protocols/README.md",
+   "target": "protocols/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "protocols/index.md",
+   "target": "protocols/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "protocols/index.md",
+   "target": "protocols/align-map-execute/formulation.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 51,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 59,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 60,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 60,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 61,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 62,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/docs/indexes.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 62,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 63,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "instruments/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 64,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": ".pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 98,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 99,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": ".pre-commit-hooks.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 102,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 115,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "standards/repo-settings.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 118,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/bootstrap-labels",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/file-graph",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/index.md",
+   "target": "scripts/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/internal-skill-audit",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/okf-lint",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 49,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/python-lint",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "src/dev_playbook/filegraph.py",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "src/dev_playbook/filegraph.py",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 55,
+   "status": "ok"
+  },
+  {
+   "source": "src/dev_playbook/md.py",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 147,
+   "status": "ok"
+  },
+  {
+   "source": "standards/README.md",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "standards/adr-conventions.md",
+   "target": "standards/docs/indexes.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/adr-conventions.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 53,
+   "status": "ok"
+  },
+  {
+   "source": "standards/adr-conventions.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/adr-conventions.md",
+   "target": "docs/adr/README.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/adr-conventions.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 53,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/box/charter.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/box/charter.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/charter.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/contract.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/emissions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/fixtures/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/prompt.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "scripts/repo-audit",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "scripts/sweep",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "standards/build/canonical/Makefile.base",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build.md",
+   "target": "standards/build/canonical/ci.yml",
+   "kind": "internal",
+   "form": "link",
+   "line": 33,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/aws.md",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/aws.md",
+   "target": "standards/build/make.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/ci.yml",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/.python-version",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/Makefile.base",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/Makefile.python",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/Makefile.aws",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/pyproject.toml",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/.gitignore",
+   "kind": "internal",
+   "form": "link",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/CLAUDE.md.standards",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/claude-code/claude-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical.md",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 41,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical/CLAUDE.md.standards",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/canonical/CLAUDE.md.standards",
+   "target": "standards/docs/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/ci.md",
+   "target": "standards/build/canonical/ci.yml",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/distribution.md",
+   "target": ".pre-commit-hooks.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/distribution.md",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/distribution.md",
+   "target": "standards/build/enforcement.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/enforcement.md",
+   "target": "standards/build/ci.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/enforcement.md",
+   "target": "standards/repo-settings.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/enforcement.md",
+   "target": "standards/repo-settings.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 42,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/layers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/layers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/aws.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/make.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/distribution.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/ci.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/index.md",
+   "target": "standards/build/enforcement.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/layers.md",
+   "target": "standards/build/enforcement.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/layers.md",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/layers.md",
+   "target": "standards/build/aws.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/layers.md",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 28,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/make.md",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/make.md",
+   "target": "standards/build/ci.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 27,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/make.md",
+   "target": "instruments/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/python.md",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/python.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/python.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/python.md",
+   "target": "standards/build/canonical/pyproject.toml",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/build/layers.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/docs/readme-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/claude-code/claude-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/docs/indexes.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/docs/context-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/adr-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "~/workspace/spec-tools/sdd-standards/README.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 27,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/claude-code/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 28,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 44,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 50,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "standards/claude-code/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "standards/skill-management.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "scripts/repo-audit",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "scripts/internal-skill-audit",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code.md",
+   "target": "standards/build/canonical/CLAUDE.md.standards",
+   "kind": "internal",
+   "form": "link",
+   "line": 37,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/claude-content.md",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/claude-content.md",
+   "target": "standards/build/canonical/CLAUDE.md.standards",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/claude-content.md",
+   "target": "standards/build/canonical.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/claude-content.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/files.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/files.md",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/files.md",
+   "target": "standards/claude-code/claude-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/files.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/files.md",
+   "target": "standards/skill-management.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/index.md",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/index.md",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/index.md",
+   "target": "standards/claude-code/claude-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "standards/doc-conventions.md",
+   "target": "standards/references/okf-spec.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 50,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/bundle.md",
+   "target": "standards/build/skeleton.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/bundle.md",
+   "target": "standards/references/okf-spec.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/bundle.md",
+   "target": "standards/docs/indexes.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/bundle.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/bundle.md",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 36,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/bundle.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 64,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/cross-references.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 41,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/cross-references.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/cross-references.md",
+   "target": "scripts/ref-check",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 63,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/cross-references.md",
+   "target": "scripts/ref-check",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 75,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/document-types.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/document-types.md",
+   "target": "standards/claude-code/files.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/document-types.md",
+   "target": "standards/agentic-box.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/document-types.md",
+   "target": "dotfiles/dot-claude/workflows/ralph-loop.js",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 52,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/indexes.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/readme-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/context-content.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/index.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/indexes.md",
+   "target": "standards/references/okf-spec.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/readme-content.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs/readme-content.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/standard.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/build.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/claude-code.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/adr-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/agentic-box.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/module-design.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/python-style.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/repo-settings.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/skill-management.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/testing-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 27,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 32,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/claude-code/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 33,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/docs/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/references/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 35,
+   "status": "ok"
+  },
+  {
+   "source": "standards/issue-conventions.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "standards/issue-conventions.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 57,
+   "status": "ok"
+  },
+  {
+   "source": "standards/module-design.md",
+   "target": "CONTEXT.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python-style.md",
+   "target": "standards/build/make.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/references/index.md",
+   "target": "standards/references/okf-spec.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-conventions.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-conventions.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 51,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-conventions.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 101,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-conventions.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 113,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-conventions.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 157,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-management.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-management.md",
+   "target": "standards/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "standards/skill-management.md",
+   "target": "dotfiles/.agents/.skill-lock.json",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard.md",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard.md",
+   "target": "scripts/okf-lint",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard.md",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard.md",
+   "target": "scripts/ref-check",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard.md",
+   "target": "judgments/doc-consistency.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard.md",
+   "target": ".pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard/format.md",
+   "target": "instruments/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard/format.md",
+   "target": "standards/build.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 59,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard/format.md",
+   "target": "standards/standard.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 60,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard/format.md",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 65,
+   "status": "ok"
+  },
+  {
+   "source": "standards/standard/format.md",
+   "target": "instruments/judgments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 76,
+   "status": "ok"
+  },
+  {
+   "source": "standards/testing-conventions.md",
+   "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_filegraph.py",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 1,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 94,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 96,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "harness-recipes/recipes/ralph-loop.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 99,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "protocols/align-map-execute/formulation.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 100,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "dotfiles/dot-claude/CLAUDE.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 102,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "protocols/align-map-execute/SKILL.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 103,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "dotfiles/dot-claude/rules/bash-commands.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 104,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "dotfiles/dot-claude/skills/prototype/references/logic.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 105,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/contract.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 107,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "standards/agentic-box/templates/greenfield-cli/box/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 110,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_md.py",
+   "target": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 111,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 22,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 28,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 36,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 85,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 92,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 100,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 113,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 126,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 127,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 131,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 143,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 145,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 150,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 154,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 155,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 167,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 168,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 170,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 183,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 203,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 215,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 221,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 232,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 233,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 236,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 250,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 251,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 252,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 254,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_okf_lint.py",
+   "target": "standards/README.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 259,
+   "status": "ok"
+  },
+  {
+   "source": "tests/test_repo_audit.py",
+   "target": "standards/build/canonical/pyproject.toml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 649,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/README.md",
+   "target": "workflow/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/index.md",
+   "target": "workflow/README.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 3,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/index.md",
+   "target": "workflow/skill-authoring.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 4,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/index.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/skill-authoring.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/skill-authoring.md",
+   "target": "standards/doc-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/skill-authoring.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "scripts/bootstrap-labels",
+   "kind": "internal",
+   "form": "link",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 24,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 41,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 79,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 81,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 102,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 121,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "standards/issue-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 125,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 137,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 157,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 165,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 169,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 175,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 175,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/skill-authoring.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 175,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 177,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 178,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-batch/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-batch/references/starting-point.py",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/ANYWIDGET.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/CONFIGURATION.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/DEPLOYMENT.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/EXPENSIVE.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/EXPORTS.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/PYTEST.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/REACTIVITY.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/SQL.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/STATE.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/TOP-LEVEL-IMPORTS.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/UI.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+   "target": "dotfiles/.agents/skills/marimo-notebook/references/WATCHING.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/causal.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+   "target": "dotfiles/.agents/skills/pymc-modeling/references/workflow.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/datasheet/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/datasheet/scripts/check_datasheet.py",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/prototype/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/prototype/references/logic.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/prototype/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/prototype/references/presentation.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+   "target": "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  },
+  {
+   "source": "protocols/align-map-execute/SKILL.md",
+   "target": "protocols/align-map-execute/formulation.md",
+   "kind": "internal",
+   "form": "bundle",
+   "line": 0,
+   "status": "ok"
+  }
+ ],
+ "ignored": {
+  ".gitignore:.venv/": 2268,
+  ".gitignore:__pycache__/": 47,
+  ".gitignore:.mypy_cache/": 18,
+  ".gitignore:.ruff_cache/": 11,
+  ".gitignore:.pytest_cache/": 5,
+  "standards/build/canonical/.gitignore:.ruff_cache/": 2,
+  "/home/geoff/workspace/dev-playbook/.git/info/exclude:**/.claude/scheduled_tasks.json": 1,
+  "/home/geoff/.config/git/ignore:**/.claude/settings.local.json": 1
+ },
+ "queries": {
+  "census": {
+   "nodes_by_bucket": {
+    "concept": 68,
+    "code": 67,
+    "harness-skill-authored": 39,
+    "harness-skill-thirdparty": 32,
+    "config": 27,
+    "index": 16,
+    "harness-session": 4
+   },
+   "edges_by_form": {
+    "link": 250,
+    "relative": 193,
+    "code-ref": 125,
+    "citation": 61,
+    "prose-path": 32,
+    "bundle": 32,
+    "resource": 2
+   },
+   "edges_by_status": {
+    "ok": 681,
+    "wrong-form": 11,
+    "broken": 3
+   }
+  },
+  "reachability": {
+   "seeds": [
+    "CLAUDE.md"
+   ],
+   "reached": {
+    "CLAUDE.md": 0,
+    "standards/build/distribution.md": 1,
+    "standards/docs/index.md": 1,
+    "standards/index.md": 1,
+    ".pre-commit-hooks.yaml": 2,
+    "standards/README.md": 2,
+    "standards/adr-conventions.md": 2,
+    "standards/agentic-box.md": 2,
+    "standards/agentic-box/templates/greenfield-cli/index.md": 2,
+    "standards/build.md": 2,
+    "standards/build/canonical.md": 2,
+    "standards/build/enforcement.md": 2,
+    "standards/build/index.md": 2,
+    "standards/claude-code.md": 2,
+    "standards/claude-code/index.md": 2,
+    "standards/doc-conventions.md": 2,
+    "standards/docs/bundle.md": 2,
+    "standards/docs/context-content.md": 2,
+    "standards/docs/cross-references.md": 2,
+    "standards/docs/document-types.md": 2,
+    "standards/docs/indexes.md": 2,
+    "standards/docs/readme-content.md": 2,
+    "standards/issue-conventions.md": 2,
+    "standards/module-design.md": 2,
+    "standards/python-style.md": 2,
+    "standards/references/index.md": 2,
+    "standards/repo-settings.md": 2,
+    "standards/skill-conventions.md": 2,
+    "standards/skill-management.md": 2,
+    "standards/standard.md": 2,
+    "standards/standard/format.md": 2,
+    "standards/testing-conventions.md": 2,
+    ".pre-commit-config.yaml": 3,
+    "CONTEXT.md": 3,
+    "docs/adr/README.md": 3,
+    "docs/adr/index.md": 3,
+    "dotfiles/.agents/.skill-lock.json": 3,
+    "dotfiles/dot-claude/workflows/ralph-loop.js": 3,
+    "instruments/format.md": 3,
+    "instruments/judgments/index.md": 3,
+    "judgments/doc-consistency.yaml": 3,
+    "scripts/internal-skill-audit": 3,
+    "scripts/okf-lint": 3,
+    "scripts/ref-check": 3,
+    "scripts/repo-audit": 3,
+    "scripts/sweep": 3,
+    "standards/agentic-box/templates/greenfield-cli/box/README.md": 3,
+    "standards/agentic-box/templates/greenfield-cli/box/charter.md": 3,
+    "standards/agentic-box/templates/greenfield-cli/box/contract.md": 3,
+    "standards/agentic-box/templates/greenfield-cli/box/emissions.md": 3,
+    "standards/agentic-box/templates/greenfield-cli/box/fixtures/README.md": 3,
+    "standards/agentic-box/templates/greenfield-cli/box/prompt.md": 3,
+    "standards/build/aws.md": 3,
+    "standards/build/canonical/.gitignore": 3,
+    "standards/build/canonical/.pre-commit-config.yaml": 3,
+    "standards/build/canonical/.python-version": 3,
+    "standards/build/canonical/CLAUDE.md.standards": 3,
+    "standards/build/canonical/Makefile.aws": 3,
+    "standards/build/canonical/Makefile.base": 3,
+    "standards/build/canonical/Makefile.python": 3,
+    "standards/build/canonical/ci.yml": 3,
+    "standards/build/canonical/pyproject.toml": 3,
+    "standards/build/ci.md": 3,
+    "standards/build/layers.md": 3,
+    "standards/build/make.md": 3,
+    "standards/build/python.md": 3,
+    "standards/build/skeleton.md": 3,
+    "standards/claude-code/claude-content.md": 3,
+    "standards/claude-code/files.md": 3,
+    "standards/references/okf-spec.md": 3,
+    "workflow/workflow.md": 3,
+    "docs/adr/0001-adopt-matt-pocock-conventions.md": 4,
+    "docs/adr/0002-compounding-with-ai.md": 4,
+    "docs/adr/0003-decline-superpowers.md": 4,
+    "docs/adr/0004-remove-pocock-direct-dependency.md": 4,
+    "docs/adr/0005-issue-workflow-reorganization.md": 4,
+    "docs/adr/0006-harvest-pocock-prototype-and-handoff.md": 4,
+    "docs/adr/0007-merge-sdd-spec-authoring-phase.md": 4,
+    "docs/adr/0008-retire-edit-time-ruff-hook.md": 4,
+    "instruments/index.md": 4,
+    "instruments/judgments/cache-gate.md": 4,
+    "instruments/judgments/consuming.md": 4,
+    "instruments/judgments/declarations.md": 4,
+    "scripts/bootstrap-labels": 4,
+    "src/dev_playbook/md.py": 4,
+    "workflow/skill-authoring.md": 4,
+    "docs/third-party-survey.md": 5,
+    "dotfiles/bin/sync-dotfiles.sh": 5,
+    "instruments/datasheet.md": 5,
+    "instruments/file-graph.md": 5,
+    "src/dev_playbook/judgments/core.py": 5,
+    "src/dev_playbook/judgments/instruments.py": 5,
+    "instruments/datasheet-example.html": 6,
+    "scripts/file-graph": 6
+   },
+   "reached_by_distance": {
+    "0": 1,
+    "1": 3,
+    "2": 28,
+    "3": 39,
+    "4": 15,
+    "5": 6,
+    "6": 2
+   },
+   "unreached_by_bucket": {
+    "code": 55,
+    "harness-skill-authored": 39,
+    "harness-skill-thirdparty": 31,
+    "config": 14,
+    "concept": 10,
+    "index": 7,
+    "harness-session": 3
+   },
+   "unreached": [
+    ".claude/skills/improve-protocol/SKILL.md",
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".python-version",
+    "Makefile",
+    "README.md",
+    "docs/datasheets/judgments.html",
+    "docs/datasheets/lint-suite.html",
+    "docs/datasheets/tools.html",
+    "docs/datasheets/transcript-export.html",
+    "docs/datasheets/workspace-scripts.html",
+    "docs/index.md",
+    "docs/sandboxing.md",
+    "dotfiles/.agents/skills/caveman/SKILL.md",
+    "dotfiles/.agents/skills/marimo-batch/SKILL.md",
+    "dotfiles/.agents/skills/marimo-batch/references/starting-point.py",
+    "dotfiles/.agents/skills/marimo-notebook/SKILL.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/ANYWIDGET.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/CONFIGURATION.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/DEPLOYMENT.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/EXPENSIVE.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/EXPORTS.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/PYTEST.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/REACTIVITY.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/SQL.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/STATE.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/TOP-LEVEL-IMPORTS.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/UI.md",
+    "dotfiles/.agents/skills/marimo-notebook/references/WATCHING.md",
+    "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/arviz.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/bart.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/causal.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/custom_models.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/diagnostics.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/gp.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/inference.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/mixtures.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/priors.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/specialized_likelihoods.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/timeseries.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/troubleshooting.md",
+    "dotfiles/.agents/skills/pymc-modeling/references/workflow.md",
+    "dotfiles/.agents/skills/zoom-out/SKILL.md",
+    "dotfiles/.bashrc.d/aliases.sh",
+    "dotfiles/.bashrc.d/worktree.sh",
+    "dotfiles/.stow-local-ignore",
+    "dotfiles/README.md",
+    "dotfiles/dot-claude/CLAUDE.md",
+    "dotfiles/dot-claude/rules/bash-commands.md",
+    "dotfiles/dot-claude/rules/edit-in-dev-playbook.md",
+    "dotfiles/dot-claude/settings.json",
+    "dotfiles/dot-claude/skills/build/SKILL.md",
+    "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
+    "dotfiles/dot-claude/skills/commit/SKILL.md",
+    "dotfiles/dot-claude/skills/datasheet/SKILL.md",
+    "dotfiles/dot-claude/skills/datasheet/scripts/check_datasheet.py",
+    "dotfiles/dot-claude/skills/design/SKILL.md",
+    "dotfiles/dot-claude/skills/doc-format/SKILL.md",
+    "dotfiles/dot-claude/skills/doc-present-state/SKILL.md",
+    "dotfiles/dot-claude/skills/doc-rewrite/SKILL.md",
+    "dotfiles/dot-claude/skills/doc-rules/SKILL.md",
+    "dotfiles/dot-claude/skills/em-dashes/SKILL.md",
+    "dotfiles/dot-claude/skills/grill-with-docs/SKILL.md",
+    "dotfiles/dot-claude/skills/handoff/SKILL.md",
+    "dotfiles/dot-claude/skills/improve-python-code/SKILL.md",
+    "dotfiles/dot-claude/skills/intake/SKILL.md",
+    "dotfiles/dot-claude/skills/open-pr/SKILL.md",
+    "dotfiles/dot-claude/skills/orient-workspace-meta/SKILL.md",
+    "dotfiles/dot-claude/skills/orient/SKILL.md",
+    "dotfiles/dot-claude/skills/prime-user-context/SKILL.md",
+    "dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md",
+    "dotfiles/dot-claude/skills/prototype/SKILL.md",
+    "dotfiles/dot-claude/skills/prototype/references/logic.md",
+    "dotfiles/dot-claude/skills/prototype/references/presentation.md",
+    "dotfiles/dot-claude/skills/ralph-setup/SKILL.md",
+    "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md",
+    "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md",
+    "dotfiles/dot-claude/skills/rewind-compact/SKILL.md",
+    "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
+    "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
+    "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md",
+    "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
+    "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
+    "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
+    "dotfiles/dot-claude/skills/small-steps/SKILL.md",
+    "dotfiles/dot-claude/skills/tdd/SKILL.md",
+    "dotfiles/dot-claude/skills/workflow-overwatch/SKILL.md",
+    "dotfiles/dot-claude/skills/write-agent-review/SKILL.md",
+    "dotfiles/dot-claude/workflows/scatter-gather.js",
+    "dotfiles/index.md",
+    "harness-recipes/README.md",
+    "harness-recipes/index.md",
+    "harness-recipes/recipes/ralph-loop.md",
+    "harness-recipes/recipes/scatter-gather.md",
+    "index.md",
+    "protocols/README.md",
+    "protocols/align-map-execute/SKILL.md",
+    "protocols/align-map-execute/formulation.md",
+    "protocols/index.md",
+    "pyproject.toml",
+    "scripts/README.md",
+    "scripts/griffe-outline",
+    "scripts/index.md",
+    "scripts/judgments-lint",
+    "scripts/judgments-run",
+    "scripts/python-lint",
+    "scripts/transcript-export",
+    "src/dev_playbook/__init__.py",
+    "src/dev_playbook/filegraph.py",
+    "src/dev_playbook/gitrepo.py",
+    "src/dev_playbook/judgments/__init__.py",
+    "src/dev_playbook/judgments/loader.py",
+    "src/dev_playbook/judgments/pytest_support.py",
+    "src/dev_playbook/judgments/runner.py",
+    "src/dev_playbook/pyast.py",
+    "src/dev_playbook/skipcache/__init__.py",
+    "src/dev_playbook/skipcache/seen.py",
+    "src/dev_playbook/transcript_export/__init__.py",
+    "src/dev_playbook/transcript_export/classify.py",
+    "src/dev_playbook/transcript_export/cli.py",
+    "src/dev_playbook/transcript_export/client.py",
+    "src/dev_playbook/transcript_export/forks.py",
+    "src/dev_playbook/transcript_export/model.py",
+    "src/dev_playbook/transcript_export/render.py",
+    "src/dev_playbook/transcript_export/transcript.py",
+    "standards/agentic-box/templates/greenfield-cli/box/gate.sh",
+    "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/conftest.py",
+    "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/test_cli.py",
+    "standards/agentic-box/templates/greenfield-cli/dot-claude/settings.json",
+    "tests/conftest.py",
+    "tests/test_filegraph.py",
+    "tests/test_judgments_gate.py",
+    "tests/test_judgments_lint.py",
+    "tests/test_judgments_model.py",
+    "tests/test_judgments_prepare.py",
+    "tests/test_loader.py",
+    "tests/test_md.py",
+    "tests/test_okf_lint.py",
+    "tests/test_pytest_support.py",
+    "tests/test_python_lint.py",
+    "tests/test_ref_check.py",
+    "tests/test_repo_audit.py",
+    "tests/test_runner.py",
+    "tests/test_skipcache.py",
+    "tests/test_sweep.py",
+    "tests/test_transcript_export.py",
+    "tests/test_transcript_export_classify.py",
+    "tests/test_transcript_export_client.py",
+    "tests/test_transcript_export_e2e.py",
+    "tests/test_transcript_export_forks.py",
+    "tests/test_transcript_export_live.py",
+    "tests/test_transcript_export_model.py",
+    "tests/test_transcript_export_render.py",
+    "tests/test_transcript_export_subagent.py",
+    "tests/transcript_fakes.py",
+    "uv.lock",
+    "workflow/README.md",
+    "workflow/index.md"
+   ]
+  },
+  "components": [
+   [
+    "CONTEXT.md",
+    "README.md",
+    "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "docs/adr/0002-compounding-with-ai.md",
+    "docs/adr/0003-decline-superpowers.md",
+    "docs/adr/0004-remove-pocock-direct-dependency.md",
+    "docs/adr/0005-issue-workflow-reorganization.md",
+    "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+    "docs/adr/0007-merge-sdd-spec-authoring-phase.md",
+    "docs/adr/0008-retire-edit-time-ruff-hook.md",
+    "docs/adr/README.md",
+    "docs/adr/index.md",
+    "docs/index.md",
+    "docs/sandboxing.md",
+    "docs/third-party-survey.md",
+    "dotfiles/README.md",
+    "dotfiles/index.md",
+    "harness-recipes/README.md",
+    "harness-recipes/index.md",
+    "harness-recipes/recipes/ralph-loop.md",
+    "harness-recipes/recipes/scatter-gather.md",
+    "index.md",
+    "instruments/datasheet.md",
+    "instruments/file-graph.md",
+    "instruments/format.md",
+    "instruments/index.md",
+    "instruments/judgments/cache-gate.md",
+    "instruments/judgments/consuming.md",
+    "instruments/judgments/declarations.md",
+    "instruments/judgments/index.md",
+    "protocols/README.md",
+    "protocols/align-map-execute/formulation.md",
+    "protocols/index.md",
+    "scripts/README.md",
+    "scripts/index.md",
+    "standards/README.md",
+    "standards/adr-conventions.md",
+    "standards/agentic-box.md",
+    "standards/agentic-box/templates/greenfield-cli/box/README.md",
+    "standards/agentic-box/templates/greenfield-cli/box/charter.md",
+    "standards/agentic-box/templates/greenfield-cli/box/contract.md",
+    "standards/agentic-box/templates/greenfield-cli/box/emissions.md",
+    "standards/agentic-box/templates/greenfield-cli/box/fixtures/README.md",
+    "standards/agentic-box/templates/greenfield-cli/box/prompt.md",
+    "standards/agentic-box/templates/greenfield-cli/index.md",
+    "standards/build.md",
+    "standards/build/aws.md",
+    "standards/build/canonical.md",
+    "standards/build/ci.md",
+    "standards/build/distribution.md",
+    "standards/build/enforcement.md",
+    "standards/build/index.md",
+    "standards/build/layers.md",
+    "standards/build/make.md",
+    "standards/build/python.md",
+    "standards/build/skeleton.md",
+    "standards/claude-code.md",
+    "standards/claude-code/claude-content.md",
+    "standards/claude-code/files.md",
+    "standards/claude-code/index.md",
+    "standards/doc-conventions.md",
+    "standards/docs/bundle.md",
+    "standards/docs/context-content.md",
+    "standards/docs/cross-references.md",
+    "standards/docs/document-types.md",
+    "standards/docs/index.md",
+    "standards/docs/indexes.md",
+    "standards/docs/readme-content.md",
+    "standards/index.md",
+    "standards/issue-conventions.md",
+    "standards/module-design.md",
+    "standards/python-style.md",
+    "standards/references/index.md",
+    "standards/references/okf-spec.md",
+    "standards/repo-settings.md",
+    "standards/skill-conventions.md",
+    "standards/skill-management.md",
+    "standards/standard.md",
+    "standards/standard/format.md",
+    "standards/testing-conventions.md",
+    "workflow/README.md",
+    "workflow/index.md",
+    "workflow/skill-authoring.md",
+    "workflow/workflow.md"
+   ]
+  ],
+  "orphans": {
+   ".github/workflows/ci.yml": "config",
+   ".gitignore": "config",
+   ".python-version": "config",
+   "Makefile": "config",
+   "docs/datasheets/judgments.html": "config",
+   "docs/datasheets/tools.html": "config",
+   "docs/datasheets/transcript-export.html": "config",
+   "dotfiles/.agents/skills/caveman/SKILL.md": "harness-skill-thirdparty",
+   "dotfiles/.agents/skills/zoom-out/SKILL.md": "harness-skill-thirdparty",
+   "dotfiles/.bashrc.d/aliases.sh": "code",
+   "dotfiles/.bashrc.d/worktree.sh": "code",
+   "dotfiles/.stow-local-ignore": "config",
+   "dotfiles/dot-claude/rules/edit-in-dev-playbook.md": "harness-session",
+   "dotfiles/dot-claude/settings.json": "config",
+   "dotfiles/dot-claude/skills/commit/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/doc-format/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/doc-present-state/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/em-dashes/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/handoff/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/open-pr/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/prime-user-context/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/rewind-compact/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/small-steps/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/write-agent-review/SKILL.md": "harness-skill-authored",
+   "pyproject.toml": "config",
+   "scripts/judgments-lint": "code",
+   "scripts/judgments-run": "code",
+   "scripts/transcript-export": "code",
+   "src/dev_playbook/__init__.py": "code",
+   "src/dev_playbook/judgments/__init__.py": "code",
+   "src/dev_playbook/judgments/pytest_support.py": "code",
+   "src/dev_playbook/skipcache/__init__.py": "code",
+   "src/dev_playbook/skipcache/seen.py": "code",
+   "src/dev_playbook/transcript_export/__init__.py": "code",
+   "src/dev_playbook/transcript_export/classify.py": "code",
+   "src/dev_playbook/transcript_export/cli.py": "code",
+   "src/dev_playbook/transcript_export/client.py": "code",
+   "src/dev_playbook/transcript_export/forks.py": "code",
+   "src/dev_playbook/transcript_export/model.py": "code",
+   "src/dev_playbook/transcript_export/render.py": "code",
+   "src/dev_playbook/transcript_export/transcript.py": "code",
+   "standards/agentic-box/templates/greenfield-cli/box/gate.sh": "code",
+   "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/conftest.py": "code",
+   "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/test_cli.py": "code",
+   "standards/agentic-box/templates/greenfield-cli/dot-claude/settings.json": "config",
+   "tests/conftest.py": "code",
+   "tests/test_judgments_gate.py": "code",
+   "tests/test_judgments_lint.py": "code",
+   "tests/test_judgments_model.py": "code",
+   "tests/test_judgments_prepare.py": "code",
+   "tests/test_loader.py": "code",
+   "tests/test_pytest_support.py": "code",
+   "tests/test_runner.py": "code",
+   "tests/test_skipcache.py": "code",
+   "tests/test_transcript_export.py": "code",
+   "tests/test_transcript_export_classify.py": "code",
+   "tests/test_transcript_export_client.py": "code",
+   "tests/test_transcript_export_e2e.py": "code",
+   "tests/test_transcript_export_forks.py": "code",
+   "tests/test_transcript_export_live.py": "code",
+   "tests/test_transcript_export_model.py": "code",
+   "tests/test_transcript_export_render.py": "code",
+   "tests/test_transcript_export_subagent.py": "code",
+   "tests/transcript_fakes.py": "code",
+   "uv.lock": "config"
+  },
+  "defects": [
+   {
+    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "target": "standards/workflow.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 60,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "target": "standards/repo-documentation.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 62,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "target": "standards/workflow.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 134,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "target": "standards/repo-documentation.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 137,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "target": "standards/testing-conventions.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 139,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+    "target": "standards/workflow.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 155,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0003-decline-superpowers.md",
+    "target": "docs/third-party-survey.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 17,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+    "target": "standards/workflow.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 188,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
+    "target": "standards/repo-documentation.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 196,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+    "target": "docs/third-party-survey.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 11,
+    "status": "wrong-form"
+   },
+   {
+    "source": "docs/adr/0006-harvest-pocock-prototype-and-handoff.md",
+    "target": "standards/repo-documentation.md",
+    "kind": "internal",
+    "form": "citation",
+    "line": 32,
+    "status": "wrong-form"
+   },
+   {
+    "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+    "target": "dotfiles/.agents/skills/model-evaluation/SKILL.md",
+    "kind": "internal",
+    "form": "relative",
+    "line": 276,
+    "status": "broken"
+   },
+   {
+    "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+    "target": "dotfiles/.agents/skills/prior-elicitation/SKILL.md",
+    "kind": "internal",
+    "form": "relative",
+    "line": 320,
+    "status": "broken"
+   },
+   {
+    "source": "dotfiles/.agents/skills/pymc-modeling/SKILL.md",
+    "target": "dotfiles/.agents/skills/pymc-extras/SKILL.md",
+    "kind": "internal",
+    "form": "relative",
+    "line": 507,
+    "status": "broken"
+   }
+  ]
+ }
+}

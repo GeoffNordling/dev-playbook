@@ -32,20 +32,42 @@ class AgentsViewError(Exception):
     """Any agentsview CLI failure — fail loud, never partial output."""
 
 
+class SessionNotFound(AgentsViewError):
+    """The CLI reported the requested session id absent from the archive.
+
+    Raised so callers can tell an unresolvable link — a session the daemon
+    references but never ingested — apart from an infrastructure failure
+    (daemon down, bad arguments), which stays a bare `AgentsViewError`.
+    """
+
+
 def _run(args: list[str], runner: Callable = subprocess.run) -> dict:
     """Run one agentsview command against the running daemon; parse its JSON stdout.
 
     Every command targets the standing daemon via `--server` (see `DAEMON_URL`)
-    so the CLI never auto-starts a competing server. Fail loud on nonzero.
+    so the CLI never auto-starts a competing server. Fail loud on nonzero: a
+    stderr that names a `session` as `not found` becomes `SessionNotFound`, any
+    other nonzero exit a bare `AgentsViewError`. Matching on the stderr text is
+    acceptable here because this module is explicitly the humble subprocess
+    boundary.
     """
     result = runner(
         ["agentsview", "--server", DAEMON_URL, *args], capture_output=True, text=True
     )
     if result.returncode != 0:
-        raise AgentsViewError(
+        message = (
             f"agentsview {' '.join(args)} failed (rc={result.returncode}): "
             f"{result.stderr.strip()[:300]}"
         )
+        # A missing session id: the daemon says "session <id> not found" (get)
+        # or "session not found: <id>" (messages). Require both tokens so an
+        # infrastructure "not found" (host, config file, missing binary) stays a
+        # bare AgentsViewError and surfaces loudly instead of being mistaken for
+        # an unresolvable subagent link.
+        stderr = result.stderr
+        if "session" in stderr and "not found" in stderr:
+            raise SessionNotFound(message)
+        raise AgentsViewError(message)
     return cast(dict, json.loads(result.stdout))
 
 

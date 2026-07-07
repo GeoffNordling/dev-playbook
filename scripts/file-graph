@@ -1,0 +1,82 @@
+#!/usr/bin/env -S uv run --script
+"""Build the file graph of a repository.
+
+Reference executor for the file-graph instrument (this repo's
+instruments/file-graph.md): a total, typed map of every file in the
+invoking checkout and the references connecting them. Discovery honors
+`.gitignore` and is scoped to the current worktree; gitignored files are
+counted per ignore pattern rather than enumerated. The logic lives in
+`dev_playbook.filegraph`; this file is the runnable shim.
+
+Output:
+    stdout — the machine artifact: one JSON document with nodes (bucket per
+             file), edges (form, line, status), the ignored census, and the
+             query results (census, reachability, components, orphans,
+             defects). With --output: written to that path instead.
+    stderr — one human-readable summary line.
+    exit   — 0 graph built, 2 cannot run.
+
+Usage:
+    file-graph [--output PATH] [directory]
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml"]
+# ///
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook import filegraph, gitrepo  # noqa: E402
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Repository root to graph (default: current directory)",
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=Path,
+        help="Write the JSON document here instead of stdout",
+    )
+    args = parser.parse_args()
+
+    repo_root = Path(args.directory).resolve()
+    try:
+        graph = filegraph.build_graph(repo_root)
+    except gitrepo.NotAGitRepository:
+        print(f"file-graph: not a git repository: {repo_root}", file=sys.stderr)
+        sys.exit(2)
+
+    rendered = json.dumps(graph, indent=1)
+    if args.output:
+        args.output.write_text(rendered + "\n")
+    else:
+        print(rendered)
+
+    census = graph["queries"]["census"]
+    defects = len(graph["queries"]["defects"])
+    unclassified = census["nodes_by_bucket"].get("unclassified", 0)
+    print(
+        f"file-graph: {len(graph['nodes'])} files, "
+        f"{len(graph['edges'])} edges, {defects} defects, "
+        f"{unclassified} unclassified",
+        file=sys.stderr,
+    )
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

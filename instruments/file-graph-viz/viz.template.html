@@ -1,0 +1,599 @@
+<title>File Graph — dev-playbook</title>
+<style>
+  :root {
+    --bg:#f4f5f8; --stage:#ffffff; --panel:#ffffff; --panel2:#f3f5f9; --edge:#dde1e9;
+    --text:#1b2130; --muted:#5b6577; --dim:#94a0b2; --accent:#4f46e5;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font:13px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  #app { display:grid; grid-template-columns:1fr 348px; height:100vh; }
+  #stage { position:relative; overflow:hidden; background:var(--stage); }
+  svg#c { display:block; width:100%; height:100%; cursor:grab; background:var(--stage); }
+  svg#c:active { cursor:grabbing; }
+  #side { background:var(--panel); border-left:1px solid var(--edge); overflow-y:auto; padding:16px; }
+  h1 { font-size:15px; margin:0 0 2px; letter-spacing:.2px; }
+  .sub { color:var(--muted); font-size:12px; margin-bottom:14px; }
+  .panel { background:var(--panel); border:1px solid var(--edge); border-radius:8px;
+    padding:11px 12px; margin-bottom:12px; position:relative; }
+  .panel h2 { font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted);
+    margin:0 0 9px; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .panel.key.active { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .tag { font-size:9px; letter-spacing:.5px; color:var(--accent); border:1px solid var(--accent);
+    border-radius:4px; padding:1px 5px; opacity:0; white-space:nowrap; }
+  .panel.key.active .tag { opacity:1; }
+  .row { display:flex; align-items:center; gap:8px; margin:2px 0; }
+  .glyph { flex:0 0 16px; text-align:center; font-size:13px; line-height:1; }
+  .row .name { flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .num { color:var(--muted); font-variant-numeric:tabular-nums; font-size:11px; }
+  .bar { height:6px; border-radius:3px; margin:2px 0 2px 24px; }
+  .selrow { cursor:pointer; border-radius:5px; padding:1px 4px; margin-left:-4px; }
+  .selrow:hover { background:rgba(79,70,229,.07); }
+  .selrow.selected { background:rgba(79,70,229,.14); outline:1px solid var(--accent); }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--text);
+    border:1px solid var(--edge); border-radius:20px; padding:3px 9px; cursor:pointer; }
+  .chip:hover { background:rgba(79,70,229,.07); }
+  .chip.selected { background:rgba(79,70,229,.14); border-color:var(--accent); }
+  .seglabel { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
+  .seg { display:flex; margin-bottom:12px; border:1px solid var(--edge); border-radius:7px; overflow:hidden; }
+  .seg button { flex:1; background:var(--panel); color:var(--muted); border:0; border-left:1px solid var(--edge);
+    padding:8px 6px; cursor:pointer; font-size:12px; }
+  .seg button:first-child { border-left:0; }
+  .seg button.on { background:var(--accent); color:#fff; }
+  .big { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .big .u { font-size:12px; color:var(--muted); font-weight:400; }
+  .kv { display:flex; justify-content:space-between; margin:2px 0; }
+  .kv .k { color:var(--muted); }
+  .eline { display:inline-block; width:20px; height:0; vertical-align:middle; margin-right:2px; }
+  .defect { font-size:11px; margin:4px 0; }
+  .defect .st { display:inline-block; font-size:10px; padding:0 5px; border-radius:3px; margin-right:5px; vertical-align:1px; }
+  .st.broken { background:#fee2e2; color:#b91c1c; } .st.wrong-form { background:#fef3c7; color:#b45309; }
+  .defect .p { color:var(--muted); word-break:break-all; }
+  #hud { position:absolute; left:12px; top:12px; background:rgba(255,255,255,.96); border:1px solid var(--edge);
+    border-radius:8px; padding:9px 11px; max-width:60%; pointer-events:none; font-size:12px;
+    box-shadow:0 2px 10px rgba(20,25,40,.08); }
+  #hud .path { font-weight:600; word-break:break-all; } #hud .meta { color:var(--muted); margin-top:3px; }
+  #hud.hidden { display:none; }
+  .hint { position:absolute; right:12px; bottom:10px; color:var(--dim); font-size:11px; pointer-events:none; }
+  .node { cursor:pointer; }
+
+  /* search box */
+  .search { width:100%; border:1px solid var(--edge); border-radius:7px; padding:8px 10px;
+    font:13px ui-sans-serif, system-ui, sans-serif; color:var(--text); background:var(--panel2); }
+  .search:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .searchinfo { color:var(--muted); font-size:11px; margin:5px 2px 12px; min-height:13px; }
+
+  /* trace-path panel */
+  .btn { font:12px ui-sans-serif, system-ui, sans-serif; border:1px solid var(--edge); background:var(--panel2);
+    color:var(--text); border-radius:6px; padding:6px 11px; cursor:pointer; }
+  .btn:hover { border-color:var(--accent); }
+  .btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .btn.ghost { color:var(--muted); }
+  .ep { display:inline-flex; align-items:center; gap:6px; font-size:11px; }
+  .ep .dot { width:9px; height:9px; border-radius:50%; border:2px solid; flex:0 0 auto; }
+  .ep .p { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pathseq { margin-top:8px; max-height:150px; overflow:auto; }
+  .pathseq .s { display:flex; gap:6px; font-size:11px; color:var(--muted); padding:1px 0; }
+  .pathseq .s .i { color:var(--dim); font-variant-numeric:tabular-nums; flex:0 0 18px; text-align:right; }
+  .pathseq .s .n { color:var(--text); word-break:break-all; }
+
+  /* text-viewer drawer */
+  #viewer { position:absolute; left:0; top:0; bottom:0; width:46%; min-width:340px; background:#fff;
+    border-right:1px solid var(--edge); box-shadow:6px 0 24px rgba(20,25,40,.10); display:flex; flex-direction:column;
+    transition:transform .18s ease; z-index:5; }
+  #viewer.hidden { transform:translateX(-101%); }
+  .vhdr { display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:1px solid var(--edge); }
+  .vpath { flex:1 1 auto; font-weight:600; font-size:12.5px; word-break:break-all;
+    font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  #vclose { flex:0 0 auto; border:0; background:var(--panel2); color:var(--muted); border-radius:6px;
+    width:26px; height:26px; cursor:pointer; font-size:14px; line-height:1; }
+  #vclose:hover { background:#e9edf4; color:var(--text); }
+  .vmeta { padding:6px 12px; color:var(--muted); font-size:11px; border-bottom:1px solid var(--edge); }
+  .vbody { flex:1 1 auto; margin:0; overflow:auto; padding:12px 14px; font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space:pre-wrap; word-break:break-word; color:#1b2130; background:#fbfcfe; }
+  .vbody.empty { color:var(--dim); font-style:italic; }
+</style>
+
+<div id="app">
+  <div id="stage">
+    <svg id="c"><rect id="bg" fill="transparent" pointer-events="all"></rect><g id="viewport"><g id="edges"></g><g id="nodes"></g><g id="overlay"></g></g></svg>
+    <div id="hud" class="hidden"></div>
+    <div id="viewer" class="hidden">
+      <div class="vhdr"><span class="vpath" id="vpath"></span><button id="vclose" title="close (Esc)">✕</button></div>
+      <div class="vmeta" id="vmeta"></div>
+      <pre class="vbody" id="vbody"></pre>
+    </div>
+    <div class="hint">scroll = zoom · drag = pan · click a node to read it · legend isolates · hover traces</div>
+  </div>
+  <div id="side">
+    <h1>File Graph</h1>
+    <div class="sub" id="subline"></div>
+
+    <input id="search" class="search" type="text" placeholder="search files…" autocomplete="off" spellcheck="false">
+    <div class="searchinfo" id="searchInfo"></div>
+
+    <div class="panel">
+      <h2>Trace shortest path</h2>
+      <div id="pathBody"></div>
+    </div>
+
+    <div class="seglabel">Node color</div>
+    <div class="seg">
+      <button id="mBucket" class="on">bucket</button>
+      <button id="mReach">reach from CLAUDE.md</button>
+    </div>
+
+    <div class="panel">
+      <h2>Shape = file family</h2>
+      <div class="chips" id="shapekey"></div>
+    </div>
+
+    <div class="panel key active" id="bucketPanel">
+      <h2>Node color · bucket <span class="tag">on graph</span></h2>
+      <div id="buckets"></div>
+    </div>
+
+    <div class="panel key" id="reachPanel">
+      <h2>Node color · reach from CLAUDE.md <span class="tag">on graph</span></h2>
+      <div class="big" id="reachBig"></div>
+      <div id="rings"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Edges</h2>
+      <div id="edgeLegend"></div>
+      <div style="height:8px"></div>
+      <div id="edgeStatus"></div>
+    </div>
+
+    <div class="panel">
+      <h2 id="orphanHdr">Orphans</h2>
+      <div id="orphans"></div>
+    </div>
+
+    <div class="panel">
+      <h2 id="defectHdr">Defects</h2>
+      <div id="defects"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Components (concept + index)</h2>
+      <div id="components"></div>
+    </div>
+  </div>
+</div>
+
+<script>__D3__</script>
+<script>
+const DATA = __DATA__;
+const CONTENTS = __CONTENTS__;   // { path: rawText | null } — for the click-to-read viewer
+
+// Escape any file path / edge endpoint before interpolating it into innerHTML.
+// Paths come from arbitrary repos and may contain &, <, > that must render as
+// text, not markup. (The click-to-read viewer already uses textContent.)
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+// ---- encoding: shape = file family, color = detail (bucket, test-split) ----
+const BUCKET = {
+  "harness-session":          { color:"#dc2626", shape:"doc" },
+  "concept":                  { color:"#4f46e5", shape:"doc" },
+  "index":                    { color:"#d97706", shape:"doc" },
+  "harness-skill-authored":   { color:"#ea580c", shape:"skill" },
+  "harness-skill-thirdparty": { color:"#0d9488", shape:"skill" },
+  "code":                     { color:"#2563eb", shape:"code" },
+  "code-test":                { color:"#9333ea", shape:"code" },
+  "config":                   { color:"#16a34a", shape:"config" },
+  "unclassified":             { color:"#db2777", shape:"other" },
+};
+const CKEY_ORDER = ["harness-session","concept","index","harness-skill-authored",
+  "harness-skill-thirdparty","code","code-test","config","unclassified"];
+const CKEY_LABEL = { "code-test":"code · test" };
+const SHAPE_SYMBOL = { doc:d3.symbolCircle, code:d3.symbolSquare, config:d3.symbolTriangle,
+  star:d3.symbolStar, skill:d3.symbolStar, other:d3.symbolCross };
+const SHAPE_GLYPH = { doc:"●", code:"■", config:"▲", skill:"★", other:"✖" };
+const SHAPE_LABEL = { doc:"prose / doc", code:"code", config:"config", skill:"skill", other:"unclassified" };
+const SHAPE_ORDER = ["doc","code","config","skill","other"];
+
+// continuous reach ramp: green (near CLAUDE.md) → yellow/orange → red (far)
+const maxDist = Math.max(1, ...Object.keys(DATA.queries.reachability.reached_by_distance).map(Number));
+const distScale = d3.interpolateHsl(d3.hsl(142, 0.55, 0.40), d3.hsl(2, 0.72, 0.50));
+function distColor(d){ return distScale(Math.min(d, maxDist) / maxDist); }
+const UNREACHED = "#c3c9d4";
+
+// edges: three classes only
+const E_REF = "#8792a6", E_BUNDLE = "#8b5cf6", E_WRONG = "#f59e0b";
+function edgeClass(e){ return e.status === "wrong-form" ? "wrong" : e.form === "bundle" ? "bundle" : "ref"; }
+function edgeColor(e){ const c = edgeClass(e); return c === "wrong" ? E_WRONG : c === "bundle" ? E_BUNDLE : E_REF; }
+function edgeDash(e){ return e.form === "bundle" ? "3,3" : null; }
+function edgeBaseOp(e){ const c = edgeClass(e); return c === "wrong" ? 0.75 : c === "bundle" ? 0.45 : 0.13; }
+
+// ---- test-code heuristic (within the code bucket) ----
+function isTest(p){
+  return /(^|\/)tests?\//.test(p) || /(^|\/)test_[^/]*$/.test(p)
+      || /_test\.[a-z]+$/.test(p) || /\.test\.[a-z]+$/.test(p) || /(^|\/)conftest\.py$/.test(p);
+}
+function ckeyOf(path, bucket){ return (bucket === "code" && isTest(path)) ? "code-test" : bucket; }
+
+// ---- data → nodes + links ----
+const reach = DATA.queries.reachability;
+const reached = reach.reached, seeds = new Set(reach.seeds);
+const orphans = DATA.queries.orphans;
+
+const nodes = Object.entries(DATA.nodes).map(([path, bucket]) => {
+  const ckey = ckeyOf(path, bucket);
+  return { path, bucket, ckey, deg:0, seed:seeds.has(path),
+    dist:(path in reached ? reached[path] : null),
+    shape:(BUCKET[ckey] || BUCKET.unclassified).shape };
+});
+const byPath = new Map(nodes.map(n => [n.path, n]));
+const links = [];
+for (const e of DATA.edges) {
+  const s = byPath.get(e.source), t = byPath.get(e.target);
+  if (s && t && s !== t) { links.push({ source:s, target:t, form:e.form, status:e.status }); s.deg++; t.deg++; }
+}
+const nbr = new Map(nodes.map(n => [n, new Set()]));
+for (const l of links) { nbr.get(l.source).add(l.target); nbr.get(l.target).add(l.source); }
+for (const n of nodes) {
+  n.hero = (n.path === "CLAUDE.md");   // the real, central harness-injected entry point
+  n.r = n.hero ? 11 : 3.2 + Math.sqrt(n.deg) * 1.3;
+  n.area = Math.PI * n.r * n.r;
+}
+
+const ckeyCounts = {}, shapeCounts = {};
+for (const n of nodes) { ckeyCounts[n.ckey] = (ckeyCounts[n.ckey] || 0) + 1; shapeCounts[n.shape] = (shapeCounts[n.shape] || 0) + 1; }
+
+let mode = "bucket";
+function colorFor(d){
+  if (mode === "reach") return d.dist == null ? UNREACHED : distColor(d.dist);
+  return (BUCKET[d.ckey] || BUCKET.unclassified).color;
+}
+
+// ---- svg + zoom + pan ----
+const stage = document.getElementById("stage");
+const svg = d3.select("#c"), bg = d3.select("#bg");
+const viewport = d3.select("#viewport");
+const edgeG = d3.select("#edges"), nodeG = d3.select("#nodes"), overlayG = d3.select("#overlay");
+let W = stage.clientWidth, H = stage.clientHeight;
+bg.attr("width", W).attr("height", H);
+
+const zoom = d3.zoom().scaleExtent([0.12, 6]).on("zoom", (ev) => viewport.attr("transform", ev.transform));
+svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(W / 2, H / 2).scale(0.72));
+window.addEventListener("resize", () => { W = stage.clientWidth; H = stage.clientHeight; bg.attr("width", W).attr("height", H); });
+
+// ---- draw ----
+const link = edgeG.selectAll("line").data(links).join("line")
+  .attr("stroke", edgeColor).attr("stroke-dasharray", edgeDash)
+  .attr("stroke-opacity", edgeBaseOp).attr("stroke-width", 0.9);
+
+const sym = d3.symbol();
+const node = nodeG.selectAll("g.node").data(nodes).join("g").attr("class", "node");
+// hero marker (root CLAUDE.md): a dotted target ring behind it, mode-independent
+node.filter(d => d.hero).append("circle")
+  .attr("r", d => d.r + 6).attr("fill", "none")
+  .attr("stroke", "#1b2130").attr("stroke-opacity", 0.6)
+  .attr("stroke-width", 1.5).attr("stroke-dasharray", "2,3");
+node.append("path")
+  .attr("d", d => sym.type(SHAPE_SYMBOL[d.shape]).size(d.area * 2.4)())
+  .attr("fill", colorFor)
+  .attr("stroke", d => d.seed ? "#0f172a" : "rgba(15,23,42,.35)")
+  .attr("stroke-width", d => d.seed ? 2.2 : 0.6);
+// permanent label on the hero so the entry point is unmistakable
+node.filter(d => d.hero).append("text").text("CLAUDE.md")
+  .attr("x", d => d.r + 8).attr("y", 4.5).attr("font-size", 12.5).attr("font-weight", 700)
+  .attr("fill", "#0f172a").attr("stroke", "#ffffff").attr("stroke-width", 3.5)
+  .attr("paint-order", "stroke").attr("pointer-events", "none")
+  .style("font-family", "ui-sans-serif, system-ui, sans-serif");
+
+// ---- simulation ----
+const sim = d3.forceSimulation(nodes)
+  .force("charge", d3.forceManyBody().strength(-150).distanceMax(430))
+  .force("link", d3.forceLink(links).distance(30).strength(0.35))
+  .force("x", d3.forceX(0).strength(0.05))
+  .force("y", d3.forceY(0).strength(0.05))
+  .force("collide", d3.forceCollide().radius(d => d.r + 2.5))
+  .on("tick", () => {
+    link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+    positionMarkers();
+  });
+
+node.call(d3.drag().clickDistance(4)
+  .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+  .on("drag",  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+  .on("end",   (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+node.on("click", (ev, d) => onNodeClick(d));
+
+// ---- highlight state ----
+// Two mutually-exclusive persistent highlights: `sel` (legend/search isolate)
+// and `pathHi` (a traced shortest path). `focusNode` is the node whose text is
+// open in the viewer — an independent ring, drawn regardless. Hover is transient.
+const PATH_COLOR = "#4f46e5";
+let sel = null;       // { id, kind:'node'|'edge', test }
+let pathHi = null;    // { nodes:Set, edges:Set, seq:[node]|null, hops:int|null, disconnected? }
+let epA = null, epB = null, focusNode = null;
+let picking = "off";  // off | awaitA | awaitB
+
+function ekey(a, b){ return a.path < b.path ? a.path + " " + b.path : b.path + " " + a.path; }
+
+function applyState(){
+  if (pathHi) {
+    const on = e => pathHi.edges.has(ekey(e.source, e.target));
+    node.style("opacity", n => pathHi.nodes.has(n) ? 1 : 0.06);
+    link.attr("stroke", e => on(e) ? PATH_COLOR : edgeColor(e))
+        .attr("stroke-opacity", e => on(e) ? 0.95 : 0.03)
+        .attr("stroke-width", e => on(e) ? 3 : 0.9);
+  } else if (!sel) {
+    node.style("opacity", 1);
+    link.attr("stroke", edgeColor).attr("stroke-opacity", edgeBaseOp).attr("stroke-width", 0.9);
+  } else if (sel.kind === "node") {
+    node.style("opacity", n => sel.test(n) ? 1 : 0.09);
+    link.attr("stroke", edgeColor)
+        .attr("stroke-opacity", e => (sel.test(e.source) && sel.test(e.target)) ? edgeBaseOp(e) : 0.03)
+        .attr("stroke-width", 0.9);
+  } else {
+    node.style("opacity", 0.5);
+    link.attr("stroke", edgeColor)
+        .attr("stroke-opacity", e => sel.test(e) ? Math.max(0.8, edgeBaseOp(e)) : 0.03)
+        .attr("stroke-width", e => sel.test(e) ? 1.6 : 0.9);
+  }
+}
+function markRows(){
+  document.querySelectorAll(".selrow,.chip").forEach(el =>
+    el.classList.toggle("selected", !!sel && el.dataset.selid === sel.id));
+}
+
+// ---- overlay markers (endpoints A/B + viewer focus), pinned to node positions ----
+function mkMarker(color, letter){
+  const g = overlayG.append("g").attr("pointer-events", "none").style("display", "none");
+  g.append("circle").attr("fill", "none").attr("stroke", color).attr("stroke-width", 2.5);
+  if (letter) g.append("text").text(letter).attr("y", -14).attr("text-anchor", "middle")
+    .attr("font-size", 11).attr("font-weight", 700).attr("fill", color)
+    .attr("stroke", "#fff").attr("stroke-width", 3).attr("paint-order", "stroke")
+    .style("font-family", "ui-sans-serif, system-ui, sans-serif");
+  return g;
+}
+const gFocus = mkMarker(PATH_COLOR, null), gA = mkMarker("#16a34a", "A"), gB = mkMarker("#dc2626", "B");
+function place(g, d){
+  if (d && d.x != null){
+    g.select("circle").attr("r", (d.r || 4) + 6);
+    g.attr("transform", `translate(${d.x},${d.y})`).style("display", null);
+  } else g.style("display", "none");
+}
+function positionMarkers(){ place(gFocus, focusNode); place(gA, epA); place(gB, epB); }
+
+// ---- selection (legend isolate) + search ----
+function clearSearchBox(){ if (search.value) search.value = ""; searchInfo.textContent = ""; }
+function clearSel(){ if (sel){ sel = null; markRows(); } clearSearchBox(); }
+function setSel(id, kind, test){
+  sel = (sel && sel.id === id) ? null : { id, kind, test };
+  if (sel){ resetPath(); clearSearchBox(); }
+  markRows(); applyState();
+}
+
+// ---- shortest-path tracer (undirected BFS over the reference graph) ----
+function shortestPath(a, b){
+  if (a === b) return [a];
+  const prev = new Map([[a, null]]); const q = [a];
+  for (let head = 0; head < q.length; head++){
+    const u = q[head];
+    if (u === b) break;
+    for (const v of nbr.get(u)) if (!prev.has(v)){ prev.set(v, u); q.push(v); }
+  }
+  if (!prev.has(b)) return null;
+  const out = []; for (let x = b; x != null; x = prev.get(x)) out.push(x);
+  return out.reverse();
+}
+function buildPathHi(seq){
+  const es = new Set();
+  for (let i = 0; i < seq.length - 1; i++) es.add(ekey(seq[i], seq[i + 1]));
+  return { nodes: new Set(seq), edges: es, seq, hops: seq.length - 1 };
+}
+function resetPath(){ pathHi = null; epA = null; epB = null; picking = "off"; updatePathPanel(); positionMarkers(); }
+function startPick(){ pathHi = null; epA = null; epB = null; clearSel(); picking = "awaitA"; updatePathPanel(); positionMarkers(); applyState(); }
+function onNodeClick(d){
+  if (picking === "awaitA"){ epA = d; picking = "awaitB"; updatePathPanel(); positionMarkers(); return; }
+  if (picking === "awaitB"){
+    if (d === epA) return;                       // need a distinct target
+    epB = d; picking = "off";
+    const seq = shortestPath(epA, epB);
+    pathHi = seq ? buildPathHi(seq)
+      : { nodes: new Set([epA, epB]), edges: new Set(), seq: null, hops: null, disconnected: true };
+    updatePathPanel(); positionMarkers(); applyState();
+    return;
+  }
+  openViewer(d);
+}
+
+const pathBody = document.getElementById("pathBody");
+function epChip(d, color, label){
+  return `<div class="ep"><span class="dot" style="border-color:${color}"></span>`
+    + `<b>${label}</b>&nbsp;<span class="p">${d ? esc(d.path) : "—"}</span></div>`;
+}
+function updatePathPanel(){
+  let h;
+  if (picking === "awaitA"){
+    h = `<div style="color:var(--muted);font-size:11px;margin-bottom:8px">Click the <b>first</b> file on the graph…</div>`
+      + `<button class="btn ghost" id="pathCancel">cancel</button>`;
+  } else if (picking === "awaitB"){
+    h = epChip(epA, "#16a34a", "A")
+      + `<div style="color:var(--muted);font-size:11px;margin:8px 0">Now click the <b>second</b> file…</div>`
+      + `<button class="btn ghost" id="pathCancel">cancel</button>`;
+  } else if (pathHi){
+    h = epChip(epA, "#16a34a", "A") + `<div style="height:4px"></div>` + epChip(epB, "#dc2626", "B");
+    if (pathHi.disconnected){
+      h += `<div style="color:#b45309;font-size:11px;margin-top:8px">No path — these files are in separate components.</div>`;
+    } else {
+      h += `<div style="margin:9px 0 3px"><span class="big">${pathHi.hops}<span class="u"> hop${pathHi.hops === 1 ? "" : "s"} apart</span></span></div>`
+        + `<div class="pathseq">` + pathHi.seq.map((n, i) =>
+            `<div class="s"><span class="i">${i}</span><span class="n">${esc(n.path)}</span></div>`).join("") + `</div>`;
+    }
+    h += `<div style="margin-top:9px"><button class="btn" id="pathClear">clear</button></div>`;
+  } else {
+    h = `<div style="color:var(--muted);font-size:11px;margin-bottom:8px">Highlight the shortest connection between two files. Edges are followed undirected.</div>`
+      + `<button class="btn" id="pathStart">Pick two files</button>`;
+  }
+  pathBody.innerHTML = h;
+  const bStart = document.getElementById("pathStart"); if (bStart) bStart.onclick = startPick;
+  const bCancel = document.getElementById("pathCancel"); if (bCancel) bCancel.onclick = () => { resetPath(); applyState(); };
+  const bClear = document.getElementById("pathClear"); if (bClear) bClear.onclick = () => { resetPath(); applyState(); };
+}
+
+// ---- text viewer (click a node to read its source) ----
+const viewer = document.getElementById("viewer");
+const vpath = document.getElementById("vpath"), vmeta = document.getElementById("vmeta"), vbody = document.getElementById("vbody");
+function distText(d){
+  return d.dist == null ? "unreachable from CLAUDE.md"
+    : d.dist === 0 ? "seed" : d.dist + " hop" + (d.dist > 1 ? "s" : "") + " from CLAUDE.md";
+}
+function openViewer(d){
+  focusNode = d; positionMarkers();
+  vpath.textContent = d.path;
+  vmeta.textContent = `${CKEY_LABEL[d.ckey] || d.ckey} · ${d.deg} edge${d.deg === 1 ? "" : "s"} · ${distText(d)}`;
+  const txt = CONTENTS[d.path];
+  vbody.classList.toggle("empty", txt == null);
+  vbody.textContent = txt == null ? "(source not captured for this file)" : txt;
+  vbody.scrollTop = 0;
+  viewer.classList.remove("hidden");
+}
+function closeViewer(){ viewer.classList.add("hidden"); focusNode = null; positionMarkers(); }
+document.getElementById("vclose").onclick = closeViewer;
+
+// ---- clicks on empty space + Escape unwind the current interaction ----
+bg.on("click", () => {
+  if (picking !== "off"){ resetPath(); applyState(); return; }
+  if (sel){ clearSel(); applyState(); }
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!viewer.classList.contains("hidden")) closeViewer();
+  else if (picking !== "off" || pathHi){ resetPath(); applyState(); }
+  else if (sel){ clearSel(); applyState(); }
+});
+
+const hud = document.getElementById("hud");
+node.on("pointerenter", (ev, d) => {
+  const near = nbr.get(d);
+  node.style("opacity", n => (n === d || near.has(n)) ? 1 : 0.1);
+  link.attr("stroke", e => (e.source === d || e.target === d) ? "#334155" : edgeColor(e))
+      .attr("stroke-opacity", e => (e.source === d || e.target === d) ? 0.9 : 0.03)
+      .attr("stroke-width", e => (e.source === d || e.target === d) ? 1.6 : 0.9);
+  const dtxt = d.dist == null ? "unreachable from CLAUDE.md"
+    : d.dist === 0 ? "seed (harness context)"
+    : d.dist + " hop" + (d.dist > 1 ? "s" : "") + " from CLAUDE.md";
+  hud.classList.remove("hidden");
+  hud.innerHTML = `<div class="path">${esc(d.path)}</div><div class="meta">`
+    + `${CKEY_LABEL[d.ckey] || d.ckey} &middot; ${d.deg} edge${d.deg === 1 ? "" : "s"} &middot; ${dtxt}</div>`;
+}).on("pointerleave", () => { hud.classList.add("hidden"); applyState(); });
+
+// ---- mode toggle ----
+const mB = document.getElementById("mBucket"), mR = document.getElementById("mReach");
+const bucketPanel = document.getElementById("bucketPanel"), reachPanel = document.getElementById("reachPanel");
+function setMode(m){
+  mode = m;
+  node.select("path").attr("fill", colorFor);
+  mB.classList.toggle("on", m === "bucket"); mR.classList.toggle("on", m === "reach");
+  bucketPanel.classList.toggle("active", m === "bucket");
+  reachPanel.classList.toggle("active", m === "reach");
+}
+mB.onclick = () => setMode("bucket");
+mR.onclick = () => setMode("reach");
+
+// ---- sidebar ----
+const census = DATA.queries.census;
+const total = nodes.length, nreached = Object.keys(reached).length;
+document.getElementById("subline").textContent =
+  `${DATA.repo} · ${total} files · ${links.length} internal edges · ${DATA.queries.defects.length} defects`;
+
+// shape key — clickable chips (isolate by family)
+document.getElementById("shapekey").innerHTML = SHAPE_ORDER.filter(s => shapeCounts[s]).map(s =>
+  `<span class="chip selrow" data-selid="shape:${s}"><b style="font-size:13px">${SHAPE_GLYPH[s]}</b> ${SHAPE_LABEL[s]}</span>`).join("");
+
+// bucket color key — clickable rows
+document.getElementById("buckets").innerHTML = CKEY_ORDER.filter(b => ckeyCounts[b]).map(b => {
+  const m = BUCKET[b];
+  return `<div class="row selrow" data-selid="ckey:${b}"><span class="glyph" style="color:${m.color}">${SHAPE_GLYPH[m.shape]}</span>`
+    + `<span class="name">${CKEY_LABEL[b] || b}</span><span class="num">${ckeyCounts[b]}</span></div>`;
+}).join("");
+
+// reach color key — clickable rows
+document.getElementById("reachBig").innerHTML = `${nreached}<span class="u"> / ${total} reached</span>`;
+const rbd = reach.reached_by_distance;
+const maxRing = Math.max(...Object.values(rbd), reach.unreached.length);
+let rings = "";
+for (let d = 0; d <= 6; d++) {
+  const c = rbd[d] || 0; if (!c && d > 0) continue;
+  rings += `<div class="row selrow" data-selid="dist:${d}"><span class="glyph" style="color:${distColor(d)}">●</span>`
+    + `<span class="name">${d === 0 ? "seeds" : d + " hop" + (d > 1 ? "s" : "")}</span><span class="num">${c}</span></div>`
+    + `<div class="bar" style="width:${Math.max(4, c / maxRing * 100)}%;background:${distColor(d)}"></div>`;
+}
+rings += `<div class="row selrow" data-selid="dist:none" style="margin-top:6px"><span class="glyph" style="color:${UNREACHED}">●</span>`
+  + `<span class="name">unreachable</span><span class="num">${reach.unreached.length}</span></div>`
+  + `<div class="bar" style="width:${reach.unreached.length / maxRing * 100}%;background:${UNREACHED}"></div>`;
+const ubb = reach.unreached_by_bucket;
+rings += `<div style="margin-top:7px;color:var(--muted);font-size:11px">unreachable: `
+  + CKEY_ORDER.filter(b => ubb[b]).map(b => `${ubb[b]}&nbsp;${b.replace("harness-", "")}`).join(" · ") + `</div>`;
+document.getElementById("rings").innerHTML = rings;
+
+// edge legend — clickable rows
+function eline(color, dash){ return `<span class="eline" style="border-top:2px ${dash ? "dashed" : "solid"} ${color}"></span>`; }
+document.getElementById("edgeLegend").innerHTML =
+  `<div class="row selrow" data-selid="edge:ref">${eline(E_REF)}<span class="name">reference</span>`
+    + `<span class="num">link · citation · relative · prose · code-ref</span></div>`
+  + `<div class="row selrow" data-selid="edge:bundle">${eline(E_BUNDLE, true)}<span class="name">bundle</span>`
+    + `<span class="num">skill → member</span></div>`
+  + `<div class="row selrow" data-selid="edge:wrong">${eline(E_WRONG)}<span class="name">wrong-form</span>`
+    + `<span class="num">defect edge</span></div>`;
+document.getElementById("edgeStatus").innerHTML = Object.entries(census.edges_by_status)
+  .map(([s, c]) => `<div class="kv"><span class="k" style="color:${s === "ok" ? "#16a34a" : s === "broken" ? "#dc2626" : "#d97706"}">${s}</span><span>${c}</span></div>`).join("");
+
+// orphans
+const oc = {}; for (const [p, b] of Object.entries(orphans)) { const k = ckeyOf(p, b); oc[k] = (oc[k] || 0) + 1; }
+document.getElementById("orphanHdr").textContent = `Orphans (${Object.keys(orphans).length})`;
+document.getElementById("orphans").innerHTML = CKEY_ORDER.filter(b => oc[b]).map(b =>
+  `<div class="row"><span class="glyph" style="color:${BUCKET[b].color}">${SHAPE_GLYPH[BUCKET[b].shape]}</span>`
+  + `<span class="name">${CKEY_LABEL[b] || b}</span><span class="num">${oc[b]}</span></div>`).join("")
+  + `<div style="color:var(--dim);font-size:11px;margin-top:6px">files with no edges at all</div>`;
+
+// defects
+const defects = DATA.queries.defects;
+document.getElementById("defectHdr").textContent = `Defects (${defects.length})`;
+document.getElementById("defects").innerHTML = defects.map(d =>
+  `<div class="defect"><span class="st ${d.status}">${d.status}</span><span class="p">${esc(d.source)} → ${esc(d.target)}</span></div>`).join("");
+
+// components
+const comps = DATA.queries.components;
+document.getElementById("components").innerHTML =
+  `<div class="big">${comps.length}<span class="u"> component${comps.length === 1 ? "" : "s"} · ${comps.reduce((a, c) => a + c.length, 0)} docs</span></div>`
+  + `<div style="color:var(--dim);font-size:11px;margin-top:4px">`
+  + (comps.length === 1 ? "the whole concept+index bundle is one connected web" : "sizes: " + comps.map(c => c.length).sort((a, b) => b - a).join(", ")) + `</div>`;
+
+// ---- wire legend clicks (delegate) ----
+document.querySelectorAll("[data-selid]").forEach(el => {
+  const id = el.dataset.selid;
+  el.addEventListener("click", () => {
+    const [kind, val] = id.split(":");
+    if (kind === "ckey")  setSel(id, "node", n => n.ckey === val);
+    else if (kind === "shape") setSel(id, "node", n => n.shape === val);
+    else if (kind === "dist")  setSel(id, "node", n => val === "none" ? n.dist == null : n.dist === +val);
+    else if (kind === "edge")  setSel(id, "edge", e => edgeClass(e) === val);
+  });
+});
+
+// ---- search box: isolate every file whose path matches ----
+const search = document.getElementById("search"), searchInfo = document.getElementById("searchInfo");
+search.addEventListener("input", () => {
+  const q = search.value.trim().toLowerCase();
+  if (!q){ searchInfo.textContent = ""; if (sel && sel.id === "search"){ sel = null; markRows(); applyState(); } return; }
+  const test = n => n.path.toLowerCase().includes(q);
+  const count = nodes.reduce((a, n) => a + (test(n) ? 1 : 0), 0);
+  searchInfo.textContent = `${count} match${count === 1 ? "" : "es"}`;
+  pathHi = null; epA = null; epB = null; picking = "off"; updatePathPanel(); positionMarkers();
+  sel = { id: "search", kind: "node", test };
+  markRows(); applyState();
+});
+
+updatePathPanel();   // initial render of the trace-path panel
+</script>
