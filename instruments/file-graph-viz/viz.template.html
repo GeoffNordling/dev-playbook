@@ -57,17 +57,66 @@
   #hud.hidden { display:none; }
   .hint { position:absolute; right:12px; bottom:10px; color:var(--dim); font-size:11px; pointer-events:none; }
   .node { cursor:pointer; }
+
+  /* search box */
+  .search { width:100%; border:1px solid var(--edge); border-radius:7px; padding:8px 10px;
+    font:13px ui-sans-serif, system-ui, sans-serif; color:var(--text); background:var(--panel2); }
+  .search:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .searchinfo { color:var(--muted); font-size:11px; margin:5px 2px 12px; min-height:13px; }
+
+  /* trace-path panel */
+  .btn { font:12px ui-sans-serif, system-ui, sans-serif; border:1px solid var(--edge); background:var(--panel2);
+    color:var(--text); border-radius:6px; padding:6px 11px; cursor:pointer; }
+  .btn:hover { border-color:var(--accent); }
+  .btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .btn.ghost { color:var(--muted); }
+  .ep { display:inline-flex; align-items:center; gap:6px; font-size:11px; }
+  .ep .dot { width:9px; height:9px; border-radius:50%; border:2px solid; flex:0 0 auto; }
+  .ep .p { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pathseq { margin-top:8px; max-height:150px; overflow:auto; }
+  .pathseq .s { display:flex; gap:6px; font-size:11px; color:var(--muted); padding:1px 0; }
+  .pathseq .s .i { color:var(--dim); font-variant-numeric:tabular-nums; flex:0 0 18px; text-align:right; }
+  .pathseq .s .n { color:var(--text); word-break:break-all; }
+
+  /* text-viewer drawer */
+  #viewer { position:absolute; left:0; top:0; bottom:0; width:46%; min-width:340px; background:#fff;
+    border-right:1px solid var(--edge); box-shadow:6px 0 24px rgba(20,25,40,.10); display:flex; flex-direction:column;
+    transition:transform .18s ease; z-index:5; }
+  #viewer.hidden { transform:translateX(-101%); }
+  .vhdr { display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:1px solid var(--edge); }
+  .vpath { flex:1 1 auto; font-weight:600; font-size:12.5px; word-break:break-all;
+    font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  #vclose { flex:0 0 auto; border:0; background:var(--panel2); color:var(--muted); border-radius:6px;
+    width:26px; height:26px; cursor:pointer; font-size:14px; line-height:1; }
+  #vclose:hover { background:#e9edf4; color:var(--text); }
+  .vmeta { padding:6px 12px; color:var(--muted); font-size:11px; border-bottom:1px solid var(--edge); }
+  .vbody { flex:1 1 auto; margin:0; overflow:auto; padding:12px 14px; font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space:pre-wrap; word-break:break-word; color:#1b2130; background:#fbfcfe; }
+  .vbody.empty { color:var(--dim); font-style:italic; }
 </style>
 
 <div id="app">
   <div id="stage">
-    <svg id="c"><rect id="bg" fill="transparent" pointer-events="all"></rect><g id="viewport"><g id="edges"></g><g id="nodes"></g></g></svg>
+    <svg id="c"><rect id="bg" fill="transparent" pointer-events="all"></rect><g id="viewport"><g id="edges"></g><g id="nodes"></g><g id="overlay"></g></g></svg>
     <div id="hud" class="hidden"></div>
-    <div class="hint">scroll = zoom · drag = pan · click a legend to isolate · hover = trace</div>
+    <div id="viewer" class="hidden">
+      <div class="vhdr"><span class="vpath" id="vpath"></span><button id="vclose" title="close (Esc)">✕</button></div>
+      <div class="vmeta" id="vmeta"></div>
+      <pre class="vbody" id="vbody"></pre>
+    </div>
+    <div class="hint">scroll = zoom · drag = pan · click a node to read it · legend isolates · hover traces</div>
   </div>
   <div id="side">
     <h1>File Graph</h1>
     <div class="sub" id="subline"></div>
+
+    <input id="search" class="search" type="text" placeholder="search files…" autocomplete="off" spellcheck="false">
+    <div class="searchinfo" id="searchInfo"></div>
+
+    <div class="panel">
+      <h2>Trace shortest path</h2>
+      <div id="pathBody"></div>
+    </div>
 
     <div class="seglabel">Node color</div>
     <div class="seg">
@@ -118,6 +167,7 @@
 <script>__D3__</script>
 <script>
 const DATA = __DATA__;
+const CONTENTS = __CONTENTS__;   // { path: rawText | null } — for the click-to-read viewer
 
 // ---- encoding: shape = file family, color = detail (bucket, test-split) ----
 const BUCKET = {
@@ -198,7 +248,7 @@ function colorFor(d){
 const stage = document.getElementById("stage");
 const svg = d3.select("#c"), bg = d3.select("#bg");
 const viewport = d3.select("#viewport");
-const edgeG = d3.select("#edges"), nodeG = d3.select("#nodes");
+const edgeG = d3.select("#edges"), nodeG = d3.select("#nodes"), overlayG = d3.select("#overlay");
 let W = stage.clientWidth, H = stage.clientHeight;
 bg.attr("width", W).attr("height", H);
 
@@ -241,17 +291,35 @@ const sim = d3.forceSimulation(nodes)
     link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
         .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
     node.attr("transform", d => `translate(${d.x},${d.y})`);
+    positionMarkers();
   });
 
-node.call(d3.drag()
+node.call(d3.drag().clickDistance(4)
   .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
   .on("drag",  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
   .on("end",   (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+node.on("click", (ev, d) => onNodeClick(d));
 
-// ---- selection (click a legend to isolate) + hover trace ----
-let sel = null;  // { id, kind:'node'|'edge', test }
+// ---- highlight state ----
+// Two mutually-exclusive persistent highlights: `sel` (legend/search isolate)
+// and `pathHi` (a traced shortest path). `focusNode` is the node whose text is
+// open in the viewer — an independent ring, drawn regardless. Hover is transient.
+const PATH_COLOR = "#4f46e5";
+let sel = null;       // { id, kind:'node'|'edge', test }
+let pathHi = null;    // { nodes:Set, edges:Set, seq:[node]|null, hops:int|null, disconnected? }
+let epA = null, epB = null, focusNode = null;
+let picking = "off";  // off | awaitA | awaitB
+
+function ekey(a, b){ return a.path < b.path ? a.path + " " + b.path : b.path + " " + a.path; }
+
 function applyState(){
-  if (!sel) {
+  if (pathHi) {
+    const on = e => pathHi.edges.has(ekey(e.source, e.target));
+    node.style("opacity", n => pathHi.nodes.has(n) ? 1 : 0.06);
+    link.attr("stroke", e => on(e) ? PATH_COLOR : edgeColor(e))
+        .attr("stroke-opacity", e => on(e) ? 0.95 : 0.03)
+        .attr("stroke-width", e => on(e) ? 3 : 0.9);
+  } else if (!sel) {
     node.style("opacity", 1);
     link.attr("stroke", edgeColor).attr("stroke-opacity", edgeBaseOp).attr("stroke-width", 0.9);
   } else if (sel.kind === "node") {
@@ -270,11 +338,134 @@ function markRows(){
   document.querySelectorAll(".selrow,.chip").forEach(el =>
     el.classList.toggle("selected", !!sel && el.dataset.selid === sel.id));
 }
+
+// ---- overlay markers (endpoints A/B + viewer focus), pinned to node positions ----
+function mkMarker(color, letter){
+  const g = overlayG.append("g").attr("pointer-events", "none").style("display", "none");
+  g.append("circle").attr("fill", "none").attr("stroke", color).attr("stroke-width", 2.5);
+  if (letter) g.append("text").text(letter).attr("y", -14).attr("text-anchor", "middle")
+    .attr("font-size", 11).attr("font-weight", 700).attr("fill", color)
+    .attr("stroke", "#fff").attr("stroke-width", 3).attr("paint-order", "stroke")
+    .style("font-family", "ui-sans-serif, system-ui, sans-serif");
+  return g;
+}
+const gFocus = mkMarker(PATH_COLOR, null), gA = mkMarker("#16a34a", "A"), gB = mkMarker("#dc2626", "B");
+function place(g, d){
+  if (d && d.x != null){
+    g.select("circle").attr("r", (d.r || 4) + 6);
+    g.attr("transform", `translate(${d.x},${d.y})`).style("display", null);
+  } else g.style("display", "none");
+}
+function positionMarkers(){ place(gFocus, focusNode); place(gA, epA); place(gB, epB); }
+
+// ---- selection (legend isolate) + search ----
+function clearSearchBox(){ if (search.value) search.value = ""; searchInfo.textContent = ""; }
+function clearSel(){ if (sel){ sel = null; markRows(); } clearSearchBox(); }
 function setSel(id, kind, test){
   sel = (sel && sel.id === id) ? null : { id, kind, test };
+  if (sel){ resetPath(); clearSearchBox(); }
   markRows(); applyState();
 }
-bg.on("click", () => { if (sel) { sel = null; markRows(); applyState(); } });
+
+// ---- shortest-path tracer (undirected BFS over the reference graph) ----
+function shortestPath(a, b){
+  if (a === b) return [a];
+  const prev = new Map([[a, null]]); const q = [a];
+  for (let head = 0; head < q.length; head++){
+    const u = q[head];
+    if (u === b) break;
+    for (const v of nbr.get(u)) if (!prev.has(v)){ prev.set(v, u); q.push(v); }
+  }
+  if (!prev.has(b)) return null;
+  const out = []; for (let x = b; x != null; x = prev.get(x)) out.push(x);
+  return out.reverse();
+}
+function buildPathHi(seq){
+  const es = new Set();
+  for (let i = 0; i < seq.length - 1; i++) es.add(ekey(seq[i], seq[i + 1]));
+  return { nodes: new Set(seq), edges: es, seq, hops: seq.length - 1 };
+}
+function resetPath(){ pathHi = null; epA = null; epB = null; picking = "off"; updatePathPanel(); positionMarkers(); }
+function startPick(){ pathHi = null; epA = null; epB = null; clearSel(); picking = "awaitA"; updatePathPanel(); positionMarkers(); applyState(); }
+function onNodeClick(d){
+  if (picking === "awaitA"){ epA = d; picking = "awaitB"; updatePathPanel(); positionMarkers(); return; }
+  if (picking === "awaitB"){
+    if (d === epA) return;                       // need a distinct target
+    epB = d; picking = "off";
+    const seq = shortestPath(epA, epB);
+    pathHi = seq ? buildPathHi(seq)
+      : { nodes: new Set([epA, epB]), edges: new Set(), seq: null, hops: null, disconnected: true };
+    updatePathPanel(); positionMarkers(); applyState();
+    return;
+  }
+  openViewer(d);
+}
+
+const pathBody = document.getElementById("pathBody");
+function epChip(d, color, label){
+  return `<div class="ep"><span class="dot" style="border-color:${color}"></span>`
+    + `<b>${label}</b>&nbsp;<span class="p">${d ? d.path : "—"}</span></div>`;
+}
+function updatePathPanel(){
+  let h;
+  if (picking === "awaitA"){
+    h = `<div style="color:var(--muted);font-size:11px;margin-bottom:8px">Click the <b>first</b> file on the graph…</div>`
+      + `<button class="btn ghost" id="pathCancel">cancel</button>`;
+  } else if (picking === "awaitB"){
+    h = epChip(epA, "#16a34a", "A")
+      + `<div style="color:var(--muted);font-size:11px;margin:8px 0">Now click the <b>second</b> file…</div>`
+      + `<button class="btn ghost" id="pathCancel">cancel</button>`;
+  } else if (pathHi){
+    h = epChip(epA, "#16a34a", "A") + `<div style="height:4px"></div>` + epChip(epB, "#dc2626", "B");
+    if (pathHi.disconnected){
+      h += `<div style="color:#b45309;font-size:11px;margin-top:8px">No path — these files are in separate components.</div>`;
+    } else {
+      h += `<div style="margin:9px 0 3px"><span class="big">${pathHi.hops}<span class="u"> hop${pathHi.hops === 1 ? "" : "s"} apart</span></span></div>`
+        + `<div class="pathseq">` + pathHi.seq.map((n, i) =>
+            `<div class="s"><span class="i">${i}</span><span class="n">${n.path}</span></div>`).join("") + `</div>`;
+    }
+    h += `<div style="margin-top:9px"><button class="btn" id="pathClear">clear</button></div>`;
+  } else {
+    h = `<div style="color:var(--muted);font-size:11px;margin-bottom:8px">Highlight the shortest connection between two files. Edges are followed undirected.</div>`
+      + `<button class="btn" id="pathStart">Pick two files</button>`;
+  }
+  pathBody.innerHTML = h;
+  const bStart = document.getElementById("pathStart"); if (bStart) bStart.onclick = startPick;
+  const bCancel = document.getElementById("pathCancel"); if (bCancel) bCancel.onclick = () => { resetPath(); applyState(); };
+  const bClear = document.getElementById("pathClear"); if (bClear) bClear.onclick = () => { resetPath(); applyState(); };
+}
+
+// ---- text viewer (click a node to read its source) ----
+const viewer = document.getElementById("viewer");
+const vpath = document.getElementById("vpath"), vmeta = document.getElementById("vmeta"), vbody = document.getElementById("vbody");
+function distText(d){
+  return d.dist == null ? "unreachable from CLAUDE.md"
+    : d.dist === 0 ? "seed" : d.dist + " hop" + (d.dist > 1 ? "s" : "") + " from CLAUDE.md";
+}
+function openViewer(d){
+  focusNode = d; positionMarkers();
+  vpath.textContent = d.path;
+  vmeta.textContent = `${CKEY_LABEL[d.ckey] || d.ckey} · ${d.deg} edge${d.deg === 1 ? "" : "s"} · ${distText(d)}`;
+  const txt = CONTENTS[d.path];
+  vbody.classList.toggle("empty", txt == null);
+  vbody.textContent = txt == null ? "(source not captured for this file)" : txt;
+  vbody.scrollTop = 0;
+  viewer.classList.remove("hidden");
+}
+function closeViewer(){ viewer.classList.add("hidden"); focusNode = null; positionMarkers(); }
+document.getElementById("vclose").onclick = closeViewer;
+
+// ---- clicks on empty space + Escape unwind the current interaction ----
+bg.on("click", () => {
+  if (picking !== "off"){ resetPath(); applyState(); return; }
+  if (sel){ clearSel(); applyState(); }
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!viewer.classList.contains("hidden")) closeViewer();
+  else if (picking !== "off" || pathHi){ resetPath(); applyState(); }
+  else if (sel){ clearSel(); applyState(); }
+});
 
 const hud = document.getElementById("hud");
 node.on("pointerenter", (ev, d) => {
@@ -384,4 +575,19 @@ document.querySelectorAll("[data-selid]").forEach(el => {
     else if (kind === "edge")  setSel(id, "edge", e => edgeClass(e) === val);
   });
 });
+
+// ---- search box: isolate every file whose path matches ----
+const search = document.getElementById("search"), searchInfo = document.getElementById("searchInfo");
+search.addEventListener("input", () => {
+  const q = search.value.trim().toLowerCase();
+  if (!q){ searchInfo.textContent = ""; if (sel && sel.id === "search"){ sel = null; markRows(); applyState(); } return; }
+  const test = n => n.path.toLowerCase().includes(q);
+  const count = nodes.reduce((a, n) => a + (test(n) ? 1 : 0), 0);
+  searchInfo.textContent = `${count} match${count === 1 ? "" : "es"}`;
+  pathHi = null; epA = null; epB = null; picking = "off"; updatePathPanel(); positionMarkers();
+  sel = { id: "search", kind: "node", test };
+  markRows(); applyState();
+});
+
+updatePathPanel();   // initial render of the trace-path panel
 </script>
