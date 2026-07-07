@@ -14,6 +14,7 @@ import pytest
 from dev_playbook.transcript_export.client import (
     DAEMON_URL,
     AgentsViewError,
+    SessionNotFound,
     session_get,
     session_list,
     session_messages,
@@ -122,5 +123,23 @@ def test_run_fails_loud_on_nonzero_exit() -> None:
         [completed(1, stderr="agentsview: no such session 'nope'")], calls
     )
 
-    with pytest.raises(AgentsViewError, match="no such session"):
+    with pytest.raises(AgentsViewError, match="no such session") as excinfo:
         session_get("nope", runner=runner)
+
+    # A generic failure stays a bare AgentsViewError; only "not found" on stderr
+    # escalates to SessionNotFound.
+    assert not isinstance(excinfo.value, SessionNotFound)
+
+
+def test_session_not_found_is_an_agentsview_error() -> None:
+    assert issubclass(SessionNotFound, AgentsViewError)
+
+
+def test_session_get_raises_session_not_found_when_stderr_reports_not_found() -> None:
+    calls: list[list[str]] = []
+    runner = recording_runner(
+        [completed(1, stderr="fatal: session agent-x not found")], calls
+    )
+
+    with pytest.raises(SessionNotFound, match="not found"):
+        session_get("agent-x", runner=runner)

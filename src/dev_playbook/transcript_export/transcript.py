@@ -7,9 +7,10 @@ reconstructs rewind forks, then walks the live path emitting each message with
 any abandoned branches at their fork points. When a tool call spawned a
 sub-agent it fetches that child session and renders it inline as a nested
 `<subagent>`, recursively — the child renders in the very same schema. A visited
-set guards against a cycle in the agent graph and a depth ceiling against
-pathological nesting; tripping either emits a self-closing placeholder rather
-than silently dropping the sub-agent.
+set guards against a cycle in the agent graph, a depth ceiling against
+pathological nesting, and a child absent from the archive (an async background
+agent the daemon links but never ingests) is tolerated; each case emits a
+self-closing placeholder rather than silently dropping the sub-agent.
 
 `render_session` is the single per-session entry point; the CLI calls it for
 each selected session and writes the `<id>.xml` files.
@@ -20,7 +21,11 @@ import xml.etree.ElementTree as ElementTree
 from collections.abc import Callable
 
 from dev_playbook.transcript_export.classify import keep_messages
-from dev_playbook.transcript_export.client import session_get, session_messages
+from dev_playbook.transcript_export.client import (
+    SessionNotFound,
+    session_get,
+    session_messages,
+)
 from dev_playbook.transcript_export.forks import reconstruct_forks
 from dev_playbook.transcript_export.model import normalize_messages
 from dev_playbook.transcript_export.render import (
@@ -116,12 +121,14 @@ def _subagent_renderer(
 
     The returned function maps a `subagent_session_id` to its full
     `<subagent id messages>…</subagent>` XML, closed over the current `visited`
-    set and `depth`. It enforces the two guards: a session already on the path
-    back to the root (a cycle) or one past `MAX_SUBAGENT_DEPTH` is *not* expanded
-    — instead a self-closing `<subagent id omitted="cycle|depth"/>` placeholder
-    records that the sub-agent existed without recursing. The `messages` attribute
-    carries the child's `message_count` (omitted if the header lacks it), matching
-    the top-level header's mapping.
+    set and `depth`. It enforces three guards, each emitting a self-closing
+    `<subagent id omitted="…"/>` placeholder that records the sub-agent existed
+    without recursing: a session already on the path back to the root
+    (`omitted="cycle"`), one past `MAX_SUBAGENT_DEPTH` (`omitted="depth"`), and
+    one the daemon links but never ingested (`omitted="unarchived"` — the client
+    raises `SessionNotFound` for it). The `messages` attribute carries the
+    child's `message_count` (omitted if the header lacks it), matching the
+    top-level header's mapping.
     """
 
     def render_subagent(subagent_session_id: str) -> str:
@@ -130,7 +137,17 @@ def _subagent_renderer(
             return f'<subagent id="{ident}" omitted="cycle"/>'
         if depth + 1 > MAX_SUBAGENT_DEPTH:
             return f'<subagent id="{ident}" omitted="depth"/>'
-        meta = session_get(subagent_session_id, runner=runner)
+        try:
+            meta = session_get(subagent_session_id, runner=runner)
+        except SessionNotFound:
+            # The daemon stamps parent tool calls with subagent ids for async
+            # background agents, but those transcripts live in the session's tmp
+            # task dir and are never ingested — so this id is unresolvable by
+            # construction, an expected runtime state, not a fault. Emit a
+            # fail-visible placeholder rather than crash the whole render. Only
+            # SessionNotFound is caught; a daemon-down AgentsViewError still
+            # propagates loud.
+            return f'<subagent id="{ident}" omitted="unarchived"/>'
         body = _render_body(
             subagent_session_id,
             runner,
