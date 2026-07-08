@@ -34,6 +34,19 @@ every instrument is listed there.
 ## Executors
 
 The tooling behind a spec may be deterministic code
-(judgments — `scripts/judgments-run`), an agent executing the spec directly
-(the datasheet), or a mix. The spec states which, and what the executor
-needs: inputs, scope, and where the artifact lands.
+(the file graph — `scripts/file-graph`), an agent executing the spec
+directly (the datasheet), or a mix. The spec states which, and what the
+executor needs: inputs, scope, and where the artifact lands.
+
+## Readings
+
+An instrument's artifacts land under `readings/<instrument>/<subject>.<ext>`
+— one subdirectory per instrument, named for its spec (`instruments/<X>.md`
+⇒ `readings/<X>/`). Readings are regenerated **manually, on demand** — by
+re-running the instrument when someone wants a fresh one, never by
+hand-editing the output and never on an automatic sync. A committed reading
+may lag the code or repository it describes until it is next regenerated;
+that staleness is expected, not a defect to chase. Readings carry no OKF
+frontmatter (they are outputs, not concept docs). A repository that consumes
+an instrument grows only a `readings/` directory; the spec and its tooling
+stay in dev-playbook.

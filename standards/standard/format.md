@@ -35,7 +35,7 @@ Not everything normative is a standard. A device built to serve a purpose
 question, and so belongs inside a cell rather than in the catalog. Such
 devices are **instruments**; each carries a prescriptive contract of its
 own, typed `Instrument Spec`. The instrument concept is defined in
-[Instruments and Instrument Specs](/instruments/format.md).
+[Instruments and Instrument Specs](/standards/instrument/format.md).
 
 ## The card
 
@@ -73,7 +73,7 @@ Standards drift at two grains, each with its own detector:
 
 1. **Fine grain** — a specific document or passage must keep meaning what
    it meant when validated.
-   [Judgments](/instruments/judgments/index.md) cover this: the
+   [Judgments](/standards/judgments/index.md) cover this: the
    content-addressed cache expires a verdict the moment the underlying
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across

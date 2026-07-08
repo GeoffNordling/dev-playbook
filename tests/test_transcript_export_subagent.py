@@ -228,7 +228,7 @@ def test_subagent_evicted_between_get_and_messages_renders_placeholder() -> None
     # its `session messages` then fails not-found because the daemon pruned it
     # between the two calls. The body fetch is guarded together with the header,
     # so the parent still renders a placeholder instead of crashing the export.
-    sessions = {
+    sessions: dict[str, dict] = {
         "parent": {
             "meta": {"id": "parent", "message_count": 1},
             "rows": [

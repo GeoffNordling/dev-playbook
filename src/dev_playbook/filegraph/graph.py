@@ -69,6 +69,8 @@ def bucket(relpath: str, repo_root: Path) -> str:
         return "harness-skill-authored"
     if relpath.endswith(".md") and kind == "harness":
         return "harness-session"
+    if relpath.startswith("readings/"):
+        return "reading"  # an instrument's output artifact, not code or config
     suffix = PurePosixPath(relpath).suffix
     if suffix in CODE_EXTENSIONS:
         return "code"
@@ -369,8 +371,9 @@ def components(nodes: dict[str, str], edges: list[dict]) -> list[list[str]]:
 def compute_queries(nodes: dict[str, str], edges: list[dict], seeds: list[str]) -> dict:
     """Assemble the spec's five query results over a (possibly filtered) graph.
 
-    Shared by :func:`build_graph` and the viz's ``gen-graph`` so the census,
-    reachability, components, orphans, and defects shapes cannot drift apart.
+    The single assembly point in :func:`build_graph`, run over the full graph
+    or a ``--exclude``-narrowed one, so the census, reachability, components,
+    orphans, and defects shapes cannot drift between the two.
     """
     known = set(nodes)
     touched = {e["source"] for e in edges if e["kind"] == "internal"}
@@ -391,11 +394,22 @@ def compute_queries(nodes: dict[str, str], edges: list[dict], seeds: list[str]) 
 # --- orchestration -----------------------------------------------------------
 
 
-def build_graph(repo_root: Path) -> dict:
+def build_graph(
+    repo_root: Path,
+    seeds: list[str] | None = None,
+    exclude: list[str] | None = None,
+) -> dict:
     """Build the spec's machine artifact for the checkout at ``repo_root``.
 
     Returns the full document: nodes with buckets, typed edges, the
     ignored-pattern census, and the five query results.
+
+    ``seeds`` overrides the reachability seed set; the default is the
+    ``harness-session`` bucket. ``exclude`` drops in-scope files under any of
+    the given path prefixes — and every edge touching one — from the graph
+    before the queries run. The dropped nodes are counted per prefix under the
+    ``excluded`` key: the graph reports what a caller narrowed rather than
+    silently hiding it, so totality survives the filter.
     """
     repo_name = gitrepo.canonical_repo_name(repo_root)
     files = gitrepo.git_files(repo_root)
@@ -419,12 +433,35 @@ def build_graph(repo_root: Path) -> dict:
             edges.extend(path_token_edges(rel, repo_root, repo_name, known, "code-ref"))
     edges.extend(bundle_edges(files))
 
-    seeds = sorted(rel for rel, b in nodes.items() if b == "harness-session")
+    prefixes = tuple(exclude or ())
+    excluded: dict[str, int] = {}
+    if prefixes:
+        kept: dict[str, str] = {}
+        for rel, b in nodes.items():
+            hit = next((p for p in prefixes if rel.startswith(p)), None)
+            if hit is None:
+                kept[rel] = b
+            else:
+                excluded[hit] = excluded.get(hit, 0) + 1
+        nodes = kept
+        edges = [
+            e
+            for e in edges
+            if not any(e["source"].startswith(p) for p in prefixes)
+            and not (
+                e["kind"] == "internal"
+                and any(e["target"].startswith(p) for p in prefixes)
+            )
+        ]
+
+    if seeds is None:
+        seeds = sorted(rel for rel, b in nodes.items() if b == "harness-session")
     return {
         "repo": repo_name,
         "root": str(repo_root),
         "nodes": nodes,
         "edges": edges,
         "ignored": ignored_census(repo_root),
+        "excluded": dict(sorted(excluded.items())),
         "queries": compute_queries(nodes, edges, seeds),
     }

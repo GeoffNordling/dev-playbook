@@ -16,7 +16,7 @@ from typing import NamedTuple, TypeGuard
 
 import yaml
 
-from dev_playbook.judgments.instruments import VALID_EFFORTS, VALID_MODELS
+from dev_playbook.judgments.bench import VALID_EFFORTS, VALID_MODELS
 
 _ID_CHARSET = re.compile(r"[A-Za-z0-9._-]+")
 

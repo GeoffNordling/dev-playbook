@@ -13,11 +13,14 @@ import pytest
 
 from dev_playbook.transcript_export.client import (
     DAEMON_URL,
+    LIST_PAGE,
+    SEARCH_MATCH_CAP,
     AgentsViewError,
     SessionNotFound,
     session_get,
     session_list,
     session_messages,
+    session_search,
 )
 
 
@@ -43,17 +46,121 @@ def messages_page(rows: list[dict]) -> str:
     return json.dumps({"messages": rows, "count": len(rows)})
 
 
-def test_session_list_builds_argv_and_parses_payload() -> None:
+def list_page(ids: list[str], next_cursor: str | None = None) -> str:
+    """JSON for one `session list` page; the final page omits `next_cursor`."""
+    payload: dict = {"sessions": [{"id": sid} for sid in ids], "total": len(ids)}
+    if next_cursor is not None:
+        payload["next_cursor"] = next_cursor
+    return json.dumps(payload)
+
+
+def test_session_list_builds_argv_and_returns_the_session_rows() -> None:
     calls: list[list[str]] = []
-    payload = {"sessions": [{"id": "s1"}], "next_cursor": None, "total": 1}
+    runner = recording_runner([completed(0, stdout=list_page(["s1"]))], calls)
+
+    assert session_list(runner=runner) == [{"id": "s1"}]
+    # Every command targets the standing daemon via `--server`, never auto-start,
+    # and asks for the maximum page so the common archive is one round trip.
+    assert calls == [
+        [
+            "agentsview",
+            "--server",
+            DAEMON_URL,
+            "session",
+            "list",
+            "--format",
+            "json",
+            "--limit",
+            str(LIST_PAGE),
+        ]
+    ]
+
+
+def test_session_list_pages_on_next_cursor_until_the_key_is_absent() -> None:
+    calls: list[list[str]] = []
+    # The regression this guards: `--all` used to read page one and stop, so an
+    # archive larger than a page exported a silent prefix. The daemon signals the
+    # end by OMITTING next_cursor, not by nulling it or answering an empty batch.
+    runner = recording_runner(
+        [
+            completed(0, stdout=list_page(["s0", "s1"], next_cursor="cur-1")),
+            completed(0, stdout=list_page(["s2"])),
+        ],
+        calls,
+    )
+
+    assert [row["id"] for row in session_list(page=2, runner=runner)] == [
+        "s0",
+        "s1",
+        "s2",
+    ]
+    assert "--cursor" not in calls[0]
+    assert calls[1][calls[1].index("--cursor") + 1] == "cur-1"
+
+
+def test_session_list_limit_stops_early_without_a_second_round_trip() -> None:
+    calls: list[list[str]] = []
+    # `--recent 2` must ask the daemon for two rows, not the whole archive: the
+    # cursor is set, but the limit is already satisfied, so we never follow it.
+    runner = recording_runner(
+        [completed(0, stdout=list_page(["s0", "s1"], next_cursor="cur-1"))], calls
+    )
+
+    assert [row["id"] for row in session_list(limit=2, runner=runner)] == ["s0", "s1"]
+    assert len(calls) == 1
+    assert calls[0][calls[0].index("--limit") + 1] == "2"
+
+
+def test_session_list_limit_truncates_an_overlong_page() -> None:
+    calls: list[list[str]] = []
+    runner = recording_runner(
+        [completed(0, stdout=list_page(["s0", "s1", "s2"]))], calls
+    )
+
+    assert [row["id"] for row in session_list(limit=2, runner=runner)] == ["s0", "s1"]
+
+
+def test_session_list_limit_larger_than_the_archive_returns_what_exists() -> None:
+    calls: list[list[str]] = []
+    runner = recording_runner([completed(0, stdout=list_page(["s0"]))], calls)
+
+    assert [row["id"] for row in session_list(limit=9, runner=runner)] == ["s0"]
+
+
+def test_session_list_fails_loud_on_a_repeating_cursor() -> None:
+    calls: list[list[str]] = []
+    # A daemon replaying one cursor would page forever; that is a fault to
+    # surface, not a condition to silently swallow with a break.
+    runner = recording_runner(
+        [
+            completed(0, stdout=list_page(["s0"], next_cursor="cur-1")),
+            completed(0, stdout=list_page(["s1"], next_cursor="cur-1")),
+        ],
+        calls,
+    )
+
+    with pytest.raises(AgentsViewError, match="repeated a cursor"):
+        session_list(page=1, runner=runner)
+
+
+def test_session_search_builds_argv_and_parses_payload() -> None:
+    calls: list[list[str]] = []
+    payload = {"matches": [{"session_id": "s1"}], "next_cursor": None}
     runner = recording_runner([completed(0, stdout=json.dumps(payload))], calls)
 
-    result = session_list(runner=runner)
-
-    assert result == payload
-    # Every command targets the standing daemon via `--server`, never auto-start.
+    assert session_search("auth bug", runner=runner) == payload
     assert calls == [
-        ["agentsview", "--server", DAEMON_URL, "session", "list", "--format", "json"]
+        [
+            "agentsview",
+            "--server",
+            DAEMON_URL,
+            "session",
+            "search",
+            "auth bug",
+            "--json",
+            "--limit",
+            str(SEARCH_MATCH_CAP),
+        ]
     ]
 
 

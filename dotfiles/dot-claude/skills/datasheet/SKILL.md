@@ -11,7 +11,7 @@ argument-hint: "[subject and/or scope paths]"
 
 Produces one datasheet conformant to the
 [Datasheet Standard](~/workspace/dev-playbook/instruments/datasheet.md): a
-fixed-section, budgeted HTML report at `docs/datasheets/<subject>.html` that
+fixed-section, budgeted HTML report at `readings/datasheet/<subject>.html` that
 gives the system's owner trust and direction without reading the code. This
 skill is the procedure; the standard is the contract.
 
@@ -40,7 +40,7 @@ subject.
 Read stamps only — never a full sheet:
 
 ```
-grep -A12 '^<!--datasheet-stamp' docs/datasheets/*.html 2>/dev/null; true
+grep -A12 '^<!--datasheet-stamp' readings/datasheet/*.html 2>/dev/null; true
 ```
 
 - Same subject already exists → this run regenerates it in place.
@@ -61,7 +61,7 @@ If the scope holds no Python package, skip this step.
 
 ## Generate
 
-Write the sheet to `docs/datasheets/<subject>.html` under these rules:
+Write the sheet to `readings/datasheet/<subject>.html` under these rules:
 
 - **Structure from the inventory.** The inventory is authoritative for what
   exists — modules, classes, functions, signatures. Read source freely for
@@ -83,7 +83,7 @@ Write the sheet to `docs/datasheets/<subject>.html` under these rules:
 Run the checker:
 
 ```
-python3 <skill-dir>/scripts/check_datasheet.py docs/datasheets/<subject>.html
+python3 <skill-dir>/scripts/check_datasheet.py readings/datasheet/<subject>.html
 ```
 
 Findings mean the sheet is nonconformant — fix by regenerating, never by

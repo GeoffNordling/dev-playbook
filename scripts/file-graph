@@ -10,14 +10,16 @@ counted per ignore pattern rather than enumerated. The logic lives in
 
 Output:
     stdout — the machine artifact: one JSON document with nodes (bucket per
-             file), edges (form, line, status), the ignored census, and the
-             query results (census, reachability, components, orphans,
-             defects). With --output: written to that path instead.
+             file), edges (form, line, status), the ignored census, any
+             --exclude census, and the query results (census, reachability,
+             components, orphans, defects). With --output: written to that
+             path instead.
     stderr — one human-readable summary line.
     exit   — 0 graph built, 2 cannot run.
 
 Usage:
-    file-graph [--output PATH] [directory]
+    file-graph [--seed PATH ...] [--exclude PREFIX ...]
+               [--output PATH] [--html PATH] [directory]
 """
 # /// script
 # requires-python = ">=3.14"
@@ -31,7 +33,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from dev_playbook import filegraph, gitrepo  # noqa: E402
+from dev_playbook import gitrepo  # noqa: E402
+from dev_playbook.filegraph import graph, viz  # noqa: E402
 
 
 def main() -> None:
@@ -46,32 +49,54 @@ def main() -> None:
         help="Repository root to graph (default: current directory)",
     )
     parser.add_argument(
+        "--seed",
+        action="append",
+        metavar="PATH",
+        help="Reachability seed, repeatable (default: the harness-session bucket)",
+    )
+    parser.add_argument(
+        "--exclude",
+        action="append",
+        metavar="PREFIX",
+        default=[],
+        help="Drop in-scope files under this path prefix, repeatable; "
+        "the dropped counts land under the JSON's `excluded` key",
+    )
+    parser.add_argument(
         "--output",
         "-o",
         type=Path,
         help="Write the JSON document here instead of stdout",
     )
+    parser.add_argument(
+        "--html",
+        type=Path,
+        help="Also assemble the self-contained viz HTML at this path",
+    )
     args = parser.parse_args()
 
     repo_root = Path(args.directory).resolve()
     try:
-        graph = filegraph.build_graph(repo_root)
+        doc = graph.build_graph(repo_root, seeds=args.seed, exclude=args.exclude)
     except gitrepo.NotAGitRepository:
         print(f"file-graph: not a git repository: {repo_root}", file=sys.stderr)
         sys.exit(2)
 
-    rendered = json.dumps(graph, indent=1)
+    rendered = json.dumps(doc, indent=1)
     if args.output:
         args.output.write_text(rendered + "\n")
     else:
         print(rendered)
 
-    census = graph["queries"]["census"]
-    defects = len(graph["queries"]["defects"])
+    if args.html:
+        viz.build_viz(doc, repo_root, args.html)
+
+    census = doc["queries"]["census"]
+    defects = len(doc["queries"]["defects"])
     unclassified = census["nodes_by_bucket"].get("unclassified", 0)
     print(
-        f"file-graph: {len(graph['nodes'])} files, "
-        f"{len(graph['edges'])} edges, {defects} defects, "
+        f"file-graph: {len(doc['nodes'])} files, "
+        f"{len(doc['edges'])} edges, {defects} defects, "
         f"{unclassified} unclassified",
         file=sys.stderr,
     )

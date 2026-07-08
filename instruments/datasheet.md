@@ -32,14 +32,15 @@ The caller chooses the scope: an explicit manifest of paths and globs. The datas
 its own scope. The **subject** names the datasheet and its file; the caller supplies it, or the
 generator proposes one and the caller confirms. 
 
-- Home: `docs/datasheets/<subject>.html` in the covered repository.
+- Home: `readings/datasheet/<subject>.html` in the covered repository.
 - One datasheet per subject. Regenerating an existing subject overwrites the
   file in place.
 - Before creating a new subject, check every existing sheet's identity by its
   stamp comment alone — never by reading a full sheet. If the new manifest
   overlaps an existing one, stop and surface the overlap to the caller instead
   of writing a near-duplicate.
-- Datasheets are regenerated, never hand-edited.
+- Datasheets are regenerated manually, on demand — never hand-edited, never
+  auto-synced; a sheet may lag its subject until someone regenerates it.
 
 ## Document form
 

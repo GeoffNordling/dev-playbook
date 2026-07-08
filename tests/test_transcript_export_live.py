@@ -41,7 +41,7 @@ def recent_ids() -> list[str]:
     No defensive guard: if the daemon is unreachable this raises, and the canary
     fails loudly, because on this machine an unreachable daemon is a real fault.
     """
-    return [s["id"] for s in session_list()["sessions"][:3]]
+    return [s["id"] for s in session_list(limit=3)]
 
 
 def test_recent_real_sessions_render_well_formed(recent_ids: list[str]) -> None:
