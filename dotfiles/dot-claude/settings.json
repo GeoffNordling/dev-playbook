@@ -49,7 +49,7 @@
       "Bash(gh pr unlock *)"
     ]
   },
-  "model": "claude-fable-5[1m]",
+  "model": "opus[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "Stop": [
@@ -82,8 +82,10 @@
   "sandbox": {
     "enabled": true,
     "network": {
-        "allowedDomains": ["127.0.0.1"]
-      },
+      "allowedDomains": [
+        "127.0.0.1"
+      ]
+    },
     "filesystem": {
       "allowWrite": [
         "~/workspace",
@@ -104,6 +106,10 @@
       "gh *",
       "agentsview",
       "agentsview *",
+      "transcript-export",
+      "transcript-export *",
+      "*/scripts/transcript-export",
+      "*/scripts/transcript-export *",
       "git",
       "git *",
       "make check",
