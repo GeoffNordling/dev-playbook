@@ -42,6 +42,7 @@ Two grains:
 | `harness-session` | markdown injected into agent context at session start: `CLAUDE.md` at any level, `rules/*.md` |
 | `harness-skill-authored` | a first-party skill bundle member — `SKILL.md` plus everything in its skill directory |
 | `harness-skill-thirdparty` | anything under an externally-managed install tree (`.agents/`) |
+| `reading` | an instrument's output artifact under `readings/` |
 | `code` | a file run as code: `*.py`, `*.sh`, `*.js`, executables, hooks |
 | `config` | a file read as configuration: settings, manifests, lockfiles, canonical templates |
 | `unclassified` | the residual that guarantees totality; a nonzero count is a finding |
@@ -108,6 +109,8 @@ force-directed graph coloring nodes by bucket or by reach distance from the
 root `CLAUDE.md`, encoding each file's family as its shape, with search,
 shortest-path tracing between two files, and in-place reading of any file's
 source. Like the datasheet it is a single self-contained HTML file that
-renders from `file://` with no external requests. A working prototype lives
-at `instruments/file-graph-viz/`; unlike the datasheet its form is not yet
-pinned to a normative example.
+renders from `file://` with no external requests; unlike the datasheet its
+form is not yet pinned to a normative example.
+
+Both layers land under `readings/file-graph/<subject>.{json,html}`,
+regenerated never hand-edited.

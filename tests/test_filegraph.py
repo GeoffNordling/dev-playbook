@@ -63,6 +63,28 @@ def test_every_file_gets_exactly_one_bucket(tmp_path: Path) -> None:
     assert graph["queries"]["census"]["nodes_by_bucket"]["unclassified"] == 1
 
 
+def test_readings_artifacts_bucket_as_reading_not_config_or_code(
+    tmp_path: Path,
+) -> None:
+    # Instrument outputs under readings/ are their own bucket, tested ahead of
+    # the suffix rules that would otherwise claim .html/.json as config — the
+    # misbucket the reading bucket exists to fix.
+    repo = graph_repo(
+        tmp_path,
+        {
+            "readings/datasheet/x.html": "<html></html>",
+            "readings/file-graph/dev-playbook.json": "{}",
+        },
+    )
+
+    graph = filegraph.build_graph(repo)
+
+    assert graph["nodes"] == {
+        "readings/datasheet/x.html": "reading",
+        "readings/file-graph/dev-playbook.json": "reading",
+    }
+
+
 def test_skill_buckets_split_authored_from_thirdparty(tmp_path: Path) -> None:
     repo = graph_repo(
         tmp_path,

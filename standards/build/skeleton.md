@@ -24,6 +24,7 @@ forbids.
 | `CONTEXT.md` | Optional | root only; content per [context-content.md](/standards/docs/context-content.md) |
 | `docs/` | Optional | guides and surveys that outgrow the README, each an OKF concept doc |
 | `docs/adr/` | Optional | ADRs per [adr-conventions.md](/standards/adr-conventions.md) |
+| `readings/` | Optional | instrument output artifacts, one subdirectory per instrument, per [the instrument standard](/standards/instrument/format.md); regenerated, never hand-edited |
 | `specs/` | Optional | governed by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md), not the OKF profile |
 | `.claude/` | Optional | Claude Code files per [the harness-files standard](/standards/claude-code/index.md); `worktrees/` gitignored |
 

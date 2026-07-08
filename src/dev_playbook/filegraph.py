@@ -69,6 +69,8 @@ def bucket(relpath: str, repo_root: Path) -> str:
         return "harness-skill-authored"
     if relpath.endswith(".md") and kind == "harness":
         return "harness-session"
+    if relpath.startswith("readings/"):
+        return "reading"  # an instrument's output artifact, not code or config
     suffix = PurePosixPath(relpath).suffix
     if suffix in CODE_EXTENSIONS:
         return "code"
