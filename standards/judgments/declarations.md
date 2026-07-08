@@ -1,5 +1,5 @@
 ---
-type: Instrument Spec
+type: Standard
 title: Judgment Declarations
 description: The judgment model and YAML declaration format — claim, evidence, bench, and the content-addressed key
 ---
@@ -9,7 +9,7 @@ description: The judgment model and YAML declaration format — claim, evidence,
 A **judgment** is a single yes/no question about one or more files, ruled
 on by an LLM judge — for example, *"docs/errors.md lists every exception
 type that src/exceptions.py raises."* A judgment is declared as data on
-disk; the deterministic [cache gate](/instruments/judgments/cache-gate.md)
+disk; the deterministic [cache gate](/standards/judgments/cache-gate.md)
 passes it **iff its exact content has already been judged-and-passed**, and
 the `run-judgments` skill fills the cache by actually running the judge on
 the misses.

@@ -1,5 +1,5 @@
 ---
-type: Instrument Spec
+type: Standard
 title: Consuming Judgments
 description: The consumer-repo recipe — editable path dependency, declarations, pytest gate, lint hook, cache fill
 ---
@@ -12,8 +12,8 @@ and `skipcache` import packages and the `judgments-run` / `judgments-lint`
 console scripts. Any repo on the same machine consumes it as a **local path
 dependency** — no network, no PyPI, no published index. The recipe below is
 end-to-end; the field rules, config, and gate it points at are defined in
-[declarations.md](/instruments/judgments/declarations.md) and
-[cache-gate.md](/instruments/judgments/cache-gate.md).
+[declarations.md](/standards/judgments/declarations.md) and
+[cache-gate.md](/standards/judgments/cache-gate.md).
 
 ## 1. Add the package as an editable path dependency
 
@@ -43,10 +43,10 @@ PATH.
 ## 2. Declare the repo's judgments
 
 Opt in exactly as
-[declarations.md — Config and root resolution](/instruments/judgments/declarations.md#config-and-root-resolution)
+[declarations.md — Config and root resolution](/standards/judgments/declarations.md#config-and-root-resolution)
 defines: a `[tool.judgments]` table in the consumer's own `pyproject.toml`
 and one or more declaration YAML files in
-[the YAML declaration format](/instruments/judgments/declarations.md#the-yaml-declaration-format).
+[the YAML declaration format](/standards/judgments/declarations.md#the-yaml-declaration-format).
 
 ```toml
 [tool.judgments]
@@ -60,7 +60,7 @@ against it.
 ## 3. Gate the judgments in pytest
 
 Add the cache gate as an ordinary test in the consumer's suite, using the
-parametrized form from [cache-gate.md](/instruments/judgments/cache-gate.md):
+parametrized form from [cache-gate.md](/standards/judgments/cache-gate.md):
 
 ```python
 import pytest

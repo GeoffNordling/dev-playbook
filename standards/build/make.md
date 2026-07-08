@@ -28,4 +28,4 @@ superset of [thin CI](/standards/build/ci.md), a green local `check`
 guarantees a green cloud run.
 
 The `test` target includes the judgments stage-1 cache gate — a
-deterministic pytest, no LLM ([cache-gate.md](/instruments/judgments/cache-gate.md)).
+deterministic pytest, no LLM ([cache-gate.md](/standards/judgments/cache-gate.md)).

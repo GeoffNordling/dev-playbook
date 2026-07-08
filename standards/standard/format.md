@@ -73,7 +73,7 @@ Standards drift at two grains, each with its own detector:
 
 1. **Fine grain** — a specific document or passage must keep meaning what
    it meant when validated.
-   [Judgments](/instruments/judgments/index.md) cover this: the
+   [Judgments](/standards/judgments/index.md) cover this: the
    content-addressed cache expires a verdict the moment the underlying
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across
