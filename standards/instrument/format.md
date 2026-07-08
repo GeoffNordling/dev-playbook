@@ -34,6 +34,6 @@ every instrument is listed there.
 ## Executors
 
 The tooling behind a spec may be deterministic code
-(judgments — `scripts/judgments-run`), an agent executing the spec directly
-(the datasheet), or a mix. The spec states which, and what the executor
-needs: inputs, scope, and where the artifact lands.
+(the file graph — `scripts/file-graph`), an agent executing the spec
+directly (the datasheet), or a mix. The spec states which, and what the
+executor needs: inputs, scope, and where the artifact lands.
