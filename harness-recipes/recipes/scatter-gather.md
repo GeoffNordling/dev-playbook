@@ -25,7 +25,7 @@ state between iterations; scatter-gather is the opposite shape — parallel,
 independent jobs that share nothing and run at once. If a job needs another job's
 output, it is not a scatter-gather job.
 `model` and `effort` are pinned **per job** (each job runs under its own fixed
-identity), so a batch can mix instruments across its jobs.
+identity), so a batch can mix identities across its jobs.
 
 ## How it works
 
@@ -42,7 +42,7 @@ The script validates args, then fans out once with `parallel()`:
 `model` and `effort` are required **on every job**: the script throws, naming the
 offending job index and id, if either is missing rather than inheriting the
 session's values, because each job runs under its own fixed identity — there is no
-batch-level instrument and no default. A job that throws or is skipped yields
+batch-level identity and no default. A job that throws or is skipped yields
 `{ id, result: null }` — the per-job catch keeps the `id` rather than dropping the
 key, so every input job has exactly one output entry. The guards fail loud before
 any agent spawns: an unknown arg, a missing per-job `model`/`effort`, and a batch

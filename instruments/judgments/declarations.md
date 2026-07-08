@@ -1,7 +1,7 @@
 ---
 type: Instrument Spec
 title: Judgment Declarations
-description: The judgment model and YAML declaration format — claim, evidence, instrument, and the content-addressed key
+description: The judgment model and YAML declaration format — claim, evidence, bench, and the content-addressed key
 ---
 
 # Judgment Declarations
@@ -22,16 +22,16 @@ A judgment has four parts:
 - **evidence** — the files under judgment; what the judge is ruling on.
 - **reference** — optional files the judge may consult for context but are
   not judged.
-- **instrument** — the `model` and `effort` the judge runs under.
+- **bench** — the `model` and `effort` the judge runs under.
 
-A declaration sets a judgment's **case** — its claim, files, and
-instrument. It does not set the **judge**: every judgment is ruled through
-one fixed judge prompt and output schema (constants in
+A declaration sets a judgment's **case** — its claim, files, and bench. It
+does not set the **procedure**: every judgment is ruled through one fixed
+judge prompt and output schema (constants in
 [`src/dev_playbook/judgments/core.py`](/src/dev_playbook/judgments/core.py)), uniform
-across all judgments, so there is nothing to declare for them.
+across all judgments, so there is nothing to declare for it.
 
-The claim, the contents of every evidence and reference file, the
-instrument, and that fixed prompt and schema together form a
+The claim, the contents of every evidence and reference file, the bench,
+and that fixed procedure together form a
 content-addressed **key**. The key is what the cache is keyed on, so a
 judgment is re-judged exactly when one of those inputs changes — and not
 otherwise. The `id` (below) is a label only; it never enters the key.
@@ -64,8 +64,8 @@ file):
 | `claim` | yes | non-empty string. |
 | `evidence` | yes | list of **≥1** repo-root-relative path strings. |
 | `reference` | no | list of repo-root-relative path strings; omit or `[]` for none. |
-| `model` | yes | string in `VALID_MODELS` (see [Instruments](#instruments)). |
-| `effort` | yes | string in `VALID_EFFORTS` (see [Instruments](#instruments)). |
+| `model` | yes | string in `VALID_MODELS` (see [The bench](#the-bench)). |
+| `effort` | yes | string in `VALID_EFFORTS` (see [The bench](#the-bench)). |
 
 Paths are **relative to the repo root** (see
 [Config and root resolution](#config-and-root-resolution)), never to the
@@ -97,10 +97,10 @@ worktrees and checkouts.
 If no `[tool.judgments]` table is found anywhere up the tree, there are
 **no judgments**.
 
-## Instruments
+## The bench
 
-A judgment's instrument is its `model` and `effort`. The valid values are
-the single source of truth in
-[`src/dev_playbook/judgments/instruments.py`](/src/dev_playbook/judgments/instruments.py)
+A judgment's bench is its `model` and `effort` — the judge that hears the
+case. The valid values are the single source of truth in
+[`src/dev_playbook/judgments/bench.py`](/src/dev_playbook/judgments/bench.py)
 (`VALID_MODELS`, `VALID_EFFORTS`); a `model` or `effort` outside it is a
 fail-loud error.

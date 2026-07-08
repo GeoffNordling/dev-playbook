@@ -1,4 +1,4 @@
-"""The instrument source of truth: the model and effort values a judge may run under.
+"""The bench source of truth: the model and effort values a judge may run under.
 
 These mirror the values the agent runtime accepts -- full model IDs, not aliases,
 because the full ID is what gets hashed into a judgment's content key, so the

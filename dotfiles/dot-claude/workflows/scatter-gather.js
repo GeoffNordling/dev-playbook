@@ -8,7 +8,7 @@ export const meta = {
 // args: a required JSON string of options. No defaults.
 //   jobs    array of { id, prompt, model, effort }; results return in this order, keyed by id.
 //           model ('haiku' | 'sonnet' | 'opus' | ...) and effort ('low' | 'medium' | 'high' |
-//           'xhigh' | 'max') are per-job and required on every job — no batch-level instrument.
+//           'xhigh' | 'max') are per-job and required on every job — no batch-level identity.
 //   schema  optional JSON Schema applied to every job's structured output
 //
 // NOTE (2026-06-25): the Workflow runtime's own docs are wrong here — they say objects/arrays

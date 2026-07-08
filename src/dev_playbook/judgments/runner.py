@@ -2,7 +2,7 @@
 
 Every subcommand reads the repo's declarations through the loader and drives the
 two already-built dependencies -- ``judgments.core.prepare`` (claim + files +
-instrument -> content key and judge prompt) and the ``skipcache`` seen-set. No
+bench -> content key and judge prompt) and the ``skipcache`` seen-set. No
 LLM, no network: this is the deterministic half the judge skill stands on.
 
 - ``plan``  -- key every judgment, partition by cache membership, emit one JSON

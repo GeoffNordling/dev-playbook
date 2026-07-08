@@ -24,7 +24,7 @@ Run `judgments-run plan` and parse its single JSON object:
   "unseen": [ {"id": "ID#2", "model": "<model>", "effort": "<effort>", "prompt": "Run `judgments-run render ID#2` …"}, … ] }
 ```
 
-`unseen` is the set of judgments not yet cached. Each entry is a **ready-to-dispatch job** — `id`, its instrument (`model`/`effort`), and the `prompt` that bootstraps the judge. If `unseen` is empty, report "all N judgments already cached; nothing to run" and stop.
+`unseen` is the set of judgments not yet cached. Each entry is a **ready-to-dispatch job** — `id`, its bench (`model`/`effort`), and the `prompt` that bootstraps the judge. If `unseen` is empty, report "all N judgments already cached; nothing to run" and stop.
 
 ### 2. Dispatch
 
