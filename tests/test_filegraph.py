@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from dev_playbook import filegraph
+from dev_playbook.filegraph import graph
 
 
 def graph_repo(tmp_path: Path, files: dict[str, str]) -> Path:
@@ -30,9 +30,9 @@ def graph_repo(tmp_path: Path, files: dict[str, str]) -> Path:
     return repo
 
 
-def edge(graph: dict, form: str) -> dict:
+def edge(doc: dict, form: str) -> dict:
     """The single edge of the given form; fails the test when not exactly one."""
-    matches: list[dict] = [e for e in graph["edges"] if e["form"] == form]
+    matches: list[dict] = [e for e in doc["edges"] if e["form"] == form]
     assert len(matches) == 1, f"expected one {form} edge, got {matches}"
     return matches[0]
 
@@ -50,9 +50,9 @@ def test_every_file_gets_exactly_one_bucket(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["nodes"] == {
+    assert doc["nodes"] == {
         "CLAUDE.md": "harness-session",
         "index.md": "index",
         "docs/guide.md": "concept",
@@ -60,7 +60,7 @@ def test_every_file_gets_exactly_one_bucket(tmp_path: Path) -> None:
         "settings.json": "config",
         "mystery.xyz": "unclassified",
     }
-    assert graph["queries"]["census"]["nodes_by_bucket"]["unclassified"] == 1
+    assert doc["queries"]["census"]["nodes_by_bucket"]["unclassified"] == 1
 
 
 def test_readings_artifacts_bucket_as_reading_not_config_or_code(
@@ -77,9 +77,9 @@ def test_readings_artifacts_bucket_as_reading_not_config_or_code(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["nodes"] == {
+    assert doc["nodes"] == {
         "readings/datasheet/x.html": "reading",
         "readings/file-graph/dev-playbook.json": "reading",
     }
@@ -94,12 +94,12 @@ def test_skill_buckets_split_authored_from_thirdparty(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["nodes"]["dotfiles/dot-claude/skills/fmt/SKILL.md"] == (
+    assert doc["nodes"]["dotfiles/dot-claude/skills/fmt/SKILL.md"] == (
         "harness-skill-authored"
     )
-    assert graph["nodes"]["dotfiles/.agents/skills/vendor/SKILL.md"] == (
+    assert doc["nodes"]["dotfiles/.agents/skills/vendor/SKILL.md"] == (
         "harness-skill-thirdparty"
     )
 
@@ -117,11 +117,11 @@ def test_gitignored_files_counted_per_pattern_not_as_nodes(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert set(graph["nodes"]) == {".gitignore"}
-    assert graph["ignored"][".gitignore:*.pyc"] == 2
-    assert graph["ignored"][".gitignore:.venv/"] == 1
+    assert set(doc["nodes"]) == {".gitignore"}
+    assert doc["ignored"][".gitignore:*.pyc"] == 2
+    assert doc["ignored"][".gitignore:.venv/"] == 1
 
 
 def test_root_absolute_link_is_an_ok_link_edge(tmp_path: Path) -> None:
@@ -133,9 +133,9 @@ def test_root_absolute_link_is_an_ok_link_edge(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert edge(graph, "link") == {
+    assert edge(doc, "link") == {
         "source": "a.md",
         "target": "docs/b.md",
         "kind": "internal",
@@ -148,9 +148,9 @@ def test_root_absolute_link_is_an_ok_link_edge(tmp_path: Path) -> None:
 def test_link_to_missing_file_lands_in_defects(tmp_path: Path) -> None:
     repo = graph_repo(tmp_path, {"a.md": "see [gone](/docs/gone.md)"})
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["queries"]["defects"] == [
+    assert doc["queries"]["defects"] == [
         {
             "source": "a.md",
             "target": "docs/gone.md",
@@ -173,9 +173,9 @@ def test_same_repo_citation_from_fixed_root_source_is_wrong_form(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert edge(graph, "citation")["status"] == "wrong-form"
+    assert edge(doc, "citation")["status"] == "wrong-form"
 
 
 def test_same_repo_citation_from_skill_is_ok(tmp_path: Path) -> None:
@@ -187,9 +187,9 @@ def test_same_repo_citation_from_skill_is_ok(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert edge(graph, "citation") == {
+    assert edge(doc, "citation") == {
         "source": "skills/fmt/SKILL.md",
         "target": "b.md",
         "kind": "internal",
@@ -214,9 +214,9 @@ def test_cross_repo_citation_is_an_external_edge(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert edge(graph, "citation") == {
+    assert edge(doc, "citation") == {
         "source": "a.md",
         "target": "~/workspace/other/README.md",
         "kind": "external",
@@ -235,9 +235,9 @@ def test_backticked_path_is_a_prose_path_edge(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert edge(graph, "prose-path") == {
+    assert edge(doc, "prose-path") == {
         "source": "CLAUDE.md",
         "target": "docs/b.md",
         "kind": "internal",
@@ -256,9 +256,9 @@ def test_prose_path_deduplicates_against_grammar_edges(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert [e["form"] for e in graph["edges"]] == ["link"]
+    assert [e["form"] for e in doc["edges"]] == ["link"]
 
 
 def test_code_path_token_resolving_in_repo_is_a_code_ref(
@@ -272,9 +272,9 @@ def test_code_path_token_resolving_in_repo_is_a_code_ref(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert edge(graph, "code-ref") == {
+    assert edge(doc, "code-ref") == {
         "source": "tool.py",
         "target": "docs/b.md",
         "kind": "internal",
@@ -287,9 +287,9 @@ def test_code_path_token_resolving_in_repo_is_a_code_ref(
 def test_code_path_token_with_no_target_is_not_an_edge(tmp_path: Path) -> None:
     repo = graph_repo(tmp_path, {"tool.py": "# see /docs/gone.md\n"})
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["edges"] == []
+    assert doc["edges"] == []
 
 
 def test_skill_bundle_members_attach_to_their_skill_md(tmp_path: Path) -> None:
@@ -303,10 +303,10 @@ def test_skill_bundle_members_attach_to_their_skill_md(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
     bundle = sorted(
-        (e["source"], e["target"]) for e in graph["edges"] if e["form"] == "bundle"
+        (e["source"], e["target"]) for e in doc["edges"] if e["form"] == "bundle"
     )
     assert bundle == [
         ("skills/fmt/SKILL.md", "skills/fmt/references/notes.md"),
@@ -327,9 +327,9 @@ def test_reachability_walks_from_harness_session_with_distances(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    reach = graph["queries"]["reachability"]
+    reach = doc["queries"]["reachability"]
     assert reach["seeds"] == ["CLAUDE.md"]
     assert reach["reached"] == {"CLAUDE.md": 0, "a.md": 1, "b.md": 2}
     assert reach["unreached"] == ["island.md"]
@@ -345,9 +345,9 @@ def test_fragmented_concept_docs_split_into_components(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["queries"]["components"] == [["a.md", "index.md"], ["b.md"]]
+    assert doc["queries"]["components"] == [["a.md", "index.md"], ["b.md"]]
 
 
 def test_files_with_no_edges_are_orphans_by_bucket(tmp_path: Path) -> None:
@@ -360,9 +360,9 @@ def test_files_with_no_edges_are_orphans_by_bucket(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["queries"]["orphans"] == {"lonely.py": "code"}
+    assert doc["queries"]["orphans"] == {"lonely.py": "code"}
 
 
 def test_frontmatter_resource_is_not_also_a_phantom_citation(
@@ -376,12 +376,12 @@ def test_frontmatter_resource_is_not_also_a_phantom_citation(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
     # The resource declaration is one edge, not a resource edge plus a phantom
     # ``wrong-form`` citation re-scanned out of the YAML frontmatter.
-    assert [e["form"] for e in graph["edges"]] == ["resource"]
-    assert edge(graph, "resource") == {
+    assert [e["form"] for e in doc["edges"]] == ["resource"]
+    assert edge(doc, "resource") == {
         "source": "a.md",
         "target": "b.md",
         "kind": "internal",
@@ -389,7 +389,7 @@ def test_frontmatter_resource_is_not_also_a_phantom_citation(
         "line": 0,
         "status": "ok",
     }
-    assert graph["queries"]["defects"] == []
+    assert doc["queries"]["defects"] == []
 
 
 def test_executable_bit_only_buckets_extensionless_files_as_code(
@@ -405,10 +405,10 @@ def test_executable_bit_only_buckets_extensionless_files_as_code(
     (repo / "deploy.yaml").chmod(0o755)
     (repo / "hook").chmod(0o755)
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
-    assert graph["nodes"]["deploy.yaml"] == "config"
-    assert graph["nodes"]["hook"] == "code"
+    assert doc["nodes"]["deploy.yaml"] == "config"
+    assert doc["nodes"]["hook"] == "code"
 
 
 def test_nested_bundle_files_attach_only_to_the_nearest_skill(
@@ -424,10 +424,10 @@ def test_nested_bundle_files_attach_only_to_the_nearest_skill(
         },
     )
 
-    graph = filegraph.build_graph(repo)
+    doc = graph.build_graph(repo)
 
     bundle = sorted(
-        (e["source"], e["target"]) for e in graph["edges"] if e["form"] == "bundle"
+        (e["source"], e["target"]) for e in doc["edges"] if e["form"] == "bundle"
     )
     # deep.md attaches only to the inner SKILL.md, never doubly to the outer.
     assert bundle == [
@@ -447,12 +447,10 @@ def test_compute_queries_matches_build_graph_queries(tmp_path: Path) -> None:
         },
     )
 
-    graph = filegraph.build_graph(repo)
-    seeds = sorted(r for r, b in graph["nodes"].items() if b == "harness-session")
+    doc = graph.build_graph(repo)
+    seeds = sorted(r for r, b in doc["nodes"].items() if b == "harness-session")
 
-    # build_graph and gen-graph share this helper, so the query shapes cannot
-    # drift: the same (nodes, edges, seeds) reproduce build_graph's queries.
-    assert (
-        filegraph.compute_queries(graph["nodes"], graph["edges"], seeds)
-        == graph["queries"]
-    )
+    # build_graph assembles its queries through this helper, so the shapes
+    # cannot drift: the same (nodes, edges, seeds) reproduce build_graph's
+    # queries.
+    assert graph.compute_queries(doc["nodes"], doc["edges"], seeds) == doc["queries"]

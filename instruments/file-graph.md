@@ -20,8 +20,17 @@ gap in the instrument.
 
 ## Inputs
 
-The caller supplies the repository root. Optionally, a **seed set** for the
-reachability query; the default seed set is the `harness-session` bucket.
+The caller supplies the repository root. Optionally:
+
+- a **seed set** for the reachability query; the default is the
+  `harness-session` bucket.
+- a set of **exclusion prefixes** — path prefixes whose in-scope files, and
+  every edge touching them, are dropped before the queries run. Exclusions
+  remove scaffolding that would only add noise: a vendored bundle that spawns
+  hundreds of spurious `code-ref` edges, or the graph's own prior output. The
+  dropped files are counted per prefix — an `excluded` tally beside the
+  ignored census — so a narrowed graph still reports what it left out and
+  totality survives the filter.
 
 ## Node accounting
 
@@ -101,8 +110,8 @@ The executor is deterministic code; no LLM judgment participates in graph
 construction. The reference implementation is `dev_playbook.filegraph`
 behind the [file-graph](/scripts/file-graph) script. The machine layer of
 the artifact is one JSON document — nodes, edges, ignored-pattern counts,
-and query results as separate keys — regenerated in full on each run,
-never hand-edited.
+and query results as separate keys — rebuilt in full each time the tool is
+run, never patched incrementally and never hand-edited.
 
 The human-facing layer over that JSON is an interactive visualization: a
 force-directed graph coloring nodes by bucket or by reach distance from the
@@ -113,4 +122,5 @@ renders from `file://` with no external requests; unlike the datasheet its
 form is not yet pinned to a normative example.
 
 Both layers land under `readings/file-graph/<subject>.{json,html}`,
-regenerated never hand-edited.
+regenerated manually on demand — never hand-edited, and free to lag the
+repository until someone rebuilds them.

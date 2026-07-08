@@ -39,7 +39,8 @@ generator proposes one and the caller confirms.
   stamp comment alone — never by reading a full sheet. If the new manifest
   overlaps an existing one, stop and surface the overlap to the caller instead
   of writing a near-duplicate.
-- Datasheets are regenerated, never hand-edited.
+- Datasheets are regenerated manually, on demand — never hand-edited, never
+  auto-synced; a sheet may lag its subject until someone regenerates it.
 
 ## Document form
 

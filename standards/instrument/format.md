@@ -42,7 +42,11 @@ executor needs: inputs, scope, and where the artifact lands.
 
 An instrument's artifacts land under `readings/<instrument>/<subject>.<ext>`
 — one subdirectory per instrument, named for its spec (`instruments/<X>.md`
-⇒ `readings/<X>/`). Readings are regenerated, never hand-edited, and carry
-no OKF frontmatter (they are outputs, not concept docs). A repository that
-consumes an instrument grows only a `readings/` directory; the spec and its
-tooling stay in dev-playbook.
+⇒ `readings/<X>/`). Readings are regenerated **manually, on demand** — by
+re-running the instrument when someone wants a fresh one, never by
+hand-editing the output and never on an automatic sync. A committed reading
+may lag the code or repository it describes until it is next regenerated;
+that staleness is expected, not a defect to chase. Readings carry no OKF
+frontmatter (they are outputs, not concept docs). A repository that consumes
+an instrument grows only a `readings/` directory; the spec and its tooling
+stay in dev-playbook.
