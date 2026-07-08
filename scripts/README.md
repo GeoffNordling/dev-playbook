@@ -117,7 +117,42 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `griffe-outline` | Print class/function structure of a Python package |
 | `sweep` | On-demand workspace sweep: GitHub settings drift via `gh api` ([repo-settings.md](/standards/repo-settings.md)) and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
-| `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --recent N \| --all>` |
+| `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 
 Run any script with `--help`; each script's docstring documents its behavior in
 full.
+
+### Exporting a session transcript
+
+Naming the session is the only hard step, so `transcript-export` takes it three
+ways and never asks the caller to reach past it to the `agentsview` CLI:
+
+```bash
+scripts/transcript-export out/ "$CLAUDE_CODE_SESSION_ID"   # the running session
+scripts/transcript-export out/ --find 'the auth bug'       # by content
+scripts/transcript-export out/ --recent 3                  # the 3 newest
+```
+
+`CLAUDE_CODE_SESSION_ID` is set in every Claude Code session and holds exactly
+the id the exporter wants. `--find` searches message and tool content; a pattern
+matching more than one session is ambiguous and fails loud rather than guess, so
+narrow it or pass `--limit N`.
+
+Two traps, both of which cost real time to rediscover:
+
+- **The script must be excluded from the Claude Code sandbox.** It reaches the
+  agentsview daemon on the host's loopback, which a sandboxed process cannot
+  see. `excludedCommands` in [`settings.json`](/dotfiles/dot-claude/settings.json)
+  matches the *top-level* command, so excluding `agentsview` does nothing for a
+  script that merely spawns it — `transcript-export` itself carries the entry.
+- **A command excluded from the sandbox loses the sandbox's environment**, so
+  `$TMPDIR` is unset. Pass a real output directory, not `"$TMPDIR/out"`.
+
+When a filter `--find` does not expose is needed (`--project`, `--date-from`,
+`--regex`), query the daemon directly and pass the ids through. `agentsview`
+requires `--server`: without it the CLI auto-starts a rival daemon, which dies on
+the write lock the running one holds.
+
+```bash
+agentsview --server http://127.0.0.1:8080 session search 'x' --json --project p
+```

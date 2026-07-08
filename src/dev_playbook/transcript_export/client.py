@@ -17,6 +17,22 @@ DEFAULT_PAGE = 100
 """`session messages` returns at most this many rows per call (the CLI default),
 so we always pass --limit and page on last_ordinal + 1."""
 
+LIST_PAGE = 500
+"""`session list` caps --limit at 500, so a full listing pages on `next_cursor`.
+
+The CLI's own default is 200; asking for the maximum makes the common archive a
+single round trip. Paging is not optional: an archive larger than one page
+otherwise truncates silently, which is the defect this constant exists to fix."""
+
+SEARCH_MATCH_CAP = 500
+"""`session search` caps --limit at 500 matches, and we take exactly one page.
+
+Matches are per-message, so one session yields many; a few hundred is far more
+than enough to name the handful of sessions a pattern hits. We do not page: a
+pattern broad enough to overflow this cap is too broad to identify a session, and
+the caller is told the match set was truncated rather than served a silent
+prefix."""
+
 DAEMON_URL = "http://127.0.0.1:8080"
 """The always-running local agentsview daemon (its default listen address).
 
@@ -71,13 +87,62 @@ def _run(args: list[str], runner: Callable = subprocess.run) -> dict:
     return cast(dict, json.loads(result.stdout))
 
 
-def session_list(runner: Callable = subprocess.run) -> dict:
-    """Return the `session list` payload: {sessions, next_cursor, total}.
+def session_list(
+    limit: int | None = None,
+    page: int = LIST_PAGE,
+    runner: Callable = subprocess.run,
+) -> list[dict]:
+    """Return top-level session rows, newest first, paging until `limit` or exhaustion.
+
+    `session list` answers at most `page` rows plus an opaque `next_cursor` to
+    resume from, and **omits `next_cursor` entirely on the final page** — that
+    absence, not a null or an empty batch, is the terminal condition. `limit`
+    stops early and never over-fetches: `--recent 3` asks the daemon for three
+    rows, not the whole archive.
 
     Sub-agent sessions are excluded by default — exactly the set we pick a
-    top-level transcript from.
+    top-level transcript from. A cursor the daemon repeats would page forever,
+    so it fails loud rather than spin.
     """
-    return _run(["session", "list", "--format", "json"], runner=runner)
+    sessions: list[dict] = []
+    cursor: str | None = None
+    seen_cursors: set[str] = set()
+    while True:
+        want = page if limit is None else min(page, limit - len(sessions))
+        args = ["session", "list", "--format", "json", "--limit", str(want)]
+        if cursor is not None:
+            args.extend(["--cursor", cursor])
+        payload = _run(args, runner=runner)
+        sessions.extend(payload["sessions"])
+        if limit is not None and len(sessions) >= limit:
+            return sessions[:limit]
+        cursor = payload.get("next_cursor")
+        if not cursor:
+            return sessions
+        if cursor in seen_cursors:
+            raise AgentsViewError(
+                f"session list repeated a cursor after {len(sessions)} rows; "
+                "refusing to page forever"
+            )
+        seen_cursors.add(cursor)
+
+
+def session_search(
+    pattern: str,
+    matches: int = SEARCH_MATCH_CAP,
+    runner: Callable = subprocess.run,
+) -> dict:
+    """Return the `session search` payload: {matches, next_cursor}.
+
+    Searches message and tool content across sessions. Each match names its
+    `session_id`; a present `next_cursor` means the daemon had more to say and
+    the caller must treat the distinct-session count as a lower bound. Sub-agent
+    sessions are excluded by default, matching `session_list`.
+    """
+    return _run(
+        ["session", "search", pattern, "--json", "--limit", str(matches)],
+        runner=runner,
+    )
 
 
 def session_get(session_id: str, runner: Callable = subprocess.run) -> dict:
