@@ -401,6 +401,37 @@ Audit python-audit + ruff (check, format, D rules) + mypy / Enforce
 commit gate + make check (mypy at the push gate) / Adopt none. Modules
 and Prose — Define only, all other cells none.
 
+## RESOLVED: Build — how is a repository laid out, built, and checked?
+
+No redesign — the strongest category; residuals are the vocabulary
+rewrite and mechanical ripples of earlier decisions.
+
+39. enforcement.md is rewritten around the ratified Gate vocabulary
+    (frontmatter, headings, tables — the word "venue" disappears).
+    The gate ladder has exactly three rungs with fixed names every
+    card's Enforce cell cites: **commit gate** (pre-commit suite),
+    **push gate** (make check via pre-push stage), **CI gate** (thin
+    CI). An **Outside the gates** section lists, as references, the
+    two check-running non-gates: (a) the agent ritual — node skills
+    run make check before committing and before opening a PR; the
+    normative rule lives in workflow.md's node-skill contract, this
+    row points there; (b) workspace-audit — on demand / weekly
+    ritual, reports and never blocks; GitHub sits outside every gate.
+40. enforcement.md's Map table re-rows for the detector fleet:
+    renames (python-audit, okf-audit, ref-audit, judgments-audit,
+    skill-audit, workspace-audit), new rows (testing-audit,
+    standards-audit, decisions-audit, shfmt).
+41. repo-audit keeps its name; rule ids namespaced build.* and it
+    grows --list-rules like every detector.
+42. Canonical-artifact ripples land here: pyproject.toml gains the
+    ruff pydocstyle config (decision 35), .pre-commit-config.yaml
+    gains shfmt + the renamed/new hooks, .pre-commit-hooks.yaml gains
+    the new hook definitions.
+
+Card resolution: Define unchanged (build/ + canonical.md) / Audit
+repo-audit + workspace-audit / Enforce the three gate rungs cited by
+fixed name / Adopt none.
+
 ## Remaining agenda
 
 - Per-card pass: Decisions (answers pending) -> Tracking -> Workflow ->
