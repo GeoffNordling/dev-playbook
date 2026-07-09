@@ -87,21 +87,107 @@ verbatim in a comment on GitHub issue #133.
     pin (consumers get it on rev bump); only judgment declarations and
     label bootstrapping need per-repo adoption steps.
 
-## Card 1 (Decisions) — questions asked, ANSWERS PENDING
+## Presentation rule (user)
 
-Discovered: the card's define cell claims "immutability" but
-`standards/decisions/adrs.md` never states an immutability rule.
+Name categories by the question they govern — a short phrase, never a bare
+tracking label like "Card 1".
 
-1. What is the immutability rule? Proposed: body frozen once committed;
-   only the `status` frontmatter key may change; reversal = new ADR +
-   `superseded by ADR-NNNN`. Then it is prose in adrs.md plus a
-   deterministic commit-gate check (staged diff touching an existing ADR
-   outside the status line = finding).
-2. Numbering: if ADRs are never deleted, assert contiguous 0001..N with no
-   duplicates; if deletion is legal, only catch dupes and bad padding.
-3. Ownership: new `decisions-audit` owns decisions.sequential-numbering,
-   decisions.status-vocabulary, decisions.immutable-body; frontmatter shape
-   and index freshness stay with okf-audit under the docs standard.
+## RESOLVED: Decision Records — how are hard-to-reverse decisions recorded?
+
+16. The record kind broadens beyond ADRs: one generic **Decision Record**
+    (`type: Decision Record`), directory `docs/decisions/` (ex `docs/adr/`),
+    contract renamed `standards/decisions/records.md` (ex adrs.md), same
+    0001-slug numbering, same bar, same template; one line mapping the
+    industry term ADR to the architectural subset. Scope: repo decisions in
+    that repo, workspace decisions in dev-playbook. CONTEXT.md rejected
+    framings are NOT Decision Records (current-state vs why-at-a-time).
+17. Immutability rule (to be stated in records.md): body frozen once
+    MERGED via PR — development-branch edits before merge are fine; only
+    the `status` key may change after; reversal = new record +
+    `superseded by 0NNN`. NO deterministic check — overkill, per user.
+18. `decisions-audit` (new, published hook, all repos): owns
+    decisions.sequential-numbering (contiguous 0001..N, no dupes, padding)
+    and decisions.status-vocabulary. Frontmatter shape + index freshness
+    stay with okf-audit under knowledge-organization.
+
+Card lands as: Define records.md / Audit decisions-audit / Enforce commit
+gate (canonical hook suite) / Adopt none.
+
+## RESOLVED: Tracking — how is work tracked? (way-of-working redesigned)
+
+Meta-rule (user): every category starts with a zoom-out redesign of the way
+of working; implementation triage only after.
+
+19. Word ratified: **epic**. The role: an issue never built directly — no
+    branch, no PR, no phase label; category label only. DERIVED from having
+    sub-issues (per the existing "blocked is derived, never a label"
+    principle) — no epic label. Epic body = outcome + decomposition
+    rationale; never duplicates the native sub-issue list.
+20. Two roles only: epic and leaf. Readiness is a lifecycle position (phase
+    label), not a kind. THE DISPATCH RULE: the factory only dispatches a
+    leaf whose body meets the brief standard (industry: Definition of
+    Ready). HITL refinement interview = the promotion step (user's
+    experiment validated as industry norm: backlog refinement).
+21. No RFC machinery (right-sized for solo): design sessions are ephemeral;
+    durable outputs = Decision Records (one-way doors) + epic body
+    (coordination) + ready leaf briefs (work). "Design session produces an
+    epic" named as a pattern; #133 is the worked example.
+22. **Spike** ratified as the second leaf brief format (XP term): timeboxed
+    question, deliverable = an ANSWER not merged code, closes without a PR;
+    typically a child of an epic with the implementation leaf blocked-by
+    the spike; findings land in the closing comment (+ Decision Record if
+    one-way door); prototype branches die with the spike.
+23. Vertical slices kept (user, explicitly). Settings contract kept;
+    settings repairs stay manual/by-hand (admin perms too broad) — audit
+    reports, weekly ritual fixes, no repair tool ever.
+24. Audit candidates once the contract is rewritten (workspace-audit, gh
+    api scope — serves both build and tracking cards; its categorical
+    responsibility = "workspace-scope facts readable over gh api"):
+    tracking.settings-drift (exists), tracking.no-blocked-label,
+    tracking.issue-brief-shape (ready leaves carry required headings),
+    tracking.epic-shape (issue with children has no phase label). Final
+    list when contract lands. Enforce: none — GitHub sits outside every
+    gate, permanently honest.
+25. Contract rewrite: standards/tracking/issues.md reorganized around
+    roles (epic/leaf), readiness, brief formats (build leaf / spike /
+    epic body), relationships, slices.
+
+PARKED for the Workflow category: PR conventions ownership (tracking card
+claims PRs, no contract governs them; open-pr node produces them); label
+scheme ownership (tuple semantics = workflow; scheme-intact-in-repo =
+tracking?); the dispatch rule's enforcement (it's a workflow-side rule).
+
+## PROPOSED, NOT YET RATIFIED: Workflow — how does an idea become a merged PR?
+
+User has only SKIMMED these six; discuss before treating as decided.
+Category taken out of agenda order because tracking's rulings ripple in.
+
+W1. Spike = a third **mode** (mode:spike beside sdd/direct): its own path
+    `intake -> spike -> closed`, exits with an answer, never a PR. Spike
+    node runs FOTW (delegated learning; DONE: carries findings to the
+    closing comment). If it needs a human interview it was design, not a
+    spike. Worktree optional, branch disposable, tests: dimension moot.
+W2. Design node gains a second exit: `design ->|decompose| epic + ready
+    children` — the issue becomes an epic and never builds itself.
+    Formalizes the user's HITL-interview->briefs practice and the #133
+    pattern with an existing node; no new "plan" node.
+W3. Dispatch readiness rule: dispatch requires unblocked AND a leaf (epics
+    never dispatch) AND brief-complete. /tdd + /build already escalate on
+    bad briefs; the dispatcher checks before burning a session.
+W4. PR conventions move INTO workflow/workflow.md (squash-only makes PR
+    title/body the permanent commit message on main; today the format is
+    folklore in the open-pr skill). Title = the change; body = summary +
+    mandatory `Closes #N`. Tracking's governing sentence drops "pull
+    requests".
+W5. Label scheme: workflow.md's graph + table stay the semantic authority
+    ("the set of graph nodes IS the phase-label inventory"); policy-as-data
+    canonical scheme file minted by bootstrap-labels and checked in live
+    repos by workspace-audit (tracking.label-scheme). Scheme-file-vs-graph
+    consistency = a small docs-match-code judgment, not a parser.
+W6. Workflow audit: workflow.tuple-valid over gh api (every open
+    post-intake leaf carries a full valid tuple, phase names a real node).
+    Enforce: none — structural (human dispatcher, GitHub outside gates);
+    the skills' escalation lines are the real integrity mechanism.
 
 ## Remaining agenda
 
