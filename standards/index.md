@@ -1,37 +1,43 @@
 # standards/ — index
 
 The catalog: every standard has a card here (`type: Standard Card`), and
-each card's cells point at the files that define, audit, enforce, and adopt
-it. See [Standards and Standard Cards](/standards/standard/format.md).
-Ordered by level of abstraction — meta first — then alphabetically within
-a level.
-
-> **Temporary:** most entries below predate the card format and have no
-> standard card yet; cataloging them is tracked in
-> [issue #133](https://github.com/GeoffNordling/dev-playbook/issues/133).
+each card's cells point at the files that define, audit, enforce, and
+adopt it. See [Standards and Standard Cards](/standards/standard/format.md).
+Ordering: README, then the cards — meta-standard first, the rest
+alphabetical — then the contract documents not listed by a child index,
+alphabetical; directories last.
 
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
 - [Meta-Standard](/standards/standard.md) — Card for the meta-standard — how standards are declared as cards, cataloged, and kept honest
-- [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
 - [Build](/standards/build.md) — Card for the build standard — how a repository is laid out, built, and checked
-- [Claude Code Harness Files](/standards/claude-code.md) — Card for the Claude Code harness-files standard — which repo files the harness consumes and what each contains
-- [ADR Conventions](/standards/adr-conventions.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
-- [Agentic Box](/standards/agentic-box.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
-- [Doc Conventions](/standards/doc-conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
+- [Claude Code Harness Files](/standards/claude-code.md) — Card for the Claude Code harness-files standard — how harness-consumed files are distinguished from ordinary files and what each contains
+- [Decision Records](/standards/decisions.md) — Card for the decision-records standard — how hard-to-reverse decisions are recorded
+- [Instruments](/standards/instrument.md) — Card for the instrument standard — how purpose-built devices are specified and kept conformant
+- [Knowledge Organization](/standards/docs.md) — Card for the knowledge-organization standard — how knowledge is organized in markdown
+- [Module Design](/standards/modules.md) — Card for the module-design standard — how modules are designed
+- [Prose](/standards/prose.md) — Card for the prose standard — how workspace prose is written
+- [Python](/standards/python.md) — Card for the Python standard — how Python source code is written
+- [Python Testing](/standards/testing.md) — Card for the Python-testing standard — how Python tests are written
+- [Semantic Validation](/standards/judgments.md) — Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
+- [Shell](/standards/shell.md) — Card for the shell standard — how shell is written
+- [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
+- [Tracking](/standards/tracking.md) — Card for the tracking standard — how work is tracked through issues, pull requests, and repository settings
+- [Workflow](/standards/workflow.md) — Card for the workflow standard — how an idea becomes a merged pull request
+- [ADR Conventions](/standards/decisions/adrs.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
+- [Agentic Box](/standards/agentic-box/format.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
+- [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
-- [Issue Conventions](/standards/issue-conventions.md) — GitHub issue body format — the body as agent brief, vertical-slice decomposition, blocked-by and sub-issue relationships
-- [Module Design](/standards/module-design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
-- [Python Style](/standards/python-style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
-- [Repository Settings](/standards/repo-settings.md) — GitHub repository settings every repo should have — squash-only merges, PR message format, auto-deleted merged branches
-- [Skill Conventions](/standards/skill-conventions.md) — Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
-- [Skill Management](/standards/skill-management.md) — Where skills live, how third-party skills are installed, and the mirror rule between authored and installed
-- [Testing Conventions](/standards/testing-conventions.md) — Default pytest conventions — structure, behavioral focus, test doubles, fixtures, and humble objects
+- [Module Design](/standards/modules/design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
+- [Python Style](/standards/python/style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
+- [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
+- [Testing Conventions](/standards/testing/conventions.md) — Default pytest conventions — structure, behavioral focus, test doubles, fixtures, and humble objects
 
 ## Directories
 
 - [agentic-box/templates/greenfield-cli/](/standards/agentic-box/templates/greenfield-cli/index.md) — The worked greenfield-CLI box template
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement
-- [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard — the member registry and the CLAUDE.md content standard
+- [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard — the member registry, the CLAUDE.md content standard, and the skill conventions
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
 - [judgments/](/standards/judgments/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
+- [tracking/](/standards/tracking/index.md) — The tracking standard's contract — issue conventions and repository settings

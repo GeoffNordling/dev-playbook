@@ -126,7 +126,9 @@ full.
 
 dev-playbook commits its own file graph under `readings/file-graph/` — a
 reading like any other, regenerated manually on demand by running the executor
-with this repo's scope, never hand-edited and free to lag until you rerun it:
+with this repo's scope, never hand-edited and free to lag until you rerun it.
+Run this only when a human asks for a fresh graph — never as part of a
+refactor or rename sweep:
 
 ```bash
 scripts/file-graph --seed CLAUDE.md --exclude readings/file-graph/ --exclude src/dev_playbook/filegraph/assets/ --output readings/file-graph/dev-playbook.json --html readings/file-graph/dev-playbook.html

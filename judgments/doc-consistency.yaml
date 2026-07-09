@@ -139,3 +139,186 @@ judgments:
       - standards/build/canonical/CLAUDE.md.standards
     model: claude-opus-4-8
     effort: high
+
+  - id: standard-card-docs
+    claim: |
+      standards/docs.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the knowledge-organization standard, and
+      no cell misrepresents what its targets do.
+    evidence:  [standards/docs.md]
+    reference:
+      - standards/standard/format.md
+      - standards/docs/index.md
+      - scripts/okf-lint
+      - scripts/ref-check
+      - standards/build/canonical/.pre-commit-config.yaml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-judgments
+    claim: |
+      standards/judgments.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the semantic-validation
+      standard, and no cell misrepresents what its targets do.
+    evidence:  [standards/judgments.md]
+    reference:
+      - standards/standard/format.md
+      - standards/judgments/index.md
+      - standards/judgments/cache-gate.md
+      - standards/judgments/consuming.md
+      - scripts/judgments-lint
+      - scripts/judgments-run
+      - standards/build/canonical/.pre-commit-config.yaml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-prose
+    claim: |
+      standards/prose.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the prose standard, its empty cells are
+      truly empty, and no cell misrepresents what its targets do.
+    evidence:  [standards/prose.md]
+    reference:
+      - standards/standard/format.md
+      - standards/prose/conventions.md
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-python
+    claim: |
+      standards/python.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the Python standard, and no cell
+      misrepresents what its targets do.
+    evidence:  [standards/python.md]
+    reference:
+      - standards/standard/format.md
+      - standards/python/style.md
+      - scripts/python-lint
+      - standards/build/canonical/.pre-commit-config.yaml
+      - standards/build/canonical/Makefile.python
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-shell
+    claim: |
+      standards/shell.md is an honest card: its define cell truthfully
+      declares that no prose contract exists, its audit and enforce cells
+      correctly locate shellcheck in the canonical hook suite, and no cell
+      misrepresents what its targets do.
+    evidence:  [standards/shell.md]
+    reference:
+      - standards/standard/format.md
+      - standards/build/canonical/.pre-commit-config.yaml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-testing
+    claim: |
+      standards/testing.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the Python-testing standard, and no cell
+      misrepresents what its targets do.
+    evidence:  [standards/testing.md]
+    reference:
+      - standards/standard/format.md
+      - standards/testing/conventions.md
+      - scripts/python-lint
+      - standards/build/canonical/Makefile.python
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-tracking
+    claim: |
+      standards/tracking.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the tracking standard, its
+      enforce cell truthfully declares that nothing blocks, and no cell
+      misrepresents what its targets do.
+    evidence:  [standards/tracking.md]
+    reference:
+      - standards/standard/format.md
+      - standards/tracking/issues.md
+      - standards/tracking/repo-settings.md
+      - scripts/sweep
+      - scripts/bootstrap-labels
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-workflow
+    claim: |
+      standards/workflow.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the workflow standard, its
+      empty cells are truly empty, and no cell misrepresents what its
+      targets do.
+    evidence:  [standards/workflow.md]
+    reference:
+      - standards/standard/format.md
+      - workflow/workflow.md
+      - workflow/skill-authoring.md
+      - standards/agentic-box/format.md
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-instrument
+    claim: |
+      standards/instrument.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the instrument standard, and
+      no cell misrepresents what its targets do.
+    evidence:  [standards/instrument.md]
+    reference:
+      - standards/standard/format.md
+      - standards/instrument/format.md
+      - scripts/okf-lint
+      - instruments/index.md
+      - standards/build/canonical/.pre-commit-config.yaml
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-legibility
+    claim: |
+      standards/legibility.md is an honest card: its define cell points at
+      the instrument specs that genuinely answer how a human understands a
+      large system without reading it, its empty cells are truly empty,
+      and no cell misrepresents what its targets do.
+    evidence:  [standards/legibility.md]
+    reference:
+      - standards/standard/format.md
+      - instruments/datasheet.md
+      - instruments/file-graph.md
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-modules
+    claim: |
+      standards/modules.md is an honest card: every pointer in its define,
+      audit, enforce, and adopt cells names a real artifact that genuinely
+      serves that cell's role for the module-design standard, its empty
+      cells are truly empty, and no cell misrepresents what its targets
+      do.
+    evidence:  [standards/modules.md]
+    reference:
+      - standards/standard/format.md
+      - standards/modules/design.md
+      - CONTEXT.md
+    model: claude-opus-4-8
+    effort: high
+
+  - id: standard-card-decisions
+    claim: |
+      standards/decisions.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the decision-records standard,
+      its empty cells are truly empty, and no cell misrepresents what its
+      targets do.
+    evidence:  [standards/decisions.md]
+    reference:
+      - standards/standard/format.md
+      - standards/decisions/adrs.md
+    model: claude-opus-4-8
+    effort: high
