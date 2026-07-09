@@ -25,6 +25,10 @@ verbatim in a comment on GitHub issue #133.
    issues minted for gaps we choose not to build. "We won't forget — we can
    always look and see what's none."
 5. Talk intention and high-level design before implementation.
+6. Write this ledger for its real reader: a fresh-context agent
+   implementing forward from current state. State what IS and what to
+   DO; never narrate proposals, withdrawals, or who said what in a
+   conversation the reader never saw.
 
 ## Ratified design decisions
 
@@ -297,6 +301,68 @@ Enforce: none — structural (GitHub outside every gate; human dispatcher
 + escalation contract are the integrity mechanism).
 Adopt: node skills (updated per Q1/Q2) + NEW issue-overwatch skill +
 bootstrap-labels.
+
+## RESOLVED: Instruments — how are purpose-built devices specified and kept conformant?
+
+No way-of-working redesign: spec as prescriptive contract,
+invoked-not-adopted, and the deliberate staleness contract for readings
+all stand as written in standards/instrument/format.md.
+
+26. Named-consumer rule: format.md requires every Instrument Spec to
+    carry an "Employed by" line naming the standard, skill, or ritual
+    that demands its readings. okf-audit checks section presence;
+    ref-audit covers the link. Both existing specs (datasheet,
+    file-graph) gain the line.
+27. Reading cadence belongs to the consumer, never the instrument
+    standard: on-demand is the device's contract; a ritual wanting
+    fresh readings states that in the ritual's own doc (which
+    "Employed by" points at). Do not bind any instrument to the weekly
+    loop.
+28. okf type registry: scripts/okf-lint:76-100 already treats
+    document-types.md's `## Types` table as the single source of truth.
+    Do NOT extract a separate data file — it would strip the doc's
+    table or duplicate it. Two changes: (a) harden the parse — today a
+    malformed row (e.g. name missing backticks) is silently skipped,
+    dropping its type from the registry so every doc using that type
+    fails "not in the registry" at the wrong place; instead, every
+    non-header `|` row in `## Types` must match the exact row shape
+    (backticked Title Case name, first cell) or okf-audit emits
+    okf.registry-row at the table itself. (b) Update the `ADR` row to
+    `Decision Record` (see decisions 16–18).
+
+Card resolution: Define format.md + named-consumer rule / Audit
+okf-audit (spec typing via registry, catalog freshness, Employed-by
+presence — no dedicated instruments-audit; north-star's not-mandatory
+clause) / Enforce commit gate via canonical suite (unchanged) / Adopt
+none.
+
+## RESOLVED: Shell — how is shell code kept correct?
+
+The workspace is Python-first: scripts/ is all Python; shell exists
+only as glue (two sourced .bashrc.d fragments, sync-dotfiles.sh, the
+box gate.sh, Make recipes, CI run: lines). The contract's core is the
+boundary rule, not style.
+
+29. New contract standards/shell/conventions.md (fills the Define
+    cell's admitted gap), four rules: (1) boundary — shell is glue
+    only; code needing a function, an array, or parsing becomes a
+    Python scripts/ shim over src/; (2) strict mode — every executable
+    script opens `#!/usr/bin/env bash` + `set -euo pipefail`; sourced
+    fragments (.bashrc.d/*) carry neither, since strict mode in a
+    sourced file kills the parent shell; (3) bash, declared — bashisms
+    fine, sh portability a non-goal; (4) shellcheck-clean; any
+    `# shellcheck disable=` carries a same-line reason comment.
+30. shfmt joins shellcheck in the canonical .pre-commit-config.yaml —
+    the shell mirror of the ruff check + ruff format pairing.
+31. No first-party shell detector: rules 1–3 are prose-only, and the
+    Audit cell says so explicitly (third-party tools only) so the gap
+    reads as chosen, not forgotten.
+32. Sweep all 15 cards replacing the word "venue" with "gate" (the
+    ratified vocabulary; CONTEXT.md rewrite defines Gate, decision 10).
+
+Card resolution: Define conventions.md (new) / Audit shellcheck + shfmt
+(third-party only, marked as such) / Enforce commit gate via canonical
+suite / Adopt none.
 
 ## Remaining agenda
 
