@@ -432,6 +432,26 @@ Card resolution: Define unchanged (build/ + canonical.md) / Audit
 repo-audit + workspace-audit / Enforce the three gate rungs cited by
 fixed name / Adopt none.
 
+## RESOLVED: Meta-Standard — how are standards declared, cataloged, and kept honest?
+
+43. standards/standard/format.md gains a **Detectors** section — the
+    normative home for the detector contract this triage invented:
+    the north star (one detector script per card, explicitly not
+    mandatory), rule ids namespaced by card (`card.rule`), every
+    detector answers `--list-rules`, and the finding line format
+    (`file:line  card.rule  message`, matching CONTEXT.md's Finding).
+    This is what makes standards-audit's bidirectional card<->rule
+    matrix a documented contract.
+44. format.md mechanical updates: cell definitions swap "venue" for
+    gate language; the Enforce cell definition gains the
+    enforce-vs-review sentence (decision 9); Drift item 2's
+    "workspace-level sweeps" becomes workspace-audit.
+45. Card cells: Audit = standards-audit (principal) + okf-audit +
+    ref-audit + judgments/standard-cards.yaml. Enforce = commit gate
+    via the canonical suite, with standards-audit wired in
+    dev-playbook's LOCAL pre-commit block only (it has no meaning in
+    consumer repos). Adopt none.
+
 ## Remaining agenda
 
 - Per-card pass: Decisions (answers pending) -> Tracking -> Workflow ->
