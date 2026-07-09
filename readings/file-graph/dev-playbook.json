@@ -203,10 +203,6 @@
   "standards/claude-code/index.md": "index",
   "standards/claude-code/skill-conventions.md": "concept",
   "standards/claude-code/skill-management.md": "concept",
-  "standards/collaboration.md": "concept",
-  "standards/collaboration/index.md": "index",
-  "standards/collaboration/issues.md": "concept",
-  "standards/collaboration/repo-settings.md": "concept",
   "standards/decisions.md": "concept",
   "standards/decisions/adrs.md": "concept",
   "standards/docs.md": "concept",
@@ -239,6 +235,10 @@
   "standards/standard/format.md": "concept",
   "standards/testing.md": "concept",
   "standards/testing/conventions.md": "concept",
+  "standards/tracking.md": "concept",
+  "standards/tracking/index.md": "index",
+  "standards/tracking/issues.md": "concept",
+  "standards/tracking/repo-settings.md": "concept",
   "standards/workflow.md": "concept",
   "tests/conftest.py": "code",
   "tests/test_filegraph.py": "code",
@@ -2211,7 +2211,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/design/SKILL.md",
-   "target": "standards/collaboration/issues.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "citation",
    "line": 58,
@@ -2267,7 +2267,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
-   "target": "standards/collaboration/issues.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "citation",
    "line": 21,
@@ -2275,7 +2275,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
-   "target": "standards/collaboration/issues.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "citation",
    "line": 89,
@@ -3475,7 +3475,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "standards/collaboration.md",
+   "target": "standards/tracking.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 236,
@@ -3483,7 +3483,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "standards/collaboration.md",
+   "target": "standards/tracking.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 241,
@@ -3499,7 +3499,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "standards/collaboration/issues.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 244,
@@ -3507,7 +3507,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "standards/collaboration/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 245,
@@ -3939,7 +3939,7 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "standards/collaboration/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
    "line": 118,
@@ -4355,7 +4355,7 @@
   },
   {
    "source": "standards/build/enforcement.md",
-   "target": "standards/collaboration/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
    "line": 17,
@@ -4363,7 +4363,7 @@
   },
   {
    "source": "standards/build/enforcement.md",
-   "target": "standards/collaboration/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
    "line": 42,
@@ -4866,62 +4866,6 @@
    "status": "ok"
   },
   {
-   "source": "standards/collaboration.md",
-   "target": "standards/collaboration/index.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 14,
-   "status": "ok"
-  },
-  {
-   "source": "standards/collaboration.md",
-   "target": "scripts/sweep",
-   "kind": "internal",
-   "form": "link",
-   "line": 19,
-   "status": "ok"
-  },
-  {
-   "source": "standards/collaboration.md",
-   "target": "scripts/bootstrap-labels",
-   "kind": "internal",
-   "form": "link",
-   "line": 29,
-   "status": "ok"
-  },
-  {
-   "source": "standards/collaboration/index.md",
-   "target": "standards/collaboration/issues.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 5,
-   "status": "ok"
-  },
-  {
-   "source": "standards/collaboration/index.md",
-   "target": "standards/collaboration/repo-settings.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 6,
-   "status": "ok"
-  },
-  {
-   "source": "standards/collaboration/issues.md",
-   "target": "standards/collaboration/issues.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 39,
-   "status": "ok"
-  },
-  {
-   "source": "standards/collaboration/issues.md",
-   "target": "standards/collaboration/issues.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 57,
-   "status": "ok"
-  },
-  {
    "source": "standards/decisions.md",
    "target": "standards/decisions/adrs.md",
    "kind": "internal",
@@ -5235,7 +5179,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/collaboration.md",
+   "target": "standards/decisions.md",
    "kind": "internal",
    "form": "link",
    "line": 14,
@@ -5243,7 +5187,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/decisions.md",
+   "target": "standards/instrument.md",
    "kind": "internal",
    "form": "link",
    "line": 15,
@@ -5251,7 +5195,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/instrument.md",
+   "target": "standards/docs.md",
    "kind": "internal",
    "form": "link",
    "line": 16,
@@ -5259,7 +5203,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/docs.md",
+   "target": "standards/modules.md",
    "kind": "internal",
    "form": "link",
    "line": 17,
@@ -5267,7 +5211,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/modules.md",
+   "target": "standards/prose.md",
    "kind": "internal",
    "form": "link",
    "line": 18,
@@ -5275,7 +5219,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/prose.md",
+   "target": "standards/python.md",
    "kind": "internal",
    "form": "link",
    "line": 19,
@@ -5283,7 +5227,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/python.md",
+   "target": "standards/testing.md",
    "kind": "internal",
    "form": "link",
    "line": 20,
@@ -5291,7 +5235,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/testing.md",
+   "target": "standards/judgments.md",
    "kind": "internal",
    "form": "link",
    "line": 21,
@@ -5299,7 +5243,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/judgments.md",
+   "target": "standards/shell.md",
    "kind": "internal",
    "form": "link",
    "line": 22,
@@ -5307,7 +5251,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/shell.md",
+   "target": "standards/legibility.md",
    "kind": "internal",
    "form": "link",
    "line": 23,
@@ -5315,7 +5259,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/legibility.md",
+   "target": "standards/tracking.md",
    "kind": "internal",
    "form": "link",
    "line": 24,
@@ -5419,7 +5363,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/collaboration/index.md",
+   "target": "standards/docs/index.md",
    "kind": "internal",
    "form": "link",
    "line": 40,
@@ -5427,7 +5371,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/docs/index.md",
+   "target": "standards/judgments/index.md",
    "kind": "internal",
    "form": "link",
    "line": 41,
@@ -5435,7 +5379,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/judgments/index.md",
+   "target": "standards/references/index.md",
    "kind": "internal",
    "form": "link",
    "line": 42,
@@ -5443,7 +5387,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/references/index.md",
+   "target": "standards/tracking/index.md",
    "kind": "internal",
    "form": "link",
    "line": 43,
@@ -5919,6 +5863,62 @@
    "kind": "external",
    "form": "citation",
    "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking.md",
+   "target": "standards/tracking/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking.md",
+   "target": "scripts/sweep",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking.md",
+   "target": "scripts/bootstrap-labels",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/index.md",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/index.md",
+   "target": "standards/tracking/repo-settings.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/issues.md",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/issues.md",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 57,
    "status": "ok"
   },
   {
@@ -6403,7 +6403,7 @@
   },
   {
    "source": "workflow/workflow.md",
-   "target": "standards/collaboration/issues.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "link",
    "line": 20,
@@ -6467,7 +6467,7 @@
   },
   {
    "source": "workflow/workflow.md",
-   "target": "standards/collaboration/issues.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "link",
    "line": 126,
@@ -6858,8 +6858,6 @@
     "standards/build/index.md": 2,
     "standards/claude-code.md": 2,
     "standards/claude-code/index.md": 2,
-    "standards/collaboration.md": 2,
-    "standards/collaboration/index.md": 2,
     "standards/decisions.md": 2,
     "standards/decisions/adrs.md": 2,
     "standards/docs.md": 2,
@@ -6886,6 +6884,8 @@
     "standards/standard/format.md": 2,
     "standards/testing.md": 2,
     "standards/testing/conventions.md": 2,
+    "standards/tracking.md": 2,
+    "standards/tracking/index.md": 2,
     "standards/workflow.md": 2,
     ".pre-commit-config.yaml": 3,
     "CONTEXT.md": 3,
@@ -6930,12 +6930,12 @@
     "standards/claude-code/files.md": 3,
     "standards/claude-code/skill-conventions.md": 3,
     "standards/claude-code/skill-management.md": 3,
-    "standards/collaboration/issues.md": 3,
-    "standards/collaboration/repo-settings.md": 3,
     "standards/judgments/cache-gate.md": 3,
     "standards/judgments/consuming.md": 3,
     "standards/judgments/declarations.md": 3,
     "standards/references/okf-spec.md": 3,
+    "standards/tracking/issues.md": 3,
+    "standards/tracking/repo-settings.md": 3,
     "workflow/skill-authoring.md": 3,
     "workflow/workflow.md": 3,
     "docs/adr/0001-adopt-matt-pocock-conventions.md": 4,
@@ -7193,10 +7193,6 @@
     "standards/claude-code/index.md",
     "standards/claude-code/skill-conventions.md",
     "standards/claude-code/skill-management.md",
-    "standards/collaboration.md",
-    "standards/collaboration/index.md",
-    "standards/collaboration/issues.md",
-    "standards/collaboration/repo-settings.md",
     "standards/decisions.md",
     "standards/decisions/adrs.md",
     "standards/docs.md",
@@ -7229,6 +7225,10 @@
     "standards/standard/format.md",
     "standards/testing.md",
     "standards/testing/conventions.md",
+    "standards/tracking.md",
+    "standards/tracking/index.md",
+    "standards/tracking/issues.md",
+    "standards/tracking/repo-settings.md",
     "standards/workflow.md",
     "workflow/README.md",
     "workflow/index.md",
