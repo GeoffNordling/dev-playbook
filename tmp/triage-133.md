@@ -364,6 +364,43 @@ Card resolution: Define conventions.md (new) / Audit shellcheck + shfmt
 (third-party only, marked as such) / Enforce commit gate via canonical
 suite / Adopt none.
 
+## RESOLVED: Semantic cluster — Testing, Python, Modules, Prose
+
+Shared principle: semantic contracts get their teeth at authoring time
+(the agent reads the contract) and at PR review — never as Enforce
+pointers. The deterministic slivers below are the whole audit story;
+every remaining cell is bare none by choice.
+
+33. testing-audit (new detector, split from python-lint) owns three
+    rules: testing.no-private-access (the existing privacy.* family
+    moves over), testing.mirror-layout (src/x/y.py <-> tests/x/
+    test_y.py, pure path check), testing.no-logic (AST: no if/else or
+    try/except inside test bodies — exactly the two constructs the
+    contract bans; loops stay legal).
+34. Testing card's Enforce cell = commit gate (testing-audit in the
+    canonical suite). The pytest line leaves the cell: green tests are
+    the build card's gate-ladder story, not test-writing style.
+35. python-audit keeps python.no-future-annotations and
+    python.empty-init. The docstring rule (style.md) is delegated to
+    ruff's pydocstyle `D` family, enabled in the canonical
+    pyproject.toml with a per-file ignore for tests/ — third-party
+    detector over custom code. Fail-loud, module layout, and the
+    helpers bar have no detector: review lenses.
+36. Review-node skill lists the semantic contracts as its review
+    lenses: testing behavioral focus, python fail-loud + helpers bar,
+    modules design, prose conventions on doc diffs. (Implementation
+    note for the review skill, not a card cell.)
+37. Modules card: all-none stands. Its Define cell points at
+    CONTEXT.md, so the CONTEXT.md rewrite (decision 10) must preserve
+    the architecture vocabulary.
+38. Prose card: all-none stands.
+
+Card resolutions: Testing — Define conventions.md / Audit testing-audit
+(3 rules) / Enforce commit gate / Adopt none. Python — Define style.md /
+Audit python-audit + ruff (check, format, D rules) + mypy / Enforce
+commit gate + make check (mypy at the push gate) / Adopt none. Modules
+and Prose — Define only, all other cells none.
+
 ## Remaining agenda
 
 - Per-card pass: Decisions (answers pending) -> Tracking -> Workflow ->
