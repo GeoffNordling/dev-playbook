@@ -327,7 +327,7 @@ all stand as written in standards/instrument/format.md.
     fails "not in the registry" at the wrong place; instead, every
     non-header `|` row in `## Types` must match the exact row shape
     (backticked Title Case name, first cell) or okf-audit emits
-    okf.registry-row at the table itself. (b) Update the `ADR` row to
+    docs.registry-row at the table itself. (b) Update the `ADR` row to
     `Decision Record` (see decisions 16–18).
 
 Card resolution: Define format.md + named-consumer rule / Audit
@@ -451,6 +451,27 @@ fixed name / Adopt none.
     via the canonical suite, with standards-audit wired in
     dev-playbook's LOCAL pre-commit block only (it has no meaning in
     consumer repos). Adopt none.
+
+## RESOLVED: Docs — how is knowledge organized in markdown?
+
+46. okf-audit's rule ids are re-namespaced by CARD, not tool, per
+    decision 6: `okf.type` -> `docs.type`, index freshness ->
+    `docs.index-freshness`, the registry-row rule (decision 28) ->
+    `docs.registry-row`, the Employed-by presence check (decision 26)
+    -> `instrument.employed-by`. One detector carries several cards'
+    rules; the prefix is what standards-audit's card<->rule matrix
+    keys on.
+47. New micro-rule `docs.description-shape` in okf-audit: frontmatter
+    `description` carries no trailing period. A few lines in the
+    existing frontmatter pass (scripts/okf-lint:127-152); the soft
+    description rules (~20 words, one breath) stay prose.
+48. context-content.md moves together with the CONTEXT.md rewrite
+    (decision 10): the contract keeps describing the actual artifact
+    as the glossary broadens to governance terms.
+
+Card resolution: Define standards/docs/ unchanged in structure /
+Audit okf-audit + ref-audit, card-namespaced rule ids / Enforce
+commit gate via canonical suite / Adopt none.
 
 ## Remaining agenda
 
