@@ -21,7 +21,7 @@ Issue **relationships** â€” hierarchy (sub-issues) and dependency (blocked-by) â
 
 ### Valid labels
 
-[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Six fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
+[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Seven fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
 
 | Dimension | Label | Meaning |
 |---|---|---|
@@ -31,6 +31,7 @@ Issue **relationships** â€” hierarchy (sub-issues) and dependency (blocked-by) â
 | Mode | `mode:direct` | Direct path: no spec/design ceremony. |
 | Tests | `tests:yes` | Issue involves writing or modifying tests. |
 | Tests | `tests:no` | Issue does not touch tests. |
+| Status | `status:parked` | Decided and dormant: triage skips it; remove the label to revive. |
 
 ### Graph-based flow
 
