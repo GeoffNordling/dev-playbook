@@ -157,10 +157,12 @@ claims PRs, no contract governs them; open-pr node produces them); label
 scheme ownership (tuple semantics = workflow; scheme-intact-in-repo =
 tracking?); the dispatch rule's enforcement (it's a workflow-side rule).
 
-## PROPOSED, NOT YET RATIFIED: Workflow — how does an idea become a merged PR?
+## RESOLVED: Workflow — how does an idea become a merged PR?
 
-User has only SKIMMED these six; discuss before treating as decided.
-Category taken out of agenda order because tracking's rulings ripple in.
+W1–W6 RATIFIED (user accepted, incl. embedded recommendations: W1 spikes
+carry tests:no to preserve the tuple invariant; W2 the decomposing
+design session does the children's intake, minting them as ready leaves
+with full tuples — no round-trip back through intake).
 
 W1. Spike = a third **mode** (mode:spike beside sdd/direct): its own path
     `intake -> spike -> closed`, exits with an answer, never a PR. Spike
@@ -188,6 +190,113 @@ W6. Workflow audit: workflow.tuple-valid over gh api (every open
     post-intake leaf carries a full valid tuple, phase names a real node).
     Enforce: none — structural (human dispatcher, GitHub outside gates);
     the skills' escalation lines are the real integrity mechanism.
+
+### Dispatch redesign (RATIFIED with modifications — see each item)
+
+User discovery: AFK nodes ARE possible inside interactive sessions via
+subagents. Right screen = one ISSUE-LEVEL agent per issue (not one agent
+per node); it walks the graph, delegating AFK nodes to subagents and
+switching to interview mode for HITL nodes. Left screen stays
+/workflow-overwatch (fleet scope). Two terminals = the user's stated
+comprehension limit — a design constraint, write it down.
+
+Facts verified against official docs (code.claude.com):
+- Dashboard's official name: **Agent view** (`claude agents`) — use this
+  term everywhere; workflow.md's "claude agents dashboard" updates.
+- Subagents CANNOT talk to the terminal user (AskUserQuestion blocked);
+  only channel = final message to parent. Platform enforces HITL-stays-
+  at-issue-agent.
+- Each subagent gets a fresh context window (replaces /clear-between-
+  nodes for AFK nodes; /clear remains for the issue agent itself).
+- Agent definitions (.claude/agents/*.md) support tools allowlist,
+  disallowedTools, and model choice — per-node denies become agent
+  definitions (reviewer = structurally read-only).
+- Nesting possible to depth 5, but standard caps delegation at ONE level
+  below the issue agent (user: never plan to dive into layer two).
+- No headless requirement; works in subscription-billed interactive
+  sessions — the constraint that ruled AFK out is preserved.
+
+W7. RATIFIED. Unit of dispatch = issue. Human launches one issue-level
+    agent per issue in Agent view; it owns the issue's whole traverse.
+    Turn boundaries align with the human capability points (push tap,
+    HITL node, merge) — the agent chains AFK nodes within a turn and
+    stops at exactly the boundaries that were already the human's
+    rituals.
+W8. RATIFIED. Mode taxonomy redraw: nodes are AFK (delegated to a
+    subagent) or HITL (issue overwatch interviews the user directly).
+    FOTW dissolves. workflow.md's "AFK: Not available" sentence flips.
+W9. RATIFIED, modified: /goal retires ENTIRELY (user: "I don't think we
+    need goal anymore"). Subagents must EMIT terminal reports in a
+    simple, highly standardized, difficult-to-miss format —
+    DONE:/ESCALATE: survives as the subagent return contract; the exact
+    format gets specified in workflow.md.
+W10. RATIFIED, narrowed: token widens — the issue overwatch's single
+    launch prompt carries ⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ for the issue's
+    whole life. Subagent-level permissions are OUT OF SCOPE this pass
+    (user: wide permissions, rely on auto mode; don't add complexity).
+    Consequence, consciously accepted: the reviewer read-only guarantee
+    becomes prompt-level, not tool-enforced, for now.
+W11. RATIFIED, modified: expand the term, don't replace it. Left screen
+    = **Agent-view overwatch** (fleet scope). Right screen = **issue
+    overwatch** (one per issue). Both terms defined in workflow.md.
+
+Nesting: NOT strictly capped at one level. User intent: don't go crazy,
+but the future direction is that the issue overwatch can "run" an
+arbitrary mermaid workflow graph — if the graph nests, fine. Design
+principle now (cheap, no engine built): the issue-overwatch skill reads
+the graph from workflow.md and executes it, rather than hard-coding the
+node sequence.
+
+Ripples: W1–W6 all survive, landing in the rewritten Dispatch prose
+(spike node = AFK delegation; design stays HITL at issue-overwatch
+level; W3's rule reframed — see open questions). W1–W6 still awaiting
+explicit ratification (user skimmed twice, called them reasonable).
+
+### Holistic re-check questions — ALL RESOLVED (user ratified)
+
+Q1. AFK nodes STAY SKILLS (subagent prompt = "run /<skill> N"). One
+    authoring surface; "skills are simple, stay simple this pass."
+Q2. The issue-overwatch skill is the SINGLE label writer; node skills
+    shed their label-update step; subagents do work and report.
+Q3. ESCALATE: always bubbles up to the human, context added; the issue
+    overwatch never overrides or self-fixes a node's escalation.
+Q4. Launch an issue overwatch on any unblocked issue (incl. untriaged —
+    intake is its first HITL node); the readiness rule (leaf +
+    brief-complete) gates crossing INTO implementation nodes.
+Q5. Mixed dissolves: a review node = AFK delegation then HITL follow-up,
+    sequenced by the issue overwatch. Taxonomy = two modes; a node may
+    sequence them.
+Q6. DEFERRED to build time: how the native /code-review gets invoked
+    (issue overwatch directly vs review subagent vs human half).
+
+Terminal report format (to state verbatim in workflow.md): the
+subagent's final message MUST begin at character one with exactly
+`DONE: <one-line outcome>` or `ESCALATE: <one-line reason>`; detail
+follows below; any non-matching final message is treated as ESCALATE
+(malformed fails safe, toward the human).
+
+Principle endorsed (user: "always a principle we try to maintain
+everywhere"): reference-and-read rather than duplicate — the
+issue-overwatch skill reads the graph from workflow.md and executes it;
+node sequence never hard-coded.
+
+### Card resolution
+
+Define: workflow/workflow.md REWRITTEN — Dispatch around issue
+overwatches + Agent view, Skills taxonomy AFK/HITL (FOTW and mixed
+dissolve, /goal removed), spike mode + path (W1), design decompose exit
+(W2), readiness rule per Q4 (W3), PR conventions absorbed (W4),
+terminal report format, both overwatch terms defined.
+skill-authoring.md updates for the subagent return contract.
+Audit: workflow.tuple-valid via workspace-audit (gh api scope) — open
+post-intake leaves carry full valid tuples, phase names a real graph
+node, epics carry category only. Label-scheme data file per W5
+(bootstrap-labels mints from it; tracking.label-scheme checks live
+repos; scheme-vs-graph = one docs-match-code judgment).
+Enforce: none — structural (GitHub outside every gate; human dispatcher
++ escalation contract are the integrity mechanism).
+Adopt: node skills (updated per Q1/Q2) + NEW issue-overwatch skill +
+bootstrap-labels.
 
 ## Remaining agenda
 
