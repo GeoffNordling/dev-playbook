@@ -12,7 +12,7 @@ Create a new Claude Code skill. The user describes what the skill should do via 
 
 ## 1. Read the standard
 
-Read [skill-conventions.md](~/workspace/dev-playbook/standards/skill-conventions.md) before drafting. The standard is the source of truth for what a valid skill looks like — front matter, file structure, length, naming, references, checklist. This skill is the workflow over those conventions; the conventions live there, not here.
+Read [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) before drafting. The standard is the source of truth for what a valid skill looks like — front matter, file structure, length, naming, references, checklist. This skill is the workflow over those conventions; the conventions live there, not here.
 
 ## 2. Gather requirements
 
@@ -40,7 +40,7 @@ For `disable-model-invocation: false`, both sentences are required:
 
 For `disable-model-invocation: true`, a short third-person label is enough; no triggers needed since the user invokes by name.
 
-See [skill-conventions.md — Required Fields](~/workspace/dev-playbook/standards/skill-conventions.md#required-fields) for the format rules and worked examples.
+See [skill-conventions.md — Required Fields](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md#required-fields) for the format rules and worked examples.
 
 ## 4. Decide on bundle layout
 
@@ -67,7 +67,7 @@ Revise based on feedback. Iterate until the user is satisfied.
 
 ## 7. Walk the checklist
 
-Walk the checklist in [skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/skill-conventions.md#checklist) and confirm each item passes. Fix any failures before considering the skill done.
+Walk the checklist in [skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md#checklist) and confirm each item passes. Fix any failures before considering the skill done.
 
 ## 8. Sync dotfiles
 

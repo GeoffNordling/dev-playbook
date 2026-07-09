@@ -18,7 +18,7 @@ Work without waiting for approval: plan, implement, refactor, and commit on your
 
 Before doing anything else, read end-to-end:
 
-- [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
+- [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) — pytest structure, naming, fixtures, behavioral focus.
 
 Then report: `READ: testing-conventions.md`. Proceed only after.
 
@@ -78,7 +78,7 @@ Refactor candidate catalogue:
 - **Primitive obsession** → Introduce value objects
 - **Existing code** the new code reveals as problematic
 
-For test-quality patterns and mocking guidance, see [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md).
+For test-quality patterns and mocking guidance, see [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md).
 
 ## 5. Escalations
 

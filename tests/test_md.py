@@ -93,7 +93,7 @@ class TestClassify:
             ("index.md", "index"),
             ("standards/index.md", "index"),
             ("README.md", "concept"),
-            ("standards/doc-conventions.md", "concept"),
+            ("standards/prose/conventions.md", "concept"),
             ("CONTEXT.md", "concept"),
             ("docs/adr/0001-x.md", "concept"),
             ("harness-recipes/recipes/ralph-loop.md", "concept"),

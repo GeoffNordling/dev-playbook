@@ -12,7 +12,7 @@ dev_playbook.pyast.find_python_files, so gitignore-aware and worktree-scoped):
     (see standards/python-conventions.md).
   - **test-privacy** — a ``test_*.py`` file must not import or reach into a
     private name (``_foo``) of a non-test module; dunders are public
-    (see standards/testing-conventions.md).
+    (see standards/testing/conventions.md).
 
 Output:
     stdout — one finding per line, ``file:line  rule  message``.

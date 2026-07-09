@@ -170,7 +170,7 @@ install Superpowers content as a foreign skill.
     `/sdd-implementation`, if real-use evidence shows context pollution
     in the existing chunk loop.
   - Citation of Cialdini and Meincke et al. in
-    `standards/skill-conventions.md`, if persuasion-principle guidance
+    `standards/claude-code/skill-conventions.md`, if persuasion-principle guidance
     becomes useful for future authored skills.
 - The SDD-extension bet (from
   [spec-tools ADR-0005](~/workspace/spec-tools/docs/adr/0005-workspace-sdd-standard.md), reaffirmed in

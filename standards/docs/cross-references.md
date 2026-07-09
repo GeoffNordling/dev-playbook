@@ -18,7 +18,7 @@ path**: a target beginning with `/`, interpreted relative to the bundle
 root (the repo root).
 
 ```markdown
-[doc-conventions.md](/standards/doc-conventions.md)
+[prose/conventions.md](/standards/prose/conventions.md)
 ```
 
 A root-absolute link resolves against the reader's *own* checkout root —
@@ -38,7 +38,7 @@ is already inside that repo), so both use the Link form for same-repo
 targets. Files with **no fixed repo root** — skills and global `~/.claude/`
 config such as `rules/`, loaded across arbitrary repos — have no root for
 `/` to resolve against, so they use the Citation form even for a same-repo
-target (see [skill-conventions.md — Cross-references](/standards/skill-conventions.md#cross-references)).
+target (see [skill-conventions.md — Cross-references](/standards/claude-code/skill-conventions.md#cross-references)).
 
 ## Citation — another repo
 

@@ -17,7 +17,7 @@ Every issue past intake carries the full four-tuple `(category:*, mode:*, tests:
 - `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (implemented at `tdd`), doc/config/work not touching tests goes `tests:no` (implemented at `build`).
 - `phase:*` — the current node in the graph below. An untriaged issue is at `phase:intake` — labelled so, or implied by carrying no labels at all. The graph is the inventory; see [Naming](#naming).
 
-Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](/standards/issue-conventions.md).
+Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](/standards/collaboration/issues.md).
 
 ### Valid labels
 
@@ -123,7 +123,7 @@ The human dispatcher operates from Claude Code's "claude agents" dashboard. **Ea
 
 **One session, many nodes — `/clear` between them.** A node skill works in the issue's worktree, commits, updates the `phase:*` label to the next node, and stops. Nodes do not auto-advance: the human reads the new phase, runs **`/clear`** to reset the session's context — cwd and worktree persist — then pastes the next node's launch command. Every transition stays human-gated and visible on the dashboard. Parallel issues run as independent sessions, each in its own worktree; worktrees keep them from colliding.
 
-**Ready means unblocked.** New issues launch only if they have no open blockers — every issue in its blocked-by set is closed (see [issue-conventions § Relationships](/standards/issue-conventions.md)). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label; the dispatcher checks it and lets a blocked issue wait. Hierarchy (sub-issues) is organizational and does not gate dispatch.
+**Ready means unblocked.** New issues launch only if they have no open blockers — every issue in its blocked-by set is closed (see [issue-conventions § Relationships](/standards/collaboration/issues.md)). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label; the dispatcher checks it and lets a blocked issue wait. Hierarchy (sub-issues) is organizational and does not gate dispatch.
 
 **Re-orientation is minimal.** A node launched after `/clear` starts with a blank context. Its launch command carries only what the node needs — the skill and the issue number — and the skill reloads its own context from the issue (`gh issue view <N>`) and the worktree it already sits in. Nothing carries over from the cleared context.
 

@@ -6,7 +6,7 @@ description: Where skills live, how third-party skills are installed, and the mi
 
 # Skill Management
 
-Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](/standards/skill-conventions.md).
+Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](/standards/claude-code/skill-conventions.md).
 
 ## When to adopt third-party skills
 
@@ -31,7 +31,7 @@ After installing or removing a third-party skill (commands below), run `bin/sync
 
 ## Authored skills
 
-Skills written for this workspace live in `dotfiles/dot-claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](/standards/skill-conventions.md) for the format.
+Skills written for this workspace live in `dotfiles/dot-claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](/standards/claude-code/skill-conventions.md) for the format.
 
 ## Third-party skills
 

@@ -8,7 +8,7 @@ effort: low
 
 # Doc Rules
 
-Read [doc-conventions.md](~/workspace/dev-playbook/standards/doc-conventions.md).
+Read [prose/conventions.md](~/workspace/dev-playbook/standards/prose/conventions.md).
 That's how Markdown documents in this workspace are written.
 
 After reading, continue with whatever doc work prompted the invocation. The

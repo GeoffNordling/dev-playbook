@@ -131,8 +131,8 @@ judgments:
       - standards/standard/format.md
       - standards/claude-code/files.md
       - standards/claude-code/claude-content.md
-      - standards/skill-conventions.md
-      - standards/skill-management.md
+      - standards/claude-code/skill-conventions.md
+      - standards/claude-code/skill-management.md
       - scripts/repo-audit
       - scripts/internal-skill-audit
       - standards/build/canonical/.pre-commit-config.yaml
