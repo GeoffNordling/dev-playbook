@@ -53,8 +53,12 @@ restate the content of their targets.
 - **Enforce** — blocking gates: the rungs where nonconformance stops the
   path to main, cited by fixed name (**commit gate**, **push gate**,
   **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
-  Enforcement is automatic and continuously in effect; a code review is a
-  one-time factory gate, not enforcement, and never an Enforce pointer.
+  A cell cites the single rung where the detector is stationed — where its
+  wiring lives (pre-commit hooks → the commit gate; tools that run only inside
+  `make check` → the push gate); the hook pattern in enforcement.md's Map
+  implies the echoes at the other rungs. Enforcement is automatic and
+  continuously in effect; a code review is a one-time checkpoint, not
+  enforcement, and never an Enforce pointer.
 - **Adopt** — anything that helps bring a repository into conformance,
   such as templates or migration procedures. Often "none": the generic
   path is an agent reading the define cell and fixing the repository.
@@ -73,9 +77,10 @@ hook suite rather than by new tooling.
 ## Detectors
 
 A **detector** is the read-only script behind an Audit cell — it inspects the
-repository against one standard and emits findings, never mutating and never
-blocking by itself (a detector stationed at a gate is what enforces). This is
-the normative home of the detector contract.
+repository against one standard and emits findings, never mutating the
+repository and never blocking by itself (its runs at a gate are the audit
+stationed there — that is Enforcement). This is the normative home of the
+detector contract.
 
 - **North star: one detector script per card.** The aim is a single detector
   answering each card's question. It is explicitly not mandatory — a card may
@@ -88,7 +93,10 @@ the normative home of the detector contract.
   after that question — never after the tool that happens to detect it.
 - **`--list-rules`.** Every detector answers `--list-rules`, printing the
   `card.rule` ids it can emit.
-- **Finding format.** A finding is one line: `file:line  card.rule  message`.
+- **Finding format.** A finding is one line, GNU format:
+  `file:line: card.rule message` — a colon after the location, single spaces, a
+  repo-relative path; `:line` is omitted for a file-level finding
+  (e.g. `README.md: docs.readme-missing …`).
 
 ## Drift
 
