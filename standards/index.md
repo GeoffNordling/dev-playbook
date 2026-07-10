@@ -21,7 +21,7 @@ alphabetical; directories last.
 - [Semantic Validation](/standards/judgments.md) — Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
 - [Shell](/standards/shell.md) — Card for the shell standard — how shell is written
 - [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
-- [Tracking](/standards/tracking.md) — Card for the tracking standard — how work is tracked through issues, pull requests, and repository settings
+- [Tracking](/standards/tracking.md) — Card for the tracking standard — how work is tracked through issues and repository settings
 - [Workflow](/standards/workflow.md) — Card for the workflow standard — how an idea becomes a merged pull request
 - [ADR Conventions](/standards/decisions/adrs.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
 - [Agentic Box](/standards/agentic-box/format.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box

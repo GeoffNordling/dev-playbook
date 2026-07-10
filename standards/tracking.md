@@ -1,13 +1,13 @@
 ---
 type: Standard Card
 title: Tracking
-description: Card for the tracking standard — how work is tracked through issues, pull requests, and repository settings
+description: Card for the tracking standard — how work is tracked through issues and repository settings
 ---
 
 # Tracking
 
-Governs how work is tracked — issues, pull requests, and repository
-settings.
+Governs how work is tracked — issues and repository settings. Pull
+requests belong to the [workflow standard](/workflow/workflow.md).
 
 ## Define
 

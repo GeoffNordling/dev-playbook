@@ -25,6 +25,7 @@ METADATA: list[tuple[str, str]] = [
     ("Category", "enhancement"),
     ("Mode", "sdd"),
     ("Mode", "direct"),
+    ("Mode", "spike"),
     ("Tests", "yes"),
     ("Tests", "no"),
     ("Status", "parked"),
@@ -42,6 +43,7 @@ PHASES: list[str] = [
     "tdd",
     "build",
     "code-pr-review",
+    "spike",
 ]
 
 
