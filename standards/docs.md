@@ -24,7 +24,7 @@ types, indexes, and cross-references.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-lint and ref-check in every repo's suite
+  — okf-lint and ref-check at the **commit gate** in every repo's suite
 
 ## Adopt
 

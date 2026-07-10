@@ -24,7 +24,7 @@ Governs how shell is written.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the venue where shellcheck blocks every commit
+  — the **commit gate**, where shellcheck blocks every commit
 
 ## Adopt
 
