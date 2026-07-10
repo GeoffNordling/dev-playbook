@@ -57,10 +57,10 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | Script | Standard | Purpose |
 |--------|----------|---------|
 | `repo-audit` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
-| `python-lint` | [python-style.md](/standards/python-style.md), [testing-conventions.md](/standards/testing-conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
+| `python-lint` | [python/style.md](/standards/python/style.md), [testing/conventions.md](/standards/testing/conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
 | `ref-check` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `internal-skill-audit` | [skill-conventions.md](/standards/skill-conventions.md) | Skill conformance |
+| `internal-skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
 `repo-audit`, `python-lint`, `ref-check`, and `okf-lint` assert unconditionally
@@ -115,7 +115,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout, `--html` assembles the viz |
 | `judgments-run` | Plan / render / record over a repo's judgment declarations (driven by the `/run-judgments` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
-| `sweep` | On-demand workspace sweep: GitHub settings drift via `gh api` ([repo-settings.md](/standards/repo-settings.md)) and stale dev-playbook pins |
+| `sweep` | On-demand workspace sweep: GitHub settings drift via `gh api` ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 
@@ -126,7 +126,9 @@ full.
 
 dev-playbook commits its own file graph under `readings/file-graph/` — a
 reading like any other, regenerated manually on demand by running the executor
-with this repo's scope, never hand-edited and free to lag until you rerun it:
+with this repo's scope, never hand-edited and free to lag until you rerun it.
+Run this only when a human asks for a fresh graph — never as part of a
+refactor or rename sweep:
 
 ```bash
 scripts/file-graph --seed CLAUDE.md --exclude readings/file-graph/ --exclude src/dev_playbook/filegraph/assets/ --output readings/file-graph/dev-playbook.json --html readings/file-graph/dev-playbook.html

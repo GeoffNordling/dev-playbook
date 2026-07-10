@@ -30,7 +30,7 @@ a description like "the auth setup doc."
 ## Workflow
 
 1. **Read the doc conventions** at
-   [doc-conventions.md](~/workspace/dev-playbook/standards/doc-conventions.md).
+   [prose/conventions.md](~/workspace/dev-playbook/standards/prose/conventions.md).
    These are the patterns the rewrite applies.
 2. **Read the entire target document**, top to bottom, before any edits.
 3. **Articulate the document's purpose.** This is the north star for the

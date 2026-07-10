@@ -57,7 +57,7 @@ Vercel dependencies because their lift cost ≈ drop cost.
 - `/setup-matt-pocock-skills` — its job (scaffolding `docs/agents/` and the
   `## Agent skills` block) is gone.
 - `/tdd` — covered by `/sdd-implementation` for spec-bound work; exploratory
-  TDD outside SDD is encoded in `standards/testing-conventions.md`. Author
+  TDD outside SDD is encoded in `standards/testing/conventions.md`. Author
   later if a real gap surfaces.
 - `/grill-me` — redundant with `/grill-with-docs`.
 
@@ -65,11 +65,11 @@ Vercel dependencies because their lift cost ≈ drop cost.
 
 Body prose preserved verbatim from the originals; references rewired to
 absorbed standards; `model: opus`, `effort: xhigh`, explicit
-`disable-model-invocation`, `# H1` titles per `standards/skill-conventions.md`.
+`disable-model-invocation`, `# H1` titles per `standards/claude-code/skill-conventions.md`.
 
 - `/grill-with-docs` → `dotfiles/.claude/skills/grill-with-docs/`. References
   absorbed into `standards/repo-documentation.md` (CONTEXT.md format) and
-  `standards/adr-conventions.md` (template, offer-gate).
+  `standards/decisions/adrs.md` (template, offer-gate).
 - `/triage` → `dotfiles/.claude/skills/triage/`. References absorbed into
   `standards/issue-management.md` (triage roles, agent briefs).
   `OUT-OF-SCOPE.md` and the `.out-of-scope/` knowledge-base content dropped.
@@ -79,7 +79,7 @@ absorbed standards; `model: opus`, `effort: xhigh`, explicit
 - `/improve-codebase-architecture` →
   `dotfiles/.claude/skills/improve-codebase-architecture/`. References
   absorbed into `standards/architecture-vocabulary.md`,
-  `standards/module-design.md`, `standards/dependency-taxonomy.md`. Two
+  `standards/modules/design.md`, `standards/dependency-taxonomy.md`. Two
   workflow refs kept in `references/`: `DEEPENING-WORKFLOW.md` (testing
   strategy: replace, don't layer) and `DESIGN-IT-TWICE.md` (parallel-design
   sub-agent pattern). Both are skill workflow, not standards.
@@ -96,11 +96,11 @@ mirrored into `dotfiles/.claude/skills/` by `dotfiles/bin/sync-dotfiles.sh`.
 - New: `standards/architecture-vocabulary.md` (Module / Interface /
   Implementation / Depth / Seam / Adapter / Leverage / Locality, verbatim
   from `improve-codebase-architecture/LANGUAGE.md`).
-- New: `standards/module-design.md` (deep-module principle and
+- New: `standards/modules/design.md` (deep-module principle and
   designing-for-testability rules).
 - New: `standards/dependency-taxonomy.md` (four dependency categories +
   seam discipline).
-- New: `standards/adr-conventions.md` (offer-gate, template, optional
+- New: `standards/decisions/adrs.md` (offer-gate, template, optional
   sections, 4-digit numbering).
 - Rewritten: `standards/issue-management.md` from pointer-file to authored
   content (5-role vocabulary, agent-brief template, vertical-slice rules,
@@ -108,17 +108,17 @@ mirrored into `dotfiles/.claude/skills/` by `dotfiles/bin/sync-dotfiles.sh`.
 - Updated: `standards/repo-documentation.md` (absorb CONTEXT.md format;
   pointer to `adr-conventions.md`; drop `docs/agents/` row; drop multi-context
   `CONTEXT-MAP.md` framing).
-- Updated: `standards/testing-conventions.md` (drop `/tdd` runtime-companion
+- Updated: `standards/testing/conventions.md` (drop `/tdd` runtime-companion
   pointer).
-- Updated: `standards/skill-management.md` (drop the Pocock-vs-Superpowers
+- Updated: `standards/claude-code/skill-management.md` (drop the Pocock-vs-Superpowers
   anecdote paragraph; rule and failure-modes paragraph kept).
 
 ### Authored skills rewired
 
 - `/sdd-design` — `tdd/{deep-modules,interface-design}.md` references →
-  `standards/module-design.md`. `/grill-me` invocation line dropped.
+  `standards/modules/design.md`. `/grill-me` invocation line dropped.
 - `/sdd-implementation` — `tdd/{tests,mocking}.md` references →
-  `standards/testing-conventions.md`. `tdd/refactoring.md` reference replaced
+  `standards/testing/conventions.md`. `tdd/refactoring.md` reference replaced
   with the inline 6-bullet refactor catalogue (lifted verbatim, since the
   catalogue is post-green workflow rather than a convention that fits any
   standard).

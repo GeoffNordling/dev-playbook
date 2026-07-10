@@ -1,21 +1,22 @@
 ---
 type: Standard Card
 title: Claude Code Harness Files
-description: Card for the Claude Code harness-files standard — which repo files the harness consumes and what each contains
+description: Card for the Claude Code harness-files standard — how harness-consumed files are distinguished from ordinary files and what each contains
 ---
 
 # Claude Code Harness Files
 
-Governs which repo files the Claude Code harness consumes — injected into
-context, read as configuration, or run as code — and what each contains.
+Governs how the repo files the Claude Code harness consumes — injected
+into context, read as configuration, or run as code — are distinguished
+from ordinary files, and what each may contain.
 
 ## Define
 
 - [standards/claude-code/](/standards/claude-code/index.md) — the member
   registry and the CLAUDE.md content standard; start at Files
-- [Skill Conventions](/standards/skill-conventions.md) — the skill-bundle
+- [Skill Conventions](/standards/claude-code/skill-conventions.md) — the skill-bundle
   format
-- [Skill Management](/standards/skill-management.md) — where skills live
+- [Skill Management](/standards/claude-code/skill-management.md) — where skills live
   and the authored/installed mirror rule
 
 ## Audit

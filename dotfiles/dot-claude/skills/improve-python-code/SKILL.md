@@ -25,7 +25,7 @@ If ambiguous, ask the user which target they meant before continuing. Don't gues
 
 ## 2. Read the standard
 
-Read [python-style.md](~/workspace/dev-playbook/standards/python-style.md). It is the primary reference for this skill. Beyond the standard, apply general software-engineering judgment: naming, cohesion, dead code, duplicated logic, unclear control flow, modules that have grown two unrelated concerns.
+Read [python/style.md](~/workspace/dev-playbook/standards/python/style.md). It is the primary reference for this skill. Beyond the standard, apply general software-engineering judgment: naming, cohesion, dead code, duplicated logic, unclear control flow, modules that have grown two unrelated concerns.
 
 The standard wins on the topics it covers. Don't re-litigate decisions it has already made.
 

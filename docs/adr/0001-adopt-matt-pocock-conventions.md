@@ -136,7 +136,7 @@ skills themselves.
   vertical-slice rules.
 - The [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
   amended with the 4-digit ADR rule and offer-criteria gate.
-- The [Testing conventions standard](~/workspace/dev-playbook/standards/testing-conventions.md)
+- The [Testing conventions standard](~/workspace/dev-playbook/standards/testing/conventions.md)
   cross-references Matt's `/tdd` while remaining authoritative — we
   do not fork `/tdd`.
 - `/to-prd` is not installed and is not authorised for use in this

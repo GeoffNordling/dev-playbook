@@ -1,0 +1,35 @@
+---
+type: Standard Card
+title: Workflow
+description: Card for the workflow standard — how an idea becomes a merged pull request
+---
+
+# Workflow
+
+Governs how an idea becomes a merged pull request.
+
+## Define
+
+- [workflow/workflow.md](/workflow/workflow.md) — the intake-to-merge
+  state machine: labels, dispatch, worktrees, permissions
+- [workflow/skill-authoring.md](/workflow/skill-authoring.md) — voice and
+  mechanics for the phase node-skills
+- [agentic-box/format.md](/standards/agentic-box/format.md) — the
+  delegation boundary for autonomous agent work
+
+## Audit
+
+- none
+
+## Enforce
+
+- none — the state machine is operated by the human dispatcher; nothing
+  blocks a skipped phase
+
+## Adopt
+
+- the phase node-skills in `dotfiles/dot-claude/skills/` — intake, design,
+  build, tdd, open-pr, and the review nodes carry an issue through the
+  graph ([Skills](/workflow/workflow.md#skills))
+- [the greenfield-CLI box template](/standards/agentic-box/templates/greenfield-cli/index.md)
+  — the worked agentic-box instantiation

@@ -29,7 +29,7 @@ Audit procedure (human, ~15 min):
    internal tests too) and diff its account against the emissions
 
 Template notes: this is the worked greenfield-CLI example from
-/standards/agentic-box.md. To instantiate, copy the tree, replace the
+/standards/agentic-box/format.md. To instantiate, copy the tree, replace the
 `sessionxml` mission (contract, fixtures, acceptance tests) with yours, and
 keep the skeleton — prompt, charter shape, emissions spec, and gate barely
 change between CLI boxes.

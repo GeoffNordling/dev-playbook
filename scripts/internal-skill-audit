@@ -2,7 +2,7 @@
 """Audit internal SKILL.md files for skill-conventions.md conformance.
 
 Scans skill bundles authored in this repo against the conventions in
-dev-playbook's standards/skill-conventions.md. Two skill roots are checked
+dev-playbook's standards/claude-code/skill-conventions.md. Two skill roots are checked
 when present in the target directory:
 
   - .claude/skills/                (project-level skills, any repo)

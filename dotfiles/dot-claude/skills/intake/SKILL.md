@@ -18,7 +18,7 @@ The front door for work. Input arrives under-formed and leaves as a ready issue 
 Before doing anything else, read end-to-end:
 
 - [workflow standard](~/workspace/dev-playbook/workflow/workflow.md) — label scheme, state-machine graph.
-- [issue conventions](~/workspace/dev-playbook/standards/issue-conventions.md) — body format, brief principles, vertical-slice rules.
+- [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) — body format, brief principles, vertical-slice rules.
 
 Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
 
@@ -86,7 +86,7 @@ If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`
 
 ### 6. Wire relationships
 
-When intake produced more than one issue, set the native relationships per [issue conventions → Relationships](~/workspace/dev-playbook/standards/issue-conventions.md). Neither has a `gh` subcommand, so use `gh api`; both endpoints take the target issue's internal `id` (not its number), so resolve that first. `{owner}`/`{repo}` are filled from the current repo.
+When intake produced more than one issue, set the native relationships per [issue conventions → Relationships](~/workspace/dev-playbook/standards/tracking/issues.md). Neither has a `gh` subcommand, so use `gh api`; both endpoints take the target issue's internal `id` (not its number), so resolve that first. `{owner}`/`{repo}` are filled from the current repo.
 
 Mark each ordered slice **blocked-by** its predecessor:
 

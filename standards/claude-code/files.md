@@ -19,7 +19,7 @@ different file set and would get its own standard.
 | Member | Role | Content standard |
 |---|---|---|
 | `CLAUDE.md`, `<dir>/CLAUDE.md` | injected into every session at or below its directory | [claude-content.md](/standards/claude-code/claude-content.md) |
-| skill bundles — `SKILL.md` + `references/`, `scripts/` | loaded when a skill is invoked | [skill-conventions.md](/standards/skill-conventions.md); placement per [skill-management.md](/standards/skill-management.md) |
+| skill bundles — `SKILL.md` + `references/`, `scripts/` | loaded when a skill is invoked | [skill-conventions.md](/standards/claude-code/skill-conventions.md); placement per [skill-management.md](/standards/claude-code/skill-management.md) |
 | `rules/*.md` | injected into every session | none yet |
 | `settings.json`, `settings.local.json` | read as configuration | none yet |
 | `hooks/` | run as code around harness events | none yet |

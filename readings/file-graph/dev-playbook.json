@@ -1,6 +1,6 @@
 {
  "repo": "dev-playbook",
- "root": "/home/geoff/workspace/dev-playbook/.claude/worktrees/2026-07-06-file-graph-instrument",
+ "root": "/home/geoff/workspace/dev-playbook/.claude/worktrees/issue-133",
  "nodes": {
   ".claude/skills/improve-protocol/SKILL.md": "harness-skill-authored",
   ".github/workflows/ci.yml": "config",
@@ -22,11 +22,6 @@
   "docs/adr/0008-retire-edit-time-ruff-hook.md": "concept",
   "docs/adr/README.md": "concept",
   "docs/adr/index.md": "index",
-  "docs/datasheets/judgments.html": "config",
-  "docs/datasheets/lint-suite.html": "config",
-  "docs/datasheets/tools.html": "config",
-  "docs/datasheets/transcript-export.html": "config",
-  "docs/datasheets/workspace-scripts.html": "config",
   "docs/index.md": "index",
   "docs/sandboxing.md": "concept",
   "docs/third-party-survey.md": "concept",
@@ -86,6 +81,7 @@
   "dotfiles/dot-claude/skills/handoff/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/improve-python-code/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/intake/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/log-friction/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/open-pr/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/orient-workspace-meta/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/orient/SKILL.md": "harness-skill-authored",
@@ -119,18 +115,18 @@
   "instruments/datasheet-example.html": "config",
   "instruments/datasheet.md": "concept",
   "instruments/file-graph.md": "concept",
-  "instruments/format.md": "concept",
   "instruments/index.md": "index",
-  "instruments/judgments/cache-gate.md": "concept",
-  "instruments/judgments/consuming.md": "concept",
-  "instruments/judgments/declarations.md": "concept",
-  "instruments/judgments/index.md": "index",
   "judgments/doc-consistency.yaml": "config",
   "protocols/README.md": "concept",
   "protocols/align-map-execute/SKILL.md": "harness-skill-authored",
   "protocols/align-map-execute/formulation.md": "concept",
   "protocols/index.md": "index",
   "pyproject.toml": "config",
+  "readings/datasheet/judgments.html": "reading",
+  "readings/datasheet/lint-suite.html": "reading",
+  "readings/datasheet/tools.html": "reading",
+  "readings/datasheet/transcript-export.html": "reading",
+  "readings/datasheet/workspace-scripts.html": "reading",
   "scripts/README.md": "concept",
   "scripts/bootstrap-labels": "code",
   "scripts/file-graph": "code",
@@ -146,11 +142,13 @@
   "scripts/sweep": "code",
   "scripts/transcript-export": "code",
   "src/dev_playbook/__init__.py": "code",
-  "src/dev_playbook/filegraph.py": "code",
+  "src/dev_playbook/filegraph/__init__.py": "code",
+  "src/dev_playbook/filegraph/graph.py": "code",
+  "src/dev_playbook/filegraph/viz.py": "code",
   "src/dev_playbook/gitrepo.py": "code",
   "src/dev_playbook/judgments/__init__.py": "code",
+  "src/dev_playbook/judgments/bench.py": "code",
   "src/dev_playbook/judgments/core.py": "code",
-  "src/dev_playbook/judgments/instruments.py": "code",
   "src/dev_playbook/judgments/loader.py": "code",
   "src/dev_playbook/judgments/pytest_support.py": "code",
   "src/dev_playbook/judgments/runner.py": "code",
@@ -167,8 +165,7 @@
   "src/dev_playbook/transcript_export/render.py": "code",
   "src/dev_playbook/transcript_export/transcript.py": "code",
   "standards/README.md": "concept",
-  "standards/adr-conventions.md": "concept",
-  "standards/agentic-box.md": "concept",
+  "standards/agentic-box/format.md": "concept",
   "standards/agentic-box/templates/greenfield-cli/box/README.md": "concept",
   "standards/agentic-box/templates/greenfield-cli/box/charter.md": "concept",
   "standards/agentic-box/templates/greenfield-cli/box/contract.md": "concept",
@@ -204,7 +201,11 @@
   "standards/claude-code/claude-content.md": "concept",
   "standards/claude-code/files.md": "concept",
   "standards/claude-code/index.md": "index",
-  "standards/doc-conventions.md": "concept",
+  "standards/claude-code/skill-conventions.md": "concept",
+  "standards/claude-code/skill-management.md": "concept",
+  "standards/decisions.md": "concept",
+  "standards/decisions/adrs.md": "concept",
+  "standards/docs.md": "concept",
   "standards/docs/bundle.md": "concept",
   "standards/docs/context-content.md": "concept",
   "standards/docs/cross-references.md": "concept",
@@ -213,17 +214,32 @@
   "standards/docs/indexes.md": "concept",
   "standards/docs/readme-content.md": "concept",
   "standards/index.md": "index",
-  "standards/issue-conventions.md": "concept",
-  "standards/module-design.md": "concept",
-  "standards/python-style.md": "concept",
+  "standards/instrument.md": "concept",
+  "standards/instrument/format.md": "concept",
+  "standards/judgments.md": "concept",
+  "standards/judgments/cache-gate.md": "concept",
+  "standards/judgments/consuming.md": "concept",
+  "standards/judgments/declarations.md": "concept",
+  "standards/judgments/index.md": "index",
+  "standards/legibility.md": "concept",
+  "standards/modules.md": "concept",
+  "standards/modules/design.md": "concept",
+  "standards/prose.md": "concept",
+  "standards/prose/conventions.md": "concept",
+  "standards/python.md": "concept",
+  "standards/python/style.md": "concept",
   "standards/references/index.md": "index",
   "standards/references/okf-spec.md": "concept",
-  "standards/repo-settings.md": "concept",
-  "standards/skill-conventions.md": "concept",
-  "standards/skill-management.md": "concept",
+  "standards/shell.md": "concept",
   "standards/standard.md": "concept",
   "standards/standard/format.md": "concept",
-  "standards/testing-conventions.md": "concept",
+  "standards/testing.md": "concept",
+  "standards/testing/conventions.md": "concept",
+  "standards/tracking.md": "concept",
+  "standards/tracking/index.md": "index",
+  "standards/tracking/issues.md": "concept",
+  "standards/tracking/repo-settings.md": "concept",
+  "standards/workflow.md": "concept",
   "tests/conftest.py": "code",
   "tests/test_filegraph.py": "code",
   "tests/test_judgments_gate.py": "code",
@@ -379,7 +395,7 @@
   },
   {
    "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 139,
@@ -483,7 +499,7 @@
   },
   {
    "source": "docs/adr/0003-decline-superpowers.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 173,
@@ -555,7 +571,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 60,
@@ -563,7 +579,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 68,
@@ -571,7 +587,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/adr-conventions.md",
+   "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 72,
@@ -579,7 +595,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/module-design.md",
+   "target": "standards/modules/design.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 82,
@@ -595,7 +611,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/module-design.md",
+   "target": "standards/modules/design.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 99,
@@ -603,7 +619,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/adr-conventions.md",
+   "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 103,
@@ -611,7 +627,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 111,
@@ -619,7 +635,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/skill-management.md",
+   "target": "standards/claude-code/skill-management.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 113,
@@ -627,7 +643,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/module-design.md",
+   "target": "standards/modules/design.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 119,
@@ -635,7 +651,7 @@
   },
   {
    "source": "docs/adr/0004-remove-pocock-direct-dependency.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 121,
@@ -647,6 +663,14 @@
    "kind": "internal",
    "form": "prose-path",
    "line": 151,
+   "status": "ok"
+  },
+  {
+   "source": "docs/adr/0005-issue-workflow-reorganization.md",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 59,
    "status": "ok"
   },
   {
@@ -783,102 +807,6 @@
    "kind": "internal",
    "form": "link",
    "line": 13,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "src/dev_playbook/md.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 10,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "src/dev_playbook/pyast.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 11,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "src/dev_playbook/gitrepo.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 12,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "tests/test_okf_lint.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 13,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "tests/test_python_lint.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 14,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "tests/test_ref_check.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 15,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "tests/test_md.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 16,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "tests/test_repo_audit.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 17,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "tests/test_sweep.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 18,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "src/dev_playbook/gitrepo.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 130,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/lint-suite.html",
-   "target": "src/dev_playbook/md.py",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 133,
-   "status": "ok"
-  },
-  {
-   "source": "docs/datasheets/workspace-scripts.html",
-   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
-   "kind": "internal",
-   "form": "code-ref",
-   "line": 179,
    "status": "ok"
   },
   {
@@ -2178,8 +2106,24 @@
    "status": "ok"
   },
   {
+   "source": "dotfiles/dot-claude/settings.json",
+   "target": "scripts/transcript-export",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 111,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/settings.json",
+   "target": "scripts/transcript-export",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 112,
+   "status": "ok"
+  },
+  {
    "source": "dotfiles/dot-claude/skills/build/SKILL.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 26,
@@ -2195,7 +2139,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 39,
@@ -2203,7 +2147,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
-   "target": "standards/python-style.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "citation",
    "line": 39,
@@ -2211,7 +2155,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 46,
@@ -2259,7 +2203,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/design/SKILL.md",
-   "target": "standards/module-design.md",
+   "target": "standards/modules/design.md",
    "kind": "internal",
    "form": "citation",
    "line": 18,
@@ -2267,7 +2211,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/design/SKILL.md",
-   "target": "standards/issue-conventions.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "citation",
    "line": 58,
@@ -2275,7 +2219,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/doc-rewrite/SKILL.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 33,
@@ -2283,7 +2227,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/doc-rules/SKILL.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 11,
@@ -2299,7 +2243,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/grill-with-docs/SKILL.md",
-   "target": "standards/adr-conventions.md",
+   "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "citation",
    "line": 67,
@@ -2307,7 +2251,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/improve-python-code/SKILL.md",
-   "target": "standards/python-style.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "citation",
    "line": 28,
@@ -2323,7 +2267,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
-   "target": "standards/issue-conventions.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "citation",
    "line": 21,
@@ -2331,10 +2275,34 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/intake/SKILL.md",
-   "target": "standards/issue-conventions.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "citation",
    "line": 89,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/log-friction/SKILL.md",
+   "target": "~/workspace/select-measure-learn/friction-log.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/log-friction/SKILL.md",
+   "target": "~/workspace/select-measure-learn/rules.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/log-friction/SKILL.md",
+   "target": "~/workspace/select-measure-learn/friction-log.md",
+   "kind": "external",
+   "form": "citation",
+   "line": 27,
    "status": "ok"
   },
   {
@@ -2379,7 +2347,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/prototype/SKILL.md",
-   "target": "standards/adr-conventions.md",
+   "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "citation",
    "line": 44,
@@ -2411,7 +2379,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
-   "target": "instruments/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 11,
@@ -2427,7 +2395,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 23,
@@ -2435,7 +2403,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
-   "target": "standards/python-style.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "citation",
    "line": 24,
@@ -2491,7 +2459,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
-   "target": "standards/module-design.md",
+   "target": "standards/modules/design.md",
    "kind": "internal",
    "form": "citation",
    "line": 75,
@@ -2515,7 +2483,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 22,
@@ -2531,7 +2499,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/sdd-tdd/SKILL.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 89,
@@ -2547,7 +2515,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 15,
@@ -2555,7 +2523,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 43,
@@ -2563,7 +2531,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/skill-creator/SKILL.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 70,
@@ -2579,7 +2547,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/tdd/SKILL.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 21,
@@ -2587,7 +2555,7 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/tdd/SKILL.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 81,
@@ -2774,7 +2742,7 @@
    "target": "instruments/datasheet.md",
    "kind": "internal",
    "form": "relative",
-   "line": 59,
+   "line": 60,
    "status": "ok"
   },
   {
@@ -2782,7 +2750,7 @@
    "target": "instruments/datasheet.md",
    "kind": "internal",
    "form": "relative",
-   "line": 138,
+   "line": 139,
    "status": "ok"
   },
   {
@@ -2790,7 +2758,7 @@
    "target": "instruments/datasheet-example.html",
    "kind": "internal",
    "form": "link",
-   "line": 264,
+   "line": 265,
    "status": "ok"
   },
   {
@@ -2798,7 +2766,7 @@
    "target": "standards/docs/bundle.md",
    "kind": "internal",
    "form": "link",
-   "line": 40,
+   "line": 49,
    "status": "ok"
   },
   {
@@ -2806,7 +2774,7 @@
    "target": "standards/docs/bundle.md",
    "kind": "internal",
    "form": "link",
-   "line": 55,
+   "line": 65,
    "status": "ok"
   },
   {
@@ -2814,7 +2782,7 @@
    "target": "standards/claude-code/files.md",
    "kind": "internal",
    "form": "link",
-   "line": 56,
+   "line": 66,
    "status": "ok"
   },
   {
@@ -2822,7 +2790,7 @@
    "target": "src/dev_playbook/md.py",
    "kind": "internal",
    "form": "link",
-   "line": 57,
+   "line": 67,
    "status": "ok"
   },
   {
@@ -2830,7 +2798,7 @@
    "target": "standards/docs/cross-references.md",
    "kind": "internal",
    "form": "link",
-   "line": 68,
+   "line": 78,
    "status": "ok"
   },
   {
@@ -2838,7 +2806,7 @@
    "target": "standards/docs/document-types.md",
    "kind": "internal",
    "form": "link",
-   "line": 70,
+   "line": 80,
    "status": "ok"
   },
   {
@@ -2846,23 +2814,15 @@
    "target": "scripts/file-graph",
    "kind": "internal",
    "form": "link",
-   "line": 101,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/format.md",
-   "target": "instruments/index.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 31,
+   "line": 111,
    "status": "ok"
   },
   {
    "source": "instruments/index.md",
-   "target": "instruments/format.md",
+   "target": "standards/instrument/format.md",
    "kind": "internal",
    "form": "link",
-   "line": 5,
+   "line": 3,
    "status": "ok"
   },
   {
@@ -2870,7 +2830,7 @@
    "target": "instruments/datasheet.md",
    "kind": "internal",
    "form": "link",
-   "line": 6,
+   "line": 5,
    "status": "ok"
   },
   {
@@ -2878,151 +2838,7 @@
    "target": "instruments/file-graph.md",
    "kind": "internal",
    "form": "link",
-   "line": 7,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/index.md",
-   "target": "instruments/judgments/index.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 8,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/cache-gate.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 21,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/cache-gate.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 23,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/consuming.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 15,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/consuming.md",
-   "target": "instruments/judgments/cache-gate.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 16,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/consuming.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 46,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/consuming.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 49,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/consuming.md",
-   "target": "instruments/judgments/cache-gate.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 63,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/declarations.md",
-   "target": "instruments/judgments/cache-gate.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 12,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/declarations.md",
-   "target": "src/dev_playbook/judgments/core.py",
-   "kind": "internal",
-   "form": "link",
-   "line": 30,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/declarations.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 67,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/declarations.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 68,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/declarations.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 71,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/declarations.md",
-   "target": "src/dev_playbook/judgments/instruments.py",
-   "kind": "internal",
-   "form": "link",
-   "line": 104,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/index.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 5,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/index.md",
-   "target": "instruments/judgments/declarations.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 7,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/index.md",
-   "target": "instruments/judgments/cache-gate.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 8,
-   "status": "ok"
-  },
-  {
-   "source": "instruments/judgments/index.md",
-   "target": "instruments/judgments/consuming.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 9,
+   "line": 6,
    "status": "ok"
   },
   {
@@ -3051,7 +2867,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "instruments/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 18,
@@ -3059,7 +2875,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "instruments/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 21,
@@ -3075,7 +2891,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "src/dev_playbook/judgments/instruments.py",
+   "target": "src/dev_playbook/judgments/bench.py",
    "kind": "internal",
    "form": "code-ref",
    "line": 22,
@@ -3403,7 +3219,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 134,
@@ -3411,7 +3227,7 @@
   },
   {
    "source": "judgments/doc-consistency.yaml",
-   "target": "standards/skill-management.md",
+   "target": "standards/claude-code/skill-management.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 135,
@@ -3423,6 +3239,478 @@
    "kind": "internal",
    "form": "code-ref",
    "line": 138,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/docs.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 145,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/docs.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 149,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 151,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/docs/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 152,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 155,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/judgments.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 161,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/judgments.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 165,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 167,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/judgments/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 168,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 169,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/judgments/consuming.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 170,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 173,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/prose.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 179,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/prose.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 183,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 185,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/prose/conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 186,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/python.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 192,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/python.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 196,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 198,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/python/style.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 199,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 201,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/shell.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 208,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/shell.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 212,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 214,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 215,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/testing.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 221,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/testing.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 225,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 227,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/testing/conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 228,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/tracking.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 236,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/tracking.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 241,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 243,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 244,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/tracking/repo-settings.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 245,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 253,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/workflow.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 258,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 260,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 261,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "workflow/skill-authoring.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 262,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/agentic-box/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 263,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/instrument.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 269,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/instrument.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 273,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 275,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/instrument/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 276,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "instruments/index.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 278,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 279,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/legibility.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 285,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/legibility.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 289,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 291,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 292,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 293,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/modules.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 299,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/modules.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 304,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 306,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/modules/design.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 307,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/decisions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 314,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/decisions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 319,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 321,
+   "status": "ok"
+  },
+  {
+   "source": "judgments/doc-consistency.yaml",
+   "target": "standards/decisions/adrs.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 322,
    "status": "ok"
   },
   {
@@ -3450,6 +3738,102 @@
    "status": "ok"
   },
   {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 10,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "src/dev_playbook/pyast.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 11,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "src/dev_playbook/gitrepo.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "tests/test_okf_lint.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "tests/test_python_lint.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "tests/test_ref_check.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "tests/test_md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "tests/test_repo_audit.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "tests/test_sweep.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "src/dev_playbook/gitrepo.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 130,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/lint-suite.html",
+   "target": "src/dev_playbook/md.py",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 133,
+   "status": "ok"
+  },
+  {
+   "source": "readings/datasheet/workspace-scripts.html",
+   "target": "docs/adr/0001-adopt-matt-pocock-conventions.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 179,
+   "status": "ok"
+  },
+  {
    "source": "scripts/README.md",
    "target": "standards/build/distribution.md",
    "kind": "internal",
@@ -3467,7 +3851,7 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "standards/python-style.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "link",
    "line": 60,
@@ -3475,7 +3859,7 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 60,
@@ -3507,7 +3891,7 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 63,
@@ -3515,7 +3899,7 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "instruments/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 64,
@@ -3555,10 +3939,18 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "standards/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
    "line": 118,
+   "status": "ok"
+  },
+  {
+   "source": "scripts/README.md",
+   "target": "dotfiles/dot-claude/settings.json",
+   "kind": "internal",
+   "form": "link",
+   "line": 161,
    "status": "ok"
   },
   {
@@ -3587,7 +3979,7 @@
   },
   {
    "source": "scripts/internal-skill-audit",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 5,
@@ -3603,14 +3995,14 @@
   },
   {
    "source": "scripts/python-lint",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 15,
    "status": "ok"
   },
   {
-   "source": "src/dev_playbook/filegraph.py",
+   "source": "src/dev_playbook/filegraph/graph.py",
    "target": "instruments/file-graph.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3618,7 +4010,7 @@
    "status": "ok"
   },
   {
-   "source": "src/dev_playbook/filegraph.py",
+   "source": "src/dev_playbook/filegraph/graph.py",
    "target": "instruments/file-graph.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3635,54 +4027,30 @@
   },
   {
    "source": "standards/README.md",
+   "target": "standards/standard/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/README.md",
    "target": "standards/index.md",
    "kind": "internal",
    "form": "link",
-   "line": 11,
+   "line": 43,
    "status": "ok"
   },
   {
-   "source": "standards/adr-conventions.md",
-   "target": "standards/docs/indexes.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 13,
-   "status": "ok"
-  },
-  {
-   "source": "standards/adr-conventions.md",
-   "target": "standards/docs/document-types.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 53,
-   "status": "ok"
-  },
-  {
-   "source": "standards/adr-conventions.md",
-   "target": "docs/adr/index.md",
+   "source": "standards/README.md",
+   "target": "standards/instrument/format.md",
    "kind": "internal",
    "form": "prose-path",
-   "line": 13,
+   "line": 40,
    "status": "ok"
   },
   {
-   "source": "standards/adr-conventions.md",
-   "target": "docs/adr/README.md",
-   "kind": "internal",
-   "form": "prose-path",
-   "line": 15,
-   "status": "ok"
-  },
-  {
-   "source": "standards/adr-conventions.md",
-   "target": "docs/adr/index.md",
-   "kind": "internal",
-   "form": "prose-path",
-   "line": 53,
-   "status": "ok"
-  },
-  {
-   "source": "standards/agentic-box.md",
+   "source": "standards/agentic-box/format.md",
    "target": "standards/agentic-box/templates/greenfield-cli/box/README.md",
    "kind": "internal",
    "form": "link",
@@ -3691,7 +4059,7 @@
   },
   {
    "source": "standards/agentic-box/templates/greenfield-cli/box/charter.md",
-   "target": "standards/python-style.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "citation",
    "line": 25,
@@ -3699,7 +4067,7 @@
   },
   {
    "source": "standards/agentic-box/templates/greenfield-cli/box/charter.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "citation",
    "line": 26,
@@ -3987,7 +4355,7 @@
   },
   {
    "source": "standards/build/enforcement.md",
-   "target": "standards/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
    "line": 17,
@@ -3995,7 +4363,7 @@
   },
   {
    "source": "standards/build/enforcement.md",
-   "target": "standards/repo-settings.md",
+   "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
    "line": 42,
@@ -4131,7 +4499,7 @@
   },
   {
    "source": "standards/build/make.md",
-   "target": "instruments/judgments/cache-gate.md",
+   "target": "standards/judgments/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 31,
@@ -4147,7 +4515,7 @@
   },
   {
    "source": "standards/build/python.md",
-   "target": "standards/python-style.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "link",
    "line": 15,
@@ -4155,7 +4523,7 @@
   },
   {
    "source": "standards/build/python.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 16,
@@ -4211,7 +4579,7 @@
   },
   {
    "source": "standards/build/skeleton.md",
-   "target": "standards/adr-conventions.md",
+   "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "link",
    "line": 26,
@@ -4219,26 +4587,26 @@
   },
   {
    "source": "standards/build/skeleton.md",
-   "target": "~/workspace/spec-tools/sdd-standards/README.md",
-   "kind": "external",
-   "form": "citation",
+   "target": "standards/instrument/format.md",
+   "kind": "internal",
+   "form": "link",
    "line": 27,
    "status": "ok"
   },
   {
    "source": "standards/build/skeleton.md",
-   "target": "standards/claude-code/index.md",
-   "kind": "internal",
-   "form": "link",
+   "target": "~/workspace/spec-tools/sdd-standards/README.md",
+   "kind": "external",
+   "form": "citation",
    "line": 28,
    "status": "ok"
   },
   {
    "source": "standards/build/skeleton.md",
-   "target": "standards/build/python.md",
+   "target": "standards/claude-code/index.md",
    "kind": "internal",
    "form": "link",
-   "line": 34,
+   "line": 29,
    "status": "ok"
   },
   {
@@ -4246,7 +4614,7 @@
    "target": "standards/build/python.md",
    "kind": "internal",
    "form": "link",
-   "line": 44,
+   "line": 35,
    "status": "ok"
   },
   {
@@ -4254,7 +4622,15 @@
    "target": "standards/build/python.md",
    "kind": "internal",
    "form": "link",
-   "line": 50,
+   "line": 45,
+   "status": "ok"
+  },
+  {
+   "source": "standards/build/skeleton.md",
+   "target": "standards/build/python.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 51,
    "status": "ok"
   },
   {
@@ -4262,23 +4638,23 @@
    "target": "standards/claude-code/index.md",
    "kind": "internal",
    "form": "link",
-   "line": 14,
+   "line": 15,
    "status": "ok"
   },
   {
    "source": "standards/claude-code.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "link",
-   "line": 16,
+   "line": 17,
    "status": "ok"
   },
   {
    "source": "standards/claude-code.md",
-   "target": "standards/skill-management.md",
+   "target": "standards/claude-code/skill-management.md",
    "kind": "internal",
    "form": "link",
-   "line": 18,
+   "line": 19,
    "status": "ok"
   },
   {
@@ -4286,7 +4662,7 @@
    "target": "scripts/repo-audit",
    "kind": "internal",
    "form": "link",
-   "line": 23,
+   "line": 24,
    "status": "ok"
   },
   {
@@ -4294,7 +4670,7 @@
    "target": "scripts/internal-skill-audit",
    "kind": "internal",
    "form": "link",
-   "line": 25,
+   "line": 26,
    "status": "ok"
   },
   {
@@ -4302,7 +4678,7 @@
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "link",
-   "line": 31,
+   "line": 32,
    "status": "ok"
   },
   {
@@ -4310,7 +4686,7 @@
    "target": "standards/build/canonical/CLAUDE.md.standards",
    "kind": "internal",
    "form": "link",
-   "line": 37,
+   "line": 38,
    "status": "ok"
   },
   {
@@ -4371,7 +4747,7 @@
   },
   {
    "source": "standards/claude-code/files.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 22,
@@ -4379,7 +4755,7 @@
   },
   {
    "source": "standards/claude-code/files.md",
-   "target": "standards/skill-management.md",
+   "target": "standards/claude-code/skill-management.md",
    "kind": "internal",
    "form": "link",
    "line": 22,
@@ -4410,11 +4786,163 @@
    "status": "ok"
   },
   {
-   "source": "standards/doc-conventions.md",
-   "target": "standards/references/okf-spec.md",
+   "source": "standards/claude-code/index.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "link",
-   "line": 50,
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/index.md",
+   "target": "standards/claude-code/skill-management.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-conventions.md",
+   "target": "standards/docs/bundle.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-conventions.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 51,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-conventions.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 101,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-conventions.md",
+   "target": "standards/docs/cross-references.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 113,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 157,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-management.md",
+   "target": "standards/claude-code/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-management.md",
+   "target": "standards/claude-code/skill-conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "standards/claude-code/skill-management.md",
+   "target": "dotfiles/.agents/.skill-lock.json",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "standards/decisions.md",
+   "target": "standards/decisions/adrs.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/decisions/adrs.md",
+   "target": "standards/docs/indexes.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/decisions/adrs.md",
+   "target": "standards/docs/document-types.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 53,
+   "status": "ok"
+  },
+  {
+   "source": "standards/decisions/adrs.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/decisions/adrs.md",
+   "target": "docs/adr/README.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/decisions/adrs.md",
+   "target": "docs/adr/index.md",
+   "kind": "internal",
+   "form": "prose-path",
+   "line": 53,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs.md",
+   "target": "standards/docs/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs.md",
+   "target": "scripts/okf-lint",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs.md",
+   "target": "scripts/ref-check",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/docs.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 26,
    "status": "ok"
   },
   {
@@ -4459,7 +4987,7 @@
   },
   {
    "source": "standards/docs/bundle.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 64,
@@ -4467,7 +4995,7 @@
   },
   {
    "source": "standards/docs/cross-references.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 41,
@@ -4475,7 +5003,7 @@
   },
   {
    "source": "standards/docs/cross-references.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 21,
@@ -4515,7 +5043,7 @@
   },
   {
    "source": "standards/docs/document-types.md",
-   "target": "standards/agentic-box.md",
+   "target": "standards/agentic-box/format.md",
    "kind": "internal",
    "form": "link",
    "line": 29,
@@ -4622,7 +5150,7 @@
    "target": "standards/README.md",
    "kind": "internal",
    "form": "link",
-   "line": 13,
+   "line": 10,
    "status": "ok"
   },
   {
@@ -4630,15 +5158,7 @@
    "target": "standards/standard.md",
    "kind": "internal",
    "form": "link",
-   "line": 14,
-   "status": "ok"
-  },
-  {
-   "source": "standards/index.md",
-   "target": "standards/standard/format.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 15,
+   "line": 11,
    "status": "ok"
   },
   {
@@ -4646,7 +5166,7 @@
    "target": "standards/build.md",
    "kind": "internal",
    "form": "link",
-   "line": 16,
+   "line": 12,
    "status": "ok"
   },
   {
@@ -4654,12 +5174,44 @@
    "target": "standards/claude-code.md",
    "kind": "internal",
    "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/decisions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/instrument.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/docs.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/modules.md",
+   "kind": "internal",
+   "form": "link",
    "line": 17,
    "status": "ok"
   },
   {
    "source": "standards/index.md",
-   "target": "standards/adr-conventions.md",
+   "target": "standards/prose.md",
    "kind": "internal",
    "form": "link",
    "line": 18,
@@ -4667,7 +5219,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/agentic-box.md",
+   "target": "standards/python.md",
    "kind": "internal",
    "form": "link",
    "line": 19,
@@ -4675,7 +5227,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/testing.md",
    "kind": "internal",
    "form": "link",
    "line": 20,
@@ -4683,7 +5235,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/issue-conventions.md",
+   "target": "standards/judgments.md",
    "kind": "internal",
    "form": "link",
    "line": 21,
@@ -4691,7 +5243,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/module-design.md",
+   "target": "standards/shell.md",
    "kind": "internal",
    "form": "link",
    "line": 22,
@@ -4699,7 +5251,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/python-style.md",
+   "target": "standards/legibility.md",
    "kind": "internal",
    "form": "link",
    "line": 23,
@@ -4707,7 +5259,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/repo-settings.md",
+   "target": "standards/tracking.md",
    "kind": "internal",
    "form": "link",
    "line": 24,
@@ -4715,7 +5267,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/skill-conventions.md",
+   "target": "standards/workflow.md",
    "kind": "internal",
    "form": "link",
    "line": 25,
@@ -4723,7 +5275,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/skill-management.md",
+   "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "link",
    "line": 26,
@@ -4731,7 +5283,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/testing-conventions.md",
+   "target": "standards/agentic-box/format.md",
    "kind": "internal",
    "form": "link",
    "line": 27,
@@ -4739,7 +5291,31 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "target": "standards/prose/conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 28,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/instrument/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/modules/design.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 30,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/python/style.md",
    "kind": "internal",
    "form": "link",
    "line": 31,
@@ -4747,7 +5323,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/build/index.md",
+   "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "link",
    "line": 32,
@@ -4755,7 +5331,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/claude-code/index.md",
+   "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 33,
@@ -4763,10 +5339,42 @@
   },
   {
    "source": "standards/index.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 37,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/build/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 38,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/claude-code/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
    "target": "standards/docs/index.md",
    "kind": "internal",
    "form": "link",
-   "line": 34,
+   "line": 40,
+   "status": "ok"
+  },
+  {
+   "source": "standards/index.md",
+   "target": "standards/judgments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 41,
    "status": "ok"
   },
   {
@@ -4774,27 +5382,275 @@
    "target": "standards/references/index.md",
    "kind": "internal",
    "form": "link",
-   "line": 35,
+   "line": 42,
    "status": "ok"
   },
   {
-   "source": "standards/issue-conventions.md",
-   "target": "standards/issue-conventions.md",
+   "source": "standards/index.md",
+   "target": "standards/tracking/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 43,
+   "status": "ok"
+  },
+  {
+   "source": "standards/instrument.md",
+   "target": "standards/instrument/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/instrument.md",
+   "target": "scripts/okf-lint",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/instrument.md",
+   "target": "instruments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/instrument.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/instrument/format.md",
+   "target": "instruments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 31,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments.md",
+   "target": "standards/judgments/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments.md",
+   "target": "scripts/judgments-lint",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments.md",
+   "target": "scripts/judgments-run",
+   "kind": "internal",
+   "form": "link",
+   "line": 20,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments.md",
+   "target": "standards/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments.md",
+   "target": "standards/judgments/consuming.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/cache-gate.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/cache-gate.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/consuming.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/consuming.md",
+   "target": "standards/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/consuming.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 46,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/consuming.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 49,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/consuming.md",
+   "target": "standards/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 63,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/declarations.md",
+   "target": "standards/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 12,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/declarations.md",
+   "target": "src/dev_playbook/judgments/core.py",
+   "kind": "internal",
+   "form": "link",
+   "line": 30,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
    "kind": "internal",
    "form": "relative",
-   "line": 39,
+   "line": 67,
    "status": "ok"
   },
   {
-   "source": "standards/issue-conventions.md",
-   "target": "standards/issue-conventions.md",
+   "source": "standards/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
    "kind": "internal",
    "form": "relative",
-   "line": 57,
+   "line": 68,
    "status": "ok"
   },
   {
-   "source": "standards/module-design.md",
+   "source": "standards/judgments/declarations.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 71,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/declarations.md",
+   "target": "src/dev_playbook/judgments/bench.py",
+   "kind": "internal",
+   "form": "link",
+   "line": 104,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/index.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/index.md",
+   "target": "standards/judgments/declarations.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 7,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/index.md",
+   "target": "standards/judgments/cache-gate.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 8,
+   "status": "ok"
+  },
+  {
+   "source": "standards/judgments/index.md",
+   "target": "standards/judgments/consuming.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 9,
+   "status": "ok"
+  },
+  {
+   "source": "standards/legibility.md",
+   "target": "instruments/datasheet.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/legibility.md",
+   "target": "instruments/file-graph.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "standards/modules.md",
+   "target": "standards/modules/design.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/modules.md",
+   "target": "CONTEXT.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/modules/design.md",
    "target": "CONTEXT.md",
    "kind": "internal",
    "form": "link",
@@ -4802,7 +5658,63 @@
    "status": "ok"
   },
   {
-   "source": "standards/python-style.md",
+   "source": "standards/prose.md",
+   "target": "standards/prose/conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/prose/conventions.md",
+   "target": "standards/references/okf-spec.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 50,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python.md",
+   "target": "standards/python/style.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python.md",
+   "target": "scripts/python-lint",
+   "kind": "internal",
+   "form": "link",
+   "line": 18,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 21,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python.md",
+   "target": "standards/build/canonical/Makefile.python",
+   "kind": "internal",
+   "form": "link",
+   "line": 23,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
+   "kind": "internal",
+   "form": "link",
+   "line": 28,
+   "status": "ok"
+  },
+  {
+   "source": "standards/python/style.md",
    "target": "standards/build/make.md",
    "kind": "internal",
    "form": "link",
@@ -4818,67 +5730,19 @@
    "status": "ok"
   },
   {
-   "source": "standards/skill-conventions.md",
-   "target": "standards/docs/bundle.md",
+   "source": "standards/shell.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "link",
-   "line": 29,
+   "line": 19,
    "status": "ok"
   },
   {
-   "source": "standards/skill-conventions.md",
-   "target": "workflow/workflow.md",
+   "source": "standards/shell.md",
+   "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "link",
-   "line": 51,
-   "status": "ok"
-  },
-  {
-   "source": "standards/skill-conventions.md",
-   "target": "standards/docs/cross-references.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 101,
-   "status": "ok"
-  },
-  {
-   "source": "standards/skill-conventions.md",
-   "target": "standards/docs/cross-references.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 113,
-   "status": "ok"
-  },
-  {
-   "source": "standards/skill-conventions.md",
-   "target": "standards/skill-conventions.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 157,
-   "status": "ok"
-  },
-  {
-   "source": "standards/skill-management.md",
-   "target": "standards/skill-conventions.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 9,
-   "status": "ok"
-  },
-  {
-   "source": "standards/skill-management.md",
-   "target": "standards/skill-conventions.md",
-   "kind": "internal",
-   "form": "link",
-   "line": 34,
-   "status": "ok"
-  },
-  {
-   "source": "standards/skill-management.md",
-   "target": "dotfiles/.agents/.skill-lock.json",
-   "kind": "internal",
-   "form": "prose-path",
-   "line": 38,
+   "line": 24,
    "status": "ok"
   },
   {
@@ -4931,7 +5795,7 @@
   },
   {
    "source": "standards/standard/format.md",
-   "target": "instruments/format.md",
+   "target": "standards/instrument/format.md",
    "kind": "internal",
    "form": "link",
    "line": 38,
@@ -4963,18 +5827,138 @@
   },
   {
    "source": "standards/standard/format.md",
-   "target": "instruments/judgments/index.md",
+   "target": "standards/judgments/index.md",
    "kind": "internal",
    "form": "link",
    "line": 76,
    "status": "ok"
   },
   {
-   "source": "standards/testing-conventions.md",
+   "source": "standards/testing.md",
+   "target": "standards/testing/conventions.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/testing.md",
+   "target": "scripts/python-lint",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/testing.md",
+   "target": "standards/build/canonical/Makefile.python",
+   "kind": "internal",
+   "form": "link",
+   "line": 25,
+   "status": "ok"
+  },
+  {
+   "source": "standards/testing/conventions.md",
    "target": "~/workspace/spec-tools/sdd-standards/spec-standard.md",
    "kind": "external",
    "form": "citation",
    "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking.md",
+   "target": "standards/tracking/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 14,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking.md",
+   "target": "scripts/sweep",
+   "kind": "internal",
+   "form": "link",
+   "line": 19,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking.md",
+   "target": "scripts/bootstrap-labels",
+   "kind": "internal",
+   "form": "link",
+   "line": 29,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/index.md",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 5,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/index.md",
+   "target": "standards/tracking/repo-settings.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 6,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/issues.md",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 39,
+   "status": "ok"
+  },
+  {
+   "source": "standards/tracking/issues.md",
+   "target": "standards/tracking/issues.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 57,
+   "status": "ok"
+  },
+  {
+   "source": "standards/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 13,
+   "status": "ok"
+  },
+  {
+   "source": "standards/workflow.md",
+   "target": "workflow/skill-authoring.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 15,
+   "status": "ok"
+  },
+  {
+   "source": "standards/workflow.md",
+   "target": "standards/agentic-box/format.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "standards/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 33,
+   "status": "ok"
+  },
+  {
+   "source": "standards/workflow.md",
+   "target": "standards/agentic-box/templates/greenfield-cli/index.md",
+   "kind": "internal",
+   "form": "link",
+   "line": 34,
    "status": "ok"
   },
   {
@@ -5003,7 +5987,7 @@
   },
   {
    "source": "tests/test_md.py",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 96,
@@ -5395,7 +6379,7 @@
   },
   {
    "source": "workflow/skill-authoring.md",
-   "target": "standards/doc-conventions.md",
+   "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "link",
    "line": 18,
@@ -5419,7 +6403,7 @@
   },
   {
    "source": "workflow/workflow.md",
-   "target": "standards/issue-conventions.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "link",
    "line": 20,
@@ -5446,7 +6430,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 41,
+   "line": 42,
    "status": "ok"
   },
   {
@@ -5454,7 +6438,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 79,
+   "line": 80,
    "status": "ok"
   },
   {
@@ -5462,7 +6446,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 81,
+   "line": 82,
    "status": "ok"
   },
   {
@@ -5470,7 +6454,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 102,
+   "line": 103,
    "status": "ok"
   },
   {
@@ -5478,15 +6462,15 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 121,
+   "line": 122,
    "status": "ok"
   },
   {
    "source": "workflow/workflow.md",
-   "target": "standards/issue-conventions.md",
+   "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "link",
-   "line": 125,
+   "line": 126,
    "status": "ok"
   },
   {
@@ -5494,7 +6478,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 137,
+   "line": 138,
    "status": "ok"
   },
   {
@@ -5502,7 +6486,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 157,
+   "line": 158,
    "status": "ok"
   },
   {
@@ -5510,7 +6494,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 165,
+   "line": 166,
    "status": "ok"
   },
   {
@@ -5518,7 +6502,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 169,
+   "line": 170,
    "status": "ok"
   },
   {
@@ -5526,7 +6510,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 175,
+   "line": 176,
    "status": "ok"
   },
   {
@@ -5534,7 +6518,7 @@
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "relative",
-   "line": 175,
+   "line": 176,
    "status": "ok"
   },
   {
@@ -5542,15 +6526,7 @@
    "target": "workflow/skill-authoring.md",
    "kind": "internal",
    "form": "link",
-   "line": 175,
-   "status": "ok"
-  },
-  {
-   "source": "workflow/workflow.md",
-   "target": "workflow/workflow.md",
-   "kind": "internal",
-   "form": "relative",
-   "line": 177,
+   "line": 176,
    "status": "ok"
   },
   {
@@ -5559,6 +6535,14 @@
    "kind": "internal",
    "form": "relative",
    "line": 178,
+   "status": "ok"
+  },
+  {
+   "source": "workflow/workflow.md",
+   "target": "workflow/workflow.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 179,
    "status": "ok"
   },
   {
@@ -5819,37 +6803,38 @@
   }
  ],
  "ignored": {
-  ".gitignore:.venv/": 2268,
-  ".gitignore:__pycache__/": 47,
-  ".gitignore:.mypy_cache/": 18,
-  ".gitignore:.ruff_cache/": 11,
+  ".gitignore:.venv/": 2228,
+  ".gitignore:__pycache__/": 49,
   ".gitignore:.pytest_cache/": 5,
-  "standards/build/canonical/.gitignore:.ruff_cache/": 2,
-  "/home/geoff/workspace/dev-playbook/.git/info/exclude:**/.claude/scheduled_tasks.json": 1,
   "/home/geoff/.config/git/ignore:**/.claude/settings.local.json": 1
+ },
+ "excluded": {
+  "readings/file-graph/": 2,
+  "src/dev_playbook/filegraph/assets/": 2
  },
  "queries": {
   "census": {
    "nodes_by_bucket": {
-    "concept": 68,
-    "code": 67,
-    "harness-skill-authored": 39,
+    "concept": 80,
+    "code": 69,
+    "harness-skill-authored": 40,
     "harness-skill-thirdparty": 32,
-    "config": 27,
-    "index": 16,
+    "config": 22,
+    "index": 17,
+    "reading": 5,
     "harness-session": 4
    },
    "edges_by_form": {
-    "link": 250,
+    "link": 305,
     "relative": 193,
-    "code-ref": 125,
-    "citation": 61,
-    "prose-path": 32,
+    "code-ref": 186,
+    "citation": 64,
+    "prose-path": 34,
     "bundle": 32,
     "resource": 2
    },
    "edges_by_status": {
-    "ok": 681,
+    "ok": 802,
     "wrong-form": 11,
     "broken": 3
    }
@@ -5865,8 +6850,7 @@
     "standards/index.md": 1,
     ".pre-commit-hooks.yaml": 2,
     "standards/README.md": 2,
-    "standards/adr-conventions.md": 2,
-    "standards/agentic-box.md": 2,
+    "standards/agentic-box/format.md": 2,
     "standards/agentic-box/templates/greenfield-cli/index.md": 2,
     "standards/build.md": 2,
     "standards/build/canonical.md": 2,
@@ -5874,34 +6858,50 @@
     "standards/build/index.md": 2,
     "standards/claude-code.md": 2,
     "standards/claude-code/index.md": 2,
-    "standards/doc-conventions.md": 2,
+    "standards/decisions.md": 2,
+    "standards/decisions/adrs.md": 2,
+    "standards/docs.md": 2,
     "standards/docs/bundle.md": 2,
     "standards/docs/context-content.md": 2,
     "standards/docs/cross-references.md": 2,
     "standards/docs/document-types.md": 2,
     "standards/docs/indexes.md": 2,
     "standards/docs/readme-content.md": 2,
-    "standards/issue-conventions.md": 2,
-    "standards/module-design.md": 2,
-    "standards/python-style.md": 2,
+    "standards/instrument.md": 2,
+    "standards/instrument/format.md": 2,
+    "standards/judgments.md": 2,
+    "standards/judgments/index.md": 2,
+    "standards/legibility.md": 2,
+    "standards/modules.md": 2,
+    "standards/modules/design.md": 2,
+    "standards/prose.md": 2,
+    "standards/prose/conventions.md": 2,
+    "standards/python.md": 2,
+    "standards/python/style.md": 2,
     "standards/references/index.md": 2,
-    "standards/repo-settings.md": 2,
-    "standards/skill-conventions.md": 2,
-    "standards/skill-management.md": 2,
+    "standards/shell.md": 2,
     "standards/standard.md": 2,
     "standards/standard/format.md": 2,
-    "standards/testing-conventions.md": 2,
+    "standards/testing.md": 2,
+    "standards/testing/conventions.md": 2,
+    "standards/tracking.md": 2,
+    "standards/tracking/index.md": 2,
+    "standards/workflow.md": 2,
     ".pre-commit-config.yaml": 3,
     "CONTEXT.md": 3,
     "docs/adr/README.md": 3,
     "docs/adr/index.md": 3,
-    "dotfiles/.agents/.skill-lock.json": 3,
     "dotfiles/dot-claude/workflows/ralph-loop.js": 3,
-    "instruments/format.md": 3,
-    "instruments/judgments/index.md": 3,
+    "instruments/datasheet.md": 3,
+    "instruments/file-graph.md": 3,
+    "instruments/index.md": 3,
     "judgments/doc-consistency.yaml": 3,
+    "scripts/bootstrap-labels": 3,
     "scripts/internal-skill-audit": 3,
+    "scripts/judgments-lint": 3,
+    "scripts/judgments-run": 3,
     "scripts/okf-lint": 3,
+    "scripts/python-lint": 3,
     "scripts/ref-check": 3,
     "scripts/repo-audit": 3,
     "scripts/sweep": 3,
@@ -5928,7 +6928,15 @@
     "standards/build/skeleton.md": 3,
     "standards/claude-code/claude-content.md": 3,
     "standards/claude-code/files.md": 3,
+    "standards/claude-code/skill-conventions.md": 3,
+    "standards/claude-code/skill-management.md": 3,
+    "standards/judgments/cache-gate.md": 3,
+    "standards/judgments/consuming.md": 3,
+    "standards/judgments/declarations.md": 3,
     "standards/references/okf-spec.md": 3,
+    "standards/tracking/issues.md": 3,
+    "standards/tracking/repo-settings.md": 3,
+    "workflow/skill-authoring.md": 3,
     "workflow/workflow.md": 3,
     "docs/adr/0001-adopt-matt-pocock-conventions.md": 4,
     "docs/adr/0002-compounding-with-ai.md": 4,
@@ -5938,38 +6946,31 @@
     "docs/adr/0006-harvest-pocock-prototype-and-handoff.md": 4,
     "docs/adr/0007-merge-sdd-spec-authoring-phase.md": 4,
     "docs/adr/0008-retire-edit-time-ruff-hook.md": 4,
-    "instruments/index.md": 4,
-    "instruments/judgments/cache-gate.md": 4,
-    "instruments/judgments/consuming.md": 4,
-    "instruments/judgments/declarations.md": 4,
-    "scripts/bootstrap-labels": 4,
+    "dotfiles/.agents/.skill-lock.json": 4,
+    "instruments/datasheet-example.html": 4,
+    "scripts/file-graph": 4,
+    "src/dev_playbook/judgments/bench.py": 4,
+    "src/dev_playbook/judgments/core.py": 4,
     "src/dev_playbook/md.py": 4,
-    "workflow/skill-authoring.md": 4,
     "docs/third-party-survey.md": 5,
-    "dotfiles/bin/sync-dotfiles.sh": 5,
-    "instruments/datasheet.md": 5,
-    "instruments/file-graph.md": 5,
-    "src/dev_playbook/judgments/core.py": 5,
-    "src/dev_playbook/judgments/instruments.py": 5,
-    "instruments/datasheet-example.html": 6,
-    "scripts/file-graph": 6
+    "dotfiles/bin/sync-dotfiles.sh": 5
    },
    "reached_by_distance": {
     "0": 1,
     "1": 3,
-    "2": 28,
-    "3": 39,
-    "4": 15,
-    "5": 6,
-    "6": 2
+    "2": 39,
+    "3": 51,
+    "4": 14,
+    "5": 2
    },
    "unreached_by_bucket": {
-    "code": 55,
-    "harness-skill-authored": 39,
+    "code": 54,
+    "harness-skill-authored": 40,
     "harness-skill-thirdparty": 31,
-    "config": 14,
     "concept": 10,
+    "config": 9,
     "index": 7,
+    "reading": 5,
     "harness-session": 3
    },
    "unreached": [
@@ -5979,11 +6980,6 @@
     ".python-version",
     "Makefile",
     "README.md",
-    "docs/datasheets/judgments.html",
-    "docs/datasheets/lint-suite.html",
-    "docs/datasheets/tools.html",
-    "docs/datasheets/transcript-export.html",
-    "docs/datasheets/workspace-scripts.html",
     "docs/index.md",
     "docs/sandboxing.md",
     "dotfiles/.agents/skills/caveman/SKILL.md",
@@ -6040,6 +7036,7 @@
     "dotfiles/dot-claude/skills/handoff/SKILL.md",
     "dotfiles/dot-claude/skills/improve-python-code/SKILL.md",
     "dotfiles/dot-claude/skills/intake/SKILL.md",
+    "dotfiles/dot-claude/skills/log-friction/SKILL.md",
     "dotfiles/dot-claude/skills/open-pr/SKILL.md",
     "dotfiles/dot-claude/skills/orient-workspace-meta/SKILL.md",
     "dotfiles/dot-claude/skills/orient/SKILL.md",
@@ -6074,15 +7071,19 @@
     "protocols/align-map-execute/formulation.md",
     "protocols/index.md",
     "pyproject.toml",
+    "readings/datasheet/judgments.html",
+    "readings/datasheet/lint-suite.html",
+    "readings/datasheet/tools.html",
+    "readings/datasheet/transcript-export.html",
+    "readings/datasheet/workspace-scripts.html",
     "scripts/README.md",
     "scripts/griffe-outline",
     "scripts/index.md",
-    "scripts/judgments-lint",
-    "scripts/judgments-run",
-    "scripts/python-lint",
     "scripts/transcript-export",
     "src/dev_playbook/__init__.py",
-    "src/dev_playbook/filegraph.py",
+    "src/dev_playbook/filegraph/__init__.py",
+    "src/dev_playbook/filegraph/graph.py",
+    "src/dev_playbook/filegraph/viz.py",
     "src/dev_playbook/gitrepo.py",
     "src/dev_playbook/judgments/__init__.py",
     "src/dev_playbook/judgments/loader.py",
@@ -6160,20 +7161,14 @@
     "index.md",
     "instruments/datasheet.md",
     "instruments/file-graph.md",
-    "instruments/format.md",
     "instruments/index.md",
-    "instruments/judgments/cache-gate.md",
-    "instruments/judgments/consuming.md",
-    "instruments/judgments/declarations.md",
-    "instruments/judgments/index.md",
     "protocols/README.md",
     "protocols/align-map-execute/formulation.md",
     "protocols/index.md",
     "scripts/README.md",
     "scripts/index.md",
     "standards/README.md",
-    "standards/adr-conventions.md",
-    "standards/agentic-box.md",
+    "standards/agentic-box/format.md",
     "standards/agentic-box/templates/greenfield-cli/box/README.md",
     "standards/agentic-box/templates/greenfield-cli/box/charter.md",
     "standards/agentic-box/templates/greenfield-cli/box/contract.md",
@@ -6196,7 +7191,11 @@
     "standards/claude-code/claude-content.md",
     "standards/claude-code/files.md",
     "standards/claude-code/index.md",
-    "standards/doc-conventions.md",
+    "standards/claude-code/skill-conventions.md",
+    "standards/claude-code/skill-management.md",
+    "standards/decisions.md",
+    "standards/decisions/adrs.md",
+    "standards/docs.md",
     "standards/docs/bundle.md",
     "standards/docs/context-content.md",
     "standards/docs/cross-references.md",
@@ -6205,17 +7204,32 @@
     "standards/docs/indexes.md",
     "standards/docs/readme-content.md",
     "standards/index.md",
-    "standards/issue-conventions.md",
-    "standards/module-design.md",
-    "standards/python-style.md",
+    "standards/instrument.md",
+    "standards/instrument/format.md",
+    "standards/judgments.md",
+    "standards/judgments/cache-gate.md",
+    "standards/judgments/consuming.md",
+    "standards/judgments/declarations.md",
+    "standards/judgments/index.md",
+    "standards/legibility.md",
+    "standards/modules.md",
+    "standards/modules/design.md",
+    "standards/prose.md",
+    "standards/prose/conventions.md",
+    "standards/python.md",
+    "standards/python/style.md",
     "standards/references/index.md",
     "standards/references/okf-spec.md",
-    "standards/repo-settings.md",
-    "standards/skill-conventions.md",
-    "standards/skill-management.md",
+    "standards/shell.md",
     "standards/standard.md",
     "standards/standard/format.md",
-    "standards/testing-conventions.md",
+    "standards/testing.md",
+    "standards/testing/conventions.md",
+    "standards/tracking.md",
+    "standards/tracking/index.md",
+    "standards/tracking/issues.md",
+    "standards/tracking/repo-settings.md",
+    "standards/workflow.md",
     "workflow/README.md",
     "workflow/index.md",
     "workflow/skill-authoring.md",
@@ -6227,21 +7241,18 @@
    ".gitignore": "config",
    ".python-version": "config",
    "Makefile": "config",
-   "docs/datasheets/judgments.html": "config",
-   "docs/datasheets/tools.html": "config",
-   "docs/datasheets/transcript-export.html": "config",
    "dotfiles/.agents/skills/caveman/SKILL.md": "harness-skill-thirdparty",
    "dotfiles/.agents/skills/zoom-out/SKILL.md": "harness-skill-thirdparty",
    "dotfiles/.bashrc.d/aliases.sh": "code",
    "dotfiles/.bashrc.d/worktree.sh": "code",
    "dotfiles/.stow-local-ignore": "config",
    "dotfiles/dot-claude/rules/edit-in-dev-playbook.md": "harness-session",
-   "dotfiles/dot-claude/settings.json": "config",
    "dotfiles/dot-claude/skills/commit/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/doc-format/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/doc-present-state/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/em-dashes/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/handoff/SKILL.md": "harness-skill-authored",
+   "dotfiles/dot-claude/skills/log-friction/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/open-pr/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/prime-user-context/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md": "harness-skill-authored",
@@ -6250,10 +7261,12 @@
    "dotfiles/dot-claude/skills/small-steps/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/write-agent-review/SKILL.md": "harness-skill-authored",
    "pyproject.toml": "config",
-   "scripts/judgments-lint": "code",
-   "scripts/judgments-run": "code",
-   "scripts/transcript-export": "code",
+   "readings/datasheet/judgments.html": "reading",
+   "readings/datasheet/tools.html": "reading",
+   "readings/datasheet/transcript-export.html": "reading",
    "src/dev_playbook/__init__.py": "code",
+   "src/dev_playbook/filegraph/__init__.py": "code",
+   "src/dev_playbook/filegraph/viz.py": "code",
    "src/dev_playbook/judgments/__init__.py": "code",
    "src/dev_playbook/judgments/pytest_support.py": "code",
    "src/dev_playbook/skipcache/__init__.py": "code",
@@ -6326,7 +7339,7 @@
    },
    {
     "source": "docs/adr/0001-adopt-matt-pocock-conventions.md",
-    "target": "standards/testing-conventions.md",
+    "target": "standards/testing/conventions.md",
     "kind": "internal",
     "form": "citation",
     "line": 139,

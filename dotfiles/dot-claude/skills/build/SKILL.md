@@ -23,7 +23,7 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 - `gh issue view <issue> --comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't.
 - **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline/line-level diff comments alike, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews` — these endpoints are a non-binding hint.) Build the rework work list from that complete feedback. If `gh pr view` finds none, this is first implementation; work from the brief alone. The brief stays the contract — where a finding conflicts with it, the brief wins.
 - The existing files the brief concerns — there may be partial work from a prior cycle.
-- Read the standard that governs the artifact you're changing, where one applies — e.g. [documentation conventions](~/workspace/dev-playbook/standards/doc-conventions.md) for docs, [the build standard](~/workspace/dev-playbook/standards/build/index.md) for the build or the pre-commit hooks.
+- Read the standard that governs the artifact you're changing, where one applies — e.g. [documentation conventions](~/workspace/dev-playbook/standards/prose/conventions.md) for docs, [the build standard](~/workspace/dev-playbook/standards/build/index.md) for the build or the pre-commit hooks.
 
 ## 2. Plan
 

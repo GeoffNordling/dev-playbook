@@ -61,5 +61,5 @@ requirements.
 home. Files reference each other rather than repeating content.
 
 **Voice and structure are standardized.** Every doc in this hierarchy
-follows [doc-conventions.md](/standards/doc-conventions.md) — declarative
+follows [prose/conventions.md](/standards/prose/conventions.md) — declarative
 present tense, one rule per section, current-state only.

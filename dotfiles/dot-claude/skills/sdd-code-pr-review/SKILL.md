@@ -20,8 +20,8 @@ An automated bug-review pass (the native `/code-review`) runs before you in the 
 Before doing anything else, read end-to-end:
 
 - [spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md) — how to read the committed `feat`/`req`/`dsn` and `Interface:` lines you check the code against.
-- [testing conventions](~/workspace/dev-playbook/standards/testing-conventions.md) — pytest structure, naming, fixtures, behavioral focus.
-- [python style](~/workspace/dev-playbook/standards/python-style.md) — docstring rules, fail-loudly, annotation style. The build agent never saw this standard; enforcing it is yours alone.
+- [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) — pytest structure, naming, fixtures, behavioral focus.
+- [python style](~/workspace/dev-playbook/standards/python/style.md) — docstring rules, fail-loudly, annotation style. The build agent never saw this standard; enforcing it is yours alone.
 
 Then report: `READ: spec-standard.md, testing-conventions.md, python-style.md`. Proceed only after.
 

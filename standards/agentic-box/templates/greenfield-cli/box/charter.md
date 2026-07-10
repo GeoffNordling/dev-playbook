@@ -22,8 +22,8 @@ CONFORMANCE
     The work product conforms to these workspace standards. Read each one
     before writing code. A reviewer or judge may cite them to reject work.
 
-    - ~/workspace/dev-playbook/standards/python-style.md
-    - ~/workspace/dev-playbook/standards/testing-conventions.md
+    - ~/workspace/dev-playbook/standards/python/style.md
+    - ~/workspace/dev-playbook/standards/testing/conventions.md
 
 RESOLUTION RULES (when contract and fixtures are silent)
 

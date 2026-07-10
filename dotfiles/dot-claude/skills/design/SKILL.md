@@ -15,7 +15,7 @@ Explore the approach for a direct-path issue — talk through solutions, prototy
 
 Before doing anything else, read end-to-end:
 
-- [module design](~/workspace/dev-playbook/standards/module-design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. The lens for weighing a solution's shape.
+- [module design](~/workspace/dev-playbook/standards/modules/design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. The lens for weighing a solution's shape.
 
 Then report: `READ: module-design.md`. Proceed only after.
 
@@ -55,7 +55,7 @@ Present the approach for explicit approval, then wait:
 
 ## 5. Capture the approach
 
-On approval, append an `## Approach` section to the issue body — preserving the existing brief, never overwriting it — per [issue conventions](~/workspace/dev-playbook/standards/issue-conventions.md). `gh issue edit --body` replaces the whole body, so write back the brief unchanged plus the new section. Keep the Approach to what the implementation node needs — the chosen solution, the decisions that constrain the build, and the tradeoffs behind them; it is the contract the implementation node reads.
+On approval, append an `## Approach` section to the issue body — preserving the existing brief, never overwriting it — per [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md). `gh issue edit --body` replaces the whole body, so write back the brief unchanged plus the new section. Keep the Approach to what the implementation node needs — the chosen solution, the decisions that constrain the build, and the tradeoffs behind them; it is the contract the implementation node reads.
 
 ```bash
 gh issue edit <issue> --body "$(cat <<'EOF'
