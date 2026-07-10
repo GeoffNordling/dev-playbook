@@ -166,7 +166,7 @@ The issue overwatch's session runs in **auto mode** — a permission mode (toggl
 
 To permit something the classifier would otherwise block, add an entry to the `autoMode.allow` list in `settings.json`. Entries are natural-language descriptions, not tool patterns — the classifier reads them as rules — and are honored from user scope (`~/.claude/settings.json`) and project-local (`.claude/settings.local.json`), but not from checked-in project settings. The list's first entry is the literal string `"$defaults"`: it tells the classifier to keep its built-in rule set in force, so the entries you add **extend** the defaults rather than replace them.
 
-**The commit-authorization token.** The literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` pre-authorizes `Skill(commit)` for any session whose launch prompt carries it — an uncommon bracketed string chosen so it cannot appear by accident, recognized as the lone commit exception. The human's launch prompt for the issue overwatch carries it, and the overwatch carries it into every AFK delegation prompt — a subagent is a separate session, and the delegation prompt is its launch prompt. The AFK implementation nodes commit with no human present to say "commit now"; the token in their delegation prompts is what lets them, and the work is reviewed at the PR rather than diff-by-diff.
+**The commit-authorization token.** The literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` pre-authorizes `Skill(commit)` for any session whose launch prompt carries it — an uncommon bracketed string recognized as the lone commit exception. It rides AFK delegation prompts only, affixed by the issue overwatch: a subagent is a separate session, its delegation prompt is its launch prompt, and the AFK implementation nodes commit with no human present to say "commit now" — the token is what lets them, with the work reviewed at the PR rather than diff-by-diff. The overwatch's own launch prompt carries no token, and needs none: the overwatch session commits only inside inline HITL nodes, where the user's phase-close approval authorizes in the moment. A standing commit grant on the long-lived, content-ingesting overwatch session would be privilege it never uses.
 
 **Subagent permissions are consciously wide.** Subagent-level tool permissions are out of scope for this model: subagents run under auto mode with wide permissions, and the reviewer read-only guarantee — a reviewer reports findings, never rewrites the work under review — is prompt-level for now. This is accepted deliberately; a later pass may tighten it.
 
@@ -189,21 +189,20 @@ A node skill does the node's work and reports; the issue overwatch launches it, 
 - **HITL** — the issue overwatch runs the node itself, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts — and the node closes with a plain report.
 - **AFK** — a subagent runs the skill hands-off and terminates per the terminal report contract ([Dispatch](#dispatch)): `DONE:` on success, `ESCALATE:` when stuck, with the skill's escalation triggers listed in the table.
 
-The table lists every skill the issue overwatch dispatches — one per work node, plus the code-review node's within-node delegations (`/open-pr`, and the native `/code-review`, whose wrapping subagent is prompted to close per the terminal report contract). Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
+The table lists every skill the issue overwatch dispatches. Nodes and skills intersect imperfectly: most work nodes are served by a skill of the same name; the code-review nodes add two within-node delegations (`/open-pr`, and the native `/code-review`, whose wrapping subagent is prompted to close per the terminal report contract); and `spike` is a node with no skill yet — the overwatch escalates rather than dispatching a skill that doesn't exist. Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
 
 | Skill | Engagement | Escalation triggers |
 |-------|------|---------------------|
 | `/intake` | HITL | — |
 | `/sdd-specs` | HITL | — |
 | `/design` | HITL | — |
-| `/spike` | AFK | needs a human interview mid-flight (was design, not a spike) |
 | `/sdd-tdd` | AFK | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts |
 | `/tdd` | AFK | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts |
 | `/build` | AFK | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged) |
 | `/open-pr` | AFK | branch not pushed to origin |
 | `/code-review` (native) | AFK | — (built-in; posts findings as a PR comment) |
-| `/sdd-spec-review` | AFK audit + HITL verdict | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-code-pr-review` | AFK audit + HITL verdict | Green gate red (PR over red tree); PR/diff missing |
-| `/code-pr-review` | AFK audit + HITL verdict | Green gate red (PR over red tree); PR/diff missing |
+| `/sdd-spec-review` | AFK | Consistency gate red (malformed spec); specs absent/unreadable |
+| `/sdd-code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
+| `/code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
 
 **The code-review sequence.** At `code_pr_review` and `sdd_code_pr_review` the issue overwatch sequences three AFK delegations, then goes HITL: `/open-pr` creates the PR from the just-pushed branch; the native `/code-review` posts its automated bug/regression findings as a PR comment; our review skill adds the fidelity and convention findings the native pass does not cover — running last so it can read the native comment and skip re-flagging. With the audit complete, the overwatch interviews the human for the verdict: merge, or rework back to the implementation node.
