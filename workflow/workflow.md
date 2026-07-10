@@ -123,7 +123,7 @@ Consequences that shape the flow:
 
 - **The implementation node never opens the PR.** It cannot push, and an AFK subagent cannot pause mid-run to wait for a tap. So it commits and reports; the PR is created downstream, after the push.
 - **The push is the human's transition ritual.** Any committing node leaves its branch `unpushed`; the human pushes (one tap) before the next node — a turn boundary of the issue overwatch, which surfaces the push command targeted at the issue's worktree.
-- **The PR is born at code review.** `/open-pr` — the code-review node's first AFK delegation — creates it with `gh pr create` once the branch is on origin, tap-free. If the branch isn't pushed yet, `/open-pr` escalates rather than guessing.
+- **The PR is born at the review stop.** `/open-pr` — the review stop's first AFK delegation — creates it with `gh pr create` once the branch is on origin, tap-free. If the branch isn't pushed yet, `/open-pr` escalates rather than guessing.
 - **The merge is the human's; cleanup is the Agent-view overwatch's.** The PAT cannot merge (`mergePullRequest` is forbidden), so on `approve: merge` the human squash-merges in the GitHub UI — dropping the origin branch and closing the issue via `Closes #<N>`. The Agent-view overwatch then tears down the local side once the human confirms the merge, per the worktree contract above.
 
 ## Pull requests
