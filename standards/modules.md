@@ -12,8 +12,8 @@ Governs how modules are designed — interfaces, depth, and seams.
 
 - [modules/design.md](/standards/modules/design.md) — the contract: deep
   modules, the deletion test, designing for testability
-- [CONTEXT.md](/CONTEXT.md) — the architecture vocabulary, used exactly in
-  every architecture suggestion
+- [CONTEXT.md](/CONTEXT.md) — the architecture cluster of the repo's
+  vocabulary center, used exactly in every architecture suggestion
 
 ## Audit
 
