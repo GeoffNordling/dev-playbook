@@ -1,6 +1,6 @@
 ---
 name: sdd-tdd
-description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removes the work-in-progress markers as verifiers land, then advances the issue to code review. Use when the agents dashboard launches the build phase.
+description: Implements an SDD issue via vertical-slice TDD against the committed `Interface:` declarations, removing the work-in-progress markers as verifiers land. Use when the issue overwatch launches the `sdd-tdd` node.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -10,7 +10,7 @@ argument-hint: "<issue-number>"
 
 # SDD TDD
 
-Implement an SDD issue with vertical-slice TDD against its committed specs — every `feat`, `req`, and `dsn`, down to the `Interface:` lines the design pins — remove the `WIP:` markers as each region's verifiers land, then hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
+Implement an SDD issue with vertical-slice TDD against its committed specs — every `feat`, `req`, and `dsn`, down to the `Interface:` lines the design pins — remove the `WIP:` markers as each region's verifiers land. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
 
 Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The user reviews the finished work separately, not mid-build.
 
@@ -32,7 +32,7 @@ When modifying the spec comes into play (§6), also read [lessons](~/workspace/s
 **Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
 - `gh issue view <issue> --comments` — the body is the contract; comments may carry context the body doesn't.
-- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline/line-level diff comments alike, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews` — these endpoints are a non-binding hint.) Build the rework work list from that complete feedback. If `gh pr view` finds none, this is first implementation; work from the spec alone. The committed spec is authoritative — a finding that conflicts with it yields to it; one that requires changing it routes through §6.
+- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) Build the rework work list from that complete feedback. If `gh pr view` finds none, this is first implementation; work from the spec alone. The committed spec is authoritative — a finding that conflicts with it yields to it; one that requires changing it routes through §6.
 - The specs under `specs/functional_requirements/` and `specs/design/`.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
@@ -71,7 +71,7 @@ Each slice is one test, one implementation, then a brief refactor.
 
 **Exception — inherited stale markers.** Re-pointing or reworking a *stale* marker inherited from a prior cycle's revision bump (§1, §2) is reconciliation, not editing a fresh slice's test: re-point its covers-string to the current revision, and rework the test only where the bumped meaning demands it (route to §6 if that rework would change a committed `Interface:` or the new meaning is underdetermined). This exception covers inherited stale markers alone — a test you wrote in this build's slices is still never modified; escalate (§5) instead.
 
-**Stub on first contact.** When a test imports a symbol with no stub yet, create the stub matching its `Interface:` declaration verbatim — same parameter names, kinds, annotations, return annotation. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
+**Stub on first contact.** When a test names a symbol with no stub yet, create the stub matching its `Interface:` declaration verbatim — same parameter names, kinds, annotations, return annotation. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
 **Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 
@@ -93,14 +93,14 @@ For test-quality patterns and mocking guidance, see [testing conventions](~/work
 You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: <repo>#<issue> · current phase: sdd-tdd · <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · phase: sdd-tdd · <where you're stuck and the call you need>
 ```
 
 The user reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
 
 - **Stuck test.** A slice's test won't pass after two implementation attempts.
 - **A written test looks wrong.** You want to change a test you already wrote — surface why; the user decides whether you mis-encoded it or the spec needs to change.
-- **The issue is too big for one session.** You can see the whole spec won't be implemented in this build before context runs low — a sizing miss. Surface it so the user re-splits it into smaller issues at intake; don't truncate the work silently.
+- **The issue is too big for one session.** You can see the whole spec won't be implemented in this session before context runs low — a sizing miss. Surface it so the user re-splits it into smaller issues at intake; don't truncate the work silently.
 - **The spec needs to change.** A committed `Interface:` no longer fits — refactor pressure or a bug fix would change it, or a structural problem won't sit behind one module's seam — or the spec underdetermines the next slice's behavior, so you can't write the assertion.
 - **The spec could be better.** You see a spec change that would improve the design, even though nothing is stopping you.
 
@@ -123,11 +123,7 @@ With the whole issue implemented:
 1. **Remove the work-in-progress markers.** Delete the `WIP: true` line from every node that carries one. Each marked cone is now covered by verifiers. If a cone you couldn't complete would force you to leave one marked, that's an escalation (§5), not a close.
 2. **Leave the tree green.** Run the gate — `make check`; with every `WIP:` removed, its `spec-tools validate .` step now enforces completeness over the whole spec graph: a red build means a missing verifier — add it and re-run. Don't commit a red tree.
 3. **Commit** the remaining changes (marker removals included) with /commit.
-4. **Advance to code review:**
-   ```bash
-   gh issue edit <issue> --remove-label "phase:sdd-tdd" --add-label "phase:sdd-code-pr-review"
+4. Emit the terminal line, then stop:
    ```
-5. Emit the terminal line, then stop:
-   ```
-   DONE: <repo>#<issue> · current phase: sdd-tdd · next phase: sdd-code-pr-review · commit <sha> · check green · unpushed
+   DONE: <repo>#<issue> · phase: sdd-tdd · commit <sha> · check green · unpushed
    ```

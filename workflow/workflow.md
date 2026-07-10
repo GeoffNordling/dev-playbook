@@ -21,7 +21,7 @@ Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) �
 
 ### Valid labels
 
-[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Eight fixed-value labels enumerated below, plus all `phase:*` labels derived from graph nodes per [Naming](#naming).
+[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Eight fixed-value labels enumerated below, plus all `phase:*` labels derived from work nodes per [Naming](#naming).
 
 | Dimension | Label | Meaning |
 |---|---|---|
@@ -41,7 +41,7 @@ Each node engages the human one of two ways — the taxonomy [Dispatch](#dispatc
 - **AFK** (away from keyboard) — the issue overwatch delegates the node to a subagent, which does the work and reports (e.g. `tdd`, `build`, `sdd_tdd`, `spike`).
 - **HITL** (human in the loop) — the issue overwatch itself interviews the user and does the work with them (e.g. `intake`, `sdd_specs`, `design`).
 
-A review node (diamond) is an AFK delegation followed by a HITL follow-up — a subagent audits and posts findings, then the overwatch takes the user's verdict — sequenced by the issue overwatch within the one node.
+A review node (diamond) is one or more AFK delegations followed by a HITL follow-up — subagents audit and post findings, then the overwatch takes the user's verdict — sequenced by the issue overwatch within the one node.
 
 ```mermaid
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
@@ -54,10 +54,10 @@ flowchart LR
     intake -->|mode:spike| spike[spike]
 
     subgraph sdd[SDD path]
-        sdd_specs -->|draft| sdd_spec_review{sdd_spec_review}
+        sdd_specs -->|pushed| sdd_spec_review{sdd_spec_review}
         sdd_spec_review -->|reject: rework| sdd_specs
         sdd_spec_review -->|approve| sdd_tdd[sdd_tdd]
-        sdd_tdd -->|open PR| sdd_code_pr_review{sdd_code_pr_review}
+        sdd_tdd -->|pushed| sdd_code_pr_review{sdd_code_pr_review}
         sdd_code_pr_review -->|reject: rework| sdd_tdd
     end
 
@@ -65,8 +65,8 @@ flowchart LR
         design -->|tests:yes| tdd
         design -->|tests:no| build
         design -->|decompose| decomposed([epic + ready children])
-        tdd -->|open PR| code_pr_review{code_pr_review}
-        build -->|open PR| code_pr_review
+        tdd -->|pushed| code_pr_review{code_pr_review}
+        build -->|pushed| code_pr_review
         code_pr_review -->|reject: rework| tdd
         code_pr_review -->|reject: rework| build
     end
@@ -84,11 +84,11 @@ On the direct path, intake also decides whether the work needs a **design** pass
 
 ### Naming
 
-Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_spec_review` → label `phase:sdd-spec-review`, command `/sdd-spec-review`. The set of graph nodes IS the phase-label inventory.
+Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_spec_review` → label `phase:sdd-spec-review`, command `/sdd-spec-review`. The set of work nodes — the graph's rectangles and diamonds; terminal markers mint nothing — IS the phase-label inventory.
 
-The issue overwatch moves the `phase:*` label to the next node when a node finishes — it is the **single label writer** per [Dispatch](#dispatch); node skills do the work and report. Nothing launches itself: the overwatch sequences every node, and the human launches the overwatch.
+The issue overwatch moves the `phase:*` label to the next node when a node finishes — one writing session per issue, per [Dispatch](#dispatch); node skills do the work and report. The exception is intake, whose label writes are the deliverable: triage *is* the four-tuple. Nothing launches itself: the overwatch sequences every node, and the human launches the overwatch.
 
-One long-lived branch and PR per issue — spikes open none. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the PR opens on the `open PR` edge — after the human pushes the branch — and the human merges it on `approve: merge` in the GitHub UI, per [Pull requests](#pull-requests).
+One long-lived branch and PR per issue — spikes open none. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the human's push crosses each `pushed` edge, and at code review the node's first delegation opens the PR; the human merges it on `approve: merge` in the GitHub UI, per [Pull requests](#pull-requests).
 
 ## Worktrees and branches
 
@@ -97,13 +97,13 @@ An issue runs under **one issue overwatch** that builds a continuous line of wor
 ### The per-issue worktree
 
 - **One worktree, one branch, one PR per issue,** at `<repo>/.claude/worktrees/issue-<N>` on branch `issue-<N>` (`N` is the issue number).
-- **Opened once, then persisted.** The issue's first file-touching node opens it. cwd and worktree survive a `/clear`, so an overwatch re-invoked after one inherits them with no re-entry.
+- **Opened once, then persisted.** The issue overwatch opens it at the first file-touching node. cwd and worktree survive a `/clear`, so an overwatch re-invoked after one inherits them with no re-entry.
 
 ### The worktree contract
 
 Every file-touching node sits in the issue's worktree:
 
-- **Open (first file-touching node).** The issue overwatch opens it, gated on a tap-free check that local `main` matches origin (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base escalates, since pulling is the human's. Open with `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is `origin/main` whatever branch the main checkout sits on. Then rename the branch to the bare `issue-<N>`: Agent view's cleanup keys on the `worktree-` prefix, so dropping it lets the worktree outlive a torn-down session.
+- **Open (first file-touching node).** The issue overwatch opens it, gated on a tap-free check that the local `origin/main` ref matches origin (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base escalates, since pulling is the human's. Open with `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is `origin/main` whatever branch the main checkout sits on. Then rename the branch to the bare `issue-<N>`: Agent view's cleanup keys on the `worktree-` prefix, so dropping it lets the worktree outlive a torn-down session.
 - **Inherit (everything after).** AFK subagents inherit the worktree as their cwd; the overwatch itself keeps it across `/clear`. Every later node confirms the worktree is present — escalating if it's gone, since the issue's work would be lost.
 - **Tear down (Agent-view overwatch, post-merge).** When the issue lands, the Agent-view overwatch removes the local side — `git worktree remove .claude/worktrees/issue-<N>` and `git branch -D issue-<N>` — only after the human confirms the merge happened. A spike's worktree goes the same way when its issue closes.
 
@@ -139,8 +139,8 @@ The unit of dispatch is the **issue**. The human launches one **issue overwatch*
 
 Two overwatch scopes, two screens:
 
-- **Agent-view overwatch** (left screen) — fleet scope: reads the board, recommends what to launch next, hands the human their push/pull commands, tears down worktrees after confirmed merges.
-- **Issue overwatch** (right screen) — issue scope, one per issue: executes that issue's traverse.
+- **Agent-view overwatch** (left screen) — fleet scope: reads the board, recommends what to launch next, tears down worktrees after confirmed merges.
+- **Issue overwatch** (right screen) — issue scope, one per issue: executes that issue's traverse and surfaces its human git commands — the push at each committing boundary, the pull on a stale base.
 
 Two terminals is the user's stated comprehension limit — a design constraint, not an implementation detail: nothing in this model may require the human to watch a third screen.
 
@@ -154,7 +154,7 @@ Two terminals is the user's stated comprehension limit — a design constraint, 
 
 **ESCALATE bubbles up.** An escalation always reaches the human: the issue overwatch adds context — which node, what it attempted, what the report says — and stops. It never overrides or self-fixes a node's escalation; the human's call routes the issue onward.
 
-**Single label writer.** The issue overwatch writes every label update; node skills do work and report. One writer keeps the phase label authoritative — no node can advance the board out from under the overwatch that sequences it.
+**Single label writer.** One writing session per issue — the session sequencing it. An AFK subagent never writes a label; a HITL skill runs inline in the sequencing session, so its label writes are that session's own. That is what lets intake — the one skill whose deliverable is the label tuple itself — write its four-tuple identically under the overwatch or run standalone by the human. Every other label move is the overwatch's, made as a node finishes: no subagent can advance the board out from under the session that sequences it.
 
 **Readiness.** An issue overwatch may launch on any **unblocked** issue — every issue in its blocked-by set closed (see [issue-conventions § Relationships](/standards/tracking/issues.md)) — with intake as its first HITL node when the issue is untriaged. Crossing into an implementation node requires more: the issue must be a **leaf** (epics never dispatch) with a brief-complete body per the [tracking standard](/standards/tracking/issues.md). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label.
 
@@ -166,11 +166,11 @@ The issue overwatch's session runs in **auto mode** — a permission mode (toggl
 
 To permit something the classifier would otherwise block, add an entry to the `autoMode.allow` list in `settings.json`. Entries are natural-language descriptions, not tool patterns — the classifier reads them as rules — and are honored from user scope (`~/.claude/settings.json`) and project-local (`.claude/settings.local.json`), but not from checked-in project settings. The list's first entry is the literal string `"$defaults"`: it tells the classifier to keep its built-in rule set in force, so the entries you add **extend** the defaults rather than replace them.
 
-**The commit-authorization token.** The issue overwatch's launch prompt carries the literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧`, pre-authorizing `Skill(commit)` for the issue's whole life — an uncommon bracketed string chosen so it cannot appear by accident, recognized as the lone commit exception. The AFK implementation nodes commit with no human present to say "commit now"; the token in the overwatch's launch prompt is what lets them, and the work is reviewed at the PR rather than diff-by-diff.
+**The commit-authorization token.** The literal token `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` pre-authorizes `Skill(commit)` for any session whose launch prompt carries it — an uncommon bracketed string recognized as the lone commit exception. It rides AFK delegation prompts only, affixed by the issue overwatch: a subagent is a separate session, its delegation prompt is its launch prompt, and the AFK implementation nodes commit with no human present to say "commit now" — the token is what lets them, with the work reviewed at the PR rather than diff-by-diff. The overwatch's own launch prompt carries no token, and needs none: the overwatch session commits only inside inline HITL nodes, where the user's phase-close approval authorizes in the moment. A standing commit grant on the long-lived, content-ingesting overwatch session would be privilege it never uses.
 
 **Subagent permissions are consciously wide.** Subagent-level tool permissions are out of scope for this model: subagents run under auto mode with wide permissions, and the reviewer read-only guarantee — a reviewer reports findings, never rewrites the work under review — is prompt-level for now. This is accepted deliberately; a later pass may tighten it.
 
-The session is cwd-bound to the issue's worktree, which confines its file reach.
+From the first file-touching node on, the session is cwd-bound to the issue's worktree, which confines its file reach.
 
 Canonical front-matter and syntax: [skills](https://code.claude.com/docs/en/skills.md), [permissions](https://code.claude.com/docs/en/permissions).
 
@@ -183,24 +183,26 @@ Two modes of human engagement:
 
 ### Node-skill contract
 
-A node skill does the node's work and reports; the issue overwatch launches it, sequences what follows, and writes the labels. When a skill has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](/workflow/skill-authoring.md).
+A node skill does the node's work and reports; the issue overwatch launches it, sequences what follows, and writes the labels (intake excepted — its label tuple is the deliverable, per [Dispatch](#dispatch)). When a skill has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](/workflow/skill-authoring.md).
 
 - **Worktree.** Every file-touching node sits in the issue's worktree before doing anything else, per [Worktrees](#worktrees-and-branches). `intake` touches no files and uses no worktree.
 - **HITL** — the issue overwatch runs the node itself, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts — and the node closes with a plain report.
-- **AFK** — a subagent runs the skill hands-off and terminates per the terminal report contract ([Dispatch](#dispatch)): `DONE:` on success, `ESCALATE:` when stuck, with the node's escalation triggers listed in the table.
+- **AFK** — a subagent runs the skill hands-off and terminates per the terminal report contract ([Dispatch](#dispatch)): `DONE:` on success, `ESCALATE:` when stuck, with the skill's escalation triggers listed in the table.
 
-| Node | Engagement | Escalation triggers |
+The table lists every skill the issue overwatch dispatches. Nodes and skills intersect imperfectly: most work nodes are served by a skill of the same name; the code-review nodes add two within-node delegations (`/open-pr`, and the native `/code-review`, whose wrapping subagent is prompted to close per the terminal report contract); and `spike` is a node with no skill yet — the overwatch escalates rather than dispatching a skill that doesn't exist. Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
+
+| Skill | Engagement | Escalation triggers |
 |-------|------|---------------------|
 | `/intake` | HITL | — |
-| `/sdd-specs` | HITL | main behind origin (stale base) |
-| `/design` | HITL | main behind origin (stale base) |
-| `/spike` | AFK | needs a human interview mid-flight (was design, not a spike); main behind origin (stale base) |
+| `/sdd-specs` | HITL | — |
+| `/design` | HITL | — |
 | `/sdd-tdd` | AFK | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts |
-| `/tdd` | AFK | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts; main behind origin (stale base) |
-| `/build` | AFK | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged); main behind origin (stale base) |
+| `/tdd` | AFK | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts |
+| `/build` | AFK | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged) |
 | `/open-pr` | AFK | branch not pushed to origin |
-| `/sdd-spec-review` | AFK audit + HITL verdict | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-code-pr-review` | AFK audit + HITL verdict | Green gate red (PR over red tree); PR/diff missing |
-| `/code-pr-review` | AFK audit + HITL verdict | Green gate red (PR over red tree); PR/diff missing |
+| `/code-review` (native) | AFK | — (built-in; posts findings as a PR comment) |
+| `/sdd-spec-review` | AFK | Consistency gate red (malformed spec); specs absent/unreadable |
+| `/sdd-code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
+| `/code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
 
-**The code-review sequence.** At `code_pr_review` and `sdd_code_pr_review` the issue overwatch sequences three AFK delegations, then goes HITL: `/open-pr` creates the PR from the just-pushed branch; the native `/code-review` posts its automated bug/regression findings as a PR comment; our review skill adds the spec-fidelity and convention findings the native pass does not cover — running last so it can read the native comment and skip re-flagging. With the audit complete, the overwatch interviews the human for the verdict: merge, or rework back to the implementation node.
+**The code-review sequence.** At `code_pr_review` and `sdd_code_pr_review` the issue overwatch sequences three AFK delegations, then goes HITL: `/open-pr` creates the PR from the just-pushed branch; the native `/code-review` posts its automated bug/regression findings as a PR comment; our review skill adds the fidelity and convention findings the native pass does not cover — running last so it can read the native comment and skip re-flagging. With the audit complete, the overwatch interviews the human for the verdict: merge, or rework back to the implementation node.

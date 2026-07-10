@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea (one issue or many). Decides category, mode, tests; writes the brief into the issue body; advances the issue past intake. Use when the agents dashboard launches intake.
+description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea (one issue or many). Decides category, mode, tests; writes the four-tuple labels and the brief onto the issue. Use when the issue overwatch launches the `intake` node, or standalone straight from the user.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -27,15 +27,17 @@ Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
 ### 1. Read the input
 
 - **Capture** — the text passed in is the raw idea.
-- **Adopt** — `gh issue view <issue>` and read its title and body as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
+- **Adopt** — `gh issue view <issue> --comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
 
 Either way, invoke `/grill-with-docs` to sharpen the raw idea, then return — **every time**, in both Capture and Adopt. No fuzziness condition, no escape hatch: understanding intent always precedes authoring. Run it **once**, over the raw idea and **before §2 decomposition** — not per slice — since sharpening intent can change how the work is sliced, and always before the §4–§5 write (Capture) or rewrite (Adopt).
 
 ### 2. Decide one issue or many
 
-Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies. Size each slice to the context budget (issue conventions → vertical-slice rules): split anything whose build would push an agent past ~30% context. The build agent won't resize the work, so the split has to happen here. When **adopting** a stub that turns out to be a multi-issue plan, refine the stub into the first slice and create the rest as new issues.
+Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies — and on whether the slices roll up under a tracking **epic** ([issue conventions → Relationships](~/workspace/dev-playbook/standards/tracking/issues.md)). Size each slice to the context budget (issue conventions → vertical-slice rules): split anything whose build would push an agent past ~30% context. The build agent won't resize the work, so the split has to happen here. When **adopting** a stub that turns out to be a multi-issue plan, the stub becomes the epic — rewrite it as the epic rather than a slice, and create every slice as a new issue; if the user declines an epic, refine the stub into the first slice instead.
 
 ### 3. For each issue, pick the four-tuple
+
+The four-tuple is per slice; an epic carries `category:*` alone, per workflow.md's label scheme — it never dispatches.
 
 - `category:*` — pick one.
 - `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.
@@ -69,7 +71,7 @@ EOF
 )"
 ```
 
-Multi-issue plans: create slices in dependency order so each blocker exists before the next slice links to it (wired in step 6).
+Multi-issue plans: when §2 decided on an epic, create it first — `<category>` its only label. Then create slices in dependency order so each blocker exists before the next slice links to it (wired in step 6).
 
 **Adopt** — set the four-tuple and overwrite the body on the existing issue:
 
@@ -82,7 +84,7 @@ EOF
 )"
 ```
 
-If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`; if it carried no labels, there is nothing to remove. Either way the issue ends at its first work node. A stub that was really a multi-issue plan: edit it into the first slice, then `gh issue create` the rest.
+If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`; if it carried no labels, there is nothing to remove. Either way the issue ends at its first work node. A stub that was really a multi-issue plan becomes the epic (§2): `gh issue edit` it to carry `<category>` alone — remove any `phase:*` — and rewrite its body as the epic's, then `gh issue create` the slices.
 
 ### 6. Wire relationships
 
@@ -95,7 +97,7 @@ blocker_id=$(gh api repos/{owner}/{repo}/issues/<blocker#> --jq .id)
 gh api --method POST repos/{owner}/{repo}/issues/<dependent#>/dependencies/blocked_by -F issue_id="$blocker_id"
 ```
 
-If the slices roll up under a tracking epic, also add each as a **sub-issue** of it:
+When §2 decided on an epic, also add each slice as a **sub-issue** of it:
 
 ```bash
 child_id=$(gh api repos/{owner}/{repo}/issues/<child#> --jq .id)
@@ -104,4 +106,4 @@ gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues -F sub_issue
 
 ## Output
 
-Report one line per issue, in the standard form: `<repo>#<issue> · current phase: intake · next phase: <first work node> · <one-line summary> · brief in issue`.
+Report one line per issue, in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · landed at <first work node> · brief in issue`.
