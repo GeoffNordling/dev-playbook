@@ -31,7 +31,7 @@ import yaml
 
 REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
 BANNED_FIELDS = ("user-invocable",)
-VALID_MODELS = ("haiku", "sonnet", "opus")
+VALID_MODELS = ("haiku", "sonnet", "opus", "fable")
 VALID_EFFORTS = ("low", "medium", "high", "xhigh")
 KEBAB_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
