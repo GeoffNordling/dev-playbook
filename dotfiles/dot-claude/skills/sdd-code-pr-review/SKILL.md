@@ -1,6 +1,6 @@
 ---
 name: sdd-code-pr-review
-description: Audits an SDD issue's PR against its committed spec and the project conventions, and attaches findings to the PR. Use when the issue overwatch launches the `sdd-code-pr-review` node.
+description: Audits the code in an SDD issue's PR against its committed spec and the project conventions, and attaches findings to the PR. Use when the issue overwatch dispatches the code track at the `sdd_pr_review` stop.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -14,6 +14,8 @@ argument-hint: "<issue-number>"
 Review an SDD issue's PR diff against its committed spec and the project's conventions, and attach your findings to the PR. The review is an audit only: you never modify the code under review, and the verdict on the findings is not yours to take — post them and stop.
 
 An automated bug-review pass (the native `/code-review`) runs before you and posts its own PR comment; you add the spec-fidelity and convention findings it does not cover. The audit runs hands-off; finding code problems is its output, not a reason to stop.
+
+**Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a spec-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
 
 ## Read first
 
@@ -55,10 +57,6 @@ Read the change as a whole — the spec and the code together — against the co
 - **Python style.** The code conforms to python-style.md — docstrings, the fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a helper earns its place or stays inline), annotation style.
 - **Module design.** The change conforms to modules/design.md — deep modules behind small interfaces, no pass-throughs that fail the deletion test, seams only where something varies — plus clear naming, no dead code or needless duplication.
 
-**When the diff touches docs** — read [documentation conventions](~/workspace/dev-playbook/standards/prose/conventions.md) first and add:
-
-- **Documentation conventions.** The prose conforms to doc-conventions.md — voice, structure, one rule per section, current-state — and reads accurately against what it documents.
-
 ## 4. Attach findings
 
 Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one PR comment with `gh pr comment --body-file <path>`.
@@ -71,7 +69,7 @@ Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) —
 Emit the terminal line, then stop:
 
 ```
-DONE: <repo>#<issue> · phase: sdd-code-pr-review · findings on PR #<n>
+DONE: <repo>#<issue> · phase: sdd-pr-review · findings on PR #<n>
 ```
 
 ## 5. Escalations
@@ -79,7 +77,7 @@ DONE: <repo>#<issue> · phase: sdd-code-pr-review · findings on PR #<n>
 Whenever you can't produce the review, surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: <repo>#<issue> · phase: sdd-code-pr-review · <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · phase: sdd-pr-review · <where you're stuck and the call you need>
 ```
 
 In particular:

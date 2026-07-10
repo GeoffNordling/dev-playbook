@@ -57,23 +57,23 @@ flowchart LR
         sdd_specs -->|pushed| sdd_spec_review{sdd_spec_review}
         sdd_spec_review -->|reject: rework| sdd_specs
         sdd_spec_review -->|approve| sdd_tdd[sdd_tdd]
-        sdd_tdd -->|pushed| sdd_code_pr_review{sdd_code_pr_review}
-        sdd_code_pr_review -->|reject: rework| sdd_tdd
+        sdd_tdd -->|pushed| sdd_pr_review{sdd_pr_review}
+        sdd_pr_review -->|reject: rework| sdd_tdd
     end
 
     subgraph direct[Direct path]
         design -->|tests:yes| tdd
         design -->|tests:no| build
         design -->|decompose| decomposed([epic + ready children])
-        tdd -->|pushed| code_pr_review{code_pr_review}
-        build -->|pushed| code_pr_review
-        code_pr_review -->|reject: rework| tdd
-        code_pr_review -->|reject: rework| build
+        tdd -->|pushed| pr_review{pr_review}
+        build -->|pushed| pr_review
+        pr_review -->|reject: rework| tdd
+        pr_review -->|reject: rework| build
     end
 
     spike -->|findings in closing comment| closed([closed])
-    sdd_code_pr_review -->|approve: merge| done([merged])
-    code_pr_review -->|approve: merge| done
+    sdd_pr_review -->|approve: merge| done([merged])
+    pr_review -->|approve: merge| done
 ```
 
 On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at code review.
@@ -84,7 +84,7 @@ On the direct path, intake also decides whether the work needs a **design** pass
 
 ### Naming
 
-Phase labels and slash-commands derive from graph node ids by `_`→`-`. Example: node `sdd_spec_review` → label `phase:sdd-spec-review`, command `/sdd-spec-review`. The set of work nodes — the graph's rectangles and diamonds; terminal markers mint nothing — IS the phase-label inventory.
+Phase labels derive from graph node ids by `_`→`-`: node `sdd_spec_review` → label `phase:sdd-spec-review`. The set of work nodes — the graph's rectangles and diamonds; terminal markers mint nothing — IS the phase-label inventory. A work node is usually served by a slash-command of the same name (`design` → `/design`), but a review diamond is a generic stop that dispatches several content-specific skills, none named after the node — `pr_review` launches `/code-pr-review` and `/doc-pr-review`; `sdd_pr_review` launches `/sdd-code-pr-review` and `/doc-pr-review`.
 
 The issue overwatch moves the `phase:*` label to the next node when a node finishes — one writing session per issue, per [Dispatch](#dispatch); node skills do the work and report. The exception is intake, whose label writes are the deliverable: triage *is* the four-tuple. Nothing launches itself: the overwatch sequences every node, and the human launches the overwatch.
 
@@ -189,7 +189,7 @@ A node skill does the node's work and reports; the issue overwatch launches it, 
 - **HITL** — the issue overwatch runs the node itself, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts — and the node closes with a plain report.
 - **AFK** — a subagent runs the skill hands-off and terminates per the terminal report contract ([Dispatch](#dispatch)): `DONE:` on success, `ESCALATE:` when stuck, with the skill's escalation triggers listed in the table.
 
-The table lists every skill the issue overwatch dispatches. Nodes and skills intersect imperfectly: most work nodes are served by a skill of the same name; the code-review nodes add two within-node delegations (`/open-pr`, and the native `/code-review`, whose wrapping subagent is prompted to close per the terminal report contract); and `spike` is a node with no skill yet — the overwatch escalates rather than dispatching a skill that doesn't exist. Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
+The table lists every skill the issue overwatch dispatches. Nodes and skills intersect imperfectly: most work nodes are served by a skill of the same name; a review node is a generic stop that dispatches several — `/open-pr` first, then the track skills the overwatch recommends (the native `/code-review`, whose wrapping subagent is prompted to close per the terminal report contract, and our fidelity skill on the code track; `/doc-pr-review` on the doc track); and `spike` is a node with no skill yet — the overwatch escalates rather than dispatching a skill that doesn't exist. Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
 
 | Skill | Engagement | Escalation triggers |
 |-------|------|---------------------|
@@ -204,5 +204,6 @@ The table lists every skill the issue overwatch dispatches. Nodes and skills int
 | `/sdd-spec-review` | AFK | Consistency gate red (malformed spec); specs absent/unreadable |
 | `/sdd-code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
 | `/code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
+| `/doc-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing; no docs in the diff (mis-launched) |
 
-**The code-review sequence.** At `code_pr_review` and `sdd_code_pr_review` the issue overwatch sequences three AFK delegations, then goes HITL: `/open-pr` creates the PR from the just-pushed branch; the native `/code-review` posts its automated bug/regression findings as a PR comment; our review skill adds the fidelity and convention findings the native pass does not cover — running last so it can read the native comment and skip re-flagging. With the audit complete, the overwatch interviews the human for the verdict: merge, or rework back to the implementation node.
+**The review sequence.** At `pr_review` and `sdd_pr_review` the issue overwatch runs `/open-pr` first — creating the PR from the just-pushed branch — then reads the issue and diff and recommends, with reasons, which tracks to launch: the **code track**, the **doc track**, or both. Content kind picks the track, not file format; the user confirms. The confirmed tracks run in parallel. On the code track the native `/code-review` posts its automated bug/regression findings, then our review skill adds the fidelity and convention findings the native pass does not cover — running after it so it can read the native comment and skip re-flagging. On the doc track `/doc-pr-review` audits the diff's documentation. Each audit posts its own PR comment; with them complete, the overwatch interviews the human for one verdict on the stop: merge, or rework back to the implementation node.

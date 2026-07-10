@@ -9,6 +9,14 @@ description: How Markdown docs are written — voice, structure, brevity, curren
 How Markdown documents in workspace repos are written. Applies to every doc
 in the repo documentation hierarchy.
 
+## Current state and next steps only
+
+Describe what exists and what's planned next. Don't reference removed things,
+past state, or rejected alternatives.
+
+Don't: "X is hand-maintained — there is no generator."
+Do: "X is the source of truth."
+
 ## Voice
 
 Declarative present tense. "The symlink is relative." Not "We make the
@@ -58,7 +66,9 @@ with no `src/`."
 
 ## Name concepts once, use consistently
 
-Pick one name per concept and use it across the document.
+Pick one name per concept and use it across the document. The repo's root
+[`CONTEXT.md`](/CONTEXT.md) holds the established vocabulary; a doc uses its
+terms where they apply, with no obligation to extend it.
 
 ## Terminology: human vs user
 
@@ -75,14 +85,6 @@ One override applies on top, wherever the token appears:
 - **Platform tokens stay `user`** — the `~/.claude/` "User" settings tier, a
   "user message", `user-invocable`. These are Claude Code's own names, not ours
   to translate.
-
-## Current state and next steps only
-
-Describe what exists and what's planned next. Don't reference removed things,
-past state, or rejected alternatives.
-
-Don't: "X is hand-maintained — there is no generator."
-Do: "X is the source of truth."
 
 ## Point at canonical artifacts
 

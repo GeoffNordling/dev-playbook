@@ -49,7 +49,7 @@ Provide commands under **state once, then trust**. When you hand the user a laun
    ```
    | | | Handle | Purpose | Node | Notes |
    |---|---|---|---|---|---|
-   | ✈️ | 💚 | `dev-playbook#103` | judgments library | code-pr-review | audit running → verdict at its overwatch |
+   | ✈️ | 💚 | `dev-playbook#103` | judgments library | pr-review | audit running → verdict at its overwatch |
    | 💤 | 💚 | `dev-playbook#105` | dispatch-graph edges | sdd-tdd | push pending at its overwatch |
    | 💤 | ❌ | `dev-playbook#101` | judgment orchestration | design | blocked by #103 |
    | 💤 | 💚 | `dev-playbook#106` | rework reads inline comments | intake | launchable now |

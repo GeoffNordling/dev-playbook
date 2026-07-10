@@ -1,6 +1,6 @@
 ---
 name: code-pr-review
-description: Audits a direct-mode issue's PR against its issue brief and the project conventions, and attaches findings to the PR. Use when the issue overwatch launches the `code-pr-review` node.
+description: Audits the code in a direct-mode issue's PR against its issue brief and the project conventions, and attaches findings to the PR. Use when the issue overwatch dispatches the code track at the `pr_review` stop.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -14,6 +14,8 @@ argument-hint: "<issue-number>"
 Review a direct-mode issue's PR diff against its issue brief and the project's conventions, and attach your findings to the PR. The review is an audit only: you never modify the code under review, and the verdict on the findings is not yours to take — post them and stop.
 
 An automated bug-review pass (the native `/code-review`) runs before you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover. The audit runs hands-off; finding code problems is its output, not a reason to stop.
+
+**Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
 
 ## 1. Load context
 
@@ -32,21 +34,16 @@ Run the gate — `make -C <subproject> check` (or `make check` when the `Makefil
 
 ## 3. Audit the change
 
-Read the change as a whole — the brief and the change together — against the standards it answers to. The diff's nature picks the dimensions; pin each finding to its file and line and the rule or criterion it breaches.
+Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches.
 
 **Know your cycle first.** The cycle number is the count of prior `## Code review — …` comments on the PR, plus one. Cycles 1 and 2 are full reviews across the dimensions below. From cycle 3 on, the review is a lockdown: its sole job is verifying the prior review's Blocking findings are fixed — don't hunt for new findings, though anything you notice incidentally still gets reported.
 
-**When the change includes code** — read [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md), [python style](~/workspace/dev-playbook/standards/python/style.md), and [module design](~/workspace/dev-playbook/standards/modules/design.md) first; the implementer read at most the testing conventions, so enforcing these is yours alone:
+Read [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md), [python style](~/workspace/dev-playbook/standards/python/style.md), and [module design](~/workspace/dev-playbook/standards/modules/design.md) first; the implementer read at most the testing conventions, so enforcing these is yours alone:
 
 - **Brief fidelity.** Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
 - **Testing conventions.** Where the change includes tests, they conform to testing-conventions.md — structure, naming, behavioral focus.
 - **Python style.** The code conforms to python-style.md — docstrings, the fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a helper earns its place or stays inline), annotation style.
 - **Module design.** The change conforms to modules/design.md — deep modules behind small interfaces, no pass-throughs that fail the deletion test, seams only where something varies — plus clear naming, no dead code or needless duplication.
-
-**When the change is docs or text only** — read [documentation conventions](~/workspace/dev-playbook/standards/prose/conventions.md) first:
-
-- **Brief fidelity.** Every acceptance criterion is satisfied, with no silent gap, and nothing reaches past the brief's stated scope.
-- **Documentation conventions.** The prose conforms to doc-conventions.md — voice, structure, one rule per section, current-state — and reads accurately against what it documents.
 
 ## 4. Attach findings
 
@@ -60,7 +57,7 @@ Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) —
 Emit the terminal line, then stop:
 
 ```
-DONE: <repo>#<issue> · phase: code-pr-review · findings on PR #<n>
+DONE: <repo>#<issue> · phase: pr-review · findings on PR #<n>
 ```
 
 ## 5. Escalations
@@ -68,7 +65,7 @@ DONE: <repo>#<issue> · phase: code-pr-review · findings on PR #<n>
 Whenever you can't produce the review, surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: <repo>#<issue> · phase: code-pr-review · <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · phase: pr-review · <where you're stuck and the call you need>
 ```
 
 In particular:
