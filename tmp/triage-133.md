@@ -495,17 +495,41 @@ Everything substantive was decided in the cross-cutting rounds
     honest nones. A question with an answer under active manual use
     and no automation is a legitimate resting state.
 
+## RESOLVED: Claude Code — how are harness files governed?
+
+53. skill-audit (renamed from internal-skill-audit) gains
+    `claude-code.skill-mirror`: a symlink-correspondence check over the
+    committed dotfiles tree — every `.agents/skills/` entry mirrored in
+    `dot-claude/skills/`, no stale symlinks, no authored/installed name
+    collisions (the same three conditions bin/sync-dotfiles.sh
+    repairs). Wired in dev-playbook's local block only. Audit reports
+    at the commit gate; sync-dotfiles.sh stays the repairer —
+    auditor/repairer split as with bootstrap-labels.
+54. skill-management.md retypes Guide -> Standard: it states a SHALL we
+    now build a detector for; a Guide is read to learn, not measured
+    against.
+55. skill-audit's and repo-audit's harness-file rules namespace as
+    `claude-code.*`. Deliberate non-action: AFK nodes stay skills
+    (workflow Q1), so no .claude/agents/ definitions exist and the
+    harness-files registry gains no new row; the new issue-overwatch
+    skill follows existing skill conventions.
+
+Card resolution: Define unchanged, skill-management.md retyped / Audit
+repo-audit + skill-audit incl. claude-code.skill-mirror / Enforce
+commit gate; skill-audit appended in skill-authoring repos' local
+blocks / Adopt CLAUDE.md.standards unchanged.
+
 ## Remaining agenda
 
-- Per-card pass: Decisions (answers pending) -> Tracking -> Workflow ->
-  Instruments (incl. the named-consumer rule, still no verdict) -> Shell
-  (define contract must be written) -> semantic cluster (Prose, Testing,
-  Modules, Python residual) -> solid-tier residuals (Build, Meta-Standard,
-  Docs, Judgments, Claude Code) -> Legibility (likely all-none, fine).
-- Each card resolves to: detector rules (namespaced ids), gate, owner
-  script, adopt path — or bare `none`.
-- Then: conformance epic + sub-issues compiled from this ledger and the
-  per-card requirements (seed drafts in the #133 comment fold into the
-  standards-audit issue per decision 3). Epic MUST be open before the PR
-  merges (PR will carry "Closes #133").
-- Then /open-pr 133. User pushes (YubiKey); agent never pushes or merges.
+ALL FIFTEEN CARDS RESOLVED. What remains:
+
+- Compile the conformance epic + sub-issues from this ledger's numbered
+  decisions and card resolutions (seed drafts in the #133 comment fold
+  into the standards-audit issue per decision 3). The epic MUST be open
+  before the PR merges (the PR carries "Closes #133").
+- Then /open-pr 133. User pushes (YubiKey); agent never pushes or
+  merges.
+- DELETE this file before the PR opens.
+- Post-implementation (parked): draft the handoff paragraph telling the
+  select-measure-learn weekly-review agent it owns running
+  workspace-audit (decision 14).
