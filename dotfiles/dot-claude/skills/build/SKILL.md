@@ -40,7 +40,7 @@ The plan is your map, not a gate — proceed without waiting for approval.
 Carry out the brief in coherent commits, keeping the tree green as you go:
 
 1. Make the changes for a coherent piece of the scope.
-2. If the piece touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root) — and resolve failures; you write no tests, but your change must not break the existing ones. A piece touching no Python sub-project has no `make` gate.
+2. Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root — and resolve failures; you write no tests, but your change must not break the existing ones.
 3. Commit the piece with /commit.
 4. Move to the next piece, or to §5 once the issue's scope is fully carried out.
 
@@ -62,7 +62,7 @@ The user reads it, decides, and relaunches; you don't push past the obstacle on 
 
 With every acceptance criterion satisfied:
 
-1. **Leave the tree green.** If the work touched a Python sub-project, run its gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root); don't commit a red tree.
+1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
 3. Emit the terminal line, then stop:
    ```
