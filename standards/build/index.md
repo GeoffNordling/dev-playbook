@@ -11,4 +11,4 @@ order. Start at [Layers](/standards/build/layers.md).
 - [Canonical Artifacts](/standards/build/canonical.md) — The canonical artifacts — the single-source files under standards/build/canonical/ and how each repo copy is compared
 - [Distribution](/standards/build/distribution.md) — The distribution channel — the pre-commit hook repo, pinned revs, dogfooding, and the rev-bump release
 - [Thin CI](/standards/build/ci.md) — Thin CI — the byte-identical workflow that runs exactly the hook suite on every push and PR
-- [Enforcement](/standards/build/enforcement.md) — The enforcement map — the venues where checks fire and the tool that owns each rule
+- [Enforcement](/standards/build/enforcement.md) — The gate ladder — the three rungs where checks block the path to main, and the detector that owns each rule
