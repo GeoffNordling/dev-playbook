@@ -33,7 +33,7 @@ profile. See [the OKF bundle boundary](/standards/docs/bundle.md).
 name: <skill-name>
 description: <one-line summary>
 disable-model-invocation: <true|false>
-model: <haiku|sonnet|opus>
+model: <haiku|sonnet|opus|fable>
 effort: <low|medium|high|xhigh>
 allowed-tools: <tool spec>          # optional
 argument-hint: "<hint>"             # optional
@@ -49,7 +49,7 @@ Every skill must have all five of these:
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, the description `SHALL` include a second sentence beginning `Use when …` that lists the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
 | `disable-model-invocation` | `false` is the standard — per the [dispatch model](/workflow/workflow.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
-| `model` | Pin the skill to a model: `haiku`, `sonnet`, or `opus`. Mandatory — always explicit, never rely on the session default. `opus` is the default choice; pin `sonnet`/`haiku` only where a cheaper, faster model demonstrably fits the work. |
+| `model` | Pin the skill to a model: `haiku`, `sonnet`, `opus`, or `fable`. Mandatory — always explicit, never rely on the session default. `opus` is the default choice; pin `sonnet`/`haiku` only where a cheaper, faster model demonstrably fits the work, or `fable` where the skill is meant to run on Fable. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
 ### Optional fields
