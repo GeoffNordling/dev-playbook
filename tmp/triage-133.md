@@ -473,6 +473,28 @@ Card resolution: Define standards/docs/ unchanged in structure /
 Audit okf-audit + ref-audit, card-namespaced rule ids / Enforce
 commit gate via canonical suite / Adopt none.
 
+## RESOLVED: Judgments — how is semantic drift caught?
+
+Everything substantive was decided in the cross-cutting rounds
+(decisions 7, 8, 13); residuals are bookkeeping.
+
+49. judgments-audit rule ids namespace as `judgments.*`; it grows
+    --list-rules like every detector.
+50. Audit cell states the division precisely: judgments-audit is the
+    deterministic detector (declaration shape); judgments-run is the
+    semantic detector (dispatches judges; verdicts are its findings) —
+    the one card where an audit is an LLM.
+51. Enforce cell re-cites fixed rungs: judgments-audit at the commit
+    gate; the pytest cache gate at the push gate (make check). Adopt
+    keeps consuming.md.
+
+## RESOLVED: Legibility — how does a human understand a large system without reading it?
+
+52. All-none stands: Define = the two instrument specs (which now name
+    their consumers per the Employed-by rule), Audit/Enforce/Adopt
+    honest nones. A question with an answer under active manual use
+    and no automation is a legitimate resting state.
+
 ## Remaining agenda
 
 - Per-card pass: Decisions (answers pending) -> Tracking -> Workflow ->
