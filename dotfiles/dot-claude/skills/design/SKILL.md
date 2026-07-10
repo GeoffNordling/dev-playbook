@@ -1,6 +1,6 @@
 ---
 name: design
-description: Explores the approach for a direct-path issue — solutions, prototypes, tradeoffs — through a structured interview, then writes the chosen approach into the issue and advances it to implementation. Use when the agents dashboard launches the design phase.
+description: Explores the approach for a direct-path issue — solutions, prototypes, tradeoffs — through a structured interview, then writes the chosen approach into the issue. Use when the issue overwatch launches the `design` node.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -9,7 +9,7 @@ argument-hint: "<issue-number>"
 
 # Design
 
-Explore the approach for a direct-path issue — talk through solutions, prototype where it helps, weigh tradeoffs — then write the chosen approach into the issue body and hand it off to implementation. The interview is the value of this skill. Design does not permanently write to disk: the deliverable is the approach captured on the issue, and any prototyping is exploratory — the worktree is left clean for the implementation node.
+Explore the approach for a direct-path issue — talk through solutions, prototype where it helps, weigh tradeoffs — then write the chosen approach into the issue body. The interview is the value of this skill. Design does not permanently write to disk: the deliverable is the approach captured on the issue, and any prototyping is exploratory — the worktree is left clean for the implementation phase.
 
 ## Read first
 
@@ -23,9 +23,9 @@ Then report: `READ: module-design.md`. Proceed only after.
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, tell the user to pull `main` and stop), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — tell the user and stop.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, tell the user and stop — don't start a fresh tree.
 
-- `gh issue view <issue>` — the brief is the contract; the approach you write extends it.
+- `gh issue view <issue> --comments` — the brief is the contract; the approach you write extends it. Comments may carry context the body doesn't.
 - **Brownfield reconnaissance.** Read the existing code the issue touches — the modules in play, their public surfaces, the seams a solution would use.
 
 ## 2. Area discovery interview
@@ -55,7 +55,7 @@ Present the approach for explicit approval, then wait:
 
 ## 5. Capture the approach
 
-On approval, append an `## Approach` section to the issue body — preserving the existing brief, never overwriting it — per [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md). `gh issue edit --body` replaces the whole body, so write back the brief unchanged plus the new section. Keep the Approach to what the implementation node needs — the chosen solution, the decisions that constrain the build, and the tradeoffs behind them; it is the contract the implementation node reads.
+On approval, append an `## Approach` section to the issue body — preserving the existing brief, never overwriting it — per [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md). `gh issue edit --body` replaces the whole body, so write back the brief unchanged plus the new section. Keep the Approach to what the implementation phase needs — the chosen solution, the decisions that constrain the build, and the tradeoffs behind them; it is the contract the implementation phase reads.
 
 ```bash
 gh issue edit <issue> --body "$(cat <<'EOF'
@@ -72,15 +72,8 @@ EOF
 
 When the user approves the approach:
 
-1. **Leave the worktree clean.** Design commits nothing — discard any scratch prototyping (restore tracked files, remove untracked) so the tree matches `origin/main` and the implementation node starts from the written approach alone.
-2. Advance the issue to its implementation phase — move its label by the issue's `tests:*` value:
-   ```bash
-   # tests:yes
-   gh issue edit <issue> --remove-label "phase:design" --add-label "phase:tdd"
-   # tests:no
-   gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"
+1. **Leave the worktree clean.** Design commits nothing — discard any scratch prototyping (restore tracked files, remove untracked) so the tree matches `origin/main` and the implementation phase starts from the written approach alone.
+2. Report and stop:
    ```
-3. Report and stop:
-   ```
-   <repo>#<issue> · current phase: design · next phase: <tdd|build> · <one-line summary> · approach in issue
+   <repo>#<issue> · phase: design · approach in issue
    ```

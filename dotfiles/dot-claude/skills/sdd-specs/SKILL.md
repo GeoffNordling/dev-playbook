@@ -1,6 +1,6 @@
 ---
 name: sdd-specs
-description: Authors a project's spec — its `feat`, `req`, and `dsn` items — as one hierarchy through a structured interview, then leaves the tree green and advances the issue to spec review. Use when the agents dashboard launches the spec phase.
+description: Authors a project's spec — its `feat`, `req`, and `dsn` items — as one hierarchy through a structured interview, then leaves the tree green. Use when the issue overwatch launches the `sdd-specs` node.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -9,7 +9,7 @@ argument-hint: "<issue-number>"
 
 # SDD Specs
 
-Author a project's spec as one interdependent hierarchy — `feat` (high-level capability), `req` (functional requirement), and `dsn` (design item pinning `Interface:` lines and design commitments) — through a structured interview, then leave the tree green and hand the issue off to spec review. The interview is the value of this skill.
+Author a project's spec as one interdependent hierarchy — `feat` (high-level capability), `req` (functional requirement), and `dsn` (design item pinning `Interface:` lines and design commitments) — through a structured interview, then leave the tree green. The interview is the value of this skill.
 
 The three levels are one graph, not two passes. A `req` and the `dsn` that designs it are decided together; a sharper name or shape at one level is free to cascade to its neighbours — rename a `req` and update the `dsn` that covers it in the same breath, with the user's agreement. Move between levels as the conversation demands: establish a capability before pinning its interface, but revisit either when the other sharpens it. What stays distinct is the *altitude* — a `req` says what holds, a `dsn` says how — not the moment you think about each.
 
@@ -27,7 +27,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, tell the user to pull `main` and stop), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — tell the user and stop.
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, tell the user and stop — don't start a fresh tree.
 
 - `gh issue view <issue> --comments` — the body is the contract. On a rework re-entry from spec review, the comments carry the review's findings; treat the latest as the work list. The brief stays the contract — a comment that conflicts with it yields to it.
 - Existing specs: `specs/functional_requirements/` and `specs/design/`.
@@ -97,12 +97,8 @@ Re-read each new `feat` / `req` / `dsn` and iterate until clean:
 When the user approves and the rubric passes:
 
 1. **Leave the tree green.** Run the gate — `make check`; its `spec-tools validate .` step builds and validates the spec graph (the project pins spec-tools as a dev dependency per the consumption model, putting the CLI in its environment). The region is `WIP:` (§5), so completeness is exempt and only **consistency** is enforced — a red build means the spec you just authored is malformed. Don't commit a red tree.
-2. Run /commit.
-3. Advance the issue to spec review — move its label from this node to the next:
-   ```bash
-   gh issue edit <issue> --remove-label "phase:sdd-specs" --add-label "phase:sdd-spec-review"
+2. **Commit** the remaining changes with /commit.
+3. Report and stop:
    ```
-4. Report and stop:
-   ```
-   <repo>#<issue> · current phase: sdd-specs · next phase: sdd-spec-review · commit <sha> · check green · unpushed
+   <repo>#<issue> · phase: sdd-specs · commit <sha> · check green · unpushed
    ```

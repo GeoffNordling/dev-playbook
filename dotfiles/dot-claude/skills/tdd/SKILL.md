@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Implements a direct-mode issue via vertical-slice TDD against the issue brief's acceptance criteria, then advances the issue to code review. Use when the agents dashboard launches the tdd phase.
+description: Implements a direct-mode issue via vertical-slice TDD against the issue brief's acceptance criteria. Use when the issue overwatch launches the `tdd` node.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -10,7 +10,7 @@ argument-hint: "<issue-number>"
 
 # TDD
 
-Implement a direct-mode issue with vertical-slice TDD against the issue brief — its acceptance criteria are the contract. Then hand the issue off to code review. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
+Implement a direct-mode issue with vertical-slice TDD against the issue brief — its acceptance criteria are the contract. Implementation proceeds in **chunks** — each runs an inner red/green/refactor loop per slice and closes with a whole-chunk refactor pass.
 
 Work without waiting for approval: plan, implement, refactor, and commit on your own, pausing only to escalate on the §5 triggers. The user reviews the finished work separately, not mid-build.
 
@@ -26,10 +26,10 @@ Then report: `READ: testing-conventions.md`. Proceed only after.
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Be in the issue's worktree.** If the session is already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`), proceed. If the worktree exists but the session isn't in it, re-enter it: `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If neither the worktree nor the branch `issue-<issue>` exists yet — this is the issue's first node — create it: confirm local `main` is current with origin (a check, not a pull: compare `git rev-parse origin/main` to `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`; if they differ, escalate (§5) so the user pulls `main`), then `EnterWorktree(name=issue-<issue>)` and `git branch -m worktree-issue-<issue> issue-<issue>`. If the branch exists but the worktree is gone, the issue's work was lost — escalate (§5).
+**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
 - `gh issue view <issue> --comments` — the body is the contract; its acceptance criteria are the behaviors you must discharge. Comments may carry context the body doesn't.
-- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline/line-level diff comments alike, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews` — these endpoints are a non-binding hint.) Build the rework work list from that complete feedback. If `gh pr view` finds none, this is first implementation; work from the brief alone. The brief stays the contract — where a finding conflicts with it, the brief wins.
+- **Rework re-entry.** Check for an existing PR (`gh pr view`). If one exists, code review already ran — read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) Build the rework work list from that complete feedback. If `gh pr view` finds none, this is first implementation; work from the brief alone. The brief stays the contract — where a finding conflicts with it, the brief wins.
 - Existing tests under `tests/` and code under `src/` — there may be partial work or stubs from a prior cycle.
 - Run the test suite to see the current state: `make test`. Run all `make` commands from the Python sub-project the issue lives in (`make -C <subproject> …`); when the `Makefile` is at the repo root, run them there.
 
@@ -63,7 +63,7 @@ Each slice is one test, one implementation, then a brief refactor.
 
 **Never modify a written test.** Once you've written a test, make it pass by changing code, not the test. If you feel the need to change the test, escalate (§5) — don't edit it yourself.
 
-**Stub on first contact.** When a test names a symbol that doesn't exist yet, create the stub it needs — you design the signature here, since the brief pins behavior, not interfaces. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
+**Stub on first contact.** When a test names a symbol with no stub yet, create the stub it needs — you design the signature here, since the brief pins behavior, not interfaces. Body is `raise NotImplementedError` for functions and methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
 **Green.** Write the minimal implementation that makes the failing test pass. Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 
@@ -85,7 +85,7 @@ For test-quality patterns and mocking guidance, see [testing conventions](~/work
 You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
-ESCALATE: <repo>#<issue> · current phase: tdd · <where you're stuck and the call you need>
+ESCALATE: <repo>#<issue> · phase: tdd · <where you're stuck and the call you need>
 ```
 
 The user reads it, decides, and relaunches; you don't push past the obstacle on your own. In particular:
@@ -93,8 +93,7 @@ The user reads it, decides, and relaunches; you don't push past the obstacle on 
 - **Stuck test.** A slice's test won't pass after two implementation attempts.
 - **A written test looks wrong.** You want to change a test you already wrote — surface why; the user decides whether you mis-encoded it or the brief needs to change.
 - **The brief is wrong or underdetermined.** Building reveals the brief is mistaken, or it doesn't pin down the next behavior tightly enough to write the assertion. The brief is the user's; you don't edit the issue — surface it and let the user amend the issue or redirect.
-- **The issue is too big for one session.** You can see the whole brief won't be implemented in this build before context runs low — a sizing miss. Surface it so the user re-splits it into smaller issues at intake; don't truncate the work silently.
-- **Main is behind origin.** The stale-base check at §1 shows local `main` isn't current with origin. Surface it so the user pulls `main`; the worktree must branch off current main.
+- **The issue is too big for one session.** You can see the whole brief won't be implemented in this session before context runs low — a sizing miss. Surface it so the user re-splits it into smaller issues at intake; don't truncate the work silently.
 
 ## 6. Close the phase
 
@@ -102,11 +101,7 @@ With every acceptance criterion met by a passing test:
 
 1. **Leave the tree green.** Run the gate — `make check`. Don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
-3. **Advance to code review:**
-   ```bash
-   gh issue edit <issue> --remove-label "phase:tdd" --add-label "phase:code-pr-review"
+3. Emit the terminal line, then stop:
    ```
-4. Emit the terminal line, then stop:
-   ```
-   DONE: <repo>#<issue> · current phase: tdd · next phase: code-pr-review · commit <sha> · check green · unpushed
+   DONE: <repo>#<issue> · phase: tdd · commit <sha> · check green · unpushed
    ```
