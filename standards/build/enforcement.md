@@ -21,6 +21,14 @@ these names.
 | **push gate** | `git push` | `make check`, via the pre-push stage |
 | **CI gate** | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
 
+The commit and push gates block locally, through the git hooks that invoke
+them. The CI gate has no branch protection behind it —
+[repo-settings.md](/standards/tracking/repo-settings.md) configures no required
+status checks — so its block executes through the human's standing rule: **a
+red CI run is never merged**. That rule is nondiscretionary — no judgment is
+exercised — which is what keeps the CI gate a gate rather than a review; the
+block sits at the merge button, not in branch-protection settings.
+
 ## Outside the gates
 
 Not every place a check runs is a gate. These run checks but block nothing on
@@ -28,12 +36,13 @@ the path to main — they are references here, not rungs:
 
 | Non-gate | When | What runs | Blocks |
 |---|---|---|---|
-| agent ritual | before every commit and before opening every PR | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [workflow.md's node-skill contract](/workflow/workflow.md#node-skill-contract) |
-| workspace sweep | on demand and via the weekly ritual | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins, via [`sweep`](/scripts/sweep) | no — reports, never blocks |
+| agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [workflow.md's node-skill contract](/workflow/workflow.md#node-skill-contract) |
+| workspace sweep | on demand and via the weekly review ([rules.md](~/workspace/select-measure-learn/rules.md)) | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins, via [`sweep`](/scripts/sweep) | no — reports, never blocks |
 
-The agent ritual re-runs `make check` immediately before opening a PR even
-though the push gate already covered the pushed commits — stated explicitly
-so the belt-and-braces re-run is not mistaken for a fourth gate. GitHub sits
+The re-run of `make check` at review start is the review node's **green gate**:
+the code-review skills run it before auditing and escalate if it is red, even
+though the push gate already covered the pushed commits — stated explicitly so
+this belt-and-braces re-run is not mistaken for a fourth gate. GitHub sits
 outside every gate: it hosts the CI gate but is not itself one.
 
 ## Map
