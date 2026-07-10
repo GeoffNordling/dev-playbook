@@ -5,7 +5,7 @@ okf_version: "0.1"
 # dev-playbook — bundle index
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, workflow definitions, agent configuration, CLI tools, and reusable harness patterns
-- [dev-playbook Vocabulary](/CONTEXT.md) — The repo's vocabulary disambiguation center — the architecture terms and the governance terms (Audit, Gate, Enforcement, Finding), used exactly
+- [dev-playbook Vocabulary](/CONTEXT.md) — The repo's vocabulary disambiguation center — the architecture terms and the governance terms (Audit, Detector, Gate, Enforcement, Finding), used exactly
 
 ## Directories
 
