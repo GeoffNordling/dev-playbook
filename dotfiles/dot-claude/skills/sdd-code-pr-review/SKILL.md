@@ -71,7 +71,7 @@ Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) —
 Emit the terminal line, then stop:
 
 ```
-DONE: <repo>#<issue> · phase: sdd-code-pr-review · findings on PR
+DONE: <repo>#<issue> · phase: sdd-code-pr-review · findings on PR #<n>
 ```
 
 ## 5. Escalations
