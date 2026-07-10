@@ -1,17 +1,26 @@
 ---
 type: Standard
 title: CONTEXT.md Content
-description: The CONTEXT.md domain glossary — structure, authoring rules, and a brief worked example
+description: The CONTEXT.md vocabulary center — structure, authoring rules, and a brief worked example
 ---
 
 # CONTEXT.md Content
+
+CONTEXT.md is the repo's vocabulary disambiguation center. It is not confined
+to a single domain glossary: as ambiguity surfaces it may accrete several
+term clusters — an architecture vocabulary, a governance vocabulary — grouped
+under `## Language` subheadings. The point is constant: when several words
+compete for one concept, pick one and retire the rest.
 
 ## Structure
 
 Frontmatter (`type: Vocabulary`, `title`, `description`), an H1 with a
 short purpose statement, then four sections: `## Language`,
-`## Relationships`, `## Example dialogue`, `## Flagged ambiguities`. A
-brief worked example:
+`## Relationships`, `## Example dialogue`, `## Flagged ambiguities`. When
+the file carries more than one term cluster, group `## Language` (and, where
+it helps, `## Relationships`) under `###` subheadings, one per cluster. A
+`## Rejected framings` section is optional, for framings deliberately turned
+down. A brief worked example:
 
 ```markdown
 ---
