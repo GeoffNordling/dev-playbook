@@ -13,8 +13,14 @@ typically pointing into dotfiles/.agents/skills/) are skipped — their
 conformance is the upstream's concern. Exits 0 silently when neither root
 exists, so the same invocation is safe in any repo.
 
+Output:
+    stdout — one finding per line, `file: claude-code.rule message`.
+    stderr — non-failing advisories (body length) and one summary line.
+    exit   — 0 clean, 1 findings.
+
 Usage:
     skill-audit [directory]
+    skill-audit --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -28,6 +34,30 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.findings import print_rules, render  # noqa: E402
+
+# Every rule id this detector can emit — the skill conventions live under the
+# claude-code card. body-length is not here: it is a non-failing stderr advisory,
+# not a finding.
+RULES = (
+    "claude-code.parse",
+    "claude-code.front-matter",
+    "claude-code.required-field",
+    "claude-code.banned-field",
+    "claude-code.name-match",
+    "claude-code.name-format",
+    "claude-code.description-type",
+    "claude-code.description-length",
+    "claude-code.description-trigger",
+    "claude-code.model-value",
+    "claude-code.effort-value",
+    "claude-code.dmi-type",
+    "claude-code.body-h1",
+    "claude-code.references-depth",
+)
 
 REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
 BANNED_FIELDS = ("user-invocable",)
@@ -44,10 +74,9 @@ class Finding:
     file: str
     check: str
     message: str
-    level: str = "error"  # "error" fails exit code; "warn" prints but does not fail
 
-    def __str__(self) -> str:
-        return f"{self.file}:{self.check}:{self.level}: {self.message}"
+    def render(self) -> str:
+        return render(self.file, self.check, self.message)
 
 
 def parse_skill(path: Path) -> tuple[dict | None, str]:
@@ -64,7 +93,7 @@ def parse_skill(path: Path) -> tuple[dict | None, str]:
 
 def check_required_fields(fm: dict, rel: str) -> list[Finding]:
     return [
-        Finding(rel, "required-field", f"missing '{field}'")
+        Finding(rel, "claude-code.required-field", f"missing '{field}'")
         for field in REQUIRED_FIELDS
         if field not in fm
     ]
@@ -72,7 +101,7 @@ def check_required_fields(fm: dict, rel: str) -> list[Finding]:
 
 def check_banned_fields(fm: dict, rel: str) -> list[Finding]:
     return [
-        Finding(rel, "banned-field", f"'{field}' must not be present")
+        Finding(rel, "claude-code.banned-field", f"'{field}' must not be present")
         for field in BANNED_FIELDS
         if field in fm
     ]
@@ -88,12 +117,12 @@ def check_name(fm: dict, dir_name: str, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                "name-match",
+                "claude-code.name-match",
                 f"name '{name}' does not match directory '{dir_name}'",
             )
         )
     if not KEBAB_RE.match(name):
-        findings.append(Finding(rel, "name-format", f"name '{name}' is not kebab-case"))
+        findings.append(Finding(rel, "claude-code.name-format", f"name '{name}' is not kebab-case"))
     return findings
 
 
@@ -106,7 +135,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                "description-type",
+                "claude-code.description-type",
                 f"description must be a string, got {type(desc).__name__}",
             )
         ]
@@ -115,7 +144,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                "description-length",
+                "claude-code.description-length",
                 f"description is {len(desc)} chars (max {DESCRIPTION_MAX})",
             )
         )
@@ -124,7 +153,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                "description-trigger",
+                "claude-code.description-trigger",
                 "auto-invocable description should include a 'Use when …' sentence "
                 "naming trigger keywords/contexts/file types",
             )
@@ -138,7 +167,7 @@ def check_model(fm: dict, rel: str) -> list[Finding]:
     if model is None:
         return []
     if model not in VALID_MODELS:
-        return [Finding(rel, "model-value", f"model '{model}' not in {VALID_MODELS}")]
+        return [Finding(rel, "claude-code.model-value", f"model '{model}' not in {VALID_MODELS}")]
     return []
 
 
@@ -148,7 +177,7 @@ def check_effort(fm: dict, rel: str) -> list[Finding]:
         return []
     if effort not in VALID_EFFORTS:
         return [
-            Finding(rel, "effort-value", f"effort '{effort}' not in {VALID_EFFORTS}")
+            Finding(rel, "claude-code.effort-value", f"effort '{effort}' not in {VALID_EFFORTS}")
         ]
     return []
 
@@ -161,7 +190,7 @@ def check_disable_model_invocation(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                "dmi-type",
+                "claude-code.dmi-type",
                 f"disable-model-invocation must be boolean, got '{value}'",
             )
         ]
@@ -176,23 +205,24 @@ def check_body_h1(body: str, rel: str) -> list[Finding]:
         if stripped.startswith("# "):
             return []
         return [
-            Finding(rel, "body-h1", f"body must start with H1, got: '{stripped[:40]}'")
+            Finding(rel, "claude-code.body-h1", f"body must start with H1, got: '{stripped[:40]}'")
         ]
-    return [Finding(rel, "body-h1", "body is empty")]
+    return [Finding(rel, "claude-code.body-h1", "body is empty")]
 
 
-def check_body_length(body: str, rel: str) -> list[Finding]:
+def body_length_advisory(body: str, rel: str) -> str | None:
+    """A non-failing stderr advisory when a SKILL.md body runs long.
+
+    Never a finding: the body-length rule is a nudge, not a gate — it prints to
+    stderr and never affects the exit code.
+    """
     n = len(body.splitlines())
     if n > BODY_MAX_LINES:
-        return [
-            Finding(
-                rel,
-                "body-length",
-                f"SKILL.md body is {n} lines (>{BODY_MAX_LINES}); consider spilling into references/",
-                level="warn",
-            )
-        ]
-    return []
+        return (
+            f"{rel}: SKILL.md body is {n} lines (>{BODY_MAX_LINES}); "
+            "consider spilling into references/"
+        )
+    return None
 
 
 def check_references_depth(skill_dir: Path, rel_dir: str) -> list[Finding]:
@@ -223,7 +253,7 @@ def check_references_depth(skill_dir: Path, rel_dir: str) -> list[Finding]:
                 findings.append(
                     Finding(
                         rel_md,
-                        "references-depth",
+                        "claude-code.references-depth",
                         f"link to sibling reference file '{target}' "
                         "(references/ must be one level deep)",
                     )
@@ -231,10 +261,15 @@ def check_references_depth(skill_dir: Path, rel_dir: str) -> list[Finding]:
     return findings
 
 
-def audit_skill(skill_dir: Path, repo_root: Path) -> list[Finding]:
+def audit_skill(skill_dir: Path, repo_root: Path) -> tuple[list[Finding], list[str]]:
+    """Return ``(findings, advisories)`` for one skill bundle.
+
+    findings are blocking (they set the exit code); advisories are non-failing
+    stderr nudges (currently only the body-length advisory).
+    """
     skill_md = skill_dir / "SKILL.md"
     if not skill_md.is_file():
-        return []
+        return [], []
 
     rel = str(skill_md.relative_to(repo_root))
     rel_dir = str(skill_dir.relative_to(repo_root))
@@ -243,10 +278,10 @@ def audit_skill(skill_dir: Path, repo_root: Path) -> list[Finding]:
     try:
         fm, body = parse_skill(skill_md)
     except Exception as e:
-        return [Finding(rel, "parse", str(e))]
+        return [Finding(rel, "claude-code.parse", str(e))], []
 
     if fm is None:
-        return [Finding(rel, "front-matter", "no YAML front matter found")]
+        return [Finding(rel, "claude-code.front-matter", "no YAML front matter found")], []
 
     findings = []
     findings.extend(check_required_fields(fm, rel))
@@ -257,9 +292,11 @@ def audit_skill(skill_dir: Path, repo_root: Path) -> list[Finding]:
     findings.extend(check_effort(fm, rel))
     findings.extend(check_disable_model_invocation(fm, rel))
     findings.extend(check_body_h1(body, rel))
-    findings.extend(check_body_length(body, rel))
     findings.extend(check_references_depth(skill_dir, rel_dir))
-    return findings
+
+    advisory = body_length_advisory(body, rel)
+    advisories = [advisory] if advisory is not None else []
+    return findings, advisories
 
 
 def discover_internal_skills(skills_dir: Path) -> tuple[list[Path], int]:
@@ -292,7 +329,14 @@ def main():
         default=".",
         help="Repository root to scan (default: current directory)",
     )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
     args = parser.parse_args()
+    if args.list_rules:
+        sys.exit(print_rules(RULES))
 
     repo_root = Path(args.directory).resolve()
 
@@ -320,21 +364,25 @@ def main():
         print("skill-audit: no internal skills found", file=sys.stderr)
         sys.exit(0)
 
-    all_findings = []
+    all_findings: list[Finding] = []
+    all_advisories: list[str] = []
     for skill_dir in internal_skills:
-        all_findings.extend(audit_skill(skill_dir, repo_root))
+        findings, advisories = audit_skill(skill_dir, repo_root)
+        all_findings.extend(findings)
+        all_advisories.extend(advisories)
 
     for f in all_findings:
-        print(f)
+        print(f.render())
+    for advisory in all_advisories:
+        print(f"skill-audit: {advisory}", file=sys.stderr)
 
-    errors = sum(1 for f in all_findings if f.level == "error")
-    warnings = sum(1 for f in all_findings if f.level == "warn")
+    errors = len(all_findings)
     skills = len(internal_skills)
     suffix = f" (skipped {skipped} external)" if skipped else ""
-    if errors or warnings:
+    if errors:
         print(
-            f"skill-audit: {skills} internal skills, "
-            f"{errors} error(s), {warnings} warning(s){suffix}",
+            f"skill-audit: {skills} internal skills, {errors} finding(s), "
+            f"{len(all_advisories)} advisory(ies){suffix}",
             file=sys.stderr,
         )
     else:
