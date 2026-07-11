@@ -18,7 +18,7 @@ kept honest.
 
 - [okf-audit](/scripts/okf-audit) — keeps the catalog
   ([standards/index.md](/standards/index.md)) complete and every card typed
-- [ref-check](/scripts/ref-check) — keeps every card pointer resolving
+- [ref-audit](/scripts/ref-audit) — keeps every card pointer resolving
 - [judgments/doc-consistency.yaml](/judgments/doc-consistency.yaml) — one
   judgment per card: its pointers really do define, audit, and enforce
   their standard
@@ -27,7 +27,7 @@ kept honest.
 
 - the pre-commit hook suite
   ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — okf-audit,
-  ref-check, and judgments-lint block nonconforming commits at the
+  ref-audit, and judgments-lint block nonconforming commits at the
   **commit gate**; the judgment cache gate reds the **push gate**
   (`make check`)
 

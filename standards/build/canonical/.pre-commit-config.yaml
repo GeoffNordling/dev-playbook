@@ -5,7 +5,7 @@ repos:
     hooks:
       - id: repo-audit
       - id: python-audit
-      - id: ref-check
+      - id: ref-audit
       - id: okf-audit
       - id: judgments-lint
   - repo: https://github.com/astral-sh/ruff-pre-commit

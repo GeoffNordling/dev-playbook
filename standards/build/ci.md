@@ -8,10 +8,10 @@ description: Thin CI — the byte-identical workflow that runs exactly the hook 
 
 Every repo carries the identical workflow, byte-for-byte the canonical
 [ci.yml](/standards/build/canonical/ci.yml): one job, one real step —
-`pre-commit run --all-files` with `SKIP: ref-check` — on every push and PR
+`pre-commit run --all-files` with `SKIP: ref-audit` — on every push and PR
 to `main`.
 
-`SKIP: ref-check` because `ref-check` validates cross-repo Citations
+`SKIP: ref-audit` because `ref-audit` validates cross-repo Citations
 (`~/workspace/<repo>/…`), and a CI runner checks out only the one repo, so
 those citations can never resolve there. Local pre-commit remains the strict
 reference gate. `okf-audit` runs in CI — everything it checks is in-repo.

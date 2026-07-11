@@ -151,7 +151,7 @@ def test_missing_base_files_all_reported(tmp_path: Path) -> None:
 def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
     files = base_files()
     files[".github/workflows/ci.yml"] = canonical("ci.yml").replace(
-        "SKIP: ref-check", "SKIP: nothing"
+        "SKIP: ref-audit", "SKIP: nothing"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1

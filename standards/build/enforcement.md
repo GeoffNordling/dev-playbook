@@ -58,7 +58,7 @@ pattern. Detector names are the current ones — renames are a later slice.
 | ruff-check / ruff-format | Python lint + formatting | hook pattern, plus `lint`/`format-check` targets |
 | python-audit | workspace Python-source rules | hook pattern |
 | okf-audit | concept-doc types, `index.md` freshness | hook pattern |
-| ref-check | Links and Citations | hook pattern, except the CI gate (skipped) |
+| ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
 | judgments-lint | judgment declarations | hook pattern |
 | shellcheck | shell scripts | hook pattern |
 | internal-skill-audit | skill bundles (skill-authoring repos) | hook pattern |

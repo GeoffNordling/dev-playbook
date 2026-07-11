@@ -114,7 +114,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - scripts/okf-audit
-      - scripts/ref-check
+      - scripts/ref-audit
       - judgments/doc-consistency.yaml
       - .pre-commit-config.yaml
     model: claude-opus-4-8
@@ -151,7 +151,7 @@ judgments:
       - standards/standard/format.md
       - standards/docs/index.md
       - scripts/okf-audit
-      - scripts/ref-check
+      - scripts/ref-audit
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8
     effort: high

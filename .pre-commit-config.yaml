@@ -39,9 +39,9 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: ref-check
-        name: ref-check
-        entry: scripts/ref-check
+      - id: ref-audit
+        name: ref-audit
+        entry: scripts/ref-audit
         language: script
         pass_filenames: false
         types: [markdown]

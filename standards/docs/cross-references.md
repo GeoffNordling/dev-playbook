@@ -28,7 +28,7 @@ already in, whether that's the main checkout or a per-issue worktree. A
 same-repo reference `SHALL NOT` be written as `~/workspace/<this-repo>/…` —
 from inside a worktree that absolute path silently jumps to the main
 checkout, yielding a different (possibly stale) copy than the one the
-reader is working in. `ref-check` enforces this: a same-repo citation in a
+reader is working in. `ref-audit` enforces this: a same-repo citation in a
 fixed-root file fails as `wrong-form`, whether or not the target exists.
 
 The deciding factor is whether the referencing file has a **fixed repo
@@ -60,26 +60,26 @@ VS Code does not expand `~/` in markdown links, and it resolves a leading
 form is clickable from the editor
 ([vscode#103542](https://github.com/microsoft/vscode/issues/103542)).
 Accepted — agents are the primary audience, and both forms are what the
-`ref-check` linter (`/scripts/ref-check`) validates. Anything else —
+`ref-audit` linter (`/scripts/ref-audit`) validates. Anything else —
 backticked filenames like `` `conftest.py` ``, slash-skill invocations like
-`/commit` — is treated as prose by `ref-check`.
+`/commit` — is treated as prose by `ref-audit`.
 
 ## Fenced code blocks
 
 Fenced code blocks delimited by triple backticks or `~~~` may contain
 `~/workspace/` paths or `/`-root paths in shell examples or sample output;
-`ref-check` skips them. For example:
+`ref-audit` skips them. For example:
 
 ```bash
-# Run ref-check from any workspace repo:
-~/workspace/dev-playbook/scripts/ref-check .
+# Run ref-audit from any workspace repo:
+~/workspace/dev-playbook/scripts/ref-audit .
 ```
 
 ## Fragment anchors
 
 A cross-reference `MAY` append `#anchor` to target a specific heading in a
 markdown file. The anchor `MUST` match the heading's GitHub slug —
-`ref-check` computes and validates the slug, so a stale or misspelled
+`ref-audit` computes and validates the slug, so a stale or misspelled
 anchor fails the commit.
 
 **Prefer a stable named anchor over a positional one.** A numbered fragment
