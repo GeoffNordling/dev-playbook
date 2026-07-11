@@ -109,4 +109,4 @@ Standards drift at two grains, each with its own detector:
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across
    adopting repositories. This is a version bump of the standard,
-   propagated and verified by workspace-level sweeps.
+   propagated and verified by workspace-audit.

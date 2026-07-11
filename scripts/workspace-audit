@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
-"""Sweep the workspace: GitHub repo settings and stale dev-playbook pins.
+"""Audit the workspace: GitHub repo settings and stale dev-playbook pins.
 
-The on-demand sweep venue of the enforcement standard — the checks that
+The on-demand audit venue of the enforcement standard — the checks that
 live outside any single commit. For every git repo under the workspace
 root:
 
@@ -20,7 +20,7 @@ Output:
     exit   — 0 clean, 1 settings findings, 2 cannot run.
 
 Usage:
-    sweep [--workspace DIR] [--pins-only | --settings-only]
+    workspace-audit [--workspace DIR] [--pins-only | --settings-only]
 """
 # /// script
 # requires-python = ">=3.14"
@@ -37,7 +37,7 @@ from pathlib import Path
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_CONFIG = HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
 
-# Expected GitHub settings, as the repos API reports them. The sweep only
+# Expected GitHub settings, as the repos API reports them. The audit only
 # reads; the merge settings are set by hand per the repo-settings standard.
 EXPECTED_SETTINGS = {
     "allow_squash_merge": True,
@@ -54,7 +54,7 @@ REMOTE_SLUG_PATTERN = re.compile(
 
 
 class ToolError(Exception):
-    """The sweep could not run at all."""
+    """The audit could not run at all."""
 
 
 @dataclass(frozen=True)
@@ -180,7 +180,7 @@ def check_settings(repo: Path) -> list[Line]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="sweep",
+        prog="workspace-audit",
         description="Report GitHub settings drift and stale dev-playbook pins.",
     )
     parser.add_argument(
@@ -207,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
             if not args.pins_only:
                 lines.extend(check_settings(repo))
     except ToolError as err:
-        print(f"sweep: {err}", file=sys.stderr)
+        print(f"workspace-audit: {err}", file=sys.stderr)
         return 2
 
     for line in lines:
@@ -216,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
     findings = sum(1 for line in lines if line.finding)
     stale = sum(1 for line in lines if line.stale)
     print(
-        f"sweep: {len(repos)} repos, {findings} settings finding(s), {stale} stale pin(s)",
+        f"workspace-audit: {len(repos)} repos, {findings} settings finding(s), {stale} stale pin(s)",
         file=sys.stderr,
     )
     return 1 if findings else 0

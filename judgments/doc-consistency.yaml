@@ -97,7 +97,7 @@ judgments:
       - standards/build/index.md
       - standards/build/canonical.md
       - scripts/repo-audit
-      - scripts/sweep
+      - scripts/workspace-audit
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/Makefile.base
       - standards/build/canonical/ci.yml
@@ -243,7 +243,7 @@ judgments:
       - standards/standard/format.md
       - standards/tracking/issues.md
       - standards/tracking/repo-settings.md
-      - scripts/sweep
+      - scripts/workspace-audit
       - scripts/bootstrap-labels
     model: claude-opus-4-8
     effort: high

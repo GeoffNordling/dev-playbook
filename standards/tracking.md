@@ -16,12 +16,12 @@ requests belong to the [workflow standard](/workflow/workflow.md).
 
 ## Audit
 
-- [sweep](/scripts/sweep) — GitHub settings drift across repositories via
+- [workspace-audit](/scripts/workspace-audit) — GitHub settings drift across repositories via
   `gh api`
 
 ## Enforce
 
-- none — sweep reports and bootstrap-labels repairs, but nothing blocks a
+- none — workspace-audit reports and bootstrap-labels repairs, but nothing blocks a
   malformed issue or a drifted setting
 
 ## Adopt

@@ -37,7 +37,7 @@ the path to main — they are references here, not rungs:
 | Non-gate | When | What runs | Blocks |
 |---|---|---|---|
 | agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [workflow.md's node-skill contract](/workflow/workflow.md#node-skill-contract) |
-| workspace sweep | on demand and via the weekly review ([rules.md](~/workspace/select-measure-learn/rules.md)) | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins, via [`sweep`](/scripts/sweep) | no — reports, never blocks |
+| workspace-audit | on demand and via the weekly review ([rules.md](~/workspace/select-measure-learn/rules.md)) | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins, via [`workspace-audit`](/scripts/workspace-audit) | no — reports, never blocks |
 
 The re-run of `make check` at review start is the review node's **green gate**:
 the code-review skills run it before auditing and escalate if it is red, even
@@ -50,7 +50,7 @@ outside every gate: it hosts the CI gate but is not itself one.
 Where each detector's rules fire. Every pre-commit hook fires at the **commit
 gate, in the CI gate, and inside every `make check`** (hence also at the push
 gate and in the agent ritual); the table lists only what falls outside that
-pattern. Detector names are the current ones — renames are a later slice.
+pattern.
 
 | Detector | Owns | Gates |
 |---|---|---|
@@ -64,4 +64,4 @@ pattern. Detector names are the current ones — renames are a later slice.
 | skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments stage-1 cache gate | push gate only — never the CI gate |
-| `gh api` sweep | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), stale pins | workspace sweep (outside the gates) |
+| workspace-audit | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), stale pins | workspace-audit (outside the gates) |

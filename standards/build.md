@@ -20,7 +20,7 @@ Governs how a repository is laid out, built, and checked.
 
 - [repo-audit](/scripts/repo-audit) — structural conformance and canonical
   byte comparison for one repository
-- [sweep](/scripts/sweep) — workspace-wide drift: pinned hook revs and
+- [workspace-audit](/scripts/workspace-audit) — workspace-wide drift: pinned hook revs and
   GitHub settings across repositories
 
 ## Enforce
