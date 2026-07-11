@@ -1,6 +1,6 @@
 # docs/adr/ — index
 
-Records listed in ADR number order.
+Ordering: ADR number order.
 
 - [Architecture Decision Records](/docs/adr/README.md) — The architecture decision records directory — numbered, immutable records of decisions and their rationale
 - [Adopt Matt Pocock's Conventions](/docs/adr/0001-adopt-matt-pocock-conventions.md) — Adopt Matt Pocock's repository conventions wholesale — 4-digit ADRs, per-repo agent config, triage vocabulary, vertical-slice discipline — rejecting only his PRD format

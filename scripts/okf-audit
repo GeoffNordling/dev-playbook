@@ -21,12 +21,14 @@ The concept-document/harness-owned split comes from dev_playbook.md.classify. Th
 asserts unconditionally and fails loud — there is no applicability skip.
 
 Output:
-    stdout — one finding per line, `file  rule  message`.
+    stdout — one finding per line, `file:line: docs.rule message` (`:line`
+             omitted for a file-level finding).
     stderr — one human-readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
     okf-audit [directory]
+    okf-audit --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -45,6 +47,21 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from dev_playbook import md  # noqa: E402
+from dev_playbook.findings import print_rules, render  # noqa: E402
+
+# Every rule id this detector can emit, namespaced by the knowledge-organization
+# card (docs) whose questions they answer.
+RULES = (
+    "docs.frontmatter",
+    "docs.type",
+    "docs.title",
+    "docs.description",
+    "docs.resource",
+    "docs.index",
+    "docs.registry-row",
+    "docs.description-shape",
+    "docs.index-ordering",
+)
 
 REGISTRY_DOC = "standards/docs/document-types.md"
 RESOURCE_REQUIRED_TYPES = {"Recipe Description"}
@@ -54,6 +71,9 @@ BACKTICK_NAME = re.compile(r"`([^`]+)`")
 INDEX_BULLET = re.compile(
     r"^\s*[-*]\s+\[([^\]]*)\]\((/[^)\s]+)\)(?:\s*(?:—|--)\s*(.*\S))?\s*$"
 )
+# An intro line beginning with this marker declares a meaningful (non-alphabetical)
+# order and exempts an index from the ordering check.
+ORDERING_MARKER = "Ordering:"
 
 # A directory is a tuple of path parts; the repository root is the empty tuple.
 Dir = tuple[str, ...]
@@ -68,36 +88,67 @@ class Finding:
     file: str
     rule: str
     message: str
+    line: int | None = None
 
     def render(self) -> str:
-        return f"{self.file}  {self.rule}  {self.message}"
+        return render(self.file, self.rule, self.message, self.line)
 
 
-def parse_registry(repo_root: Path) -> set[str]:
-    """Parse the allowed concept-document types from the registry document.
+def _table_cells(line: str) -> list[str]:
+    """The stripped cells of a markdown table row (the pipes removed)."""
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
 
-    Reads the backticked name in the first column of every row of the
-    `## Types` table. Raises ToolError if the document or table is absent.
+
+def _is_separator_row(cells: list[str]) -> bool:
+    """Whether a table row is the header/body delimiter (``|---|---|``)."""
+    return bool(cells) and all(set(c) <= {"-", ":", " "} for c in cells) and any(
+        "-" in c for c in cells
+    )
+
+
+def parse_registry(repo_root: Path) -> tuple[list[str], list[int]]:
+    """Parse the concept-document type names from the registry document.
+
+    Returns ``(names, malformed_rows)`` — the backticked type names in table
+    order (so the caller can both build the registry set and check the declared
+    alphabetical order), and the line numbers of malformed rows. Every data row
+    of the `## Types` table (the rows after the header/separator) must carry a
+    single backticked type name in its first cell; a row that does not is a
+    malformed row, so the caller emits a `docs.registry-row` finding rather than
+    silently dropping the type. Raises ToolError if the document or its
+    `## Types` table is absent.
     """
     doc = repo_root / REGISTRY_DOC
     if not doc.is_file():
         raise ToolError(f"registry doc not found: {REGISTRY_DOC}")
     in_types = False
-    types: set[str] = set()
-    for _, line in md.content_lines(doc):
+    seen_separator = False
+    names: list[str] = []
+    malformed: list[int] = []
+    for line_num, line in md.content_lines(doc):
         heading = md.HEADING_PATTERN.match(line)
         if heading:
             in_types = md.github_slug(heading.group(1)) == "types"
+            seen_separator = False
             continue
         if not in_types or not line.lstrip().startswith("|"):
             continue
-        first_cell = line.split("|")[1] if "|" in line else ""
-        name = BACKTICK_NAME.search(first_cell)
+        cells = _table_cells(line)
+        if not seen_separator:
+            # The header row and the |---| separator both precede the body; the
+            # separator marks where data rows begin.
+            if _is_separator_row(cells):
+                seen_separator = True
+            continue
+        first_cell = cells[0] if cells else ""
+        name = BACKTICK_NAME.fullmatch(first_cell)
         if name:
-            types.add(name.group(1))
-    if not types:
+            names.append(name.group(1))
+        else:
+            malformed.append(line_num)
+    if not names:
         raise ToolError(f"no types parsed from {REGISTRY_DOC} '## Types' table")
-    return types
+    return names, malformed
 
 
 def relpath(path: Path, repo_root: Path) -> str:
@@ -131,25 +182,34 @@ def check_types(
     for rel in concept_docs:
         fm, err = frontmatter_of(repo_root / rel)
         if err is not None:
-            findings.append(Finding(rel, "okf.frontmatter", err))
+            findings.append(Finding(rel, "docs.frontmatter", err))
             continue
         if fm is None:
-            findings.append(Finding(rel, "okf.type", "no OKF frontmatter"))
+            findings.append(Finding(rel, "docs.type", "no OKF frontmatter"))
             continue
         doctype = fm.get("type")
         if doctype is None:
-            findings.append(Finding(rel, "okf.type", "missing 'type'"))
+            findings.append(Finding(rel, "docs.type", "missing 'type'"))
         elif doctype not in registry:
             findings.append(
-                Finding(rel, "okf.type", f"type '{doctype}' not in the registry")
+                Finding(rel, "docs.type", f"type '{doctype}' not in the registry")
             )
         if not fm.get("title"):
-            findings.append(Finding(rel, "okf.title", "missing 'title'"))
-        if not fm.get("description"):
-            findings.append(Finding(rel, "okf.description", "missing 'description'"))
+            findings.append(Finding(rel, "docs.title", "missing 'title'"))
+        description = fm.get("description")
+        if not description:
+            findings.append(Finding(rel, "docs.description", "missing 'description'"))
+        elif isinstance(description, str) and description.rstrip().endswith("."):
+            findings.append(
+                Finding(
+                    rel,
+                    "docs.description-shape",
+                    "description must not end with a trailing period",
+                )
+            )
         if doctype in RESOURCE_REQUIRED_TYPES and not fm.get("resource"):
             findings.append(
-                Finding(rel, "okf.resource", f"'{doctype}' requires a 'resource'")
+                Finding(rel, "docs.resource", f"'{doctype}' requires a 'resource'")
             )
     return findings
 
@@ -206,7 +266,7 @@ def check_indexes(
     index_dirs: set[Dir] = {dir_of(rel) for rel in index_docs}
 
     if () not in index_dirs:
-        return [Finding("index.md", "okf.index", "repository root index.md is missing")]
+        return [Finding("index.md", "docs.index", "repository root index.md is missing")]
 
     # Expected ownership: each concept doc belongs to its nearest index; each
     # non-root index is a child of its nearest ancestor index.
@@ -229,7 +289,7 @@ def check_indexes(
         for bad in sorted(set(invalid_targets)):
             findings.append(
                 Finding(
-                    rel, "okf.index", f"lists {bad} which is not a concept document"
+                    rel, "docs.index", f"lists {bad} which is not a concept document"
                 )
             )
 
@@ -242,19 +302,19 @@ def check_indexes(
         listed_targets = set(listed_map)
         counts = Counter(target for target, _ in listed_concepts)
         for dup in sorted(t for t, c in counts.items() if c > 1):
-            findings.append(Finding(rel, "okf.index", f"lists {dup} more than once"))
+            findings.append(Finding(rel, "docs.index", f"lists {dup} more than once"))
 
         expected = owned_concepts[d]
 
         for missing in sorted(expected - listed_targets):
-            findings.append(Finding(rel, "okf.index", f"omits concept doc {missing}"))
+            findings.append(Finding(rel, "docs.index", f"omits concept doc {missing}"))
         for extra in sorted(listed_targets - expected):
             reason = (
                 "does not exist"
                 if not (repo_root / extra).is_file()
                 else "is not owned by this directory"
             )
-            findings.append(Finding(rel, "okf.index", f"lists {extra} which {reason}"))
+            findings.append(Finding(rel, "docs.index", f"lists {extra} which {reason}"))
         for target in sorted(expected & listed_targets):
             listed_desc = listed_map[target]
             # A frontmatter error here is already reported by check_types (target
@@ -263,13 +323,13 @@ def check_indexes(
             actual_desc = fm.get("description") if fm else None
             if listed_desc is None:
                 findings.append(
-                    Finding(rel, "okf.index", f"entry for {target} has no description")
+                    Finding(rel, "docs.index", f"entry for {target} has no description")
                 )
             elif actual_desc is not None and listed_desc != actual_desc:
                 findings.append(
                     Finding(
                         rel,
-                        "okf.index",
+                        "docs.index",
                         f"description for {target} does not match its frontmatter",
                     )
                 )
@@ -278,12 +338,12 @@ def check_indexes(
         listed_child_set = set(listed_children)
         for missing in sorted(expected_children - listed_child_set):
             findings.append(
-                Finding(rel, "okf.index", f"omits child index {missing}/index.md")
+                Finding(rel, "docs.index", f"omits child index {missing}/index.md")
             )
         for extra in sorted(listed_child_set - expected_children):
             findings.append(
                 Finding(
-                    rel, "okf.index", f"lists unexpected child index {extra}/index.md"
+                    rel, "docs.index", f"lists unexpected child index {extra}/index.md"
                 )
             )
 
@@ -291,11 +351,73 @@ def check_indexes(
     # sees it; its frontmatter error, if any, is caught only here.
     root_fm, root_err = frontmatter_of(repo_root / "index.md")
     if root_err is not None:
-        findings.append(Finding("index.md", "okf.frontmatter", root_err))
+        findings.append(Finding("index.md", "docs.frontmatter", root_err))
     elif not root_fm or "okf_version" not in root_fm:
         findings.append(
-            Finding("index.md", "okf.index", "root index.md must declare okf_version")
+            Finding("index.md", "docs.index", "root index.md must declare okf_version")
         )
+    return findings
+
+
+def _is_alphabetical(titles: list[str]) -> bool:
+    """Whether ``titles`` are in case-insensitive alphabetical order."""
+    lowered = [t.lower() for t in titles]
+    return lowered == sorted(lowered)
+
+
+def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding]:
+    """Flag an index whose entries are not in the standard order.
+
+    Within each group of an index — the concept documents after `README.md`,
+    then the child-directory links — entries are alphabetical by link title,
+    case-insensitive, and the README.md entry always leads. An intro line
+    beginning `Ordering:` declares a meaningful order and exempts the whole
+    index (only the marker's presence is checked, never its prose).
+    """
+    findings: list[Finding] = []
+    for rel in index_docs:
+        exempt = False
+        group_a: list[tuple[str, bool]] = []  # (title, is_readme) in listing order
+        child_titles: list[str] = []
+        for _, line in md.content_lines(repo_root / rel):
+            m = INDEX_BULLET.match(line)
+            if m is None:
+                if line.strip().startswith(ORDERING_MARKER):
+                    exempt = True
+                continue
+            title = m.group(1)
+            target = m.group(2).partition("#")[0].lstrip("/")
+            base = PurePosixPath(target).name
+            if base == "index.md":
+                child_titles.append(title)
+            elif md.classify(target) == "concept":
+                group_a.append((title, base == "README.md"))
+        if exempt:
+            continue
+        readmes = [i for i, (_, is_readme) in enumerate(group_a) if is_readme]
+        if readmes and readmes[0] != 0:
+            findings.append(
+                Finding(
+                    rel, "docs.index-ordering", "the README.md entry must be listed first"
+                )
+            )
+        concept_titles = [t for t, is_readme in group_a if not is_readme]
+        if not _is_alphabetical(concept_titles):
+            findings.append(
+                Finding(
+                    rel,
+                    "docs.index-ordering",
+                    "concept-doc entries are not in alphabetical order by title",
+                )
+            )
+        if not _is_alphabetical(child_titles):
+            findings.append(
+                Finding(
+                    rel,
+                    "docs.index-ordering",
+                    "child-directory entries are not in alphabetical order by title",
+                )
+            )
     return findings
 
 
@@ -310,11 +432,18 @@ def main(argv: list[str] | None = None) -> int:
         default=".",
         help="repository root to scan (default: current directory)",
     )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
     args = parser.parse_args(argv)
+    if args.list_rules:
+        return print_rules(RULES)
     repo_root = Path(args.directory).resolve()
 
     try:
-        registry = parse_registry(repo_root)
+        type_names, malformed_rows = parse_registry(repo_root)
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
         print(f"okf-audit: {err}", file=sys.stderr)
@@ -323,10 +452,28 @@ def main(argv: list[str] | None = None) -> int:
     concept_docs = [rel for rel in all_md if md.classify(rel) == "concept"]
     index_docs = [rel for rel in all_md if md.classify(rel) == "index"]
 
-    findings = check_types(concept_docs, repo_root, registry)
+    findings = check_types(concept_docs, repo_root, set(type_names))
     findings.extend(check_indexes(concept_docs, index_docs, repo_root))
+    findings.extend(check_index_ordering(index_docs, repo_root))
+    findings.extend(
+        Finding(
+            REGISTRY_DOC,
+            "docs.registry-row",
+            "`## Types` row's first cell is not a backticked type name",
+            line=line_num,
+        )
+        for line_num in malformed_rows
+    )
+    if not _is_alphabetical(type_names):
+        findings.append(
+            Finding(
+                REGISTRY_DOC,
+                "docs.index-ordering",
+                "`## Types` rows are not in alphabetical order by type name",
+            )
+        )
 
-    for f in sorted(findings, key=lambda f: (f.file, f.rule, f.message)):
+    for f in sorted(findings, key=lambda f: (f.file, f.rule, f.message, f.line or 0)):
         print(f.render())
 
     scanned = f"{len(concept_docs)} concept docs, {len(index_docs)} indexes"

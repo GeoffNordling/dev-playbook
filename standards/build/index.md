@@ -1,7 +1,9 @@
 # standards/build/ — index
 
-The layered repo standard, one concern per document, listed in reading
-order. Start at [Layers](/standards/build/layers.md).
+The layered repo standard, one concern per document. Start at
+[Layers](/standards/build/layers.md).
+
+Ordering: reading order.
 
 - [Layers](/standards/build/layers.md) — The layered model — the base layer, inferred membership, what each layer adds, and the additions-are-free rule
 - [File Skeleton](/standards/build/skeleton.md) — The per-layer file skeleton — required, optional, and forbidden entries, with worked example trees

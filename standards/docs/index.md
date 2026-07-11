@@ -1,7 +1,9 @@
 # standards/docs/ — index
 
-The documentation-content standard, one concern per document, listed in
-reading order. Start at [The OKF Bundle](/standards/docs/bundle.md).
+The documentation-content standard, one concern per document. Start at
+[The OKF Bundle](/standards/docs/bundle.md).
+
+Ordering: reading order.
 
 - [The OKF Bundle](/standards/docs/bundle.md) — The documentation bundle — its purpose, principles, and the concept/harness boundary
 - [Document Types](/standards/docs/document-types.md) — The OKF document-type registry and the frontmatter profile every concept doc carries
