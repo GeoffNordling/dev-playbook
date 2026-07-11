@@ -424,8 +424,9 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
     Within each group of an index — the concept documents after `README.md`,
     then the child-directory links — entries are alphabetical by link title,
     case-insensitive, and the README.md entry always leads. An intro line
-    beginning `Ordering:` declares a meaningful order and exempts the whole
-    index (only the marker's presence is checked, never its prose).
+    beginning `Ordering:` declares a meaningful order and exempts an index from
+    the two alphabetical checks (only the marker's presence is checked, never its
+    prose); the README.md-leads invariant holds regardless of the marker.
     """
     findings: list[Finding] = []
     for rel in index_docs:
@@ -452,8 +453,8 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
                 child_titles.append(title)
             elif md.classify(target) == "concept":
                 group_a.append((title, base == "README.md"))
-        if exempt:
-            continue
+        # The README.md entry must lead every index; the Ordering: marker excuses
+        # only the two alphabetical checks below, never this invariant.
         readmes = [i for i, (_, is_readme) in enumerate(group_a) if is_readme]
         if readmes and readmes[0] != 0:
             findings.append(
@@ -461,6 +462,8 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
                     rel, INDEX_ORDERING, "the README.md entry must be listed first"
                 )
             )
+        if exempt:
+            continue
         concept_titles = [t for t, is_readme in group_a if not is_readme]
         if not _is_alphabetical(concept_titles):
             findings.append(

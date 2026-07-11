@@ -339,15 +339,26 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
 
 def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> None:
     """The `Ordering:` marker exempts only as an intro line; one appearing after
-    the first entry is not an exemption, so a deviating index is still flagged."""
+    the first entry is not an exemption, so the out-of-alphabetical concept order
+    (README.md still leads) is still flagged."""
+    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
         "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
+        "- [Apple](/standards/apple.md) — apple guide\n"
         "- [Document Types](/standards/docs/document-types.md) —"
-        " The document type registry\n"
-        "- [Standards](/standards/README.md) — Standards desc\n\n"
+        " The document type registry\n\n"
         "Ordering: by significance, not alphabetical.\n"
     )
-    repo = make_bundle(tmp_path, {"standards/index.md": index})
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/zebra.md": guide.format(t="Zebra", d="zebra guide"),
+            "standards/apple.md": guide.format(t="Apple", d="apple guide"),
+            "standards/index.md": index,
+        },
+    )
 
     result = run_okf_audit(repo)
 
@@ -397,7 +408,36 @@ def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
 
 def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
     """An intro line beginning `Ordering:` declares a meaningful order and
-    exempts the index from the alphabetical check."""
+    exempts the index from the alphabetical checks. README.md still leads, so the
+    marker excuses only the out-of-alphabetical concept order below."""
+    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    index = (
+        "# standards/ — index\n\n"
+        "Ordering: by significance, not alphabetical.\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
+        "- [Apple](/standards/apple.md) — apple guide\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/zebra.md": guide.format(t="Zebra", d="zebra guide"),
+            "standards/apple.md": guide.format(t="Apple", d="apple guide"),
+            "standards/index.md": index,
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
+    """The `Ordering:` marker exempts only the alphabetical checks; the README.md
+    entry must lead even under the marker, so a marked index that lists it
+    non-first is still flagged."""
     index = (
         "# standards/ — index\n\n"
         "Ordering: by significance, not alphabetical.\n\n"
@@ -409,7 +449,9 @@ def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
 
     result = run_okf_audit(repo)
 
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode == 1
+    assert "standards/index.md: docs.index-ordering" in result.stdout
+    assert "the README.md entry must be listed first" in result.stdout
 
 
 def test_concept_entries_out_of_alphabetical_order_are_flagged(
