@@ -1,4 +1,4 @@
-"""Behavioral tests for scripts/sweep.
+"""Behavioral tests for scripts/workspace-audit.
 
 Fixtures build a throwaway workspace of git repos and point --workspace at
 it. Settings tests put a fake ``gh`` executable on PATH that serves canned
@@ -13,7 +13,7 @@ import re
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "sweep"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "workspace-audit"
 HOOK_REPO = Path(__file__).resolve().parents[1]
 CANONICAL_CONFIG = (
     HOOK_REPO / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"

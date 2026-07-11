@@ -20,7 +20,7 @@ the cited standards *are* the change under review: on issue #145's
 doc review the reviewer's first reads returned pre-change content, recovering
 only by hand-rewriting paths into the worktree.
 
-The linter was already worktree-correct: `scripts/ref-check` resolves a same-repo
+The linter was already worktree-correct: `scripts/ref-audit` resolves a same-repo
 citation against the *invoking* checkout (`citation_actual()`), so a worktree
 validates its own working copy. The correct interpretation existed only inside
 the linter — no equivalent rule bound the agent at read time.
@@ -47,7 +47,7 @@ carrier grows its own drifting caveat.
 ## Alternatives considered
 
 - **Change the written form** (issue #164 branch B) — swap the absolute
-  same-repo path for a positionally-safe form and teach `ref-check` to flag the
+  same-repo path for a positionally-safe form and teach `ref-audit` to flag the
   old form for rootless sources too. Rejected: the *same* reference must resolve
   differently by reader position — a globally-loaded skill running in another
   repo's worktree must still resolve a dev-playbook citation to dev-playbook's
@@ -67,7 +67,7 @@ carrier grows its own drifting caveat.
   session-injected `CLAUDE.md` copy, annotated `keep in sync`. The runtime
   carrier cannot be a pointer — it must be readable before any standard is
   loaded.
-- `ref-check` and `tests/test_ref_check.py` are unchanged. The linter already
+- `ref-audit` and `tests/test_ref_audit.py` are unchanged. The linter already
   implements these semantics at commit time (`citation_actual()` resolves
   in-repo citations against the invoking checkout), so the runtime rule aligns
   the agent *with* the linter rather than changing it — the diff is

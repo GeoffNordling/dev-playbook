@@ -110,7 +110,7 @@ class TestClassify:
             ("standards/agentic-box/templates/greenfield-cli/box/README.md", "concept"),
             ("standards/agentic-box/templates/greenfield-cli/index.md", "index"),
             (".pre-commit-config.yaml", "harness"),
-            ("tools/bin/ref-check", "harness"),
+            ("tools/bin/ref-audit", "harness"),
         ],
     )
     def test_classify(self, relpath: str, kind: str) -> None:

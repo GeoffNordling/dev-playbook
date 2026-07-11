@@ -70,7 +70,7 @@ card, since the meta-standard is an instance of the format it defines.
 ## The catalog
 
 The catalog of all standards is [standards/index.md](/standards/index.md).
-okf-lint's index rule already forces that index to list every card with a
+okf-audit's index rule already forces that index to list every card with a
 matching description, so catalog completeness is enforced by the existing
 hook suite rather than by new tooling.
 
@@ -109,4 +109,4 @@ Standards drift at two grains, each with its own detector:
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across
    adopting repositories. This is a version bump of the standard,
-   propagated and verified by workspace-level sweeps.
+   propagated and verified by workspace-audit.

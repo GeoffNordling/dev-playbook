@@ -23,7 +23,7 @@ from ordinary files, and what each may contain.
 
 - [repo-audit](/scripts/repo-audit) — CLAUDE.md presence and its canonical
   standards block
-- [internal-skill-audit](/scripts/internal-skill-audit) — skill bundles in
+- [skill-audit](/scripts/skill-audit) — skill bundles in
   skill-authoring repos
 
 ## Enforce
@@ -31,7 +31,7 @@ from ordinary files, and what each may contain.
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — repo-audit at the **commit gate** in every repo's suite;
-  skill-authoring repos append internal-skill-audit
+  skill-authoring repos append skill-audit
 
 ## Adopt
 

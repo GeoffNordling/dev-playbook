@@ -57,13 +57,13 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | Script | Standard | Purpose |
 |--------|----------|---------|
 | `repo-audit` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
-| `python-lint` | [python/style.md](/standards/python/style.md), [testing/conventions.md](/standards/testing/conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
-| `ref-check` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
-| `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `internal-skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
-| `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `python-audit` | [python/style.md](/standards/python/style.md), [testing/conventions.md](/standards/testing/conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
+| `ref-audit` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
+| `okf-audit` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
+| `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
+| `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
-`repo-audit`, `python-lint`, `ref-check`, and `okf-lint` assert unconditionally
+`repo-audit`, `python-audit`, `ref-audit`, and `okf-audit` assert unconditionally
 and fail loud; they do not skip themselves when a target kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
@@ -73,13 +73,13 @@ full.
 The scripts share their markdown and Python primitives rather than redefining
 them per script. The library is the installed `dev_playbook` package:
 
-- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-check` and `okf-lint`.
-- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint` and `repo-audit`.
-- `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-check` and `repo-audit`.
+- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-audit` and `okf-audit`.
+- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-audit` and `repo-audit`.
+- `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-audit` and `repo-audit`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
-loading/validation and the plan/render/record runner, behind `judgments-lint`
+loading/validation and the plan/render/record runner, behind `judgments-audit`
 and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`), and
 `dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
@@ -115,7 +115,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout, `--html` assembles the viz |
 | `judgments-run` | Plan / render / record over a repo's judgment declarations (driven by the `/run-judgments` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
-| `sweep` | On-demand workspace sweep: GitHub settings drift via `gh api` ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins |
+| `workspace-audit` | On-demand workspace audit: GitHub settings drift via `gh api` ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 

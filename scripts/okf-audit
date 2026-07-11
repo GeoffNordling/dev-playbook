@@ -26,7 +26,7 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    okf-lint [directory]
+    okf-audit [directory]
 """
 # /// script
 # requires-python = ">=3.14"
@@ -301,7 +301,7 @@ def check_indexes(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="okf-lint",
+        prog="okf-audit",
         description="Lint the repo's OKF bundle: concept-doc types and index freshness.",
     )
     parser.add_argument(
@@ -317,7 +317,7 @@ def main(argv: list[str] | None = None) -> int:
         registry = parse_registry(repo_root)
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
-        print(f"okf-lint: {err}", file=sys.stderr)
+        print(f"okf-audit: {err}", file=sys.stderr)
         return 2
 
     concept_docs = [rel for rel in all_md if md.classify(rel) == "concept"]
@@ -331,9 +331,9 @@ def main(argv: list[str] | None = None) -> int:
 
     scanned = f"{len(concept_docs)} concept docs, {len(index_docs)} indexes"
     if findings:
-        print(f"okf-lint: {len(findings)} finding(s) across {scanned}", file=sys.stderr)
+        print(f"okf-audit: {len(findings)} finding(s) across {scanned}", file=sys.stderr)
         return 1
-    print(f"okf-lint: clean across {scanned}", file=sys.stderr)
+    print(f"okf-audit: clean across {scanned}", file=sys.stderr)
     return 0
 
 

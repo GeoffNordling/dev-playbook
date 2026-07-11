@@ -151,7 +151,7 @@ conflict; they are different paths and different concerns.
 ## Naming conventions
 
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
-  Good: `commit`, `ref-check`. Bad: `do-the-commit-thing`.
+  Good: `commit`, `ref-audit`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
   Example: `sdd-func-reqs`, `sdd-design`, `sdd-red`, `sdd-green`.
 - **Descriptions**: see the [Required Fields](#required-fields) row for

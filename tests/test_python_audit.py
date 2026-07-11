@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/python-lint.
+"""Behavioral tests for scripts/python-audit.
 
-python-lint merges the former no-future-annotations, empty-init, and
+python-audit merges the former no-future-annotations, empty-init, and
 test-privacy hooks into one walk. Discovery goes through `git ls-files`, so
 every fixture is a git repo; a directory (repo root) is the only argument.
 """
@@ -8,7 +8,7 @@ every fixture is a git repo; a directory (repo root) is the only argument.
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "python-lint"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "python-audit"
 
 
 def run(repo: Path) -> subprocess.CompletedProcess:
@@ -128,7 +128,7 @@ def test_unreadable_init_reports_tool_error(tmp_path: Path) -> None:
     subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)
     result = run(repo)
     assert result.returncode == 2, result.stdout + result.stderr
-    assert "python-lint" in result.stderr
+    assert "python-audit" in result.stderr
 
 
 # --- test-privacy rule ---
