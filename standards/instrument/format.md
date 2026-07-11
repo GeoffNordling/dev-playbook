@@ -31,6 +31,21 @@ spec and the caller's inputs produces a conformant artifact with no other
 instruction. [instruments/index.md](/instruments/index.md) is the catalog;
 every instrument is listed there.
 
+## Employed by
+
+Every Instrument Spec carries an **`## Employed by`** section naming the
+standard, skill, or ritual that demands its readings. An instrument is an
+answer only because something asks the question; the section records who
+asks, so an orphaned instrument — one no live consumer names — reads as
+orphaned rather than indistinguishable from a working device.
+
+Reading cadence belongs to the consumer, never to this standard. On demand is
+the device's contract — an instrument is regenerated when someone asks for a
+fresh reading (see Readings below), and no instrument is bound to the weekly
+loop by this standard. A ritual that wants its readings refreshed on a
+schedule states that cadence in the ritual's own doc, and the Employed-by
+section points at that ritual; the cadence lives there, not here.
+
 ## Executors
 
 The tooling behind a spec may be deterministic code

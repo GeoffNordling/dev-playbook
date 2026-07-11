@@ -16,7 +16,8 @@ specified and kept conformant.
 
 ## Audit
 
-- [okf-audit](/scripts/okf-audit) — every spec typed `Instrument Spec`, the
+- [okf-audit](/scripts/okf-audit) — every spec typed `Instrument Spec` carries
+  an `## Employed by` section (`instrument.employed-by`), the
   [instruments catalog](/instruments/index.md) complete and fresh
 
 ## Enforce
