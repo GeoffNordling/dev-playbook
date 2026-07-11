@@ -1,9 +1,9 @@
 # shellcheck shell=bash
 # Git worktree navigation. Sourced by ~/.bashrc via ~/.bashrc.d/* loader.
 #
-# Worktrees live at <repo>/.claude/worktrees/<branch-name>/ per
-# workflow/workflow.md. `cdwt <name>` jumps into one;
-# tab-completion suggests existing branch-names from the current repo.
+# Worktrees live at <repo>/.claude/worktrees/<branch-name>/. `cdwt <name>`
+# jumps into one; tab-completion suggests existing branch-names from the
+# current repo.
 
 cdwt() {
 	local toplevel
