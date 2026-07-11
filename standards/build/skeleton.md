@@ -72,7 +72,7 @@ Base only:
 ├── Makefile
 ├── README.md
 ├── index.md
-└── scripts/            # optional — shell here, gated by shellcheck
+└── scripts/            # optional — shell here, gated by shellcheck and shfmt
 ```
 
 Full stack (python · src · scripts · aws):

@@ -11,7 +11,10 @@ pytest box/tests/acceptance -q
 
 # emissions present and non-empty
 for f in DEVIATIONS.md UPSTREAM.md; do
-  test -s "tools/sessionxml/$f" || { echo "missing emission: $f"; exit 1; }
+	test -s "tools/sessionxml/$f" || {
+		echo "missing emission: $f"
+		exit 1
+	}
 done
 
 echo "GATE PASS"
