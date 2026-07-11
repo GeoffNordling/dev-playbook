@@ -23,11 +23,11 @@ are validated and kept from drifting as the underlying files change.
 ## Enforce
 
 - the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
-  — `make check` is red until every judgment's exact content is
-  judged-and-passed
+  — reds the **push gate** (`make check`) until every judgment's exact
+  content is judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — judgments-lint in every repo's suite
+  — judgments-lint at the **commit gate** in every repo's suite
 
 ## Adopt
 

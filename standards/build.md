@@ -27,11 +27,12 @@ Governs how a repository is laid out, built, and checked.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the hook suite every repo runs, repo-audit included
+  — the hook suite every repo runs at the **commit gate**, repo-audit
+  included
 - `make check` ([Makefile.base](/standards/build/canonical/Makefile.base))
-  — the local gate
-- thin CI ([ci.yml](/standards/build/canonical/ci.yml)) — the same suite on
-  every push and PR
+  — the **push gate**
+- thin CI ([ci.yml](/standards/build/canonical/ci.yml)) — the **CI gate**,
+  the same suite on every push and PR
 
 ## Adopt
 

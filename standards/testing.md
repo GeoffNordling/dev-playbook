@@ -21,7 +21,7 @@ Governs how Python tests are written.
 
 ## Enforce
 
-- `make check` — pytest in every Python repo's local gate
+- `make check` — pytest at the **push gate** in every Python repo
   ([Makefile.python](/standards/build/canonical/Makefile.python))
 
 ## Adopt

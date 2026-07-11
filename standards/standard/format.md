@@ -48,10 +48,17 @@ restate the content of their targets.
 
 - **Define** — the contract: prose documents and canonical reference
   files.
-- **Audit** — read-only deviation detection: the tools that report
+- **Audit** — read-only deviation detection: the detectors that report
   nonconformance without blocking anything.
-- **Enforce** — blocking gates: the venues where nonconformance stops a
-  commit, a check run, or a merge.
+- **Enforce** — blocking gates: the rungs where nonconformance stops the
+  path to main, cited by fixed name (**commit gate**, **push gate**,
+  **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
+  A cell cites the single rung where the detector is stationed — where its
+  wiring lives (pre-commit hooks → the commit gate; tools that run only inside
+  `make check` → the push gate); the hook pattern in enforcement.md's Map
+  implies the echoes at the other rungs. Enforcement is automatic and
+  continuously in effect; a code review is a one-time checkpoint, not
+  enforcement, and never an Enforce pointer.
 - **Adopt** — anything that helps bring a repository into conformance,
   such as templates or migration procedures. Often "none": the generic
   path is an agent reading the define cell and fixing the repository.
@@ -66,6 +73,30 @@ The catalog of all standards is [standards/index.md](/standards/index.md).
 okf-lint's index rule already forces that index to list every card with a
 matching description, so catalog completeness is enforced by the existing
 hook suite rather than by new tooling.
+
+## Detectors
+
+A **detector** is the read-only script behind an Audit cell — it inspects the
+repository against one standard and emits findings, never mutating the
+repository and never blocking by itself (its runs at a gate are the audit
+stationed there — that is Enforcement). This is the normative home of the
+detector contract.
+
+- **North star: one detector script per card.** The aim is a single detector
+  answering each card's question. It is explicitly not mandatory — a card may
+  honestly audit `none` when no automatic check exists.
+- **Thin shims.** A detector script stays a thin shim over the reusable
+  modules in `src/dev_playbook`; the logic lives in the module, the script
+  wires argument parsing and output to it.
+- **Card-namespaced rule ids.** Every finding carries a rule id of the form
+  `card.rule`, namespaced by the card whose question it answers and named
+  after that question — never after the tool that happens to detect it.
+- **`--list-rules`.** Every detector answers `--list-rules`, printing the
+  `card.rule` ids it can emit.
+- **Finding format.** A finding is one line, GNU format:
+  `file:line: card.rule message` — a colon after the location, single spaces, a
+  repo-relative path; `:line` is omitted for a file-level finding
+  (e.g. `README.md: docs.readme-missing …`).
 
 ## Drift
 

@@ -27,8 +27,9 @@ kept honest.
 
 - the pre-commit hook suite
   ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — okf-lint,
-  ref-check, and judgments-lint block nonconforming commits; the judgment
-  cache gate reds `make check`
+  ref-check, and judgments-lint block nonconforming commits at the
+  **commit gate**; the judgment cache gate reds the **push gate**
+  (`make check`)
 
 ## Adopt
 

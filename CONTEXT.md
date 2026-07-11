@@ -10,6 +10,12 @@ The workspace's established vocabulary — the canonical terms every doc uses ex
 
 ## Language
 
+### Architecture
+
+Shared vocabulary for every suggestion about module architecture. Use these
+terms exactly — don't substitute "component," "service," "API," or
+"boundary."
+
 **Module**
 Anything with an interface and an implementation. Deliberately scale-agnostic — applies equally to a function, class, package, or tier-spanning slice.
 _Avoid_: unit, component, service.
@@ -37,6 +43,29 @@ What callers get from depth. More capability per unit of interface they have to 
 **Locality**
 What maintainers get from depth. Change, bugs, knowledge, and verification concentrate at one place rather than spreading across callers. Fix once, fixed everywhere.
 
+### Governance
+
+How a standard is checked against the repository and where nonconformance is
+blocked. The gate rungs are defined once in
+[enforcement.md](/standards/build/enforcement.md); this fixes the words.
+
+**Audit**
+A run of one or more detectors; read-only — it never mutates the repository and never blocks by itself.
+_Avoid_: check (too broad — a check may block; an audit never does).
+
+**Detector**
+The read-only script that inspects the repository against one standard and emits findings; it never mutates the repository. One detector per card is the north star.
+
+**Gate**
+An automatic, unmanned blocking point on the path to main. There are exactly three, with fixed rung names: **commit gate** (the pre-commit suite), **push gate** (`make check`, via the pre-push stage), **CI gate** (thin CI).
+_Avoid_: venue (retired — say **gate**, or a rung name).
+
+**Enforcement**
+An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect; a one-time human code review is not enforcement.
+
+**Finding**
+One output line from a detector, in GNU format: `file:line: card.rule message` — a colon after the location, single spaces, a repo-relative path. The `:line` is omitted for a file-level finding (e.g. `README.md: docs.readme-missing …`). The rule id is namespaced by the card whose question it answers.
+
 ## Relationships
 
 - A **Module** has exactly one **Interface** (the surface it presents to callers and tests).
@@ -44,6 +73,8 @@ What maintainers get from depth. Change, bugs, knowledge, and verification conce
 - A **Seam** is where a **Module**'s **Interface** lives.
 - An **Adapter** sits at a **Seam** and satisfies the **Interface**.
 - **Depth** produces **Leverage** for callers and **Locality** for maintainers.
+- A **Detector** inspects the repository against one standard and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
+- There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 
 ## Example dialogue
 
@@ -54,12 +85,18 @@ What maintainers get from depth. Change, bugs, knowledge, and verification conce
 > **Dev:** "And that depth is worth it because…?"
 > **Reviewer:** "It's the same **Depth** paying out twice — **Leverage** for the callers (the fake pays back across every test) and **Locality** for us (a store bug is fixed in one **Implementation**, not chased across call sites)."
 
+> **Dev:** "repo-audit reported a **Finding**. Does that block my commit?"
+> **Reviewer:** "Only because it runs at the **commit gate**. The audit itself is read-only — it just emits **Findings**. It's the **Gate** it's stationed at that blocks; run by hand, it isn't **Enforcement** at all."
+
 ## Flagged ambiguities
 
 - "boundary" was used for both the location of an interface and the interface itself — resolved: say **Seam** for the location, **Interface** for the surface. "boundary" is retired (collides with DDD's bounded context).
 - "component" / "service" / "unit" all floated as names for the same thing — resolved: **Module** is the single scale-agnostic term; the others are aliases to avoid.
 - "depth" was read two ways — the implementation-to-interface line ratio (Ousterhout) vs. leverage at the interface — resolved: **Depth** here means leverage (see Rejected framings).
 - "interface" was narrowed to the type signature or a class's public methods — resolved: **Interface** includes every fact a caller must know (invariants, ordering, error modes, config), not just the signature.
+- "venue" was used informally for a blocking point — resolved: say **Gate**, or one of the three rung names (commit gate, push gate, CI gate). "venue" is retired.
+- "check" and "audit" were blurred — resolved: an **Audit** is read-only and never blocks; a **Gate** is what blocks. A check that blocks is a gate; a check that only reports is an audit.
+- "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the script; an **Audit** is a run of one or more detectors.
 
 ## Rejected framings
 

@@ -26,7 +26,7 @@ document is relevant.
 Not every file in the repo is a concept document. The bundle divides in two:
 
 - **Concept documents** — prose knowledge a reader loads to *understand*
-  something: standards, guides, surveys, ADRs, READMEs, the domain
+  something: standards, guides, surveys, ADRs, READMEs, the
   vocabulary. Each carries OKF frontmatter (`type` + `title` +
   `description`, per [document-types.md](/standards/docs/document-types.md)) and
   is subject to the type-lint.
@@ -53,7 +53,7 @@ stays within scope.
 
 **Presence is the status signal.** There are no explicit status fields. The
 presence or absence of optional files signals the project's stage. A missing
-`CONTEXT.md` means no domain terms have needed pinning yet; a populated
+`CONTEXT.md` means no vocabulary has needed pinning yet; a populated
 `specs/` directory means the project is complex enough to warrant formal
 requirements.
 
