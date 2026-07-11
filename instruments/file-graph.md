@@ -69,7 +69,7 @@ The bucket tests follow the concept/harness boundary
 ## Edge accounting
 
 A directed edge records source file, target, form, line, and status
-(`ok`, `broken`, or `wrong-form`, per `ref-check`). Targets outside the
+(`ok`, `broken`, or `wrong-form`, per `ref-audit`). Targets outside the
 repository (`~/workspace/<other-repo>/…`) become boundary nodes; URLs are
 not edges.
 

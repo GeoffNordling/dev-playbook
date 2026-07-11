@@ -49,7 +49,7 @@ unstated meaning from entropy.
 ## Authored, not generated
 
 `index.md` files are **authored**, not produced by a committed generator. A
-staleness checker (a pre-commit hook, alongside `ref-check` and the
+staleness checker (a pre-commit hook, alongside `ref-audit` and the
 type-lint) fails the commit when an index omits a concept document in its
 directory, lists one that no longer exists, or gives a description that no
 longer matches the child's frontmatter. The check keeps hand-authored

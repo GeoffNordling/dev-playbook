@@ -16,15 +16,15 @@ types, indexes, and cross-references.
 
 ## Audit
 
-- [okf-lint](/scripts/okf-lint) — concept-doc frontmatter types and
+- [okf-audit](/scripts/okf-audit) — concept-doc frontmatter types and
   `index.md` freshness
-- [ref-check](/scripts/ref-check) — Links and Citations resolve
+- [ref-audit](/scripts/ref-audit) — Links and Citations resolve
 
 ## Enforce
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-lint and ref-check at the **commit gate** in every repo's suite
+  — okf-audit and ref-audit at the **commit gate** in every repo's suite
 
 ## Adopt
 

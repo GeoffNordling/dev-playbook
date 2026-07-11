@@ -34,7 +34,7 @@ A change to the standard — hook code, canonical artifact, version pin —
 reaches a consumer only when the consumer's pinned `rev` moves
 (`pre-commit autoupdate`). A stale pin is not an error: the consumer keeps
 running the standard as of its pin and catches up when the pin is bumped.
-Staleness is detected on demand — the sweep
+Staleness is detected on demand — workspace-audit
 ([enforcement.md](/standards/build/enforcement.md)) compares each consumer's
 pinned `rev` against dev-playbook's current `main` — never by a commit
 hook.

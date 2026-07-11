@@ -29,7 +29,7 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    ref-check [--all] [directory]
+    ref-audit [--all] [directory]
 """
 # /// script
 # requires-python = ">=3.14"
@@ -189,12 +189,12 @@ def main() -> None:
     try:
         repo_name = gitrepo.canonical_repo_name(repo_root)
     except gitrepo.NotAGitRepository:
-        print(f"ref-check: not a git repository: {repo_root}", file=sys.stderr)
+        print(f"ref-audit: not a git repository: {repo_root}", file=sys.stderr)
         sys.exit(2)
 
     md_files = source_files(repo_root)
     if not md_files:
-        print(f"ref-check: no .md files found in {repo_root}", file=sys.stderr)
+        print(f"ref-audit: no .md files found in {repo_root}", file=sys.stderr)
         sys.exit(2)
 
     total = 0
@@ -211,17 +211,17 @@ def main() -> None:
                 print(json.dumps(ref))
 
     if total == 0:
-        print(f"ref-check: no cross-references found in {repo_root}", file=sys.stderr)
+        print(f"ref-audit: no cross-references found in {repo_root}", file=sys.stderr)
         sys.exit(0)
     issues = broken + wrong_form
     if issues:
         print(
-            f"ref-check: {issues}/{total} need fixing "
+            f"ref-audit: {issues}/{total} need fixing "
             f"({broken} broken, {wrong_form} wrong-form)",
             file=sys.stderr,
         )
         sys.exit(1)
-    print(f"ref-check: {total} references, all ok", file=sys.stderr)
+    print(f"ref-audit: {total} references, all ok", file=sys.stderr)
     sys.exit(0)
 
 

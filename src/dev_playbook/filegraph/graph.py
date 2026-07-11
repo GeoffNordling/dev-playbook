@@ -8,7 +8,7 @@ artifact as a dict; the ``file-graph`` script serializes it.
 
 Markdown mechanics (fence skipping, link extraction, frontmatter, the
 concept/harness classification) come from :mod:`dev_playbook.md`, so the
-graph's grammar cannot drift from ``ref-check`` and ``okf-lint``.
+graph's grammar cannot drift from ``ref-audit`` and ``okf-audit``.
 """
 
 import re
@@ -31,7 +31,7 @@ CONFIG_EXTENSIONS = {
     ".ini",
 }
 CONFIG_NAMES = {"Makefile"}
-# Mirrors scripts/ref-check: sources with no fixed repo root (skills, rules,
+# Mirrors scripts/ref-audit: sources with no fixed repo root (skills, rules,
 # box artifacts) legitimately use the Citation form for same-repo targets.
 ROOTLESS_SEGMENTS = {"skills", "rules", "box"}
 FORMAL_FORMS = {"link", "citation", "resource"}
@@ -162,7 +162,7 @@ def markdown_edges(relpath: str, repo_root: Path, repo_name: str) -> list[dict]:
     """Extract the markdown reference-grammar edges of one file.
 
     Covers the formal forms (``link``, ``citation``, ``resource``) with
-    ``ref-check`` status semantics, plus off-grammar ``relative`` links.
+    ``ref-audit`` status semantics, plus off-grammar ``relative`` links.
     """
     text = (repo_root / relpath).read_text(encoding="utf-8", errors="replace")
     fixed_root = not (ROOTLESS_SEGMENTS & set(PurePosixPath(relpath).parts))
