@@ -36,7 +36,7 @@ Title Case; acronyms stay upper. Listed alphabetically.
 | `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work. |
 | `Standard Card` | The thin catalog record for one standard — four pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
-| `Vocabulary` | The canonical definitions of the workspace's domain terms (lives in `CONTEXT.md`). |
+| `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
 ## Frontmatter profile
 

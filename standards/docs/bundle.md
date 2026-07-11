@@ -53,7 +53,7 @@ stays within scope.
 
 **Presence is the status signal.** There are no explicit status fields. The
 presence or absence of optional files signals the project's stage. A missing
-`CONTEXT.md` means no domain terms have needed pinning yet; a populated
+`CONTEXT.md` means no vocabulary has needed pinning yet; a populated
 `specs/` directory means the project is complex enough to warrant formal
 requirements.
 
