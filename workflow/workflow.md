@@ -128,10 +128,21 @@ Consequences that shape the flow:
 
 ## Pull requests
 
-One PR per issue — spikes open none — born at the review stop and squash-merged by the human. [Repository settings](/standards/tracking/repo-settings.md) make every merge squash-only with the message taken from the PR, so the PR title and body become the permanent commit message on `main`. The format is therefore normative:
+One PR per issue — spikes open none — born at the review stop and squash-merged by the human. [Repository settings](/standards/tracking/repo-settings.md) make every merge squash-only with the message taken from the PR, so the PR title and body become the permanent commit message on `main`. It is therefore authored deliberately from the issue brief and the current diff — never left as a placeholder — and kept current as the diff changes.
+
+### The merge-message recipe
+
+Title and body are written from one recipe, so a message born at `/open-pr` and one refreshed at the verdict cannot diverge:
 
 - **Title** — states the change: it is the commit subject `main`'s history will carry.
-- **Body** — a summary of what changed and why, plus the mandatory `Closes #<N>` line that closes the issue on merge.
+- **Body** — a summary of what changed and why, drawn from the issue brief and the current diff, plus the mandatory `Closes #<N>` line that closes the issue on merge.
+
+### The two-owner lifecycle
+
+The message has two owners across the issue's life, the one recipe between them:
+
+- **Born good — `/open-pr`, on create.** When the PR is created, `/open-pr` synthesizes the title and body per the recipe from the brief and the diff as it then stands — never a bare `Closes #<N>`. On intermediate re-reviews it finds the PR already open and leaves the message untouched: refreshing mid-flight is not its job.
+- **Stays true — the approve verdict, before merge.** Rework mutates the diff after the message is born, so on the approve verdict at a PR review stop the issue overwatch regenerates the title and body from the final diff (a tap-free `gh pr edit`), per the same recipe — so what squash-lands reflects what actually shipped. This binds both PR review stops (`pr_review`, `sdd_pr_review`); spec review opens no PR and is unaffected.
 
 ## Dispatch
 
@@ -207,4 +218,4 @@ The table lists every skill the issue overwatch dispatches. Nodes and skills int
 | `/code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
 | `/doc-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing; no docs in the diff (mis-launched) |
 
-**The review sequence.** At `pr_review` and `sdd_pr_review` the issue overwatch runs `/open-pr` first — creating the PR from the just-pushed branch — then reads the issue and diff and recommends, with reasons, which tracks to launch: the **code track**, the **doc track**, or both. Content kind picks the track, not file format; the user confirms. The confirmed tracks run in parallel. On the code track the native `/code-review` posts its automated bug/regression findings, then our review skill adds the fidelity and convention findings the native pass does not cover — running after it so it can read the native comment and skip re-flagging. On the doc track `/doc-pr-review` audits the diff's documentation. Each audit posts its own PR comment; with them complete, the overwatch interviews the human for one verdict on the stop: merge, or rework back to the implementation node.
+**The review sequence.** At `pr_review` and `sdd_pr_review` the issue overwatch runs `/open-pr` first — creating the PR from the just-pushed branch — then reads the issue and diff and recommends, with reasons, which tracks to launch: the **code track**, the **doc track**, or both. Content kind picks the track, not file format; the user confirms. The confirmed tracks run in parallel. On the code track the native `/code-review` posts its automated bug/regression findings, then our review skill adds the fidelity and convention findings the native pass does not cover — running after it so it can read the native comment and skip re-flagging. On the doc track `/doc-pr-review` audits the diff's documentation. Each audit posts its own PR comment; with them complete, the overwatch interviews the human for one verdict on the stop: merge, or rework back to the implementation node. On the merge verdict it first refreshes the PR's merge message from the final diff before the human merges, per [the two-owner lifecycle](#the-two-owner-lifecycle).
