@@ -116,6 +116,26 @@ def test_lint_reports_every_missing_path_not_just_the_first(
     assert len(findings) == 2
 
 
+def test_no_finding_message_leaks_the_absolute_repo_path(
+    make_repo: Callable[[dict[str, str]], Path],
+) -> None:
+    """A malformed declaration's finding carries path-free detail; the absolute
+    repo/source path must never leak into a message. The location is a separate,
+    repo-relative field, so a reworded error can never smuggle a path in."""
+    repo = make_repo(
+        {
+            "pyproject.toml": CONFIG,
+            "judgments/a.yaml": "judgments: 5\n",  # 'judgments' must be a list
+            "judgments/b.yaml": judgment_yaml(model="gpt-4"),  # bad field value
+        }
+    )
+
+    findings = lint_findings(repo)
+
+    assert findings
+    assert all(str(repo) not in f.message for f in findings)
+
+
 def _run_hook(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
     """Run the judgments-audit hook script against ``repo`` as its working dir."""
     return subprocess.run(
