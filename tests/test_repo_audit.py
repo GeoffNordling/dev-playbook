@@ -145,7 +145,7 @@ def test_missing_base_files_all_reported(tmp_path: Path) -> None:
         "Makefile",
         ".github/workflows/ci.yml",
     ):
-        assert f"{rel}  required-file" in result.stdout
+        assert f"{rel}: build.required-file" in result.stdout
 
 
 def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
@@ -155,7 +155,7 @@ def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert ".github/workflows/ci.yml  canonical-bytes" in result.stdout
+    assert ".github/workflows/ci.yml: build.canonical-bytes" in result.stdout
 
 
 def test_root_bin_and_tools_forbidden(tmp_path: Path) -> None:
@@ -163,8 +163,8 @@ def test_root_bin_and_tools_forbidden(tmp_path: Path) -> None:
     files["bin/run.sh"] = "echo hi\n"
     files["tools/helper.sh"] = "echo hi\n"
     result = run(make_repo(tmp_path, files))
-    assert "bin/  forbidden" in result.stdout
-    assert "tools/  forbidden" in result.stdout
+    assert "bin/: build.forbidden" in result.stdout
+    assert "tools/: build.forbidden" in result.stdout
 
 
 # --- .gitignore: patterns only ---
@@ -252,7 +252,7 @@ def test_readme_without_h1_fails(tmp_path: Path) -> None:
     files = base_files()
     files["README.md"] = "Just prose, no heading.\n"
     result = run(make_repo(tmp_path, files))
-    assert "README.md  doc-shape" in result.stdout
+    assert "README.md: docs.doc-shape" in result.stdout
 
 
 def test_claude_md_missing_standards_block_fails(tmp_path: Path) -> None:
@@ -260,7 +260,7 @@ def test_claude_md_missing_standards_block_fails(tmp_path: Path) -> None:
     files["CLAUDE.md"] = "## Rules\n\n- be good\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "CLAUDE.md  canonical-block" in result.stdout
+    assert "CLAUDE.md: claude-code.standards-block" in result.stdout
     assert "## Standards" in result.stdout
 
 
@@ -271,7 +271,7 @@ def test_claude_md_drifted_standards_block_fails(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "CLAUDE.md  canonical-block" in result.stdout
+    assert "CLAUDE.md: claude-code.standards-block" in result.stdout
 
 
 def test_claude_md_prose_around_standards_block_passes(tmp_path: Path) -> None:
@@ -301,7 +301,7 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
     files = base_files()
     files["docs/CONTEXT.md"] = "# Nested\n"
     result = run(make_repo(tmp_path, files))
-    assert "docs/CONTEXT.md  forbidden" in result.stdout
+    assert "docs/CONTEXT.md: build.forbidden" in result.stdout
 
 
 # --- skills ---
@@ -341,30 +341,30 @@ def test_python_repo_missing_lock_version_tests(tmp_path: Path) -> None:
     del files[".python-version"]
     del files["tests/test_sample.py"]
     result = run(make_repo(tmp_path, files))
-    assert "uv.lock  required-file" in result.stdout
-    assert ".python-version  required-file" in result.stdout
-    assert "tests/  required-file" in result.stdout
+    assert "uv.lock: build.required-file" in result.stdout
+    assert ".python-version: build.required-file" in result.stdout
+    assert "tests/: build.required-file" in result.stdout
 
 
 def test_python_version_must_match_canonical_pin(tmp_path: Path) -> None:
     files = python_files()
     files[".python-version"] = "3.12\n"
     result = run(make_repo(tmp_path, files))
-    assert ".python-version  canonical-bytes" in result.stdout
+    assert ".python-version: build.canonical-bytes" in result.stdout
 
 
 def test_requirements_txt_forbidden_anywhere(tmp_path: Path) -> None:
     files = python_files()
     files["docs/requirements.txt"] = "flask\n"
     result = run(make_repo(tmp_path, files))
-    assert "docs/requirements.txt  forbidden" in result.stdout
+    assert "docs/requirements.txt: build.forbidden" in result.stdout
 
 
 def test_nested_pyproject_forbidden(tmp_path: Path) -> None:
     files = python_files()
     files["sub/pyproject.toml"] = "[project]\nname = 'sub'\n"
     result = run(make_repo(tmp_path, files))
-    assert "sub/pyproject.toml  forbidden" in result.stdout
+    assert "sub/pyproject.toml: build.forbidden" in result.stdout
 
 
 def test_project_name_must_follow_mapping(tmp_path: Path) -> None:
@@ -381,15 +381,15 @@ def test_src_package_must_match_mapping(tmp_path: Path) -> None:
     del files["src/sample_repo/__init__.py"]
     files["src/wrongpkg/__init__.py"] = ""
     result = run(make_repo(tmp_path, files))
-    assert "src/wrongpkg  name-mapping" in result.stdout
-    assert "src/sample_repo/  name-mapping" in result.stdout
+    assert "src/wrongpkg: build.name-mapping" in result.stdout
+    assert "src/sample_repo/: build.name-mapping" in result.stdout
 
 
 def test_second_src_package_flagged(tmp_path: Path) -> None:
     files = python_files()
     files["src/extra_pkg/__init__.py"] = ""
     result = run(make_repo(tmp_path, files))
-    assert "src/extra_pkg  name-mapping" in result.stdout
+    assert "src/extra_pkg: build.name-mapping" in result.stdout
 
 
 def test_extra_dev_dependency_allowed_missing_floor_fails(tmp_path: Path) -> None:
@@ -469,7 +469,7 @@ def test_makefile_wrong_mypy_roots_fails(tmp_path: Path) -> None:
     files = python_files(code_roots="src")
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "Makefile  canonical-block" in result.stdout
+    assert "Makefile: build.canonical-block" in result.stdout
     assert "Makefile.python" in result.stdout
 
 
@@ -487,7 +487,7 @@ def test_executable_script_with_plain_shebang_fails(tmp_path: Path) -> None:
     files["scripts/tool.py"] = "#!/usr/bin/env python3\nprint('hi')\n"
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 1
-    assert "scripts/tool.py  script-shebang" in result.stdout
+    assert "scripts/tool.py: build.script-shebang" in result.stdout
 
 
 def test_executable_script_without_pep723_fails(tmp_path: Path) -> None:
@@ -503,7 +503,7 @@ def test_script_python_floor_mismatch_fails(tmp_path: Path) -> None:
     files["scripts/tool.py"] = UV_SCRIPT.replace('">=3.14"', '">=3.11"')
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 1
-    assert "scripts/tool.py  script-python" in result.stdout
+    assert "scripts/tool.py: build.script-python" in result.stdout
     assert '">=3.14"' in result.stdout
 
 
@@ -512,7 +512,7 @@ def test_script_python_floor_missing_fails(tmp_path: Path) -> None:
     files["scripts/tool.py"] = UV_SCRIPT.replace('# requires-python = ">=3.14"\n', "")
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 1
-    assert "scripts/tool.py  script-python" in result.stdout
+    assert "scripts/tool.py: build.script-python" in result.stdout
 
 
 def test_makefile_roots_require_real_py_files(tmp_path: Path) -> None:
@@ -546,7 +546,7 @@ def test_cdk_app_command_enforced(tmp_path: Path) -> None:
     files = aws_files()
     files["cdk.json"] = '{"app": "python3 app.py"}\n'
     result = run(make_repo(tmp_path, files))
-    assert "cdk.json  canonical-value" in result.stdout
+    assert "cdk.json: build.canonical-value" in result.stdout
     assert "uv run python -m sample_repo.app" in result.stdout
 
 
@@ -555,22 +555,22 @@ def test_root_app_py_forbidden_and_entry_required(tmp_path: Path) -> None:
     del files["src/sample_repo/app.py"]
     files["app.py"] = "app = None\n"
     result = run(make_repo(tmp_path, files))
-    assert "app.py  forbidden" in result.stdout
-    assert "src/sample_repo/app.py  required-file" in result.stdout
+    assert "app.py: build.forbidden" in result.stdout
+    assert "src/sample_repo/app.py: build.required-file" in result.stdout
 
 
 def test_aws_without_src_flagged(tmp_path: Path) -> None:
     files = base_files()
     files["cdk.json"] = '{"app": "uv run python -m sample_repo.app"}\n'
     result = run(make_repo(tmp_path, files))
-    assert "cdk.json  layer-shape" in result.stdout
+    assert "cdk.json: build.layer-shape" in result.stdout
 
 
 def test_tracked_cdk_out_forbidden(tmp_path: Path) -> None:
     files = aws_files()
     files["cdk.out/manifest.json"] = "{}\n"
     result = run(make_repo(tmp_path, files))
-    assert "cdk.out/  forbidden" in result.stdout
+    assert "cdk.out/: build.forbidden" in result.stdout
 
 
 def test_makefile_missing_aws_targets_fails(tmp_path: Path) -> None:
@@ -590,7 +590,7 @@ def test_package_json_requires_committed_lockfile(tmp_path: Path) -> None:
     files["package.json"] = '{"name": "sample"}\n'
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "package.json  required-file" in result.stdout
+    assert "package.json: build.required-file" in result.stdout
 
     files["package-lock.json"] = "{}\n"
     result = run(make_repo(tmp_path, files, name="locked-repo"))
@@ -639,7 +639,41 @@ def test_hook_repo_unknown_canonical_artifact_fails(tmp_path: Path) -> None:
     files["standards/build/canonical/mystery.cfg"] = "x\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "standards/build/canonical/mystery.cfg  self-audit" in result.stdout
+    assert "standards/build/canonical/mystery.cfg: build.self-audit" in result.stdout
+
+
+def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["python3", str(SCRIPT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    ids = set(result.stdout.split())
+    assert "build.required-file" in ids
+    assert "build.canonical-block" in ids
+    assert "claude-code.standards-block" in ids
+    assert "claude-code.skills-hook" in ids
+    assert "docs.doc-shape" in ids
+    assert all(
+        rule.split(".")[0] in {"build", "claude-code", "docs"} for rule in ids
+    ), ids
+
+
+def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {"README.md": "# X\n"})
+    result = run(repo)
+    assert result.returncode == 1
+    assert "CLAUDE.md: build.required-file " in result.stdout
+
+
+def test_claude_standards_block_uses_claude_code_id(tmp_path: Path) -> None:
+    files = base_files()
+    files["CLAUDE.md"] = "## Rules\n\n- be good\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "CLAUDE.md: claude-code.standards-block" in result.stdout
 
 
 def test_canonical_dir_exempt_from_tree_rules(tmp_path: Path) -> None:
