@@ -5,7 +5,7 @@ okf_version: "0.1"
 # dev-playbook — bundle index
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, workflow definitions, agent configuration, CLI tools, and reusable harness patterns
-- [Architecture Vocabulary](/CONTEXT.md) — The shared architecture vocabulary — Module, Interface, Depth, Seam, Adapter, Leverage, Locality — used exactly in every architecture suggestion
+- [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly; currently the module-architecture set (Module, Interface, Depth, Seam, Adapter, Leverage, Locality)
 
 ## Directories
 

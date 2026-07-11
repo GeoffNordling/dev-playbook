@@ -48,7 +48,7 @@ Read the changed docs whole, not as hunks — the brief and the docs together �
 2. **Outbound** — docs the changed docs reference: each claim the changed docs make about them must hold.
 3. **Concept** — for each term, name, or rule the diff renames, redefines, or retires, grep repo-wide: every hit outside the diff is a candidate stale claim.
 
-Read the frontier docs and check agreement with the diff. The frontier is one hop: a neighbor's own neighbors are out of bounds — a problem you suspect beyond it goes in the findings as a question or risk naming the doc, not another expansion.
+Read the frontier docs and check agreement with the diff. The frontier is one hop: a neighbor's own neighbors are out of bounds — a problem you suspect beyond it goes in the findings as a question or risk naming the doc, not another expansion. Generated and derived artifacts are off the frontier: anything under `readings/`, `*.html` datasheets, and the like are regenerated from source rather than hand-maintained — never flag them, not even as an out-of-scope follow-up.
 
 ## 4. Attach findings
 

@@ -76,7 +76,7 @@ flowchart LR
     pr_review -->|approve: merge| done
 ```
 
-On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at code review.
+On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at the review stop.
 
 **The decompose exit.** When design concludes the issue is too big to build as one leaf, the issue becomes an **epic** and never builds itself. The decomposing design session performs the children's intake in place, minting each child as a ready leaf — full tuple, brief-complete body per the [tracking standard](/standards/tracking/issues.md) — with no round-trip through the intake node.
 
@@ -88,7 +88,7 @@ Phase labels derive from graph node ids by `_`→`-`: node `sdd_spec_review` →
 
 The issue overwatch moves the `phase:*` label to the next node when a node finishes — one writing session per issue, per [Dispatch](#dispatch); node skills do the work and report. The exception is intake, whose label writes are the deliverable: triage *is* the four-tuple. Nothing launches itself: the overwatch sequences every node, and the human launches the overwatch.
 
-One long-lived branch and PR per issue — spikes open none. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the human's push crosses each `pushed` edge, and at code review the node's first delegation opens the PR; the human merges it on `approve: merge` in the GitHub UI, per [Pull requests](#pull-requests).
+One long-lived branch and PR per issue — spikes open none. The branch is built up across phases in the issue's worktree (see [Worktrees](#worktrees-and-branches)); the human's push crosses each `pushed` edge, and at the review stop the node's first delegation opens the PR; the human merges it on `approve: merge` in the GitHub UI, per [Pull requests](#pull-requests).
 
 ## Worktrees and branches
 
@@ -128,7 +128,7 @@ Consequences that shape the flow:
 
 ## Pull requests
 
-One PR per issue — spikes open none — born at code review and squash-merged by the human. [Repository settings](/standards/tracking/repo-settings.md) make every merge squash-only with the message taken from the PR, so the PR title and body become the permanent commit message on `main`. The format is therefore normative:
+One PR per issue — spikes open none — born at the review stop and squash-merged by the human. [Repository settings](/standards/tracking/repo-settings.md) make every merge squash-only with the message taken from the PR, so the PR title and body become the permanent commit message on `main`. The format is therefore normative:
 
 - **Title** — states the change: it is the commit subject `main`'s history will carry.
 - **Body** — a summary of what changed and why, plus the mandatory `Closes #<N>` line that closes the issue on merge.
