@@ -14,7 +14,7 @@ conformance is the upstream's concern. Exits 0 silently when neither root
 exists, so the same invocation is safe in any repo.
 
 Usage:
-    internal-skill-audit [directory]
+    skill-audit [directory]
 """
 # /// script
 # requires-python = ">=3.14"
@@ -306,7 +306,7 @@ def main():
     ]
 
     if not skill_roots:
-        print("internal-skill-audit: no skill roots found", file=sys.stderr)
+        print("skill-audit: no skill roots found", file=sys.stderr)
         sys.exit(0)
 
     internal_skills: list[Path] = []
@@ -317,7 +317,7 @@ def main():
         skipped += roots_skipped
 
     if not internal_skills:
-        print("internal-skill-audit: no internal skills found", file=sys.stderr)
+        print("skill-audit: no internal skills found", file=sys.stderr)
         sys.exit(0)
 
     all_findings = []
@@ -333,13 +333,13 @@ def main():
     suffix = f" (skipped {skipped} external)" if skipped else ""
     if errors or warnings:
         print(
-            f"internal-skill-audit: {skills} internal skills, "
+            f"skill-audit: {skills} internal skills, "
             f"{errors} error(s), {warnings} warning(s){suffix}",
             file=sys.stderr,
         )
     else:
         print(
-            f"internal-skill-audit: {skills} internal skills, all ok{suffix}",
+            f"skill-audit: {skills} internal skills, all ok{suffix}",
             file=sys.stderr,
         )
 

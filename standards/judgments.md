@@ -16,7 +16,7 @@ are validated and kept from drifting as the underlying files change.
 
 ## Audit
 
-- [judgments-lint](/scripts/judgments-lint) — declaration validity
+- [judgments-audit](/scripts/judgments-audit) — declaration validity
 - [judgments-run](/scripts/judgments-run) — plans, renders, and records
   verdicts over a repo's declarations
 
@@ -27,7 +27,7 @@ are validated and kept from drifting as the underlying files change.
   content is judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — judgments-lint at the **commit gate** in every repo's suite
+  — judgments-audit at the **commit gate** in every repo's suite
 
 ## Adopt
 

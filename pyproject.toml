@@ -11,7 +11,7 @@ dependencies = [
 # scripts/ pre-commit shims call, so the two channels behave identically.
 [project.scripts]
 judgments-run = "dev_playbook.judgments.runner:run_cli"
-judgments-lint = "dev_playbook.judgments.loader:lint_cli"
+judgments-audit = "dev_playbook.judgments.loader:lint_cli"
 
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network

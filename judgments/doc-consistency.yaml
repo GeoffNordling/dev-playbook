@@ -97,7 +97,7 @@ judgments:
       - standards/build/index.md
       - standards/build/canonical.md
       - scripts/repo-audit
-      - scripts/sweep
+      - scripts/workspace-audit
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/Makefile.base
       - standards/build/canonical/ci.yml
@@ -113,8 +113,8 @@ judgments:
     evidence:  [standards/standard.md]
     reference:
       - standards/standard/format.md
-      - scripts/okf-lint
-      - scripts/ref-check
+      - scripts/okf-audit
+      - scripts/ref-audit
       - judgments/doc-consistency.yaml
       - .pre-commit-config.yaml
     model: claude-opus-4-8
@@ -134,7 +134,7 @@ judgments:
       - standards/claude-code/skill-conventions.md
       - standards/claude-code/skill-management.md
       - scripts/repo-audit
-      - scripts/internal-skill-audit
+      - scripts/skill-audit
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/CLAUDE.md.standards
     model: claude-opus-4-8
@@ -150,8 +150,8 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/docs/index.md
-      - scripts/okf-lint
-      - scripts/ref-check
+      - scripts/okf-audit
+      - scripts/ref-audit
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8
     effort: high
@@ -168,7 +168,7 @@ judgments:
       - standards/judgments/index.md
       - standards/judgments/cache-gate.md
       - standards/judgments/consuming.md
-      - scripts/judgments-lint
+      - scripts/judgments-audit
       - scripts/judgments-run
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8
@@ -197,7 +197,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/python/style.md
-      - scripts/python-lint
+      - scripts/python-audit
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/Makefile.python
     model: claude-opus-4-8
@@ -226,7 +226,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/testing/conventions.md
-      - scripts/python-lint
+      - scripts/python-audit
       - standards/build/canonical/Makefile.python
     model: claude-opus-4-8
     effort: high
@@ -243,7 +243,7 @@ judgments:
       - standards/standard/format.md
       - standards/tracking/issues.md
       - standards/tracking/repo-settings.md
-      - scripts/sweep
+      - scripts/workspace-audit
       - scripts/bootstrap-labels
     model: claude-opus-4-8
     effort: high
@@ -274,7 +274,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/instrument/format.md
-      - scripts/okf-lint
+      - scripts/okf-audit
       - instruments/index.md
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8

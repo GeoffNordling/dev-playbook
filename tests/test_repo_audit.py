@@ -151,7 +151,7 @@ def test_missing_base_files_all_reported(tmp_path: Path) -> None:
 def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
     files = base_files()
     files[".github/workflows/ci.yml"] = canonical("ci.yml").replace(
-        "SKIP: ref-check", "SKIP: nothing"
+        "SKIP: ref-audit", "SKIP: nothing"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
@@ -228,8 +228,8 @@ def test_missing_shellcheck_block_fails(tmp_path: Path) -> None:
 def test_appended_hook_inside_pinned_block_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-lint\n",
-        "      - id: judgments-lint\n      - id: internal-skill-audit\n",
+        "      - id: judgments-audit\n",
+        "      - id: judgments-audit\n      - id: skill-audit\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -319,8 +319,8 @@ def test_skills_dir_with_audit_hook_appended_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-lint\n",
-        "      - id: judgments-lint\n      - id: internal-skill-audit\n",
+        "      - id: judgments-audit\n",
+        "      - id: judgments-audit\n      - id: skill-audit\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -609,9 +609,9 @@ def hook_repo_files() -> dict[str, str]:
         config[:start]
         + config[end:]
         + "  - repo: local\n    hooks:\n"
-        + "".join(f"      - id: {h}\n" for h in ("repo-audit", "okf-lint"))
+        + "".join(f"      - id: {h}\n" for h in ("repo-audit", "okf-audit"))
     )
-    files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-lint\n"
+    files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-audit\n"
     # is_file(): tools that treat the canonical pyproject.toml template as a
     # real project drop cache dirs (e.g. .ruff_cache/) into standards/build/canonical/.
     for name in CANONICAL.iterdir():

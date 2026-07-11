@@ -15,7 +15,7 @@ Governs how Python source code is written.
 
 ## Audit
 
-- [python-lint](/scripts/python-lint) — the workspace Python-source
+- [python-audit](/scripts/python-audit) — the workspace Python-source
   detector; read-only, run ad hoc or by the suite
 - ruff (`ruff-check`, `ruff-format`) — third-party lint and formatting
   detector, located by its pin in the canonical
@@ -27,7 +27,7 @@ Governs how Python source code is written.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the **commit gate**, where python-lint and ruff block every commit
+  — the **commit gate**, where python-audit and ruff block every commit
 - `make check` — the **push gate**, where mypy blocks every push
 
 ## Adopt

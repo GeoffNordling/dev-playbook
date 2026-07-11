@@ -16,7 +16,7 @@ Governs how Python tests are written.
 
 ## Audit
 
-- [python-lint](/scripts/python-lint) — partial: no private-name access
+- [python-audit](/scripts/python-audit) — partial: no private-name access
   from tests
 
 ## Enforce

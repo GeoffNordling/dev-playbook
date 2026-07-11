@@ -4,10 +4,10 @@ repos:
     rev: <pinned-sha>
     hooks:
       - id: repo-audit
-      - id: python-lint
-      - id: ref-check
-      - id: okf-lint
-      - id: judgments-lint
+      - id: python-audit
+      - id: ref-audit
+      - id: okf-audit
+      - id: judgments-audit
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:

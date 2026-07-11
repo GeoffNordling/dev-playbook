@@ -32,37 +32,37 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: python-lint
-        name: python-lint
-        entry: scripts/python-lint
+      - id: python-audit
+        name: python-audit
+        entry: scripts/python-audit
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: ref-check
-        name: ref-check
-        entry: scripts/ref-check
+      - id: ref-audit
+        name: ref-audit
+        entry: scripts/ref-audit
         language: script
         pass_filenames: false
         types: [markdown]
 
-      - id: okf-lint
-        name: okf-lint
-        entry: scripts/okf-lint
+      - id: okf-audit
+        name: okf-audit
+        entry: scripts/okf-audit
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: internal-skill-audit
-        name: internal-skill-audit
-        entry: scripts/internal-skill-audit
+      - id: skill-audit
+        name: skill-audit
+        entry: scripts/skill-audit
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: judgments-lint
-        name: judgments-lint
-        entry: scripts/judgments-lint
+      - id: judgments-audit
+        name: judgments-audit
+        entry: scripts/judgments-audit
         language: script
         pass_filenames: false
         always_run: true

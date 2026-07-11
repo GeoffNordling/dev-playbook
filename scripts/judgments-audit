@@ -3,7 +3,7 @@
 # requires-python = ">=3.14"
 # dependencies = ["pyyaml>=6.0"]
 # ///
-"""judgments-lint — pre-commit validator for a repo's judgment declarations.
+"""judgments-audit — pre-commit validator for a repo's judgment declarations.
 
 Thin shim over dev_playbook.judgments.loader.lint: resolve the repo's [tool.judgments]
 config, run the loader's field validation plus the static evidence/reference
