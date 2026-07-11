@@ -16,7 +16,7 @@ that literal path into the repo's **main** checkout. Harmless while the bytes
 match; wrong the moment a session runs inside an issue worktree whose copy of
 the cited file differs from main — every same-repo read silently reaches past
 the worktree into stale, pre-change content. It bit hardest in doc review, where
-the cited standards *are* the change under review (issue #164): on issue #145's
+the cited standards *are* the change under review: on issue #145's
 doc review the reviewer's first reads returned pre-change content, recovering
 only by hand-rewriting paths into the worktree.
 

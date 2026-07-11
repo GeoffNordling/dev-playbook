@@ -58,12 +58,6 @@ published state, not whatever worktree is currently open.
 `~/workspace/<repo>` is self-describing: the repo name is in the path, so
 no external convention is needed to interpret it.
 
-## Same-repo resolution
-
-**Same-repo resolution:** a `~/workspace/<repo>/…` path whose `<repo>` is the repo your session is working in — its main checkout or any of its worktrees — resolves inside your own checkout: substitute your checkout root for `~/workspace/<repo>/`. A path into a different repo resolves as written, to that repo's main checkout. Touching your repo's main checkout from a worktree is legitimate only as a deliberate comparison against published state — say so when you do it.
-
-The written form is kept because no static path can encode this: the same `~/workspace/<repo>/…` citation must resolve to a different checkout depending on where the reader stands — a globally-loaded skill resolves a dev-playbook citation to dev-playbook's main checkout from another repo's worktree, but to the worktree when run inside a dev-playbook worktree — so the meaning has to be a reader-side rule, not a rewritten path. `ref-check` already resolves same-repo citations this way, against the invoking checkout, so this rule states at read time what the linter has enforced at commit time all along; the [same-repo-resolution ADR](/docs/adr/0009-same-repo-resolution.md) records why the alternatives were rejected.
-
 VS Code does not expand `~/` in markdown links, and it resolves a leading
 `/` against the filesystem root rather than the bundle root, so neither
 form is clickable from the editor
@@ -72,6 +66,19 @@ Accepted — agents are the primary audience, and both forms are what the
 `ref-check` linter (`/scripts/ref-check`) validates. Anything else —
 backticked filenames like `` `conftest.py` ``, slash-skill invocations like
 `/commit` — is treated as prose by `ref-check`.
+
+## Same-repo resolution
+
+The definition below is the **canonical wording**, pinned and reused
+byte-for-byte by the session-level carriers (`dotfiles/dot-claude/CLAUDE.md`
+and the `edit-in-dev-playbook` rule) that an agent holds before it has read
+any standard. It is deliberately in the agent-facing second person —
+reproduced here verbatim rather than paraphrased to this Standard's
+declarative third person — so the copies stay identical.
+
+**Same-repo resolution:** a `~/workspace/<repo>/…` path whose `<repo>` is the repo your session is working in — its main checkout or any of its worktrees — resolves inside your own checkout: substitute your checkout root for `~/workspace/<repo>/`. A path into a different repo resolves as written, to that repo's main checkout. Touching your repo's main checkout from a worktree is legitimate only as a deliberate comparison against published state — say so when you do it.
+
+The written form is kept because no static path can encode this: the same `~/workspace/<repo>/…` citation must resolve to a different checkout depending on where the reader stands — a globally-loaded skill resolves a dev-playbook citation to dev-playbook's main checkout from another repo's worktree, but to the worktree when run inside a dev-playbook worktree — so the meaning has to be a reader-side rule, not a rewritten path. `ref-check` already resolves same-repo citations this way, against the invoking checkout, so this rule states at read time what the linter has enforced at commit time all along; the [same-repo-resolution ADR](/docs/adr/0009-same-repo-resolution.md) records why the alternatives were rejected.
 
 ## Fenced code blocks
 
