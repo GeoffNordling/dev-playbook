@@ -38,11 +38,11 @@ PHASES: list[str] = [
     "sdd-specs",
     "sdd-spec-review",
     "sdd-tdd",
-    "sdd-code-pr-review",
+    "sdd-pr-review",
     "design",
     "tdd",
     "build",
-    "code-pr-review",
+    "pr-review",
     "spike",
 ]
 

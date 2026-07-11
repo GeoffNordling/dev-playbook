@@ -1,12 +1,12 @@
 ---
 type: Vocabulary
-title: Architecture Vocabulary
-description: The shared architecture vocabulary — Module, Interface, Depth, Seam, Adapter, Leverage, Locality — used exactly in every architecture suggestion
+title: Vocabulary
+description: The workspace's established vocabulary — the canonical terms to use exactly
 ---
 
-# Architecture Vocabulary
+# Vocabulary
 
-Shared vocabulary for every suggestion about module architecture. Use these terms exactly — don't substitute "component," "service," "API," or "boundary." Consistent language is the whole point.
+The workspace's established vocabulary — the canonical terms every doc uses exactly, so shared language stays consistent instead of each doc reinventing it. Extensible: terms are added here as they're pinned down. Consistent language is the whole point.
 
 ## Language
 

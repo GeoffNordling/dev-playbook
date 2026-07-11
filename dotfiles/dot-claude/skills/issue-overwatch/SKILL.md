@@ -17,7 +17,7 @@ Two hard limits: you never push, and you never merge. Both are the user's.
 
 The workflow is your subject, so know it cold:
 
-- [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) — the graph you execute, the skill table, the worktree contract, the terminal report contract, readiness, and the code-review sequence. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
+- [workflow.md](~/workspace/dev-playbook/workflow/workflow.md) — the graph you execute, the skill table, the worktree contract, the terminal report contract, readiness, and the review sequence. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
 
 Then report: `READ: workflow.md`. Proceed only after.
 
@@ -35,7 +35,7 @@ Repeat until the issue merges, closes, or a stop point (§6): place the issue at
 
 - **HITL** — run it yourself: invoke the node's skill inline (the `Skill` tool, issue number as argument) and interview the user directly.
 - **AFK** — delegate to a subagent (§3).
-- **Review node** — sequence its AFK audit delegations per the skill table and the code-review sequence, then take the verdict yourself (§5).
+- **Review stop** — run `/open-pr` first (always), then read the issue and diff and recommend to the user, with reasons, which tracks to launch: the **code track** (the native `/code-review`, then our fidelity skill), the **doc track** (`/doc-pr-review`), or both — content kind picks the track, not file format. On the user's confirmation, dispatch the chosen tracks' audits in parallel (§3); within the code track the native pass runs before the fidelity skill. Each posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence is workflow.md's review sequence.
 
 When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue. A node whose skill doesn't exist is an escalation, not an improvisation.
 
@@ -69,7 +69,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 The audit subagents post findings and terminate; the verdict interview is yours. First read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) At spec review the findings live in the issue's comments instead (`gh issue view <N> --comments`). Point the user at the findings, answer their questions and help them weigh, and act only on an explicit verdict. Rework is Blocking-driven by default — Suggestions alone don't call for a rework lap. You never touch the work under review; a fix is the author's, routed through rework.
 
-- **approve** — follow the graph's approve edge: at spec review, move the label onward; at code review, the user merges in the GitHub UI (you can't) — report and stop. Worktree teardown is the Agent-view overwatch's, not yours.
+- **approve** — follow the graph's approve edge: at spec review, move the label onward; at the review stop, the user merges in the GitHub UI (you can't) — report and stop. Worktree teardown is the Agent-view overwatch's, not yours.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment` / `gh pr comment`), then move the label back along the rework edge (routed by `tests:*` on the direct path).
 
 ## 6. Turn boundaries — the human's commands
