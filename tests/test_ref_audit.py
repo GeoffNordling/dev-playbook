@@ -10,6 +10,7 @@ and the Citation form wherever the citation handling itself is the subject.
 """
 
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -696,10 +697,59 @@ def test_both_link_classes_counted_in_one_run(tmp_path: Path, workspace: Path) -
         "a [link](/target.md) and a citation ~/workspace/other/thing.md\n",
     )
 
-    result = run_ref_audit(repo, tmp_path, "--all")
+    result = run_ref_audit(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
     assert "2 references, all ok" in result.stderr
+
+
+def test_list_rules_prints_docs_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["python3", str(REF_AUDIT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    ids = result.stdout.split()
+    assert "docs.broken-reference" in ids
+    assert "docs.wrong-form-citation" in ids
+    assert all(rule.startswith("docs.") for rule in ids), ids
+
+
+def test_broken_reference_renders_as_gnu_finding(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "docs.md", "see [gone](/standards/gone.md)\n")
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert re.search(
+        r"^docs\.md:\d+: docs\.broken-reference .*standards/gone\.md",
+        result.stdout,
+        re.MULTILINE,
+    ), result.stdout
+
+
+def test_wrong_form_citation_renders_as_gnu_finding(
+    tmp_path: Path, workspace: Path
+) -> None:
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(repo / "docs.md", "see ~/workspace/primary/target.md\n")
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert re.search(
+        r"^docs\.md:\d+: docs\.wrong-form-citation ",
+        result.stdout,
+        re.MULTILINE,
+    ), result.stdout
 
 
 def test_mixed_pass_and_fail_in_one_run_reports_only_the_broken(
