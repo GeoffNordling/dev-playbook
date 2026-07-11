@@ -228,8 +228,8 @@ def test_missing_shellcheck_block_fails(tmp_path: Path) -> None:
 def test_appended_hook_inside_pinned_block_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-lint\n",
-        "      - id: judgments-lint\n      - id: internal-skill-audit\n",
+        "      - id: judgments-audit\n",
+        "      - id: judgments-audit\n      - id: internal-skill-audit\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -319,8 +319,8 @@ def test_skills_dir_with_audit_hook_appended_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-lint\n",
-        "      - id: judgments-lint\n      - id: internal-skill-audit\n",
+        "      - id: judgments-audit\n",
+        "      - id: judgments-audit\n      - id: internal-skill-audit\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 

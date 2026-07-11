@@ -60,9 +60,9 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: judgments-lint
-        name: judgments-lint
-        entry: scripts/judgments-lint
+      - id: judgments-audit
+        name: judgments-audit
+        entry: scripts/judgments-audit
         language: script
         pass_filenames: false
         always_run: true

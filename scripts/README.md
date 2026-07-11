@@ -61,7 +61,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `ref-audit` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-audit` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `internal-skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
-| `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
 `repo-audit`, `python-audit`, `ref-audit`, and `okf-audit` assert unconditionally
 and fail loud; they do not skip themselves when a target kind is absent. Run
@@ -79,7 +79,7 @@ them per script. The library is the installed `dev_playbook` package:
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
-loading/validation and the plan/render/record runner, behind `judgments-lint`
+loading/validation and the plan/render/record runner, behind `judgments-audit`
 and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`), and
 `dev_playbook.skipcache` (the seen-set the judgments runner uses to skip

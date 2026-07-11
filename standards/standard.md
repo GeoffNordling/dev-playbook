@@ -27,7 +27,7 @@ kept honest.
 
 - the pre-commit hook suite
   ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — okf-audit,
-  ref-audit, and judgments-lint block nonconforming commits at the
+  ref-audit, and judgments-audit block nonconforming commits at the
   **commit gate**; the judgment cache gate reds the **push gate**
   (`make check`)
 

@@ -168,7 +168,7 @@ judgments:
       - standards/judgments/index.md
       - standards/judgments/cache-gate.md
       - standards/judgments/consuming.md
-      - scripts/judgments-lint
+      - scripts/judgments-audit
       - scripts/judgments-run
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8

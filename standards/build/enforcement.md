@@ -59,7 +59,7 @@ pattern. Detector names are the current ones — renames are a later slice.
 | python-audit | workspace Python-source rules | hook pattern |
 | okf-audit | concept-doc types, `index.md` freshness | hook pattern |
 | ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
-| judgments-lint | judgment declarations | hook pattern |
+| judgments-audit | judgment declarations | hook pattern |
 | shellcheck | shell scripts | hook pattern |
 | internal-skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
