@@ -29,6 +29,7 @@ alphabetical; directories last.
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
 - [Module Design](/standards/modules/design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
 - [Python Style](/standards/python/style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
+- [Shell Conventions](/standards/shell/conventions.md) — How shell is written — glue-only boundary, strict mode, declared bash, shellcheck-clean
 - [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
 - [Testing Conventions](/standards/testing/conventions.md) — Default pytest conventions — structure, behavioral focus, test doubles, fixtures, and humble objects
 
