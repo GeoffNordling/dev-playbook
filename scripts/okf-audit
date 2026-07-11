@@ -94,6 +94,17 @@ class Finding:
         return render(self.file, self.rule, self.message, self.line)
 
 
+def _is_title_case(name: str) -> bool:
+    """Whether every whitespace-separated word of a type name is capitalized.
+
+    ``README`` and ``Recipe Description`` pass; ``bogus name`` does not. The
+    registry document declares Title Case type names, so a backticked-but-
+    lowercase cell is a malformed row, not a silently accepted type.
+    """
+    words = name.split()
+    return bool(words) and all(word[0].isupper() for word in words)
+
+
 def _table_cells(line: str) -> list[str]:
     """The stripped cells of a markdown table row (the pipes removed)."""
     return [cell.strip() for cell in line.strip().strip("|").split("|")]
@@ -142,13 +153,43 @@ def parse_registry(repo_root: Path) -> tuple[list[str], list[int]]:
             continue
         first_cell = cells[0] if cells else ""
         name = BACKTICK_NAME.fullmatch(first_cell)
-        if name:
+        if name and _is_title_case(name.group(1)):
             names.append(name.group(1))
         else:
             malformed.append(line_num)
     if not names:
         raise ToolError(f"no types parsed from {REGISTRY_DOC} '## Types' table")
     return names, malformed
+
+
+def check_registry(repo_root: Path) -> tuple[set[str], list[Finding]]:
+    """Parse the type registry and check its rows' shape and declared order.
+
+    Owns ``parse_registry``: returns the registry set (consumed by the type-lint)
+    and its own findings — a ``docs.registry-row`` per malformed row and a
+    ``docs.index-ordering`` when the `## Types` table is not alphabetical by type
+    name (the document's intro declares it alphabetical). Raises ToolError if the
+    registry document or its `## Types` table is absent.
+    """
+    type_names, malformed_rows = parse_registry(repo_root)
+    findings = [
+        Finding(
+            REGISTRY_DOC,
+            "docs.registry-row",
+            "`## Types` row's first cell is not a backticked Title Case type name",
+            line=line_num,
+        )
+        for line_num in malformed_rows
+    ]
+    if not _is_alphabetical(type_names):
+        findings.append(
+            Finding(
+                REGISTRY_DOC,
+                "docs.index-ordering",
+                "`## Types` rows are not in alphabetical order by type name",
+            )
+        )
+    return set(type_names), findings
 
 
 def relpath(path: Path, repo_root: Path) -> str:
@@ -382,7 +423,14 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
         for _, line in md.content_lines(repo_root / rel):
             m = INDEX_BULLET.match(line)
             if m is None:
-                if line.strip().startswith(ORDERING_MARKER):
+                # The marker exempts only as an intro line — one before the
+                # first listed entry. A marker below the listing is prose, not
+                # a declared-order exemption.
+                if (
+                    not group_a
+                    and not child_titles
+                    and line.strip().startswith(ORDERING_MARKER)
+                ):
                     exempt = True
                 continue
             title = m.group(1)
@@ -443,7 +491,7 @@ def main(argv: list[str] | None = None) -> int:
     repo_root = Path(args.directory).resolve()
 
     try:
-        type_names, malformed_rows = parse_registry(repo_root)
+        registry, registry_findings = check_registry(repo_root)
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
         print(f"okf-audit: {err}", file=sys.stderr)
@@ -452,28 +500,12 @@ def main(argv: list[str] | None = None) -> int:
     concept_docs = [rel for rel in all_md if md.classify(rel) == "concept"]
     index_docs = [rel for rel in all_md if md.classify(rel) == "index"]
 
-    findings = check_types(concept_docs, repo_root, set(type_names))
+    findings = check_types(concept_docs, repo_root, registry)
     findings.extend(check_indexes(concept_docs, index_docs, repo_root))
     findings.extend(check_index_ordering(index_docs, repo_root))
-    findings.extend(
-        Finding(
-            REGISTRY_DOC,
-            "docs.registry-row",
-            "`## Types` row's first cell is not a backticked type name",
-            line=line_num,
-        )
-        for line_num in malformed_rows
-    )
-    if not _is_alphabetical(type_names):
-        findings.append(
-            Finding(
-                REGISTRY_DOC,
-                "docs.index-ordering",
-                "`## Types` rows are not in alphabetical order by type name",
-            )
-        )
+    findings.extend(registry_findings)
 
-    for f in sorted(findings, key=lambda f: (f.file, f.rule, f.message, f.line or 0)):
+    for f in sorted(findings, key=lambda f: (f.file, f.line or 0, f.rule, f.message)):
         print(f.render())
 
     scanned = f"{len(concept_docs)} concept docs, {len(index_docs)} indexes"

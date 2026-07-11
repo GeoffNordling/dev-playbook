@@ -313,6 +313,48 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
     ), result.stdout
 
 
+def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> None:
+    """A backticked first cell whose name is not Title Case (each whitespace-
+    separated word capitalized) is a malformed registry row, not a silently
+    accepted type."""
+    doc = (
+        "---\ntype: Standard\ntitle: Document Types\n"
+        "description: The document type registry\n---\n\n"
+        "# Document Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Guide` | teaching |\n| `README` | landing |\n"
+        "| `Recipe Description` | describes code |\n| `Standard` | rules |\n"
+        "| `bogus name` | nonsense |\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert re.search(
+        r"standards/docs/document-types\.md:\d+: docs\.registry-row",
+        result.stdout,
+    ), result.stdout
+
+
+def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> None:
+    """The `Ordering:` marker exempts only as an intro line; one appearing after
+    the first entry is not an exemption, so a deviating index is still flagged."""
+    index = (
+        "# standards/ — index\n\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n"
+        "- [Standards](/standards/README.md) — Standards desc\n\n"
+        "Ordering: by significance, not alphabetical.\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: docs.index-ordering" in result.stdout
+
+
 def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
     """A concept doc's frontmatter `description` must carry no trailing period."""
     repo = make_bundle(
