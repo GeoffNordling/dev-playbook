@@ -609,9 +609,9 @@ def hook_repo_files() -> dict[str, str]:
         config[:start]
         + config[end:]
         + "  - repo: local\n    hooks:\n"
-        + "".join(f"      - id: {h}\n" for h in ("repo-audit", "okf-lint"))
+        + "".join(f"      - id: {h}\n" for h in ("repo-audit", "okf-audit"))
     )
-    files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-lint\n"
+    files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-audit\n"
     # is_file(): tools that treat the canonical pyproject.toml template as a
     # real project drop cache dirs (e.g. .ruff_cache/) into standards/build/canonical/.
     for name in CANONICAL.iterdir():

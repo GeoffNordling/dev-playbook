@@ -14,7 +14,7 @@ to `main`.
 `SKIP: ref-check` because `ref-check` validates cross-repo Citations
 (`~/workspace/<repo>/…`), and a CI runner checks out only the one repo, so
 those citations can never resolve there. Local pre-commit remains the strict
-reference gate. `okf-lint` runs in CI — everything it checks is in-repo.
+reference gate. `okf-audit` runs in CI — everything it checks is in-repo.
 
 ## Tests run locally, not in CI
 

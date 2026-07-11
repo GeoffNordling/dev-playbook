@@ -9,7 +9,7 @@
 #       - id: repo-audit
 #       - id: python-audit
 #       - id: ref-check
-#       - id: okf-lint
+#       - id: okf-audit
 #       - id: internal-skill-audit
 #       - id: judgments-lint
 #
@@ -39,9 +39,9 @@
   pass_filenames: false
   types: [markdown]
 
-- id: okf-lint
-  name: okf-lint
-  entry: scripts/okf-lint
+- id: okf-audit
+  name: okf-audit
+  entry: scripts/okf-audit
   language: script
   pass_filenames: false
   always_run: true

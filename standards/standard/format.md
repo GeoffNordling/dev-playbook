@@ -70,7 +70,7 @@ card, since the meta-standard is an instance of the format it defines.
 ## The catalog
 
 The catalog of all standards is [standards/index.md](/standards/index.md).
-okf-lint's index rule already forces that index to list every card with a
+okf-audit's index rule already forces that index to list every card with a
 matching description, so catalog completeness is enforced by the existing
 hook suite rather than by new tooling.
 

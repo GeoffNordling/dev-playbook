@@ -6,7 +6,7 @@ repos:
       - id: repo-audit
       - id: python-audit
       - id: ref-check
-      - id: okf-lint
+      - id: okf-audit
       - id: judgments-lint
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20

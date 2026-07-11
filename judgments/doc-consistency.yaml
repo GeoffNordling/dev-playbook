@@ -113,7 +113,7 @@ judgments:
     evidence:  [standards/standard.md]
     reference:
       - standards/standard/format.md
-      - scripts/okf-lint
+      - scripts/okf-audit
       - scripts/ref-check
       - judgments/doc-consistency.yaml
       - .pre-commit-config.yaml
@@ -150,7 +150,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/docs/index.md
-      - scripts/okf-lint
+      - scripts/okf-audit
       - scripts/ref-check
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8
@@ -274,7 +274,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/instrument/format.md
-      - scripts/okf-lint
+      - scripts/okf-audit
       - instruments/index.md
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-opus-4-8

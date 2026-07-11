@@ -16,14 +16,14 @@ specified and kept conformant.
 
 ## Audit
 
-- [okf-lint](/scripts/okf-lint) — every spec typed `Instrument Spec`, the
+- [okf-audit](/scripts/okf-audit) — every spec typed `Instrument Spec`, the
   [instruments catalog](/instruments/index.md) complete and fresh
 
 ## Enforce
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-lint at the **commit gate** in every repo's suite
+  — okf-audit at the **commit gate** in every repo's suite
 
 ## Adopt
 

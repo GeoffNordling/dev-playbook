@@ -8,7 +8,7 @@ artifact as a dict; the ``file-graph`` script serializes it.
 
 Markdown mechanics (fence skipping, link extraction, frontmatter, the
 concept/harness classification) come from :mod:`dev_playbook.md`, so the
-graph's grammar cannot drift from ``ref-check`` and ``okf-lint``.
+graph's grammar cannot drift from ``ref-check`` and ``okf-audit``.
 """
 
 import re

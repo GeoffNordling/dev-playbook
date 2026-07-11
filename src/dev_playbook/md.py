@@ -3,7 +3,7 @@
 This module is the single home for the markdown mechanics that more than one
 hook needs: fenced-code skipping, GitHub heading slugs, YAML frontmatter,
 link extraction, and the OKF concept-doc/harness-owned path classification.
-``ref-check`` and ``okf-lint`` both consume it, so the slug rule and the bundle
+``ref-check`` and ``okf-audit`` both consume it, so the slug rule and the bundle
 boundary are defined once here rather than drifting between scripts.
 
 ``yaml`` is imported lazily inside :func:`parse_frontmatter` so importers that
