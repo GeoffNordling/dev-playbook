@@ -32,9 +32,9 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: python-lint
-        name: python-lint
-        entry: scripts/python-lint
+      - id: python-audit
+        name: python-audit
+        entry: scripts/python-audit
         language: script
         pass_filenames: false
         always_run: true

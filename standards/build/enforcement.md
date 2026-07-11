@@ -56,7 +56,7 @@ pattern. Detector names are the current ones — renames are a later slice.
 |---|---|---|
 | repo-audit | structure: presence, forbidden files, layer shape, canonical compares, doc shape, script shebangs, name mapping | hook pattern |
 | ruff-check / ruff-format | Python lint + formatting | hook pattern, plus `lint`/`format-check` targets |
-| python-lint | workspace Python-source rules | hook pattern |
+| python-audit | workspace Python-source rules | hook pattern |
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
 | ref-check | Links and Citations | hook pattern, except the CI gate (skipped) |
 | judgments-lint | judgment declarations | hook pattern |

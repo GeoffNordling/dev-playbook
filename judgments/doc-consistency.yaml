@@ -197,7 +197,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/python/style.md
-      - scripts/python-lint
+      - scripts/python-audit
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/Makefile.python
     model: claude-opus-4-8
@@ -226,7 +226,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/testing/conventions.md
-      - scripts/python-lint
+      - scripts/python-audit
       - standards/build/canonical/Makefile.python
     model: claude-opus-4-8
     effort: high

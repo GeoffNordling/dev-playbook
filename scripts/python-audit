@@ -20,7 +20,7 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    python-lint [directory]
+    python-audit [directory]
 """
 # /// script
 # requires-python = ">=3.14"
@@ -251,7 +251,7 @@ def scan_file(path: Path, root: Path) -> list[Finding]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="python-lint",
+        prog="python-audit",
         description="Lint Python sources: no-future-annotations, empty-init, test-privacy.",
     )
     parser.add_argument(
@@ -269,7 +269,7 @@ def main(argv: list[str] | None = None) -> int:
         for path in files:
             findings.extend(scan_file(path, root))
     except ToolError as err:
-        print(f"python-lint: {err}", file=sys.stderr)
+        print(f"python-audit: {err}", file=sys.stderr)
         return 2
 
     for f in sorted(findings, key=lambda f: (f.file, f.line, f.rule)):
@@ -277,11 +277,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if findings:
         print(
-            f"python-lint: {len(findings)} finding(s) across {len(files)} files",
+            f"python-audit: {len(findings)} finding(s) across {len(files)} files",
             file=sys.stderr,
         )
         return 1
-    print(f"python-lint: clean across {len(files)} files", file=sys.stderr)
+    print(f"python-audit: clean across {len(files)} files", file=sys.stderr)
     return 0
 
 
