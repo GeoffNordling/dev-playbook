@@ -249,3 +249,31 @@ def test_repo_self_scan_is_clean() -> None:
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+# --- rule ids and finding format ---
+
+
+def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+    """--list-rules names every rule, card-prefixed, needing no repository."""
+    result = subprocess.run(
+        ["python3", str(SCRIPT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    ids = result.stdout.split()
+    assert "python.no-future-annotations" in ids
+    assert "python.empty-init" in ids
+    assert "privacy.import-private" in ids
+    assert "privacy.attribute-access" in ids
+
+
+def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path, {"bad.py": "from __future__ import annotations\nx = 1\n"}
+    )
+    result = run(repo)
+    assert result.returncode == 1
+    assert "bad.py:1: python.no-future-annotations " in result.stdout

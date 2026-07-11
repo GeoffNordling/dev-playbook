@@ -105,6 +105,24 @@ def make_fake_gh(tmp_path: Path, data: dict[str, dict]) -> tuple[Path, Path]:
     return gh_dir, gh_data
 
 
+# --- rule ids ---
+
+
+def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["python3", str(SCRIPT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    ids = set(result.stdout.split())
+    assert "tracking.settings" in ids
+    assert "tracking.remote" in ids
+    assert "build.pin" in ids
+    assert all(rule.split(".")[0] in {"tracking", "build"} for rule in ids), ids
+
+
 # --- pins ---
 
 
@@ -125,9 +143,11 @@ def test_pin_current_stale_and_absent(tmp_path: Path) -> None:
     make_workspace_repo(ws, "gamma", {"README.md": "# G\n"})
     result = run(ws, "--pins-only")
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "alpha  pin  current" in result.stdout
-    assert re.search(r"beta  pin  0{16} \(hook repo main is \w{12}\)", result.stdout)
-    assert "gamma  pin  no .pre-commit-config.yaml" in result.stdout
+    assert "alpha: pin current" in result.stderr
+    assert re.search(
+        r"beta: build.pin 0{16} \(hook repo main is \w{12}\)", result.stdout
+    )
+    assert "gamma: no .pre-commit-config.yaml" in result.stderr
     assert "1 stale pin(s)" in result.stderr
 
 
@@ -145,7 +165,7 @@ def test_short_sha_pin_matches_main(tmp_path: Path) -> None:
         ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha()[:10])}
     )
     result = run(ws, "--pins-only")
-    assert "alpha  pin  current" in result.stdout
+    assert "alpha: pin current" in result.stderr
 
 
 def test_config_without_hook_repo_pin(tmp_path: Path) -> None:
@@ -161,7 +181,7 @@ def test_config_without_hook_repo_pin(tmp_path: Path) -> None:
         },
     )
     result = run(ws, "--pins-only")
-    assert "delta  pin  no dev-playbook pin" in result.stdout
+    assert "delta: no dev-playbook pin" in result.stderr
 
 
 def test_hook_repo_itself_has_no_pin_line(tmp_path: Path) -> None:
@@ -194,7 +214,10 @@ def test_drifted_setting_is_a_finding(tmp_path: Path) -> None:
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": drifted})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
-    assert "alpha  settings  allow_merge_commit is True (want False)" in result.stdout
+    assert (
+        "alpha: tracking.settings allow_merge_commit is True (want False)"
+        in result.stdout
+    )
 
 
 def test_unreachable_repo_is_a_finding(tmp_path: Path) -> None:
@@ -205,7 +228,9 @@ def test_unreachable_repo_is_a_finding(tmp_path: Path) -> None:
     gh_dir, gh_data = make_fake_gh(tmp_path, {})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
-    assert "alpha  settings  unreachable via gh api (me/unknown)" in result.stdout
+    assert (
+        "alpha: tracking.settings unreachable via gh api (me/unknown)" in result.stdout
+    )
 
 
 def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
@@ -214,4 +239,6 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     gh_dir, gh_data = make_fake_gh(tmp_path, {})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
-    assert "alpha  remote  no GitHub origin; settings unchecked" in result.stdout
+    assert (
+        "alpha: tracking.remote no GitHub origin; settings unchecked" in result.stdout
+    )

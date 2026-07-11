@@ -15,12 +15,13 @@ dev_playbook.pyast.find_python_files, so gitignore-aware and worktree-scoped):
     (see standards/testing/conventions.md).
 
 Output:
-    stdout — one finding per line, ``file:line  rule  message``.
+    stdout — one finding per line, ``file:line: card.rule message``.
     stderr — one human-readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
     python-audit [directory]
+    python-audit --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -35,9 +36,27 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from dev_playbook import pyast  # noqa: E402
+from dev_playbook.findings import print_rules, render  # noqa: E402
 
 FUTURE_MESSAGE = "`from __future__ import annotations` is banned (Python >= 3.11)"
 INIT_MESSAGE = "`__init__.py` must be empty (no docstring, no code)"
+
+# Every rule id this detector can emit, namespaced by the card whose question
+# it answers. The privacy.* family relocates to the testing detector later. Each
+# id is a module-level constant so every emission site references the constant,
+# never a raw literal, and RULES (what --list-rules prints) cannot drift from
+# what the detector actually emits.
+NO_FUTURE_ANNOTATIONS = "python.no-future-annotations"
+EMPTY_INIT = "python.empty-init"
+IMPORT_PRIVATE = "privacy.import-private"
+ATTRIBUTE_ACCESS = "privacy.attribute-access"
+
+RULES = (
+    NO_FUTURE_ANNOTATIONS,
+    EMPTY_INIT,
+    IMPORT_PRIVATE,
+    ATTRIBUTE_ACCESS,
+)
 
 # Per-rule directory scope. The three rules were separate hooks with different
 # reach, and consolidation preserves each rather than silently unifying them:
@@ -79,7 +98,7 @@ class Finding:
     message: str
 
     def render(self) -> str:
-        return f"{self.file}:{self.line}  {self.rule}  {self.message}"
+        return render(self.file, self.rule, self.message, self.line)
 
 
 def check_no_future(rel: str, tree: ast.Module) -> list[Finding]:
@@ -91,7 +110,7 @@ def check_no_future(rel: str, tree: ast.Module) -> list[Finding]:
             and any(alias.name == "annotations" for alias in node.names)
         ):
             findings.append(
-                Finding(rel, node.lineno, "no-future-annotations", FUTURE_MESSAGE)
+                Finding(rel, node.lineno, NO_FUTURE_ANNOTATIONS, FUTURE_MESSAGE)
             )
     return findings
 
@@ -107,7 +126,7 @@ def check_empty_init(rel: str, path: Path) -> list[Finding]:
     except (OSError, UnicodeDecodeError) as err:
         raise ToolError(f"cannot read {rel}: {err}") from err
     if text.strip():
-        return [Finding(rel, 1, "empty-init", INIT_MESSAGE)]
+        return [Finding(rel, 1, EMPTY_INIT, INIT_MESSAGE)]
     return []
 
 
@@ -171,7 +190,7 @@ class _PrivacyVisitor(ast.NodeVisitor):
                 if _is_private(alias.name):
                     self._add(
                         node,
-                        "privacy.import-private",
+                        IMPORT_PRIVATE,
                         f"imports private name '{alias.name}' from "
                         f"non-test module '{module}'",
                     )
@@ -206,7 +225,7 @@ class _PrivacyVisitor(ast.NodeVisitor):
                 if source_module and not _is_test_module(source_module):
                     self._add(
                         node,
-                        "privacy.attribute-access",
+                        ATTRIBUTE_ACCESS,
                         f"reaches into private name '{node.attr}' on "
                         f"non-test import '{root}' ({_attribute_chain(node)})",
                     )
@@ -217,7 +236,7 @@ class _PrivacyVisitor(ast.NodeVisitor):
             if _is_private(segment):
                 self._add(
                     node,
-                    "privacy.import-private",
+                    IMPORT_PRIVATE,
                     f"imports through private module segment '{segment}' in '{module}'",
                 )
                 return
@@ -260,7 +279,14 @@ def main(argv: list[str] | None = None) -> int:
         default=".",
         help="repository root to scan (default: current directory)",
     )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
     args = parser.parse_args(argv)
+    if args.list_rules:
+        return print_rules(RULES)
     root = Path(args.directory).resolve()
 
     try:

@@ -15,12 +15,14 @@ root:
     catches up when its pin is deliberately bumped.
 
 Output:
-    stdout — one line per repo per fact, ``repo  kind  message``.
-    stderr — one human-readable summary line.
+    stdout — one finding per line, ``repo: card.rule message`` (the repo name
+             stands in the location slot; this audit inspects repos, not files).
+    stderr — informational per-repo lines (current/absent pins) and one summary.
     exit   — 0 clean, 1 settings findings, 2 cannot run.
 
 Usage:
     workspace-audit [--workspace DIR] [--pins-only | --settings-only]
+    workspace-audit --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -33,6 +35,26 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.findings import print_rules, render  # noqa: E402
+
+# Every rule id this detector can emit. Repo-settings drift and reachability
+# answer the tracking card; a stale dev-playbook pin answers the build card
+# (non-blocking). Informational pin lines carry no rule id. Each id is a
+# module-level constant so every emission site references the constant, never a
+# raw literal, and RULES (what --list-rules prints) cannot drift from what the
+# detector actually emits.
+SETTINGS = "tracking.settings"
+REMOTE = "tracking.remote"
+PIN = "build.pin"
+
+RULES = (
+    SETTINGS,
+    REMOTE,
+    PIN,
+)
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_CONFIG = HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
@@ -60,13 +82,17 @@ class ToolError(Exception):
 @dataclass(frozen=True)
 class Line:
     repo: str
-    kind: str  # "settings" | "pin" | "remote"
+    rule: str | None  # None = informational (no rule id): a stderr advisory
     message: str
-    finding: bool
-    stale: bool = False
+    blocking: bool = False  # a settings finding: sets exit 1
+
+    @property
+    def stale(self) -> bool:
+        return self.rule == PIN
 
     def render(self) -> str:
-        return f"{self.repo}  {self.kind}  {self.message}"
+        assert self.rule is not None
+        return render(self.repo, self.rule, self.message)
 
 
 def hook_repo_url() -> str:
@@ -128,19 +154,17 @@ def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
     name = repo.name
     config = repo / ".pre-commit-config.yaml"
     if not config.is_file():
-        return Line(name, "pin", "no .pre-commit-config.yaml", finding=False)
+        return Line(name, None, "no .pre-commit-config.yaml")
     rev = pinned_rev(config.read_text(encoding="utf-8"), url)
     if rev is None:
-        return Line(name, "pin", "no dev-playbook pin", finding=False)
+        return Line(name, None, "no dev-playbook pin")
     current = main_sha == rev or (len(rev) >= 7 and main_sha.startswith(rev))
     if current:
-        return Line(name, "pin", "current", finding=False)
+        return Line(name, None, "pin current")
     return Line(
         name,
-        "pin",
+        PIN,
         f"{rev} (hook repo main is {main_sha[:12]})",
-        finding=False,
-        stale=True,
     )
 
 
@@ -162,16 +186,20 @@ def check_settings(repo: Path) -> list[Line]:
     name = repo.name
     slug = origin_slug(repo)
     if slug is None:
-        return [Line(name, "remote", "no GitHub origin; settings unchecked", finding=True)]
+        return [
+            Line(name, REMOTE, "no GitHub origin; settings unchecked", blocking=True)
+        ]
     settings = fetch_settings(slug)
     if settings is None:
-        return [Line(name, "settings", f"unreachable via gh api ({slug})", finding=True)]
+        return [
+            Line(name, SETTINGS, f"unreachable via gh api ({slug})", blocking=True)
+        ]
     return [
         Line(
             name,
-            "settings",
+            SETTINGS,
             f"{field} is {settings.get(field)!r} (want {want!r})",
-            finding=True,
+            blocking=True,
         )
         for field, want in EXPECTED_SETTINGS.items()
         if settings.get(field) != want
@@ -189,10 +217,17 @@ def main(argv: list[str] | None = None) -> int:
         default=Path.home() / "workspace",
         help="workspace root holding the repos (default: ~/workspace)",
     )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--pins-only", action="store_true", help="skip the gh api checks")
     mode.add_argument("--settings-only", action="store_true", help="skip the pin checks")
     args = parser.parse_args(argv)
+    if args.list_rules:
+        return print_rules(RULES)
 
     try:
         repos = workspace_repos(args.workspace.resolve())
@@ -211,9 +246,12 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     for line in lines:
-        print(line.render())
+        if line.rule is not None:
+            print(line.render())
+        else:
+            print(f"workspace-audit: {line.repo}: {line.message}", file=sys.stderr)
 
-    findings = sum(1 for line in lines if line.finding)
+    findings = sum(1 for line in lines if line.blocking)
     stale = sum(1 for line in lines if line.stale)
     print(
         f"workspace-audit: {len(repos)} repos, {findings} settings finding(s), {stale} stale pin(s)",

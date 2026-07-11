@@ -22,27 +22,39 @@ outside link syntax, and files under any `adr/` directory as sources
 (references *to* ADRs are still validated).
 
 Output:
-    stdout — JSON Lines, one record per reference: {source, line, target, status};
-             status is "ok", "broken", or "wrong-form". Default: only
-             non-"ok" records. With --all: every reference.
+    stdout — one finding per line, `file:line: docs.rule message`, for each
+             reference that does not resolve (broken) or uses the wrong form
+             (a same-repo Citation from a fixed-root source).
     stderr — one human-readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    ref-audit [--all] [directory]
+    ref-audit [directory]
+    ref-audit --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
 # ///
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from dev_playbook import gitrepo, md  # noqa: E402
+from dev_playbook.findings import print_rules, render  # noqa: E402
+
+# The rule id and finding message for each non-ok reference status.
+RULE_FOR = {
+    "broken": "docs.broken-reference",
+    "wrong-form": "docs.wrong-form-citation",
+}
+MESSAGE_FOR = {
+    "broken": "reference does not resolve",
+    "wrong-form": "same-repo target must use a Link, not a Citation",
+}
+RULES = tuple(RULE_FOR.values())
 
 # ADR sources are exempt: ADRs are immutable, so their outbound references
 # are accepted staleness. References TO ADRs are still validated.
@@ -179,11 +191,13 @@ def main() -> None:
         help="Repository root to scan (default: current directory)",
     )
     parser.add_argument(
-        "--all",
+        "--list-rules",
         action="store_true",
-        help="Emit JSON for every reference, not just broken ones",
+        help="print the rule ids this detector can emit, one per line, and exit",
     )
     args = parser.parse_args()
+    if args.list_rules:
+        sys.exit(print_rules(RULES))
 
     repo_root = Path(args.directory).resolve()
     try:
@@ -207,8 +221,16 @@ def main() -> None:
                 broken += 1
             elif ref["status"] == "wrong-form":
                 wrong_form += 1
-            if args.all or ref["status"] != "ok":
-                print(json.dumps(ref))
+            status = ref["status"]
+            if status != "ok":
+                print(
+                    render(
+                        ref["source"],
+                        RULE_FOR[status],
+                        f"{MESSAGE_FOR[status]}: {ref['target']}",
+                        ref["line"],
+                    )
+                )
 
     if total == 0:
         print(f"ref-audit: no cross-references found in {repo_root}", file=sys.stderr)

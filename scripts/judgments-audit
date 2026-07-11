@@ -5,11 +5,13 @@
 # ///
 """judgments-audit — pre-commit validator for a repo's judgment declarations.
 
-Thin shim over dev_playbook.judgments.loader.lint: resolve the repo's [tool.judgments]
-config, run the loader's field validation plus the static evidence/reference
-path checks (relative + exists), print every error, and exit nonzero if any.
-A repo with no config validates nothing and exits 0. Fast and deterministic --
-no LLM, no hashing. See dev_playbook.judgments.loader for the logic and its tests.
+Thin shim over dev_playbook.judgments.loader.lint_cli: resolve the repo's
+[tool.judgments] config, run the loader's field validation plus the static
+evidence/reference path checks (relative + exists), print every finding to
+stdout as a GNU finding line (`file: judgments.rule message`), and exit nonzero
+if any. `--list-rules` prints the rule ids and exits 0. A repo with no config
+validates nothing and exits 0. Fast and deterministic -- no LLM, no hashing.
+See dev_playbook.judgments.loader for the logic and its tests.
 """
 
 import sys

@@ -4,6 +4,7 @@ okf-audit declares pyyaml via PEP 723 and imports the local dev_playbook package
 is invoked exactly the way pre-commit runs it: `uv run --script`.
 """
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -30,8 +31,8 @@ BASE_BUNDLE: dict[str, str] = {
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
-        "| `Standard` | rules |\n| `README` | landing |\n"
-        "| `Guide` | teaching |\n| `Recipe Description` | describes code |\n"
+        "| `Guide` | teaching |\n| `README` | landing |\n"
+        "| `Recipe Description` | describes code |\n| `Standard` | rules |\n"
     ),
     "standards/index.md": (
         "# standards/ — index\n\n"
@@ -219,7 +220,7 @@ def test_malformed_frontmatter_is_flagged_and_siblings_still_lint(
 
     assert result.returncode == 1
     assert "standards/README.md" in result.stdout
-    assert "okf.frontmatter" in result.stdout
+    assert "docs.frontmatter" in result.stdout
     # The malformed doc did not abort the scan: the sibling problem is caught too.
     assert "missing 'type'" in result.stdout
 
@@ -265,3 +266,249 @@ def test_repo_self_scan_is_clean() -> None:
     repo = Path(__file__).resolve().parents[1]
     result = run_okf_audit(repo)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+# --- rule ids and finding format ---
+
+
+def test_list_rules_prints_docs_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["uv", "run", "--script", str(OKF_AUDIT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    ids = result.stdout.split()
+    assert "docs.type" in ids
+    assert "docs.registry-row" in ids
+    assert "docs.description-shape" in ids
+    assert "docs.index-ordering" in ids
+    assert all(rule.startswith("docs.") for rule in ids), ids
+
+
+def test_malformed_registry_row_is_flagged_not_silently_skipped(
+    tmp_path: Path,
+) -> None:
+    """A `## Types` row without a backticked name in its first cell used to drop
+    out of the registry silently; now it is a `docs.registry-row` finding at the
+    row's line."""
+    doc = (
+        "---\ntype: Standard\ntitle: Document Types\n"
+        "description: The document type registry\n---\n\n"
+        "# Document Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Standard` | rules |\n| `README` | landing |\n"
+        "| `Guide` | teaching |\n| `Recipe Description` | describes code |\n"
+        "| Bogus row without ticks | nonsense |\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert re.search(
+        r"standards/docs/document-types\.md:\d+: docs\.registry-row",
+        result.stdout,
+    ), result.stdout
+
+
+def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> None:
+    """A backticked first cell whose name is not Title Case (each whitespace-
+    separated word capitalized) is a malformed registry row, not a silently
+    accepted type."""
+    doc = (
+        "---\ntype: Standard\ntitle: Document Types\n"
+        "description: The document type registry\n---\n\n"
+        "# Document Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Guide` | teaching |\n| `README` | landing |\n"
+        "| `Recipe Description` | describes code |\n| `Standard` | rules |\n"
+        "| `bogus name` | nonsense |\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert re.search(
+        r"standards/docs/document-types\.md:\d+: docs\.registry-row",
+        result.stdout,
+    ), result.stdout
+
+
+def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> None:
+    """The `Ordering:` marker exempts only as an intro line; one appearing after
+    the first entry is not an exemption, so the out-of-alphabetical concept order
+    (README.md still leads) is still flagged."""
+    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
+        "- [Apple](/standards/apple.md) — apple guide\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n\n"
+        "Ordering: by significance, not alphabetical.\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/zebra.md": guide.format(t="Zebra", d="zebra guide"),
+            "standards/apple.md": guide.format(t="Apple", d="apple guide"),
+            "standards/index.md": index,
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: docs.index-ordering" in result.stdout
+
+
+def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
+    """A concept doc's frontmatter `description` must carry no trailing period."""
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/README.md": (
+                "---\ntype: README\ntitle: Standards\n"
+                "description: Standards desc.\n---\n\n# Standards\n"
+            ),
+            "standards/index.md": (
+                "# standards/ — index\n\n"
+                "- [Standards](/standards/README.md) — Standards desc.\n"
+                "- [Document Types](/standards/docs/document-types.md) —"
+                " The document type registry\n"
+            ),
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/README.md: docs.description-shape" in result.stdout
+
+
+def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
+    """The README.md entry must head an index; here it trails a concept doc."""
+    index = (
+        "# standards/ — index\n\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: docs.index-ordering" in result.stdout
+
+
+def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
+    """An intro line beginning `Ordering:` declares a meaningful order and
+    exempts the index from the alphabetical checks. README.md still leads, so the
+    marker excuses only the out-of-alphabetical concept order below."""
+    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    index = (
+        "# standards/ — index\n\n"
+        "Ordering: by significance, not alphabetical.\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
+        "- [Apple](/standards/apple.md) — apple guide\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/zebra.md": guide.format(t="Zebra", d="zebra guide"),
+            "standards/apple.md": guide.format(t="Apple", d="apple guide"),
+            "standards/index.md": index,
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
+    """The `Ordering:` marker exempts only the alphabetical checks; the README.md
+    entry must lead even under the marker, so a marked index that lists it
+    non-first is still flagged."""
+    index = (
+        "# standards/ — index\n\n"
+        "Ordering: by significance, not alphabetical.\n\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: docs.index-ordering" in result.stdout
+    assert "the README.md entry must be listed first" in result.stdout
+
+
+def test_concept_entries_out_of_alphabetical_order_are_flagged(
+    tmp_path: Path,
+) -> None:
+    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Document Types](/standards/docs/document-types.md) —"
+        " The document type registry\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
+        "- [Apple](/standards/apple.md) — apple guide\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/zebra.md": guide.format(t="Zebra", d="zebra guide"),
+            "standards/apple.md": guide.format(t="Apple", d="apple guide"),
+            "standards/index.md": index,
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: docs.index-ordering" in result.stdout
+
+
+def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> None:
+    """document-types.md declares its `## Types` table alphabetical; a table
+    whose rows are not is a `docs.index-ordering` finding."""
+    doc = (
+        "---\ntype: Standard\ntitle: Document Types\n"
+        "description: The document type registry\n---\n\n"
+        "# Document Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `README` | landing |\n| `Standard` | rules |\n"
+        "| `Guide` | teaching |\n| `Recipe Description` | describes code |\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/docs/document-types.md: docs.index-ordering" in result.stdout
+
+
+def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/README.md": "---\ntitle: Standards\ndescription: Standards desc\n---\n\n# S\n"
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/README.md: docs.type missing 'type'" in result.stdout

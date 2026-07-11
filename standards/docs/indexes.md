@@ -37,14 +37,16 @@ okf_version: "0.1"
 ## Ordering
 
 Within each group of an index — the concept documents after `README.md`,
-and the child-directory links — the default order is **alphabetical by
-link title**, case-insensitive. `README.md` always comes first.
+and the child-directory links — entries are **alphabetical by link title**,
+case-insensitive. `README.md` always comes first.
 
-An index may use a different, meaningful order **only when its intro prose
-declares what that order is** — for example "listed in reading order",
-"in ADR number order", or "ordered by level of abstraction". An undeclared
-deviation from alphabetical is a defect: a reader cannot distinguish
-unstated meaning from entropy.
+An index may deviate from alphabetical **only when an intro line beginning
+`Ordering:` declares the meaningful order** — for example
+`Ordering: in ADR number order` or `Ordering: by level of abstraction`. The
+marker is structured, not prose: the detector checks only that an intro line
+(one before the first listed entry) begins `Ordering:`, and never parses what
+the declaration says. An undeclared deviation from alphabetical is a defect —
+a reader cannot distinguish unstated meaning from entropy.
 
 ## Authored, not generated
 

@@ -18,12 +18,13 @@ and parsed pyproject.toml values (settings the canonical file pins must
 match exactly; additions are free).
 
 Output:
-    stdout — one finding per line, ``path  rule  message``.
+    stdout — one finding per line, ``path: card.rule message``.
     stderr — one human-readable summary line, including the inferred layers.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
     repo-audit [directory]
+    repo-audit --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -41,6 +42,43 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from dev_playbook import gitrepo, md, pyast  # noqa: E402
+from dev_playbook.findings import print_rules, render  # noqa: E402
+
+# Every rule id this detector can emit. Most answer the build card; the
+# CLAUDE.md ## Standards block and the skills-hook check answer the claude-code
+# card, and the README/CONTEXT doc-shape check answers the docs card. Each id is
+# a module-level constant so every emission site references the constant, never a
+# raw literal, and RULES (what --list-rules prints) cannot drift from what the
+# detector actually emits.
+REQUIRED_FILE = "build.required-file"
+LAYER_SHAPE = "build.layer-shape"
+FORBIDDEN = "build.forbidden"
+CANONICAL_BYTES = "build.canonical-bytes"
+CANONICAL_BLOCK = "build.canonical-block"
+CANONICAL_VALUE = "build.canonical-value"
+NAME_MAPPING = "build.name-mapping"
+SCRIPT_SHEBANG = "build.script-shebang"
+SCRIPT_PYTHON = "build.script-python"
+SELF_AUDIT = "build.self-audit"
+STANDARDS_BLOCK = "claude-code.standards-block"
+SKILLS_HOOK = "claude-code.skills-hook"
+DOC_SHAPE = "docs.doc-shape"
+
+RULES = (
+    REQUIRED_FILE,
+    LAYER_SHAPE,
+    FORBIDDEN,
+    CANONICAL_BYTES,
+    CANONICAL_BLOCK,
+    CANONICAL_VALUE,
+    NAME_MAPPING,
+    SCRIPT_SHEBANG,
+    SCRIPT_PYTHON,
+    SELF_AUDIT,
+    STANDARDS_BLOCK,
+    SKILLS_HOOK,
+    DOC_SHAPE,
+)
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_DIR = HOOK_REPO_ROOT / "standards" / "build" / "canonical"
@@ -98,7 +136,7 @@ class Finding:
     message: str
 
     def render(self) -> str:
-        return f"{self.path}  {self.rule}  {self.message}"
+        return render(self.path, self.rule, self.message)
 
 
 @dataclass(frozen=True)
@@ -214,7 +252,7 @@ def check_precommit_config(root: Path, self_mode: bool) -> list[Finding]:
             findings.append(
                 Finding(
                     ".pre-commit-config.yaml",
-                    "canonical-block",
+                    CANONICAL_BLOCK,
                     f"canonical block missing or out of order: '{segment[0].strip()}'",
                 )
             )
@@ -247,7 +285,7 @@ def check_makefile(root: Path, layers: Layers, python_files: list[Path]) -> list
             findings.append(
                 Finding(
                     "Makefile",
-                    "canonical-block",
+                    CANONICAL_BLOCK,
                     f"canonical {name} targets missing (verbatim; extras may follow)",
                 )
             )
@@ -263,15 +301,15 @@ def check_presence(
     findings = []
     for rel in BASE_REQUIRED:
         if not (root / rel).is_file():
-            findings.append(Finding(rel, "required-file", "required in every repo"))
+            findings.append(Finding(rel, REQUIRED_FILE, "required in every repo"))
     if layers.python:
         if not (root / ".python-version").is_file():
             findings.append(
-                Finding(".python-version", "required-file", "required in a python repo")
+                Finding(".python-version", REQUIRED_FILE, "required in a python repo")
             )
         if "uv.lock" not in tracked:
             findings.append(
-                Finding("uv.lock", "required-file", "must be committed in a python repo")
+                Finding("uv.lock", REQUIRED_FILE, "must be committed in a python repo")
             )
     if (layers.src or layers.scripts_python) and not any(
         rel.startswith("tests/") for rel in files
@@ -279,7 +317,7 @@ def check_presence(
         findings.append(
             Finding(
                 "tests/",
-                "required-file",
+                REQUIRED_FILE,
                 "required once src/ exists or scripts/ holds Python",
             )
         )
@@ -287,12 +325,12 @@ def check_presence(
         findings.append(
             Finding(
                 "package.json",
-                "required-file",
+                REQUIRED_FILE,
                 "a committed lockfile must sit alongside package.json",
             )
         )
     if layers.aws and not layers.src:
-        findings.append(Finding("cdk.json", "layer-shape", "the aws layer requires src/"))
+        findings.append(Finding("cdk.json", LAYER_SHAPE, "the aws layer requires src/"))
     return findings
 
 
@@ -305,7 +343,7 @@ def check_forbidden(
             findings.append(
                 Finding(
                     f"{name}/",
-                    "forbidden",
+                    FORBIDDEN,
                     "checked-in runnables live in scripts/, not a root bin/ or tools/",
                 )
             )
@@ -315,28 +353,28 @@ def check_forbidden(
         base = Path(rel).name
         if base == "requirements.txt":
             findings.append(
-                Finding(rel, "forbidden", "dependencies live in pyproject.toml + uv.lock")
+                Finding(rel, FORBIDDEN, "dependencies live in pyproject.toml + uv.lock")
             )
         elif base == "pyproject.toml" and rel != "pyproject.toml":
             findings.append(
-                Finding(rel, "forbidden", "one Python project per repo, at the root")
+                Finding(rel, FORBIDDEN, "one Python project per repo, at the root")
             )
         elif base == "CONTEXT.md" and rel != "CONTEXT.md":
             findings.append(
-                Finding(rel, "forbidden", "CONTEXT.md lives at the repo root only")
+                Finding(rel, FORBIDDEN, "CONTEXT.md lives at the repo root only")
             )
     if layers.aws:
         if (root / "app.py").is_file():
             findings.append(
                 Finding(
                     "app.py",
-                    "forbidden",
+                    FORBIDDEN,
                     "the CDK entry is src/<package>/app.py, not a root app.py",
                 )
             )
         if any(rel.startswith("cdk.out/") for rel in tracked):
             findings.append(
-                Finding("cdk.out/", "forbidden", "synth output is gitignored, never committed")
+                Finding("cdk.out/", FORBIDDEN, "synth output is gitignored, never committed")
             )
     return findings
 
@@ -348,7 +386,7 @@ def check_canonical_bytes(root: Path) -> list[Finding]:
         path = root / rel
         if path.is_file() and path.read_bytes() != canonical_raw(canon):
             findings.append(
-                Finding(rel, "canonical-bytes", f"must be byte-identical to the canonical {canon}")
+                Finding(rel, CANONICAL_BYTES, f"must be byte-identical to the canonical {canon}")
             )
     return findings
 
@@ -364,7 +402,7 @@ def check_gitignore(root: Path) -> list[Finding]:
         return []
     have = set(gitignore_patterns(path.read_text(encoding="utf-8")))
     return [
-        Finding(".gitignore", "canonical-block", f"missing baseline pattern '{pattern}'")
+        Finding(".gitignore", CANONICAL_BLOCK, f"missing baseline pattern '{pattern}'")
         for pattern in gitignore_patterns(canonical_text(".gitignore"))
         if pattern not in have
     ]
@@ -389,7 +427,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
     try:
         consumer = tomllib.loads(path.read_text(encoding="utf-8"))
     except tomllib.TOMLDecodeError as err:
-        return [Finding("pyproject.toml", "canonical-value", f"does not parse: {err}")]
+        return [Finding("pyproject.toml", CANONICAL_VALUE, f"does not parse: {err}")]
     canon = tomllib.loads(canonical_text("pyproject.toml"))
     findings = []
 
@@ -399,7 +437,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
             findings.append(
                 Finding(
                     "pyproject.toml",
-                    "canonical-value",
+                    CANONICAL_VALUE,
                     f"{dotted} must be {expected!r}, got {actual!r}",
                 )
             )
@@ -429,7 +467,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
             findings.append(
                 Finding(
                     "pyproject.toml",
-                    "canonical-value",
+                    CANONICAL_VALUE,
                     f"dependency-groups.dev must contain {floor!r}",
                 )
             )
@@ -444,7 +482,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
             findings.append(
                 Finding(
                     "pyproject.toml",
-                    "canonical-value",
+                    CANONICAL_VALUE,
                     "a scripts-only repo (no src/) omits [build-system]",
                 )
             )
@@ -471,7 +509,7 @@ def check_src_package(
         findings.append(
             Finding(
                 f"src/{extra}",
-                "name-mapping",
+                NAME_MAPPING,
                 f"src/ holds exactly one package, named '{pkg}'",
             )
         )
@@ -479,13 +517,13 @@ def check_src_package(
         findings.append(
             Finding(
                 f"src/{pkg}/",
-                "name-mapping",
+                NAME_MAPPING,
                 f"src/ holds exactly one package, named '{pkg}'",
             )
         )
     if layers.aws and not (root / "src" / pkg / "app.py").is_file():
         findings.append(
-            Finding(f"src/{pkg}/app.py", "required-file", "the aws layer's CDK entry")
+            Finding(f"src/{pkg}/app.py", REQUIRED_FILE, "the aws layer's CDK entry")
         )
     return findings
 
@@ -497,11 +535,11 @@ def check_cdk(root: Path, layers: Layers, repo_name: str) -> list[Finding]:
     try:
         data = json.loads((root / "cdk.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as err:
-        return [Finding("cdk.json", "canonical-value", f"does not parse: {err}")]
+        return [Finding("cdk.json", CANONICAL_VALUE, f"does not parse: {err}")]
     actual = data.get("app")
     if actual != expected:
         return [
-            Finding("cdk.json", "canonical-value", f"app must be {expected!r}, got {actual!r}")
+            Finding("cdk.json", CANONICAL_VALUE, f"app must be {expected!r}, got {actual!r}")
         ]
     return []
 
@@ -526,7 +564,7 @@ def check_claude_standards(root: Path) -> list[Finding]:
         return [
             Finding(
                 "CLAUDE.md",
-                "canonical-block",
+                STANDARDS_BLOCK,
                 "canonical '## Standards' block missing"
                 " (verbatim; the CLAUDE.md.standards artifact)",
             )
@@ -540,12 +578,12 @@ def check_doc_shapes(root: Path) -> list[Finding]:
     if readme.is_file() and not any(
         re.match(r"^# +\S", line) for line in body_lines(readme)
     ):
-        findings.append(Finding("README.md", "doc-shape", "missing an H1 title"))
+        findings.append(Finding("README.md", DOC_SHAPE, "missing an H1 title"))
     context = root / "CONTEXT.md"
     if context.is_file():
         lines = body_lines(context)
         findings.extend(
-            Finding("CONTEXT.md", "doc-shape", f"missing section '{section}'")
+            Finding("CONTEXT.md", DOC_SHAPE, f"missing section '{section}'")
             for section in CONTEXT_SECTIONS
             if section not in lines
         )
@@ -570,7 +608,7 @@ def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[
             findings.append(
                 Finding(
                     str(rel),
-                    "script-shebang",
+                    SCRIPT_SHEBANG,
                     f"executable Python in scripts/ opens with '{UV_SHEBANG}'",
                 )
             )
@@ -578,7 +616,7 @@ def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[
             findings.append(
                 Finding(
                     str(rel),
-                    "script-shebang",
+                    SCRIPT_SHEBANG,
                     f"missing PEP 723 inline metadata block ('{PEP723_OPEN}')",
                 )
             )
@@ -595,7 +633,7 @@ def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[
                 findings.append(
                     Finding(
                         str(rel),
-                        "script-python",
+                        SCRIPT_PYTHON,
                         f'PEP 723 requires-python must be "{floor}"'
                         " (the repo's .python-version floor)",
                     )
@@ -630,7 +668,7 @@ def check_skills_hook(root: Path) -> list[Finding]:
     return [
         Finding(
             ".pre-commit-config.yaml",
-            "skills-hook",
+            SKILLS_HOOK,
             "this repo authors skills: append the skill-audit hook",
         )
     ]
@@ -651,7 +689,7 @@ def check_self(root: Path) -> list[Finding]:
         findings.append(
             Finding(
                 f"standards/build/canonical/{name}",
-                "self-audit",
+                SELF_AUDIT,
                 "no repo-audit compare covers this canonical artifact",
             )
         )
@@ -659,7 +697,7 @@ def check_self(root: Path) -> list[Finding]:
         findings.append(
             Finding(
                 f"standards/build/canonical/{name}",
-                "self-audit",
+                SELF_AUDIT,
                 "canonical artifact missing from standards/build/canonical/",
             )
         )
@@ -681,7 +719,7 @@ def check_self(root: Path) -> list[Finding]:
         findings.append(
             Finding(
                 ".pre-commit-config.yaml",
-                "self-audit",
+                SELF_AUDIT,
                 f"dogfood local hooks must cover the published manifest "
                 f"(missing: {', '.join(sorted(missing))})",
             )
@@ -727,7 +765,14 @@ def main(argv: list[str] | None = None) -> int:
         default=".",
         help="repository root to audit (default: current directory)",
     )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
     args = parser.parse_args(argv)
+    if args.list_rules:
+        return print_rules(RULES)
     root = Path(args.directory).resolve()
 
     try:
