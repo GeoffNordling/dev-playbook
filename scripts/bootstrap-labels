@@ -2,9 +2,11 @@
 """bootstrap-labels — enforce the workspace's GitHub label scheme in the current repo.
 
 Closed-world: labels in the canonical set are created or updated to match;
-labels not in the canonical set are deleted. Idempotent. See
-~/workspace/dev-playbook/workflow/workflow.md (§Valid labels and §Naming) for
-the label scheme.
+labels not in the canonical set are deleted. Idempotent. The canonical scheme is
+policy-as-data in ``dev_playbook.label_scheme`` (``label_scheme.json``); this
+script is the thin shim that mints it into the current repo over `gh`. See
+~/workspace/dev-playbook/workflow/workflow.md (§Valid labels and §Naming) for the
+scheme's semantic authority.
 """
 # /// script
 # requires-python = ">=3.14"
@@ -13,52 +15,11 @@ the label scheme.
 import json
 import subprocess
 import sys
+from pathlib import Path
 
-# Two-color scheme: metadata grey, phases yellow.
-META_COLOR = "cccccc"
-PHASE_COLOR = "fbca04"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-# Fixed-value labels — see workflow.md §Valid labels.
-# Format: (dimension, value); label name is "<dimension-lower>:<value>".
-METADATA: list[tuple[str, str]] = [
-    ("Category", "bug"),
-    ("Category", "enhancement"),
-    ("Mode", "sdd"),
-    ("Mode", "direct"),
-    ("Mode", "spike"),
-    ("Tests", "yes"),
-    ("Tests", "no"),
-    ("Status", "parked"),
-]
-
-# Phase labels — one per graph node in workflow.md §State machine.
-# Names derived from node ids by `_` → `-` per workflow.md §Naming.
-PHASES: list[str] = [
-    "intake",
-    "sdd-specs",
-    "sdd-spec-review",
-    "sdd-tdd",
-    "sdd-pr-review",
-    "design",
-    "tdd",
-    "build",
-    "pr-review",
-    "spike",
-]
-
-
-def canonical_labels() -> list[tuple[str, str, str]]:
-    """Build (name, color, description) tuples for all canonical labels."""
-    result: list[tuple[str, str, str]] = []
-    for dim, value in METADATA:
-        name = f"{dim.lower()}:{value}"
-        desc = f"{dim}: {value}. See workflow.md."
-        result.append((name, META_COLOR, desc))
-    for value in PHASES:
-        name = f"phase:{value}"
-        desc = f"Phase: {value}. See workflow.md."
-        result.append((name, PHASE_COLOR, desc))
-    return result
+from dev_playbook.label_scheme import canonical_labels  # noqa: E402
 
 
 def existing() -> dict[str, dict[str, str]]:
