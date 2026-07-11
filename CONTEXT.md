@@ -1,17 +1,12 @@
 ---
 type: Vocabulary
-title: dev-playbook Vocabulary
-description: The repo's vocabulary disambiguation center — the architecture terms and the governance terms (Audit, Detector, Gate, Enforcement, Finding), used exactly
+title: Vocabulary
+description: The workspace's established vocabulary — the canonical terms to use exactly
 ---
 
-# dev-playbook Vocabulary
+# Vocabulary
 
-The repo's vocabulary disambiguation center. When several words compete for
-one concept, this file picks one and lists the rest as aliases to avoid —
-consistent language is the whole point. Two clusters live here today: the
-**architecture** vocabulary used in every suggestion about module design, and
-the **governance** vocabulary that names how standards are checked and
-blocked.
+The workspace's established vocabulary — the canonical terms every doc uses exactly, so shared language stays consistent instead of each doc reinventing it. Extensible: terms are added here as they're pinned down. Consistent language is the whole point.
 
 ## Language
 
