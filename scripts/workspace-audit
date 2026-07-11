@@ -42,11 +42,18 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Repo-settings drift and reachability
 # answer the tracking card; a stale dev-playbook pin answers the build card
-# (non-blocking). Informational pin lines carry no rule id.
+# (non-blocking). Informational pin lines carry no rule id. Each id is a
+# module-level constant so every emission site references the constant, never a
+# raw literal, and RULES (what --list-rules prints) cannot drift from what the
+# detector actually emits.
+SETTINGS = "tracking.settings"
+REMOTE = "tracking.remote"
+PIN = "build.pin"
+
 RULES = (
-    "tracking.settings",
-    "tracking.remote",
-    "build.pin",
+    SETTINGS,
+    REMOTE,
+    PIN,
 )
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -81,7 +88,7 @@ class Line:
 
     @property
     def stale(self) -> bool:
-        return self.rule == "build.pin"
+        return self.rule == PIN
 
     def render(self) -> str:
         assert self.rule is not None
@@ -156,7 +163,7 @@ def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
         return Line(name, None, "pin current")
     return Line(
         name,
-        "build.pin",
+        PIN,
         f"{rev} (hook repo main is {main_sha[:12]})",
     )
 
@@ -180,17 +187,17 @@ def check_settings(repo: Path) -> list[Line]:
     slug = origin_slug(repo)
     if slug is None:
         return [
-            Line(name, "tracking.remote", "no GitHub origin; settings unchecked", blocking=True)
+            Line(name, REMOTE, "no GitHub origin; settings unchecked", blocking=True)
         ]
     settings = fetch_settings(slug)
     if settings is None:
         return [
-            Line(name, "tracking.settings", f"unreachable via gh api ({slug})", blocking=True)
+            Line(name, SETTINGS, f"unreachable via gh api ({slug})", blocking=True)
         ]
     return [
         Line(
             name,
-            "tracking.settings",
+            SETTINGS,
             f"{field} is {settings.get(field)!r} (want {want!r})",
             blocking=True,
         )

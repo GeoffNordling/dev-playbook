@@ -50,17 +50,29 @@ from dev_playbook import md  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit, namespaced by the knowledge-organization
-# card (docs) whose questions they answer.
+# card (docs) whose questions they answer. Each id is a module-level constant so
+# every emission site references the constant, never a raw literal, and RULES
+# (what --list-rules prints) cannot drift from what the detector actually emits.
+FRONTMATTER = "docs.frontmatter"
+TYPE = "docs.type"
+TITLE = "docs.title"
+DESCRIPTION = "docs.description"
+RESOURCE = "docs.resource"
+INDEX = "docs.index"
+REGISTRY_ROW = "docs.registry-row"
+DESCRIPTION_SHAPE = "docs.description-shape"
+INDEX_ORDERING = "docs.index-ordering"
+
 RULES = (
-    "docs.frontmatter",
-    "docs.type",
-    "docs.title",
-    "docs.description",
-    "docs.resource",
-    "docs.index",
-    "docs.registry-row",
-    "docs.description-shape",
-    "docs.index-ordering",
+    FRONTMATTER,
+    TYPE,
+    TITLE,
+    DESCRIPTION,
+    RESOURCE,
+    INDEX,
+    REGISTRY_ROW,
+    DESCRIPTION_SHAPE,
+    INDEX_ORDERING,
 )
 
 REGISTRY_DOC = "standards/docs/document-types.md"
@@ -175,7 +187,7 @@ def check_registry(repo_root: Path) -> tuple[set[str], list[Finding]]:
     findings = [
         Finding(
             REGISTRY_DOC,
-            "docs.registry-row",
+            REGISTRY_ROW,
             "`## Types` row's first cell is not a backticked Title Case type name",
             line=line_num,
         )
@@ -185,7 +197,7 @@ def check_registry(repo_root: Path) -> tuple[set[str], list[Finding]]:
         findings.append(
             Finding(
                 REGISTRY_DOC,
-                "docs.index-ordering",
+                INDEX_ORDERING,
                 "`## Types` rows are not in alphabetical order by type name",
             )
         )
@@ -223,34 +235,34 @@ def check_types(
     for rel in concept_docs:
         fm, err = frontmatter_of(repo_root / rel)
         if err is not None:
-            findings.append(Finding(rel, "docs.frontmatter", err))
+            findings.append(Finding(rel, FRONTMATTER, err))
             continue
         if fm is None:
-            findings.append(Finding(rel, "docs.type", "no OKF frontmatter"))
+            findings.append(Finding(rel, TYPE, "no OKF frontmatter"))
             continue
         doctype = fm.get("type")
         if doctype is None:
-            findings.append(Finding(rel, "docs.type", "missing 'type'"))
+            findings.append(Finding(rel, TYPE, "missing 'type'"))
         elif doctype not in registry:
             findings.append(
-                Finding(rel, "docs.type", f"type '{doctype}' not in the registry")
+                Finding(rel, TYPE, f"type '{doctype}' not in the registry")
             )
         if not fm.get("title"):
-            findings.append(Finding(rel, "docs.title", "missing 'title'"))
+            findings.append(Finding(rel, TITLE, "missing 'title'"))
         description = fm.get("description")
         if not description:
-            findings.append(Finding(rel, "docs.description", "missing 'description'"))
+            findings.append(Finding(rel, DESCRIPTION, "missing 'description'"))
         elif isinstance(description, str) and description.rstrip().endswith("."):
             findings.append(
                 Finding(
                     rel,
-                    "docs.description-shape",
+                    DESCRIPTION_SHAPE,
                     "description must not end with a trailing period",
                 )
             )
         if doctype in RESOURCE_REQUIRED_TYPES and not fm.get("resource"):
             findings.append(
-                Finding(rel, "docs.resource", f"'{doctype}' requires a 'resource'")
+                Finding(rel, RESOURCE, f"'{doctype}' requires a 'resource'")
             )
     return findings
 
@@ -307,7 +319,7 @@ def check_indexes(
     index_dirs: set[Dir] = {dir_of(rel) for rel in index_docs}
 
     if () not in index_dirs:
-        return [Finding("index.md", "docs.index", "repository root index.md is missing")]
+        return [Finding("index.md", INDEX, "repository root index.md is missing")]
 
     # Expected ownership: each concept doc belongs to its nearest index; each
     # non-root index is a child of its nearest ancestor index.
@@ -330,7 +342,7 @@ def check_indexes(
         for bad in sorted(set(invalid_targets)):
             findings.append(
                 Finding(
-                    rel, "docs.index", f"lists {bad} which is not a concept document"
+                    rel, INDEX, f"lists {bad} which is not a concept document"
                 )
             )
 
@@ -343,19 +355,19 @@ def check_indexes(
         listed_targets = set(listed_map)
         counts = Counter(target for target, _ in listed_concepts)
         for dup in sorted(t for t, c in counts.items() if c > 1):
-            findings.append(Finding(rel, "docs.index", f"lists {dup} more than once"))
+            findings.append(Finding(rel, INDEX, f"lists {dup} more than once"))
 
         expected = owned_concepts[d]
 
         for missing in sorted(expected - listed_targets):
-            findings.append(Finding(rel, "docs.index", f"omits concept doc {missing}"))
+            findings.append(Finding(rel, INDEX, f"omits concept doc {missing}"))
         for extra in sorted(listed_targets - expected):
             reason = (
                 "does not exist"
                 if not (repo_root / extra).is_file()
                 else "is not owned by this directory"
             )
-            findings.append(Finding(rel, "docs.index", f"lists {extra} which {reason}"))
+            findings.append(Finding(rel, INDEX, f"lists {extra} which {reason}"))
         for target in sorted(expected & listed_targets):
             listed_desc = listed_map[target]
             # A frontmatter error here is already reported by check_types (target
@@ -364,13 +376,13 @@ def check_indexes(
             actual_desc = fm.get("description") if fm else None
             if listed_desc is None:
                 findings.append(
-                    Finding(rel, "docs.index", f"entry for {target} has no description")
+                    Finding(rel, INDEX, f"entry for {target} has no description")
                 )
             elif actual_desc is not None and listed_desc != actual_desc:
                 findings.append(
                     Finding(
                         rel,
-                        "docs.index",
+                        INDEX,
                         f"description for {target} does not match its frontmatter",
                     )
                 )
@@ -379,12 +391,12 @@ def check_indexes(
         listed_child_set = set(listed_children)
         for missing in sorted(expected_children - listed_child_set):
             findings.append(
-                Finding(rel, "docs.index", f"omits child index {missing}/index.md")
+                Finding(rel, INDEX, f"omits child index {missing}/index.md")
             )
         for extra in sorted(listed_child_set - expected_children):
             findings.append(
                 Finding(
-                    rel, "docs.index", f"lists unexpected child index {extra}/index.md"
+                    rel, INDEX, f"lists unexpected child index {extra}/index.md"
                 )
             )
 
@@ -392,10 +404,10 @@ def check_indexes(
     # sees it; its frontmatter error, if any, is caught only here.
     root_fm, root_err = frontmatter_of(repo_root / "index.md")
     if root_err is not None:
-        findings.append(Finding("index.md", "docs.frontmatter", root_err))
+        findings.append(Finding("index.md", FRONTMATTER, root_err))
     elif not root_fm or "okf_version" not in root_fm:
         findings.append(
-            Finding("index.md", "docs.index", "root index.md must declare okf_version")
+            Finding("index.md", INDEX, "root index.md must declare okf_version")
         )
     return findings
 
@@ -446,7 +458,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
         if readmes and readmes[0] != 0:
             findings.append(
                 Finding(
-                    rel, "docs.index-ordering", "the README.md entry must be listed first"
+                    rel, INDEX_ORDERING, "the README.md entry must be listed first"
                 )
             )
         concept_titles = [t for t, is_readme in group_a if not is_readme]
@@ -454,7 +466,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
             findings.append(
                 Finding(
                     rel,
-                    "docs.index-ordering",
+                    INDEX_ORDERING,
                     "concept-doc entries are not in alphabetical order by title",
                 )
             )
@@ -462,7 +474,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
             findings.append(
                 Finding(
                     rel,
-                    "docs.index-ordering",
+                    INDEX_ORDERING,
                     "child-directory entries are not in alphabetical order by title",
                 )
             )

@@ -41,22 +41,39 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit — the skill conventions live under the
 # claude-code card. body-length is not here: it is a non-failing stderr advisory,
-# not a finding.
+# not a finding. Each id is a module-level constant so every emission site
+# references the constant, never a raw literal, and RULES (what --list-rules
+# prints) cannot drift from what the detector actually emits.
+PARSE = "claude-code.parse"
+FRONT_MATTER = "claude-code.front-matter"
+REQUIRED_FIELD = "claude-code.required-field"
+BANNED_FIELD = "claude-code.banned-field"
+NAME_MATCH = "claude-code.name-match"
+NAME_FORMAT = "claude-code.name-format"
+DESCRIPTION_TYPE = "claude-code.description-type"
+DESCRIPTION_LENGTH = "claude-code.description-length"
+DESCRIPTION_TRIGGER = "claude-code.description-trigger"
+MODEL_VALUE = "claude-code.model-value"
+EFFORT_VALUE = "claude-code.effort-value"
+DMI_TYPE = "claude-code.dmi-type"
+BODY_H1 = "claude-code.body-h1"
+REFERENCES_DEPTH = "claude-code.references-depth"
+
 RULES = (
-    "claude-code.parse",
-    "claude-code.front-matter",
-    "claude-code.required-field",
-    "claude-code.banned-field",
-    "claude-code.name-match",
-    "claude-code.name-format",
-    "claude-code.description-type",
-    "claude-code.description-length",
-    "claude-code.description-trigger",
-    "claude-code.model-value",
-    "claude-code.effort-value",
-    "claude-code.dmi-type",
-    "claude-code.body-h1",
-    "claude-code.references-depth",
+    PARSE,
+    FRONT_MATTER,
+    REQUIRED_FIELD,
+    BANNED_FIELD,
+    NAME_MATCH,
+    NAME_FORMAT,
+    DESCRIPTION_TYPE,
+    DESCRIPTION_LENGTH,
+    DESCRIPTION_TRIGGER,
+    MODEL_VALUE,
+    EFFORT_VALUE,
+    DMI_TYPE,
+    BODY_H1,
+    REFERENCES_DEPTH,
 )
 
 REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
@@ -93,7 +110,7 @@ def parse_skill(path: Path) -> tuple[dict | None, str]:
 
 def check_required_fields(fm: dict, rel: str) -> list[Finding]:
     return [
-        Finding(rel, "claude-code.required-field", f"missing '{field}'")
+        Finding(rel, REQUIRED_FIELD, f"missing '{field}'")
         for field in REQUIRED_FIELDS
         if field not in fm
     ]
@@ -101,7 +118,7 @@ def check_required_fields(fm: dict, rel: str) -> list[Finding]:
 
 def check_banned_fields(fm: dict, rel: str) -> list[Finding]:
     return [
-        Finding(rel, "claude-code.banned-field", f"'{field}' must not be present")
+        Finding(rel, BANNED_FIELD, f"'{field}' must not be present")
         for field in BANNED_FIELDS
         if field in fm
     ]
@@ -117,12 +134,12 @@ def check_name(fm: dict, dir_name: str, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                "claude-code.name-match",
+                NAME_MATCH,
                 f"name '{name}' does not match directory '{dir_name}'",
             )
         )
     if not KEBAB_RE.match(name):
-        findings.append(Finding(rel, "claude-code.name-format", f"name '{name}' is not kebab-case"))
+        findings.append(Finding(rel, NAME_FORMAT, f"name '{name}' is not kebab-case"))
     return findings
 
 
@@ -135,7 +152,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                "claude-code.description-type",
+                DESCRIPTION_TYPE,
                 f"description must be a string, got {type(desc).__name__}",
             )
         ]
@@ -144,7 +161,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                "claude-code.description-length",
+                DESCRIPTION_LENGTH,
                 f"description is {len(desc)} chars (max {DESCRIPTION_MAX})",
             )
         )
@@ -153,7 +170,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                "claude-code.description-trigger",
+                DESCRIPTION_TRIGGER,
                 "auto-invocable description should include a 'Use when …' sentence "
                 "naming trigger keywords/contexts/file types",
             )
@@ -167,7 +184,7 @@ def check_model(fm: dict, rel: str) -> list[Finding]:
     if model is None:
         return []
     if model not in VALID_MODELS:
-        return [Finding(rel, "claude-code.model-value", f"model '{model}' not in {VALID_MODELS}")]
+        return [Finding(rel, MODEL_VALUE, f"model '{model}' not in {VALID_MODELS}")]
     return []
 
 
@@ -177,7 +194,7 @@ def check_effort(fm: dict, rel: str) -> list[Finding]:
         return []
     if effort not in VALID_EFFORTS:
         return [
-            Finding(rel, "claude-code.effort-value", f"effort '{effort}' not in {VALID_EFFORTS}")
+            Finding(rel, EFFORT_VALUE, f"effort '{effort}' not in {VALID_EFFORTS}")
         ]
     return []
 
@@ -190,7 +207,7 @@ def check_disable_model_invocation(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                "claude-code.dmi-type",
+                DMI_TYPE,
                 f"disable-model-invocation must be boolean, got '{value}'",
             )
         ]
@@ -205,9 +222,9 @@ def check_body_h1(body: str, rel: str) -> list[Finding]:
         if stripped.startswith("# "):
             return []
         return [
-            Finding(rel, "claude-code.body-h1", f"body must start with H1, got: '{stripped[:40]}'")
+            Finding(rel, BODY_H1, f"body must start with H1, got: '{stripped[:40]}'")
         ]
-    return [Finding(rel, "claude-code.body-h1", "body is empty")]
+    return [Finding(rel, BODY_H1, "body is empty")]
 
 
 def body_length_advisory(body: str, rel: str) -> str | None:
@@ -253,7 +270,7 @@ def check_references_depth(skill_dir: Path, rel_dir: str) -> list[Finding]:
                 findings.append(
                     Finding(
                         rel_md,
-                        "claude-code.references-depth",
+                        REFERENCES_DEPTH,
                         f"link to sibling reference file '{target}' "
                         "(references/ must be one level deep)",
                     )
@@ -278,10 +295,10 @@ def audit_skill(skill_dir: Path, repo_root: Path) -> tuple[list[Finding], list[s
     try:
         fm, body = parse_skill(skill_md)
     except Exception as e:
-        return [Finding(rel, "claude-code.parse", str(e))], []
+        return [Finding(rel, PARSE, str(e))], []
 
     if fm is None:
-        return [Finding(rel, "claude-code.front-matter", "no YAML front matter found")], []
+        return [Finding(rel, FRONT_MATTER, "no YAML front matter found")], []
 
     findings = []
     findings.extend(check_required_fields(fm, rel))
