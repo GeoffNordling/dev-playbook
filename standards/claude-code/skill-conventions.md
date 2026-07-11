@@ -100,7 +100,7 @@ After the front matter, the body is Markdown.
 
 Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) are harness-owned, not concept documents, and they follow a **target-based** rule instead of the bundle Link/Citation split ([cross-references.md](/standards/docs/cross-references.md)). The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
 
-A skill has **no fixed repo root**. The same skill can be invoked from a session in any repo's checkout, so there is no stable bundle root for a `/`-absolute Link to resolve against. A skill therefore cites a workspace document by its full `~/workspace/<repo>/…` path even when that document lives in the same repo as the skill bundle.
+A skill has **no fixed repo root**. The same skill can be invoked from a session in any repo's checkout, so there is no stable bundle root for a `/`-absolute Link to resolve against. A skill therefore cites a workspace document by its full `~/workspace/<repo>/…` path even when that document lives in the same repo as the skill bundle. When that document is in the same repo, the citation resolves per [same-repo resolution](/standards/docs/cross-references.md#same-repo-resolution) — against the reader's own checkout, worktree included, not the main checkout.
 
 | Target | Style | Example |
 |---|---|---|

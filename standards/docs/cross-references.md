@@ -39,6 +39,9 @@ targets. Files with **no fixed repo root** — skills and global `~/.claude/`
 config such as `rules/`, loaded across arbitrary repos — have no root for
 `/` to resolve against, so they use the Citation form even for a same-repo
 target (see [skill-conventions.md — Cross-references](/standards/claude-code/skill-conventions.md#cross-references)).
+That same-repo Citation is not a fixed jump to the main checkout: it
+resolves per [Same-repo resolution](/standards/docs/cross-references.md#same-repo-resolution)
+below, against the reader's own checkout.
 
 ## Citation — another repo
 
@@ -54,6 +57,12 @@ checkout, which is the intended behavior — it references another repo's
 published state, not whatever worktree is currently open.
 `~/workspace/<repo>` is self-describing: the repo name is in the path, so
 no external convention is needed to interpret it.
+
+## Same-repo resolution
+
+**Same-repo resolution:** a `~/workspace/<repo>/…` path whose `<repo>` is the repo your session is working in — its main checkout or any of its worktrees — resolves inside your own checkout: substitute your checkout root for `~/workspace/<repo>/`. A path into a different repo resolves as written, to that repo's main checkout. Touching your repo's main checkout from a worktree is legitimate only as a deliberate comparison against published state — say so when you do it.
+
+The written form is kept because no static path can encode this: the same `~/workspace/<repo>/…` citation must resolve to a different checkout depending on where the reader stands — a globally-loaded skill resolves a dev-playbook citation to dev-playbook's main checkout from another repo's worktree, but to the worktree when run inside a dev-playbook worktree — so the meaning has to be a reader-side rule, not a rewritten path. `ref-check` already resolves same-repo citations this way, against the invoking checkout, so this rule states at read time what the linter has enforced at commit time all along; the [same-repo-resolution ADR](/docs/adr/0009-same-repo-resolution.md) records why the alternatives were rejected.
 
 VS Code does not expand `~/` in markdown links, and it resolves a leading
 `/` against the filesystem root rather than the bundle root, so neither

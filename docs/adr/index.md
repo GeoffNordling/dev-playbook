@@ -11,3 +11,4 @@ Records listed in ADR number order.
 - [Harvest Pocock's `prototype` and `handoff` Skills](/docs/adr/0006-harvest-pocock-prototype-and-handoff.md) — Harvest Pocock's prototype and handoff skills into authored bundles rather than taking a direct dependency
 - [Merge SDD Spec Authoring into One Phase](/docs/adr/0007-merge-sdd-spec-authoring-phase.md) — Merge sdd-requirements and sdd-design into a single sdd-specs phase authoring the whole feat/req/dsn hierarchy in one interview
 - [Retire the Edit-Time ruff Hook for a Single Pre-commit Gate](/docs/adr/0008-retire-edit-time-ruff-hook.md) — Remove the edit-time PostToolUse ruff hook so pre-commit is the single ruff gate over every authored .py
+- [Same-Repo Resolution — Keep the Written Form, Resolve Reader-Side](/docs/adr/0009-same-repo-resolution.md) — Resolve intra-repo workspace citations against the reader's own checkout via a reader-side rule, keeping the written path form unchanged
