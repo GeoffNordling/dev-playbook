@@ -24,7 +24,8 @@ from ordinary files, and what each may contain.
 - [repo-audit](/scripts/repo-audit) — CLAUDE.md presence and its canonical
   standards block
 - [skill-audit](/scripts/skill-audit) — skill bundles in
-  skill-authoring repos
+  skill-authoring repos, plus the `claude-code.skill-mirror`
+  correspondence between authored and installed skills (dev-playbook)
 
 ## Enforce
 
