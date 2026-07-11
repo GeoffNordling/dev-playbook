@@ -36,6 +36,23 @@ def run(repo: Path) -> subprocess.CompletedProcess:
     )
 
 
+def agents_skill(repo: Path, name: str) -> None:
+    """Create an externally-managed skill directory under dotfiles/.agents/skills/."""
+    (repo / "dotfiles" / ".agents" / "skills" / name).mkdir(parents=True, exist_ok=True)
+
+
+def claude_skills_dir(repo: Path) -> Path:
+    """Create and return the dotfiles/dot-claude/skills/ mirror directory."""
+    d = repo / "dotfiles" / "dot-claude" / "skills"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def mirror_link(repo: Path, name: str, target: str) -> None:
+    """Create a symlink dot-claude/skills/<name> pointing at the literal target."""
+    (claude_skills_dir(repo) / name).symlink_to(target)
+
+
 def test_conforming_skill_is_clean(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, {"greet": valid_skill()})
 
@@ -96,3 +113,103 @@ def test_repo_self_scan_is_clean() -> None:
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_missing_mirror_symlink_is_a_skill_mirror_finding(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    agents_skill(repo, "caveman")
+    claude_skills_dir(repo)  # exists, but carries no mirror symlink for caveman
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.skill-mirror" in result.stdout
+    assert "caveman" in result.stdout
+
+
+def test_agents_tree_without_mirror_dir_fails_loudly(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    agents_skill(repo, "caveman")
+    # dotfiles/dot-claude/skills/ deliberately absent: an error state, since the
+    # mirror directory always exists in a repo that has externally-managed skills.
+
+    result = run(repo)
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "dot-claude/skills" in result.stderr
+
+
+def test_mirror_symlink_pointing_elsewhere_is_a_finding(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    agents_skill(repo, "foo")
+    agents_skill(repo, "bar")
+    mirror_link(repo, "bar", "../../.agents/skills/bar")  # correct
+    mirror_link(repo, "foo", "../../.agents/skills/bar")  # resolves, wrong target
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.skill-mirror" in result.stdout
+    assert "dot-claude/skills/foo" in result.stdout
+
+
+def test_list_rules_includes_skill_mirror(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["uv", "run", "--script", str(SKILL_AUDIT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "claude-code.skill-mirror" in result.stdout.split()
+
+
+def test_correctly_mirrored_tree_is_clean(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    agents_skill(repo, "caveman")
+    mirror_link(repo, "caveman", "../../.agents/skills/caveman")
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_mirror_is_inert_without_agents_tree(tmp_path: Path) -> None:
+    # An authored-skills repo with a mirror directory but no externally-managed
+    # tree: the mirror check never activates.
+    repo = make_repo(tmp_path, {"greet": valid_skill()})
+    claude_skills_dir(repo)  # dot-claude/skills exists; .agents/skills does not
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_stale_mirror_symlink_is_a_finding(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    agents_skill(repo, "foo")
+    mirror_link(repo, "foo", "../../.agents/skills/foo")  # correct, resolves
+    mirror_link(repo, "gone", "../../.agents/skills/gone")  # target removed: stale
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.skill-mirror" in result.stdout
+    assert "dot-claude/skills/gone" in result.stdout
+
+
+def test_real_entry_colliding_with_agents_skill_is_a_finding(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    agents_skill(repo, "foo")
+    # dot-claude/skills/foo is a real directory, not a symlink: an authored skill
+    # collides with the same-named externally-managed one.
+    (claude_skills_dir(repo) / "foo").mkdir()
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.skill-mirror" in result.stdout
+    assert "dot-claude/skills/foo" in result.stdout
