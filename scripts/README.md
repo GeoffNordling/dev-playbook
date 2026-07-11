@@ -60,7 +60,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `python-audit` | [python/style.md](/standards/python/style.md), [testing/conventions.md](/standards/testing/conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
 | `ref-audit` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-audit` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `internal-skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
+| `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
 `repo-audit`, `python-audit`, `ref-audit`, and `okf-audit` assert unconditionally

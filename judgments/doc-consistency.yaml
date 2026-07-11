@@ -134,7 +134,7 @@ judgments:
       - standards/claude-code/skill-conventions.md
       - standards/claude-code/skill-management.md
       - scripts/repo-audit
-      - scripts/internal-skill-audit
+      - scripts/skill-audit
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/CLAUDE.md.standards
     model: claude-opus-4-8

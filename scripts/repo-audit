@@ -75,7 +75,7 @@ BASE_REQUIRED = (
 )
 MYPY_ROOTS = ("src", "tests", "scripts")
 LOCKFILES = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb")
-# The same two roots internal-skill-audit scans.
+# The same two roots skill-audit scans.
 SKILL_ROOTS = (".claude/skills", "dotfiles/dot-claude/skills")
 UV_SHEBANG = "#!/usr/bin/env -S uv run --script"
 PEP723_OPEN = "# /// script"
@@ -625,13 +625,13 @@ def check_skills_hook(root: Path) -> list[Finding]:
     if not config.is_file():
         return []
     ids = {hook for _, hook in hook_ids(config.read_text(encoding="utf-8"))}
-    if "internal-skill-audit" in ids:
+    if "skill-audit" in ids:
         return []
     return [
         Finding(
             ".pre-commit-config.yaml",
             "skills-hook",
-            "this repo authors skills: append the internal-skill-audit hook",
+            "this repo authors skills: append the skill-audit hook",
         )
     ]
 

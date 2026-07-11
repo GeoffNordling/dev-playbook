@@ -10,7 +10,7 @@
 #       - id: python-audit
 #       - id: ref-audit
 #       - id: okf-audit
-#       - id: internal-skill-audit
+#       - id: skill-audit
 #       - id: judgments-audit
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
@@ -46,9 +46,9 @@
   pass_filenames: false
   always_run: true
 
-- id: internal-skill-audit
-  name: internal-skill-audit
-  entry: scripts/internal-skill-audit
+- id: skill-audit
+  name: skill-audit
+  entry: scripts/skill-audit
   language: script
   pass_filenames: false
   always_run: true

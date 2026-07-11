@@ -61,7 +61,7 @@ pattern. Detector names are the current ones — renames are a later slice.
 | ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
 | judgments-audit | judgment declarations | hook pattern |
 | shellcheck | shell scripts | hook pattern |
-| internal-skill-audit | skill bundles (skill-authoring repos) | hook pattern |
+| skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments stage-1 cache gate | push gate only — never the CI gate |
 | `gh api` sweep | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), stale pins | workspace sweep (outside the gates) |
