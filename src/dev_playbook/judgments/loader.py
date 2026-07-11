@@ -8,6 +8,7 @@ declared evidence/reference paths -- existence and path-format are the lint's an
 ``prepare``'s job -- and raises a clear error on the first violation it finds.
 """
 
+import argparse
 import re
 import sys
 import tomllib
@@ -16,9 +17,23 @@ from typing import NamedTuple, TypeGuard
 
 import yaml
 
+from dev_playbook.findings import print_rules, render
 from dev_playbook.judgments.bench import VALID_EFFORTS, VALID_MODELS
 
 _ID_CHARSET = re.compile(r"[A-Za-z0-9._-]+")
+
+# The rule ids judgments-audit can emit, one per existing error family: a
+# malformed declaration (structural/field validation, at the declaring YAML
+# file) and a bad evidence/reference path (absolute, `..`, or missing).
+JUDGMENTS_RULES = ("judgments.declaration", "judgments.evidence-path")
+
+
+class LintFinding(NamedTuple):
+    """One judgments-audit finding, located at the declaring YAML file."""
+
+    location: str  # repo-relative path to the declaring file
+    rule: str  # in JUDGMENTS_RULES
+    message: str
 
 
 class Declaration(NamedTuple):
@@ -184,43 +199,90 @@ def by_id(declarations: list[Declaration], id: str) -> Declaration:
     raise ValueError(f"unknown judgment id: {id!r}")
 
 
-def lint(root: Path | None) -> list[str]:
-    """Statically validate a repo's declarations; return all errors (empty if clean).
+def lint_findings(root: Path | None) -> list[LintFinding]:
+    """Statically validate a repo's declarations; return findings (empty if clean).
 
     Runs the loader's field validation, then the static subset of ``prepare``'s
     path rules -- each evidence/reference path must be relative (not absolute, no
-    ``..``) and exist. A repo with no ``[tool.judgments]`` config validates
-    nothing. A structural error short-circuits to that one error; otherwise every
-    offending path is reported, so one run surfaces them all.
+    ``..``) and exist. Each finding is located at the declaring YAML file (a
+    configuration error at ``pyproject.toml``): a malformed declaration is
+    ``judgments.declaration``, a bad evidence/reference path is
+    ``judgments.evidence-path``. A repo with no ``[tool.judgments]`` config
+    validates nothing. One run surfaces every offending file and path.
     """
     if root is None:
         return []
     try:
-        declarations = load(root)
+        files = _discover(root)
     except (ValueError, yaml.YAMLError) as error:
-        return [str(error)]
-    errors: list[str] = []
-    for declaration in declarations:
-        for path in (*declaration.evidence, *declaration.reference):
-            problem = _path_problem(path, root)
-            if problem is not None:
-                errors.append(f"judgment {declaration.id!r}: {problem}")
-    return errors
+        pyproject = root / "pyproject.toml"
+        message = " ".join(str(error).split()).replace(f"{pyproject}: ", "")
+        return [LintFinding("pyproject.toml", "judgments.declaration", message)]
+
+    findings: list[LintFinding] = []
+    source_of: dict[str, Path] = {}
+    for path in files:
+        rel = str(path.relative_to(root))
+        try:
+            declarations = _parse_file(path)
+        except (ValueError, yaml.YAMLError) as error:
+            message = " ".join(str(error).split())
+            message = message.replace(f"{path}: ", "").replace(f" in {path}", "")
+            findings.append(LintFinding(rel, "judgments.declaration", message))
+            continue
+        for declaration in declarations:
+            if declaration.id in source_of:
+                origin = source_of[declaration.id].relative_to(root)
+                findings.append(
+                    LintFinding(
+                        rel,
+                        "judgments.declaration",
+                        f"duplicate judgment id {declaration.id!r} (also in {origin})",
+                    )
+                )
+                continue
+            source_of[declaration.id] = path
+            for candidate in (*declaration.evidence, *declaration.reference):
+                problem = _path_problem(candidate, root)
+                if problem is not None:
+                    findings.append(
+                        LintFinding(
+                            rel,
+                            "judgments.evidence-path",
+                            f"judgment {declaration.id!r}: {problem}",
+                        )
+                    )
+    return findings
 
 
-def lint_cli() -> int:
-    """Console-script entry point: lint the repo's judgments, report on stderr.
+def lint_cli(argv: list[str] | None = None) -> int:
+    """Console-script entry point: lint the repo's judgments, findings to stdout.
 
-    Resolves the repo root, runs :func:`lint`, prints every error and a summary
-    count to stderr, and returns 1 if there were any errors else 0. Registered as
-    the ``judgments-audit`` console script and called by the
-    ``scripts/judgments-audit`` pre-commit shim, so both channels behave alike.
+    Resolves the repo root, runs :func:`lint_findings`, prints every finding as a
+    GNU finding line to stdout and a summary count to stderr, and returns 1 if
+    there were any findings else 0. ``--list-rules`` prints the rule ids and
+    exits 0 without needing a repository. Registered as the ``judgments-audit``
+    console script and called by the ``scripts/judgments-audit`` pre-commit shim,
+    so both channels behave alike.
     """
-    errors = lint(resolve_root())
-    for error in errors:
-        print(error, file=sys.stderr)
-    if errors:
-        print(f"judgments-audit: {len(errors)} error(s)", file=sys.stderr)
+    parser = argparse.ArgumentParser(
+        prog="judgments-audit",
+        description="Lint a repo's judgment declarations against the schema and paths.",
+    )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
+    args = parser.parse_args(argv)
+    if args.list_rules:
+        return print_rules(JUDGMENTS_RULES)
+
+    findings = lint_findings(resolve_root())
+    for finding in findings:
+        print(render(finding.location, finding.rule, finding.message))
+    if findings:
+        print(f"judgments-audit: {len(findings)} finding(s)", file=sys.stderr)
         return 1
     return 0
 
