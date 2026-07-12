@@ -4,7 +4,7 @@ Two reference forms are validated (see this repo's cross-reference standard):
 a root-absolute `/path` **Link** for same-repo targets, and a
 `~/workspace/<repo>/...` **Citation** for cross-repo targets. A same-repo
 Citation in a fixed-root file is a `wrong-form` violation; the same Citation in
-a rootless file (skills, rules, box artifacts) is legitimate. The tests below
+a rootless file (skills, rules) is legitimate. The tests below
 use the Link form wherever the subject under test is anchor/existence logic,
 and the Citation form wherever the citation handling itself is the subject.
 """
@@ -328,7 +328,7 @@ def test_wrong_form_reported_even_when_target_missing(
     assert "0 broken" in result.stderr
 
 
-# --- rootless files: skills, rules, box artifacts use the Citation form ---
+# --- rootless files: skills, rules use the Citation form ---
 
 
 def test_same_repo_citation_in_skill_is_ok(tmp_path: Path, workspace: Path) -> None:
@@ -352,19 +352,6 @@ def test_same_repo_citation_in_rules_is_ok(tmp_path: Path, workspace: Path) -> N
     init_repo(repo)
     write(repo / "target.md", "x")
     write(repo / "rules" / "a.md", "see ~/workspace/primary/target.md\n")
-
-    result = run_ref_audit(repo, tmp_path)
-
-    assert result.returncode == 0, result.stderr
-
-
-def test_same_repo_citation_in_box_artifact_is_ok(
-    tmp_path: Path, workspace: Path
-) -> None:
-    repo = workspace / "primary"
-    init_repo(repo)
-    write(repo / "conventions.md", "x")
-    write(repo / "box" / "charter.md", "see ~/workspace/primary/conventions.md\n")
 
     result = run_ref_audit(repo, tmp_path)
 

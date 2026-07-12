@@ -32,7 +32,7 @@ live in `scripts/`", not "don't put runnables elsewhere". A prohibition
 appears only when the prohibition itself is the rule.
 
 No second person in declarative docs. "You" belongs to agent-facing
-instruction files — skills, box artifacts — that direct an executor; a
+instruction files — skills — that direct an executor; a
 standard states facts.
 
 ## Heading casing

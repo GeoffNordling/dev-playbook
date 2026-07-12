@@ -24,7 +24,6 @@ alphabetical; directories last.
 - [Tracking](/standards/tracking.md) — Card for the tracking standard — how work is tracked through issues and repository settings
 - [Workflow](/standards/workflow.md) — Card for the workflow standard — how an idea becomes a merged pull request
 - [ADR Conventions](/standards/decisions/adrs.md) — When to write an ADR, its template, sequential numbering, and the hard-to-reverse-or-surprising bar that justifies one
-- [Agentic Box](/standards/agentic-box/format.md) — The delegation boundary for autonomous agent work — walls, charter, checks, and emissions around a sealed black box
 - [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
 - [Module Design](/standards/modules/design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
@@ -35,7 +34,6 @@ alphabetical; directories last.
 
 ## Directories
 
-- [agentic-box/templates/greenfield-cli/](/standards/agentic-box/templates/greenfield-cli/index.md) — The worked greenfield-CLI box template
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement
 - [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard — the member registry, the CLAUDE.md content standard, and the skill conventions
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references

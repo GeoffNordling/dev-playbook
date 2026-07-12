@@ -8,7 +8,7 @@ description: Resolve intra-repo workspace citations against the reader's own che
 
 ## Context
 
-Rootless files — skills, global `~/.claude/` rules, and box artifacts — have no
+Rootless files — skills and global `~/.claude/` rules — have no
 fixed repo root, so they cite even a same-repo document by its full
 `~/workspace/<repo>/…` path (the cross-reference grammar mandates this; a
 `/`-absolute Link has no root to resolve against). At runtime an agent follows
