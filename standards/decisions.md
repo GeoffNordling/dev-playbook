@@ -10,16 +10,22 @@ Governs how hard-to-reverse or surprising decisions are recorded.
 
 ## Define
 
-- [decisions/adrs.md](/standards/decisions/adrs.md) — the contract: when
-  an ADR is warranted, its template, sequential numbering, immutability
+- [decisions/records.md](/standards/decisions/records.md) — the contract:
+  when a Decision Record is warranted, its template, sequential numbering,
+  immutability, status vocabulary, and scope
 
 ## Audit
 
-- none
+- [decisions-audit](/scripts/decisions-audit) — two rules over
+  `docs/decisions/`: sequential numbering
+  (`decisions.sequential-numbering`) and the status vocabulary
+  (`decisions.status-vocabulary`)
 
 ## Enforce
 
-- none
+- the canonical
+  [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
+  — the **commit gate**, where decisions-audit blocks every commit
 
 ## Adopt
 

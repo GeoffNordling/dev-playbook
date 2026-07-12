@@ -61,12 +61,13 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `testing-audit` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
 | `ref-audit` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-audit` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
+| `decisions-audit` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
-`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, and `okf-audit`
-assert unconditionally and fail loud; they do not skip themselves when a target
-kind is absent. Run
+`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, `okf-audit`, and
+`decisions-audit` assert unconditionally and fail loud; they do not skip
+themselves when a target kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 

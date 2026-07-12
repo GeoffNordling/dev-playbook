@@ -410,20 +410,21 @@ def test_worktree_resolves_rootless_citation_to_worktree_working_copy(
     assert result.returncode == 0, result.stderr
 
 
-# --- ADRs are excluded as reference sources ---
+# --- Decision Records are excluded as reference sources ---
 
 
-def test_broken_refs_inside_adr_directory_are_skipped(
+def test_broken_refs_inside_decisions_directory_are_skipped(
     tmp_path: Path, workspace: Path
 ) -> None:
-    """ADRs are immutable historical records — broken refs in them are
-    expected staleness, not lint errors."""
+    """Decision Records are immutable — broken refs in them are expected
+    staleness, not lint errors. The exemption is permanent and scoped to the
+    records directory, docs/decisions/."""
     repo = workspace / "primary"
     init_repo(repo)
     write(repo / "target.md", "x")
     write(repo / "other.md", "see [target](/target.md)\n")
     write(
-        repo / "docs" / "adr" / "0001-decision.md",
+        repo / "docs" / "decisions" / "0001-decision.md",
         "see ~/workspace/primary/gone.md\n",
     )
 
@@ -431,6 +432,77 @@ def test_broken_refs_inside_adr_directory_are_skipped(
 
     assert result.returncode == 0
     assert "all ok" in result.stderr
+
+
+def test_broken_ref_in_decisions_index_is_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """index.md is mutable and actively maintained, so its outbound links are
+    validated — the exemption covers only the immutable numbered records."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(repo / "other.md", "see [target](/target.md)\n")
+    write(repo / "docs" / "decisions" / "index.md", "see [gone](/nope.md)\n")
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "broken" in result.stdout
+    assert "/nope.md" in result.stdout
+
+
+def test_broken_ref_in_decisions_readme_is_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """README.md, like index.md, is mutable and validated."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(repo / "other.md", "see [target](/target.md)\n")
+    write(repo / "docs" / "decisions" / "README.md", "see [gone](/nope.md)\n")
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "/nope.md" in result.stdout
+
+
+def test_unexpected_file_in_decisions_dir_cannot_run(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A file under docs/decisions/ that is neither a numbered record nor the
+    index/README is unclassifiable: ref-audit refuses to silently blanket-exempt
+    it and stops (exit 2) so its treatment gets a conscious decision."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "docs" / "decisions" / "notes.md",
+        "see ~/workspace/primary/gone.md\n",
+    )
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 2
+    assert "docs/decisions/notes.md" in result.stderr
+
+
+def test_broken_refs_under_standards_decisions_are_still_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """The exemption is scoped to docs/decisions/, not any 'decisions' segment:
+    the contract under standards/decisions/ is validated like any other doc."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "standards" / "decisions" / "records.md",
+        "see [gone](/nope.md)\n",
+    )
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "broken" in result.stdout
 
 
 # --- environment failures ---
