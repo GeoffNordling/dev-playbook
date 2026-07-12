@@ -29,7 +29,7 @@ Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) �
 | Category | `category:enhancement` | New behavior or improvement; covers everything that isn't a bug. |
 | Mode | `mode:sdd` | SDD path: spec → design → TDD ceremony. |
 | Mode | `mode:direct` | Direct path: no spec/design ceremony. |
-| Mode | `mode:spike` | Spike path: a timeboxed question; the answer closes the issue, no PR. |
+| Mode | `mode:spike` | Spike path: a question; the answer closes the issue, no PR. |
 | Tests | `tests:yes` | Issue involves writing or modifying tests. |
 | Tests | `tests:no` | Issue does not touch tests. |
 | Status | `status:parked` | Decided and dormant: triage skips it; remove the label to revive. |
@@ -80,7 +80,7 @@ On the direct path, intake also decides whether the work needs a **design** pass
 
 **The decompose exit.** When design concludes the issue is too big to build as one leaf, the issue becomes an **epic** and never builds itself. The decomposing design session performs the children's intake in place, minting each child as a ready leaf — full tuple, brief-complete body per the [tracking standard](/standards/tracking/issues.md) — with no round-trip through the intake node.
 
-**The spike path.** `mode:spike` is a timeboxed question whose deliverable is an answer, not merged code. The spike node runs AFK; its findings land in the issue's closing comment — plus a [Decision Record](/standards/decisions/adrs.md) if a one-way door was crossed. No PR opens, and the branch and worktree are disposable. A spike that needs a human interview mid-flight was design, not a spike — the subagent escalates rather than interviews.
+**The spike path.** `mode:spike` is a question whose deliverable is an answer, not merged code. The spike node runs AFK; its findings land in the issue's closing comment — plus a [Decision Record](/standards/decisions/adrs.md) if a one-way door was crossed. No PR opens, and the branch and worktree are disposable. A spike that needs a human interview mid-flight was design, not a spike — the subagent escalates rather than interviews.
 
 ### Naming
 

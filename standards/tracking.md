@@ -16,13 +16,17 @@ requests belong to the [workflow standard](/workflow/workflow.md).
 
 ## Audit
 
-- [workspace-audit](/scripts/workspace-audit) — GitHub settings drift across repositories via
-  `gh api`
+- [workspace-audit](/scripts/workspace-audit) — across repositories via
+  `gh api`: GitHub settings drift, label-scheme parity and the blocked-label
+  ban, and every open post-intake leaf's brief shape and every epic's
+  category-only shape
 
 ## Enforce
 
-- none — workspace-audit reports and bootstrap-labels repairs, but nothing blocks a
-  malformed issue or a drifted setting
+- none — GitHub sits outside every gate: workspace-audit reports, the weekly
+  ritual and bootstrap-labels repair, but nothing blocks a malformed issue, a
+  drifted label, or a drifted setting. Settings repairs stay manual — admin
+  permissions are too broad to automate, so no repair tool is built
 
 ## Adopt
 
