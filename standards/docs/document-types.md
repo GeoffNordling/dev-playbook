@@ -25,7 +25,6 @@ Title Case; acronyms stay upper. Listed alphabetically.
 
 | Type | What it is |
 |------|------------|
-| `Box Artifact` | One file of an [agentic-box](/standards/agentic-box/format.md) definition — contract, charter, emissions spec, or prompt — consumed by a boxed agent as mission configuration. A box `README.md` stays `type: README`. |
 | `Decision Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
 | `Instrument Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |

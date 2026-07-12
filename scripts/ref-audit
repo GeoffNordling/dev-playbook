@@ -87,9 +87,9 @@ class UnclassifiedRecordsFile(Exception):
         self.relpath = relpath
 
 
-# Path segments marking sources with no fixed repo root (skills and rules
-# ship into ~/.claude; box artifacts are stamped into a target repo).
-ROOTLESS_SEGMENTS = {"skills", "rules", "box"}
+# Path segments marking sources with no fixed repo root: skills and rules
+# ship into ~/.claude.
+ROOTLESS_SEGMENTS = {"skills", "rules"}
 
 
 def has_fixed_repo_root(relpath: str) -> bool:

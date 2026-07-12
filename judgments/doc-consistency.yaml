@@ -260,7 +260,6 @@ judgments:
       - standards/standard/format.md
       - workflow/workflow.md
       - workflow/skill-authoring.md
-      - standards/agentic-box/format.md
     model: claude-opus-4-8
     effort: high
 

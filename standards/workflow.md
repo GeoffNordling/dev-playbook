@@ -14,8 +14,6 @@ Governs how an idea becomes a merged pull request.
   state machine: labels, dispatch, worktrees, permissions
 - [workflow/skill-authoring.md](/workflow/skill-authoring.md) — voice and
   mechanics for the phase node-skills
-- [agentic-box/format.md](/standards/agentic-box/format.md) — the
-  delegation boundary for autonomous agent work
 
 ## Audit
 
@@ -34,5 +32,3 @@ Governs how an idea becomes a merged pull request.
 - the phase node-skills in `dotfiles/dot-claude/skills/` — intake, design,
   build, tdd, open-pr, and the review nodes carry an issue through the
   graph ([Skills](/workflow/workflow.md#skills))
-- [the greenfield-CLI box template](/standards/agentic-box/templates/greenfield-cli/index.md)
-  — the worked agentic-box instantiation

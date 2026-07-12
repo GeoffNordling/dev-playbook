@@ -184,7 +184,7 @@ def test_test_file_outside_the_top_level_tests_tree_is_outside_the_rule(
         tmp_path,
         {
             "src/pkg/cli.py": "def public():\n    return 1\n",
-            "templates/box/tests/test_cli.py": "def test_it():\n    pass\n",
+            "templates/scaffold/tests/test_cli.py": "def test_it():\n    pass\n",
         },
     )
     result = run(repo)
