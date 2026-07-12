@@ -434,6 +434,59 @@ def test_broken_refs_inside_decisions_directory_are_skipped(
     assert "all ok" in result.stderr
 
 
+def test_broken_ref_in_decisions_index_is_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """index.md is mutable and actively maintained, so its outbound links are
+    validated — the exemption covers only the immutable numbered records."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(repo / "other.md", "see [target](/target.md)\n")
+    write(repo / "docs" / "decisions" / "index.md", "see [gone](/nope.md)\n")
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "broken" in result.stdout
+    assert "/nope.md" in result.stdout
+
+
+def test_broken_ref_in_decisions_readme_is_validated(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """README.md, like index.md, is mutable and validated."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "target.md", "x")
+    write(repo / "other.md", "see [target](/target.md)\n")
+    write(repo / "docs" / "decisions" / "README.md", "see [gone](/nope.md)\n")
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 1
+    assert "/nope.md" in result.stdout
+
+
+def test_unexpected_file_in_decisions_dir_cannot_run(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A file under docs/decisions/ that is neither a numbered record nor the
+    index/README is unclassifiable: ref-audit refuses to silently blanket-exempt
+    it and stops (exit 2) so its treatment gets a conscious decision."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "docs" / "decisions" / "notes.md",
+        "see ~/workspace/primary/gone.md\n",
+    )
+
+    result = run_ref_audit(repo, tmp_path)
+
+    assert result.returncode == 2
+    assert "docs/decisions/notes.md" in result.stderr
+
+
 def test_broken_refs_under_standards_decisions_are_still_validated(
     tmp_path: Path, workspace: Path
 ) -> None:
