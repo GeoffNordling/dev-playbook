@@ -50,3 +50,7 @@ Fold the resolved decisions and the drafted gap-sentences **directly into the br
 ### 7. Report
 
 One line: `<repo>#<issue> · <n> decisions resolved, <m> gaps filled · body rewritten in place` — or `· already precise, no change` when nothing needed filling.
+
+### 8. Stop — launch nothing else
+
+The gaps pass is the whole job. When the report is out, **pause and hand back to the user**: do not dispatch the next node, do not launch any other agent or skill on the issue, do not advance the phase. This skill runs on the `fable` model; the user manually downgrades to Opus before the next node picks the issue up, so stand by after the report and wait for the user — the model switch is their step, not yours.
