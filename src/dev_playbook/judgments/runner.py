@@ -140,6 +140,20 @@ def main(argv: list[str]) -> int:
         elif args.command == "render":
             print(render_prompt(by_id(declarations, args.id), root))
         elif args.command == "record":
+            if not args.ids and not args.refuted:
+                print(
+                    "judgments-run record: at least one id or --refuted id is required",
+                    file=sys.stderr,
+                )
+                return 2
+            both = set(args.ids) & set(args.refuted)
+            if both:
+                print(
+                    "judgments-run record: "
+                    f"id(s) both recorded and refuted: {', '.join(sorted(both))}",
+                    file=sys.stderr,
+                )
+                return 2
             record([by_id(declarations, id) for id in args.ids], root)
             findings = refutations([by_id(declarations, id) for id in args.refuted])
             for finding in findings:
@@ -178,9 +192,9 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     )
     record_parser.add_argument(
         "--refuted",
-        action="append",
+        nargs="*",
         default=[],
         metavar="ID",
-        help="a refuted judgment id, reported as a judgments.refuted finding",
+        help="refuted judgment id(s), each reported as a judgments.refuted finding",
     )
     return parser.parse_args(argv)
