@@ -441,7 +441,7 @@ def _canonical_dev_hook_ids(root: Path) -> set[str]:
                 repo.get("repo", "")
             ):
                 continue
-            for hook in repo.get("hooks", []):
+            for hook in repo.get("hooks") or []:
                 if isinstance(hook, dict) and "id" in hook:
                     ids.add(hook["id"])
     return ids
@@ -551,9 +551,12 @@ def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
             capture_output=True,
             text=True,
             cwd=root,
+            timeout=10,
         )
     except OSError as err:
         raise CannotRun(f"scripts/{name} --list-rules failed: {err}") from err
+    except subprocess.TimeoutExpired as err:
+        raise CannotRun(f"scripts/{name} --list-rules timed out") from err
     if result.returncode != 0:
         raise CannotRun(f"scripts/{name} does not answer --list-rules")
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
@@ -583,7 +586,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         findings = audit(root, _list_rules_via_subprocess)
-    except (CannotRun, subprocess.CalledProcessError) as err:
+    except CannotRun as err:
         print(f"standards-audit: cannot run: {err}", file=sys.stderr)
         return 2
 

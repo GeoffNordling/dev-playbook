@@ -10,6 +10,7 @@ callable, so the matrix logic is exercised without subprocessing real detectors.
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -617,6 +618,49 @@ def test_main_exits_two_on_a_dangling_catalog_link(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, files)
 
     assert sa.main([str(repo)]) == 2
+
+
+# --- the subprocess boundary ------------------------------------------------
+
+
+def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # A detector that hangs on --list-rules must fail the commit gate loudly,
+    # not block it forever: the timeout converts to a CannotRun the matrix
+    # surfaces as a "does not answer --list-rules" finding.
+    files = ordered_repo_files({})
+    files["standards/index.md"] = catalog(
+        [
+            bullet("standards/README.md", "Standards"),
+            bullet("standards/standard.md", "Meta-Standard"),
+            bullet("standards/build.md", "Build"),
+            bullet("standards/python.md", "Python"),
+            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+        ]
+    )
+    files["standards/foo.md"] = card_citing("Foo", [cite("foo")])
+    files["scripts/foo"] = "#!/usr/bin/env bash\n"
+    # Consistent hook surfaces so hook-surfaces does not can't-run and mask the
+    # matrix finding the timeout produces.
+    files[".pre-commit-hooks.yaml"] = _manifest([])
+    files[".pre-commit-config.yaml"] = _local_block(["standards-audit"])
+    files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical([])
+    files["scripts/README.md"] = _readme_table(["standards-audit"])
+    repo = make_repo(tmp_path, files)
+
+    real_run = subprocess.run
+
+    def hang(cmd: Any, *args: Any, **kwargs: Any) -> Any:
+        # Only the detector's --list-rules call hangs; git ls-files runs for real.
+        if "--list-rules" in cmd:
+            raise subprocess.TimeoutExpired(cmd=cmd, timeout=10)
+        return real_run(cmd, *args, **kwargs)
+
+    monkeypatch.setattr(sa.subprocess, "run", hang)
+
+    assert sa.main([str(repo)]) == 1
+    assert "--list-rules" in capsys.readouterr().out
 
 
 def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
