@@ -70,7 +70,6 @@ What should happen after the work is complete. Be specific about edge cases and 
 - `TypeName` — what changes and why
 - `functionName()` — what it returns vs what it should return
 - Config shape — any new options needed
-- "none" when the work introduces no interface
 
 **Acceptance criteria:**
 - [ ] Specific, testable criterion 1
