@@ -32,7 +32,7 @@ Then report: `READ: spec-standard.md, design-layer.md, lessons.md`. Proceed only
 - `gh issue view <issue> --comments` — the body is the contract. On a rework re-entry from spec review, the comments carry the review's findings; treat the latest as the work list. The brief stays the contract — a comment that conflicts with it yields to it.
 - Existing specs: `specs/functional_requirements/` and `specs/design/`.
 - `CONTEXT.md` for domain vocabulary, if present.
-- `docs/adr/README.md` — the ADR index; from its descriptions, read only the ADRs relevant to the area.
+- `docs/decisions/README.md` — the Decision Record index; from its descriptions, read only the Decision Records relevant to the area.
 - **Brownfield reconnaissance.** Read the existing code the area touches. For each new capability, work out whether it extends a module or introduces one, and what public surface each requirement implies.
 
 ## 2. Area discovery interview
@@ -51,7 +51,7 @@ Add areas as they surface. Surface your read of which areas look load-bearing an
 
 ## 3. Intent interview
 
-Invoke /grill-with-docs to reach shared understanding of the flagged areas — behavioral intent and public-boundary terminology both — challenging fuzzy terms against `CONTEXT.md`, cross-referencing the code, and recording resolved domain terms and decisions in `CONTEXT.md` / ADRs as they crystallize.
+Invoke /grill-with-docs to reach shared understanding of the flagged areas — behavioral intent and public-boundary terminology both — challenging fuzzy terms against `CONTEXT.md`, cross-referencing the code, and recording resolved domain terms and decisions in `CONTEXT.md` / Decision Records as they crystallize.
 
 Where an area has discrete options — a requirement's edge-case treatment, an interface shape, an exception strategy, a name — present them as **compact, self-contained handles** the user can weigh at a glance: each candidate item shown by id + heading + a one-line gist, never its full prose, and grouped into the `feat → req → dsn` hierarchy they form (indented along `Covers:`) so their mutual support is visible. Each option carries a recommendation and the reason it is recommended.
 
@@ -74,7 +74,7 @@ The skeleton holds — `Covers:`, `Needs:`, `Depends:`, and `Interface:` from th
 - **Leave implementation to build.** Output format, packaging, internal walk shape, file paths stay open unless a `req` constrains them.
 - When shaping public surfaces, first read [module design](~/workspace/dev-playbook/standards/modules/design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. `Interface:` lines fully qualify symbol paths and follow the standard's annotation idiom.
 - **Non-mandatory inclusion is a commitment.** A `SHOULD` / `MAY` you include is one you intend to deliver.
-- `Rationale:` and `Comment:` are optional — write one only when there's a genuine "why" to record; omit it otherwise rather than filling it, since an empty or filler `Rationale:` is a defect per the spec standard. When you do write one, keep it non-prescriptive: a claim that wants to prescribe belongs in `Description:`. Reference relevant ADRs rather than re-explaining them.
+- `Rationale:` and `Comment:` are optional — write one only when there's a genuine "why" to record; omit it otherwise rather than filling it, since an empty or filler `Rationale:` is a defect per the spec standard. When you do write one, keep it non-prescriptive: a claim that wants to prescribe belongs in `Description:`. Reference relevant Decision Records rather than re-explaining them.
 - **Mark the region work-in-progress.** Set `WIP: true` on each `feat` you author or reopen. Its cone reaches no verifiers yet, so completeness would otherwise fail; the marker exempts the `feat` and everything beneath it until build lands the verifiers and removes it. Consistency still holds.
 - **Reconcile a revision bump.** When an edit bumps an existing item's revision, every committed adjacent reference now names the prior revision — a **stale reference** (target `(type, name)` present at another revision; reported by `SpecGraph.stale_references()`, not raised), distinct from a **dangling reference** (target `(type, name)` absent entirely, still a raised consistency breach). Reconcile the bump's adjacent references:
   - **Spec-side bullets** — `Covers:` / `Depends:` in other spec items: re-point them to the new revision in-phase (the phase owns these files), re-evaluating that each adjacent item still fits the bumped item's new meaning. If it does not, update the bumped item accordingly, bump its own

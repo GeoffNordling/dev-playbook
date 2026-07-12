@@ -25,7 +25,7 @@ Title Case; acronyms stay upper. Listed alphabetically.
 
 | Type | What it is |
 |------|------------|
-| `ADR` | An immutable, numbered record of one architectural decision and its rationale. |
+| `Decision Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
 | `Instrument Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Protocol` | A formal algorithm for structured human–agent collaboration. |

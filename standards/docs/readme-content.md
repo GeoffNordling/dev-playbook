@@ -13,4 +13,4 @@ ceiling: depth varies by project ("Scope is standardized; depth is not" —
 [bundle.md](/standards/docs/bundle.md#principles)), and a README `MAY` add
 prerequisites, quick-start, architecture overview, or examples as the
 project earns them. It `SHALL NOT` contain agent instructions or
-architecture decisions — those live in `CLAUDE.md` and `docs/adr/`.
+architecture decisions — those live in `CLAUDE.md` and `docs/decisions/`.

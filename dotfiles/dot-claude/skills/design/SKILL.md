@@ -42,7 +42,7 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 ## 3. Intent interview
 
-Invoke /grill-with-docs to sharpen the approach against the codebase, capturing significant decisions as ADRs as they crystallize. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended. Prototype in the worktree only to settle a question the reading can't, and treat it as scratch, not work product.
+Invoke /grill-with-docs to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended. Prototype in the worktree only to settle a question the reading can't, and treat it as scratch, not work product.
 
 ## 4. Approach synthesis
 

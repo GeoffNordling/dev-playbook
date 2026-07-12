@@ -26,7 +26,7 @@ document is relevant.
 Not every file in the repo is a concept document. The bundle divides in two:
 
 - **Concept documents** — prose knowledge a reader loads to *understand*
-  something: standards, guides, surveys, ADRs, READMEs, the
+  something: standards, guides, surveys, Decision Records, READMEs, the
   vocabulary. Each carries OKF frontmatter (`type` + `title` +
   `description`, per [document-types.md](/standards/docs/document-types.md)) and
   is subject to the type-lint.

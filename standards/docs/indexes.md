@@ -42,7 +42,7 @@ case-insensitive. `README.md` always comes first.
 
 An index may deviate from alphabetical **only when an intro line beginning
 `Ordering:` declares the meaningful order** — for example
-`Ordering: in ADR number order` or `Ordering: by level of abstraction`. The
+`Ordering: in Decision Record number order` or `Ordering: by level of abstraction`. The
 marker is structured, not prose: the detector checks only that an intro line
 (one before the first listed entry) begins `Ordering:`, and never parses what
 the declaration says. An undeclared deviation from alphabetical is a defect —

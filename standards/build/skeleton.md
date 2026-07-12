@@ -23,7 +23,7 @@ forbids.
 | `scripts/` | Optional | sole home for checked-in runnables, any language; `bin/` and `tools/` are forbidden at the root |
 | `CONTEXT.md` | Optional | root only; content per [context-content.md](/standards/docs/context-content.md) |
 | `docs/` | Optional | guides and surveys that outgrow the README, each an OKF concept doc |
-| `docs/adr/` | Optional | ADRs per [decisions/adrs.md](/standards/decisions/adrs.md) |
+| `docs/decisions/` | Optional | Decision Records per [decisions/records.md](/standards/decisions/records.md) |
 | `readings/` | Optional | instrument output artifacts, one subdirectory per instrument, per [the instrument standard](/standards/instrument/format.md); regenerated manually on demand, never hand-edited, may lag what it describes |
 | `specs/` | Optional | governed by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md), not the OKF profile |
 | `.claude/` | Optional | Claude Code files per [the harness-files standard](/standards/claude-code/index.md); `worktrees/` gitignored |
@@ -88,7 +88,7 @@ Full stack (python · src · scripts · aws):
 ├── Makefile
 ├── README.md
 ├── cdk.json
-├── docs/adr/           # optional
+├── docs/decisions/     # optional
 ├── index.md
 ├── pyproject.toml
 ├── uv.lock

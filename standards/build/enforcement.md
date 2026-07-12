@@ -59,6 +59,7 @@ pattern.
 | python-audit | workspace Python-source rules | hook pattern |
 | testing-audit | test privacy, mirror layout, no-logic | hook pattern |
 | okf-audit | concept-doc types, `index.md` freshness | hook pattern |
+| decisions-audit | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
 | judgments-audit | judgment declarations | hook pattern |
 | shellcheck | shell scripts | hook pattern |

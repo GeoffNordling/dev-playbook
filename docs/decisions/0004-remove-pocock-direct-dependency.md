@@ -1,5 +1,5 @@
 ---
-type: ADR
+type: Decision Record
 title: Remove Pocock Direct Dependency, Absorb Conventions, Lift Engineering Skills
 description: Cut the Pocock direct dependency — absorb load-bearing conventions into standards, lift four engineering skills into bundles, keep two utilities
 ---
@@ -8,7 +8,7 @@ description: Cut the Pocock direct dependency — absorb load-bearing convention
 
 ## Context
 
-[ADR-0001](0001-adopt-matt-pocock-conventions.md) adopted Matt Pocock's
+[Decision Record 0001](0001-adopt-matt-pocock-conventions.md) adopted Matt Pocock's
 conventions and skills wholesale on the principle that running the engineering
 skills (`/tdd`, `/triage`, `/to-issues`, `/grill-with-docs`,
 `/improve-codebase-architecture`) without their per-repo configuration produces
@@ -16,17 +16,17 @@ degraded output — so adopt the conventions the skills assume, not just the
 skills themselves. The rationale held when the workspace's own conventions were
 thin and Pocock's filled gaps cleanly.
 
-[ADR-0003](0003-decline-superpowers.md) generalized that rationale into an
+[Decision Record 0003](0003-decline-superpowers.md) generalized that rationale into an
 explicit workspace principle:
 
 > **Adopt third-party skills only when their conventions integrate cleanly
 > with existing canon. Otherwise harvest techniques into authored skills,
 > not foreign skills into the toolbox.**
 
-ADR-0003 noted that the rule was *implicitly* applied in ADR-0001 because
+Decision Record 0003 noted that the rule was *implicitly* applied in Decision Record 0001 because
 Pocock's per-repo configuration complemented existing standards at the time.
 
-The landscape has changed since ADR-0001:
+The landscape has changed since Decision Record 0001:
 
 - **`spec-tools` moved to its own repo** (`~/workspace/spec-tools/`) and grew
   per-repo conventions of its own — `sdd-standards/` covering specs, design,
@@ -40,8 +40,8 @@ The landscape has changed since ADR-0001:
   config layer is a parallel mechanism for things now better served from
   workspace standards.
 
-The "complements existing canon" condition from ADR-0003 no longer holds for
-the load-bearing skills. The principle ADR-0003 articulated, applied honestly
+The "complements existing canon" condition from Decision Record 0003 no longer holds for
+the load-bearing skills. The principle Decision Record 0003 articulated, applied honestly
 to the changed landscape, points to cutting the direct dependency.
 
 ## Decision
@@ -129,7 +129,7 @@ mirrored into `dotfiles/.claude/skills/` by `dotfiles/bin/sync-dotfiles.sh`.
 - `docs/agents/{issue-tracker,triage-labels,domain}.md` — deleted.
 - `## Agent skills` block in root `CLAUDE.md` — deleted.
 
-The single-context `CONTEXT.md` + `docs/adr/` pattern at the repo root
+The single-context `CONTEXT.md` + `docs/decisions/` pattern at the repo root
 remains, codified in `standards/repo-documentation.md`. The multi-context
 `CONTEXT-MAP.md` variant is dropped — single-context is the only supported
 shape going forward.
@@ -138,7 +138,7 @@ shape going forward.
 
 | Alternative | Why rejected |
 |---|---|
-| Keep the wholesale Pocock dependency from ADR-0001 | Honest application of the [ADR-0003](0003-decline-superpowers.md) rule says the "complements existing canon" condition no longer holds; the dependency is now competing rather than complementing. |
+| Keep the wholesale Pocock dependency from Decision Record 0001 | Honest application of the [Decision Record 0003](0003-decline-superpowers.md) rule says the "complements existing canon" condition no longer holds; the dependency is now competing rather than complementing. |
 | Lift only some skills, keep others as direct dependencies | All four load-bearing skills overlap with workspace standards in the same way; halfway state would carry the worst of both — partial dependency for skills that no longer complement, no clean ownership of the conventions they rely on. |
 | Keep `/zoom-out` and `/caveman` as authored bundles too | These are tiny utility skills with negligible semantic-drift risk. Authoring them adds maintenance for no real benefit; the Vercel install path handles them adequately. |
 | Lift the supplementary reference files (`AGENT-BRIEF.md`, `OUT-OF-SCOPE.md`, `CONTEXT-FORMAT.md`, `ADR-FORMAT.md`) into the lifted skill bundles | Standards are the single source of truth. Duplicating reference material into skill bundles invites drift between the standard and the bundle copy. The lifted skills point at the standards directly. |
@@ -158,13 +158,13 @@ shape going forward.
 - Six standards files are added or rewritten; three existing standards
   updated; one repo file (`CLAUDE.md`) and one repo directory
   (`docs/agents/`) removed.
-- ADR-0001's `Status` is updated to `Superseded by ADR-0004 in part` —
-  conventions like 4-digit ADR numbering remain. The body of ADR-0001 is
+- Decision Record 0001's `Status` is updated to `Superseded by Decision Record 0004 in part` —
+  conventions like 4-digit Decision Record numbering remain. The body of Decision Record 0001 is
   unchanged (historical record).
-- ADR-0003's Consequences are extended with a pointer back to this ADR,
+- Decision Record 0003's Consequences are extended with a pointer back to this Decision Record,
   noting the rule's re-application to Pocock himself.
 - Future luminary-driven framework pulls route through the same rule
-  ([ADR-0003](0003-decline-superpowers.md)). Pocock is now the worked
+  ([Decision Record 0003](0003-decline-superpowers.md)). Pocock is now the worked
   example of the rule's *re*-application: a dependency that was once
   complementary can become competing as the workspace's own canon grows.
 - The soft cost of carrying a foreign voice inside the authored skill
@@ -188,10 +188,10 @@ Audit and disposition:
   [workflow.md](~/workspace/dev-playbook/standards/workflow.md). Deleted
   with no migration.
 - **`domain.md`** — five agent-discipline rules (read `CONTEXT.md` and
-  relevant ADRs before exploring; proceed silently on missing optional
+  relevant Decision Records before exploring; proceed silently on missing optional
   docs; use glossary vocabulary in outputs; explicit disposition for
-  off-glossary concepts; flag ADR conflicts with template). All five
-  were absent from the workspace canon at the time of this ADR. Absorbed
+  off-glossary concepts; flag Decision Record conflicts with template). All five
+  were absent from the workspace canon at the time of this Decision Record. Absorbed
   into the CLAUDE.md Baseline as a new `## Domain awareness` section in
   [repo-documentation.md](~/workspace/dev-playbook/standards/repo-documentation.md),
   then inlined into dev-playbook's and spec-tools' root `CLAUDE.md`. File
@@ -203,4 +203,4 @@ silence is the answer.
 
 ## Addendum — 2026-05-29
 
-Two skills Pocock published after this ADR — `engineering/prototype` and `productivity/handoff` — were evaluated through the [ADR-0003](0003-decline-superpowers.md) rule this ADR re-applied, and harvested into authored bundles (`dotfiles/dot-claude/skills/prototype/` and `.../handoff/`) rather than installed as dependencies. The third re-application of the rule; see [ADR-0006](0006-harvest-pocock-prototype-and-handoff.md).
+Two skills Pocock published after this Decision Record — `engineering/prototype` and `productivity/handoff` — were evaluated through the [Decision Record 0003](0003-decline-superpowers.md) rule this Decision Record re-applied, and harvested into authored bundles (`dotfiles/dot-claude/skills/prototype/` and `.../handoff/`) rather than installed as dependencies. The third re-application of the rule; see [Decision Record 0006](0006-harvest-pocock-prototype-and-handoff.md).

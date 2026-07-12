@@ -11,6 +11,7 @@
 #       - id: testing-audit
 #       - id: ref-audit
 #       - id: okf-audit
+#       - id: decisions-audit
 #       - id: skill-audit
 #       - id: judgments-audit
 #
@@ -50,6 +51,13 @@
 - id: okf-audit
   name: okf-audit
   entry: scripts/okf-audit
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: decisions-audit
+  name: decisions-audit
+  entry: scripts/decisions-audit
   language: script
   pass_filenames: false
   always_run: true

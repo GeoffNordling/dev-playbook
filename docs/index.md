@@ -5,4 +5,4 @@
 
 ## Directories
 
-- [adr/](/docs/adr/index.md) — The architecture decision records directory — numbered, immutable records of decisions and their rationale
+- [decisions/](/docs/decisions/index.md) — The Decision Records directory — numbered, immutable records of decisions and their rationale

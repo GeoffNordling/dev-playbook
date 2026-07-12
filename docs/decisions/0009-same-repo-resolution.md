@@ -1,5 +1,5 @@
 ---
-type: ADR
+type: Decision Record
 title: Same-Repo Resolution — Keep the Written Form, Resolve Reader-Side
 description: Resolve intra-repo workspace citations against the reader's own checkout via a reader-side rule, keeping the written path form unchanged
 ---

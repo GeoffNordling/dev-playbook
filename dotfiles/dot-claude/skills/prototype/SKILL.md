@@ -41,6 +41,6 @@ If the user is unreachable (an autonomous run), don't invent a placement — use
 
 ## When done
 
-The answer is the only durable artifact. Capture it — and the question it answered — somewhere lasting: a commit message, an ADR (see [ADR conventions](~/workspace/dev-playbook/standards/decisions/adrs.md)), an issue, or a `NOTES.md` beside the prototype. If the user is around, that's a quick conversation; if not, leave the placeholder so the verdict can be filled in before the prototype is deleted or absorbed.
+The answer is the only durable artifact. Capture it — and the question it answered — somewhere lasting: a commit message, a Decision Record (see [Decision Record conventions](~/workspace/dev-playbook/standards/decisions/records.md)), an issue, or a `NOTES.md` beside the prototype. If the user is around, that's a quick conversation; if not, leave the placeholder so the verdict can be filled in before the prototype is deleted or absorbed.
 
 Then **graduate or delete**: fold the validated decision into real code — rewritten to production standard, since the prototype was written under throwaway constraints — or remove it. Don't leave prototypes rotting in the repo.

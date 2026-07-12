@@ -17,10 +17,10 @@ past state, or rejected alternatives.
 Don't: "X is hand-maintained — there is no generator."
 Do: "X is the source of truth."
 
-Decision records are the exception. An ADR in `docs/adr/` is a dated record of a
-past decision — the choice made, the alternatives rejected, the context that
-forced it — and is never rewritten to match later state. This rule binds every
-other doc.
+Decision Records are the exception. A Decision Record in `docs/decisions/` is a
+dated record of a past decision — the choice made, the alternatives rejected,
+the context that forced it — and is never rewritten to match later state. This
+rule binds every other doc.
 
 ## Voice
 

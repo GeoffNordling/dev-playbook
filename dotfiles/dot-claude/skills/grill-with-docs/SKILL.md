@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
+description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, Decision Records) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -24,13 +24,13 @@ During codebase exploration, also look for existing documentation:
 /
 ├── CONTEXT.md
 ├── docs/
-│   └── adr/
+│   └── decisions/
 │       ├── 0001-event-sourced-orders.md
 │       └── 0002-postgres-for-write-model.md
 └── src/
 ```
 
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/decisions/` exists, create it when the first Decision Record is needed.
 
 ## During the session
 
@@ -56,12 +56,12 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up �
 
 Don't couple `CONTEXT.md` to implementation details. Only include terms that are meaningful to domain experts.
 
-### Offer ADRs sparingly
+### Offer Decision Records sparingly
 
-Only offer to create an ADR when all three are true:
+Only offer to create a Decision Record when all three are true:
 
 1. **Hard to reverse** — the cost of changing your mind later is meaningful
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. See [ADR conventions](~/workspace/dev-playbook/standards/decisions/adrs.md) for the template and optional sections.
+If any of the three is missing, skip the Decision Record. See [Decision Record conventions](~/workspace/dev-playbook/standards/decisions/records.md) for the template and optional sections.
