@@ -1,13 +1,21 @@
-"""Audit the workspace: GitHub repo settings and stale dev-playbook pins.
+"""Audit the workspace: GitHub repo settings, label/issue conformance, and pins.
 
 The library behind the ``workspace-audit`` shim — the on-demand audit venue of
-the enforcement standard, the checks that live outside any single commit. For
-every git repo under the workspace root:
+the enforcement standard, the checks that live outside any single commit. It
+answers workspace-scope facts readable over `gh api`, and it reports and never
+blocks — GitHub sits outside every gate. For every git repo under the workspace
+root:
 
   - **settings** — read the repo's GitHub settings over `gh api` and compare
     them against the expected values (squash-only merges, PR title/body commit
     message, auto-deleted merged branches). A repo the API cannot reach, or with
     no GitHub origin, is reported loudly.
+  - **labels** — compare the repo's labels against the canonical scheme at full
+    parity (a finding exactly when bootstrap-labels would repair), and flag any
+    label naming a blocked state.
+  - **issues** — from one open-issues read, check every post-intake leaf's
+    four-tuple validity and brief shape, and every epic's category-only shape;
+    epic/leaf comes from ``sub_issues_summary``.
   - **pin** — read the dev-playbook `rev` pinned in the repo's
     `.pre-commit-config.yaml` and compare it against the hook repo's local
     `main`. Stale pins are reported but are not failures: a consumer catches up
