@@ -146,26 +146,36 @@ def check_card_layout(root: Path) -> list[Finding]:
             )
             continue
         sections = [s for s in _h2_sections(path) if s in CELLS]
-        if sections != list(CELLS):
-            missing = [c for c in CELLS if c not in sections]
-            if missing:
-                findings.append(
-                    Finding(
-                        rel,
-                        None,
-                        CARD_LAYOUT,
-                        f"card is missing the cell(s): {', '.join(missing)}",
-                    )
+        missing = [c for c in CELLS if c not in sections]
+        if missing:
+            findings.append(
+                Finding(
+                    rel,
+                    None,
+                    CARD_LAYOUT,
+                    f"card is missing the cell(s): {', '.join(missing)}",
                 )
-            else:
-                findings.append(
-                    Finding(
-                        rel,
-                        None,
-                        CARD_LAYOUT,
-                        f"card cells are out of order (want {', '.join(CELLS)})",
-                    )
+            )
+        elif len(sections) != len(CELLS):
+            # All four present but one repeats — a duplicate, not a reordering.
+            duplicates = sorted({c for c in sections if sections.count(c) > 1})
+            findings.append(
+                Finding(
+                    rel,
+                    None,
+                    CARD_LAYOUT,
+                    f"card has duplicate cell(s): {', '.join(duplicates)}",
                 )
+            )
+        elif sections != list(CELLS):
+            findings.append(
+                Finding(
+                    rel,
+                    None,
+                    CARD_LAYOUT,
+                    f"card cells are out of order (want {', '.join(CELLS)})",
+                )
+            )
     return findings
 
 
@@ -340,7 +350,7 @@ def check_rule_matrix(
                         f"standards/{prefix}.md",
                     )
                 )
-            elif name not in cited_by or prefix not in cited_by[name]:
+            elif prefix not in cited_by[name]:
                 findings.append(
                     Finding(
                         f"standards/{prefix}.md",

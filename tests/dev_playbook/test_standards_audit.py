@@ -85,6 +85,24 @@ def test_card_with_cells_out_of_order_is_flagged(tmp_path: Path) -> None:
     assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
 
 
+def test_card_with_a_duplicated_cell_is_flagged_as_duplicate(tmp_path: Path) -> None:
+    # All four cells present but one repeated: reported as a duplicate, not as
+    # "out of order" (the real defect the message must name).
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card(
+                "Build", cells=("Define", "Define", "Audit", "Enforce", "Adopt")
+            )
+        },
+    )
+
+    findings = sa.check_card_layout(repo)
+
+    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert "duplicate" in findings[0].message.lower()
+
+
 def test_readme_and_index_are_not_treated_as_cards(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
