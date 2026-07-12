@@ -10,13 +10,18 @@ when present in the target directory:
 
 Externally-managed skills (those whose bundle directory is a symlink,
 typically pointing into dotfiles/.agents/skills/) are skipped — their
-conformance is the upstream's concern. Exits 0 silently when neither root
-exists, so the same invocation is safe in any repo.
+conformance is the upstream's concern. The same invocation is safe in any
+repo: with no skill roots there is nothing to scan.
+
+In a repo with a committed dotfiles/.agents/skills/ tree (dev-playbook), the
+claude-code.skill-mirror check additionally reports the symlink-mirror
+conditions bin/sync-dotfiles.sh repairs — missing, mispointed, stale, or
+colliding entries under dotfiles/dot-claude/skills/. It is inert elsewhere.
 
 Output:
     stdout — one finding per line, `file: claude-code.rule message`.
     stderr — non-failing advisories (body length) and one summary line.
-    exit   — 0 clean, 1 findings.
+    exit   — 0 clean, 1 findings, 2 error state (agents tree without its mirror).
 
 Usage:
     skill-audit [directory]
@@ -58,6 +63,7 @@ EFFORT_VALUE = "claude-code.effort-value"
 DMI_TYPE = "claude-code.dmi-type"
 BODY_H1 = "claude-code.body-h1"
 REFERENCES_DEPTH = "claude-code.references-depth"
+SKILL_MIRROR = "claude-code.skill-mirror"
 
 RULES = (
     PARSE,
@@ -74,6 +80,7 @@ RULES = (
     DMI_TYPE,
     BODY_H1,
     REFERENCES_DEPTH,
+    SKILL_MIRROR,
 )
 
 REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
@@ -84,6 +91,10 @@ KEBAB_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 DESCRIPTION_MAX = 1024
 BODY_MAX_LINES = 100
+
+
+class ToolError(Exception):
+    """The audit hit a structural error state and cannot complete its scan."""
 
 
 @dataclass
@@ -316,6 +327,75 @@ def audit_skill(skill_dir: Path, repo_root: Path) -> tuple[list[Finding], list[s
     return findings, advisories
 
 
+def _mirror_finding(entry: Path, link: Path, rel: str) -> Finding | None:
+    """The finding for how dot-claude/skills/<name> mirrors an .agents/skills entry.
+
+    ``None`` when the link correctly mirrors the entry, or when it is a broken
+    symlink — those are left to the stale-symlink pass, which owns non-resolving
+    links regardless of a matching entry, so no link is reported twice.
+    """
+    name = entry.name
+    if link.is_symlink():
+        if not link.exists():
+            return None
+        if link.resolve() != entry.resolve():
+            return Finding(
+                rel,
+                SKILL_MIRROR,
+                f"symlink points elsewhere, not to '.agents/skills/{name}'",
+            )
+        return None
+    if link.exists():
+        return Finding(
+            rel,
+            SKILL_MIRROR,
+            f"authored skill collides with externally-managed '.agents/skills/{name}'",
+        )
+    return Finding(
+        rel, SKILL_MIRROR, f"missing mirror symlink for '.agents/skills/{name}'"
+    )
+
+
+def check_skill_mirror(repo_root: Path) -> list[Finding]:
+    """Audit the committed dotfiles mirror between .agents/skills and dot-claude/skills.
+
+    Claude Code discovers skills only from dot-claude/skills/, so every
+    externally-managed skill under dotfiles/.agents/skills/ must have a
+    corresponding symlink there. This reports the conditions bin/sync-dotfiles.sh
+    repairs; it is inert in repos without a committed dotfiles/.agents/skills/ tree.
+    """
+    agents_skills = repo_root / "dotfiles" / ".agents" / "skills"
+    claude_skills = repo_root / "dotfiles" / "dot-claude" / "skills"
+
+    if not agents_skills.is_dir():
+        return []
+    if not claude_skills.is_dir():
+        raise ToolError(
+            "dotfiles/.agents/skills/ exists but its mirror directory "
+            "dotfiles/dot-claude/skills/ does not"
+        )
+
+    findings: list[Finding] = []
+    for entry in sorted(agents_skills.iterdir()):
+        if not entry.is_dir():
+            continue  # non-directories are ignored, matching the repairer
+        link = claude_skills / entry.name
+        finding = _mirror_finding(entry, link, str(link.relative_to(repo_root)))
+        if finding is not None:
+            findings.append(finding)
+
+    for link in sorted(claude_skills.iterdir()):
+        if link.is_symlink() and not link.exists():
+            findings.append(
+                Finding(
+                    str(link.relative_to(repo_root)),
+                    SKILL_MIRROR,
+                    f"stale symlink '{link.name}' does not resolve",
+                )
+            )
+    return findings
+
+
 def discover_internal_skills(skills_dir: Path) -> tuple[list[Path], int]:
     """Return (internal_skill_dirs, externally_managed_count).
 
@@ -357,6 +437,12 @@ def main():
 
     repo_root = Path(args.directory).resolve()
 
+    try:
+        all_findings: list[Finding] = list(check_skill_mirror(repo_root))
+    except ToolError as err:
+        print(f"skill-audit: {err}", file=sys.stderr)
+        sys.exit(2)
+
     skill_roots = [
         p
         for p in (
@@ -366,10 +452,6 @@ def main():
         if p.is_dir()
     ]
 
-    if not skill_roots:
-        print("skill-audit: no skill roots found", file=sys.stderr)
-        sys.exit(0)
-
     internal_skills: list[Path] = []
     skipped = 0
     for root in skill_roots:
@@ -377,11 +459,6 @@ def main():
         internal_skills.extend(roots_internal)
         skipped += roots_skipped
 
-    if not internal_skills:
-        print("skill-audit: no internal skills found", file=sys.stderr)
-        sys.exit(0)
-
-    all_findings: list[Finding] = []
     all_advisories: list[str] = []
     for skill_dir in internal_skills:
         findings, advisories = audit_skill(skill_dir, repo_root)
