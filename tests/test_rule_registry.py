@@ -44,6 +44,7 @@ CARRIERS = [
     (SCRIPTS / "skill-audit", "Finding", 1),
     (SCRIPTS / "workspace-audit", "Line", 1),
     (SRC / "dev_playbook" / "judgments" / "loader.py", "LintFinding", 1),
+    (SRC / "dev_playbook" / "testing_audit.py", "Finding", 2),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
@@ -54,6 +55,7 @@ REGISTRIES = [
     (SCRIPTS / "skill-audit", "RULES"),
     (SCRIPTS / "workspace-audit", "RULES"),
     (SRC / "dev_playbook" / "judgments" / "loader.py", "JUDGMENTS_RULES"),
+    (SRC / "dev_playbook" / "testing_audit.py", "RULES"),
 ]
 
 

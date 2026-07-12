@@ -1,8 +1,9 @@
 """Behavioral tests for scripts/python-audit.
 
-python-audit merges the former no-future-annotations, empty-init, and
-test-privacy hooks into one walk. Discovery goes through `git ls-files`, so
-every fixture is a git repo; a directory (repo root) is the only argument.
+python-audit merges the no-future-annotations and empty-init rules into one
+walk (the test-privacy family moved to testing-audit). Discovery goes through
+`git ls-files`, so every fixture is a git repo; a directory (repo root) is the
+only argument.
 """
 
 import subprocess
@@ -131,62 +132,6 @@ def test_unreadable_init_reports_tool_error(tmp_path: Path) -> None:
     assert "python-audit" in result.stderr
 
 
-# --- test-privacy rule ---
-
-
-def test_import_of_private_name_from_non_test_module_is_flagged(
-    tmp_path: Path,
-) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def _secret():\n    return 1\n",
-            "tests/test_thing.py": "from mypkg.thing import _secret\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "privacy.import-private" in result.stdout
-    assert "tests/test_thing.py" in result.stdout
-
-
-def test_attribute_access_into_private_name_is_flagged(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def _secret():\n    return 1\n",
-            "tests/test_thing.py": "import mypkg.thing\n\n\ndef test_it():\n    mypkg.thing._secret()\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "privacy.attribute-access" in result.stdout
-
-
-def test_dunder_access_is_public(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "class T:\n    pass\n",
-            "tests/test_thing.py": "import mypkg.thing\n\n\ndef test_it():\n    mypkg.thing.__name__\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_public_access_in_test_is_clean(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def public():\n    return 1\n",
-            "tests/test_thing.py": "from mypkg.thing import public\n\n\ndef test_it():\n    assert public() == 1\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
 # --- combined ---
 
 
@@ -228,24 +173,8 @@ def test_future_rule_skips_deprecated_tree(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_privacy_rule_scans_deprecated_tree(tmp_path: Path) -> None:
-    """test-privacy's original exclusions were caches only — a private-access
-    violation under deprecated/ is still flagged."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "deprecated/thing.py": "def _secret():\n    return 1\n",
-            "deprecated/tests/test_thing.py": "from deprecated.thing import _secret\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "privacy.import-private" in result.stdout
-    assert "deprecated/tests/test_thing.py" in result.stdout
-
-
 def test_repo_self_scan_is_clean() -> None:
-    """The dev-playbook repo itself passes all three rules."""
+    """The dev-playbook repo itself passes both rules."""
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -264,10 +193,8 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "python.no-future-annotations" in ids
-    assert "python.empty-init" in ids
-    assert "privacy.import-private" in ids
-    assert "privacy.attribute-access" in ids
+    assert ids == ["python.empty-init", "python.no-future-annotations"]
+    assert not any(rule.startswith("privacy") for rule in ids)
 
 
 def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
