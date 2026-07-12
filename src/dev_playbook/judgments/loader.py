@@ -44,7 +44,7 @@ class DeclarationError(ValueError):
     """
 
     def __init__(self, source: Path, detail: str) -> None:
-        """Keep the source path and detail apart, and format them as the message."""
+        """Keeps the source path and detail apart, and formats them as the message."""
         self.source = source
         self.detail = detail
         super().__init__(f"{source}: {detail}")

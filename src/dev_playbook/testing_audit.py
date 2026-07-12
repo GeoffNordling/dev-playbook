@@ -133,7 +133,7 @@ class _PrivacyVisitor(ast.NodeVisitor):
         self._imports: dict[str, str] = {}
 
     def visit_Import(self, node: ast.Import) -> None:
-        """Record aliases and flag private module segments in each import."""
+        """Records aliases and flags private module segments in each import."""
         for alias in node.names:
             module = alias.name
             local = alias.asname or alias.name.split(".")[0]
@@ -143,7 +143,7 @@ class _PrivacyVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        """Flag private names (and segments) imported from a non-test module."""
+        """Flags private names (and segments) imported from a non-test module."""
         module = node.module or ""
         if module and not _is_test_module(module):
             self._flag_private_segments(node, module)
@@ -160,29 +160,29 @@ class _PrivacyVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        """Shadow the function name so later attribute reaches skip it."""
+        """Shadows the function name so later attribute reaches skip it."""
         self._imports.setdefault(node.name, "")
         self.generic_visit(node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        """Shadow the coroutine name so later attribute reaches skip it."""
+        """Shadows the coroutine name so later attribute reaches skip it."""
         self._imports.setdefault(node.name, "")
         self.generic_visit(node)
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        """Shadow the class name so later attribute reaches skip it."""
+        """Shadows the class name so later attribute reaches skip it."""
         self._imports.setdefault(node.name, "")
         self.generic_visit(node)
 
     def visit_Assign(self, node: ast.Assign) -> None:
-        """Shadow assigned names so later attribute reaches skip them."""
+        """Shadows assigned names so later attribute reaches skip them."""
         for target in node.targets:
             if isinstance(target, ast.Name):
                 self._imports.setdefault(target.id, "")
         self.generic_visit(node)
 
     def visit_Attribute(self, node: ast.Attribute) -> None:
-        """Flag reaching into a private attribute of a non-test import."""
+        """Flags reaching into a private attribute of a non-test import."""
         if _is_private(node.attr):
             root = _root_name(node)
             if root is not None:

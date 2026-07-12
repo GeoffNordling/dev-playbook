@@ -452,6 +452,10 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
     pin("tool.ruff.line-length", toml_get(canon, "tool.ruff.line-length"))
     pin("tool.ruff.lint.select", toml_get(canon, "tool.ruff.lint.select"))
     pin("tool.ruff.lint.ignore", toml_get(canon, "tool.ruff.lint.ignore"))
+    pin(
+        "tool.ruff.lint.pydocstyle.convention",
+        toml_get(canon, "tool.ruff.lint.pydocstyle.convention"),
+    )
     pin("tool.ruff.lint.isort.known-first-party", [package_name(repo_name)])
     mypy = toml_get(canon, "tool.mypy")
     assert isinstance(mypy, dict)

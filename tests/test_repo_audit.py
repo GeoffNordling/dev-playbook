@@ -413,6 +413,16 @@ def test_pinned_ruff_selection_enforced(tmp_path: Path) -> None:
     assert "tool.ruff.lint.select" in result.stdout
 
 
+def test_pinned_pydocstyle_convention_enforced(tmp_path: Path) -> None:
+    files = python_files()
+    files["pyproject.toml"] = files["pyproject.toml"].replace(
+        'convention = "pep257"',
+        'convention = "google"',
+    )
+    result = run(make_repo(tmp_path, files))
+    assert "tool.ruff.lint.pydocstyle.convention" in result.stdout
+
+
 def test_missing_mypy_strictness_key_fails(tmp_path: Path) -> None:
     files = python_files()
     files["pyproject.toml"] = files["pyproject.toml"].replace(
