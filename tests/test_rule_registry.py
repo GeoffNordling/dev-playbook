@@ -45,6 +45,7 @@ CARRIERS = [
     (SRC / "dev_playbook" / "workspace_audit.py", "Line", 1),
     (SRC / "dev_playbook" / "judgments" / "loader.py", "LintFinding", 1),
     (SRC / "dev_playbook" / "judgments" / "runner.py", "RefutedFinding", 1),
+    (SRC / "dev_playbook" / "standards_audit.py", "Finding", 2),
     (SRC / "dev_playbook" / "testing_audit.py", "Finding", 2),
     (SRC / "dev_playbook" / "decisions_audit.py", "Finding", 2),
 ]
@@ -58,6 +59,7 @@ REGISTRIES = [
     (SRC / "dev_playbook" / "workspace_audit.py", "RULES"),
     (SRC / "dev_playbook" / "judgments" / "loader.py", "JUDGMENTS_RULES"),
     (SRC / "dev_playbook" / "judgments" / "runner.py", "RULES"),
+    (SRC / "dev_playbook" / "standards_audit.py", "RULES"),
     (SRC / "dev_playbook" / "testing_audit.py", "RULES"),
     (SRC / "dev_playbook" / "decisions_audit.py", "RULES"),
 ]

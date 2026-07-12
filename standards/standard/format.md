@@ -82,6 +82,19 @@ repository and never blocking by itself (its runs at a gate are the audit
 stationed there — that is Enforcement). This is the normative home of the
 detector contract.
 
+- **Read-only means mutating nothing git tracks.** A detector reports without
+  changing the repository. Writing outside the repository does not disqualify
+  it: judgments-run records verdicts to a content-addressed cache that lives
+  outside the working tree, mutating nothing git tracks, so it is read-only and
+  belongs in an Audit cell.
+- **Universal wiring; applicability lives inside the detector.** Every detector
+  is wired in every repo — consumers run the full menu, never a subset. A
+  detector whose surface is optional (skills) exits 0 silently when the surface
+  is absent; every other detector asserts unconditionally and fails loud. A gap
+  is never resolved by making a detector opt-in. (The one exception is a
+  detector whose audited surface exists only in one repo — standards-audit
+  audits the `standards/` tree, which only dev-playbook carries — so it is wired
+  in that repo's local block alone.)
 - **North star: one detector script per card.** The aim is a single detector
   answering each card's question. It is explicitly not mandatory — a card may
   honestly audit `none` when no automatic check exists.

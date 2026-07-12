@@ -64,10 +64,11 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `decisions-audit` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `standards-audit` | [standard/format.md](/standards/standard/format.md) | The meta-standard's five rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, doc coverage (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
 
-`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, `okf-audit`, and
-`decisions-audit` assert unconditionally and fail loud; they do not skip
-themselves when a target kind is absent. Run
+`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, `okf-audit`,
+`decisions-audit`, and `standards-audit` assert unconditionally and fail loud;
+they do not skip themselves when a target kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 

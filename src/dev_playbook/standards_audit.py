@@ -19,7 +19,8 @@ the meta card (``standard.*``):
     (``--list-rules`` is the trusted ground truth).
   - **hook-surfaces** — the detector-hook id sets agree across the published
     manifest, the canonical consumer template, and the local block (modulo the
-    declared local-only set), and every detector hook is documented and cited.
+    declared local-only set ``{standards-audit}``), and every detector hook has
+    a scripts/README.md validation-table row and is cited by a card.
   - **doc-coverage** — every concept doc in the standards bundle (the normative
     prose under ``standards/``) is reachable from at least one standard card.
 

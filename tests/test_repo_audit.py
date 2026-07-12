@@ -309,6 +309,11 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
 
 def test_skills_dir_without_audit_hook_fails(tmp_path: Path) -> None:
     files = base_files()
+    # The canonical template now carries skill-audit; strip it so this repo has
+    # a skills dir but no skill-audit hook -- the condition the rule flags.
+    files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
+        "      - id: skill-audit\n", ""
+    )
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1

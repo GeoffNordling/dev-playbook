@@ -8,6 +8,7 @@ callable, so the matrix logic is exercised without subprocessing real detectors.
 """
 
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 
 from dev_playbook import standards_audit as sa
@@ -243,7 +244,9 @@ def cite(name: str) -> str:
     return f"- [{name}](/scripts/{name}) — a detector"
 
 
-def fake_list_rules(mapping: dict[str, list[str]]):
+def fake_list_rules(
+    mapping: dict[str, list[str]],
+) -> Callable[[str, Path], list[str]]:
     """A --list-rules stand-in; an absent name models a script that won't answer."""
 
     def _list(name: str, root: Path) -> list[str]:
