@@ -82,6 +82,29 @@ any pattern argument:
 When a `&&`-chained or parallel `Bash` call fails this way, siblings get
 cancelled too. Prefer single quotes by default for regex/pattern data.
 
+## Keep sandbox-excluded commands leading and top-level
+
+A sandbox-excluded command (`gh`, `git`) only escapes the bwrap jail to reach
+its out-of-jail resource — the keyring holding `gh`'s PAT, the SSH remote for
+`git` — when it is the **leading, top-level** command; nested inside a `$(…)`
+capture, a `for`/`while` loop, a `bash -c '…'`, or behind a prefix
+(`env`/`timeout`/`xargs`) it runs *inside* the jail and fails auth. So never
+nest it. Chaining with `&&`/`;` and piping keep it leading and are fine.
+
+When you need a value from the command, run it on its own line writing to a file
+and read the file back — never capture it in `$(gh …)`. A long or multi-line
+query belongs in a quoted `-f query='…'` argument on the top-level call, never a
+heredoc piped into `bash -c`.
+
+Wrong (jailed — no token, GraphQL fails every time):
+
+    id=$(gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id')
+
+Right (`gh` runs leading/top-level; the non-`gh` `$(cat …)` does the capture):
+
+    gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id' > "$TMPDIR/id"
+    id=$(cat "$TMPDIR/id")
+
 ## SSH-bound git operations
 
 If the remote is `git@github.com:...`, then `git fetch`, `git pull`, and
