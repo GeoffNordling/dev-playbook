@@ -12,7 +12,7 @@ from pathlib import Path
 
 from dev_playbook import label_scheme
 
-BOOTSTRAP = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap-labels"
+BOOTSTRAP = Path(__file__).resolve().parents[2] / "scripts" / "bootstrap-labels"
 
 # The canonical scheme, in mint order: the eight fixed-value metadata labels
 # (category, mode, tests, status) grey, then every phase label yellow. This is

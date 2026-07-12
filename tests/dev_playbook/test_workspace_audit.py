@@ -13,8 +13,8 @@ import re
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "workspace-audit"
-HOOK_REPO = Path(__file__).resolve().parents[1]
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-audit"
+HOOK_REPO = Path(__file__).resolve().parents[2]
 CANONICAL_CONFIG = (
     HOOK_REPO / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
 )

@@ -111,6 +111,8 @@ class ToolError(Exception):
 
 @dataclass(frozen=True)
 class Line:
+    """One line of the audit's output — a finding or an informational advisory."""
+
     repo: str
     rule: str | None  # None = informational (no rule id): a stderr advisory
     message: str
@@ -118,9 +120,11 @@ class Line:
 
     @property
     def stale(self) -> bool:
+        """Whether this line reports a stale (non-blocking) dev-playbook pin."""
         return self.rule == PIN
 
     def render(self) -> str:
+        """The finding rendered as ``repo: card.rule message``."""
         assert self.rule is not None
         return render(self.repo, self.rule, self.message)
 
@@ -135,6 +139,7 @@ def hook_repo_url() -> str:
 
 
 def hook_repo_main() -> str:
+    """The hook repo's local ``main`` commit sha."""
     result = subprocess.run(
         ["git", "-C", str(HOOK_REPO_ROOT), "rev-parse", "main"],
         capture_output=True,
@@ -148,6 +153,7 @@ def hook_repo_main() -> str:
 
 
 def workspace_repos(workspace: Path) -> list[Path]:
+    """Every git repo directly under ``workspace``, sorted by path."""
     if not workspace.is_dir():
         raise ToolError(f"workspace root not found: {workspace}")
     return sorted(entry for entry in workspace.iterdir() if (entry / ".git").exists())
@@ -167,6 +173,7 @@ def origin_slug(repo: Path) -> str | None:
 
 
 def pinned_rev(config_text: str, url: str) -> str | None:
+    """The ``rev`` pinned for ``url`` in a ``.pre-commit-config.yaml`` body, or None."""
     lines = config_text.splitlines()
     for i, line in enumerate(lines):
         if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
@@ -257,6 +264,11 @@ def fetch_issues(slug: str) -> list | None:
 
 
 def check_settings(repo: Path, slug: str | None) -> list[Line]:
+    """A repo's GitHub merge settings against the expected values.
+
+    A loud finding when the repo has no GitHub origin (``slug`` is None) or the
+    settings API is unreachable; otherwise one finding per drifted field.
+    """
     name = repo.name
     if slug is None:
         return [
@@ -326,16 +338,22 @@ def check_labels(name: str, labels: list) -> list[Line]:
 
 
 def _post_intake(labels: set[str]) -> bool:
-    """An issue is in scope once it carries a phase label other than
-    phase:intake; untriaged issues (no phase, or only phase:intake) are out."""
+    """Whether an issue is triaged past intake.
+
+    In scope once it carries a phase label other than phase:intake; untriaged
+    issues (no phase, or only phase:intake) are out.
+    """
     return any(
         label.startswith("phase:") and label != "phase:intake" for label in labels
     )
 
 
 def _has_heading(body: str, heading: str) -> bool:
-    """Whether the body carries the bold heading, colon inside or outside the
-    markers — both ``**Heading:**`` and ``**Heading**:`` read as present."""
+    """Whether the body carries the bold heading.
+
+    The colon may sit inside or outside the markers — both ``**Heading:**`` and
+    ``**Heading**:`` read as present.
+    """
     pattern = rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:"
     return re.search(pattern, body, re.IGNORECASE) is not None
 
@@ -350,9 +368,11 @@ def _dimension_values(labels: set[str], dim: str) -> list[str]:
 def _epic_findings(
     name: str, number: int, labels: set[str], scheme: dict[str, set[str]]
 ) -> list[Line]:
-    """An epic (an issue with children) carries exactly one valid category label
-    and nothing else — no phase/mode/tests, and a present, single, in-scheme
-    category."""
+    """Findings for an epic that breaks its category-only shape.
+
+    An epic (an issue with children) carries exactly one valid category label and
+    nothing else — no phase/mode/tests, and a present, single, in-scheme category.
+    """
     lines: list[Line] = []
     offending = sorted(
         label for label in labels if label.startswith(("phase:", "mode:", "tests:"))
@@ -400,8 +420,11 @@ def _epic_findings(
 def _tuple_findings(
     name: str, number: int, labels: set[str], scheme: dict[str, set[str]]
 ) -> list[Line]:
-    """A leaf carries the full four-tuple: one label per dimension, each value in
-    the scheme, and the mode↔tests pairings holding."""
+    """Findings for a leaf whose four-tuple is invalid.
+
+    A leaf carries the full four-tuple: one label per dimension, each value in the
+    scheme, and the mode↔tests pairings holding.
+    """
     present = {dim: _dimension_values(labels, dim) for dim in TUPLE_DIMENSIONS}
     lines: list[Line] = []
     for dim in TUPLE_DIMENSIONS:
@@ -477,9 +500,11 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
 
 
 def check_issues(name: str, issues: list) -> list[Line]:
-    """Every open post-intake leaf's four-tuple and brief shape; every epic's
-    category-only shape. Epic/leaf comes from sub_issues_summary — no per-issue
-    API call. Pull requests the issues endpoint returns are skipped."""
+    """Every open post-intake leaf's four-tuple and brief shape, plus every epic's category-only shape.
+
+    Epic/leaf comes from sub_issues_summary — no per-issue API call. Pull requests
+    the issues endpoint returns are skipped.
+    """
     scheme = values_by_dimension()
     lines: list[Line] = []
     for issue in issues:
@@ -513,11 +538,11 @@ def _fetch_or_report(
     fetcher: Callable[[str], list | None],
     checker: Callable[[str, list], list[Line]],
 ) -> list[Line]:
-    """Fetch one live resource and hand it to ``checker``; on an unusable read
-    surface a single unreachable finding under ``rule``.
+    """``checker``'s findings for one live resource, or a lone unreachable finding.
 
     A failed read is not a clean audit — surface it loudly (mirroring
-    check_settings) rather than reporting zero findings for the repo.
+    check_settings) rather than reporting zero findings for the repo. The
+    unreachable finding is filed under ``rule``.
     """
     payload = fetcher(slug)
     if payload is None:
@@ -530,9 +555,11 @@ def _fetch_or_report(
 
 
 def check_tracking(repo: Path, slug: str | None) -> list[Line]:
-    """The live-repo label and issue checks, from one labels and one issues
-    fetch. Skipped when the repo has no GitHub origin — check_settings has
-    already reported that."""
+    """The live-repo label and issue checks, from one labels and one issues fetch.
+
+    Skipped when the repo has no GitHub origin — check_settings has already
+    reported that.
+    """
     if slug is None:
         return []
     return [
@@ -546,6 +573,10 @@ def check_tracking(repo: Path, slug: str | None) -> list[Line]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """The ``workspace-audit`` command-line entry point.
+
+    Returns the process exit code: 0 clean, 1 findings, 2 cannot run.
+    """
     parser = argparse.ArgumentParser(
         prog="workspace-audit",
         description=(
