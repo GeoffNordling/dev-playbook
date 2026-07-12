@@ -78,7 +78,7 @@ BUILD_HEADINGS = (
     "Acceptance criteria",
     "Out of scope",
 )
-SPIKE_HEADINGS = ("Summary", "Question", "Timebox", "Deliverable")
+SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
 
 # The four dimensions of the state-machine tuple (status is not part of it).
 TUPLE_DIMENSIONS = ("category", "mode", "tests", "phase")

@@ -381,9 +381,7 @@ BUILD_BODY = (
     "**Summary:** s\n\n**Current behavior:** c\n\n**Desired behavior:** d\n\n"
     "**Key interfaces:** none\n\n**Acceptance criteria:** a\n\n**Out of scope:** o\n"
 )
-SPIKE_BODY = (
-    "**Summary:** s\n\n**Question:** q\n\n**Timebox:** t\n\n**Deliverable:** d\n"
-)
+SPIKE_BODY = "**Summary:** s\n\n**Question:** q\n\n**Deliverable:** d\n"
 VALID_DIRECT = ["category:enhancement", "mode:direct", "tests:no", "phase:build"]
 
 
@@ -481,10 +479,10 @@ def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
 
 def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:enhancement", "mode:spike", "tests:no", "phase:spike"]
-    body = SPIKE_BODY.replace("**Timebox:** t\n\n", "")
+    body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
     result = run_with_issue(tmp_path, issue(6, labels, body=body))
     assert "alpha: tracking.issue-brief-shape" in result.stdout
-    assert "Timebox" in result.stdout
+    assert "Deliverable" in result.stdout
 
 
 def test_pull_requests_are_ignored(tmp_path: Path) -> None:

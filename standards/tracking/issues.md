@@ -83,7 +83,7 @@ What should happen after the work is complete. Be specific about edge cases and 
 
 ### The spike brief (`mode:spike`)
 
-A spike is a **timeboxed question** whose deliverable is an **answer**, not
+A spike is a **question** whose deliverable is an **answer**, not
 merged code — the findings land in the issue's closing comment, and no PR opens
 (see [workflow.md's spike path](/workflow/workflow.md)). The spike brief carries
 these headings:
@@ -92,10 +92,7 @@ these headings:
 **Summary:** one-line framing of the question
 
 **Question:**
-The specific question the spike answers — narrow enough to resolve in the timebox.
-
-**Timebox:**
-The time budget; when it runs out, the spike reports what it found.
+The specific question the spike answers — narrow enough to resolve in one focused investigation.
 
 **Deliverable:**
 What a good answer looks like. The answer itself lands in the closing comment
