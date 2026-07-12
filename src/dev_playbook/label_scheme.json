@@ -1,0 +1,45 @@
+{
+  "dimensions": [
+    {
+      "name": "category",
+      "color": "cccccc",
+      "description": "Category: {value}. See workflow.md.",
+      "values": ["bug", "enhancement"]
+    },
+    {
+      "name": "mode",
+      "color": "cccccc",
+      "description": "Mode: {value}. See workflow.md.",
+      "values": ["sdd", "direct", "spike"]
+    },
+    {
+      "name": "tests",
+      "color": "cccccc",
+      "description": "Tests: {value}. See workflow.md.",
+      "values": ["yes", "no"]
+    },
+    {
+      "name": "status",
+      "color": "cccccc",
+      "description": "Status: {value}. See workflow.md.",
+      "values": ["parked"]
+    },
+    {
+      "name": "phase",
+      "color": "fbca04",
+      "description": "Phase: {value}. See workflow.md.",
+      "values": [
+        "intake",
+        "sdd-specs",
+        "sdd-spec-review",
+        "sdd-tdd",
+        "sdd-pr-review",
+        "design",
+        "tdd",
+        "build",
+        "pr-review",
+        "spike"
+      ]
+    }
+  ]
+}

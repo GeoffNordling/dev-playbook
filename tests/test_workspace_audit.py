@@ -22,12 +22,54 @@ CANONICAL_CONFIG = (
 FAKE_GH = """\
 #!/usr/bin/env python3
 import json, os, sys
-slug = sys.argv[2].removeprefix("repos/")
+
+# Only `gh api <path>` is faked. Find the path arg (skip flags), drop any query
+# string, and split into segments: repos/<owner>/<name>[/<resource>].
+path = next(a for a in sys.argv[2:] if not a.startswith("-")).split("?", 1)[0]
+segs = path.split("/")
+slug = "/".join(segs[1:3])
+resource = segs[3] if len(segs) > 3 else "settings"
+
 data = json.load(open(os.environ["FAKE_GH_DATA"]))
 if slug not in data:
     sys.exit(1)
-print(json.dumps(data[slug]))
+entry = data[slug]
+
+# An entry is either a bare settings dict (legacy) or a wrapper carrying any of
+# settings / labels / issues. A bare entry answers the base repo path with its
+# settings and every sub-resource with an empty list.
+wrapper = isinstance(entry, dict) and any(
+    k in entry for k in ("settings", "labels", "issues")
+)
+if wrapper:
+    payload = entry.get(resource, [] if resource in ("labels", "issues") else {})
+else:
+    payload = entry if resource == "settings" else []
+# A resource set to the sentinel "__unreachable__" simulates a non-zero `gh api`
+# exit (rate limit, permissions, transient 5xx) for that one resource.
+if payload == "__unreachable__":
+    sys.exit(1)
+# "__badjson__" simulates a zero-exit response whose body is not JSON (204 No
+# Content, a degraded/HTML error body) — the parse, not the exit, is what fails.
+if payload == "__badjson__":
+    sys.stdout.write("{not valid json")
+    sys.exit(0)
+print(json.dumps(payload))
 """
+
+
+def canonical_label_objects() -> list[dict]:
+    """The scheme's labels as the GitHub labels endpoint returns them."""
+    import sys as _sys
+
+    _sys.path.insert(0, str(HOOK_REPO / "src"))
+    from dev_playbook.label_scheme import canonical_labels
+
+    return [
+        {"name": name, "color": color, "description": desc}
+        for name, color, desc in canonical_labels()
+    ]
+
 
 GOOD_SETTINGS = {
     "allow_squash_merge": True,
@@ -94,7 +136,7 @@ def run(
     )
 
 
-def make_fake_gh(tmp_path: Path, data: dict[str, dict]) -> tuple[Path, Path]:
+def make_fake_gh(tmp_path: Path, data: dict[str, object]) -> tuple[Path, Path]:
     gh_dir = tmp_path / "fakebin"
     gh_dir.mkdir()
     gh = gh_dir / "gh"
@@ -120,7 +162,15 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "tracking.settings" in ids
     assert "tracking.remote" in ids
     assert "build.pin" in ids
-    assert all(rule.split(".")[0] in {"tracking", "build"} for rule in ids), ids
+    # the tracking and workflow rules this slice adds
+    assert "tracking.label-scheme" in ids
+    assert "tracking.no-blocked-label" in ids
+    assert "tracking.issue-brief-shape" in ids
+    assert "tracking.epic-shape" in ids
+    assert "workflow.tuple-valid" in ids
+    assert all(
+        rule.split(".")[0] in {"tracking", "build", "workflow"} for rule in ids
+    ), ids
 
 
 # --- pins ---
@@ -242,3 +292,391 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     assert (
         "alpha: tracking.remote no GitHub origin; settings unchecked" in result.stdout
     )
+
+
+# --- label scheme (full mode; settings clean so only label findings surface) ---
+
+
+def full_mode_repo(
+    tmp_path: Path,
+    *,
+    labels: list[dict],
+    issues: list[dict] | None = None,
+) -> tuple[Path, Path, Path]:
+    """A one-repo workspace with a GitHub origin and a fake gh serving good
+    settings plus the given labels/issues, so a full-mode run surfaces only the
+    label/issue findings under test."""
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "labels": labels,
+                "issues": issues or [],
+            }
+        },
+    )
+    return ws, gh_dir, gh_data
+
+
+def test_conformant_labels_raise_no_label_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=canonical_label_objects())
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "tracking.label-scheme" not in result.stdout
+    assert "tracking.no-blocked-label" not in result.stdout
+
+
+def test_missing_canonical_label_is_a_finding(tmp_path: Path) -> None:
+    labels = [obj for obj in canonical_label_objects() if obj["name"] != "mode:spike"]
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "alpha: tracking.label-scheme missing label mode:spike" in result.stdout
+    assert result.returncode == 1
+
+
+def test_drifted_label_color_is_a_finding(tmp_path: Path) -> None:
+    labels = canonical_label_objects()
+    labels[0] = dict(labels[0], color="ff0000")
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "alpha: tracking.label-scheme" in result.stdout
+    assert labels[0]["name"] in result.stdout
+
+
+def test_drifted_label_description_is_a_finding(tmp_path: Path) -> None:
+    labels = canonical_label_objects()
+    labels[0] = dict(labels[0], description="wrong")
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "alpha: tracking.label-scheme" in result.stdout
+    assert labels[0]["name"] in result.stdout
+
+
+def test_unexpected_label_is_a_finding(tmp_path: Path) -> None:
+    labels = [
+        *canonical_label_objects(),
+        {"name": "wip", "color": "cccccc", "description": ""},
+    ]
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "alpha: tracking.label-scheme unexpected label wip" in result.stdout
+
+
+# --- blocked labels (own rule, overlapping the closed world by design) ---
+
+
+def test_blocked_label_is_its_own_finding(tmp_path: Path) -> None:
+    labels = [
+        *canonical_label_objects(),
+        {"name": "status:Blocked", "color": "cccccc", "description": ""},
+    ]
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "alpha: tracking.no-blocked-label" in result.stdout
+    assert "status:Blocked" in result.stdout
+    # deliberately also flagged by the closed-world scheme rule
+    assert (
+        "alpha: tracking.label-scheme unexpected label status:Blocked" in result.stdout
+    )
+
+
+def test_label_containing_blocked_substring_is_not_a_blocked_finding(
+    tmp_path: Path,
+) -> None:
+    # The rule names a blocked *state* — the value token equal to "blocked".
+    # Names that merely contain the substring (a negation, a compound) are not
+    # blocked states and must not draw the no-blocked-label rule.
+    labels = [
+        *canonical_label_objects(),
+        {"name": "status:unblocked", "color": "cccccc", "description": ""},
+        {"name": "type:blocked-by-vendor", "color": "cccccc", "description": ""},
+    ]
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "tracking.no-blocked-label" not in result.stdout
+
+
+# --- fetch reachability (a failed labels/issues read must surface loudly) ---
+
+
+def test_labels_fetch_failure_is_surfaced(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {"me/alpha": {"settings": GOOD_SETTINGS, "labels": "__unreachable__"}},
+    )
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "alpha" in result.stdout
+    assert "unreachable" in result.stdout
+
+
+def test_issues_fetch_failure_is_surfaced(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "labels": canonical_label_objects(),
+                "issues": "__unreachable__",
+            }
+        },
+    )
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "alpha" in result.stdout
+    assert "unreachable" in result.stdout
+
+
+def test_bad_json_response_reports_repo_unreachable_and_run_survives(
+    tmp_path: Path,
+) -> None:
+    # A zero-exit response with a non-JSON body for one repo must not abort the
+    # whole run: that repo is reported unreachable and every later repo is still
+    # audited (alpha sorts first, so beta's finding proves the loop continued).
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    make_workspace_repo(
+        ws, "beta", {"README.md": "# B\n"}, origin="git@github.com:me/beta.git"
+    )
+    drifted = dict(GOOD_SETTINGS, allow_merge_commit=True)
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {"me/alpha": "__badjson__", "me/beta": drifted}
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "Traceback" not in result.stderr
+    assert "alpha: tracking.settings unreachable via gh api (me/alpha)" in result.stdout
+    assert "beta: tracking.settings allow_merge_commit is True (want False)" in (
+        result.stdout
+    )
+    assert result.returncode == 1
+
+
+def test_wrong_shape_response_is_surfaced_not_crash(tmp_path: Path) -> None:
+    # A valid-JSON but wrong-typed response (a dict where the labels list is
+    # expected) must degrade to an unreachable finding, not an AssertionError
+    # traceback that blinds the audit to the rest of the repo.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {"me/alpha": {"settings": GOOD_SETTINGS, "labels": {"wrong": "shape"}}},
+    )
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "Traceback" not in result.stderr
+    assert result.returncode == 1
+    assert "alpha" in result.stdout
+    assert "unreachable" in result.stdout
+
+
+# --- issue rules: tuple validity, brief shape, epic shape (full mode) ---
+
+BUILD_BODY = (
+    "**Summary:** s\n\n**Current behavior:** c\n\n**Desired behavior:** d\n\n"
+    "**Key interfaces:** none\n\n**Acceptance criteria:** a\n\n**Out of scope:** o\n"
+)
+SPIKE_BODY = "**Summary:** s\n\n**Question:** q\n\n**Deliverable:** d\n"
+VALID_DIRECT = ["category:enhancement", "mode:direct", "tests:no", "phase:build"]
+
+
+def issue(
+    number: int,
+    labels: list[str],
+    *,
+    body: str = "",
+    sub_issues_total: int = 0,
+    pull_request: bool = False,
+) -> dict:
+    """One issue object shaped as the GitHub issues endpoint returns it."""
+    obj = {
+        "number": number,
+        "title": f"issue {number}",
+        "body": body,
+        "state": "open",
+        "labels": [{"name": name} for name in labels],
+        "sub_issues_summary": {"total": sub_issues_total},
+    }
+    if pull_request:
+        obj["pull_request"] = {"url": "https://example/pr"}
+    return obj
+
+
+def run_with_issue(tmp_path: Path, one: dict) -> subprocess.CompletedProcess:
+    """Run a full-mode audit over a one-repo workspace carrying the one issue."""
+    ws, gh_dir, gh_data = full_mode_repo(
+        tmp_path, labels=canonical_label_objects(), issues=[one]
+    )
+    return run(ws, gh_dir=gh_dir, gh_data=gh_data)
+
+
+def test_valid_leaf_tuple_and_brief_pass(tmp_path: Path) -> None:
+    result = run_with_issue(tmp_path, issue(1, VALID_DIRECT, body=BUILD_BODY))
+    assert "workflow.tuple-valid" not in result.stdout
+    assert "tracking.issue-brief-shape" not in result.stdout
+    assert "tracking.epic-shape" not in result.stdout
+
+
+def test_untriaged_issue_is_out_of_scope(tmp_path: Path) -> None:
+    result = run_with_issue(tmp_path, issue(2, ["phase:intake"], body=""))
+    assert "workflow.tuple-valid" not in result.stdout
+    assert "tracking.issue-brief-shape" not in result.stdout
+
+
+def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "tests:no", "phase:build"]
+    result = run_with_issue(tmp_path, issue(7, labels, body=BUILD_BODY))
+    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "#7" in result.stdout
+    assert "mode" in result.stdout
+
+
+def test_leaf_invalid_phase_value_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "mode:direct", "tests:no", "phase:frobnicate"]
+    result = run_with_issue(tmp_path, issue(8, labels, body=BUILD_BODY))
+    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "phase" in result.stdout
+
+
+def test_sdd_leaf_requires_tests_yes(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "mode:sdd", "tests:no", "phase:sdd-tdd"]
+    result = run_with_issue(tmp_path, issue(9, labels, body=BUILD_BODY))
+    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "tests:yes" in result.stdout
+
+
+def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "mode:spike", "tests:yes", "phase:spike"]
+    result = run_with_issue(tmp_path, issue(10, labels, body=SPIKE_BODY))
+    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "tests:no" in result.stdout
+
+
+def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "phase:tdd"]
+    result = run_with_issue(tmp_path, issue(3, labels, sub_issues_total=4))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#3" in result.stdout
+    assert "workflow.tuple-valid" not in result.stdout
+
+
+def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(4, ["category:enhancement"], sub_issues_total=4)
+    )
+    assert "tracking.epic-shape" not in result.stdout
+
+
+def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
+    # An epic carrying a mode/tests label but no phase label is still malformed:
+    # the category-only invariant holds regardless of triage state.
+    labels = ["category:enhancement", "mode:direct"]
+    result = run_with_issue(tmp_path, issue(12, labels, sub_issues_total=3))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#12" in result.stdout
+    assert "workflow.tuple-valid" not in result.stdout
+
+
+def test_epic_without_category_label_is_a_finding(tmp_path: Path) -> None:
+    # "An epic carries a category label only" is a positive invariant too: an
+    # epic with no category label at all is malformed.
+    result = run_with_issue(tmp_path, issue(13, [], sub_issues_total=2))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#13" in result.stdout
+
+
+def test_epic_with_two_category_labels_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "category:bug"]
+    result = run_with_issue(tmp_path, issue(14, labels, sub_issues_total=2))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#14" in result.stdout
+
+
+def test_epic_with_invalid_category_value_is_a_finding(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(15, ["category:frobnicate"], sub_issues_total=2)
+    )
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#15" in result.stdout
+
+
+def test_null_sub_issues_summary_does_not_crash(tmp_path: Path) -> None:
+    # GitHub can return sub_issues_summary as JSON null (key present, value null);
+    # a valid leaf so shaped must be classified as a leaf, not crash the audit.
+    one = {
+        "number": 20,
+        "title": "issue 20",
+        "body": BUILD_BODY,
+        "state": "open",
+        "labels": [{"name": name} for name in VALID_DIRECT],
+        "sub_issues_summary": None,
+    }
+    result = run_with_issue(tmp_path, one)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Traceback" not in result.stderr
+
+
+def test_issue_missing_labels_key_is_surfaced_not_silently_skipped(
+    tmp_path: Path,
+) -> None:
+    # GitHub's issues endpoint always returns a labels array; an issue with no
+    # labels key at all is a malformed response. It must surface loudly, not be
+    # papered over with an empty-list default that silently skips the issue.
+    one = {
+        "number": 30,
+        "title": "issue 30",
+        "body": "",
+        "state": "open",
+        "sub_issues_summary": {"total": 0},
+    }
+    result = run_with_issue(tmp_path, one)
+    assert "Traceback" in result.stderr
+    assert "KeyError" in result.stderr
+
+
+def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
+    body = BUILD_BODY.replace("**Out of scope:** o\n", "")
+    result = run_with_issue(tmp_path, issue(5, VALID_DIRECT, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "Out of scope" in result.stdout
+
+
+def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "mode:spike", "tests:no", "phase:spike"]
+    body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
+    result = run_with_issue(tmp_path, issue(6, labels, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "Deliverable" in result.stdout
+
+
+def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
+    # `**Summary**:` (colon after the close markers) reads as a present heading
+    # to a human; it must not draw a false brief-shape finding.
+    body = (
+        "**Summary**: s\n\n**Current behavior**: c\n\n**Desired behavior**: d\n\n"
+        "**Key interfaces**: none\n\n**Acceptance criteria**: a\n\n**Out of scope**: o\n"
+    )
+    result = run_with_issue(tmp_path, issue(31, VALID_DIRECT, body=body))
+    assert "tracking.issue-brief-shape" not in result.stdout
+
+
+def test_pull_requests_are_ignored(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(11, ["phase:tdd"], body="", pull_request=True)
+    )
+    assert "workflow.tuple-valid" not in result.stdout
+    assert "tracking.issue-brief-shape" not in result.stdout

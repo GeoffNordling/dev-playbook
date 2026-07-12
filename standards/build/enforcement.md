@@ -37,7 +37,7 @@ the path to main — they are references here, not rungs:
 | Non-gate | When | What runs | Blocks |
 |---|---|---|---|
 | agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [workflow.md's node-skill contract](/workflow/workflow.md#node-skill-contract) |
-| workspace-audit | on demand and via the weekly review ([rules.md](~/workspace/select-measure-learn/rules.md)) | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)) and stale dev-playbook pins, via [`workspace-audit`](/scripts/workspace-audit) | no — reports, never blocks |
+| workspace-audit | on demand and via the weekly review ([rules.md](~/workspace/select-measure-learn/rules.md)) | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-audit`](/scripts/workspace-audit) | no — reports, never blocks |
 
 The re-run of `make check` at review start is the review node's **green gate**:
 the code-review skills run it before auditing and escalate if it is red, even
@@ -66,4 +66,4 @@ pattern.
 | skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments stage-1 cache gate | push gate only — never the CI gate |
-| workspace-audit | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), stale pins | workspace-audit (outside the gates) |
+| workspace-audit | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-audit (outside the gates) |

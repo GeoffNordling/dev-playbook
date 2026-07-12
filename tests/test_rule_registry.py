@@ -42,7 +42,7 @@ CARRIERS = [
     (SCRIPTS / "python-audit", "Finding", 2),
     (SCRIPTS / "repo-audit", "Finding", 1),
     (SCRIPTS / "skill-audit", "Finding", 1),
-    (SCRIPTS / "workspace-audit", "Line", 1),
+    (SRC / "dev_playbook" / "workspace_audit.py", "Line", 1),
     (SRC / "dev_playbook" / "judgments" / "loader.py", "LintFinding", 1),
     (SRC / "dev_playbook" / "testing_audit.py", "Finding", 2),
 ]
@@ -53,7 +53,7 @@ REGISTRIES = [
     (SCRIPTS / "python-audit", "RULES"),
     (SCRIPTS / "repo-audit", "RULES"),
     (SCRIPTS / "skill-audit", "RULES"),
-    (SCRIPTS / "workspace-audit", "RULES"),
+    (SRC / "dev_playbook" / "workspace_audit.py", "RULES"),
     (SRC / "dev_playbook" / "judgments" / "loader.py", "JUDGMENTS_RULES"),
     (SRC / "dev_playbook" / "testing_audit.py", "RULES"),
 ]
