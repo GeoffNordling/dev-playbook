@@ -16,20 +16,17 @@ kept honest.
 
 ## Audit
 
-- [okf-audit](/scripts/okf-audit) — keeps the catalog
-  ([standards/index.md](/standards/index.md)) complete and every card typed
-- [ref-audit](/scripts/ref-audit) — keeps every card pointer resolving
-- [judgments/doc-consistency.yaml](/judgments/doc-consistency.yaml) — one
-  judgment per card: its pointers really do define, audit, and enforce
-  their standard
+- [standards-audit](/scripts/standards-audit) — the meta-standard's four
+  deterministic rules: card layout, catalog order, the bidirectional
+  card↔rule matrix, and hook-surface agreement
 
 ## Enforce
 
 - the pre-commit hook suite
-  ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — okf-audit,
-  ref-audit, and judgments-audit block nonconforming commits at the
-  **commit gate**; the judgment cache gate reds the **push gate**
-  (`make check`)
+  ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — standards-audit
+  blocks nonconforming commits at the **commit gate**; it is wired in
+  dev-playbook's local block alone, since the `standards/` tree it audits
+  exists only here
 
 ## Adopt
 

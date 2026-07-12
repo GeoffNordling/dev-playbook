@@ -19,12 +19,15 @@ types, indexes, and cross-references.
 - [okf-audit](/scripts/okf-audit) — concept-doc frontmatter types and
   `index.md` freshness
 - [ref-audit](/scripts/ref-audit) — Links and Citations resolve
+- [repo-audit](/scripts/repo-audit) — README and CONTEXT.md doc shape
+  (`docs.doc-shape`)
 
 ## Enforce
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-audit and ref-audit at the **commit gate** in every repo's suite
+  — okf-audit, ref-audit, and repo-audit at the **commit gate** in every
+  repo's suite
 
 ## Adopt
 

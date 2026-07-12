@@ -46,11 +46,14 @@ its dependencies via its `uv run --script` shebang.
 
 ## Validation scripts
 
-The published hooks. They run automatically on every commit via pre-commit,
-and consumer repos run them from a pinned clone (see
-[distribution.md](/standards/build/distribution.md)). Each script exits 0 on
-success / 1 on findings / 2 on tool error, writes machine-readable findings to
-stdout (one per line) and a one-line summary to stderr. Each takes the
+The published hooks — with one dev-playbook-local exception, `standards-audit`
+(see its row). The published ones run automatically on every commit via
+pre-commit, and consumer repos run them from a pinned clone (see
+[distribution.md](/standards/build/distribution.md)); `standards-audit` is
+wired in dev-playbook's local block alone, since the `standards/` tree it
+audits exists only here (the validate-manifest precedent). Each script exits 0
+on success / 1 on findings / 2 on tool error, writes machine-readable findings
+to stdout (one per line) and a one-line summary to stderr. Each takes the
 repository root as its argument (default: cwd) and discovers its targets
 through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 
@@ -64,10 +67,11 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `decisions-audit` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `standards-audit` | [standard/format.md](/standards/standard/format.md) | The meta-standard's four rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
 
-`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, `okf-audit`, and
-`decisions-audit` assert unconditionally and fail loud; they do not skip
-themselves when a target kind is absent. Run
+`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, `okf-audit`,
+`decisions-audit`, and `standards-audit` assert unconditionally and fail loud;
+they do not skip themselves when a target kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 
@@ -97,7 +101,8 @@ directory.
 
 ### Two run environments
 
-Each hook entry runs in two environments and MUST work in both:
+Each *published* hook entry runs in two environments and MUST work in both
+(the dev-playbook-local `standards-audit` runs in the first alone):
 
 1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
 2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [distribution.md](/standards/build/distribution.md).
@@ -108,7 +113,9 @@ block) against the dev-playbook checkout that holds it — no `$HOME` paths, no
 `realpath` indirection.
 
 When adding a validator, mirror it into both the manifest and the local block,
-and test it in dev-playbook and a consumer repo before pushing.
+and test it in dev-playbook and a consumer repo before pushing — unless it is
+dev-playbook-local (like `standards-audit`), which is wired in the local block
+alone and tested here only.
 
 ## Utility scripts
 

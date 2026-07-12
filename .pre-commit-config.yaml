@@ -85,6 +85,16 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Local-only: the standards/ tree it audits exists only in dev-playbook,
+      # so standards-audit is not published in the manifest or the canonical
+      # template (the validate-manifest precedent).
+      - id: standards-audit
+        name: standards-audit
+        entry: scripts/standards-audit
+        language: script
+        pass_filenames: false
+        always_run: true
+
       # Local-only: consumers have no hook manifest to validate.
       - id: validate-manifest
         name: validate-manifest

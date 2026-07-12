@@ -9,6 +9,7 @@ repos:
       - id: ref-audit
       - id: okf-audit
       - id: decisions-audit
+      - id: skill-audit
       - id: judgments-audit
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20

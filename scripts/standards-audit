@@ -1,0 +1,27 @@
+#!/usr/bin/env -S uv run --script
+"""standards-audit — pre-commit validator for the meta-standard's rules.
+
+Thin shim over dev_playbook.standards_audit.main: it puts the checkout's ``src/``
+on ``sys.path`` and calls the module, which audits the ``standards/`` tree
+against the four meta-standard rules (card-layout, catalog-order, rule-matrix,
+hook-surfaces), printing each finding as a GNU finding line
+(``file:line: standard.rule message``) and exiting nonzero if any.
+``--list-rules`` prints the rule ids and exits 0. dev-playbook-local: the
+``standards/`` tree it audits exists only here, so it is wired in the local
+pre-commit block alone. pyyaml is declared below because the module parses card
+frontmatter. See dev_playbook.standards_audit for the logic and its tests.
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml>=6.0"]
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.standards_audit import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())
