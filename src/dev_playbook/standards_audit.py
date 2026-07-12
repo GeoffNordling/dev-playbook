@@ -424,13 +424,24 @@ def _local_hooks(root: Path) -> list[dict]:
     return []
 
 
-def _canonical_hook_ids(root: Path) -> set[str]:
-    """Every hook id referenced anywhere in the canonical consumer template."""
+def _canonical_dev_hook_ids(root: Path) -> set[str]:
+    """The hook ids in the canonical template's pinned dev-playbook block.
+
+    Consumers wire dev-playbook's detectors through this one ``repo:`` block, so
+    it must list exactly the published manifest's detector hooks. Ids in the
+    template's other blocks -- third-party repos, its own ``repo: local`` block --
+    are out of scope: a detector misplaced there is one a consumer never gets, so
+    scoping to the pinned block is what lets that misplacement fail as missing.
+    """
     config = _load_yaml(root / CANONICAL_CONFIG)
     ids: set[str] = set()
     if isinstance(config, dict):
         for repo in config.get("repos", []):
-            for hook in repo.get("hooks", []) if isinstance(repo, dict) else []:
+            if not isinstance(repo, dict) or "dev-playbook" not in str(
+                repo.get("repo", "")
+            ):
+                continue
+            for hook in repo.get("hooks", []):
                 if isinstance(hook, dict) and "id" in hook:
                     ids.add(hook["id"])
     return ids
@@ -471,7 +482,7 @@ def check_hook_surfaces(root: Path) -> list[Finding]:
         else []
     )
     local = _scripts_entry_ids(_local_hooks(root))
-    canonical = _canonical_hook_ids(root)
+    canonical = _canonical_dev_hook_ids(root)
 
     findings: list[Finding] = []
 
@@ -490,7 +501,13 @@ def check_hook_surfaces(root: Path) -> list[Finding]:
     for name in sorted(manifest - canonical):
         flag(
             CANONICAL_CONFIG,
-            f"manifest hook {name} is missing from the canonical consumer template",
+            f"manifest hook {name} is missing from the canonical consumer "
+            "template's pinned dev-playbook block",
+        )
+    for name in sorted(canonical - manifest):
+        flag(
+            CANONICAL_CONFIG,
+            f"canonical consumer template hook {name} is not in the published manifest",
         )
 
     table = _readme_table_names(root)

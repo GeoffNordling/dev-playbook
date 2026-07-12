@@ -500,6 +500,55 @@ def test_detector_hook_missing_from_readme_table_is_flagged(tmp_path: Path) -> N
     assert any("okf-audit" in f.message and "README" in f.message for f in findings)
 
 
+def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
+    # An id in the pinned dev-playbook block that the manifest never publishes
+    # (a typo or a stale entry) must fail -- the reverse direction.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=[*ALL, "standards-audit"],
+        canonical_ids=[*ALL, "stray-audit"],  # not in the manifest
+        readme_ids=[*ALL, "standards-audit"],
+        cited_ids=[*ALL, "standards-audit"],
+    )
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert any(
+        "stray-audit" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+    )
+
+
+def test_manifest_detector_in_canonical_local_block_is_flagged(tmp_path: Path) -> None:
+    # okf-audit sits in canonical's repo:local block, not the pinned dev-playbook
+    # block, so a consumer would never get it wired -- it must fail as missing.
+    canonical = (
+        "repos:\n"
+        "  - repo: https://github.com/GeoffNordling/dev-playbook\n"
+        "    rev: <pinned-sha>\n    hooks:\n"
+        "      - id: repo-audit\n"
+        "  - repo: local\n    hooks:\n"
+        "      - id: okf-audit\n        name: okf-audit\n"
+        "        entry: scripts/okf-audit\n        language: script\n"
+    )
+    cited = [*ALL, "standards-audit"]
+    files = {
+        ".pre-commit-hooks.yaml": _manifest(ALL),
+        ".pre-commit-config.yaml": _local_block([*ALL, "standards-audit"]),
+        "standards/build/canonical/.pre-commit-config.yaml": canonical,
+        "scripts/README.md": _readme_table([*ALL, "standards-audit"]),
+    }
+    for i, name in enumerate(cited):
+        files[f"standards/c{i}.md"] = card_citing(f"C{i}", [cite(name)])
+    repo = make_repo(tmp_path, files)
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert any(
+        "okf-audit" in f.message and "canonical" in f.message.lower() for f in findings
+    )
+
+
 def test_detector_hook_cited_by_no_card_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
