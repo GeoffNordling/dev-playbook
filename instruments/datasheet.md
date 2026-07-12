@@ -269,3 +269,11 @@ stamp comment first, the rail and main regions, the chips, cells, rows,
 badges, and the dataflow diagram in the prescribed form (inline SVG, DOT source
 in a comment beside it) — and vary only the content. It does not set the
 size: a real system may spend the full budget.
+
+## Employed by
+
+[System Legibility](/standards/legibility.md) — the standard whose Define cell
+claims the datasheet as its answer to how a system's owner earns trust and
+direction without reading the code. Datasheets are regenerated on demand;
+System Legibility sets no cadence, and nothing binds this instrument to a
+schedule.

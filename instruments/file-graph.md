@@ -124,3 +124,10 @@ form is not yet pinned to a normative example.
 Both layers land under `readings/file-graph/<subject>.{json,html}`,
 regenerated manually on demand — never hand-edited, and free to lag the
 repository until someone rebuilds them.
+
+## Employed by
+
+[System Legibility](/standards/legibility.md) — the standard whose Define cell
+claims the file graph as its answer to how a reader sees the connectivity of a
+repository without crawling it in full. File graphs are rebuilt on demand;
+System Legibility sets no cadence.

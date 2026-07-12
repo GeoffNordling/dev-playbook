@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: Standard
 title: Skill Management
 description: Where skills live, how third-party skills are installed, and the mirror rule between authored and installed
 ---
@@ -25,7 +25,9 @@ Stow links `dot-claude/` into `~/.claude/` and `.agents/` into `~/.agents/`, so 
 
 ## Mirror rule
 
-Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `dot-claude/skills/` pointing at it (`dot-claude/skills/<name>` → `../../.agents/skills/<name>`). `bin/sync-dotfiles.sh` enforces this on every run: it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
+Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `dot-claude/skills/` pointing at it (`dot-claude/skills/<name>` → `../../.agents/skills/<name>`), with no stale symlinks and no authored skill colliding with an `.agents/skills/` name.
+
+Auditor and repairer are split, as [tracking](/standards/tracking.md) splits reporting from repair. The `claude-code.skill-mirror` rule in [skill-audit](/scripts/skill-audit) is the auditor: at the commit gate it reports any missing, mispointed, or stale symlink or authored/installed collision, and treats a committed `.agents/skills/` tree with no `dot-claude/skills/` mirror directory as an error state it fails loudly on. `bin/sync-dotfiles.sh` is the repairer: on every run it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
 
 After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree.
 

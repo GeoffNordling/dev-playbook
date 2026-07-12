@@ -1,7 +1,9 @@
 #!/usr/bin/env -S uv run --script
 """Lint the repo's Open Knowledge Format (OKF) bundle.
 
-Two checks over one walk of the bundle:
+Three checks over one walk of the bundle, their rules namespaced by the card
+that owns them — `docs.*` for the first two (knowledge-organization),
+`instrument.*` for the third (instruments):
 
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the registry document (`REGISTRY_DOC` below), plus `title` and
@@ -17,11 +19,16 @@ Two checks over one walk of the bundle:
     `index.md` additionally declares `okf_version`. The prose standard for
     these rules lives in this repo's standards/ tree.
 
+  - **Instrument-spec** — every document typed `Instrument Spec` carries an
+    `## Employed by` section naming the standard, skill, or ritual that demands
+    its readings. Presence only: the section's content is review's territory,
+    and ref-audit verifies any link it carries.
+
 The concept-document/harness-owned split comes from dev_playbook.md.classify. This hook
 asserts unconditionally and fails loud — there is no applicability skip.
 
 Output:
-    stdout — one finding per line, `file:line: docs.rule message` (`:line`
+    stdout — one finding per line, `file:line: rule message` (`:line`
              omitted for a file-level finding).
     stderr — one human-readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
@@ -49,10 +56,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from dev_playbook import md  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
-# Every rule id this detector can emit, namespaced by the knowledge-organization
-# card (docs) whose questions they answer. Each id is a module-level constant so
-# every emission site references the constant, never a raw literal, and RULES
-# (what --list-rules prints) cannot drift from what the detector actually emits.
+# Every rule id this detector can emit, namespaced by the card whose questions
+# they answer: `docs.*` for the knowledge-organization card (frontmatter and
+# index freshness) and `instrument.*` for the instruments card (the Employed-by
+# rule). Each id is a module-level constant so every emission site references the
+# constant, never a raw literal, and RULES (what --list-rules prints) cannot
+# drift from what the detector actually emits.
 FRONTMATTER = "docs.frontmatter"
 TYPE = "docs.type"
 TITLE = "docs.title"
@@ -62,6 +71,7 @@ INDEX = "docs.index"
 REGISTRY_ROW = "docs.registry-row"
 DESCRIPTION_SHAPE = "docs.description-shape"
 INDEX_ORDERING = "docs.index-ordering"
+EMPLOYED_BY = "instrument.employed-by"
 
 RULES = (
     FRONTMATTER,
@@ -73,10 +83,15 @@ RULES = (
     REGISTRY_ROW,
     DESCRIPTION_SHAPE,
     INDEX_ORDERING,
+    EMPLOYED_BY,
 )
 
 REGISTRY_DOC = "standards/docs/document-types.md"
 RESOURCE_REQUIRED_TYPES = {"Recipe Description"}
+# The type whose docs must carry an `## Employed by` section, and that section's
+# GitHub heading slug — the presence the instrument.employed-by check looks for.
+INSTRUMENT_SPEC_TYPE = "Instrument Spec"
+EMPLOYED_BY_SLUG = "employed-by"
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # An index bullet: `- [Title](/root-absolute) — description`. The description
 # (group 3) is optional so a malformed entry is caught, not silently skipped.
@@ -263,6 +278,36 @@ def check_types(
         if doctype in RESOURCE_REQUIRED_TYPES and not fm.get("resource"):
             findings.append(
                 Finding(rel, RESOURCE, f"'{doctype}' requires a 'resource'")
+            )
+    return findings
+
+
+def check_instrument_specs(
+    concept_docs: list[str], repo_root: Path
+) -> list[Finding]:
+    """Every `Instrument Spec` doc carries an `## Employed by` section.
+
+    Presence only: the section names the standard, skill, or ritual that demands
+    the instrument's readings, but this check verifies just that the heading
+    exists. ref-audit already checks any link the section carries, and whether
+    the named consumer is real is review's territory. A frontmatter error is
+    reported by check_types, so a doc that fails to parse is skipped here rather
+    than double-flagged.
+    """
+    findings: list[Finding] = []
+    for rel in concept_docs:
+        fm, err = frontmatter_of(repo_root / rel)
+        if err is not None or fm is None:
+            continue
+        if fm.get("type") != INSTRUMENT_SPEC_TYPE:
+            continue
+        if EMPLOYED_BY_SLUG not in md.heading_slugs(repo_root / rel):
+            findings.append(
+                Finding(
+                    rel,
+                    EMPLOYED_BY,
+                    "Instrument Spec has no '## Employed by' section",
+                )
             )
     return findings
 
@@ -487,7 +532,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="okf-audit",
-        description="Lint the repo's OKF bundle: concept-doc types and index freshness.",
+        description="Lint the repo's OKF bundle: concept-doc types, index freshness, and instrument-spec consumers.",
     )
     parser.add_argument(
         "directory",
@@ -518,6 +563,7 @@ def main(argv: list[str] | None = None) -> int:
     findings = check_types(concept_docs, repo_root, registry)
     findings.extend(check_indexes(concept_docs, index_docs, repo_root))
     findings.extend(check_index_ordering(index_docs, repo_root))
+    findings.extend(check_instrument_specs(concept_docs, repo_root))
     findings.extend(registry_findings)
 
     for f in sorted(findings, key=lambda f: (f.file, f.line or 0, f.rule, f.message)):

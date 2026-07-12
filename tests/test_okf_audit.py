@@ -268,10 +268,70 @@ def test_repo_self_scan_is_clean() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+# --- instrument.employed-by ---
+
+# The overlay a bundle needs to carry a typed Instrument Spec: the registry row
+# that admits the type, the standards index that owns the spec doc, and the spec
+# itself (its `{body}` slot filled per test).
+INSTRUMENT_REGISTRY = (
+    "---\ntype: Standard\ntitle: Document Types\n"
+    "description: The document type registry\n---\n\n"
+    "# Document Types\n\n## Types\n\n"
+    "| Type | What it is |\n|------|------------|\n"
+    "| `Guide` | teaching |\n| `Instrument Spec` | a device contract |\n"
+    "| `README` | landing |\n| `Recipe Description` | describes code |\n"
+    "| `Standard` | rules |\n"
+)
+INSTRUMENT_INDEX = (
+    "# standards/ — index\n\n"
+    "- [Standards](/standards/README.md) — Standards desc\n"
+    "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+    "- [Widget](/standards/widget.md) — The widget instrument\n"
+)
+WIDGET_SPEC = (
+    "---\ntype: Instrument Spec\ntitle: Widget\n"
+    "description: The widget instrument\n---\n\n# Widget\n\n{body}"
+)
+
+
+def make_instrument_bundle(tmp_path: Path, spec_body: str) -> Path:
+    """A valid bundle carrying one Instrument Spec whose body is `spec_body`."""
+    return make_bundle(
+        tmp_path,
+        {
+            "standards/docs/document-types.md": INSTRUMENT_REGISTRY,
+            "standards/index.md": INSTRUMENT_INDEX,
+            "standards/widget.md": WIDGET_SPEC.format(body=spec_body),
+        },
+    )
+
+
+def test_instrument_spec_without_employed_by_is_flagged(tmp_path: Path) -> None:
+    """An Instrument Spec with no `## Employed by` section is flagged."""
+    repo = make_instrument_bundle(tmp_path, "A spec with no employed-by heading.\n")
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "standards/widget.md: instrument.employed-by" in result.stdout
+
+
+def test_instrument_spec_with_employed_by_is_clean(tmp_path: Path) -> None:
+    """An Instrument Spec carrying an `## Employed by` section is not flagged."""
+    repo = make_instrument_bundle(
+        tmp_path,
+        "## Employed by\n\n[System Legibility](/standards/legibility.md).\n",
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 # --- rule ids and finding format ---
 
 
-def test_list_rules_prints_docs_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+def test_list_rules_prints_card_namespaced_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
         ["uv", "run", "--script", str(OKF_AUDIT), "--list-rules"],
         cwd=tmp_path,
@@ -284,7 +344,8 @@ def test_list_rules_prints_docs_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "docs.registry-row" in ids
     assert "docs.description-shape" in ids
     assert "docs.index-ordering" in ids
-    assert all(rule.startswith("docs.") for rule in ids), ids
+    assert "instrument.employed-by" in ids
+    assert all(rule.startswith(("docs.", "instrument.")) for rule in ids), ids
 
 
 def test_malformed_registry_row_is_flagged_not_silently_skipped(
