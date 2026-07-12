@@ -57,14 +57,16 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | Script | Standard | Purpose |
 |--------|----------|---------|
 | `repo-audit` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
-| `python-audit` | [python/style.md](/standards/python/style.md), [testing/conventions.md](/standards/testing/conventions.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py`, no private-name access from tests |
+| `python-audit` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
+| `testing-audit` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
 | `ref-audit` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-audit` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-audit` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 
-`repo-audit`, `python-audit`, `ref-audit`, and `okf-audit` assert unconditionally
-and fail loud; they do not skip themselves when a target kind is absent. Run
+`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, and `okf-audit`
+assert unconditionally and fail loud; they do not skip themselves when a target
+kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 
@@ -74,7 +76,8 @@ The scripts share their markdown and Python primitives rather than redefining
 them per script. The library is the installed `dev_playbook` package:
 
 - `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-audit` and `okf-audit`.
-- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-audit` and `repo-audit`.
+- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-audit`, `testing-audit`, and `repo-audit`.
+- `dev_playbook.testing_audit` — the Python-testing detector logic: the three test-file rules (privacy, mirror layout, no-logic) over one walk. Consumed by `testing-audit`.
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-audit` and `repo-audit`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 

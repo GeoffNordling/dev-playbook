@@ -55,8 +55,9 @@ pattern.
 | Detector | Owns | Gates |
 |---|---|---|
 | repo-audit | structure: presence, forbidden files, layer shape, canonical compares, doc shape, script shebangs, name mapping | hook pattern |
-| ruff-check / ruff-format | Python lint + formatting | hook pattern, plus `lint`/`format-check` targets |
+| ruff-check / ruff-format | Python lint + formatting + docstrings (`D`) | hook pattern, plus `lint`/`format-check` targets |
 | python-audit | workspace Python-source rules | hook pattern |
+| testing-audit | test privacy, mirror layout, no-logic | hook pattern |
 | okf-audit | concept-doc types, `index.md` freshness | hook pattern |
 | ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
 | judgments-audit | judgment declarations | hook pattern |
