@@ -75,6 +75,23 @@ def test_gap_in_the_sequence_is_flagged(tmp_path: Path) -> None:
     assert "0002" in result.stdout
 
 
+def test_single_mis_numbered_record_yields_one_gap_finding(tmp_path: Path) -> None:
+    """A lone high-numbered record is one mistake, so it yields one gap signal —
+    not one finding per absent integer down to 0001."""
+    repo = make_repo(
+        tmp_path,
+        {"docs/decisions/0050-first.md": record("First")},
+    )
+    result = run(repo)
+    assert result.returncode == 1
+    gap_lines = [
+        line
+        for line in result.stdout.splitlines()
+        if "missing from the sequence" in line
+    ]
+    assert len(gap_lines) == 1, result.stdout
+
+
 def test_duplicate_number_is_flagged(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
@@ -87,6 +104,19 @@ def test_duplicate_number_is_flagged(tmp_path: Path) -> None:
     assert result.returncode == 1
     assert "decisions.sequential-numbering" in result.stdout
     assert "0001" in result.stdout
+
+
+def test_zeroth_record_is_flagged(tmp_path: Path) -> None:
+    """Records number contiguously from 0001, so a 0000-slug record is off
+    the contract even though it clears the padding and gap checks."""
+    repo = make_repo(
+        tmp_path,
+        {"docs/decisions/0000-zero.md": record("Zero")},
+    )
+    result = run(repo)
+    assert result.returncode == 1
+    assert "decisions.sequential-numbering" in result.stdout
+    assert "docs/decisions/0000-zero.md" in result.stdout
 
 
 def test_non_zero_padded_number_is_flagged(tmp_path: Path) -> None:
@@ -191,6 +221,37 @@ def test_superseded_without_a_padded_number_is_flagged(tmp_path: Path) -> None:
     result = run(repo)
     assert result.returncode == 1
     assert "decisions.status-vocabulary" in result.stdout
+
+
+def test_status_check_ignores_non_record_files(tmp_path: Path) -> None:
+    """status-vocabulary, like sequential-numbering, judges only NNNN-slug.md
+    records: a non-record file (index.md/README.md) that carries an
+    off-vocabulary status must not be flagged as a record."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "docs/decisions/0001-first.md": record("First"),
+            "docs/decisions/README.md": record("Readme", status="draft"),
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+# --- environment failures ---
+
+
+def test_malformed_frontmatter_cannot_run_exits_2(tmp_path: Path) -> None:
+    """A record with a broken frontmatter block is a precondition the detector
+    cannot judge: it exits 2 (cannot run) with a clear message, not a traceback."""
+    repo = make_repo(
+        tmp_path,
+        {"docs/decisions/0001-first.md": "---\ntitle: [unterminated\n---\n\n# X\n"},
+    )
+    result = run(repo)
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "cannot run" in result.stderr.lower()
+    assert "docs/decisions/0001-first.md" in result.stderr
 
 
 # --- rule ids and finding format ---

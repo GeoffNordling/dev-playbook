@@ -38,7 +38,7 @@ one adaptation.
 
 ### Adopt
 
-- `docs/decisions/` with 4-digit numbering, Decision Record template, and the
+- `docs/adr/` with 4-digit numbering, Decision Record template, and the
   offer-criteria gate (hard-to-reverse + surprising + real trade-off).
   Existing Decision Records `001`–`005` renamed to `0001`–`0005`.
 - `docs/agents/{issue-tracker,triage-labels,domain}.md` per-repo

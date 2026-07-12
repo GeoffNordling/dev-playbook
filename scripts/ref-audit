@@ -18,8 +18,10 @@ current worktree) and checks:
     out of scope and treated as ok.
 
 Not scanned: fenced code blocks and inline code spans, bare `/slash` tokens
-outside link syntax, and files under the `docs/decisions/` records directory as
-sources (references *to* Decision Records are still validated).
+outside link syntax, and the numbered Decision Records under `docs/decisions/`
+as sources (references *to* records are still validated). The mutable
+`index.md`/`README.md` there *are* scanned; any other file under
+`docs/decisions/` is unclassifiable and stops the run.
 
 Output:
     stdout — one finding per line, `file:line: docs.rule message`, for each
@@ -37,6 +39,7 @@ Usage:
 # ///
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -56,13 +59,33 @@ MESSAGE_FOR = {
 }
 RULES = tuple(RULE_FOR.values())
 
-# Decision Record sources are exempt: records are immutable, so their outbound
-# references are accepted staleness. This exemption is permanent by design —
-# immutable records inevitably go stale as their referents move, and their
-# historical refs are never audited. It is scoped to the records directory,
-# docs/decisions/, so standards/decisions/ (the contract) is still validated.
-# References TO records are still validated.
+# docs/decisions/ is classified, not blanket-exempt. A numbered record
+# (NNNN-slug.md) is exempt as a source: records are immutable, so their outbound
+# references are accepted staleness — a permanent exemption by design, since
+# immutable records inevitably go stale as their referents move. The mutable
+# index.md/README.md there are validated like any other doc — they are actively
+# maintained, so their outbound links must resolve. Any other file under
+# docs/decisions/ is unclassifiable and stops the run (see UnclassifiedRecordsFile),
+# forcing a conscious decision rather than a silent blanket exemption. The scope
+# is docs/decisions/, so standards/decisions/ (the contract) is still validated,
+# and references TO records are always validated.
 RECORDS_DIR = ("docs", "decisions")
+_RECORD_NAME = re.compile(r"^\d+-.+\.md$")
+_VALIDATED_RECORDS_FILES = frozenset({"index.md", "README.md"})
+
+
+class UnclassifiedRecordsFile(Exception):
+    """A file under docs/decisions/ that the records policy cannot classify.
+
+    It is neither a numbered record (NNNN-slug.md, exempt) nor the mutable
+    index.md/README.md (validated). ref-audit stops rather than silently
+    blanket-exempt an unexpected file, forcing a conscious decision on it.
+    """
+
+    def __init__(self, relpath: str) -> None:
+        super().__init__(relpath)
+        self.relpath = relpath
+
 
 # Path segments marking sources with no fixed repo root: skills and rules
 # ship into ~/.claude.
@@ -83,12 +106,26 @@ def workspace_root() -> Path:
 
 
 def source_files(repo_root: Path) -> list[Path]:
-    """All scannable .md files: every tracked/untracked .md minus record sources."""
-    return [
-        p
-        for p in md.find_md_files(repo_root)
-        if p.relative_to(repo_root).parts[: len(RECORDS_DIR)] != RECORDS_DIR
-    ]
+    """The .md files to scan, with docs/decisions/ classified by the records policy.
+
+    Numbered records (NNNN-slug.md) are exempt — immutable, accepted staleness;
+    index.md and README.md are validated — mutable, actively maintained; any
+    other file under docs/decisions/ raises UnclassifiedRecordsFile so ref-audit
+    stops rather than silently blanket-exempt it.
+    """
+    depth = len(RECORDS_DIR)
+    sources: list[Path] = []
+    for p in md.find_md_files(repo_root):
+        rel = p.relative_to(repo_root)
+        if rel.parts[:depth] != RECORDS_DIR:
+            sources.append(p)
+        elif _RECORD_NAME.match(rel.name):
+            continue  # exempt: immutable record, accepted staleness
+        elif rel.name in _VALIDATED_RECORDS_FILES:
+            sources.append(p)  # validated: mutable, actively maintained
+        else:
+            raise UnclassifiedRecordsFile(str(rel))
+    return sources
 
 
 def is_same_repo_citation(resolved: Path, repo_name: str) -> bool:
@@ -210,7 +247,15 @@ def main() -> None:
         print(f"ref-audit: not a git repository: {repo_root}", file=sys.stderr)
         sys.exit(2)
 
-    md_files = source_files(repo_root)
+    try:
+        md_files = source_files(repo_root)
+    except UnclassifiedRecordsFile as err:
+        print(
+            f"ref-audit: unclassifiable file under {'/'.join(RECORDS_DIR)}/: "
+            f"{err.relpath} (expected a NNNN-slug.md record, index.md, or README.md)",
+            file=sys.stderr,
+        )
+        sys.exit(2)
     if not md_files:
         print(f"ref-audit: no .md files found in {repo_root}", file=sys.stderr)
         sys.exit(2)
