@@ -43,6 +43,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: testing-audit
+        name: testing-audit
+        entry: scripts/testing-audit
+        language: script
+        pass_filenames: false
+        always_run: true
+
       - id: ref-audit
         name: ref-audit
         entry: scripts/ref-audit

@@ -8,6 +8,7 @@
 #     hooks:
 #       - id: repo-audit
 #       - id: python-audit
+#       - id: testing-audit
 #       - id: ref-audit
 #       - id: okf-audit
 #       - id: skill-audit
@@ -28,6 +29,13 @@
 - id: python-audit
   name: python-audit
   entry: scripts/python-audit
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: testing-audit
+  name: testing-audit
+  entry: scripts/testing-audit
   language: script
   pass_filenames: false
   always_run: true
