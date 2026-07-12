@@ -37,6 +37,8 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
+import yaml
+
 from dev_playbook import md
 from dev_playbook.findings import print_rules, render
 
@@ -50,8 +52,10 @@ STATUS_VOCABULARY = "decisions.status-vocabulary"
 RULES = (SEQUENTIAL_NUMBERING, STATUS_VOCABULARY)
 
 # The records directory, relative to the repo root; also the location a
-# directory-level gap finding reports against.
+# directory-level gap finding reports against. _DECISIONS_PARTS is the same
+# path as a path-segment tuple, derived here so there is one source of truth.
 DECISIONS_DIR = "docs/decisions"
+_DECISIONS_PARTS = tuple(DECISIONS_DIR.split("/"))
 
 # A record file: a numeric prefix, a hyphen, a slug, then ``.md``. The prefix is
 # captured so its padding and contiguity can be checked; index.md/README.md and
@@ -64,6 +68,14 @@ _FIXED_STATUSES = frozenset({"proposed", "accepted", "deprecated"})
 _SUPERSEDED = re.compile(r"^superseded by \d{4}$")
 
 _VOCABULARY = "proposed | accepted | deprecated | superseded by NNNN"
+
+
+class CannotRun(Exception):
+    """A precondition the detector cannot judge past.
+
+    Raised, for example, by a record whose frontmatter will not parse. Surfaces
+    as exit 2 (cannot run), not as a finding.
+    """
 
 
 @dataclass(frozen=True)
@@ -82,10 +94,11 @@ class Finding:
 
 def decision_files(root: Path) -> list[Path]:
     """The markdown files under ``docs/decisions/`` in ``root``'s checkout."""
+    depth = len(_DECISIONS_PARTS)
     return [
         path
         for path in md.find_md_files(root)
-        if path.relative_to(root).parts[:2] == ("docs", "decisions")
+        if path.relative_to(root).parts[:depth] == _DECISIONS_PARTS
     ]
 
 
@@ -109,6 +122,15 @@ def check_sequential_numbering(files: list[Path], root: Path) -> list[Finding]:
     findings: list[Finding] = []
     counts = Counter(number for number, _, _ in numbered)
     for number, prefix, rel in numbered:
+        if number < 1:
+            findings.append(
+                Finding(
+                    rel,
+                    None,
+                    SEQUENTIAL_NUMBERING,
+                    f"record number {number:04d} is below the sequence start 0001",
+                )
+            )
         if len(prefix) != 4:
             findings.append(
                 Finding(
@@ -129,16 +151,32 @@ def check_sequential_numbering(files: list[Path], root: Path) -> list[Finding]:
             )
 
     present = set(counts)
-    for missing in sorted(set(range(1, max(present) + 1)) - present) if present else []:
-        findings.append(
-            Finding(
-                DECISIONS_DIR,
-                None,
-                SEQUENTIAL_NUMBERING,
-                f"record number {missing:04d} is missing from the sequence",
+    missing = sorted(set(range(1, max(present) + 1)) - present) if present else []
+    for low, high in _contiguous_ranges(missing):
+        if low == high:
+            message = f"record number {low:04d} is missing from the sequence"
+        else:
+            message = (
+                f"record numbers {low:04d} through {high:04d} "
+                "are missing from the sequence"
             )
-        )
+        findings.append(Finding(DECISIONS_DIR, None, SEQUENTIAL_NUMBERING, message))
     return findings
+
+
+def _contiguous_ranges(numbers: list[int]) -> list[tuple[int, int]]:
+    """Collapse a sorted list of ints into (low, high) runs of consecutive values.
+
+    So a single mis-numbering yields one signal — a lone ``0050`` reports the
+    gap ``0001 through 0049`` once, not forty-nine separate findings.
+    """
+    ranges: list[tuple[int, int]] = []
+    for number in numbers:
+        if ranges and number == ranges[-1][1] + 1:
+            ranges[-1] = (ranges[-1][0], number)
+        else:
+            ranges.append((number, number))
+    return ranges
 
 
 # --- status-vocabulary rule ---
@@ -148,9 +186,14 @@ def check_status_vocabulary(files: list[Path], root: Path) -> list[Finding]:
     """Flag a record whose ``status`` frontmatter key is off the vocabulary."""
     findings: list[Finding] = []
     for path in files:
-        front, _ = md.parse_frontmatter(
-            path.read_text(encoding="utf-8", errors="replace")
-        )
+        if _RECORD_NAME.match(path.name) is None:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        try:
+            front, _ = md.parse_frontmatter(text)
+        except yaml.YAMLError as err:
+            rel = path.relative_to(root)
+            raise CannotRun(f"{rel}: malformed frontmatter: {err}") from err
         if not front or "status" not in front:
             continue
         status = front["status"]
@@ -200,13 +243,15 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         files = decision_files(root)
+        findings: list[Finding] = []
+        findings.extend(check_sequential_numbering(files, root))
+        findings.extend(check_status_vocabulary(files, root))
     except subprocess.CalledProcessError as err:
         print(f"decisions-audit: cannot list files in {root}: {err}", file=sys.stderr)
         return 2
-
-    findings: list[Finding] = []
-    findings.extend(check_sequential_numbering(files, root))
-    findings.extend(check_status_vocabulary(files, root))
+    except CannotRun as err:
+        print(f"decisions-audit: cannot run: {err}", file=sys.stderr)
+        return 2
 
     for f in sorted(findings, key=lambda f: (f.file, f.line or 0, f.rule)):
         print(f.render())
