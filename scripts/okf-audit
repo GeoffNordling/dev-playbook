@@ -28,7 +28,7 @@ The concept-document/harness-owned split comes from dev_playbook.md.classify. Th
 asserts unconditionally and fails loud — there is no applicability skip.
 
 Output:
-    stdout — one finding per line, `file:line: docs.rule message` (`:line`
+    stdout — one finding per line, `file:line: rule message` (`:line`
              omitted for a file-level finding).
     stderr — one human-readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
@@ -532,7 +532,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="okf-audit",
-        description="Lint the repo's OKF bundle: concept-doc types and index freshness.",
+        description="Lint the repo's OKF bundle: concept-doc types, index freshness, and instrument-spec consumers.",
     )
     parser.add_argument(
         "directory",

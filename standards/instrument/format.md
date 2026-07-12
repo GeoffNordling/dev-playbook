@@ -9,7 +9,7 @@ description: What an instrument is and the Instrument Spec contract every instru
 An **instrument** is a purpose-built device: an artifact format together
 with the tooling that produces or checks it. Where a standard governs a
 question a repository must answer, an instrument *is* an answer — a device
-that standards, skills, and workflows employ.
+that standards, skills, and rituals employ.
 
 ## What makes a device an instrument
 
