@@ -6,37 +6,38 @@ description: The consumer-repo recipe — editable path dependency, declarations
 
 # Consuming Judgments
 
-The judgments tooling lives in dev-playbook's `tools/` directory as an
-installable package, **`dev-playbook-tools`**, that exposes the `judgments`
-and `skipcache` import packages and the `judgments-run` / `judgments-audit`
-console scripts. Any repo on the same machine consumes it as a **local path
-dependency** — no network, no PyPI, no published index. The recipe below is
+The judgments tooling ships in dev-playbook's one installable package,
+**`dev-playbook`**, built from `src/dev_playbook/`. It exposes the
+`dev_playbook.judgments` and `dev_playbook.skipcache` import packages and
+the `judgments-run` / `judgments-audit` console scripts. Any repo on the
+same machine consumes it as a **local path dependency** — no network, no
+PyPI, no published index. The recipe below is
 end-to-end; the field rules, config, and gate it points at are defined in
 [declarations.md](/standards/judgments/declarations.md) and
 [cache-gate.md](/standards/judgments/cache-gate.md).
 
 ## 1. Add the package as an editable path dependency
 
-In the consuming repo's `pyproject.toml`, depend on `dev-playbook-tools`
-and point a `[tool.uv.sources]` entry at dev-playbook's `tools/` directory
-on disk:
+In the consuming repo's `pyproject.toml`, depend on `dev-playbook`
+and point a `[tool.uv.sources]` entry at the dev-playbook repo root on disk:
 
 ```toml
 [dependency-groups]
-dev = ["dev-playbook-tools"]
+dev = ["dev-playbook"]
 
 [tool.uv.sources]
-dev-playbook-tools = { path = "../dev-playbook/tools", editable = true }
+dev-playbook = { path = "../dev-playbook", editable = true }
 ```
 
 Adjust `path` to wherever `dev-playbook` sits relative to the consumer. The
 dependency is `editable`, so the consumer always resolves against the
-current `tools/` source — nothing to re-publish or re-pin when the
-libraries change. `uv sync` builds the package with uv's own bundled build
-backend, so building it needs no network or PyPI access. Its one runtime
-dependency, `pyyaml`, resolves from uv's local cache whenever it is present
-(it almost always is); only a completely cold cache reaches PyPI for it.
-Afterwards `from judgments.pytest_support import assert_judgment_cached`
+current `src/dev_playbook/` source — nothing to re-publish or re-pin when
+the libraries change. `uv sync` builds the package with uv's own bundled
+build backend, so building it needs no network or PyPI access. Its one
+runtime dependency, `pyyaml`, resolves from uv's local cache whenever it is
+present (it almost always is); only a completely cold cache reaches PyPI
+for it. Afterwards
+`from dev_playbook.judgments.pytest_support import assert_judgment_cached`
 resolves in the consumer's environment and `judgments-run` is on its venv
 PATH.
 
@@ -64,8 +65,8 @@ parametrized form from [cache-gate.md](/standards/judgments/cache-gate.md):
 
 ```python
 import pytest
-from judgments.loader import load, resolve_root
-from judgments.pytest_support import assert_judgment_cached
+from dev_playbook.judgments.loader import load, resolve_root
+from dev_playbook.judgments.pytest_support import assert_judgment_cached
 
 
 @pytest.mark.parametrize("jid", sorted(d.id for d in load(resolve_root())))
