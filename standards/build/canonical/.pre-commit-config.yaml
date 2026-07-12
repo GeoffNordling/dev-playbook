@@ -5,6 +5,7 @@ repos:
     hooks:
       - id: repo-audit
       - id: python-audit
+      - id: testing-audit
       - id: ref-audit
       - id: okf-audit
       - id: judgments-audit

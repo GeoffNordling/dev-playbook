@@ -107,16 +107,18 @@ def render_session_open(meta: dict) -> str:
 
 
 def _marker_label(line: str) -> str:
-    """The leading label of a marker line: the text before the first `:`, or the
-    whole bracket contents for a bare marker. `[Bash: detail]` -> `Bash`,
-    `[TaskList]` -> `TaskList`, `[Exiting Plan Mode]` -> `Exiting Plan Mode`."""
+    """The leading label of a marker line.
+
+    The text before the first `:`, or the whole bracket contents for a bare
+    marker. `[Bash: detail]` -> `Bash`, `[TaskList]` -> `TaskList`,
+    `[Exiting Plan Mode]` -> `Exiting Plan Mode`.
+    """
     inner = line.strip()[1:-1]
     return inner.split(":", 1)[0].strip()
 
 
 def strip_tool_markers(content: str, tool_names: Sequence[str]) -> str:
-    """Drop the trailing inline tool markers (and their inlined bodies), keeping
-    only the prose.
+    """Drop the trailing inline tool markers and their bodies, keeping only prose.
 
     A turn's `content` is prose followed by, for each tool call, a
     `[ToolName: detail]` (or bare `[ToolName]`) marker line that heads that call's

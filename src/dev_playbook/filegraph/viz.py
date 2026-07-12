@@ -8,10 +8,10 @@ renders from file:// with no external requests:
 - `__CONTENTS__` — a {path: text} map of every node file's raw source, so the
   viewer can show a document's text on click. Read from the repo at build time.
 
-The two JSON blobs are `<`-escaped to `\\u003c` before insertion, so no
-substring can terminate the inline script early or trip the `<!--`/`<script`
-double-escape trap; `<` only occurs inside JSON string values, where the escape
-is equivalent. The trusted d3 bundle is injected as-is. All three placeholders
+The two JSON blobs have every `<` rewritten to its equivalent unicode escape
+before insertion, so no substring can terminate the inline script early or trip
+the `<!--`/`<script` double-escape trap; `<` only occurs inside JSON string
+values, where the escape is equivalent. The trusted d3 bundle is injected as-is. All three placeholders
 are substituted in a single pass, so an injected blob that itself contains a
 placeholder token cannot be clobbered by a later substitution.
 
@@ -28,12 +28,11 @@ MAX_BYTES = 200_000  # a node file bigger than this is elided, not inlined
 
 
 def safe(json_text: str) -> str:
-    """Escape `<` as `\\u003c` in injected JSON so no substring can break out of
-    the inline <script>.
+    """Rewrite `<` to its unicode escape so injected JSON can't break out of <script>.
 
-    `<` only ever appears inside JSON string values, where `\\u003c` is an
-    equivalent escape, so this neutralizes `</script>`, `<!--`, and `<script`
-    at once without changing the parsed data.
+    `<` only ever appears inside JSON string values, where the escape is
+    equivalent, so this neutralizes `</script>`, `<!--`, and `<script` at once
+    without changing the parsed data.
     """
     return json_text.replace("<", "\\u003c")
 

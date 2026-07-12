@@ -52,6 +52,7 @@ def test_recent_real_sessions_render_well_formed(recent_ids: list[str]) -> None:
         root = ET.fromstring(render_session(sid))  # raises on malformed output
         assert root.tag == "session"
         assert root.attrib["id"] == sid
-        for el in root.iter():
-            if "ord" in el.attrib:
-                int(el.attrib["ord"])
+        # Every `ord` attribute parses as an int: int() raises on a malformed
+        # value, so consuming this comprehension (a filter, not an `if` branch —
+        # see testing.no-logic) is the check. The parsed list itself is unused.
+        [int(el.attrib["ord"]) for el in root.iter() if "ord" in el.attrib]

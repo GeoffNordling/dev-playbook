@@ -51,8 +51,21 @@ line-length = 88
 extend-exclude = ["dotfiles/.agents", "dotfiles/.dhub"]
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF"]
-ignore = ["E501"]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF", "D"]
+# D401 (imperative-mood summaries) is excluded to keep the workspace's
+# noun-phrase docstring voice.
+ignore = ["E501", "D401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+# Test functions carry no docstrings by convention (see python/style.md); the
+# glob also covers a nested template scaffold's own tests/ tree. __init__.py
+# stays empty, so D104 (missing package docstring) would contradict
+# python.empty-init.
+"**/tests/**" = ["D"]
+"__init__.py" = ["D104"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["dev_playbook"]

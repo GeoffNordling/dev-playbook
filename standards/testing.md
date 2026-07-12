@@ -16,13 +16,18 @@ Governs how Python tests are written.
 
 ## Audit
 
-- [python-audit](/scripts/python-audit) — partial: no private-name access
-  from tests
+- [testing-audit](/scripts/testing-audit) — the Python-testing detector,
+  three rules: no private-name access from tests
+  (`testing.no-private-access`), test-file mirror placement
+  (`testing.mirror-layout`), and no `if`/`try` logic in a test body
+  (`testing.no-logic`)
 
 ## Enforce
 
-- `make check` — pytest at the **push gate** in every Python repo
-  ([Makefile.python](/standards/build/canonical/Makefile.python))
+- the canonical
+  [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
+  — the **commit gate**, where testing-audit blocks every commit
+- `make check` — the **push gate**, where pytest runs the suite
 
 ## Adopt
 

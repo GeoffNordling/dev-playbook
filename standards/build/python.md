@@ -26,8 +26,10 @@ inside that package as subpackages.
 The canonical shape is [/standards/build/canonical/pyproject.toml](/standards/build/canonical/pyproject.toml),
 with `<repo>` and `<package>` placeholders. It pins: the `uv_build` backend,
 pytest `testpaths`, the `dev` dependency group (mypy, pytest, ruff floors),
-the ruff target/line-length/rule selection, and the mypy strictness set.
-`requires-python` states the floor matching `.python-version`.
+the ruff target/line-length/rule selection (including the pydocstyle
+`convention` and the `tests/**` + `__init__.py` docstring per-file-ignores),
+and the mypy strictness set. `requires-python` states the floor matching
+`.python-version`.
 
 A scripts-only repo (no `src/`) is not a package: it sets
 `[tool.uv] package = false` and omits `[build-system]`; everything else is
@@ -52,9 +54,20 @@ The reasons behind the canonical file's pins:
 - **The ruff families** beyond the `E`/`W`/`F` core: each catches a
   distinct defect class — `I` import order, `UP` outdated syntax, `B`
   bug-prone patterns, `SIM` needless complexity, `SLF` private-member
-  access from outside the defining class.
-- **`ignore = ["E501"]`**: `ruff format` owns line length; the lint rule
-  would report the same overruns a second time.
+  access from outside the defining class, and `D` docstring presence and
+  format (pydocstyle), enforcing the docstring conventions in
+  [python/style.md](/standards/python/style.md).
+- **`[tool.ruff.lint.pydocstyle] convention = "pep257"`**: `D` on its own
+  turns on mutually-exclusive members (`D203` vs `D211`, `D212` vs `D213`),
+  so `ruff check` is unsatisfiable until a `convention` selects between
+  them — pinning it is what keeps the family usable. Per-file ignores then
+  drop all of `D` for `tests/**` (test functions carry no docstrings by
+  convention) and `D104` for `__init__.py` (an empty init has none — see
+  `python.empty-init`).
+- **`ignore = ["E501", "D401"]`**: `ruff format` owns line length, so the
+  `E501` lint rule would report the same overruns a second time; `D401`
+  (imperative-mood summaries) is dropped to keep the workspace's
+  noun-phrase docstring voice.
 
 ## Scripts
 

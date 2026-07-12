@@ -17,8 +17,10 @@ Governs how Python source code is written.
 
 - [python-audit](/scripts/python-audit) — the workspace Python-source
   detector; read-only, run ad hoc or by the suite
-- ruff (`ruff-check`, `ruff-format`) — third-party lint and formatting
-  detector, located by its pin in the canonical
+- ruff (`ruff-check`, `ruff-format`) — third-party lint, formatting, and
+  docstring detector (the pydocstyle `D` family, configured in the canonical
+  [pyproject.toml](/standards/build/canonical/pyproject.toml)), located by its
+  pin in the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
 - mypy — third-party type detector, located by the `typecheck` target in
   [Makefile.python](/standards/build/canonical/Makefile.python)

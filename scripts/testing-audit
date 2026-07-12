@@ -1,0 +1,24 @@
+#!/usr/bin/env -S uv run --script
+"""testing-audit — pre-commit validator for a repo's Python tests.
+
+Thin shim over dev_playbook.testing_audit.main: it puts the checkout's ``src/``
+on ``sys.path`` and calls the module, which walks the repo's test files and
+applies the testing-card rules (no-private-access, mirror-layout, no-logic),
+printing each finding to stdout as a GNU finding line
+(``file:line: testing.rule message``) and exiting nonzero if any. ``--list-rules``
+prints the rule ids and exits 0. See dev_playbook.testing_audit for the logic
+and its tests.
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.testing_audit import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())

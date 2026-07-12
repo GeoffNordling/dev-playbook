@@ -33,6 +33,11 @@ Every function, method, class, and module has a docstring — except
 explains in plain English what the thing does. One short sentence is fine
 when the behavior is simple; longer when it isn't.
 
+Enforcement of these rules is delegated to ruff's pydocstyle (`D`) family,
+configured in the canonical [pyproject.toml](/standards/build/canonical/pyproject.toml)
+with `D401` (imperative mood) disabled to preserve the noun-phrase voice and
+`tests/` plus `__init__.py` exempted.
+
 Rationale: a name says what something is called; a docstring says what it
 does. Readers (human and agent) should not have to read the body to learn
 the contract.
