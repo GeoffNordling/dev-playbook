@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from dev_playbook.judgments.core import SCHEMA, prepare
-from dev_playbook.judgments.runner import main
+from dev_playbook.judgments.runner import REFUTED, main
 
 CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 
@@ -108,6 +108,30 @@ def test_record_then_plan_reports_the_judgment_as_seen(
 def test_record_is_idempotent(repo: Path) -> None:
     assert main(["record", "j1"]) == 0
     assert main(["record", "j1"]) == 0
+
+
+def test_list_rules_prints_the_refuted_rule(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["--list-rules"])
+
+    assert exit_code == 0
+    assert capsys.readouterr().out.split() == [REFUTED]
+
+
+def test_record_refuted_verdict_emits_a_finding_and_does_not_cache(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(["record", "--refuted", "j1"])
+
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert REFUTED in out
+    assert "j1" in out
+    # A refuted verdict is never recorded: the gate must stay red.
+    assert main(["plan"]) == 0
+    plan = json.loads(capsys.readouterr().out)
+    assert plan["seen"] == []
 
 
 def test_render_unknown_id_fails_loud(
