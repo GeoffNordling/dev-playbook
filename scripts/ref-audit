@@ -18,8 +18,8 @@ current worktree) and checks:
     out of scope and treated as ok.
 
 Not scanned: fenced code blocks and inline code spans, bare `/slash` tokens
-outside link syntax, and files under any `adr/` directory as sources
-(references *to* ADRs are still validated).
+outside link syntax, and files under the `docs/decisions/` records directory as
+sources (references *to* Decision Records are still validated).
 
 Output:
     stdout — one finding per line, `file:line: docs.rule message`, for each
@@ -56,9 +56,13 @@ MESSAGE_FOR = {
 }
 RULES = tuple(RULE_FOR.values())
 
-# ADR sources are exempt: ADRs are immutable, so their outbound references
-# are accepted staleness. References TO ADRs are still validated.
-EXCLUDE_DIRS = {"adr"}
+# Decision Record sources are exempt: records are immutable, so their outbound
+# references are accepted staleness. This exemption is permanent by design —
+# immutable records inevitably go stale as their referents move, and their
+# historical refs are never audited. It is scoped to the records directory,
+# docs/decisions/, so standards/decisions/ (the contract) is still validated.
+# References TO records are still validated.
+RECORDS_DIR = ("docs", "decisions")
 
 # Path segments marking sources with no fixed repo root (skills and rules
 # ship into ~/.claude; box artifacts are stamped into a target repo).
@@ -79,11 +83,11 @@ def workspace_root() -> Path:
 
 
 def source_files(repo_root: Path) -> list[Path]:
-    """All scannable .md files: every tracked/untracked .md minus adr sources."""
+    """All scannable .md files: every tracked/untracked .md minus record sources."""
     return [
         p
         for p in md.find_md_files(repo_root)
-        if not (EXCLUDE_DIRS & set(p.relative_to(repo_root).parts))
+        if p.relative_to(repo_root).parts[: len(RECORDS_DIR)] != RECORDS_DIR
     ]
 
 

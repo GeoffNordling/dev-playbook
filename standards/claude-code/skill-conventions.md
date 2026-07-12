@@ -107,7 +107,7 @@ A skill has **no fixed repo root**. The same skill can be invoked from a session
 | File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
 | File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md)` |
 | File in the human's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
-| Directory | Inline code | `` `docs/adr/` `` |
+| Directory | Inline code | `` `docs/decisions/` `` |
 | Slash-skill invocation | Bare — no markup | `/commit` |
 
 When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/docs/cross-references.md#fragment-anchors)).

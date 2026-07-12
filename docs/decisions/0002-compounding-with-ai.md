@@ -1,12 +1,12 @@
 ---
-type: ADR
+type: Decision Record
 title: Compounding Workflow with AI
 description: Establish tiered instruction loading — a global behavioral CLAUDE.md, nested per-project variants, and edit-time Python linting via project-local ruff
 ---
 
 # Compounding Workflow with AI
 
-**Status:** The edit-time ruff hook decisions (the "Edit-time Python verification" and "Project-local ruff" adopt bullets, the matching "global-ruff fallback" alternative, and the 2026-06-06 amendment) are superseded by [ADR-0008](0008-retire-edit-time-ruff-hook.md) in part (issue #127). The tiered-instruction decisions stand.
+**Status:** The edit-time ruff hook decisions (the "Edit-time Python verification" and "Project-local ruff" adopt bullets, the matching "global-ruff fallback" alternative, and the 2026-06-06 amendment) are superseded by [Decision Record 0008](0008-retire-edit-time-ruff-hook.md) in part (issue #127). The tiered-instruction decisions stand.
 
 ## Context
 
@@ -55,7 +55,7 @@ The change makes the instruction surface explicitly **tiered**:
 | Workspace governance | `standards/`, `sdd-standards/` | When referenced |
 | Workflow | `.claude/skills/*/SKILL.md` | On invocation |
 
-Before this ADR, universal preferences were either absent or scattered. After, each piece of instruction has exactly one home and one load trigger.
+Before this Decision Record, universal preferences were either absent or scattered. After, each piece of instruction has exactly one home and one load trigger.
 
 The edit-time hook closes the verification loop. Pre-commit was the only ruff gate; the model would only learn about lint issues after a human committed and saw the failure. Now the model sees them inside the same edit loop and corrects without round-trips.
 
@@ -85,7 +85,7 @@ Project-local ruff is the only stable answer. Each repo's `pyproject.toml` pins 
   - `bin/transcript-reader` to enable transcript mining for config gaps.
   - Worklog auto-post hook on substantial task completion.
   - `standards/agent-hooks.md` to be extracted if a second hook lands and shared conventions emerge.
-- The cookiecutter project template (`project-template/`) does not yet propagate any of these conventions. Cookiecutter-generated repos start with their own pyproject.toml + uv setup, which means the edit-time hook works for them out of the box. No template change needed for this ADR.
+- The cookiecutter project template (`project-template/`) does not yet propagate any of these conventions. Cookiecutter-generated repos start with their own pyproject.toml + uv setup, which means the edit-time hook works for them out of the box. No template change needed for this Decision Record.
 
 ## Amendment (2026-06-06) — edit-transient lint rules (issue #78)
 
@@ -136,7 +136,7 @@ autofixes, and exit-2 blocking on any real unfixable lint (e.g. E711).
 
 Moving *all* lint/checking out of the edit-time hook and onto pre-commit only.
 That would more fully honor "this should happen at pre-commit," but it discards
-the in-loop feedback ADR 0002 deliberately added (the model corrects without a
+the in-loop feedback Decision Record 0002 deliberately added (the model corrects without a
 commit round-trip). Deferred as a separate decision; the minimal fix above
 removes the corruption without giving that up.
 

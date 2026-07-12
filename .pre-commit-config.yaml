@@ -64,6 +64,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: decisions-audit
+        name: decisions-audit
+        entry: scripts/decisions-audit
+        language: script
+        pass_filenames: false
+        always_run: true
+
       - id: skill-audit
         name: skill-audit
         entry: scripts/skill-audit

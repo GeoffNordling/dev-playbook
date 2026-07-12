@@ -218,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
     print(
-        f"decisions-audit: clean ({len(files)} record file(s) checked)",
+        f"decisions-audit: clean ({len(files)} file(s) under {DECISIONS_DIR})",
         file=sys.stderr,
     )
     return 0

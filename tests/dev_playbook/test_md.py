@@ -95,7 +95,7 @@ class TestClassify:
             ("README.md", "concept"),
             ("standards/prose/conventions.md", "concept"),
             ("CONTEXT.md", "concept"),
-            ("docs/adr/0001-x.md", "concept"),
+            ("docs/decisions/0001-x.md", "concept"),
             ("harness-recipes/recipes/ralph-loop.md", "concept"),
             ("protocols/align-map-execute/formulation.md", "concept"),
             ("CLAUDE.md", "harness"),

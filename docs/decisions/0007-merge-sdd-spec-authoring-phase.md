@@ -1,5 +1,5 @@
 ---
-type: ADR
+type: Decision Record
 title: Merge SDD Spec Authoring into One Phase
 description: Merge sdd-requirements and sdd-design into a single sdd-specs phase authoring the whole feat/req/dsn hierarchy in one interview
 ---
@@ -8,7 +8,7 @@ description: Merge sdd-requirements and sdd-design into a single sdd-specs phase
 
 ## Context
 
-The SDD path split spec authoring into two sequential HITL nodes: `sdd_requirements` authored the `feat`/`req` layer, then handed off to `sdd_design`, which authored the `dsn` layer. Each was its own worktree commit, its own `phase:*` label, and — critically — its own locked scope: requirements owned `feat`/`req` and was told to leave `dsn` alone; design owned `dsn`. [ADR-0005](0005-issue-workflow-reorganization.md) kept the two parallel and explicitly retained the `sdd-requirements` name "parallel to `sdd-design`."
+The SDD path split spec authoring into two sequential HITL nodes: `sdd_requirements` authored the `feat`/`req` layer, then handed off to `sdd_design`, which authored the `dsn` layer. Each was its own worktree commit, its own `phase:*` label, and — critically — its own locked scope: requirements owned `feat`/`req` and was told to leave `dsn` alone; design owned `dsn`. [Decision Record 0005](0005-issue-workflow-reorganization.md) kept the two parallel and explicitly retained the `sdd-requirements` name "parallel to `sdd-design`."
 
 Real use showed the dividing line is artificial. `feat`, `req`, and `dsn` are one interdependent hierarchy, not two phases, and the hard handoff between them produced three frictions:
 
@@ -35,7 +35,7 @@ This resolves the first and third frictions outright and the second for the `fea
 | Alternative | Why rejected |
 |---|---|
 | Keep the split; relax the scope lock so `sdd_requirements` may edit `dsn` references | Still two commits, two label flips, two cold agent contexts for one act of design. The cascade still spans the boundary; the freeze just moves. Merging removes the boundary rather than patching it. |
-| One mega-skill running every SDD phase (spec → tdd → review) in sequence | Rejected for the reason ADR-0005 rejected `/intake-then-build`: each phase is a distinct interaction mode and benefits from a fresh agent context. Spec authoring is *one* mode (the interview), so merging only the two authoring phases keeps that property; folding in TDD or review would not. |
+| One mega-skill running every SDD phase (spec → tdd → review) in sequence | Rejected for the reason Decision Record 0005 rejected `/intake-then-build`: each phase is a distinct interaction mode and benefits from a fresh agent context. Spec authoring is *one* mode (the interview), so merging only the two authoring phases keeps that property; folding in TDD or review would not. |
 | Leave the workflow; make the validator tolerate a stale cross-layer revision | A real option, but a spec-standard/model change in spec-tools, orthogonal to the workflow's shape — and it addresses only the second friction, not the severed interdependence or the review asymmetry. Pursue on its own track. |
 
 ## Consequences
@@ -45,5 +45,5 @@ This resolves the first and third frictions outright and the second for the `fea
 - `bootstrap-labels`: two phase labels retired, one added. Re-run per repo to mint `phase:sdd-specs`; the retired labels linger until deleted by hand (the script only adds, on this path).
 - Any in-flight issue sitting at `phase:sdd-requirements` or `phase:sdd-design` needs a one-time relabel to `phase:sdd-specs`.
 - `intake`'s `mode:sdd` entry and `sdd-tdd`'s spec-amendment escape hatch retarget to `sdd-specs`.
-- Supersedes ADR-0005's "`sdd-requirements` keeps its name — parallel to `sdd-design`": the parallel split it preserved is what this removes.
+- Supersedes Decision Record 0005's "`sdd-requirements` keeps its name — parallel to `sdd-design`": the parallel split it preserved is what this removes.
 - The `sdd_specs`→`sdd_tdd` revision-cascade seam (stale verifier markers) is tracked as a separate spec-tools issue.

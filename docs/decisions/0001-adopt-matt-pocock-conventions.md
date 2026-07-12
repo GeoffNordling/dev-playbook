@@ -1,12 +1,12 @@
 ---
-type: ADR
+type: Decision Record
 title: Adopt Matt Pocock's Conventions
-description: Adopt Matt Pocock's repository conventions wholesale — 4-digit ADRs, per-repo agent config, triage vocabulary, vertical-slice discipline — rejecting only his PRD format
+description: Adopt Matt Pocock's repository conventions wholesale — 4-digit Decision Records, per-repo agent config, triage vocabulary, vertical-slice discipline — rejecting only his PRD format
 ---
 
 # Adopt Matt Pocock's Conventions
 
-**Status:** Superseded by [ADR-0004](0004-remove-pocock-direct-dependency.md) in part
+**Status:** Superseded by [Decision Record 0004](0004-remove-pocock-direct-dependency.md) in part
 
 ## Context
 
@@ -16,7 +16,7 @@ that bundles a small set of repo conventions: a `docs/adr/` directory
 with 4-digit numbering, a `docs/agents/` directory describing the
 issue tracker / triage labels / domain doc layout, an `## Agent skills`
 block in `CLAUDE.md`, a `CONTEXT.md` glossary at the repo root, an
-offer-criteria gate for ADRs (hard-to-reverse + surprising + real
+offer-criteria gate for Decision Records (hard-to-reverse + surprising + real
 trade-off), a triage state machine with a five-label vocabulary, a
 PRD format, and a vertical-slice issue breakdown. Several of his
 engineering skills (`tdd`, `to-issues`, `triage`, `grill-with-docs`,
@@ -24,7 +24,7 @@ engineering skills (`tdd`, `to-issues`, `triage`, `grill-with-docs`,
 from these per-repo files; running them without the conventions
 configured produces degraded output.
 
-Before this ADR, dev-playbook had its own subset of these conventions
+Before this Decision Record, dev-playbook had its own subset of these conventions
 (an existing `docs/adr/` with 3-digit numbering, an authoritative
 testing standard, a cross-reference linter) but no formal issue
 management standard, no triage vocabulary, no domain doc layout, and
@@ -38,9 +38,9 @@ one adaptation.
 
 ### Adopt
 
-- `docs/adr/` with 4-digit numbering, ADR template, and the
+- `docs/decisions/` with 4-digit numbering, Decision Record template, and the
   offer-criteria gate (hard-to-reverse + surprising + real trade-off).
-  Existing ADRs `001`–`005` renamed to `0001`–`0005`.
+  Existing Decision Records `001`–`005` renamed to `0001`–`0005`.
 - `docs/agents/{issue-tracker,triage-labels,domain}.md` per-repo
   configuration files, scaffolded by `setup-matt-pocock-skills`.
 - `## Agent skills` block in `CLAUDE.md` pointing at the above.
@@ -58,7 +58,7 @@ one adaptation.
 
 The vocabulary and slice rules live in the new
 [Issue management standard](~/workspace/dev-playbook/standards/workflow.md).
-The ADR rules live in the updated
+The Decision Record rules live in the updated
 [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md).
 
 ### Reject
@@ -121,9 +121,9 @@ skills themselves.
 
 ## Consequences
 
-- Existing ADRs `001-005` renamed to `0001-0005` to match Matt's
+- Existing Decision Records `001-005` renamed to `0001-0005` to match Matt's
   4-digit convention. The single cross-reference in
-  `sdd-standards/README.md` and the inline links between ADRs were
+  `sdd-standards/README.md` and the inline links between Decision Records were
   updated.
 - New repo files: `docs/agents/issue-tracker.md`,
   `docs/agents/triage-labels.md`, `docs/agents/domain.md`. Generated
@@ -135,7 +135,7 @@ skills themselves.
   documenting the triage state machine, label vocabulary, and
   vertical-slice rules.
 - The [Repo documentation standard](~/workspace/dev-playbook/standards/repo-documentation.md)
-  amended with the 4-digit ADR rule and offer-criteria gate.
+  amended with the 4-digit Decision Record rule and offer-criteria gate.
 - The [Testing conventions standard](~/workspace/dev-playbook/standards/testing/conventions.md)
   cross-references Matt's `/tdd` while remaining authoritative — we
   do not fork `/tdd`.
@@ -146,13 +146,13 @@ skills themselves.
   separately in GeoffNordling/spec-tools#1.
 - The SDD-extension bet remains testable. If the extension fails to
   make SDD effective with current-state coding agents in real use,
-  this ADR's PRD rejection should be revisited.
+  this Decision Record's PRD rejection should be revisited.
 
 ## Addendum — 2026-05-19
 
 The original `/to-prd` rejection (lines 60–80, 136) framed the concern as "two sources of authority for the same pre-implementation decisions." A 2026-05-19 re-audit of the upstream skill ([mattpocock/skills `engineering/to-prd`](https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md)) surfaced three concrete frictions beyond the original framing, which should anchor any future revisit:
 
-1. **Convention mismatch with post-ADR-0004 canon.** The skill's Process section depends on `/setup-matt-pocock-skills` (dropped in [ADR-0004](0004-remove-pocock-direct-dependency.md)) and applies a `ready-for-agent` triage label not present in the workspace's `phase/*` scheme (canonicalized in [workflow.md](~/workspace/dev-playbook/standards/workflow.md) and enforced by `bootstrap-labels`).
+1. **Convention mismatch with post-Decision Record 0004 canon.** The skill's Process section depends on `/setup-matt-pocock-skills` (dropped in [Decision Record 0004](0004-remove-pocock-direct-dependency.md)) and applies a `ready-for-agent` triage label not present in the workspace's `phase/*` scheme (canonicalized in [workflow.md](~/workspace/dev-playbook/standards/workflow.md) and enforced by `bootstrap-labels`).
 2. **Slot collision with `/intake`.** Both `/to-prd` and the workspace's `/intake` skill want to be the "context → tracked work item" step. Adopting `/to-prd` would force a choice of which workflow is canonical for new work.
 3. **The "ephemeral PRD" lifecycle is not enforced by the skill.** Publishing the PRD as a GitHub issue creates a persistent artifact; the discipline of closing or archiving it once `feat`/`req` items exist is not in the skill and would erode under deadline pressure. The PRD template's *Implementation Decisions* and *Testing Decisions* sections in particular overlap `dsn` items and `Needs: utest/itest` markers — encoding those decisions in prose first means `/sdd-design` becomes downstream paperwork rather than the source of truth.
 
