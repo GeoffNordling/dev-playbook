@@ -1,0 +1,80 @@
+# Doc-on-trial drift guards for dev-playbook: a document is on trial against the
+# code or workflow it describes, and an LLM judge rules whether the doc still
+# accurately describes it. Evidence is the document under trial; reference is the
+# code or workflow it documents. These are the semantic drift guards the
+# deterministic gate cannot check -- a doc and its implementation share no bytes,
+# so only a reader can tell when they have drifted apart. See standards/judgments/.
+judgments:
+  - id: scatter-gather-recipe-matches-workflow
+    claim: |
+      harness-recipes/recipes/scatter-gather.md accurately documents the
+      scatter-gather workflow script it describes.
+    evidence:  [harness-recipes/recipes/scatter-gather.md]
+    reference: [dotfiles/dot-claude/workflows/scatter-gather.js]
+    model: claude-sonnet-5
+    effort: high
+
+  - id: judgments-standard-matches-loader
+    claim: |
+      standards/judgments/declarations.md accurately documents the judgment
+      declaration format and the field rules that the judgments tooling
+      validates.
+    evidence:  [standards/judgments/declarations.md]
+    reference: [src/dev_playbook/judgments/loader.py, src/dev_playbook/judgments/bench.py]
+    model: claude-sonnet-5
+    effort: high
+
+  - id: run-judgments-skill-matches-tooling
+    claim: |
+      The run-judgments skill accurately documents how it dispatches
+      cache-missed judgments through the scatter-gather workflow and records
+      the passing verdicts.
+    evidence:  [dotfiles/dot-claude/skills/run-judgments/SKILL.md]
+    reference:
+      - src/dev_playbook/judgments/runner.py
+      - dotfiles/dot-claude/workflows/scatter-gather.js
+    model: claude-sonnet-5
+    effort: high
+
+  - id: build-standard-matches-artifacts
+    claim: |
+      The standards/build/ documents promise exactly what ships: every
+      concrete statement they make about the canonical artifacts in
+      standards/build/canonical/ and about the published hook manifest
+      (.pre-commit-hooks.yaml) — file names, hook ids, targets, commands,
+      pins, entry paths — is true of those files as they exist today.
+    evidence:
+      - standards/build/index.md
+      - standards/build/layers.md
+      - standards/build/skeleton.md
+      - standards/build/make.md
+      - standards/build/python.md
+      - standards/build/ci.md
+      - standards/build/aws.md
+      - standards/build/canonical.md
+      - standards/build/distribution.md
+      - standards/build/enforcement.md
+    reference:
+      - standards/build/canonical/Makefile.base
+      - standards/build/canonical/Makefile.python
+      - standards/build/canonical/Makefile.aws
+      - standards/build/canonical/ci.yml
+      - standards/build/canonical/pyproject.toml
+      - standards/build/canonical/CLAUDE.md.standards
+      - .pre-commit-hooks.yaml
+    model: claude-sonnet-5
+    effort: high
+
+  - id: script-responsibility
+    claim: |
+      scripts/README.md gives every script exactly one home and one job:
+      each script appears in exactly one of the file's two tables (Validation
+      scripts, Utility scripts) with a single stated responsibility, and each
+      validation-table row additionally names exactly one standard whose
+      concern the script's stated purpose serves, while the utility table
+      states purposes only and asserts no standard alignment. The claim is
+      over what the tables state, not their completeness.
+    evidence:  [scripts/README.md]
+    reference: [standards/index.md]
+    model: claude-sonnet-5
+    effort: high

@@ -1,0 +1,62 @@
+# Artifact-on-trial conformance judgments for dev-playbook: an artifact is on
+# trial against the document that governs it, and an LLM judge rules whether the
+# artifact conforms to what the doc states. Evidence is the artifact under trial;
+# reference is the governing document. This is the mirror of docs-match-code --
+# there a doc is on trial against the code it describes; here the code is on
+# trial against the doc that governs it. See standards/judgments/.
+#
+# Subset claim template. Two judgments below share one shape: X does or contains
+# only what Y states; Y may state more than X does; X must not exceed Y. The
+# conformance is one-directional -- the artifact (X) may implement less than the
+# document (Y) permits, but never more -- so the judge checks only that every
+# thing X does is sanctioned by Y, never that X covers all of Y.
+judgments:
+  - id: repo-audit-subset-of-standard
+    claim: |
+      scripts/repo-audit enforces only what the documented standard states:
+      every check it performs corresponds to a requirement stated in the
+      standards/build/ documents. The standard may state more than the tool
+      checks; the tool must not check more than the standard states.
+    evidence:  [scripts/repo-audit]
+    reference:
+      - standards/build/index.md
+      - standards/build/layers.md
+      - standards/build/skeleton.md
+      - standards/build/make.md
+      - standards/build/python.md
+      - standards/build/ci.md
+      - standards/build/aws.md
+      - standards/build/canonical.md
+      - standards/build/distribution.md
+      - standards/build/enforcement.md
+    model: claude-sonnet-5
+    effort: high
+
+  - id: scheme-vs-graph
+    claim: |
+      src/dev_playbook/label_scheme.json mints exactly the labels
+      workflow/workflow.md states: its fixed-value dimensions (category, mode,
+      tests, status) produce exactly the eight labels of the doc's Valid
+      labels table, and its phase dimension produces exactly the phase labels
+      the doc's graph-derived phase inventory names (one per work node, with
+      `_` mapped to `-`). The scheme mints no label the doc does not state,
+      and states none the doc omits.
+    evidence:  [src/dev_playbook/label_scheme.json]
+    reference: [workflow/workflow.md]
+    model: claude-sonnet-5
+    effort: high
+
+  - id: claude-md-subset
+    claim: |
+      dev-playbook's CLAUDE.md contains only content the claude-content
+      contract permits: every kind of content in the file is one that
+      standards/claude-code/claude-content.md — together with the canonical
+      standards/build/canonical/CLAUDE.md.standards it governs — sanctions for
+      an injected CLAUDE.md. The contract may permit more than this file uses;
+      this file must not exceed it.
+    evidence:  [CLAUDE.md]
+    reference:
+      - standards/claude-code/claude-content.md
+      - standards/build/canonical/CLAUDE.md.standards
+    model: claude-sonnet-5
+    effort: high
