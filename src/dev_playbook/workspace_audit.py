@@ -29,22 +29,51 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dev_playbook.findings import print_rules, render
+from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
-# Every rule id this detector can emit. Repo-settings drift and reachability
-# answer the tracking card; a stale dev-playbook pin answers the build card
-# (non-blocking). Informational pin lines carry no rule id. Each id is a
-# module-level constant so every emission site references the constant, never a
-# raw literal, and RULES (what --list-rules prints) cannot drift from what the
-# detector actually emits.
+# Every rule id this detector can emit. Repo-settings drift, reachability, and
+# the live-repo tracking checks (label scheme, blocked labels, brief shape, epic
+# shape) answer the tracking card; four-tuple validity answers the workflow
+# card; a stale dev-playbook pin answers the build card (non-blocking).
+# Informational pin lines carry no rule id. Each id is a module-level constant so
+# every emission site references the constant, never a raw literal, and RULES
+# (what --list-rules prints) cannot drift from what the detector actually emits.
 SETTINGS = "tracking.settings"
 REMOTE = "tracking.remote"
+LABEL_SCHEME = "tracking.label-scheme"
+NO_BLOCKED_LABEL = "tracking.no-blocked-label"
+ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
+EPIC_SHAPE = "tracking.epic-shape"
+TUPLE_VALID = "workflow.tuple-valid"
 PIN = "build.pin"
 
 RULES = (
     SETTINGS,
     REMOTE,
+    LABEL_SCHEME,
+    NO_BLOCKED_LABEL,
+    ISSUE_BRIEF_SHAPE,
+    EPIC_SHAPE,
+    TUPLE_VALID,
     PIN,
 )
+
+# The required headings of each brief format, stated here exactly as
+# standards/tracking/issues.md states them — the doc and this rule read one
+# contract and cannot disagree. A build leaf (mode:sdd, mode:direct) carries all
+# six; a spike leaf carries the spike shape.
+BUILD_HEADINGS = (
+    "Summary",
+    "Current behavior",
+    "Desired behavior",
+    "Key interfaces",
+    "Acceptance criteria",
+    "Out of scope",
+)
+SPIKE_HEADINGS = ("Summary", "Question", "Timebox", "Deliverable")
+
+# The four dimensions of the state-machine tuple (status is not part of it).
+TUPLE_DIMENSIONS = ("category", "mode", "tests", "phase")
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_CONFIG = (
@@ -160,19 +189,40 @@ def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
     )
 
 
-def fetch_settings(slug: str) -> dict | None:
+def gh_api(path: str) -> object | None:
+    """Parsed JSON from ``gh api <path>``, or None when the call fails."""
     try:
-        result = subprocess.run(
-            ["gh", "api", f"repos/{slug}"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["gh", "api", path], capture_output=True, text=True)
     except FileNotFoundError as err:
         raise ToolError("gh not found on PATH") from err
     if result.returncode != 0:
         return None
-    settings: dict = json.loads(result.stdout)
-    return settings
+    parsed: object = json.loads(result.stdout)
+    return parsed
+
+
+def fetch_settings(slug: str) -> dict | None:
+    data = gh_api(f"repos/{slug}")
+    if data is None:
+        return None
+    assert isinstance(data, dict)
+    return data
+
+
+def fetch_labels(slug: str) -> list | None:
+    data = gh_api(f"repos/{slug}/labels?per_page=100")
+    if data is None:
+        return None
+    assert isinstance(data, list)
+    return data
+
+
+def fetch_issues(slug: str) -> list | None:
+    data = gh_api(f"repos/{slug}/issues?per_page=100&state=open")
+    if data is None:
+        return None
+    assert isinstance(data, list)
+    return data
 
 
 def check_settings(repo: Path) -> list[Line]:
@@ -195,6 +245,207 @@ def check_settings(repo: Path) -> list[Line]:
         for field, want in EXPECTED_SETTINGS.items()
         if settings.get(field) != want
     ]
+
+
+def check_labels(name: str, labels: list) -> list[Line]:
+    """A repo's labels against the canonical scheme, at full parity.
+
+    Mirrors what bootstrap-labels would repair — a finding for every missing
+    label, every drifted color/description, and every label outside the closed
+    world — plus its own named rule for any label naming a blocked state (which
+    the closed-world check already flags, deliberately overlapping).
+    """
+    have = {label["name"]: label for label in labels}
+    canonical = canonical_labels()
+    canonical_names = {label_name for label_name, _, _ in canonical}
+    lines: list[Line] = []
+    for label_name, color, desc in canonical:
+        if label_name not in have:
+            lines.append(
+                Line(name, LABEL_SCHEME, f"missing label {label_name}", blocking=True)
+            )
+        elif (
+            have[label_name].get("color", "").lower() != color.lower()
+            or have[label_name].get("description", "") != desc
+        ):
+            lines.append(
+                Line(
+                    name,
+                    LABEL_SCHEME,
+                    f"label {label_name} drifted (color/description)",
+                    blocking=True,
+                )
+            )
+    for label_name in sorted(have):
+        if label_name not in canonical_names:
+            lines.append(
+                Line(
+                    name, LABEL_SCHEME, f"unexpected label {label_name}", blocking=True
+                )
+            )
+    for label_name in sorted(have):
+        if "blocked" in label_name.lower():
+            lines.append(
+                Line(
+                    name,
+                    NO_BLOCKED_LABEL,
+                    f"label {label_name} names a blocked state",
+                    blocking=True,
+                )
+            )
+    return lines
+
+
+def _post_intake(labels: set[str]) -> bool:
+    """An issue is in scope once it carries a phase label other than
+    phase:intake; untriaged issues (no phase, or only phase:intake) are out."""
+    return any(
+        label.startswith("phase:") and label != "phase:intake" for label in labels
+    )
+
+
+def _has_heading(body: str, heading: str) -> bool:
+    return (
+        re.search(rf"\*\*\s*{re.escape(heading)}\s*:", body, re.IGNORECASE) is not None
+    )
+
+
+def _epic_findings(name: str, number: int, labels: set[str]) -> list[Line]:
+    """An epic (an issue with children) carries a category label only."""
+    offending = sorted(
+        label for label in labels if label.startswith(("phase:", "mode:", "tests:"))
+    )
+    if not offending:
+        return []
+    return [
+        Line(
+            name,
+            EPIC_SHAPE,
+            f"#{number} epic carries {offending}; an epic carries a category label only",
+            blocking=True,
+        )
+    ]
+
+
+def _tuple_findings(name: str, number: int, labels: set[str]) -> list[Line]:
+    """A leaf carries the full four-tuple: one label per dimension, each value in
+    the scheme, and the mode↔tests pairings holding."""
+    scheme = values_by_dimension()
+    present = {
+        dim: sorted(
+            label.split(":", 1)[1] for label in labels if label.startswith(f"{dim}:")
+        )
+        for dim in TUPLE_DIMENSIONS
+    }
+    lines: list[Line] = []
+    for dim in TUPLE_DIMENSIONS:
+        vals = present[dim]
+        if not vals:
+            lines.append(
+                Line(name, TUPLE_VALID, f"#{number} missing {dim} label", blocking=True)
+            )
+        elif len(vals) > 1:
+            lines.append(
+                Line(
+                    name,
+                    TUPLE_VALID,
+                    f"#{number} multiple {dim} labels: {vals}",
+                    blocking=True,
+                )
+            )
+        elif vals[0] not in scheme[dim]:
+            lines.append(
+                Line(
+                    name,
+                    TUPLE_VALID,
+                    f"#{number} {dim}:{vals[0]} is not a scheme value",
+                    blocking=True,
+                )
+            )
+    mode = present["mode"][0] if len(present["mode"]) == 1 else None
+    tests = present["tests"][0] if len(present["tests"]) == 1 else None
+    if mode == "sdd" and tests != "yes":
+        lines.append(
+            Line(
+                name,
+                TUPLE_VALID,
+                f"#{number} mode:sdd requires tests:yes",
+                blocking=True,
+            )
+        )
+    if mode == "spike" and tests != "no":
+        lines.append(
+            Line(
+                name,
+                TUPLE_VALID,
+                f"#{number} mode:spike requires tests:no",
+                blocking=True,
+            )
+        )
+    return lines
+
+
+def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list[Line]:
+    """A leaf's body carries its mode's required brief headings."""
+    modes = [label.split(":", 1)[1] for label in labels if label.startswith("mode:")]
+    if len(modes) != 1:
+        return []  # a missing or ambiguous mode is tuple-valid's finding
+    mode = modes[0]
+    required: tuple[str, ...]
+    if mode == "spike":
+        required = SPIKE_HEADINGS
+    elif mode in ("sdd", "direct"):
+        required = BUILD_HEADINGS
+    else:
+        return []  # an unknown mode value is tuple-valid's finding
+    return [
+        Line(
+            name,
+            ISSUE_BRIEF_SHAPE,
+            f"#{number} missing {heading} heading",
+            blocking=True,
+        )
+        for heading in required
+        if not _has_heading(body, heading)
+    ]
+
+
+def check_issues(name: str, issues: list) -> list[Line]:
+    """Every open post-intake leaf's four-tuple and brief shape; every epic's
+    category-only shape. Epic/leaf comes from sub_issues_summary — no per-issue
+    API call. Pull requests the issues endpoint returns are skipped."""
+    lines: list[Line] = []
+    for issue in issues:
+        if "pull_request" in issue:
+            continue
+        labels = {label["name"] for label in issue.get("labels", [])}
+        if not _post_intake(labels):
+            continue
+        number = issue["number"]
+        total = issue.get("sub_issues_summary", {}).get("total", 0)
+        if total > 0:
+            lines.extend(_epic_findings(name, number, labels))
+        else:
+            lines.extend(_tuple_findings(name, number, labels))
+            lines.extend(_brief_findings(name, number, labels, issue.get("body") or ""))
+    return lines
+
+
+def check_tracking(repo: Path) -> list[Line]:
+    """The live-repo label and issue checks, from one labels and one issues
+    fetch. Skipped when the repo has no GitHub origin — check_settings has
+    already reported that."""
+    slug = origin_slug(repo)
+    if slug is None:
+        return []
+    lines: list[Line] = []
+    labels = fetch_labels(slug)
+    if labels is not None:
+        lines.extend(check_labels(repo.name, labels))
+    issues = fetch_issues(slug)
+    if issues is not None:
+        lines.extend(check_issues(repo.name, issues))
+    return lines
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -234,6 +485,8 @@ def main(argv: list[str] | None = None) -> int:
                     lines.append(pin)
             if not args.pins_only:
                 lines.extend(check_settings(repo))
+            if not args.pins_only and not args.settings_only:
+                lines.extend(check_tracking(repo))
     except ToolError as err:
         print(f"workspace-audit: {err}", file=sys.stderr)
         return 2
