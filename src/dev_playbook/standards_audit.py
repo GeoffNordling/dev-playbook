@@ -95,8 +95,19 @@ def _relpath(path: Path, root: Path) -> str:
 
 
 def _frontmatter(path: Path) -> dict | None:
-    """A doc's parsed frontmatter mapping, or None when it carries none."""
-    return md.parse_frontmatter(path.read_text(encoding="utf-8", errors="replace"))[0]
+    """A doc's parsed frontmatter mapping, or None when it carries none.
+
+    Raises CannotRun when the file cannot be read (a dangling catalog target) or
+    its frontmatter will not parse (malformed YAML), so either surfaces as exit 2
+    rather than an uncaught traceback -- matching ``_load_yaml``'s boundary.
+    """
+    import yaml
+
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+        return md.parse_frontmatter(text)[0]
+    except (OSError, yaml.YAMLError) as err:
+        raise CannotRun(f"cannot read frontmatter of {path.name}: {err}") from err
 
 
 def _title(path: Path) -> str:
@@ -209,7 +220,7 @@ def check_catalog_order(root: Path) -> list[Finding]:
     docs by title, then directories.
     """
     if not (root / CATALOG).is_file():
-        return []
+        raise CannotRun(f"no catalog at {CATALOG}")
     bullets = _catalog_bullets(root)
     doc_targets = [t for _, t in bullets if not _is_directory_bullet(t)]
     dir_seen = False

@@ -11,6 +11,8 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+import pytest
+
 from dev_playbook import standards_audit as sa
 
 
@@ -511,6 +513,61 @@ def test_detector_hook_cited_by_no_card_is_flagged(tmp_path: Path) -> None:
     findings = sa.check_hook_surfaces(repo)
 
     assert any("okf-audit" in f.message and "Audit cell" in f.message for f in findings)
+
+
+def test_malformed_card_frontmatter_cannot_run(tmp_path: Path) -> None:
+    # Unreadable frontmatter is a can't-run condition (exit 2), not a crash.
+    repo = make_repo(
+        tmp_path, {"standards/build.md": "---\ntype: [unterminated\n---\n\n# Build\n"}
+    )
+
+    with pytest.raises(sa.CannotRun):
+        sa.check_card_layout(repo)
+
+
+def test_dangling_catalog_target_cannot_run(tmp_path: Path) -> None:
+    # A catalog bullet pointing at a nonexistent card must surface as CannotRun,
+    # not an uncaught FileNotFoundError.
+    files = ordered_repo_files({})
+    files["standards/index.md"] = catalog(
+        [
+            bullet("standards/README.md", "Standards"),
+            bullet("standards/standard.md", "Meta-Standard"),
+            bullet("standards/ghost.md", "Ghost"),  # no such file
+            bullet("standards/build.md", "Build"),
+            bullet("standards/python.md", "Python"),
+            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+        ]
+    )
+    repo = make_repo(tmp_path, files)
+
+    with pytest.raises(sa.CannotRun):
+        sa.check_catalog_order(repo)
+
+
+def test_missing_catalog_cannot_run(tmp_path: Path) -> None:
+    # An absent catalog is a can't-run condition, not silently clean.
+    repo = make_repo(tmp_path, {"standards/build.md": card("Build")})
+
+    with pytest.raises(sa.CannotRun):
+        sa.check_catalog_order(repo)
+
+
+def test_main_exits_two_on_a_dangling_catalog_link(tmp_path: Path) -> None:
+    files = ordered_repo_files({})
+    files["standards/index.md"] = catalog(
+        [
+            bullet("standards/README.md", "Standards"),
+            bullet("standards/standard.md", "Meta-Standard"),
+            bullet("standards/ghost.md", "Ghost"),  # no such file
+            bullet("standards/build.md", "Build"),
+            bullet("standards/python.md", "Python"),
+            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+        ]
+    )
+    repo = make_repo(tmp_path, files)
+
+    assert sa.main([str(repo)]) == 2
 
 
 def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
