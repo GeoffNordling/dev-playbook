@@ -355,6 +355,137 @@ def check_rule_matrix(
     return findings
 
 
+# --- standard.hook-surfaces -------------------------------------------------
+
+MANIFEST = ".pre-commit-hooks.yaml"
+LOCAL_CONFIG = ".pre-commit-config.yaml"
+CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
+SCRIPTS_README = "scripts/README.md"
+# Detectors wired only in dev-playbook's local block, never published or offered
+# to consumers: their audited surface exists only here. standards-audit audits
+# the standards/ tree, which no consumer carries (the validate-manifest
+# precedent). Kept a constant so the local-only set is declared in one place.
+LOCAL_ONLY = frozenset({"standards-audit"})
+
+# A markdown table row's first backticked cell: ``| `name` | ... |``.
+_TABLE_NAME = re.compile(r"^\s*\|\s*`([^`]+)`\s*\|")
+
+
+def _scripts_entry_ids(hooks: list[dict]) -> set[str]:
+    """The ids of hooks whose ``entry`` is a ``scripts/`` path (the detectors).
+
+    Non-detector hooks (make-check, validate-manifest -- ``language: system``)
+    fall outside by this entry-path scoping.
+    """
+    return {
+        hook["id"]
+        for hook in hooks
+        if isinstance(hook.get("entry"), str) and hook["entry"].startswith("scripts/")
+    }
+
+
+def _load_yaml(path: Path) -> object:
+    """Parse a YAML file, or raise CannotRun naming it when it will not read."""
+    import yaml
+
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as err:
+        raise CannotRun(f"cannot read {path.name}: {err}") from err
+
+
+def _local_hooks(root: Path) -> list[dict]:
+    """The hooks of the ``repo: local`` block in the local pre-commit config."""
+    config = _load_yaml(root / LOCAL_CONFIG)
+    if not isinstance(config, dict):
+        return []
+    for repo in config.get("repos", []):
+        if isinstance(repo, dict) and repo.get("repo") == "local":
+            return [h for h in repo.get("hooks", []) if isinstance(h, dict)]
+    return []
+
+
+def _canonical_hook_ids(root: Path) -> set[str]:
+    """Every hook id referenced anywhere in the canonical consumer template."""
+    config = _load_yaml(root / CANONICAL_CONFIG)
+    ids: set[str] = set()
+    if isinstance(config, dict):
+        for repo in config.get("repos", []):
+            for hook in repo.get("hooks", []) if isinstance(repo, dict) else []:
+                if isinstance(hook, dict) and "id" in hook:
+                    ids.add(hook["id"])
+    return ids
+
+
+def _readme_table_names(root: Path) -> set[str]:
+    """Every backticked first-cell name in a scripts/README.md table."""
+    path = root / SCRIPTS_README
+    if not path.is_file():
+        return set()
+    return {
+        m.group(1)
+        for _, line in md.content_lines(path)
+        if (m := _TABLE_NAME.match(line))
+    }
+
+
+def _all_cited_detectors(root: Path) -> set[str]:
+    """Every detector any card's Audit cell cites via a ``/scripts/`` link."""
+    cited: set[str] = set()
+    for rel in _card_paths(root):
+        cited.update(_audit_citations(root / rel))
+    return cited
+
+
+def check_hook_surfaces(root: Path) -> list[Finding]:
+    """The three detector-hook surfaces agree, modulo the local-only set.
+
+    The detector-hook id sets (hooks whose entry is a ``scripts/`` path) must be
+    equal across the published manifest, the canonical consumer template, and
+    the local block, modulo ``LOCAL_ONLY``. Every local detector hook must also
+    have a scripts/README.md validation-table row and be cited by a card.
+    """
+    manifest_raw = _load_yaml(root / MANIFEST)
+    manifest = _scripts_entry_ids(
+        [h for h in manifest_raw if isinstance(h, dict)]
+        if isinstance(manifest_raw, list)
+        else []
+    )
+    local = _scripts_entry_ids(_local_hooks(root))
+    canonical = _canonical_hook_ids(root)
+
+    findings: list[Finding] = []
+
+    def flag(location: str, message: str) -> None:
+        findings.append(Finding(location, None, HOOK_SURFACES, message))
+
+    for name in sorted(manifest - local):
+        flag(LOCAL_CONFIG, f"manifest hook {name} is missing from the local block")
+    for name in sorted(local - manifest - LOCAL_ONLY):
+        flag(
+            LOCAL_CONFIG,
+            f"local hook {name} is not in the manifest and is not declared local-only",
+        )
+    for name in sorted(LOCAL_ONLY - local):
+        flag(LOCAL_CONFIG, f"local-only hook {name} is missing from the local block")
+    for name in sorted(manifest - canonical):
+        flag(
+            CANONICAL_CONFIG,
+            f"manifest hook {name} is missing from the canonical consumer template",
+        )
+
+    table = _readme_table_names(root)
+    cited = _all_cited_detectors(root)
+    for name in sorted(local - table):
+        flag(SCRIPTS_README, f"detector hook {name} is missing from the README table")
+    for name in sorted(local - cited):
+        flag(
+            f"scripts/{name}",
+            f"detector hook {name} is cited by no card's Audit cell",
+        )
+    return findings
+
+
 # --- the walk ---------------------------------------------------------------
 
 
@@ -364,6 +495,7 @@ def audit(root: Path, list_rules: Callable[[str, Path], list[str]]) -> list[Find
     findings.extend(check_card_layout(root))
     findings.extend(check_catalog_order(root))
     findings.extend(check_rule_matrix(root, list_rules))
+    findings.extend(check_hook_surfaces(root))
     return findings
 
 

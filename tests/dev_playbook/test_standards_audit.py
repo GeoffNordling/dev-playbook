@@ -331,6 +331,167 @@ def test_third_party_and_judgment_pointers_are_outside_the_matrix(
     assert sa.check_rule_matrix(repo, fake_list_rules({})) == []
 
 
+# --- standard.hook-surfaces -------------------------------------------------
+
+
+def _manifest(ids: list[str]) -> str:
+    return "".join(
+        f"- id: {i}\n  name: {i}\n  entry: scripts/{i}\n  language: script\n"
+        for i in ids
+    )
+
+
+def _local_block(ids: list[str]) -> str:
+    system = (
+        "      - id: make-check\n        name: make check\n"
+        "        entry: make check\n        language: system\n"
+    )
+    hooks = "".join(
+        f"      - id: {i}\n        name: {i}\n"
+        f"        entry: scripts/{i}\n        language: script\n"
+        for i in ids
+    )
+    return "repos:\n  - repo: local\n    hooks:\n" + system + hooks
+
+
+def _canonical(ids: list[str]) -> str:
+    dev = (
+        "  - repo: https://github.com/GeoffNordling/dev-playbook\n"
+        "    rev: <pinned-sha>\n    hooks:\n"
+        + "".join(f"      - id: {i}\n" for i in ids)
+    )
+    local = (
+        "  - repo: local\n    hooks:\n      - id: make-check\n        name: make check\n"
+        "        entry: make check\n        language: system\n"
+    )
+    return "repos:\n" + dev + local
+
+
+def _readme_table(ids: list[str]) -> str:
+    rows = "".join(f"| `{i}` | s | p |\n" for i in ids)
+    return (
+        "---\ntype: README\ntitle: Scripts\ndescription: s\n---\n\n# Scripts\n\n"
+        "| Script | Standard | Purpose |\n|---|---|---|\n" + rows
+    )
+
+
+def surfaces_repo(
+    tmp_path: Path,
+    *,
+    manifest_ids: list[str],
+    local_ids: list[str],
+    canonical_ids: list[str],
+    readme_ids: list[str],
+    cited_ids: list[str],
+) -> Path:
+    """Assemble a repo with the four hook surfaces and citing cards."""
+    files = {
+        ".pre-commit-hooks.yaml": _manifest(manifest_ids),
+        ".pre-commit-config.yaml": _local_block(local_ids),
+        "standards/build/canonical/.pre-commit-config.yaml": _canonical(canonical_ids),
+        "scripts/README.md": _readme_table(readme_ids),
+    }
+    for i, name in enumerate(cited_ids):
+        files[f"standards/c{i}.md"] = card_citing(f"C{i}", [cite(name)])
+    return make_repo(tmp_path, files)
+
+
+ALL = ["repo-audit", "okf-audit"]
+
+
+def test_agreeing_hook_surfaces_pass(tmp_path: Path) -> None:
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=[*ALL, "standards-audit"],
+        canonical_ids=ALL,
+        readme_ids=[*ALL, "standards-audit"],
+        cited_ids=[*ALL, "standards-audit"],
+    )
+
+    assert sa.check_hook_surfaces(repo) == []
+
+
+def test_manifest_hook_missing_from_local_is_flagged(tmp_path: Path) -> None:
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=["repo-audit", "standards-audit"],  # okf-audit dropped
+        canonical_ids=ALL,
+        readme_ids=[*ALL, "standards-audit"],
+        cited_ids=[*ALL, "standards-audit"],
+    )
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert sa.HOOK_SURFACES in {f.rule for f in findings}
+    assert any("okf-audit" in f.message for f in findings)
+
+
+def test_manifest_hook_missing_from_canonical_is_flagged(tmp_path: Path) -> None:
+    # The skill-audit-style violation: published, but not offered to consumers.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=[*ALL, "standards-audit"],
+        canonical_ids=["repo-audit"],  # okf-audit missing from the template
+        readme_ids=[*ALL, "standards-audit"],
+        cited_ids=[*ALL, "standards-audit"],
+    )
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert any(
+        "okf-audit" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+    )
+
+
+def test_local_only_detector_absent_elsewhere_is_not_flagged(tmp_path: Path) -> None:
+    # standards-audit is local-only: absent from manifest and canonical by design.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=[*ALL, "standards-audit"],
+        canonical_ids=ALL,
+        readme_ids=[*ALL, "standards-audit"],
+        cited_ids=[*ALL, "standards-audit"],
+    )
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert not any("standards-audit" in f.message for f in findings)
+
+
+def test_detector_hook_missing_from_readme_table_is_flagged(tmp_path: Path) -> None:
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=[*ALL, "standards-audit"],
+        canonical_ids=ALL,
+        readme_ids=["repo-audit", "standards-audit"],  # okf-audit missing
+        cited_ids=[*ALL, "standards-audit"],
+    )
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert any("okf-audit" in f.message and "README" in f.message for f in findings)
+
+
+def test_detector_hook_cited_by_no_card_is_flagged(tmp_path: Path) -> None:
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        local_ids=[*ALL, "standards-audit"],
+        canonical_ids=ALL,
+        readme_ids=[*ALL, "standards-audit"],
+        cited_ids=["repo-audit", "standards-audit"],  # okf-audit cited by no card
+    )
+
+    findings = sa.check_hook_surfaces(repo)
+
+    assert any("okf-audit" in f.message and "Audit cell" in f.message for f in findings)
+
+
 def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
     files = ordered_repo_files({"standards/docs/index.md": "# docs\n"})
     files["standards/index.md"] = catalog(
