@@ -26,7 +26,8 @@ types, indexes, and cross-references.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-audit and ref-audit at the **commit gate** in every repo's suite
+  — okf-audit, ref-audit, and repo-audit at the **commit gate** in every
+  repo's suite
 
 ## Adopt
 

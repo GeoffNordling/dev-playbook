@@ -359,6 +359,7 @@ def test_third_party_and_judgment_pointers_are_outside_the_matrix(
 
 
 def _manifest(ids: list[str]) -> str:
+    """A .pre-commit-hooks.yaml manifest listing each id as a scripts/ hook."""
     return "".join(
         f"- id: {i}\n  name: {i}\n  entry: scripts/{i}\n  language: script\n"
         for i in ids
@@ -366,6 +367,7 @@ def _manifest(ids: list[str]) -> str:
 
 
 def _local_block(ids: list[str]) -> str:
+    """A .pre-commit-config.yaml whose repo:local block holds make-check + ids."""
     system = (
         "      - id: make-check\n        name: make check\n"
         "        entry: make check\n        language: system\n"
@@ -379,6 +381,7 @@ def _local_block(ids: list[str]) -> str:
 
 
 def _canonical(ids: list[str]) -> str:
+    """A canonical template whose pinned dev-playbook block lists the given ids."""
     dev = (
         "  - repo: https://github.com/GeoffNordling/dev-playbook\n"
         "    rev: <pinned-sha>\n    hooks:\n"
@@ -392,6 +395,7 @@ def _canonical(ids: list[str]) -> str:
 
 
 def _readme_table(ids: list[str]) -> str:
+    """A scripts/README.md whose validation table has one backticked row per id."""
     rows = "".join(f"| `{i}` | s | p |\n" for i in ids)
     return (
         "---\ntype: README\ntitle: Scripts\ndescription: s\n---\n\n# Scripts\n\n"
