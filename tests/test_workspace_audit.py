@@ -45,6 +45,10 @@ if wrapper:
     payload = entry.get(resource, [] if resource in ("labels", "issues") else {})
 else:
     payload = entry if resource == "settings" else []
+# A resource set to the sentinel "__unreachable__" simulates a non-zero `gh api`
+# exit (rate limit, permissions, transient 5xx) for that one resource.
+if payload == "__unreachable__":
+    sys.exit(1)
 print(json.dumps(payload))
 """
 
@@ -375,6 +379,45 @@ def test_blocked_label_is_its_own_finding(tmp_path: Path) -> None:
     )
 
 
+# --- fetch reachability (a failed labels/issues read must surface loudly) ---
+
+
+def test_labels_fetch_failure_is_surfaced(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {"me/alpha": {"settings": GOOD_SETTINGS, "labels": "__unreachable__"}},
+    )
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "alpha" in result.stdout
+    assert "unreachable" in result.stdout
+
+
+def test_issues_fetch_failure_is_surfaced(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "labels": canonical_label_objects(),
+                "issues": "__unreachable__",
+            }
+        },
+    )
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "alpha" in result.stdout
+    assert "unreachable" in result.stdout
+
+
 # --- issue rules: tuple validity, brief shape, epic shape (full mode) ---
 
 BUILD_BODY = (
@@ -468,6 +511,32 @@ def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
         tmp_path, issue(4, ["category:enhancement"], sub_issues_total=4)
     )
     assert "tracking.epic-shape" not in result.stdout
+
+
+def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
+    # An epic carrying a mode/tests label but no phase label is still malformed:
+    # the category-only invariant holds regardless of triage state.
+    labels = ["category:enhancement", "mode:direct"]
+    result = run_with_issue(tmp_path, issue(12, labels, sub_issues_total=3))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#12" in result.stdout
+    assert "workflow.tuple-valid" not in result.stdout
+
+
+def test_null_sub_issues_summary_does_not_crash(tmp_path: Path) -> None:
+    # GitHub can return sub_issues_summary as JSON null (key present, value null);
+    # a valid leaf so shaped must be classified as a leaf, not crash the audit.
+    one = {
+        "number": 20,
+        "title": "issue 20",
+        "body": BUILD_BODY,
+        "state": "open",
+        "labels": [{"name": name} for name in VALID_DIRECT],
+        "sub_issues_summary": None,
+    }
+    result = run_with_issue(tmp_path, one)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Traceback" not in result.stderr
 
 
 def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:

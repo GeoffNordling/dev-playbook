@@ -197,10 +197,19 @@ def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
     )
 
 
-def gh_api(path: str) -> object | None:
-    """Parsed JSON from ``gh api <path>``, or None when the call fails."""
+def gh_api(path: str, *, paginate: bool = False) -> object | None:
+    """Parsed JSON from ``gh api <path>``, or None when the call fails.
+
+    With ``paginate=True``, ``gh api --paginate`` follows the Link headers and
+    merges every page's JSON array into one array, so a list endpoint with more
+    than a page of results is read in full and the parse is unchanged.
+    """
+    argv = ["gh", "api"]
+    if paginate:
+        argv.append("--paginate")
+    argv.append(path)
     try:
-        result = subprocess.run(["gh", "api", path], capture_output=True, text=True)
+        result = subprocess.run(argv, capture_output=True, text=True)
     except FileNotFoundError as err:
         raise ToolError("gh not found on PATH") from err
     if result.returncode != 0:
@@ -210,6 +219,7 @@ def gh_api(path: str) -> object | None:
 
 
 def fetch_settings(slug: str) -> dict | None:
+    """The repo's GitHub settings object, or None when the read fails."""
     data = gh_api(f"repos/{slug}")
     if data is None:
         return None
@@ -218,7 +228,8 @@ def fetch_settings(slug: str) -> dict | None:
 
 
 def fetch_labels(slug: str) -> list | None:
-    data = gh_api(f"repos/{slug}/labels?per_page=100")
+    """Every label on the repo (all pages), or None when the read fails."""
+    data = gh_api(f"repos/{slug}/labels?per_page=100", paginate=True)
     if data is None:
         return None
     assert isinstance(data, list)
@@ -226,16 +237,16 @@ def fetch_labels(slug: str) -> list | None:
 
 
 def fetch_issues(slug: str) -> list | None:
-    data = gh_api(f"repos/{slug}/issues?per_page=100&state=open")
+    """Every open issue on the repo (all pages), or None when the read fails."""
+    data = gh_api(f"repos/{slug}/issues?per_page=100&state=open", paginate=True)
     if data is None:
         return None
     assert isinstance(data, list)
     return data
 
 
-def check_settings(repo: Path) -> list[Line]:
+def check_settings(repo: Path, slug: str | None) -> list[Line]:
     name = repo.name
-    slug = origin_slug(repo)
     if slug is None:
         return [
             Line(name, REMOTE, "no GitHub origin; settings unchecked", blocking=True)
@@ -291,7 +302,6 @@ def check_labels(name: str, labels: list) -> list[Line]:
                     name, LABEL_SCHEME, f"unexpected label {label_name}", blocking=True
                 )
             )
-    for label_name in sorted(have):
         if "blocked" in label_name.lower():
             lines.append(
                 Line(
@@ -335,10 +345,11 @@ def _epic_findings(name: str, number: int, labels: set[str]) -> list[Line]:
     ]
 
 
-def _tuple_findings(name: str, number: int, labels: set[str]) -> list[Line]:
+def _tuple_findings(
+    name: str, number: int, labels: set[str], scheme: dict[str, set[str]]
+) -> list[Line]:
     """A leaf carries the full four-tuple: one label per dimension, each value in
     the scheme, and the mode↔tests pairings holding."""
-    scheme = values_by_dimension()
     present = {
         dim: sorted(
             label.split(":", 1)[1] for label in labels if label.startswith(f"{dim}:")
@@ -422,36 +433,61 @@ def check_issues(name: str, issues: list) -> list[Line]:
     """Every open post-intake leaf's four-tuple and brief shape; every epic's
     category-only shape. Epic/leaf comes from sub_issues_summary — no per-issue
     API call. Pull requests the issues endpoint returns are skipped."""
+    scheme = values_by_dimension()
     lines: list[Line] = []
     for issue in issues:
         if "pull_request" in issue:
             continue
         labels = {label["name"] for label in issue.get("labels", [])}
-        if not _post_intake(labels):
-            continue
         number = issue["number"]
-        total = issue.get("sub_issues_summary", {}).get("total", 0)
+        # GitHub returns sub_issues_summary as null (not absent) for an issue
+        # with no children, so `or {}` covers both the missing and null cases.
+        total = (issue.get("sub_issues_summary") or {}).get("total", 0)
         if total > 0:
+            # An epic (issue with children) carries a category label only — the
+            # invariant holds regardless of triage state, so the epic branch is
+            # not gated on post-intake (a phase label on an epic is itself a
+            # finding).
             lines.extend(_epic_findings(name, number, labels))
-        else:
-            lines.extend(_tuple_findings(name, number, labels))
+        elif _post_intake(labels):
+            # A leaf is checked only once triaged; untriaged leaves are out.
+            lines.extend(_tuple_findings(name, number, labels, scheme))
             lines.extend(_brief_findings(name, number, labels, issue.get("body") or ""))
     return lines
 
 
-def check_tracking(repo: Path) -> list[Line]:
+def check_tracking(repo: Path, slug: str | None) -> list[Line]:
     """The live-repo label and issue checks, from one labels and one issues
     fetch. Skipped when the repo has no GitHub origin — check_settings has
     already reported that."""
-    slug = origin_slug(repo)
     if slug is None:
         return []
     lines: list[Line] = []
     labels = fetch_labels(slug)
-    if labels is not None:
+    if labels is None:
+        # A failed read is not a clean audit — surface it loudly (mirroring
+        # check_settings) rather than reporting zero findings for the repo.
+        lines.append(
+            Line(
+                repo.name,
+                LABEL_SCHEME,
+                f"labels unreachable via gh api ({slug})",
+                blocking=True,
+            )
+        )
+    else:
         lines.extend(check_labels(repo.name, labels))
     issues = fetch_issues(slug)
-    if issues is not None:
+    if issues is None:
+        lines.append(
+            Line(
+                repo.name,
+                ISSUE_BRIEF_SHAPE,
+                f"issues unreachable via gh api ({slug})",
+                blocking=True,
+            )
+        )
+    else:
         lines.extend(check_issues(repo.name, issues))
     return lines
 
@@ -459,7 +495,10 @@ def check_tracking(repo: Path) -> list[Line]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="workspace-audit",
-        description="Report GitHub settings drift and stale dev-playbook pins.",
+        description=(
+            "Report GitHub settings drift, label/issue/epic/tuple conformance, "
+            "and stale dev-playbook pins across the workspace."
+        ),
     )
     parser.add_argument(
         "--workspace",
@@ -475,7 +514,9 @@ def main(argv: list[str] | None = None) -> int:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--pins-only", action="store_true", help="skip the gh api checks")
     mode.add_argument(
-        "--settings-only", action="store_true", help="skip the pin checks"
+        "--settings-only",
+        action="store_true",
+        help="run only the settings checks (skip pins and the tracking gh-api checks)",
     )
     args = parser.parse_args(argv)
     if args.list_rules:
@@ -492,9 +533,10 @@ def main(argv: list[str] | None = None) -> int:
                 if pin is not None:
                     lines.append(pin)
             if not args.pins_only:
-                lines.extend(check_settings(repo))
-            if not args.pins_only and not args.settings_only:
-                lines.extend(check_tracking(repo))
+                slug = origin_slug(repo)
+                lines.extend(check_settings(repo, slug))
+                if not args.settings_only:
+                    lines.extend(check_tracking(repo, slug))
     except ToolError as err:
         print(f"workspace-audit: {err}", file=sys.stderr)
         return 2
