@@ -509,3 +509,102 @@ def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
     findings = sa.check_catalog_order(repo)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+
+
+# --- standard.doc-coverage --------------------------------------------------
+
+
+def concept(title: str, links: list[str] | None = None) -> str:
+    """A concept doc with OKF frontmatter and optional outbound markdown links."""
+    front = (
+        f"---\ntype: Standard\ntitle: {title}\ndescription: about {title}\n---\n\n"
+        f"# {title}\n\nProse about {title}.\n"
+    )
+    body = "".join(f"\nSee [{t}](/{t}).\n" for t in (links or []))
+    return front + body
+
+
+def card_defining(title: str, define_targets: list[str]) -> str:
+    """A card whose Define cell links the given targets; other cells are none."""
+    define = "\n".join(f"- [{t}](/{t}) — d" for t in define_targets)
+    front = (
+        f"---\ntype: Standard Card\ntitle: {title}\n"
+        f"description: Card for the {title} standard\n---\n\n# {title}\n\nGoverns it.\n"
+    )
+    return (
+        front
+        + f"\n## Define\n\n{define}\n"
+        + "\n## Audit\n\n- none\n\n## Enforce\n\n- none\n\n## Adopt\n\n- none\n"
+    )
+
+
+def test_doc_linked_from_a_card_is_covered(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card_defining("Build", ["standards/build/spec.md"]),
+            "standards/build/spec.md": concept("Spec"),
+        },
+    )
+
+    assert sa.check_doc_coverage(repo) == []
+
+
+def test_doc_reached_only_through_an_index_is_covered(tmp_path: Path) -> None:
+    # The card links the directory index; the index bullet conducts to the doc.
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card_defining("Build", ["standards/build/index.md"]),
+            "standards/build/index.md": (
+                "# build\n\n- [Spec](/standards/build/spec.md) — d\n"
+            ),
+            "standards/build/spec.md": concept("Spec"),
+        },
+    )
+
+    assert sa.check_doc_coverage(repo) == []
+
+
+def test_unreached_concept_doc_is_flagged(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card_defining("Build", ["standards/build/spec.md"]),
+            "standards/build/spec.md": concept("Spec"),
+            "standards/build/orphan.md": concept("Orphan"),
+        },
+    )
+
+    findings = sa.check_doc_coverage(repo)
+
+    assert [f.rule for f in findings] == [sa.DOC_COVERAGE]
+    assert findings[0].file == "standards/build/orphan.md"
+
+
+def test_unreached_readme_is_exempt(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card_defining("Build", ["standards/build/spec.md"]),
+            "standards/build/spec.md": concept("Spec"),
+            "standards/build/README.md": (
+                "---\ntype: README\ntitle: Build\ndescription: m\n---\n\n# Build\n"
+            ),
+        },
+    )
+
+    assert sa.check_doc_coverage(repo) == []
+
+
+def test_unreached_references_mirror_is_exempt(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card_defining("Build", ["standards/build/spec.md"]),
+            "standards/build/spec.md": concept("Spec"),
+            "standards/references/vendored.md": concept("Vendored"),
+        },
+    )
+
+    assert sa.check_doc_coverage(repo) == []
