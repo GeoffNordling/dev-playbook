@@ -38,11 +38,33 @@ otherwise. The `id` (below) is a label only; it never enters the key.
 Renaming an `id` with unchanged content stays a cache hit; changing content
 under the same `id` is a miss.
 
+## The bar
+
+Not every true statement about a repo deserves a judgment. A judgment is
+expensive — an LLM re-runs whenever the bytes of any input change — so it
+is spent only where it buys the most: **targeted semantic glue at a
+high-risk point**, a specific claim about specific files whose silent drift
+would be costly and that no deterministic detector can catch. A judgment is
+never a catch-all, and never a blanket family stretched over a whole
+population of documents — a population is a detector's job, or no one's.
+When in doubt, do not add one.
+
 ## The YAML declaration format
 
-A repo declares its judgments in one or more YAML files. Each file has a
-single top-level key `judgments:` whose value is a list of judgment
-objects:
+A repo declares its judgments in one or more YAML files, **one file per
+claim family**. A claim family is a set of judgments that share a claim
+shape — what is on trial, what it is tried against, and what makes the
+verdict true or false. Each file opens with a header comment defining its
+family's shape, so a reader learns the pattern once and reads the entries
+against it. The families themselves are each repo's own and live in the
+file headers, not in this contract; the uniform rule is only that
+declarations are grouped into families, one file each. Discovery globs all
+declaration files (see [Config and root resolution](#config-and-root-resolution)),
+so adding or splitting a family file needs no registration beyond matching
+the glob.
+
+Each file has a single top-level key `judgments:` whose value is a list of
+judgment objects:
 
 ```yaml
 judgments:
