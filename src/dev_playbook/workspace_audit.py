@@ -33,6 +33,7 @@ import json
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -200,9 +201,12 @@ def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
 def gh_api(path: str, *, paginate: bool = False) -> object | None:
     """Parsed JSON from ``gh api <path>``, or None when the call fails.
 
-    With ``paginate=True``, ``gh api --paginate`` follows the Link headers and
-    merges every page's JSON array into one array, so a list endpoint with more
-    than a page of results is read in full and the parse is unchanged.
+    A non-zero exit or a body that is not JSON (an empty 204, a degraded/HTML
+    error page) yields None for that one path, so a single bad response degrades
+    to an unreachable finding rather than a traceback that blinds the audit to
+    every remaining repo. With ``paginate=True``, ``gh api --paginate`` follows
+    the Link headers and merges every page's JSON array into one array, so a list
+    endpoint with more than a page of results is read in full.
     """
     argv = ["gh", "api"]
     if paginate:
@@ -214,35 +218,42 @@ def gh_api(path: str, *, paginate: bool = False) -> object | None:
         raise ToolError("gh not found on PATH") from err
     if result.returncode != 0:
         return None
-    parsed: object = json.loads(result.stdout)
+    try:
+        parsed: object = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
     return parsed
 
 
 def fetch_settings(slug: str) -> dict | None:
-    """The repo's GitHub settings object, or None when the read fails."""
+    """The repo's GitHub settings object, or None when the read is unusable.
+
+    A failed read or a wrong-shaped response (anything but a JSON object)
+    degrades to None — the unreachable path — so one malformed response cannot
+    abort the whole run.
+    """
     data = gh_api(f"repos/{slug}")
-    if data is None:
-        return None
-    assert isinstance(data, dict)
-    return data
+    return data if isinstance(data, dict) else None
 
 
 def fetch_labels(slug: str) -> list | None:
-    """Every label on the repo (all pages), or None when the read fails."""
+    """Every label on the repo (all pages), or None when the read is unusable.
+
+    A failed read or a wrong-shaped response (anything but a JSON array) degrades
+    to None — the unreachable path.
+    """
     data = gh_api(f"repos/{slug}/labels?per_page=100", paginate=True)
-    if data is None:
-        return None
-    assert isinstance(data, list)
-    return data
+    return data if isinstance(data, list) else None
 
 
 def fetch_issues(slug: str) -> list | None:
-    """Every open issue on the repo (all pages), or None when the read fails."""
+    """Every open issue on the repo (all pages), or None when the read is unusable.
+
+    A failed read or a wrong-shaped response (anything but a JSON array) degrades
+    to None — the unreachable path.
+    """
     data = gh_api(f"repos/{slug}/issues?per_page=100&state=open", paginate=True)
-    if data is None:
-        return None
-    assert isinstance(data, list)
-    return data
+    return data if isinstance(data, list) else None
 
 
 def check_settings(repo: Path, slug: str | None) -> list[Line]:
@@ -456,40 +467,44 @@ def check_issues(name: str, issues: list) -> list[Line]:
     return lines
 
 
+def _fetch_or_report(
+    name: str,
+    slug: str,
+    rule: str,
+    resource: str,
+    fetcher: Callable[[str], list | None],
+    checker: Callable[[str, list], list[Line]],
+) -> list[Line]:
+    """Fetch one live resource and hand it to ``checker``; on an unusable read
+    surface a single unreachable finding under ``rule``.
+
+    A failed read is not a clean audit — surface it loudly (mirroring
+    check_settings) rather than reporting zero findings for the repo.
+    """
+    payload = fetcher(slug)
+    if payload is None:
+        return [
+            Line(
+                name, rule, f"{resource} unreachable via gh api ({slug})", blocking=True
+            )
+        ]
+    return checker(name, payload)
+
+
 def check_tracking(repo: Path, slug: str | None) -> list[Line]:
     """The live-repo label and issue checks, from one labels and one issues
     fetch. Skipped when the repo has no GitHub origin — check_settings has
     already reported that."""
     if slug is None:
         return []
-    lines: list[Line] = []
-    labels = fetch_labels(slug)
-    if labels is None:
-        # A failed read is not a clean audit — surface it loudly (mirroring
-        # check_settings) rather than reporting zero findings for the repo.
-        lines.append(
-            Line(
-                repo.name,
-                LABEL_SCHEME,
-                f"labels unreachable via gh api ({slug})",
-                blocking=True,
-            )
-        )
-    else:
-        lines.extend(check_labels(repo.name, labels))
-    issues = fetch_issues(slug)
-    if issues is None:
-        lines.append(
-            Line(
-                repo.name,
-                ISSUE_BRIEF_SHAPE,
-                f"issues unreachable via gh api ({slug})",
-                blocking=True,
-            )
-        )
-    else:
-        lines.extend(check_issues(repo.name, issues))
-    return lines
+    return [
+        *_fetch_or_report(
+            repo.name, slug, LABEL_SCHEME, "labels", fetch_labels, check_labels
+        ),
+        *_fetch_or_report(
+            repo.name, slug, ISSUE_BRIEF_SHAPE, "issues", fetch_issues, check_issues
+        ),
+    ]
 
 
 def main(argv: list[str] | None = None) -> int:

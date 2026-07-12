@@ -49,6 +49,11 @@ else:
 # exit (rate limit, permissions, transient 5xx) for that one resource.
 if payload == "__unreachable__":
     sys.exit(1)
+# "__badjson__" simulates a zero-exit response whose body is not JSON (204 No
+# Content, a degraded/HTML error body) — the parse, not the exit, is what fails.
+if payload == "__badjson__":
+    sys.stdout.write("{not valid json")
+    sys.exit(0)
 print(json.dumps(payload))
 """
 
@@ -131,7 +136,7 @@ def run(
     )
 
 
-def make_fake_gh(tmp_path: Path, data: dict[str, dict]) -> tuple[Path, Path]:
+def make_fake_gh(tmp_path: Path, data: dict[str, object]) -> tuple[Path, Path]:
     gh_dir = tmp_path / "fakebin"
     gh_dir.mkdir()
     gh = gh_dir / "gh"
@@ -413,6 +418,51 @@ def test_issues_fetch_failure_is_surfaced(tmp_path: Path) -> None:
         },
     )
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "alpha" in result.stdout
+    assert "unreachable" in result.stdout
+
+
+def test_bad_json_response_reports_repo_unreachable_and_run_survives(
+    tmp_path: Path,
+) -> None:
+    # A zero-exit response with a non-JSON body for one repo must not abort the
+    # whole run: that repo is reported unreachable and every later repo is still
+    # audited (alpha sorts first, so beta's finding proves the loop continued).
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    make_workspace_repo(
+        ws, "beta", {"README.md": "# B\n"}, origin="git@github.com:me/beta.git"
+    )
+    drifted = dict(GOOD_SETTINGS, allow_merge_commit=True)
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {"me/alpha": "__badjson__", "me/beta": drifted}
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "Traceback" not in result.stderr
+    assert "alpha: tracking.settings unreachable via gh api (me/alpha)" in result.stdout
+    assert "beta: tracking.settings allow_merge_commit is True (want False)" in (
+        result.stdout
+    )
+    assert result.returncode == 1
+
+
+def test_wrong_shape_response_is_surfaced_not_crash(tmp_path: Path) -> None:
+    # A valid-JSON but wrong-typed response (a dict where the labels list is
+    # expected) must degrade to an unreachable finding, not an AssertionError
+    # traceback that blinds the audit to the rest of the repo.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {"me/alpha": {"settings": GOOD_SETTINGS, "labels": {"wrong": "shape"}}},
+    )
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "Traceback" not in result.stderr
     assert result.returncode == 1
     assert "alpha" in result.stdout
     assert "unreachable" in result.stdout
