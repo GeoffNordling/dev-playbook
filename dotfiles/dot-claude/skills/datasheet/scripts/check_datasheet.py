@@ -34,6 +34,7 @@ class LayerCounter(HTMLParser):
     """Split rendered text into visible/collapsed word counts and collect H2s."""
 
     def __init__(self) -> None:
+        """Start with zeroed counts and no collected headers."""
         super().__init__()
         self.details_depth = 0
         self.in_header = False
@@ -45,6 +46,7 @@ class LayerCounter(HTMLParser):
         self._h2_parts: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list) -> None:
+        """Track entry into a details, header, style, or h2 region."""
         if tag == "details":
             self.details_depth += 1
         elif tag == "header":
@@ -56,6 +58,7 @@ class LayerCounter(HTMLParser):
             self._h2_parts = []
 
     def handle_endtag(self, tag: str) -> None:
+        """Track exit from a region, recording each finished h2's text."""
         if tag == "details" and self.details_depth:
             self.details_depth -= 1
         elif tag == "header":
@@ -67,6 +70,7 @@ class LayerCounter(HTMLParser):
             self.h2s.append(" ".join("".join(self._h2_parts).split()))
 
     def handle_data(self, data: str) -> None:
+        """Count words toward the visible or collapsed budget, skipping styles/headers."""
         if self.in_style:
             return
         if self.in_h2:
@@ -125,6 +129,7 @@ def check(text: str) -> tuple[list[str], LayerCounter]:
 
 
 def main(argv: list[str]) -> int:
+    """Check one datasheet file named on argv and print its findings; return the exit code."""
     if len(argv) != 2:
         print("usage: check_datasheet.py <datasheet.html>", file=sys.stderr)
         return 2

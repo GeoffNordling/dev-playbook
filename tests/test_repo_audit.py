@@ -406,7 +406,7 @@ def test_extra_dev_dependency_allowed_missing_floor_fails(tmp_path: Path) -> Non
 def test_pinned_ruff_selection_enforced(tmp_path: Path) -> None:
     files = python_files()
     files["pyproject.toml"] = files["pyproject.toml"].replace(
-        'select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF"]',
+        'select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF", "D"]',
         'select = ["E", "F"]',
     )
     result = run(make_repo(tmp_path, files))
@@ -426,7 +426,7 @@ def test_additions_to_pyproject_are_free(tmp_path: Path) -> None:
     files = python_files()
     files["pyproject.toml"] += (
         '\n[project.scripts]\nsample = "sample_repo.cli:main"\n'
-        '\n[tool.ruff.lint.per-file-ignores]\n"tests/*" = ["SLF"]\n'
+        "\n[tool.ruff.lint.mccabe]\nmax-complexity = 10\n"
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
