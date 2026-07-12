@@ -313,7 +313,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
                     name, LABEL_SCHEME, f"unexpected label {label_name}", blocking=True
                 )
             )
-        if "blocked" in label_name.lower():
+        if label_name.split(":")[-1].lower() == "blocked":
             lines.append(
                 Line(
                     name,
@@ -334,26 +334,67 @@ def _post_intake(labels: set[str]) -> bool:
 
 
 def _has_heading(body: str, heading: str) -> bool:
-    return (
-        re.search(rf"\*\*\s*{re.escape(heading)}\s*:", body, re.IGNORECASE) is not None
+    """Whether the body carries the bold heading, colon inside or outside the
+    markers — both ``**Heading:**`` and ``**Heading**:`` read as present."""
+    pattern = rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:"
+    return re.search(pattern, body, re.IGNORECASE) is not None
+
+
+def _dimension_values(labels: set[str], dim: str) -> list[str]:
+    """The sorted values a label set carries for one ``<dim>:`` prefix."""
+    return sorted(
+        label.split(":", 1)[1] for label in labels if label.startswith(f"{dim}:")
     )
 
 
-def _epic_findings(name: str, number: int, labels: set[str]) -> list[Line]:
-    """An epic (an issue with children) carries a category label only."""
+def _epic_findings(
+    name: str, number: int, labels: set[str], scheme: dict[str, set[str]]
+) -> list[Line]:
+    """An epic (an issue with children) carries exactly one valid category label
+    and nothing else — no phase/mode/tests, and a present, single, in-scheme
+    category."""
+    lines: list[Line] = []
     offending = sorted(
         label for label in labels if label.startswith(("phase:", "mode:", "tests:"))
     )
-    if not offending:
-        return []
-    return [
-        Line(
-            name,
-            EPIC_SHAPE,
-            f"#{number} epic carries {offending}; an epic carries a category label only",
-            blocking=True,
+    if offending:
+        lines.append(
+            Line(
+                name,
+                EPIC_SHAPE,
+                f"#{number} epic carries {offending}; an epic carries a category label only",
+                blocking=True,
+            )
         )
-    ]
+    categories = _dimension_values(labels, "category")
+    if not categories:
+        lines.append(
+            Line(
+                name,
+                EPIC_SHAPE,
+                f"#{number} epic missing category label",
+                blocking=True,
+            )
+        )
+    elif len(categories) > 1:
+        lines.append(
+            Line(
+                name,
+                EPIC_SHAPE,
+                f"#{number} epic has multiple category labels: {categories}",
+                blocking=True,
+            )
+        )
+    elif categories[0] not in scheme["category"]:
+        lines.append(
+            Line(
+                name,
+                EPIC_SHAPE,
+                f"#{number} epic category:{categories[0]} is not a scheme value",
+                blocking=True,
+            )
+        )
+    return lines
 
 
 def _tuple_findings(
@@ -361,12 +402,7 @@ def _tuple_findings(
 ) -> list[Line]:
     """A leaf carries the full four-tuple: one label per dimension, each value in
     the scheme, and the mode↔tests pairings holding."""
-    present = {
-        dim: sorted(
-            label.split(":", 1)[1] for label in labels if label.startswith(f"{dim}:")
-        )
-        for dim in TUPLE_DIMENSIONS
-    }
+    present = {dim: _dimension_values(labels, dim) for dim in TUPLE_DIMENSIONS}
     lines: list[Line] = []
     for dim in TUPLE_DIMENSIONS:
         vals = present[dim]
@@ -417,7 +453,7 @@ def _tuple_findings(
 
 def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list[Line]:
     """A leaf's body carries its mode's required brief headings."""
-    modes = [label.split(":", 1)[1] for label in labels if label.startswith("mode:")]
+    modes = _dimension_values(labels, "mode")
     if len(modes) != 1:
         return []  # a missing or ambiguous mode is tuple-valid's finding
     mode = modes[0]
@@ -449,7 +485,9 @@ def check_issues(name: str, issues: list) -> list[Line]:
     for issue in issues:
         if "pull_request" in issue:
             continue
-        labels = {label["name"] for label in issue.get("labels", [])}
+        # GitHub always returns a labels array (empty at worst); a missing key
+        # is a malformed response, so index it and let the KeyError surface.
+        labels = {label["name"] for label in issue["labels"]}
         number = issue["number"]
         # GitHub returns sub_issues_summary as null (not absent) for an issue
         # with no children, so `or {}` covers both the missing and null cases.
@@ -459,7 +497,7 @@ def check_issues(name: str, issues: list) -> list[Line]:
             # invariant holds regardless of triage state, so the epic branch is
             # not gated on post-intake (a phase label on an epic is itself a
             # finding).
-            lines.extend(_epic_findings(name, number, labels))
+            lines.extend(_epic_findings(name, number, labels, scheme))
         elif _post_intake(labels):
             # A leaf is checked only once triaged; untriaged leaves are out.
             lines.extend(_tuple_findings(name, number, labels, scheme))

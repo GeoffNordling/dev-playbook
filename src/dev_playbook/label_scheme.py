@@ -30,6 +30,7 @@ class Dimension:
 
 
 def _dimensions() -> list[Dimension]:
+    """The scheme's dimensions, parsed from the JSON data file."""
     raw = json.loads(SCHEME_PATH.read_text(encoding="utf-8"))
     return [
         Dimension(

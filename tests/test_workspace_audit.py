@@ -384,6 +384,22 @@ def test_blocked_label_is_its_own_finding(tmp_path: Path) -> None:
     )
 
 
+def test_label_containing_blocked_substring_is_not_a_blocked_finding(
+    tmp_path: Path,
+) -> None:
+    # The rule names a blocked *state* — the value token equal to "blocked".
+    # Names that merely contain the substring (a negation, a compound) are not
+    # blocked states and must not draw the no-blocked-label rule.
+    labels = [
+        *canonical_label_objects(),
+        {"name": "status:unblocked", "color": "cccccc", "description": ""},
+        {"name": "type:blocked-by-vendor", "color": "cccccc", "description": ""},
+    ]
+    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
+    assert "tracking.no-blocked-label" not in result.stdout
+
+
 # --- fetch reachability (a failed labels/issues read must surface loudly) ---
 
 
@@ -486,6 +502,7 @@ def issue(
     sub_issues_total: int = 0,
     pull_request: bool = False,
 ) -> dict:
+    """One issue object shaped as the GitHub issues endpoint returns it."""
     obj = {
         "number": number,
         "title": f"issue {number}",
@@ -500,6 +517,7 @@ def issue(
 
 
 def run_with_issue(tmp_path: Path, one: dict) -> subprocess.CompletedProcess:
+    """Run a full-mode audit over a one-repo workspace carrying the one issue."""
     ws, gh_dir, gh_data = full_mode_repo(
         tmp_path, labels=canonical_label_objects(), issues=[one]
     )
@@ -573,6 +591,29 @@ def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
     assert "workflow.tuple-valid" not in result.stdout
 
 
+def test_epic_without_category_label_is_a_finding(tmp_path: Path) -> None:
+    # "An epic carries a category label only" is a positive invariant too: an
+    # epic with no category label at all is malformed.
+    result = run_with_issue(tmp_path, issue(13, [], sub_issues_total=2))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#13" in result.stdout
+
+
+def test_epic_with_two_category_labels_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:enhancement", "category:bug"]
+    result = run_with_issue(tmp_path, issue(14, labels, sub_issues_total=2))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#14" in result.stdout
+
+
+def test_epic_with_invalid_category_value_is_a_finding(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(15, ["category:frobnicate"], sub_issues_total=2)
+    )
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#15" in result.stdout
+
+
 def test_null_sub_issues_summary_does_not_crash(tmp_path: Path) -> None:
     # GitHub can return sub_issues_summary as JSON null (key present, value null);
     # a valid leaf so shaped must be classified as a leaf, not crash the audit.
@@ -589,6 +630,24 @@ def test_null_sub_issues_summary_does_not_crash(tmp_path: Path) -> None:
     assert "Traceback" not in result.stderr
 
 
+def test_issue_missing_labels_key_is_surfaced_not_silently_skipped(
+    tmp_path: Path,
+) -> None:
+    # GitHub's issues endpoint always returns a labels array; an issue with no
+    # labels key at all is a malformed response. It must surface loudly, not be
+    # papered over with an empty-list default that silently skips the issue.
+    one = {
+        "number": 30,
+        "title": "issue 30",
+        "body": "",
+        "state": "open",
+        "sub_issues_summary": {"total": 0},
+    }
+    result = run_with_issue(tmp_path, one)
+    assert "Traceback" in result.stderr
+    assert "KeyError" in result.stderr
+
+
 def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     body = BUILD_BODY.replace("**Out of scope:** o\n", "")
     result = run_with_issue(tmp_path, issue(5, VALID_DIRECT, body=body))
@@ -602,6 +661,17 @@ def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(6, labels, body=body))
     assert "alpha: tracking.issue-brief-shape" in result.stdout
     assert "Deliverable" in result.stdout
+
+
+def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
+    # `**Summary**:` (colon after the close markers) reads as a present heading
+    # to a human; it must not draw a false brief-shape finding.
+    body = (
+        "**Summary**: s\n\n**Current behavior**: c\n\n**Desired behavior**: d\n\n"
+        "**Key interfaces**: none\n\n**Acceptance criteria**: a\n\n**Out of scope**: o\n"
+    )
+    result = run_with_issue(tmp_path, issue(31, VALID_DIRECT, body=body))
+    assert "tracking.issue-brief-shape" not in result.stdout
 
 
 def test_pull_requests_are_ignored(tmp_path: Path) -> None:
