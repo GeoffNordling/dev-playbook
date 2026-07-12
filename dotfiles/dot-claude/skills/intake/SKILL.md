@@ -93,14 +93,16 @@ When intake produced more than one issue, set the native relationships per [issu
 Mark each ordered slice **blocked-by** its predecessor:
 
 ```bash
-blocker_id=$(gh api repos/{owner}/{repo}/issues/<blocker#> --jq .id)
+gh api repos/{owner}/{repo}/issues/<blocker#> --jq .id > "$TMPDIR/blocker_id"
+blocker_id=$(cat "$TMPDIR/blocker_id")
 gh api --method POST repos/{owner}/{repo}/issues/<dependent#>/dependencies/blocked_by -F issue_id="$blocker_id"
 ```
 
 When §2 decided on an epic, also add each slice as a **sub-issue** of it:
 
 ```bash
-child_id=$(gh api repos/{owner}/{repo}/issues/<child#> --jq .id)
+gh api repos/{owner}/{repo}/issues/<child#> --jq .id > "$TMPDIR/child_id"
+child_id=$(cat "$TMPDIR/child_id")
 gh api --method POST repos/{owner}/{repo}/issues/<epic#>/sub_issues -F sub_issue_id="$child_id"
 ```
 
