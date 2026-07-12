@@ -62,7 +62,7 @@ pattern.
 | decisions-audit | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
 | judgments-audit | judgment declarations | hook pattern |
-| standards-audit | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces, doc coverage | hook pattern (dev-playbook only) |
+| standards-audit | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |
 | shfmt | shell formatting | hook pattern |
 | skill-audit | skill bundles (skill-authoring repos) | hook pattern |

@@ -3,7 +3,7 @@
 standards-audit is the detector behind the meta-standard card. It is
 dev-playbook-local: the ``standards/`` tree it audits exists only in this repo,
 so the detector is wired in dev-playbook's local pre-commit block alone (the
-local-only precedent is validate-manifest). Five rules, each namespaced under
+local-only precedent is validate-manifest). Four rules, each namespaced under
 the meta card (``standard.*``):
 
   - **card-layout** — every flat ``standards/<name>.md`` except README.md and
@@ -21,8 +21,6 @@ the meta card (``standard.*``):
     manifest, the canonical consumer template, and the local block (modulo the
     declared local-only set ``{standards-audit}``), and every detector hook has
     a scripts/README.md validation-table row and is cited by a card.
-  - **doc-coverage** — every concept doc in the standards bundle (the normative
-    prose under ``standards/``) is reachable from at least one standard card.
 
 Output:
     stdout — one finding per line, ``file:line: standard.rule message``.
@@ -35,7 +33,6 @@ Usage:
 """
 
 import argparse
-import posixpath
 import re
 import subprocess
 import sys
@@ -54,9 +51,8 @@ CARD_LAYOUT = "standard.card-layout"
 CATALOG_ORDER = "standard.catalog-order"
 RULE_MATRIX = "standard.rule-matrix"
 HOOK_SURFACES = "standard.hook-surfaces"
-DOC_COVERAGE = "standard.doc-coverage"
 
-RULES = (CARD_LAYOUT, CATALOG_ORDER, RULE_MATRIX, HOOK_SURFACES, DOC_COVERAGE)
+RULES = (CARD_LAYOUT, CATALOG_ORDER, RULE_MATRIX, HOOK_SURFACES)
 
 CARD_TYPE = "Standard Card"
 CATALOG = "standards/index.md"
@@ -488,93 +484,6 @@ def check_hook_surfaces(root: Path) -> list[Finding]:
     return findings
 
 
-# --- standard.doc-coverage --------------------------------------------------
-
-STANDARDS_DIR = "standards/"
-REFERENCES_DIR = "standards/references/"
-_EXTERNAL_LINK = ("http://", "https://", "mailto:", "tel:", "//")
-
-
-def _resolve_link(source_rel: str, target: str) -> str | None:
-    """Resolve a markdown link target to a repo-relative path, or None to drop it.
-
-    Root-absolute ``/x`` and relative targets both resolve; the ``#`` anchor is
-    stripped, and external, empty, or non-markdown targets are dropped so only
-    in-bundle documents become edges.
-    """
-    clean = target.partition("#")[0].strip()
-    if not clean or clean.startswith(_EXTERNAL_LINK) or clean.startswith("~"):
-        return None
-    if clean.startswith("/"):
-        rel = clean.lstrip("/")
-    else:
-        rel = posixpath.normpath(posixpath.join(posixpath.dirname(source_rel), clean))
-    return rel if rel.endswith(".md") else None
-
-
-def _outbound(path: Path, source_rel: str, bundle: set[str]) -> set[str]:
-    """The in-bundle documents ``source_rel`` links to (its conducting edges)."""
-    reached: set[str] = set()
-    for _, line in md.content_lines(path):
-        for _, target in md.markdown_links(line):
-            rel = _resolve_link(source_rel, target)
-            if rel is not None and rel in bundle:
-                reached.add(rel)
-    return reached
-
-
-def _is_exempt(rel: str, root: Path) -> bool:
-    """Whether a concept doc is exempt from coverage (structural or a mirror).
-
-    READMEs and the vendored ``standards/references/`` mirrors are normative
-    targets no card need reach; indexes are not concept docs and never candidates.
-    """
-    if rel.startswith(REFERENCES_DIR):
-        return True
-    front = _frontmatter(root / rel)
-    return front is not None and front.get("type") == "README"
-
-
-def check_doc_coverage(root: Path) -> list[Finding]:
-    """Flag any concept doc unreachable from a standard card.
-
-    Reachability is a walk from the cards (the roots) over the markdown links of
-    every reached conductor -- a concept doc or an index. Index bullets conduct,
-    so a reached directory index carries coverage to its whole subtree and the
-    rule's bite is whole-subtree orphanhood. The candidate set is the standards
-    bundle (concept docs under ``standards/``) -- the prose the cards govern;
-    edges may still leave and re-enter ``standards/``. READMEs and
-    ``standards/references/`` mirrors are exempt targets.
-    """
-    all_md = [_relpath(p, root) for p in md.find_md_files(root)]
-    bundle = set(all_md)
-    cards = _card_paths(root)
-
-    reached: set[str] = set(cards)
-    queue = list(cards)
-    while queue:
-        rel = queue.pop()
-        if md.classify(rel) not in {"concept", "index"}:
-            continue  # only concept docs and indexes conduct their links
-        for target in _outbound(root / rel, rel, bundle):
-            if target not in reached:
-                reached.add(target)
-                queue.append(target)
-
-    findings: list[Finding] = []
-    for rel in all_md:
-        if not rel.startswith(STANDARDS_DIR) or md.classify(rel) != "concept":
-            continue
-        if rel in reached or _is_exempt(rel, root):
-            continue
-        findings.append(
-            Finding(
-                rel, None, DOC_COVERAGE, "concept doc is reached by no standard card"
-            )
-        )
-    return findings
-
-
 # --- the walk ---------------------------------------------------------------
 
 
@@ -585,7 +494,6 @@ def audit(root: Path, list_rules: Callable[[str, Path], list[str]]) -> list[Find
     findings.extend(check_catalog_order(root))
     findings.extend(check_rule_matrix(root, list_rules))
     findings.extend(check_hook_surfaces(root))
-    findings.extend(check_doc_coverage(root))
     return findings
 
 

@@ -3,8 +3,8 @@
 
 Thin shim over dev_playbook.standards_audit.main: it puts the checkout's ``src/``
 on ``sys.path`` and calls the module, which audits the ``standards/`` tree
-against the five meta-standard rules (card-layout, catalog-order, rule-matrix,
-hook-surfaces, doc-coverage), printing each finding as a GNU finding line
+against the four meta-standard rules (card-layout, catalog-order, rule-matrix,
+hook-surfaces), printing each finding as a GNU finding line
 (``file:line: standard.rule message``) and exiting nonzero if any.
 ``--list-rules`` prints the rule ids and exits 0. dev-playbook-local: the
 ``standards/`` tree it audits exists only here, so it is wired in the local

@@ -16,9 +16,9 @@ kept honest.
 
 ## Audit
 
-- [standards-audit](/scripts/standards-audit) — the meta-standard's five
+- [standards-audit](/scripts/standards-audit) — the meta-standard's four
   deterministic rules: card layout, catalog order, the bidirectional
-  card↔rule matrix, hook-surface agreement, and doc coverage
+  card↔rule matrix, and hook-surface agreement
 
 ## Enforce
 
