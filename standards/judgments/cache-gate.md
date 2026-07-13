@@ -10,7 +10,7 @@ Every judgment is a **pytest** whose body does only a deterministic,
 offline cache check — no LLM, no network, no API key:
 
 ```python
-from judgments.pytest_support import assert_judgment_cached
+from dev_playbook.judgments.pytest_support import assert_judgment_cached
 
 
 def test_errors_exhaustive():
@@ -36,8 +36,8 @@ enumerating ids through the loader:
 
 ```python
 import pytest
-from judgments.loader import load, resolve_root
-from judgments.pytest_support import assert_judgment_cached
+from dev_playbook.judgments.loader import load, resolve_root
+from dev_playbook.judgments.pytest_support import assert_judgment_cached
 
 
 @pytest.mark.parametrize("jid", sorted(d.id for d in load(resolve_root())))

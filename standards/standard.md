@@ -19,6 +19,10 @@ kept honest.
 - [standards-audit](/scripts/standards-audit) — the meta-standard's four
   deterministic rules: card layout, catalog order, the bidirectional
   card↔rule matrix, and hook-surface agreement
+- [judgments/standard-cards.yaml](/judgments/standard-cards.yaml) — the
+  card-honesty judgments, one per card: an LLM judge rules whether each
+  card's pointers are truthful, the semantic check the deterministic rules
+  cannot make
 
 ## Enforce
 

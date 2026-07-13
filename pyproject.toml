@@ -21,14 +21,12 @@ requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
 # Workspace-wide tooling that resolves from the repo root reads this table.
-# Judgment gate suspended for the duration of epic #142: its slices edit the
-# watched cards continuously, and the content-addressed cache would force a
-# judge-fleet re-run on every merge. The epic's final slice re-declares the
-# suite against the finished state and restores the real path
-# (judgments/doc-consistency.yaml stays on disk as drafting reference).
-# This glob deliberately matches nothing.
+# The judgment gate collects every declaration in the judgments/*.yaml
+# claim-family files; each passes iff its exact content-key is already cached
+# (fill the cache with a run-judgments fleet run after editing a declaration or
+# a file it puts on trial).
 [tool.judgments]
-paths = ["judgments/suspended-epic-142/*.yaml"]
+paths = ["judgments/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

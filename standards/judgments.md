@@ -16,9 +16,11 @@ are validated and kept from drifting as the underlying files change.
 
 ## Audit
 
-- [judgments-audit](/scripts/judgments-audit) — declaration validity
-- [judgments-run](/scripts/judgments-run) — plans, renders, and records
-  verdicts over a repo's declarations
+- [judgments-audit](/scripts/judgments-audit) — checks declaration shape,
+  deterministically
+- [judgments-run](/scripts/judgments-run) — the deterministic engine of the
+  semantic-detection workflow: plans the docket, renders the judge prompts,
+  and records the verdicts
 
 ## Enforce
 

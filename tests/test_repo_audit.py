@@ -669,7 +669,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "build.required-file" in ids
     assert "build.canonical-block" in ids
     assert "claude-code.standards-block" in ids
-    assert "claude-code.skills-hook" in ids
+    assert "build.skills-hook" in ids
     assert "docs.doc-shape" in ids
     assert all(
         rule.split(".")[0] in {"build", "claude-code", "docs"} for rule in ids
