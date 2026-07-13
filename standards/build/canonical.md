@@ -45,4 +45,6 @@ replaces the published block with its dogfood block
 One version set for the whole workspace: the Python interpreter
 (`.python-version`), ruff, mypy, pytest, and every hook `rev` are defined
 once, in the canonical artifacts — latest stable, identical in all repos,
-bumped deliberately. Exact resolutions live in each repo's `uv.lock`.
+bumped deliberately; that one floor reaches each standalone script's PEP 723
+`requires-python`, not just `pyproject.toml`. Exact resolutions live in each
+repo's `uv.lock`.

@@ -44,12 +44,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from dev_playbook import gitrepo, md, pyast  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
-# Every rule id this detector can emit. Most answer the build card; the
-# CLAUDE.md ## Standards block and the skills-hook check answer the claude-code
-# card, and the README/CONTEXT doc-shape check answers the docs card. Each id is
-# a module-level constant so every emission site references the constant, never a
-# raw literal, and RULES (what --list-rules prints) cannot drift from what the
-# detector actually emits.
+# Every rule id this detector can emit. Most answer the build card -- including
+# the skills-hook check, which asserts a build artifact (the pre-commit config)
+# carries the skill-audit hook. The CLAUDE.md ## Standards block answers the
+# claude-code card, and the README/CONTEXT doc-shape check answers the docs card.
+# Each id is a module-level constant so every emission site references the
+# constant, never a raw literal, and RULES (what --list-rules prints) cannot
+# drift from what the detector actually emits.
 REQUIRED_FILE = "build.required-file"
 LAYER_SHAPE = "build.layer-shape"
 FORBIDDEN = "build.forbidden"
@@ -60,8 +61,8 @@ NAME_MAPPING = "build.name-mapping"
 SCRIPT_SHEBANG = "build.script-shebang"
 SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
+SKILLS_HOOK = "build.skills-hook"
 STANDARDS_BLOCK = "claude-code.standards-block"
-SKILLS_HOOK = "claude-code.skills-hook"
 DOC_SHAPE = "docs.doc-shape"
 
 RULES = (
@@ -75,8 +76,8 @@ RULES = (
     SCRIPT_SHEBANG,
     SCRIPT_PYTHON,
     SELF_AUDIT,
-    STANDARDS_BLOCK,
     SKILLS_HOOK,
+    STANDARDS_BLOCK,
     DOC_SHAPE,
 )
 

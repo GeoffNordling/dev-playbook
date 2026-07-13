@@ -75,7 +75,8 @@ For Python files in `scripts/`:
 
 - **Standalone script** (imports nothing from the repo): shebang
   `#!/usr/bin/env -S uv run --script`, dependencies declared in a PEP 723
-  inline block. Runs from a bare clone with nothing installed — what
+  inline block whose `requires-python` states the floor matching
+  `.python-version`. Runs from a bare clone with nothing installed — what
   pre-commit hook entries require.
 - **Script backed by the package**: expose it as an entry point (below)
   instead of path-hacking imports. A file in `scripts/` then exists only
