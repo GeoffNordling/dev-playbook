@@ -58,8 +58,7 @@ normal review path. As a `CLAUDE.md` it is already a registry member
 configuration, so it holds to the agent-facing voice — second person, the
 human named as `user` ([conventions.md](/standards/prose/conventions.md)).
 
-Because the harness reads it as raw configuration rather than rendered prose,
-the global file `SHALL` be a **well-formed XML document** with exactly two
+The global file `SHALL` be a **well-formed XML document** with exactly two
 top-level elements:
 
 - `<principles>` — dispositional stances, how to carry yourself. Each is a
@@ -67,7 +66,6 @@ top-level elements:
 - `<behaviors>` — operating rules for named situations, what to do. Each is a
   verb-first child element (`<git-commit>`, `<sandbox>`, …).
 
-The distinction is disposition versus situation: a principle colors every
-response; a behavior fires when its situation arises. Well-formedness and the
+Well-formedness and the
 two-element shape are checked deterministically, but only in dev-playbook,
 where the source file lives — other repos have no global file to check.
