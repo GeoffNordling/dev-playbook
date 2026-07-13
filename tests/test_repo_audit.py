@@ -280,6 +280,107 @@ def test_claude_md_prose_around_standards_block_passes(tmp_path: Path) -> None:
     assert run(make_repo(tmp_path, files)).returncode == 0
 
 
+# --- CLAUDE.md agent-facing voice ---
+
+# A well-formed global CLAUDE.md source: two top-level elements, no voice tokens.
+GLOBAL_VALID = (
+    "<principles>\n  <be-terse>Be terse.</be-terse>\n</principles>\n"
+    "<behaviors>\n  <sandbox>You run sandboxed.</sandbox>\n</behaviors>\n"
+)
+
+
+def test_claude_md_bare_human_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["CLAUDE.md"] += "\n## Rules\n\n- Ask the human before deleting.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "CLAUDE.md: claude-code.agent-facing-voice" in result.stdout
+    assert "'human'" in result.stdout
+
+
+def test_claude_md_first_person_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["CLAUDE.md"] += "\n## Rules\n\n- I want my tests to pass.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "claude-code.agent-facing-voice" in result.stdout
+    assert "'I'" in result.stdout
+    assert "'my'" in result.stdout
+
+
+def test_claude_md_voice_guards_compounds(tmp_path: Path) -> None:
+    # "human-readable" and "I/O" are not actor-noun / first-person violations.
+    files = base_files()
+    files["CLAUDE.md"] += "\n## Rules\n\n- Produce human-readable I/O.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_nested_claude_md_voice_checked(tmp_path: Path) -> None:
+    files = base_files()
+    files["sub/CLAUDE.md"] = "Tell the human to run it.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "sub/CLAUDE.md: claude-code.agent-facing-voice" in result.stdout
+
+
+# --- global CLAUDE.md structure (dev-playbook only) ---
+
+
+def test_global_claude_valid_passes(tmp_path: Path) -> None:
+    files = base_files()
+    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_global_claude_wrong_shape_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "<extra>nope</extra>\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-shape"
+        in result.stdout
+    )
+
+
+def test_global_claude_malformed_xml_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["dotfiles/dot-claude/CLAUDE.md"] = (
+        "<principles><unclosed></principles>\n<behaviors></behaviors>\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-wellformed"
+        in result.stdout
+    )
+
+
+def test_global_claude_backticked_placeholder_passes(tmp_path: Path) -> None:
+    # Inline-code spans are masked before the parse, so a backticked `<repo>`
+    # token does not read as an unclosed tag.
+    files = base_files()
+    files["dotfiles/dot-claude/CLAUDE.md"] = (
+        "<principles>\n  <be-terse>Prefer `<repo>` over guessing.</be-terse>\n"
+        "</principles>\n<behaviors>\n  <sandbox>You run sandboxed.</sandbox>\n"
+        "</behaviors>\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_global_claude_absent_gates_the_check(tmp_path: Path) -> None:
+    # Owning-repo gate: a repo with no global source — even one carrying an
+    # ordinary nested CLAUDE.md — emits no global-claude-* finding.
+    files = base_files()
+    files["sub/CLAUDE.md"] = "Operate carefully.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "global-claude" not in result.stdout
+
+
 def test_context_md_with_all_sections_passes(tmp_path: Path) -> None:
     files = base_files()
     files["CONTEXT.md"] = (

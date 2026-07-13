@@ -22,10 +22,16 @@ from ordinary files, and what each may contain.
 ## Audit
 
 - [repo-audit](/scripts/repo-audit) — CLAUDE.md presence and its canonical
-  standards block
+  standards block; the agent-facing voice of every CLAUDE.md, root to global
+  (`claude-code.agent-facing-voice`); and, in dev-playbook only, the global
+  CLAUDE.md source's two-element XML shape and well-formedness
+  (`claude-code.global-claude-shape`, `claude-code.global-claude-wellformed`)
 - [skill-audit](/scripts/skill-audit) — skill bundles in
   skill-authoring repos, plus the `claude-code.skill-mirror`
   correspondence between authored and installed skills (dev-playbook)
+- [judgments/claude-code.yaml](/judgments/claude-code.yaml) — the LLM-judged
+  claim that the root and global CLAUDE.md genuinely read as agent-facing
+  voice, the semantic check the token-level rule cannot make
 
 ## Enforce
 

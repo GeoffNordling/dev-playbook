@@ -36,6 +36,7 @@ import os
 import re
 import sys
 import tomllib
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -63,6 +64,9 @@ SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
 SKILLS_HOOK = "build.skills-hook"
 STANDARDS_BLOCK = "claude-code.standards-block"
+AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
+GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
+GLOBAL_CLAUDE_WELLFORMED = "claude-code.global-claude-wellformed"
 DOC_SHAPE = "docs.doc-shape"
 
 RULES = (
@@ -78,6 +82,9 @@ RULES = (
     SELF_AUDIT,
     SKILLS_HOOK,
     STANDARDS_BLOCK,
+    AGENT_FACING_VOICE,
+    GLOBAL_CLAUDE_SHAPE,
+    GLOBAL_CLAUDE_WELLFORMED,
     DOC_SHAPE,
 )
 
@@ -124,6 +131,22 @@ CONTEXT_SECTIONS = (
     "## Example dialogue",
     "## Flagged ambiguities",
 )
+
+# CLAUDE.md is agent-facing configuration at every level, so it names the human
+# actor "user" and never speaks in first person. These match the actor-noun
+# "human" (but not the "human-readable" compound) and the first-person "I"/"my"
+# (but not the "I/O" abbreviation); inline code and fenced blocks are stripped
+# before matching so a backticked token or example is not mistaken for prose.
+VOICE_PATTERNS = (
+    ("human", re.compile(r"\bhuman\b(?!-)", re.IGNORECASE)),
+    ("I", re.compile(r"\bI\b(?!/O)")),
+    ("my", re.compile(r"\b[Mm]y\b")),
+)
+
+# The dev-playbook global CLAUDE.md source, Stow-symlinked to ~/.claude/. Its
+# presence is the marker that gates the global-file structural checks to the
+# one repo that owns the file (claude-content.md — The global file).
+GLOBAL_CLAUDE = "dotfiles/dot-claude/CLAUDE.md"
 
 
 class ToolError(Exception):
@@ -577,6 +600,62 @@ def check_claude_standards(root: Path) -> list[Finding]:
     return []
 
 
+def check_agent_facing_voice(root: Path) -> list[Finding]:
+    """Every CLAUDE.md — root, nested, and the dev-playbook global source — is
+    agent-facing configuration, so it names the human "user" and never speaks in
+    first person (claude-content.md, conventions.md). Runs in every repo but
+    inspects only that repo's own CLAUDE.md files. Inline code and fenced blocks
+    are skipped so a backticked token or example does not read as prose.
+    """
+    findings = []
+    for path in md.find_md_files(root):
+        if path.name != "CLAUDE.md":
+            continue
+        rel = path.relative_to(root).as_posix()
+        for num, line in md.content_lines(path):
+            masked = md.INLINE_CODE_PATTERN.sub("", line)
+            for token, pattern in VOICE_PATTERNS:
+                if pattern.search(masked):
+                    findings.append(
+                        Finding(
+                            rel,
+                            AGENT_FACING_VOICE,
+                            f"line {num}: name the human 'user', not '{token}'",
+                        )
+                    )
+    return findings
+
+
+def check_global_claude(root: Path) -> list[Finding]:
+    """The global CLAUDE.md source is a well-formed XML document with exactly two
+    top-level elements, <principles> then <behaviors> (claude-content.md — The
+    global file). Gated on the source file's presence, so it runs only in the
+    repo that owns it; other repos have no global file. Inline-code spans are
+    masked before the parse so backticked placeholders like the repo token do not
+    read as unclosed tags. The two elements are wrapped in a synthetic root
+    because a two-element document has no single root of its own.
+    """
+    path = root / GLOBAL_CLAUDE
+    if not path.is_file():
+        return []
+    masked = md.INLINE_CODE_PATTERN.sub("", path.read_text(encoding="utf-8"))
+    try:
+        document = ET.fromstring(f"<claude-md>{masked}</claude-md>")
+    except ET.ParseError as err:
+        return [Finding(GLOBAL_CLAUDE, GLOBAL_CLAUDE_WELLFORMED, f"not well-formed XML: {err}")]
+    children = [child.tag for child in document]
+    if children != ["principles", "behaviors"]:
+        return [
+            Finding(
+                GLOBAL_CLAUDE,
+                GLOBAL_CLAUDE_SHAPE,
+                "top-level elements must be exactly <principles> then <behaviors>, "
+                f"got {children}",
+            )
+        ]
+    return []
+
+
 def check_doc_shapes(root: Path) -> list[Finding]:
     findings = []
     readme = root / "README.md"
@@ -750,6 +829,8 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_src_package(root, layers, files, repo_name),
         *check_cdk(root, layers, repo_name),
         *check_claude_standards(root),
+        *check_agent_facing_voice(root),
+        *check_global_claude(root),
         *check_doc_shapes(root),
         *check_scripts(root, layers, python_files),
         *check_skills_hook(root),
