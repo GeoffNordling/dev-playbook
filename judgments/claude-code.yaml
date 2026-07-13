@@ -1,0 +1,22 @@
+# Voice conformance for the Claude Code agent-facing files: a CLAUDE.md is on
+# trial for genuinely speaking in the voice its standard requires — addressing
+# the executing agent in the second person, naming the human "user", and reading
+# as operating instructions rather than a third-person description of the system.
+# Evidence is the file(s) on trial; reference is the voice standard they answer
+# to. The deterministic detector bans the tokens "human"/"I"/"my", but only a
+# reader can tell whether the prose is actually agent-facing or merely token-clean
+# declarative third person — that semantic gap is what this family guards.
+# See standards/judgments/.
+judgments:
+  - id: claude-md-agent-facing-voice
+    claim: |
+      The repo-root CLAUDE.md and the global CLAUDE.md source
+      (dotfiles/dot-claude/CLAUDE.md) are written in the agent-facing voice
+      their standard requires: each addresses the executing agent in the second
+      person, names the human "user" (never "human", nor first-person "I"/"my"),
+      and reads as operating instructions to the agent rather than a third-person
+      description of the system written for a human reader.
+    evidence:  [CLAUDE.md, dotfiles/dot-claude/CLAUDE.md]
+    reference: [standards/claude-code/claude-content.md, standards/prose/conventions.md]
+    model: claude-sonnet-5
+    effort: high

@@ -45,3 +45,27 @@ Nested files follow the same scope as the root: operational instructions
 for an agent operating inside that directory. They `SHALL NOT` contain
 project description, architecture decisions, or roadmap — those belong
 elsewhere in the documentation hierarchy.
+
+## The global file
+
+A user's `~/.claude/CLAUDE.md` is injected into every session regardless of
+repo: it sits above the per-repo hierarchy and carries cross-repo operating
+preferences, not project-specific rules. In this workspace it is not authored
+in place — its source is `dotfiles/dot-claude/CLAUDE.md`, Stow-symlinked into
+`~/.claude/`, so the governed artifact lives in dev-playbook and rides the
+normal review path. As a `CLAUDE.md` it is already a registry member
+([files.md](/standards/claude-code/files.md)) and already agent-facing
+configuration, so it holds to the agent-facing voice — second person, the
+human named as `user` ([conventions.md](/standards/prose/conventions.md)).
+
+The global file `SHALL` be a **well-formed XML document** with exactly two
+top-level elements:
+
+- `<principles>` — dispositional stances, how to carry yourself. Each is a
+  verb-first child element (`<be-direct>`, `<admit-uncertainty>`, …).
+- `<behaviors>` — operating rules for named situations, what to do. Each is a
+  verb-first child element (`<git-commit>`, `<sandbox>`, …).
+
+Well-formedness and the
+two-element shape are checked deterministically, but only in dev-playbook,
+where the source file lives — other repos have no global file to check.
