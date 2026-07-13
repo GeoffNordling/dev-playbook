@@ -2,7 +2,7 @@
 name: open-pr
 description: Opens the long-lived PR for an issue once its branch is on origin — idempotent. Use when the issue overwatch reaches a review stop.
 disable-model-invocation: false
-model: opus
+model: sonnet
 effort: low
 disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"

@@ -2,7 +2,7 @@
 name: log-friction
 description: Capture a friction entry — pain felt, time lost, a manual intervention — into select-measure-learn's friction log from any repo, commit it there, and hand the user the push. Use when the user invokes /log-friction, says "log this friction", "that was friction", "add to the friction log", or asks to record a recurring pain or intervention.
 disable-model-invocation: false
-model: opus
+model: sonnet
 effort: xhigh
 argument-hint: "[what bit, one line]"
 ---
