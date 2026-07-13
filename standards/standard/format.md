@@ -77,7 +77,7 @@ hook suite rather than by new tooling.
 ## Detectors
 
 A **detector** is the read-only script behind an Audit cell — it inspects the
-repository against one standard and emits findings, never mutating the
+repository against one or more standards and emits findings, never mutating the
 repository and never blocking by itself (its runs at a gate are the audit
 stationed there — that is Enforcement). This is the normative home of the
 detector contract.
@@ -95,9 +95,14 @@ detector contract.
   detector whose audited surface exists only in one repo — standards-audit
   audits the `standards/` tree, which only dev-playbook carries — so it is wired
   in that repo's local block alone.)
-- **North star: one detector script per card.** The aim is a single detector
-  answering each card's question. It is explicitly not mandatory — a card may
-  honestly audit `none` when no automatic check exists.
+- **A card may have more than one detector.** Cards are organized by the
+  question they govern; detectors by the mechanism they run. Question and
+  mechanism cross-cut, so the relation is one-to-many, not one-to-one: one
+  question can need several mechanisms (a card cited by more than one
+  detector), and one mechanism can serve several questions (a detector cited by
+  more than one card). The one-to-one invariant lives a level down, at the rule
+  — every `card.rule` id belongs to exactly one card. A card may still honestly
+  audit `none` when no automatic check exists.
 - **Thin shims.** A detector script stays a thin shim over the reusable
   modules in `src/dev_playbook`; the logic lives in the module, the script
   wires argument parsing and output to it.
