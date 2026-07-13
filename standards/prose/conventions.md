@@ -32,8 +32,8 @@ live in `scripts/`", not "don't put runnables elsewhere". A prohibition
 appears only when the prohibition itself is the rule.
 
 No second person in declarative docs. "You" belongs to agent-facing
-instruction files — skills — that direct an executor; a
-standard states facts.
+instruction files — `CLAUDE.md` at every level, skills, and rules — that
+direct an executor; a standard states facts.
 
 ## Heading casing
 
@@ -78,12 +78,18 @@ terms where they apply, with no obligation to extend it.
 ## Terminology: human vs user
 
 One actor — the dispatcher, reviewer, and approver — wears two names, chosen by
-voice. **Agent-facing instruction text says `user`**: the skill and rule bodies
-under `dotfiles/dot-claude/skills/` and `dotfiles/dot-claude/rules/`, read by the
-executing agent, name that person the way Claude Code does (`AskUserQuestion`).
+voice. **Agent-facing instruction text says `user`**: `CLAUDE.md` at every level
+— root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike — plus the
+skill and rule bodies under `dotfiles/dot-claude/skills/` and
+`dotfiles/dot-claude/rules/`. None of these are written for a human reader; every
+one of them has exactly one real audience, the executing agent, so all of them
+name that person the way Claude Code does (`AskUserQuestion`). CLAUDE.md does not
+split by location — its content is commands to the agent
+([claude-content.md](/standards/claude-code/claude-content.md)), never a
+description of the system for a human to read, at any level.
 **Declarative documentation says `human`**: `workflow/`, `standards/`, `docs/`,
-`README.md`, and `CLAUDE.md` describe the system in third person, where the actor
-is the human dispatcher.
+and `README.md` describe the system in third person, where the actor is the
+human dispatcher.
 
 One override applies on top, wherever the token appears:
 
