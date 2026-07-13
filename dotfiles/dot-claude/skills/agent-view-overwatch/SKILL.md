@@ -2,7 +2,7 @@
 name: agent-view-overwatch
 description: Fleet co-pilot in Agent view — reads the issue board, recommends the next issue-overwatch launch, and tears down worktrees after confirmed merges.
 disable-model-invocation: true
-model: opus
+model: sonnet
 effort: xhigh
 allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *) AskUserQuestion
 ---
