@@ -31,8 +31,8 @@ from ordinary files, and what each may contain.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — repo-audit at the **commit gate** in every repo's suite;
-  skill-authoring repos append skill-audit
+  — repo-audit and skill-audit both at the **commit gate** in every repo's
+  suite; skill-audit no-ops where a repo authors no skills
 
 ## Adopt
 

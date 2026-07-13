@@ -21,13 +21,12 @@ requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
 # Workspace-wide tooling that resolves from the repo root reads this table.
-# The judgment gate stays suspended: the declarations are reorganized into the
-# judgments/*.yaml claim-family files, but this glob deliberately matches
-# nothing, so the gate collects no judgments and make check stays green with an
-# unfilled cache. Re-enabling the gate -- restoring paths to ["judgments/*.yaml"]
-# and filling the cache with a run-judgments fleet run -- is a deferred follow-up.
+# The judgment gate collects every declaration in the judgments/*.yaml
+# claim-family files; each passes iff its exact content-key is already cached
+# (fill the cache with a run-judgments fleet run after editing a declaration or
+# a file it puts on trial).
 [tool.judgments]
-paths = ["judgments/suspended-epic-142/*.yaml"]
+paths = ["judgments/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

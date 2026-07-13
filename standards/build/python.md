@@ -27,9 +27,10 @@ The canonical shape is [/standards/build/canonical/pyproject.toml](/standards/bu
 with `<repo>` and `<package>` placeholders. It pins: the `uv_build` backend,
 pytest `testpaths`, the `dev` dependency group (mypy, pytest, ruff floors),
 the ruff target/line-length/rule selection (including the pydocstyle
-`convention` and the `tests/**` + `__init__.py` docstring per-file-ignores),
-and the mypy strictness set. `requires-python` states the floor matching
-`.python-version`.
+`convention`, the `tests/**` + `__init__.py` docstring per-file-ignores, and
+the isort `known-first-party` naming the repo's own import package per
+[Name mapping](#name-mapping)), and the mypy strictness set. `requires-python`
+states the floor matching `.python-version`.
 
 A scripts-only repo (no `src/`) is not a package: it sets
 `[tool.uv] package = false` and omits `[build-system]`; everything else is
