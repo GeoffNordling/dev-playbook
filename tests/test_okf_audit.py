@@ -268,6 +268,76 @@ def test_repo_self_scan_is_clean() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+# --- consumer mode: no standards/docs/document-types.md in the audited repo ---
+
+# A minimal bundle with no registry doc at all (no standards/ directory), so
+# okf-audit must resolve consumer mode and validate types against its own
+# clone's registry instead of raising "registry doc not found". Types used
+# here (README) exist in dev-playbook's live registry, since the subprocess
+# resolves its clone root to the real checkout via __file__.
+CONSUMER_BUNDLE: dict[str, str] = {
+    "README.md": (
+        "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
+    ),
+    "index.md": (
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        "- [Root](/README.md) — Root readme desc\n"
+    ),
+}
+
+
+def make_consumer_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
+    """Write CONSUMER_BUNDLE into a fresh git repo, applying overrides.
+
+    An override value of None deletes that file; any other value replaces it.
+    """
+    repo = tmp_path / "repo"
+    files = dict(CONSUMER_BUNDLE)
+    for path, content in overrides.items():
+        if content is None:
+            files.pop(path, None)
+        else:
+            files[path] = content
+    for rel, content in files.items():
+        p = repo / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)
+    return repo
+
+
+def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
+    """A repo with no standards/docs/document-types.md is still linted — its
+    types are validated against the hook's own clone registry, never treated
+    as 'cannot run'."""
+    repo = make_consumer_bundle(tmp_path, {})
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "docs.registry-row" not in result.stdout
+    assert "docs.index-ordering" not in result.stdout
+
+
+def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
+    """A bogus type in a registry-less repo is checked against the clone's
+    registry and flagged, and still emits no registry-shape finding — a
+    consumer cannot fix dev-playbook's registry from its own commit."""
+    repo = make_consumer_bundle(
+        tmp_path,
+        {
+            "README.md": "---\ntype: Bogus\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 1
+    assert "not in the registry" in result.stdout
+    assert "docs.registry-row" not in result.stdout
+    assert "docs.index-ordering" not in result.stdout
+
+
 # --- instrument.employed-by ---
 
 # The overlay a bundle needs to carry a typed Instrument Spec: the registry row

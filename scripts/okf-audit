@@ -9,7 +9,13 @@ that owns them — `docs.*` for the first two (knowledge-organization),
     drawn from the registry document (`REGISTRY_DOC` below), plus `title` and
     `description`. `resource` is optional in general and required on a
     `Recipe Description`. The registry is parsed from the registry document's
-    `## Types` table, so that document is the single source of truth.
+    `## Types` table, so that document is the single source of truth. The
+    registry document is a single global file that lives only in dev-playbook:
+    when the audited repo carries it (dev-playbook itself), it is read from the
+    audited tree and its shape is checked too; otherwise (every consumer repo)
+    it is read from this script's own hook clone, and its shape is not
+    checked — a consumer cannot fix dev-playbook's registry from its own
+    commit.
 
   - **Index-staleness** — every `index.md` lists exactly the concept documents
     it owns (a concept document is owned by the nearest `index.md` at or above
@@ -51,7 +57,13 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+# The dev-playbook checkout this script itself lives in — the pre-commit clone
+# in consumer repos, dev-playbook's own working tree when dogfooded. Consumer
+# mode resolves the type registry here, since a consumer repo never carries
+# its own copy (see REGISTRY_DOC below).
+HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
+
+sys.path.insert(0, str(HOOK_REPO_ROOT / "src"))
 
 from dev_playbook import md  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
@@ -144,19 +156,21 @@ def _is_separator_row(cells: list[str]) -> bool:
     )
 
 
-def parse_registry(repo_root: Path) -> tuple[list[str], list[int]]:
+def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     """Parse the concept-document type names from the registry document.
 
-    Returns ``(names, malformed_rows)`` — the backticked type names in table
-    order (so the caller can both build the registry set and check the declared
-    alphabetical order), and the line numbers of malformed rows. Every data row
-    of the `## Types` table (the rows after the header/separator) must carry a
-    single backticked type name in its first cell; a row that does not is a
-    malformed row, so the caller emits a `docs.registry-row` finding rather than
-    silently dropping the type. Raises ToolError if the document or its
-    `## Types` table is absent.
+    ``registry_root`` is the tree that carries the registry document — the
+    audited repo in self mode, this script's own hook clone in consumer mode
+    (see `HOOK_REPO_ROOT`). Returns ``(names, malformed_rows)`` — the
+    backticked type names in table order (so the caller can both build the
+    registry set and check the declared alphabetical order), and the line
+    numbers of malformed rows. Every data row of the `## Types` table (the rows
+    after the header/separator) must carry a single backticked type name in its
+    first cell; a row that does not is a malformed row, so the caller emits a
+    `docs.registry-row` finding rather than silently dropping the type. Raises
+    ToolError if the document or its `## Types` table is absent.
     """
-    doc = repo_root / REGISTRY_DOC
+    doc = registry_root / REGISTRY_DOC
     if not doc.is_file():
         raise ToolError(f"registry doc not found: {REGISTRY_DOC}")
     in_types = False
@@ -189,16 +203,18 @@ def parse_registry(repo_root: Path) -> tuple[list[str], list[int]]:
     return names, malformed
 
 
-def check_registry(repo_root: Path) -> tuple[set[str], list[Finding]]:
+def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
     """Parse the type registry and check its rows' shape and declared order.
 
     Owns ``parse_registry``: returns the registry set (consumed by the type-lint)
     and its own findings — a ``docs.registry-row`` per malformed row and a
     ``docs.index-ordering`` when the `## Types` table is not alphabetical by type
-    name (the document's intro declares it alphabetical). Raises ToolError if the
-    registry document or its `## Types` table is absent.
+    name (the document's intro declares it alphabetical). Called only in self
+    mode — see `main()` — since the registry's shape is dev-playbook's to fix,
+    never a consumer's. Raises ToolError if the registry document or its
+    `## Types` table is absent.
     """
-    type_names, malformed_rows = parse_registry(repo_root)
+    type_names, malformed_rows = parse_registry(registry_root)
     findings = [
         Finding(
             REGISTRY_DOC,
@@ -549,9 +565,19 @@ def main(argv: list[str] | None = None) -> int:
     if args.list_rules:
         return print_rules(RULES)
     repo_root = Path(args.directory).resolve()
+    # Self mode: the audited repo carries the registry (dev-playbook itself, or
+    # a fixture simulating it) — read and shape-check it from there. Consumer
+    # mode: every other repo, which never carries its own copy — read the
+    # registry from this script's own hook clone, and skip the shape checks,
+    # since a consumer cannot fix dev-playbook's registry from its own commit.
+    self_mode = (repo_root / REGISTRY_DOC).is_file()
 
     try:
-        registry, registry_findings = check_registry(repo_root)
+        if self_mode:
+            registry, registry_findings = check_registry(repo_root)
+        else:
+            registry, _malformed_rows = parse_registry(HOOK_REPO_ROOT)
+            registry_findings = []
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
         print(f"okf-audit: {err}", file=sys.stderr)
