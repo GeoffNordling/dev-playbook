@@ -54,7 +54,7 @@ A run of one or more detectors; read-only — it never mutates the repository an
 _Avoid_: check (too broad — a check may block; an audit never does).
 
 **Detector**
-The read-only script that inspects the repository against one standard and emits findings; it never mutates the repository. One detector per card is the north star.
+The read-only script that inspects the repository against one or more standards and emits findings; it never mutates the repository. Cards are organized by question and detectors by mechanism, so a card may have more than one detector; the one-to-one is at the rule — every `card.rule` id belongs to exactly one card.
 
 **Gate**
 An automatic, unmanned blocking point on the path to main. There are exactly three, with fixed rung names: **commit gate** (the pre-commit suite), **push gate** (`make check`, via the pre-push stage), **CI gate** (thin CI).
@@ -73,7 +73,7 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 - A **Seam** is where a **Module**'s **Interface** lives.
 - An **Adapter** sits at a **Seam** and satisfies the **Interface**.
 - **Depth** produces **Leverage** for callers and **Locality** for maintainers.
-- A **Detector** inspects the repository against one standard and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
+- A **Detector** inspects the repository against one or more standards and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 
 ## Example dialogue

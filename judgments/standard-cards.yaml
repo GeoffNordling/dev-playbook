@@ -184,6 +184,7 @@ judgments:
       - standards/standard/format.md
       - workflow/workflow.md
       - workflow/skill-authoring.md
+      - scripts/workspace-audit
     model: claude-sonnet-5
     effort: high
 
