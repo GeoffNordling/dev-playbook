@@ -261,6 +261,24 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
     assert "more than once" in result.stdout
 
 
+def test_tests_tree_malformed_markdown_is_not_flagged(tmp_path: Path) -> None:
+    """Malformed markdown under a top-level tests/ tree is parser fixture data,
+    not a concept document — okf-audit emits no findings on it."""
+    repo = make_bundle(
+        tmp_path,
+        {
+            "tests/broken.md": '---\ntitle: "unterminated\n---\n\n# Broken\n',
+            "tests/fixtures/specs/feat-01.md": "not even frontmatter\n",
+            "tests/spec_files/index.md": "# not a real index\n",
+        },
+    )
+
+    result = run_okf_audit(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "tests/" not in result.stdout
+
+
 def test_repo_self_scan_is_clean() -> None:
     """The dev-playbook bundle itself passes okf-audit."""
     repo = Path(__file__).resolve().parents[1]

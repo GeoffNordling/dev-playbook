@@ -140,7 +140,10 @@ def classify(relpath: str) -> str:
       is subject to the type-lint.
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
-      ``references/``/``scripts/``, ``rules/``, and every non-``.md`` file.
+      ``references/``/``scripts/``, ``rules/``, every top-level ``tests/`` tree
+      (parser fixtures — tool-consumed, often deliberately malformed; see the
+      tests-tree boundary in standards/docs/bundle.md), and every non-``.md``
+      file.
 
     The concept/harness split mirrors the bundle boundary in the docs
     standard and the Claude Code file registry
@@ -156,6 +159,8 @@ def classify(relpath: str) -> str:
         return "excluded"
     if any(seg in {".agents", ".dhub", ".git"} for seg in parts):
         return "excluded"
+    if parts[0] == "tests":
+        return "harness"
 
     if not name.endswith(".md"):
         return "harness"

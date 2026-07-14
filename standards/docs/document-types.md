@@ -32,6 +32,7 @@ Title Case; acronyms stay upper. Listed alphabetically.
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
+| `Spec Item` | One SDD spec item — a `feat`/`req`/`dsn` node in a `specs/` tree; body format owned by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md); frontmatter exists for OKF navigation only. |
 | `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work. |
 | `Standard Card` | The thin catalog record for one standard — four pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |

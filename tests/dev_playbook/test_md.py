@@ -105,6 +105,12 @@ class TestClassify:
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
             ("tools/bin/ref-audit", "harness"),
+            ("tests/x.md", "harness"),
+            ("tests/fixtures/specs/feat-01.md", "harness"),
+            ("tests/spec_files/broken.md", "harness"),
+            ("tests/anything/index.md", "harness"),
+            ("specs/feat-01.md", "concept"),
+            ("specs/index.md", "index"),
         ],
     )
     def test_classify(self, relpath: str, kind: str) -> None:
