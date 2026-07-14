@@ -31,12 +31,14 @@ Not every file in the repo is a concept document. The bundle divides in two:
   `description`, per [document-types.md](/standards/docs/document-types.md)) and
   is subject to the type-lint.
 - **Harness-owned files** — files a tool *consumes as configuration or runs
-  as code*, not prose a reader loads to learn: every non-`.md` file, plus
-  the Claude Code file set enumerated in
-  [the harness-files registry](/standards/claude-code/files.md). These carry
-  no OKF frontmatter and are not type-linted. They keep whatever format
-  their consumer requires — a `SKILL.md` keeps its Claude Code frontmatter
-  (`name`, `model`, …), not OKF frontmatter.
+  as code*, not prose a reader loads to learn: every non-`.md` file, every
+  `.md` under a top-level `tests/` tree, plus the Claude Code file set
+  enumerated in [the harness-files registry](/standards/claude-code/files.md).
+  These carry no OKF frontmatter and are not type-linted. They keep whatever
+  format their consumer requires — a `SKILL.md` keeps its Claude Code
+  frontmatter (`name`, `model`, …), not OKF frontmatter; a `tests/` markdown
+  file is parser fixture data, often deliberately malformed, so it is never
+  measured against OKF format at all.
 
 The test is *how the file is used*, not where it sits: everything is in the
 repo, hence in the bundle; harness-owned files are simply in-bundle
