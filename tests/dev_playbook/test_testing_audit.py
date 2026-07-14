@@ -151,6 +151,96 @@ def test_test_file_at_its_module_mirror_is_clean(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_test_file_at_scope_nested_mirror_under_unit_is_clean(tmp_path: Path) -> None:
+    """A mirror nested beneath the SDD unit scope root is an accepted location."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/unit/pkg/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_test_file_at_scope_nested_mirror_under_integration_is_clean(
+    tmp_path: Path,
+) -> None:
+    """A mirror nested beneath the SDD integration scope root is accepted."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/integration/pkg/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_test_file_at_scope_nested_mirror_under_agent_review_is_clean(
+    tmp_path: Path,
+) -> None:
+    """A mirror nested beneath the SDD agent_review scope root is accepted."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/agent_review/pkg/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_test_file_flat_inside_a_scope_root_is_flagged(tmp_path: Path) -> None:
+    """A scope root is a mirror root, not an exemption: the package path is still required."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/unit/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 1
+    assert "testing.mirror-layout" in result.stdout
+    assert "tests/unit/test_thing.py" in result.stdout
+
+
+def test_test_file_at_wrong_location_inside_a_scope_root_is_flagged(
+    tmp_path: Path,
+) -> None:
+    """Neither the plain mirror nor the scope-nested mirror: still a finding."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/unit/otherpkg/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 1
+    assert "testing.mirror-layout" in result.stdout
+    assert "tests/unit/otherpkg/test_thing.py" in result.stdout
+
+
+def test_test_file_matching_no_module_in_a_scope_root_is_outside_the_rule(
+    tmp_path: Path,
+) -> None:
+    """A flattened name whose stem names no src module stays exempt inside a scope root."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/render.py": "def public():\n    return 1\n",
+            "tests/unit/test_pkg_render_edgecases.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_test_file_matching_no_module_is_outside_the_rule(tmp_path: Path) -> None:
     """A flattened name whose stem names no src module is not policed."""
     repo = make_repo(
