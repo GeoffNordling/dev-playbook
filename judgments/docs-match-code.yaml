@@ -58,9 +58,13 @@ judgments:
       - standards/build/canonical/Makefile.base
       - standards/build/canonical/Makefile.python
       - standards/build/canonical/Makefile.aws
+      - standards/build/canonical/Makefile.sdd
       - standards/build/canonical/ci.yml
       - standards/build/canonical/pyproject.toml
       - standards/build/canonical/CLAUDE.md.standards
+      - standards/build/canonical/.pre-commit-config.yaml
+      - standards/build/canonical/.python-version
+      - standards/build/canonical/.gitignore
       - .pre-commit-hooks.yaml
     model: claude-sonnet-5
     effort: high

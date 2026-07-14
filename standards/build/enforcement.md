@@ -68,4 +68,5 @@ pattern.
 | skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments stage-1 cache gate | push gate only — never the CI gate |
+| validate | spec graph | push gate only — never the CI gate (sdd repos) |
 | workspace-audit | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-audit (outside the gates) |
