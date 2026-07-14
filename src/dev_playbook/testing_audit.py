@@ -10,10 +10,15 @@ and worktree-scoped) and applies three rules to the test files it finds:
     from python-audit, whose ``privacy.*`` family answered the testing standard's
     question, not Python's.
   - **mirror-layout** — a ``test_<stem>.py`` whose stem names an existing ``src``
-    module must sit at that module's literal mirror
-    (``src/x/y.py`` -> ``tests/x/test_y.py``). Test files matching no module
-    (e2e suites, flattened names), ``conftest.py``, and non-``test_*`` helpers are
-    outside the rule's domain. Placement only, not coverage or naming.
+    module must sit at that module's literal mirror, either directly beneath
+    ``tests/`` (``src/x/y.py`` -> ``tests/x/test_y.py``) or beneath one of the
+    three SDD scope roots with the package path preserved
+    (``tests/unit/x/test_y.py``, ``tests/integration/x/test_y.py``,
+    ``tests/agent_review/x/test_y.py``); a flat placement directly inside a
+    scope root (``tests/unit/test_y.py``) still fails. Test files matching no
+    module (e2e suites, flattened names), ``conftest.py``, and non-``test_*``
+    helpers are outside the rule's domain. Placement only, not coverage or
+    naming.
   - **no-logic** — no ``if``/``else`` or ``try``/``except`` statement in the body
     of a ``test_*`` function; loops, ternary expressions, and comprehension
     filters stay legal; nested helpers and module level are exempt.
@@ -236,19 +241,40 @@ def src_module_mirrors(files: list[Path], root: Path) -> dict[str, set[str]]:
     return mirrors
 
 
+# The three SDD scope directories (spec-tools' sdd-standards/spec-standard.md,
+# §3 Verifiers) are also accepted mirror roots: a src module's mirror may sit
+# directly beneath tests/, or beneath any one of these, package path intact.
+_SCOPE_ROOTS = frozenset({"unit", "integration", "agent_review"})
+
+
+def _normalized_mirror_candidate(rel: str) -> str:
+    """``rel`` with a leading SDD scope segment stripped, so it compares like a plain mirror.
+
+    ``tests/<scope>/pkg/test_mod.py`` normalizes to ``tests/pkg/test_mod.py``.
+    A non-scope second segment (or none) passes through unchanged.
+    """
+    parts = Path(rel).parts
+    if len(parts) > 2 and parts[1] in _SCOPE_ROOTS:
+        return str(Path(parts[0], *parts[2:]))
+    return rel
+
+
 def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]:
     """Flag a stem-matching test file that does not sit at its module's mirror.
 
     The mirror relationship holds between the repo's top-level ``src/`` and
     ``tests/`` trees, so only files under ``tests/`` are in the rule's domain. A
     ``test_*.py`` living elsewhere -- e.g. a nested template scaffold's own test
-    tree -- is not matched against the top-level ``src/`` modules.
+    tree -- is not matched against the top-level ``src/`` modules. The mirror may
+    also sit beneath one of the three SDD scope roots (``tests/unit/``,
+    ``tests/integration/``, ``tests/agent_review/``), package path preserved; a
+    flat placement directly inside a scope root does not count.
     """
     if Path(rel).parts[0] != "tests":
         return []
     stem = Path(rel).name[len("test_") : -len(".py")]
     targets = mirrors.get(stem)
-    if not targets or rel in targets:
+    if not targets or rel in targets or _normalized_mirror_candidate(rel) in targets:
         return []
     expected = " or ".join(sorted(targets))
     return [
@@ -256,7 +282,9 @@ def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]
             rel,
             None,
             MIRROR_LAYOUT,
-            f"test file for a src module must sit at its mirror ({expected})",
+            "test file for a src module must sit at its mirror "
+            f"({expected}, directly or beneath a scope root "
+            "tests/{unit,integration,agent_review}/)",
         )
     ]
 
