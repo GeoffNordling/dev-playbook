@@ -26,11 +26,19 @@ and point a `[tool.uv.sources]` entry at the dev-playbook repo root on disk:
 dev = ["dev-playbook"]
 
 [tool.uv.sources]
-dev-playbook = { path = "../dev-playbook", editable = true }
+dev-playbook = { path = "/home/geoff/workspace/dev-playbook", editable = true }
 ```
 
-Adjust `path` to wherever `dev-playbook` sits relative to the consumer. The
-dependency is `editable`, so the consumer always resolves against the
+Adjust `path` to wherever `dev-playbook` sits **on disk**, and keep it
+absolute. uv resolves a relative source path against the directory holding
+the `pyproject.toml` being read, not the cwd — and an issue worktree
+(`.claude/worktrees/issue-NN/`) carries its own copy of that file at a
+different depth than the main checkout, so a relative spelling that
+resolves in one breaks in the other. uv also expands neither `~` nor
+`$HOME` in source paths. An absolute literal is the only spelling that
+resolves from every checkout.
+
+The dependency is `editable`, so the consumer always resolves against the
 current `src/dev_playbook/` source — nothing to re-publish or re-pin when
 the libraries change. `uv sync` builds the package with uv's own bundled
 build backend, so building it needs no network or PyPI access. Its one
