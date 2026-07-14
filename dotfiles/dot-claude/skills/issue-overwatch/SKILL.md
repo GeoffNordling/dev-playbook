@@ -43,13 +43,24 @@ When a node finishes, move the phase label along the edge the graph names — `g
 
 ## 3. AFK delegation
 
-Every file-touching node sits in the issue's worktree — open it before the first one (§4). Spawn a subagent whose prompt is the token plus the launch line, nothing more:
+Every file-touching node sits in the issue's worktree — open it before the first one (§4). Spawn a subagent whose prompt is the launch line, nothing more:
+
+```
+Run /<skill> <N>.
+```
+
+**The commit token rides only the three implementation nodes.** Prefix the launch line with `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ ` for exactly the AFK nodes that write and commit code — `/tdd`, `/build`, `/sdd-tdd`:
 
 ```
 ⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /<skill> <N>.
 ```
 
-Affix the token to every AFK delegation prompt — a subagent is a separate session, its delegation prompt is its launch prompt, and the token is what pre-authorizes its commits.
+A subagent is a separate session, its delegation prompt is its launch prompt, and the token is what pre-authorizes its commits. But the PR and review nodes — `/open-pr`, `/code-review`, `/code-pr-review`, `/sdd-code-pr-review`, `/sdd-spec-review`, `/doc-pr-review` — are gh-only actions or read-only audits that never commit, so they get the bare launch line. Granting the token where it goes unused is privilege the node doesn't need; the subset is fixed here, not decided per dispatch.
+
+**The native `/code-review` breaks the launch template.** It is a harness built-in, not one of our skills, so two things differ from every other AFK dispatch:
+
+- **Its argument is the effort level, not the issue number.** Launch it as `Run /code-review medium --comment` — always **medium** effort, and always `--comment` so the findings post to the PR rather than staying in-session — never `Run /code-review <N>`; the issue number is not its argument, and it reviews the branch's diff on its own. (Effort is a positional arg: `low`/`medium`/`high`/`max`; `--comment` posts findings as inline PR comments.)
+- **It has no frontmatter to pin its model, so pin it at the spawn.** Our own review skills declare `model: opus` themselves; the native one inherits whatever runs it. Spawn its subagent with an explicit `model: opus` override so the review is Opus regardless of the model this overwatch was launched under.
 
 Parse the subagent's final message per the terminal report contract: it must begin at character one with `DONE:` or `ESCALATE:`; any other shape reads as ESCALATE.
 
