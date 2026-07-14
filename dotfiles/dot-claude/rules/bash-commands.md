@@ -84,26 +84,46 @@ cancelled too. Prefer single quotes by default for regex/pattern data.
 
 ## Keep sandbox-excluded commands leading and top-level
 
-A sandbox-excluded command (`gh`, `git`) only escapes the bwrap jail to reach
-its out-of-jail resource — the keyring holding `gh`'s PAT, the SSH remote for
-`git` — when it is the **leading, top-level** command; nested inside a `$(…)`
-capture, a `for`/`while` loop, a `bash -c '…'`, or behind a prefix
-(`env`/`timeout`/`xargs`) it runs *inside* the jail and fails auth. So never
-nest it. Chaining with `&&`/`;` and piping keep it leading and are fine.
+`gh` and `git` are sandbox-excluded: each escapes the bwrap jail to reach an
+out-of-jail resource — the keyring holding `gh`'s PAT, the SSH remote for
+`git`. That escape works **only when the command is the first, top-level thing
+on its line.** Every rule below protects that.
 
-When you need a value from the command, run it on its own line writing to a file
-and read the file back — never capture it in `$(gh …)`. A long or multi-line
-query belongs in a quoted `-f query='…'` argument on the top-level call, never a
-heredoc piped into `bash -c`.
+**Do:**
 
-Wrong (jailed — no token, GraphQL fails every time):
+- **Start the line with `gh`/`git`.** Chaining with `&&`/`;` and piping with
+  `|` keep it leading — all fine.
+- **Read the result from stdout, shaped with `--jq`.** Take the value out of
+  the tool result yourself; don't route it through a temp file. This one habit
+  sidesteps both traps below.
 
-    id=$(gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id')
+      gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
 
-Right (`gh` runs leading/top-level; the non-`gh` `$(cat …)` does the capture):
+- **One top-level call per item — never a loop.** Acting on several issues/PRs
+  is several separate Bash calls (run them in parallel), not a `for`/`while`
+  over a single call.
+- **Keep a long query inline** as a quoted `-f query='…'` argument on the same
+  line — never a heredoc piped into `bash -c`.
 
-    gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id' > "$TMPDIR/id"
-    id=$(cat "$TMPDIR/id")
+**Two traps this guards against** — both hit in real sessions:
+
+- **Nesting jails the command.** Inside `$(…)`, a `for`/`while` loop,
+  `bash -c '…'`, or behind `env`/`timeout`/`xargs`, it runs *inside* the jail
+  and auth fails (`gh`: HTTP 401; `git` push/pull: no key). To capture a value,
+  write it to a file on its own top-level `gh` line, then `id=$(cat file)` on a
+  separate line — `$(cat …)` is fine, `$(gh …)` is not.
+- **`$TMPDIR` is empty on the escaped line.** The escape context drops session
+  env vars, so `> "$TMPDIR/x"` (or `| tee "$TMPDIR/x"`) on a `gh`/`git` line
+  writes to `/x` at the root and fails with `Permission denied` — even though
+  `$TMPDIR` resolves fine for ordinary sandboxed commands. When a `gh`/`git`
+  line must write a file, hardcode the literal path (it's the scratchpad path
+  in your prompt, or run plain `echo "$TMPDIR"` first), never the `$TMPDIR`
+  variable.
+
+Right — capture a value for a follow-on command in the same call:
+
+    gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id' > /tmp/claude-1000/id
+    id=$(cat /tmp/claude-1000/id)
 
 ## SSH-bound git operations
 
