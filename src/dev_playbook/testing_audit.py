@@ -274,7 +274,7 @@ def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]
         return []
     stem = Path(rel).name[len("test_") : -len(".py")]
     targets = mirrors.get(stem)
-    if not targets or _normalized_mirror_candidate(rel) in targets:
+    if not targets or rel in targets or _normalized_mirror_candidate(rel) in targets:
         return []
     expected = " or ".join(sorted(targets))
     return [

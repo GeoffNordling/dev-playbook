@@ -226,6 +226,21 @@ def test_test_file_at_wrong_location_inside_a_scope_root_is_flagged(
     assert "tests/unit/otherpkg/test_thing.py" in result.stdout
 
 
+def test_plain_mirror_of_a_scope_root_named_src_package_is_clean(
+    tmp_path: Path,
+) -> None:
+    """When a src package is itself named after a scope root, its plain mirror still passes."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/integration/thing.py": "def public():\n    return 1\n",
+            "tests/integration/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_test_file_matching_no_module_in_a_scope_root_is_outside_the_rule(
     tmp_path: Path,
 ) -> None:
