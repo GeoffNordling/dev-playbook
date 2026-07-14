@@ -19,7 +19,7 @@ place, and `repo-audit` enforces them equal to the canonical source:
 | [ci.yml](/standards/build/canonical/ci.yml) | whole file, byte-identical |
 | [.python-version](/standards/build/canonical/.python-version) | whole file, byte-identical |
 | [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml) | canonical blocks present verbatim; extra hooks may follow |
-| [Makefile.base](/standards/build/canonical/Makefile.base) / [Makefile.python](/standards/build/canonical/Makefile.python) / [Makefile.aws](/standards/build/canonical/Makefile.aws) | the repo's layer-matching targets present verbatim; extra targets may follow |
+| [Makefile.base](/standards/build/canonical/Makefile.base) / [Makefile.python](/standards/build/canonical/Makefile.python) / [Makefile.aws](/standards/build/canonical/Makefile.aws) / [Makefile.sdd](/standards/build/canonical/Makefile.sdd) | the repo's layer-matching targets present verbatim; extra targets may follow |
 | [pyproject.toml](/standards/build/canonical/pyproject.toml) | pinned values match, parsed from TOML; additions are free |
 | [.gitignore](/standards/build/canonical/.gitignore) | baseline lines present |
 | [CLAUDE.md.standards](/standards/build/canonical/CLAUDE.md.standards) | block present verbatim in the repo's `CLAUDE.md` — [claude-content.md](/standards/claude-code/claude-content.md) |

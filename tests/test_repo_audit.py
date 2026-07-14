@@ -99,6 +99,21 @@ def scripts_only_files() -> dict[str, str]:
     return files
 
 
+def sdd_files() -> dict[str, str]:
+    files = python_files()
+    files.update(
+        {
+            "specs/feat-001.md": "# feat-001\n",
+            "Makefile": canonical("Makefile.python").replace(
+                "<code-roots>", "src tests"
+            )
+            + "\n"
+            + canonical("Makefile.sdd"),
+        }
+    )
+    return files
+
+
 def aws_files() -> dict[str, str]:
     files = python_files()
     files.update(
@@ -696,6 +711,41 @@ def test_makefile_missing_aws_targets_fails(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert "Makefile.aws" in result.stdout
+
+
+# --- sdd layer ---
+
+
+def test_conforming_sdd_repo_is_clean(tmp_path: Path) -> None:
+    result = run(make_repo(tmp_path, sdd_files()))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "layers: base, python, src, sdd" in result.stderr
+
+
+def test_sdd_repo_missing_fragment_fails(tmp_path: Path) -> None:
+    files = sdd_files()
+    files["Makefile"] = canonical("Makefile.python").replace(
+        "<code-roots>", "src tests"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "Makefile: build.canonical-block" in result.stdout
+    assert "Makefile.sdd" in result.stdout
+
+
+def test_specs_without_python_layer_flagged(tmp_path: Path) -> None:
+    files = base_files()
+    files["specs/feat-001.md"] = "# feat-001\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "specs/: build.layer-shape" in result.stdout
+    assert "the sdd layer requires the python layer" in result.stdout
+
+
+def test_repo_without_specs_unaffected(tmp_path: Path) -> None:
+    result = run(make_repo(tmp_path, python_files()))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "sdd" not in result.stderr
 
 
 # --- js layer ---
