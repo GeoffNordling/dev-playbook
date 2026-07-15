@@ -55,7 +55,7 @@ restate the content of their targets.
   **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
   A cell cites the single rung where the detector is stationed — where its
   wiring lives (pre-commit hooks → the commit gate; tools that run only inside
-  `make check` / `make check-judgments` → the push gate); the hook pattern in enforcement.md's Map
+  `make check` / `make check-judgements` → the push gate); the hook pattern in enforcement.md's Map
   implies the echoes at the other rungs. Enforcement is automatic and
   continuously in effect; a code review is a one-time checkpoint, not
   enforcement, and never an Enforce pointer.
@@ -84,7 +84,7 @@ detector contract.
 
 - **Read-only means mutating nothing git tracks.** A detector reports without
   changing the repository. Writing outside the repository does not disqualify
-  it: judgments-run records verdicts to a content-addressed cache that lives
+  it: judgements-run records verdicts to a content-addressed cache that lives
   outside the working tree, mutating nothing git tracks, so it is read-only and
   belongs in an Audit cell.
 - **Universal wiring; applicability lives inside the detector.** Every detector
@@ -122,7 +122,7 @@ Standards drift at two grains, each with its own detector:
 
 1. **Fine grain** — a specific document or passage must keep meaning what
    it meant when validated.
-   [Judgments](/standards/judgments/index.md) cover this: the
+   [Judgements](/standards/judgements/index.md) cover this: the
    content-addressed cache expires a verdict the moment the underlying
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across

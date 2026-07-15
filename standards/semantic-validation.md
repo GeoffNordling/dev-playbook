@@ -11,27 +11,27 @@ are validated and kept from drifting as the underlying files change.
 
 ## Define
 
-- [standards/judgments/](/standards/judgments/index.md) — the contract, one
-  concern per document; start at Judgment Declarations
+- [standards/judgements/](/standards/judgements/index.md) — the contract, one
+  concern per document; start at Judgement Declarations
 
 ## Audit
 
-- [judgments-audit](/scripts/judgments-audit) — checks declaration shape,
+- [judgements-audit](/scripts/judgements-audit) — checks declaration shape,
   deterministically
-- [judgments-run](/scripts/judgments-run) — the deterministic engine of the
+- [judgements-run](/scripts/judgements-run) — the deterministic engine of the
   semantic-detection workflow: plans the docket, renders the judge prompts,
   and records the verdicts
 
 ## Enforce
 
-- the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
-  — reds `make check-judgments`, wired to the **push gate** by the canonical
-  pre-push hook, until every judgment's exact content is judged-and-passed
+- the pytest cache gate ([The Cache Gate](/standards/judgements/cache-gate.md))
+  — reds `make check-judgements`, wired to the **push gate** by the canonical
+  pre-push hook, until every judgement's exact content is judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — judgments-audit at the **commit gate** in every repo's suite
+  — judgements-audit at the **commit gate** in every repo's suite
 
 ## Adopt
 
-- [Consuming Judgments](/standards/judgments/consuming.md) — the
+- [Consuming Judgements](/standards/judgements/consuming.md) — the
   consumer-repo recipe: dependency, declarations, gate, cache fill

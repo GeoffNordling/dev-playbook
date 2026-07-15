@@ -6,8 +6,8 @@
 # to. The deterministic detector bans the tokens "human"/"I"/"my", but only a
 # reader can tell whether the prose is actually agent-facing or merely token-clean
 # declarative third person — that semantic gap is what this family guards.
-# See standards/judgments/.
-judgments:
+# See standards/judgements/.
+judgements:
   - id: claude-md-agent-facing-voice
     claim: |
       The repo-root CLAUDE.md and the global CLAUDE.md source

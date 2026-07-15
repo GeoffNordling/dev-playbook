@@ -29,7 +29,7 @@ from ordinary files, and what each may contain.
 - [skill-audit](/scripts/skill-audit) — skill bundles in
   skill-authoring repos, plus the `claude-code.skill-mirror`
   correspondence between authored and installed skills (dev-playbook)
-- [judgments/claude-code.yaml](/judgments/claude-code.yaml) — the LLM-judged
+- [judgements/claude-code.yaml](/judgements/claude-code.yaml) — the LLM-judged
   claim that the root and global CLAUDE.md genuinely read as agent-facing
   voice, the semantic check the token-level rule cannot make
 

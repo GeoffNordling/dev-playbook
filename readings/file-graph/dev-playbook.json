@@ -94,7 +94,7 @@
   "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/rewind-compact/SKILL.md": "harness-skill-authored",
-  "dotfiles/dot-claude/skills/run-judgments/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/run-judgements/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/sdd-specs/SKILL.md": "harness-skill-authored",
@@ -116,13 +116,13 @@
   "instruments/datasheet.md": "concept",
   "instruments/file-graph.md": "concept",
   "instruments/index.md": "index",
-  "judgments/doc-consistency.yaml": "config",
+  "judgements/doc-consistency.yaml": "config",
   "protocols/README.md": "concept",
   "protocols/align-map-execute/SKILL.md": "harness-skill-authored",
   "protocols/align-map-execute/formulation.md": "concept",
   "protocols/index.md": "index",
   "pyproject.toml": "config",
-  "readings/datasheet/judgments.html": "reading",
+  "readings/datasheet/judgements.html": "reading",
   "readings/datasheet/lint-suite.html": "reading",
   "readings/datasheet/tools.html": "reading",
   "readings/datasheet/transcript-export.html": "reading",
@@ -133,8 +133,8 @@
   "scripts/griffe-outline": "code",
   "scripts/index.md": "index",
   "scripts/internal-skill-audit": "code",
-  "scripts/judgments-lint": "code",
-  "scripts/judgments-run": "code",
+  "scripts/judgements-lint": "code",
+  "scripts/judgements-run": "code",
   "scripts/okf-lint": "code",
   "scripts/python-lint": "code",
   "scripts/ref-check": "code",
@@ -146,12 +146,12 @@
   "src/dev_playbook/filegraph/graph.py": "code",
   "src/dev_playbook/filegraph/viz.py": "code",
   "src/dev_playbook/gitrepo.py": "code",
-  "src/dev_playbook/judgments/__init__.py": "code",
-  "src/dev_playbook/judgments/bench.py": "code",
-  "src/dev_playbook/judgments/core.py": "code",
-  "src/dev_playbook/judgments/loader.py": "code",
-  "src/dev_playbook/judgments/pytest_support.py": "code",
-  "src/dev_playbook/judgments/runner.py": "code",
+  "src/dev_playbook/judgements/__init__.py": "code",
+  "src/dev_playbook/judgements/bench.py": "code",
+  "src/dev_playbook/judgements/core.py": "code",
+  "src/dev_playbook/judgements/loader.py": "code",
+  "src/dev_playbook/judgements/pytest_support.py": "code",
+  "src/dev_playbook/judgements/runner.py": "code",
   "src/dev_playbook/md.py": "code",
   "src/dev_playbook/pyast.py": "code",
   "src/dev_playbook/skipcache/__init__.py": "code",
@@ -205,7 +205,7 @@
   "standards/claude-code/skill-management.md": "concept",
   "standards/decisions.md": "concept",
   "standards/decisions/adrs.md": "concept",
-  "standards/docs.md": "concept",
+  "standards/knowledge-organization.md": "concept",
   "standards/docs/bundle.md": "concept",
   "standards/docs/context-content.md": "concept",
   "standards/docs/cross-references.md": "concept",
@@ -216,11 +216,11 @@
   "standards/index.md": "index",
   "standards/instrument.md": "concept",
   "standards/instrument/format.md": "concept",
-  "standards/judgments.md": "concept",
-  "standards/judgments/cache-gate.md": "concept",
-  "standards/judgments/consuming.md": "concept",
-  "standards/judgments/declarations.md": "concept",
-  "standards/judgments/index.md": "index",
+  "standards/semantic-validation.md": "concept",
+  "standards/judgements/cache-gate.md": "concept",
+  "standards/judgements/consuming.md": "concept",
+  "standards/judgements/declarations.md": "concept",
+  "standards/judgements/index.md": "index",
   "standards/legibility.md": "concept",
   "standards/modules.md": "concept",
   "standards/modules/design.md": "concept",
@@ -242,10 +242,10 @@
   "standards/workflow.md": "concept",
   "tests/conftest.py": "code",
   "tests/test_filegraph.py": "code",
-  "tests/test_judgments_gate.py": "code",
-  "tests/test_judgments_lint.py": "code",
-  "tests/test_judgments_model.py": "code",
-  "tests/test_judgments_prepare.py": "code",
+  "tests/test_judgements_gate.py": "code",
+  "tests/test_judgements_lint.py": "code",
+  "tests/test_judgements_model.py": "code",
+  "tests/test_judgements_prepare.py": "code",
   "tests/test_loader.py": "code",
   "tests/test_md.py": "code",
   "tests/test_okf_lint.py": "code",
@@ -2378,8 +2378,8 @@
    "status": "ok"
   },
   {
-   "source": "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "dotfiles/dot-claude/skills/run-judgements/SKILL.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "prose-path",
    "line": 11,
@@ -2842,7 +2842,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "harness-recipes/recipes/scatter-gather.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2850,7 +2850,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "harness-recipes/recipes/scatter-gather.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2858,7 +2858,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "dotfiles/dot-claude/workflows/scatter-gather.js",
    "kind": "internal",
    "form": "code-ref",
@@ -2866,55 +2866,55 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments/declarations.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 18,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments/declarations.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 21,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "src/dev_playbook/judgments/loader.py",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "src/dev_playbook/judgements/loader.py",
    "kind": "internal",
    "form": "code-ref",
    "line": 22,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "src/dev_playbook/judgments/bench.py",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "src/dev_playbook/judgements/bench.py",
    "kind": "internal",
    "form": "code-ref",
    "line": 22,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "dotfiles/dot-claude/skills/run-judgements/SKILL.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 31,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "src/dev_playbook/judgments/runner.py",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "src/dev_playbook/judgements/runner.py",
    "kind": "internal",
    "form": "code-ref",
    "line": 33,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "dotfiles/dot-claude/workflows/scatter-gather.js",
    "kind": "internal",
    "form": "code-ref",
@@ -2922,7 +2922,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/index.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2930,7 +2930,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/layers.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2938,7 +2938,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/skeleton.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2946,7 +2946,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/make.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2954,7 +2954,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/python.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2962,7 +2962,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/ci.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2970,7 +2970,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/aws.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2978,7 +2978,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2986,7 +2986,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/distribution.md",
    "kind": "internal",
    "form": "code-ref",
@@ -2994,7 +2994,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/enforcement.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3002,7 +3002,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/ci.yml",
    "kind": "internal",
    "form": "code-ref",
@@ -3010,7 +3010,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/pyproject.toml",
    "kind": "internal",
    "form": "code-ref",
@@ -3018,7 +3018,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/index.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3026,7 +3026,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/layers.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3034,7 +3034,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/skeleton.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3042,7 +3042,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/make.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3050,7 +3050,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/python.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3058,7 +3058,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/ci.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3066,7 +3066,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/aws.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3074,7 +3074,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3082,7 +3082,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/distribution.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3090,7 +3090,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/enforcement.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3098,7 +3098,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3106,7 +3106,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3114,7 +3114,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3122,7 +3122,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/index.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3130,7 +3130,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3138,7 +3138,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3146,7 +3146,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/ci.yml",
    "kind": "internal",
    "form": "code-ref",
@@ -3154,7 +3154,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3162,7 +3162,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3170,7 +3170,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3178,7 +3178,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/claude-code.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3186,7 +3186,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/claude-code.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3194,7 +3194,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3202,7 +3202,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/claude-code/files.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3210,7 +3210,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/claude-code/claude-content.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3218,7 +3218,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/claude-code/skill-conventions.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3226,7 +3226,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/claude-code/skill-management.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3234,7 +3234,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3242,23 +3242,23 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/docs.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/knowledge-organization.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 145,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/docs.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/knowledge-organization.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 149,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3266,7 +3266,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/docs/index.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3274,7 +3274,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3282,23 +3282,23 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/semantic-validation.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 161,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/semantic-validation.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 165,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3306,31 +3306,31 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments/index.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/judgements/index.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 168,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments/cache-gate.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 169,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
-   "target": "standards/judgments/consuming.md",
+   "source": "judgements/doc-consistency.yaml",
+   "target": "standards/judgements/consuming.md",
    "kind": "internal",
    "form": "code-ref",
    "line": 170,
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3338,7 +3338,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/prose.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3346,7 +3346,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/prose.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3354,7 +3354,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3362,7 +3362,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/prose/conventions.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3370,7 +3370,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/python.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3378,7 +3378,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/python.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3386,7 +3386,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3394,7 +3394,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/python/style.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3402,7 +3402,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3410,7 +3410,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/shell.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3418,7 +3418,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/shell.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3426,7 +3426,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3434,7 +3434,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3442,7 +3442,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/testing.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3450,7 +3450,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/testing.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3458,7 +3458,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3466,7 +3466,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/testing/conventions.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3474,7 +3474,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/tracking.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3482,7 +3482,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/tracking.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3490,7 +3490,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3498,7 +3498,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/tracking/issues.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3506,7 +3506,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3514,7 +3514,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/workflow.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3522,7 +3522,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/workflow.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3530,7 +3530,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3538,7 +3538,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "workflow/workflow.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3546,7 +3546,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "workflow/skill-authoring.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3554,7 +3554,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/agentic-box/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3562,7 +3562,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/instrument.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3570,7 +3570,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/instrument.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3578,7 +3578,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3586,7 +3586,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/instrument/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3594,7 +3594,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "instruments/index.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3602,7 +3602,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "code-ref",
@@ -3610,7 +3610,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/legibility.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3618,7 +3618,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/legibility.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3626,7 +3626,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3634,7 +3634,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "instruments/datasheet.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3642,7 +3642,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "instruments/file-graph.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3650,7 +3650,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/modules.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3658,7 +3658,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/modules.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3666,7 +3666,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3674,7 +3674,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/modules/design.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3682,7 +3682,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/decisions.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3690,7 +3690,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/decisions.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3698,7 +3698,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/standard/format.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3706,7 +3706,7 @@
    "status": "ok"
   },
   {
-   "source": "judgments/doc-consistency.yaml",
+   "source": "judgements/doc-consistency.yaml",
    "target": "standards/decisions/adrs.md",
    "kind": "internal",
    "form": "code-ref",
@@ -3899,7 +3899,7 @@
   },
   {
    "source": "scripts/README.md",
-   "target": "standards/judgments/declarations.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 64,
@@ -4499,7 +4499,7 @@
   },
   {
    "source": "standards/build/make.md",
-   "target": "standards/judgments/cache-gate.md",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 31,
@@ -4914,7 +4914,7 @@
    "status": "ok"
   },
   {
-   "source": "standards/docs.md",
+   "source": "standards/knowledge-organization.md",
    "target": "standards/docs/index.md",
    "kind": "internal",
    "form": "link",
@@ -4922,7 +4922,7 @@
    "status": "ok"
   },
   {
-   "source": "standards/docs.md",
+   "source": "standards/knowledge-organization.md",
    "target": "scripts/okf-lint",
    "kind": "internal",
    "form": "link",
@@ -4930,7 +4930,7 @@
    "status": "ok"
   },
   {
-   "source": "standards/docs.md",
+   "source": "standards/knowledge-organization.md",
    "target": "scripts/ref-check",
    "kind": "internal",
    "form": "link",
@@ -4938,7 +4938,7 @@
    "status": "ok"
   },
   {
-   "source": "standards/docs.md",
+   "source": "standards/knowledge-organization.md",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "link",
@@ -5195,7 +5195,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/docs.md",
+   "target": "standards/knowledge-organization.md",
    "kind": "internal",
    "form": "link",
    "line": 16,
@@ -5235,7 +5235,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/judgments.md",
+   "target": "standards/semantic-validation.md",
    "kind": "internal",
    "form": "link",
    "line": 21,
@@ -5371,7 +5371,7 @@
   },
   {
    "source": "standards/index.md",
-   "target": "standards/judgments/index.md",
+   "target": "standards/judgements/index.md",
    "kind": "internal",
    "form": "link",
    "line": 41,
@@ -5434,39 +5434,39 @@
    "status": "ok"
   },
   {
-   "source": "standards/judgments.md",
-   "target": "standards/judgments/index.md",
+   "source": "standards/semantic-validation.md",
+   "target": "standards/judgements/index.md",
    "kind": "internal",
    "form": "link",
    "line": 14,
    "status": "ok"
   },
   {
-   "source": "standards/judgments.md",
-   "target": "scripts/judgments-lint",
+   "source": "standards/semantic-validation.md",
+   "target": "scripts/judgements-lint",
    "kind": "internal",
    "form": "link",
    "line": 19,
    "status": "ok"
   },
   {
-   "source": "standards/judgments.md",
-   "target": "scripts/judgments-run",
+   "source": "standards/semantic-validation.md",
+   "target": "scripts/judgements-run",
    "kind": "internal",
    "form": "link",
    "line": 20,
    "status": "ok"
   },
   {
-   "source": "standards/judgments.md",
-   "target": "standards/judgments/cache-gate.md",
+   "source": "standards/semantic-validation.md",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 25,
    "status": "ok"
   },
   {
-   "source": "standards/judgments.md",
+   "source": "standards/semantic-validation.md",
    "target": "standards/build/canonical/.pre-commit-config.yaml",
    "kind": "internal",
    "form": "link",
@@ -5474,144 +5474,144 @@
    "status": "ok"
   },
   {
-   "source": "standards/judgments.md",
-   "target": "standards/judgments/consuming.md",
+   "source": "standards/semantic-validation.md",
+   "target": "standards/judgements/consuming.md",
    "kind": "internal",
    "form": "link",
    "line": 34,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/cache-gate.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/cache-gate.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 21,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/cache-gate.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/cache-gate.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 23,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/consuming.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/consuming.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 15,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/consuming.md",
-   "target": "standards/judgments/cache-gate.md",
+   "source": "standards/judgements/consuming.md",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 16,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/consuming.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/consuming.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 46,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/consuming.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/consuming.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 49,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/consuming.md",
-   "target": "standards/judgments/cache-gate.md",
+   "source": "standards/judgements/consuming.md",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 63,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/declarations.md",
-   "target": "standards/judgments/cache-gate.md",
+   "source": "standards/judgements/declarations.md",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 12,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/declarations.md",
-   "target": "src/dev_playbook/judgments/core.py",
+   "source": "standards/judgements/declarations.md",
+   "target": "src/dev_playbook/judgements/core.py",
    "kind": "internal",
    "form": "link",
    "line": 30,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/declarations.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/declarations.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "relative",
    "line": 67,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/declarations.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/declarations.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "relative",
    "line": 68,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/declarations.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/declarations.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "relative",
    "line": 71,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/declarations.md",
-   "target": "src/dev_playbook/judgments/bench.py",
+   "source": "standards/judgements/declarations.md",
+   "target": "src/dev_playbook/judgements/bench.py",
    "kind": "internal",
    "form": "link",
    "line": 104,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/index.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/index.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 5,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/index.md",
-   "target": "standards/judgments/declarations.md",
+   "source": "standards/judgements/index.md",
+   "target": "standards/judgements/declarations.md",
    "kind": "internal",
    "form": "link",
    "line": 7,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/index.md",
-   "target": "standards/judgments/cache-gate.md",
+   "source": "standards/judgements/index.md",
+   "target": "standards/judgements/cache-gate.md",
    "kind": "internal",
    "form": "link",
    "line": 8,
    "status": "ok"
   },
   {
-   "source": "standards/judgments/index.md",
-   "target": "standards/judgments/consuming.md",
+   "source": "standards/judgements/index.md",
+   "target": "standards/judgements/consuming.md",
    "kind": "internal",
    "form": "link",
    "line": 9,
@@ -5779,7 +5779,7 @@
   },
   {
    "source": "standards/standard.md",
-   "target": "judgments/doc-consistency.yaml",
+   "target": "judgements/doc-consistency.yaml",
    "kind": "internal",
    "form": "link",
    "line": 22,
@@ -5827,7 +5827,7 @@
   },
   {
    "source": "standards/standard/format.md",
-   "target": "standards/judgments/index.md",
+   "target": "standards/judgements/index.md",
    "kind": "internal",
    "form": "link",
    "line": 76,
@@ -6860,7 +6860,7 @@
     "standards/claude-code/index.md": 2,
     "standards/decisions.md": 2,
     "standards/decisions/adrs.md": 2,
-    "standards/docs.md": 2,
+    "standards/knowledge-organization.md": 2,
     "standards/docs/bundle.md": 2,
     "standards/docs/context-content.md": 2,
     "standards/docs/cross-references.md": 2,
@@ -6869,8 +6869,8 @@
     "standards/docs/readme-content.md": 2,
     "standards/instrument.md": 2,
     "standards/instrument/format.md": 2,
-    "standards/judgments.md": 2,
-    "standards/judgments/index.md": 2,
+    "standards/semantic-validation.md": 2,
+    "standards/judgements/index.md": 2,
     "standards/legibility.md": 2,
     "standards/modules.md": 2,
     "standards/modules/design.md": 2,
@@ -6895,11 +6895,11 @@
     "instruments/datasheet.md": 3,
     "instruments/file-graph.md": 3,
     "instruments/index.md": 3,
-    "judgments/doc-consistency.yaml": 3,
+    "judgements/doc-consistency.yaml": 3,
     "scripts/bootstrap-labels": 3,
     "scripts/internal-skill-audit": 3,
-    "scripts/judgments-lint": 3,
-    "scripts/judgments-run": 3,
+    "scripts/judgements-lint": 3,
+    "scripts/judgements-run": 3,
     "scripts/okf-lint": 3,
     "scripts/python-lint": 3,
     "scripts/ref-check": 3,
@@ -6930,9 +6930,9 @@
     "standards/claude-code/files.md": 3,
     "standards/claude-code/skill-conventions.md": 3,
     "standards/claude-code/skill-management.md": 3,
-    "standards/judgments/cache-gate.md": 3,
-    "standards/judgments/consuming.md": 3,
-    "standards/judgments/declarations.md": 3,
+    "standards/judgements/cache-gate.md": 3,
+    "standards/judgements/consuming.md": 3,
+    "standards/judgements/declarations.md": 3,
     "standards/references/okf-spec.md": 3,
     "standards/tracking/issues.md": 3,
     "standards/tracking/repo-settings.md": 3,
@@ -6949,8 +6949,8 @@
     "dotfiles/.agents/.skill-lock.json": 4,
     "instruments/datasheet-example.html": 4,
     "scripts/file-graph": 4,
-    "src/dev_playbook/judgments/bench.py": 4,
-    "src/dev_playbook/judgments/core.py": 4,
+    "src/dev_playbook/judgements/bench.py": 4,
+    "src/dev_playbook/judgements/core.py": 4,
     "src/dev_playbook/md.py": 4,
     "docs/third-party-survey.md": 5,
     "dotfiles/bin/sync-dotfiles.sh": 5
@@ -7049,7 +7049,7 @@
     "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md",
     "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md",
     "dotfiles/dot-claude/skills/rewind-compact/SKILL.md",
-    "dotfiles/dot-claude/skills/run-judgments/SKILL.md",
+    "dotfiles/dot-claude/skills/run-judgements/SKILL.md",
     "dotfiles/dot-claude/skills/sdd-code-pr-review/SKILL.md",
     "dotfiles/dot-claude/skills/sdd-spec-review/SKILL.md",
     "dotfiles/dot-claude/skills/sdd-specs/SKILL.md",
@@ -7071,7 +7071,7 @@
     "protocols/align-map-execute/formulation.md",
     "protocols/index.md",
     "pyproject.toml",
-    "readings/datasheet/judgments.html",
+    "readings/datasheet/judgements.html",
     "readings/datasheet/lint-suite.html",
     "readings/datasheet/tools.html",
     "readings/datasheet/transcript-export.html",
@@ -7085,10 +7085,10 @@
     "src/dev_playbook/filegraph/graph.py",
     "src/dev_playbook/filegraph/viz.py",
     "src/dev_playbook/gitrepo.py",
-    "src/dev_playbook/judgments/__init__.py",
-    "src/dev_playbook/judgments/loader.py",
-    "src/dev_playbook/judgments/pytest_support.py",
-    "src/dev_playbook/judgments/runner.py",
+    "src/dev_playbook/judgements/__init__.py",
+    "src/dev_playbook/judgements/loader.py",
+    "src/dev_playbook/judgements/pytest_support.py",
+    "src/dev_playbook/judgements/runner.py",
     "src/dev_playbook/pyast.py",
     "src/dev_playbook/skipcache/__init__.py",
     "src/dev_playbook/skipcache/seen.py",
@@ -7106,10 +7106,10 @@
     "standards/agentic-box/templates/greenfield-cli/dot-claude/settings.json",
     "tests/conftest.py",
     "tests/test_filegraph.py",
-    "tests/test_judgments_gate.py",
-    "tests/test_judgments_lint.py",
-    "tests/test_judgments_model.py",
-    "tests/test_judgments_prepare.py",
+    "tests/test_judgements_gate.py",
+    "tests/test_judgements_lint.py",
+    "tests/test_judgements_model.py",
+    "tests/test_judgements_prepare.py",
     "tests/test_loader.py",
     "tests/test_md.py",
     "tests/test_okf_lint.py",
@@ -7195,7 +7195,7 @@
     "standards/claude-code/skill-management.md",
     "standards/decisions.md",
     "standards/decisions/adrs.md",
-    "standards/docs.md",
+    "standards/knowledge-organization.md",
     "standards/docs/bundle.md",
     "standards/docs/context-content.md",
     "standards/docs/cross-references.md",
@@ -7206,11 +7206,11 @@
     "standards/index.md",
     "standards/instrument.md",
     "standards/instrument/format.md",
-    "standards/judgments.md",
-    "standards/judgments/cache-gate.md",
-    "standards/judgments/consuming.md",
-    "standards/judgments/declarations.md",
-    "standards/judgments/index.md",
+    "standards/semantic-validation.md",
+    "standards/judgements/cache-gate.md",
+    "standards/judgements/consuming.md",
+    "standards/judgements/declarations.md",
+    "standards/judgements/index.md",
     "standards/legibility.md",
     "standards/modules.md",
     "standards/modules/design.md",
@@ -7261,14 +7261,14 @@
    "dotfiles/dot-claude/skills/small-steps/SKILL.md": "harness-skill-authored",
    "dotfiles/dot-claude/skills/write-agent-review/SKILL.md": "harness-skill-authored",
    "pyproject.toml": "config",
-   "readings/datasheet/judgments.html": "reading",
+   "readings/datasheet/judgements.html": "reading",
    "readings/datasheet/tools.html": "reading",
    "readings/datasheet/transcript-export.html": "reading",
    "src/dev_playbook/__init__.py": "code",
    "src/dev_playbook/filegraph/__init__.py": "code",
    "src/dev_playbook/filegraph/viz.py": "code",
-   "src/dev_playbook/judgments/__init__.py": "code",
-   "src/dev_playbook/judgments/pytest_support.py": "code",
+   "src/dev_playbook/judgements/__init__.py": "code",
+   "src/dev_playbook/judgements/pytest_support.py": "code",
    "src/dev_playbook/skipcache/__init__.py": "code",
    "src/dev_playbook/skipcache/seen.py": "code",
    "src/dev_playbook/transcript_export/__init__.py": "code",
@@ -7284,10 +7284,10 @@
    "standards/agentic-box/templates/greenfield-cli/box/tests/acceptance/test_cli.py": "code",
    "standards/agentic-box/templates/greenfield-cli/dot-claude/settings.json": "config",
    "tests/conftest.py": "code",
-   "tests/test_judgments_gate.py": "code",
-   "tests/test_judgments_lint.py": "code",
-   "tests/test_judgments_model.py": "code",
-   "tests/test_judgments_prepare.py": "code",
+   "tests/test_judgements_gate.py": "code",
+   "tests/test_judgements_lint.py": "code",
+   "tests/test_judgements_model.py": "code",
+   "tests/test_judgements_prepare.py": "code",
    "tests/test_loader.py": "code",
    "tests/test_pytest_support.py": "code",
    "tests/test_runner.py": "code",

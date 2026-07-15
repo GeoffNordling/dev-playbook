@@ -63,7 +63,7 @@ evaluate, and iteratively refining the agent's model of human intent.
 | Symbol | Name | Description |
 |--------|------|-------------|
 | $C_a$ | Agent context | Token budget for a single agent pass; discrete, finite. Degrades under load — a leaner context produces sharper reasoning |
-| $C_h$ | Human context | What a human can hold in mind simultaneously; latent, finite. Smaller than $C_a$ for raw information, richer for abstraction and judgment. Same degradation applies |
+| $C_h$ | Human context | What a human can hold in mind simultaneously; latent, finite. Smaller than $C_a$ for raw information, richer for abstraction and judgement. Same degradation applies |
 | $\kappa$ | Agent capability | Effective capability of the agent for this task: $\kappa(O, S, F, R, C_a)$. Not fixed — the same model has different $\kappa$ for different tasks. Improves as the frontier advances |
 | $Q^\ast$ | Quality threshold | The minimum acceptable quality of the agent's work at each step — latent, never directly observable by either party |
 | $\sigma^\ast$ | Optimal step size | The latent optimal amount of work per iteration — a property of the task/agent/alignment configuration, not a human preference. Neither party knows $\sigma^\ast$ |
@@ -179,7 +179,7 @@ efficiently.
 3. **Present.** The agent surfaces $a_k$ to the human with enough
    context for independent verification.
 4. **Direct.** The human evaluates $a_k$ and provides direction
-   $d_k$ — a judgment, decision, or instruction.
+   $d_k$ — a judgement, decision, or instruction.
 5. **Act.** If $d_k$ requires action, the agent executes it.
 
 ### Step size

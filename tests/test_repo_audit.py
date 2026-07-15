@@ -243,8 +243,8 @@ def test_missing_shellcheck_block_fails(tmp_path: Path) -> None:
 def test_appended_hook_inside_pinned_block_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-audit\n",
-        "      - id: judgments-audit\n      - id: skill-audit\n",
+        "      - id: judgements-audit\n",
+        "      - id: judgements-audit\n      - id: skill-audit\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -267,7 +267,7 @@ def test_readme_without_h1_fails(tmp_path: Path) -> None:
     files = base_files()
     files["README.md"] = "Just prose, no heading.\n"
     result = run(make_repo(tmp_path, files))
-    assert "README.md: docs.doc-shape" in result.stdout
+    assert "README.md: knowledge-organization.doc-shape" in result.stdout
 
 
 def test_claude_md_missing_standards_block_fails(tmp_path: Path) -> None:
@@ -440,8 +440,8 @@ def test_skills_dir_with_audit_hook_appended_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-audit\n",
-        "      - id: judgments-audit\n      - id: skill-audit\n",
+        "      - id: judgements-audit\n",
+        "      - id: judgements-audit\n      - id: skill-audit\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -821,9 +821,10 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "build.canonical-block" in ids
     assert "claude-code.standards-block" in ids
     assert "build.skills-hook" in ids
-    assert "docs.doc-shape" in ids
+    assert "knowledge-organization.doc-shape" in ids
     assert all(
-        rule.split(".")[0] in {"build", "claude-code", "docs"} for rule in ids
+        rule.split(".")[0] in {"build", "claude-code", "knowledge-organization"}
+        for rule in ids
     ), ids
 
 

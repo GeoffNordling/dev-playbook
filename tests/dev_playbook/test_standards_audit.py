@@ -289,35 +289,42 @@ def test_consistent_matrix_passes(tmp_path: Path) -> None:
 
 
 def test_uncited_emitted_prefix_fails_direction_one(tmp_path: Path) -> None:
-    # repo-audit emits docs.y, but the docs card does not cite repo-audit.
+    # repo-audit emits knowledge-organization.y, but that card does not cite
+    # repo-audit.
     repo = make_repo(
         tmp_path,
         {
             "standards/build.md": card_citing("Build", [cite("repo-audit")]),
-            "standards/docs.md": card_citing("Docs", ["- none"]),
+            "standards/knowledge-organization.md": card_citing(
+                "Knowledge Organization", ["- none"]
+            ),
         },
     )
 
     findings = sa.check_rule_matrix(
-        repo, fake_list_rules({"repo-audit": ["build.x", "docs.y"]})
+        repo, fake_list_rules({"repo-audit": ["build.x", "knowledge-organization.y"]})
     )
 
     assert [f.rule for f in findings] == [sa.RULE_MATRIX]
-    assert "docs.md" in findings[0].file
+    assert "knowledge-organization.md" in findings[0].file
 
 
 def test_unbacked_citation_fails_direction_two(tmp_path: Path) -> None:
     # The build card cites repo-audit, but repo-audit emits no build.* rule --
-    # only docs.*, which the docs card legitimately cites.
+    # only knowledge-organization.*, which that card legitimately cites.
     repo = make_repo(
         tmp_path,
         {
             "standards/build.md": card_citing("Build", [cite("repo-audit")]),
-            "standards/docs.md": card_citing("Docs", [cite("repo-audit")]),
+            "standards/knowledge-organization.md": card_citing(
+                "Knowledge Organization", [cite("repo-audit")]
+            ),
         },
     )
 
-    findings = sa.check_rule_matrix(repo, fake_list_rules({"repo-audit": ["docs.y"]}))
+    findings = sa.check_rule_matrix(
+        repo, fake_list_rules({"repo-audit": ["knowledge-organization.y"]})
+    )
 
     assert [f.rule for f in findings] == [sa.RULE_MATRIX]
     assert findings[0].file == "standards/build.md"
@@ -334,10 +341,10 @@ def test_cited_detector_without_list_rules_fails_membership(tmp_path: Path) -> N
     assert "--list-rules" in findings[0].message
 
 
-def test_third_party_and_judgment_pointers_are_outside_the_matrix(
+def test_third_party_and_judgement_pointers_are_outside_the_matrix(
     tmp_path: Path,
 ) -> None:
-    # ruff (name + pin, no scripts/ link) and a judgment-file pointer are not
+    # ruff (name + pin, no scripts/ link) and a judgement-file pointer are not
     # detector citations, so an empty rule map still passes.
     repo = make_repo(
         tmp_path,
@@ -346,7 +353,7 @@ def test_third_party_and_judgment_pointers_are_outside_the_matrix(
                 "Shell",
                 [
                     "- shellcheck — third-party lint",
-                    "- [j](/judgments/x.yaml) — a judgment",
+                    "- [j](/judgements/x.yaml) — a judgement",
                 ],
             )
         },

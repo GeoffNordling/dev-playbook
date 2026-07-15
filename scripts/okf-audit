@@ -74,15 +74,15 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # rule). Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
-FRONTMATTER = "docs.frontmatter"
-TYPE = "docs.type"
-TITLE = "docs.title"
-DESCRIPTION = "docs.description"
-RESOURCE = "docs.resource"
-INDEX = "docs.index"
-REGISTRY_ROW = "docs.registry-row"
-DESCRIPTION_SHAPE = "docs.description-shape"
-INDEX_ORDERING = "docs.index-ordering"
+FRONTMATTER = "knowledge-organization.frontmatter"
+TYPE = "knowledge-organization.type"
+TITLE = "knowledge-organization.title"
+DESCRIPTION = "knowledge-organization.description"
+RESOURCE = "knowledge-organization.resource"
+INDEX = "knowledge-organization.index"
+REGISTRY_ROW = "knowledge-organization.registry-row"
+DESCRIPTION_SHAPE = "knowledge-organization.description-shape"
+INDEX_ORDERING = "knowledge-organization.index-ordering"
 EMPLOYED_BY = "instrument.employed-by"
 
 RULES = (
@@ -167,7 +167,7 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     numbers of malformed rows. Every data row of the `## Types` table (the rows
     after the header/separator) must carry a single backticked type name in its
     first cell; a row that does not is a malformed row, so the caller emits a
-    `docs.registry-row` finding rather than silently dropping the type. Raises
+    `knowledge-organization.registry-row` finding rather than silently dropping the type. Raises
     ToolError if the document or its `## Types` table is absent.
     """
     doc = registry_root / REGISTRY_DOC
@@ -207,8 +207,8 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
     """Parse the type registry and check its rows' shape and declared order.
 
     Owns ``parse_registry``: returns the registry set (consumed by the type-lint)
-    and its own findings — a ``docs.registry-row`` per malformed row and a
-    ``docs.index-ordering`` when the `## Types` table is not alphabetical by type
+    and its own findings — a ``knowledge-organization.registry-row`` per malformed row and a
+    ``knowledge-organization.index-ordering`` when the `## Types` table is not alphabetical by type
     name (the document's intro declares it alphabetical). Called only in self
     mode — see `main()` — since the registry's shape is dev-playbook's to fix,
     never a consumer's. Raises ToolError if the registry document or its

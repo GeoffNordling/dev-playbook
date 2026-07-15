@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from dev_playbook.judgments.core import PROMPT, Prepared, prepare
+from dev_playbook.judgements.core import PROMPT, Prepared, prepare
 
 
 def write(root: Path, rel: str, text: str) -> None:

@@ -27,7 +27,7 @@ Governs how Python tests are written.
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — the **commit gate**, where testing-audit blocks every commit
-- `make check-judgments` — the **push gate**, where pytest runs the suite
+- `make check-judgements` — the **push gate**, where pytest runs the suite
 
 ## Adopt
 

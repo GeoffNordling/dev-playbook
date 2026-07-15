@@ -29,7 +29,7 @@ Governs how a repository is laid out, built, and checked.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — the hook suite every repo runs at the **commit gate**, repo-audit
   included
-- `make check-judgments` ([Makefile.base](/standards/build/canonical/Makefile.base))
+- `make check-judgements` ([Makefile.base](/standards/build/canonical/Makefile.base))
   — the **push gate**
 - thin CI ([ci.yml](/standards/build/canonical/ci.yml)) — the **CI gate**,
   the same suite on every push and PR

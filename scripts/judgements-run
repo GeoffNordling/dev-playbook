@@ -3,9 +3,9 @@
 # requires-python = ">=3.14"
 # dependencies = ["pyyaml>=6.0"]
 # ///
-"""judgments-run — deterministic plan/render/record over judgment declarations.
+"""judgements-run — deterministic plan/render/record over judgement declarations.
 
-Thin shim over the dev_playbook.judgments.runner library: resolve the repo's [tool.judgments]
+Thin shim over the dev_playbook.judgements.runner library: resolve the repo's [tool.judgements]
 config, load and validate declarations, and run the requested subcommand. See
 that module for the logic and its tests.
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from dev_playbook.judgments.runner import run_cli  # noqa: E402
+from dev_playbook.judgements.runner import run_cli  # noqa: E402
 
 if __name__ == "__main__":
     sys.exit(run_cli())

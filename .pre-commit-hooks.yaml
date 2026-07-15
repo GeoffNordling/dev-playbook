@@ -13,7 +13,7 @@
 #       - id: okf-audit
 #       - id: decisions-audit
 #       - id: skill-audit
-#       - id: judgments-audit
+#       - id: judgements-audit
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
 # hook from there, so resolution is independent of where the consumer repo —
@@ -69,9 +69,9 @@
   pass_filenames: false
   always_run: true
 
-- id: judgments-audit
-  name: judgments-audit
-  entry: scripts/judgments-audit
+- id: judgements-audit
+  name: judgements-audit
+  entry: scripts/judgements-audit
   language: script
   pass_filenames: false
   always_run: true

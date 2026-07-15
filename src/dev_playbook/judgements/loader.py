@@ -1,6 +1,6 @@
-"""Discover, parse, and validate judgment declarations from a repo's YAML files.
+"""Discover, parse, and validate judgement declarations from a repo's YAML files.
 
-A repo opts in with a ``[tool.judgments]`` table in its ``pyproject.toml`` that
+A repo opts in with a ``[tool.judgements]`` table in its ``pyproject.toml`` that
 points (via ``paths`` globs) at one or more declaration files. This module turns
 those files into validated :class:`Declaration` records: it owns root resolution,
 file discovery, and the structural field rules. It does no file I/O on the
@@ -19,22 +19,22 @@ from typing import NamedTuple, TypeGuard
 import yaml
 
 from dev_playbook.findings import print_rules, render
-from dev_playbook.judgments.bench import VALID_EFFORTS, VALID_MODELS
+from dev_playbook.judgements.bench import VALID_EFFORTS, VALID_MODELS
 
 _ID_CHARSET = re.compile(r"[A-Za-z0-9._-]+")
 
-# The rule ids judgments-audit can emit, one per existing error family: a
+# The rule ids judgements-audit can emit, one per existing error family: a
 # malformed declaration (structural/field validation, at the declaring YAML
 # file) and a bad evidence/reference path (absolute, `..`, or missing). Each id
 # is a module-level constant so every emission site references the constant, not
 # a raw literal, and --list-rules cannot drift from what the code emits.
-DECLARATION = "judgments.declaration"
-EVIDENCE_PATH = "judgments.evidence-path"
-JUDGMENTS_RULES = (DECLARATION, EVIDENCE_PATH)
+DECLARATION = "semantic-validation.declaration"
+EVIDENCE_PATH = "semantic-validation.evidence-path"
+JUDGEMENTS_RULES = (DECLARATION, EVIDENCE_PATH)
 
 
 class DeclarationError(ValueError):
-    """A malformed judgment declaration, located at its ``source`` file.
+    """A malformed judgement declaration, located at its ``source`` file.
 
     Carries the offending ``source`` path and a path-free ``detail`` so callers
     format the location themselves -- repo-relative for a finding -- rather than
@@ -51,15 +51,15 @@ class DeclarationError(ValueError):
 
 
 class LintFinding(NamedTuple):
-    """One judgments-audit finding, located at the declaring YAML file."""
+    """One judgements-audit finding, located at the declaring YAML file."""
 
     location: str  # repo-relative path to the declaring file
-    rule: str  # in JUDGMENTS_RULES
+    rule: str  # in JUDGEMENTS_RULES
     message: str
 
 
 class Declaration(NamedTuple):
-    """One parsed, validated judgment from a declaration YAML file."""
+    """One parsed, validated judgement from a declaration YAML file."""
 
     id: str
     claim: str
@@ -70,32 +70,32 @@ class Declaration(NamedTuple):
 
 
 def resolve_root(start: Path | None = None) -> Path | None:
-    """Nearest ancestor of ``start`` whose ``pyproject.toml`` has ``[tool.judgments]``.
+    """Nearest ancestor of ``start`` whose ``pyproject.toml`` has ``[tool.judgements]``.
 
     Walks up from ``start`` (default: the current working directory). Returns the
     first directory that opts in, or ``None`` if no ancestor does -- in which case
-    there are no judgments.
+    there are no judgements.
     """
     here = (start or Path.cwd()).resolve()
     for directory in (here, *here.parents):
         pyproject = directory / "pyproject.toml"
-        if pyproject.is_file() and _has_judgments_table(pyproject):
+        if pyproject.is_file() and _has_judgements_table(pyproject):
             return directory
     return None
 
 
-def _has_judgments_table(pyproject: Path) -> bool:
-    """Whether ``pyproject``'s parsed contents carry a ``[tool.judgments]`` table."""
+def _has_judgements_table(pyproject: Path) -> bool:
+    """Whether ``pyproject``'s parsed contents carry a ``[tool.judgements]`` table."""
     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-    # a pyproject without a [tool] table is valid -- it just means no judgments
-    return "judgments" in data.get("tool", {})
+    # a pyproject without a [tool] table is valid -- it just means no judgements
+    return "judgements" in data.get("tool", {})
 
 
 def load(root: Path | None) -> list[Declaration]:
-    """Discover, parse, and validate every judgment declared under ``root``.
+    """Discover, parse, and validate every judgement declared under ``root``.
 
     Returns ``[]`` when ``root`` is ``None`` (no opted-in config). Otherwise it
-    expands the ``[tool.judgments].paths`` globs against ``root``, parses each
+    expands the ``[tool.judgements].paths`` globs against ``root``, parses each
     matched YAML file, and validates the structural field rules. It does no file
     I/O on the declared evidence/reference paths.
     """
@@ -110,7 +110,7 @@ def load(root: Path | None) -> list[Declaration]:
     for declaration, source, original in _dedup(pairs):
         if original is not None:
             raise ValueError(
-                f"duplicate judgment id {declaration.id!r}: in {source} and {original}"
+                f"duplicate judgement id {declaration.id!r}: in {source} and {original}"
             )
         declarations.append(declaration)
     return declarations
@@ -132,7 +132,7 @@ def _parsed_files(
     Yields ``(file, declarations)`` for each discovered declaration file, or
     ``(file, error)`` when that one file is malformed -- so ``load`` can raise on
     the error and the lint can turn it into a finding, both over one walk. A
-    configuration error (a bad ``[tool.judgments].paths``) raises out of the
+    configuration error (a bad ``[tool.judgements].paths``) raises out of the
     initial ``_discover`` before any file is yielded.
     """
     for path in _discover(root):
@@ -161,18 +161,18 @@ def _dedup(
 
 
 def _declaration_globs(root: Path) -> list[str]:
-    """The ``[tool.judgments].paths`` globs from ``root``'s ``pyproject.toml``.
+    """The ``[tool.judgements].paths`` globs from ``root``'s ``pyproject.toml``.
 
-    A ``[tool.judgments]`` table that is present but declares no ``paths`` (or an
+    A ``[tool.judgements]`` table that is present but declares no ``paths`` (or an
     empty ``paths``) is a hard configuration error: the repo opted in but pointed
     nowhere.
     """
     pyproject = root / "pyproject.toml"
     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-    paths = data["tool"]["judgments"].get("paths")
+    paths = data["tool"]["judgements"].get("paths")
     if not _is_str_list(paths) or not paths:
         raise DeclarationError(
-            pyproject, "[tool.judgments] must declare a non-empty 'paths' list"
+            pyproject, "[tool.judgements] must declare a non-empty 'paths' list"
         )
     return paths
 
@@ -181,7 +181,7 @@ def _parse_file(path: Path) -> list[Declaration]:
     """Parse one declaration YAML file into validated :class:`Declaration` records.
 
     Rejects a structurally-malformed file -- a non-mapping document, or a
-    ``judgments`` value that is not a list -- with the module's clear, file-named
+    ``judgements`` value that is not a list -- with the module's clear, file-named
     ``ValueError`` before iterating, so a plausible typo surfaces as that uniform
     error rather than a raw ``TypeError``/``AttributeError`` traceback.
     """
@@ -193,61 +193,63 @@ def _parse_file(path: Path) -> list[Declaration]:
         ) from error
     if not isinstance(document, dict):
         raise DeclarationError(
-            path, "top-level YAML must be a mapping with a 'judgments' key"
+            path, "top-level YAML must be a mapping with a 'judgements' key"
         )
-    judgments = document.get("judgments", [])
-    if not isinstance(judgments, list):
-        raise DeclarationError(path, "'judgments' must be a list")
-    return [_to_declaration(item, path) for item in judgments]
+    judgements = document.get("judgements", [])
+    if not isinstance(judgements, list):
+        raise DeclarationError(path, "'judgements' must be a list")
+    return [_to_declaration(item, path) for item in judgements]
 
 
 def _to_declaration(item: object, source: Path) -> Declaration:
-    """Validate one parsed YAML judgment object into a :class:`Declaration`.
+    """Validate one parsed YAML judgement object into a :class:`Declaration`.
 
     Enforces the structural field rules fail-loud, raising on the first
     violation with a message naming the offending ``id`` (or ``source`` file,
     when the ``id`` itself is the problem).
     """
     if not isinstance(item, dict):
-        raise DeclarationError(source, f"each judgment must be a mapping, got {item!r}")
+        raise DeclarationError(
+            source, f"each judgement must be a mapping, got {item!r}"
+        )
     id = _require(item, "id", source, "<unknown>")
     if not isinstance(id, str) or not id:
-        raise DeclarationError(source, "judgment 'id' must be a non-empty string")
+        raise DeclarationError(source, "judgement 'id' must be a non-empty string")
     if _ID_CHARSET.fullmatch(id) is None:
         raise DeclarationError(
             source,
-            f"judgment {id!r}: 'id' has illegal characters (allowed: A-Za-z0-9._-)",
+            f"judgement {id!r}: 'id' has illegal characters (allowed: A-Za-z0-9._-)",
         )
     claim = _require(item, "claim", source, id)
     if not isinstance(claim, str) or not claim.strip():
         raise DeclarationError(
-            source, f"judgment {id!r}: 'claim' must be a non-empty string"
+            source, f"judgement {id!r}: 'claim' must be a non-empty string"
         )
     evidence = _require(item, "evidence", source, id)
     if not _is_str_list(evidence):
         raise DeclarationError(
-            source, f"judgment {id!r}: 'evidence' must be a list of paths"
+            source, f"judgement {id!r}: 'evidence' must be a list of paths"
         )
     if not evidence:
         raise DeclarationError(
-            source, f"judgment {id!r}: 'evidence' must list at least one path"
+            source, f"judgement {id!r}: 'evidence' must list at least one path"
         )
     reference = item.get("reference") or []
     if not _is_str_list(reference):
         raise DeclarationError(
-            source, f"judgment {id!r}: 'reference' must be a list of paths"
+            source, f"judgement {id!r}: 'reference' must be a list of paths"
         )
     model = _require(item, "model", source, id)
     if not isinstance(model, str) or model not in VALID_MODELS:
         raise DeclarationError(
             source,
-            f"judgment {id!r}: 'model' {model!r} is not one of {sorted(VALID_MODELS)}",
+            f"judgement {id!r}: 'model' {model!r} is not one of {sorted(VALID_MODELS)}",
         )
     effort = _require(item, "effort", source, id)
     if not isinstance(effort, str) or effort not in VALID_EFFORTS:
         raise DeclarationError(
             source,
-            f"judgment {id!r}: 'effort' {effort!r} is not one of {sorted(VALID_EFFORTS)}",
+            f"judgement {id!r}: 'effort' {effort!r} is not one of {sorted(VALID_EFFORTS)}",
         )
     return Declaration(id, claim, evidence, reference, model, effort)
 
@@ -256,7 +258,7 @@ def _require(item: dict[str, object], field: str, source: Path, id: str) -> obje
     """Return ``item[field]`` or raise a fail-loud missing-required-field error."""
     if field not in item:
         raise DeclarationError(
-            source, f"judgment {id!r}: missing required field {field!r}"
+            source, f"judgement {id!r}: missing required field {field!r}"
         )
     return item[field]
 
@@ -271,7 +273,7 @@ def by_id(declarations: list[Declaration], id: str) -> Declaration:
     for declaration in declarations:
         if declaration.id == id:
             return declaration
-    raise ValueError(f"unknown judgment id: {id!r}")
+    raise ValueError(f"unknown judgement id: {id!r}")
 
 
 def lint_findings(root: Path | None) -> list[LintFinding]:
@@ -281,8 +283,8 @@ def lint_findings(root: Path | None) -> list[LintFinding]:
     path rules -- each evidence/reference path must be relative (not absolute, no
     ``..``) and exist. Each finding is located at the declaring YAML file (a
     configuration error at ``pyproject.toml``): a malformed declaration is
-    ``judgments.declaration``, a bad evidence/reference path is
-    ``judgments.evidence-path``. A repo with no ``[tool.judgments]`` config
+    ``semantic-validation.declaration``, a bad evidence/reference path is
+    ``semantic-validation.evidence-path``. A repo with no ``[tool.judgements]`` config
     validates nothing. One run surfaces every offending file and path.
     """
     if root is None:
@@ -298,7 +300,7 @@ def lint_findings(root: Path | None) -> list[LintFinding]:
             else:
                 parsed.extend((declaration, path) for declaration in result)
     except DeclarationError as error:
-        # A configuration error (a bad [tool.judgments].paths) surfaces from the
+        # A configuration error (a bad [tool.judgements].paths) surfaces from the
         # initial discovery, before any file parses: one finding at pyproject.
         return [LintFinding(_rel(error.source, root), DECLARATION, error.detail)]
 
@@ -309,7 +311,7 @@ def lint_findings(root: Path | None) -> list[LintFinding]:
                 LintFinding(
                     rel,
                     DECLARATION,
-                    f"duplicate judgment id {declaration.id!r} "
+                    f"duplicate judgement id {declaration.id!r} "
                     f"(also in {_rel(original, root)})",
                 )
             )
@@ -319,7 +321,7 @@ def lint_findings(root: Path | None) -> list[LintFinding]:
             if problem is not None:
                 findings.append(
                     LintFinding(
-                        rel, EVIDENCE_PATH, f"judgment {declaration.id!r}: {problem}"
+                        rel, EVIDENCE_PATH, f"judgement {declaration.id!r}: {problem}"
                     )
                 )
     return findings
@@ -331,18 +333,18 @@ def _rel(path: Path, root: Path) -> str:
 
 
 def lint_cli(argv: list[str] | None = None) -> int:
-    """Console-script entry point: lint the repo's judgments, findings to stdout.
+    """Console-script entry point: lint the repo's judgements, findings to stdout.
 
     Resolves the repo root, runs :func:`lint_findings`, prints every finding as a
     GNU finding line to stdout and a summary count to stderr, and returns 1 if
     there were any findings else 0. ``--list-rules`` prints the rule ids and
-    exits 0 without needing a repository. Registered as the ``judgments-audit``
-    console script and called by the ``scripts/judgments-audit`` pre-commit shim,
+    exits 0 without needing a repository. Registered as the ``judgements-audit``
+    console script and called by the ``scripts/judgements-audit`` pre-commit shim,
     so both channels behave alike.
     """
     parser = argparse.ArgumentParser(
-        prog="judgments-audit",
-        description="Lint a repo's judgment declarations against the schema and paths.",
+        prog="judgements-audit",
+        description="Lint a repo's judgement declarations against the schema and paths.",
     )
     parser.add_argument(
         "--list-rules",
@@ -351,13 +353,13 @@ def lint_cli(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     if args.list_rules:
-        return print_rules(JUDGMENTS_RULES)
+        return print_rules(JUDGEMENTS_RULES)
 
     findings = lint_findings(resolve_root())
     for finding in findings:
         print(render(finding.location, finding.rule, finding.message))
     if findings:
-        print(f"judgments-audit: {len(findings)} finding(s)", file=sys.stderr)
+        print(f"judgements-audit: {len(findings)} finding(s)", file=sys.stderr)
         return 1
     return 0
 

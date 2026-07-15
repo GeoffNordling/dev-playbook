@@ -50,8 +50,8 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # The rule id and finding message for each non-ok reference status.
 RULE_FOR = {
-    "broken": "docs.broken-reference",
-    "wrong-form": "docs.wrong-form-citation",
+    "broken": "knowledge-organization.broken-reference",
+    "wrong-form": "knowledge-organization.wrong-form-citation",
 }
 MESSAGE_FOR = {
     "broken": "reference does not resolve",

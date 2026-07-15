@@ -166,7 +166,7 @@ permission to act autonomously on similar findings.
    and recommend an action. The result is an enumerable report the
    user can approve or deny per item.
 4. **Direct.** The user evaluates your analysis and gives direction — a
-   judgment, decision, or instruction.
+   judgement, decision, or instruction.
 5. **Act.** If the direction requires action, execute it.
 
 After completing each unit of work, update the protocol state document:

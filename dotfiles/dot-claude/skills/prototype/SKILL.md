@@ -27,7 +27,7 @@ Decide this *with the user* — don't guess it. Before creating the prototype, s
 
 The default home is a top-level `prototypes/<name>/` directory, a sibling of `src/` — **never** under `src/`, which would put it on the import path. Production code does not import from `prototypes/`; the prototype may merge to `main` but is not integrated until it graduates. This is the right home for anything not yet trusted, and the safe fallback when no other location is settled.
 
-The usual reason to put it elsewhere is judgment: a presentation variant often only reads true butting up against the real page or module, so it may be worth living next to what it prototypes — named so a casual reader sees it's a prototype, not production. That's a call to make together in the moment, not a rule to apply silently.
+The usual reason to put it elsewhere is judgement: a presentation variant often only reads true butting up against the real page or module, so it may be worth living next to what it prototypes — named so a casual reader sees it's a prototype, not production. That's a call to make together in the moment, not a rule to apply silently.
 
 If the user is unreachable (an autonomous run), don't invent a placement — use `prototypes/<name>/` and note where it went so the choice can be revisited.
 

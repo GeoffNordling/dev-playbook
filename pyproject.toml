@@ -7,11 +7,11 @@ dependencies = [
 ]
 
 # Console scripts so a consumer that installs this package resolves the
-# judgments CLIs on its venv PATH. They wrap the same library entry points the
+# judgements CLIs on its venv PATH. They wrap the same library entry points the
 # scripts/ pre-commit shims call, so the two channels behave identically.
 [project.scripts]
-judgments-run = "dev_playbook.judgments.runner:run_cli"
-judgments-audit = "dev_playbook.judgments.loader:lint_cli"
+judgements-run = "dev_playbook.judgements.runner:run_cli"
+judgements-audit = "dev_playbook.judgements.loader:lint_cli"
 
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network
@@ -21,12 +21,12 @@ requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
 # Workspace-wide tooling that resolves from the repo root reads this table.
-# The judgment gate collects every declaration in the judgments/*.yaml
+# The judgement gate collects every declaration in the judgements/*.yaml
 # claim-family files; each passes iff its exact content-key is already cached
-# (fill the cache with a run-judgments fleet run after editing a declaration or
+# (fill the cache with a run-judgements fleet run after editing a declaration or
 # a file it puts on trial).
-[tool.judgments]
-paths = ["judgments/*.yaml"]
+[tool.judgements]
+paths = ["judgements/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

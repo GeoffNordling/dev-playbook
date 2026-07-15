@@ -43,7 +43,7 @@ Paired em dashes acting as parentheses should become actual parentheses:
    untracked files in the git working tree).
 2. Read each file and locate every em dash (U+2014: `—`).
 3. For each occurrence, read the surrounding sentence and apply the
-   replacement rules above. Use your judgment; the rules are guidelines, not
+   replacement rules above. Use your judgement; the rules are guidelines, not
    a mechanical mapping.
 4. Edit the file in place using the Edit tool.
 5. After all replacements, report a summary: how many em dashes were replaced,
