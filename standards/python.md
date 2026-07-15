@@ -30,7 +30,7 @@ Governs how Python source code is written.
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — the **commit gate**, where python-audit and ruff block every commit
-- `make check` — the **push gate**, where mypy blocks every push
+- `make check-judgments` — the **push gate**, where mypy blocks every push
 
 ## Adopt
 
