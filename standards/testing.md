@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Python Testing
 description: Card for the Python-testing standard — how Python tests are written
 ---

@@ -1,6 +1,6 @@
 # standards/ — index
 
-The catalog: every standard has a card here (`type: Standard Card`), and
+The catalog: every standard has a card here (`type: Standard-Card`), and
 each card's cells point at the files that define, audit, enforce, and
 adopt it. See [Standards and Standard Cards](/standards/standard/format.md).
 Ordering: README, then the cards — meta-standard first, the rest

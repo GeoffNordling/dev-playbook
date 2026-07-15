@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Claude Code Harness Files
 description: Card for the Claude Code harness-files standard — how harness-consumed files are distinguished from ordinary files and what each contains
 ---

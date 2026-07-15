@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Shell
 description: Card for the shell standard — how shell is written
 ---

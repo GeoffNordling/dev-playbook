@@ -1,5 +1,5 @@
 ---
-type: Decision Record
+type: Decision-Record
 title: Merge SDD Spec Authoring into One Phase
 description: Merge sdd-requirements and sdd-design into a single sdd-specs phase authoring the whole feat/req/dsn hierarchy in one interview
 ---

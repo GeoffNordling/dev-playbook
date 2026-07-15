@@ -74,8 +74,8 @@ judgments:
       scripts/README.md gives every script exactly one home and one job:
       each script appears in exactly one of the file's two tables (Validation
       scripts, Utility scripts) with a single stated responsibility, and each
-      validation-table row additionally names exactly one standard whose
-      concern the script's stated purpose serves, while the utility table
+      validation-table row additionally names one or more standards whose
+      concerns the script's stated purpose serves, while the utility table
       states purposes only and asserts no standard alignment. The claim is
       over what the tables state, not their completeness.
     evidence:  [scripts/README.md]

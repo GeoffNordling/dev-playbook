@@ -1,5 +1,5 @@
 ---
-type: Instrument Spec
+type: Instrument-Spec
 title: The File Graph
 description: The file graph — a total, typed map of every file in a repository and the references connecting them
 ---

@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Semantic Validation
 description: Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
 ---

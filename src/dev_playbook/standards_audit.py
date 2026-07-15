@@ -7,7 +7,7 @@ local-only precedent is validate-manifest). Four rules, each namespaced under
 the meta card (``standard.*``):
 
   - **card-layout** — every flat ``standards/<name>.md`` except README.md and
-    index.md is a card: ``type: Standard Card`` frontmatter and the four cells
+    index.md is a card: ``type: Standard-Card`` frontmatter and the four cells
     (Define, Audit, Enforce, Adopt) as ``##`` sections, in that order. Contracts
     live in sub-directories, so the flat-file layer is exactly the cards.
   - **catalog-order** — ``standards/index.md`` follows its declared ordering:
@@ -54,7 +54,7 @@ HOOK_SURFACES = "standard.hook-surfaces"
 
 RULES = (CARD_LAYOUT, CATALOG_ORDER, RULE_MATRIX, HOOK_SURFACES)
 
-CARD_TYPE = "Standard Card"
+CARD_TYPE = "Standard-Card"
 CATALOG = "standards/index.md"
 README = "standards/README.md"
 META_CARD = "standards/standard.md"

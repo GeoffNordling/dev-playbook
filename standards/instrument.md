@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Instruments
 description: Card for the instrument standard — how purpose-built devices are specified and kept conformant
 ---
@@ -16,7 +16,7 @@ specified and kept conformant.
 
 ## Audit
 
-- [okf-audit](/scripts/okf-audit) — every spec typed `Instrument Spec` carries
+- [okf-audit](/scripts/okf-audit) — every spec typed `Instrument-Spec` carries
   an `## Employed by` section (`instrument.employed-by`), the
   [instruments catalog](/instruments/index.md) complete and fresh
 

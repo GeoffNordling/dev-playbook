@@ -1,5 +1,5 @@
 ---
-type: Decision Record
+type: Decision-Record
 title: Harvest Pocock's `prototype` and `handoff` Skills
 description: Harvest Pocock's prototype and handoff skills into authored bundles rather than taking a direct dependency
 ---

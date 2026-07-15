@@ -34,13 +34,13 @@ Not everything normative is a standard. A device built to serve a purpose
 — an artifact format, a tool, a template — is an answer, not a governed
 question, and so belongs inside a cell rather than in the catalog. Such
 devices are **instruments**; each carries a prescriptive contract of its
-own, typed `Instrument Spec`. The instrument concept is defined in
+own, typed `Instrument-Spec`. The instrument concept is defined in
 [Instruments and Instrument Specs](/standards/instrument/format.md).
 
 ## The card
 
 A card is a markdown file at `standards/<name>.md` with
-`type: Standard Card` frontmatter: a heading, one sentence naming the
+`type: Standard-Card` frontmatter: a heading, one sentence naming the
 governed question, then exactly four cells as sections. Each cell holds
 annotated pointers; an empty cell states an explicit "none" so gaps stay
 visible. Cards are thin — often just a handful of pointers — and never

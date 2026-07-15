@@ -8,7 +8,7 @@ that owns them — `docs.*` for the first two (knowledge-organization),
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the registry document (`REGISTRY_DOC` below), plus `title` and
     `description`. `resource` is optional in general and required on a
-    `Recipe Description`. The registry is parsed from the registry document's
+    `Recipe-Description`. The registry is parsed from the registry document's
     `## Types` table, so that document is the single source of truth. The
     registry document is a single global file that lives only in dev-playbook:
     when the audited repo carries it (dev-playbook itself), it is read from the
@@ -25,7 +25,7 @@ that owns them — `docs.*` for the first two (knowledge-organization),
     `index.md` additionally declares `okf_version`. The prose standard for
     these rules lives in this repo's standards/ tree.
 
-  - **Instrument-spec** — every document typed `Instrument Spec` carries an
+  - **Instrument-spec** — every document typed `Instrument-Spec` carries an
     `## Employed by` section naming the standard, skill, or ritual that demands
     its readings. Presence only: the section's content is review's territory,
     and ref-audit verifies any link it carries.
@@ -99,10 +99,10 @@ RULES = (
 )
 
 REGISTRY_DOC = "standards/docs/document-types.md"
-RESOURCE_REQUIRED_TYPES = {"Recipe Description"}
+RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # The type whose docs must carry an `## Employed by` section, and that section's
 # GitHub heading slug — the presence the instrument.employed-by check looks for.
-INSTRUMENT_SPEC_TYPE = "Instrument Spec"
+INSTRUMENT_SPEC_TYPE = "Instrument-Spec"
 EMPLOYED_BY_SLUG = "employed-by"
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # An index bullet: `- [Title](/root-absolute) — description`. The description
@@ -136,7 +136,7 @@ class Finding:
 def _is_title_case(name: str) -> bool:
     """Whether every whitespace-separated word of a type name is capitalized.
 
-    ``README`` and ``Recipe Description`` pass; ``bogus name`` does not. The
+    ``README`` and ``Recipe-Description`` pass; ``bogus name`` does not. The
     registry document declares Title Case type names, so a backticked-but-
     lowercase cell is a malformed row, not a silently accepted type.
     """
@@ -301,7 +301,7 @@ def check_types(
 def check_instrument_specs(
     concept_docs: list[str], repo_root: Path
 ) -> list[Finding]:
-    """Every `Instrument Spec` doc carries an `## Employed by` section.
+    """Every `Instrument-Spec` doc carries an `## Employed by` section.
 
     Presence only: the section names the standard, skill, or ritual that demands
     the instrument's readings, but this check verifies just that the heading

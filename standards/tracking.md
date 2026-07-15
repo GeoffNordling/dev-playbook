@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Tracking
 description: Card for the tracking standard — how work is tracked through issues and repository settings
 ---

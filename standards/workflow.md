@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Workflow
 description: Card for the workflow standard — how an idea becomes a merged pull request
 ---

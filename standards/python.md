@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Python
 description: Card for the Python standard — how Python source code is written
 ---
