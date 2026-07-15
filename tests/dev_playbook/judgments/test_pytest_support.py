@@ -28,7 +28,13 @@ EVIDENCE = {
 
 @pytest.fixture
 def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Stand up a judgments repo, chdir into it, and isolate the seen-set cache."""
+    """Stand up a judgments repo, chdir into it, and isolate the seen-set cache.
+
+    Also clears any ambient ``SKIP_JUDGMENTS`` so the gate runs by default; the
+    make targets export it (``=1`` under ``make test``), and a leaked value would
+    silently turn these gate-behaviour tests into skips. Tests that exercise the
+    skip lever set the variable themselves.
+    """
     root = tmp_path / "repo"
     for relpath, contents in {
         "pyproject.toml": CONFIG,
@@ -40,6 +46,7 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         path.write_text(contents)
     monkeypatch.chdir(root)
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
+    monkeypatch.delenv("SKIP_JUDGMENTS", raising=False)
     return root
 
 
@@ -76,4 +83,36 @@ def test_missing_evidence_file_raises_a_loud_error(repo: Path) -> None:
     (repo / "docs" / "errors.md").unlink()
 
     with pytest.raises(FileNotFoundError):
+        assert_judgment_cached("j1")
+
+
+def test_skip_judgments_1_skips_the_gate_visibly(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("SKIP_JUDGMENTS", "1")
+
+    # An uncached judgment: without the skip lever this would fail the gate, so
+    # the skip must short-circuit before the cache check -- and as a real pytest
+    # skip (visible in the summary), naming the id.
+    with pytest.raises(pytest.skip.Exception, match="j1"):
+        assert_judgment_cached("j1")
+
+
+def test_skip_judgments_0_arms_the_gate(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("SKIP_JUDGMENTS", "0")
+
+    with pytest.raises(AssertionError, match="j1.*cache miss"):
+        assert_judgment_cached("j1")
+
+
+def test_only_the_literal_1_arms_the_skip(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Any value other than the literal "1" runs the gate -- the tripwire cannot
+    # be disarmed by a truthy-looking string.
+    monkeypatch.setenv("SKIP_JUDGMENTS", "true")
+
+    with pytest.raises(AssertionError, match="j1.*cache miss"):
         assert_judgment_cached("j1")
