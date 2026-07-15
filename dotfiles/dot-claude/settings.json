@@ -49,7 +49,7 @@
       "Bash(gh pr unlock *)"
     ]
   },
-  "model": "sonnet",
+  "model": "opus[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "Stop": [
