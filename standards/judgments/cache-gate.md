@@ -48,8 +48,33 @@ def test_judgment_cached(jid):
 So `pytest` is a fast gate: green means every judgment's current content is
 already cached as passing. Filling the cache — running the judge on the
 misses and recording the passes — is the job of the `run-judgments` skill,
-the only place an LLM ever runs. It has to be a skill — thin harness
-instructions — because subscription billing requires running the judges
-through the harness interactively. A judgment whose judge returns *false*
-is never recorded, so it stays a permanent miss (a permanent failing test)
-until the underlying content is fixed.
+the only place an LLM ever runs, and it runs at the **main loop only**: it
+needs orchestration tooling a subagent lacks. It has to be a skill — thin
+harness instructions — because subscription billing requires running the
+judges through the harness interactively. A judgment whose judge returns
+*false* is never recorded, so it stays a permanent miss (a permanent failing
+test) until the underlying content is fixed.
+
+## Two tiers: when the gate is armed
+
+The cache miss is only remediable by `run-judgments` at the main loop, but
+subagents are told to run `make check` regularly. So the gate is two-tier,
+keyed off one environment variable, `SKIP_JUDGMENTS`, read inside
+`assert_judgment_cached` itself:
+
+| Invocation | `SKIP_JUDGMENTS` | The gate |
+|---|---|---|
+| `make check`, `make test` | `1` (the Makefile default, exported) | **skipped** |
+| `make check-judgments` | `0` (`$(MAKE) check SKIP_JUDGMENTS=0`) | **armed** |
+| bare `uv run pytest` | unset | **armed** (fail-safe) |
+
+When `SKIP_JUDGMENTS` is exactly `1`, the helper **skips** each case with a
+visible pytest skip naming the id — never a silent pass; any other value, or
+unset, arms the check. The lever lives in the helper — the one choke point
+every consumer's gate test calls — so it covers any test shape (the single or
+parametrized recipes above) with **no per-test markers** and no change to
+those recipes. `make check-judgments` is the
+[pre-push hook](/standards/build/canonical/.pre-commit-config.yaml)'s entry, so
+a miss blocks the push; the human or main-loop agent then runs `run-judgments`
+and retries. A subagent running plain `make check` never meets an
+unresolvable red.

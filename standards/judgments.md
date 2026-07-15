@@ -25,8 +25,8 @@ are validated and kept from drifting as the underlying files change.
 ## Enforce
 
 - the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
-  — reds the **push gate** (`make check`) until every judgment's exact
-  content is judged-and-passed
+  — reds `make check-judgments`, wired to the **push gate** by the canonical
+  pre-push hook, until every judgment's exact content is judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — judgments-audit at the **commit gate** in every repo's suite

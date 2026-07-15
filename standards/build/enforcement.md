@@ -18,7 +18,7 @@ them by these names.
 | Gate | Trigger | What runs |
 |---|---|---|
 | **commit gate** | `git commit` | the pre-commit hook suite, on staged files |
-| **push gate** | `git push` | `make check`, via the pre-push stage |
+| **push gate** | `git push` | `make check-judgments`, via the pre-push stage |
 | **CI gate** | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
 
 The commit and push gates block locally, through the git hooks that invoke
@@ -48,9 +48,9 @@ outside every gate: it hosts the CI gate but is not itself one.
 ## Map
 
 Where each detector's rules fire. Every pre-commit hook fires at the **commit
-gate, in the CI gate, and inside every `make check`** (hence also at the push
-gate and in the agent ritual); the table lists only what falls outside that
-pattern.
+gate, in the CI gate, and inside every `make check`** (hence also in the agent
+ritual, and at the push gate via `make check-judgments`); the table lists only
+what falls outside that pattern.
 
 | Detector | Owns | Gates |
 |---|---|---|
@@ -67,6 +67,6 @@ pattern.
 | shfmt | shell formatting | hook pattern |
 | skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
-| pytest | tests + judgments stage-1 cache gate | push gate only — never the CI gate |
+| pytest | tests + judgments cache gate | push gate only — never the CI gate |
 | validate | spec graph | push gate only — never the CI gate (sdd repos) |
 | workspace-audit | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-audit (outside the gates) |

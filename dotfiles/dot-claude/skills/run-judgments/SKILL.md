@@ -12,6 +12,8 @@ A **judgment** is a specific yes/no question about specific files, ruled on by a
 
 This is a thin implementation skill relying on deterministic CLI commands: the CLI enumerates the work and records the outcomes, the judges produce the verdicts, and this skill's own judgment is confined to the fixes.
 
+**Main loop only.** This skill dispatches judges through the `Workflow` tool, which exists only at the main loop — a subagent does not have it. A subagent that hits a cache miss (a red judgment gate) must **surface** it for the main loop or the user to run this skill; it must never hand-roll judge calls, which would bypass the per-judgment `model`/`effort` pinning and schema validation and produce off-bench verdicts that must not be recorded.
+
 ## The loop
 
 Repeat steps 1–5 until step 1 finds nothing left to run. Two limits govern every pass through it:
@@ -59,4 +61,4 @@ Each job carries its own required `model`/`effort`; `schema` is batch-wide. One 
 
 ## Report
 
-When the loop stops, tell the user: skipped (already cached), ran, passed (recorded), fixed-then-passed (each id + the edit made), set aside (each id + its `opinion` or crash history + why), crashed-and-recovered. The gate (`pytest` / `make check`) goes green only when **every** judgment passes — set-aside judgments keep it red by design.
+When the loop stops, tell the user: skipped (already cached), ran, passed (recorded), fixed-then-passed (each id + the edit made), set aside (each id + its `opinion` or crash history + why), crashed-and-recovered. The armed gate — `make check-judgments`, the pre-push hook's entry (a bare `uv run pytest` arms it too) — goes green only when **every** judgment passes; set-aside judgments keep it red by design. Default `make check`/`make test` skip the gate (`SKIP_JUDGMENTS=1`), so re-check against `make check-judgments`.
