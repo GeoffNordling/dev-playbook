@@ -2,7 +2,7 @@
 name: issue-overwatch
 description: Executes one issue's whole traverse through the workflow graph — dispatches every node, writes the labels, and stops wherever only the human can act. Launched per issue from Agent view.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: xhigh
 argument-hint: "<issue-number>"
 ---

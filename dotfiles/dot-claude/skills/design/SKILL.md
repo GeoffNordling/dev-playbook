@@ -2,7 +2,7 @@
 name: design
 description: Explores the approach for a direct-path issue — solutions, prototypes, tradeoffs — through a structured interview, then writes the chosen approach into the issue. Use when the issue overwatch launches the `design` node.
 disable-model-invocation: false
-model: opus
+model: inherit
 effort: xhigh
 argument-hint: "<issue-number>"
 ---

@@ -2,7 +2,7 @@
 name: skill-creator
 description: Author a new Claude Code skill following workspace conventions
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: xhigh
 ---
 
@@ -22,7 +22,7 @@ Discuss with the user. Ask the questions the standard leaves to choice:
 - **Use cases** — what specific scenarios should it handle? Any edge cases worth calling out?
 - **Invocation mode** — `disable-model-invocation: true` (user-only, slash-command) or `false` (Claude auto-invokes when relevant)?
 - **Triggers** (auto-invocable only) — what keywords, contexts, or file types should make Claude reach for it? These go into the description.
-- **Model** — default to `opus` unless the user says otherwise (`haiku` / `sonnet` / `opus`, or none to inherit session model).
+- **Model** — ask the user which model the skill runs under (`haiku` / `sonnet` / `opus` / `fable`, or `inherit` to follow the session model); it's their call, not a default you set. The one mechanic to surface when they decide: a pin only governs the turn that loads the skill, so for an interactive, multi-turn skill `inherit` is what honestly reflects the rest of the interaction.
 - **Effort** — default to `xhigh` unless the user says otherwise (`low` / `medium` / `high` / `xhigh`).
 - **Arguments** — none, single free-form (`$ARGUMENTS`), or positional (`$0`/`$1`/...)?
 - **References** — does the body need supporting files under `references/`?

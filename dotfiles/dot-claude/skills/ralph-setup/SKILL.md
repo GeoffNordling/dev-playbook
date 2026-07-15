@@ -2,7 +2,7 @@
 name: ralph-setup
 description: Scaffolds a Ralph loop — interviews the user to pin what the finished product is, breaks it into a sequential plan a memoryless agent can grind through one task at a time, and writes the plan and progress files the loop requires. Use when the user wants to set up or scaffold a ralph loop or says "set up a ralph loop".
 disable-model-invocation: false
-model: opus
+model: inherit
 effort: xhigh
 argument-hint: "[goal description]"
 ---

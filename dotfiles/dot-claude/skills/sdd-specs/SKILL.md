@@ -2,7 +2,7 @@
 name: sdd-specs
 description: Authors a project's spec — its `feat`, `req`, and `dsn` items — as one hierarchy through a structured interview, then leaves the tree green. Use when the issue overwatch launches the `sdd-specs` node.
 disable-model-invocation: false
-model: opus
+model: inherit
 effort: xhigh
 argument-hint: "<issue-number>"
 ---

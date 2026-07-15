@@ -2,7 +2,7 @@
 name: intake
 description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea (one issue or many). Decides category, mode, tests; writes the four-tuple labels and the brief onto the issue. Use when the issue overwatch launches the `intake` node, or standalone straight from the user.
 disable-model-invocation: false
-model: opus
+model: inherit
 effort: xhigh
 ---
 
