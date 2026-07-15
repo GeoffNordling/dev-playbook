@@ -86,6 +86,21 @@ The check is deterministic and offline; it reads the same machine-local
 seen-set the `run-judgments` skill fills, so it needs no LLM and no API key
 on CI.
 
+The gate is two-tier, keyed off one environment variable `SKIP_JUDGMENTS` that
+`assert_judgment_cached` reads ([cache-gate.md](/standards/judgments/cache-gate.md)):
+exactly `1` skips the check with a visible pytest skip, any other value or
+unset arms it. The canonical [Makefile](/standards/build/make.md) defaults it
+to `1` and exports it, so `make check` and `make test` **skip** the gate — a
+subagent running them never hits a miss only `run-judgments` (main loop) can
+fill. `make check-judgments` runs `check` with `SKIP_JUDGMENTS=0`, arming the
+gate, and is the entry of the canonical pre-push hook: a miss blocks the push
+until the cache is filled. A bare `uv run pytest` arms it too (fail-safe).
+
+**Same-commit adoption.** A repo taking the new Makefile fragment `MUST`
+repoint its pre-push hook to `make check-judgments` in the **same commit**.
+Otherwise its `make check` stops running the gate while nothing at the push
+enforces it — a window with zero mechanical enforcement.
+
 ## 4. Lint the declarations on commit
 
 Add the `judgments-audit` pre-commit hook so malformed or stale declarations
