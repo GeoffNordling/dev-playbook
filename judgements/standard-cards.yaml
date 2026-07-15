@@ -1,13 +1,13 @@
-# Card-honesty judgments for dev-playbook's standard cards (the meta-standard's
+# Card-honesty judgements for dev-playbook's standard cards (the meta-standard's
 # per-card semantic check). Each puts one standard card on trial: an LLM judge
 # rules whether the card is honest -- every pointer in its Define, Audit,
 # Enforce, and Adopt cells names a real artifact that genuinely serves that
 # cell's role, any cell that declares "none" is genuinely empty, and no cell
 # misrepresents what its targets do. Evidence is the card under trial; reference
 # is standards/standard/format.md (the card contract) plus the artifacts the
-# card points at. One judgment per card -- semantic honesty the deterministic
-# standards-audit cannot check. See standards/judgments/.
-judgments:
+# card points at. One judgement per card -- semantic honesty the deterministic
+# standards-audit cannot check. See standards/judgements/.
+judgements:
   - id: standard-card-build
     claim: |
       standards/build.md is an honest card: every pointer in its define,
@@ -37,7 +37,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - scripts/standards-audit
-      - judgments/standard-cards.yaml
+      - judgements/standard-cards.yaml
       - .pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high
@@ -64,11 +64,11 @@ judgments:
 
   - id: standard-card-docs
     claim: |
-      standards/docs.md is an honest card: every pointer in its define,
+      standards/knowledge-organization.md is an honest card: every pointer in its define,
       audit, enforce, and adopt cells names a real artifact that genuinely
       serves that cell's role for the knowledge-organization standard, and
       no cell misrepresents what its targets do.
-    evidence:  [standards/docs.md]
+    evidence:  [standards/knowledge-organization.md]
     reference:
       - standards/standard/format.md
       - standards/docs/index.md
@@ -79,20 +79,20 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-judgments
+  - id: standard-card-judgements
     claim: |
-      standards/judgments.md is an honest card: every pointer in its
+      standards/semantic-validation.md is an honest card: every pointer in its
       define, audit, enforce, and adopt cells names a real artifact that
       genuinely serves that cell's role for the semantic-validation
       standard, and no cell misrepresents what its targets do.
-    evidence:  [standards/judgments.md]
+    evidence:  [standards/semantic-validation.md]
     reference:
       - standards/standard/format.md
-      - standards/judgments/index.md
-      - standards/judgments/cache-gate.md
-      - standards/judgments/consuming.md
-      - scripts/judgments-audit
-      - scripts/judgments-run
+      - standards/judgements/index.md
+      - standards/judgements/cache-gate.md
+      - standards/judgements/consuming.md
+      - scripts/judgements-audit
+      - scripts/judgements-run
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high

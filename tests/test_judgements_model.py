@@ -1,20 +1,20 @@
-"""The judgment model and the SCHEMA structured-output contract.
+"""The judgement model and the SCHEMA structured-output contract.
 
-PROMPT's exact text is pinned by the constant in ``dev_playbook.judgments.core`` (and the
+PROMPT's exact text is pinned by the constant in ``dev_playbook.judgements.core`` (and the
 issue brief, its source of truth); a golden copy here would only duplicate it.
-Its rendered role is covered behaviorally in ``test_judgments_prepare.py``.
+Its rendered role is covered behaviorally in ``test_judgements_prepare.py``.
 """
 
 import json
 
-from dev_playbook.judgments.core import SCHEMA, Judgment
+from dev_playbook.judgements.core import SCHEMA, Judgement
 
 
-def test_judgment_holds_a_verdict_and_an_opinion() -> None:
-    judgment = Judgment(verdict=True, opinion="the evidence supports the claim")
+def test_judgement_holds_a_verdict_and_an_opinion() -> None:
+    judgement = Judgement(verdict=True, opinion="the evidence supports the claim")
 
-    assert judgment.verdict is True
-    assert judgment.opinion == "the evidence supports the claim"
+    assert judgement.verdict is True
+    assert judgement.opinion == "the evidence supports the claim"
 
 
 def test_schema_declares_verdict_boolean_and_opinion_string() -> None:

@@ -1,18 +1,18 @@
-"""The judgments-run CLI: deterministic plan / render / record over declarations.
+"""The judgements-run CLI: deterministic plan / render / record over declarations.
 
 Every subcommand reads the repo's declarations through the loader and drives the
-two already-built dependencies -- ``judgments.core.prepare`` (claim + files +
+two already-built dependencies -- ``judgements.core.prepare`` (claim + files +
 bench -> content key and judge prompt) and the ``skipcache`` seen-set. No
 LLM, no network: this is the deterministic half the judge skill stands on.
 
-- ``plan``  -- key every judgment, partition by cache membership, emit one JSON
+- ``plan``  -- key every judgement, partition by cache membership, emit one JSON
   object ``{schema, seen, unseen}`` with both lists ordered by id.
-- ``render <id>`` -- print exactly the judge prompt for one judgment.
-- ``record <id>... [--refuted <id>...]`` -- record the passing judgments' keys
-  idempotently, and report each refuted judgment as a ``judgments.refuted``
+- ``render <id>`` -- print exactly the judge prompt for one judgement.
+- ``record <id>... [--refuted <id>...]`` -- record the passing judgements' keys
+  idempotently, and report each refuted judgement as a ``semantic-validation.refuted``
   finding (never cached, so the gate stays red).
-- ``--list-rules`` -- print the ``judgments.refuted`` rule id and exit; this is
-  the read-only Audit detector behind the judgments card's judgments-run pointer.
+- ``--list-rules`` -- print the ``semantic-validation.refuted`` rule id and exit; this is
+  the read-only Audit detector behind the judgements card's judgements-run pointer.
 """
 
 import argparse
@@ -22,35 +22,35 @@ from pathlib import Path
 from typing import NamedTuple
 
 from dev_playbook.findings import print_rules, render
-from dev_playbook.judgments.core import SCHEMA, Prepared, prepare
-from dev_playbook.judgments.loader import Declaration, by_id, load, resolve_root
+from dev_playbook.judgements.core import SCHEMA, Prepared, prepare
+from dev_playbook.judgements.loader import Declaration, by_id, load, resolve_root
 from dev_playbook.skipcache import seen
 
-# judgments-run is the detector behind the judgments card's second Audit pointer:
+# judgements-run is the detector behind the judgements card's second Audit pointer:
 # recording a batch of verdicts is a read-only audit (it mutates only the
 # content-addressed cache outside the repo, never anything git tracks), so a
 # refuted verdict in that batch is a finding. This one rule id is a module-level
 # constant so the emission site references it, not a raw literal, and RULES (what
 # --list-rules prints) cannot drift from what the code emits.
-REFUTED = "judgments.refuted"
+REFUTED = "semantic-validation.refuted"
 RULES = (REFUTED,)
 
 _DISPATCH_PROMPT = (
-    "Run the shell command `judgments-run render {id}`. Its stdout is your complete "
+    "Run the shell command `judgements-run render {id}`. Its stdout is your complete "
     "instructions and the material to judge -- follow it and return your verdict."
 )
 
 
 class RefutedFinding(NamedTuple):
-    """One refuted judgment, located at its id and rendered as a GNU finding."""
+    """One refuted judgement, located at its id and rendered as a GNU finding."""
 
-    location: str  # the judgment id -- the addressable thing under judgment
+    location: str  # the judgement id -- the addressable thing under judgement
     rule: str  # REFUTED
     message: str
 
 
 def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object]:
-    """Partition the judgments by cache membership into a ``{schema, seen, unseen}``.
+    """Partition the judgements by cache membership into a ``{schema, seen, unseen}``.
 
     ``seen`` is the sorted ids whose key is already cached; ``unseen`` is the
     sorted-by-id list of ``{id, model, effort, prompt}`` the judge skill must still
@@ -76,7 +76,7 @@ def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object
 
 
 def render_prompt(declaration: Declaration, root: Path | None) -> str:
-    """The judge prompt for one judgment -- the XML input a judge agent runs.
+    """The judge prompt for one judgement -- the XML input a judge agent runs.
 
     Named ``render_prompt`` (not ``render``) so it does not shadow the shared GNU
     finding renderer this module imports for the refuted-verdict finding.
@@ -85,12 +85,12 @@ def render_prompt(declaration: Declaration, root: Path | None) -> str:
 
 
 def record(declarations: list[Declaration], root: Path | None) -> None:
-    """Record the given judgments' content keys in the seen-set, idempotently."""
+    """Record the given judgements' content keys in the seen-set, idempotently."""
     seen.record([_prepared(d, root).key for d in declarations])
 
 
 def refutations(declarations: list[Declaration]) -> list[RefutedFinding]:
-    """One ``judgments.refuted`` finding per refuted judgment in the batch.
+    """One ``semantic-validation.refuted`` finding per refuted judgement in the batch.
 
     A refuted verdict is never cached (the gate stays red until the claim is
     judged-and-passed); recording the batch surfaces it as a finding instead.
@@ -117,8 +117,8 @@ def _prepared(declaration: Declaration, root: Path | None) -> Prepared:
 def run_cli() -> int:
     """Console-script entry point: run the CLI over this process's own argv.
 
-    Registered as the ``judgments-run`` console script and called by the
-    ``scripts/judgments-run`` pre-commit shim, so both channels run the same
+    Registered as the ``judgements-run`` console script and called by the
+    ``scripts/judgements-run`` pre-commit shim, so both channels run the same
     ``main`` over ``sys.argv``.
     """
     return main(sys.argv[1:])
@@ -130,7 +130,7 @@ def main(argv: list[str]) -> int:
     if args.list_rules:
         return print_rules(RULES)
     if args.command is None:
-        print("judgments-run: a subcommand is required", file=sys.stderr)
+        print("judgements-run: a subcommand is required", file=sys.stderr)
         return 2
     root = resolve_root()
     try:
@@ -142,14 +142,14 @@ def main(argv: list[str]) -> int:
         elif args.command == "record":
             if not args.ids and not args.refuted:
                 print(
-                    "judgments-run record: at least one id or --refuted id is required",
+                    "judgements-run record: at least one id or --refuted id is required",
                     file=sys.stderr,
                 )
                 return 2
             both = set(args.ids) & set(args.refuted)
             if both:
                 print(
-                    "judgments-run record: "
+                    "judgements-run record: "
                     f"id(s) both recorded and refuted: {', '.join(sorted(both))}",
                     file=sys.stderr,
                 )
@@ -161,7 +161,7 @@ def main(argv: list[str]) -> int:
             if findings:
                 return 1
     except (ValueError, OSError) as error:
-        print(f"judgments-run: {error}", file=sys.stderr)
+        print(f"judgements-run: {error}", file=sys.stderr)
         return 1
     return 0
 
@@ -174,8 +174,8 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     therefore optional, and a bare invocation with neither is an error.
     """
     parser = argparse.ArgumentParser(
-        prog="judgments-run",
-        description="Deterministic plan/render/record over judgment declarations.",
+        prog="judgements-run",
+        description="Deterministic plan/render/record over judgement declarations.",
     )
     parser.add_argument(
         "--list-rules",
@@ -184,17 +184,17 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     )
     sub = parser.add_subparsers(dest="command")
     sub.add_parser("plan", help="emit {schema, seen, unseen} as JSON")
-    render_parser = sub.add_parser("render", help="print one judgment's judge prompt")
-    render_parser.add_argument("id", help="the judgment id to render")
-    record_parser = sub.add_parser("record", help="record verdicts over judgments")
+    render_parser = sub.add_parser("render", help="print one judgement's judge prompt")
+    render_parser.add_argument("id", help="the judgement id to render")
+    record_parser = sub.add_parser("record", help="record verdicts over judgements")
     record_parser.add_argument(
-        "ids", nargs="*", help="the passing judgment ids to record"
+        "ids", nargs="*", help="the passing judgement ids to record"
     )
     record_parser.add_argument(
         "--refuted",
         nargs="*",
         default=[],
         metavar="ID",
-        help="refuted judgment id(s), each reported as a judgments.refuted finding",
+        help="refuted judgement id(s), each reported as a semantic-validation.refuted finding",
     )
     return parser.parse_args(argv)

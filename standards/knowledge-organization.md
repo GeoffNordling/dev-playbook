@@ -20,7 +20,7 @@ types, indexes, and cross-references.
   `index.md` freshness
 - [ref-audit](/scripts/ref-audit) — Links and Citations resolve
 - [repo-audit](/scripts/repo-audit) — README and CONTEXT.md doc shape
-  (`docs.doc-shape`)
+  (`knowledge-organization.doc-shape`)
 
 ## Enforce
 

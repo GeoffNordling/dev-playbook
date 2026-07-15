@@ -13,12 +13,12 @@ alphabetical; directories last.
 - [Claude Code Harness Files](/standards/claude-code.md) — Card for the Claude Code harness-files standard — how harness-consumed files are distinguished from ordinary files and what each contains
 - [Decision Records](/standards/decisions.md) — Card for the decision-records standard — how hard-to-reverse decisions are recorded
 - [Instruments](/standards/instrument.md) — Card for the instrument standard — how purpose-built devices are specified and kept conformant
-- [Knowledge Organization](/standards/docs.md) — Card for the knowledge-organization standard — how knowledge is organized in markdown
+- [Knowledge Organization](/standards/knowledge-organization.md) — Card for the knowledge-organization standard — how knowledge is organized in markdown
 - [Module Design](/standards/modules.md) — Card for the module-design standard — how modules are designed
 - [Prose](/standards/prose.md) — Card for the prose standard — how workspace prose is written
 - [Python](/standards/python.md) — Card for the Python standard — how Python source code is written
 - [Python Testing](/standards/testing.md) — Card for the Python-testing standard — how Python tests are written
-- [Semantic Validation](/standards/judgments.md) — Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
+- [Semantic Validation](/standards/semantic-validation.md) — Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
 - [Shell](/standards/shell.md) — Card for the shell standard — how shell is written
 - [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
 - [Tracking](/standards/tracking.md) — Card for the tracking standard — how work is tracked through issues and repository settings
@@ -37,6 +37,6 @@ alphabetical; directories last.
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement
 - [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard — the member registry, the CLAUDE.md content standard, and the skill conventions
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
-- [judgments/](/standards/judgments/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
+- [judgements/](/standards/judgements/index.md) — The judgements standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
 - [tracking/](/standards/tracking/index.md) — The tracking standard's contract — issue conventions and repository settings

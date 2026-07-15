@@ -220,7 +220,7 @@ def test_malformed_frontmatter_is_flagged_and_siblings_still_lint(
 
     assert result.returncode == 1
     assert "standards/README.md" in result.stdout
-    assert "docs.frontmatter" in result.stdout
+    assert "knowledge-organization.frontmatter" in result.stdout
     # The malformed doc did not abort the scan: the sibling problem is caught too.
     assert "missing 'type'" in result.stdout
 
@@ -333,8 +333,8 @@ def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
     result = run_okf_audit(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "docs.registry-row" not in result.stdout
-    assert "docs.index-ordering" not in result.stdout
+    assert "knowledge-organization.registry-row" not in result.stdout
+    assert "knowledge-organization.index-ordering" not in result.stdout
 
 
 def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
@@ -352,8 +352,8 @@ def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "not in the registry" in result.stdout
-    assert "docs.registry-row" not in result.stdout
-    assert "docs.index-ordering" not in result.stdout
+    assert "knowledge-organization.registry-row" not in result.stdout
+    assert "knowledge-organization.index-ordering" not in result.stdout
 
 
 # --- instrument.employed-by ---
@@ -428,19 +428,21 @@ def test_list_rules_prints_card_namespaced_ids_from_any_cwd(tmp_path: Path) -> N
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "docs.type" in ids
-    assert "docs.registry-row" in ids
-    assert "docs.description-shape" in ids
-    assert "docs.index-ordering" in ids
+    assert "knowledge-organization.type" in ids
+    assert "knowledge-organization.registry-row" in ids
+    assert "knowledge-organization.description-shape" in ids
+    assert "knowledge-organization.index-ordering" in ids
     assert "instrument.employed-by" in ids
-    assert all(rule.startswith(("docs.", "instrument.")) for rule in ids), ids
+    assert all(
+        rule.startswith(("knowledge-organization.", "instrument.")) for rule in ids
+    ), ids
 
 
 def test_malformed_registry_row_is_flagged_not_silently_skipped(
     tmp_path: Path,
 ) -> None:
     """A `## Types` row without a backticked name in its first cell used to drop
-    out of the registry silently; now it is a `docs.registry-row` finding at the
+    out of the registry silently; now it is a `knowledge-organization.registry-row` finding at the
     row's line."""
     doc = (
         "---\ntype: Standard\ntitle: Document Types\n"
@@ -457,7 +459,7 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/docs/document-types\.md:\d+: docs\.registry-row",
+        r"standards/docs/document-types\.md:\d+: knowledge-organization\.registry-row",
         result.stdout,
     ), result.stdout
 
@@ -481,7 +483,7 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/docs/document-types\.md:\d+: docs\.registry-row",
+        r"standards/docs/document-types\.md:\d+: knowledge-organization\.registry-row",
         result.stdout,
     ), result.stdout
 
@@ -512,7 +514,7 @@ def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> No
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: docs.index-ordering" in result.stdout
+    assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
 
 
 def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
@@ -536,7 +538,9 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/README.md: docs.description-shape" in result.stdout
+    assert (
+        "standards/README.md: knowledge-organization.description-shape" in result.stdout
+    )
 
 
 def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
@@ -552,7 +556,7 @@ def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: docs.index-ordering" in result.stdout
+    assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
 
 
 def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
@@ -599,7 +603,7 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: docs.index-ordering" in result.stdout
+    assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
     assert "the README.md entry must be listed first" in result.stdout
 
 
@@ -627,12 +631,12 @@ def test_concept_entries_out_of_alphabetical_order_are_flagged(
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: docs.index-ordering" in result.stdout
+    assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
 
 
 def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> None:
     """document-types.md declares its `## Types` table alphabetical; a table
-    whose rows are not is a `docs.index-ordering` finding."""
+    whose rows are not is a `knowledge-organization.index-ordering` finding."""
     doc = (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
@@ -646,7 +650,10 @@ def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> Non
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/docs/document-types.md: docs.index-ordering" in result.stdout
+    assert (
+        "standards/docs/document-types.md: knowledge-organization.index-ordering"
+        in result.stdout
+    )
 
 
 def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
@@ -660,4 +667,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     result = run_okf_audit(repo)
 
     assert result.returncode == 1
-    assert "standards/README.md: docs.type missing 'type'" in result.stdout
+    assert (
+        "standards/README.md: knowledge-organization.type missing 'type'"
+        in result.stdout
+    )

@@ -1,17 +1,17 @@
-"""Behavioral tests for the judgments-run CLI: plan, render, record."""
+"""Behavioral tests for the judgements-run CLI: plan, render, record."""
 
 import json
 from pathlib import Path
 
 import pytest
 
-from dev_playbook.judgments.core import SCHEMA, prepare
-from dev_playbook.judgments.runner import REFUTED, main
+from dev_playbook.judgements.core import SCHEMA, prepare
+from dev_playbook.judgements.runner import REFUTED, main
 
-CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
+CONFIG = '[tool.judgements]\npaths = ["judgements/*.yaml"]\n'
 
-ONE_JUDGMENT = """\
-judgments:
+ONE_JUDGEMENT = """\
+judgements:
   - id: j1
     claim: docs/errors.md lists every exception src/exceptions.py raises.
     evidence: [docs/errors.md]
@@ -20,8 +20,8 @@ judgments:
     effort: high
 """
 
-TWO_JUDGMENTS = """\
-judgments:
+TWO_JUDGEMENTS = """\
+judgements:
   - id: j1
     claim: docs/errors.md lists every exception src/exceptions.py raises.
     evidence: [docs/errors.md]
@@ -44,11 +44,11 @@ EVIDENCE = {
 
 @pytest.fixture
 def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Stand up a judgments repo, chdir into it, and isolate the seen-set cache."""
+    """Stand up a judgements repo, chdir into it, and isolate the seen-set cache."""
     root = tmp_path / "repo"
     files = {
         "pyproject.toml": CONFIG,
-        "judgments/a.yaml": ONE_JUDGMENT,
+        "judgements/a.yaml": ONE_JUDGEMENT,
         **EVIDENCE,
     }
     for relpath, contents in files.items():
@@ -62,11 +62,11 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 @pytest.fixture
 def two_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """A judgments repo carrying two declarations (j1, j2), cache isolated."""
+    """A judgements repo carrying two declarations (j1, j2), cache isolated."""
     root = tmp_path / "repo"
     files = {
         "pyproject.toml": CONFIG,
-        "judgments/a.yaml": TWO_JUDGMENTS,
+        "judgements/a.yaml": TWO_JUDGEMENTS,
         **EVIDENCE,
     }
     for relpath, contents in files.items():
@@ -78,7 +78,7 @@ def two_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return root
 
 
-def test_plan_reports_an_uncached_judgment_as_unseen(
+def test_plan_reports_an_uncached_judgement_as_unseen(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     exit_code = main(["plan"])
@@ -92,7 +92,7 @@ def test_plan_reports_an_uncached_judgment_as_unseen(
     assert entry["id"] == "j1"
     assert entry["model"] == "claude-sonnet-4-6"
     assert entry["effort"] == "high"
-    assert "judgments-run render j1" in entry["prompt"]
+    assert "judgements-run render j1" in entry["prompt"]
 
 
 def test_plan_with_no_config_emits_empty_lists(
@@ -128,7 +128,7 @@ def test_render_prints_exactly_the_prepared_prompt(
     assert capsys.readouterr().out == expected + "\n"
 
 
-def test_record_then_plan_reports_the_judgment_as_seen(
+def test_record_then_plan_reports_the_judgement_as_seen(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     assert main(["record", "j1"]) == 0

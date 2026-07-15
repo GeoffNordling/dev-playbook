@@ -67,7 +67,7 @@ STANDARDS_BLOCK = "claude-code.standards-block"
 AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
 GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
 GLOBAL_CLAUDE_WELLFORMED = "claude-code.global-claude-wellformed"
-DOC_SHAPE = "docs.doc-shape"
+DOC_SHAPE = "knowledge-organization.doc-shape"
 
 RULES = (
     REQUIRED_FILE,

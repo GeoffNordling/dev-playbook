@@ -10,7 +10,7 @@ repos:
       - id: okf-audit
       - id: decisions-audit
       - id: skill-audit
-      - id: judgments-audit
+      - id: judgements-audit
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:
@@ -27,8 +27,8 @@ repos:
   - repo: local
     hooks:
       - id: make-check
-        name: make check-judgments
-        entry: make check-judgments
+        name: make check-judgements
+        entry: make check-judgements
         language: system
         pass_filenames: false
         always_run: true

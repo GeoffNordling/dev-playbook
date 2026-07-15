@@ -1,11 +1,11 @@
 <!--datasheet-stamp
-subject: judgments
+subject: judgements
 scope:
-  - tools/src/judgments/
+  - tools/src/judgements/
   - tools/src/skipcache/
-  - tools/bin/judgments-lint
-  - tools/bin/judgments-run
-  - tools/tests/test_judgments_*.py
+  - tools/bin/judgements-lint
+  - tools/bin/judgements-run
+  - tools/tests/test_judgements_*.py
   - tools/tests/test_loader.py
   - tools/tests/test_runner.py
   - tools/tests/test_pytest_support.py
@@ -18,7 +18,7 @@ generator: claude-opus-4-8
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>judgments — datasheet</title>
+<title>judgements — datasheet</title>
 <style>
   :root {
     --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
@@ -111,29 +111,29 @@ generator: claude-opus-4-8
 <aside class="rail">
 
   <header class="card identity">
-    <div class="subject">judgments</div>
+    <div class="subject">judgements</div>
     <div class="meta">datasheet · commit <code>4c5c891</code><br>
     2026-07-02 · claude-opus-4-8<br>
-    scope: tools/src/judgments/, tools/src/skipcache/, tools/bin/judgments-{run,lint}, tools/tests/test_{judgments_*,loader,runner,pytest_support,skipcache}.py</div>
+    scope: tools/src/judgements/, tools/src/skipcache/, tools/bin/judgements-{run,lint}, tools/tests/test_{judgements_*,loader,runner,pytest_support,skipcache}.py</div>
   </header>
 
   <section class="card">
     <h2>Concepts</h2>
-    <div class="concept"><span class="chip" title="tools/src/judgments/loader.py:24 Declaration.claim">Claim</span> <span class="def">the plain-English proposition a judge rules true or false</span></div>
-    <div class="concept"><span class="chip" title="tools/src/judgments/core.py:83 prepare()">Evidence / reference</span> <span class="def">the files a claim is judged on; reference is context only, not itself ruled on</span></div>
-    <div class="concept"><span class="chip" title="tools/src/judgments/core.py:168 _content_key">Content key</span> <span class="def">a SHA-256 over the claim, instrument, and file bytes — the cache identity; any change re-keys</span></div>
-    <div class="concept"><span class="chip" title="tools/src/judgments/instruments.py">Instrument</span> <span class="def">the model + effort a judge runs under, folded into the key</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/loader.py:24 Declaration.claim">Claim</span> <span class="def">the plain-English proposition a judge rules true or false</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/core.py:83 prepare()">Evidence / reference</span> <span class="def">the files a claim is judged on; reference is context only, not itself ruled on</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/core.py:168 _content_key">Content key</span> <span class="def">a SHA-256 over the claim, instrument, and file bytes — the cache identity; any change re-keys</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/instruments.py">Instrument</span> <span class="def">the model + effort a judge runs under, folded into the key</span></div>
     <div class="concept"><span class="chip" title="tools/src/skipcache/seen.py">Seen-set</span> <span class="def">the local store of keys already judged-and-passed</span></div>
-    <div class="concept"><span class="chip" title="tools/src/judgments/pytest_support.py:15 assert_judgment_cached">Cache-gate</span> <span class="def">the pytest assertion that fails until a judgment's current content is in the seen-set</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/pytest_support.py:15 assert_judgement_cached">Cache-gate</span> <span class="def">the pytest assertion that fails until a judgement's current content is in the seen-set</span></div>
   </section>
 
   <section class="card">
     <h2>Touch surface</h2>
-    <div class="cell"><span class="k">Reads</span> a repo's <code>pyproject.toml</code> (<code>[tool.judgments]</code>), the declaration YAML it globs, and each judgment's evidence/reference files</div>
+    <div class="cell"><span class="k">Reads</span> a repo's <code>pyproject.toml</code> (<code>[tool.judgements]</code>), the declaration YAML it globs, and each judgement's evidence/reference files</div>
     <div class="cell"><span class="k">Writes</span> the seen-set store (<code>~/.cache/skipcache/seen.sqlite</code>) — only <code>record</code>; plan, render, lint never write</div>
     <div class="cell"><span class="k">Spawns</span> <span class="none">none</span></div>
     <div class="cell"><span class="k">Net</span> <span class="none">none</span></div>
-    <div class="cell"><span class="k">Env</span> <code>XDG_CACHE_HOME</code> — seen-set location (else <code>$HOME/.cache</code>); <code>SKIP_JUDGMENTS</code> — skips the repo's own gate on CI</div>
+    <div class="cell"><span class="k">Env</span> <code>XDG_CACHE_HOME</code> — seen-set location (else <code>$HOME/.cache</code>); <code>SKIP_JUDGEMENTS</code> — skips the repo's own gate on CI</div>
     <div class="cell"><span class="k">Deps</span> PyYAML; stdlib <code>sqlite3</code>, <code>hashlib</code>, <code>tomllib</code>, <code>argparse</code></div>
   </section>
 
@@ -142,7 +142,7 @@ generator: claude-opus-4-8
     <div class="testrow"><span class="n">✓ 30</span> keying &amp; prompt — content-key stability, root-invariance, per-input sensitivity, path canonicalization; fail-loud on absolute / <code>..</code> / symlink-escape / non-UTF-8; single read</div>
     <div class="testrow"><span class="n">✓ 18</span> loading &amp; validation — root resolution, glob discovery, field rules, duplicate-id, malformed-shape</div>
     <div class="testrow"><span class="n">✓ 34</span> the rest, offline — CLI plan/render/record, the lint hook (subprocess), the seen-set (persistence, opaque keys, XDG path), the gate helper, the verdict schema</div>
-    <div class="testrow"><span class="gated">⚠ gated</span> the repo's own judgment gate — one case per declared judgment, skipped on GH CI (no LLM or cache there); passes only where a human ran the judge. A never-skipped guard asserts the config resolves everywhere</div>
+    <div class="testrow"><span class="gated">⚠ gated</span> the repo's own judgement gate — one case per declared judgement, skipped on GH CI (no LLM or cache there); passes only where a human ran the judge. A never-skipped guard asserts the config resolves everywhere</div>
   </section>
 
 </aside>
@@ -161,16 +161,16 @@ generator: claude-opus-4-8
 
   <section class="card">
     <h2>Behavior <span class="badge run">verified: run</span> <span class="badge constructed">exhibit: constructed</span></h2>
-    <pre class="term"><span class="p">$</span> judgments-run plan
+    <pre class="term"><span class="p">$</span> judgements-run plan
 {"schema": {…}, "seen": [],
  "unseen": [{"id": "readme-documents-flags", "model": "claude-opus-4-8",
-   "effort": "high", "prompt": "Run `judgments-run render readme-documents-flags` …"}]}
-<span class="p">$</span> judgments-run record readme-documents-flags   <span class="p">#</span> after the judge rules it true
-<span class="p">$</span> judgments-run plan
+   "effort": "high", "prompt": "Run `judgements-run render readme-documents-flags` …"}]}
+<span class="p">$</span> judgements-run record readme-documents-flags   <span class="p">#</span> after the judge rules it true
+<span class="p">$</span> judgements-run plan
 {"schema": {…}, "seen": ["readme-documents-flags"], "unseen": []}</pre>
     <p class="aside">The declaration (a claim plus its evidence/reference files)
     is fabricated for the demo, so the exhibit is constructed; the
-    plan→record→plan run is live. First <code>plan</code> flags the judgment
+    plan→record→plan run is live. First <code>plan</code> flags the judgement
     unseen with a ready-to-dispatch prompt; once a pass is recorded, the same
     content reads back seen and the cache-gate goes green.</p>
   </section>
@@ -183,11 +183,11 @@ generator: claude-opus-4-8
           <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
         </marker>
       </defs>
-      <!-- judgments-run track -->
+      <!-- judgements-run track -->
       <circle cx="14" cy="100" r="4" fill="#64748b"/>
       <line x1="14" y1="100" x2="38" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
       <rect x="40" y="84" width="134" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
-      <text x="107" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">judgments-run</text>
+      <text x="107" y="104" text-anchor="middle" font-size="12.5" fill="#1e293b">judgements-run</text>
       <line x1="174" y1="100" x2="196" y2="100" stroke="#64748b" stroke-width="2"/>
       <circle cx="196" cy="100" r="3.5" fill="#64748b"/>
       <!-- top branch: plan -->
@@ -218,17 +218,17 @@ generator: claude-opus-4-8
       <line x1="452" y1="100" x2="478" y2="100" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
       <line x1="482" y1="92" x2="482" y2="108" stroke="#64748b" stroke-width="2.5"/>
       <line x1="488" y1="92" x2="488" y2="108" stroke="#64748b" stroke-width="2.5"/>
-      <!-- judgments-lint track -->
+      <!-- judgements-lint track -->
       <circle cx="14" cy="200" r="4" fill="#64748b"/>
       <line x1="14" y1="200" x2="38" y2="200" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
       <rect x="40" y="184" width="130" height="32" rx="16" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
-      <text x="105" y="204" text-anchor="middle" font-size="12.5" fill="#1e293b">judgments-lint</text>
+      <text x="105" y="204" text-anchor="middle" font-size="12.5" fill="#1e293b">judgements-lint</text>
       <line x1="170" y1="200" x2="196" y2="200" stroke="#64748b" stroke-width="2" marker-end="url(#rrarw)"/>
       <line x1="200" y1="192" x2="200" y2="208" stroke="#64748b" stroke-width="2.5"/>
       <line x1="206" y1="192" x2="206" y2="208" stroke="#64748b" stroke-width="2.5"/>
     </svg>
     <div class="apilist">
-      <div class="sig">assert_judgment_cached(id: str) -&gt; None</div>
+      <div class="sig">assert_judgement_cached(id: str) -&gt; None</div>
       <div class="sig">prepare(claim, evidence, reference, model, effort, root) -&gt; Prepared</div>
       <div class="sig">load(root) -&gt; list[Declaration] · resolve_root(start=None) -&gt; Path | None</div>
       <div class="sig">lint(root) -&gt; list[str]</div>
@@ -236,11 +236,11 @@ generator: claude-opus-4-8
       <div class="sig">seen.filter(keys) -&gt; Partition · seen.record(keys) -&gt; None</div>
     </div>
     <p class="aside">Both CLIs above, the importable library below.
-    <code>judgments-run</code> takes exactly one subcommand; <code>&lt;id&gt;</code>
-    repeats for <code>record</code>. <code>judgments-lint</code> takes no
-    arguments. Exit <code>judgments-run</code>: <code>0</code> ok ·
+    <code>judgements-run</code> takes exactly one subcommand; <code>&lt;id&gt;</code>
+    repeats for <code>record</code>. <code>judgements-lint</code> takes no
+    arguments. Exit <code>judgements-run</code>: <code>0</code> ok ·
     <code>1</code> bad config / unknown id / unreadable file · <code>2</code>
-    usage. <code>judgments-lint</code>: <code>0</code> clean · <code>1</code>
+    usage. <code>judgements-lint</code>: <code>0</code> clean · <code>1</code>
     errors.</p>
   </section>
 
@@ -248,7 +248,7 @@ generator: claude-opus-4-8
     <h2>Shape</h2>
     <p class="legend"><span><i class="in"></i>input</span><span><i class="int"></i>internal</span><span><i class="out"></i>output</span></p>
     <!-- DOT source:
-    digraph judgments {
+    digraph judgements {
       rankdir=LR;
       bgcolor="transparent";
       node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12,
@@ -276,7 +276,7 @@ generator: claude-opus-4-8
 <svg width="825pt" height="152pt"
  viewBox="0.00 0.00 825.00 152.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 148.11)">
-<title>judgments</title>
+<title>judgements</title>
 <!-- in -->
 <g id="node1" class="node">
 <title>in</title>
@@ -391,9 +391,9 @@ generator: claude-opus-4-8
 </g>
 </g>
 </svg>
-    <p class="aside">One input — a repo's judgment declarations — flows through
-    the loader and <span title="tools/src/judgments/core.py:83">prepare</span>
-    into the seen-set; the three <code>judgments-run</code> subcommands and the
+    <p class="aside">One input — a repo's judgement declarations — flows through
+    the loader and <span title="tools/src/judgements/core.py:83">prepare</span>
+    into the seen-set; the three <code>judgements-run</code> subcommands and the
     pytest gate read or write that store. The judge itself is external: prepare
     renders the prompt, but no node here calls an LLM.</p>
     <details>
@@ -411,7 +411,7 @@ generator: claude-opus-4-8
     <h2>Assessment <span class="badge opinion">opinion</span></h2>
     <ol>
       <li><strong>A pass certifies exact bytes, not the claim's spirit</strong><span>the content key folds in every evidence byte, so any edit to a judged file re-keys and forces a re-judge — a stale pass can't mask changed content, but a cosmetic edit re-charges the judge (Content key).</span></li>
-      <li><strong>The gate is only as strong as the machine it runs on</strong><span>the seen-set is local and only the interactive run-judgments skill fills it; on CI the gate is skipped, so nothing verifies judgments there (Seen-set, Cache-gate).</span></li>
+      <li><strong>The gate is only as strong as the machine it runs on</strong><span>the seen-set is local and only the interactive run-judgements skill fills it; on CI the gate is skipped, so nothing verifies judgements there (Seen-set, Cache-gate).</span></li>
       <li><strong>A recorded verdict is trusted, never re-checked</strong><span>recording a key asserts a pass, but nothing in scope runs the LLM or validates its ruling — a wrongly-recorded pass is invisible (Cache-gate).</span></li>
       <li><strong>The model roster is hand-maintained</strong><span>a config is rejected if its model isn't in the frozen set, so a newly-shipped model fails validation until someone edits the list (Instrument).</span></li>
       <li><strong>Evidence-vs-reference rides on prompt wording alone</strong><span>the two key differently, but only the instructions' prose tells the judge not to rule on reference material (Evidence / reference).</span></li>

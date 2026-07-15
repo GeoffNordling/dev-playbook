@@ -18,14 +18,14 @@ them by these names.
 | Gate | Trigger | What runs |
 |---|---|---|
 | **commit gate** | `git commit` | the pre-commit hook suite, on staged files |
-| **push gate** | `git push` | `make check-judgments`, via the pre-push stage |
+| **push gate** | `git push` | `make check-judgements`, via the pre-push stage |
 | **CI gate** | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
 
 The commit and push gates block locally, through the git hooks that invoke
 them. The CI gate has no branch protection behind it —
 [repo-settings.md](/standards/tracking/repo-settings.md) configures no required
 status checks — so its block executes through the human's standing rule: **a
-red CI run is never merged**. That rule is nondiscretionary — no judgment is
+red CI run is never merged**. That rule is nondiscretionary — no judgement is
 exercised — which is what keeps the CI gate a gate rather than a review; the
 block sits at the merge button, not in branch-protection settings.
 
@@ -49,7 +49,7 @@ outside every gate: it hosts the CI gate but is not itself one.
 
 Where each detector's rules fire. Every pre-commit hook fires at the **commit
 gate, in the CI gate, and inside every `make check`** (hence also in the agent
-ritual, and at the push gate via `make check-judgments`); the table lists only
+ritual, and at the push gate via `make check-judgements`); the table lists only
 what falls outside that pattern.
 
 | Detector | Owns | Gates |
@@ -61,12 +61,12 @@ what falls outside that pattern.
 | okf-audit | concept-doc types, `index.md` freshness | hook pattern |
 | decisions-audit | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-audit | Links and Citations | hook pattern, except the CI gate (skipped) |
-| judgments-audit | judgment declarations | hook pattern |
+| judgements-audit | judgement declarations | hook pattern |
 | standards-audit | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |
 | shfmt | shell formatting | hook pattern |
 | skill-audit | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
-| pytest | tests + judgments cache gate | push gate only — never the CI gate |
+| pytest | tests + judgements cache gate | push gate only — never the CI gate |
 | validate | spec graph | push gate only — never the CI gate (sdd repos) |
 | workspace-audit | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-audit (outside the gates) |

@@ -762,7 +762,9 @@ def test_both_link_classes_counted_in_one_run(tmp_path: Path, workspace: Path) -
     assert "2 references, all ok" in result.stderr
 
 
-def test_list_rules_prints_docs_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
+def test_list_rules_prints_knowledge_organization_prefixed_ids_from_any_cwd(
+    tmp_path: Path,
+) -> None:
     result = subprocess.run(
         ["python3", str(REF_AUDIT), "--list-rules"],
         cwd=tmp_path,
@@ -771,9 +773,9 @@ def test_list_rules_prints_docs_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "docs.broken-reference" in ids
-    assert "docs.wrong-form-citation" in ids
-    assert all(rule.startswith("docs.") for rule in ids), ids
+    assert "knowledge-organization.broken-reference" in ids
+    assert "knowledge-organization.wrong-form-citation" in ids
+    assert all(rule.startswith("knowledge-organization.") for rule in ids), ids
 
 
 def test_broken_reference_renders_as_gnu_finding(
@@ -787,7 +789,7 @@ def test_broken_reference_renders_as_gnu_finding(
 
     assert result.returncode == 1
     assert re.search(
-        r"^docs\.md:\d+: docs\.broken-reference .*standards/gone\.md",
+        r"^docs\.md:\d+: knowledge-organization\.broken-reference .*standards/gone\.md",
         result.stdout,
         re.MULTILINE,
     ), result.stdout
@@ -805,7 +807,7 @@ def test_wrong_form_citation_renders_as_gnu_finding(
 
     assert result.returncode == 1
     assert re.search(
-        r"^docs\.md:\d+: docs\.wrong-form-citation ",
+        r"^docs\.md:\d+: knowledge-organization\.wrong-form-citation ",
         result.stdout,
         re.MULTILINE,
     ), result.stdout

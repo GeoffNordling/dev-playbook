@@ -116,31 +116,31 @@ generator: claude-opus-4-8
 
   <section class="card">
     <h2>Concepts</h2>
-    <div class="concept"><span class="chip" title="tools/bin/judgments-lint:5 — pre-commit validator">Pre-commit hook</span> <span class="def">a file-walking validator run on commit; nonzero exit blocks it</span></div>
+    <div class="concept"><span class="chip" title="tools/bin/judgements-lint:5 — pre-commit validator">Pre-commit hook</span> <span class="def">a file-walking validator run on commit; nonzero exit blocks it</span></div>
     <div class="concept"><span class="chip" title="tools/bin/okf-lint:1 — Open Knowledge Format bundle">OKF bundle</span> <span class="def">a repo's typed, indexed markdown knowledge base</span></div>
-    <div class="concept"><span class="chip" title="tools/src/judgments/loader.py Declaration">Judgment declaration</span> <span class="def">a claim plus its evidence files, awaiting an LLM verdict</span></div>
-    <div class="concept"><span class="chip" title="tools/src/judgments/core.py:_content_key">Content key</span> <span class="def">SHA-256 over claim, files, model, effort — a judgment's cache identity</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/loader.py Declaration">Judgement declaration</span> <span class="def">a claim plus its evidence files, awaiting an LLM verdict</span></div>
+    <div class="concept"><span class="chip" title="tools/src/judgements/core.py:_content_key">Content key</span> <span class="def">SHA-256 over claim, files, model, effort — a judgement's cache identity</span></div>
     <div class="concept"><span class="chip" title="tools/src/skipcache/seen.py">Seen-set</span> <span class="def">a global SQLite store of keys already judged-and-passed</span></div>
     <div class="concept"><span class="chip" title="tools/transcript_export/forks.py reconstruct_forks">Rewind fork</span> <span class="def">an abandoned conversation branch, split off the live path</span></div>
   </section>
 
   <section class="card">
     <h2>Touch surface</h2>
-    <div class="cell"><span class="k">Reads</span> a repo's git-tracked files — <code>.py</code>, <code>.md</code>, <code>SKILL.md</code>, <code>pyproject.toml</code>, judgment YAML; the AgentsView daemon's session API</div>
+    <div class="cell"><span class="k">Reads</span> a repo's git-tracked files — <code>.py</code>, <code>.md</code>, <code>SKILL.md</code>, <code>pyproject.toml</code>, judgement YAML; the AgentsView daemon's session API</div>
     <div class="cell"><span class="k">Writes</span> findings to stdout; XML transcripts to <code>&lt;out_dir&gt;/&lt;id&gt;.xml</code> (overwrites); the seen-set cache; a repo's GitHub labels (closed-world — non-canonical ones deleted)</div>
     <div class="cell"><span class="k">Spawns</span> <code>git ls-files</code>, <code>gh</code>, <code>agentsview</code>, <code>uv</code> (script deps)</div>
     <div class="cell"><span class="k">Net</span> GitHub via <code>gh</code> (label sync); otherwise <span class="none">none</span></div>
-    <div class="cell"><span class="k">Env</span> <code>XDG_CACHE_HOME</code> — seen-set location; <code>SKIP_JUDGMENTS</code>, <code>SKIP_LIVE_TRANSCRIPT</code> — CI opt-outs (test-only)</div>
-    <div class="cell"><span class="k">Deps</span> stdlib + <code>pyyaml</code>, <code>griffe</code>; in-repo <code>judgments</code> / <code>skipcache</code> / <code>transcript_export</code></div>
+    <div class="cell"><span class="k">Env</span> <code>XDG_CACHE_HOME</code> — seen-set location; <code>SKIP_JUDGEMENTS</code>, <code>SKIP_LIVE_TRANSCRIPT</code> — CI opt-outs (test-only)</div>
+    <div class="cell"><span class="k">Deps</span> stdlib + <code>pyyaml</code>, <code>griffe</code>; in-repo <code>judgements</code> / <code>skipcache</code> / <code>transcript_export</code></div>
   </section>
 
   <section class="card">
     <h2>Tests</h2>
     <div class="testrow"><span class="n">✓ 307</span> total, all but two offline and deterministic</div>
     <div class="testrow"><span class="n">✓</span> transcript_export — normalize, classify, fork split, XML render, subagent recursion (fake <code>agentsview</code>)</div>
-    <div class="testrow"><span class="n">✓</span> judgments / skipcache — loading, static lint, content-key prepare, seen-set partition + record</div>
+    <div class="testrow"><span class="n">✓</span> judgements / skipcache — loading, static lint, content-key prepare, seen-set partition + record</div>
     <div class="testrow"><span class="n">✓</span> lint hooks — python-lint, okf-lint, ref-check, and the <code>lib</code> markdown/AST primitives</div>
-    <div class="testrow"><span class="gated">⚠ cache-gate</span> one case per declared judgment; skipped on CI — needs the local LLM judge to fill the cache</div>
+    <div class="testrow"><span class="gated">⚠ cache-gate</span> one case per declared judgement; skipped on CI — needs the local LLM judge to fill the cache</div>
     <div class="testrow"><span class="gated">⚠ live canary</span> one test; skipped on CI — needs the local <code>agentsview</code> daemon</div>
   </section>
 
@@ -152,7 +152,7 @@ generator: claude-opus-4-8
     <h2>Purpose</h2>
     <p>A grab-bag of workspace developer tooling: the pre-commit hooks that guard
     every repo's Python, markdown, and knowledge-bundle conventions; the
-    deterministic half of the LLM-judgment system; and the exporter that turns a
+    deterministic half of the LLM-judgement system; and the exporter that turns a
     Claude Code session into an XML transcript. They share a checkout and a test
     suite but no runtime path — each is invoked on its own. It exists so the
     workspace's conventions and audit trails are enforced by code, not vigilance.</p>
@@ -239,7 +239,7 @@ def record(keys: list[str]) -&gt; None
     or <code>--all</code>. Exit <code>0</code> ok · <code>2</code> usage error. Four
     file-walking hooks share a <code>&lt;tool&gt; [directory]</code> grammar (ref-check
     adds <code>--all</code>; exit <code>0</code>/<code>1</code>/<code>2</code>);
-    judgments-lint takes no argument, and judgments-run takes <code>plan</code> ·
+    judgements-lint takes no argument, and judgements-run takes <code>plan</code> ·
     <code>render &lt;id&gt;</code> · <code>record &lt;id&gt;…</code>. Importable surface below.</p>
   </section>
 
@@ -260,9 +260,9 @@ def record(keys: list[str]) -&gt; None
       files -> pyast [label=".py"]; files -> md [label=".md"];
       pyast -> pylint [label="AST"]; md -> okf [label="frontmatter"];
       pylint -> findings; okf -> findings;
-      // Track 2 — judgments
+      // Track 2 — judgements
       decl [label="declaration YAML", fillcolor="#e0f2fe", color="#38bdf8"];
-      loader [label="judgments.loader"]; core [label="judgments.core"];
+      loader [label="judgements.loader"]; core [label="judgements.core"];
       seenset [label="skipcache seen-set"];
       plan [label="plan JSON · gate", fillcolor="#dcfce7", color="#4ade80"];
       decl -> loader [label="validate"]; loader -> core [label="claim+files"];
@@ -366,7 +366,7 @@ def record(keys: list[str]) -&gt; None
 <g id="node8" class="node">
 <title>loader</title>
 <path fill="#f1f5f9" stroke="#94a3b8" d="M305.75,-144C305.75,-144 221.5,-144 221.5,-144 215.5,-144 209.5,-138 209.5,-132 209.5,-132 209.5,-120 209.5,-120 209.5,-114 215.5,-108 221.5,-108 221.5,-108 305.75,-108 305.75,-108 311.75,-108 317.75,-114 317.75,-120 317.75,-120 317.75,-132 317.75,-132 317.75,-138 311.75,-144 305.75,-144"/>
-<text xml:space="preserve" text-anchor="middle" x="263.62" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">judgments.loader</text>
+<text xml:space="preserve" text-anchor="middle" x="263.62" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">judgements.loader</text>
 </g>
 <!-- decl&#45;&gt;loader -->
 <g id="edge7" class="edge">
@@ -379,7 +379,7 @@ def record(keys: list[str]) -&gt; None
 <g id="node9" class="node">
 <title>core</title>
 <path fill="#f1f5f9" stroke="#94a3b8" d="M486.75,-144C486.75,-144 413,-144 413,-144 407,-144 401,-138 401,-132 401,-132 401,-120 401,-120 401,-114 407,-108 413,-108 413,-108 486.75,-108 486.75,-108 492.75,-108 498.75,-114 498.75,-120 498.75,-120 498.75,-132 498.75,-132 498.75,-138 492.75,-144 486.75,-144"/>
-<text xml:space="preserve" text-anchor="middle" x="449.88" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">judgments.core</text>
+<text xml:space="preserve" text-anchor="middle" x="449.88" y="-121.72" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#1e293b">judgements.core</text>
 </g>
 <!-- loader&#45;&gt;core -->
 <g id="edge8" class="edge">
@@ -488,7 +488,7 @@ def record(keys: list[str]) -&gt; None
 </g>
 </svg>
     <p class="aside">Three disconnected tracks — the lint hooks (through the
-    shared <code>lib</code> helpers), the judgments pipeline, and
+    shared <code>lib</code> helpers), the judgements pipeline, and
     transcript-export — with no hub joining them; ref-check, internal-skill-audit,
     bootstrap-labels, and griffe-outline are four more standalone tools not drawn.</p>
     <details>
@@ -496,8 +496,8 @@ def record(keys: list[str]) -&gt; None
       <p><strong>Pre-commit hooks:</strong> python-lint (no-future-annotations,
       empty-init, test-privacy), okf-lint (document-type frontmatter +
       index-staleness), ref-check (root-absolute links and workspace citations),
-      judgments-lint (declaration field/path validation), internal-skill-audit
-      (SKILL.md conventions). <strong>Judgments:</strong> judgments-run
+      judgements-lint (declaration field/path validation), internal-skill-audit
+      (SKILL.md conventions). <strong>Judgements:</strong> judgements-run
       (plan/render/record) over the loader, core (content key + judge prompt),
       and the skipcache seen-set; the pytest cache-gate stands on the same
       pieces. <strong>transcript_export:</strong> client (agentsview boundary) →
@@ -514,9 +514,9 @@ def record(keys: list[str]) -&gt; None
     <h2>Assessment <span class="badge opinion">opinion</span></h2>
     <ol>
       <li><strong>A bag of tools, not a system</strong><span>the Shape is three disconnected tracks plus four more standalone tools; a change to one implies nothing about the others (Shape).</span></li>
-      <li><strong>The judgment gate trusts one machine's cache</strong><span>green means a key sits in a local seen-set that only a human-run LLM judge fills, and CI skips the gate entirely (Seen-set, Tests).</span></li>
+      <li><strong>The judgement gate trusts one machine's cache</strong><span>green means a key sits in a local seen-set that only a human-run LLM judge fills, and CI skips the gate entirely (Seen-set, Tests).</span></li>
       <li><strong>Transcript fidelity rides on one daemon version</strong><span>the whole suite fakes agentsview at v0.34.5; a single local-only canary is all that would notice the daemon drifting (Rewind fork, Tests).</span></li>
-      <li><strong>A content key can reuse a stale verdict</strong><span>the cache identity hashes only the declared claim, files, model, and effort — anything influencing the judgment from outside that set changes it without changing the key (Content key).</span></li>
+      <li><strong>A content key can reuse a stale verdict</strong><span>the cache identity hashes only the declared claim, files, model, and effort — anything influencing the judgement from outside that set changes it without changing the key (Content key).</span></li>
       <li><strong>Label sync deletes to match a closed world</strong><span>the one tool that mutates outside the repo removes every GitHub label not in its canonical set (Touch surface).</span></li>
     </ol>
   </section>

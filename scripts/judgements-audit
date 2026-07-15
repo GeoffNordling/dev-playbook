@@ -3,15 +3,15 @@
 # requires-python = ">=3.14"
 # dependencies = ["pyyaml>=6.0"]
 # ///
-"""judgments-audit — pre-commit validator for a repo's judgment declarations.
+"""judgements-audit — pre-commit validator for a repo's judgement declarations.
 
-Thin shim over dev_playbook.judgments.loader.lint_cli: resolve the repo's
-[tool.judgments] config, run the loader's field validation plus the static
+Thin shim over dev_playbook.judgements.loader.lint_cli: resolve the repo's
+[tool.judgements] config, run the loader's field validation plus the static
 evidence/reference path checks (relative + exists), print every finding to
-stdout as a GNU finding line (`file: judgments.rule message`), and exit nonzero
+stdout as a GNU finding line (`file: judgements.rule message`), and exit nonzero
 if any. `--list-rules` prints the rule ids and exits 0. A repo with no config
 validates nothing and exits 0. Fast and deterministic -- no LLM, no hashing.
-See dev_playbook.judgments.loader for the logic and its tests.
+See dev_playbook.judgements.loader for the logic and its tests.
 """
 
 import sys
@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from dev_playbook.judgments.loader import lint_cli  # noqa: E402
+from dev_playbook.judgements.loader import lint_cli  # noqa: E402
 
 if __name__ == "__main__":
     sys.exit(lint_cli())

@@ -23,8 +23,8 @@ repos:
   - repo: local
     hooks:
       - id: make-check
-        name: make check-judgments
-        entry: make check-judgments
+        name: make check-judgements
+        entry: make check-judgements
         language: system
         pass_filenames: false
         always_run: true
@@ -78,9 +78,9 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: judgments-audit
-        name: judgments-audit
-        entry: scripts/judgments-audit
+      - id: judgements-audit
+        name: judgements-audit
+        entry: scripts/judgements-audit
         language: script
         pass_filenames: false
         always_run: true
