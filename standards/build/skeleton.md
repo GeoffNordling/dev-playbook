@@ -25,8 +25,9 @@ forbids.
 | `docs/` | Optional | guides and surveys that outgrow the README, each an OKF concept doc |
 | `docs/decisions/` | Optional | Decision Records per [decisions/records.md](/standards/decisions/records.md) |
 | `readings/` | Optional | instrument output artifacts, one subdirectory per instrument, per [the instrument standard](/standards/instrument/format.md); regenerated manually on demand, never hand-edited, may lag what it describes |
-| `specs/` | Optional | body format governed by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md); carries OKF frontmatter (`type: Spec Item`) and per-folder `index.md` like any concept docs; presence activates the sdd layer ([make.md](/standards/build/make.md)) |
+| `specs/` | Optional | body format governed by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md); carries OKF frontmatter (`type: Spec-Item`) and per-folder `index.md` like any concept docs; presence activates the sdd layer ([make.md](/standards/build/make.md)) |
 | `.claude/` | Optional | Claude Code files per [the harness-files standard](/standards/claude-code/index.md); `worktrees/` gitignored |
+| `requirements.txt` | Forbidden | anywhere in the tree; dependencies live in `pyproject.toml` + `uv.lock` |
 
 ## python layer
 
@@ -36,7 +37,6 @@ forbids.
 | `uv.lock` | Required | committed |
 | `.python-version` | Required | byte-identical to the canonical pin |
 | `tests/` | Required | non-empty (every Python repo has `src/` or Python `scripts/`) |
-| `requirements.txt` | Forbidden | anywhere in the tree |
 
 ## python · src
 

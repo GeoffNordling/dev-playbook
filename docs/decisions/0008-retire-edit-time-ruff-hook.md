@@ -1,5 +1,5 @@
 ---
-type: Decision Record
+type: Decision-Record
 title: Retire the Edit-Time ruff Hook for a Single Pre-commit Gate
 description: Remove the edit-time PostToolUse ruff hook so pre-commit is the single ruff gate over every authored .py
 ---

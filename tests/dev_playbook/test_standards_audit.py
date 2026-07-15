@@ -31,7 +31,7 @@ def make_repo(tmp_path: Path, files: dict[str, str]) -> Path:
 def card(
     title: str,
     *,
-    type_: str = "Standard Card",
+    type_: str = "Standard-Card",
     cells: tuple[str, ...] = ("Define", "Audit", "Enforce", "Adopt"),
 ) -> str:
     """A standard card with the given title, type, and cell sections."""
@@ -251,7 +251,7 @@ def card_citing(title: str, audit: list[str]) -> str:
         "Adopt": ["- none"],
     }
     front = (
-        f"---\ntype: Standard Card\ntitle: {title}\n"
+        f"---\ntype: Standard-Card\ntitle: {title}\n"
         f"description: Card for the {title} standard\n---\n\n# {title}\n\nGoverns it.\n"
     )
     body = ""

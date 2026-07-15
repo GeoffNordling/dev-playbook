@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Prose
 description: Card for the prose standard — how workspace prose is written
 ---

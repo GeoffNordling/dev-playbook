@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Build
 description: Card for the build standard — how a repository is laid out, built, and checked
 ---

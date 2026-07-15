@@ -1,5 +1,5 @@
 ---
-type: Decision Record
+type: Decision-Record
 title: Decline Superpowers, Catalog Techniques
 description: Decline the Superpowers framework wholesale, cataloguing its techniques for later harvest into authored workspace skills
 ---

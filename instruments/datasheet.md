@@ -1,5 +1,5 @@
 ---
-type: Instrument Spec
+type: Instrument-Spec
 title: The Datasheet
 description: The datasheet — a fixed-section, budgeted HTML report giving a system's owner trust and direction without reading its code
 ---

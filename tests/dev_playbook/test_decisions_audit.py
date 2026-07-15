@@ -40,7 +40,7 @@ def record(title: str, *, status: str | None = None) -> str:
     """A minimal Decision Record body, optionally carrying a status key."""
     status_line = f"status: {status}\n" if status is not None else ""
     return (
-        f"---\ntype: Decision Record\ntitle: {title}\n"
+        f"---\ntype: Decision-Record\ntitle: {title}\n"
         f"description: {title}\n{status_line}---\n\n# {title}\n\nWe decided.\n"
     )
 

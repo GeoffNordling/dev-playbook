@@ -32,7 +32,7 @@ BASE_BUNDLE: dict[str, str] = {
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Guide` | teaching |\n| `README` | landing |\n"
-        "| `Recipe Description` | describes code |\n| `Standard` | rules |\n"
+        "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
     ),
     "standards/index.md": (
         "# standards/ — index\n\n"
@@ -121,7 +121,7 @@ def test_missing_description_is_flagged(tmp_path: Path) -> None:
 
 
 def test_recipe_description_requires_resource(tmp_path: Path) -> None:
-    recipe = "---\ntype: Recipe Description\ntitle: Ralph\ndescription: A loop\n---\n\n# Ralph\n"
+    recipe = "---\ntype: Recipe-Description\ntitle: Ralph\ndescription: A loop\n---\n\n# Ralph\n"
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
@@ -366,8 +366,8 @@ INSTRUMENT_REGISTRY = (
     "description: The document type registry\n---\n\n"
     "# Document Types\n\n## Types\n\n"
     "| Type | What it is |\n|------|------------|\n"
-    "| `Guide` | teaching |\n| `Instrument Spec` | a device contract |\n"
-    "| `README` | landing |\n| `Recipe Description` | describes code |\n"
+    "| `Guide` | teaching |\n| `Instrument-Spec` | a device contract |\n"
+    "| `README` | landing |\n| `Recipe-Description` | describes code |\n"
     "| `Standard` | rules |\n"
 )
 INSTRUMENT_INDEX = (
@@ -377,7 +377,7 @@ INSTRUMENT_INDEX = (
     "- [Widget](/standards/widget.md) — The widget instrument\n"
 )
 WIDGET_SPEC = (
-    "---\ntype: Instrument Spec\ntitle: Widget\n"
+    "---\ntype: Instrument-Spec\ntitle: Widget\n"
     "description: The widget instrument\n---\n\n# Widget\n\n{body}"
 )
 
@@ -448,7 +448,7 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Standard` | rules |\n| `README` | landing |\n"
-        "| `Guide` | teaching |\n| `Recipe Description` | describes code |\n"
+        "| `Guide` | teaching |\n| `Recipe-Description` | describes code |\n"
         "| Bogus row without ticks | nonsense |\n"
     )
     repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
@@ -472,7 +472,7 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Guide` | teaching |\n| `README` | landing |\n"
-        "| `Recipe Description` | describes code |\n| `Standard` | rules |\n"
+        "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
         "| `bogus name` | nonsense |\n"
     )
     repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
@@ -639,7 +639,7 @@ def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> Non
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `README` | landing |\n| `Standard` | rules |\n"
-        "| `Guide` | teaching |\n| `Recipe Description` | describes code |\n"
+        "| `Guide` | teaching |\n| `Recipe-Description` | describes code |\n"
     )
     repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
 

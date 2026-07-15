@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Module Design
 description: Card for the module-design standard — how modules are designed
 ---

@@ -1,5 +1,5 @@
 ---
-type: Decision Record
+type: Decision-Record
 title: Issue Workflow Reorganization
 description: Reorganize the issue workflow around phase-on-issue labels, merging triage and creation into `/intake` and adding an `/sdd` dispatcher
 ---

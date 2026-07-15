@@ -24,7 +24,7 @@ that standards, skills, and rituals employ.
 
 ## The Instrument Spec
 
-Each instrument's contract is a document typed `Instrument Spec` under
+Each instrument's contract is a document typed `Instrument-Spec` under
 `instruments/` — a single file, or a directory of single-concern documents
 with an `index.md`. The spec is self-sufficient: an executor handed the
 spec and the caller's inputs produces a conformant artifact with no other

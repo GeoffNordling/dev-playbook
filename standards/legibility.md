@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: System Legibility
 description: Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
 ---

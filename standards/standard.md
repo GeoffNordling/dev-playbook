@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Meta-Standard
 description: Card for the meta-standard — how standards are declared as cards, cataloged, and kept honest
 ---

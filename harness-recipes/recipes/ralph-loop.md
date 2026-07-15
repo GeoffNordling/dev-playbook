@@ -1,5 +1,5 @@
 ---
-type: Recipe Description
+type: Recipe-Description
 title: Ralph loop
 description: Grinding a large task to done by booting a fresh agent each iteration, with plan and progress carried on disk
 resource: /dotfiles/dot-claude/workflows/ralph-loop.js

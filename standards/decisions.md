@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Decision Records
 description: Card for the decision-records standard — how hard-to-reverse decisions are recorded
 ---

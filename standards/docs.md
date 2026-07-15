@@ -1,5 +1,5 @@
 ---
-type: Standard Card
+type: Standard-Card
 title: Knowledge Organization
 description: Card for the knowledge-organization standard — how knowledge is organized in markdown
 ---

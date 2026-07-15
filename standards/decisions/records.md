@@ -44,7 +44,7 @@ An easy-to-reverse decision is simply reversed, not recorded. An unsurprising on
 
 ```md
 ---
-type: Decision Record
+type: Decision-Record
 title: {Short title of the decision}
 description: {One-line summary of the decision, for triage and the index}
 ---
