@@ -27,8 +27,8 @@ repos:
   - repo: local
     hooks:
       - id: make-check
-        name: make check
-        entry: make check
+        name: make check-judgments
+        entry: make check-judgments
         language: system
         pass_filenames: false
         always_run: true
