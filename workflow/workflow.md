@@ -32,7 +32,7 @@ Issue **relationships** â€” hierarchy (sub-issues) and dependency (blocked-by) â
 | Mode | `mode:spike` | Spike path: a question; the answer closes the issue, no PR. |
 | Tests | `tests:yes` | Issue involves writing or modifying tests. |
 | Tests | `tests:no` | Issue does not touch tests. |
-| Status | `status:parked` | Decided and dormant: triage skips it; remove the label to revive. |
+| Type | `type:chore` | An ad-hoc minor task filed directly on the repo: not a briefed issue, carries no `mode`/`phase`/`tests` four-tuple, worked when a Cycle scopes it in or in the moment. |
 
 ### Graph-based flow
 

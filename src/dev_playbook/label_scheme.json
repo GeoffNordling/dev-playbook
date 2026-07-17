@@ -19,10 +19,10 @@
       "values": ["yes", "no"]
     },
     {
-      "name": "status",
+      "name": "type",
       "color": "cccccc",
-      "description": "Status: {value}. See workflow.md.",
-      "values": ["parked"]
+      "description": "Type: {value}. See workflow.md.",
+      "values": ["chore"]
     },
     {
       "name": "phase",

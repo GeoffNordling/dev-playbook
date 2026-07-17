@@ -10,10 +10,10 @@ argument-hint: "[what bit, one line]"
 # Log Friction
 
 Append one entry to the friction log —
-[friction-log.md](~/workspace/mission-control/friction-log.md) —
+[friction/log.md](~/workspace/mission-control/friction/log.md) —
 commit it, and hand the user the push. The log feeds triage:
-twice-felt friction becomes a backlog candidate on board.md, and
-only Selection places it as a bet.
+twice-felt friction becomes a triage item mapped onto the idea
+archive, and only Selection scopes it into a Cycle.
 Recording friction is not a commitment to fix it — capture and move
 on; never start fixing the friction as part of logging it.
 
@@ -24,7 +24,7 @@ session context and confirm it with the user before writing anything.
 
 ## Steps
 
-1. Read [friction-log.md](~/workspace/mission-control/friction-log.md).
+1. Read [friction/log.md](~/workspace/mission-control/friction/log.md).
    Follow the entry format defined there — the log file, not this
    skill, owns the format.
 2. Decide: is this a **repeat bite** of an existing entry (add a
@@ -35,7 +35,7 @@ session context and confirm it with the user before writing anything.
    fix unless the user gave one.
 4. Commit via /commit, applied to `~/workspace/mission-control`
    (use `git -C`; the session's cwd is usually another repo). Stage
-   **only** `friction-log.md` — the repo may hold unrelated work
+   **only** `friction/log.md` — the repo may hold unrelated work
    awaiting the owner's diff review.
 5. Remind the user to push (their YubiKey): hand them, as one line,
    `git -C ~/workspace/mission-control push`.
