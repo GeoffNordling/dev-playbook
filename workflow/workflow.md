@@ -12,7 +12,7 @@ Standard workflow for how ideas become merged PRs — or, on the spike path, ans
 
 Every post-intake **leaf** carries the full four-tuple `(category:*, mode:*, tests:*, phase:*)`, with `phase:*` naming its current node. Before intake, a rushed issue may carry only `phase:intake` or no labels at all — either way it is untriaged, with `phase:intake` the implied default. Assigning the metadata triple and advancing the phase is intake's job. An **epic** — an issue decomposed into sub-issues — is not a leaf: it never dispatches and needs only `category:*`; its children carry the work. The state of a post-intake leaf is the `(mode, tests, phase)` sub-triple — each node below is one reachable combination. Category is required metadata but does not affect routing.
 
-- `category:*` — `category:bug` (broken or incorrect) or `category:enhancement` (new behavior or improvement; covers everything that isn't a bug, including docs, config, refactors, and chores). Picked at intake.
+- `category:*` — `category:maintenance` (maintains shipped state: a fix, hygiene, or polish that adds no new capability) or `category:extension` (extends a system past its shipped line, giving it a capability it does not have today). Picked at intake; it names the work's nature and does not affect routing.
 - `mode:*` — `mode:sdd`, `mode:direct`, or `mode:spike`. Picked at intake.
 - `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (implemented at `tdd`), doc/config/work not touching tests goes `tests:no` (implemented at `build`); `mode:spike` always carries `tests:no` — a spike merges no code — so the full-tuple invariant holds on every leaf.
 - `phase:*` — the current node in the graph below. An untriaged issue is at `phase:intake` — labelled so, or implied by carrying no labels at all. The graph is the inventory; see [Naming](#naming).
@@ -21,18 +21,17 @@ Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) �
 
 ### Valid labels
 
-[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Eight fixed-value labels enumerated below, plus all `phase:*` labels derived from work nodes per [Naming](#naming).
+[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these. Seven fixed-value labels enumerated below, plus all `phase:*` labels derived from work nodes per [Naming](#naming).
 
 | Dimension | Label | Meaning |
 |---|---|---|
-| Category | `category:bug` | Something is broken or incorrect. |
-| Category | `category:enhancement` | New behavior or improvement; covers everything that isn't a bug. |
+| Category | `category:maintenance` | Maintains shipped state — a fix, hygiene, or polish that adds no new capability. |
+| Category | `category:extension` | Extends a system past its shipped line — a capability it does not have today. |
 | Mode | `mode:sdd` | SDD path: spec → design → TDD ceremony. |
 | Mode | `mode:direct` | Direct path: no spec/design ceremony. |
 | Mode | `mode:spike` | Spike path: a question; the answer closes the issue, no PR. |
 | Tests | `tests:yes` | Issue involves writing or modifying tests. |
 | Tests | `tests:no` | Issue does not touch tests. |
-| Type | `type:chore` | An ad-hoc minor task filed directly on the repo: not a briefed issue, carries no `mode`/`phase`/`tests` four-tuple, worked when a Cycle scopes it in or in the moment. |
 
 ### Graph-based flow
 

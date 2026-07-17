@@ -491,7 +491,7 @@ BUILD_BODY = (
     "**Key interfaces:** none\n\n**Acceptance criteria:** a\n\n**Out of scope:** o\n"
 )
 SPIKE_BODY = "**Summary:** s\n\n**Question:** q\n\n**Deliverable:** d\n"
-VALID_DIRECT = ["category:enhancement", "mode:direct", "tests:no", "phase:build"]
+VALID_DIRECT = ["category:extension", "mode:direct", "tests:no", "phase:build"]
 
 
 def issue(
@@ -538,7 +538,7 @@ def test_untriaged_issue_is_out_of_scope(tmp_path: Path) -> None:
 
 
 def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "tests:no", "phase:build"]
+    labels = ["category:extension", "tests:no", "phase:build"]
     result = run_with_issue(tmp_path, issue(7, labels, body=BUILD_BODY))
     assert "alpha: workflow.tuple-valid" in result.stdout
     assert "#7" in result.stdout
@@ -546,28 +546,28 @@ def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
 
 
 def test_leaf_invalid_phase_value_is_a_finding(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "mode:direct", "tests:no", "phase:frobnicate"]
+    labels = ["category:extension", "mode:direct", "tests:no", "phase:frobnicate"]
     result = run_with_issue(tmp_path, issue(8, labels, body=BUILD_BODY))
     assert "alpha: workflow.tuple-valid" in result.stdout
     assert "phase" in result.stdout
 
 
 def test_sdd_leaf_requires_tests_yes(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "mode:sdd", "tests:no", "phase:sdd-tdd"]
+    labels = ["category:extension", "mode:sdd", "tests:no", "phase:sdd-tdd"]
     result = run_with_issue(tmp_path, issue(9, labels, body=BUILD_BODY))
     assert "alpha: workflow.tuple-valid" in result.stdout
     assert "tests:yes" in result.stdout
 
 
 def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "mode:spike", "tests:yes", "phase:spike"]
+    labels = ["category:extension", "mode:spike", "tests:yes", "phase:spike"]
     result = run_with_issue(tmp_path, issue(10, labels, body=SPIKE_BODY))
     assert "alpha: workflow.tuple-valid" in result.stdout
     assert "tests:no" in result.stdout
 
 
 def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "phase:tdd"]
+    labels = ["category:extension", "phase:tdd"]
     result = run_with_issue(tmp_path, issue(3, labels, sub_issues_total=4))
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#3" in result.stdout
@@ -576,7 +576,7 @@ def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
 
 def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(
-        tmp_path, issue(4, ["category:enhancement"], sub_issues_total=4)
+        tmp_path, issue(4, ["category:extension"], sub_issues_total=4)
     )
     assert "tracking.epic-shape" not in result.stdout
 
@@ -584,7 +584,7 @@ def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
 def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
     # An epic carrying a mode/tests label but no phase label is still malformed:
     # the category-only invariant holds regardless of triage state.
-    labels = ["category:enhancement", "mode:direct"]
+    labels = ["category:extension", "mode:direct"]
     result = run_with_issue(tmp_path, issue(12, labels, sub_issues_total=3))
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#12" in result.stdout
@@ -600,7 +600,7 @@ def test_epic_without_category_label_is_a_finding(tmp_path: Path) -> None:
 
 
 def test_epic_with_two_category_labels_is_a_finding(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "category:bug"]
+    labels = ["category:extension", "category:maintenance"]
     result = run_with_issue(tmp_path, issue(14, labels, sub_issues_total=2))
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#14" in result.stdout
@@ -656,7 +656,7 @@ def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
 
 
 def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
-    labels = ["category:enhancement", "mode:spike", "tests:no", "phase:spike"]
+    labels = ["category:extension", "mode:spike", "tests:no", "phase:spike"]
     body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
     result = run_with_issue(tmp_path, issue(6, labels, body=body))
     assert "alpha: tracking.issue-brief-shape" in result.stdout

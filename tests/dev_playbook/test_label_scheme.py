@@ -14,18 +14,16 @@ from dev_playbook import label_scheme
 
 BOOTSTRAP = Path(__file__).resolve().parents[2] / "scripts" / "bootstrap-labels"
 
-# The canonical scheme, in mint order: the eight fixed-value metadata labels
-# (category, mode, tests, type) grey, then every phase label yellow. This is
-# exactly the set the pre-lift bootstrap-labels hard-coded.
+# The canonical scheme, in mint order: the seven fixed-value metadata labels
+# (category, mode, tests) grey, then every phase label yellow.
 EXPECTED_LABELS = [
-    ("category:bug", "cccccc", "Category: bug. See workflow.md."),
-    ("category:enhancement", "cccccc", "Category: enhancement. See workflow.md."),
+    ("category:maintenance", "cccccc", "Category: maintenance. See workflow.md."),
+    ("category:extension", "cccccc", "Category: extension. See workflow.md."),
     ("mode:sdd", "cccccc", "Mode: sdd. See workflow.md."),
     ("mode:direct", "cccccc", "Mode: direct. See workflow.md."),
     ("mode:spike", "cccccc", "Mode: spike. See workflow.md."),
     ("tests:yes", "cccccc", "Tests: yes. See workflow.md."),
     ("tests:no", "cccccc", "Tests: no. See workflow.md."),
-    ("type:chore", "cccccc", "Type: chore. See workflow.md."),
     ("phase:intake", "fbca04", "Phase: intake. See workflow.md."),
     ("phase:sdd-specs", "fbca04", "Phase: sdd-specs. See workflow.md."),
     ("phase:sdd-spec-review", "fbca04", "Phase: sdd-spec-review. See workflow.md."),
@@ -53,7 +51,7 @@ def test_scheme_preserves_the_spike_labels() -> None:
 def test_values_by_dimension_exposes_the_tuple_dimensions() -> None:
     values = label_scheme.values_by_dimension()
 
-    assert values["category"] == {"bug", "enhancement"}
+    assert values["category"] == {"maintenance", "extension"}
     assert values["mode"] == {"sdd", "direct", "spike"}
     assert values["tests"] == {"yes", "no"}
     assert "spike" in values["phase"]

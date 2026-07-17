@@ -4,7 +4,7 @@
       "name": "category",
       "color": "cccccc",
       "description": "Category: {value}. See workflow.md.",
-      "values": ["bug", "enhancement"]
+      "values": ["maintenance", "extension"]
     },
     {
       "name": "mode",
@@ -17,12 +17,6 @@
       "color": "cccccc",
       "description": "Tests: {value}. See workflow.md.",
       "values": ["yes", "no"]
-    },
-    {
-      "name": "type",
-      "color": "cccccc",
-      "description": "Type: {value}. See workflow.md.",
-      "values": ["chore"]
     },
     {
       "name": "phase",
