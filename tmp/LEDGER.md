@@ -16,8 +16,9 @@ verdict: — (early read: bigger than it looks — mechanical rename + open-ende
 | 1 | workflow.md and the "Workflow" term are still current reality; no partial rename begun | untested | — |
 | 2 | Rename blast radius is enumerable and mechanical; no consumer-facing identifier (hook names, label values) breaks — distribution.md warns consumer repos pin hook revs | untested | — |
 | 3 | "workflow" genuinely collides with Claude Code's workflows feature somewhere in-repo | untested | — |
-| 4 | The "organize/improve/simplify" rider is separable scope (intent Q — human's call) | untested | — |
+| 4 | The "organize/improve/simplify" rider is separable scope (intent Q — human's call) | resolved | human dropped the rider — #208 is rename-only |
 ### Decisions (human, verbatim)
+- "I'm ok removing 'simplify and improve' from the factory rename issue mandate (208). I agree that could be complex and might be too much for this batch workflow." (checkpoint 0)
 ### Decided without the human
 ### Probe log
 
