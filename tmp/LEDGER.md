@@ -31,14 +31,15 @@ verdict: AFK-ready (brief assumes full rename incl. paths + internal rule id; ob
 | 4 | The "organize/improve/simplify" rider is separable scope (intent Q — human's call) | resolved | human dropped the rider — #208 is rename-only |
 ### Decisions (human, verbatim)
 - "I'm ok removing 'simplify and improve' from the factory rename issue mandate (208). I agree that could be complex and might be too much for this batch workflow." (checkpoint 0)
+- "208 caveat: '"See workflow.md." mint onto GitHub in every repo (re-bootstrap needed),' find but in the pass, remove reference to specific files in a github. Github should be labels only not references to Git files that will become stale again in the future at some point." (checkpoint 1) — interpreted: during the rename pass, label descriptions drop file references entirely (no "See <file>.md." successor); one final re-bootstrap, then descriptions can never go stale against file moves again.
 ### Decided without the human
 ### Probe log
 - opus · M2: terrain map of workflow.md + label_scheme, rename blast radius, cross-check seams · returned — 3-bucket sweep, 5 fragilities, ordering: 208 before 207 (both center on workflow.md + label_scheme.json; a 207 checker would hard-code the path 208 moves)
 - sonnet · P5: falsify "blast radius bounded/mechanical" · SURVIVED w/ caveats — 354 hits/74 files, all bucketed; zero consumer-pinned identifiers carry "workflow"; risks: frozen DRs must be exempted, workflow.tuple-valid is a 9-test-site internal rename, run-judgements SKILL.md is pure bucket-2 despite living in bucket-1 territory
 
 ## Issue 207 — label_scheme.json and workflow.md can drift silently
-stage: blocked-on-human
-verdict: recommend close — premise refuted: scheme-vs-graph judgement already enforces this at pre-push
+stage: ready-to-land
+verdict: close — human-ratified at checkpoint 1 (premise refuted: scheme-vs-graph judgement already enforces this at pre-push)
 ### Hypotheses
 | # | claim | status | evidence (one line) |
 |---|-------|--------|---------------------|
@@ -48,6 +49,7 @@ verdict: recommend close — premise refuted: scheme-vs-graph judgement already 
 | 4 | Disposition (action / fold into 208 / record-only) is an intent decision | resolved | human: mission is to fix the problem; method left to design |
 ### Decisions (human, verbatim)
 - "Oh. I DO WANT the problem fixed. By 'not proposing a fix' in the issue, it meant 'no specific method of fixing is proposed.' But yes the mission of the issue is to fix the problem as described." (checkpoint 0)
+- "207 ok good finding. I'm ok closing this." (checkpoint 1)
 ### Decided without the human
 ### Probe log
 - sonnet · P6: falsify "no cross-check exists"; check docstring; extract+compare both label inventories · H-a REFUTED (scheme-vs-graph judgement exists, pre-push-gated), H-b/H-c SURVIVED (no live drift)
@@ -68,8 +70,10 @@ verdict: needs your call — deliverable shape: new rule file, retrofit of 4 fan
 - sonnet · P4: inventory fan-out guardrails across dotfiles/dot-claude · SURVIVED ×3 ("fork" appears nowhere in the tree; no guardrail language anywhere)
 
 ## Issue 184 — Remove the circular judgments.refuted ceremony forced by rule-matrix
-stage: ready-to-land
-verdict: AFK-ready — premise confirmed in code; brief authored against current names; A-vs-B routed to the design node
+stage: blocked-on-human
+verdict: needs your call — human doesn't recognize the issue's problem statement (black-box interior); orchestrator translation + recommendation delivered at checkpoint 1; ASK: keep as AFK-ready cleanup, or close
+### Decisions (human, verbatim)
+- "184- bro I don't even understand what this issue is trying to say. Do you? I forget why I wrote this or what I thought the problem was when I did. […] It's complaining about a problem inside a black box that I don't understand. I think of 'judgements' as: 'CLI operation that checks the judgements all pass or are all cached as passing their hashes in the past.' The details of this ticket don't make sense to me because they're focused on the middle of the implementation, which is a black box from my perspective." (checkpoint 1)
 ### Hypotheses
 | # | claim | status | evidence (one line) |
 |---|-------|--------|---------------------|
@@ -85,8 +89,10 @@ verdict: AFK-ready — premise confirmed in code; brief authored against current
 - sonnet · P1: verify post-#155 reality of judgments.refuted (exists? sole emitter? skill passes-only?) · SURVIVED ×3, with naming-rot caveat: real ids are `judgements-run` / `semantic-validation.refuted`; drift-guard test tests/test_rule_registry.py:47,61 pins RULES into --list-rules ground truth
 
 ## Issue 183 — standards-audit: consider reducing per-commit cold-start latency
-stage: blocked-on-human
-verdict: recommend close — latency premise refuted (0.62s measured, not 1–2s; LOCAL_ONLY so only dev-playbook pays)
+stage: ready-to-land
+verdict: close — human-ratified at checkpoint 1; closing comment must be succinct, accurate findings + reasons
+### Decisions (human, verbatim)
+- "183- fine to close. When closing an issue of post succint and accurate findings and reasons." (checkpoint 1)
 ### Hypotheses
 | # | claim | status | evidence (one line) |
 |---|-------|--------|---------------------|
@@ -99,8 +105,10 @@ verdict: recommend close — latency premise refuted (0.62s measured, not 1–2s
 - sonnet · P2: confirm always_run + subprocess count, time warm runs · H-a/H-b SURVIVED, H-c REFUTED (0.62s, not 1–2s; counterexample verified by orchestrator)
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
-stage: blocked-on-human
-verdict: bigger than it looks — real surface ~5× the issue's list; scope + anti-lint-rule decisions needed
+stage: investigating
+verdict: PIVOTED by human at checkpoint 1 — no longer a purge; now: define both terms in CONTEXT.md ("audit" = in the context of a standard; "lint" = default fallback otherwise) and realign only usages violating that rule. Wave-2 probe proposed to size the realignment surface.
+### Decisions (human, verbatim)
+- "Reading your findings and the issue makes me consider a pivot: 'lint' is a very natural word in common usage in software engineering, and it has a meaning everyone understands and it is good. However, I chose to have 'the standard' be based on 'describe, audit, enforce, adopt' which led me to standardize on 'audit' […] But that could be an overcorrection. Instead, what if we specifically standardized the meaning of vocabulary so that 'lint' and 'audit' are both allowed (and both defined in CONTEXT.md). The difference is that 'audit' is appropriate any time we're in the context of a standard. Lint is a default fallback otherwise. This might also involve understanding how an audit is different or the same as a lint." (checkpoint 1)
 ### Hypotheses
 | # | claim | status | evidence (one line) |
 |---|-------|--------|---------------------|
