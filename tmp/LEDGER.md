@@ -6,82 +6,84 @@
 |---|-------|-------|-----------------|------------|
 | 208 | Workflow → Software Factory rename | ✅ ready-to-land | AFK-ready — full rename, labels lose file refs | landing nod |
 | 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | landing nod |
-| 199 | fork-recursion guardrails | 🟡 blocked-on-human | 4-piece proposal delivered | **your yes/no + cap number** |
+| 199 | fan-out guardrails | 🟡 blocked-on-human | piece 2 ratified; pieces 1 & 4 rejected | **cap: number or "drop"** |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | lint/audit vocabulary (pivoted) | 🟡 blocked-on-human | 27 violations ready; 41 borderline = one question | **your borderline call** |
+| 169 | lint/audit vocabulary (pivoted) | 🟡 blocked-on-human | borderline resolved — 68-site workset; reverse sweep open | **probe: go / fold into brief** |
 
 ## ❓ Open asks — everything currently waiting on you
 
-1. **#199 — the fork-recursion incident. Deferred to post-compact; written
-   out in full here so nothing depends on session memory.**
+1. **#199 — last open piece: the spawn cap. A number, or "drop"?**
 
-   **What happened (the incident the issue records).** A session was told to
-   run a code review and then a second review skill. It invoked the built-in
-   `/code-review` skill, whose loaded instructions said to launch 8 parallel
-   "finder" agents. The session launched them as **forks**. A fork inherits
-   the entire conversation — including the original "run the review, then run
-   the other skill" instruction — and at least one fork re-executed that
-   whole directive on its own, spawning its own agents in turn. Result: ~37
-   agents, PR comments posted by rogue children, and no way to stop the
-   grandchildren (TaskStop refused on ownership grounds).
+   Your checkpoint-2 ruling settled the rest: piece 2 (guard language in the
+   four fan-out files) is ratified and absorbs piece 1's clauses at the
+   skill level; the rule file and the upstream report are rejected. Piece 3
+   is the spawn cap, which you asked me to explain properly.
 
-   **What investigation established (wave 1 + wave 2):**
-   - Four workspace files instruct launching parallel agents, and none of
-     them carries any guard language: the issue-overwatch skill, the
-     run-judgements skill, and the two workflow scripts ralph-loop.js and
-     scatter-gather.js. No rule file about subagent use exists at all. (The
-     guard-language pattern does exist in one skill, fill-issue-gaps, so
-     there is house precedent.)
-   - The built-in `/code-review` is not a sealed program. Its instructions
-     load into OUR session, and OUR agent is the one that chooses fork vs
-     fresh when obeying them. So a workspace rule genuinely binds the agent
-     doing the spawning — "telling agents" is not wishful in this specific
-     failure, because the teller and the spawner share one context.
-   - The fork hazard is real and UNDOCUMENTED upstream: Anthropic's docs say
-     forks inherit the whole conversation, but never warn that a fork can
-     re-execute inherited instructions, and offer no prevention guidance.
-   - Our own overwatch design already contains the main protection: it runs
-     `/code-review` inside a wrapper subagent whose entire conversation is
-     the one line "Run /code-review medium --comment", so a fork born in
-     there inherits nothing dangerous. The incident happened in a session
-     that carried a rich multi-step directive instead — exactly what the
-     wrapper pattern prevents.
-   - One hard mechanical lever exists that works even if every agent
-     ignores every rule: the env var CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION
-     (default 200). Set lower, the harness itself refuses to spawn agent
-     N+1 and fails loudly.
+   **How the spawn cap works.** `CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION` is
+   an environment variable read by the Claude Code harness itself — a hard
+   counter, not an instruction an agent might ignore. Every agent that
+   anything in a session spawns — subagents, forks, nested grandchildren,
+   workflow-launched agents — increments one session-wide counter that
+   never goes down (only `/clear` resets it). When the counter reaches the
+   cap, the harness refuses the next spawn: the Agent tool fails loudly
+   with "Subagent spawn limit reached," no matter what any agent intends.
+   It cannot be turned off; the default is 200. We would set it in the
+   workspace settings file so every session inherits it — note that file is
+   agent-write-protected, so the edit would be yours to make.
 
-   **The proposal — four independent pieces, answer yes/no to each:**
-   1. **Write a rule file** under dotfiles/dot-claude/rules/ that teaches
-      every session: bounded worker tasks get fresh agents, never forks;
-      every worker prompt ends with a "you are a leaf — do not spawn agents,
-      do not invoke skills, do not write" clause; before launching a
-      multi-agent skill, state how many agents it will run; a bounded worker
-      that goes silent is a signal to stop and investigate, not wait; and
-      the native /code-review runs only inside a single-purpose wrapper
-      agent, never inline in a session with other pending directives.
-   2. **Add that same guard language to the four fan-out files** named above,
-      so an agent following any of them verbatim is bound even if it never
-      read the rule.
-   3. **Set the spawn cap** in workspace settings. Needs a number from you:
-      25 would have strangled this incident (37 agents) but could choke a
-      legitimately big scatter-gather run; 50 still stops runaway recursion
-      and leaves headroom. Or say "drop it" and we rely on pieces 1–2.
-   4. **Draft an upstream report to Anthropic** describing the undocumented
-      fork re-execution hazard (they document the inheritance, not the risk).
+   **Why my recommendation changes to "drop."** The counter cannot tell
+   rogue children from legitimate fan-out, and it accumulates for the whole
+   session. This batch legitimately spent 10 workers in one session, and
+   scatter-gather is designed to accept up to 1,000 jobs. So a cap tight
+   enough to have caught the incident (~37 agents means cap ≈ 25) is
+   guaranteed to choke sanctioned big runs, while a cap loose enough to be
+   safe catches nothing incident-shaped — and that tier already exists as
+   the default 200. Meanwhile piece 2's count-stating clause ("say how many
+   agents before launching") surfaces a blowout instead of merely killing
+   it at an arbitrary threshold.
 
-   **My recommendation: yes to 1, 2, and 4; a cap of 50 for 3.**
-2. **#169 — the one borderline call:** do the judgements-audit internals
-   (`lint_cli`, `LintFinding`, `lint_findings` + their test mirrors, ~41
-   sites) count as "in the context of a standard" and get renamed to audit
-   vocabulary? Evidence favors yes — `LintFinding` is the fleet's lone
-   non-`Finding` carrier and the console script is already `judgements-audit`
-   — cost is ~41 sites of internal churn.
+   **Answer: a number, or "drop." My recommendation: drop.**
+
+2. **#169 — close the accounting with one probe, or fold it into the brief?**
+
+   Your borderline ruling resolves every classified site: the 41 borderline
+   sites join the 27 violations — a workset of 68 sites, each already on
+   disk with file:line and suggested wording (tmp/worker-returns/W2-A). The
+   one direction never swept is the reverse: "audit" used somewhere that is
+   NOT in a standard's context, where your rule says plain "lint" (or
+   another word) is the right vocabulary. Likely rare — the audit
+   vocabulary here was standardized deliberately — but it has never been
+   checked. Options: **(a)** one Sonnet probe now (manifest +1, needs your
+   go), so the brief lands with a complete two-direction accounting;
+   **(b)** fold the reverse sweep into the implementer's mandate, guided by
+   the CONTEXT.md definitions they will write.
+
+   **Answer: "go" for the probe, or "fold it into the brief." My
+   recommendation: the probe — a closed-world workset is what makes the
+   brief safely hands-off.**
 
 ## Δ log — on a repeat pass, read only the newest section
 
-### Δ wave 2 (LATEST)
+### Δ checkpoint 2 — post-compact answers (LATEST)
+
+- **169**: borderline RESOLVED — the judgements-audit internals are
+  in-standard-context ("this thing is literally an auditor"); internal code
+  and naming go to audit vocabulary; docs say audit but may bridge to lint
+  as an analogy. Workset: 27 + 41 = 68 sites. One open point remains: the
+  reverse-direction sweep ("audit" outside standard contexts) — probe
+  proposed at manifest +1. → ASK 2.
+- **199**: piece 2 RATIFIED (guard language in the 4 fan-out files),
+  absorbing piece 1's clauses at skill level, where the human expects agents
+  to actually listen; piece 1 (rule file) REJECTED — "a sledgehammer";
+  piece 4 (upstream report) REJECTED — "waste of time." Piece 3 (spawn cap):
+  explanation delivered in Open asks #1; my recommendation revised to DROP
+  (an effective cap collides with scatter-gather's 1,000-job envelope; the
+  default-200 tier already exists). Human also flags the issue's fork
+  narrative as unverified memory — the verified core is the agent-count
+  blowout; the guard language binds regardless of mechanism. → ASK 1.
+
+### Δ wave 2
 
 - **POST-COMPACT RECOVERY (verified):** all four ready-to-land issues
   (208, 207, 184, 183) re-certified from disk state alone — ledger +
@@ -188,9 +190,26 @@ ASK: none — closing comment lands after the batched nod.
 ## Issue 199 — Code Review Ran Wild Like Uncle Jeff Was Paying the Bill
 
 stage: 🟡 blocked-on-human
-verdict: four-piece proposal delivered (post-W2-B)
+verdict: scope settled (checkpoint 2) — guard language in the 4 fan-out files (piece 2, absorbing piece 1's clauses: fresh-not-fork, leaf clause on every worker prompt, count-stating, silent-worker-means-stop, /code-review only via a single-purpose wrapper); rule file and upstream report rejected; spawn cap is the one open call
 
-> ❓ **ASK** — yes/no on the proposal's four pieces + a cap number. Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #1.
+> ❓ **ASK** — spawn cap: a number, or "drop" (recommendation: drop). Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #1.
+
+### Incident narrative (preserved from the checkpoint-1 ask; mechanism caveat below)
+
+A session was told to run a code review and then a second review skill. It
+invoked the built-in `/code-review` skill, whose loaded instructions said to
+launch 8 parallel "finder" agents. Per the issue's account it launched them
+as forks — a fork inherits the entire conversation, including the original
+multi-step directive — and at least one fork re-executed that directive,
+spawning its own agents in turn. Result: ~37 agents, PR comments posted by
+rogue children, no way to stop the grandchildren (TaskStop refused on
+ownership grounds).
+
+CAVEAT (human, checkpoint 2): the fork mechanism is unverified memory — "It
+may be true, may not be." The verified core: "code review launched way too
+many damn agents." The guard language binds regardless of mechanism — a leaf
+clause stops any child from spawning, and count-stating surfaces a blowout
+however it starts.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -203,6 +222,7 @@ verdict: four-piece proposal delivered (post-W2-B)
 
 ### Decisions (human, verbatim)
 - "199- I'm open to (c) both But you think that's the answer? Just telling the agents not to repeat bad behaviors? I'm not quite certain this is going to work. take a closer look at workflow.md and the code review skills for the pr/code review nodes. They involve the *native* Claude Code code review skill (with the effort arguments we're trying to force to medium). You need to look up the anthropic primary documentation on that. And if you find two skills, one a plug in and one a native Claude code function, you can rest assured we are using the native Claude code function. […] It's tricky. It's different from our normal skills." (checkpoint 1)
+- "199- I'm actually not sure from memory that /fork was the primary problem. It may be true, may not be. I know that's how it was written but that doesn't mean it is true. In general, "code review launched way too many damn agents." THAT is true at least! In terms of how to handle this, honestly, I'm really only optimistic about #2: adding guard language to the four fan out files. I don't like the rule files because I believe a rule file is just a sledgehammer that tries to cover everything all at once. If the agent will listen to the rule, then it will certainly listen to the skill. Indeed, it's more likely to listen to the skill, I believe. I'm not sure how the spawn cap works. You could try explaining that a little better to me. we're not gonna report to anthropic. That's a waste of time." (checkpoint 2) — interpreted: piece 2 yes, absorbing piece 1's guard clauses into the four files; pieces 1 and 4 no; piece 3 awaits the cap explanation (now in Open asks #1); the brief anchors on the verified fact (agent-count blowout) and treats fork inheritance as probable-but-unverified mechanism.
 
 ### Decided without the human
 ### Probe log
@@ -258,8 +278,8 @@ ASK: none — closing comment lands after the batched nod.
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 
 stage: 🟡 blocked-on-human
-verdict: pivoted (checkpoint 1) to "define both terms in CONTEXT.md; realign violations only." 27 violations in 5 clusters are ready work; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement).
-> ❓ **ASK** — the one borderline call on renaming the judgements-audit internals. Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #2.
+verdict: borderline resolved (checkpoint 2) — internals rename to audit vocabulary; workset = 68 sites (27 violations + 41 ex-borderline, all with file:line + suggested wording in tmp/worker-returns/W2-A); docs say audit but may bridge to lint as analogy; CONTEXT.md defines both terms; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement). Last open: the reverse-direction ("audit" outside standard context) sweep.
+> ❓ **ASK** — one Sonnet probe (manifest +1) for the reverse sweep, or fold it into the brief (recommendation: probe). Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #2.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -272,6 +292,7 @@ verdict: pivoted (checkpoint 1) to "define both terms in CONTEXT.md; realign vio
 ### Decisions (human, verbatim)
 - "Reading your findings and the issue makes me consider a pivot: 'lint' is a very natural word in common usage in software engineering, and it has a meaning everyone understands and it is good. However, I chose to have 'the standard' be based on 'describe, audit, enforce, adopt' which led me to standardize on 'audit' […] But that could be an overcorrection. Instead, what if we specifically standardized the meaning of vocabulary so that 'lint' and 'audit' are both allowed (and both defined in CONTEXT.md). The difference is that 'audit' is appropriate any time we're in the context of a standard. Lint is a default fallback otherwise. This might also involve understanding how an audit is different or the same as a lint." (checkpoint 1)
 - "169- good idea. go" (checkpoint 1, wave-2 reclassification probe)
+- "169- Yes judgements-audit is called "audit" because it comes directly from a standard. Internal code and naming should say "audit" not lint since this thing is literally an auditor. Documentation should say audit but may bridge to lint as an analogy." (checkpoint 2)
 
 ### Decided without the human
 ### Probe log
