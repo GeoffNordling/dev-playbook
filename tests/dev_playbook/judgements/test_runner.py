@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from dev_playbook.judgements.core import SCHEMA, prepare
-from dev_playbook.judgements.runner import REFUTED, main
+from dev_playbook.judgements.runner import main
 
 CONFIG = '[tool.judgements]\npaths = ["judgements/*.yaml"]\n'
 
@@ -14,22 +14,6 @@ ONE_JUDGEMENT = """\
 judgements:
   - id: j1
     claim: docs/errors.md lists every exception src/exceptions.py raises.
-    evidence: [docs/errors.md]
-    reference: [src/exceptions.py]
-    model: claude-sonnet-4-6
-    effort: high
-"""
-
-TWO_JUDGEMENTS = """\
-judgements:
-  - id: j1
-    claim: docs/errors.md lists every exception src/exceptions.py raises.
-    evidence: [docs/errors.md]
-    reference: [src/exceptions.py]
-    model: claude-sonnet-4-6
-    effort: high
-  - id: j2
-    claim: docs/errors.md names the module each exception lives in.
     evidence: [docs/errors.md]
     reference: [src/exceptions.py]
     model: claude-sonnet-4-6
@@ -49,24 +33,6 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     files = {
         "pyproject.toml": CONFIG,
         "judgements/a.yaml": ONE_JUDGEMENT,
-        **EVIDENCE,
-    }
-    for relpath, contents in files.items():
-        path = root / relpath
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(contents)
-    monkeypatch.chdir(root)
-    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
-    return root
-
-
-@pytest.fixture
-def two_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """A judgements repo carrying two declarations (j1, j2), cache isolated."""
-    root = tmp_path / "repo"
-    files = {
-        "pyproject.toml": CONFIG,
-        "judgements/a.yaml": TWO_JUDGEMENTS,
         **EVIDENCE,
     }
     for relpath, contents in files.items():
@@ -144,60 +110,30 @@ def test_record_is_idempotent(repo: Path) -> None:
     assert main(["record", "j1"]) == 0
 
 
-def test_list_rules_prints_the_refuted_rule(
+def test_list_rules_reports_no_rules(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    # judgements-run records passing verdicts but emits no findings, so it answers
+    # the detector protocol with an empty rule set.
     exit_code = main(["--list-rules"])
 
     assert exit_code == 0
-    assert capsys.readouterr().out.split() == [REFUTED]
+    assert capsys.readouterr().out == ""
 
 
-def test_record_refuted_verdict_emits_a_finding_and_does_not_cache(
+def test_record_rejects_the_removed_refuted_flag(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    exit_code = main(["record", "--refuted", "j1"])
+    # The never-used refuted recording path is gone; passing it is a hard usage
+    # error, never a silently-ignored no-op.
+    with pytest.raises(SystemExit) as excinfo:
+        main(["record", "--refuted", "j1"])
 
-    out = capsys.readouterr().out
-    assert exit_code == 1
-    assert REFUTED in out
-    assert "j1" in out
-    # A refuted verdict is never recorded: the gate must stay red.
-    assert main(["plan"]) == 0
-    plan = json.loads(capsys.readouterr().out)
-    assert plan["seen"] == []
+    assert excinfo.value.code == 2
+    assert "refuted" in capsys.readouterr().err
 
 
-def test_record_refuted_takes_several_ids_and_caches_none(
-    two_repo: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    # Space-separated refuted ids all refute; none is silently cached as a pass.
-    exit_code = main(["record", "--refuted", "j1", "j2"])
-
-    out = capsys.readouterr().out
-    assert exit_code == 1
-    assert out.count(REFUTED) == 2
-    assert "j1" in out and "j2" in out
-    assert main(["plan"]) == 0
-    plan = json.loads(capsys.readouterr().out)
-    assert plan["seen"] == []
-
-
-def test_record_rejects_an_id_that_is_also_refuted(
-    repo: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    # Recording an id as both a pass and a refutation is a contradiction; it must
-    # fail loud and cache nothing rather than green the gate for a refuted claim.
-    exit_code = main(["record", "j1", "--refuted", "j1"])
-    capsys.readouterr()
-
-    assert exit_code != 0
-    assert main(["plan"]) == 0
-    plan = json.loads(capsys.readouterr().out)
-    assert plan["seen"] == []
-
-
-def test_record_with_no_ids_and_no_refutations_is_an_error(
+def test_record_with_no_ids_is_an_error(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     # A bare record records nothing — a caller-side bug, surfaced loudly.
