@@ -3,25 +3,25 @@
     {
       "name": "category",
       "color": "cccccc",
-      "description": "Category: {value}. See workflow.md.",
+      "description": "Category: {value}.",
       "values": ["maintenance", "extension"]
     },
     {
       "name": "mode",
       "color": "cccccc",
-      "description": "Mode: {value}. See workflow.md.",
+      "description": "Mode: {value}.",
       "values": ["sdd", "direct", "spike"]
     },
     {
       "name": "tests",
       "color": "cccccc",
-      "description": "Tests: {value}. See workflow.md.",
+      "description": "Tests: {value}.",
       "values": ["yes", "no"]
     },
     {
       "name": "phase",
       "color": "fbca04",
-      "description": "Phase: {value}. See workflow.md.",
+      "description": "Phase: {value}.",
       "values": [
         "intake",
         "sdd-specs",
