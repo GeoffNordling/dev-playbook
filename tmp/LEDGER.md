@@ -3,6 +3,11 @@
 ## Batch
 issues: 208, 207, 199, 184, 183, 169 · wave: 1 COMPLETE (8/8 returned) · manifest: 8 approved spent: 8
 
+Wave 2 (human-directed at checkpoint 1): probe W2-A — reclassify lint hits
+under the pivot rule (169, approved "go"); worker W2-B — primary-doc lookup
+on the native Claude Code code-review skill (199, human-directed:
+"read the documentation before you propose a solution"). spent: 8+2.
+
 Wave-1 batch findings: edges proposed 208→207 (only if 207 lives) and 184→169
 (file collisions: runner.py, loader.py, test_rule_registry.py, the card,
 judgements/ docs). Consolidation: none warranted — probed. Cross-cutting:
@@ -56,7 +61,9 @@ verdict: close — human-ratified at checkpoint 1 (premise refuted: scheme-vs-gr
 
 ## Issue 199 — Code Review Ran Wild Like Uncle Jeff Was Paying the Bill
 stage: blocked-on-human
-verdict: needs your call — deliverable shape: new rule file, retrofit of 4 fan-out surfaces, or both
+verdict: needs deeper look before proposing — human open to (c) both but skeptical that "telling agents" works; directed a read of the native code-review skill's primary docs + workflow.md review nodes first
+### Decisions (human, verbatim)
+- "199- I'm open to (c) both But you think that's the answer? Just telling the agents not to repeat bad behaviors? I'm not quite certain this is going to work. take a closer look at workflow.md and the code review skills for the pr/code review nodes. They involve the *native* Claude Code code review skill (with the effort arguments we're trying to force to medium). You need to look up the anthropic primary documentation on that. And if you find two skills, one a plug in and one a native Claude code function, you can rest assured we are using the native Claude code function. […] It's tricky. It's different from our normal skills." (checkpoint 1)
 ### Hypotheses
 | # | claim | status | evidence (one line) |
 |---|-------|--------|---------------------|
@@ -71,8 +78,9 @@ verdict: needs your call — deliverable shape: new rule file, retrofit of 4 fan
 
 ## Issue 184 — Remove the circular judgments.refuted ceremony forced by rule-matrix
 stage: blocked-on-human
-verdict: needs your call — human doesn't recognize the issue's problem statement (black-box interior); orchestrator translation + recommendation delivered at checkpoint 1; ASK: keep as AFK-ready cleanup, or close
+verdict: AFK-ready — human ratified keeping it after translation; brief to be written in plain exterior language (interior detail in an implementer section); HARD CONSTRAINT: human must be fully in the loop on any change to the enforcement standard
 ### Decisions (human, verbatim)
+- "184- Okay, man. The way you just explained it jogged my memory, and it made me understand and remember why we wrote this issue. […] you should talk like that in the issue and instead of the hyper specific gobbley goop that was in there unless you think that will help the implementing agent, which is certainly might. Now I'll just say I'll be interested in how you change the enforcement standard because that is near and dear to my heart. So I want to be fully in the loop on plan to changes to the enforcement standard." (checkpoint 1)
 - "184- bro I don't even understand what this issue is trying to say. Do you? I forget why I wrote this or what I thought the problem was when I did. […] It's complaining about a problem inside a black box that I don't understand. I think of 'judgements' as: 'CLI operation that checks the judgements all pass or are all cached as passing their hashes in the past.' The details of this ticket don't make sense to me because they're focused on the middle of the implementation, which is a black box from my perspective." (checkpoint 1)
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -106,7 +114,7 @@ verdict: close — human-ratified at checkpoint 1; closing comment must be succi
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 stage: investigating
-verdict: PIVOTED by human at checkpoint 1 — no longer a purge; now: define both terms in CONTEXT.md ("audit" = in the context of a standard; "lint" = default fallback otherwise) and realign only usages violating that rule. Wave-2 probe proposed to size the realignment surface.
+verdict: PIVOTED by human at checkpoint 1 — no longer a purge; now: define both terms in CONTEXT.md ("audit" = in the context of a standard; "lint" = default fallback otherwise) and realign only usages violating that rule. Wave-2 reclassification probe approved ("good idea. go") and launched.
 ### Decisions (human, verbatim)
 - "Reading your findings and the issue makes me consider a pivot: 'lint' is a very natural word in common usage in software engineering, and it has a meaning everyone understands and it is good. However, I chose to have 'the standard' be based on 'describe, audit, enforce, adopt' which led me to standardize on 'audit' […] But that could be an overcorrection. Instead, what if we specifically standardized the meaning of vocabulary so that 'lint' and 'audit' are both allowed (and both defined in CONTEXT.md). The difference is that 'audit' is appropriate any time we're in the context of a standard. Lint is a default fallback otherwise. This might also involve understanding how an audit is different or the same as a lint." (checkpoint 1)
 ### Hypotheses
