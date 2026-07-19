@@ -9,62 +9,41 @@
 | 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | lint/audit vocabulary (ruling v2) | 🟡 blocked-on-human | sweep mostly dissolves; CONTEXT.md is the one true fix | **3 boundary calls (Open asks)** |
+| 169 | vocabulary hierarchy (v2.1) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit (code vs LLM); zero renames | landing nod (+2 veto-flags) |
 
 ## ❓ Open asks — everything currently waiting on you
 
-The overnight question is ANSWERED (checkpoint 3) — **ruling v2**, verbatim
-in #169's Decisions. The taxonomy: **audit** is the umbrella word for a
-standard's checking machinery; a **deterministic script may be called a
-lint or linter**; anything using an **LLM judge must be called an audit**;
-the **standard's own vocabulary stays "audit"** because its mechanisms
-include both linters and auditors; **lint ⊂ audit**, never the reverse.
+**Ruling v2.1** (verbatim in #169's Decisions) finalized the taxonomy and
+resolved checkpoint 3's boundary calls 1 and 2; the ledger and the landing
+checkpoint's #169 entry are rewritten to match. The hierarchy: **the
+Standard consists of Auditing Detectors; a Detector is a lint if it is
+deterministic code and an audit if it is an LLM judge; lint ⊂ audit,
+never the reverse.** CONTEXT.md will define exactly this subset
+relationship, keyed on code-vs-LLM.
 
-Re-evaluated both sweeps from disk under v2 (no new probes — the W2-A and
-W3-A inventories cover every site). Most of the old 113-site workset
-dissolves; the one mandatory deliverable left is CONTEXT.md, which defines
-neither "lint" (verified: zero mentions) nor the two kinds of detector, and
-whose Audit entry reads as script-runs-only — contradicting v2's "LLM judge
-must be called audit." Three boundary calls remain, and only you can make
-them:
+Two light veto-flags remain — say no to either while you read, otherwise
+they land as stated:
 
-1. **Does today's ruling supersede yesterday's on the judgements-audit
-   internals?** Yesterday you ruled the internals (`lint_cli`,
-   `LintFinding`, `lint_findings` + test mirrors, 41 sites) rename to audit
-   vocabulary — "this thing is literally an auditor." Today's ruling makes
-   "lint" legal for deterministic scripts, and judgements-audit's checker
-   IS deterministic (it validates declarations; the LLM judge lives in
-   judgements-run). If today supersedes: zero churn, the 41 sites stay. If
-   yesterday stands: the 41-site rename ships as planned. My
-   recommendation: let yesterday stand — the tool's public name is already
-   judgements-audit and every other carrier class in the fleet is
-   `Finding`, so the rename fixes a real internal inconsistency; v2 makes
-   lint *permissible* there, not *preferable*.
+1. **Fleet proper names stay.** I read "call deterministic scripts lint"
+   as governing descriptions and future naming, NOT as a mandate to rename
+   the ten existing `*-audit` scripts to `*-lint`. Because lint ⊂ audit,
+   an umbrella name on a linter is truthful (square/rectangle); and a
+   fleet rename would break consumer-pinned pre-commit hook ids and
+   reverse #166. Flag if you actually want fleet renames — that is a
+   different, much bigger issue.
 
-2. **Where exactly does "the standard itself needs to use audit" stop?**
-   My reading: it binds the framework vocabulary — cards and their Audit
-   cells, the lifecycle words, CONTEXT.md, the enforcement standard — while
-   prose naming one specific deterministic mechanism may still say lint
-   (the judgements standard's "## 4. Lint the declarations on commit," a
-   detector's own "Lint …" docstring, the type-lint nickname, ref-audit
-   called a linter). Under that reading only the 3 judgements-doc sites are
-   even debatable. If you instead want every standards/** doc to say audit
-   throughout, then most of W2-A's old 27 violations (type-lint ×9,
-   "linter" ×2, the judgements-doc ×3, plus the detector self-descriptions)
-   rejoin the workset — the W2-A list lets me recompute exactly once you
-   rule. My recommendation: framework = audit, mechanism-naming may say
-   lint — it matches your "the audit mechanisms include both linters and
-   auditors."
+2. **Generic English stays unregulated.** The third-party survey's six
+   "**Audited:** <date>" lines are plain English, no detector or standard
+   in play. Default: leave them; or say the word and they become
+   "Surveyed:" as a 6-line ride-along.
 
-3. **Does the vocabulary rule regulate ordinary English?** The third-party
-   survey's six "**Audited:** <date>" lines are plain English ("we looked
-   into this") — no standard, no LLM judge, no detector. Leave generic
-   English unregulated (my recommendation), or reword to "Surveyed:" as a
-   courtesy so "audit" reads unambiguously as the system term everywhere.
+Also resolved by v2.1, flagged here for your veto: yesterday's "rename the
+judgements-audit internals to audit vocabulary" (checkpoint 2, 41 sites) is
+treated as SUPERSEDED — `lint_*` names on deterministic code are now
+exactly per-policy, so the internals stay and that churn drops to zero.
 
-After these three, #169's landing entry gets rewritten and the batched nod
-on the full checkpoint closes the batch. The other five issues' entries are
-unchanged — you can ratify them now if you want to split the nod.
+Then: the **batched nod** on the Landing checkpoint below — all six
+entries are current again.
 
 Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
 options live in the issue blocks' Decisions sections and in git history
@@ -128,31 +107,54 @@ launched far too many agents); fork inheritance recorded as probable
 mechanism. Tuple: `category:maintenance` · `mode:direct` · `tests:no`
 (prose/skill edits, no test surface) · `phase:build`.
 
-**#169 — SUPERSEDED at checkpoint 3.** Ruling v2 (audit = umbrella; lint =
-the deterministic subset; LLM judge ⇒ audit) dissolves most of this entry's
-old sweep: the 39 audit→"review" renames are dead (those sites are LLM
-judges, so "audit" is now mandated-correct), the fold-in scope flag is
-moot, and the workset shrinks to the CONTEXT.md definitional work plus the
-outcome of the three boundary calls in Open asks. This entry, 169's tuple,
-and its edges get rewritten when those calls land. The five entries above
-stand as written.
+**#169 — vocabulary hierarchy (ruling v2.1).** Brief: CONTEXT.md defines
+the hierarchy — the Standard's checking process is the **audit**; it runs
+**detectors**; a detector is a **lint** when it is deterministic code and
+an **audit** (narrow sense) when it is an LLM judge; **lint ⊂ audit**, so
+umbrella naming (a linter called `*-audit`, as the fleet's proper names
+do) is always truthful, and the one violation class is calling an LLM
+judge a "lint" — zero instances exist today. Concretely: a new **Lint**
+glossary entry; the two-kinds note added to the existing **Audit** and
+**Detector** entries (connecting "judgement" as the yaml-machinery LLM
+kind); a third **Flagged-ambiguities** entry recording the lint/audit
+resolution alongside check/audit and audit/detector. NO renames: the
+judgements-audit `lint_*` internals stay (deterministic — per-policy),
+mechanism prose stays (type-lint, "Lint the declarations," "linter"), the
+39 LLM-review "audit" sites stay (correct). Optional ride-along per
+veto-flag 2: survey "Audited:" → "Surveyed:" (6 lines). Untouchables
+unchanged (frozen DRs; readings/ regeneration is its own concern). Tuple:
+`category:maintenance` · `mode:direct` · `tests:no` (CONTEXT.md + at most
+one doc; no tests touched) · `phase:build`.
 
 **Dependency picture** (blocked-by edges to be written):
 - 208 and 184 are collision-free with each other → land first, in parallel.
 - 199 blocked-by 208 (soft: both edit issue-overwatch/SKILL.md and other
   dotfiles pins of workflow.md paths).
-- 169 blocked-by 184 (hard: runner.py, loader.py, test_rule_registry.py,
-  the card, judgements docs), blocked-by 208 (hard: 169 edits lines inside
-  files 208 renames/moves — workflow.md, skill-authoring.md), blocked-by
-  199 (soft: issue-overwatch/SKILL.md again). The sweep lands last.
-- Landing order: **208 ∥ 184 → 199 → 169**; 207 and 183 close on the nod.
-  (169's edges under revision at checkpoint 3: the 208/199 collisions
-  existed only for the now-dead cluster-2 renames; the 184 edge survives
-  only if the internals rename stands.)
+- 169 (v2.1): all three former edges DROP — the workset is CONTEXT.md
+  (+ at most the survey doc), which collides with nothing in the batch.
+  169 is independent and can land any time.
+- Landing order: **208 ∥ 184 ∥ 169 → 199**; 207 and 183 close on the nod.
 
 ## Δ log — on a repeat pass, read only the newest section
 
-### Δ checkpoint 3 — lint/audit ruling v2; the sweep largely dissolves (LATEST)
+### Δ checkpoint 3.1 — taxonomy finalized; 169 re-scoped to definitions (LATEST)
+
+- **169**: ruling v2.1 (verbatim in Decisions): the Standard consists of
+  Auditing Detectors; a Detector is a **lint** if deterministic code, an
+  **audit** if an LLM judge; lint ⊂ audit; documented policy is to call
+  deterministic scripts lint and LLM judges audit. Resolves checkpoint-3
+  asks 1 and 2: the judgements-audit internals STAY `lint_*` (per-policy —
+  supersedes the checkpoint-2 rename ruling; churn → zero) and
+  mechanism-describing prose ("Lint the declarations," type-lint, "linter")
+  STAYS. Workset = CONTEXT.md hierarchy definitions + third
+  Flagged-ambiguities entry (+ optional survey reword). Tuple becomes
+  tests:no · phase:build. All three blocked-by edges DROP — 169 is
+  independent. → ✅ ready-to-land with 2 veto-flags in Open asks (fleet
+  proper names stay; generic English unregulated).
+- **batch**: landing order simplifies to **208 ∥ 184 ∥ 169 → 199**; the
+  landing checkpoint is fully current again — awaiting the batched nod.
+
+### Δ checkpoint 3 — lint/audit ruling v2; the sweep largely dissolves
 
 - **169**: overnight question answered — ruling v2: audit = umbrella;
   deterministic scripts may be "lint/linter"; LLM-judge mechanisms MUST be
@@ -415,9 +417,9 @@ ASK: none — closing comment lands after the batched nod.
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 
-stage: 🟡 blocked-on-human
-verdict: ruling v2 (checkpoint 3) — audit is the umbrella; deterministic scripts may be called lint/linter; LLM-judge mechanisms must be called audit; the standard's own vocabulary is audit; lint ⊂ audit. Re-evaluation from disk: W3-A's 39 LLM-review-pass sites flip to MANDATED-CORRECT; 24/27 W2-A violations flip to legal; zero sites call an LLM mechanism "lint" → no forced renames. The one true violation standing is CONTEXT.md itself: "lint" never defined (verified: zero mentions), Audit entry reads scripts-only ("a run of one or more detectors" / "Detector — the read-only script"), and its Flagged-ambiguities list — which already resolved check/audit and audit/detector — has no lint/audit entry. Residual workset = outcome of the 3 boundary calls.
-> ❓ **ASK** — three boundary calls: internals supersession (41 sites), the mechanism-naming boundary (3–~20 sites), generic-English regulation (6 sites). Full prose in [Open asks](#-open-asks--everything-currently-waiting-on-you).
+stage: ✅ ready-to-land
+verdict: ruling v2.1 (checkpoint 3.1) — the hierarchy: the Standard consists of Auditing Detectors; a Detector is a **lint** if deterministic code, an **audit** if an LLM judge; lint ⊂ audit, never the reverse. Workset: CONTEXT.md defines the subset relationship keyed on code-vs-LLM (new Lint entry; two-kinds note on Audit and Detector; third Flagged-ambiguities entry) — the sole violation class going forward is calling an LLM judge a "lint," of which the repo has zero instances today. Everything else stands as-is per policy: the 39 LLM-review "audit" sites (correct — LLM judges), the `*-audit` fleet names (umbrella naming on linters, truthful since lint ⊂ audit), the judgements-audit `lint_*` internals (deterministic code — supersedes the checkpoint-2 rename ruling), mechanism prose (type-lint, "Lint the declarations," "linter"). Optional 6-line survey reword rides on veto-flag 2.
+ASK: two veto-flags in [Open asks](#-open-asks--everything-currently-waiting-on-you) — otherwise ratify at landing.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -433,7 +435,8 @@ verdict: ruling v2 (checkpoint 3) — audit is the umbrella; deterministic scrip
 - "169- Yes judgements-audit is called "audit" because it comes directly from a standard. Internal code and naming should say "audit" not lint since this thing is literally an auditor. Documentation should say audit but may bridge to lint as an analogy." (checkpoint 2)
 - "Yes, send a Sonnet agent to do the reverse sweep for the word audit." (checkpoint 2 — manifest +1 approved; probe W3-A launched)
 - "tomorrow I wanna actually answer the question first: What if we change the standard to say 'lint' instead of 'audit'? […] The answer to this question would be the precise definition of lint. Does it match the precise definition of audit? Because I know audit is the true meaning I want for a standard. If lint just happens to match it, then we might agree to just call everything lint." (end of night — raised the question; answered next morning by ruling v2 below)
-- "I decided to maintain the split between audit and lint, with things directly falling under standard being call audit and other parts of the system ok being called lint. Specifically, I think it's ok to call a deterministic script a "lint" or "linter", but anything using LLM judge must be called "audit." Additionally, the standard itself needs to use "audit" because the audit mechanisms include both linters and auditers. In general, lint is a subset of audit, but audit is not a subset of lint." (checkpoint 3 — RULING v2; supersedes the checkpoint-1 pivot's "lint = fallback outside standard context" framing where they conflict; whether it supersedes the checkpoint-2 internals ruling is Open asks #1)
+- "I decided to maintain the split between audit and lint, with things directly falling under standard being call audit and other parts of the system ok being called lint. Specifically, I think it's ok to call a deterministic script a "lint" or "linter", but anything using LLM judge must be called "audit." Additionally, the standard itself needs to use "audit" because the audit mechanisms include both linters and auditers. In general, lint is a subset of audit, but audit is not a subset of lint." (checkpoint 3 — RULING v2; supersedes the checkpoint-1 pivot's "lint = fallback outside standard context" framing where they conflict)
+- "In general, our documented standard and policy will be to call deterministic scripts "lint" and to clearly specify that they are a subset of the overall "audit" standard and process. Additionally, anything that is an LLM judge shall be called "audit" not "lint." So the Standard consists of Auditing Detectors, and a Detector is a linter if it's deterministic code and an audit if its LLM judge. This is a simple hierarchy and way to fit tehse pieces together. […] Also I want CONTEXT.md to define linting and auditing as this subset relationship related to code vs LLMs." (checkpoint 3.1 — RULING v2.1, the final taxonomy; resolves checkpoint-3 asks 1 and 2: internals stay lint_*, mechanism prose stays; supersedes the checkpoint-2 internals-rename ruling — flagged for veto in Open asks)
 
 ### Decided without the human
 ### Probe log
