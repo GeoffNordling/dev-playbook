@@ -9,7 +9,7 @@
 | 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | vocabulary hierarchy (v2.2) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit + fleet renames to `*-lint` | landing nod (+name-list flag) |
+| 169 | vocabulary hierarchy (v2.2) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit + fleet renames to `*-lint` | your "go" |
 
 ## ❓ Open asks — everything currently waiting on you
 
@@ -21,118 +21,37 @@ deterministic code and an audit if it is an LLM judge; lint ⊂ audit,
 never the reverse.** CONTEXT.md will define exactly this subset
 relationship, keyed on code-vs-LLM.
 
-Checkpoint 3.2 resolved both prior veto-flags: generic English stays
-unregulated (agreed — the survey's "Audited:" lines stay as-is), and the
-fleet-names flag was OVERTURNED — the documented standard is that
-deterministic scripts are CALLED lint, so **the ten `*-audit` scripts
-rename to `*-lint`**, hook ids and all. Consumer repos pin a rev and adapt
-at their next bump; this repo owns only itself.
-
-One veto-flag remains — the concrete name list. Default pattern `*-lint`;
-say no to any of these while you read, otherwise they land as listed:
-
-> repo-lint · python-lint · testing-lint · ref-lint · okf-lint ·
-> decisions-lint · skill-lint · workspace-lint · standards-lint ·
-> judgements-lint
-> (plus the four `src/dev_playbook/*_audit.py` modules → `*_lint.py` and
-> their test files; `judgements-run` keeps its name — it is the LLM-judge
-> machinery, not a linter; the cards' "## Audit" cell headers stay — the
-> umbrella process is still the audit.)
-
-Then: the **batched nod** on the Landing checkpoint below.
+**One thing only: the word "go."** Every investigation question and every
+vocabulary ruling is resolved — v2.2 taxonomy, fleet renames in, name list
+approved verbatim, generic English unregulated. All decisions live in the
+issue blocks' Decisions sections; resolved-ask history is in this file's
+git revisions. Saying **"go"** executes the Landing checkpoint below — the
+batch's first and only GitHub writes.
 
 Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
 options live in the issue blocks' Decisions sections and in git history
 (commit b3a0737's version of this section).
 
-## Landing checkpoint — awaiting your nod
+## Landing checkpoint — say "go"
 
-The nod authorizes the batch's FIRST GitHub writes: four-tuple labels and
-rewritten briefs on 208/184/199/169, blocked-by edges, and closes with
-findings comments on 207/183. (I read tmp/references/landing.md only after
-the nod, per the skill.)
+One word — **"go"** — and I execute this table: the batch's first and only
+GitHub writes. (I read tmp/references/landing.md first, per the skill.)
+Every scope rule in it was ratified at checkpoints 0–3.2; the ratified
+detail lives in each issue's block below and in tmp/worker-returns/; the
+long-form checkpoint entries are archived in git (rev 5495c44 of this
+file).
 
-**#208 — rename "Workflow" → "Software Factory".** Brief: full rename of
-our concept — the workflow/ directory and its four docs, the
-standards/workflow.md card, every path cross-reference and dotfiles skill
-pin, code/data docstrings, judgement declarations, and the internal rule id
-`workflow.tuple-valid` (coordinated with its 9 test sites). Label
-descriptions drop file references entirely (your ruling) and get
-self-contained wording; one re-bootstrap per repo after merge. Untouched:
-the Claude Code harness "workflows" feature, GitHub-Actions/generic uses,
-frozen Decision Records; readings/ gets regenerated, not edited. Judgement
-caches invalidate → re-run rides the change; OKF index descriptions move in
-lockstep. Tuple: `category:maintenance` (no new capability) ·
-`mode:direct` (mechanical, design already done by this investigation) ·
-`tests:yes` (modifies pinned test fixtures) · `phase:tdd` (the graph routes
-direct+tests:yes there).
+| # | GitHub write | four-tuple labels |
+|---|---|---|
+| 208 | brief rewritten: rename Workflow → Software Factory, rename-only; label descriptions drop file refs | maintenance · direct · tests:yes · tdd |
+| 207 | **CLOSE** with findings: cross-check already exists (scheme-vs-graph judgement, pre-push-gated), zero live drift | — |
+| 199 | brief rewritten: guard language in the 4 fan-out files (fresh-not-fork, leaf clause, count-stating) | maintenance · direct · tests:no · build |
+| 184 | brief rewritten in plain language: remove unused `--refuted` ceremony atomically with the card bullet; enforcement-standard edits escalate to you | maintenance · direct · tests:yes · tdd |
+| 183 | **CLOSE** with findings: 0.62 s measured vs 1–2 s claimed; dev-playbook-local only | — |
+| 169 | brief rewritten: CONTEXT.md lint ⊂ audit hierarchy + fleet rename to `*-lint` (approved list) | maintenance · direct · tests:yes · tdd |
 
-**#207 — close.** Comment: premise refuted — the `scheme-vs-graph`
-judgement already enforces label_scheme.json ↔ workflow.md agreement,
-gated at pre-push (test_judgements_gate + make check-judgements), and a
-live extraction found zero drift (17 labels match both sides). The doc↔JSON
-seam is deliberately the judgement's job per label_scheme.py's docstring.
-
-**#183 — close.** Comment: premise refuted — three warm runs measured
-0.61–0.62 s (orchestrator re-verified 0.636 s), not the claimed 1–2 s; the
-11 `--list-rules` subprocesses cost ~0.065 s each; and the hook is
-dev-playbook-local (LOCAL_ONLY), so no consumer repo pays it. If it ever
-matters, the existing Callable seam makes a cached/in-process swap clean.
-
-**#184 — remove the unused `--refuted` ceremony.** Brief opens in plain
-language: judgements-run carries a `--refuted` flag and a
-`semantic-validation.refuted` rule that nothing ever uses — the
-run-judgements skill records passes only; the rule exists solely so the
-standards-audit bookkeeping check doesn't complain about the card citing
-judgements-run. Remove flag, rule, and their tests, AND drop the card's
-judgements-run Audit bullet in the same change (atomic, or the always-run
-standards-audit reds between edits). Implementer section carries M1's exact
-touch-list. Escalation trigger (your hard constraint): any edit to the
-enforcement standard → stop and bring the plan to you first. Tuple:
-`category:maintenance` · `mode:direct` · `tests:yes` (deletes/updates
-tests) · `phase:tdd`.
-
-**#199 — fan-out guard language.** Brief: add the guard clauses to the four
-fan-out surfaces (issue-overwatch and run-judgements SKILL.md, ralph-loop.js,
-scatter-gather.js), modeled on fill-issue-gaps' existing leaf clause:
-bounded workers get fresh agents never forks; every worker prompt ends with
-a leaf clause; state the agent count before launching; a silent bounded
-worker means stop and investigate; the native /code-review runs only inside
-a single-purpose wrapper. Anchored on the verified fact (the review
-launched far too many agents); fork inheritance recorded as probable
-mechanism. Tuple: `category:maintenance` · `mode:direct` · `tests:no`
-(prose/skill edits, no test surface) · `phase:build`.
-
-**#169 — vocabulary hierarchy + fleet rename (ruling v2.2).** Brief, two
-parts. **Definitions:** CONTEXT.md defines the hierarchy — the Standard's
-checking process is the **audit**; it runs **detectors**; a detector is a
-**lint** when it is deterministic code and an **audit** (narrow sense)
-when it is an LLM judge; **lint ⊂ audit**. New Lint glossary entry;
-two-kinds note on Audit and Detector (connecting "judgement" as the
-yaml-machinery LLM kind); third Flagged-ambiguities entry. **Rename:** the
-ten deterministic scripts become `*-lint` (list in Open asks) — script
-filenames, published hook ids (with the distribution.md rev-bump +
-consumer migration note), the canonical pre-commit template, the four
-`src/dev_playbook/*_audit.py` modules and their test files, the
-test_rule_registry.py pins, every card Audit-cell citation link, and prose
-references; judgement caches invalidate → re-run rides the change; OKF
-index lockstep applies. Ceiling ≈604 identifier sites (W3-A);
-implementer re-greps rather than trusting a frozen list. Stays: card
-"## Audit" headers (umbrella), judgements-run, the 39 LLM-review "audit"
-sites, `lint_*` internals (now matching judgements-lint), mechanism prose,
-survey lines, frozen DRs; readings/ regenerates. Tuple:
-`category:maintenance` · `mode:direct` · `tests:yes` (renames test files
-and pinned strings) · `phase:tdd`.
-
-**Dependency picture** (blocked-by edges to be written):
-- 208 and 184 are collision-free with each other → land first, in parallel.
-- 199 blocked-by 208 (soft: both edit issue-overwatch/SKILL.md and other
-  dotfiles pins of workflow.md paths).
-- 169 (v2.2): edges RESTORED — the fleet rename collides with 184
-  (semantic-validation card's Audit cell + test_rule_registry rows +
-  judgements files) and 208 (workspace_audit.py, enforcement.md tables),
-  softly with 199 (skill prose naming detectors). The sweep lands last.
-- Landing order: **208 ∥ 184 → 199 → 169**; 207 and 183 close on the nod.
+Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
+(soft). Landing order: **208 ∥ 184 → 199 → 169**.
 
 ## Δ log — on a repeat pass, read only the newest section
 
@@ -154,6 +73,10 @@ and pinned strings) · `phase:tdd`.
   phase:tdd; edges restored (169 blocked-by 184, 208; soft 199). One
   remaining veto-flag: the concrete `*-lint` name list (Open asks).
 - **batch**: landing order back to **208 ∥ 184 → 199 → 169**.
+- **checkpoint 3.2 wrap**: name list approved verbatim — zero open
+  questions remain. Open asks emptied to the single live item (the "go");
+  Landing checkpoint compressed to a six-row table, long-form entries
+  archived in git (rev 5495c44).
 
 ### Δ checkpoint 3.1 — taxonomy finalized; 169 re-scoped to definitions
 
@@ -437,7 +360,7 @@ ASK: none — closing comment lands after the batched nod.
 
 stage: ✅ ready-to-land
 verdict: ruling v2.2 (checkpoint 3.2) — the hierarchy stands (a Detector is a **lint** if deterministic code, an **audit** if an LLM judge; lint ⊂ audit) AND naming follows it: the ten deterministic `*-audit` scripts rename to `*-lint`, hook ids included; consumers pin a rev and adapt at bump. Workset: (1) CONTEXT.md defines the subset relationship keyed on code-vs-LLM (new Lint entry; two-kinds note on Audit and Detector; third Flagged-ambiguities entry); (2) the fleet rename — filenames, hook ids + rev-bump note, canonical pre-commit template, `*_audit.py` modules + test files, registry pins, card Audit-cell citation links, prose references (ceiling ≈604 identifier sites, W3-A). Stays: card "## Audit" headers (umbrella), judgements-run (LLM machinery), the 39 LLM-review "audit" sites (correct), `lint_*` internals (now MATCHING judgements-lint's public name), mechanism prose, survey "Audited:" lines (generic English unregulated, agreed).
-ASK: one veto-flag — the concrete `*-lint` name list in [Open asks](#-open-asks--everything-currently-waiting-on-you); otherwise ratify at landing.
+ASK: none — name list approved verbatim; lands on your "go."
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -456,6 +379,7 @@ ASK: one veto-flag — the concrete `*-lint` name list in [Open asks](#-open-ask
 - "I decided to maintain the split between audit and lint, with things directly falling under standard being call audit and other parts of the system ok being called lint. Specifically, I think it's ok to call a deterministic script a "lint" or "linter", but anything using LLM judge must be called "audit." Additionally, the standard itself needs to use "audit" because the audit mechanisms include both linters and auditers. In general, lint is a subset of audit, but audit is not a subset of lint." (checkpoint 3 — RULING v2; supersedes the checkpoint-1 pivot's "lint = fallback outside standard context" framing where they conflict)
 - "In general, our documented standard and policy will be to call deterministic scripts "lint" and to clearly specify that they are a subset of the overall "audit" standard and process. Additionally, anything that is an LLM judge shall be called "audit" not "lint." So the Standard consists of Auditing Detectors, and a Detector is a linter if it's deterministic code and an audit if its LLM judge. This is a simple hierarchy and way to fit tehse pieces together. […] Also I want CONTEXT.md to define linting and auditing as this subset relationship related to code vs LLMs." (checkpoint 3.1 — RULING v2.1, the taxonomy; resolves checkpoint-3 asks 1 and 2: internals stay lint_*, mechanism prose stays; supersedes the checkpoint-2 internals-rename ruling)
 - "Yes, 'Generic English stays unregulated' agreed. But no, for your 'fleet proper names stay' section, no: Our standard is going to be that the deterministic scripts are called lint. Therefore, we do need to rename implementation so the deterministic scripts are called lint. Don't worry about whether this breaks consumer repos. You don't own those. You only own this repo. The other repos will adapt when you are done." (checkpoint 3.2 — RULING v2.2: fleet renames IN; the ten deterministic scripts rename to `*-lint`; consumer adaptation is out of scope for this repo)
+- "Yes the concrete name list is fine." (checkpoint 3.2 wrap — the ten `*-lint` names land as listed; last open question closed)
 
 ### Decided without the human
 ### Probe log
