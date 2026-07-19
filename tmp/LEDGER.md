@@ -6,67 +6,31 @@
 |---|-------|-------|-----------------|------------|
 | 208 | Workflow → Software Factory rename | ✅ ready-to-land | AFK-ready — full rename, labels lose file refs | landing nod |
 | 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | landing nod |
-| 199 | fan-out guardrails | 🟡 blocked-on-human | piece 2 ratified; pieces 1 & 4 rejected | **cap: number or "drop"** |
+| 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | lint/audit vocabulary (pivoted) | 🟡 blocked-on-human | borderline resolved — 68-site workset; reverse sweep open | **probe: go / fold into brief** |
+| 169 | lint/audit vocabulary (pivoted) | 🟡 probe in flight | borderline resolved — 68-site workset; W3-A sweeping reverse direction | W3-A return (me, not you) |
 
 ## ❓ Open asks — everything currently waiting on you
 
-1. **#199 — last open piece: the spawn cap. A number, or "drop"?**
+None — every human decision is in. (Checkpoint 2 resolved the last two:
+spawn cap dropped per recommendation; reverse-sweep probe approved and in
+flight.) Next contact is the **landing checkpoint** — per-issue
+brief-in-miniature, four-tuples, edges — once probe W3-A returns.
 
-   Your checkpoint-2 ruling settled the rest: piece 2 (guard language in the
-   four fan-out files) is ratified and absorbs piece 1's clauses at the
-   skill level; the rule file and the upstream report are rejected. Piece 3
-   is the spawn cap, which you asked me to explain properly.
-
-   **How the spawn cap works.** `CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION` is
-   an environment variable read by the Claude Code harness itself — a hard
-   counter, not an instruction an agent might ignore. Every agent that
-   anything in a session spawns — subagents, forks, nested grandchildren,
-   workflow-launched agents — increments one session-wide counter that
-   never goes down (only `/clear` resets it). When the counter reaches the
-   cap, the harness refuses the next spawn: the Agent tool fails loudly
-   with "Subagent spawn limit reached," no matter what any agent intends.
-   It cannot be turned off; the default is 200. We would set it in the
-   workspace settings file so every session inherits it — note that file is
-   agent-write-protected, so the edit would be yours to make.
-
-   **Why my recommendation changes to "drop."** The counter cannot tell
-   rogue children from legitimate fan-out, and it accumulates for the whole
-   session. This batch legitimately spent 10 workers in one session, and
-   scatter-gather is designed to accept up to 1,000 jobs. So a cap tight
-   enough to have caught the incident (~37 agents means cap ≈ 25) is
-   guaranteed to choke sanctioned big runs, while a cap loose enough to be
-   safe catches nothing incident-shaped — and that tier already exists as
-   the default 200. Meanwhile piece 2's count-stating clause ("say how many
-   agents before launching") surfaces a blowout instead of merely killing
-   it at an arbitrary threshold.
-
-   **Answer: a number, or "drop." My recommendation: drop.**
-
-2. **#169 — close the accounting with one probe, or fold it into the brief?**
-
-   Your borderline ruling resolves every classified site: the 41 borderline
-   sites join the 27 violations — a workset of 68 sites, each already on
-   disk with file:line and suggested wording (tmp/worker-returns/W2-A). The
-   one direction never swept is the reverse: "audit" used somewhere that is
-   NOT in a standard's context, where your rule says plain "lint" (or
-   another word) is the right vocabulary. Likely rare — the audit
-   vocabulary here was standardized deliberately — but it has never been
-   checked. Options: **(a)** one Sonnet probe now (manifest +1, needs your
-   go), so the brief lands with a complete two-direction accounting;
-   **(b)** fold the reverse sweep into the implementer's mandate, guided by
-   the CONTEXT.md definitions they will write.
-
-   **Answer: "go" for the probe, or "fold it into the brief." My
-   recommendation: the probe — a closed-world workset is what makes the
-   brief safely hands-off.**
+Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
+options live in the issue blocks' Decisions sections and in git history
+(commit b3a0737's version of this section).
 
 ## Δ log — on a repeat pass, read only the newest section
 
 ### Δ checkpoint 2 — post-compact answers (LATEST)
 
+- **199**: spawn cap DROPPED — human approved the drop recommendation
+  ("everything you said in the last turn is approved"). Scope final: guard
+  language in the 4 fan-out files, nothing else. → ✅ ready-to-land.
+- **batch**: all human asks resolved; W3-A (reverse audit-sweep, wave 3)
+  is the only thing between here and the landing checkpoint.
 - **169**: borderline RESOLVED — the judgements-audit internals are
   in-standard-context ("this thing is literally an auditor"); internal code
   and naming go to audit vocabulary; docs say audit but may bridge to lint
@@ -189,10 +153,9 @@ ASK: none — closing comment lands after the batched nod.
 
 ## Issue 199 — Code Review Ran Wild Like Uncle Jeff Was Paying the Bill
 
-stage: 🟡 blocked-on-human
-verdict: scope settled (checkpoint 2) — guard language in the 4 fan-out files (piece 2, absorbing piece 1's clauses: fresh-not-fork, leaf clause on every worker prompt, count-stating, silent-worker-means-stop, /code-review only via a single-purpose wrapper); rule file and upstream report rejected; spawn cap is the one open call
-
-> ❓ **ASK** — spawn cap: a number, or "drop" (recommendation: drop). Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #1.
+stage: ✅ ready-to-land
+verdict: AFK-ready — scope final (checkpoint 2): guard language in the 4 fan-out files (piece 2, absorbing piece 1's clauses: fresh-not-fork, leaf clause on every worker prompt, count-stating, silent-worker-means-stop, /code-review only via a single-purpose wrapper); rule file, upstream report, and spawn cap all rejected/dropped
+ASK: none — ratify at landing.
 
 ### Incident narrative (preserved from the checkpoint-1 ask; mechanism caveat below)
 
@@ -223,6 +186,7 @@ however it starts.
 ### Decisions (human, verbatim)
 - "199- I'm open to (c) both But you think that's the answer? Just telling the agents not to repeat bad behaviors? I'm not quite certain this is going to work. take a closer look at workflow.md and the code review skills for the pr/code review nodes. They involve the *native* Claude Code code review skill (with the effort arguments we're trying to force to medium). You need to look up the anthropic primary documentation on that. And if you find two skills, one a plug in and one a native Claude code function, you can rest assured we are using the native Claude code function. […] It's tricky. It's different from our normal skills." (checkpoint 1)
 - "199- I'm actually not sure from memory that /fork was the primary problem. It may be true, may not be. I know that's how it was written but that doesn't mean it is true. In general, "code review launched way too many damn agents." THAT is true at least! In terms of how to handle this, honestly, I'm really only optimistic about #2: adding guard language to the four fan out files. I don't like the rule files because I believe a rule file is just a sledgehammer that tries to cover everything all at once. If the agent will listen to the rule, then it will certainly listen to the skill. Indeed, it's more likely to listen to the skill, I believe. I'm not sure how the spawn cap works. You could try explaining that a little better to me. we're not gonna report to anthropic. That's a waste of time." (checkpoint 2) — interpreted: piece 2 yes, absorbing piece 1's guard clauses into the four files; pieces 1 and 4 no; piece 3 awaits the cap explanation (now in Open asks #1); the brief anchors on the verified fact (agent-count blowout) and treats fork inheritance as probable-but-unverified mechanism.
+- "Otherwise, everything you said in the last turn is approved" (checkpoint 2) — resolves the last open piece: spawn cap dropped per recommendation (an effective cap collides with scatter-gather's 1,000-job envelope; default-200 tier already exists; count-stating in the guard language gives the visibility).
 
 ### Decided without the human
 ### Probe log
@@ -279,7 +243,7 @@ ASK: none — closing comment lands after the batched nod.
 
 stage: 🟡 blocked-on-human
 verdict: borderline resolved (checkpoint 2) — internals rename to audit vocabulary; workset = 68 sites (27 violations + 41 ex-borderline, all with file:line + suggested wording in tmp/worker-returns/W2-A); docs say audit but may bridge to lint as analogy; CONTEXT.md defines both terms; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement). Last open: the reverse-direction ("audit" outside standard context) sweep.
-> ❓ **ASK** — one Sonnet probe (manifest +1) for the reverse sweep, or fold it into the brief (recommendation: probe). Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #2.
+ASK: none — probe W3-A in flight (human: "go"); flips to ready-to-land on its return.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
