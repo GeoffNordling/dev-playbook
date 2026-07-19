@@ -9,6 +9,10 @@ description: Card for the semantic-validation standard — how claims only langu
 Governs how claims only language can check — accuracy, honesty, scope —
 are validated and kept from drifting as the underlying files change.
 
+The [`judgements-run`](/scripts/judgements-run) CLI is the deterministic engine
+the `run-judgements` skill drives: it plans the docket, renders the judge
+prompts, and records the passing verdicts.
+
 ## Define
 
 - [standards/judgements/](/standards/judgements/index.md) — the contract, one
@@ -18,9 +22,9 @@ are validated and kept from drifting as the underlying files change.
 
 - [judgements-audit](/scripts/judgements-audit) — checks declaration shape,
   deterministically
-- [judgements-run](/scripts/judgements-run) — the deterministic engine of the
-  semantic-detection workflow: plans the docket, renders the judge prompts,
-  and records the verdicts
+- [the LLM judgements](/standards/judgements/declarations.md) — an LLM judge
+  rules on each declared claim against its evidence; the audit-kind detector
+  no deterministic lint can stand in for
 
 ## Enforce
 

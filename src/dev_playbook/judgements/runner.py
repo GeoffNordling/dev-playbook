@@ -8,45 +8,25 @@ LLM, no network: this is the deterministic half the judge skill stands on.
 - ``plan``  -- key every judgement, partition by cache membership, emit one JSON
   object ``{schema, seen, unseen}`` with both lists ordered by id.
 - ``render <id>`` -- print exactly the judge prompt for one judgement.
-- ``record <id>... [--refuted <id>...]`` -- record the passing judgements' keys
-  idempotently, and report each refuted judgement as a ``semantic-validation.refuted``
-  finding (never cached, so the gate stays red).
-- ``--list-rules`` -- print the ``semantic-validation.refuted`` rule id and exit; this is
-  the read-only Audit detector behind the judgements card's judgements-run pointer.
+- ``record <id>...`` -- record the passing judgements' keys idempotently.
+- ``--list-rules`` -- print nothing and exit 0: this CLI records passing verdicts
+  but emits no findings, so it answers the detector protocol with an empty rule set.
 """
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import NamedTuple
 
-from dev_playbook.findings import print_rules, render
+from dev_playbook.findings import print_rules
 from dev_playbook.judgements.core import SCHEMA, Prepared, prepare
 from dev_playbook.judgements.loader import Declaration, by_id, load, resolve_root
 from dev_playbook.skipcache import seen
-
-# judgements-run is the detector behind the judgements card's second Audit pointer:
-# recording a batch of verdicts is a read-only audit (it mutates only the
-# content-addressed cache outside the repo, never anything git tracks), so a
-# refuted verdict in that batch is a finding. This one rule id is a module-level
-# constant so the emission site references it, not a raw literal, and RULES (what
-# --list-rules prints) cannot drift from what the code emits.
-REFUTED = "semantic-validation.refuted"
-RULES = (REFUTED,)
 
 _DISPATCH_PROMPT = (
     "Run the shell command `judgements-run render {id}`. Its stdout is your complete "
     "instructions and the material to judge -- follow it and return your verdict."
 )
-
-
-class RefutedFinding(NamedTuple):
-    """One refuted judgement, located at its id and rendered as a GNU finding."""
-
-    location: str  # the judgement id -- the addressable thing under judgement
-    rule: str  # REFUTED
-    message: str
 
 
 def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object]:
@@ -76,29 +56,13 @@ def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object
 
 
 def render_prompt(declaration: Declaration, root: Path | None) -> str:
-    """The judge prompt for one judgement -- the XML input a judge agent runs.
-
-    Named ``render_prompt`` (not ``render``) so it does not shadow the shared GNU
-    finding renderer this module imports for the refuted-verdict finding.
-    """
+    """The judge prompt for one judgement -- the XML input a judge agent runs."""
     return _prepared(declaration, root).prompt
 
 
 def record(declarations: list[Declaration], root: Path | None) -> None:
     """Record the given judgements' content keys in the seen-set, idempotently."""
     seen.record([_prepared(d, root).key for d in declarations])
-
-
-def refutations(declarations: list[Declaration]) -> list[RefutedFinding]:
-    """One ``semantic-validation.refuted`` finding per refuted judgement in the batch.
-
-    A refuted verdict is never cached (the gate stays red until the claim is
-    judged-and-passed); recording the batch surfaces it as a finding instead.
-    """
-    return [
-        RefutedFinding(d.id, REFUTED, "recorded verdict is refuted")
-        for d in declarations
-    ]
 
 
 def _prepared(declaration: Declaration, root: Path | None) -> Prepared:
@@ -128,7 +92,7 @@ def main(argv: list[str]) -> int:
     """Parse the subcommand, load declarations, and run it; nonzero on any error."""
     args = _parse_args(argv)
     if args.list_rules:
-        return print_rules(RULES)
+        return print_rules(())
     if args.command is None:
         print("judgements-run: a subcommand is required", file=sys.stderr)
         return 2
@@ -140,26 +104,13 @@ def main(argv: list[str]) -> int:
         elif args.command == "render":
             print(render_prompt(by_id(declarations, args.id), root))
         elif args.command == "record":
-            if not args.ids and not args.refuted:
+            if not args.ids:
                 print(
-                    "judgements-run record: at least one id or --refuted id is required",
-                    file=sys.stderr,
-                )
-                return 2
-            both = set(args.ids) & set(args.refuted)
-            if both:
-                print(
-                    "judgements-run record: "
-                    f"id(s) both recorded and refuted: {', '.join(sorted(both))}",
+                    "judgements-run record: at least one id is required",
                     file=sys.stderr,
                 )
                 return 2
             record([by_id(declarations, id) for id in args.ids], root)
-            findings = refutations([by_id(declarations, id) for id in args.refuted])
-            for finding in findings:
-                print(render(finding.location, finding.rule, finding.message))
-            if findings:
-                return 1
     except (ValueError, OSError) as error:
         print(f"judgements-run: {error}", file=sys.stderr)
         return 1
@@ -189,12 +140,5 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     record_parser = sub.add_parser("record", help="record verdicts over judgements")
     record_parser.add_argument(
         "ids", nargs="*", help="the passing judgement ids to record"
-    )
-    record_parser.add_argument(
-        "--refuted",
-        nargs="*",
-        default=[],
-        metavar="ID",
-        help="refuted judgement id(s), each reported as a semantic-validation.refuted finding",
     )
     return parser.parse_args(argv)
