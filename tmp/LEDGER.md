@@ -11,6 +11,25 @@
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
 | 169 | lint/audit vocabulary (pivoted) | 🟡 blocked-on-human | 27 violations ready; 41 borderline = one question | **your borderline call** |
 
+## ❓ Open asks — everything currently waiting on you
+
+1. **#199 — yes/no per piece of the proposal:** (1) a new rules/ file (fresh
+   workers never forks; leaf clause on every worker prompt; state agent count
+   before a multi-agent skill; silent bounded worker = stop signal; native
+   /code-review only inside a single-purpose wrapper). (2) Retrofit that
+   language onto the 4 fan-out surfaces (issue-overwatch, run-judgements,
+   ralph-loop.js, scatter-gather.js). (3) A session spawn cap in settings —
+   needs a number: ~25 strict (would have strangled the incident's 37) /
+   ~50 loose (headroom for big scatter-gather runs) / or drop this piece.
+   (4) Optional: draft an upstream report on the undocumented fork
+   re-execution hazard.
+2. **#169 — the one borderline call:** do the judgements-audit internals
+   (`lint_cli`, `LintFinding`, `lint_findings` + their test mirrors, ~41
+   sites) count as "in the context of a standard" and get renamed to audit
+   vocabulary? Evidence favors yes — `LintFinding` is the fleet's lone
+   non-`Finding` carrier and the console script is already `judgements-audit`
+   — cost is ~41 sites of internal churn.
+
 ## Δ log — on a repeat pass, read only the newest section
 
 ### Δ wave 2 (LATEST)
@@ -103,8 +122,9 @@ ASK: none — closing comment lands after the batched nod.
 ## Issue 199 — Code Review Ran Wild Like Uncle Jeff Was Paying the Bill
 
 stage: 🟡 blocked-on-human
-verdict: four-piece proposal delivered (terminal, post-W2-B)
-ASK: yes/no on the proposal — (1) rule file, (2) retrofit 4 fan-out surfaces, (3) session spawn cap in settings (needs a number from you, ~25 strict / ~50 loose, or drop), (4) optional upstream doc-gap report.
+verdict: four-piece proposal delivered (post-W2-B)
+
+> ❓ **ASK** — yes/no on the proposal's four pieces + a cap number. Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #1.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -173,7 +193,7 @@ ASK: none — closing comment lands after the batched nod.
 
 stage: 🟡 blocked-on-human
 verdict: pivoted (checkpoint 1) to "define both terms in CONTEXT.md; realign violations only." 27 violations in 5 clusters are ready work; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement).
-ASK: the one borderline call — do the judgements-audit INTERNALS (`lint_cli`, `LintFinding`, `lint_findings` + test mirrors, ~41 sites) count as "in the context of a standard" and get renamed? Fleet evidence favors yes (`LintFinding` is the lone non-`Finding` carrier; console script already `judgements-audit`); cost is internal churn.
+> ❓ **ASK** — the one borderline call on renaming the judgements-audit internals. Full text in [Open asks](#-open-asks--everything-currently-waiting-on-you) #2.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |

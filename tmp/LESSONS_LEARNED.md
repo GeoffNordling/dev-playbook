@@ -60,7 +60,14 @@ Fix applied mid-run (bake into the skill's ledger format later):
   verdict, "waiting on" column. Ten-second read of where input is needed.
 - **Δ log second** — per wave, one-liners of what changed. On a repeat pass
   the human reads only the newest Δ section; issue blocks stay the archive.
-- **ASK: line per issue block** — explicit, even when the value is "none".
+- **"Open asks" section directly under the dashboard** — every question
+  currently waiting on the human, written out in full, numbered, in ONE
+  place. The dashboard's "waiting on" column flags who's blocking; this
+  section holds the actual questions.
+- **ASK per issue block** — a visually loud blockquote (`> ❓ **ASK** — …`)
+  linking up to the Open-asks entry when a real question exists; a plain
+  "ASK: none" line otherwise. A bare sentence buried in prose fails — the
+  human had to Ctrl-F to find asks.
 - Discipline: every ledger update also appends its one-liner to the current
   wave's Δ section — the Δ log is written as events happen, not reconstructed.
 
