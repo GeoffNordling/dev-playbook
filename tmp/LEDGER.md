@@ -7,7 +7,7 @@
 | 208 | Workflow → Software Factory rename | 🏁 landed | brief + four-tuple live on GitHub | your approval of the landed brief |
 | 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | paced queue |
 | 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | paced queue |
-| 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | paced queue (next) |
+| 184 | judgements dead ceremony (`--refuted`) | 🏁 landed | brief + four-tuple live; retitled to real names | your approval of the landed brief |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | paced queue |
 | 169 | vocabulary hierarchy (v2.2) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit + fleet renames to `*-lint` | paced queue (last) |
 
@@ -70,8 +70,18 @@ Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
   `software-factory.md`, card `standards/software-factory.md`, rule id
   `software-factory.tuple-valid`. Certification (blind-implementer test)
   stated and lesson 10 recorded.
-- **next**: #184 on approval; then 199 (edge 199←208 written with it),
-  then 169 (edges 169←184, 169←208, 169←199); closes 207/183 slot between.
+- **main-runnable check** (human ask): branch differs from main by 11 files,
+  all tmp/**; local main == origin/main (29f182ec). Briefs reference only
+  main-resident files — issues runnable off main. Confirmed.
+- **184**: LANDED — retitled to real names ("Remove the never-used
+  `--refuted` ceremony from `judgements-run`"); plain-language brief with
+  circularity explained, atomic rule+card-bullet removal mandated, hard
+  escalation constraint on enforcement-standard surfaces (standards_audit
+  rule-matrix semantics, standard/format.md §Detectors, build/enforcement.md),
+  full touch-list from M1 in Key interfaces; four-tuple
+  maintenance·direct·tests:yes·tdd. Certified blind-implementer-ready.
+- **next**: 199 on approval (edge 199←208 written with it), then 169
+  (edges 169←184, 169←208, 169←199); closes 207/183 slot between.
 
 ### Δ checkpoint 3.2 — fleet renames IN; 169 becomes definitions + rename
 
@@ -332,9 +342,9 @@ however it starts.
 
 ## Issue 184 — Remove the circular judgments.refuted ceremony forced by rule-matrix
 
-stage: ✅ ready-to-land
+stage: 🏁 landed (brief + four-tuple live; retitled "Remove the never-used `--refuted` ceremony from `judgements-run`")
 verdict: AFK-ready — human ratified keeping it after translation; brief in plain exterior language (interior detail in an implementer section); HARD CONSTRAINT: human fully in the loop on any change to the enforcement standard
-ASK: none — ratify at landing.
+ASK: approve the landed brief to unlock #199.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
