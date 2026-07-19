@@ -13,16 +13,65 @@
 
 ## ❓ Open asks — everything currently waiting on you
 
-1. **#199 — yes/no per piece of the proposal:** (1) a new rules/ file (fresh
-   workers never forks; leaf clause on every worker prompt; state agent count
-   before a multi-agent skill; silent bounded worker = stop signal; native
-   /code-review only inside a single-purpose wrapper). (2) Retrofit that
-   language onto the 4 fan-out surfaces (issue-overwatch, run-judgements,
-   ralph-loop.js, scatter-gather.js). (3) A session spawn cap in settings —
-   needs a number: ~25 strict (would have strangled the incident's 37) /
-   ~50 loose (headroom for big scatter-gather runs) / or drop this piece.
-   (4) Optional: draft an upstream report on the undocumented fork
-   re-execution hazard.
+1. **#199 — the fork-recursion incident. Deferred to post-compact; written
+   out in full here so nothing depends on session memory.**
+
+   **What happened (the incident the issue records).** A session was told to
+   run a code review and then a second review skill. It invoked the built-in
+   `/code-review` skill, whose loaded instructions said to launch 8 parallel
+   "finder" agents. The session launched them as **forks**. A fork inherits
+   the entire conversation — including the original "run the review, then run
+   the other skill" instruction — and at least one fork re-executed that
+   whole directive on its own, spawning its own agents in turn. Result: ~37
+   agents, PR comments posted by rogue children, and no way to stop the
+   grandchildren (TaskStop refused on ownership grounds).
+
+   **What investigation established (wave 1 + wave 2):**
+   - Four workspace files instruct launching parallel agents, and none of
+     them carries any guard language: the issue-overwatch skill, the
+     run-judgements skill, and the two workflow scripts ralph-loop.js and
+     scatter-gather.js. No rule file about subagent use exists at all. (The
+     guard-language pattern does exist in one skill, fill-issue-gaps, so
+     there is house precedent.)
+   - The built-in `/code-review` is not a sealed program. Its instructions
+     load into OUR session, and OUR agent is the one that chooses fork vs
+     fresh when obeying them. So a workspace rule genuinely binds the agent
+     doing the spawning — "telling agents" is not wishful in this specific
+     failure, because the teller and the spawner share one context.
+   - The fork hazard is real and UNDOCUMENTED upstream: Anthropic's docs say
+     forks inherit the whole conversation, but never warn that a fork can
+     re-execute inherited instructions, and offer no prevention guidance.
+   - Our own overwatch design already contains the main protection: it runs
+     `/code-review` inside a wrapper subagent whose entire conversation is
+     the one line "Run /code-review medium --comment", so a fork born in
+     there inherits nothing dangerous. The incident happened in a session
+     that carried a rich multi-step directive instead — exactly what the
+     wrapper pattern prevents.
+   - One hard mechanical lever exists that works even if every agent
+     ignores every rule: the env var CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION
+     (default 200). Set lower, the harness itself refuses to spawn agent
+     N+1 and fails loudly.
+
+   **The proposal — four independent pieces, answer yes/no to each:**
+   1. **Write a rule file** under dotfiles/dot-claude/rules/ that teaches
+      every session: bounded worker tasks get fresh agents, never forks;
+      every worker prompt ends with a "you are a leaf — do not spawn agents,
+      do not invoke skills, do not write" clause; before launching a
+      multi-agent skill, state how many agents it will run; a bounded worker
+      that goes silent is a signal to stop and investigate, not wait; and
+      the native /code-review runs only inside a single-purpose wrapper
+      agent, never inline in a session with other pending directives.
+   2. **Add that same guard language to the four fan-out files** named above,
+      so an agent following any of them verbatim is bound even if it never
+      read the rule.
+   3. **Set the spawn cap** in workspace settings. Needs a number from you:
+      25 would have strangled this incident (37 agents) but could choke a
+      legitimately big scatter-gather run; 50 still stops runaway recursion
+      and leaves headroom. Or say "drop it" and we rely on pieces 1–2.
+   4. **Draft an upstream report to Anthropic** describing the undocumented
+      fork re-execution hazard (they document the inheritance, not the risk).
+
+   **My recommendation: yes to 1, 2, and 4; a cap of 50 for 3.**
 2. **#169 — the one borderline call:** do the judgements-audit internals
    (`lint_cli`, `LintFinding`, `lint_findings` + their test mirrors, ~41
    sites) count as "in the context of a standard" and get renamed to audit
@@ -34,6 +83,15 @@
 
 ### Δ wave 2 (LATEST)
 
+- **RESUME STATE (post-compact, read first):** both open asks (199, 169) are
+  deferred — the human compacted before answering. Next contact: take their
+  answers, then present the landing checkpoint (per-issue brief-in-miniature,
+  four-tuples, edges) for the batched nod. tmp/references/landing.md is read
+  ONLY after the nod. Worker returns live in tmp/worker-returns/; lessons in
+  tmp/LESSONS_LEARNED.md. No GitHub has been written.
+- **199**: open-ask rewritten in full prose (human: prior version was "word
+  salad" — over-compressed); answer deferred to post-compact.
+- **169**: ask understood but answer deferred to post-compact.
 - **batch**: all 10 worker returns persisted verbatim to `tmp/worker-returns/`
   (M1, M2, P1–P6, W2-A, W2-B) — compaction-proof; landing briefs author from
   these files, not from context memory. (Lesson 5.)

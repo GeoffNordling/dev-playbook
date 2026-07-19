@@ -114,7 +114,22 @@ board). Variants that keep that invariant:
 Decision deferred to the rewrite; (b) is the floor any future run should do
 as soon as a worker returns, not at checkpoint time.
 
-## 6. Translate to the human's altitude — no black-box internals
+## 6. Asks are prose, not compressed lists — "word salad" fails
+
+The #199 open ask packed four deliverables, their rationale, and a parameter
+choice into one parenthetical-dense paragraph. The human: "honestly reads,
+like, word salad… you were really, really trying to smash a lot of
+information into just a few sentences to the point where I can't even
+understand what you're trying to say."
+
+Rule for the skill: an ask the human must decide on gets full descriptive
+prose — background, what was established, the options spelled out one per
+paragraph/bullet, then the recommendation — even when that takes half a
+page. Compression belongs in the dashboard and Δ log; the ask itself is the
+one place to spend words. (Same failure family as lesson 7's altitude rule:
+both trade the reader's comprehension for the writer's brevity.)
+
+## 7. Translate to the human's altitude — no black-box internals
 
 The human bounced off #184's block ("complaining about a problem inside a
 black box"): the hypothesis table talked rule-matrix/Direction-2/citation
