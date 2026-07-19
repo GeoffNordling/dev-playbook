@@ -96,6 +96,13 @@ Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
   per distribution.md, the keeps-audit list, generic-English exemption.
   Four-tuple maintenance·direct·tests:yes·tdd. Edges 169←184, 169←208,
   169←199 written; verified via GET: [208] and [184,208,199].
+- **184 + 169 amended post-landing** (human: "The judgements are NOT
+  linters, but they are AUDITORS… yes do both"): 184's card edit is now
+  replace-not-delete — the Audit cell cites the LLM judgements via a
+  non-script link (outside rule-matrix's /scripts/ scope), judgements-audit
+  stays, judgements-run's plumbing keeps a prose mention; 169 gains the
+  format.md §Detectors two-citation-kinds documentation (+ AC). Both
+  briefs re-PATCHed and verified.
 - **remaining**: closes 207 + 183 (findings comments) — awaiting the word;
   then the batch report ends the run.
 
@@ -371,6 +378,7 @@ ASK: approve the landed brief to unlock #199.
 | 4 | Direction A (semantic-detector marker) is small and breaks no other detector's matrix check | reframed | M1: dropping the citation ≠ Direction B's dishonesty if removal ships atomically; hook-surfaces unaffected (judgements-run isn't a hook); full touch-list mapped incl. test_rule_registry.py:47,61 |
 
 ### Decisions (human, verbatim)
+- "The judgements are NOT linters, but they are AUDITORS. Why aren't we mentioning LLM judges in the Audit section of the card?" + "yes do both" (post-landing) — Audit-cell bullet REPLACED, not deleted: audit-kind citation of the LLM judgements via a non-script link (rule-matrix scopes to /scripts/ links, so no fake-rule pressure); judgements-run's plumbing role keeps a prose mention; format.md two-kinds documentation assigned to #169.
 - "184- Okay, man. The way you just explained it jogged my memory, and it made me understand and remember why we wrote this issue. […] you should talk like that in the issue and instead of the hyper specific gobbley goop that was in there unless you think that will help the implementing agent, which is certainly might. Now I'll just say I'll be interested in how you change the enforcement standard because that is near and dear to my heart. So I want to be fully in the loop on plan to changes to the enforcement standard." (checkpoint 1)
 - "184- bro I don't even understand what this issue is trying to say. Do you? I forget why I wrote this or what I thought the problem was when I did. […] It's complaining about a problem inside a black box that I don't understand. I think of 'judgements' as: 'CLI operation that checks the judgements all pass or are all cached as passing their hashes in the past.' The details of this ticket don't make sense to me because they're focused on the middle of the implementation, which is a black box from my perspective." (checkpoint 1)
 
@@ -425,6 +433,7 @@ ASK: none — name list approved verbatim; lands on your "go."
 - "In general, our documented standard and policy will be to call deterministic scripts "lint" and to clearly specify that they are a subset of the overall "audit" standard and process. Additionally, anything that is an LLM judge shall be called "audit" not "lint." So the Standard consists of Auditing Detectors, and a Detector is a linter if it's deterministic code and an audit if its LLM judge. This is a simple hierarchy and way to fit tehse pieces together. […] Also I want CONTEXT.md to define linting and auditing as this subset relationship related to code vs LLMs." (checkpoint 3.1 — RULING v2.1, the taxonomy; resolves checkpoint-3 asks 1 and 2: internals stay lint_*, mechanism prose stays; supersedes the checkpoint-2 internals-rename ruling)
 - "Yes, 'Generic English stays unregulated' agreed. But no, for your 'fleet proper names stay' section, no: Our standard is going to be that the deterministic scripts are called lint. Therefore, we do need to rename implementation so the deterministic scripts are called lint. Don't worry about whether this breaks consumer repos. You don't own those. You only own this repo. The other repos will adapt when you are done." (checkpoint 3.2 — RULING v2.2: fleet renames IN; the ten deterministic scripts rename to `*-lint`; consumer adaptation is out of scope for this repo)
 - "Yes the concrete name list is fine." (checkpoint 3.2 wrap — the ten `*-lint` names land as listed; last open question closed)
+- "yes do both" (post-landing, after "The judgements are NOT linters, but they are AUDITORS") — #169 gains the format.md §Detectors workset item: Audit cells carry two citation kinds, lint via /scripts/ link (rule-matrix contract) and LLM-judge audit via judgement link (exempt by construction).
 
 ### Decided without the human
 ### Probe log
