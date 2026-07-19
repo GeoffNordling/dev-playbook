@@ -47,7 +47,24 @@ Corollary: each issue block needs an explicit **ASK line** — one sentence
 stating exactly what input (if any) is needed from the human. At checkpoint 1
 the human read #199's block and couldn't tell what was being asked of them.
 
-## 3. Translate to the human's altitude — no black-box internals
+## 3. The ledger must support repeated scanning — deltas, not rereads
+
+By wave 2 the human couldn't scan the ledger anymore: "I don't know what
+changed and what didn't. It's all quite black and white with minimal
+formatting and difficult to read" when diffing mentally against the version
+read ten minutes earlier.
+
+Fix applied mid-run (bake into the skill's ledger format later):
+
+- **Dashboard table first** — one row per issue: stage glyph (✅/🟡), short
+  verdict, "waiting on" column. Ten-second read of where input is needed.
+- **Δ log second** — per wave, one-liners of what changed. On a repeat pass
+  the human reads only the newest Δ section; issue blocks stay the archive.
+- **ASK: line per issue block** — explicit, even when the value is "none".
+- Discipline: every ledger update also appends its one-liner to the current
+  wave's Δ section — the Δ log is written as events happen, not reconstructed.
+
+## 4. Translate to the human's altitude — no black-box internals
 
 The human bounced off #184's block ("complaining about a problem inside a
 black box"): the hypothesis table talked rule-matrix/Direction-2/citation
