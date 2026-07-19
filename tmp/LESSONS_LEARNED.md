@@ -154,6 +154,17 @@ a scratch directory the orchestrator already owns. Bonus: the return is on
 disk the moment the worker finishes, so a crash between return and
 checkpoint loses nothing.
 
+## 10. Landing gate: certify every brief against the blind-implementer test
+
+Stated by the human at landing: implementers read the issues blindly — no
+access to the conversation, the ledger, or tmp/. Before each GitHub write,
+the orchestrator must certify the brief is self-contained: no investigation
+jargon (bucket names, probe ids, checkpoint numbers), every referenced
+artifact repo-resident, findings folded in as flat claims rather than
+citations to private evidence, acceptance criteria runnable blind, and
+cross-references GitHub-native only. Bake this into the skill's landing
+section as an explicit per-issue gate.
+
 ## 6. Asks are prose, not compressed lists — "word salad" fails
 
 The #199 open ask packed four deliverables, their rationale, and a parameter
