@@ -84,7 +84,37 @@ eyes goes at the END of the turn (or, better, into the ledger — which is the
 one reading surface, per lesson 2) as a single consolidated reading
 assignment. A mid-stream terminal message is a status note, nothing more.
 
-## 5. Translate to the human's altitude — no black-box internals
+## 5. Worker outputs must survive compaction — the ledger's one-liners can't author briefs
+
+Spotted by the human before it bit: the subagent returns (terrain-map
+touch-lists, the 27-violation list with file:line and suggested wording, the
+doc-research citations) existed only in the orchestrator's context. The
+session was overdue for compaction; losing them would leave the landing
+briefs authored from ledger one-liners — less crisp, less precise than the
+evidence justified.
+
+Human's proposed mechanism: give each worker an individual "spike" GitHub
+issue to write its output to — persistent, readable on demand, still there
+at issue-writing time.
+
+Design tension to resolve in the skill rewrite: the skill's current rule is
+"nothing below you writes to GitHub — ever" (single-writer protects the
+board). Variants that keep that invariant:
+
+- (a) workers return as today; the ORCHESTRATOR posts each return as a
+  comment on a per-batch scratch issue (GitHub persistence, single writer).
+- (b) the orchestrator writes each return to `tmp/worker-returns/<id>.md` on
+  the batch branch and commits — no GitHub surface at all, survives compact
+  and `/clear` via git, zero new permissions. Chosen as the mid-run
+  remediation for this batch; cheapest, and recovery is just reading files.
+- (c) the human's original: per-worker spike issues — strongest persistence
+  and visibility, but breaches single-writer or multiplies orchestrator
+  posting work, and litters the tracker with N spike issues per batch.
+
+Decision deferred to the rewrite; (b) is the floor any future run should do
+as soon as a worker returns, not at checkpoint time.
+
+## 6. Translate to the human's altitude — no black-box internals
 
 The human bounced off #184's block ("complaining about a problem inside a
 black box"): the hypothesis table talked rule-matrix/Direction-2/citation

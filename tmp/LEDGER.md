@@ -34,6 +34,10 @@
 
 ### Δ wave 2 (LATEST)
 
+- **batch**: all 10 worker returns persisted verbatim to `tmp/worker-returns/`
+  (M1, M2, P1–P6, W2-A, W2-B) — compaction-proof; landing briefs author from
+  these files, not from context memory. (Lesson 5.)
+
 - **169**: reclassification under your pivot rule (W2-A): **27 violations** in 5 clusters (type-lint ×9, ref-audit-as-"linter" ×3, detector "Lint…" self-descriptions ×7, judgements "lint hook" ×3, test prose ×5); **41 borderline hits = one single question** — do the judgements-audit internals (`lint_cli`/`LintFinding`/`lint_findings` + test mirrors) count as "in the context of a standard"? Fleet evidence favors yes (every other carrier class is `Finding`). 45 legal-fallback, 136 untouchable. The issue's anti-lint grep rule is dead under the pivot. → ASK below.
 - **199**: primary-doc research done (W2-B): local /code-review's agent spawning is **undocumented internals** executed by our own session (so rules do bind the spawner); fork inheritance documented but the re-execution hazard is **not** — real upstream doc gap; mechanical lever exists: `CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION` (default 200); a project skill named `code-review` would REPLACE the bundled one (rejected — loses native quality). I read workflow.md + issue-overwatch myself: the overwatch's one-line wrapper dispatch already isolates inherited context. Four-piece proposal delivered in the terminal. → ASK below.
 - **208**: your decision recorded — label descriptions drop repo-file references entirely (labels never go stale against file moves again).
