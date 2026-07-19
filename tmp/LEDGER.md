@@ -117,7 +117,7 @@ verdict: close — human-ratified at checkpoint 1; closing comment must be succi
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 stage: investigating
-verdict: PIVOTED by human at checkpoint 1 — no longer a purge; now: define both terms in CONTEXT.md ("audit" = in the context of a standard; "lint" = default fallback otherwise) and realign only usages violating that rule. Wave-2 reclassification probe approved ("good idea. go") and launched.
+verdict: needs one call — pivot rule classifies cleanly; 27 violations across 5 clusters are ready work; the 41 BORDERLINE hits are ONE question only the human can answer: does code implementing a standard's audit machinery (lint_cli / LintFinding / lint_findings + their test mirrors) count as "in the context of a standard"? Fleet evidence favors renaming (LintFinding is the lone non-Finding carrier; console script already judgements-audit). Anti-lint grep rule is dead under the pivot — enforcement, if any, would be a judgement.
 ### Decisions (human, verbatim)
 - "Reading your findings and the issue makes me consider a pivot: 'lint' is a very natural word in common usage in software engineering, and it has a meaning everyone understands and it is good. However, I chose to have 'the standard' be based on 'describe, audit, enforce, adopt' which led me to standardize on 'audit' […] But that could be an overcorrection. Instead, what if we specifically standardized the meaning of vocabulary so that 'lint' and 'audit' are both allowed (and both defined in CONTEXT.md). The difference is that 'audit' is appropriate any time we're in the context of a standard. Lint is a default fallback otherwise. This might also involve understanding how an audit is different or the same as a lint." (checkpoint 1)
 ### Hypotheses
@@ -131,3 +131,4 @@ verdict: PIVOTED by human at checkpoint 1 — no longer a purge; now: define bot
 ### Decided without the human
 ### Probe log
 - sonnet · P3: fresh lint inventory vs issue's list · H-a REFUTED (paths stale), H-b REFUTED-as-complete (242 hits/48 files, bucket-1 5× undercounted); counterexamples verified by orchestrator (Makefile:8, lint-suite.html, judgements/ move)
+- sonnet · W2-A: reclassify 249 hits under the pivot rule · H-a REFUTED (27 violations > ~15, in 5 clusters: type-lint ×9, ref-audit-"linter" ×3, detector "Lint…" docstrings/argparse ×7, judgements "lint hook" ×3, test prose ×5); 41 BORDERLINE = one bundled identifiers question; 45 legal-fallback; 136 untouchable (readings/ 121 + frozen DRs 15); orchestrator verified decisions_audit prog/description inconsistency + LintFinding outlier
