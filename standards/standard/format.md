@@ -83,10 +83,10 @@ stationed there — that is Enforcement). This is the normative home of the
 detector contract.
 
 - **Read-only means mutating nothing git tracks.** A detector reports without
-  changing the repository. Writing outside the repository does not disqualify
-  it: judgements-run records verdicts to a content-addressed cache that lives
-  outside the working tree, mutating nothing git tracks, so it is read-only and
-  belongs in an Audit cell.
+  changing the repository. Reaching outside the working tree does not disqualify
+  it: workspace-audit queries GitHub over `gh api` and writes only a stderr
+  summary, reading remote state and mutating nothing git tracks, so it is
+  read-only and belongs in an Audit cell.
 - **Universal wiring; applicability lives inside the detector.** Every detector
   is wired in every repo — consumers run the full menu, never a subset. A
   detector whose surface is optional (skills) exits 0 silently when the surface
@@ -111,6 +111,14 @@ detector contract.
   after that question — never after the tool that happens to detect it.
 - **`--list-rules`.** Every detector answers `--list-rules`, printing the
   `card.rule` ids it can emit.
+- **Two citation kinds in an Audit cell.** A cell cites a **lint** via a
+  `/scripts/` link — a deterministic detector, held to the rule-matrix
+  `--list-rules` contract — or an **audit** (an LLM judge) via a judgement link
+  (`/standards/judgements/…` or `/judgements/*.yaml`), which carries no script
+  contract. The rule-matrix check scopes its citation collection to `/scripts/`
+  links, so audit-kind citations are exempt by construction, not by exception.
+  The [Semantic Validation](/standards/semantic-validation.md) card shows both:
+  judgements-audit is the lint, the LLM judgements the audit.
 - **Finding format.** A finding is one line, GNU format:
   `file:line: card.rule message` — a colon after the location, single spaces, a
   repo-relative path; `:line` is omitted for a file-level finding
