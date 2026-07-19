@@ -9,47 +9,62 @@
 | 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | lint/audit vocabulary (pivoted) | ⏸ held | sweep ready (113 sites) BUT a prior question may invert its direction | **tomorrow-first question (Open asks)** |
+| 169 | lint/audit vocabulary (ruling v2) | 🟡 blocked-on-human | sweep mostly dissolves; CONTEXT.md is the one true fix | **3 boundary calls (Open asks)** |
 
 ## ❓ Open asks — everything currently waiting on you
 
-**⏭ TOMORROW, FIRST — a prior question that gates #169's whole direction.
-Answer this BEFORE the batched nod; it can invert the sweep.**
+The overnight question is ANSWERED (checkpoint 3) — **ruling v2**, verbatim
+in #169's Decisions. The taxonomy: **audit** is the umbrella word for a
+standard's checking machinery; a **deterministic script may be called a
+lint or linter**; anything using an **LLM judge must be called an audit**;
+the **standard's own vocabulary stays "audit"** because its mechanisms
+include both linters and auditors; **lint ⊂ audit**, never the reverse.
 
-Human, verbatim (end of night, deferred to tomorrow): "What if we change the
-standard to say 'lint' instead of 'audit'? I chose the word audit when I
-invented the standard because it just made sense in the moment, but I didn't
-realize it would conflict with the word lint. The answer to this question
-would be the precise definition of lint. Does it match the precise
-definition of audit? Because I know audit is the true meaning I want for a
-standard. If lint just happens to match it, then we might agree to just call
-everything lint."
+Re-evaluated both sweeps from disk under v2 (no new probes — the W2-A and
+W3-A inventories cover every site). Most of the old 113-site workset
+dissolves; the one mandatory deliverable left is CONTEXT.md, which defines
+neither "lint" (verified: zero mentions) nor the two kinds of detector, and
+whose Audit entry reads as script-runs-only — contradicting v2's "LLM judge
+must be called audit." Three boundary calls remain, and only you can make
+them:
 
-Why this comes first: the current #169 disposition (pivot — define BOTH
-words: audit = in-standard-context, lint = fallback) assumed the two words
-name different things. This question is upstream of that. It asks whether
-"lint," by its precise real meaning, already IS what "audit" means for a
-standard. Two outcomes:
-- **lint ≢ audit** (they mean different things) → the current pivot stands;
-  the 113-site sweep lands as written (lint→audit inside standards).
-- **lint ≡ audit** (lint precisely matches the true meaning audit carries)
-  → collapse to one word. Since "lint" is the more natural, widely-understood
-  word, the standard could adopt "lint" everywhere — which **inverts** the
-  sweep: rename audit→lint, not lint→audit. Same files, opposite direction.
+1. **Does today's ruling supersede yesterday's on the judgements-audit
+   internals?** Yesterday you ruled the internals (`lint_cli`,
+   `LintFinding`, `lint_findings` + test mirrors, 41 sites) rename to audit
+   vocabulary — "this thing is literally an auditor." Today's ruling makes
+   "lint" legal for deterministic scripts, and judgements-audit's checker
+   IS deterministic (it validates declarations; the LLM judge lives in
+   judgements-run). If today supersedes: zero churn, the 41 sites stay. If
+   yesterday stands: the 41-site rename ships as planned. My
+   recommendation: let yesterday stand — the tool's public name is already
+   judgements-audit and every other carrier class in the fleet is
+   `Finding`, so the rename fixes a real internal inconsistency; v2 makes
+   lint *permissible* there, not *preferable*.
 
-Scope: this gates ONLY #169. The other five (208, 207, 184, 183, 199) are
-untouched by it and can still ratify. #169 must NOT land until this is
-answered. Do NOT pre-investigate — the human wants to answer it themselves
-first, tomorrow; tee it up, don't pre-empt it.
+2. **Where exactly does "the standard itself needs to use audit" stop?**
+   My reading: it binds the framework vocabulary — cards and their Audit
+   cells, the lifecycle words, CONTEXT.md, the enforcement standard — while
+   prose naming one specific deterministic mechanism may still say lint
+   (the judgements standard's "## 4. Lint the declarations on commit," a
+   detector's own "Lint …" docstring, the type-lint nickname, ref-audit
+   called a linter). Under that reading only the 3 judgements-doc sites are
+   even debatable. If you instead want every standards/** doc to say audit
+   throughout, then most of W2-A's old 27 violations (type-lint ×9,
+   "linter" ×2, the judgements-doc ×3, plus the detector self-descriptions)
+   rejoin the workset — the W2-A list lets me recompute exactly once you
+   rule. My recommendation: framework = audit, mechanism-naming may say
+   lint — it matches your "the audit mechanisms include both linters and
+   auditors."
 
----
+3. **Does the vocabulary rule regulate ordinary English?** The third-party
+   survey's six "**Audited:** <date>" lines are plain English ("we looked
+   into this") — no standard, no LLM judge, no detector. Leave generic
+   English unregulated (my recommendation), or reword to "Surveyed:" as a
+   courtesy so "audit" reads unambiguously as the system term everywhere.
 
-Then: the **batched nod** on the Landing checkpoint directly below —
-respond per issue, or ratify at once. The one scope change since your last
-ruling is flagged in #169's entry: the reverse sweep found a third
-vocabulary blur (LLM review passes called "audits"); I propose folding it
-into 169's mandate rather than minting a new issue — but note the
-tomorrow-first question above may reframe even that.
+After these three, #169's landing entry gets rewritten and the batched nod
+on the full checkpoint closes the batch. The other five issues' entries are
+unchanged — you can ratify them now if you want to split the nod.
 
 Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
 options live in the issue blocks' Decisions sections and in git history
@@ -113,26 +128,14 @@ launched far too many agents); fork inheritance recorded as probable
 mechanism. Tuple: `category:maintenance` · `mode:direct` · `tests:no`
 (prose/skill edits, no test surface) · `phase:build`.
 
-**#169 — audit/lint vocabulary.** Brief: CONTEXT.md gets the ruled
-definitions — **audit** = detector run in a standard's context (matching
-its existing glossary), **lint** = the fallback word outside standard
-context and for third-party linters; docs may bridge ("audit — a lint for
-standards") as analogy. Realign 113 sites, all listed with file:line and
-suggested wording on disk: 68 lint-side (W2-A: 27 violations + 41
-ex-borderline internals incl. `lint_cli`/`LintFinding`/`lint_findings`) and
-45 audit-side (W3-A: 6 "Audited:" → "Surveyed:" in the third-party survey;
-39 skill/doc sites where an LLM review pass is called an "audit" →
-"review"). Judgment calls baked into the brief: enforcement.md:43 →
-"review"; sdd-review "audits against the grammar" → "reviews against";
-"audit log" in testing/conventions.md stays (universal term in a
-hypothetical example). Untouchables: readings/ (regeneration is a candidate
-ride-along), frozen DRs. OKF index↔frontmatter lockstep on the judgements
-docs. Tuple: `category:maintenance` · `mode:direct` · `tests:yes` (renames
-test-mirrored identifiers) · `phase:tdd`.
-> ⚠ **SCOPE FLAG** — folding W3-A's audit-vs-review blur into 169 is the
-> one decision not yet ratified by you. Alternative: a separate new issue.
-> I recommend the fold: same definitional pass in CONTEXT.md, same
-> mechanical sweep, and a split would touch the same files twice.
+**#169 — SUPERSEDED at checkpoint 3.** Ruling v2 (audit = umbrella; lint =
+the deterministic subset; LLM judge ⇒ audit) dissolves most of this entry's
+old sweep: the 39 audit→"review" renames are dead (those sites are LLM
+judges, so "audit" is now mandated-correct), the fold-in scope flag is
+moot, and the workset shrinks to the CONTEXT.md definitional work plus the
+outcome of the three boundary calls in Open asks. This entry, 169's tuple,
+and its edges get rewritten when those calls land. The five entries above
+stand as written.
 
 **Dependency picture** (blocked-by edges to be written):
 - 208 and 184 are collision-free with each other → land first, in parallel.
@@ -143,10 +146,33 @@ test-mirrored identifiers) · `phase:tdd`.
   files 208 renames/moves — workflow.md, skill-authoring.md), blocked-by
   199 (soft: issue-overwatch/SKILL.md again). The sweep lands last.
 - Landing order: **208 ∥ 184 → 199 → 169**; 207 and 183 close on the nod.
+  (169's edges under revision at checkpoint 3: the 208/199 collisions
+  existed only for the now-dead cluster-2 renames; the 184 edge survives
+  only if the internals rename stands.)
 
 ## Δ log — on a repeat pass, read only the newest section
 
-### Δ end-of-night — prior question raised, #169 held (LATEST)
+### Δ checkpoint 3 — lint/audit ruling v2; the sweep largely dissolves (LATEST)
+
+- **169**: overnight question answered — ruling v2: audit = umbrella;
+  deterministic scripts may be "lint/linter"; LLM-judge mechanisms MUST be
+  "audit"; the standard's own vocabulary stays "audit"; lint ⊂ audit.
+  Re-evaluated both sweeps from disk, no new probes: W3-A's 39
+  LLM-review-pass sites flip from violation to MANDATED-CORRECT (they're
+  LLM judges); 24 of W2-A's 27 violations flip to legal (deterministic
+  mechanisms); zero sites in either sweep call an LLM mechanism "lint," so
+  no forced renames exist anywhere. The one true violation standing:
+  CONTEXT.md — "lint" never defined (verified live: zero mentions), Audit
+  entry reads scripts-only. Residual workset rides on 3 boundary calls
+  (Open asks): the 41 internals (supersession of yesterday's ruling), the
+  mechanism-naming boundary (3 to ~20 sites), the 6 generic-English survey
+  lines. → 🟡 blocked-on-human.
+- **batch**: landing checkpoint's #169 entry marked SUPERSEDED pending the
+  calls; 169's blocked-by edges shrink with the sweep — the 208/199
+  collisions existed only for the now-dead cluster-2 renames; the 184 edge
+  survives only if the internals rename stands. Other five entries stand.
+
+### Δ end-of-night — prior question raised, #169 held
 
 - **169 HELD**: human raised a question upstream of the whole pivot — should
   the standard adopt "lint" instead of "audit" entirely? Hinges on whether
@@ -389,9 +415,9 @@ ASK: none — closing comment lands after the batched nod.
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 
-stage: ✅ ready-to-land
-verdict: two-direction accounting complete — 113 sites, all with file:line + suggested wording on disk: 68 lint-side (W2-A: 27 violations + 41 ex-borderline internals) + 45 audit-side (W3-A: 6 survey "Audited:" → "Surveyed:", 39 LLM-review-pass "audit" → "review"); CONTEXT.md defines both terms, docs may bridge to lint as analogy; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement)
-ASK: none beyond the nod — the audit-vs-review fold-in is flagged in the Landing checkpoint's #169 entry.
+stage: 🟡 blocked-on-human
+verdict: ruling v2 (checkpoint 3) — audit is the umbrella; deterministic scripts may be called lint/linter; LLM-judge mechanisms must be called audit; the standard's own vocabulary is audit; lint ⊂ audit. Re-evaluation from disk: W3-A's 39 LLM-review-pass sites flip to MANDATED-CORRECT; 24/27 W2-A violations flip to legal; zero sites call an LLM mechanism "lint" → no forced renames. The one true violation standing is CONTEXT.md itself: "lint" never defined (verified: zero mentions), Audit entry reads scripts-only ("a run of one or more detectors" / "Detector — the read-only script"), and its Flagged-ambiguities list — which already resolved check/audit and audit/detector — has no lint/audit entry. Residual workset = outcome of the 3 boundary calls.
+> ❓ **ASK** — three boundary calls: internals supersession (41 sites), the mechanism-naming boundary (3–~20 sites), generic-English regulation (6 sites). Full prose in [Open asks](#-open-asks--everything-currently-waiting-on-you).
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -406,7 +432,8 @@ ASK: none beyond the nod — the audit-vs-review fold-in is flagged in the Landi
 - "169- good idea. go" (checkpoint 1, wave-2 reclassification probe)
 - "169- Yes judgements-audit is called "audit" because it comes directly from a standard. Internal code and naming should say "audit" not lint since this thing is literally an auditor. Documentation should say audit but may bridge to lint as an analogy." (checkpoint 2)
 - "Yes, send a Sonnet agent to do the reverse sweep for the word audit." (checkpoint 2 — manifest +1 approved; probe W3-A launched)
-- "tomorrow I wanna actually answer the question first: What if we change the standard to say 'lint' instead of 'audit'? […] The answer to this question would be the precise definition of lint. Does it match the precise definition of audit? Because I know audit is the true meaning I want for a standard. If lint just happens to match it, then we might agree to just call everything lint." (end of night — raises a question upstream of the pivot; #169 held pending it; see the tomorrow-first block at the top of Open asks)
+- "tomorrow I wanna actually answer the question first: What if we change the standard to say 'lint' instead of 'audit'? […] The answer to this question would be the precise definition of lint. Does it match the precise definition of audit? Because I know audit is the true meaning I want for a standard. If lint just happens to match it, then we might agree to just call everything lint." (end of night — raised the question; answered next morning by ruling v2 below)
+- "I decided to maintain the split between audit and lint, with things directly falling under standard being call audit and other parts of the system ok being called lint. Specifically, I think it's ok to call a deterministic script a "lint" or "linter", but anything using LLM judge must be called "audit." Additionally, the standard itself needs to use "audit" because the audit mechanisms include both linters and auditers. In general, lint is a subset of audit, but audit is not a subset of lint." (checkpoint 3 — RULING v2; supersedes the checkpoint-1 pivot's "lint = fallback outside standard context" framing where they conflict; whether it supersedes the checkpoint-2 internals ruling is Open asks #1)
 
 ### Decided without the human
 ### Probe log
