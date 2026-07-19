@@ -65,6 +65,11 @@ Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
   rename, label descriptions drop file refs entirely, bucket-2/3 surfaces
   byte-unchanged, 17 pinned test strings + OKF lockstep + judgement-cache
   re-run called out. No incoming edges for 208.
+- **208 amendment**: kebab token hard-fixed to `software-factory` (human
+  ruling at landing); brief re-PATCHed — dir `software-factory/`, doc
+  `software-factory.md`, card `standards/software-factory.md`, rule id
+  `software-factory.tuple-valid`. Certification (blind-implementer test)
+  stated and lesson 10 recorded.
 - **next**: #184 on approval; then 199 (edge 199←208 written with it),
   then 169 (edges 169←184, 169←208, 169←199); closes 207/183 slot between.
 
@@ -253,6 +258,7 @@ ASK: approve the landed brief to unlock #184.
 ### Decisions (human, verbatim)
 - "I'm ok removing 'simplify and improve' from the factory rename issue mandate (208). I agree that could be complex and might be too much for this batch workflow." (checkpoint 0)
 - "208 caveat: '"See workflow.md." mint onto GitHub in every repo (re-bootstrap needed),' find but in the pass, remove reference to specific files in a github. Github should be labels only not references to Git files that will become stale again in the future at some point." (checkpoint 1) — interpreted: during the rename pass, label descriptions drop file references entirely (no "See <file>.md." successor); one final re-bootstrap, then descriptions can never go stale against file moves again.
+- "Yeah we should make up the name now. software-factory makes sense to me. Any push back on that?" (landing) — token hard-fixed to `software-factory` in the live brief; orchestrator's `factory` recommendation withdrawn (generic-token collision with the factory pattern — the same sin the rename escapes).
 
 ### Decided without the human
 ### Probe log
