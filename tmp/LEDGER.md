@@ -4,12 +4,12 @@
 
 | # | issue | stage | verdict (short) | waiting on |
 |---|-------|-------|-----------------|------------|
-| 208 | Workflow → Software Factory rename | ✅ ready-to-land | AFK-ready — full rename, labels lose file refs | landing nod |
-| 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | landing nod |
-| 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
-| 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
-| 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | vocabulary hierarchy (v2.2) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit + fleet renames to `*-lint` | your "go" |
+| 208 | Workflow → Software Factory rename | 🏁 landed | brief + four-tuple live on GitHub | your approval of the landed brief |
+| 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | paced queue |
+| 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | paced queue |
+| 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | paced queue (next) |
+| 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | paced queue |
+| 169 | vocabulary hierarchy (v2.2) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit + fleet renames to `*-lint` | paced queue (last) |
 
 ## ❓ Open asks — everything currently waiting on you
 
@@ -21,12 +21,11 @@ deterministic code and an audit if it is an LLM judge; lint ⊂ audit,
 never the reverse.** CONTEXT.md will define exactly this subset
 relationship, keyed on code-vs-LLM.
 
-**One thing only: the word "go."** Every investigation question and every
-vocabulary ruling is resolved — v2.2 taxonomy, fleet renames in, name list
-approved verbatim, generic English unregulated. All decisions live in the
-issue blocks' Decisions sections; resolved-ask history is in this file's
-git revisions. Saying **"go"** executes the Landing checkpoint below — the
-batch's first and only GitHub writes.
+**The go arrived, paced** ("Write the issues one at a time. Wait for my
+approval before writing the next."). #208 is landed — brief and four-tuple
+are live on GitHub. **Currently waiting on: your approval of #208's landed
+brief**, which unlocks #184 (next in the landing order 208 ∥ 184 → 199 →
+169; closes 207/183 slot between approvals).
 
 Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
 options live in the issue blocks' Decisions sections and in git history
@@ -55,7 +54,21 @@ Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
 
 ## Δ log — on a repeat pass, read only the newest section
 
-### Δ checkpoint 3.2 — fleet renames IN; 169 becomes definitions + rename (LATEST)
+### Δ landing — paced go; 208 landed (LATEST)
+
+- **batch**: the go arrived paced — one issue written per human approval.
+  Read tmp/references/landing.md and standards/tracking/issues.md per the
+  skill (`READ: issues.md`).
+- **208**: LANDED — build-leaf brief (six headings) replaced the stub body;
+  four-tuple `category:maintenance · mode:direct · tests:yes · phase:tdd`
+  applied. Brief encodes: rename-only (rider dropped), full path + rule-id
+  rename, label descriptions drop file refs entirely, bucket-2/3 surfaces
+  byte-unchanged, 17 pinned test strings + OKF lockstep + judgement-cache
+  re-run called out. No incoming edges for 208.
+- **next**: #184 on approval; then 199 (edge 199←208 written with it),
+  then 169 (edges 169←184, 169←208, 169←199); closes 207/183 slot between.
+
+### Δ checkpoint 3.2 — fleet renames IN; 169 becomes definitions + rename
 
 - **169**: human overturned veto-flag 1 — the standard is that
   deterministic scripts ARE CALLED lint, so implementation renames: the ten
@@ -225,9 +238,9 @@ tmp/ is this branch's sanctioned scratch (per commit 5a03cb0).
 
 ## Issue 208 — Rename "Workflow" to "Software Factory"
 
-stage: ✅ ready-to-land
+stage: 🏁 landed (brief + four-tuple live on GitHub)
 verdict: AFK-ready (brief assumes full rename incl. paths + internal rule id; label descriptions drop file references entirely)
-ASK: none — ratify at landing.
+ASK: approve the landed brief to unlock #184.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
