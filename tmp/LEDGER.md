@@ -9,22 +9,127 @@
 | 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | lint/audit vocabulary (pivoted) | 🟡 probe in flight | borderline resolved — 68-site workset; W3-A sweeping reverse direction | W3-A return (me, not you) |
+| 169 | lint/audit vocabulary (pivoted) | ✅ ready-to-land | two-direction accounting done — 113 sites; scope flag: audit-vs-review fold-in | landing nod |
 
 ## ❓ Open asks — everything currently waiting on you
 
-None — every human decision is in. (Checkpoint 2 resolved the last two:
-spawn cap dropped per recommendation; reverse-sweep probe approved and in
-flight.) Next contact is the **landing checkpoint** — per-issue
-brief-in-miniature, four-tuples, edges — once probe W3-A returns.
+One item: the **batched nod** on the Landing checkpoint directly below —
+respond per issue, or ratify all six at once. The one scope change since
+your last ruling is flagged loudly in #169's entry: the reverse sweep found
+a third vocabulary blur (LLM review passes called "audits"), and I propose
+folding it into 169's mandate rather than minting a new issue.
 
 Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
 options live in the issue blocks' Decisions sections and in git history
 (commit b3a0737's version of this section).
 
+## Landing checkpoint — awaiting your nod
+
+The nod authorizes the batch's FIRST GitHub writes: four-tuple labels and
+rewritten briefs on 208/184/199/169, blocked-by edges, and closes with
+findings comments on 207/183. (I read tmp/references/landing.md only after
+the nod, per the skill.)
+
+**#208 — rename "Workflow" → "Software Factory".** Brief: full rename of
+our concept — the workflow/ directory and its four docs, the
+standards/workflow.md card, every path cross-reference and dotfiles skill
+pin, code/data docstrings, judgement declarations, and the internal rule id
+`workflow.tuple-valid` (coordinated with its 9 test sites). Label
+descriptions drop file references entirely (your ruling) and get
+self-contained wording; one re-bootstrap per repo after merge. Untouched:
+the Claude Code harness "workflows" feature, GitHub-Actions/generic uses,
+frozen Decision Records; readings/ gets regenerated, not edited. Judgement
+caches invalidate → re-run rides the change; OKF index descriptions move in
+lockstep. Tuple: `category:maintenance` (no new capability) ·
+`mode:direct` (mechanical, design already done by this investigation) ·
+`tests:yes` (modifies pinned test fixtures) · `phase:tdd` (the graph routes
+direct+tests:yes there).
+
+**#207 — close.** Comment: premise refuted — the `scheme-vs-graph`
+judgement already enforces label_scheme.json ↔ workflow.md agreement,
+gated at pre-push (test_judgements_gate + make check-judgements), and a
+live extraction found zero drift (17 labels match both sides). The doc↔JSON
+seam is deliberately the judgement's job per label_scheme.py's docstring.
+
+**#183 — close.** Comment: premise refuted — three warm runs measured
+0.61–0.62 s (orchestrator re-verified 0.636 s), not the claimed 1–2 s; the
+11 `--list-rules` subprocesses cost ~0.065 s each; and the hook is
+dev-playbook-local (LOCAL_ONLY), so no consumer repo pays it. If it ever
+matters, the existing Callable seam makes a cached/in-process swap clean.
+
+**#184 — remove the unused `--refuted` ceremony.** Brief opens in plain
+language: judgements-run carries a `--refuted` flag and a
+`semantic-validation.refuted` rule that nothing ever uses — the
+run-judgements skill records passes only; the rule exists solely so the
+standards-audit bookkeeping check doesn't complain about the card citing
+judgements-run. Remove flag, rule, and their tests, AND drop the card's
+judgements-run Audit bullet in the same change (atomic, or the always-run
+standards-audit reds between edits). Implementer section carries M1's exact
+touch-list. Escalation trigger (your hard constraint): any edit to the
+enforcement standard → stop and bring the plan to you first. Tuple:
+`category:maintenance` · `mode:direct` · `tests:yes` (deletes/updates
+tests) · `phase:tdd`.
+
+**#199 — fan-out guard language.** Brief: add the guard clauses to the four
+fan-out surfaces (issue-overwatch and run-judgements SKILL.md, ralph-loop.js,
+scatter-gather.js), modeled on fill-issue-gaps' existing leaf clause:
+bounded workers get fresh agents never forks; every worker prompt ends with
+a leaf clause; state the agent count before launching; a silent bounded
+worker means stop and investigate; the native /code-review runs only inside
+a single-purpose wrapper. Anchored on the verified fact (the review
+launched far too many agents); fork inheritance recorded as probable
+mechanism. Tuple: `category:maintenance` · `mode:direct` · `tests:no`
+(prose/skill edits, no test surface) · `phase:build`.
+
+**#169 — audit/lint vocabulary.** Brief: CONTEXT.md gets the ruled
+definitions — **audit** = detector run in a standard's context (matching
+its existing glossary), **lint** = the fallback word outside standard
+context and for third-party linters; docs may bridge ("audit — a lint for
+standards") as analogy. Realign 113 sites, all listed with file:line and
+suggested wording on disk: 68 lint-side (W2-A: 27 violations + 41
+ex-borderline internals incl. `lint_cli`/`LintFinding`/`lint_findings`) and
+45 audit-side (W3-A: 6 "Audited:" → "Surveyed:" in the third-party survey;
+39 skill/doc sites where an LLM review pass is called an "audit" →
+"review"). Judgment calls baked into the brief: enforcement.md:43 →
+"review"; sdd-review "audits against the grammar" → "reviews against";
+"audit log" in testing/conventions.md stays (universal term in a
+hypothetical example). Untouchables: readings/ (regeneration is a candidate
+ride-along), frozen DRs. OKF index↔frontmatter lockstep on the judgements
+docs. Tuple: `category:maintenance` · `mode:direct` · `tests:yes` (renames
+test-mirrored identifiers) · `phase:tdd`.
+> ⚠ **SCOPE FLAG** — folding W3-A's audit-vs-review blur into 169 is the
+> one decision not yet ratified by you. Alternative: a separate new issue.
+> I recommend the fold: same definitional pass in CONTEXT.md, same
+> mechanical sweep, and a split would touch the same files twice.
+
+**Dependency picture** (blocked-by edges to be written):
+- 208 and 184 are collision-free with each other → land first, in parallel.
+- 199 blocked-by 208 (soft: both edit issue-overwatch/SKILL.md and other
+  dotfiles pins of workflow.md paths).
+- 169 blocked-by 184 (hard: runner.py, loader.py, test_rule_registry.py,
+  the card, judgements docs), blocked-by 208 (hard: 169 edits lines inside
+  files 208 renames/moves — workflow.md, skill-authoring.md), blocked-by
+  199 (soft: issue-overwatch/SKILL.md again). The sweep lands last.
+- Landing order: **208 ∥ 184 → 199 → 169**; 207 and 183 close on the nod.
+
 ## Δ log — on a repeat pass, read only the newest section
 
-### Δ checkpoint 2 — post-compact answers (LATEST)
+### Δ wave 3 + landing checkpoint (LATEST)
+
+- **169**: W3-A returned — H-a REFUTED. 844 total hits; all 10 detectors
+  verified tracing to standard cards (no orphan); 80 prose lines read
+  per-line; **45 counterexamples in 2 clusters**: the third-party survey's
+  "Audited:" lines (×6 → "Surveyed:") and the skill family calling
+  LLM-driven review passes "audits" (×39 → "review" — violating CONTEXT.md's
+  own glossary, Audit = a run of detectors). Orchestrator verified 4 sites +
+  the glossary. Return persisted to tmp/worker-returns/W3-A. → ✅
+  ready-to-land; scope flag (fold the blur into 169) goes to the nod.
+- **batch**: landing checkpoint authored (section above) — 4
+  briefs-in-miniature with four-tuples, 2 closes, edges, landing order
+  208 ∥ 184 → 199 → 169. Awaiting the batched nod; wave 3 complete,
+  manifest fully spent at 11.
+
+### Δ checkpoint 2 — post-compact answers
 
 - **199**: spawn cap DROPPED — human approved the drop recommendation
   ("everything you said in the last turn is approved"). Scope final: guard
@@ -83,7 +188,7 @@ options live in the issue blocks' Decisions sections and in git history
 
 ## Batch
 
-issues: 208, 207, 199, 184, 183, 169 · wave: 3 IN FLIGHT (1 probe) · manifest: 8 (wave 1) + 2 (wave 2, human-directed) + 1 (wave 3, human-directed) spent: 11
+issues: 208, 207, 199, 184, 183, 169 · wave: 3 COMPLETE · manifest: 8 (wave 1) + 2 (wave 2, human-directed) + 1 (wave 3, human-directed) spent: 11
 
 Decision (human, verbatim): "Approved." — Wave-1 manifest, 2 Opus maps + 6
 Sonnet probes (checkpoint 0)
@@ -241,9 +346,9 @@ ASK: none — closing comment lands after the batched nod.
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 
-stage: 🟡 blocked-on-human
-verdict: borderline resolved (checkpoint 2) — internals rename to audit vocabulary; workset = 68 sites (27 violations + 41 ex-borderline, all with file:line + suggested wording in tmp/worker-returns/W2-A); docs say audit but may bridge to lint as analogy; CONTEXT.md defines both terms; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement). Last open: the reverse-direction ("audit" outside standard context) sweep.
-ASK: none — probe W3-A in flight (human: "go"); flips to ready-to-land on its return.
+stage: ✅ ready-to-land
+verdict: two-direction accounting complete — 113 sites, all with file:line + suggested wording on disk: 68 lint-side (W2-A: 27 violations + 41 ex-borderline internals) + 45 audit-side (W3-A: 6 survey "Audited:" → "Surveyed:", 39 LLM-review-pass "audit" → "review"); CONTEXT.md defines both terms, docs may bridge to lint as analogy; anti-lint grep rule dead under the pivot (enforcement, if ever, = a judgement)
+ASK: none beyond the nod — the audit-vs-review fold-in is flagged in the Landing checkpoint's #169 entry.
 
 ### Hypotheses
 | # | claim | status | evidence (one line) |
@@ -263,3 +368,4 @@ ASK: none — probe W3-A in flight (human: "go"); flips to ready-to-land on its 
 ### Probe log
 - sonnet · P3: fresh lint inventory vs issue's list · H-a REFUTED (paths stale), H-b REFUTED-as-complete (242 hits/48 files, bucket-1 5× undercounted); counterexamples verified by orchestrator (Makefile:8, lint-suite.html, judgements/ move)
 - sonnet · W2-A: reclassify 249 hits under the pivot rule · H-a REFUTED (27 violations > ~15, in 5 clusters: type-lint ×9, ref-audit-"linter" ×3, detector "Lint…" docstrings/argparse ×7, judgements "lint hook" ×3, test prose ×5); 41 BORDERLINE = one bundled identifiers question; 45 legal-fallback; 136 untouchable (readings/ 121 + frozen DRs 15); orchestrator verified decisions_audit prog/description inconsistency + LintFinding outlier
+- sonnet · W3-A: reverse sweep — falsify "every 'audit' is in-standard-context" · REFUTED — 844 hits, 684 classified (≈604 fleet identifiers, all 10 detectors verified tracing to a standard card; 80 prose lines read per-line); 45 counterexamples in 2 clusters (survey "Audited:" ×6; LLM review passes called "audits" ×39, against CONTEXT.md's own Audit-=-detector-run glossary); 4 near-line judgment calls flagged for the brief; orchestrator verified 4 sites + the glossary definition

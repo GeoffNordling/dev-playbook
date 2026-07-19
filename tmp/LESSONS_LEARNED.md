@@ -137,6 +137,23 @@ so every fact has exactly one home and nothing is duplicated or orphaned.
 Not now — at skill-rewrite time, as part of the same pass that folds in
 lessons 1–7.
 
+## 9. Workers should write their own return files — the orchestrator re-typing them is waste
+
+Caught by the human at wave 3: the orchestrator received W3-A's return and
+re-typed it verbatim into tmp/worker-returns/ — expensive top-model output
+spent transcribing text a cheap model already produced. The persistence
+itself is right (lessons 5/8); the scribe is wrong.
+
+Fix for the rewrite: carve one sanctioned write into the leaf clause — each
+worker writes exactly one file, `tmp/worker-returns/<its-id>.md`, and its
+final message shrinks to verdict + pointer. The orchestrator reads the file
+(or skims the verdict), verifies, and commits. The clause's purpose is
+untouched — still no GitHub writes, no repo mutation, no spawning; the
+single-writer invariant was always about the board and the repo, not about
+a scratch directory the orchestrator already owns. Bonus: the return is on
+disk the moment the worker finishes, so a crash between return and
+checkpoint loses nothing.
+
 ## 6. Asks are prose, not compressed lists — "word salad" fails
 
 The #199 open ask packed four deliverables, their rationale, and a parameter
