@@ -83,6 +83,10 @@
 
 ### Δ wave 2 (LATEST)
 
+- **POST-COMPACT RECOVERY (verified):** all four ready-to-land issues
+  (208, 207, 184, 183) re-certified from disk state alone — ledger +
+  worker-returns suffice to author every brief and closing comment with no
+  session memory. No recovery probes needed.
 - **RESUME STATE (post-compact, read first):** both open asks (199, 169) are
   deferred — the human compacted before answering. Next contact: take their
   answers, then present the landing checkpoint (per-issue brief-in-miniature,
