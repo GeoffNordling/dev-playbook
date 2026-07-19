@@ -46,10 +46,10 @@ its dependencies via its `uv run --script` shebang.
 
 ## Validation scripts
 
-The published hooks — with one dev-playbook-local exception, `standards-audit`
+The published hooks — with one dev-playbook-local exception, `standards-lint`
 (see its row). The published ones run automatically on every commit via
 pre-commit, and consumer repos run them from a pinned clone (see
-[distribution.md](/standards/build/distribution.md)); `standards-audit` is
+[distribution.md](/standards/build/distribution.md)); `standards-lint` is
 wired in dev-playbook's local block alone, since the `standards/` tree it
 audits exists only here (the validate-manifest precedent). Each script exits 0
 on success / 1 on findings / 2 on tool error, writes machine-readable findings
@@ -59,18 +59,18 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 
 | Script | Standard | Purpose |
 |--------|----------|---------|
-| `repo-audit` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
-| `python-audit` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
-| `testing-audit` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
-| `ref-audit` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
-| `okf-audit` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `decisions-audit` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
-| `skill-audit` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
-| `judgements-audit` | [declarations.md](/standards/judgements/declarations.md) | Judgement declaration validity |
-| `standards-audit` | [standard/format.md](/standards/standard/format.md) | The meta-standard's four rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
+| `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
+| `python-lint` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
+| `testing-lint` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
+| `ref-lint` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
+| `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
+| `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
+| `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
+| `judgements-lint` | [declarations.md](/standards/judgements/declarations.md) | Judgement declaration validity |
+| `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's four rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
 
-`repo-audit`, `python-audit`, `testing-audit`, `ref-audit`, `okf-audit`,
-`decisions-audit`, and `standards-audit` assert unconditionally and fail loud;
+`repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
+`decisions-lint`, and `standards-lint` assert unconditionally and fail loud;
 they do not skip themselves when a target kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
@@ -80,14 +80,14 @@ full.
 The scripts share their markdown and Python primitives rather than redefining
 them per script. The library is the installed `dev_playbook` package:
 
-- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-audit` and `okf-audit`.
-- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-audit`, `testing-audit`, and `repo-audit`.
-- `dev_playbook.testing_audit` — the Python-testing detector logic: the three test-file rules (privacy, mirror layout, no-logic) over one walk. Consumed by `testing-audit`.
-- `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-audit` and `repo-audit`.
+- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-lint` and `okf-lint`.
+- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint`, `testing-lint`, and `repo-lint`.
+- `dev_playbook.testing_lint` — the Python-testing detector logic: the three test-file rules (privacy, mirror layout, no-logic) over one walk. Consumed by `testing-lint`.
+- `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 
 The larger surfaces are subpackages: `dev_playbook.judgements` (declaration
-loading/validation and the plan/render/record runner, behind `judgements-audit`
+loading/validation and the plan/render/record runner, behind `judgements-lint`
 and `judgements-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`), and
 `dev_playbook.skipcache` (the seen-set the judgements runner uses to skip
@@ -102,7 +102,7 @@ directory.
 ### Two run environments
 
 Each *published* hook entry runs in two environments and MUST work in both
-(the dev-playbook-local `standards-audit` runs in the first alone):
+(the dev-playbook-local `standards-lint` runs in the first alone):
 
 1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
 2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [distribution.md](/standards/build/distribution.md).
@@ -114,7 +114,7 @@ block) against the dev-playbook checkout that holds it — no `$HOME` paths, no
 
 When adding a validator, mirror it into both the manifest and the local block,
 and test it in dev-playbook and a consumer repo before pushing — unless it is
-dev-playbook-local (like `standards-audit`), which is wired in the local block
+dev-playbook-local (like `standards-lint`), which is wired in the local block
 alone and tested here only.
 
 ## Utility scripts
@@ -126,7 +126,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout, `--html` assembles the viz |
 | `judgements-run` | Plan / render / record over a repo's judgement declarations (driven by the `/run-judgements` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-audit` | On-demand workspace audit via `gh api`: GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, and stale dev-playbook pins |
+| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 

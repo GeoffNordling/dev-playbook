@@ -1,4 +1,4 @@
-"""Behavioral tests for judgements-audit: loader.lint_findings and the hook."""
+"""Behavioral tests for judgements-lint: loader.lint_findings and the hook."""
 
 import os
 import subprocess
@@ -10,7 +10,7 @@ from dev_playbook.judgements.loader import lint_findings
 
 CONFIG = '[tool.judgements]\npaths = ["judgements/*.yaml"]\n'
 REPO_ROOT = Path(__file__).resolve().parents[1]
-LINT_HOOK = REPO_ROOT / "scripts" / "judgements-audit"
+LINT_HOOK = REPO_ROOT / "scripts" / "judgements-lint"
 
 
 def judgement_yaml(
@@ -144,7 +144,7 @@ def test_no_finding_message_leaks_the_absolute_repo_path(
 
 
 def _run_hook(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    """Run the judgements-audit hook script against ``repo`` as its working dir."""
+    """Run the judgements-lint hook script against ``repo`` as its working dir."""
     return subprocess.run(
         [sys.executable, str(LINT_HOOK), *args],
         cwd=repo,

@@ -1,6 +1,6 @@
-"""Behavioral tests for the standards-audit detector (the meta-standard's rules).
+"""Behavioral tests for the standards-lint detector (the meta-standard's rules).
 
-standards-audit is dev-playbook-local: it audits the ``standards/`` tree that
+standards-lint is dev-playbook-local: it audits the ``standards/`` tree that
 only this repo carries. Each check function takes a repo root and returns
 findings; discovery goes through ``git ls-files``, so every fixture is a git
 repo. The rule-matrix check's ``--list-rules`` boundary is injected as a plain
@@ -14,7 +14,7 @@ from typing import Any
 
 import pytest
 
-from dev_playbook import standards_audit as sa
+from dev_playbook import standards_lint as sa
 
 
 def make_repo(tmp_path: Path, files: dict[str, str]) -> Path:
@@ -280,21 +280,21 @@ def fake_list_rules(
 
 def test_consistent_matrix_passes(tmp_path: Path) -> None:
     repo = make_repo(
-        tmp_path, {"standards/build.md": card_citing("Build", [cite("repo-audit")])}
+        tmp_path, {"standards/build.md": card_citing("Build", [cite("repo-lint")])}
     )
 
-    findings = sa.check_rule_matrix(repo, fake_list_rules({"repo-audit": ["build.x"]}))
+    findings = sa.check_rule_matrix(repo, fake_list_rules({"repo-lint": ["build.x"]}))
 
     assert findings == []
 
 
 def test_uncited_emitted_prefix_fails_direction_one(tmp_path: Path) -> None:
-    # repo-audit emits knowledge-organization.y, but that card does not cite
-    # repo-audit.
+    # repo-lint emits knowledge-organization.y, but that card does not cite
+    # repo-lint.
     repo = make_repo(
         tmp_path,
         {
-            "standards/build.md": card_citing("Build", [cite("repo-audit")]),
+            "standards/build.md": card_citing("Build", [cite("repo-lint")]),
             "standards/knowledge-organization.md": card_citing(
                 "Knowledge Organization", ["- none"]
             ),
@@ -302,7 +302,7 @@ def test_uncited_emitted_prefix_fails_direction_one(tmp_path: Path) -> None:
     )
 
     findings = sa.check_rule_matrix(
-        repo, fake_list_rules({"repo-audit": ["build.x", "knowledge-organization.y"]})
+        repo, fake_list_rules({"repo-lint": ["build.x", "knowledge-organization.y"]})
     )
 
     assert [f.rule for f in findings] == [sa.RULE_MATRIX]
@@ -310,20 +310,20 @@ def test_uncited_emitted_prefix_fails_direction_one(tmp_path: Path) -> None:
 
 
 def test_unbacked_citation_fails_direction_two(tmp_path: Path) -> None:
-    # The build card cites repo-audit, but repo-audit emits no build.* rule --
+    # The build card cites repo-lint, but repo-lint emits no build.* rule --
     # only knowledge-organization.*, which that card legitimately cites.
     repo = make_repo(
         tmp_path,
         {
-            "standards/build.md": card_citing("Build", [cite("repo-audit")]),
+            "standards/build.md": card_citing("Build", [cite("repo-lint")]),
             "standards/knowledge-organization.md": card_citing(
-                "Knowledge Organization", [cite("repo-audit")]
+                "Knowledge Organization", [cite("repo-lint")]
             ),
         },
     )
 
     findings = sa.check_rule_matrix(
-        repo, fake_list_rules({"repo-audit": ["knowledge-organization.y"]})
+        repo, fake_list_rules({"repo-lint": ["knowledge-organization.y"]})
     )
 
     assert [f.rule for f in findings] == [sa.RULE_MATRIX]
@@ -332,7 +332,7 @@ def test_unbacked_citation_fails_direction_two(tmp_path: Path) -> None:
 
 def test_cited_detector_without_list_rules_fails_membership(tmp_path: Path) -> None:
     repo = make_repo(
-        tmp_path, {"standards/build.md": card_citing("Build", [cite("repo-audit")])}
+        tmp_path, {"standards/build.md": card_citing("Build", [cite("repo-lint")])}
     )
 
     findings = sa.check_rule_matrix(repo, fake_list_rules({}))
@@ -431,17 +431,17 @@ def surfaces_repo(
     return make_repo(tmp_path, files)
 
 
-ALL = ["repo-audit", "okf-audit"]
+ALL = ["repo-lint", "okf-lint"]
 
 
 def test_agreeing_hook_surfaces_pass(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-audit"],
+        local_ids=[*ALL, "standards-lint"],
         canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-audit"],
-        cited_ids=[*ALL, "standards-audit"],
+        readme_ids=[*ALL, "standards-lint"],
+        cited_ids=[*ALL, "standards-lint"],
     )
 
     assert sa.check_hook_surfaces(repo) == []
@@ -451,65 +451,63 @@ def test_manifest_hook_missing_from_local_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=["repo-audit", "standards-audit"],  # okf-audit dropped
+        local_ids=["repo-lint", "standards-lint"],  # okf-lint dropped
         canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-audit"],
-        cited_ids=[*ALL, "standards-audit"],
+        readme_ids=[*ALL, "standards-lint"],
+        cited_ids=[*ALL, "standards-lint"],
     )
 
     findings = sa.check_hook_surfaces(repo)
 
     assert sa.HOOK_SURFACES in {f.rule for f in findings}
-    assert any("okf-audit" in f.message for f in findings)
+    assert any("okf-lint" in f.message for f in findings)
 
 
 def test_manifest_hook_missing_from_canonical_is_flagged(tmp_path: Path) -> None:
-    # The skill-audit-style violation: published, but not offered to consumers.
+    # The skill-lint-style violation: published, but not offered to consumers.
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-audit"],
-        canonical_ids=["repo-audit"],  # okf-audit missing from the template
-        readme_ids=[*ALL, "standards-audit"],
-        cited_ids=[*ALL, "standards-audit"],
+        local_ids=[*ALL, "standards-lint"],
+        canonical_ids=["repo-lint"],  # okf-lint missing from the template
+        readme_ids=[*ALL, "standards-lint"],
+        cited_ids=[*ALL, "standards-lint"],
     )
 
     findings = sa.check_hook_surfaces(repo)
 
-    assert any(
-        "okf-audit" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
-    )
+    assert any("okf-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings)
 
 
 def test_local_only_detector_absent_elsewhere_is_not_flagged(tmp_path: Path) -> None:
-    # standards-audit is local-only: absent from manifest and canonical by design.
+    # standards-lint is local-only: absent from manifest and canonical by design.
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-audit"],
+        local_ids=[*ALL, "standards-lint"],
         canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-audit"],
-        cited_ids=[*ALL, "standards-audit"],
+        readme_ids=[*ALL, "standards-lint"],
+        cited_ids=[*ALL, "standards-lint"],
     )
 
     findings = sa.check_hook_surfaces(repo)
 
-    assert not any("standards-audit" in f.message for f in findings)
+    assert not any("standards-lint" in f.message for f in findings)
 
 
 def test_detector_hook_missing_from_readme_table_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-audit"],
+        local_ids=[*ALL, "standards-lint"],
         canonical_ids=ALL,
-        readme_ids=["repo-audit", "standards-audit"],  # okf-audit missing
-        cited_ids=[*ALL, "standards-audit"],
+        readme_ids=["repo-lint", "standards-lint"],  # okf-lint missing
+        cited_ids=[*ALL, "standards-lint"],
     )
 
     findings = sa.check_hook_surfaces(repo)
 
-    assert any("okf-audit" in f.message and "README" in f.message for f in findings)
+    assert any("okf-lint" in f.message and "README" in f.message for f in findings)
 
 
 def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
@@ -518,10 +516,10 @@ def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-audit"],
+        local_ids=[*ALL, "standards-lint"],
         canonical_ids=[*ALL, "stray-audit"],  # not in the manifest
-        readme_ids=[*ALL, "standards-audit"],
-        cited_ids=[*ALL, "standards-audit"],
+        readme_ids=[*ALL, "standards-lint"],
+        cited_ids=[*ALL, "standards-lint"],
     )
 
     findings = sa.check_hook_surfaces(repo)
@@ -532,23 +530,23 @@ def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
 
 
 def test_manifest_detector_in_canonical_local_block_is_flagged(tmp_path: Path) -> None:
-    # okf-audit sits in canonical's repo:local block, not the pinned dev-playbook
+    # okf-lint sits in canonical's repo:local block, not the pinned dev-playbook
     # block, so a consumer would never get it wired -- it must fail as missing.
     canonical = (
         "repos:\n"
         "  - repo: https://github.com/GeoffNordling/dev-playbook\n"
         "    rev: <pinned-sha>\n    hooks:\n"
-        "      - id: repo-audit\n"
+        "      - id: repo-lint\n"
         "  - repo: local\n    hooks:\n"
-        "      - id: okf-audit\n        name: okf-audit\n"
-        "        entry: scripts/okf-audit\n        language: script\n"
+        "      - id: okf-lint\n        name: okf-lint\n"
+        "        entry: scripts/okf-lint\n        language: script\n"
     )
-    cited = [*ALL, "standards-audit"]
+    cited = [*ALL, "standards-lint"]
     files = {
         ".pre-commit-hooks.yaml": _manifest(ALL),
-        ".pre-commit-config.yaml": _local_block([*ALL, "standards-audit"]),
+        ".pre-commit-config.yaml": _local_block([*ALL, "standards-lint"]),
         "standards/build/canonical/.pre-commit-config.yaml": canonical,
-        "scripts/README.md": _readme_table([*ALL, "standards-audit"]),
+        "scripts/README.md": _readme_table([*ALL, "standards-lint"]),
     }
     for i, name in enumerate(cited):
         files[f"standards/c{i}.md"] = card_citing(f"C{i}", [cite(name)])
@@ -557,7 +555,7 @@ def test_manifest_detector_in_canonical_local_block_is_flagged(tmp_path: Path) -
     findings = sa.check_hook_surfaces(repo)
 
     assert any(
-        "okf-audit" in f.message and "canonical" in f.message.lower() for f in findings
+        "okf-lint" in f.message and "canonical" in f.message.lower() for f in findings
     )
 
 
@@ -565,15 +563,15 @@ def test_detector_hook_cited_by_no_card_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-audit"],
+        local_ids=[*ALL, "standards-lint"],
         canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-audit"],
-        cited_ids=["repo-audit", "standards-audit"],  # okf-audit cited by no card
+        readme_ids=[*ALL, "standards-lint"],
+        cited_ids=["repo-lint", "standards-lint"],  # okf-lint cited by no card
     )
 
     findings = sa.check_hook_surfaces(repo)
 
-    assert any("okf-audit" in f.message and "Audit cell" in f.message for f in findings)
+    assert any("okf-lint" in f.message and "Audit cell" in f.message for f in findings)
 
 
 def test_malformed_card_frontmatter_cannot_run(tmp_path: Path) -> None:
@@ -655,9 +653,9 @@ def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
     # Consistent hook surfaces so hook-surfaces does not can't-run and mask the
     # matrix finding the timeout produces.
     files[".pre-commit-hooks.yaml"] = _manifest([])
-    files[".pre-commit-config.yaml"] = _local_block(["standards-audit"])
+    files[".pre-commit-config.yaml"] = _local_block(["standards-lint"])
     files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical([])
-    files["scripts/README.md"] = _readme_table(["standards-audit"])
+    files["scripts/README.md"] = _readme_table(["standards-lint"])
     repo = make_repo(tmp_path, files)
 
     real_run = subprocess.run

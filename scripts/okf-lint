@@ -28,7 +28,7 @@ that owns them — `docs.*` for the first two (knowledge-organization),
   - **Instrument-spec** — every document typed `Instrument-Spec` carries an
     `## Employed by` section naming the standard, skill, or ritual that demands
     its readings. Presence only: the section's content is review's territory,
-    and ref-audit verifies any link it carries.
+    and ref-lint verifies any link it carries.
 
 The concept-document/harness-owned split comes from dev_playbook.md.classify. This hook
 asserts unconditionally and fails loud — there is no applicability skip.
@@ -40,8 +40,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    okf-audit [directory]
-    okf-audit --list-rules
+    okf-lint [directory]
+    okf-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -305,7 +305,7 @@ def check_instrument_specs(
 
     Presence only: the section names the standard, skill, or ritual that demands
     the instrument's readings, but this check verifies just that the heading
-    exists. ref-audit already checks any link the section carries, and whether
+    exists. ref-lint already checks any link the section carries, and whether
     the named consumer is real is review's territory. A frontmatter error is
     reported by check_types, so a doc that fails to parse is skipped here rather
     than double-flagged.
@@ -547,7 +547,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="okf-audit",
+        prog="okf-lint",
         description="Lint the repo's OKF bundle: concept-doc types, index freshness, and instrument-spec consumers.",
     )
     parser.add_argument(
@@ -580,7 +580,7 @@ def main(argv: list[str] | None = None) -> int:
             registry_findings = []
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
-        print(f"okf-audit: {err}", file=sys.stderr)
+        print(f"okf-lint: {err}", file=sys.stderr)
         return 2
 
     concept_docs = [rel for rel in all_md if md.classify(rel) == "concept"]
@@ -597,9 +597,9 @@ def main(argv: list[str] | None = None) -> int:
 
     scanned = f"{len(concept_docs)} concept docs, {len(index_docs)} indexes"
     if findings:
-        print(f"okf-audit: {len(findings)} finding(s) across {scanned}", file=sys.stderr)
+        print(f"okf-lint: {len(findings)} finding(s) across {scanned}", file=sys.stderr)
         return 1
-    print(f"okf-audit: clean across {scanned}", file=sys.stderr)
+    print(f"okf-lint: clean across {scanned}", file=sys.stderr)
     return 0
 
 

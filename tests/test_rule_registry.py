@@ -1,14 +1,14 @@
 """Drift guards tying each detector's ``--list-rules`` to what it actually emits.
 
 Each detector hand-maintains a rule-id tuple that ``--list-rules`` prints, and
-the standards-audit slice will consume ``--list-rules`` as ground truth for the
+the standards-lint slice will consume ``--list-rules`` as ground truth for the
 card->rule matrix. Two ways the tuple could lie, each guarded here:
 
 - **Literal drift.** An emission site could pass a raw string literal instead of
   a rule-id constant, so the tuple silently diverges from the emitted id. The
   first guard walks each detector's AST and asserts every finding-carrier
   construction passes its rule argument as a name reference (a module-level
-  constant), never a string literal. ``None`` -- a workspace-audit informational
+  constant), never a string literal. ``None`` -- a workspace-lint informational
   ``Line`` with no rule id -- is fine.
 
 - **Membership drift.** A rule-id constant could be emitted but forgotten from
@@ -16,7 +16,7 @@ card->rule matrix. Two ways the tuple could lie, each guarded here:
   (over-reports). The second guard asserts, per detector, that the set of
   rule-id constants the module actually emits equals the set the tuple lists.
 
-ref-audit is absent from both: its ``RULES = tuple(RULE_FOR.values())`` derives
+ref-lint is absent from both: its ``RULES = tuple(RULE_FOR.values())`` derives
 from the emission map, so the tuple cannot drift from what it emits by
 construction.
 """
@@ -38,28 +38,28 @@ RULE_ID = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z][a-z0-9]*(-[a-z0-9]+)*
 
 # (source file, finding-carrier class name, 0-based position of the rule arg).
 CARRIERS = [
-    (SCRIPTS / "okf-audit", "Finding", 1),
-    (SCRIPTS / "python-audit", "Finding", 2),
-    (SCRIPTS / "repo-audit", "Finding", 1),
-    (SCRIPTS / "skill-audit", "Finding", 1),
-    (SRC / "dev_playbook" / "workspace_audit.py", "Line", 1),
+    (SCRIPTS / "okf-lint", "Finding", 1),
+    (SCRIPTS / "python-lint", "Finding", 2),
+    (SCRIPTS / "repo-lint", "Finding", 1),
+    (SCRIPTS / "skill-lint", "Finding", 1),
+    (SRC / "dev_playbook" / "workspace_lint.py", "Line", 1),
     (SRC / "dev_playbook" / "judgements" / "loader.py", "LintFinding", 1),
-    (SRC / "dev_playbook" / "standards_audit.py", "Finding", 2),
-    (SRC / "dev_playbook" / "testing_audit.py", "Finding", 2),
-    (SRC / "dev_playbook" / "decisions_audit.py", "Finding", 2),
+    (SRC / "dev_playbook" / "standards_lint.py", "Finding", 2),
+    (SRC / "dev_playbook" / "testing_lint.py", "Finding", 2),
+    (SRC / "dev_playbook" / "decisions_lint.py", "Finding", 2),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
 REGISTRIES = [
-    (SCRIPTS / "okf-audit", "RULES"),
-    (SCRIPTS / "python-audit", "RULES"),
-    (SCRIPTS / "repo-audit", "RULES"),
-    (SCRIPTS / "skill-audit", "RULES"),
-    (SRC / "dev_playbook" / "workspace_audit.py", "RULES"),
+    (SCRIPTS / "okf-lint", "RULES"),
+    (SCRIPTS / "python-lint", "RULES"),
+    (SCRIPTS / "repo-lint", "RULES"),
+    (SCRIPTS / "skill-lint", "RULES"),
+    (SRC / "dev_playbook" / "workspace_lint.py", "RULES"),
     (SRC / "dev_playbook" / "judgements" / "loader.py", "JUDGEMENTS_RULES"),
-    (SRC / "dev_playbook" / "standards_audit.py", "RULES"),
-    (SRC / "dev_playbook" / "testing_audit.py", "RULES"),
-    (SRC / "dev_playbook" / "decisions_audit.py", "RULES"),
+    (SRC / "dev_playbook" / "standards_lint.py", "RULES"),
+    (SRC / "dev_playbook" / "testing_lint.py", "RULES"),
+    (SRC / "dev_playbook" / "decisions_lint.py", "RULES"),
 ]
 
 
@@ -135,7 +135,7 @@ def _call_argument_names(tree: ast.Module) -> set[str]:
 
     A rule-id constant reaches ``--list-rules``'s ground truth only by being
     emitted, i.e. passed to a finding carrier -- directly, or through a helper
-    that forwards it (python-audit's private-access findings go through ``_add``,
+    that forwards it (python-lint's private-access findings go through ``_add``,
     whose constant argument is captured here). This over-approximates emission by
     any call argument, which is exactly the rule-id constants at emission sites,
     since a rule-id constant is referenced nowhere else but the rule tuple.

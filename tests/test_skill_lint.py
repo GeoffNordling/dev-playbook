@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/skill-audit.
+"""Behavioral tests for scripts/skill-lint.
 
-skill-audit declares pyyaml via PEP 723 and imports the local dev_playbook
+skill-lint declares pyyaml via PEP 723 and imports the local dev_playbook
 package, so it is invoked the way pre-commit runs it: `uv run --script`. It
 walks skill bundles under .claude/skills/ (no git needed).
 """
@@ -8,7 +8,7 @@ walks skill bundles under .claude/skills/ (no git needed).
 import subprocess
 from pathlib import Path
 
-SKILL_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "skill-audit"
+SKILL_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "skill-lint"
 
 
 def valid_skill(name: str = "greet", body: str = "# Greet\n\nDo the thing.\n") -> str:
@@ -109,7 +109,7 @@ def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
 
 
 def test_repo_self_scan_is_clean() -> None:
-    """The dev-playbook repo's own authored skills pass skill-audit."""
+    """The dev-playbook repo's own authored skills pass skill-lint."""
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr

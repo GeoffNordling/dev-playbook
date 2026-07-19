@@ -1,4 +1,4 @@
-"""Behavioral tests for scripts/repo-audit.
+"""Behavioral tests for scripts/repo-lint.
 
 Every fixture is a git repo (discovery and the repo-name mapping both go
 through git) with all files staged, since "committed" requirements read the
@@ -10,7 +10,7 @@ import os
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "repo-audit"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "repo-lint"
 CANONICAL = Path(__file__).resolve().parents[1] / "standards" / "build" / "canonical"
 
 UV_SCRIPT = (
@@ -166,7 +166,7 @@ def test_missing_base_files_all_reported(tmp_path: Path) -> None:
 def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
     files = base_files()
     files[".github/workflows/ci.yml"] = canonical("ci.yml").replace(
-        "SKIP: ref-audit", "SKIP: nothing"
+        "SKIP: ref-lint", "SKIP: nothing"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
@@ -243,8 +243,8 @@ def test_missing_shellcheck_block_fails(tmp_path: Path) -> None:
 def test_appended_hook_inside_pinned_block_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgements-audit\n",
-        "      - id: judgements-audit\n      - id: skill-audit\n",
+        "      - id: judgements-lint\n",
+        "      - id: judgements-lint\n      - id: skill-lint\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -425,10 +425,10 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
 
 def test_skills_dir_without_audit_hook_fails(tmp_path: Path) -> None:
     files = base_files()
-    # The canonical template now carries skill-audit; strip it so this repo has
-    # a skills dir but no skill-audit hook -- the condition the rule flags.
+    # The canonical template now carries skill-lint; strip it so this repo has
+    # a skills dir but no skill-lint hook -- the condition the rule flags.
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: skill-audit\n", ""
+        "      - id: skill-lint\n", ""
     )
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     result = run(make_repo(tmp_path, files))
@@ -440,8 +440,8 @@ def test_skills_dir_with_audit_hook_appended_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgements-audit\n",
-        "      - id: judgements-audit\n      - id: skill-audit\n",
+        "      - id: judgements-lint\n",
+        "      - id: judgements-lint\n      - id: skill-lint\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -775,9 +775,9 @@ def hook_repo_files() -> dict[str, str]:
         config[:start]
         + config[end:]
         + "  - repo: local\n    hooks:\n"
-        + "".join(f"      - id: {h}\n" for h in ("repo-audit", "okf-audit"))
+        + "".join(f"      - id: {h}\n" for h in ("repo-lint", "okf-lint"))
     )
-    files[".pre-commit-hooks.yaml"] = "- id: repo-audit\n- id: okf-audit\n"
+    files[".pre-commit-hooks.yaml"] = "- id: repo-lint\n- id: okf-lint\n"
     # is_file(): tools that treat the canonical pyproject.toml template as a
     # real project drop cache dirs (e.g. .ruff_cache/) into standards/build/canonical/.
     for name in CANONICAL.iterdir():

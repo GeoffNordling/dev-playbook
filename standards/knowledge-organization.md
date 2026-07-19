@@ -16,17 +16,17 @@ types, indexes, and cross-references.
 
 ## Audit
 
-- [okf-audit](/scripts/okf-audit) — concept-doc frontmatter types and
+- [okf-lint](/scripts/okf-lint) — concept-doc frontmatter types and
   `index.md` freshness
-- [ref-audit](/scripts/ref-audit) — Links and Citations resolve
-- [repo-audit](/scripts/repo-audit) — README and CONTEXT.md doc shape
+- [ref-lint](/scripts/ref-lint) — Links and Citations resolve
+- [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)
 
 ## Enforce
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-audit, ref-audit, and repo-audit at the **commit gate** in every
+  — okf-lint, ref-lint, and repo-lint at the **commit gate** in every
   repo's suite
 
 ## Adopt

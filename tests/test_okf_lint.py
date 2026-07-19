@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/okf-audit.
+"""Behavioral tests for scripts/okf-lint.
 
-okf-audit declares pyyaml via PEP 723 and imports the local dev_playbook package, so it
+okf-lint declares pyyaml via PEP 723 and imports the local dev_playbook package, so it
 is invoked exactly the way pre-commit runs it: `uv run --script`.
 """
 
@@ -8,7 +8,7 @@ import re
 import subprocess
 from pathlib import Path
 
-OKF_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "okf-audit"
+OKF_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "okf-lint"
 
 # A minimal but valid OKF bundle: a registry doc, two concept docs, a root
 # index (with okf_version) and a standards index, all internally consistent.
@@ -42,7 +42,7 @@ BASE_BUNDLE: dict[str, str] = {
 }
 
 
-def run_okf_audit(repo_root: Path) -> subprocess.CompletedProcess:
+def run_okf_lint(repo_root: Path) -> subprocess.CompletedProcess:
     return subprocess.run(
         ["uv", "run", "--script", str(OKF_AUDIT), str(repo_root)],
         capture_output=True,
@@ -73,7 +73,7 @@ def make_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
 def test_valid_bundle_is_clean(tmp_path: Path) -> None:
     repo = make_bundle(tmp_path, {})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "clean" in result.stderr
@@ -87,7 +87,7 @@ def test_missing_type_is_flagged(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/README.md" in result.stdout
@@ -102,7 +102,7 @@ def test_type_outside_registry_is_flagged(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "not in the registry" in result.stdout
@@ -114,7 +114,7 @@ def test_missing_description_is_flagged(tmp_path: Path) -> None:
         {"standards/README.md": "---\ntype: README\ntitle: Standards\n---\n\n# S\n"},
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "missing 'description'" in result.stdout
@@ -132,7 +132,7 @@ def test_recipe_description_requires_resource(tmp_path: Path) -> None:
         tmp_path, {"standards/ralph.md": recipe, "standards/index.md": index}
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "requires a 'resource'" in result.stdout
@@ -145,7 +145,7 @@ def test_index_omitting_a_concept_is_flagged(tmp_path: Path) -> None:
     )  # drops the document-types.md line
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "omits concept doc standards/docs/document-types.md" in result.stdout
@@ -155,7 +155,7 @@ def test_index_listing_missing_file_is_flagged(tmp_path: Path) -> None:
     index = BASE_BUNDLE["standards/index.md"] + "- [Gone](/standards/gone.md) — nope\n"
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/gone.md" in result.stdout
@@ -170,7 +170,7 @@ def test_index_description_drift_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "does not match its frontmatter" in result.stdout
@@ -185,7 +185,7 @@ def test_root_index_missing_okf_version_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_bundle(tmp_path, {"index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "okf_version" in result.stdout
@@ -198,7 +198,7 @@ def test_root_index_omitting_child_index_is_flagged(tmp_path: Path) -> None:
     )  # drops the standards/ child-index link
     repo = make_bundle(tmp_path, {"index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "omits child index standards/index.md" in result.stdout
@@ -216,7 +216,7 @@ def test_malformed_frontmatter_is_flagged_and_siblings_still_lint(
         {"standards/README.md": malformed, "README.md": missing_type},
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/README.md" in result.stdout
@@ -236,7 +236,7 @@ def test_index_listing_non_concept_target_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/rules/naming.md" in result.stdout
@@ -254,7 +254,7 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/README.md" in result.stdout
@@ -263,7 +263,7 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
 
 def test_tests_tree_malformed_markdown_is_not_flagged(tmp_path: Path) -> None:
     """Malformed markdown under a top-level tests/ tree is parser fixture data,
-    not a concept document — okf-audit emits no findings on it."""
+    not a concept document — okf-lint emits no findings on it."""
     repo = make_bundle(
         tmp_path,
         {
@@ -273,23 +273,23 @@ def test_tests_tree_malformed_markdown_is_not_flagged(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "tests/" not in result.stdout
 
 
 def test_repo_self_scan_is_clean() -> None:
-    """The dev-playbook bundle itself passes okf-audit."""
+    """The dev-playbook bundle itself passes okf-lint."""
     repo = Path(__file__).resolve().parents[1]
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
     assert result.returncode == 0, result.stdout + result.stderr
 
 
 # --- consumer mode: no standards/docs/document-types.md in the audited repo ---
 
 # A minimal bundle with no registry doc at all (no standards/ directory), so
-# okf-audit must resolve consumer mode and validate types against its own
+# okf-lint must resolve consumer mode and validate types against its own
 # clone's registry instead of raising "registry doc not found". Types used
 # here (README) exist in dev-playbook's live registry, since the subprocess
 # resolves its clone root to the real checkout via __file__.
@@ -330,7 +330,7 @@ def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
     as 'cannot run'."""
     repo = make_consumer_bundle(tmp_path, {})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "knowledge-organization.registry-row" not in result.stdout
@@ -348,7 +348,7 @@ def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "not in the registry" in result.stdout
@@ -398,7 +398,7 @@ def test_instrument_spec_without_employed_by_is_flagged(tmp_path: Path) -> None:
     """An Instrument Spec with no `## Employed by` section is flagged."""
     repo = make_instrument_bundle(tmp_path, "A spec with no employed-by heading.\n")
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/widget.md: instrument.employed-by" in result.stdout
@@ -411,7 +411,7 @@ def test_instrument_spec_with_employed_by_is_clean(tmp_path: Path) -> None:
         "## Employed by\n\n[System Legibility](/standards/legibility.md).\n",
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -455,7 +455,7 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
     )
     repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert re.search(
@@ -479,7 +479,7 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
     )
     repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert re.search(
@@ -511,7 +511,7 @@ def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> No
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
@@ -535,7 +535,7 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert (
@@ -553,7 +553,7 @@ def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
@@ -582,7 +582,7 @@ def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -600,7 +600,7 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
@@ -628,7 +628,7 @@ def test_concept_entries_out_of_alphabetical_order_are_flagged(
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert "standards/index.md: knowledge-organization.index-ordering" in result.stdout
@@ -647,7 +647,7 @@ def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> Non
     )
     repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert (
@@ -664,7 +664,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_audit(repo)
+    result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert (

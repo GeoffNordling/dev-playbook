@@ -16,7 +16,7 @@ Governs how Python tests are written.
 
 ## Audit
 
-- [testing-audit](/scripts/testing-audit) — the Python-testing detector,
+- [testing-lint](/scripts/testing-lint) — the Python-testing detector,
   three rules: no private-name access from tests
   (`testing.no-private-access`), test-file mirror placement
   (`testing.mirror-layout`), and no `if`/`try` logic in a test body
@@ -26,7 +26,7 @@ Governs how Python tests are written.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the **commit gate**, where testing-audit blocks every commit
+  — the **commit gate**, where testing-lint blocks every commit
 - `make check-judgements` — the **push gate**, where pytest runs the suite
 
 ## Adopt

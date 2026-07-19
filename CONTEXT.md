@@ -90,7 +90,7 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 > **Dev:** "And that depth is worth it because…?"
 > **Reviewer:** "It's the same **Depth** paying out twice — **Leverage** for the callers (the fake pays back across every test) and **Locality** for us (a store bug is fixed in one **Implementation**, not chased across call sites)."
 
-> **Dev:** "repo-audit reported a **Finding**. Does that block my commit?"
+> **Dev:** "repo-lint reported a **Finding**. Does that block my commit?"
 > **Reviewer:** "Only because it runs at the **commit gate**. The audit itself is read-only — it just emits **Findings**. It's the **Gate** it's stationed at that blocks; run by hand, it isn't **Enforcement** at all."
 
 ## Flagged ambiguities

@@ -23,7 +23,7 @@ from dev_playbook.judgements.bench import VALID_EFFORTS, VALID_MODELS
 
 _ID_CHARSET = re.compile(r"[A-Za-z0-9._-]+")
 
-# The rule ids judgements-audit can emit, one per existing error family: a
+# The rule ids judgements-lint can emit, one per existing error family: a
 # malformed declaration (structural/field validation, at the declaring YAML
 # file) and a bad evidence/reference path (absolute, `..`, or missing). Each id
 # is a module-level constant so every emission site references the constant, not
@@ -51,7 +51,7 @@ class DeclarationError(ValueError):
 
 
 class LintFinding(NamedTuple):
-    """One judgements-audit finding, located at the declaring YAML file."""
+    """One judgements-lint finding, located at the declaring YAML file."""
 
     location: str  # repo-relative path to the declaring file
     rule: str  # in JUDGEMENTS_RULES
@@ -338,12 +338,12 @@ def lint_cli(argv: list[str] | None = None) -> int:
     Resolves the repo root, runs :func:`lint_findings`, prints every finding as a
     GNU finding line to stdout and a summary count to stderr, and returns 1 if
     there were any findings else 0. ``--list-rules`` prints the rule ids and
-    exits 0 without needing a repository. Registered as the ``judgements-audit``
-    console script and called by the ``scripts/judgements-audit`` pre-commit shim,
+    exits 0 without needing a repository. Registered as the ``judgements-lint``
+    console script and called by the ``scripts/judgements-lint`` pre-commit shim,
     so both channels behave alike.
     """
     parser = argparse.ArgumentParser(
-        prog="judgements-audit",
+        prog="judgements-lint",
         description="Lint a repo's judgement declarations against the schema and paths.",
     )
     parser.add_argument(
@@ -359,7 +359,7 @@ def lint_cli(argv: list[str] | None = None) -> int:
     for finding in findings:
         print(render(finding.location, finding.rule, finding.message))
     if findings:
-        print(f"judgements-audit: {len(findings)} finding(s)", file=sys.stderr)
+        print(f"judgements-lint: {len(findings)} finding(s)", file=sys.stderr)
         return 1
     return 0
 

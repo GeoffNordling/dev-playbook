@@ -31,8 +31,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    ref-audit [directory]
-    ref-audit --list-rules
+    ref-lint [directory]
+    ref-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -78,7 +78,7 @@ class UnclassifiedRecordsFile(Exception):
     """A file under docs/decisions/ that the records policy cannot classify.
 
     It is neither a numbered record (NNNN-slug.md, exempt) nor the mutable
-    index.md/README.md (validated). ref-audit stops rather than silently
+    index.md/README.md (validated). ref-lint stops rather than silently
     blanket-exempt an unexpected file, forcing a conscious decision on it.
     """
 
@@ -110,7 +110,7 @@ def source_files(repo_root: Path) -> list[Path]:
 
     Numbered records (NNNN-slug.md) are exempt — immutable, accepted staleness;
     index.md and README.md are validated — mutable, actively maintained; any
-    other file under docs/decisions/ raises UnclassifiedRecordsFile so ref-audit
+    other file under docs/decisions/ raises UnclassifiedRecordsFile so ref-lint
     stops rather than silently blanket-exempt it.
     """
     depth = len(RECORDS_DIR)
@@ -244,20 +244,20 @@ def main() -> None:
     try:
         repo_name = gitrepo.canonical_repo_name(repo_root)
     except gitrepo.NotAGitRepository:
-        print(f"ref-audit: not a git repository: {repo_root}", file=sys.stderr)
+        print(f"ref-lint: not a git repository: {repo_root}", file=sys.stderr)
         sys.exit(2)
 
     try:
         md_files = source_files(repo_root)
     except UnclassifiedRecordsFile as err:
         print(
-            f"ref-audit: unclassifiable file under {'/'.join(RECORDS_DIR)}/: "
+            f"ref-lint: unclassifiable file under {'/'.join(RECORDS_DIR)}/: "
             f"{err.relpath} (expected a NNNN-slug.md record, index.md, or README.md)",
             file=sys.stderr,
         )
         sys.exit(2)
     if not md_files:
-        print(f"ref-audit: no .md files found in {repo_root}", file=sys.stderr)
+        print(f"ref-lint: no .md files found in {repo_root}", file=sys.stderr)
         sys.exit(2)
 
     total = 0
@@ -282,17 +282,17 @@ def main() -> None:
                 )
 
     if total == 0:
-        print(f"ref-audit: no cross-references found in {repo_root}", file=sys.stderr)
+        print(f"ref-lint: no cross-references found in {repo_root}", file=sys.stderr)
         sys.exit(0)
     issues = broken + wrong_form
     if issues:
         print(
-            f"ref-audit: {issues}/{total} need fixing "
+            f"ref-lint: {issues}/{total} need fixing "
             f"({broken} broken, {wrong_form} wrong-form)",
             file=sys.stderr,
         )
         sys.exit(1)
-    print(f"ref-audit: {total} references, all ok", file=sys.stderr)
+    print(f"ref-lint: {total} references, all ok", file=sys.stderr)
     sys.exit(0)
 
 

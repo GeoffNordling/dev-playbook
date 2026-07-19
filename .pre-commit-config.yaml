@@ -29,68 +29,68 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [pre-push]
-      - id: repo-audit
-        name: repo-audit
-        entry: scripts/repo-audit
+      - id: repo-lint
+        name: repo-lint
+        entry: scripts/repo-lint
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: python-audit
-        name: python-audit
-        entry: scripts/python-audit
+      - id: python-lint
+        name: python-lint
+        entry: scripts/python-lint
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: testing-audit
-        name: testing-audit
-        entry: scripts/testing-audit
+      - id: testing-lint
+        name: testing-lint
+        entry: scripts/testing-lint
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: ref-audit
-        name: ref-audit
-        entry: scripts/ref-audit
+      - id: ref-lint
+        name: ref-lint
+        entry: scripts/ref-lint
         language: script
         pass_filenames: false
         types: [markdown]
 
-      - id: okf-audit
-        name: okf-audit
-        entry: scripts/okf-audit
+      - id: okf-lint
+        name: okf-lint
+        entry: scripts/okf-lint
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: decisions-audit
-        name: decisions-audit
-        entry: scripts/decisions-audit
+      - id: decisions-lint
+        name: decisions-lint
+        entry: scripts/decisions-lint
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: skill-audit
-        name: skill-audit
-        entry: scripts/skill-audit
+      - id: skill-lint
+        name: skill-lint
+        entry: scripts/skill-lint
         language: script
         pass_filenames: false
         always_run: true
 
-      - id: judgements-audit
-        name: judgements-audit
-        entry: scripts/judgements-audit
+      - id: judgements-lint
+        name: judgements-lint
+        entry: scripts/judgements-lint
         language: script
         pass_filenames: false
         always_run: true
 
       # Local-only: the standards/ tree it audits exists only in dev-playbook,
-      # so standards-audit is not published in the manifest or the canonical
+      # so standards-lint is not published in the manifest or the canonical
       # template (the validate-manifest precedent).
-      - id: standards-audit
-        name: standards-audit
-        entry: scripts/standards-audit
+      - id: standards-lint
+        name: standards-lint
+        entry: scripts/standards-lint
         language: script
         pass_filenames: false
         always_run: true

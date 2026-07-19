@@ -24,8 +24,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 error state (agents tree without its mirror).
 
 Usage:
-    skill-audit [directory]
-    skill-audit --list-rules
+    skill-lint [directory]
+    skill-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -440,7 +440,7 @@ def main():
     try:
         all_findings: list[Finding] = list(check_skill_mirror(repo_root))
     except ToolError as err:
-        print(f"skill-audit: {err}", file=sys.stderr)
+        print(f"skill-lint: {err}", file=sys.stderr)
         sys.exit(2)
 
     skill_roots = [
@@ -468,20 +468,20 @@ def main():
     for f in all_findings:
         print(f.render())
     for advisory in all_advisories:
-        print(f"skill-audit: {advisory}", file=sys.stderr)
+        print(f"skill-lint: {advisory}", file=sys.stderr)
 
     errors = len(all_findings)
     skills = len(internal_skills)
     suffix = f" (skipped {skipped} external)" if skipped else ""
     if errors:
         print(
-            f"skill-audit: {skills} internal skills, {errors} finding(s), "
+            f"skill-lint: {skills} internal skills, {errors} finding(s), "
             f"{len(all_advisories)} advisory(ies){suffix}",
             file=sys.stderr,
         )
     else:
         print(
-            f"skill-audit: {skills} internal skills, all ok{suffix}",
+            f"skill-lint: {skills} internal skills, all ok{suffix}",
             file=sys.stderr,
         )
 

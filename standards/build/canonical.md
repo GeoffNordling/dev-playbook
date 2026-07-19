@@ -12,7 +12,7 @@ shipped inside every hook clone
 ([distribution.md](/standards/build/distribution.md)). Prose points at them
 and does not restate their contents — the files are the standard. Each
 repo's working copies exist because the consuming tools demand real files in
-place, and `repo-audit` enforces them equal to the canonical source:
+place, and `repo-lint` enforces them equal to the canonical source:
 
 | Artifact | Compared how |
 |---|---|
@@ -26,7 +26,7 @@ place, and `repo-audit` enforces them equal to the canonical source:
 
 `standards/build/canonical/` is quoted material: hooks and tree rules skip it —
 its `pyproject.toml` is a template, not a second project. Every file in the
-directory is compared against by `repo-audit`; a file that no tool checks
+directory is compared against by `repo-lint`; a file that no tool checks
 does not belong there.
 
 ## One config serves every repo
@@ -35,9 +35,9 @@ The canonical [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-c
 carries the dev-playbook hook set, the ruff, shellcheck, and shfmt hooks at
 canonical revs, and the pre-push `make check-judgements` hook, installing both
 the commit and push stages. It serves every repo unchanged: a hook with no matching files
-skips itself, and `judgements-audit` and `skill-audit` pass trivially where a
+skips itself, and `judgements-lint` and `skill-lint` pass trivially where a
 repo has no `[tool.judgements]` table and no authored skills. A repo that
-authors skills carries `skill-audit` in its `.pre-commit-config.yaml` so those
+authors skills carries `skill-lint` in its `.pre-commit-config.yaml` so those
 skills are audited. dev-playbook
 replaces the published block with its dogfood block
 ([distribution.md](/standards/build/distribution.md#dogfooding)).

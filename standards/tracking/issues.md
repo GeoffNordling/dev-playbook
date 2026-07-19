@@ -46,7 +46,7 @@ role never changes as it readies; only its body and phase advance.
 
 The issue body IS the agent brief. There are **three brief formats**, one per
 role-and-mode. Each format's required headings are stated explicitly below, and
-are exactly the lists the [`tracking.issue-brief-shape` audit](/scripts/workspace-audit)
+are exactly the lists the [`tracking.issue-brief-shape` audit](/scripts/workspace-lint)
 checks on live leaves — so this document and the rule cannot disagree.
 
 Dependencies and hierarchy are **not** body fields — they are native GitHub

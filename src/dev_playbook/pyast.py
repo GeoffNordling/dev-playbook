@@ -1,12 +1,12 @@
 """Shared Python-source discovery and AST helpers for the pre-commit hooks.
 
-`python-audit` runs three rules over one walk of a repo's Python sources; this
+`python-lint` runs three rules over one walk of a repo's Python sources; this
 module is that walk. Discovery goes through `git ls-files`, so it is
 gitignore-aware and worktree-scoped in the same way as dev_playbook.md.find_md_files:
 from inside a worktree only that worktree's files are listed, and gitignored
 caches and virtualenvs never appear. Discovery returns every Python file git
 lists; which trees each rule polices is per-rule policy that lives in
-`python-audit`, not here — the three retired hooks had different scopes and the
+`python-lint`, not here — the three retired hooks had different scopes and the
 consolidation preserves each rather than imposing one shared exclusion set.
 """
 

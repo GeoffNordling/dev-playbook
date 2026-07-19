@@ -16,7 +16,7 @@ kept honest.
 
 ## Audit
 
-- [standards-audit](/scripts/standards-audit) — the meta-standard's four
+- [standards-lint](/scripts/standards-lint) — the meta-standard's four
   deterministic rules: card layout, catalog order, the bidirectional
   card↔rule matrix, and hook-surface agreement
 - [judgements/standard-cards.yaml](/judgements/standard-cards.yaml) — the
@@ -27,7 +27,7 @@ kept honest.
 ## Enforce
 
 - the pre-commit hook suite
-  ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — standards-audit
+  ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — standards-lint
   blocks nonconforming commits at the **commit gate**; it is wired in
   dev-playbook's local block alone, since the `standards/` tree it audits
   exists only here

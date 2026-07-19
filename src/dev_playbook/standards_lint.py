@@ -1,6 +1,6 @@
 """Audit the ``standards/`` tree against the meta-standard's deterministic rules.
 
-standards-audit is the detector behind the meta-standard card. It is
+standards-lint is the detector behind the meta-standard card. It is
 dev-playbook-local: the ``standards/`` tree it audits exists only in this repo,
 so the detector is wired in dev-playbook's local pre-commit block alone (the
 local-only precedent is validate-manifest). Four rules, each namespaced under
@@ -19,7 +19,7 @@ the meta card (``standard.*``):
     (``--list-rules`` is the trusted ground truth).
   - **hook-surfaces** — the detector-hook id sets agree across the published
     manifest, the canonical consumer template, and the local block (modulo the
-    declared local-only set ``{standards-audit}``), and every detector hook has
+    declared local-only set ``{standards-lint}``), and every detector hook has
     a scripts/README.md validation-table row and is cited by a card.
 
 Output:
@@ -28,8 +28,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    standards-audit [directory]
-    standards-audit --list-rules
+    standards-lint [directory]
+    standards-lint --list-rules
 """
 
 import argparse
@@ -214,7 +214,7 @@ def _is_directory_bullet(target: str) -> bool:
 def check_catalog_order(root: Path) -> list[Finding]:
     """Flag a catalog whose entries depart from the declared order.
 
-    okf-audit already enforces catalog *membership* (the ``Ordering:`` marker
+    okf-lint already enforces catalog *membership* (the ``Ordering:`` marker
     exempts only its generic alphabetical rule), so this checks order alone:
     README, the meta-standard card, the remaining cards by title, the contract
     docs by title, then directories.
@@ -381,10 +381,10 @@ LOCAL_CONFIG = ".pre-commit-config.yaml"
 CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 SCRIPTS_README = "scripts/README.md"
 # Detectors wired only in dev-playbook's local block, never published or offered
-# to consumers: their audited surface exists only here. standards-audit audits
+# to consumers: their audited surface exists only here. standards-lint audits
 # the standards/ tree, which no consumer carries (the validate-manifest
 # precedent). Kept a constant so the local-only set is declared in one place.
-LOCAL_ONLY = frozenset({"standards-audit"})
+LOCAL_ONLY = frozenset({"standards-lint"})
 
 # A markdown table row's first backticked cell: ``| `name` | ... |``.
 _TABLE_NAME = re.compile(r"^\s*\|\s*`([^`]+)`\s*\|")
@@ -565,7 +565,7 @@ def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     """Scan the standards tree and print one finding per line; return the exit code."""
     parser = argparse.ArgumentParser(
-        prog="standards-audit",
+        prog="standards-lint",
         description="Audit the standards/ tree against the meta-standard's rules.",
     )
     parser.add_argument(
@@ -587,14 +587,14 @@ def main(argv: list[str] | None = None) -> int:
     try:
         findings = audit(root, _list_rules_via_subprocess)
     except CannotRun as err:
-        print(f"standards-audit: cannot run: {err}", file=sys.stderr)
+        print(f"standards-lint: cannot run: {err}", file=sys.stderr)
         return 2
 
     for f in sorted(findings, key=lambda f: (f.file, f.line or 0, f.rule, f.message)):
         print(f.render())
 
     if findings:
-        print(f"standards-audit: {len(findings)} finding(s)", file=sys.stderr)
+        print(f"standards-lint: {len(findings)} finding(s)", file=sys.stderr)
         return 1
-    print("standards-audit: clean", file=sys.stderr)
+    print("standards-lint: clean", file=sys.stderr)
     return 0

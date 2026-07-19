@@ -9,7 +9,7 @@ description: The consumer-repo recipe — editable path dependency, declarations
 The judgements tooling ships in dev-playbook's one installable package,
 **`dev-playbook`**, built from `src/dev_playbook/`. It exposes the
 `dev_playbook.judgements` and `dev_playbook.skipcache` import packages and
-the `judgements-run` / `judgements-audit` console scripts. Any repo on the
+the `judgements-run` / `judgements-lint` console scripts. Any repo on the
 same machine consumes it as a **local path dependency** — no network, no
 PyPI, no published index. The recipe below is
 end-to-end; the field rules, config, and gate it points at are defined in
@@ -103,7 +103,7 @@ enforces it — a window with zero mechanical enforcement.
 
 ## 4. Lint the declarations on commit
 
-Add the `judgements-audit` pre-commit hook so malformed or stale declarations
+Add the `judgements-lint` pre-commit hook so malformed or stale declarations
 fail fast. It ships from dev-playbook's published hook manifest; reference
 it by URL and pinned `rev`, exactly as for the other dev-playbook hooks:
 
@@ -111,7 +111,7 @@ it by URL and pinned `rev`, exactly as for the other dev-playbook hooks:
 - repo: https://github.com/GeoffNordling/dev-playbook
   rev: <commit-sha>
   hooks:
-    - id: judgements-audit
+    - id: judgements-lint
 ```
 
 The hook runs from pre-commit's own clone of dev-playbook at the pinned

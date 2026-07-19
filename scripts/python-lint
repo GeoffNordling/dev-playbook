@@ -10,7 +10,7 @@ dev_playbook.pyast.find_python_files, so gitignore-aware and worktree-scoped):
   - **empty-init** — every ``__init__.py`` is empty: no docstring, no code.
     Imports, re-exports, and ``__all__`` live in named modules.
 
-The test-privacy family moved to testing-audit, which answers the testing
+The test-privacy family moved to testing-lint, which answers the testing
 standard's question rather than Python's.
 
 Output:
@@ -19,8 +19,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    python-audit [directory]
-    python-audit --list-rules
+    python-lint [directory]
+    python-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -139,7 +139,7 @@ def scan_file(path: Path, root: Path) -> list[Finding]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="python-audit",
+        prog="python-lint",
         description="Lint Python sources: no-future-annotations, empty-init.",
     )
     parser.add_argument(
@@ -164,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
         for path in files:
             findings.extend(scan_file(path, root))
     except ToolError as err:
-        print(f"python-audit: {err}", file=sys.stderr)
+        print(f"python-lint: {err}", file=sys.stderr)
         return 2
 
     for f in sorted(findings, key=lambda f: (f.file, f.line, f.rule)):
@@ -172,11 +172,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if findings:
         print(
-            f"python-audit: {len(findings)} finding(s) across {len(files)} files",
+            f"python-lint: {len(findings)} finding(s) across {len(files)} files",
             file=sys.stderr,
         )
         return 1
-    print(f"python-audit: clean across {len(files)} files", file=sys.stderr)
+    print(f"python-lint: clean across {len(files)} files", file=sys.stderr)
     return 0
 
 

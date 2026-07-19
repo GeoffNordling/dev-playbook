@@ -23,8 +23,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    repo-audit [directory]
-    repo-audit --list-rules
+    repo-lint [directory]
+    repo-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -47,7 +47,7 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card -- including
 # the skills-hook check, which asserts a build artifact (the pre-commit config)
-# carries the skill-audit hook. The CLAUDE.md ## Standards block answers the
+# carries the skill-lint hook. The CLAUDE.md ## Standards block answers the
 # claude-code card, and the README/CONTEXT doc-shape check answers the docs card.
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
@@ -122,7 +122,7 @@ BASE_REQUIRED = (
 )
 MYPY_ROOTS = ("src", "tests", "scripts")
 LOCKFILES = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb")
-# The same two roots skill-audit scans.
+# The same two roots skill-lint scans.
 SKILL_ROOTS = (".claude/skills", "dotfiles/dot-claude/skills")
 UV_SHEBANG = "#!/usr/bin/env -S uv run --script"
 PEP723_OPEN = "# /// script"
@@ -757,13 +757,13 @@ def check_skills_hook(root: Path) -> list[Finding]:
     if not config.is_file():
         return []
     ids = {hook for _, hook in hook_ids(config.read_text(encoding="utf-8"))}
-    if "skill-audit" in ids:
+    if "skill-lint" in ids:
         return []
     return [
         Finding(
             ".pre-commit-config.yaml",
             SKILLS_HOOK,
-            "this repo authors skills: append the skill-audit hook",
+            "this repo authors skills: append the skill-lint hook",
         )
     ]
 
@@ -784,7 +784,7 @@ def check_self(root: Path) -> list[Finding]:
             Finding(
                 f"standards/build/canonical/{name}",
                 SELF_AUDIT,
-                "no repo-audit compare covers this canonical artifact",
+                "no repo-lint compare covers this canonical artifact",
             )
         )
     for name in sorted(CANONICAL_MANIFEST - present):
@@ -852,7 +852,7 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="repo-audit",
+        prog="repo-lint",
         description="Audit a repo's structure against the workspace build standard.",
     )
     parser.add_argument(
@@ -874,12 +874,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         repo_name = gitrepo.canonical_repo_name(root)
     except gitrepo.NotAGitRepository:
-        print(f"repo-audit: not a git repository: {root}", file=sys.stderr)
+        print(f"repo-lint: not a git repository: {root}", file=sys.stderr)
         return 2
     try:
         findings, layers = audit(root, repo_name)
     except ToolError as err:
-        print(f"repo-audit: {err}", file=sys.stderr)
+        print(f"repo-lint: {err}", file=sys.stderr)
         return 2
 
     for finding in sorted(findings, key=lambda f: (f.path, f.rule, f.message)):
@@ -888,11 +888,11 @@ def main(argv: list[str] | None = None) -> int:
     layer_list = ", ".join(layers.names())
     if findings:
         print(
-            f"repo-audit: {len(findings)} finding(s) (layers: {layer_list})",
+            f"repo-lint: {len(findings)} finding(s) (layers: {layer_list})",
             file=sys.stderr,
         )
         return 1
-    print(f"repo-audit: clean (layers: {layer_list})", file=sys.stderr)
+    print(f"repo-lint: clean (layers: {layer_list})", file=sys.stderr)
     return 0
 
 

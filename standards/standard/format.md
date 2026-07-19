@@ -70,7 +70,7 @@ card, since the meta-standard is an instance of the format it defines.
 ## The catalog
 
 The catalog of all standards is [standards/index.md](/standards/index.md).
-okf-audit's index rule already forces that index to list every card with a
+okf-lint's index rule already forces that index to list every card with a
 matching description, so catalog completeness is enforced by the existing
 hook suite rather than by new tooling.
 
@@ -84,7 +84,7 @@ detector contract.
 
 - **Read-only means mutating nothing git tracks.** A detector reports without
   changing the repository. Reaching outside the working tree does not disqualify
-  it: workspace-audit queries GitHub over `gh api` and writes only a stderr
+  it: workspace-lint queries GitHub over `gh api` and writes only a stderr
   summary, reading remote state and mutating nothing git tracks, so it is
   read-only and belongs in an Audit cell.
 - **Universal wiring; applicability lives inside the detector.** Every detector
@@ -92,7 +92,7 @@ detector contract.
   detector whose surface is optional (skills) exits 0 silently when the surface
   is absent; every other detector asserts unconditionally and fails loud. A gap
   is never resolved by making a detector opt-in. (The one exception is a
-  detector whose audited surface exists only in one repo — standards-audit
+  detector whose audited surface exists only in one repo — standards-lint
   audits the `standards/` tree, which only dev-playbook carries — so it is wired
   in that repo's local block alone.)
 - **A card may have more than one detector.** Cards are organized by the
@@ -118,7 +118,7 @@ detector contract.
   contract. The rule-matrix check scopes its citation collection to `/scripts/`
   links, so audit-kind citations are exempt by construction, not by exception.
   The [Semantic Validation](/standards/semantic-validation.md) card shows both:
-  judgements-audit is the lint, the LLM judgements the audit.
+  judgements-lint is the lint, the LLM judgements the audit.
 - **Finding format.** A finding is one line, GNU format:
   `file:line: card.rule message` — a colon after the location, single spaces, a
   repo-relative path; `:line` is omitted for a file-level finding
@@ -135,4 +135,4 @@ Standards drift at two grains, each with its own detector:
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across
    adopting repositories. This is a version bump of the standard,
-   propagated and verified by workspace-audit.
+   propagated and verified by workspace-lint.

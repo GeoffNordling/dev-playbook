@@ -9,7 +9,7 @@ description: The layered model — the base layer, inferred membership, what eac
 Every workspace repository conforms to one layered standard: a **base layer**
 that applies to every repo, plus each further layer the repo is in. Layer
 membership is inferred from facts on disk, never declared. Conformance is
-machine-checked — this prose describes the rules; the `repo-audit` hook is
+machine-checked — this prose describes the rules; the `repo-lint` hook is
 the authority ([enforcement.md](/standards/build/enforcement.md)).
 
 | Layer | A repo is in it when | It adds |

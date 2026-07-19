@@ -1,13 +1,13 @@
 """Audit a repo's Python tests against the workspace testing conventions.
 
-testing-audit is the detector behind the Python-testing card. It walks a repo's
+testing-lint is the detector behind the Python-testing card. It walks a repo's
 Python files once (via dev_playbook.pyast.find_python_files, so gitignore-aware
 and worktree-scoped) and applies three rules to the test files it finds:
 
   - **no-private-access** — a ``test_*.py`` file must not import or reach into a
     private name (``_foo``) of a non-test module; dunders are public. The
     finding message keeps the import-vs-attribute-reach distinction. Moved here
-    from python-audit, whose ``privacy.*`` family answered the testing standard's
+    from python-lint, whose ``privacy.*`` family answered the testing standard's
     question, not Python's.
   - **mirror-layout** — a ``test_<stem>.py`` whose stem names an existing ``src``
     module must sit at that module's literal mirror, either directly beneath
@@ -31,8 +31,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    testing-audit [directory]
-    testing-audit --list-rules
+    testing-lint [directory]
+    testing-lint --list-rules
 """
 
 import argparse
@@ -362,7 +362,7 @@ def scan_file(path: Path, root: Path, mirrors: dict[str, set[str]]) -> list[Find
 def main(argv: list[str] | None = None) -> int:
     """Scan a repo's test files and print one finding per line; return the exit code."""
     parser = argparse.ArgumentParser(
-        prog="testing-audit",
+        prog="testing-lint",
         description="Lint Python tests: no-private-access, mirror-layout, no-logic.",
     )
     parser.add_argument(
@@ -384,7 +384,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         files = pyast.find_python_files(root)
     except subprocess.CalledProcessError as err:
-        print(f"testing-audit: cannot list files in {root}: {err}", file=sys.stderr)
+        print(f"testing-lint: cannot list files in {root}: {err}", file=sys.stderr)
         return 2
     mirrors = src_module_mirrors(files, root)
     findings: list[Finding] = []
@@ -396,9 +396,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if findings:
         print(
-            f"testing-audit: {len(findings)} finding(s) across {len(files)} files",
+            f"testing-lint: {len(findings)} finding(s) across {len(files)} files",
             file=sys.stderr,
         )
         return 1
-    print(f"testing-audit: clean across {len(files)} files", file=sys.stderr)
+    print(f"testing-lint: clean across {len(files)} files", file=sys.stderr)
     return 0
