@@ -162,14 +162,14 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "tracking.settings" in ids
     assert "tracking.remote" in ids
     assert "build.pin" in ids
-    # the tracking and workflow rules this slice adds
+    # the tracking and software-factory rules this slice adds
     assert "tracking.label-scheme" in ids
     assert "tracking.no-blocked-label" in ids
     assert "tracking.issue-brief-shape" in ids
     assert "tracking.epic-shape" in ids
-    assert "workflow.tuple-valid" in ids
+    assert "software-factory.tuple-valid" in ids
     assert all(
-        rule.split(".")[0] in {"tracking", "build", "workflow"} for rule in ids
+        rule.split(".")[0] in {"tracking", "build", "software-factory"} for rule in ids
     ), ids
 
 
@@ -526,21 +526,21 @@ def run_with_issue(tmp_path: Path, one: dict) -> subprocess.CompletedProcess:
 
 def test_valid_leaf_tuple_and_brief_pass(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(1, VALID_DIRECT, body=BUILD_BODY))
-    assert "workflow.tuple-valid" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
     assert "tracking.issue-brief-shape" not in result.stdout
     assert "tracking.epic-shape" not in result.stdout
 
 
 def test_untriaged_issue_is_out_of_scope(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(2, ["phase:intake"], body=""))
-    assert "workflow.tuple-valid" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
     assert "tracking.issue-brief-shape" not in result.stdout
 
 
 def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "tests:no", "phase:build"]
     result = run_with_issue(tmp_path, issue(7, labels, body=BUILD_BODY))
-    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "alpha: software-factory.tuple-valid" in result.stdout
     assert "#7" in result.stdout
     assert "mode" in result.stdout
 
@@ -548,21 +548,21 @@ def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
 def test_leaf_invalid_phase_value_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:direct", "tests:no", "phase:frobnicate"]
     result = run_with_issue(tmp_path, issue(8, labels, body=BUILD_BODY))
-    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "alpha: software-factory.tuple-valid" in result.stdout
     assert "phase" in result.stdout
 
 
 def test_sdd_leaf_requires_tests_yes(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:sdd", "tests:no", "phase:sdd-tdd"]
     result = run_with_issue(tmp_path, issue(9, labels, body=BUILD_BODY))
-    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "alpha: software-factory.tuple-valid" in result.stdout
     assert "tests:yes" in result.stdout
 
 
 def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:yes", "phase:spike"]
     result = run_with_issue(tmp_path, issue(10, labels, body=SPIKE_BODY))
-    assert "alpha: workflow.tuple-valid" in result.stdout
+    assert "alpha: software-factory.tuple-valid" in result.stdout
     assert "tests:no" in result.stdout
 
 
@@ -571,7 +571,7 @@ def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(3, labels, sub_issues_total=4))
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#3" in result.stdout
-    assert "workflow.tuple-valid" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
 
 
 def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
@@ -588,7 +588,7 @@ def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(12, labels, sub_issues_total=3))
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#12" in result.stdout
-    assert "workflow.tuple-valid" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
 
 
 def test_epic_without_category_label_is_a_finding(tmp_path: Path) -> None:
@@ -678,5 +678,5 @@ def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(11, ["phase:tdd"], body="", pull_request=True)
     )
-    assert "workflow.tuple-valid" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
     assert "tracking.issue-brief-shape" not in result.stdout

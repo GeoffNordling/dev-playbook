@@ -17,10 +17,10 @@ The front door for work. Input arrives under-formed and leaves as a ready issue 
 
 Before doing anything else, read end-to-end:
 
-- [workflow standard](~/workspace/dev-playbook/workflow/workflow.md) — label scheme, state-machine graph.
+- [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md) — label scheme, state-machine graph.
 - [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) — body format, brief principles, vertical-slice rules.
 
-Then report: `READ: workflow.md, issue-conventions.md`. Proceed only after.
+Then report: `READ: software-factory.md, issue-conventions.md`. Proceed only after.
 
 ## Process
 
@@ -37,7 +37,7 @@ Single coherent piece → one issue. Plan crossing concerns or layers → break 
 
 ### 3. For each issue, pick the four-tuple
 
-The four-tuple is per slice; an epic carries `category:*` alone, per workflow.md's label scheme — it never dispatches.
+The four-tuple is per slice; an epic carries `category:*` alone, per software-factory.md's label scheme — it never dispatches.
 
 - `category:*` — pick one.
 - `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.

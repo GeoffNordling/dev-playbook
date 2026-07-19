@@ -5,7 +5,7 @@ Closed-world: labels in the canonical set are created or updated to match;
 labels not in the canonical set are deleted. Idempotent. The canonical scheme is
 policy-as-data in ``dev_playbook.label_scheme`` (``label_scheme.json``); this
 script is the thin shim that mints it into the current repo over `gh`. See
-~/workspace/dev-playbook/workflow/workflow.md (§Valid labels and §Naming) for the
+~/workspace/dev-playbook/software-factory/software-factory.md (§Valid labels and §Naming) for the
 scheme's semantic authority.
 """
 # /// script

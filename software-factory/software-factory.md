@@ -1,12 +1,12 @@
 ---
 type: Standard
-title: Workflow
+title: Software Factory
 description: The intake-to-merge state machine — phase labels, issue-overwatch dispatch, and the worktree contract each node follows
 ---
 
-# Workflow
+# Software Factory
 
-Standard workflow for how ideas become merged PRs — or, on the spike path, answered questions — in a workspace repo.
+The software factory: how ideas become merged PRs — or, on the spike path, answered questions — in a workspace repo.
 
 ## State machine
 
@@ -193,7 +193,7 @@ Two modes of human engagement:
 
 ### Node-skill contract
 
-A node skill does the node's work and reports; the issue overwatch launches it, sequences what follows, and writes the labels (intake excepted — its label tuple is the deliverable, per [Dispatch](#dispatch)). When a skill has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](/workflow/skill-authoring.md).
+A node skill does the node's work and reports; the issue overwatch launches it, sequences what follows, and writes the labels (intake excepted — its label tuple is the deliverable, per [Dispatch](#dispatch)). When a skill has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](/software-factory/skill-authoring.md).
 
 - **Worktree.** Every file-touching node sits in the issue's worktree before doing anything else, per [Worktrees](#worktrees-and-branches). `intake` touches no files and uses no worktree.
 - **HITL** — the issue overwatch runs the node itself, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts — and the node closes with a plain report.

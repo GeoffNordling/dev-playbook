@@ -1,24 +1,24 @@
 ---
 type: Standard-Card
-title: Workflow
-description: Card for the workflow standard — how an idea becomes a merged pull request
+title: Software Factory
+description: Card for the software factory standard — how an idea becomes a merged pull request
 ---
 
-# Workflow
+# Software Factory
 
 Governs how an idea becomes a merged pull request.
 
 ## Define
 
-- [workflow/workflow.md](/workflow/workflow.md) — the intake-to-merge
+- [software-factory/software-factory.md](/software-factory/software-factory.md) — the intake-to-merge
   state machine: labels, dispatch, worktrees, permissions
-- [workflow/skill-authoring.md](/workflow/skill-authoring.md) — voice and
+- [software-factory/skill-authoring.md](/software-factory/skill-authoring.md) — voice and
   mechanics for the phase node-skills
 
 ## Audit
 
 - [workspace-audit](/scripts/workspace-audit) — four-tuple validity on every
-  open post-intake leaf (`workflow.tuple-valid`), across repositories via
+  open post-intake leaf (`software-factory.tuple-valid`), across repositories via
   `gh api`
 
 ## Enforce
@@ -31,4 +31,4 @@ Governs how an idea becomes a merged pull request.
 
 - the phase node-skills in `dotfiles/dot-claude/skills/` — intake, design,
   build, tdd, open-pr, and the review nodes carry an issue through the
-  graph ([Skills](/workflow/workflow.md#skills))
+  graph ([Skills](/software-factory/software-factory.md#skills))

@@ -7,7 +7,7 @@ description: Card for the tracking standard — how work is tracked through issu
 # Tracking
 
 Governs how work is tracked — issues and repository settings. Pull
-requests belong to the [workflow standard](/workflow/workflow.md).
+requests belong to the [software factory standard](/software-factory/software-factory.md).
 
 ## Define
 

@@ -172,18 +172,18 @@ judgements:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-workflow
+  - id: standard-card-software-factory
     claim: |
-      standards/workflow.md is an honest card: every pointer in its
+      standards/software-factory.md is an honest card: every pointer in its
       define, audit, enforce, and adopt cells names a real artifact that
-      genuinely serves that cell's role for the workflow standard, its
+      genuinely serves that cell's role for the software factory standard, its
       empty cells are truly empty, and no cell misrepresents what its
       targets do.
-    evidence:  [standards/workflow.md]
+    evidence:  [standards/software-factory.md]
     reference:
       - standards/standard/format.md
-      - workflow/workflow.md
-      - workflow/skill-authoring.md
+      - software-factory/software-factory.md
+      - software-factory/skill-authoring.md
       - scripts/workspace-audit
     model: claude-sonnet-5
     effort: high

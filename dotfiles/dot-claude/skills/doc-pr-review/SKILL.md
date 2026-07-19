@@ -24,7 +24,7 @@ Review the documentation in an issue's PR diff against its issue brief, the doc 
 - `gh issue view <issue> --comments` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
 - The PR's existing feedback — any prior doc-review cycle's findings; to avoid re-flagging, read every comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.)
-- [Doc conventions](~/workspace/dev-playbook/standards/prose/conventions.md) — the contract every doc answers to; read it always. By the diff's content, also read: [skill authoring](~/workspace/dev-playbook/workflow/skill-authoring.md) when the diff touches skills; [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) when it touches standard cards; the [OKF docs](~/workspace/dev-playbook/standards/docs/index.md) when structure — frontmatter, indexes, cross-references — is in question.
+- [Doc conventions](~/workspace/dev-playbook/standards/prose/conventions.md) — the contract every doc answers to; read it always. By the diff's content, also read: [skill authoring](~/workspace/dev-playbook/software-factory/skill-authoring.md) when the diff touches skills; [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) when it touches standard cards; the [OKF docs](~/workspace/dev-playbook/standards/docs/index.md) when structure — frontmatter, indexes, cross-references — is in question.
 
 ## 2. Green gate
 
