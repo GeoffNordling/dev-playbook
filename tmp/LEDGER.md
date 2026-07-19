@@ -6,10 +6,10 @@
 |---|-------|-------|-----------------|------------|
 | 208 | Workflow → Software Factory rename | 🏁 landed | brief + four-tuple live on GitHub | your approval of the landed brief |
 | 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | paced queue |
-| 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | paced queue |
+| 199 | fan-out guardrails | 🏁 landed | brief + four-tuple live; edge ←208 written | your review |
 | 184 | judgements dead ceremony (`--refuted`) | 🏁 landed | brief + four-tuple live; retitled to real names | your approval of the landed brief |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | paced queue |
-| 169 | vocabulary hierarchy (v2.2) | ✅ ready-to-land | CONTEXT.md defines lint ⊂ audit + fleet renames to `*-lint` | paced queue (last) |
+| 169 | vocabulary hierarchy (v2.2) | 🏁 landed | brief + four-tuple live; edges ←184, ←208, ←199 written | your review |
 
 ## ❓ Open asks — everything currently waiting on you
 
@@ -80,8 +80,24 @@ Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
   rule-matrix semantics, standard/format.md §Detectors, build/enforcement.md),
   full touch-list from M1 in Key interfaces; four-tuple
   maintenance·direct·tests:yes·tdd. Certified blind-implementer-ready.
-- **next**: 199 on approval (edge 199←208 written with it), then 169
-  (edges 169←184, 169←208, 169←199); closes 207/183 slot between.
+- **199**: LANDED — human said "Do 169 and 199." Brief anchors on verified
+  blowout (~37 vs 8), fork mechanism framed as report-not-fact, five guard
+  clauses mandated across the 4 fan-out files (fresh-not-fork, leaf clause
+  in every worker-prompt template, count-stating, silent-worker-stop,
+  wrapper-only /code-review), rejected alternatives in Out of scope with
+  reasons (rule file = sledgehammer; spawn cap collides with scatter-gather
+  envelope; no Anthropic report). Title kept (human-authored). Four-tuple
+  maintenance·direct·tests:no·build. Edge 199←208 written.
+- **169**: LANDED — retitled "Define the lint ⊂ audit hierarchy in
+  CONTEXT.md and rename the deterministic detector fleet to `*-lint`".
+  Brief states v2.2 policy as flat law, CONTEXT.md workset (Lint entry,
+  two-kinds notes, third Flagged-ambiguities entry), the ten approved
+  `*-lint` names verbatim, all identifier surfaces incl. hook-id rev-bump
+  per distribution.md, the keeps-audit list, generic-English exemption.
+  Four-tuple maintenance·direct·tests:yes·tdd. Edges 169←184, 169←208,
+  169←199 written; verified via GET: [208] and [184,208,199].
+- **remaining**: closes 207 + 183 (findings comments) — awaiting the word;
+  then the batch report ends the run.
 
 ### Δ checkpoint 3.2 — fleet renames IN; 169 becomes definitions + rename
 
@@ -299,7 +315,7 @@ ASK: none — closing comment lands after the batched nod.
 
 ## Issue 199 — Code Review Ran Wild Like Uncle Jeff Was Paying the Bill
 
-stage: ✅ ready-to-land
+stage: 🏁 landed (brief + four-tuple live: maintenance·direct·tests:no·build; edge 199←208 written; title kept — human-authored)
 verdict: AFK-ready — scope final (checkpoint 2): guard language in the 4 fan-out files (piece 2, absorbing piece 1's clauses: fresh-not-fork, leaf clause on every worker prompt, count-stating, silent-worker-means-stop, /code-review only via a single-purpose wrapper); rule file, upstream report, and spawn cap all rejected/dropped
 ASK: none — ratify at landing.
 
@@ -387,7 +403,7 @@ ASK: none — closing comment lands after the batched nod.
 
 ## Issue 169 — Purge the residual "lint" vocabulary; standardize on "audit"
 
-stage: ✅ ready-to-land
+stage: 🏁 landed (retitled "Define the lint ⊂ audit hierarchy in CONTEXT.md and rename the deterministic detector fleet to `*-lint`"; four-tuple maintenance·direct·tests:yes·tdd; edges 169←184, 169←208, 169←199 written and verified)
 verdict: ruling v2.2 (checkpoint 3.2) — the hierarchy stands (a Detector is a **lint** if deterministic code, an **audit** if an LLM judge; lint ⊂ audit) AND naming follows it: the ten deterministic `*-audit` scripts rename to `*-lint`, hook ids included; consumers pin a rev and adapt at bump. Workset: (1) CONTEXT.md defines the subset relationship keyed on code-vs-LLM (new Lint entry; two-kinds note on Audit and Detector; third Flagged-ambiguities entry); (2) the fleet rename — filenames, hook ids + rev-bump note, canonical pre-commit template, `*_audit.py` modules + test files, registry pins, card Audit-cell citation links, prose references (ceiling ≈604 identifier sites, W3-A). Stays: card "## Audit" headers (umbrella), judgements-run (LLM machinery), the 39 LLM-review "audit" sites (correct), `lint_*` internals (now MATCHING judgements-lint's public name), mechanism prose, survey "Audited:" lines (generic English unregulated, agreed).
 ASK: none — name list approved verbatim; lands on your "go."
 
