@@ -9,15 +9,47 @@
 | 199 | fan-out guardrails | ✅ ready-to-land | guard language in the 4 fan-out files; cap dropped | landing nod |
 | 184 | judgements dead ceremony (`--refuted`) | ✅ ready-to-land | AFK-ready — plain-language brief; enforcement-std changes come back to you | landing nod |
 | 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | landing nod |
-| 169 | lint/audit vocabulary (pivoted) | ✅ ready-to-land | two-direction accounting done — 113 sites; scope flag: audit-vs-review fold-in | landing nod |
+| 169 | lint/audit vocabulary (pivoted) | ⏸ held | sweep ready (113 sites) BUT a prior question may invert its direction | **tomorrow-first question (Open asks)** |
 
 ## ❓ Open asks — everything currently waiting on you
 
-One item: the **batched nod** on the Landing checkpoint directly below —
-respond per issue, or ratify all six at once. The one scope change since
-your last ruling is flagged loudly in #169's entry: the reverse sweep found
-a third vocabulary blur (LLM review passes called "audits"), and I propose
-folding it into 169's mandate rather than minting a new issue.
+**⏭ TOMORROW, FIRST — a prior question that gates #169's whole direction.
+Answer this BEFORE the batched nod; it can invert the sweep.**
+
+Human, verbatim (end of night, deferred to tomorrow): "What if we change the
+standard to say 'lint' instead of 'audit'? I chose the word audit when I
+invented the standard because it just made sense in the moment, but I didn't
+realize it would conflict with the word lint. The answer to this question
+would be the precise definition of lint. Does it match the precise
+definition of audit? Because I know audit is the true meaning I want for a
+standard. If lint just happens to match it, then we might agree to just call
+everything lint."
+
+Why this comes first: the current #169 disposition (pivot — define BOTH
+words: audit = in-standard-context, lint = fallback) assumed the two words
+name different things. This question is upstream of that. It asks whether
+"lint," by its precise real meaning, already IS what "audit" means for a
+standard. Two outcomes:
+- **lint ≢ audit** (they mean different things) → the current pivot stands;
+  the 113-site sweep lands as written (lint→audit inside standards).
+- **lint ≡ audit** (lint precisely matches the true meaning audit carries)
+  → collapse to one word. Since "lint" is the more natural, widely-understood
+  word, the standard could adopt "lint" everywhere — which **inverts** the
+  sweep: rename audit→lint, not lint→audit. Same files, opposite direction.
+
+Scope: this gates ONLY #169. The other five (208, 207, 184, 183, 199) are
+untouched by it and can still ratify. #169 must NOT land until this is
+answered. Do NOT pre-investigate — the human wants to answer it themselves
+first, tomorrow; tee it up, don't pre-empt it.
+
+---
+
+Then: the **batched nod** on the Landing checkpoint directly below —
+respond per issue, or ratify at once. The one scope change since your last
+ruling is flagged in #169's entry: the reverse sweep found a third
+vocabulary blur (LLM review passes called "audits"); I propose folding it
+into 169's mandate rather than minting a new issue — but note the
+tomorrow-first question above may reframe even that.
 
 Resolved-ask archive: the spawn-cap explanation and the probe-vs-fold
 options live in the issue blocks' Decisions sections and in git history
@@ -114,7 +146,18 @@ test-mirrored identifiers) · `phase:tdd`.
 
 ## Δ log — on a repeat pass, read only the newest section
 
-### Δ wave 3 + landing checkpoint (LATEST)
+### Δ end-of-night — prior question raised, #169 held (LATEST)
+
+- **169 HELD**: human raised a question upstream of the whole pivot — should
+  the standard adopt "lint" instead of "audit" entirely? Hinges on whether
+  lint's precise definition matches the true meaning audit carries for a
+  standard. If yes → invert the sweep (audit→lint everywhere); if no → the
+  current pivot stands. Deferred to tomorrow, human answers first; full
+  verbatim + framing at the top of Open asks. #169 does not land until
+  resolved. Other five issues unaffected.
+- **committed, night**: tree clean at this Δ; batch parks here.
+
+### Δ wave 3 + landing checkpoint
 
 - **169**: W3-A returned — H-a REFUTED. 844 total hits; all 10 detectors
   verified tracing to standard cards (no orphan); 80 prose lines read
@@ -363,6 +406,7 @@ ASK: none beyond the nod — the audit-vs-review fold-in is flagged in the Landi
 - "169- good idea. go" (checkpoint 1, wave-2 reclassification probe)
 - "169- Yes judgements-audit is called "audit" because it comes directly from a standard. Internal code and naming should say "audit" not lint since this thing is literally an auditor. Documentation should say audit but may bridge to lint as an analogy." (checkpoint 2)
 - "Yes, send a Sonnet agent to do the reverse sweep for the word audit." (checkpoint 2 — manifest +1 approved; probe W3-A launched)
+- "tomorrow I wanna actually answer the question first: What if we change the standard to say 'lint' instead of 'audit'? […] The answer to this question would be the precise definition of lint. Does it match the precise definition of audit? Because I know audit is the true meaning I want for a standard. If lint just happens to match it, then we might agree to just call everything lint." (end of night — raises a question upstream of the pivot; #169 held pending it; see the tomorrow-first block at the top of Open asks)
 
 ### Decided without the human
 ### Probe log
