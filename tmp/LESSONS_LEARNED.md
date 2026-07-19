@@ -114,6 +114,29 @@ board). Variants that keep that invariant:
 Decision deferred to the rewrite; (b) is the floor any future run should do
 as soon as a worker returns, not at checkpoint time.
 
+UPDATE (post-compact): the human is rethinking (c) — spike issues are likely
+out. (b) proved itself in practice: the tmp/*.md files survived compaction,
+pre-commit audits, and commits, and the post-compact recovery re-certified
+all four ready-to-land issues from disk alone. Direction for the rewrite is
+lesson 8: a designed tmp/ file structure, not GitHub-side persistence.
+
+## 8. Stateful markdown needs a designed structure — everything gets a home
+
+The tmp/ files worked, but their layout was improvised mid-run (LEDGER.md,
+LESSONS_LEARNED.md, worker-returns/ each invented when a need surfaced). For
+the rewrite, replace improvisation with a template: a defined catalog of
+what stateful markdown the skill creates, where each thing lives, and what
+goes in it — things learned, hypotheses and their outcomes, human decisions
+verbatim, intent clarifications, worker returns, and so on.
+
+Open design question: much of that catalog already lives in the ledger.
+The template must draw the line between the ledger (the human-facing report
++ decision archive) and satellite files (bulk evidence like worker returns),
+so every fact has exactly one home and nothing is duplicated or orphaned.
+
+Not now — at skill-rewrite time, as part of the same pass that folds in
+lessons 1–7.
+
 ## 6. Asks are prose, not compressed lists — "word salad" fails
 
 The #199 open ask packed four deliverables, their rationale, and a parameter
