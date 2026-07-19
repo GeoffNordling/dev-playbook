@@ -64,7 +64,20 @@ Fix applied mid-run (bake into the skill's ledger format later):
 - Discipline: every ledger update also appends its one-liner to the current
   wave's Δ section — the Δ log is written as events happen, not reconstructed.
 
-## 4. Translate to the human's altitude — no black-box internals
+## 4. Reading assignments at the end only — never mid-flow
+
+Sequence that failed: the orchestrator dumped the #199 proposal into the
+terminal, followed it with ledger edits and commits, then closed wave 2, then
+handled an unrelated complaint. The human never read the proposal — it sat in
+the middle of a flowing work stream, scrolled away by later turns.
+
+Rule for the skill: substantive content the human must read is never
+interleaved with work narration. Work quietly; whatever needs the human's
+eyes goes at the END of the turn (or, better, into the ledger — which is the
+one reading surface, per lesson 2) as a single consolidated reading
+assignment. A mid-stream terminal message is a status note, nothing more.
+
+## 5. Translate to the human's altitude — no black-box internals
 
 The human bounced off #184's block ("complaining about a problem inside a
 black box"): the hypothesis table talked rule-matrix/Direction-2/citation
