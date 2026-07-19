@@ -55,27 +55,14 @@ const { jobs: JOBS, schema: SCHEMA } = parseArgs(args)
 
 phase('Scatter')
 
-// Fan-out guard — count-stating: this log surfaces how many agents are about to spawn *before* the
-// parallel() fan-out below, so a scope mismatch ("expected 3, this launches 8") shows up before the spend.
 log(`scatter-gather: ${JOBS.length} job(s), per-job model/effort, schema=${SCHEMA ? 'yes' : 'no'}`)
 
-// Fan-out guard — leaf clause: prepend the leaf discipline to every job's prompt so no worker launches
-// without it. Each job is one leaf in a supervised fan-out, not an orchestrator: it does its task and
-// returns, spawning nothing further.
-const LEAF_CLAUSE =
-  'You are one leaf in a supervised parallel fan-out, not an orchestrator: do not use the Agent tool ' +
-  'to spawn sub-agents and do not invoke skills — do only the task below and return its result as ' +
-  'your final message.\n\n'
-
-// Single fan-out: one isolated agent() per job, each pinned to its own model/effort. Every agent() here
-// is a fresh, zero-context session by construction — never a fork — so a job cannot inherit and re-run a
-// caller's wider directive; and a bounded job gone silent past ~5–10 min is a stop-and-investigate signal
-// for the caller, never something to passively wait out. Catch inside the per-job thunk so a thrown or
-// skipped job yields { id, result: null } and keeps its id, rather than dropping to a bare null (which
-// parallel() returns on a throw) and losing the key.
+// Single fan-out: one isolated agent() per job, each pinned to its own model/effort. Catch inside
+// the per-job thunk so a thrown or skipped job yields { id, result: null } and keeps its id, rather
+// than dropping to a bare null (which parallel() returns on a throw) and losing the key.
 const results = await parallel(JOBS.map((job) => async () => {
   try {
-    const result = await agent(LEAF_CLAUSE + job.prompt, {
+    const result = await agent(job.prompt, {
       label: `job:${job.id}`,
       phase: 'Scatter',
       model: job.model,

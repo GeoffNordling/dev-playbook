@@ -53,7 +53,7 @@ Run /<skill> <N>.
 
 - **Fresh, never fork.** Spawn each subagent fresh and zero-context, never as a fork. A fork inherits this overwatch's whole multi-step traverse and can re-execute it — fanning out on its own — instead of running the one node it was handed.
 - **Launch line only.** The worker's prompt is the bare launch line above and nothing more: it carries no directive beyond its single node or audit, and it stays a leaf, not an orchestrator — the one skill it runs is its entire context.
-- **State the count first.** Before dispatching the review-stop audits, say how many subagents are about to launch — one per chosen track, plus the native review's wrapper — so a scope mismatch ("expected 2, this launches 4") surfaces before the spend, not after.
+- **State the count first.** Before dispatching the review-stop audits, say how many subagents are about to launch — one per chosen track, plus one for the native review's wrapper when the code track is chosen (it rides that track only) — so a scope mismatch ("expected 1, this launches 3") surfaces before the spend, not after.
 - **Silence is a stop signal.** A dispatched subagent gone silent past ~5–10 minutes is a stop-and-investigate signal, never something to wait out.
 
 **The commit token rides only the three implementation nodes.** Prefix the launch line with `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ ` for exactly the AFK nodes that write and commit code — `/tdd`, `/build`, `/sdd-tdd`:

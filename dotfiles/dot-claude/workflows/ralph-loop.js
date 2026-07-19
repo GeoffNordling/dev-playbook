@@ -69,15 +69,7 @@ const step4 = CHECK
   ? `Run \`${CHECK}\` again. If your work broke it, fix until it passes. Never commit red.`
   : `This loop has no check gate, so there is nothing to run. Still, never commit work you believe is broken.`
 
-// Fan-out guard. Leaf clause: the prompt's opening line pins each iteration's agent as a single leaf —
-// it spawns no sub-agents and invokes no skill but the directed /commit in step 6 — so no worker launches
-// without the discipline. Fresh, never fork: the agent() below boots a fresh, zero-context session each
-// iteration, never a fork, so an iteration cannot inherit and re-run a wider directive. Count: the fan-out
-// is one worker per iteration, and the per-iter log states it. Silent worker = stop signal: an iteration
-// agent gone silent past ~5–10 min is a stop-and-investigate signal, never something to passively wait out.
-const PROMPT = `You are the sole worker for this iteration — one leaf in a supervised loop, not an orchestrator: do not use the Agent tool to spawn other agents, and invoke no skill beyond the /commit in step 6 below. Do the one task and report.
-
-Work in the current directory — do not cd; use relative paths.
+const PROMPT = `Work in the current directory — do not cd; use relative paths.
 
 The plan is in ${PLAN}; the running log of work so far is in ${PROGRESS}. Both must already exist.
 

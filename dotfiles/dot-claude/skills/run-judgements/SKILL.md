@@ -43,8 +43,6 @@ Workflow({ name: "scatter-gather", args: { jobs, schema } })
 
 Each job carries its own required `model`/`effort`; `schema` is batch-wide. One judge agent per miss, in parallel. Each agent runs its `prompt` — which tells it to `judgements-run render <id>` and obey that output — so the heavy prompt bytes are produced **inside each judge**, never here. The workflow returns `[{ id, result }]` in input order, where `result` is the schema-validated `{verdict, opinion}`, or `null` for a crashed/skipped job.
 
-**Fan-out guard.** The judges fan out through `scatter-gather`, which isolates each one — fresh and zero-context, never a fork that could inherit this loop's directive and re-run it. Each judge is a single leaf: it runs its `render` command and returns one verdict as its final message; it never uses the Agent tool, invokes a skill, or hand-rolls more judges (see **Main loop only** above). Before you dispatch, state the count — how many judges this pass launches (the `unseen` jobs, less any set aside) — so a scope mismatch surfaces before the spend, not after. Once launched, a bounded judge gone silent past ~5–10 minutes is a stop-and-investigate signal, never something to wait out.
-
 ### 3. Partition the results
 
 - **pass** — `result.verdict === true`
