@@ -4,7 +4,7 @@ okf_version: "0.1"
 
 # dev-playbook — bundle index
 
-- [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, workflow definitions, agent configuration, CLI tools, and reusable harness patterns
+- [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories
@@ -15,5 +15,5 @@ okf_version: "0.1"
 - [instruments/](/instruments/index.md) — Purpose-built artifact formats and their tooling
 - [protocols/](/protocols/index.md) — Formal human–agent collaboration protocols — problem-decomposition algorithms and the skills that operationalize them
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
+- [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the intake-to-merge state machine and the standards defining each phase
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace
-- [workflow/](/workflow/index.md) — What the workflow/ directory holds — the intake-to-merge state machine and the standards defining each phase

@@ -87,7 +87,7 @@ name that person the way Claude Code does (`AskUserQuestion`). CLAUDE.md does no
 split by location — its content is commands to the agent
 ([claude-content.md](/standards/claude-code/claude-content.md)), never a
 description of the system for a human to read, at any level.
-**Declarative documentation says `human`**: `workflow/`, `standards/`, `docs/`,
+**Declarative documentation says `human`**: `software-factory/`, `standards/`, `docs/`,
 and `README.md` describe the system in third person, where the actor is the
 human dispatcher.
 

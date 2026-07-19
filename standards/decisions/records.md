@@ -12,7 +12,7 @@ Decision Records live in `docs/decisions/` and use sequential 4-digit numbering:
 
 ## Scope
 
-A decision lives with the thing it governs: a decision about one repo is recorded in that repo's `docs/decisions/`; a decision about the workspace — a standard, a cross-repo convention, the workflow — is recorded in dev-playbook.
+A decision lives with the thing it governs: a decision about one repo is recorded in that repo's `docs/decisions/`; a decision about the workspace — a standard, a cross-repo convention, the software factory — is recorded in dev-playbook.
 
 ## Index
 

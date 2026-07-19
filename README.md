@@ -1,7 +1,7 @@
 ---
 type: README
 title: dev-playbook
-description: The dev-playbook meta repo — workspace standards, workflow definitions, agent configuration, CLI tools, and reusable harness patterns
+description: The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
 ---
 
 # dev-playbook
