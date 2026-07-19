@@ -5,10 +5,10 @@
 | # | issue | stage | verdict (short) | waiting on |
 |---|-------|-------|-----------------|------------|
 | 208 | Workflow → Software Factory rename | 🏁 landed | brief + four-tuple live on GitHub | your approval of the landed brief |
-| 207 | label-scheme drift cross-check | ✅ ready-to-land | close — premise refuted, check already exists | paced queue |
+| 207 | label-scheme drift cross-check | 🏁 closed | findings comment posted; state_reason not_planned | — |
 | 199 | fan-out guardrails | 🏁 landed | brief + four-tuple live; edge ←208 written | your review |
 | 184 | judgements dead ceremony (`--refuted`) | 🏁 landed | brief + four-tuple live; retitled to real names | your approval of the landed brief |
-| 183 | standards-audit latency | ✅ ready-to-land | close — 0.62 s measured, premise refuted | paced queue |
+| 183 | standards-audit latency | 🏁 closed | findings comment posted; state_reason not_planned | — |
 | 169 | vocabulary hierarchy (v2.2) | 🏁 landed | brief + four-tuple live; edges ←184, ←208, ←199 written | your review |
 
 ## ❓ Open asks — everything currently waiting on you
@@ -103,8 +103,12 @@ Blocked-by edges written: 169←184, 169←208, 169←199 (soft), 199←208
   stays, judgements-run's plumbing keeps a prose mention; 169 gains the
   format.md §Detectors two-citation-kinds documentation (+ AC). Both
   briefs re-PATCHed and verified.
-- **remaining**: closes 207 + 183 (findings comments) — awaiting the word;
-  then the batch report ends the run.
+- **207 + 183 CLOSED** (human: "close the other two issues. Very brief
+  comments explaining why"): 207 — cross-check already exists
+  (scheme-vs-graph judgement, pre-push gate, zero live drift); 183 —
+  premise refuted by measurement (0.62 s vs 1–2 s claimed; LOCAL_ONLY).
+  Both state_reason not_planned. **BATCH COMPLETE — all six issues
+  dispositioned; the factory takes it from here.**
 
 ### Δ checkpoint 3.2 — fleet renames IN; 169 becomes definitions + rename
 
@@ -300,7 +304,7 @@ ASK: approve the landed brief to unlock #184.
 
 ## Issue 207 — label_scheme.json and workflow.md can drift silently
 
-stage: ✅ ready-to-land
+stage: 🏁 closed (findings comment posted; not_planned)
 verdict: close — human-ratified at checkpoint 1 (premise refuted: scheme-vs-graph judgement already enforces this at pre-push)
 ASK: none — closing comment lands after the batched nod.
 
@@ -391,7 +395,7 @@ ASK: approve the landed brief to unlock #199.
 
 ## Issue 183 — standards-audit: consider reducing per-commit cold-start latency
 
-stage: ✅ ready-to-land
+stage: 🏁 closed (findings comment posted; not_planned)
 verdict: close — human-ratified at checkpoint 1; closing comment must be succinct, accurate findings + reasons
 ASK: none — closing comment lands after the batched nod.
 
