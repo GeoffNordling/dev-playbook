@@ -119,7 +119,7 @@
 
 ## Batch
 
-issues: 208, 207, 199, 184, 183, 169 · wave: 2 COMPLETE · manifest: 8 (wave 1) + 2 (wave 2, human-directed) spent: 10
+issues: 208, 207, 199, 184, 183, 169 · wave: 3 IN FLIGHT (1 probe) · manifest: 8 (wave 1) + 2 (wave 2, human-directed) + 1 (wave 3, human-directed) spent: 11
 
 Decision (human, verbatim): "Approved." — Wave-1 manifest, 2 Opus maps + 6
 Sonnet probes (checkpoint 0)
@@ -293,6 +293,7 @@ verdict: borderline resolved (checkpoint 2) — internals rename to audit vocabu
 - "Reading your findings and the issue makes me consider a pivot: 'lint' is a very natural word in common usage in software engineering, and it has a meaning everyone understands and it is good. However, I chose to have 'the standard' be based on 'describe, audit, enforce, adopt' which led me to standardize on 'audit' […] But that could be an overcorrection. Instead, what if we specifically standardized the meaning of vocabulary so that 'lint' and 'audit' are both allowed (and both defined in CONTEXT.md). The difference is that 'audit' is appropriate any time we're in the context of a standard. Lint is a default fallback otherwise. This might also involve understanding how an audit is different or the same as a lint." (checkpoint 1)
 - "169- good idea. go" (checkpoint 1, wave-2 reclassification probe)
 - "169- Yes judgements-audit is called "audit" because it comes directly from a standard. Internal code and naming should say "audit" not lint since this thing is literally an auditor. Documentation should say audit but may bridge to lint as an analogy." (checkpoint 2)
+- "Yes, send a Sonnet agent to do the reverse sweep for the word audit." (checkpoint 2 — manifest +1 approved; probe W3-A launched)
 
 ### Decided without the human
 ### Probe log
