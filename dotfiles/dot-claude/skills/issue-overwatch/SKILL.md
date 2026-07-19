@@ -49,6 +49,13 @@ Every file-touching node sits in the issue's worktree — open it before the fir
 Run /<skill> <N>.
 ```
 
+**Fan-out guard.** You are a spawner — the AFK node subagents here, and the parallel review-audit subagents at a review stop (§2), all launch from you — so every dispatch obeys this:
+
+- **Fresh, never fork.** Spawn each subagent fresh and zero-context, never as a fork. A fork inherits this overwatch's whole multi-step traverse and can re-execute it — fanning out on its own — instead of running the one node it was handed.
+- **Launch line only.** The worker's prompt is the bare launch line above and nothing more: it carries no directive beyond its single node or audit, and it stays a leaf, not an orchestrator — the one skill it runs is its entire context.
+- **State the count first.** Before dispatching the review-stop audits, say how many subagents are about to launch — one per chosen track, plus the native review's wrapper — so a scope mismatch ("expected 2, this launches 4") surfaces before the spend, not after.
+- **Silence is a stop signal.** A dispatched subagent gone silent past ~5–10 minutes is a stop-and-investigate signal, never something to wait out.
+
 **The commit token rides only the three implementation nodes.** Prefix the launch line with `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ ` for exactly the AFK nodes that write and commit code — `/tdd`, `/build`, `/sdd-tdd`:
 
 ```
@@ -61,6 +68,8 @@ A subagent is a separate session, its delegation prompt is its launch prompt, an
 
 - **Its argument is the effort level, not the issue number.** Launch it as `Run /code-review medium --comment` — always **medium** effort, and always `--comment` so the findings post to the PR rather than staying in-session — never `Run /code-review <N>`; the issue number is not its argument, and it reviews the branch's diff on its own. (Effort is a positional arg: `low`/`medium`/`high`/`max`; `--comment` posts findings as inline PR comments.)
 - **It has no frontmatter to pin its model, so pin it at the spawn.** Our own review skills declare `model: opus` themselves; the native one inherits whatever runs it. Spawn its subagent with an explicit `model: opus` override so the review is Opus regardless of the model this overwatch was launched under.
+
+This wrapper is the guard for the native review: dispatch `/code-review` only from a fresh single-purpose subagent whose entire context is that one command — never inline in this overwatch session, which carries the whole traverse the review must not inherit and re-run.
 
 Parse the subagent's final message per the terminal report contract: it must begin at character one with `DONE:` or `ESCALATE:`; any other shape reads as ESCALATE.
 
