@@ -67,7 +67,8 @@ verdict: needs deeper look before proposing — human open to (c) both but skept
 ### Hypotheses
 | # | claim | status | evidence (one line) |
 |---|-------|--------|---------------------|
-| 1 | The failure mode (fork inherits top-level directives and re-executes them) is accurately described and not mooted by harness changes | untested | not probeable from repo alone; fork semantics are harness-defined and current docs still describe inheritance |
+| 1 | The failure mode (fork inherits top-level directives and re-executes them) is accurately described and not mooted by harness changes | SURVIVED | docs confirm forks inherit the entire conversation; the re-execution RISK is undocumented upstream — no warning, no prevention guidance (sub-agents.md) |
+| 5 | (new, W2-B) mechanical levers exist beyond prompting | facts | CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION (default 200, v2.1.212+, can't be disabled); depth-5 nesting cap fixed; project skill named code-review would REPLACE the bundled one (documented) — no wrap pattern documented; effort→agent-count link NOT documented, so the medium pin is heuristic |
 | 2 | Workspace-authored skills that instruct agent fan-out lack leaf clauses / fork prohibitions | SURVIVED | 4 fan-out surfaces, zero guardrails: issue-overwatch SKILL.md:46, run-judgements SKILL.md:44, ralph-loop.js:88, scatter-gather.js:63-76; leaf-clause pattern exists at fill-issue-gaps:56 but nowhere on these |
 | 3 | No existing rule file in dotfiles/dot-claude covers fork usage for fan-out workers | SURVIVED | rules/ has exactly 2 files (bash-commands, edit-in-dev-playbook); zero fork/subagent matches there or in CLAUDE.md |
 | 4 | The fix surface is workspace-owned (rules + skills), not upstream-only | SURVIVED (narrowed) | incident's /code-review is harness-builtin (issue-overwatch:60 says so itself) — workspace can harden its own 4 surfaces + add a rule, cannot fix the builtin |
@@ -75,6 +76,8 @@ verdict: needs deeper look before proposing — human open to (c) both but skept
 ### Decided without the human
 ### Probe log
 - sonnet · P4: inventory fan-out guardrails across dotfiles/dot-claude · SURVIVED ×3 ("fork" appears nowhere in the tree; no guardrail language anywhere)
+- claude-code-guide · W2-B: primary-doc research on native /code-review, forks, spawn limits · returned — local /code-review's agent spawning is undocumented internals; fork inheritance documented but re-execution risk is not; session spawn cap env var + fixed depth-5 limit exist; same-name project skill replaces the bundled one
+- orchestrator read (human-directed): workflow.md review sequence + issue-overwatch §3 — native dispatch is a fresh wrapper subagent whose whole context is "Run /code-review medium --comment" (+ model:opus pin); the incident session instead carried a multi-step top-level directive, which is exactly what the fork inherited
 
 ## Issue 184 — Remove the circular judgments.refuted ceremony forced by rule-matrix
 stage: blocked-on-human
