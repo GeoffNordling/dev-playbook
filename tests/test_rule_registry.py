@@ -47,6 +47,7 @@ CARRIERS = [
     (SRC / "dev_playbook" / "standards_lint.py", "Finding", 2),
     (SRC / "dev_playbook" / "testing_lint.py", "Finding", 2),
     (SRC / "dev_playbook" / "decisions_lint.py", "Finding", 2),
+    (SRC / "dev_playbook" / "prose_lint.py", "Finding", 2),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
@@ -60,6 +61,7 @@ REGISTRIES = [
     (SRC / "dev_playbook" / "standards_lint.py", "RULES"),
     (SRC / "dev_playbook" / "testing_lint.py", "RULES"),
     (SRC / "dev_playbook" / "decisions_lint.py", "RULES"),
+    (SRC / "dev_playbook" / "prose_lint.py", "RULES"),
 ]
 
 
