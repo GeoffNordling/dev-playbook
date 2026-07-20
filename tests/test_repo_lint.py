@@ -243,8 +243,8 @@ def test_missing_shellcheck_block_fails(tmp_path: Path) -> None:
 def test_appended_hook_inside_pinned_block_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-lint\n",
-        "      - id: judgments-lint\n      - id: skill-lint\n",
+        "      - id: prose-lint\n",
+        "      - id: prose-lint\n      - id: extra-lint\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
@@ -440,8 +440,8 @@ def test_skills_dir_with_lint_hook_appended_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: judgments-lint\n",
-        "      - id: judgments-lint\n      - id: skill-lint\n",
+        "      - id: prose-lint\n",
+        "      - id: prose-lint\n      - id: skill-lint\n",
     )
     assert run(make_repo(tmp_path, files)).returncode == 0
 
