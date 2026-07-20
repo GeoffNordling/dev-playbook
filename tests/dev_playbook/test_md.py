@@ -64,6 +64,14 @@ class TestMarkdownLinks:
         # `[`code`](/target)` -> the link text is inline code; target survives.
         assert md.markdown_links("[`code`](/t.md)") == [("", "/t.md")]
 
+    def test_double_backtick_span_is_stripped_whole(self) -> None:
+        # A CommonMark code span of arbitrary delimiter length: a double-backtick
+        # span is stripped as one unit, so link syntax inside it is not extracted
+        # as a phantom link. Only the real link outside the span survives.
+        assert md.markdown_links("``[x](/y.md)`` and [real](/r.md)") == [
+            ("real", "/r.md")
+        ]
+
 
 class TestParseFrontmatter:
     def test_reads_mapping_and_body(self) -> None:

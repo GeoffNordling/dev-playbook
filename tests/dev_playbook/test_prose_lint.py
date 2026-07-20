@@ -62,6 +62,13 @@ def test_inline_code_span_is_skipped() -> None:
     assert prose_lint.scan_text("f.md", "the `judgement` token is fine\n") == []
 
 
+def test_double_backtick_code_span_is_skipped() -> None:
+    # A double-backtick span (the form used when the code itself contains a
+    # backtick) must be stripped whole — not read as two adjacent empty
+    # single-backtick spans that leave the word exposed to the scanner.
+    assert prose_lint.scan_text("f.md", "the ``judgement`` token is fine\n") == []
+
+
 def test_fenced_block_is_skipped() -> None:
     assert prose_lint.scan_text("f.md", "before\n```\njudgement\n```\nafter\n") == []
 
