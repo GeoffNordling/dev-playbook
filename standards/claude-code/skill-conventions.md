@@ -87,7 +87,7 @@ After the front matter, the body is Markdown.
   kebab-case ID.
 - Use `##` sections to organize instructions. The number and depth of
   sections should match the skill's complexity — no formula here, use
-  judgement.
+  judgment.
 - Content decisions (what sections to include, what patterns to use) are
   made per skill, not prescribed by this standard.
 - Keep SKILL.md under ~100 lines. When content exceeds that, has distinct

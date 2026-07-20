@@ -1,21 +1,21 @@
-# Artifact-on-trial conformance judgements for dev-playbook: an artifact is on
+# Artifact-on-trial conformance judgments for dev-playbook: an artifact is on
 # trial against the document that governs it, and an LLM judge rules whether the
 # artifact conforms to what the doc states. Evidence is the artifact under trial;
 # reference is the governing document. This is the mirror of docs-match-code --
 # there a doc is on trial against the code it describes; here the code is on
-# trial against the doc that governs it. See standards/judgements/.
+# trial against the doc that governs it. See standards/judgments/.
 #
-# Subset claim template. The subset judgements below share one shape: X does or
+# Subset claim template. The subset judgments below share one shape: X does or
 # contains only what Y states; Y may state more than X does; X must not exceed
 # Y. The conformance is one-directional -- the artifact (X) may implement less
 # than the document (Y) permits, but never more -- so the judge checks only that
 # everything X does is sanctioned by Y, never that X covers all of Y.
 #
-# A multi-card detector is put on trial one subset judgement per card. repo-lint
+# A multi-card detector is put on trial one subset judgment per card. repo-lint
 # emits build.*, docs.*, and claude-code.* rules, so each card's rule-prefix
-# slice is tried against that card's standard in its own judgement -- keeping any
-# single judge's reference set small instead of one judgement over every card.
-judgements:
+# slice is tried against that card's standard in its own judgment -- keeping any
+# single judge's reference set small instead of one judgment over every card.
+judgments:
   - id: repo-lint-build-subset-of-standard
     claim: |
       Every check scripts/repo-lint performs that emits a `build.` rule
@@ -23,7 +23,7 @@ judgements:
       The standard may state more than the tool checks; the tool must not
       check more than the standard states. repo-lint is a multi-card
       detector -- its docs.* and claude-code.* checks are on trial in their
-      own judgements, not here.
+      own judgments, not here.
     evidence:  [scripts/repo-lint]
     reference:
       - standards/build/index.md

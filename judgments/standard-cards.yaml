@@ -1,13 +1,13 @@
-# Card-honesty judgements for dev-playbook's standard cards (the meta-standard's
+# Card-honesty judgments for dev-playbook's standard cards (the meta-standard's
 # per-card semantic check). Each puts one standard card on trial: an LLM judge
 # rules whether the card is honest -- every pointer in its Define, Audit,
 # Enforce, and Adopt cells names a real artifact that genuinely serves that
 # cell's role, any cell that declares "none" is genuinely empty, and no cell
 # misrepresents what its targets do. Evidence is the card under trial; reference
 # is standards/standard/format.md (the card contract) plus the artifacts the
-# card points at. One judgement per card -- semantic honesty the deterministic
-# standards-lint cannot check. See standards/judgements/.
-judgements:
+# card points at. One judgment per card -- semantic honesty the deterministic
+# standards-lint cannot check. See standards/judgments/.
+judgments:
   - id: standard-card-build
     claim: |
       standards/build.md is an honest card: every pointer in its define,
@@ -37,7 +37,7 @@ judgements:
     reference:
       - standards/standard/format.md
       - scripts/standards-lint
-      - judgements/standard-cards.yaml
+      - judgments/standard-cards.yaml
       - .pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high
@@ -79,7 +79,7 @@ judgements:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-judgements
+  - id: standard-card-judgments
     claim: |
       standards/semantic-validation.md is an honest card: every pointer in its
       define, audit, enforce, and adopt cells names a real artifact that
@@ -88,11 +88,11 @@ judgements:
     evidence:  [standards/semantic-validation.md]
     reference:
       - standards/standard/format.md
-      - standards/judgements/index.md
-      - standards/judgements/cache-gate.md
-      - standards/judgements/consuming.md
-      - scripts/judgements-lint
-      - scripts/judgements-run
+      - standards/judgments/index.md
+      - standards/judgments/cache-gate.md
+      - standards/judgments/consuming.md
+      - scripts/judgments-lint
+      - scripts/judgments-run
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high

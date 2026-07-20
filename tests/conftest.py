@@ -10,8 +10,8 @@ import pytest
 def make_repo(tmp_path: Path) -> Callable[[dict[str, str]], Path]:
     """Write a throwaway repo from a {relative path: contents} map; return its root.
 
-    Used by the judgements tests to stand up a fixture repo -- a
-    ``pyproject.toml`` with ``[tool.judgements]``, declaration YAML files, and
+    Used by the judgments tests to stand up a fixture repo -- a
+    ``pyproject.toml`` with ``[tool.judgments]``, declaration YAML files, and
     evidence files -- against ``tmp_path``.
     """
 

@@ -8,7 +8,7 @@ scheme into a repo, and ``workspace-lint`` checks live repos against it.
 
 The semantic authority for what the labels *mean* stays software-factory.md's label
 table and state-machine graph; this file is the operational data. The
-scheme-vs-graph consistency between the two is left to a judgement, never parsed
+scheme-vs-graph consistency between the two is left to a judgment, never parsed
 here.
 """
 

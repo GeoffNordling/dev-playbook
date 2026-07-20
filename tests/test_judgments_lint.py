@@ -1,4 +1,4 @@
-"""Behavioral tests for judgements-lint: loader.lint_findings and the hook."""
+"""Behavioral tests for judgments-lint: loader.lint_findings and the hook."""
 
 import os
 import subprocess
@@ -6,19 +6,19 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from dev_playbook.judgements.loader import lint_findings
+from dev_playbook.judgments.loader import lint_findings
 
-CONFIG = '[tool.judgements]\npaths = ["judgements/*.yaml"]\n'
+CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 REPO_ROOT = Path(__file__).resolve().parents[1]
-LINT_HOOK = REPO_ROOT / "scripts" / "judgements-lint"
+LINT_HOOK = REPO_ROOT / "scripts" / "judgments-lint"
 
 
-def judgement_yaml(
+def judgment_yaml(
     evidence: str = "[docs/errors.md]", model: str = "claude-sonnet-4-6"
 ) -> str:
-    """Render a one-judgement declaration with controllable evidence and model."""
+    """Render a one-judgment declaration with controllable evidence and model."""
     return (
-        "judgements:\n"
+        "judgments:\n"
         "  - id: j1\n"
         "    claim: a claim\n"
         f"    evidence: {evidence}\n"
@@ -28,11 +28,11 @@ def judgement_yaml(
 
 
 def clean_repo(make_repo: Callable[[dict[str, str]], Path]) -> Path:
-    """A repo whose single judgement is structurally valid with existing evidence."""
+    """A repo whose single judgment is structurally valid with existing evidence."""
     return make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": judgement_yaml(),
+            "judgments/a.yaml": judgment_yaml(),
             "docs/errors.md": "errors\n",
         }
     )
@@ -54,14 +54,14 @@ def test_missing_evidence_file_is_an_evidence_path_finding_at_the_yaml(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": judgement_yaml("[docs/gone.md]"),
+            "judgments/a.yaml": judgment_yaml("[docs/gone.md]"),
         }
     )
 
     findings = lint_findings(repo)
 
     assert len(findings) == 1
-    assert findings[0].location == "judgements/a.yaml"
+    assert findings[0].location == "judgments/a.yaml"
     assert findings[0].rule == "semantic-validation.evidence-path"
     assert "docs/gone.md" in findings[0].message
 
@@ -70,7 +70,7 @@ def test_lint_reports_an_absolute_evidence_path(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
     repo = make_repo(
-        {"pyproject.toml": CONFIG, "judgements/a.yaml": judgement_yaml("[/etc/hosts]")}
+        {"pyproject.toml": CONFIG, "judgments/a.yaml": judgment_yaml("[/etc/hosts]")}
     )
 
     findings = lint_findings(repo)
@@ -84,7 +84,7 @@ def test_lint_reports_a_parent_escape_evidence_path(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": judgement_yaml("[../escape.md]"),
+            "judgments/a.yaml": judgment_yaml("[../escape.md]"),
         }
     )
 
@@ -97,7 +97,7 @@ def test_structural_error_is_a_declaration_finding(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
     repo = make_repo(
-        {"pyproject.toml": CONFIG, "judgements/a.yaml": judgement_yaml(model="gpt-4")}
+        {"pyproject.toml": CONFIG, "judgments/a.yaml": judgment_yaml(model="gpt-4")}
     )
 
     findings = lint_findings(repo)
@@ -114,7 +114,7 @@ def test_lint_reports_every_missing_path_not_just_the_first(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": judgement_yaml("[a.md, b.md]"),
+            "judgments/a.yaml": judgment_yaml("[a.md, b.md]"),
         }
     )
 
@@ -132,8 +132,8 @@ def test_no_finding_message_leaks_the_absolute_repo_path(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": "judgements: 5\n",  # 'judgements' must be a list
-            "judgements/b.yaml": judgement_yaml(model="gpt-4"),  # bad field value
+            "judgments/a.yaml": "judgments: 5\n",  # 'judgments' must be a list
+            "judgments/b.yaml": judgment_yaml(model="gpt-4"),  # bad field value
         }
     )
 
@@ -144,7 +144,7 @@ def test_no_finding_message_leaks_the_absolute_repo_path(
 
 
 def _run_hook(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    """Run the judgements-lint hook script against ``repo`` as its working dir."""
+    """Run the judgments-lint hook script against ``repo`` as its working dir."""
     return subprocess.run(
         [sys.executable, str(LINT_HOOK), *args],
         cwd=repo,
@@ -168,14 +168,14 @@ def test_hook_prints_gnu_finding_to_stdout_on_a_broken_repo(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": judgement_yaml("[docs/gone.md]"),
+            "judgments/a.yaml": judgment_yaml("[docs/gone.md]"),
         }
     )
 
     result = _run_hook(repo)
 
     assert result.returncode != 0
-    assert "judgements/a.yaml: semantic-validation.evidence-path" in result.stdout
+    assert "judgments/a.yaml: semantic-validation.evidence-path" in result.stdout
     assert "docs/gone.md" in result.stdout
 
 

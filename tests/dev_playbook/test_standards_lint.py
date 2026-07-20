@@ -341,10 +341,10 @@ def test_cited_detector_without_list_rules_fails_membership(tmp_path: Path) -> N
     assert "--list-rules" in findings[0].message
 
 
-def test_third_party_and_judgement_pointers_are_outside_the_matrix(
+def test_third_party_and_judgment_pointers_are_outside_the_matrix(
     tmp_path: Path,
 ) -> None:
-    # ruff (name + pin, no scripts/ link) and a judgement-file pointer are not
+    # ruff (name + pin, no scripts/ link) and a judgment-file pointer are not
     # detector citations, so an empty rule map still passes.
     repo = make_repo(
         tmp_path,
@@ -353,7 +353,7 @@ def test_third_party_and_judgement_pointers_are_outside_the_matrix(
                 "Shell",
                 [
                     "- shellcheck — third-party lint",
-                    "- [j](/judgements/x.yaml) — a judgement",
+                    "- [j](/judgments/x.yaml) — a judgment",
                 ],
             )
         },

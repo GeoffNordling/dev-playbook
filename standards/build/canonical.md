@@ -33,10 +33,10 @@ does not belong there.
 
 The canonical [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
 carries the dev-playbook hook set, the ruff, shellcheck, and shfmt hooks at
-canonical revs, and the pre-push `make check-judgements` hook, installing both
+canonical revs, and the pre-push `make check-judgments` hook, installing both
 the commit and push stages. It serves every repo unchanged: a hook with no matching files
-skips itself, and `judgements-lint` and `skill-lint` pass trivially where a
-repo has no `[tool.judgements]` table and no authored skills. A repo that
+skips itself, and `judgments-lint` and `skill-lint` pass trivially where a
+repo has no `[tool.judgments]` table and no authored skills. A repo that
 authors skills carries `skill-lint` in its `.pre-commit-config.yaml` so those
 skills are audited. dev-playbook
 replaces the published block with its dogfood block

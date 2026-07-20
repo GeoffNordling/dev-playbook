@@ -17,7 +17,7 @@ sequencing matters — or, on the user's call, consolidated, decomposed, or clos
 hand the factory ready work; you implement nothing.
 
 Run on the Fable model (if you are not Fable, abort and escalate — this relies on the
-orchestrator's judgement) on a **fresh worktree and branch**
+orchestrator's judgment) on a **fresh worktree and branch**
 whose notes never merge to main; only the readied work on GitHub reaches main.
 
 ## Operating principles
