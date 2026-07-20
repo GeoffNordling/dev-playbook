@@ -35,6 +35,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from dev_playbook import pyast  # noqa: E402
+from dev_playbook.external import is_externally_managed  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 FUTURE_MESSAGE = "`from __future__ import annotations` is banned (Python >= 3.11)"
@@ -55,11 +56,13 @@ RULES = (
 # Per-rule directory scope. The two rules had different reach as separate hooks,
 # and consolidation preserves each rather than silently unifying them:
 #   - empty-init policed every tracked __init__.py (no directory exclusions);
-#   - no-future-annotations additionally skipped build artifacts and the
-#     externally-managed / legacy trees we don't police.
+#   - no-future-annotations additionally skipped build artifacts and legacy trees
+#     we don't police, plus the externally-managed trees.
 # git ls-files already drops gitignored caches; these name filters also cover the
 # rare tracked copy. A file is scanned by a rule when none of its parent
-# directory names is in that rule's set.
+# directory names is in that rule's set. Externally-managed trees are excluded
+# from no-future via the shared dev_playbook.external registry (not a name here),
+# so the one source of truth stays in external.py.
 _CACHES = frozenset(
     {
         ".git",
@@ -73,9 +76,7 @@ _CACHES = frozenset(
     }
 )
 INIT_EXCLUDE: frozenset[str] = frozenset()
-FUTURE_EXCLUDE = _CACHES | frozenset(
-    {"build", "dist", ".agents", ".dhub", "deprecated"}
-)
+FUTURE_EXCLUDE = _CACHES | frozenset({"build", "dist", "deprecated"})
 
 
 class ToolError(Exception):
@@ -132,7 +133,7 @@ def scan_file(path: Path, root: Path) -> list[Finding]:
     tree = pyast.parse(path)
     if tree is None:
         return findings
-    if not (FUTURE_EXCLUDE & dir_parts):
+    if not (FUTURE_EXCLUDE & dir_parts) and not is_externally_managed(rel):
         findings.extend(check_no_future(rel, tree))
     return findings
 

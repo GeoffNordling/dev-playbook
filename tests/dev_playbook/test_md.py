@@ -89,7 +89,6 @@ class TestClassify:
             ("PROGRESS.md", "excluded"),
             ("tmp/SCRATCH.md", "excluded"),
             ("dotfiles/.agents/skills/x/SKILL.md", "excluded"),
-            ("dotfiles/.dhub/whatever.md", "excluded"),
             ("index.md", "index"),
             ("standards/index.md", "index"),
             ("README.md", "concept"),

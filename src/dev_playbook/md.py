@@ -18,6 +18,8 @@ import subprocess
 from collections.abc import Iterator
 from pathlib import Path, PurePosixPath
 
+from dev_playbook.external import is_externally_managed
+
 FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
 INLINE_CODE_PATTERN = re.compile(r"`[^`\n]*`")
 HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
@@ -132,8 +134,9 @@ def classify(relpath: str) -> str:
 
     - ``"excluded"`` — out of the bundle entirely: the transient ``PLAN.md``
       and ``PROGRESS.md`` (ralph-loop plan/progress pair), the root ``tmp/``
-      scratch tree, and anything under externally-managed
-      ``.agents``/``.dhub`` trees.
+      scratch tree, the ``.git`` directory, and anything under an
+      externally-managed vendored tree (the shared dev_playbook.external
+      registry, currently ``dotfiles/.agents``).
     - ``"index"`` — a directory listing (``index.md``): typeless, validated as
       an index rather than as a concept document.
     - ``"concept"`` — a prose concept document that carries OKF frontmatter and
@@ -157,7 +160,7 @@ def classify(relpath: str) -> str:
         return "excluded"
     if parts[0] == "tmp":
         return "excluded"
-    if any(seg in {".agents", ".dhub", ".git"} for seg in parts):
+    if ".git" in parts or is_externally_managed(relpath):
         return "excluded"
     if parts[0] == "tests":
         return "harness"

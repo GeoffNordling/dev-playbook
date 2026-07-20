@@ -45,8 +45,11 @@ dev = [
 target-version = "py314"
 line-length = 88
 # Externally-managed vendored trees; ruff-pre-commit passes --force-exclude so
-# this holds under the hook as well as under `uv run ruff`.
-extend-exclude = ["dotfiles/.agents", "dotfiles/.dhub"]
+# this holds under the hook as well as under `uv run ruff`. The authoritative
+# list of externally-managed roots is src/dev_playbook/external.py
+# (is_externally_managed); ruff config cannot import Python, so this literal
+# mirrors that source of truth — keep the two in sync.
+extend-exclude = ["dotfiles/.agents"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF", "D"]
