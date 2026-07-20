@@ -23,8 +23,8 @@ repos:
   - repo: local
     hooks:
       - id: make-check
-        name: make check-judgements
-        entry: make check-judgements
+        name: make check-judgments
+        entry: make check-judgments
         language: system
         pass_filenames: false
         always_run: true
@@ -78,9 +78,9 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: judgements-lint
-        name: judgements-lint
-        entry: scripts/judgements-lint
+      - id: judgments-lint
+        name: judgments-lint
+        entry: scripts/judgments-lint
         language: script
         pass_filenames: false
         always_run: true

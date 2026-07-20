@@ -55,7 +55,7 @@ restate the content of their targets.
   **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
   A cell cites the single rung where the detector is stationed — where its
   wiring lives (pre-commit hooks → the commit gate; tools that run only inside
-  `make check` / `make check-judgements` → the push gate); the hook pattern in enforcement.md's Map
+  `make check` / `make check-judgments` → the push gate); the hook pattern in enforcement.md's Map
   implies the echoes at the other rungs. Enforcement is automatic and
   continuously in effect; a code review is a one-time checkpoint, not
   enforcement, and never an Enforce pointer.
@@ -113,12 +113,12 @@ detector contract.
   `card.rule` ids it can emit.
 - **Two citation kinds in an Audit cell.** A cell cites a **lint** via a
   `/scripts/` link — a deterministic detector, held to the rule-matrix
-  `--list-rules` contract — or an **audit** (an LLM judge) via a judgement link
-  (`/standards/judgements/…` or `/judgements/*.yaml`), which carries no script
+  `--list-rules` contract — or an **audit** (an LLM judge) via a judgment link
+  (`/standards/judgments/…` or `/judgments/*.yaml`), which carries no script
   contract. The rule-matrix check scopes its citation collection to `/scripts/`
   links, so audit-kind citations are exempt by construction, not by exception.
   The [Semantic Validation](/standards/semantic-validation.md) card shows both:
-  judgements-lint is the lint, the LLM judgements the audit.
+  judgments-lint is the lint, the LLM judgments the audit.
 - **Finding format.** A finding is one line, GNU format:
   `file:line: card.rule message` — a colon after the location, single spaces, a
   repo-relative path; `:line` is omitted for a file-level finding
@@ -130,7 +130,7 @@ Standards drift at two grains, each with its own detector:
 
 1. **Fine grain** — a specific document or passage must keep meaning what
    it meant when validated.
-   [Judgements](/standards/judgements/index.md) cover this: the
+   [Judgments](/standards/judgments/index.md) cover this: the
    content-addressed cache expires a verdict the moment the underlying
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across

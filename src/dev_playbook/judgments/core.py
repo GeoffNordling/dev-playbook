@@ -1,8 +1,8 @@
-"""The judgement model and the fixed judge configuration.
+"""The judgment model and the fixed judge configuration.
 
-A judgement is a single yes/no question about one or more files, ruled on by an
-LLM judge. This module owns the judgement vocabulary -- claim, evidence,
-reference -- the ``Judgement`` verdict type, and the two fixed pieces of judge
+A judgment is a single yes/no question about one or more files, ruled on by an
+LLM judge. This module owns the judgment vocabulary -- claim, evidence,
+reference -- the ``Judgment`` verdict type, and the two fixed pieces of judge
 configuration (``PROMPT`` and ``SCHEMA``) that the downstream layer must run the
 judge under verbatim, because they are folded into the content key.
 """
@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, NamedTuple
 
 # The general judge prompt. It is part of the content key, so editing it re-keys
-# (and therefore re-runs) every judgement everywhere -- by design.
+# (and therefore re-runs) every judgment everywhere -- by design.
 PROMPT = """\
 You are a careful and fair judge. You are given a single CLAIM — a proposition
 stated in prose — and you must decide whether it holds.
@@ -21,7 +21,7 @@ stated in prose — and you must decide whether it holds.
 You are given the material to judge it against:
 - EVIDENCE — the material the claim is about. This is what you are ruling on.
 - REFERENCE — optional additional material you may consult for context. It is not
-  itself under judgement; use it only to interpret or corroborate the evidence.
+  itself under judgment; use it only to interpret or corroborate the evidence.
 
 Each piece of material is delivered in its own XML tag: the claim in <claim>, each
 evidence file in an <evidence> tag, and each reference file in a <reference> tag. Every
@@ -54,7 +54,7 @@ Return:
 The CLAIM, EVIDENCE, and any REFERENCE follow, each in its own XML tag."""
 
 
-# The structured-output contract the judge must fill: the JSON schema of Judgement.
+# The structured-output contract the judge must fill: the JSON schema of Judgment.
 SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -66,7 +66,7 @@ SCHEMA: dict[str, Any] = {
 }
 
 
-class Judgement(NamedTuple):
+class Judgment(NamedTuple):
     """A judge's ruling on a claim: a verdict plus one paragraph of reasoning."""
 
     verdict: bool
@@ -88,12 +88,12 @@ def prepare(
     effort: str,
     root: str | Path,
 ) -> Prepared:
-    """Derive the content key and the judge prompt for one judgement.
+    """Derive the content key and the judge prompt for one judgment.
 
     ``evidence`` and ``reference`` are paths relative to ``root``; each is read
     exactly once, and both outputs come from that single read. ``root`` only
     locates the files -- it enters neither the key nor the prompt, so the same
-    judgement under different roots yields the identical key and prompt. Raises if
+    judgment under different roots yields the identical key and prompt. Raises if
     a declared path is absolute, contains a ``..`` segment, or does not resolve
     to a readable file under ``root``.
     """
@@ -172,12 +172,12 @@ def _content_key(
     evidence_files: list[_ReadFile],
     reference_files: list[_ReadFile],
 ) -> str:
-    """Hex SHA-256 over a canonical, unambiguous serialization of the judgement.
+    """Hex SHA-256 over a canonical, unambiguous serialization of the judgment.
 
     Each file contributes its canonical relpath paired with the SHA-256 of its
     raw bytes; ``root`` and absolute paths never enter. The serialization is
     canonical JSON (sorted keys); JSON string quoting plus the fixed-width hex
-    digests keep the fields unambiguous, so distinct judgements cannot collide
+    digests keep the fields unambiguous, so distinct judgments cannot collide
     into a false skip.
     """
     payload = {

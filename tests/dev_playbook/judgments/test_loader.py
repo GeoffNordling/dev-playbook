@@ -1,13 +1,13 @@
-"""Behavioral tests for the judgements loader: root resolution, discovery, validation."""
+"""Behavioral tests for the judgments loader: root resolution, discovery, validation."""
 
 from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
-from dev_playbook.judgements.loader import Declaration, by_id, load, resolve_root
+from dev_playbook.judgments.loader import Declaration, by_id, load, resolve_root
 
-CONFIG = '[tool.judgements]\npaths = ["judgements/*.yaml"]\n'
+CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 
 _OMIT = object()
 
@@ -22,21 +22,21 @@ _DEFAULTS = {
 
 
 def declaration_yaml(**overrides: object) -> str:
-    """Render a one-judgement declaration YAML.
+    """Render a one-judgment declaration YAML.
 
     Each field is rendered verbatim as ``key: value`` (so a test controls the
     exact YAML scalar); pass ``_OMIT`` to leave a field out entirely.
     """
     fields = {**_DEFAULTS, **overrides}
     rendered = [(k, v) for k, v in fields.items() if v is not _OMIT]
-    lines = ["judgements:"]
+    lines = ["judgments:"]
     for index, (key, value) in enumerate(rendered):
         prefix = "  - " if index == 0 else "    "
         lines.append(f"{prefix}{key}: {value}")
     return "\n".join(lines) + "\n"
 
 
-def test_resolve_root_finds_nearest_ancestor_with_tool_judgements(
+def test_resolve_root_finds_nearest_ancestor_with_tool_judgments(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
     repo = make_repo({"pyproject.toml": CONFIG, "sub/deep/.keep": ""})
@@ -63,9 +63,7 @@ def test_load_returns_empty_when_root_is_none() -> None:
 def test_load_parses_a_valid_declaration(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
-    repo = make_repo(
-        {"pyproject.toml": CONFIG, "judgements/a.yaml": declaration_yaml()}
-    )
+    repo = make_repo({"pyproject.toml": CONFIG, "judgments/a.yaml": declaration_yaml()})
 
     declarations = load(repo)
 
@@ -87,7 +85,7 @@ def test_load_normalizes_omitted_reference_to_empty_list(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": declaration_yaml(reference=_OMIT),
+            "judgments/a.yaml": declaration_yaml(reference=_OMIT),
         }
     )
 
@@ -103,7 +101,7 @@ def test_load_rejects_a_missing_required_field(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": declaration_yaml(**{field: _OMIT}),
+            "judgments/a.yaml": declaration_yaml(**{field: _OMIT}),
         }
     )
 
@@ -117,7 +115,7 @@ def test_load_rejects_an_id_with_illegal_characters(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": declaration_yaml(id='"bad id!"'),
+            "judgments/a.yaml": declaration_yaml(id='"bad id!"'),
         }
     )
 
@@ -129,7 +127,7 @@ def test_load_rejects_an_empty_claim(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
     repo = make_repo(
-        {"pyproject.toml": CONFIG, "judgements/a.yaml": declaration_yaml(claim='""')}
+        {"pyproject.toml": CONFIG, "judgments/a.yaml": declaration_yaml(claim='""')}
     )
 
     with pytest.raises(ValueError, match="claim"):
@@ -140,7 +138,7 @@ def test_load_rejects_empty_evidence(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
     repo = make_repo(
-        {"pyproject.toml": CONFIG, "judgements/a.yaml": declaration_yaml(evidence="[]")}
+        {"pyproject.toml": CONFIG, "judgments/a.yaml": declaration_yaml(evidence="[]")}
     )
 
     with pytest.raises(ValueError, match="evidence"):
@@ -151,7 +149,7 @@ def test_load_rejects_a_model_outside_valid_models(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
     repo = make_repo(
-        {"pyproject.toml": CONFIG, "judgements/a.yaml": declaration_yaml(model="gpt-4")}
+        {"pyproject.toml": CONFIG, "judgments/a.yaml": declaration_yaml(model="gpt-4")}
     )
 
     with pytest.raises(ValueError, match="model"):
@@ -164,7 +162,7 @@ def test_load_rejects_an_effort_outside_valid_efforts(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": declaration_yaml(effort="turbo"),
+            "judgments/a.yaml": declaration_yaml(effort="turbo"),
         }
     )
 
@@ -178,8 +176,8 @@ def test_load_rejects_a_duplicate_id_across_files(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": declaration_yaml(id="dup"),
-            "judgements/b.yaml": declaration_yaml(id="dup"),
+            "judgments/a.yaml": declaration_yaml(id="dup"),
+            "judgments/b.yaml": declaration_yaml(id="dup"),
         }
     )
 
@@ -195,7 +193,7 @@ def test_load_does_no_io_on_declared_evidence_paths(
     repo = make_repo(
         {
             "pyproject.toml": CONFIG,
-            "judgements/a.yaml": declaration_yaml(evidence="[does/not/exist.md]"),
+            "judgments/a.yaml": declaration_yaml(evidence="[does/not/exist.md]"),
         }
     )
 
@@ -207,36 +205,36 @@ def test_load_does_no_io_on_declared_evidence_paths(
 @pytest.mark.parametrize(
     ("content", "expected"),
     [
-        ("judgements:\n", "must be a list"),  # key present, null value
-        ("judgements: 5\n", "must be a list"),  # scalar, not a list
+        ("judgments:\n", "must be a list"),  # key present, null value
+        ("judgments: 5\n", "must be a list"),  # scalar, not a list
         ("- a\n", "mapping"),  # top-level list, not a mapping
     ],
 )
-def test_load_rejects_a_malformed_judgements_shape(
+def test_load_rejects_a_malformed_judgments_shape(
     make_repo: Callable[[dict[str, str]], Path], content: str, expected: str
 ) -> None:
     # A structurally-malformed declaration file must raise the loader's clear,
     # file-named ValueError -- not a raw TypeError/AttributeError that escapes the
     # lint's and CLI's error handling and dumps a traceback.
-    repo = make_repo({"pyproject.toml": CONFIG, "judgements/a.yaml": content})
+    repo = make_repo({"pyproject.toml": CONFIG, "judgments/a.yaml": content})
 
     with pytest.raises(ValueError, match=expected):
         load(repo)
 
 
-def test_load_rejects_tool_judgements_table_with_no_paths(
+def test_load_rejects_tool_judgments_table_with_no_paths(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
-    repo = make_repo({"pyproject.toml": "[tool.judgements]\n"})
+    repo = make_repo({"pyproject.toml": "[tool.judgments]\n"})
 
     with pytest.raises(ValueError, match="paths"):
         load(repo)
 
 
-def test_load_rejects_tool_judgements_table_with_empty_paths(
+def test_load_rejects_tool_judgments_table_with_empty_paths(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
-    repo = make_repo({"pyproject.toml": "[tool.judgements]\npaths = []\n"})
+    repo = make_repo({"pyproject.toml": "[tool.judgments]\npaths = []\n"})
 
     with pytest.raises(ValueError, match="paths"):
         load(repo)

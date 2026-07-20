@@ -1,6 +1,6 @@
-.PHONY: format format-check lint typecheck test check check-judgements
-SKIP_JUDGEMENTS ?= 1
-export SKIP_JUDGEMENTS
+.PHONY: format format-check lint typecheck test check check-judgments
+SKIP_JUDGMENTS ?= 1
+export SKIP_JUDGMENTS
 format:
 	uv run ruff format .
 format-check:
@@ -13,5 +13,5 @@ test:
 	uv run pytest
 check: format-check lint typecheck test
 	uvx pre-commit run --all-files
-check-judgements:
-	$(MAKE) check SKIP_JUDGEMENTS=0
+check-judgments:
+	$(MAKE) check SKIP_JUDGMENTS=0

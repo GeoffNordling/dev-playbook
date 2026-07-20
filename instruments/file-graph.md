@@ -106,7 +106,7 @@ The graph answers these; the artifact renders them:
 
 ## Executor and artifact
 
-The executor is deterministic code; no LLM judgement participates in graph
+The executor is deterministic code; no LLM judgment participates in graph
 construction. The reference implementation is `dev_playbook.filegraph`
 behind the [file-graph](/scripts/file-graph) script. The machine layer of
 the artifact is one JSON document — nodes, edges, ignored-pattern counts,

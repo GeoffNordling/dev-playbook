@@ -96,7 +96,7 @@ the owner, and demotes the identifier to a parenthetical.
 Structure over prose: anything enumerable — concepts, touched paths, test
 coverage — renders as chips, labeled cells, or rows, never as a paragraph.
 Prose is reserved for what only a sentence can say: purpose, what an exhibit
-demonstrates, a judgement's consequence.
+demonstrates, a judgment's consequence.
 
 ## Content classes
 
@@ -107,8 +107,8 @@ Every section is one of two classes, and the accuracy standard differs:
   extractive claim carries a source anchor — file path, and line where
   sensible — in a `title` attribute or the collapsed layer; anchors spend no
   budget.
-- **Judgement [J]** — the generator's opinion, confined to the Assessment
-  section and visually marked as opinion. Judgements must be grounded; owner
+- **Judgment [J]** — the generator's opinion, confined to the Assessment
+  section and visually marked as opinion. Judgments must be grounded; owner
   disagreement with one is not a defect.
 
 ## Sections
@@ -249,7 +249,7 @@ roster, a schema — goes in a collapsed block at the card's foot.
 
 The one section allowed opinion, fenced five ways:
 
-1. Every judgement rests on facts already stated in the extractive sections and
+1. Every judgment rests on facts already stated in the extractive sections and
    points to them. Assessment interprets the sheet; it introduces no new facts.
 2. Flag, don't prescribe. "Nothing verifies the output shape — consumers are
    trusting string templates" flags; "add schema validation" prescribes and is

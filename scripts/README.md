@@ -66,7 +66,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
-| `judgements-lint` | [declarations.md](/standards/judgements/declarations.md) | Judgement declaration validity |
+| `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 | `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's four rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
@@ -86,11 +86,11 @@ them per script. The library is the installed `dev_playbook` package:
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 
-The larger surfaces are subpackages: `dev_playbook.judgements` (declaration
-loading/validation and the plan/render/record runner, behind `judgements-lint`
-and `judgements-run`), `dev_playbook.transcript_export` (the Claude Code session
+The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
+loading/validation and the plan/render/record runner, behind `judgments-lint`
+and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`), and
-`dev_playbook.skipcache` (the seen-set the judgements runner uses to skip
+`dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
 already-recorded work).
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
@@ -124,7 +124,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout, `--html` assembles the viz |
-| `judgements-run` | Plan / render / record over a repo's judgement declarations (driven by the `/run-judgements` skill) |
+| `judgments-run` | Plan / render / record over a repo's judgment declarations (driven by the `/run-judgments` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
 | `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
