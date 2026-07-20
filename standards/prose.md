@@ -16,11 +16,15 @@ workspace document.
 
 ## Audit
 
-- none
+- [prose-lint](/scripts/prose-lint) — the prose detector; one rule,
+  `prose.judgment-spelling`, flagging the British `judgement`/`judgements`
+  form in all authored Markdown outside code spans
 
 ## Enforce
 
-- none
+- the canonical
+  [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
+  — the **commit gate**, where prose-lint blocks every commit
 
 ## Adopt
 

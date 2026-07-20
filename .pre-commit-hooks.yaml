@@ -14,6 +14,7 @@
 #       - id: decisions-lint
 #       - id: skill-lint
 #       - id: judgments-lint
+#       - id: prose-lint
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
 # hook from there, so resolution is independent of where the consumer repo —
@@ -72,6 +73,13 @@
 - id: judgments-lint
   name: judgments-lint
   entry: scripts/judgments-lint
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: prose-lint
+  name: prose-lint
+  entry: scripts/prose-lint
   language: script
   pass_filenames: false
   always_run: true

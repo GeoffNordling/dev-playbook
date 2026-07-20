@@ -11,6 +11,7 @@ repos:
       - id: decisions-lint
       - id: skill-lint
       - id: judgments-lint
+      - id: prose-lint
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:

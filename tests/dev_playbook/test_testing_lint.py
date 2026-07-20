@@ -308,6 +308,23 @@ def test_mirror_finding_is_file_level_without_a_line(tmp_path: Path) -> None:
     assert "tests/test_thing.py: testing.mirror-layout " in result.stdout
 
 
+# --- externally-managed exclusion (the shared registry) ---
+
+
+def test_test_file_in_an_externally_managed_tree_is_skipped(tmp_path: Path) -> None:
+    """A test file under a vendored externally-managed root is not ours to police,
+    so its private-name reach is not flagged — closing testing-lint's old drift."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "mypkg/thing.py": "def _secret():\n    return 1\n",
+            "dotfiles/.agents/tests/test_thing.py": "from mypkg.thing import _secret\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 # --- no-logic rule ---
 
 

@@ -18,6 +18,7 @@ from collections.abc import Set as AbstractSet
 from pathlib import Path, PurePosixPath
 
 from dev_playbook import gitrepo, md
+from dev_playbook.external import is_externally_managed
 
 CODE_EXTENSIONS = {".py", ".sh", ".js"}
 CONFIG_EXTENSIONS = {
@@ -60,7 +61,7 @@ def bucket(relpath: str, repo_root: Path) -> str:
     """
     parts = PurePosixPath(relpath).parts
     name = parts[-1]
-    if ".agents" in parts:
+    if is_externally_managed(relpath):
         return "harness-skill-thirdparty"
     kind = md.classify(relpath)
     if kind in CORE_BUCKETS:

@@ -67,10 +67,12 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment`, over all authored Markdown outside code spans |
 | `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's four rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
-`decisions-lint`, and `standards-lint` assert unconditionally and fail loud;
+`decisions-lint`, `prose-lint`, and `standards-lint` assert unconditionally and
+fail loud;
 they do not skip themselves when a target kind is absent. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.

@@ -1,0 +1,27 @@
+#!/usr/bin/env -S uv run --script
+"""prose-lint — pre-commit validator for authored Markdown prose.
+
+Thin shim over dev_playbook.prose_lint.main: it puts the checkout's ``src/`` on
+``sys.path`` and calls the module, which scans every authored Markdown file
+(harness files included) for the British ``judgement`` / ``judgements`` spelling
+outside code spans and fenced blocks, excluding externally-managed and verbatim
+(``type: Reference``) documents via the shared registry. Each finding prints to
+stdout as a GNU finding line (``file:line: prose.rule message``) and the hook
+exits nonzero if any. ``--list-rules`` prints the rule ids and exits 0. pyyaml
+is declared below because the module parses frontmatter. See
+dev_playbook.prose_lint for the logic and its tests.
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml>=6.0"]
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.prose_lint import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())

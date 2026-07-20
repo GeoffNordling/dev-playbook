@@ -85,6 +85,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: prose-lint
+        name: prose-lint
+        entry: scripts/prose-lint
+        language: script
+        pass_filenames: false
+        always_run: true
+
       # Local-only: the standards/ tree it audits exists only in dev-playbook,
       # so standards-lint is not published in the manifest or the canonical
       # template (the validate-manifest precedent).

@@ -35,6 +35,15 @@ No second person in declarative docs. "You" belongs to agent-facing
 instruction files — `CLAUDE.md` at every level, skills, and rules — that
 direct an executor; a standard states facts.
 
+## Spelling
+
+House spelling is American English. Write `judgment`, not `judgement` — and
+`judgments`, not `judgements`. `prose-lint` enforces this one deterministically,
+because the British form slips back in through habit and voice dictation. Naming
+the forbidden form in prose stays legible as long as it sits in backticks: the
+detector checks only text outside code spans, so this section names it without
+tripping itself.
+
 ## Heading casing
 
 H1 uses Title Case. H2 and below use sentence case.

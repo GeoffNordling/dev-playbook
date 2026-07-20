@@ -61,6 +61,7 @@ what falls outside that pattern.
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
 | decisions-lint | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-lint | Links and Citations | hook pattern, except the CI gate (skipped) |
+| prose-lint | prose spelling (the American `judgment`) | hook pattern |
 | judgments-lint | judgment declarations | hook pattern |
 | standards-lint | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |

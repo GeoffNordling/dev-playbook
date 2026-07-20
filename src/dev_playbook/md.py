@@ -18,8 +18,17 @@ import subprocess
 from collections.abc import Iterator
 from pathlib import Path, PurePosixPath
 
+from dev_playbook.external import is_externally_managed
+
 FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
-INLINE_CODE_PATTERN = re.compile(r"`[^`\n]*`")
+# A CommonMark inline code span: an opening run of N backticks closes on the
+# next run of exactly N (the trailing (?!`) rejects a longer run). The
+# backreference ties the closing length to the opening one, so a double-backtick
+# span whose body itself contains a single backtick — e.g. ``a`b`` — is stripped
+# as one unit rather than read as two empty single-backtick spans that would leak
+# the body into the surrounding prose. The body is non-greedy and newline-free,
+# matching how callers mask code span by span, line by line.
+INLINE_CODE_PATTERN = re.compile(r"(`+)([^\n]+?)\1(?!`)")
 HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
 # A markdown inline link: [text](target). target stops at whitespace or ')';
 # a trailing "#anchor" stays part of the captured target.
@@ -132,8 +141,9 @@ def classify(relpath: str) -> str:
 
     - ``"excluded"`` — out of the bundle entirely: the transient ``PLAN.md``
       and ``PROGRESS.md`` (ralph-loop plan/progress pair), the root ``tmp/``
-      scratch tree, and anything under externally-managed
-      ``.agents``/``.dhub`` trees.
+      scratch tree, the ``.git`` directory, and anything under an
+      externally-managed vendored tree (the shared dev_playbook.external
+      registry, currently ``dotfiles/.agents``).
     - ``"index"`` — a directory listing (``index.md``): typeless, validated as
       an index rather than as a concept document.
     - ``"concept"`` — a prose concept document that carries OKF frontmatter and
@@ -157,7 +167,7 @@ def classify(relpath: str) -> str:
         return "excluded"
     if parts[0] == "tmp":
         return "excluded"
-    if any(seg in {".agents", ".dhub", ".git"} for seg in parts):
+    if ".git" in parts or is_externally_managed(relpath):
         return "excluded"
     if parts[0] == "tests":
         return "harness"
