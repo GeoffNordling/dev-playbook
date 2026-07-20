@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-REF_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "ref-lint"
+REF_LINT = Path(__file__).resolve().parents[1] / "scripts" / "ref-lint"
 
 
 def run_ref_lint(
@@ -25,7 +25,7 @@ def run_ref_lint(
     env = os.environ.copy()
     env["HOME"] = str(home)
     return subprocess.run(
-        ["python3", str(REF_AUDIT), *args, str(repo_root)],
+        ["python3", str(REF_LINT), *args, str(repo_root)],
         capture_output=True,
         text=True,
         env=env,
@@ -766,7 +766,7 @@ def test_list_rules_prints_knowledge_organization_prefixed_ids_from_any_cwd(
     tmp_path: Path,
 ) -> None:
     result = subprocess.run(
-        ["python3", str(REF_AUDIT), "--list-rules"],
+        ["python3", str(REF_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,

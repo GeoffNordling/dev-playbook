@@ -58,7 +58,7 @@ A Detector implemented as deterministic code — the `*-lint` scripts under `scr
 _Avoid_: audit, for a deterministic detector — that detector is a lint.
 
 **Detector**
-The read-only script that inspects the repository against one or more standards and emits findings; it never mutates the repository. A Detector is a **lint** if it is deterministic code and an **audit** in the narrow sense if it is an LLM judge. Cards are organized by question and detectors by mechanism, so a card may have more than one detector; the one-to-one is at the rule — every `card.rule` id belongs to exactly one card.
+The read-only check that inspects the repository against one or more standards and emits findings; it never mutates the repository. A Detector is a **lint** if it is deterministic code and an **audit** in the narrow sense if it is an LLM judge. Cards are organized by question and detectors by mechanism, so a card may have more than one detector; the one-to-one is at the rule — every `card.rule` id belongs to exactly one card.
 
 **Gate**
 An automatic, unmanned blocking point on the path to main. There are exactly three, with fixed rung names: **commit gate** (the pre-commit suite), **push gate** (`make check-judgements`, via the pre-push stage), **CI gate** (thin CI).

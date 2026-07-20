@@ -8,7 +8,7 @@ import re
 import subprocess
 from pathlib import Path
 
-OKF_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "okf-lint"
+OKF_LINT = Path(__file__).resolve().parents[1] / "scripts" / "okf-lint"
 
 # A minimal but valid OKF bundle: a registry doc, two concept docs, a root
 # index (with okf_version) and a standards index, all internally consistent.
@@ -44,7 +44,7 @@ BASE_BUNDLE: dict[str, str] = {
 
 def run_okf_lint(repo_root: Path) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["uv", "run", "--script", str(OKF_AUDIT), str(repo_root)],
+        ["uv", "run", "--script", str(OKF_LINT), str(repo_root)],
         capture_output=True,
         text=True,
     )
@@ -421,7 +421,7 @@ def test_instrument_spec_with_employed_by_is_clean(tmp_path: Path) -> None:
 
 def test_list_rules_prints_card_namespaced_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
-        ["uv", "run", "--script", str(OKF_AUDIT), "--list-rules"],
+        ["uv", "run", "--script", str(OKF_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,

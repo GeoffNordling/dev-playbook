@@ -76,7 +76,7 @@ hook suite rather than by new tooling.
 
 ## Detectors
 
-A **detector** is the read-only script behind an Audit cell — it inspects the
+A **detector** is the read-only check behind an Audit cell — it inspects the
 repository against one or more standards and emits findings, never mutating the
 repository and never blocking by itself (its runs at a gate are the audit
 stationed there — that is Enforcement). This is the normative home of the
@@ -84,9 +84,9 @@ detector contract.
 
 - **Read-only means mutating nothing git tracks.** A detector reports without
   changing the repository. Reaching outside the working tree does not disqualify
-  it: workspace-lint queries GitHub over `gh api` and writes only a stderr
-  summary, reading remote state and mutating nothing git tracks, so it is
-  read-only and belongs in an Audit cell.
+  it: workspace-lint queries GitHub over `gh api`, writing findings to stdout
+  and a summary to stderr — reading remote state and mutating nothing git
+  tracks — so it is read-only and belongs in an Audit cell.
 - **Universal wiring; applicability lives inside the detector.** Every detector
   is wired in every repo — consumers run the full menu, never a subset. A
   detector whose surface is optional (skills) exits 0 silently when the surface

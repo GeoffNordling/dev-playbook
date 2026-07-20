@@ -423,7 +423,7 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
 # --- skills ---
 
 
-def test_skills_dir_without_audit_hook_fails(tmp_path: Path) -> None:
+def test_skills_dir_without_lint_hook_fails(tmp_path: Path) -> None:
     files = base_files()
     # The canonical template now carries skill-lint; strip it so this repo has
     # a skills dir but no skill-lint hook -- the condition the rule flags.
@@ -436,7 +436,7 @@ def test_skills_dir_without_audit_hook_fails(tmp_path: Path) -> None:
     assert "skills-hook" in result.stdout
 
 
-def test_skills_dir_with_audit_hook_appended_passes(tmp_path: Path) -> None:
+def test_skills_dir_with_lint_hook_appended_passes(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
     files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
