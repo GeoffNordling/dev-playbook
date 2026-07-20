@@ -1,6 +1,6 @@
 ---
-name: native-code-review-mimic
-description: Runs a bug review over an issue's PR diff — eight finder angles, deduped without verification, at most eight findings posted as one PR comment; an audit that never edits code. Use when the issue overwatch dispatches the code review track.
+name: bug-pr-review
+description: Runs a bug review over an issue's PR diff — eight finder angles, deduped without verification, at most eight findings posted as one PR comment; an audit that never edits code. Use when the issue overwatch dispatches the code track at a review stop.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -9,7 +9,9 @@ allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---
 
-# Native Code Review Mimic
+# Bug PR Review
+
+<!-- Intentionally mirrors Anthropic's retired native /code-review (medium tier); keep the sections lifted from it verbatim. -->
 
 Hunt bugs in the PR diff through eight finder angles, dedup, and post the
 findings as one PR comment. The review is an audit only: you never modify the
@@ -58,8 +60,9 @@ Target **at least 4 findings**; cap at **8**, keeping the 8 most severe. If
 fewer genuine findings exist, post what you have — do not invent to hit the
 floor. A clean pass is a real outcome: say so plainly in the comment.
 
-Stage the comment body in a `/tmp` file (worktree writes are denied), then
-post one PR comment with `gh pr comment --body-file <path>`.
+Stage the comment body in `/tmp/bug-review-<issue>.md` (worktree writes are
+denied, `/tmp` is allowed), then post one PR comment with
+`gh pr comment --body-file <path>`.
 
 - **Head it `## Bug review — <sha>`**, using the short HEAD sha
   (`git rev-parse --short HEAD`) — that exact header, no other.

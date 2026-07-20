@@ -35,7 +35,7 @@ Repeat until the issue merges, closes, or a stop point (§6): place the issue at
 
 - **HITL** — run it yourself: invoke the node's skill inline (the `Skill` tool, issue number as argument) and interview the user directly.
 - **AFK** — delegate to a subagent (§3).
-- **Review stop** — run `/open-pr` first (always), then read the issue and diff and recommend to the user, with reasons, which tracks to launch: the **code track** (the native `/code-review`, then our fidelity skill), the **doc track** (`/doc-pr-review`), or both — content kind picks the track, not file format. On the user's confirmation, dispatch the chosen tracks' audits in parallel (§3); within the code track the native pass runs before the fidelity skill. Each posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence is software-factory.md's review sequence.
+- **Review stop** — run `/open-pr` first (always), then read the issue and diff and recommend to the user, with reasons, which tracks to launch: the **code track** (`/bug-pr-review` and our fidelity skill), the **doc track** (`/doc-pr-review`), or both — content kind picks the track, not file format. On the user's confirmation, dispatch every chosen audit in parallel (§3) — the code track's two skills included. On a lockdown re-review (the PR already carries two or more `## Code review — …` comments), dispatch only the fidelity skill on the code track — a lockdown verifies fixes and needs no fresh bug hunt. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence is software-factory.md's review sequence.
 
 When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue. A node whose skill doesn't exist is an escalation, not an improvisation.
 
@@ -55,12 +55,7 @@ Run /<skill> <N>.
 ⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /<skill> <N>.
 ```
 
-A subagent is a separate session, its delegation prompt is its launch prompt, and the token is what pre-authorizes its commits. But the PR and review nodes — `/open-pr`, `/code-review`, `/code-pr-review`, `/sdd-code-pr-review`, `/sdd-spec-review`, `/doc-pr-review` — are gh-only actions or read-only audits that never commit, so they get the bare launch line. Granting the token where it goes unused is privilege the node doesn't need; the subset is fixed here, not decided per dispatch.
-
-**The native `/code-review` breaks the launch template.** It is a harness built-in, not one of our skills, so two things differ from every other AFK dispatch:
-
-- **Its argument is the effort level, not the issue number.** Launch it as `Run /code-review medium --comment` — always **medium** effort, and always `--comment` so the findings post to the PR rather than staying in-session — never `Run /code-review <N>`; the issue number is not its argument, and it reviews the branch's diff on its own. (Effort is a positional arg: `low`/`medium`/`high`/`max`; `--comment` posts findings as inline PR comments.)
-- **It has no frontmatter to pin its model, so pin it at the spawn.** Our own review skills declare `model: opus` themselves; the native one inherits whatever runs it. Spawn its subagent with an explicit `model: opus` override so the review is Opus regardless of the model this overwatch was launched under.
+A subagent is a separate session, its delegation prompt is its launch prompt, and the token is what pre-authorizes its commits. But the PR and review nodes — `/open-pr`, `/bug-pr-review`, `/code-pr-review`, `/sdd-code-pr-review`, `/sdd-spec-review`, `/doc-pr-review` — are gh-only actions or read-only audits that never commit, so they get the bare launch line. Granting the token where it goes unused is privilege the node doesn't need; the subset is fixed here, not decided per dispatch.
 
 Parse the subagent's final message per the terminal report contract: it must begin at character one with `DONE:` or `ESCALATE:`; any other shape reads as ESCALATE.
 

@@ -13,7 +13,7 @@ argument-hint: "<issue-number>"
 
 Review an SDD issue's PR diff against its committed spec and the project's conventions, and attach your findings to the PR. The review is an audit only: you never modify the code under review, and the verdict on the findings is not yours to take — post them and stop.
 
-An automated bug-review pass (the native `/code-review`) runs before you and posts its own PR comment; you add the spec-fidelity and convention findings it does not cover. The audit runs hands-off; finding code problems is its output, not a reason to stop.
+A bug-review pass (`/bug-pr-review`) runs in parallel with you and posts its own PR comment; you add the spec-fidelity and convention findings it does not cover. The audit runs hands-off; finding code problems is its output, not a reason to stop.
 
 **Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a spec-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
 
@@ -38,7 +38,7 @@ Then report: `READ: spec-standard.md, testing-conventions.md, python-style.md, m
 
 - `gh issue view <issue> --comments` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
-- The PR's existing feedback — the native bug-review pass that ran before you, and any prior review cycle's findings; to avoid re-flagging what they caught, read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.)
+- The PR's existing feedback — prior review cycles' findings; to avoid re-flagging what they caught, read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) The `/bug-pr-review` pass runs in parallel with you — its comment for this cycle may not exist yet; don't wait for it or dedup against it.
 - The committed specs under `specs/functional_requirements/` and `specs/design/` — what the code must implement.
 - The tests under `tests/` and code under `src/` — the full picture behind the diff.
 
