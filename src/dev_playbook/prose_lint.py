@@ -11,10 +11,11 @@ worktree-scoped) and applies one deterministic rule:
 
 Scope is **all authored Markdown, harness files included** (``CLAUDE.md``,
 rules, skills) — deliberately wider than ``md.classify``'s concept-only split,
-since the spelling is house-wide. Two kinds of content are excluded, both via
-the shared dev_playbook.external registry: externally-managed vendored trees
-(``is_externally_managed``) and verbatim upstream mirrors (``is_verbatim_doc``,
-i.e. ``type: Reference`` documents).
+since the spelling is house-wide. What is out is ``classify``'s ``"excluded"``
+category: externally-managed vendored trees (which ``classify`` decides through
+the shared dev_playbook.external registry) and transient scratch (``PLAN.md`` /
+``PROGRESS.md``, the root ``tmp/`` tree). Verbatim upstream mirrors are excluded
+per file via the registry's ``is_verbatim_doc`` (``type: Reference`` documents).
 
 Output:
     stdout — one finding per line, ``file:line: prose.rule message``.
@@ -36,7 +37,7 @@ from pathlib import Path
 import yaml
 
 from dev_playbook import md
-from dev_playbook.external import is_externally_managed, is_verbatim_doc
+from dev_playbook.external import is_verbatim_doc
 from dev_playbook.findings import print_rules, render
 
 
@@ -124,13 +125,18 @@ def scan_file(path: Path, root: Path) -> list[Finding]:
 def audit(root: Path) -> list[Finding]:
     """Scan every authored Markdown file under ``root`` for the spelling rule.
 
-    Externally-managed vendored trees are excluded by path; verbatim Reference
-    docs are excluded per file in ``scan_file``.
+    Scope is wider than ``md.classify``'s concept split — harness files are in —
+    but ``classify``'s ``"excluded"`` category is out: externally-managed
+    vendored trees, the ``.git`` tree, and the transient scratch that is not
+    authored content (``PLAN.md`` / ``PROGRESS.md`` and the root ``tmp/`` tree).
+    Reusing that one boundary keeps vendored-tree exclusion on the shared
+    registry (``classify`` consults it) and stops the gate firing on scratch.
+    Verbatim Reference docs are excluded per file in ``scan_file``.
     """
     findings: list[Finding] = []
     for path in md.find_md_files(root):
         rel = str(path.relative_to(root))
-        if is_externally_managed(rel):
+        if md.classify(rel) == "excluded":
             continue
         findings.extend(scan_file(path, root))
     return findings

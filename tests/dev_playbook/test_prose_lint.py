@@ -110,6 +110,25 @@ def test_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     assert prose_lint.audit(repo) == []
 
 
+def test_skips_transient_plan_progress_scratch(tmp_path: Path) -> None:
+    # PLAN.md / PROGRESS.md are the ralph-loop scratch pair — md.classify's
+    # "excluded" category, out of the authored-content bundle. A British spelling
+    # in throwaway scratch must not block every commit.
+    repo = make_repo(
+        tmp_path,
+        {"PLAN.md": "a judgement in scratch\n", "PROGRESS.md": "another judgement\n"},
+    )
+
+    assert prose_lint.audit(repo) == []
+
+
+def test_skips_root_tmp_scratch_tree(tmp_path: Path) -> None:
+    # The root tmp/ tree is scratch too — excluded, never scanned.
+    repo = make_repo(tmp_path, {"tmp/notes.md": "a judgement here\n"})
+
+    assert prose_lint.audit(repo) == []
+
+
 def test_flags_non_reference_doc(tmp_path: Path) -> None:
     # Control for the verbatim exclusion: an authored (non-Reference) doc with
     # the same body is flagged.
