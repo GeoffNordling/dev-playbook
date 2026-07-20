@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/testing-audit.
+"""Behavioral tests for scripts/testing-lint.
 
-testing-audit walks a repo's Python files once and applies three rules to the
+testing-lint walks a repo's Python files once and applies three rules to the
 test files it finds: no-private-access (privacy of non-test modules),
 mirror-layout (test placement), and no-logic (no if/try in a test body).
 Discovery goes through `git ls-files`, so every fixture is a git repo; a
@@ -10,11 +10,11 @@ directory (repo root) is the only positional argument.
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "testing-audit"
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "testing-lint"
 
 
 def run(repo: Path) -> subprocess.CompletedProcess:
-    """Run testing-audit against repo and capture its output."""
+    """Run testing-lint against repo and capture its output."""
     return subprocess.run(
         ["python3", str(SCRIPT), str(repo)],
         capture_output=True,

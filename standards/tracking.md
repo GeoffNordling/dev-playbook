@@ -16,14 +16,14 @@ requests belong to the [software factory standard](/software-factory/software-fa
 
 ## Audit
 
-- [workspace-audit](/scripts/workspace-audit) — across repositories via
+- [workspace-lint](/scripts/workspace-lint) — across repositories via
   `gh api`: GitHub settings drift, label-scheme parity and the blocked-label
   ban, and every open post-intake leaf's brief shape and every epic's
   category-only shape
 
 ## Enforce
 
-- none — GitHub sits outside every gate: workspace-audit reports, the weekly
+- none — GitHub sits outside every gate: workspace-lint reports, the weekly
   ritual and bootstrap-labels repair, but nothing blocks a malformed issue, a
   drifted label, or a drifted setting. Settings repairs stay manual — admin
   permissions are too broad to automate, so no repair tool is built

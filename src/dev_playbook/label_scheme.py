@@ -4,7 +4,7 @@ One JSON file (``label_scheme.json``, beside this module) is the single source
 of the workspace's label scheme. It is structured by dimension — each dimension
 carries its label color, a description recipe, and its values — so the two
 consumers read one authority and cannot disagree: ``bootstrap-labels`` mints the
-scheme into a repo, and ``workspace-audit`` checks live repos against it.
+scheme into a repo, and ``workspace-lint`` checks live repos against it.
 
 The semantic authority for what the labels *mean* stays software-factory.md's label
 table and state-machine graph; this file is the operational data. The

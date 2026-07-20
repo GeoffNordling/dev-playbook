@@ -18,16 +18,16 @@ Governs how a repository is laid out, built, and checked.
 
 ## Audit
 
-- [repo-audit](/scripts/repo-audit) — structural conformance and canonical
+- [repo-lint](/scripts/repo-lint) — structural conformance and canonical
   byte comparison for one repository
-- [workspace-audit](/scripts/workspace-audit) — workspace-wide drift: stale
+- [workspace-lint](/scripts/workspace-lint) — workspace-wide drift: stale
   pinned hook revs across repositories
 
 ## Enforce
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the hook suite every repo runs at the **commit gate**, repo-audit
+  — the hook suite every repo runs at the **commit gate**, repo-lint
   included
 - `make check-judgements` ([Makefile.base](/standards/build/canonical/Makefile.base))
   — the **push gate**

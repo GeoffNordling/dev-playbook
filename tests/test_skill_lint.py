@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/skill-audit.
+"""Behavioral tests for scripts/skill-lint.
 
-skill-audit declares pyyaml via PEP 723 and imports the local dev_playbook
+skill-lint declares pyyaml via PEP 723 and imports the local dev_playbook
 package, so it is invoked the way pre-commit runs it: `uv run --script`. It
 walks skill bundles under .claude/skills/ (no git needed).
 """
@@ -8,7 +8,7 @@ walks skill bundles under .claude/skills/ (no git needed).
 import subprocess
 from pathlib import Path
 
-SKILL_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "skill-audit"
+SKILL_LINT = Path(__file__).resolve().parents[1] / "scripts" / "skill-lint"
 
 
 def valid_skill(name: str = "greet", body: str = "# Greet\n\nDo the thing.\n") -> str:
@@ -30,7 +30,7 @@ def make_repo(tmp_path: Path, skills: dict[str, str]) -> Path:
 
 def run(repo: Path) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["uv", "run", "--script", str(SKILL_AUDIT), str(repo)],
+        ["uv", "run", "--script", str(SKILL_LINT), str(repo)],
         capture_output=True,
         text=True,
     )
@@ -95,7 +95,7 @@ def test_body_length_is_a_stderr_advisory_that_never_fails(tmp_path: Path) -> No
 
 def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
-        ["uv", "run", "--script", str(SKILL_AUDIT), "--list-rules"],
+        ["uv", "run", "--script", str(SKILL_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -109,7 +109,7 @@ def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
 
 
 def test_repo_self_scan_is_clean() -> None:
-    """The dev-playbook repo's own authored skills pass skill-audit."""
+    """The dev-playbook repo's own authored skills pass skill-lint."""
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -155,7 +155,7 @@ def test_mirror_symlink_pointing_elsewhere_is_a_finding(tmp_path: Path) -> None:
 
 def test_list_rules_includes_skill_mirror(tmp_path: Path) -> None:
     result = subprocess.run(
-        ["uv", "run", "--script", str(SKILL_AUDIT), "--list-rules"],
+        ["uv", "run", "--script", str(SKILL_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,

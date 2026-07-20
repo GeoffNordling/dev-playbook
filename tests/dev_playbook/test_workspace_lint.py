@@ -1,4 +1,4 @@
-"""Behavioral tests for scripts/workspace-audit.
+"""Behavioral tests for scripts/workspace-lint.
 
 Fixtures build a throwaway workspace of git repos and point --workspace at
 it. Settings tests put a fake ``gh`` executable on PATH that serves canned
@@ -13,7 +13,7 @@ import re
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-audit"
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-lint"
 HOOK_REPO = Path(__file__).resolve().parents[2]
 CANONICAL_CONFIG = (
     HOOK_REPO / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
@@ -117,7 +117,7 @@ def make_workspace_repo(
 
 
 def pin_config(rev: str) -> str:
-    return f"repos:\n  - repo: {hook_repo_url()}\n    rev: {rev}\n    hooks:\n      - id: repo-audit\n"
+    return f"repos:\n  - repo: {hook_repo_url()}\n    rev: {rev}\n    hooks:\n      - id: repo-lint\n"
 
 
 def run(

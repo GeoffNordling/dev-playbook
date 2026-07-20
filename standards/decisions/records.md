@@ -71,7 +71,7 @@ A record's body is frozen once its introducing pull request merges. Before merge
 - `deprecated`
 - `superseded by NNNN` — where `NNNN` is the 4-digit, zero-padded number of the record that replaces this one.
 
-`decisions-audit` matches this vocabulary exactly. Omit `status` entirely when a record needs none.
+`decisions-lint` matches this vocabulary exactly. Omit `status` entirely when a record needs none.
 
 ## Optional sections
 

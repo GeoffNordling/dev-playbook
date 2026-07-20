@@ -50,11 +50,15 @@ blocked. The gate rungs are defined once in
 [enforcement.md](/standards/build/enforcement.md); this fixes the words.
 
 **Audit**
-A run of one or more detectors; read-only — it never mutates the repository and never blocks by itself.
+The umbrella term for the Standard's read-only checking process: a run of one or more detectors; read-only — it never mutates the repository and never blocks by itself. A Detector is a **lint** if it is deterministic code, an **audit** in the narrow sense if it is an LLM judge — two kinds of the one read-only process.
 _Avoid_: check (too broad — a check may block; an audit never does).
 
+**Lint**
+A Detector implemented as deterministic code — the `*-lint` scripts under `scripts/`. Every lint is part of the audit process (lint ⊂ audit), never the reverse: a lint is one kind of audit, but an audit in the narrow sense (an LLM judge) is not a lint.
+_Avoid_: audit, for a deterministic detector — that detector is a lint.
+
 **Detector**
-The read-only script that inspects the repository against one or more standards and emits findings; it never mutates the repository. Cards are organized by question and detectors by mechanism, so a card may have more than one detector; the one-to-one is at the rule — every `card.rule` id belongs to exactly one card.
+The read-only check that inspects the repository against one or more standards and emits findings; it never mutates the repository. A Detector is a **lint** if it is deterministic code and an **audit** in the narrow sense if it is an LLM judge. Cards are organized by question and detectors by mechanism, so a card may have more than one detector; the one-to-one is at the rule — every `card.rule` id belongs to exactly one card.
 
 **Gate**
 An automatic, unmanned blocking point on the path to main. There are exactly three, with fixed rung names: **commit gate** (the pre-commit suite), **push gate** (`make check-judgements`, via the pre-push stage), **CI gate** (thin CI).
@@ -74,6 +78,7 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 - An **Adapter** sits at a **Seam** and satisfies the **Interface**.
 - **Depth** produces **Leverage** for callers and **Locality** for maintainers.
 - A **Detector** inspects the repository against one or more standards and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
+- A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 
 ## Example dialogue
@@ -85,7 +90,7 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 > **Dev:** "And that depth is worth it because…?"
 > **Reviewer:** "It's the same **Depth** paying out twice — **Leverage** for the callers (the fake pays back across every test) and **Locality** for us (a store bug is fixed in one **Implementation**, not chased across call sites)."
 
-> **Dev:** "repo-audit reported a **Finding**. Does that block my commit?"
+> **Dev:** "repo-lint reported a **Finding**. Does that block my commit?"
 > **Reviewer:** "Only because it runs at the **commit gate**. The audit itself is read-only — it just emits **Findings**. It's the **Gate** it's stationed at that blocks; run by hand, it isn't **Enforcement** at all."
 
 ## Flagged ambiguities
@@ -96,7 +101,8 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 - "interface" was narrowed to the type signature or a class's public methods — resolved: **Interface** includes every fact a caller must know (invariants, ordering, error modes, config), not just the signature.
 - "venue" was used informally for a blocking point — resolved: say **Gate**, or one of the three rung names (commit gate, push gate, CI gate). "venue" is retired.
 - "check" and "audit" were blurred — resolved: an **Audit** is read-only and never blocks; a **Gate** is what blocks. A check that blocks is a gate; a check that only reports is an audit.
-- "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the script; an **Audit** is a run of one or more detectors.
+- "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the check; an **Audit** is a run of one or more detectors.
+- "lint" and "audit" were blurred — "lint" survived in internals and prose with no defined status while every read-only detector was named an "audit" — resolved: a **Lint** is a Detector implemented as deterministic code, an **Audit** in the narrow sense is a Detector that is an LLM judge, and **Lint** ⊂ **Audit** (the umbrella read-only process). Deterministic scripts are `*-lint`; LLM judges keep "audit."
 
 ## Rejected framings
 

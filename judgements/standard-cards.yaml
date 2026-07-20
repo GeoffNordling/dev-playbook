@@ -6,7 +6,7 @@
 # misrepresents what its targets do. Evidence is the card under trial; reference
 # is standards/standard/format.md (the card contract) plus the artifacts the
 # card points at. One judgement per card -- semantic honesty the deterministic
-# standards-audit cannot check. See standards/judgements/.
+# standards-lint cannot check. See standards/judgements/.
 judgements:
   - id: standard-card-build
     claim: |
@@ -19,8 +19,8 @@ judgements:
       - standards/standard/format.md
       - standards/build/index.md
       - standards/build/canonical.md
-      - scripts/repo-audit
-      - scripts/workspace-audit
+      - scripts/repo-lint
+      - scripts/workspace-lint
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/Makefile.base
       - standards/build/canonical/ci.yml
@@ -36,7 +36,7 @@ judgements:
     evidence:  [standards/standard.md]
     reference:
       - standards/standard/format.md
-      - scripts/standards-audit
+      - scripts/standards-lint
       - judgements/standard-cards.yaml
       - .pre-commit-config.yaml
     model: claude-sonnet-5
@@ -55,8 +55,8 @@ judgements:
       - standards/claude-code/claude-content.md
       - standards/claude-code/skill-conventions.md
       - standards/claude-code/skill-management.md
-      - scripts/repo-audit
-      - scripts/skill-audit
+      - scripts/repo-lint
+      - scripts/skill-lint
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/CLAUDE.md.standards
     model: claude-sonnet-5
@@ -72,9 +72,9 @@ judgements:
     reference:
       - standards/standard/format.md
       - standards/docs/index.md
-      - scripts/okf-audit
-      - scripts/ref-audit
-      - scripts/repo-audit
+      - scripts/okf-lint
+      - scripts/ref-lint
+      - scripts/repo-lint
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high
@@ -91,7 +91,7 @@ judgements:
       - standards/judgements/index.md
       - standards/judgements/cache-gate.md
       - standards/judgements/consuming.md
-      - scripts/judgements-audit
+      - scripts/judgements-lint
       - scripts/judgements-run
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
@@ -120,7 +120,7 @@ judgements:
     reference:
       - standards/standard/format.md
       - standards/python/style.md
-      - scripts/python-audit
+      - scripts/python-lint
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/Makefile.python
     model: claude-sonnet-5
@@ -150,7 +150,7 @@ judgements:
     reference:
       - standards/standard/format.md
       - standards/testing/conventions.md
-      - scripts/testing-audit
+      - scripts/testing-lint
       - standards/build/canonical/Makefile.python
     model: claude-sonnet-5
     effort: high
@@ -167,7 +167,7 @@ judgements:
       - standards/standard/format.md
       - standards/tracking/issues.md
       - standards/tracking/repo-settings.md
-      - scripts/workspace-audit
+      - scripts/workspace-lint
       - scripts/bootstrap-labels
     model: claude-sonnet-5
     effort: high
@@ -184,7 +184,7 @@ judgements:
       - standards/standard/format.md
       - software-factory/software-factory.md
       - software-factory/skill-authoring.md
-      - scripts/workspace-audit
+      - scripts/workspace-lint
     model: claude-sonnet-5
     effort: high
 
@@ -198,7 +198,7 @@ judgements:
     reference:
       - standards/standard/format.md
       - standards/instrument/format.md
-      - scripts/okf-audit
+      - scripts/okf-lint
       - instruments/index.md
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
@@ -243,6 +243,6 @@ judgements:
     reference:
       - standards/standard/format.md
       - standards/decisions/records.md
-      - scripts/decisions-audit
+      - scripts/decisions-lint
     model: claude-sonnet-5
     effort: high

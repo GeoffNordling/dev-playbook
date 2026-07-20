@@ -20,7 +20,7 @@ prompts, and records the passing verdicts.
 
 ## Audit
 
-- [judgements-audit](/scripts/judgements-audit) — checks declaration shape,
+- [judgements-lint](/scripts/judgements-lint) — checks declaration shape,
   deterministically
 - [the LLM judgements](/standards/judgements/declarations.md) — an LLM judge
   rules on each declared claim against its evidence; the audit-kind detector
@@ -33,7 +33,7 @@ prompts, and records the passing verdicts.
   pre-push hook, until every judgement's exact content is judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — judgements-audit at the **commit gate** in every repo's suite
+  — judgements-lint at the **commit gate** in every repo's suite
 
 ## Adopt
 

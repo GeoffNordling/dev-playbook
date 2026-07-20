@@ -1,6 +1,6 @@
 """Audit a repo's Decision Records against the records contract.
 
-decisions-audit is the detector behind the Decision Records card. It walks a
+decisions-lint is the detector behind the Decision Records card. It walks a
 repo's markdown files once (via dev_playbook.md.find_md_files, so gitignore-aware
 and worktree-scoped), keeps the ones under ``docs/decisions/``, and applies two
 rules:
@@ -14,7 +14,7 @@ rules:
     NNNN`` (NNNN a 4-digit, zero-padded record number).
 
 An absent ``docs/decisions/`` passes both rules — the directory is lazily
-created. Frontmatter shape and index freshness are okf-audit's, not this
+created. Frontmatter shape and index freshness are okf-lint's, not this
 detector's.
 
 See standards/decisions/records.md for the contract these rules enforce.
@@ -25,8 +25,8 @@ Output:
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
-    decisions-audit [directory]
-    decisions-audit --list-rules
+    decisions-lint [directory]
+    decisions-lint --list-rules
 """
 
 import argparse
@@ -222,7 +222,7 @@ def _is_valid_status(status: object) -> bool:
 def main(argv: list[str] | None = None) -> int:
     """Scan a repo's Decision Records and print one finding per line; return the exit code."""
     parser = argparse.ArgumentParser(
-        prog="decisions-audit",
+        prog="decisions-lint",
         description="Lint Decision Records: sequential-numbering, status-vocabulary.",
     )
     parser.add_argument(
@@ -247,10 +247,10 @@ def main(argv: list[str] | None = None) -> int:
         findings.extend(check_sequential_numbering(files, root))
         findings.extend(check_status_vocabulary(files, root))
     except subprocess.CalledProcessError as err:
-        print(f"decisions-audit: cannot list files in {root}: {err}", file=sys.stderr)
+        print(f"decisions-lint: cannot list files in {root}: {err}", file=sys.stderr)
         return 2
     except CannotRun as err:
-        print(f"decisions-audit: cannot run: {err}", file=sys.stderr)
+        print(f"decisions-lint: cannot run: {err}", file=sys.stderr)
         return 2
 
     for f in sorted(findings, key=lambda f: (f.file, f.line or 0, f.rule)):
@@ -258,12 +258,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if findings:
         print(
-            f"decisions-audit: {len(findings)} finding(s) in {DECISIONS_DIR}",
+            f"decisions-lint: {len(findings)} finding(s) in {DECISIONS_DIR}",
             file=sys.stderr,
         )
         return 1
     print(
-        f"decisions-audit: clean ({len(files)} file(s) under {DECISIONS_DIR})",
+        f"decisions-lint: clean ({len(files)} file(s) under {DECISIONS_DIR})",
         file=sys.stderr,
     )
     return 0

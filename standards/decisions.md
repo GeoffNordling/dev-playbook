@@ -16,7 +16,7 @@ Governs how hard-to-reverse or surprising decisions are recorded.
 
 ## Audit
 
-- [decisions-audit](/scripts/decisions-audit) — two rules over
+- [decisions-lint](/scripts/decisions-lint) — two rules over
   `docs/decisions/`: sequential numbering
   (`decisions.sequential-numbering`) and the status vocabulary
   (`decisions.status-vocabulary`)
@@ -25,7 +25,7 @@ Governs how hard-to-reverse or surprising decisions are recorded.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the **commit gate**, where decisions-audit blocks every commit
+  — the **commit gate**, where decisions-lint blocks every commit
 
 ## Adopt
 

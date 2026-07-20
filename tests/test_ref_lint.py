@@ -1,4 +1,4 @@
-"""Behavioral tests for scripts/ref-audit — assert on exit code and stderr.
+"""Behavioral tests for scripts/ref-lint — assert on exit code and stderr.
 
 Two reference forms are validated (see this repo's cross-reference standard):
 a root-absolute `/path` **Link** for same-repo targets, and a
@@ -16,16 +16,16 @@ from pathlib import Path
 
 import pytest
 
-REF_AUDIT = Path(__file__).resolve().parents[1] / "scripts" / "ref-audit"
+REF_LINT = Path(__file__).resolve().parents[1] / "scripts" / "ref-lint"
 
 
-def run_ref_audit(
+def run_ref_lint(
     repo_root: Path, home: Path, *args: str
 ) -> subprocess.CompletedProcess:
     env = os.environ.copy()
     env["HOME"] = str(home)
     return subprocess.run(
-        ["python3", str(REF_AUDIT), *args, str(repo_root)],
+        ["python3", str(REF_LINT), *args, str(repo_root)],
         capture_output=True,
         text=True,
         env=env,
@@ -81,7 +81,7 @@ def test_root_link_to_existing_file_is_ok(tmp_path: Path, workspace: Path) -> No
     write(repo / "standards" / "target.md", "x")
     write(repo / "docs.md", "see [target](/standards/target.md)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
     assert "all ok" in result.stderr
@@ -92,7 +92,7 @@ def test_root_link_to_missing_file_is_broken(tmp_path: Path, workspace: Path) ->
     init_repo(repo)
     write(repo / "docs.md", "see [gone](/standards/gone.md)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 broken" in result.stderr
@@ -118,7 +118,7 @@ def test_root_link_resolves_against_worktree_working_copy(
     write(wt / "docs.md", "see [target](/target.md)\n")
     assert not (repo / "target.md").exists()
 
-    result = run_ref_audit(wt, tmp_path)
+    result = run_ref_lint(wt, tmp_path)
 
     assert result.returncode == 0, result.stderr
 
@@ -130,7 +130,7 @@ def test_bare_slash_token_is_prose_not_a_link(tmp_path: Path, workspace: Path) -
     init_repo(repo)
     write(repo / "docs.md", "run /commit then /open-pr to finish /nonexistent\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "no cross-references found" in result.stderr
@@ -141,9 +141,9 @@ def test_root_link_inside_inline_code_is_skipped(
 ) -> None:
     repo = workspace / "primary"
     init_repo(repo)
-    write(repo / "docs.md", "the linter lives at `/tools/bin/ref-audit`\n")
+    write(repo / "docs.md", "the linter lives at `/tools/bin/ref-lint`\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "no cross-references found" in result.stderr
@@ -156,7 +156,7 @@ def test_root_link_inside_fenced_block_is_skipped(
     init_repo(repo)
     write(repo / "docs.md", "intro\n```\n[x](/gone.md)\n```\nend\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "no cross-references found" in result.stderr
@@ -170,7 +170,7 @@ def test_root_link_to_directory_with_fragment_is_out_of_scope(
     (repo / "standards").mkdir()
     write(repo / "docs.md", "see [dir](/standards#anything)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -186,7 +186,7 @@ def test_cross_repo_ref_to_existing_file_is_ok(tmp_path: Path, workspace: Path) 
     write(other / "thing.md", "x")
     write(repo / "docs.md", "see ~/workspace/other/thing.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -200,7 +200,7 @@ def test_cross_repo_ref_to_missing_file_is_broken(
     other.mkdir()
     write(repo / "docs.md", "see ~/workspace/other/missing.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 broken" in result.stderr
@@ -213,7 +213,7 @@ def test_cross_repo_ref_to_missing_repo_is_broken(
     init_repo(repo)
     write(repo / "docs.md", "see ~/workspace/no-such-repo/foo.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
 
@@ -230,7 +230,7 @@ def test_reference_inside_inline_code_is_skipped(
         "see `~/workspace/<name>/missing.md` for the template\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "no cross-references found" in result.stderr
@@ -246,7 +246,7 @@ def test_reference_inside_fenced_code_block_is_skipped(
         "intro\n```\nsee ~/workspace/other/missing.md\n```\nend\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "no cross-references found" in result.stderr
@@ -265,7 +265,7 @@ def test_citation_inside_link_text_is_validated(
         "[see ~/workspace/other/missing.md now](https://example.com)\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 broken" in result.stderr
@@ -286,7 +286,7 @@ def test_citation_inside_link_text_resolving_is_ok(
         "[see ~/workspace/other/thing.md](https://example.com)\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
     assert "all ok" in result.stderr
@@ -305,7 +305,7 @@ def test_same_repo_citation_in_fixed_root_file_is_wrong_form(
     write(repo / "target.md", "x")
     write(repo / "docs.md", "see ~/workspace/primary/target.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 wrong-form" in result.stderr
@@ -321,7 +321,7 @@ def test_wrong_form_reported_even_when_target_missing(
     init_repo(repo)
     write(repo / "docs.md", "see ~/workspace/primary/missing.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 wrong-form" in result.stderr
@@ -341,7 +341,7 @@ def test_same_repo_citation_in_skill_is_ok(tmp_path: Path, workspace: Path) -> N
         "see ~/workspace/primary/standards/target.md\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
     assert "all ok" in result.stderr
@@ -353,7 +353,7 @@ def test_same_repo_citation_in_rules_is_ok(tmp_path: Path, workspace: Path) -> N
     write(repo / "target.md", "x")
     write(repo / "rules" / "a.md", "see ~/workspace/primary/target.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
 
@@ -367,7 +367,7 @@ def test_same_repo_citation_to_missing_file_in_rootless_file_is_broken(
     init_repo(repo)
     write(repo / "skills" / "demo" / "SKILL.md", "see ~/workspace/primary/gone.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 broken" in result.stderr
@@ -392,7 +392,7 @@ def test_worktree_resolves_rootless_citation_to_worktree_working_copy(
     write(wt / "skills" / "demo" / "SKILL.md", "see ~/workspace/primary/target.md\n")
     assert not (repo / "target.md").exists()
 
-    result = run_ref_audit(wt, tmp_path)
+    result = run_ref_lint(wt, tmp_path)
 
     assert result.returncode == 0, result.stderr
 
@@ -415,7 +415,7 @@ def test_broken_refs_inside_decisions_directory_are_skipped(
         "see ~/workspace/primary/gone.md\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "all ok" in result.stderr
@@ -432,7 +432,7 @@ def test_broken_ref_in_decisions_index_is_validated(
     write(repo / "other.md", "see [target](/target.md)\n")
     write(repo / "docs" / "decisions" / "index.md", "see [gone](/nope.md)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "broken" in result.stdout
@@ -449,7 +449,7 @@ def test_broken_ref_in_decisions_readme_is_validated(
     write(repo / "other.md", "see [target](/target.md)\n")
     write(repo / "docs" / "decisions" / "README.md", "see [gone](/nope.md)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "/nope.md" in result.stdout
@@ -459,7 +459,7 @@ def test_unexpected_file_in_decisions_dir_cannot_run(
     tmp_path: Path, workspace: Path
 ) -> None:
     """A file under docs/decisions/ that is neither a numbered record nor the
-    index/README is unclassifiable: ref-audit refuses to silently blanket-exempt
+    index/README is unclassifiable: ref-lint refuses to silently blanket-exempt
     it and stops (exit 2) so its treatment gets a conscious decision."""
     repo = workspace / "primary"
     init_repo(repo)
@@ -468,7 +468,7 @@ def test_unexpected_file_in_decisions_dir_cannot_run(
         "see ~/workspace/primary/gone.md\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 2
     assert "docs/decisions/notes.md" in result.stderr
@@ -486,7 +486,7 @@ def test_broken_refs_under_standards_decisions_are_still_validated(
         "see [gone](/nope.md)\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "broken" in result.stdout
@@ -500,7 +500,7 @@ def test_not_a_git_repo_exits_2(tmp_path: Path, workspace: Path) -> None:
     not_a_repo.mkdir()
     write(not_a_repo / "docs.md", "irrelevant\n")
 
-    result = run_ref_audit(not_a_repo, tmp_path)
+    result = run_ref_lint(not_a_repo, tmp_path)
 
     assert result.returncode == 2
     assert "not a git repository" in result.stderr
@@ -517,7 +517,7 @@ def test_anchor_matching_existing_heading_is_ok(
     write(repo / "target.md", "## Real heading\n")
     write(repo / "docs.md", "see [x](/target.md#real-heading)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "all ok" in result.stderr
@@ -531,7 +531,7 @@ def test_anchor_missing_on_existing_file_is_broken(
     write(repo / "target.md", "## Real heading\n")
     write(repo / "docs.md", "see [x](/target.md#no-such-section)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 broken" in result.stderr
@@ -546,7 +546,7 @@ def test_slug_handles_numbered_heading_with_periods(
     write(repo / "target.md", "### 2.2.3 revision\n")
     write(repo / "docs.md", "see [x](/target.md#223-revision)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -560,7 +560,7 @@ def test_slug_handles_parentheses_in_heading(tmp_path: Path, workspace: Path) ->
         "see [x](/target.md#issue-body-format-the-brief-is-the-body)\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -572,7 +572,7 @@ def test_slug_handles_em_dash_in_heading(tmp_path: Path, workspace: Path) -> Non
     write(repo / "target.md", "## Step 1 — See the shape\n")
     write(repo / "docs.md", "see [x](/target.md#step-1--see-the-shape)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -584,7 +584,7 @@ def test_slug_strips_inline_code_in_heading(tmp_path: Path, workspace: Path) -> 
     write(repo / "target.md", "## Without `fast` (default staging)\n")
     write(repo / "docs.md", "see [x](/target.md#without-fast-default-staging)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -597,7 +597,7 @@ def test_slug_keeps_intraword_underscores(tmp_path: Path, workspace: Path) -> No
     write(repo / "target.md", "## load_issue helper\n")
     write(repo / "docs.md", "see [x](/target.md#load_issue-helper)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "all ok" in result.stderr
@@ -612,7 +612,7 @@ def test_slug_strips_underscore_emphasis_at_word_boundaries(
     write(repo / "target.md", "## the _important_ part\n")
     write(repo / "docs.md", "see [x](/target.md#the-important-part)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -626,7 +626,7 @@ def test_reference_without_fragment_does_not_require_headings(
     write(repo / "target.md", "no headings at all in this file\n")
     write(repo / "docs.md", "see [x](/target.md)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -640,7 +640,7 @@ def test_heading_inside_fenced_block_in_target_is_ignored(
     write(repo / "target.md", "```\n## Fake heading\n```\n")
     write(repo / "docs.md", "see [x](/target.md#fake-heading)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
 
@@ -654,7 +654,7 @@ def test_fragment_on_non_markdown_target_is_out_of_scope(
     write(repo / "script.py", "print('hi')\n")
     write(repo / "docs.md", "see [x](/script.py#some-fragment)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
 
@@ -667,7 +667,7 @@ def test_missing_file_with_fragment_is_broken_not_anchor_check(
     init_repo(repo)
     write(repo / "docs.md", "see [x](/nope.md#make-believe-heading)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1 broken" in result.stderr
@@ -691,7 +691,7 @@ def test_multiple_headings_in_one_target_are_all_addressable(
         "see [d](/target.md#deepest)\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "all ok" in result.stderr
@@ -704,7 +704,7 @@ def test_worktree_resolves_anchor_against_worktree_target(
 
     A heading renamed in the worktree must resolve against the worktree
     state, not the main checkout — otherwise edits within a worktree
-    would fail ref-audit until merged.
+    would fail ref-lint until merged.
     """
     repo = workspace / "primary"
     init_repo(repo)
@@ -720,7 +720,7 @@ def test_worktree_resolves_anchor_against_worktree_target(
     write(wt / "docs.md", "see [x](/target.md#renamed-in-worktree)\n")
     assert not (repo / "target.md").exists()
 
-    result = run_ref_audit(wt, tmp_path)
+    result = run_ref_lint(wt, tmp_path)
 
     assert result.returncode == 0, result.stderr
 
@@ -734,7 +734,7 @@ def test_same_file_self_anchor_resolves(tmp_path: Path, workspace: Path) -> None
         "See [the details below](/foo.md#details).\n\n## Details\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0
     assert "all ok" in result.stderr
@@ -756,7 +756,7 @@ def test_both_link_classes_counted_in_one_run(tmp_path: Path, workspace: Path) -
         "a [link](/target.md) and a citation ~/workspace/other/thing.md\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
     assert "2 references, all ok" in result.stderr
@@ -766,7 +766,7 @@ def test_list_rules_prints_knowledge_organization_prefixed_ids_from_any_cwd(
     tmp_path: Path,
 ) -> None:
     result = subprocess.run(
-        ["python3", str(REF_AUDIT), "--list-rules"],
+        ["python3", str(REF_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -785,7 +785,7 @@ def test_broken_reference_renders_as_gnu_finding(
     init_repo(repo)
     write(repo / "docs.md", "see [gone](/standards/gone.md)\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert re.search(
@@ -803,7 +803,7 @@ def test_wrong_form_citation_renders_as_gnu_finding(
     write(repo / "target.md", "x")
     write(repo / "docs.md", "see ~/workspace/primary/target.md\n")
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert re.search(
@@ -826,7 +826,7 @@ def test_mixed_pass_and_fail_in_one_run_reports_only_the_broken(
         "broken ref: [b](/target.md#missing-heading)\n",
     )
 
-    result = run_ref_audit(repo, tmp_path)
+    result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 1
     assert "1/2 need fixing" in result.stderr

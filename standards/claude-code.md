@@ -21,12 +21,12 @@ from ordinary files, and what each may contain.
 
 ## Audit
 
-- [repo-audit](/scripts/repo-audit) — CLAUDE.md presence and its canonical
+- [repo-lint](/scripts/repo-lint) — CLAUDE.md presence and its canonical
   standards block; the agent-facing voice of every CLAUDE.md, root to global
   (`claude-code.agent-facing-voice`); and, in dev-playbook only, the global
   CLAUDE.md source's two-element XML shape and well-formedness
   (`claude-code.global-claude-shape`, `claude-code.global-claude-wellformed`)
-- [skill-audit](/scripts/skill-audit) — skill bundles in
+- [skill-lint](/scripts/skill-lint) — skill bundles in
   skill-authoring repos, plus the `claude-code.skill-mirror`
   correspondence between authored and installed skills (dev-playbook)
 - [judgements/claude-code.yaml](/judgements/claude-code.yaml) — the LLM-judged
@@ -37,8 +37,8 @@ from ordinary files, and what each may contain.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — repo-audit and skill-audit both at the **commit gate** in every repo's
-  suite; skill-audit no-ops where a repo authors no skills
+  — repo-lint and skill-lint both at the **commit gate** in every repo's
+  suite; skill-lint no-ops where a repo authors no skills
 
 ## Adopt
 

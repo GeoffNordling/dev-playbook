@@ -1,15 +1,15 @@
 #!/usr/bin/env -S uv run --script
-"""workspace-audit — the on-demand workspace audit.
+"""workspace-lint — the on-demand workspace audit.
 
-Thin shim over ``dev_playbook.workspace_audit``: it puts the checkout's ``src``
+Thin shim over ``dev_playbook.workspace_lint``: it puts the checkout's ``src``
 on the path and calls the library's ``main``. The audit reads GitHub repo
 settings and label/issue conformance over `gh api` and checks stale dev-playbook
 pins across every repo under the workspace root; it reports and never blocks.
 Run with ``--help`` for the full behavior.
 
 Usage:
-    workspace-audit [--workspace DIR] [--pins-only | --settings-only]
-    workspace-audit --list-rules
+    workspace-lint [--workspace DIR] [--pins-only | --settings-only]
+    workspace-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from dev_playbook.workspace_audit import main  # noqa: E402
+from dev_playbook.workspace_lint import main  # noqa: E402
 
 if __name__ == "__main__":
     raise SystemExit(main())

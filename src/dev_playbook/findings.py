@@ -14,7 +14,7 @@ from collections.abc import Iterable
 def render(location: str, rule: str, message: str, line: int | None = None) -> str:
     """One finding line in GNU format.
 
-    ``location`` is a repo-relative path (or, for workspace-audit, the audited
+    ``location`` is a repo-relative path (or, for workspace-lint, the audited
     repo's name). ``line`` is the 1-based line number; omit it (``None``) for a
     file-level finding, which drops the ``:line`` segment entirely.
     """

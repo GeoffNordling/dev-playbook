@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/decisions-audit.
+"""Behavioral tests for scripts/decisions-lint.
 
-decisions-audit walks a repo's markdown files once, keeps the ones under
+decisions-lint walks a repo's markdown files once, keeps the ones under
 docs/decisions/, and applies two rules to the records it finds:
 sequential-numbering (contiguous, zero-padded, no-duplicate NNNN-slug.md files)
 and status-vocabulary (a record's optional `status` frontmatter key holds one of
@@ -13,11 +13,11 @@ it: `uv run --script`.
 import subprocess
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "decisions-audit"
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "decisions-lint"
 
 
 def run(repo: Path) -> subprocess.CompletedProcess:
-    """Run decisions-audit against repo and capture its output."""
+    """Run decisions-lint against repo and capture its output."""
     return subprocess.run(
         ["uv", "run", "--script", str(SCRIPT), str(repo)],
         capture_output=True,

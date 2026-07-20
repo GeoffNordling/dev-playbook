@@ -1,14 +1,14 @@
 #!/usr/bin/env -S uv run --script
-"""decisions-audit — pre-commit validator for a repo's Decision Records.
+"""decisions-lint — pre-commit validator for a repo's Decision Records.
 
-Thin shim over dev_playbook.decisions_audit.main: it puts the checkout's ``src/``
+Thin shim over dev_playbook.decisions_lint.main: it puts the checkout's ``src/``
 on ``sys.path`` and calls the module, which walks the repo's ``docs/decisions/``
 records and applies the decisions-card rules (sequential-numbering,
 status-vocabulary), printing each finding to stdout as a GNU finding line
 (``file:line: decisions.rule message``) and exiting nonzero if any.
 ``--list-rules`` prints the rule ids and exits 0. pyyaml is declared below
 because the module parses record frontmatter for the status check. See
-dev_playbook.decisions_audit for the logic and its tests.
+dev_playbook.decisions_lint for the logic and its tests.
 """
 # /// script
 # requires-python = ">=3.14"
@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from dev_playbook.decisions_audit import main  # noqa: E402
+from dev_playbook.decisions_lint import main  # noqa: E402
 
 if __name__ == "__main__":
     raise SystemExit(main())

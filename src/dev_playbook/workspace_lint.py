@@ -1,6 +1,6 @@
 """Audit the workspace: GitHub repo settings, label/issue conformance, and pins.
 
-The library behind the ``workspace-audit`` shim — the on-demand audit venue of
+The library behind the ``workspace-lint`` shim — the on-demand audit venue of
 the enforcement standard, the checks that live outside any single commit. It
 answers workspace-scope facts readable over `gh api`, and it reports and never
 blocks — GitHub sits outside every gate. For every git repo under the workspace
@@ -573,12 +573,12 @@ def check_tracking(repo: Path, slug: str | None) -> list[Line]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """The ``workspace-audit`` command-line entry point.
+    """The ``workspace-lint`` command-line entry point.
 
     Returns the process exit code: 0 clean, 1 findings, 2 cannot run.
     """
     parser = argparse.ArgumentParser(
-        prog="workspace-audit",
+        prog="workspace-lint",
         description=(
             "Report GitHub settings drift, label/issue/epic/tuple conformance, "
             "and stale dev-playbook pins across the workspace."
@@ -622,19 +622,19 @@ def main(argv: list[str] | None = None) -> int:
                 if not args.settings_only:
                     lines.extend(check_tracking(repo, slug))
     except ToolError as err:
-        print(f"workspace-audit: {err}", file=sys.stderr)
+        print(f"workspace-lint: {err}", file=sys.stderr)
         return 2
 
     for line in lines:
         if line.rule is not None:
             print(line.render())
         else:
-            print(f"workspace-audit: {line.repo}: {line.message}", file=sys.stderr)
+            print(f"workspace-lint: {line.repo}: {line.message}", file=sys.stderr)
 
     findings = sum(1 for line in lines if line.blocking)
     stale = sum(1 for line in lines if line.stale)
     print(
-        f"workspace-audit: {len(repos)} repos, {findings} finding(s), {stale} stale pin(s)",
+        f"workspace-lint: {len(repos)} repos, {findings} finding(s), {stale} stale pin(s)",
         file=sys.stderr,
     )
     return 1 if findings else 0
