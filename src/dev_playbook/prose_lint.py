@@ -33,9 +33,21 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import yaml
+
 from dev_playbook import md
 from dev_playbook.external import is_externally_managed, is_verbatim_doc
 from dev_playbook.findings import print_rules, render
+
+
+class CannotRun(Exception):
+    """A file the detector cannot process — surfaced as exit 2, not a traceback.
+
+    Matches the sibling frontmatter-parsing detectors (decisions-lint,
+    standards-lint): a malformed ``.md`` is a run failure to report, never an
+    uncaught YAML error that blocks every commit.
+    """
+
 
 # The one rule id this detector emits, namespaced by the Prose card whose
 # question it answers. Kept a module-level constant so every emission site
@@ -67,30 +79,46 @@ class Finding:
         return render(self.file, self.rule, self.message, self.line)
 
 
-def scan_text(rel: str, text: str) -> list[Finding]:
+def scan_text(rel: str, text: str, line_offset: int = 0) -> list[Finding]:
     """Flag every British judgement / judgements in prose outside code.
 
     Fenced blocks are dropped by ``md.lines_outside_fences``; inline code spans
     are stripped per line before matching, so a backticked mention of the
-    forbidden form does not trip. One finding per occurrence, line numbers
-    matching what an editor shows.
+    forbidden form does not trip. One finding per occurrence. ``line_offset`` is
+    added to every reported line so a caller scanning a document body keeps line
+    numbers absolute to the file, matching what an editor shows.
     """
     findings: list[Finding] = []
     for line_num, line in md.lines_outside_fences(text):
         prose = md.INLINE_CODE_PATTERN.sub("", line)
         for _ in JUDGEMENT_PATTERN.finditer(prose):
-            findings.append(Finding(rel, line_num, JUDGMENT_SPELLING, JUDGMENT_MESSAGE))
+            findings.append(
+                Finding(
+                    rel, line_num + line_offset, JUDGMENT_SPELLING, JUDGMENT_MESSAGE
+                )
+            )
     return findings
 
 
 def scan_file(path: Path, root: Path) -> list[Finding]:
-    """Every finding one Markdown file yields; verbatim mirrors are skipped."""
+    """Every finding one Markdown file yields; verbatim mirrors are skipped.
+
+    Only the body is scanned — frontmatter is structured YAML, not prose, and a
+    YAML scalar has no backtick escape hatch, so a title carrying the forbidden
+    form must not be flagged. The body offset keeps reported line numbers
+    absolute. A malformed frontmatter block raises :class:`CannotRun` rather than
+    an uncaught YAML traceback, matching the sibling detectors.
+    """
     rel = str(path.relative_to(root))
     text = path.read_text(encoding="utf-8", errors="replace")
-    frontmatter, _ = md.parse_frontmatter(text)
+    try:
+        frontmatter, body = md.parse_frontmatter(text)
+    except yaml.YAMLError as err:
+        raise CannotRun(f"{rel}: malformed frontmatter: {err}") from err
     if is_verbatim_doc(frontmatter):
         return []
-    return scan_text(rel, text)
+    offset = text.count("\n", 0, len(text) - len(body))
+    return scan_text(rel, body, offset)
 
 
 def audit(root: Path) -> list[Finding]:
@@ -134,6 +162,9 @@ def main(argv: list[str] | None = None) -> int:
         findings = audit(root)
     except subprocess.CalledProcessError as err:
         print(f"prose-lint: cannot list files in {root}: {err}", file=sys.stderr)
+        return 2
+    except CannotRun as err:
+        print(f"prose-lint: cannot run: {err}", file=sys.stderr)
         return 2
 
     for f in sorted(findings, key=lambda f: (f.file, f.line, f.rule)):

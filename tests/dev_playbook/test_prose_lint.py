@@ -123,6 +123,47 @@ def test_flags_non_reference_doc(tmp_path: Path) -> None:
     assert [f.file for f in findings] == ["standards/x.md"]
 
 
+def test_frontmatter_values_are_not_scanned_as_prose(tmp_path: Path) -> None:
+    # Frontmatter is structured YAML, not prose, and a YAML scalar has no
+    # backtick escape hatch — so a title/description carrying the British form in
+    # a non-Reference doc must not be flagged. Only the body is scanned.
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/x.md": (
+                "---\ntype: Standard\ntitle: A judgement of taste\n---\nclean body\n"
+            )
+        },
+    )
+
+    assert prose_lint.audit(repo) == []
+
+
+def test_body_finding_reports_absolute_line_number(tmp_path: Path) -> None:
+    # The scanner runs over the body only, but reported line numbers stay
+    # absolute to the file so an editor jumps to the right line.
+    repo = make_repo(
+        tmp_path,
+        {"standards/x.md": "---\ntype: Standard\n---\na judgement\n"},
+    )
+
+    findings = prose_lint.audit(repo)
+
+    assert [(f.file, f.line) for f in findings] == [("standards/x.md", 4)]
+
+
+def test_malformed_frontmatter_exits_two_not_traceback(tmp_path: Path) -> None:
+    # A single .md with a malformed frontmatter block — even an untracked draft,
+    # since discovery lists --others — must surface as the detector's exit 2, not
+    # an uncaught YAML traceback that blocks every commit.
+    repo = make_repo(
+        tmp_path,
+        {"draft.md": "---\ntype: [unterminated\n---\nbody\n"},
+    )
+
+    assert prose_lint.main([str(repo)]) == 2
+
+
 # --- CLI: --list-rules, exit codes, and finding format ---
 
 
