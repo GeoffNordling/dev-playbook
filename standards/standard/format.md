@@ -129,12 +129,17 @@ detector contract.
 Some content in a repo is not the repo's to hold to the authored-content
 standards: an externally-managed vendored tree — a bundle mirrored in but not
 maintained file-by-file — or a document whose body is a verbatim copy of an
-upstream external one (`type: Reference`). A detector excludes such content by
-consulting the shared registry `src/dev_playbook/external.py` —
+upstream external one (`type: Reference`). A detector that can import the
+registry excludes such content by consulting the shared registry
+`src/dev_playbook/external.py` —
 `is_externally_managed` for vendored roots, `is_verbatim_doc` for verbatim
-mirrors — never a path-skip hardcoded in the detector. The registry is the one
-place an externally-managed root is declared, so every detector excludes the
-same trees; a per-detector skip list is the drift this norm forbids.
+mirrors — never a path-skip hardcoded in the detector. (The one exception is a
+detector whose configuration cannot import Python — ruff, whose exclude list is
+static config — which keeps a hand-synced literal mirror of the roots, carrying
+a comment that names `external.py` as the authority.) The registry is the one
+place an externally-managed root is declared, so every detector that can reach
+it excludes the same trees; the drift this norm forbids is an unsynced,
+undocumented per-detector skip list, not the acknowledged mirror.
 
 ## Drift
 
