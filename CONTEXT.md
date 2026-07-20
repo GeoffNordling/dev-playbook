@@ -101,7 +101,7 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 - "interface" was narrowed to the type signature or a class's public methods — resolved: **Interface** includes every fact a caller must know (invariants, ordering, error modes, config), not just the signature.
 - "venue" was used informally for a blocking point — resolved: say **Gate**, or one of the three rung names (commit gate, push gate, CI gate). "venue" is retired.
 - "check" and "audit" were blurred — resolved: an **Audit** is read-only and never blocks; a **Gate** is what blocks. A check that blocks is a gate; a check that only reports is an audit.
-- "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the script; an **Audit** is a run of one or more detectors.
+- "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the check; an **Audit** is a run of one or more detectors.
 - "lint" and "audit" were blurred — "lint" survived in internals and prose with no defined status while every read-only detector was named an "audit" — resolved: a **Lint** is a Detector implemented as deterministic code, an **Audit** in the narrow sense is a Detector that is an LLM judge, and **Lint** ⊂ **Audit** (the umbrella read-only process). Deterministic scripts are `*-lint`; LLM judges keep "audit."
 
 ## Rejected framings
