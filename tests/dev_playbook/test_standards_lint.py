@@ -45,6 +45,11 @@ def card(
     return front + "".join(f"\n## {cell}\n\n- none\n" for cell in cells)
 
 
+def readme() -> str:
+    """A conformant standards/README.md fixture."""
+    return "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
+
+
 # --- standard.card-layout ---------------------------------------------------
 
 
@@ -161,9 +166,7 @@ def ordered_repo_files(extra: dict[str, str]) -> dict[str, str]:
     dev-playbook mode -- the template is the mode marker.
     """
     return {
-        "standards/README.md": (
-            "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
-        ),
+        "standards/README.md": readme(),
         "standards/standard.md": card("Meta-Standard"),
         "standards/build.md": card("Build"),
         "standards/python.md": card("Python"),
@@ -249,9 +252,7 @@ def test_contract_doc_before_a_card_flagged(tmp_path: Path) -> None:
 def consumer_catalog_files(doc_bullets: list[str]) -> dict[str, str]:
     """A consumer standards/ tree: README + own cards, no meta-standard card."""
     return {
-        "standards/README.md": (
-            "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
-        ),
+        "standards/README.md": readme(),
         "standards/alpha.md": card("Alpha"),
         "standards/beta.md": card("Beta"),
         "standards/index.md": catalog(doc_bullets),
@@ -824,9 +825,8 @@ def _clean_bundle(tmp_path: Path, *, dev_playbook_mode: bool) -> Path:
     so hook-surfaces' dev-playbook-only leg has files to read; in consumer mode
     it omits both. The bundle is clean under every rule but the shadow rule.
     """
-    readme = "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
     files = {
-        "standards/README.md": readme,
+        "standards/README.md": readme(),
         "standards/build.md": card("Build"),
         ".pre-commit-hooks.yaml": "",
         ".pre-commit-config.yaml": _local_block([]),
@@ -870,12 +870,11 @@ def _consumer_card_bundle(tmp_path: Path, stem: str) -> Path:
     manifest or local config, so hook-surfaces reads them as empty. The bundle
     is clean under every rule but the shadow rule.
     """
-    readme = "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
     title = stem.capitalize()
     return make_repo(
         tmp_path,
         {
-            "standards/README.md": readme,
+            "standards/README.md": readme(),
             f"standards/{stem}.md": card(title),
             "standards/index.md": catalog(
                 [
@@ -909,11 +908,10 @@ def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
     # standards/standard.md -- is in dev-playbook mode, so a card matching an
     # upstream stem is not treated as a shadow (the rule stays gated off).
     upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
-    readme = "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
     devrepo = make_repo(
         tmp_path,
         {
-            "standards/README.md": readme,
+            "standards/README.md": readme(),
             "standards/build.md": card("Build"),
             "standards/build/canonical/.pre-commit-config.yaml": _canonical([]),
             "standards/index.md": catalog(
