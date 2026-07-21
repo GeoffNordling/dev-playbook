@@ -773,7 +773,7 @@ def check_skills_hook(root: Path) -> list[Finding]:
 
 
 def check_canonical_artifacts(root: Path) -> list[Finding]:
-    """Diff the hook repo's canonical directory against the manifest.
+    """Diff the hook repo's canonical directory against CANONICAL_MANIFEST.
 
     Gated on the hook-repo condition: only dev-playbook carries
     standards/build/canonical/, so only it owns the ten canonical artifacts.
