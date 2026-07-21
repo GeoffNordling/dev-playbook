@@ -82,7 +82,8 @@ For Python files in `scripts/`:
 - **Script backed by the package**: expose it as an entry point (below)
   instead of path-hacking imports. A file in `scripts/` then exists only
   when a checked-in path is required (a pre-commit `entry`), as a thin
-  shim.
+  shim — and that shim still carries the standalone shebang and PEP 723
+  block above, since as a pre-commit `entry` it too runs from a bare clone.
 - **Workspace-wide utility**: `uv tool install -e .` puts the project's
   entry points on `PATH` machine-wide, editable — the tool tracks the
   checkout.
