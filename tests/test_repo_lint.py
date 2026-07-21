@@ -808,6 +808,46 @@ def test_hook_repo_unknown_canonical_artifact_fails(tmp_path: Path) -> None:
     assert "standards/build/canonical/mystery.cfg: build.self-audit" in result.stdout
 
 
+def manifest_only_files() -> dict[str, str]:
+    # A consumer that also hosts a hook manifest: it carries the pinned
+    # dev-playbook block AND dogfoods what it publishes, but has no
+    # standards/build/canonical/ directory (that is dev-playbook's alone).
+    files = base_files()
+    files[".pre-commit-hooks.yaml"] = "- id: acme-lint\n"
+    files[".pre-commit-config.yaml"] += "      - id: acme-lint\n"
+    return files
+
+
+def test_manifest_without_canonical_dir_is_clean(tmp_path: Path) -> None:
+    result = run(make_repo(tmp_path, manifest_only_files()))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "canonical artifact missing" not in result.stdout
+
+
+def test_manifest_without_canonical_dir_still_requires_pinned_block(
+    tmp_path: Path,
+) -> None:
+    files = manifest_only_files()
+    config = files[".pre-commit-config.yaml"]
+    start = config.index("  - repo: https://github.com/GeoffNordling/dev-playbook")
+    end = config.index("  - repo: https://github.com/astral-sh/ruff-pre-commit")
+    files[".pre-commit-config.yaml"] = config[:start] + config[end:]
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert ".pre-commit-config.yaml: build.canonical-block" in result.stdout
+
+
+def test_manifest_without_canonical_dir_enforces_dogfood_mirror(
+    tmp_path: Path,
+) -> None:
+    files = manifest_only_files()
+    files[".pre-commit-hooks.yaml"] += "- id: unmirrored-lint\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert ".pre-commit-config.yaml: build.self-audit" in result.stdout
+    assert "missing: unmirrored-lint" in result.stdout
+
+
 def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
         ["python3", str(SCRIPT), "--list-rules"],
