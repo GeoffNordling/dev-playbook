@@ -155,7 +155,11 @@ def bullet(target: str, title: str) -> str:
 
 
 def ordered_repo_files(extra: dict[str, str]) -> dict[str, str]:
-    """The card + contract files a well-ordered catalog references."""
+    """The card + contract files a well-ordered catalog references.
+
+    Carries the canonical template so full audits over these files run in
+    dev-playbook mode -- the template is the mode marker.
+    """
     return {
         "standards/README.md": (
             "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
@@ -167,6 +171,7 @@ def ordered_repo_files(extra: dict[str, str]) -> dict[str, str]:
             "---\ntype: Standard\ntitle: Standards and Standard Cards\n"
             "description: d\n---\n\n# Standards and Standard Cards\n"
         ),
+        "standards/build/canonical/.pre-commit-config.yaml": _canonical([]),
         **extra,
     }
 
@@ -833,6 +838,71 @@ def test_dev_playbook_mode_audit_never_runs_the_shadow_rule(tmp_path: Path) -> N
     findings = sa.audit(devrepo, fake_list_rules({}), hook_repo_root=upstream)
 
     assert findings == []
+
+
+def _consumer_card_bundle(tmp_path: Path, stem: str) -> Path:
+    """A clean consumer carrying a single ``standards/<stem>.md`` card.
+
+    No canonical template and no meta card, so the mode marker is absent; no
+    manifest or local config, so hook-surfaces reads them as empty. The bundle
+    is clean under every rule but the shadow rule.
+    """
+    readme = "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
+    title = stem.capitalize()
+    return make_repo(
+        tmp_path,
+        {
+            "standards/README.md": readme,
+            f"standards/{stem}.md": card(title),
+            "standards/index.md": catalog(
+                [
+                    bullet("standards/README.md", "Standards"),
+                    bullet(f"standards/{stem}.md", title),
+                ]
+            ),
+        },
+    )
+
+
+def test_consumer_card_named_standard_md_is_flagged_as_a_shadow(tmp_path: Path) -> None:
+    # The mode marker is the canonical template, not standards/standard.md, so a
+    # consumer card at that exact path stays in consumer mode and the shadow rule
+    # catches it -- the one stem the marker used to disable.
+    upstream = make_repo(
+        tmp_path / "up", {"standards/standard.md": card("Meta-Standard")}
+    )
+    consumer = _consumer_card_bundle(tmp_path, stem="standard")
+
+    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+
+    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert findings[0].file == "standards/standard.md"
+
+
+def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
+    tmp_path: Path,
+) -> None:
+    # The canonical template is the sole mode marker: a tree carrying it -- but no
+    # standards/standard.md -- is in dev-playbook mode, so a card matching an
+    # upstream stem is not treated as a shadow (the rule stays gated off).
+    upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
+    readme = "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
+    devrepo = make_repo(
+        tmp_path,
+        {
+            "standards/README.md": readme,
+            "standards/build.md": card("Build"),
+            "standards/build/canonical/.pre-commit-config.yaml": _canonical([]),
+            "standards/index.md": catalog(
+                [
+                    bullet("standards/README.md", "Standards"),
+                    bullet("standards/build.md", "Build"),
+                ]
+            ),
+        },
+    )
+
+    assert sa.audit(devrepo, fake_list_rules({}), hook_repo_root=upstream) == []
 
 
 def test_list_rules_prints_the_five_rules(capsys: pytest.CaptureFixture[str]) -> None:

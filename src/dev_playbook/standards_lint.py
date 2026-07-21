@@ -3,9 +3,10 @@
 standards-lint is the detector behind the meta-standard card, a published hook
 any repo can run over its own ``standards/`` tree. It runs in two modes:
 **dev-playbook mode**, where the audited tree is dev-playbook itself (or a
-fixture simulating it), detected by the meta-standard card
-``standards/standard.md``; and **consumer mode**, every other repo, which is
-policed from this hook's own pinned clone. A repo carrying no standards/ surface
+fixture simulating it), detected by the canonical consumer template
+``standards/build/canonical/.pre-commit-config.yaml`` -- which only the hook
+repo hosts; and **consumer mode**, every other repo, which is policed from this
+hook's own pinned clone. A repo carrying no standards/ surface
 -- neither a catalog nor a flat card -- is clean by construction. Five rules,
 each namespaced under the meta card (``standard.*``):
 
@@ -157,12 +158,19 @@ def _card_paths(root: Path) -> list[str]:
 def _dev_playbook_mode(root: Path) -> bool:
     """Whether the audited tree is dev-playbook (or a fixture simulating it).
 
-    The probe is the meta-standard card's presence -- ``standards/standard.md``,
-    which only dev-playbook and dev-playbook-simulating fixtures carry. Path
-    equality against the hook clone is deliberately avoided: it would put every
-    fixture in consumer mode and break every dev-playbook-mode test.
+    The probe is the canonical consumer template's presence --
+    ``standards/build/canonical/.pre-commit-config.yaml``. Only the hook repo
+    hosts that template; consumers copy *from* it and never carry it. Keying on
+    the meta card ``standards/standard.md`` instead would collide with the shadow
+    rule -- a consumer may innocently name a card ``standard.md``, which must stay
+    in consumer mode so the shadow rule catches it, not flip the whole audit into
+    dev-playbook mode. The template cannot be created innocently, so it carries no
+    such ambiguity, and the probe is self-consistent with hook-surfaces' canonical
+    leg, which reads exactly this file -- that leg can never CannotRun on an absent
+    template. Path equality against the hook clone is deliberately avoided: it
+    would put every fixture in consumer mode and break every dev-playbook-mode test.
     """
-    return (root / META_CARD).is_file()
+    return (root / CANONICAL_CONFIG).is_file()
 
 
 # --- standard.card-layout ---------------------------------------------------
