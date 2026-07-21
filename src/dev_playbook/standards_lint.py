@@ -598,8 +598,19 @@ def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Findin
     name, so the collision is caught at the consumer's commit gate. Self-policing:
     no network, no workspace scan -- a collision introduced upstream surfaces at
     the consumer's next pin bump as a red gate, resolved locally.
+
+    The upstream scan funnels a non-git ``hook_repo_root`` into CannotRun: if the
+    clone the hook ships in is not a git checkout, ``git ls-files`` fails, and
+    that surfaces as the module's uniform exit-2 diagnostic rather than an
+    uncaught ``CalledProcessError``.
     """
-    upstream = {PurePosixPath(rel).stem for rel in _card_paths(hook_repo_root)}
+    try:
+        upstream_cards = _card_paths(hook_repo_root)
+    except subprocess.CalledProcessError as err:
+        raise CannotRun(
+            f"cannot scan upstream cards: {hook_repo_root} is not a git checkout"
+        ) from err
+    upstream = {PurePosixPath(rel).stem for rel in upstream_cards}
     return [
         Finding(
             rel,

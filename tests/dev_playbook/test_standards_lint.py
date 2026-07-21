@@ -794,6 +794,18 @@ def test_local_card_with_a_fresh_stem_is_not_flagged(tmp_path: Path) -> None:
     assert sa.check_card_shadows_upstream(consumer, upstream) == []
 
 
+def test_shadow_scan_non_git_hook_repo_root_cannot_run(tmp_path: Path) -> None:
+    # If the clone the hook ships in is not a git checkout, the upstream card
+    # scan's git ls-files fails; that funnels into CannotRun (exit 2), not an
+    # uncaught CalledProcessError traceback.
+    non_git = tmp_path / "not-a-checkout"
+    non_git.mkdir()
+    consumer = make_repo(tmp_path, {"standards/build.md": card("Build")})
+
+    with pytest.raises(sa.CannotRun):
+        sa.check_card_shadows_upstream(consumer, non_git)
+
+
 def _clean_bundle(tmp_path: Path, *, dev_playbook_mode: bool) -> Path:
     """A conformant standards/ bundle carrying a 'build' card, clean on its own.
 
