@@ -438,7 +438,14 @@ def _load_yaml(path: Path) -> object:
 
 
 def _local_hooks(root: Path) -> list[dict]:
-    """The hooks of the ``repo: local`` block in the local pre-commit config."""
+    """The hooks of the ``repo: local`` block in the local pre-commit config.
+
+    An absent ``.pre-commit-config.yaml`` wires nothing -- the common consumer
+    that only pulls dev-playbook's pinned block carries no local config -- so it
+    reads as no hooks, never CannotRun (the ``scripts/README.md`` guard shape).
+    """
+    if not (root / LOCAL_CONFIG).is_file():
+        return []
     config = _load_yaml(root / LOCAL_CONFIG)
     if not isinstance(config, dict):
         return []
@@ -498,7 +505,13 @@ def _manifest_ids(root: Path) -> tuple[set[str], set[str]]:
     set additionally carries the published non-detectors (validate-manifest,
     ``language: system``). The mirror compare uses the detector subset; the
     canonical leg uses the full set.
+
+    An absent ``.pre-commit-hooks.yaml`` publishes nothing -- a consumer that
+    adopts the standards without publishing hooks of its own carries none -- so
+    it reads as empty, never CannotRun (the ``scripts/README.md`` guard shape).
     """
+    if not (root / MANIFEST).is_file():
+        return set(), set()
     raw = _load_yaml(root / MANIFEST)
     hooks = [h for h in raw if isinstance(h, dict)] if isinstance(raw, list) else []
     all_ids = {h["id"] for h in hooks if "id" in h}

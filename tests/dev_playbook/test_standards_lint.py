@@ -731,6 +731,42 @@ def test_consumer_mode_ignores_a_canonical_template(tmp_path: Path) -> None:
     assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
 
 
+def test_hook_surfaces_absent_manifest_reads_as_empty(tmp_path: Path) -> None:
+    # A consumer that wires only dev-playbook's pinned block has a local config
+    # but no .pre-commit-hooks.yaml of its own: the absent manifest publishes
+    # nothing, read as empty rather than surfacing as CannotRun.
+    repo = make_repo(tmp_path, {".pre-commit-config.yaml": _local_block([])})
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
+
+
+def test_hook_surfaces_absent_local_config_reads_as_empty(tmp_path: Path) -> None:
+    # A repo carrying a manifest but no .pre-commit-config.yaml wires nothing
+    # locally: the absent config reads as empty, not CannotRun.
+    repo = make_repo(tmp_path, {".pre-commit-hooks.yaml": _manifest([])})
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
+
+
+def test_publisher_less_consumer_passes_clean(tmp_path: Path) -> None:
+    # Own cards + catalog, no .pre-commit-hooks.yaml and no .pre-commit-config.yaml:
+    # both absent surface files read as empty, so a consumer that publishes no
+    # hooks of its own audits clean rather than bricking its gate at exit 2.
+    upstream = make_repo(tmp_path / "up", {"README.md": "# up\n"})
+    consumer = make_repo(
+        tmp_path,
+        consumer_catalog_files(
+            [
+                bullet("standards/README.md", "Standards"),
+                bullet("standards/alpha.md", "Alpha"),
+                bullet("standards/beta.md", "Beta"),
+            ]
+        ),
+    )
+
+    assert sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream) == []
+
+
 # --- standard.card-shadows-upstream -----------------------------------------
 
 
