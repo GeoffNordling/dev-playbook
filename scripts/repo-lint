@@ -7,8 +7,9 @@ the hook repo, not here. Layer membership is inferred from facts on disk,
 then each layer's requirements are checked: required files present,
 forbidden files absent, working copies matching the canonical artifacts
 shipped with this script's clone, name mapping (repo → project → package),
-doc shape, script shebangs, and — in the hook repo itself — the self-audit
-of the canonical directory and the dogfood hook mirror.
+doc shape, script shebangs, and two self-audits: the canonical-directory
+audit in the hook repo itself, and the dogfood hook mirror in any repo that
+publishes a hook manifest.
 
 Canonical compares come in four strengths, chosen per artifact by the
 standard: byte-identical files, verbatim line blocks (extra lines may
@@ -263,7 +264,7 @@ def config_segments(text: str) -> list[list[str]]:
     return segments
 
 
-def check_precommit_config(root: Path, self_mode: bool) -> list[Finding]:
+def check_precommit_config(root: Path, hook_repo: bool) -> list[Finding]:
     path = root / ".pre-commit-config.yaml"
     if not path.is_file():
         return []
@@ -271,7 +272,7 @@ def check_precommit_config(root: Path, self_mode: bool) -> list[Finding]:
     findings = []
     pos = 0
     for segment in config_segments(canonical_text(".pre-commit-config.yaml")):
-        if self_mode and any(REV_PLACEHOLDER in line for line in segment):
+        if hook_repo and any(REV_PLACEHOLDER in line for line in segment):
             # The hook repo dogfoods from its working tree instead of a pin;
             # the self-audit checks the dogfood block against the manifest.
             continue
@@ -768,17 +769,18 @@ def check_skills_hook(root: Path) -> list[Finding]:
     ]
 
 
-# --- hook-repo self-audit ---
+# --- self-audit: canonical artifacts (hook repo) and dogfood mirror (manifest) ---
 
 
-def check_self(root: Path) -> list[Finding]:
-    findings = []
+def check_canonical_artifacts(root: Path) -> list[Finding]:
+    """Diff the hook repo's canonical directory against CANONICAL_MANIFEST.
+
+    Gated on the hook-repo condition: only dev-playbook carries
+    standards/build/canonical/, so only it owns the ten canonical artifacts.
+    """
     canon_dir = root / "standards" / "build" / "canonical"
-    present = (
-        {p.name for p in canon_dir.iterdir() if p.is_file()}
-        if canon_dir.is_dir()
-        else set()
-    )
+    present = {p.name for p in canon_dir.iterdir() if p.is_file()}
+    findings = []
     for name in sorted(present - CANONICAL_MANIFEST):
         findings.append(
             Finding(
@@ -795,6 +797,16 @@ def check_self(root: Path) -> list[Finding]:
                 "canonical artifact missing from standards/build/canonical/",
             )
         )
+    return findings
+
+
+def check_dogfood_mirror(root: Path) -> list[Finding]:
+    """Assert every id a repo publishes is dogfooded in its local hooks.
+
+    Gated on the manifest condition: any repo publishing a
+    .pre-commit-hooks.yaml must run what it ships (the hosting-pattern
+    invariant), not just the hook repo.
+    """
     manifest = root / ".pre-commit-hooks.yaml"
     published = {
         m.group(1)
@@ -807,18 +819,18 @@ def check_self(root: Path) -> list[Finding]:
         else set()
     )
     # Subset, not equality: every published hook must be dogfooded, while
-    # local-only hooks (make-check, validate-manifest) are free additions.
+    # local-only hooks (e.g. make-check) are free additions.
     missing = published - local
     if missing:
-        findings.append(
+        return [
             Finding(
                 ".pre-commit-config.yaml",
                 SELF_AUDIT,
                 f"dogfood local hooks must cover the published manifest "
                 f"(missing: {', '.join(sorted(missing))})",
             )
-        )
-    return findings
+        ]
+    return []
 
 
 def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
@@ -826,14 +838,18 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
     tracked = set(gitrepo.git_files(root, tracked_only=True))
     python_files = pyast.find_python_files(root)
     layers = infer_layers(root, python_files)
-    self_mode = (root / ".pre-commit-hooks.yaml").is_file()
+    # Two independent conditions. hook_repo is dev-playbook alone (it carries
+    # the canonical directory); has_manifest is any repo hosting a hook
+    # manifest, including a consumer that dogfoods what it publishes.
+    hook_repo = (root / "standards" / "build" / "canonical").is_dir()
+    has_manifest = (root / ".pre-commit-hooks.yaml").is_file()
 
     findings = [
         *check_presence(root, layers, files, tracked),
         *check_forbidden(root, layers, files, tracked),
         *check_canonical_bytes(root),
         *check_gitignore(root),
-        *check_precommit_config(root, self_mode),
+        *check_precommit_config(root, hook_repo),
         *check_makefile(root, layers, python_files),
         *check_pyproject(root, layers, repo_name),
         *check_src_package(root, layers, files, repo_name),
@@ -845,8 +861,10 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_scripts(root, layers, python_files),
         *check_skills_hook(root),
     ]
-    if self_mode:
-        findings += check_self(root)
+    if hook_repo:
+        findings += check_canonical_artifacts(root)
+    if has_manifest:
+        findings += check_dogfood_mirror(root)
     return findings, layers
 
 
