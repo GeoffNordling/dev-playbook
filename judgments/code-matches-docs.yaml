@@ -63,6 +63,7 @@ judgments:
     evidence:  [scripts/repo-lint]
     reference:
       - standards/claude-code/claude-content.md
+      - standards/prose/conventions.md
     model: claude-sonnet-5
     effort: high
 
