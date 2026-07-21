@@ -15,6 +15,8 @@
 #       - id: skill-lint
 #       - id: judgments-lint
 #       - id: prose-lint
+#       - id: standards-lint
+#       - id: validate-manifest
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
 # hook from there, so resolution is independent of where the consumer repo —
@@ -83,3 +85,16 @@
   language: script
   pass_filenames: false
   always_run: true
+
+- id: standards-lint
+  name: standards-lint
+  entry: scripts/standards-lint
+  language: script
+  pass_filenames: false
+  always_run: true
+
+- id: validate-manifest
+  name: validate-manifest
+  entry: uvx pre-commit validate-manifest
+  language: system
+  files: ^\.pre-commit-hooks\.yaml$

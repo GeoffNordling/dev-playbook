@@ -12,6 +12,8 @@ repos:
       - id: skill-lint
       - id: judgments-lint
       - id: prose-lint
+      - id: standards-lint
+      - id: validate-manifest
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:

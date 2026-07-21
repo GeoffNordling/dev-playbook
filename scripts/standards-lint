@@ -3,13 +3,14 @@
 
 Thin shim over dev_playbook.standards_lint.main: it puts the checkout's ``src/``
 on ``sys.path`` and calls the module, which audits the ``standards/`` tree
-against the four meta-standard rules (card-layout, catalog-order, rule-matrix,
-hook-surfaces), printing each finding as a GNU finding line
-(``file:line: standard.rule message``) and exiting nonzero if any.
-``--list-rules`` prints the rule ids and exits 0. dev-playbook-local: the
-``standards/`` tree it audits exists only here, so it is wired in the local
-pre-commit block alone. pyyaml is declared below because the module parses card
-frontmatter. See dev_playbook.standards_lint for the logic and its tests.
+against the five meta-standard rules (card-layout, catalog-order, rule-matrix,
+hook-surfaces, card-shadows-upstream), printing each finding as a GNU finding
+line (``file:line: standard.rule message``) and exiting nonzero if any.
+``--list-rules`` prints the rule ids and exits 0. It is a published hook: any
+repo can run it over its own ``standards/`` tree, with dev-playbook itself
+detected by the meta-standard card. pyyaml is declared below because the module
+parses card frontmatter. See dev_playbook.standards_lint for the logic and its
+tests.
 """
 # /// script
 # requires-python = ">=3.14"
