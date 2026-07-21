@@ -31,11 +31,11 @@ Then report: `READ: software-factory.md`. Proceed only after.
 
 ## 2. The traverse
 
-Repeat until the issue merges, closes, or a stop point (§6): place the issue at its `phase:*` node, then run the node in the engagement the skill table assigns:
+Repeat until the issue merges, closes, or a stop point (§7): place the issue at its `phase:*` node, then run the node in the engagement the skill table assigns:
 
 - **HITL** — run it yourself: invoke the node's skill inline (the `Skill` tool, issue number as argument) and interview the user directly.
 - **AFK** — delegate to a subagent (§3).
-- **Review stop** — run `/open-pr` first (always), then read the issue and diff and recommend to the user, with reasons, which tracks to launch: the **code track** (`/bug-pr-review` and our fidelity skill), the **doc track** (`/doc-pr-review`), or both — content kind picks the track, not file format. On the user's confirmation, dispatch every chosen audit in parallel (§3) — the code track's two skills included. On a lockdown re-review (the PR already carries two or more `## Code review — …` comments), dispatch only the fidelity skill on the code track — a lockdown verifies fixes and needs no fresh bug hunt. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence is software-factory.md's review sequence.
+- **Review stop** — run `/open-pr` first (always), then select the tracks yourself by the graph doc's track rules: the **code track** (`/bug-pr-review` and our fidelity skill) whenever the diff touches code, scripts, tests, or machine-read config; the **doc track** (`/doc-pr-review`) only when docs are a substantive deliverable of the diff — never for mechanical echoes of a code change, small doc edits (roughly under 10 changed doc lines), or doc content the user already wrote or approved inline at a HITL node this traverse; doubt skips. Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait; the user can retroactively cancel a launched audit or launch a skipped one. On a lockdown re-review (the PR already carries two or more `## Code review — …` comments), dispatch only the fidelity skill on the code track — a lockdown verifies fixes and needs no fresh bug hunt. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence and the track rules are software-factory.md's review sequence.
 
 When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue. A node whose skill doesn't exist is an escalation, not an improvisation.
 
@@ -59,30 +59,39 @@ A subagent is a separate session, its delegation prompt is its launch prompt, an
 
 Parse the subagent's final message per the terminal report contract: it must begin at character one with `DONE:` or `ESCALATE:`; any other shape reads as ESCALATE.
 
-- **DONE** — move the label and continue, or end the turn at a push boundary (§6).
+- **DONE** — move the label and continue, or end the turn at a push boundary (§7).
 - **ESCALATE** — bubble it: add your context — which node, what you dispatched, what the report says — and stop. Never override, retry, or self-fix an escalation; the user's call routes the issue onward.
 
 ## 4. The worktree
 
 You open it, once, before the issue's first file-touching node, per the worktree contract:
 
-1. Confirm the base is fresh, tap-free: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — hand the user the pull (§6) and stop.
+1. Confirm the base is fresh, tap-free: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — hand the user the pull (§7) and stop.
 2. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
 
 ## 5. Verdicts at review nodes
 
-The audit subagents post findings and terminate; the verdict interview is yours. First read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) At spec review the findings live in the issue's comments instead (`gh issue view <N> --comments`). Point the user at the findings, answer their questions and help them weigh, and act only on an explicit verdict. Rework is Blocking-driven by default — Suggestions alone don't call for a rework lap. You never touch the work under review; a fix is the author's, routed through rework.
+The audit subagents post findings and terminate; the verdict interview is yours. First read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) At spec review the findings live in the issue's comments instead (`gh issue view <N> --comments`). Point the user at the findings, answer their questions and help them weigh, and act only on an explicit verdict. Rework is Blocking-driven by default — Suggestions alone don't call for a rework lap. You never touch the work under review; a fix is the author's, routed through rework. The judgment endgame (§6) is the lone exception: post-approve, its fixes are yours.
 
-- **approve** — follow the graph's approve edge. At spec review, move the label onward (no PR exists to refresh). At a PR review stop (`pr_review`, `sdd_pr_review`), first refresh the merge message — regenerate the PR title and body from the final diff with a tap-free `gh pr edit`, per the [merge-message recipe](~/workspace/dev-playbook/software-factory/software-factory.md#the-merge-message-recipe), so the squash message the GitHub-UI merge picks up reflects what shipped — then the user merges in the GitHub UI (you can't); report and stop. Worktree teardown is the Agent-view overwatch's, not yours.
+- **approve** — follow the graph's approve edge. At spec review, move the label onward (no PR exists to refresh). At a PR review stop (`pr_review`, `sdd_pr_review`), the verdict opens the judgment endgame (§6) — run it first: its fixes change the final diff. Then refresh the merge message — regenerate the PR title and body from the final diff with a tap-free `gh pr edit`, per the [merge-message recipe](~/workspace/dev-playbook/software-factory/software-factory.md#the-merge-message-recipe), so the squash message the GitHub-UI merge picks up reflects what shipped — hand the user the final verified push if the endgame committed fixes (§7), and the user merges in the GitHub UI (you can't); report and stop. Worktree teardown is the Agent-view overwatch's, not yours.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment` / `gh pr comment`), then move the label back along the rework edge (routed by `tests:*` on the direct path).
 
-## 6. Turn boundaries — the human's commands
+## 6. The judgment endgame — HITL
+
+The semantic judgment gate is deferred to the very end of the traverse: every intermediary push rides `--no-verify` (§7), so a red judgment cache never blocks a work cycle. The bill comes due exactly once, on the approve verdict at a PR review stop — and it is yours, run inline with the user present:
+
+1. **Run the judgments yourself:** invoke `/run-judgments` (the `Skill` tool) in the issue's worktree. It enumerates the misses, dispatches the judges, records the passes, and makes focused fixes for refutations — weigh any fix with the user and take over the ones it sets aside; this is an interview, not a delegation.
+2. **Commit the fixes inline** with the user's go-ahead, as with any HITL node's work. Judgment fixes never reopen review: no new cycle, no fresh audit — the user has already approved the substance.
+3. **Close green:** confirm with `make check-judgments`, then continue the approve sequence (§5) — refresh the merge message, and hand the user the final verified push (§7) if fixes were committed; with none, origin already holds the final diff and there is nothing to push.
+
+## 7. Turn boundaries — the human's commands
 
 End your turn wherever only the user can act, stating the command once, paste-safe, one line:
 
-- **Push, after any committing node:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push -u origin issue-<N>`
+- **Intermediary push, after any committing node:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push --no-verify -u origin issue-<N>` — `--no-verify` on purpose: the pre-push gate's judgment cache is deferred to the endgame (§6), and the phase-close `make check` already proved the deterministic suite.
+- **Final push, when the endgame committed fixes:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push origin issue-<N>` — verified: the armed gate re-proves the judgments on the issue's way to merge.
 - **Pull, on a stale base:** `git -C ~/workspace/<repo> pull` — the main checkout, not the worktree.
 - **Merge, on approve** — in the GitHub UI; it lands the PR, drops the origin branch, and closes the issue.
 
