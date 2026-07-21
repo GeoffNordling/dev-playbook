@@ -149,10 +149,19 @@ def _is_card_path(rel: str) -> bool:
 
 
 def _card_paths(root: Path) -> list[str]:
-    """Every flat card slot under ``standards/`` in the checkout, sorted."""
-    return sorted(
-        rel for p in md.find_md_files(root) if _is_card_path(rel := _relpath(p, root))
-    )
+    """Every flat card slot under ``standards/`` in the checkout, sorted.
+
+    Discovery runs ``git ls-files``, so a non-git ``root`` funnels into CannotRun
+    here -- the single chokepoint that covers every caller (the audited root's
+    optional-surface guard and the shadow rule's ``hook_repo_root`` scan alike),
+    so a non-git checkout surfaces as the module's uniform exit-2 diagnostic
+    rather than an uncaught ``CalledProcessError``.
+    """
+    try:
+        found = md.find_md_files(root)
+    except subprocess.CalledProcessError as err:
+        raise CannotRun(f"cannot scan cards: {root} is not a git checkout") from err
+    return sorted(rel for p in found if _is_card_path(rel := _relpath(p, root)))
 
 
 def _dev_playbook_mode(root: Path) -> bool:
@@ -599,18 +608,12 @@ def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Findin
     no network, no workspace scan -- a collision introduced upstream surfaces at
     the consumer's next pin bump as a red gate, resolved locally.
 
-    The upstream scan funnels a non-git ``hook_repo_root`` into CannotRun: if the
-    clone the hook ships in is not a git checkout, ``git ls-files`` fails, and
-    that surfaces as the module's uniform exit-2 diagnostic rather than an
-    uncaught ``CalledProcessError``.
+    A non-git ``hook_repo_root`` funnels into CannotRun through ``_card_paths``,
+    the single chokepoint for every git scan -- so if the clone the hook ships in
+    is not a git checkout, that surfaces as the module's uniform exit-2 diagnostic
+    rather than an uncaught ``CalledProcessError``.
     """
-    try:
-        upstream_cards = _card_paths(hook_repo_root)
-    except subprocess.CalledProcessError as err:
-        raise CannotRun(
-            f"cannot scan upstream cards: {hook_repo_root} is not a git checkout"
-        ) from err
-    upstream = {PurePosixPath(rel).stem for rel in upstream_cards}
+    upstream = {PurePosixPath(rel).stem for rel in _card_paths(hook_repo_root)}
     return [
         Finding(
             rel,

@@ -806,6 +806,17 @@ def test_shadow_scan_non_git_hook_repo_root_cannot_run(tmp_path: Path) -> None:
         sa.check_card_shadows_upstream(consumer, non_git)
 
 
+def test_audit_non_git_root_cannot_run(tmp_path: Path) -> None:
+    # The optional-surface guard scans the audited root via git ls-files; a
+    # non-git root funnels into CannotRun (exit 2) at the same _card_paths
+    # chokepoint as the upstream scan, never an uncaught CalledProcessError.
+    non_git = tmp_path / "not-a-checkout"
+    non_git.mkdir()
+
+    with pytest.raises(sa.CannotRun):
+        sa.audit(non_git, fake_list_rules({}))
+
+
 def _clean_bundle(tmp_path: Path, *, dev_playbook_mode: bool) -> Path:
     """A conformant standards/ bundle carrying a 'build' card, clean on its own.
 
