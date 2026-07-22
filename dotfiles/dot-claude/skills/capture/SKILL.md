@@ -1,0 +1,43 @@
+---
+name: capture
+description: Deposit raw idea material verbatim into mission-control's inbox/ from any repo — a dictation, a pasted agent conversation, a dump of disjoint ideas — then commit it there and hand the owner the push. Use when the owner invokes /capture from a repo that is not mission-control, or throws idea material into the chat to be saved for later triage.
+disable-model-invocation: true
+model: sonnet
+effort: xhigh
+argument-hint: "[raw idea material]"
+---
+
+# Capture
+
+A thin pointer so `/capture` works from any repo on desktop without
+`cd`-ing into mission-control. The real skill lives in mission-control:
+read [.claude/skills/capture/SKILL.md](~/workspace/mission-control/.claude/skills/capture/SKILL.md)
+now and follow it **verbatim** — it owns the deposit format, the
+`CLAUDE_CODE_REMOTE` path-selection, and the receipt. Apply only the
+cwd-translation overrides below.
+
+## Material: $ARGUMENTS
+
+## Overrides
+
+mission-control's capture skill assumes the session's cwd **is**
+mission-control, so it uses repo-relative paths (`inbox/…`) and a plain
+`git`. This pointer fires from another repo, so force mission-control as
+the target instead — the same discipline `log-friction` uses:
+
+- **Working repo is always `~/workspace/mission-control`**, whatever the
+  session's cwd.
+- **Every file write goes under `~/workspace/mission-control/inbox/`** —
+  each deposit file and `inbox/index.md`.
+- **Every git command runs via `git -C ~/workspace/mission-control`.**
+- **Stage only `inbox/` paths.** The current repo and mission-control may
+  both hold unrelated work awaiting the owner's diff review.
+- **Touch nothing in the current repo.**
+- Follow the mission-control skill's own `CLAUDE_CODE_REMOTE`
+  path-selection — in practice always the desktop path here: a local
+  commit on mission-control's branch, no push.
+- Hand the owner the push, as one line:
+
+  ```
+  git -C ~/workspace/mission-control push
+  ```
