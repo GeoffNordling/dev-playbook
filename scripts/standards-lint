@@ -8,7 +8,9 @@ hook-surfaces, card-shadows-upstream), printing each finding as a GNU finding
 line (``file:line: standard.rule message``) and exiting nonzero if any.
 ``--list-rules`` prints the rule ids and exits 0. It is a published hook: any
 repo can run it over its own ``standards/`` tree, with dev-playbook itself
-detected by the meta-standard card. pyyaml is declared below because the module
+detected by the canonical consumer template
+``standards/build/canonical/.pre-commit-config.yaml`` -- which only the hook repo
+hosts. pyyaml is declared below because the module
 parses card frontmatter. See dev_playbook.standards_lint for the logic and its
 tests.
 """
