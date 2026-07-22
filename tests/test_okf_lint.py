@@ -4,6 +4,7 @@ okf-lint declares pyyaml via PEP 723 and imports the local dev_playbook package,
 is invoked exactly the way pre-commit runs it: `uv run --script`.
 """
 
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -48,12 +49,48 @@ BASE_BUNDLE: dict[str, str] = {
 }
 
 
-def run_okf_lint(repo_root: Path) -> subprocess.CompletedProcess:
+def run_okf_lint(
+    repo_root: Path, upstream_root: Path | None = None
+) -> subprocess.CompletedProcess:
+    """Run okf-lint over ``repo_root``.
+
+    When ``upstream_root`` is given, pin okf-lint's upstream registry to it via
+    ``OKF_LINT_UPSTREAM_ROOT`` so a consumer-mode test resolves a synthetic
+    registry instead of dev-playbook's live one.
+    """
+    env = None
+    if upstream_root is not None:
+        env = {**os.environ, "OKF_LINT_UPSTREAM_ROOT": str(upstream_root)}
     return subprocess.run(
         ["uv", "run", "--script", str(OKF_LINT), str(repo_root)],
         capture_output=True,
         text=True,
+        env=env,
     )
+
+
+# A synthetic upstream registry a consumer-mode test pins via
+# OKF_LINT_UPSTREAM_ROOT, so its assertions never depend on dev-playbook's live
+# registry contents (which a future type rename or addition would otherwise break
+# spuriously). It declares a small fixed vocabulary; the local extension names the
+# consumer-extension tests use are chosen to sit outside it.
+UPSTREAM_REGISTRY = (
+    "---\ntype: Standard\ntitle: Document Types\n"
+    "description: The document type registry\n---\n\n"
+    "# Document Types\n\n## Types\n\n"
+    "| Type | What it is |\n|------|------------|\n"
+    "| `Guide` | teaching |\n| `README` | landing |\n"
+    "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
+)
+
+
+def make_upstream(tmp_path: Path) -> Path:
+    """Write the synthetic upstream registry into a tree and return its root."""
+    root = tmp_path / "upstream"
+    doc = root / "standards" / "docs" / "document-types.md"
+    doc.parent.mkdir(parents=True, exist_ok=True)
+    doc.write_text(UPSTREAM_REGISTRY)
+    return root
 
 
 def _write_bundle(
@@ -304,10 +341,11 @@ def test_repo_self_scan_is_clean() -> None:
 # --- consumer mode: no standards/docs/document-types.md in the audited repo ---
 
 # A minimal bundle with no registry doc at all (no standards/ directory), so
-# okf-lint must resolve consumer mode and validate types against its own
-# clone's registry instead of raising "registry doc not found". Types used
-# here (README) exist in dev-playbook's live registry, since the subprocess
-# resolves its clone root to the real checkout via __file__.
+# okf-lint must resolve consumer mode and validate types against the upstream
+# registry rather than raising because the audited tree carries none. The
+# consumer-mode tests pin a synthetic upstream via make_upstream (which declares
+# README among its types), so their assertions never depend on dev-playbook's
+# live registry contents.
 CONSUMER_BUNDLE: dict[str, str] = {
     "README.md": (
         "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
@@ -326,11 +364,11 @@ def make_consumer_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Pa
 
 def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
     """A repo with no standards/docs/document-types.md is still linted — its
-    types are validated against the hook's own clone registry, never treated
-    as 'cannot run'."""
+    types are validated against the upstream registry, never treated as
+    'cannot run'."""
     repo = make_consumer_bundle(tmp_path, {})
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "knowledge-organization.registry-row" not in result.stdout
@@ -338,9 +376,9 @@ def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
 
 
 def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
-    """A bogus type in a registry-less repo is checked against the clone's
+    """A bogus type in a registry-less repo is checked against the upstream
     registry and flagged, and still emits no registry-shape finding — a
-    consumer cannot fix dev-playbook's registry from its own commit."""
+    consumer cannot fix the upstream registry from its own commit."""
     repo = make_consumer_bundle(
         tmp_path,
         {
@@ -348,7 +386,7 @@ def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
         },
     )
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     assert "not in the registry" in result.stdout
@@ -356,15 +394,46 @@ def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
     assert "knowledge-organization.index-ordering" not in result.stdout
 
 
+def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> None:
+    """Consumer mode reads the upstream registry from OKF_LINT_UPSTREAM_ROOT when
+    it is set — a doc typed with a name only the pinned upstream declares
+    (Landmark, absent from the live registry) resolves clean. This is the seam
+    that lets the consumer-mode tests pin a synthetic registry instead of
+    asserting against dev-playbook's live one."""
+    upstream_doc = (
+        "---\ntype: Standard\ntitle: Document Types\n"
+        "description: The document type registry\n---\n\n"
+        "# Document Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Landmark` | a bespoke upstream-only type |\n| `README` | landing |\n"
+    )
+    upstream = tmp_path / "upstream"
+    (upstream / "standards" / "docs").mkdir(parents=True)
+    (upstream / "standards" / "docs" / "document-types.md").write_text(upstream_doc)
+    landmark = (
+        "---\ntype: Landmark\ntitle: A Landmark\n"
+        "description: A landmark doc\n---\n\n# A Landmark\n"
+    )
+    index = (
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        "- [Root](/README.md) — Root readme desc\n"
+        "- [A Landmark](/landmark.md) — A landmark doc\n"
+    )
+    repo = make_consumer_bundle(tmp_path, {"landmark.md": landmark, "index.md": index})
+
+    result = run_okf_lint(repo, upstream_root=upstream)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 # --- consumer mode: the local type extension (union, degradation, shadow) ---
 
 # A conformant consumer bundle that carries its OWN standards/docs/document-types.md
 # as a LOCAL EXTENSION. It ships no canonical consumer template, so okf-lint stays
-# in consumer mode: it resolves the upstream registry from the hook's own clone
+# in consumer mode: it resolves the upstream registry (the pinned synthetic one)
 # and unions the extension's valid types on top. The local names (Doohickey,
-# Gizmo) are absent from dev-playbook's live registry, so they neither collide
-# with an upstream name nor shadow one — the subprocess resolves the real registry
-# through the module's __file__.
+# Gizmo) are absent from that synthetic upstream, so they neither collide with an
+# upstream name nor shadow one.
 EXTENSION_DOC = (
     "---\ntype: Standard\ntitle: Local Types\n"
     "description: The local type extension\n---\n\n"
@@ -409,7 +478,7 @@ def test_consumer_extension_unions_and_does_not_replace_upstream(
     extension lists neither."""
     repo = make_consumer_ext_bundle(tmp_path, {})
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -430,7 +499,7 @@ def test_consumer_extension_local_type_doc_is_accepted(tmp_path: Path) -> None:
         tmp_path, {"standards/gizmo.md": gizmo, "standards/index.md": index}
     )
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -451,7 +520,7 @@ def test_consumer_extension_bogus_type_still_flagged(tmp_path: Path) -> None:
         tmp_path, {"standards/bogus.md": bogus, "standards/index.md": index}
     )
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     assert "standards/bogus.md" in result.stdout
@@ -488,7 +557,7 @@ def test_consumer_extension_malformed_row_is_flagged_and_walk_continues(
         },
     )
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     assert re.search(
@@ -515,7 +584,7 @@ def test_consumer_extension_with_zero_valid_rows_degrades_to_a_finding(
     )
     repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     # The finding is file-level (no `:line` after the path) and the run is exit 1,
@@ -540,7 +609,7 @@ def test_consumer_extension_table_out_of_alphabetical_order_is_flagged(
     )
     repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     assert (
@@ -564,7 +633,7 @@ def test_consumer_extension_shadowing_upstream_yields_one_shadow_finding(
     )
     repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     shadow_lines = [
@@ -574,6 +643,35 @@ def test_consumer_extension_shadowing_upstream_yields_one_shadow_finding(
     ]
     assert len(shadow_lines) == 1, result.stdout
     assert "Readme" in shadow_lines[0]
+
+
+def test_consumer_extension_intra_extension_case_alias_yields_one_shadow_finding(
+    tmp_path: Path,
+) -> None:
+    """Two local rows that are case-aliases of each other (Api / API), neither in
+    upstream, still yield exactly one `type-shadows-upstream` finding — on the
+    second row. The shadow rule closes the aliasing hole within the extension,
+    not only against upstream; otherwise both would union in as distinct legal
+    types."""
+    ext = (
+        "---\ntype: Standard\ntitle: Local Types\n"
+        "description: The local type extension\n---\n\n"
+        "# Local Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Api` | a local api |\n| `API` | a case variant of Api |\n"
+    )
+    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
+
+    assert result.returncode == 1
+    shadow_lines = [
+        line
+        for line in result.stdout.splitlines()
+        if "knowledge-organization.type-shadows-upstream" in line
+    ]
+    assert len(shadow_lines) == 1, result.stdout
+    assert "API" in shadow_lines[0]
 
 
 def test_consumer_extension_file_unlisted_in_index_is_flagged_by_index_rule(
@@ -587,7 +685,7 @@ def test_consumer_extension_file_unlisted_in_index_is_flagged_by_index_rule(
     )  # drops the document-types.md line
     repo = make_consumer_ext_bundle(tmp_path, {"standards/index.md": index})
 
-    result = run_okf_lint(repo)
+    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     assert "omits concept doc standards/docs/document-types.md" in result.stdout

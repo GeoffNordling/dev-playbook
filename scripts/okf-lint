@@ -49,6 +49,7 @@ Usage:
 # ///
 
 import argparse
+import os
 import re
 import sys
 from collections import Counter
@@ -62,6 +63,14 @@ import yaml
 # mode resolves the type registry here, since a consumer repo never carries
 # its own copy (see REGISTRY_DOC below).
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# The tree consumer mode reads the authoritative upstream registry from —
+# HOOK_REPO_ROOT by default. Overridable via OKF_LINT_UPSTREAM_ROOT so a test can
+# pin a synthetic upstream registry rather than depend on the live dev-playbook
+# one (the same synthetic-upstream injection standards-lint does through its
+# `hook_repo_root` parameter). Only the registry read is redirected; the
+# dev_playbook import below always resolves from the real clone.
+UPSTREAM_REGISTRY_ROOT = Path(os.environ.get("OKF_LINT_UPSTREAM_ROOT", HOOK_REPO_ROOT))
 
 sys.path.insert(0, str(HOOK_REPO_ROOT / "src"))
 
@@ -298,10 +307,11 @@ def check_extension(
       - ``knowledge-organization.index-ordering`` when the `## Types` table is
         not alphabetical, the same order the apex registry declares;
       - ``knowledge-organization.type-shadows-upstream`` per row whose name
-        case-insensitively equals an upstream type. Membership itself stays
-        exact-case; this rule is what stops a consumer aliasing an upstream type
-        under a different case (e.g. unioning ``Readme`` beside upstream
-        ``README``).
+        case-insensitively equals an already-declared type — an upstream type
+        (e.g. local ``Readme`` beside upstream ``README``) or an earlier row of
+        this same extension (e.g. ``API`` after ``Api``). Membership itself stays
+        exact-case; this rule is what stops a consumer aliasing a type under a
+        different case, whether the aliased type is upstream's or its own.
     """
     valid, malformed_rows = scan_registry_rows(repo_root / REGISTRY_DOC)
     local_names = [name for name, _ in valid]
@@ -315,16 +325,24 @@ def check_extension(
             )
         )
     upstream_lower = {name.lower() for name in upstream}
+    seen_lower = set(upstream_lower)
     for name, line_num in valid:
-        if name.lower() in upstream_lower:
+        lowered = name.lower()
+        if lowered in seen_lower:
+            target = (
+                "an upstream type"
+                if lowered in upstream_lower
+                else "another local type"
+            )
             findings.append(
                 Finding(
                     REGISTRY_DOC,
                     TYPE_SHADOWS_UPSTREAM,
-                    f"local type `{name}` case-insensitively shadows an upstream type",
+                    f"local type `{name}` case-insensitively shadows {target}",
                     line=line_num,
                 )
             )
+        seen_lower.add(lowered)
     return set(local_names), findings
 
 
@@ -674,7 +692,7 @@ def main(argv: list[str] | None = None) -> int:
         if apex_mode:
             registry, registry_findings = check_registry(repo_root)
         else:
-            upstream_names, _malformed_rows = parse_registry(HOOK_REPO_ROOT)
+            upstream_names, _malformed_rows = parse_registry(UPSTREAM_REGISTRY_ROOT)
             registry = set(upstream_names)
             registry_findings = []
             if (repo_root / REGISTRY_DOC).is_file():
