@@ -253,16 +253,23 @@ def _is_directory_bullet(target: str) -> bool:
     return PurePosixPath(target).name == "index.md"
 
 
-def check_catalog_order(root: Path) -> list[Finding]:
+def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
     """Flag a catalog whose entries depart from the declared order.
 
     okf-lint already enforces catalog *membership* (the ``Ordering:`` marker
     exempts only its generic alphabetical rule), so this checks order alone:
-    README, the meta-standard card *when the tree carries it*, the remaining
-    cards by title, the contract docs by title, then directories. The meta card
-    is data-driven, not mode-driven: a consumer catalog simply has no such row,
-    and okf-lint's index rule independently forces every existing card file to
-    have a catalog row, so dev-playbook cannot silently drop its meta-card row.
+    README, the meta-standard card *when the tree is dev-playbook's own and
+    carries it*, the remaining cards by title, the contract docs by title, then
+    directories. The meta-card lead slot is mode-gated -- only a dev-playbook-mode
+    tree that carries ``standards/standard.md`` gets it. In consumer mode a card
+    named ``standard.md`` is an ordinary card sorted among the others, so a
+    consumer that names one draws only the intended ``card-shadows-upstream``
+    finding, never a spurious catalog-order complaint about a meta-standard it has
+    no concept of. The file-existence check stays load-bearing under the mode
+    conjunct: a dev-playbook-mode tree that legitimately omits the meta card must
+    not be forced to carry a meta-card lead row, and okf-lint's index rule
+    independently forces every existing card file to have a catalog row, so
+    dev-playbook cannot silently drop its own meta-card row.
     """
     if not (root / CATALOG).is_file():
         raise CannotRun(f"no catalog at {CATALOG}")
@@ -282,9 +289,14 @@ def check_catalog_order(root: Path) -> list[Finding]:
                 )
             ]
 
-    cards = [t for t in doc_targets if _is_card_path(t) and t != META_CARD]
+    has_meta_lead = dev_playbook_mode and (root / META_CARD).is_file()
+    cards = [
+        t
+        for t in doc_targets
+        if _is_card_path(t) and not (has_meta_lead and t == META_CARD)
+    ]
     contracts = [t for t in doc_targets if not _is_card_path(t) and t != README]
-    lead = [README, META_CARD] if (root / META_CARD).is_file() else [README]
+    lead = [README, META_CARD] if has_meta_lead else [README]
     expected = (
         lead
         + sorted(cards, key=lambda t: _title(root / t).lower())
@@ -651,7 +663,7 @@ def audit(
     dev_playbook_mode = _dev_playbook_mode(root)
     findings: list[Finding] = []
     findings.extend(check_card_layout(root))
-    findings.extend(check_catalog_order(root))
+    findings.extend(check_catalog_order(root, dev_playbook_mode))
     findings.extend(check_rule_matrix(root, list_rules))
     findings.extend(check_hook_surfaces(root, dev_playbook_mode))
     if not dev_playbook_mode:

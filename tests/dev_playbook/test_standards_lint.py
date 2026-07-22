@@ -192,7 +192,7 @@ def test_catalog_in_declared_order_passes(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    assert sa.check_catalog_order(repo) == []
+    assert sa.check_catalog_order(repo, dev_playbook_mode=True) == []
 
 
 def test_readme_not_first_is_flagged(tmp_path: Path) -> None:
@@ -208,7 +208,7 @@ def test_readme_not_first_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -226,7 +226,7 @@ def test_cards_out_of_alphabetical_order_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -244,7 +244,7 @@ def test_contract_doc_before_a_card_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -273,7 +273,7 @@ def test_consumer_catalog_readme_then_own_cards_passes(tmp_path: Path) -> None:
         ),
     )
 
-    assert sa.check_catalog_order(repo) == []
+    assert sa.check_catalog_order(repo, dev_playbook_mode=False) == []
 
 
 def test_consumer_catalog_cards_out_of_order_flagged(tmp_path: Path) -> None:
@@ -290,7 +290,7 @@ def test_consumer_catalog_cards_out_of_order_flagged(tmp_path: Path) -> None:
         ),
     )
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=False)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -901,6 +901,38 @@ def test_consumer_card_named_standard_md_is_flagged_as_a_shadow(tmp_path: Path) 
     assert findings[0].file == "standards/standard.md"
 
 
+def test_consumer_card_named_standard_md_draws_no_catalog_order_finding(
+    tmp_path: Path,
+) -> None:
+    # In consumer mode standards/standard.md is an ordinary card, sorted among the
+    # others by title -- not forced into the meta-card lead slot. A catalog ordered
+    # [README, alpha, standard] therefore passes catalog-order, so the sole finding
+    # is the intended shadow, never a spurious catalog-order complaint about a
+    # meta-standard the consumer has no concept of.
+    upstream = make_repo(
+        tmp_path / "up", {"standards/standard.md": card("Meta-Standard")}
+    )
+    consumer = make_repo(
+        tmp_path,
+        {
+            "standards/README.md": readme(),
+            "standards/alpha.md": card("Alpha"),
+            "standards/standard.md": card("Standard"),
+            "standards/index.md": catalog(
+                [
+                    bullet("standards/README.md", "Standards"),
+                    bullet("standards/alpha.md", "Alpha"),
+                    bullet("standards/standard.md", "Standard"),
+                ]
+            ),
+        },
+    )
+
+    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+
+    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+
+
 def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
     tmp_path: Path,
 ) -> None:
@@ -972,7 +1004,7 @@ def test_dangling_catalog_target_cannot_run(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, files)
 
     with pytest.raises(sa.CannotRun):
-        sa.check_catalog_order(repo)
+        sa.check_catalog_order(repo, dev_playbook_mode=True)
 
 
 def test_missing_catalog_cannot_run(tmp_path: Path) -> None:
@@ -980,7 +1012,7 @@ def test_missing_catalog_cannot_run(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, {"standards/build.md": card("Build")})
 
     with pytest.raises(sa.CannotRun):
-        sa.check_catalog_order(repo)
+        sa.check_catalog_order(repo, dev_playbook_mode=False)
 
 
 # --- the optional standards/ surface ----------------------------------------
@@ -1078,6 +1110,6 @@ def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
