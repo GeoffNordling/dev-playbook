@@ -458,6 +458,155 @@ def test_consumer_extension_bogus_type_still_flagged(tmp_path: Path) -> None:
     assert "type 'Bogus' not in the registry" in result.stdout
 
 
+def test_consumer_extension_malformed_row_is_flagged_and_walk_continues(
+    tmp_path: Path,
+) -> None:
+    """A malformed extension row is a `registry-row` finding at its line, and the
+    extension is scanned non-raising — the walk does not abort, so an unrelated
+    bogus type elsewhere is still caught."""
+    ext = (
+        "---\ntype: Standard\ntitle: Local Types\n"
+        "description: The local type extension\n---\n\n"
+        "# Local Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Gizmo` | a local gizmo |\n"
+        "| Bogus row without ticks | nonsense |\n"
+    )
+    nope = "---\ntype: Nope\ntitle: A Nope\ndescription: A nope doc\n---\n\n# A Nope\n"
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [A Nope](/standards/nope.md) — A nope doc\n"
+        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+    )
+    repo = make_consumer_ext_bundle(
+        tmp_path,
+        {
+            "standards/docs/document-types.md": ext,
+            "standards/nope.md": nope,
+            "standards/index.md": index,
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert re.search(
+        r"standards/docs/document-types\.md:\d+: knowledge-organization\.registry-row",
+        result.stdout,
+    ), result.stdout
+    # The malformed extension did not abort the scan (exit 2): the sibling bogus
+    # type is still caught.
+    assert "type 'Nope' not in the registry" in result.stdout
+
+
+def test_consumer_extension_with_zero_valid_rows_degrades_to_a_finding(
+    tmp_path: Path,
+) -> None:
+    """An extension whose `## Types` table has no valid rows yields a file-level
+    `registry-row` finding — never exit 2 — so every other okf-lint check on the
+    repo still runs. The raising parse_registry would instead abort the scan."""
+    ext = (
+        "---\ntype: Standard\ntitle: Local Types\n"
+        "description: The local type extension\n---\n\n"
+        "# Local Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| no ticks here | nonsense |\n"
+    )
+    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    # The finding is file-level (no `:line` after the path) and the run is exit 1,
+    # not the exit 2 of a scan abort.
+    assert (
+        "standards/docs/document-types.md: knowledge-organization.registry-row"
+        in result.stdout
+    )
+
+
+def test_consumer_extension_table_out_of_alphabetical_order_is_flagged(
+    tmp_path: Path,
+) -> None:
+    """The extension's `## Types` table is held to the same alphabetical order as
+    the apex registry — an out-of-order table is an `index-ordering` finding."""
+    ext = (
+        "---\ntype: Standard\ntitle: Local Types\n"
+        "description: The local type extension\n---\n\n"
+        "# Local Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Gizmo` | a local gizmo |\n| `Doohickey` | a local doohickey |\n"
+    )
+    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert (
+        "standards/docs/document-types.md: knowledge-organization.index-ordering"
+        in result.stdout
+    )
+
+
+def test_consumer_extension_shadowing_upstream_yields_one_shadow_finding(
+    tmp_path: Path,
+) -> None:
+    """A local row whose name case-insensitively equals an upstream type (Readme
+    vs upstream README) yields exactly one `type-shadows-upstream` finding — the
+    rule that closes the case-alias hole left by exact-case membership."""
+    ext = (
+        "---\ntype: Standard\ntitle: Local Types\n"
+        "description: The local type extension\n---\n\n"
+        "# Local Types\n\n## Types\n\n"
+        "| Type | What it is |\n|------|------------|\n"
+        "| `Readme` | a case variant of upstream README |\n"
+    )
+    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    shadow_lines = [
+        line
+        for line in result.stdout.splitlines()
+        if "knowledge-organization.type-shadows-upstream" in line
+    ]
+    assert len(shadow_lines) == 1, result.stdout
+    assert "Readme" in shadow_lines[0]
+
+
+def test_consumer_extension_file_unlisted_in_index_is_flagged_by_index_rule(
+    tmp_path: Path,
+) -> None:
+    """The extension file is an ordinary concept doc: leaving it out of its owning
+    index is caught by the existing index rule, no extension-specific code."""
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+    )  # drops the document-types.md line
+    repo = make_consumer_ext_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "omits concept doc standards/docs/document-types.md" in result.stdout
+
+
+def test_list_rules_includes_type_shadows_upstream(tmp_path: Path) -> None:
+    """--list-rules registers the new shadow rule under the knowledge-organization
+    namespace."""
+    result = subprocess.run(
+        ["uv", "run", "--script", str(OKF_LINT), "--list-rules"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "knowledge-organization.type-shadows-upstream" in result.stdout.split()
+
+
 # --- instrument.employed-by ---
 
 # The overlay a bundle needs to carry a typed Instrument Spec: the registry row
