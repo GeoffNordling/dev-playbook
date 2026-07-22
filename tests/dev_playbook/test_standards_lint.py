@@ -1,9 +1,10 @@
 """Behavioral tests for the standards-lint detector (the meta-standard's rules).
 
 standards-lint is a published hook: it audits the ``standards/`` tree of any
-repo, in dev-playbook mode (the tree carries the meta-standard card) or consumer
-mode (it does not). Each check function takes a repo root and returns findings;
-discovery goes through ``git ls-files``, so every fixture is a git repo. The
+repo, in dev-playbook mode (keyed by the canonical consumer template) or
+consumer mode (everything else). Each check function takes a repo root and
+returns findings; discovery goes through ``git ls-files``, so every fixture is
+a git repo. The
 rule-matrix check's ``--list-rules`` boundary is injected as a plain callable,
 and consumer-mode fixtures pass a synthetic upstream root, so both are exercised
 without subprocessing real detectors.

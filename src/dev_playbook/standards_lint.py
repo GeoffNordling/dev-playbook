@@ -15,9 +15,9 @@ each namespaced under the meta card (``standard.*``):
     (Define, Audit, Enforce, Adopt) as ``##`` sections, in that order. Contracts
     live in sub-directories, so the flat-file layer is exactly the cards.
   - **catalog-order** — ``standards/index.md`` follows its declared ordering:
-    README first, then the meta-standard card when the tree carries it, the
-    remaining cards alphabetical by title, then the contract docs alphabetical
-    by title, directories last.
+    README first, then (in dev-playbook mode) the meta-standard card when the
+    tree carries it, the remaining cards alphabetical by title, then the
+    contract docs alphabetical by title, directories last.
   - **rule-matrix** — the bidirectional card<->rule check between each card's
     Audit-cell detector citations and the rule prefixes those detectors emit
     (``--list-rules`` is the trusted ground truth).
