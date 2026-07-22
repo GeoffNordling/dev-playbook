@@ -59,3 +59,44 @@ Every concept document opens with a YAML frontmatter block:
   in the body, not here.
 
 Not used: `tags`, `timestamp`.
+
+## Local extensions
+
+The registry is hierarchical, exactly two levels deep. **This file, in
+dev-playbook, is the global registry** — the upstream vocabulary every repo
+inherits. A consumer repo that carries a document type no other repo shares
+declares it in a **local extension**: its own `standards/docs/document-types.md`,
+a `## Types` table of the same shape. okf-lint resolves a document's `type`
+against **upstream ∪ local** — the global registry plus the audited repo's
+extension, defaulting to upstream alone when the repo carries no extension.
+(okf-lint tells the two apart by the canonical consumer template, not by the
+registry file's presence: only dev-playbook hosts that template, so a consumer's
+extension never flips the audit into replacing the global registry.)
+
+Extension is **additive and downhill only**:
+
+- **Add, never shadow, loosen, or drop.** A local table may only introduce new
+  types. A local name that case-insensitively equals an upstream one is a shadow
+  — okf-lint's `knowledge-organization.type-shadows-upstream` rule flags it, one
+  finding per offending row. (Membership itself stays exact-case; the
+  case-insensitive shadow rule is what stops a consumer aliasing upstream `Idea`
+  as a distinct `IDEA`.) A consumer cannot loosen or remove an upstream type,
+  because it never edits this file.
+- **Downhill only.** A local type is legal only in the repo that declares it (and
+  any repo downstream of it); it is invisible uphill to dev-playbook and sideways
+  to sibling consumers. A type is exactly as local as the population that carries
+  it — a vocabulary word lives where its documents live.
+- **Name and description only.** A local type carries just its name and its
+  `## Types` cell. The per-type constraints upstream types may impose (a
+  `resource` on `Recipe-Description`, an `## Employed by` section on
+  `Instrument-Spec`) stay hardcoded upstream; a local type cannot declare its
+  own.
+- **Broken extension degrades, never aborts.** A malformed or empty extension
+  table yields findings on that file (`knowledge-organization.registry-row`,
+  `knowledge-organization.index-ordering`) while the rest of the repo is still
+  fully checked — never a whole-repo scan abort.
+
+Authoring a local extension is one step of the
+[repo-scoped standard recipe](/standards/standard/consuming.md); it is itself a
+concept document, so the same Title-Case, alphabetical-table, and index-listing
+rules this file follows apply to it.
