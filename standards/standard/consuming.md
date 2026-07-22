@@ -17,6 +17,12 @@ the detector contract, and the hosting pattern it points at are all defined in
 
 ## 1. Grow the `standards/` tree
 
+If the repo has no `standards/` tree yet, create its landing doc first:
+`standards/README.md` (`type: README`) and `standards/index.md`, with the README
+listed **first** in the index. The catalog-order rule `standard.catalog-order`
+requires that leading `standards/README.md` entry, so an index without it fails
+the commit.
+
 Add the standard's **card** at `standards/<name>.md` (`type: Standard-Card`, the
 four cells) and the **define doc** it points at — the contract prose. Register
 the card in the repo's own `standards/index.md` so the catalog stays complete.
@@ -61,3 +67,29 @@ consumer's `standards/` tree in consumer mode: from that rev it runs the
 consumer-mode `standards-lint` rules over the tree (`standards-lint
 --list-rules` is the registry). Until the pin moves, the tree is unpoliced by
 the meta-standard; the bump is what turns policing on.
+
+## 7. Register a local document type (only if the standard needs one)
+
+Skip this step unless the new standard governs a **document type** the global
+OKF registry does not carry. If it does, declare that type in a **local
+extension**: the repo's own `standards/docs/document-types.md`, a `## Types`
+table of the same shape as the [global registry](/standards/docs/document-types.md),
+listing only the repo's local types. okf-lint unions its valid names onto the
+upstream registry (upstream ∪ local); it never replaces the global set. The
+hierarchy law — additive, downhill only, no shadowing — is defined in the
+[registry doc](/standards/docs/document-types.md#local-extensions).
+
+The extension file is itself a **concept document**, so it obeys the same rules
+as any doc in the bundle:
+
+- `type: Standard` frontmatter, with a `description` that byte-matches its entry
+  in the nearest `index.md` — where it must be listed, like every concept doc.
+- Type names in Title Case, hyphen-joined for multi-word names; the `## Types`
+  table alphabetical by name.
+- Declare a type only when a population of documents actually carries it — a
+  vocabulary word earns its place by the documents that use it, and it stays as
+  local as that population.
+
+A local type carries name and description only. The per-type constraints upstream
+types impose (a required `resource`, an `## Employed by` section) stay upstream;
+a local extension cannot declare its own.
