@@ -17,8 +17,8 @@ Governs how Python source code is written.
 
 - [python-lint](/scripts/python-lint) — the workspace Python-source
   detector; read-only, run ad hoc or by the suite
-- ruff (`ruff-check`, `ruff-format`) — third-party lint, formatting, and
-  docstring detector (the pydocstyle `D` family, configured in the canonical
+- ruff (`ruff-check`) — third-party lint and docstring detector (the
+  pydocstyle `D` family, configured in the canonical
   [pyproject.toml](/standards/build/canonical/pyproject.toml)), located by its
   pin in the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)

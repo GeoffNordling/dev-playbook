@@ -8,8 +8,10 @@ description: The distribution channel — the pre-commit hook repo, pinned revs,
 
 dev-playbook publishes the canonical hook set as a **pre-commit hook
 repository**: hook definitions live in
-[`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml), backed by executable
-scripts in `scripts/`. Consumer repos reference them by URL and a pinned
+[`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml), each backed by an
+executable script in `scripts/` — except `validate-manifest`, which delegates
+to pre-commit's own validator via `uvx` and carries no script of its own.
+Consumer repos reference them by URL and a pinned
 revision, exactly as they reference any third-party hook. pre-commit clones
 dev-playbook into its own cache at the pinned `rev` and runs the hooks from
 there, so resolution is independent of where the consumer repo — or any of
@@ -27,6 +29,11 @@ testable in place before release. The hook metadata appears twice *within*
 dev-playbook — the published manifest serves consumers, the local block
 dogfoods the working tree — and a hook change updates both. Consumers hold
 only a pinned pointer.
+
+Dogfooding is the hosting-pattern invariant, not a dev-playbook privilege:
+any repo that publishes a `.pre-commit-hooks.yaml` must run what it ships
+from its own local block. repo-lint's `build.self-audit` rule checks the
+mirror wherever it finds a manifest.
 
 ## The rev bump is the release
 

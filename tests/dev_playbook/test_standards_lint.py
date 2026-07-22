@@ -1,10 +1,13 @@
 """Behavioral tests for the standards-lint detector (the meta-standard's rules).
 
-standards-lint is dev-playbook-local: it audits the ``standards/`` tree that
-only this repo carries. Each check function takes a repo root and returns
-findings; discovery goes through ``git ls-files``, so every fixture is a git
-repo. The rule-matrix check's ``--list-rules`` boundary is injected as a plain
-callable, so the matrix logic is exercised without subprocessing real detectors.
+standards-lint is a published hook: it audits the ``standards/`` tree of any
+repo, in dev-playbook mode (keyed by the canonical consumer template) or
+consumer mode (everything else). Each check function takes a repo root and
+returns findings; discovery goes through ``git ls-files``, so every fixture is
+a git repo. The
+rule-matrix check's ``--list-rules`` boundary is injected as a plain callable,
+and consumer-mode fixtures pass a synthetic upstream root, so both are exercised
+without subprocessing real detectors.
 """
 
 import subprocess
@@ -41,6 +44,11 @@ def card(
         f"# {title}\n\nGoverns {title}.\n"
     )
     return front + "".join(f"\n## {cell}\n\n- none\n" for cell in cells)
+
+
+def readme() -> str:
+    """A conformant standards/README.md fixture."""
+    return "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
 
 
 # --- standard.card-layout ---------------------------------------------------
@@ -153,11 +161,13 @@ def bullet(target: str, title: str) -> str:
 
 
 def ordered_repo_files(extra: dict[str, str]) -> dict[str, str]:
-    """The card + contract files a well-ordered catalog references."""
+    """The card + contract files a well-ordered catalog references.
+
+    Carries the canonical template so full audits over these files run in
+    dev-playbook mode -- the template is the mode marker.
+    """
     return {
-        "standards/README.md": (
-            "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
-        ),
+        "standards/README.md": readme(),
         "standards/standard.md": card("Meta-Standard"),
         "standards/build.md": card("Build"),
         "standards/python.md": card("Python"),
@@ -165,6 +175,7 @@ def ordered_repo_files(extra: dict[str, str]) -> dict[str, str]:
             "---\ntype: Standard\ntitle: Standards and Standard Cards\n"
             "description: d\n---\n\n# Standards and Standard Cards\n"
         ),
+        "standards/build/canonical/.pre-commit-config.yaml": _canonical([]),
         **extra,
     }
 
@@ -182,7 +193,7 @@ def test_catalog_in_declared_order_passes(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    assert sa.check_catalog_order(repo) == []
+    assert sa.check_catalog_order(repo, dev_playbook_mode=True) == []
 
 
 def test_readme_not_first_is_flagged(tmp_path: Path) -> None:
@@ -198,7 +209,7 @@ def test_readme_not_first_is_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -216,7 +227,7 @@ def test_cards_out_of_alphabetical_order_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -234,7 +245,53 @@ def test_contract_doc_before_a_card_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
+
+    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+
+
+def consumer_catalog_files(doc_bullets: list[str]) -> dict[str, str]:
+    """A consumer standards/ tree: README + own cards, no meta-standard card."""
+    return {
+        "standards/README.md": readme(),
+        "standards/alpha.md": card("Alpha"),
+        "standards/beta.md": card("Beta"),
+        "standards/index.md": catalog(doc_bullets),
+    }
+
+
+def test_consumer_catalog_readme_then_own_cards_passes(tmp_path: Path) -> None:
+    # No meta-standard card: the catalog leads with README, then its own cards
+    # by title. The meta-card row is data-driven, so its absence is not a defect.
+    repo = make_repo(
+        tmp_path,
+        consumer_catalog_files(
+            [
+                bullet("standards/README.md", "Standards"),
+                bullet("standards/alpha.md", "Alpha"),
+                bullet("standards/beta.md", "Beta"),
+            ]
+        ),
+    )
+
+    assert sa.check_catalog_order(repo, dev_playbook_mode=False) == []
+
+
+def test_consumer_catalog_cards_out_of_order_flagged(tmp_path: Path) -> None:
+    # README-first and alphabetical still bind in consumer mode; only the
+    # meta-card row is optional.
+    repo = make_repo(
+        tmp_path,
+        consumer_catalog_files(
+            [
+                bullet("standards/README.md", "Standards"),
+                bullet("standards/beta.md", "Beta"),
+                bullet("standards/alpha.md", "Alpha"),
+            ]
+        ),
+    )
+
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=False)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
 
@@ -365,12 +422,21 @@ def test_third_party_and_judgment_pointers_are_outside_the_matrix(
 # --- standard.hook-surfaces -------------------------------------------------
 
 
-def _manifest(ids: list[str]) -> str:
-    """A .pre-commit-hooks.yaml manifest listing each id as a scripts/ hook."""
-    return "".join(
+def _manifest(ids: list[str], system_ids: list[str] | None = None) -> str:
+    """A .pre-commit-hooks.yaml: scripts/ detector hooks + language:system hooks.
+
+    ``system_ids`` publish non-detector hooks (the validate-manifest shape).
+    They join the full published set but not the detector subset the mirror uses.
+    """
+    detectors = "".join(
         f"- id: {i}\n  name: {i}\n  entry: scripts/{i}\n  language: script\n"
         for i in ids
     )
+    systems = "".join(
+        f"- id: {i}\n  name: {i}\n  entry: {i} --run\n  language: system\n"
+        for i in (system_ids or [])
+    )
+    return detectors + systems
 
 
 def _local_block(ids: list[str]) -> str:
@@ -418,10 +484,11 @@ def surfaces_repo(
     canonical_ids: list[str],
     readme_ids: list[str],
     cited_ids: list[str],
+    manifest_system_ids: list[str] | None = None,
 ) -> Path:
-    """Assemble a repo with the four hook surfaces and citing cards."""
+    """Assemble a repo with the published-hook surfaces and citing cards."""
     files = {
-        ".pre-commit-hooks.yaml": _manifest(manifest_ids),
+        ".pre-commit-hooks.yaml": _manifest(manifest_ids, manifest_system_ids),
         ".pre-commit-config.yaml": _local_block(local_ids),
         "standards/build/canonical/.pre-commit-config.yaml": _canonical(canonical_ids),
         "scripts/README.md": _readme_table(readme_ids),
@@ -431,81 +498,114 @@ def surfaces_repo(
     return make_repo(tmp_path, files)
 
 
-ALL = ["repo-lint", "okf-lint"]
+# The published world: standards-lint is now a published detector, and
+# validate-manifest a published non-detector (language: system).
+ALL = ["repo-lint", "okf-lint", "standards-lint"]
+SYSTEM = ["validate-manifest"]
 
 
 def test_agreeing_hook_surfaces_pass(tmp_path: Path) -> None:
+    # Every published detector sits in the manifest, the local block, the
+    # canonical pinned block, the README table, and is cited by a card; the
+    # published non-detector sits in the manifest and the pinned block.
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-lint"],
-        canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-lint"],
-        cited_ids=[*ALL, "standards-lint"],
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,
+        canonical_ids=[*ALL, *SYSTEM],
+        readme_ids=ALL,
+        cited_ids=ALL,
     )
 
-    assert sa.check_hook_surfaces(repo) == []
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=True) == []
+
+
+def test_published_non_detector_in_canonical_is_not_a_stray(tmp_path: Path) -> None:
+    # The canonical leg compares against ALL published ids, so validate-manifest
+    # (published, language: system, listed in the pinned block) is covered, not
+    # flagged as a stray -- and it never enters the detector mirror.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=ALL,
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,
+        canonical_ids=[*ALL, *SYSTEM],
+        readme_ids=ALL,
+        cited_ids=ALL,
+    )
+
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+
+    assert not any("validate-manifest" in f.message for f in findings)
 
 
 def test_manifest_hook_missing_from_local_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
+        manifest_system_ids=SYSTEM,
         local_ids=["repo-lint", "standards-lint"],  # okf-lint dropped
-        canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-lint"],
-        cited_ids=[*ALL, "standards-lint"],
+        canonical_ids=[*ALL, *SYSTEM],
+        readme_ids=ALL,
+        cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
 
     assert sa.HOOK_SURFACES in {f.rule for f in findings}
     assert any("okf-lint" in f.message for f in findings)
 
 
+def test_local_detector_not_in_manifest_is_flagged(tmp_path: Path) -> None:
+    # No local-only exemption survives the deletion of LOCAL_ONLY: a local
+    # detector absent from the manifest is a defect in both directions.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=["repo-lint", "okf-lint"],  # standards-lint unpublished
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,  # but present in the local block
+        canonical_ids=["repo-lint", "okf-lint", *SYSTEM],
+        readme_ids=ALL,
+        cited_ids=ALL,
+    )
+
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+
+    assert any(
+        "standards-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+    )
+
+
 def test_manifest_hook_missing_from_canonical_is_flagged(tmp_path: Path) -> None:
-    # The skill-lint-style violation: published, but not offered to consumers.
+    # Published, but not offered to consumers through the pinned block.
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-lint"],
-        canonical_ids=["repo-lint"],  # okf-lint missing from the template
-        readme_ids=[*ALL, "standards-lint"],
-        cited_ids=[*ALL, "standards-lint"],
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,
+        canonical_ids=["repo-lint", *SYSTEM],  # okf-lint, standards-lint dropped
+        readme_ids=ALL,
+        cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
 
     assert any("okf-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings)
-
-
-def test_local_only_detector_absent_elsewhere_is_not_flagged(tmp_path: Path) -> None:
-    # standards-lint is local-only: absent from manifest and canonical by design.
-    repo = surfaces_repo(
-        tmp_path,
-        manifest_ids=ALL,
-        local_ids=[*ALL, "standards-lint"],
-        canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-lint"],
-        cited_ids=[*ALL, "standards-lint"],
-    )
-
-    findings = sa.check_hook_surfaces(repo)
-
-    assert not any("standards-lint" in f.message for f in findings)
 
 
 def test_detector_hook_missing_from_readme_table_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-lint"],
-        canonical_ids=ALL,
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,
+        canonical_ids=[*ALL, *SYSTEM],
         readme_ids=["repo-lint", "standards-lint"],  # okf-lint missing
-        cited_ids=[*ALL, "standards-lint"],
+        cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
 
     assert any("okf-lint" in f.message and "README" in f.message for f in findings)
 
@@ -516,16 +616,17 @@ def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-lint"],
-        canonical_ids=[*ALL, "stray-audit"],  # not in the manifest
-        readme_ids=[*ALL, "standards-lint"],
-        cited_ids=[*ALL, "standards-lint"],
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,
+        canonical_ids=[*ALL, *SYSTEM, "stray-lint"],  # published nowhere
+        readme_ids=ALL,
+        cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
 
     assert any(
-        "stray-audit" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+        "stray-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
     )
 
 
@@ -536,23 +637,23 @@ def test_manifest_detector_in_canonical_local_block_is_flagged(tmp_path: Path) -
         "repos:\n"
         "  - repo: https://github.com/GeoffNordling/dev-playbook\n"
         "    rev: <pinned-sha>\n    hooks:\n"
-        "      - id: repo-lint\n"
+        "      - id: repo-lint\n      - id: standards-lint\n"
+        "      - id: validate-manifest\n"
         "  - repo: local\n    hooks:\n"
         "      - id: okf-lint\n        name: okf-lint\n"
         "        entry: scripts/okf-lint\n        language: script\n"
     )
-    cited = [*ALL, "standards-lint"]
     files = {
-        ".pre-commit-hooks.yaml": _manifest(ALL),
-        ".pre-commit-config.yaml": _local_block([*ALL, "standards-lint"]),
+        ".pre-commit-hooks.yaml": _manifest(ALL, SYSTEM),
+        ".pre-commit-config.yaml": _local_block(ALL),
         "standards/build/canonical/.pre-commit-config.yaml": canonical,
-        "scripts/README.md": _readme_table([*ALL, "standards-lint"]),
+        "scripts/README.md": _readme_table(ALL),
     }
-    for i, name in enumerate(cited):
+    for i, name in enumerate(ALL):
         files[f"standards/c{i}.md"] = card_citing(f"C{i}", [cite(name)])
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_hook_surfaces(repo)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
 
     assert any(
         "okf-lint" in f.message and "canonical" in f.message.lower() for f in findings
@@ -563,15 +664,318 @@ def test_detector_hook_cited_by_no_card_is_flagged(tmp_path: Path) -> None:
     repo = surfaces_repo(
         tmp_path,
         manifest_ids=ALL,
-        local_ids=[*ALL, "standards-lint"],
-        canonical_ids=ALL,
-        readme_ids=[*ALL, "standards-lint"],
+        manifest_system_ids=SYSTEM,
+        local_ids=ALL,
+        canonical_ids=[*ALL, *SYSTEM],
+        readme_ids=ALL,
         cited_ids=["repo-lint", "standards-lint"],  # okf-lint cited by no card
     )
 
-    findings = sa.check_hook_surfaces(repo)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
 
     assert any("okf-lint" in f.message and "Audit cell" in f.message for f in findings)
+
+
+# --- hook-surfaces: consumer mode ---
+
+
+def _consumer_surfaces_files(
+    *, manifest_ids: list[str], local_ids: list[str], cited_ids: list[str]
+) -> dict[str, str]:
+    """A consumer's own manifest + local block + citing cards, no canonical/README."""
+    files = {
+        ".pre-commit-hooks.yaml": _manifest(manifest_ids),
+        ".pre-commit-config.yaml": _local_block(local_ids),
+    }
+    for i, name in enumerate(cited_ids):
+        files[f"standards/c{i}.md"] = card_citing(f"C{i}", [cite(name)])
+    return files
+
+
+def test_consumer_mode_agreeing_surfaces_pass(tmp_path: Path) -> None:
+    # A consumer with its own manifest + local block, no canonical template and
+    # no scripts/README.md: the mirror and cited-by-a-card checks run and pass;
+    # the canonical and README sub-checks are silent.
+    repo = make_repo(
+        tmp_path,
+        _consumer_surfaces_files(
+            manifest_ids=["own-lint"], local_ids=["own-lint"], cited_ids=["own-lint"]
+        ),
+    )
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
+
+
+def test_consumer_mode_mirror_still_flags_local_not_in_manifest(tmp_path: Path) -> None:
+    # The manifest <-> local mirror runs uniformly in both modes.
+    repo = make_repo(
+        tmp_path,
+        _consumer_surfaces_files(
+            manifest_ids=["own-lint"],
+            local_ids=["own-lint", "extra-lint"],  # extra-lint unpublished
+            cited_ids=["own-lint", "extra-lint"],
+        ),
+    )
+
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=False)
+
+    assert any(
+        "extra-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+    )
+
+
+def test_consumer_mode_ignores_a_canonical_template(tmp_path: Path) -> None:
+    # A consumer that happens to carry a canonical template gets no canonical
+    # findings: the canonical leg is dev-playbook-only.
+    files = _consumer_surfaces_files(
+        manifest_ids=["own-lint"], local_ids=["own-lint"], cited_ids=["own-lint"]
+    )
+    files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical(
+        ["stray-lint"]
+    )
+    repo = make_repo(tmp_path, files)
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
+
+
+def test_hook_surfaces_absent_manifest_reads_as_empty(tmp_path: Path) -> None:
+    # A consumer that wires only dev-playbook's pinned block has a local config
+    # but no .pre-commit-hooks.yaml of its own: the absent manifest publishes
+    # nothing, read as empty rather than surfacing as CannotRun.
+    repo = make_repo(tmp_path, {".pre-commit-config.yaml": _local_block([])})
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
+
+
+def test_hook_surfaces_absent_local_config_reads_as_empty(tmp_path: Path) -> None:
+    # A repo carrying a manifest but no .pre-commit-config.yaml wires nothing
+    # locally: the absent config reads as empty, not CannotRun.
+    repo = make_repo(tmp_path, {".pre-commit-hooks.yaml": _manifest([])})
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=False) == []
+
+
+def test_publisher_less_consumer_passes_clean(tmp_path: Path) -> None:
+    # Own cards + catalog, no .pre-commit-hooks.yaml and no .pre-commit-config.yaml:
+    # both absent surface files read as empty, so a consumer that publishes no
+    # hooks of its own audits clean rather than bricking its gate at exit 2.
+    upstream = make_repo(tmp_path / "up", {"README.md": "# up\n"})
+    consumer = make_repo(
+        tmp_path,
+        consumer_catalog_files(
+            [
+                bullet("standards/README.md", "Standards"),
+                bullet("standards/alpha.md", "Alpha"),
+                bullet("standards/beta.md", "Beta"),
+            ]
+        ),
+    )
+
+    assert sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream) == []
+
+
+# --- standard.card-shadows-upstream -----------------------------------------
+
+
+def test_local_card_shadowing_an_upstream_card_is_flagged(tmp_path: Path) -> None:
+    # The consumer's standards/build.md reuses an upstream card stem, silently
+    # overriding dev-playbook's standard of that name.
+    upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
+    consumer = make_repo(tmp_path, {"standards/build.md": card("Build")})
+
+    findings = sa.check_card_shadows_upstream(consumer, upstream)
+
+    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert findings[0].file == "standards/build.md"
+
+
+def test_local_card_with_a_fresh_stem_is_not_flagged(tmp_path: Path) -> None:
+    upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
+    consumer = make_repo(tmp_path, {"standards/widget.md": card("Widget")})
+
+    assert sa.check_card_shadows_upstream(consumer, upstream) == []
+
+
+def test_shadow_scan_non_git_hook_repo_root_cannot_run(tmp_path: Path) -> None:
+    # If the clone the hook ships in is not a git checkout, the upstream card
+    # scan's git ls-files fails; that funnels into CannotRun (exit 2), not an
+    # uncaught CalledProcessError traceback.
+    non_git = tmp_path / "not-a-checkout"
+    non_git.mkdir()
+    consumer = make_repo(tmp_path, {"standards/build.md": card("Build")})
+
+    with pytest.raises(sa.CannotRun):
+        sa.check_card_shadows_upstream(consumer, non_git)
+
+
+def test_audit_non_git_root_cannot_run(tmp_path: Path) -> None:
+    # The optional-surface guard scans the audited root via git ls-files; a
+    # non-git root funnels into CannotRun (exit 2) at the same _card_paths
+    # chokepoint as the upstream scan, never an uncaught CalledProcessError.
+    non_git = tmp_path / "not-a-checkout"
+    non_git.mkdir()
+
+    with pytest.raises(sa.CannotRun):
+        sa.audit(non_git, fake_list_rules({}))
+
+
+def _clean_bundle(tmp_path: Path, *, dev_playbook_mode: bool) -> Path:
+    """A conformant standards/ bundle carrying a 'build' card, clean on its own.
+
+    In dev-playbook mode it also carries the meta card and a canonical template,
+    so hook-surfaces' dev-playbook-only leg has files to read; in consumer mode
+    it omits both. The bundle is clean under every rule but the shadow rule.
+    """
+    files = {
+        "standards/README.md": readme(),
+        "standards/build.md": card("Build"),
+        ".pre-commit-hooks.yaml": "",
+        ".pre-commit-config.yaml": _local_block([]),
+    }
+    doc_bullets = [bullet("standards/README.md", "Standards")]
+    if dev_playbook_mode:
+        files["standards/standard.md"] = card("Meta-Standard")
+        files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical([])
+        doc_bullets.append(bullet("standards/standard.md", "Meta-Standard"))
+    doc_bullets.append(bullet("standards/build.md", "Build"))
+    files["standards/index.md"] = catalog(doc_bullets)
+    return make_repo(tmp_path, files)
+
+
+def test_consumer_mode_audit_flags_a_shadowing_card(tmp_path: Path) -> None:
+    # End to end: an otherwise-clean consumer whose only defect is a shadowing
+    # card gets exactly the shadow finding.
+    upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
+    consumer = _clean_bundle(tmp_path, dev_playbook_mode=False)
+
+    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+
+    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+
+
+def test_dev_playbook_mode_audit_never_runs_the_shadow_rule(tmp_path: Path) -> None:
+    # The same 'build' stem in dev-playbook mode is not a shadow: dev-playbook's
+    # own cards cannot shadow themselves, so the rule is gated off.
+    upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
+    devrepo = _clean_bundle(tmp_path, dev_playbook_mode=True)
+
+    findings = sa.audit(devrepo, fake_list_rules({}), hook_repo_root=upstream)
+
+    assert findings == []
+
+
+def _consumer_card_bundle(tmp_path: Path, stem: str) -> Path:
+    """A clean consumer carrying a single ``standards/<stem>.md`` card.
+
+    No canonical template and no meta card, so the mode marker is absent; no
+    manifest or local config, so hook-surfaces reads them as empty. The bundle
+    is clean under every rule but the shadow rule.
+    """
+    title = stem.capitalize()
+    return make_repo(
+        tmp_path,
+        {
+            "standards/README.md": readme(),
+            f"standards/{stem}.md": card(title),
+            "standards/index.md": catalog(
+                [
+                    bullet("standards/README.md", "Standards"),
+                    bullet(f"standards/{stem}.md", title),
+                ]
+            ),
+        },
+    )
+
+
+def test_consumer_card_named_standard_md_is_flagged_as_a_shadow(tmp_path: Path) -> None:
+    # The mode marker is the canonical template, not standards/standard.md, so a
+    # consumer card at that exact path stays in consumer mode and the shadow rule
+    # catches it -- the one stem the marker used to disable.
+    upstream = make_repo(
+        tmp_path / "up", {"standards/standard.md": card("Meta-Standard")}
+    )
+    consumer = _consumer_card_bundle(tmp_path, stem="standard")
+
+    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+
+    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert findings[0].file == "standards/standard.md"
+
+
+def test_consumer_card_named_standard_md_draws_no_catalog_order_finding(
+    tmp_path: Path,
+) -> None:
+    # In consumer mode standards/standard.md is an ordinary card, sorted among the
+    # others by title -- not forced into the meta-card lead slot. A catalog ordered
+    # [README, alpha, standard] therefore passes catalog-order, so the sole finding
+    # is the intended shadow, never a spurious catalog-order complaint about a
+    # meta-standard the consumer has no concept of.
+    upstream = make_repo(
+        tmp_path / "up", {"standards/standard.md": card("Meta-Standard")}
+    )
+    consumer = make_repo(
+        tmp_path,
+        {
+            "standards/README.md": readme(),
+            "standards/alpha.md": card("Alpha"),
+            "standards/standard.md": card("Standard"),
+            "standards/index.md": catalog(
+                [
+                    bullet("standards/README.md", "Standards"),
+                    bullet("standards/alpha.md", "Alpha"),
+                    bullet("standards/standard.md", "Standard"),
+                ]
+            ),
+        },
+    )
+
+    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+
+    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+
+
+def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
+    tmp_path: Path,
+) -> None:
+    # The canonical template is the sole mode marker: a tree carrying it -- but no
+    # standards/standard.md -- is in dev-playbook mode, so a card matching an
+    # upstream stem is not treated as a shadow (the rule stays gated off).
+    upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
+    devrepo = make_repo(
+        tmp_path,
+        {
+            "standards/README.md": readme(),
+            "standards/build.md": card("Build"),
+            "standards/build/canonical/.pre-commit-config.yaml": _canonical([]),
+            "standards/index.md": catalog(
+                [
+                    bullet("standards/README.md", "Standards"),
+                    bullet("standards/build.md", "Build"),
+                ]
+            ),
+        },
+    )
+
+    assert sa.audit(devrepo, fake_list_rules({}), hook_repo_root=upstream) == []
+
+
+def test_list_rules_prints_the_five_rules(capsys: pytest.CaptureFixture[str]) -> None:
+    assert sa.main(["--list-rules"]) == 0
+
+    lines = [line for line in capsys.readouterr().out.splitlines() if line.strip()]
+
+    assert len(lines) == 5
+    assert sa.CARD_SHADOWS in lines
+
+
+def test_dev_playbook_scans_itself_clean(capsys: pytest.CaptureFixture[str]) -> None:
+    # dev-playbook mode on dev-playbook itself: the real standards/ tree and the
+    # promoted hook config agree across every surface.
+    repo = Path(sa.__file__).resolve().parents[2]
+
+    code = sa.main([str(repo)])
+
+    assert code == 0, capsys.readouterr().out
 
 
 def test_malformed_card_frontmatter_cannot_run(tmp_path: Path) -> None:
@@ -601,7 +1005,7 @@ def test_dangling_catalog_target_cannot_run(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, files)
 
     with pytest.raises(sa.CannotRun):
-        sa.check_catalog_order(repo)
+        sa.check_catalog_order(repo, dev_playbook_mode=True)
 
 
 def test_missing_catalog_cannot_run(tmp_path: Path) -> None:
@@ -609,7 +1013,28 @@ def test_missing_catalog_cannot_run(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, {"standards/build.md": card("Build")})
 
     with pytest.raises(sa.CannotRun):
-        sa.check_catalog_order(repo)
+        sa.check_catalog_order(repo, dev_playbook_mode=False)
+
+
+# --- the optional standards/ surface ----------------------------------------
+
+
+def test_repo_with_no_standards_surface_exits_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # No catalog and no flat card: nothing to police, so exit 0 with no findings
+    # rather than can't-run on the absent catalog.
+    repo = make_repo(tmp_path, {"README.md": "# root\n"})
+
+    assert sa.main([str(repo)]) == 0
+    assert capsys.readouterr().out == ""
+
+
+def test_repo_with_cards_but_no_catalog_exits_two(tmp_path: Path) -> None:
+    # A card without a catalog is a malformed surface, never a silent skip.
+    repo = make_repo(tmp_path, {"standards/build.md": card("Build")})
+
+    assert sa.main([str(repo)]) == 2
 
 
 def test_main_exits_two_on_a_dangling_catalog_link(tmp_path: Path) -> None:
@@ -650,12 +1075,12 @@ def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
     )
     files["standards/foo.md"] = card_citing("Foo", [cite("foo")])
     files["scripts/foo"] = "#!/usr/bin/env bash\n"
-    # Consistent hook surfaces so hook-surfaces does not can't-run and mask the
-    # matrix finding the timeout produces.
+    # Empty, agreeing hook surfaces so hook-surfaces produces no findings and
+    # does not mask the matrix finding the timeout produces.
     files[".pre-commit-hooks.yaml"] = _manifest([])
-    files[".pre-commit-config.yaml"] = _local_block(["standards-lint"])
+    files[".pre-commit-config.yaml"] = _local_block([])
     files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical([])
-    files["scripts/README.md"] = _readme_table(["standards-lint"])
+    files["scripts/README.md"] = _readme_table([])
     repo = make_repo(tmp_path, files)
 
     real_run = subprocess.run
@@ -686,6 +1111,6 @@ def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
     )
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_catalog_order(repo)
+    findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
     assert [f.rule for f in findings] == [sa.CATALOG_ORDER]

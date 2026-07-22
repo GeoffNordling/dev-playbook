@@ -1,26 +1,33 @@
 """Audit the ``standards/`` tree against the meta-standard's deterministic rules.
 
-standards-lint is the detector behind the meta-standard card. It is
-dev-playbook-local: the ``standards/`` tree it audits exists only in this repo,
-so the detector is wired in dev-playbook's local pre-commit block alone (the
-local-only precedent is validate-manifest). Four rules, each namespaced under
-the meta card (``standard.*``):
+standards-lint is the detector behind the meta-standard card, a published hook
+any repo can run over its own ``standards/`` tree. It runs in two modes:
+**dev-playbook mode**, where the audited tree is dev-playbook itself (or a
+fixture simulating it), detected by the canonical consumer template
+``standards/build/canonical/.pre-commit-config.yaml`` -- which only the hook
+repo hosts; and **consumer mode**, every other repo, which is policed from this
+hook's own pinned clone. A repo carrying no standards/ surface
+-- neither a catalog nor a flat card -- is clean by construction. The rules,
+each namespaced under the meta card (``standard.*``):
 
   - **card-layout** — every flat ``standards/<name>.md`` except README.md and
     index.md is a card: ``type: Standard-Card`` frontmatter and the four cells
     (Define, Audit, Enforce, Adopt) as ``##`` sections, in that order. Contracts
     live in sub-directories, so the flat-file layer is exactly the cards.
   - **catalog-order** — ``standards/index.md`` follows its declared ordering:
-    README first, the meta-standard card second, the remaining cards
-    alphabetical by title, then the contract docs alphabetical by title,
-    directories last.
+    README first, then (in dev-playbook mode) the meta-standard card when the
+    tree carries it, the remaining cards alphabetical by title, then the
+    contract docs alphabetical by title, directories last.
   - **rule-matrix** — the bidirectional card<->rule check between each card's
     Audit-cell detector citations and the rule prefixes those detectors emit
     (``--list-rules`` is the trusted ground truth).
-  - **hook-surfaces** — the detector-hook id sets agree across the published
-    manifest, the canonical consumer template, and the local block (modulo the
-    declared local-only set ``{standards-lint}``), and every detector hook has
-    a scripts/README.md validation-table row and is cited by a card.
+  - **hook-surfaces** — the detector-hook id sets agree between the published
+    manifest and the local block; in dev-playbook mode the canonical consumer
+    template's pinned block offers exactly what the manifest publishes; every
+    local detector hook is cited by a card, and carries a scripts/README.md
+    validation-table row when that file is present.
+  - **card-shadows-upstream** — in consumer mode, no local card stem may reuse
+    an upstream card stem drawn from this hook's own pinned clone.
 
 Output:
     stdout — one finding per line, ``file:line: standard.rule message``.
@@ -43,6 +50,13 @@ from pathlib import Path, PurePosixPath
 from dev_playbook import md
 from dev_playbook.findings import print_rules, render
 
+# The dev-playbook checkout this module's hook ships in — the pre-commit clone
+# in consumer repos, dev-playbook's own tree when dogfooded. The shadow rule
+# resolves its upstream card set here, since a consumer never carries
+# dev-playbook's own cards. The module sits at src/dev_playbook/, so the repo
+# root is three parents up.
+HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
+
 # Every rule id this detector can emit, namespaced by the meta card whose
 # question it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
@@ -51,8 +65,9 @@ CARD_LAYOUT = "standard.card-layout"
 CATALOG_ORDER = "standard.catalog-order"
 RULE_MATRIX = "standard.rule-matrix"
 HOOK_SURFACES = "standard.hook-surfaces"
+CARD_SHADOWS = "standard.card-shadows-upstream"
 
-RULES = (CARD_LAYOUT, CATALOG_ORDER, RULE_MATRIX, HOOK_SURFACES)
+RULES = (CARD_LAYOUT, CATALOG_ORDER, RULE_MATRIX, HOOK_SURFACES, CARD_SHADOWS)
 
 CARD_TYPE = "Standard-Card"
 CATALOG = "standards/index.md"
@@ -134,10 +149,37 @@ def _is_card_path(rel: str) -> bool:
 
 
 def _card_paths(root: Path) -> list[str]:
-    """Every flat card slot under ``standards/`` in the checkout, sorted."""
-    return sorted(
-        rel for p in md.find_md_files(root) if _is_card_path(rel := _relpath(p, root))
-    )
+    """Every flat card slot under ``standards/`` in the checkout, sorted.
+
+    Discovery runs ``git ls-files``, so a non-git ``root`` funnels into CannotRun
+    here -- the single chokepoint that covers every caller (the audited root's
+    optional-surface guard and the shadow rule's ``hook_repo_root`` scan alike),
+    so a non-git checkout surfaces as the module's uniform exit-2 diagnostic
+    rather than an uncaught ``CalledProcessError``.
+    """
+    try:
+        found = md.find_md_files(root)
+    except subprocess.CalledProcessError as err:
+        raise CannotRun(f"cannot scan cards: {root} is not a git checkout") from err
+    return sorted(rel for p in found if _is_card_path(rel := _relpath(p, root)))
+
+
+def _dev_playbook_mode(root: Path) -> bool:
+    """Whether the audited tree is dev-playbook (or a fixture simulating it).
+
+    The probe is the canonical consumer template's presence --
+    ``standards/build/canonical/.pre-commit-config.yaml``. Only the hook repo
+    hosts that template; consumers copy *from* it and never carry it. Keying on
+    the meta card ``standards/standard.md`` instead would collide with the shadow
+    rule -- a consumer may innocently name a card ``standard.md``, which must stay
+    in consumer mode so the shadow rule catches it, not flip the whole audit into
+    dev-playbook mode. The template cannot be created innocently, so it carries no
+    such ambiguity, and the probe is self-consistent with hook-surfaces' canonical
+    leg, which reads exactly this file -- that leg can never CannotRun on an absent
+    template. Path equality against the hook clone is deliberately avoided: it
+    would put every fixture in consumer mode and break every dev-playbook-mode test.
+    """
+    return (root / CANONICAL_CONFIG).is_file()
 
 
 # --- standard.card-layout ---------------------------------------------------
@@ -211,13 +253,23 @@ def _is_directory_bullet(target: str) -> bool:
     return PurePosixPath(target).name == "index.md"
 
 
-def check_catalog_order(root: Path) -> list[Finding]:
+def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
     """Flag a catalog whose entries depart from the declared order.
 
     okf-lint already enforces catalog *membership* (the ``Ordering:`` marker
     exempts only its generic alphabetical rule), so this checks order alone:
-    README, the meta-standard card, the remaining cards by title, the contract
-    docs by title, then directories.
+    README, the meta-standard card *when the tree is dev-playbook's own and
+    carries it*, the remaining cards by title, the contract docs by title, then
+    directories. The meta-card lead slot is mode-gated -- only a dev-playbook-mode
+    tree that carries ``standards/standard.md`` gets it. In consumer mode a card
+    named ``standard.md`` is an ordinary card sorted among the others, so a
+    consumer that names one draws only the intended ``card-shadows-upstream``
+    finding, never a spurious catalog-order complaint about a meta-standard it has
+    no concept of. The file-existence check stays load-bearing under the mode
+    conjunct: a dev-playbook-mode tree that legitimately omits the meta card must
+    not be forced to carry a meta-card lead row, and okf-lint's index rule
+    independently forces every existing card file to have a catalog row, so
+    dev-playbook cannot silently drop its own meta-card row.
     """
     if not (root / CATALOG).is_file():
         raise CannotRun(f"no catalog at {CATALOG}")
@@ -237,10 +289,16 @@ def check_catalog_order(root: Path) -> list[Finding]:
                 )
             ]
 
-    cards = [t for t in doc_targets if _is_card_path(t) and t != META_CARD]
+    has_meta_lead = dev_playbook_mode and (root / META_CARD).is_file()
+    cards = [
+        t
+        for t in doc_targets
+        if _is_card_path(t) and not (has_meta_lead and t == META_CARD)
+    ]
     contracts = [t for t in doc_targets if not _is_card_path(t) and t != README]
+    lead = [README, META_CARD] if has_meta_lead else [README]
     expected = (
-        [README, META_CARD]
+        lead
         + sorted(cards, key=lambda t: _title(root / t).lower())
         + sorted(contracts, key=lambda t: _title(root / t).lower())
     )
@@ -380,11 +438,6 @@ MANIFEST = ".pre-commit-hooks.yaml"
 LOCAL_CONFIG = ".pre-commit-config.yaml"
 CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 SCRIPTS_README = "scripts/README.md"
-# Detectors wired only in dev-playbook's local block, never published or offered
-# to consumers: their audited surface exists only here. standards-lint audits
-# the standards/ tree, which no consumer carries (the validate-manifest
-# precedent). Kept a constant so the local-only set is declared in one place.
-LOCAL_ONLY = frozenset({"standards-lint"})
 
 # A markdown table row's first backticked cell: ``| `name` | ... |``.
 _TABLE_NAME = re.compile(r"^\s*\|\s*`([^`]+)`\s*\|")
@@ -414,7 +467,14 @@ def _load_yaml(path: Path) -> object:
 
 
 def _local_hooks(root: Path) -> list[dict]:
-    """The hooks of the ``repo: local`` block in the local pre-commit config."""
+    """The hooks of the ``repo: local`` block in the local pre-commit config.
+
+    An absent ``.pre-commit-config.yaml`` wires nothing -- the common consumer
+    that only pulls dev-playbook's pinned block carries no local config -- so it
+    reads as no hooks, never CannotRun (the ``scripts/README.md`` guard shape).
+    """
+    if not (root / LOCAL_CONFIG).is_file():
+        return []
     config = _load_yaml(root / LOCAL_CONFIG)
     if not isinstance(config, dict):
         return []
@@ -448,10 +508,12 @@ def _canonical_dev_hook_ids(root: Path) -> set[str]:
 
 
 def _readme_table_names(root: Path) -> set[str]:
-    """Every backticked first-cell name in a scripts/README.md table."""
+    """Every backticked first-cell name in a scripts/README.md table.
+
+    Called only when scripts/README.md is present -- the sole caller guards on
+    that file's existence -- so the read needs no existence check of its own.
+    """
     path = root / SCRIPTS_README
-    if not path.is_file():
-        return set()
     return {
         m.group(1)
         for _, line in md.content_lines(path)
@@ -467,71 +529,147 @@ def _all_cited_detectors(root: Path) -> set[str]:
     return cited
 
 
-def check_hook_surfaces(root: Path) -> list[Finding]:
-    """The three detector-hook surfaces agree, modulo the local-only set.
+def _manifest_ids(root: Path) -> tuple[set[str], set[str]]:
+    """The manifest's ``(all published ids, detector ids)``.
+
+    Detector ids are the subset whose ``entry`` is a ``scripts/`` path; the full
+    set additionally carries the published non-detectors (validate-manifest,
+    ``language: system``). The mirror compare uses the detector subset; the
+    canonical leg uses the full set.
+
+    An absent ``.pre-commit-hooks.yaml`` publishes nothing -- a consumer that
+    adopts the standards without publishing hooks of its own carries none -- so
+    it reads as empty, never CannotRun (the ``scripts/README.md`` guard shape).
+    """
+    if not (root / MANIFEST).is_file():
+        return set(), set()
+    raw = _load_yaml(root / MANIFEST)
+    hooks = [h for h in raw if isinstance(h, dict)] if isinstance(raw, list) else []
+    all_ids = {h["id"] for h in hooks if "id" in h}
+    return all_ids, _scripts_entry_ids(hooks)
+
+
+def check_hook_surfaces(root: Path, dev_playbook_mode: bool) -> list[Finding]:
+    """The published-hook surfaces agree.
 
     The detector-hook id sets (hooks whose entry is a ``scripts/`` path) must be
-    equal across the published manifest, the canonical consumer template, and
-    the local block, modulo ``LOCAL_ONLY``. Every local detector hook must also
-    have a scripts/README.md validation-table row and be cited by a card.
+    equal between the published manifest and the local block -- in both modes.
+    In dev-playbook mode the canonical consumer template's pinned block must
+    offer exactly what the manifest publishes: *all* published ids, detectors and
+    non-detectors alike, so a published non-detector (validate-manifest) is
+    covered rather than flagged as a stray. Consumers carry no canonical
+    template, so that leg is dev-playbook-only. Every local detector hook must
+    be cited by a card (both modes); the scripts/README.md validation-table
+    sub-check applies only when the audited repo carries that file.
     """
-    manifest_raw = _load_yaml(root / MANIFEST)
-    manifest = _scripts_entry_ids(
-        [h for h in manifest_raw if isinstance(h, dict)]
-        if isinstance(manifest_raw, list)
-        else []
-    )
+    manifest_all, manifest = _manifest_ids(root)
     local = _scripts_entry_ids(_local_hooks(root))
-    canonical = _canonical_dev_hook_ids(root)
 
     findings: list[Finding] = []
 
     def flag(location: str, message: str) -> None:
         findings.append(Finding(location, None, HOOK_SURFACES, message))
 
+    # Mirror: the manifest's detectors and the local block's detectors agree.
     for name in sorted(manifest - local):
         flag(LOCAL_CONFIG, f"manifest hook {name} is missing from the local block")
-    for name in sorted(local - manifest - LOCAL_ONLY):
-        flag(
-            LOCAL_CONFIG,
-            f"local hook {name} is not in the manifest and is not declared local-only",
-        )
-    for name in sorted(LOCAL_ONLY - local):
-        flag(LOCAL_CONFIG, f"local-only hook {name} is missing from the local block")
-    for name in sorted(manifest - canonical):
-        flag(
-            CANONICAL_CONFIG,
-            f"manifest hook {name} is missing from the canonical consumer "
-            "template's pinned dev-playbook block",
-        )
-    for name in sorted(canonical - manifest):
-        flag(
-            CANONICAL_CONFIG,
-            f"canonical consumer template hook {name} is not in the published manifest",
-        )
+    for name in sorted(local - manifest):
+        flag(LOCAL_CONFIG, f"local hook {name} is not in the published manifest")
 
-    table = _readme_table_names(root)
+    # Canonical menu: the pinned dev-playbook block offers exactly the published
+    # manifest, non-detectors included. Dev-playbook-only -- consumers have none.
+    if dev_playbook_mode:
+        canonical = _canonical_dev_hook_ids(root)
+        for name in sorted(manifest_all - canonical):
+            flag(
+                CANONICAL_CONFIG,
+                f"manifest hook {name} is missing from the canonical consumer "
+                "template's pinned dev-playbook block",
+            )
+        for name in sorted(canonical - manifest_all):
+            flag(
+                CANONICAL_CONFIG,
+                f"canonical consumer template hook {name} is not in the published "
+                "manifest",
+            )
+
     cited = _all_cited_detectors(root)
-    for name in sorted(local - table):
-        flag(SCRIPTS_README, f"detector hook {name} is missing from the README table")
     for name in sorted(local - cited):
         flag(
             f"scripts/{name}",
             f"detector hook {name} is cited by no card's Audit cell",
         )
+
+    if (root / SCRIPTS_README).is_file():
+        table = _readme_table_names(root)
+        for name in sorted(local - table):
+            flag(
+                SCRIPTS_README, f"detector hook {name} is missing from the README table"
+            )
     return findings
+
+
+# --- standard.card-shadows-upstream -----------------------------------------
+
+
+def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Finding]:
+    """Flag any local card whose stem shadows an upstream card (consumer mode).
+
+    The upstream set is the flat ``standards/*.md`` card stems of
+    ``hook_repo_root`` -- the pinned clone this hook ships in. A local card that
+    reuses an upstream stem silently overrides dev-playbook's standard of that
+    name, so the collision is caught at the consumer's commit gate. Self-policing:
+    no network, no workspace scan -- a collision introduced upstream surfaces at
+    the consumer's next pin bump as a red gate, resolved locally.
+
+    A non-git ``hook_repo_root`` funnels into CannotRun through ``_card_paths``,
+    the single chokepoint for every git scan -- so if the clone the hook ships in
+    is not a git checkout, that surfaces as the module's uniform exit-2 diagnostic
+    rather than an uncaught ``CalledProcessError``.
+    """
+    upstream = {PurePosixPath(rel).stem for rel in _card_paths(hook_repo_root)}
+    return [
+        Finding(
+            rel,
+            None,
+            CARD_SHADOWS,
+            f"local card shadows the upstream standards/{stem}.md card",
+        )
+        for rel in _card_paths(root)
+        if (stem := PurePosixPath(rel).stem) in upstream
+    ]
 
 
 # --- the walk ---------------------------------------------------------------
 
 
-def audit(root: Path, list_rules: Callable[[str, Path], list[str]]) -> list[Finding]:
-    """Run every rule over ``root`` and return the combined findings."""
+def audit(
+    root: Path,
+    list_rules: Callable[[str, Path], list[str]],
+    *,
+    hook_repo_root: Path = HOOK_REPO_ROOT,
+) -> list[Finding]:
+    """Run every applicable rule over ``root`` and return the combined findings.
+
+    A repo carrying no standards/ surface -- neither a catalog nor a flat card --
+    is clean by construction: there is nothing to police, so the walk returns no
+    findings rather than can't-run on the absent catalog (the skill-lint
+    optional-surface precedent). A repo with cards but no catalog is a malformed
+    surface, so it still fails loud through ``check_catalog_order``. The
+    canonical-template leg of hook-surfaces and the shadow rule are gated on the
+    mode the marker probe resolves: the shadow rule fires in consumer mode only,
+    since dev-playbook's own cards cannot shadow themselves.
+    """
+    if not (root / CATALOG).is_file() and not _card_paths(root):
+        return []
+    dev_playbook_mode = _dev_playbook_mode(root)
     findings: list[Finding] = []
     findings.extend(check_card_layout(root))
-    findings.extend(check_catalog_order(root))
+    findings.extend(check_catalog_order(root, dev_playbook_mode))
     findings.extend(check_rule_matrix(root, list_rules))
-    findings.extend(check_hook_surfaces(root))
+    findings.extend(check_hook_surfaces(root, dev_playbook_mode))
+    if not dev_playbook_mode:
+        findings.extend(check_card_shadows_upstream(root, hook_repo_root))
     return findings
 
 
