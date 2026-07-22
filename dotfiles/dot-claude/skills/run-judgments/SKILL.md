@@ -10,7 +10,7 @@ effort: low
 
 A **judgment** is a specific yes/no question about specific files, ruled on by an LLM judge. Judgments are declared as YAML and gated by deterministic pytests. See `standards/judgments/declarations.md` for the declaration format. Tests pass iff the judgment's exact content has already been judged-and-passed (its key is cached); misses fail. This skill runs the judgment workflow: it dispatches each uncached judgment to the `scatter-gather` agent workflow for an LLM-judged verdict, records the passes, fixes the refutations, and loops until the gate is green — escalating to the user when a fix is beyond it.
 
-This is a thin implementation skill relying on deterministic CLI commands: the CLI enumerates the work and records the outcomes, the judges produce the verdicts, and this skill's own judgment is confined to the fixes.
+This is a thin implementation skill relying on deterministic CLI commands: the CLI enumerates the work and records the outcomes, the judges produce the verdicts, and this skill's own judgment is spent weighing each refutation and making the fixes it warrants.
 
 **Main loop only.** This skill dispatches judges through the `Workflow` tool, which exists only at the main loop — a subagent does not have it. A subagent that hits a cache miss (a red judgment gate) must **surface** it for the main loop or the user to run this skill; it must never hand-roll judge calls, which would bypass the per-judgment `model`/`effort` pinning and schema validation and produce off-bench verdicts that must not be recorded.
 
@@ -55,9 +55,14 @@ Each job carries its own required `model`/`effort`; `schema` is batch-wide. One 
 
 ### 5. Fix, requeue, loop
 
-- **Refuted** — a refuted verdict is a real defect: fix the artifact when the claim is right, fix the claim when it overstates; never weaken, drop, or reword a judgment merely to pass. Make one focused edit per refuted judgment, guided by its `opinion` — this consumes one of its two fix attempts. The edit changes the judgment's content key, so the next `plan` re-lists it automatically; no bookkeeping.
+- **Refuted — investigate, don't comply.** A refuted verdict is *one low-intelligence, stochastic judge's claim, not a proven defect*. We run these judges constantly and will get false positives; the main loop is the more careful reader, so weigh the `opinion` from first principles against the repo's own rules and adjacent artifacts, with the standing default that **the artifact is correct as written**. Overturning that default takes genuinely convincing evidence — the burden is on the judge, not on the text. Then act on what you actually find:
+  - **the artifact is wrong** — one focused edit (a section, not a rewrite), guided by the `opinion`; consumes one of the judgment's two fix attempts, and the changed content key re-lists it on the next `plan`.
+  - **the claim overstates** — fix the claim to say what is true; never weaken, drop, or reword a judgment merely to pass.
+  - **the judge is wrong** — change *nothing*. Never pad a standard or doc with hedging, caveats, or filler to placate a tripped judge: that trades correct prose for slop, worse than a red gate. With the user's concurrence, `record` the pass on the unchanged content to override the false positive — the deliberate "no need to rerun the judge" path; an autonomous run sets the suspected false positive aside for the user instead of self-clearing it.
 - **Crashed** — requeue as-is: no fix, no attempt consumed. A judgment that crashes twice in a row is set aside like a spent one — a repeating crash is an environment problem to surface, not a verdict.
-- Set aside any judgment that is out of fix attempts or needs more than a focused fix, then loop back to step 1.
+- Set aside any judgment that is out of fix attempts, needs more than a focused fix, or is a suspected false positive. Escalate these to the user.
+
+**The user is your escalation path — use it, with an example.** The user sits at the main loop for exactly the hard calls: a genuinely ambiguous artifact-vs-judge question, a refutation you cannot confidently place, a fix larger than focused. Escalate rather than guess or force a fix. When you do, quote the specific thing at issue — the artifact line as written, the claim's exact words, the precise mismatch the `opinion` alleges. The user is not looking at the code, the doc, or the judgment; present a specific example, not an abstract summary.
 
 ## Report
 
