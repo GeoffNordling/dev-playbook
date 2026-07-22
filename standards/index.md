@@ -23,6 +23,7 @@ alphabetical; directories last.
 - [Software Factory](/standards/software-factory.md) — Card for the software factory standard — how an idea becomes a merged pull request
 - [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
 - [Tracking](/standards/tracking.md) — Card for the tracking standard — how work is tracked through issues and repository settings
+- [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one
 - [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
