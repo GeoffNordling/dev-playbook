@@ -7,7 +7,7 @@ fixture simulating it), detected by the canonical consumer template
 ``standards/build/canonical/.pre-commit-config.yaml`` -- which only the hook
 repo hosts; and **consumer mode**, every other repo, which is policed from this
 hook's own pinned clone. A repo carrying no standards/ surface
--- neither a catalog nor a flat card -- is clean by construction. Five rules,
+-- neither a catalog nor a flat card -- is clean by construction. The rules,
 each namespaced under the meta card (``standard.*``):
 
   - **card-layout** — every flat ``standards/<name>.md`` except README.md and

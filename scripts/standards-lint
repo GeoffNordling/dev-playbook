@@ -3,8 +3,7 @@
 
 Thin shim over dev_playbook.standards_lint.main: it puts the checkout's ``src/``
 on ``sys.path`` and calls the module, which audits the ``standards/`` tree
-against the five meta-standard rules (card-layout, catalog-order, rule-matrix,
-hook-surfaces, card-shadows-upstream), printing each finding as a GNU finding
+against the meta-standard's rules, printing each finding as a GNU finding
 line (``file:line: standard.rule message``) and exiting nonzero if any.
 ``--list-rules`` prints the rule ids and exits 0. It is a published hook: any
 repo can run it over its own ``standards/`` tree, with dev-playbook itself

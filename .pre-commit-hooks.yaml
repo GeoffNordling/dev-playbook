@@ -20,8 +20,9 @@
 #
 # pre-commit clones this repo into its cache at the pinned rev and runs the
 # hook from there, so resolution is independent of where the consumer repo —
-# or any of its worktrees — sits on disk. The hook scripts live in scripts/
-# and share primitives from src/dev_playbook/. See standards/build/distribution.md.
+# or any of its worktrees — sits on disk. The script-backed hooks live in
+# scripts/ and share primitives from src/dev_playbook/. See
+# standards/build/distribution.md.
 
 - id: repo-lint
   name: repo-lint

@@ -16,10 +16,8 @@ kept honest.
 
 ## Audit
 
-- [standards-lint](/scripts/standards-lint) — the meta-standard's five
-  deterministic rules: card layout, catalog order, the bidirectional
-  card↔rule matrix, hook-surface agreement, and the consumer-mode
-  upstream-shadow guard
+- [standards-lint](/scripts/standards-lint) — the meta-standard's
+  deterministic rules; `--list-rules` is the registry
 - [judgments/standard-cards.yaml](/judgments/standard-cards.yaml) — the
   card-honesty judgments, one per card: an LLM judge rules whether each
   card's pointers are truthful, the semantic check the deterministic rules
