@@ -508,10 +508,12 @@ def _canonical_dev_hook_ids(root: Path) -> set[str]:
 
 
 def _readme_table_names(root: Path) -> set[str]:
-    """Every backticked first-cell name in a scripts/README.md table."""
+    """Every backticked first-cell name in a scripts/README.md table.
+
+    Called only when scripts/README.md is present -- the sole caller guards on
+    that file's existence -- so the read needs no existence check of its own.
+    """
     path = root / SCRIPTS_README
-    if not path.is_file():
-        return set()
     return {
         m.group(1)
         for _, line in md.content_lines(path)
