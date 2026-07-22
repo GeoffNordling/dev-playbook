@@ -12,7 +12,13 @@ OKF_LINT = Path(__file__).resolve().parents[1] / "scripts" / "okf-lint"
 
 # A minimal but valid OKF bundle: a registry doc, two concept docs, a root
 # index (with okf_version) and a standards index, all internally consistent.
+# The canonical consumer template puts the bundle in APEX mode — the registry
+# document is read and shape-checked from the audited tree — the same probe
+# standards-lint keys its dev-playbook mode on. Every apex fixture rides this one
+# line; without it the bundle would flip to consumer mode and its registry doc
+# would be read as a local extension whose rows all shadow upstream.
 BASE_BUNDLE: dict[str, str] = {
+    "standards/build/canonical/.pre-commit-config.yaml": "repos: []\n",
     "README.md": (
         "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
     ),
@@ -50,13 +56,17 @@ def run_okf_lint(repo_root: Path) -> subprocess.CompletedProcess:
     )
 
 
-def make_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
-    """Write BASE_BUNDLE into a fresh git repo, applying overrides.
+def _write_bundle(
+    tmp_path: Path, base: dict[str, str], overrides: dict[str, str | None]
+) -> Path:
+    """Write ``base`` into a fresh git repo under ``tmp_path``, applying overrides.
 
     An override value of None deletes that file; any other value replaces it.
+    Every bundle factory (apex, consumer, consumer-extension, instrument) is a
+    thin wrapper picking its base dict.
     """
     repo = tmp_path / "repo"
-    files = dict(BASE_BUNDLE)
+    files = dict(base)
     for path, content in overrides.items():
         if content is None:
             files.pop(path, None)
@@ -68,6 +78,11 @@ def make_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
         p.write_text(content)
     subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)
     return repo
+
+
+def make_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
+    """Write BASE_BUNDLE (apex mode) into a fresh git repo, applying overrides."""
+    return _write_bundle(tmp_path, BASE_BUNDLE, overrides)
 
 
 def test_valid_bundle_is_clean(tmp_path: Path) -> None:
@@ -305,23 +320,8 @@ CONSUMER_BUNDLE: dict[str, str] = {
 
 
 def make_consumer_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
-    """Write CONSUMER_BUNDLE into a fresh git repo, applying overrides.
-
-    An override value of None deletes that file; any other value replaces it.
-    """
-    repo = tmp_path / "repo"
-    files = dict(CONSUMER_BUNDLE)
-    for path, content in overrides.items():
-        if content is None:
-            files.pop(path, None)
-        else:
-            files[path] = content
-    for rel, content in files.items():
-        p = repo / rel
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(content)
-    subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)
-    return repo
+    """Write CONSUMER_BUNDLE (no registry doc) into a fresh git repo."""
+    return _write_bundle(tmp_path, CONSUMER_BUNDLE, overrides)
 
 
 def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
@@ -354,6 +354,108 @@ def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
     assert "not in the registry" in result.stdout
     assert "knowledge-organization.registry-row" not in result.stdout
     assert "knowledge-organization.index-ordering" not in result.stdout
+
+
+# --- consumer mode: the local type extension (union, degradation, shadow) ---
+
+# A conformant consumer bundle that carries its OWN standards/docs/document-types.md
+# as a LOCAL EXTENSION. It ships no canonical consumer template, so okf-lint stays
+# in consumer mode: it resolves the upstream registry from the hook's own clone
+# and unions the extension's valid types on top. The local names (Doohickey,
+# Gizmo) are absent from dev-playbook's live registry, so they neither collide
+# with an upstream name nor shadow one — the subprocess resolves the real registry
+# through the module's __file__.
+EXTENSION_DOC = (
+    "---\ntype: Standard\ntitle: Local Types\n"
+    "description: The local type extension\n---\n\n"
+    "# Local Types\n\n## Types\n\n"
+    "| Type | What it is |\n|------|------------|\n"
+    "| `Doohickey` | a local doohickey |\n| `Gizmo` | a local gizmo |\n"
+)
+CONSUMER_EXT_BUNDLE: dict[str, str] = {
+    "README.md": (
+        "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
+    ),
+    "index.md": (
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        "- [Root](/README.md) — Root readme desc\n\n"
+        "## Directories\n\n"
+        "- [standards/](/standards/index.md) — Local standards\n"
+    ),
+    "standards/README.md": (
+        "---\ntype: README\ntitle: Standards\ndescription: Standards desc\n---\n\n"
+        "# Standards\n"
+    ),
+    "standards/index.md": (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+    ),
+    "standards/docs/document-types.md": EXTENSION_DOC,
+}
+
+
+def make_consumer_ext_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Path:
+    """Write CONSUMER_EXT_BUNDLE (a local type extension) into a fresh git repo."""
+    return _write_bundle(tmp_path, CONSUMER_EXT_BUNDLE, overrides)
+
+
+def test_consumer_extension_unions_and_does_not_replace_upstream(
+    tmp_path: Path,
+) -> None:
+    """A consumer's own document-types.md is a local extension, not a replacement:
+    upstream types the local table omits (README, Standard) still resolve, so a
+    bundle whose only typed docs are upstream types is clean even though the
+    extension lists neither."""
+    repo = make_consumer_ext_bundle(tmp_path, {})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_consumer_extension_local_type_doc_is_accepted(tmp_path: Path) -> None:
+    """A doc typed with a name the local extension declares (Gizmo) is legal —
+    the extension's valid types are unioned into the effective set."""
+    gizmo = (
+        "---\ntype: Gizmo\ntitle: A Gizmo\ndescription: A gizmo doc\n---\n\n# A Gizmo\n"
+    )
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [A Gizmo](/standards/gizmo.md) — A gizmo doc\n"
+        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+    )
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/gizmo.md": gizmo, "standards/index.md": index}
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_consumer_extension_bogus_type_still_flagged(tmp_path: Path) -> None:
+    """A type in neither the upstream registry nor the local extension is still
+    flagged — the union widens the legal set, it does not disable the check."""
+    bogus = (
+        "---\ntype: Bogus\ntitle: A Bogus\ndescription: A bogus doc\n---\n\n# A Bogus\n"
+    )
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [A Bogus](/standards/bogus.md) — A bogus doc\n"
+        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+    )
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/bogus.md": bogus, "standards/index.md": index}
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "standards/bogus.md" in result.stdout
+    assert "type 'Bogus' not in the registry" in result.stdout
 
 
 # --- instrument.employed-by ---

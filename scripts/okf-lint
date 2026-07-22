@@ -83,6 +83,7 @@ INDEX = "knowledge-organization.index"
 REGISTRY_ROW = "knowledge-organization.registry-row"
 DESCRIPTION_SHAPE = "knowledge-organization.description-shape"
 INDEX_ORDERING = "knowledge-organization.index-ordering"
+TYPE_SHADOWS_UPSTREAM = "knowledge-organization.type-shadows-upstream"
 EMPLOYED_BY = "instrument.employed-by"
 
 RULES = (
@@ -95,10 +96,19 @@ RULES = (
     REGISTRY_ROW,
     DESCRIPTION_SHAPE,
     INDEX_ORDERING,
+    TYPE_SHADOWS_UPSTREAM,
     EMPLOYED_BY,
 )
 
 REGISTRY_DOC = "standards/docs/document-types.md"
+# The canonical consumer template — the file that puts the audited tree in APEX
+# mode. Only dev-playbook (or a fixture simulating it) hosts this template;
+# consumers copy *from* it and never carry it. Keying apex mode on it rather than
+# on the registry document's mere presence is what lets a consumer carry its own
+# registry document as a local *extension* without the audit flipping to apex and
+# replacing the global registry. This is the same probe standards-lint keys its
+# dev-playbook mode on (see CANONICAL_CONFIG in src/dev_playbook/standards_lint.py).
+CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # The type whose docs must carry an `## Employed by` section, and that section's
 # GitHub heading slug — the presence the instrument.employed-by check looks for.
@@ -156,26 +166,23 @@ def _is_separator_row(cells: list[str]) -> bool:
     )
 
 
-def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
-    """Parse the concept-document type names from the registry document.
+def scan_registry_rows(doc: Path) -> tuple[list[tuple[str, int]], list[int]]:
+    """Scan a registry document's `## Types` table without raising.
 
-    ``registry_root`` is the tree that carries the registry document — the
-    audited repo in self mode, this script's own hook clone in consumer mode
-    (see `HOOK_REPO_ROOT`). Returns ``(names, malformed_rows)`` — the
-    backticked type names in table order (so the caller can both build the
-    registry set and check the declared alphabetical order), and the line
-    numbers of malformed rows. Every data row of the `## Types` table (the rows
-    after the header/separator) must carry a single backticked type name in its
-    first cell; a row that does not is a malformed row, so the caller emits a
-    `knowledge-organization.registry-row` finding rather than silently dropping the type. Raises
-    ToolError if the document or its `## Types` table is absent.
+    Returns ``(valid, malformed)`` — ``valid`` is one ``(name, line)`` pair per
+    data row carrying a single backticked Title Case type name in its first
+    cell, in table order; ``malformed`` is the line numbers of the data rows
+    that do not. Returns two empty lists when the document or its `## Types`
+    table is absent — this scanner never raises, so the caller decides whether
+    an empty result is a fatal error (the raising `parse_registry` wrapper, for
+    the authoritative apex/hook-clone read) or a degradable finding
+    (`check_extension`, for a consumer's local extension).
     """
-    doc = registry_root / REGISTRY_DOC
     if not doc.is_file():
-        raise ToolError(f"registry doc not found: {REGISTRY_DOC}")
+        return [], []
     in_types = False
     seen_separator = False
-    names: list[str] = []
+    valid: list[tuple[str, int]] = []
     malformed: list[int] = []
     for line_num, line in md.content_lines(doc):
         heading = md.HEADING_PATTERN.match(line)
@@ -195,12 +202,33 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
         first_cell = cells[0] if cells else ""
         name = BACKTICK_NAME.fullmatch(first_cell)
         if name and _is_title_case(name.group(1)):
-            names.append(name.group(1))
+            valid.append((name.group(1), line_num))
         else:
             malformed.append(line_num)
-    if not names:
+    return valid, malformed
+
+
+def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
+    """Parse the concept-document type names from the authoritative registry.
+
+    The raising wrapper over `scan_registry_rows`, used for the reads that MUST
+    succeed: the apex tree's own registry, and the consumer-mode read of the
+    hook clone's registry (see `HOOK_REPO_ROOT`). ``registry_root`` is the tree
+    that carries the registry document. Returns ``(names, malformed_rows)`` —
+    the backticked type names in table order (so the caller can both build the
+    registry set and check the declared alphabetical order), and the line
+    numbers of malformed rows, which the caller turns into
+    `knowledge-organization.registry-row` findings rather than silently dropping
+    the type. Raises ToolError if the document or its `## Types` table is absent,
+    since a missing authoritative registry means the hook cannot run.
+    """
+    doc = registry_root / REGISTRY_DOC
+    if not doc.is_file():
+        raise ToolError(f"registry doc not found: {REGISTRY_DOC}")
+    valid, malformed = scan_registry_rows(doc)
+    if not valid:
         raise ToolError(f"no types parsed from {REGISTRY_DOC} '## Types' table")
-    return names, malformed
+    return [name for name, _ in valid], malformed
 
 
 def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
@@ -209,12 +237,28 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
     Owns ``parse_registry``: returns the registry set (consumed by the type-lint)
     and its own findings — a ``knowledge-organization.registry-row`` per malformed row and a
     ``knowledge-organization.index-ordering`` when the `## Types` table is not alphabetical by type
-    name (the document's intro declares it alphabetical). Called only in self
+    name (the document's intro declares it alphabetical). Called only in apex
     mode — see `main()` — since the registry's shape is dev-playbook's to fix,
     never a consumer's. Raises ToolError if the registry document or its
     `## Types` table is absent.
     """
     type_names, malformed_rows = parse_registry(registry_root)
+    findings = _registry_shape_findings(type_names, malformed_rows)
+    return set(type_names), findings
+
+
+def _registry_shape_findings(
+    type_names: list[str], malformed_rows: list[int]
+) -> list[Finding]:
+    """The shape findings shared by the apex registry and a consumer extension.
+
+    A ``knowledge-organization.registry-row`` per malformed row line, then one
+    ``knowledge-organization.index-ordering`` when the parsed type names are not
+    alphabetical — so a malformed row and an out-of-order table read identically
+    wherever the ``## Types`` table is found. The zero-valid-rows and shadow
+    findings are not shared: they are consumer-extension-only (apex aborts on an
+    empty registry, and the apex registry cannot shadow itself).
+    """
     findings = [
         Finding(
             REGISTRY_DOC,
@@ -232,7 +276,56 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
                 "`## Types` rows are not in alphabetical order by type name",
             )
         )
-    return set(type_names), findings
+    return findings
+
+
+def check_extension(
+    repo_root: Path, upstream: set[str]
+) -> tuple[set[str], list[Finding]]:
+    """Parse a consumer's local type extension and return its unionable names.
+
+    Consumer mode only. The audited tree's own copy of the registry document is
+    a **local extension** of the upstream registry — additive: it may add types,
+    never shadow, loosen, or drop an upstream one. Returns
+    ``(local_names, findings)``: the valid local type names to union onto the
+    effective set, and this file's findings. A broken extension degrades to
+    findings on the extension file — never a scan abort — so the walk always
+    finishes and the rest of the repo is still checked:
+
+      - ``knowledge-organization.registry-row`` per malformed row (at its line),
+        plus one file-level finding when the extension declares zero valid types
+        (the raising `parse_registry` would instead abort the whole scan);
+      - ``knowledge-organization.index-ordering`` when the `## Types` table is
+        not alphabetical, the same order the apex registry declares;
+      - ``knowledge-organization.type-shadows-upstream`` per row whose name
+        case-insensitively equals an upstream type. Membership itself stays
+        exact-case; this rule is what stops a consumer aliasing an upstream type
+        under a different case (e.g. unioning ``Readme`` beside upstream
+        ``README``).
+    """
+    valid, malformed_rows = scan_registry_rows(repo_root / REGISTRY_DOC)
+    local_names = [name for name, _ in valid]
+    findings = _registry_shape_findings(local_names, malformed_rows)
+    if not valid:
+        findings.append(
+            Finding(
+                REGISTRY_DOC,
+                REGISTRY_ROW,
+                "local type extension declares no valid types",
+            )
+        )
+    upstream_lower = {name.lower() for name in upstream}
+    for name, line_num in valid:
+        if name.lower() in upstream_lower:
+            findings.append(
+                Finding(
+                    REGISTRY_DOC,
+                    TYPE_SHADOWS_UPSTREAM,
+                    f"local type `{name}` case-insensitively shadows an upstream type",
+                    line=line_num,
+                )
+            )
+    return set(local_names), findings
 
 
 def relpath(path: Path, repo_root: Path) -> str:
@@ -565,19 +658,28 @@ def main(argv: list[str] | None = None) -> int:
     if args.list_rules:
         return print_rules(RULES)
     repo_root = Path(args.directory).resolve()
-    # Self mode: the audited repo carries the registry (dev-playbook itself, or
-    # a fixture simulating it) — read and shape-check it from there. Consumer
-    # mode: every other repo, which never carries its own copy — read the
-    # registry from this script's own hook clone, and skip the shape checks,
-    # since a consumer cannot fix dev-playbook's registry from its own commit.
-    self_mode = (repo_root / REGISTRY_DOC).is_file()
+    # Apex mode: the audited repo hosts the canonical consumer template
+    # (dev-playbook itself, or a fixture simulating it) — the registry is that
+    # tree's own document-types.md, read and shape-checked from there, the sole
+    # source of truth with no union and no shadow rule. Consumer mode: every
+    # other repo — read the authoritative registry from this script's own hook
+    # clone, and if the audited tree carries its own document-types.md, treat it
+    # as a local *extension* whose valid types union onto the upstream set
+    # (additive-only, no shadowing). Keying on the template rather than on the
+    # registry document's mere presence is what keeps a consumer's extension from
+    # silently flipping the audit into apex mode and replacing the global registry.
+    apex_mode = (repo_root / CANONICAL_CONFIG).is_file()
 
     try:
-        if self_mode:
+        if apex_mode:
             registry, registry_findings = check_registry(repo_root)
         else:
-            registry, _malformed_rows = parse_registry(HOOK_REPO_ROOT)
+            upstream_names, _malformed_rows = parse_registry(HOOK_REPO_ROOT)
+            registry = set(upstream_names)
             registry_findings = []
+            if (repo_root / REGISTRY_DOC).is_file():
+                local_names, registry_findings = check_extension(repo_root, registry)
+                registry = registry | local_names
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
         print(f"okf-lint: {err}", file=sys.stderr)
