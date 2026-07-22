@@ -51,10 +51,6 @@
   },
   "model": "opus[1m]",
   "disableClaudeAiConnectors": true,
-  "statusLine": {
-    "type": "command",
-    "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/dot-claude/statusline.sh"
-  },
   "hooks": {
     "Stop": [
       {
@@ -83,6 +79,10 @@
     "baseRef": "fresh"
   },
   "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/dot-claude/statusline.sh"
+  },
   "sandbox": {
     "enabled": true,
     "network": {
