@@ -70,6 +70,12 @@ An audit stationed at a gate — the audit's findings block the path to main the
 **Finding**
 One output line from a detector, in GNU format: `file:line: card.rule message` — a colon after the location, single spaces, a repo-relative path. The `:line` is omitted for a file-level finding (e.g. `README.md: docs.readme-missing …`). The rule id is namespaced by the card whose question it answers.
 
+**Consumer**
+A repository that consumes what dev-playbook defines — standards, published hooks, judgments machinery, methods. Consuming dev-playbook is the point of dev-playbook: every other workspace repo is a consumer.
+
+**Scope**
+The population a standard governs. **Workspace-scoped**: declared in dev-playbook, governing every repo in `~/workspace`. **Repo-scoped**: declared in one consumer, governing that repo alone. Exactly two values.
+
 ## Relationships
 
 - A **Module** has exactly one **Interface** (the surface it presents to callers and tests).
@@ -80,6 +86,7 @@ One output line from a detector, in GNU format: `file:line: card.rule message` �
 - A **Detector** inspects the repository against one or more standards and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
 - A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
+- A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
 
 ## Example dialogue
 

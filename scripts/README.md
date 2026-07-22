@@ -46,12 +46,9 @@ its dependencies via its `uv run --script` shebang.
 
 ## Validation scripts
 
-The published hooks — with one dev-playbook-local exception, `standards-lint`
-(see its row). The published ones run automatically on every commit via
-pre-commit, and consumer repos run them from a pinned clone (see
-[distribution.md](/standards/build/distribution.md)); `standards-lint` is
-wired in dev-playbook's local block alone, since the `standards/` tree it
-audits exists only here (the validate-manifest precedent). Each script exits 0
+The published hooks. They run automatically on every commit via pre-commit, and
+consumer repos run them from a pinned clone (see
+[distribution.md](/standards/build/distribution.md)). Each script exits 0
 on success / 1 on findings / 2 on tool error, writes machine-readable findings
 to stdout (one per line) and a one-line summary to stderr. Each takes the
 repository root as its argument (default: cwd) and discovers its targets
@@ -68,12 +65,14 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
 | `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment`, over all authored Markdown outside code spans |
-| `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's four rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement (dev-playbook-local, so it is wired in the local block alone, not the published manifest) |
+| `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
-`decisions-lint`, `prose-lint`, and `standards-lint` assert unconditionally and
-fail loud;
-they do not skip themselves when a target kind is absent. Run
+`decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
+not skip themselves when a target kind is absent. `skill-lint` and
+`standards-lint` are optional-surface: each exits 0 silently when its audited
+surface is absent — no skills, no `standards/` tree — and asserts only over a
+surface that is present. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 
@@ -103,8 +102,7 @@ directory.
 
 ### Two run environments
 
-Each *published* hook entry runs in two environments and MUST work in both
-(the dev-playbook-local `standards-lint` runs in the first alone):
+Each *published* hook entry runs in two environments and MUST work in both:
 
 1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
 2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [distribution.md](/standards/build/distribution.md).
@@ -115,9 +113,7 @@ block) against the dev-playbook checkout that holds it — no `$HOME` paths, no
 `realpath` indirection.
 
 When adding a validator, mirror it into both the manifest and the local block,
-and test it in dev-playbook and a consumer repo before pushing — unless it is
-dev-playbook-local (like `standards-lint`), which is wired in the local block
-alone and tested here only.
+and test it in dev-playbook and a consumer repo before pushing.
 
 ## Utility scripts
 

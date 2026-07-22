@@ -37,6 +37,31 @@ devices are **instruments**; each carries a prescriptive contract of its
 own, typed `Instrument-Spec`. The instrument concept is defined in
 [Instruments and Instrument Specs](/standards/instrument/format.md).
 
+## Scope
+
+Every standard has a **scope** — the population it governs — and there are
+exactly two values:
+
+- **Workspace-scoped** — declared in dev-playbook, governing every repo in
+  `~/workspace`. The bulk of the catalog is workspace-scoped: the
+  cross-project standards every repo inherits through dev-playbook's published
+  hooks.
+- **Repo-scoped** — declared in one consumer repo, governing that repo alone.
+  A repo stands one up when it has a convention no other repo shares; the
+  recipe is
+  [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
+
+Exactly two levels — a standard governs the whole workspace or a single repo,
+never an intermediate group. Deeper nesting is deliberately unsupported
+(YAGNI): no third scope is introduced until a real population sits between
+"one repo" and "every repo."
+
+**No shadowing.** A repo-scoped card may not reuse a workspace-scoped card's
+name. A consumer's `standards/<name>.md` may not collide with a card stem
+dev-playbook already publishes, because that would silently override the
+upstream standard of that name; the rule `standard.card-shadows-upstream`
+catches the collision at the consumer's commit gate.
+
 ## The card
 
 A card is a markdown file at `standards/<name>.md` with
@@ -69,10 +94,11 @@ card, since the meta-standard is an instance of the format it defines.
 
 ## The catalog
 
-The catalog of all standards is [standards/index.md](/standards/index.md).
-okf-lint's index rule already forces that index to list every card with a
-matching description, so catalog completeness is enforced by the existing
-hook suite rather than by new tooling.
+Each repo that carries cards has its own catalog at `standards/index.md`; in
+dev-playbook that is [standards/index.md](/standards/index.md). okf-lint's
+index rule already forces a catalog to list every card with a matching
+description, so catalog completeness is enforced by the existing hook suite
+rather than by new tooling.
 
 ## Detectors
 
@@ -87,14 +113,13 @@ detector contract.
   it: workspace-lint queries GitHub over `gh api`, writing findings to stdout
   and a summary to stderr — reading remote state and mutating nothing git
   tracks — so it is read-only and belongs in an Audit cell.
-- **Universal wiring; applicability lives inside the detector.** Every detector
-  is wired in every repo — consumers run the full menu, never a subset. A
-  detector whose surface is optional (skills) exits 0 silently when the surface
-  is absent; every other detector asserts unconditionally and fails loud. A gap
-  is never resolved by making a detector opt-in. (The one exception is a
-  detector whose audited surface exists only in one repo — standards-lint
-  audits the `standards/` tree, which only dev-playbook carries — so it is wired
-  in that repo's local block alone.)
+- **Wired throughout its scope; applicability lives inside the detector.** Every
+  detector is wired throughout its scope — a workspace-scoped detector runs in
+  every repo, a repo-scoped one throughout its host repo; the population it
+  governs runs the full menu, never a subset. A detector whose surface is
+  optional (skills, or a `standards/` tree) exits 0 silently when the surface is
+  absent; every other detector asserts unconditionally and fails loud. A gap is
+  never resolved by making a detector opt-in.
 - **A card may have more than one detector.** Cards are organized by the
   question they govern; detectors by the mechanism they run. Question and
   mechanism cross-cut, so the relation is one-to-many, not one-to-one: one
@@ -103,9 +128,15 @@ detector contract.
   more than one card). The one-to-one invariant lives a level down, at the rule
   — every `card.rule` id belongs to exactly one card. A card may still honestly
   audit `none` when no automatic check exists.
-- **Thin shims.** A detector script stays a thin shim over the reusable
-  modules in `src/dev_playbook`; the logic lives in the module, the script
-  wires argument parsing and output to it.
+- **Thin shims.** A detector script stays a thin shim over the host repo's
+  reusable modules (in dev-playbook, `src/dev_playbook`); the logic lives in the
+  module, the script wires argument parsing and output to it.
+- **The hosting pattern.** A repo's detectors live at `scripts/<name>`, are
+  published in that repo's own `.pre-commit-hooks.yaml`, and are mirrored in its
+  `repo: local` block — dev-playbook is the topmost instance of this pattern, not
+  a special case. A repo that ships a manifest must run what it ships from its
+  own local block; that dogfooding invariant is stated once in
+  [distribution.md](/standards/build/distribution.md) and not restated here.
 - **Card-namespaced rule ids.** Every finding carries a rule id of the form
   `card.rule`, namespaced by the card whose question it answers and named
   after that question — never after the tool that happens to detect it.
@@ -150,6 +181,9 @@ Standards drift at two grains, each with its own detector:
    [Judgments](/standards/judgments/index.md) cover this: the
    content-addressed cache expires a verdict the moment the underlying
    bytes change.
-2. **Contract grain** — a change to a define cell obligates rework across
-   adopting repositories. This is a version bump of the standard,
-   propagated and verified by workspace-lint.
+2. **Contract grain** — a change to a define cell obligates rework across the
+   standard's adopting population. For a workspace-scoped standard that
+   population is every repo in the workspace: a version bump propagated and
+   verified by workspace-lint. For a repo-scoped standard the adopting
+   population is the host repo itself, so no workspace-lint obligation
+   attaches — the rework lands in the same repo as the define-cell change.
