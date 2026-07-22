@@ -57,7 +57,7 @@ where nonconformance blocks the path to main.
 
 The meta-standard's detector, `standards-lint`, is a published dev-playbook
 hook. Pin-bumping to a dev-playbook `rev` that carries it wires it over the
-consumer's `standards/` tree in consumer mode: from that rev it checks card
-layout, catalog order, the card↔rule matrix, and no shadowing of an upstream
-card. Until the pin moves, the tree is unpoliced by the meta-standard; the
-bump is what turns policing on.
+consumer's `standards/` tree in consumer mode: from that rev it runs the
+consumer-mode `standards-lint` rules over the tree (`standards-lint
+--list-rules` is the registry). Until the pin moves, the tree is unpoliced by
+the meta-standard; the bump is what turns policing on.
