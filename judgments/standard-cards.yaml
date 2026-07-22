@@ -39,6 +39,8 @@ judgments:
       - scripts/standards-lint
       - judgments/standard-cards.yaml
       - .pre-commit-config.yaml
+      - .pre-commit-hooks.yaml
+      - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high
 
@@ -51,12 +53,14 @@ judgments:
     evidence:  [standards/claude-code.md]
     reference:
       - standards/standard/format.md
+      - standards/claude-code/index.md
       - standards/claude-code/files.md
       - standards/claude-code/claude-content.md
       - standards/claude-code/skill-conventions.md
       - standards/claude-code/skill-management.md
       - scripts/repo-lint
       - scripts/skill-lint
+      - judgments/claude-code.yaml
       - standards/build/canonical/.pre-commit-config.yaml
       - standards/build/canonical/CLAUDE.md.standards
     model: claude-sonnet-5

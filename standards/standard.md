@@ -16,9 +16,10 @@ kept honest.
 
 ## Audit
 
-- [standards-lint](/scripts/standards-lint) — the meta-standard's four
+- [standards-lint](/scripts/standards-lint) — the meta-standard's five
   deterministic rules: card layout, catalog order, the bidirectional
-  card↔rule matrix, and hook-surface agreement
+  card↔rule matrix, hook-surface agreement, and the consumer-mode
+  upstream-shadow guard
 - [judgments/standard-cards.yaml](/judgments/standard-cards.yaml) — the
   card-honesty judgments, one per card: an LLM judge rules whether each
   card's pointers are truthful, the semantic check the deterministic rules
@@ -28,9 +29,9 @@ kept honest.
 
 - the pre-commit hook suite
   ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — standards-lint
-  blocks nonconforming commits at the **commit gate**; it is wired in
-  dev-playbook's local block alone, since the `standards/` tree it audits
-  exists only here
+  blocks nonconforming commits at the **commit gate**; dev-playbook dogfoods
+  it from its local block, and consumer repos inherit it as a published hook
+  through the canonical template's pinned block
 
 ## Adopt
 
