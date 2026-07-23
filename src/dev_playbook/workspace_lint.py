@@ -37,6 +37,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
+from dev_playbook import gitrepo
 from dev_playbook.findings import print_rules, render
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
@@ -144,6 +145,7 @@ def hook_repo_main() -> str:
         ["git", "-C", str(HOOK_REPO_ROOT), "rev-parse", "main"],
         capture_output=True,
         text=True,
+        env=gitrepo.no_git_env(),
     )
     if result.returncode != 0:
         raise ToolError(
@@ -165,6 +167,7 @@ def origin_slug(repo: Path) -> str | None:
         ["git", "-C", str(repo), "remote", "get-url", "origin"],
         capture_output=True,
         text=True,
+        env=gitrepo.no_git_env(),
     )
     if result.returncode != 0:
         return None

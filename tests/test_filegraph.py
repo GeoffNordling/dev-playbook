@@ -8,6 +8,7 @@ file-graph instrument spec (instruments/file-graph.md).
 """
 
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -471,3 +472,15 @@ def test_compute_queries_matches_build_graph_queries(tmp_path: Path) -> None:
     # cannot drift: the same (nodes, edges, seeds) reproduce build_graph's
     # queries.
     assert graph.compute_queries(doc["nodes"], doc["edges"], seeds) == doc["queries"]
+
+
+def test_ambient_git_dir_does_not_redirect_ignored_census(
+    tmp_path: Path, ambient_git_dir: Callable[[str], Path]
+) -> None:
+    repo = graph_repo(
+        tmp_path,
+        {".gitignore": "*.pyc\n", "a.pyc": "", "b.pyc": ""},
+    )
+    ambient_git_dir("a.pyc")
+
+    assert graph.ignored_census(repo) == {".gitignore:*.pyc": 2}

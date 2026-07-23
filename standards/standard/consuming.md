@@ -38,6 +38,15 @@ repo's own reusable modules. It obeys the detector contract in
 GNU format (`file:line: card.rule message`) with card-namespaced rule ids,
 answering `--list-rules`, exit 0 clean / 1 findings / 2 tool error.
 
+One contract clause is invisible until a hook runs and is easy to miss: the
+explicit-root rule — a git-shelling detector scrubs the repository-locating
+variables `git rev-parse --local-env-vars` names from its subprocess
+environment, and its test suite clears the same set per test. The commit gate is
+a git hook, and a hook inherits an absolute `GIT_DIR` whenever discovery would
+otherwise find the wrong repository — always from a linked worktree, so anyone
+working the way this workspace does meets it immediately, even though a plain
+clone's hook exports no absolute `GIT_DIR`.
+
 ## 3. Publish it in the repo's own manifest
 
 Add the hook to the consumer repo's own `.pre-commit-hooks.yaml`, backed by the

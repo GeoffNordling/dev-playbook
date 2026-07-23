@@ -131,6 +131,24 @@ detector contract.
 - **Thin shims.** A detector script stays a thin shim over the host repo's
   reusable modules (in dev-playbook, `src/dev_playbook`); the logic lives in the
   module, the script wires argument parsing and output to it.
+- **Explicit roots outrank the hook environment.** Detectors run at git gates,
+  and a hook inherits an absolute `GIT_DIR` whenever discovery from its own
+  working directory would land on the wrong repository — always from a linked
+  worktree, where agent work happens, and in submodule flows. It silently
+  outranks `git -C <root>` and the working directory in every child process,
+  redirecting git to the hook's repository instead of the audited one. A plain
+  clone's hook exports no absolute `GIT_DIR`, so finding it absent there is not
+  evidence the clause is stale. A detector that shells out to git therefore
+  scrubs the redirecting variables from its subprocess environment; git names
+  them itself through `git rev-parse --local-env-vars`, which stays correct
+  across git versions. It leaves transport and auth settings such as
+  `GIT_SSH_COMMAND` untouched but strips the `GIT_CONFIG_*` channel, through
+  which ad-hoc config relocates a repository as readily as `GIT_DIR` does. dev-playbook detectors call `gitrepo.no_git_env`; a self-contained
+  consumer detector cannot import it and either carries its own copy or runs
+  `unset $(git rev-parse --local-env-vars)`, the remedy `githooks(5)` documents.
+  The same variable makes a bare `git init` a silent no-op, so a detector's test
+  suite clears the same set before every test (an autouse fixture in
+  `tests/conftest.py`).
 - **The hosting pattern.** A repo's detectors live at `scripts/<name>`, are
   published in that repo's own `.pre-commit-hooks.yaml`, and are mirrored in its
   `repo: local` block — dev-playbook is the topmost instance of this pattern, not
