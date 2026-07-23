@@ -132,16 +132,22 @@ detector contract.
   reusable modules (in dev-playbook, `src/dev_playbook`); the logic lives in the
   module, the script wires argument parsing and output to it.
 - **Explicit roots outrank the hook environment.** Detectors run at git gates,
-  and git exports an absolute `GIT_DIR` into every hook it runs — a variable
-  that silently outranks `git -C <root>` and the working directory in every
-  child process, redirecting git to the hook's repository instead of the
-  audited one. A detector that shells out to git therefore scrubs `GIT_*` from
-  the subprocess environment, allowlisting known-safe entries such as
-  `GIT_EXEC_PATH` — dev-playbook detectors use `gitrepo.no_git_env`; a
-  self-contained consumer detector cannot import it and carries its own copy.
-  The same ambient variable makes a bare `git init` a silent no-op, so a
-  detector's test suite likewise clears `GIT_*` before every test (an autouse
-  fixture in `tests/conftest.py`).
+  and a hook inherits an absolute `GIT_DIR` whenever discovery from its own
+  working directory would land on the wrong repository — always from a linked
+  worktree, where agent work happens, and in submodule flows. It silently
+  outranks `git -C <root>` and the working directory in every child process,
+  redirecting git to the hook's repository instead of the audited one. A plain
+  clone exports no such variable, so finding nothing there is not evidence the
+  clause is stale. A detector that shells out to git therefore scrubs the
+  redirecting variables from its subprocess environment; git names them itself
+  through `git rev-parse --local-env-vars`, which stays correct across git
+  versions and leaves transport and auth settings such as `GIT_SSH_COMMAND`
+  untouched. dev-playbook detectors call `gitrepo.no_git_env`; a self-contained
+  consumer detector cannot import it and either carries its own copy or runs
+  `unset $(git rev-parse --local-env-vars)`, the remedy `githooks(5)` documents.
+  The same variable makes a bare `git init` a silent no-op, so a detector's test
+  suite clears the same set before every test (an autouse fixture in
+  `tests/conftest.py`).
 - **The hosting pattern.** A repo's detectors live at `scripts/<name>`, are
   published in that repo's own `.pre-commit-hooks.yaml`, and are mirrored in its
   `repo: local` block — dev-playbook is the topmost instance of this pattern, not
