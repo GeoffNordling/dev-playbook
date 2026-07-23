@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import sys
 from collections.abc import Callable
 from pathlib import Path
 
@@ -101,3 +102,32 @@ def test_suite_environment_carries_no_git_redirection() -> None:
     leaked = set(os.environ) - set(no_git_env())
 
     assert leaked == set()
+
+
+def test_ambient_git_dir_cannot_reach_a_test_body(tmp_path: Path) -> None:
+    """Pin the autouse scrub by re-running the probe above under a real GIT_DIR.
+
+    The probe reads the environment it inherits, which in a clean shell and on
+    CI carries no redirection at all -- so on its own it holds whether or not
+    ``tests/conftest.py`` still scrubs, and dropping that fixture would surface
+    only at the next verified push, inside the hook, after ten test files have
+    reinitialized the real repository. Supplying the poisoned environment here
+    is what gives the pin teeth: this fails the moment the scrub stops working.
+    """
+    decoy = tmp_path / "decoy"
+    init_repo(decoy)
+    repo_root = Path(__file__).parents[2]
+    probe = (
+        f"{Path(__file__).relative_to(repo_root)}"
+        f"::{test_suite_environment_carries_no_git_redirection.__name__}"
+    )
+
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", probe],
+        cwd=repo_root,
+        env={**os.environ, "GIT_DIR": str(decoy / ".git")},
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr

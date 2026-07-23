@@ -1,3 +1,5 @@
+"""Pins that Python-file discovery answers for the root it was given."""
+
 from collections.abc import Callable
 from pathlib import Path
 
