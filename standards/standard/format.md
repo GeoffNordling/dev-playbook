@@ -131,6 +131,17 @@ detector contract.
 - **Thin shims.** A detector script stays a thin shim over the host repo's
   reusable modules (in dev-playbook, `src/dev_playbook`); the logic lives in the
   module, the script wires argument parsing and output to it.
+- **Explicit roots outrank the hook environment.** Detectors run at git gates,
+  and git exports an absolute `GIT_DIR` into every hook it runs — a variable
+  that silently outranks `git -C <root>` and the working directory in every
+  child process, redirecting git to the hook's repository instead of the
+  audited one. A detector that shells out to git therefore scrubs `GIT_*` from
+  the subprocess environment, allowlisting known-safe entries such as
+  `GIT_EXEC_PATH` — dev-playbook detectors use `gitrepo.no_git_env`; a
+  self-contained consumer detector cannot import it and carries its own copy.
+  The same ambient variable makes a bare `git init` a silent no-op, so a
+  detector's test suite likewise clears `GIT_*` before every test (an autouse
+  fixture in `tests/conftest.py`).
 - **The hosting pattern.** A repo's detectors live at `scripts/<name>`, are
   published in that repo's own `.pre-commit-hooks.yaml`, and are mirrored in its
   `repo: local` block — dev-playbook is the topmost instance of this pattern, not

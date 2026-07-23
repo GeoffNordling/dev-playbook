@@ -38,6 +38,11 @@ repo's own reusable modules. It obeys the detector contract in
 GNU format (`file:line: card.rule message`) with card-namespaced rule ids,
 answering `--list-rules`, exit 0 clean / 1 findings / 2 tool error.
 
+One contract clause is invisible until a hook runs and is easy to miss: the
+explicit-root rule — a git-shelling detector scrubs `GIT_*` from its subprocess
+environment, and its test suite clears `GIT_*` per test — because the commit
+gate is a git hook and git exports an absolute `GIT_DIR` there.
+
 ## 3. Publish it in the repo's own manifest
 
 Add the hook to the consumer repo's own `.pre-commit-hooks.yaml`, backed by the
