@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable
 from pathlib import Path
 
@@ -52,3 +53,9 @@ def test_no_git_env_drops_redirection_and_keeps_the_rest(
     assert scrubbed["GIT_CONFIG_KEY_0"] == "core.bare"
     assert scrubbed["GIT_CONFIG_VALUE_0"] == "false"
     assert scrubbed["PATH_TO_NOWHERE"] == "kept"
+
+
+def test_suite_environment_carries_no_git_redirection() -> None:
+    leaked = [k for k in os.environ if k.startswith("GIT_") and k != "GIT_EXEC_PATH"]
+
+    assert leaked == []

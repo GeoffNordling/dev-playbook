@@ -1,10 +1,25 @@
 """Shared fixtures for the tools test suite."""
 
+import os
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _clean_git_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Strip ambient git redirection variables from every test's environment.
+
+    The suite runs inside the pre-push hook (``make check-judgments``), where
+    git exports an absolute ``GIT_DIR``. That variable outranks ``git -C`` and
+    ``cwd=`` in every fixture subprocess -- ``git init`` becomes a silent no-op
+    and ``ls-files`` reads the wrong index -- so no test may inherit it.
+    """
+    for key in list(os.environ):
+        if key.startswith("GIT_") and key != "GIT_EXEC_PATH":
+            monkeypatch.delenv(key)
 
 
 def init_repo(path: Path) -> None:
