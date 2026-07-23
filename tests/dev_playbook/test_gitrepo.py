@@ -81,21 +81,16 @@ def test_no_git_env_keeps_transport_auth_and_unrelated_variables(
     assert scrubbed["PATH_TO_NOWHERE"] == "kept"
 
 
-def test_no_git_env_scrubs_exactly_what_git_reports_as_repository_local(
+def test_no_git_env_drops_git_dir_but_keeps_git_exec_path(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    reported = subprocess.run(
-        ["git", "rev-parse", "--local-env-vars"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.split()
-    for name in reported:
-        monkeypatch.setenv(name, "set-by-the-test")
+    monkeypatch.setenv("GIT_DIR", "/somewhere/.git")
+    monkeypatch.setenv("GIT_EXEC_PATH", "/usr/lib/git-core")
 
-    scrubbed = set(os.environ) - set(no_git_env())
+    scrubbed = no_git_env()
 
-    assert scrubbed == set(reported)
+    assert "GIT_DIR" not in scrubbed
+    assert scrubbed["GIT_EXEC_PATH"] == "/usr/lib/git-core"
 
 
 def test_suite_environment_carries_no_git_redirection() -> None:

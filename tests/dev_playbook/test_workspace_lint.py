@@ -16,7 +16,7 @@ from pathlib import Path
 
 from conftest import init_repo
 
-from dev_playbook import workspace_lint
+from dev_playbook import gitrepo, workspace_lint
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-lint"
 HOOK_REPO = Path(__file__).resolve().parents[2]
@@ -687,24 +687,28 @@ def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     assert "tracking.issue-brief-shape" not in result.stdout
 
 
+def _add_origin(repo: Path, url: str) -> None:
+    """Give ``repo`` an ``origin`` remote, scrubbing any ambient ``GIT_DIR``.
+
+    The scrub keeps ``-C repo`` authoritative even after ``ambient_git_dir``
+    has exported a ``GIT_DIR`` naming the decoy, so this lands on ``repo`` by
+    argument rather than by coincidence of the two paths agreeing.
+    """
+    subprocess.run(
+        ["git", "-C", str(repo), "remote", "add", "origin", url],
+        check=True,
+        capture_output=True,
+        env=gitrepo.no_git_env(),
+    )
+
+
 def test_ambient_git_dir_does_not_redirect_origin_slug(
     tmp_path: Path, ambient_git_dir: Callable[[str], Path]
 ) -> None:
     target = tmp_path / "target"
     init_repo(target)
+    _add_origin(target, "git@github.com:target/target.git")
     decoy = ambient_git_dir("leaked.txt")
-    subprocess.run(
-        [
-            "git",
-            "-C",
-            str(decoy),
-            "remote",
-            "add",
-            "origin",
-            "git@github.com:decoy/decoy.git",
-        ],
-        check=True,
-        capture_output=True,
-    )
+    _add_origin(decoy, "git@github.com:decoy/decoy.git")
 
-    assert workspace_lint.origin_slug(target) is None
+    assert workspace_lint.origin_slug(target) == "target/target"
