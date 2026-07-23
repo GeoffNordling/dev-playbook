@@ -45,7 +45,7 @@ environment, and its test suite clears the same set per test. The commit gate is
 a git hook, and a hook inherits an absolute `GIT_DIR` whenever discovery would
 otherwise find the wrong repository — always from a linked worktree, so anyone
 working the way this workspace does meets it immediately, even though a plain
-clone shows nothing.
+clone's hook exports no absolute `GIT_DIR`.
 
 ## 3. Publish it in the repo's own manifest
 

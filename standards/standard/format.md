@@ -137,12 +137,13 @@ detector contract.
   worktree, where agent work happens, and in submodule flows. It silently
   outranks `git -C <root>` and the working directory in every child process,
   redirecting git to the hook's repository instead of the audited one. A plain
-  clone exports no such variable, so finding nothing there is not evidence the
-  clause is stale. A detector that shells out to git therefore scrubs the
-  redirecting variables from its subprocess environment; git names them itself
-  through `git rev-parse --local-env-vars`, which stays correct across git
-  versions and leaves transport and auth settings such as `GIT_SSH_COMMAND`
-  untouched. dev-playbook detectors call `gitrepo.no_git_env`; a self-contained
+  clone's hook exports no absolute `GIT_DIR`, so finding it absent there is not
+  evidence the clause is stale. A detector that shells out to git therefore
+  scrubs the redirecting variables from its subprocess environment; git names
+  them itself through `git rev-parse --local-env-vars`, which stays correct
+  across git versions. It leaves transport and auth settings such as
+  `GIT_SSH_COMMAND` untouched but strips the `GIT_CONFIG_*` channel, through
+  which ad-hoc config relocates a repository as readily as `GIT_DIR` does. dev-playbook detectors call `gitrepo.no_git_env`; a self-contained
   consumer detector cannot import it and either carries its own copy or runs
   `unset $(git rev-parse --local-env-vars)`, the remedy `githooks(5)` documents.
   The same variable makes a bare `git init` a silent no-op, so a detector's test
