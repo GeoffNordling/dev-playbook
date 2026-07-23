@@ -8,7 +8,10 @@ contain (gitignore-aware, scoped to the invoking worktree).
 Both answers name their repository with an explicit ``git -C <root>``, and
 ``no_git_env`` is what makes that argument authoritative: a hook fired from a
 linked worktree runs with an ambient ``GIT_DIR`` that would otherwise outrank
-it. Every git subprocess in this package passes ``env=no_git_env()``.
+it. Every git subprocess in this package passes ``env=no_git_env()``, with one
+exception that cannot: the call inside ``no_git_env`` that asks git which
+variables to scrub. That one names no repository, so nothing in the ambient
+environment can change its answer.
 """
 
 import functools
