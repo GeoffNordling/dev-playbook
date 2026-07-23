@@ -1,8 +1,10 @@
 """Unit tests for the shared markdown library, src/dev_playbook/md.py."""
 
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
+from conftest import init_repo
 
 from dev_playbook import md
 
@@ -129,3 +131,17 @@ class TestHeadingSlugs:
         f = tmp_path / "t.md"
         f.write_text("# Top\n## Mid\n```\n## Fake\n```\n### Deep\n")
         assert md.heading_slugs(f) == frozenset({"top", "mid", "deep"})
+
+
+class TestFindMdFiles:
+    def test_ambient_git_dir_does_not_redirect_discovery(
+        self, tmp_path: Path, ambient_git_dir: Callable[[str], Path]
+    ) -> None:
+        target = tmp_path / "target"
+        init_repo(target)
+        (target / "real.md").write_text("# belongs to the target\n")
+        (target / ".gitignore").write_text("leaked.md\n")
+        (target / "leaked.md").write_text("# the target ignores its own copy\n")
+        ambient_git_dir("leaked.md")
+
+        assert md.find_md_files(target) == [target / "real.md"]

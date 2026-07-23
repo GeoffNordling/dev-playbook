@@ -14,6 +14,8 @@ import ast
 import subprocess
 from pathlib import Path
 
+from dev_playbook import gitrepo
+
 PYTHON_SHEBANG_PREFIXES = (
     "#!/usr/bin/env python",
     "#!/usr/bin/python",
@@ -62,6 +64,7 @@ def find_python_files(root: Path) -> list[Path]:
         capture_output=True,
         text=True,
         check=True,
+        env=gitrepo.no_git_env(),
     )
     files = []
     for rel in result.stdout.split("\0"):

@@ -107,6 +107,7 @@ def ignored_census(repo_root: Path) -> dict[str, int]:
         capture_output=True,
         text=True,
         check=True,
+        env=gitrepo.no_git_env(),
     )
     files = [f for f in listing.stdout.split("\0") if f]
     if not files:
@@ -116,6 +117,7 @@ def ignored_census(repo_root: Path) -> dict[str, int]:
         input="\0".join(files),
         capture_output=True,
         text=True,
+        env=gitrepo.no_git_env(),
     )
     if probe.returncode not in (0, 1):
         raise RuntimeError(f"git check-ignore failed: {probe.stderr}")

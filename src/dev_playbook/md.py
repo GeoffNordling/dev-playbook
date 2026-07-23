@@ -18,6 +18,7 @@ import subprocess
 from collections.abc import Iterator
 from pathlib import Path, PurePosixPath
 
+from dev_playbook import gitrepo
 from dev_playbook.external import is_externally_managed
 
 FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
@@ -210,6 +211,7 @@ def find_md_files(root: Path) -> list[Path]:
         capture_output=True,
         text=True,
         check=True,
+        env=gitrepo.no_git_env(),
     )
     results = []
     for rel in result.stdout.split("\0"):

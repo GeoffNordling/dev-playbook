@@ -11,7 +11,12 @@ import json
 import os
 import re
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
+
+from conftest import init_repo
+
+from dev_playbook import workspace_lint
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-lint"
 HOOK_REPO = Path(__file__).resolve().parents[2]
@@ -680,3 +685,26 @@ def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     )
     assert "software-factory.tuple-valid" not in result.stdout
     assert "tracking.issue-brief-shape" not in result.stdout
+
+
+def test_ambient_git_dir_does_not_redirect_origin_slug(
+    tmp_path: Path, ambient_git_dir: Callable[[str], Path]
+) -> None:
+    target = tmp_path / "target"
+    init_repo(target)
+    decoy = ambient_git_dir("leaked.txt")
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(decoy),
+            "remote",
+            "add",
+            "origin",
+            "git@github.com:decoy/decoy.git",
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    assert workspace_lint.origin_slug(target) is None

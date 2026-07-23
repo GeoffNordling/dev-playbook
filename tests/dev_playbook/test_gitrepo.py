@@ -1,70 +1,31 @@
-import subprocess
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
+from conftest import init_repo
 
 from dev_playbook.gitrepo import canonical_repo_name, git_files, no_git_env
 
 
-def init_repo(path: Path) -> None:
-    path.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        ["git", "init", "-q", "-b", "main", str(path)],
-        check=True,
-        capture_output=True,
-    )
-
-
-def commit_all(repo: Path) -> None:
-    subprocess.run(
-        ["git", "-C", str(repo), "add", "-A"], check=True, capture_output=True
-    )
-    subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo),
-            "-c",
-            "user.email=t@example.com",
-            "-c",
-            "user.name=test",
-            "commit",
-            "-q",
-            "-m",
-            "init",
-        ],
-        check=True,
-        capture_output=True,
-    )
-
-
 def test_ambient_git_dir_does_not_redirect_git_files(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, ambient_git_dir: Callable[[str], Path]
 ) -> None:
-    decoy = tmp_path / "decoy"
-    init_repo(decoy)
-    (decoy / "leaked.txt").write_text("tracked in the decoy\n")
-    commit_all(decoy)
     target = tmp_path / "target"
     init_repo(target)
     (target / "real.txt").write_text("belongs to the target\n")
     (target / ".gitignore").write_text("leaked.txt\n")
     (target / "leaked.txt").write_text("the target ignores its own copy\n")
-
-    monkeypatch.setenv("GIT_DIR", str(decoy / ".git"))
+    ambient_git_dir("leaked.txt")
 
     assert git_files(target) == [".gitignore", "real.txt"]
 
 
 def test_ambient_git_dir_does_not_redirect_canonical_repo_name(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, ambient_git_dir: Callable[[str], Path]
 ) -> None:
-    decoy = tmp_path / "decoy"
-    init_repo(decoy)
     target = tmp_path / "target"
     init_repo(target)
-
-    monkeypatch.setenv("GIT_DIR", str(decoy / ".git"))
+    ambient_git_dir("leaked.txt")
 
     assert canonical_repo_name(target) == "target"
 
