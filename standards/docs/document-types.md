@@ -29,7 +29,6 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `General-Sheet` | A deliberately-broad genre for a working loop document whose precise genre is not yet settled — e.g. a live record read on a cadence (a board of declared metrics, a register of selected items). Used when no crisper genre fits and the document's shape may still change. |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
-| `Idea` | A captured idea the author wants to store; a record, not a commitment. |
 | `Instrument-Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
 | `Protocol` | A formal algorithm for structured human–agent collaboration. |
@@ -79,8 +78,8 @@ Extension is **additive and downhill only**:
   types. A local name that case-insensitively equals an upstream one is a shadow
   — okf-lint's `knowledge-organization.type-shadows-upstream` rule flags it, one
   finding per offending row. (Membership itself stays exact-case; the
-  case-insensitive shadow rule is what stops a consumer aliasing upstream `Idea`
-  as a distinct `IDEA`.) A consumer cannot loosen or remove an upstream type,
+  case-insensitive shadow rule is what stops a consumer aliasing upstream `Guide`
+  as a distinct `GUIDE`.) A consumer cannot loosen or remove an upstream type,
   because it never edits this file.
 - **Downhill only.** A local type is legal only in the repo that declares it (and
   any repo downstream of it); it is invisible uphill to dev-playbook and sideways
