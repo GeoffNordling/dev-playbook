@@ -1057,6 +1057,44 @@ def test_main_exits_two_on_a_dangling_catalog_link(tmp_path: Path) -> None:
 # --- the subprocess boundary ------------------------------------------------
 
 
+def test_a_spawned_detector_does_not_inherit_the_hook_ambient_git_dir(
+    tmp_path: Path, ambient_git_dir: Callable[[str], Path]
+) -> None:
+    # standards-lint runs at a git gate and can inherit an absolute GIT_DIR the
+    # hook exports; a consumer detector it spawns must not receive it, or the
+    # detector's own git calls answer for the hook's repo instead of the audited
+    # one. A cited detector records the git dir it resolves to; with the
+    # redirecting variables scrubbed it names the audited root, not the decoy the
+    # ambient GIT_DIR points at.
+    files = ordered_repo_files({})
+    files["standards/index.md"] = catalog(
+        [
+            bullet("standards/README.md", "Standards"),
+            bullet("standards/standard.md", "Meta-Standard"),
+            bullet("standards/build.md", "Build"),
+            bullet("standards/python.md", "Python"),
+            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+        ]
+    )
+    files["standards/foo.md"] = card_citing("Foo", [cite("foo")])
+    files["scripts/foo"] = (
+        "#!/usr/bin/env bash\ngit rev-parse --absolute-git-dir > git-dir-seen\n"
+    )
+    files[".pre-commit-hooks.yaml"] = _manifest([])
+    files[".pre-commit-config.yaml"] = _local_block([])
+    files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical([])
+    files["scripts/README.md"] = _readme_table([])
+    repo = make_repo(tmp_path, files)
+    (repo / "scripts" / "foo").chmod(0o755)
+    decoy = ambient_git_dir("leaked.txt")
+
+    sa.main([str(repo)])
+
+    seen = Path((repo / "git-dir-seen").read_text().strip()).resolve()
+    assert seen == (repo / ".git").resolve()
+    assert seen != (decoy / ".git").resolve()
+
+
 def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

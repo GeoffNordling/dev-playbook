@@ -47,7 +47,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
-from dev_playbook import md
+from dev_playbook import gitrepo, md
 from dev_playbook.findings import print_rules, render
 
 # The dev-playbook checkout this module's hook ships in — the pre-commit clone
@@ -679,6 +679,11 @@ def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
     The detector's own ``uv run --script`` shebang resolves its dependencies, so
     this is the trusted ground truth format.md §Detectors fixes. Raises
     ``CannotRun`` when the script is absent or does not answer the flag.
+
+    standards-lint runs at a git gate and can inherit an absolute ``GIT_DIR`` the
+    hook exports; passing ``env=gitrepo.no_git_env()`` scrubs the redirecting
+    variables so a spawned detector's own git calls answer for the repo it names,
+    not the hook's.
     """
     script = root / "scripts" / name
     if not script.is_file():
@@ -690,6 +695,7 @@ def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
             text=True,
             cwd=root,
             timeout=10,
+            env=gitrepo.no_git_env(),
         )
     except OSError as err:
         raise CannotRun(f"scripts/{name} --list-rules failed: {err}") from err
