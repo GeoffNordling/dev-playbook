@@ -7,19 +7,26 @@ from pathlib import Path
 
 import pytest
 
+from dev_playbook import gitrepo
+
 
 @pytest.fixture(autouse=True)
 def _clean_git_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Strip ambient git redirection variables from every test's environment.
 
-    The suite runs inside the pre-push hook (``make check-judgments``), where
-    git exports an absolute ``GIT_DIR``. That variable outranks ``git -C`` and
-    ``cwd=`` in every fixture subprocess -- ``git init`` becomes a silent no-op
-    and ``ls-files`` reads the wrong index -- so no test may inherit it.
+    The suite runs inside the pre-push hook (``make check-judgments``), and from
+    a linked worktree -- where the software factory works -- git exports an
+    absolute ``GIT_DIR`` into that hook. It outranks ``git -C`` and ``cwd=`` in
+    every fixture subprocess: ``git init`` becomes a silent no-op and
+    ``ls-files`` reads the wrong index, so no test may inherit it.
+
+    The set removed is ``gitrepo.no_git_env``'s, not a second hand-written copy
+    -- one policy governs the code under test and the environment it is tested
+    in, so a fixture repo is never built under different git settings than
+    production would use.
     """
-    for key in list(os.environ):
-        if key.startswith("GIT_") and key != "GIT_EXEC_PATH":
-            monkeypatch.delenv(key)
+    for key in set(os.environ) - set(gitrepo.no_git_env()):
+        monkeypatch.delenv(key)
 
 
 def init_repo(path: Path) -> None:
