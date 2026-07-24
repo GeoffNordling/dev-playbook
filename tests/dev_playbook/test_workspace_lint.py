@@ -28,12 +28,20 @@ FAKE_GH = """\
 #!/usr/bin/env python3
 import json, os, sys
 
-# Only `gh api <path>` is faked. Find the path arg (skip flags), drop any query
-# string, and split into segments: repos/<owner>/<name>[/<resource>].
-path = next(a for a in sys.argv[2:] if not a.startswith("-")).split("?", 1)[0]
-segs = path.split("/")
-slug = "/".join(segs[1:3])
-resource = segs[3] if len(segs) > 3 else "settings"
+# Two `gh api` forms are faked, matching the two the audit issues. Settings come
+# over `gh api graphql -f query=... -f owner=... -f name=...`, so the slug is
+# rebuilt from the variables; every other resource comes over REST, whose path
+# splits into repos/<owner>/<name>[/<resource>]. Flags are skipped either way.
+args = [a for a in sys.argv[2:] if not a.startswith("-")]
+graphql = args[0] == "graphql"
+if graphql:
+    variables = dict(a.split("=", 1) for a in args[1:] if "=" in a)
+    slug = variables["owner"] + "/" + variables["name"]
+    resource = "settings"
+else:
+    segs = args[0].split("?", 1)[0].split("/")
+    slug = "/".join(segs[1:3])
+    resource = segs[3] if len(segs) > 3 else "settings"
 
 data = json.load(open(os.environ["FAKE_GH_DATA"]))
 if slug not in data:
@@ -59,6 +67,11 @@ if payload == "__unreachable__":
 if payload == "__badjson__":
     sys.stdout.write("{not valid json")
     sys.exit(0)
+# GraphQL wraps its answer. A settings payload of null models the null
+# repository GitHub returns when the token cannot see the repo at all; one
+# missing the merge fields models a response that answers 200 without them.
+if graphql:
+    payload = {"data": {"repository": payload}}
 print(json.dumps(payload))
 """
 
@@ -76,13 +89,15 @@ def canonical_label_objects() -> list[dict]:
     ]
 
 
+# Settings as GraphQL serves them — the camelCase names the audit queries, not
+# the REST names its findings print.
 GOOD_SETTINGS = {
-    "allow_squash_merge": True,
-    "allow_merge_commit": False,
-    "allow_rebase_merge": False,
-    "delete_branch_on_merge": True,
-    "squash_merge_commit_title": "PR_TITLE",
-    "squash_merge_commit_message": "PR_BODY",
+    "squashMergeAllowed": True,
+    "mergeCommitAllowed": False,
+    "rebaseMergeAllowed": False,
+    "deleteBranchOnMerge": True,
+    "squashMergeCommitTitle": "PR_TITLE",
+    "squashMergeCommitMessage": "PR_BODY",
 }
 
 
@@ -265,10 +280,11 @@ def test_drifted_setting_is_a_finding(tmp_path: Path) -> None:
     make_workspace_repo(
         ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
     )
-    drifted = dict(GOOD_SETTINGS, allow_merge_commit=True)
+    drifted = dict(GOOD_SETTINGS, mergeCommitAllowed=True)
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": drifted})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
+    # Queried as mergeCommitAllowed, reported under the REST name.
     assert (
         "alpha: tracking.settings allow_merge_commit is True (want False)"
         in result.stdout
@@ -286,6 +302,53 @@ def test_unreachable_repo_is_a_finding(tmp_path: Path) -> None:
     assert (
         "alpha: tracking.settings unreachable via gh api (me/unknown)" in result.stdout
     )
+
+
+def test_response_without_merge_fields_is_unreachable_not_six_drifts(
+    tmp_path: Path,
+) -> None:
+    # The failure this audit hit in production: a 200 whose repository object
+    # carries none of the merge fields (REST answers this way for a fine-grained
+    # token, whatever its permissions). Absent is not "set wrong" — the repo is
+    # unreadable, and reporting six confident drifts per repo is a wrong answer.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": {"settings": {}}})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert result.stdout.splitlines() == [
+        "alpha: tracking.settings unreachable via gh api (me/alpha)"
+    ]
+
+
+def test_partial_response_is_unreachable_not_partial_drift(tmp_path: Path) -> None:
+    # A repository object carrying only some merge fields is a degraded read, not
+    # a repo whose remaining settings are all None.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    partial = {"settings": {"squashMergeAllowed": True, "mergeCommitAllowed": False}}
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": partial})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert result.stdout.splitlines() == [
+        "alpha: tracking.settings unreachable via gh api (me/alpha)"
+    ]
+
+
+def test_null_repository_is_unreachable(tmp_path: Path) -> None:
+    # GraphQL answers 200 with a null repository when the token cannot see it.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": {"settings": None}})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "alpha: tracking.settings unreachable via gh api (me/alpha)" in result.stdout
 
 
 def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
@@ -457,7 +520,7 @@ def test_bad_json_response_reports_repo_unreachable_and_run_survives(
     make_workspace_repo(
         ws, "beta", {"README.md": "# B\n"}, origin="git@github.com:me/beta.git"
     )
-    drifted = dict(GOOD_SETTINGS, allow_merge_commit=True)
+    drifted = dict(GOOD_SETTINGS, mergeCommitAllowed=True)
     gh_dir, gh_data = make_fake_gh(
         tmp_path, {"me/alpha": "__badjson__", "me/beta": drifted}
     )

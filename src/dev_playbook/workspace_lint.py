@@ -6,10 +6,13 @@ answers workspace-scope facts readable over `gh api`, and it reports and never
 blocks — GitHub sits outside every gate. For every git repo under the workspace
 root:
 
-  - **settings** — read the repo's GitHub settings over `gh api` and compare
-    them against the expected values (squash-only merges, PR title/body commit
-    message, auto-deleted merged branches). A repo the API cannot reach, or with
-    no GitHub origin, is reported loudly.
+  - **settings** — read the repo's merge settings over `gh api graphql` and
+    compare them against the expected values (squash-only merges, PR title/body
+    commit message, auto-deleted merged branches). REST is not the venue: its
+    repository object omits every merge field for a fine-grained token — a 200
+    whose body simply lacks them, whatever permissions the token carries — which
+    would read as six drifted settings on every repo. A repo the API cannot
+    reach, or with no GitHub origin, is reported loudly.
   - **labels** — compare the repo's labels against the canonical scheme at full
     parity (a finding exactly when bootstrap-labels would repair), and flag any
     label naming a blocked state.
@@ -90,8 +93,8 @@ CANONICAL_CONFIG = (
     HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
 )
 
-# Expected GitHub settings, as the repos API reports them. The audit only
-# reads; the merge settings are set by hand per the repo-settings standard.
+# Expected GitHub settings, under the REST field names. The audit only reads;
+# the merge settings are set by hand per the repo-settings standard.
 EXPECTED_SETTINGS = {
     "allow_squash_merge": True,
     "allow_merge_commit": False,
@@ -100,6 +103,30 @@ EXPECTED_SETTINGS = {
     "squash_merge_commit_title": "PR_TITLE",
     "squash_merge_commit_message": "PR_BODY",
 }
+
+# The GraphQL field serving each expected setting. GraphQL is the only venue
+# that answers these for a fine-grained token; the names map back to the REST
+# ones so findings stay in one vocabulary. Both venues share the enum values
+# ("PR_TITLE", "PR_BODY"), so only the keys need translating.
+SETTINGS_FIELDS = {
+    "squashMergeAllowed": "allow_squash_merge",
+    "mergeCommitAllowed": "allow_merge_commit",
+    "rebaseMergeAllowed": "allow_rebase_merge",
+    "deleteBranchOnMerge": "delete_branch_on_merge",
+    "squashMergeCommitTitle": "squash_merge_commit_title",
+    "squashMergeCommitMessage": "squash_merge_commit_message",
+}
+
+SETTINGS_QUERY = """query($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    squashMergeAllowed
+    mergeCommitAllowed
+    rebaseMergeAllowed
+    deleteBranchOnMerge
+    squashMergeCommitTitle
+    squashMergeCommitMessage
+  }
+}"""
 
 REMOTE_SLUG_PATTERN = re.compile(
     r"^(?:git@github\.com:|https://github\.com/)([^/\s]+/[^/\s]+?)(?:\.git)?$"
@@ -222,6 +249,11 @@ def gh_api(path: str, *, paginate: bool = False) -> object | None:
     if paginate:
         argv.append("--paginate")
     argv.append(path)
+    return _gh_json(argv)
+
+
+def _gh_json(argv: list[str]) -> object | None:
+    """Parsed JSON from one ``gh`` invocation, or None when the call is unusable."""
     try:
         result = subprocess.run(argv, capture_output=True, text=True)
     except FileNotFoundError as err:
@@ -235,15 +267,41 @@ def gh_api(path: str, *, paginate: bool = False) -> object | None:
     return parsed
 
 
-def fetch_settings(slug: str) -> dict | None:
-    """The repo's GitHub settings object, or None when the read is unusable.
+def gh_graphql(query: str, **variables: str) -> object | None:
+    """Parsed JSON from ``gh api graphql``, or None when the call fails.
 
-    A failed read or a wrong-shaped response (anything but a JSON object)
-    degrades to None — the unreachable path — so one malformed response cannot
-    abort the whole run.
+    The same degradation contract as ``gh_api``: a non-zero exit (which is how
+    `gh` reports GraphQL errors) or an unparseable body yields None for that one
+    call, so a single bad response degrades to an unreachable finding.
     """
-    data = gh_api(f"repos/{slug}")
-    return data if isinstance(data, dict) else None
+    argv = ["gh", "api", "graphql", "-f", f"query={query}"]
+    for key, value in variables.items():
+        argv += ["-f", f"{key}={value}"]
+    return _gh_json(argv)
+
+
+def fetch_settings(slug: str) -> dict | None:
+    """The repo's merge settings under their REST names, or None when unusable.
+
+    A failed read, a wrong-shaped response, a null repository, or a repository
+    object that does not carry every expected field degrades to None — the
+    unreachable path — so one malformed response cannot abort the whole run.
+    That last case is the one REST fails: it answers 200 with the merge fields
+    absent, and a partial read reported as drift is a wrong answer, not a
+    lenient one.
+    """
+    owner, _, name = slug.partition("/")
+    data = gh_graphql(SETTINGS_QUERY, owner=owner, name=name)
+    if not isinstance(data, dict):
+        return None
+    payload = data.get("data")
+    repository = payload.get("repository") if isinstance(payload, dict) else None
+    if (
+        not isinstance(repository, dict)
+        or not SETTINGS_FIELDS.keys() <= repository.keys()
+    ):
+        return None
+    return {rest: repository[field] for field, rest in SETTINGS_FIELDS.items()}
 
 
 def fetch_labels(slug: str) -> list | None:
