@@ -75,9 +75,11 @@ judgments:
       each script appears in exactly one of the file's two tables (Validation
       scripts, Utility scripts) with a single stated responsibility, and each
       validation-table row additionally names one or more standards whose
-      concerns the script's stated purpose serves, while the utility table
-      states purposes only and asserts no standard alignment. The claim is
-      over what the tables state, not their completeness.
+      concerns the script's stated purpose serves, in a Standard column the
+      utility table does not carry — a utility row states its purpose, and any
+      standard it cites there is part of that purpose, not a binding of the
+      script to that standard. The claim is over what the tables state, not
+      their completeness.
     evidence:  [scripts/README.md]
     reference: [standards/index.md]
     model: claude-sonnet-5

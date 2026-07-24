@@ -29,78 +29,9 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [pre-push]
-      - id: repo-lint
-        name: repo-lint
-        entry: scripts/repo-lint
+      - id: playbook-lint
+        name: playbook-lint
+        entry: scripts/playbook-lint
         language: script
         pass_filenames: false
         always_run: true
-
-      - id: python-lint
-        name: python-lint
-        entry: scripts/python-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: testing-lint
-        name: testing-lint
-        entry: scripts/testing-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: ref-lint
-        name: ref-lint
-        entry: scripts/ref-lint
-        language: script
-        pass_filenames: false
-        types: [markdown]
-
-      - id: okf-lint
-        name: okf-lint
-        entry: scripts/okf-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: decisions-lint
-        name: decisions-lint
-        entry: scripts/decisions-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: skill-lint
-        name: skill-lint
-        entry: scripts/skill-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: judgments-lint
-        name: judgments-lint
-        entry: scripts/judgments-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: prose-lint
-        name: prose-lint
-        entry: scripts/prose-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: standards-lint
-        name: standards-lint
-        entry: scripts/standards-lint
-        language: script
-        pass_filenames: false
-        always_run: true
-
-      - id: validate-manifest
-        name: validate-manifest
-        entry: uvx pre-commit validate-manifest
-        language: system
-        files: ^\.pre-commit-hooks\.yaml$

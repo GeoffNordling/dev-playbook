@@ -46,8 +46,11 @@ its dependencies via its `uv run --script` shebang.
 
 ## Validation scripts
 
-The published hooks. They run automatically on every commit via pre-commit, and
-consumer repos run them from a pinned clone (see
+The commit-gate detectors. They run automatically on every commit through
+`playbook-lint` — the one published hook, whose roster
+(`src/dev_playbook/playbook_lint.py`) dispatches every detector below
+concurrently and aggregates their exits — and consumer repos run that hook
+from a pinned clone (see
 [distribution.md](/standards/build/distribution.md)). Each script exits 0
 on success / 1 on findings / 2 on tool error, writes machine-readable findings
 to stdout (one per line) and a one-line summary to stderr. Each takes the
@@ -112,8 +115,10 @@ in [`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml) (mirrored in the local
 block) against the dev-playbook checkout that holds it — no `$HOME` paths, no
 `realpath` indirection.
 
-When adding a validator, mirror it into both the manifest and the local block,
-and test it in dev-playbook and a consumer repo before pushing.
+When adding a validator, enroll it in the `playbook-lint` roster
+(`DETECTORS` in `src/dev_playbook/playbook_lint.py`) — the manifest and the
+local block carry only the aggregate hook and never change — and test it in
+dev-playbook and a consumer repo before pushing.
 
 ## Utility scripts
 

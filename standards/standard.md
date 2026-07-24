@@ -28,8 +28,8 @@ kept honest.
 - the pre-commit hook suite
   ([.pre-commit-config.yaml](/.pre-commit-config.yaml)) — standards-lint
   blocks nonconforming commits at the **commit gate**; dev-playbook dogfoods
-  it from its local block, and consumer repos inherit it as a published hook
-  through the canonical template's pinned block
+  it from its local block, and consumer repos inherit it through the
+  published `playbook-lint` hook the canonical template's pinned block wires
 
 ## Adopt
 

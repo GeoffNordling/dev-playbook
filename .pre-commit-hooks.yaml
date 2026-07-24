@@ -1,101 +1,25 @@
-# Canonical pre-commit hook definitions for the workspace.
+# Canonical pre-commit hook definition for the workspace.
 #
-# Consumer repos reference these by URL + pinned rev in their own
-# .pre-commit-config.yaml, exactly as they reference any third-party hook:
+# One published hook. Consumer repos reference it by URL + pinned rev in their
+# own .pre-commit-config.yaml, exactly as they reference any third-party hook:
 #
 #   - repo: https://github.com/GeoffNordling/dev-playbook
 #     rev: <commit-sha>
 #     hooks:
-#       - id: repo-lint
-#       - id: python-lint
-#       - id: testing-lint
-#       - id: ref-lint
-#       - id: okf-lint
-#       - id: decisions-lint
-#       - id: skill-lint
-#       - id: judgments-lint
-#       - id: prose-lint
-#       - id: standards-lint
-#       - id: validate-manifest
+#       - id: playbook-lint
 #
-# pre-commit clones this repo into its cache at the pinned rev and runs the
-# hook from there, so resolution is independent of where the consumer repo —
-# or any of its worktrees — sits on disk. The script-backed hooks live in
-# scripts/ and share primitives from src/dev_playbook/. See
+# playbook-lint dispatches to every detector in its roster
+# (src/dev_playbook/playbook_lint.py), so the manifest never grows and a
+# detector added upstream reaches every consumer at its next pin bump — the
+# consumer config enumerates nothing, and enrollment rides the pin by
+# construction. pre-commit clones this repo into its cache at the pinned rev
+# and runs the hook from there, so resolution is independent of where the
+# consumer repo — or any of its worktrees — sits on disk. See
 # standards/build/distribution.md.
 
-- id: repo-lint
-  name: repo-lint
-  entry: scripts/repo-lint
+- id: playbook-lint
+  name: playbook-lint
+  entry: scripts/playbook-lint
   language: script
   pass_filenames: false
   always_run: true
-
-- id: python-lint
-  name: python-lint
-  entry: scripts/python-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: testing-lint
-  name: testing-lint
-  entry: scripts/testing-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: ref-lint
-  name: ref-lint
-  entry: scripts/ref-lint
-  language: script
-  pass_filenames: false
-  types: [markdown]
-
-- id: okf-lint
-  name: okf-lint
-  entry: scripts/okf-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: decisions-lint
-  name: decisions-lint
-  entry: scripts/decisions-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: skill-lint
-  name: skill-lint
-  entry: scripts/skill-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: judgments-lint
-  name: judgments-lint
-  entry: scripts/judgments-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: prose-lint
-  name: prose-lint
-  entry: scripts/prose-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: standards-lint
-  name: standards-lint
-  entry: scripts/standards-lint
-  language: script
-  pass_filenames: false
-  always_run: true
-
-- id: validate-manifest
-  name: validate-manifest
-  entry: uvx pre-commit validate-manifest
-  language: system
-  files: ^\.pre-commit-hooks\.yaml$

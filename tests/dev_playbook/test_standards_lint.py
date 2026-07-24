@@ -518,7 +518,7 @@ def test_agreeing_hook_surfaces_pass(tmp_path: Path) -> None:
         cited_ids=ALL,
     )
 
-    assert sa.check_hook_surfaces(repo, dev_playbook_mode=True) == []
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL)) == []
 
 
 def test_published_non_detector_in_canonical_is_not_a_stray(tmp_path: Path) -> None:
@@ -535,7 +535,7 @@ def test_published_non_detector_in_canonical_is_not_a_stray(tmp_path: Path) -> N
         cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert not any("validate-manifest" in f.message for f in findings)
 
@@ -551,7 +551,7 @@ def test_manifest_hook_missing_from_local_is_flagged(tmp_path: Path) -> None:
         cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert sa.HOOK_SURFACES in {f.rule for f in findings}
     assert any("okf-lint" in f.message for f in findings)
@@ -570,7 +570,7 @@ def test_local_detector_not_in_manifest_is_flagged(tmp_path: Path) -> None:
         cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any(
         "standards-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
@@ -589,7 +589,7 @@ def test_manifest_hook_missing_from_canonical_is_flagged(tmp_path: Path) -> None
         cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any("okf-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings)
 
@@ -605,7 +605,7 @@ def test_detector_hook_missing_from_readme_table_is_flagged(tmp_path: Path) -> N
         cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any("okf-lint" in f.message and "README" in f.message for f in findings)
 
@@ -623,7 +623,7 @@ def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
         cited_ids=ALL,
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any(
         "stray-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
@@ -653,7 +653,7 @@ def test_manifest_detector_in_canonical_local_block_is_flagged(tmp_path: Path) -
         files[f"standards/c{i}.md"] = card_citing(f"C{i}", [cite(name)])
     repo = make_repo(tmp_path, files)
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any(
         "okf-lint" in f.message and "canonical" in f.message.lower() for f in findings
@@ -671,9 +671,60 @@ def test_detector_hook_cited_by_no_card_is_flagged(tmp_path: Path) -> None:
         cited_ids=["repo-lint", "standards-lint"],  # okf-lint cited by no card
     )
 
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True)
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any("okf-lint" in f.message and "Audit cell" in f.message for f in findings)
+
+
+def test_aggregate_hook_shape_passes(tmp_path: Path) -> None:
+    # The published world: one aggregate hook in the manifest, the local block,
+    # and the canonical pinned block; the roster detectors are cited and rowed.
+    # The aggregate hook itself owes no card citation and no README row.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=["agg-lint"],
+        local_ids=["agg-lint"],
+        canonical_ids=["agg-lint"],
+        readme_ids=ALL,
+        cited_ids=ALL,
+    )
+
+    assert sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL)) == []
+
+
+def test_cited_but_unenrolled_detector_is_flagged(tmp_path: Path) -> None:
+    # The closure leg: a card's Audit cell cites a script that is neither in
+    # the roster nor a registered ungated audit -- a detector card authored
+    # without gating its detector.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=["agg-lint"],
+        local_ids=["agg-lint"],
+        canonical_ids=["agg-lint"],
+        readme_ids=ALL,
+        cited_ids=[*ALL, "rogue-lint"],
+    )
+
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
+
+    assert any("rogue-lint" in f.message and "roster" in f.message for f in findings)
+
+
+def test_cited_ungated_audit_is_not_an_enrollment_hole(tmp_path: Path) -> None:
+    # workspace-lint's shape: cited by a card, absent from the roster, but
+    # registered as an ungated audit -- deliberate, not an enrollment hole.
+    repo = surfaces_repo(
+        tmp_path,
+        manifest_ids=["agg-lint"],
+        local_ids=["agg-lint"],
+        canonical_ids=["agg-lint"],
+        readme_ids=ALL,
+        cited_ids=[*ALL, "workspace-lint"],
+    )
+
+    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
+
+    assert findings == []
 
 
 # --- hook-surfaces: consumer mode ---
@@ -859,7 +910,11 @@ def test_dev_playbook_mode_audit_never_runs_the_shadow_rule(tmp_path: Path) -> N
     upstream = make_repo(tmp_path / "up", {"standards/build.md": card("Build")})
     devrepo = _clean_bundle(tmp_path, dev_playbook_mode=True)
 
-    findings = sa.audit(devrepo, fake_list_rules({}), hook_repo_root=upstream)
+    # roster=() keeps the fixture self-contained: the bundle's cards cite no
+    # detectors, so the real playbook-lint roster would read as unenrolled.
+    findings = sa.audit(
+        devrepo, fake_list_rules({}), hook_repo_root=upstream, roster=()
+    )
 
     assert findings == []
 
@@ -956,7 +1011,12 @@ def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
         },
     )
 
-    assert sa.audit(devrepo, fake_list_rules({}), hook_repo_root=upstream) == []
+    # roster=() as in the shadow-rule walk test: the fixture cites no detectors.
+    findings = sa.audit(
+        devrepo, fake_list_rules({}), hook_repo_root=upstream, roster=()
+    )
+
+    assert findings == []
 
 
 def test_list_rules_prints_the_five_rules(capsys: pytest.CaptureFixture[str]) -> None:

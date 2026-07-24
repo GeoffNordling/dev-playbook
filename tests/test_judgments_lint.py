@@ -179,6 +179,32 @@ def test_hook_prints_gnu_finding_to_stdout_on_a_broken_repo(
     assert "docs/gone.md" in result.stdout
 
 
+def test_hook_takes_an_explicit_repository_root_argument(
+    make_repo: Callable[[dict[str, str]], Path], tmp_path: Path
+) -> None:
+    # The detector contract playbook-lint dispatches on: the repository root as
+    # the positional argument, independent of the working directory.
+    repo = make_repo(
+        {
+            "pyproject.toml": CONFIG,
+            "judgments/a.yaml": judgment_yaml("[docs/gone.md]"),
+        }
+    )
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+
+    result = subprocess.run(
+        [sys.executable, str(LINT_HOOK), str(repo)],
+        cwd=elsewhere,
+        env={**os.environ, "PYTHONPATH": str(REPO_ROOT / "src")},
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "judgments/a.yaml: semantic-validation.evidence-path" in result.stdout
+
+
 def test_hook_list_rules_prints_semantic_validation_prefixed_ids(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:

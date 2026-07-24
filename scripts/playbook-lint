@@ -1,0 +1,24 @@
+#!/usr/bin/env -S uv run --script
+"""playbook-lint — the one published hook; runs every commit-gate detector.
+
+Thin shim over dev_playbook.playbook_lint.main: it puts the checkout's ``src/``
+on ``sys.path`` and calls the module, which dispatches every detector in the
+roster over the audited repo and aggregates their exits (0 clean / 1 findings
+/ 2 tool error). Consumers wire this single hook id at a pinned rev; the
+roster ships inside the clone, so a detector added upstream reaches every
+consumer at its next pin bump with no config edit — enrollment rides the pin
+by construction. See dev_playbook.playbook_lint for the logic and its tests.
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.playbook_lint import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())
