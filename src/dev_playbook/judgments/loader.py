@@ -334,9 +334,10 @@ def lint_cli(argv: list[str] | None = None) -> int:
     """Console-script entry point: lint the repo's judgments, findings to stdout.
 
     Resolves the repo root, runs :func:`lint_findings`, prints every finding as a
-    GNU finding line to stdout and a summary count to stderr, and returns 1 if
-    there were any findings else 0. ``--list-rules`` prints the rule ids and
-    exits 0 without needing a repository. Registered as the ``judgments-lint``
+    GNU finding line to stdout and a summary to stderr -- always, clean or not --
+    and returns 1 if there were any findings else 0. ``--list-rules`` prints the
+    rule ids and exits 0 without needing a repository. Registered as the
+    ``judgments-lint``
     console script and called by the ``scripts/judgments-lint`` pre-commit shim,
     so both channels behave alike.
     """
@@ -359,12 +360,22 @@ def lint_cli(argv: list[str] | None = None) -> int:
     if args.list_rules:
         return print_rules(JUDGMENTS_RULES)
 
-    findings = lint_findings(resolve_root(Path(args.directory)))
+    root = resolve_root(Path(args.directory))
+    findings = lint_findings(root)
     for finding in findings:
         print(render(finding.location, finding.rule, finding.message))
     if findings:
         print(f"judgments-lint: {len(findings)} finding(s)", file=sys.stderr)
         return 1
+    # A clean run still announces itself, and says over what: a detector that
+    # prints nothing cannot be told apart from one that never ran. The two clean
+    # outcomes are distinct -- an opted-in repo whose declarations all pass, and
+    # a repo that never opted in -- so they read differently.
+    if root is None:
+        print("judgments-lint: no [tool.judgments] config", file=sys.stderr)
+    else:
+        files = len(_discover(root))
+        print(f"judgments-lint: clean across {files} file(s)", file=sys.stderr)
     return 0
 
 

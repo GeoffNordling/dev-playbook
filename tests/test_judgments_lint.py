@@ -162,6 +162,24 @@ def test_hook_exits_zero_on_a_clean_repo(
     assert result.returncode == 0, result.stderr
 
 
+def test_hook_summarizes_a_clean_run_with_its_scope(
+    make_repo: Callable[[dict[str, str]], Path],
+) -> None:
+    # A detector that prints nothing when clean cannot be told apart from one
+    # that never ran, so the summary is unconditional and carries the count.
+    result = _run_hook(clean_repo(make_repo))
+
+    assert "judgments-lint: clean across 1 file(s)" in result.stderr
+
+
+def test_hook_says_so_when_the_repo_declares_no_judgments(tmp_path: Path) -> None:
+    # The other clean outcome, and a distinguishable one: nothing opted in.
+    result = _run_hook(tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert "judgments-lint: no [tool.judgments] config" in result.stderr
+
+
 def test_hook_prints_gnu_finding_to_stdout_on_a_broken_repo(
     make_repo: Callable[[dict[str, str]], Path],
 ) -> None:
