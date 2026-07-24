@@ -50,7 +50,11 @@ outside every gate: it hosts the CI gate but is not itself one.
 Where each detector's rules fire. Every pre-commit hook fires at the **commit
 gate, in the CI gate, and inside every `make check`** (hence also in the agent
 ritual, and at the push gate via `make check-judgments`); the table lists only
-what falls outside that pattern.
+what falls outside that pattern. The dev-playbook detectors reach those gates
+through the single published `playbook-lint` hook, which dispatches its whole
+roster ([distribution.md](/standards/build/distribution.md)); a per-detector
+skip (ref-lint's CI-gate exception) is a `SKIP=<detector>` environment entry
+the dispatcher honors.
 
 | Detector | Owns | Gates |
 |---|---|---|

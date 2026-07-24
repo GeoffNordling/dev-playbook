@@ -103,16 +103,12 @@ enforces it — a window with zero mechanical enforcement.
 
 ## 4. Lint the declarations on commit
 
-Add the `judgments-lint` pre-commit hook so malformed or stale declarations
-fail fast. It ships from dev-playbook's published hook manifest; reference
-it by URL and pinned `rev`, exactly as for the other dev-playbook hooks:
-
-```yaml
-- repo: https://github.com/GeoffNordling/dev-playbook
-  rev: <commit-sha>
-  hooks:
-    - id: judgments-lint
-```
+`judgments-lint` fails malformed or stale declarations fast at the commit
+gate. There is nothing to wire: it is in the roster of dev-playbook's
+published `playbook-lint` hook, which the canonical
+`.pre-commit-config.yaml` already pins
+([distribution.md](/standards/build/distribution.md)) — any repo on the
+canonical config runs it on every commit.
 
 The hook runs from pre-commit's own clone of dev-playbook at the pinned
 `rev` and self-bootstraps its imports, so it needs neither the installed

@@ -420,32 +420,6 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
     assert "docs/CONTEXT.md: build.forbidden" in result.stdout
 
 
-# --- skills ---
-
-
-def test_skills_dir_without_lint_hook_fails(tmp_path: Path) -> None:
-    files = base_files()
-    # The canonical template now carries skill-lint; strip it so this repo has
-    # a skills dir but no skill-lint hook -- the condition the rule flags.
-    files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: skill-lint\n", ""
-    )
-    files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "skills-hook" in result.stdout
-
-
-def test_skills_dir_with_lint_hook_appended_passes(tmp_path: Path) -> None:
-    files = base_files()
-    files[".claude/skills/greet/SKILL.md"] = "---\nname: greet\n---\nhi\n"
-    files[".pre-commit-config.yaml"] = files[".pre-commit-config.yaml"].replace(
-        "      - id: validate-manifest\n",
-        "      - id: validate-manifest\n      - id: skill-lint\n",
-    )
-    assert run(make_repo(tmp_path, files)).returncode == 0
-
-
 # --- python layer ---
 
 
@@ -860,7 +834,6 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "build.required-file" in ids
     assert "build.canonical-block" in ids
     assert "claude-code.standards-block" in ids
-    assert "build.skills-hook" in ids
     assert "knowledge-organization.doc-shape" in ids
     assert all(
         rule.split(".")[0] in {"build", "claude-code", "knowledge-organization"}

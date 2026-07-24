@@ -23,9 +23,14 @@ each namespaced under the meta card (``standard.*``):
     (``--list-rules`` is the trusted ground truth).
   - **hook-surfaces** — the detector-hook id sets agree between the published
     manifest and the local block; in dev-playbook mode the canonical consumer
-    template's pinned block offers exactly what the manifest publishes; every
-    local detector hook is cited by a card, and carries a scripts/README.md
-    validation-table row when that file is present.
+    template's pinned block offers exactly what the manifest publishes. Every
+    detector must be cited by a card and carry a scripts/README.md
+    validation-table row when that file is present — "every detector" meaning
+    the playbook-lint roster in dev-playbook mode (consumers wire one
+    aggregate hook, so the roster, not the config, enumerates what runs) and
+    the local detector hooks in consumer mode. In dev-playbook mode the
+    reverse also holds: a script cited by a card's Audit cell that is neither
+    in the roster nor a registered ungated audit is an enrollment hole.
   - **card-shadows-upstream** — in consumer mode, no local card stem may reuse
     an upstream card stem drawn from this hook's own pinned clone.
 
@@ -49,6 +54,7 @@ from pathlib import Path, PurePosixPath
 
 from dev_playbook import gitrepo, md
 from dev_playbook.findings import print_rules, render
+from dev_playbook.playbook_lint import DETECTORS, UNGATED_AUDITS
 
 # The dev-playbook checkout this module's hook ships in — the pre-commit clone
 # in consumer repos, dev-playbook's own tree when dogfooded. The shadow rule
@@ -549,18 +555,30 @@ def _manifest_ids(root: Path) -> tuple[set[str], set[str]]:
     return all_ids, _scripts_entry_ids(hooks)
 
 
-def check_hook_surfaces(root: Path, dev_playbook_mode: bool) -> list[Finding]:
+def check_hook_surfaces(
+    root: Path,
+    dev_playbook_mode: bool,
+    roster: tuple[str, ...] = DETECTORS,
+    ungated: frozenset[str] = UNGATED_AUDITS,
+) -> list[Finding]:
     """The published-hook surfaces agree.
 
     The detector-hook id sets (hooks whose entry is a ``scripts/`` path) must be
     equal between the published manifest and the local block -- in both modes.
     In dev-playbook mode the canonical consumer template's pinned block must
-    offer exactly what the manifest publishes: *all* published ids, detectors and
-    non-detectors alike, so a published non-detector (validate-manifest) is
-    covered rather than flagged as a stray. Consumers carry no canonical
-    template, so that leg is dev-playbook-only. Every local detector hook must
-    be cited by a card (both modes); the scripts/README.md validation-table
-    sub-check applies only when the audited repo carries that file.
+    offer exactly what the manifest publishes -- consumers carry no canonical
+    template, so that leg is dev-playbook-only.
+
+    The per-detector legs -- cited by a card's Audit cell, rowed in the
+    scripts/README.md validation table when that file is present -- run over
+    the set that actually enumerates what the commit gate runs. In consumer
+    mode that is the local detector hooks; in dev-playbook mode it is
+    ``roster`` (the playbook-lint dispatch list -- the local block carries only
+    the aggregate hook, which owns no rules and earns no card). Dev-playbook
+    mode adds the closure leg: a ``/scripts/`` name cited by any Audit cell
+    must be enrolled in the roster or registered in ``ungated`` (the audits
+    enforcement.md stations outside the gates), so a detector card cannot be
+    authored without gating its detector.
     """
     manifest_all, manifest = _manifest_ids(root)
     local = _scripts_entry_ids(_local_hooks(root))
@@ -577,7 +595,7 @@ def check_hook_surfaces(root: Path, dev_playbook_mode: bool) -> list[Finding]:
         flag(LOCAL_CONFIG, f"local hook {name} is not in the published manifest")
 
     # Canonical menu: the pinned dev-playbook block offers exactly the published
-    # manifest, non-detectors included. Dev-playbook-only -- consumers have none.
+    # manifest. Dev-playbook-only -- consumers have none.
     if dev_playbook_mode:
         canonical = _canonical_dev_hook_ids(root)
         for name in sorted(manifest_all - canonical):
@@ -594,18 +612,25 @@ def check_hook_surfaces(root: Path, dev_playbook_mode: bool) -> list[Finding]:
             )
 
     cited = _all_cited_detectors(root)
-    for name in sorted(local - cited):
+    detectors = set(roster) if dev_playbook_mode else local
+    for name in sorted(detectors - cited):
         flag(
             f"scripts/{name}",
-            f"detector hook {name} is cited by no card's Audit cell",
+            f"detector {name} is cited by no card's Audit cell",
         )
+
+    if dev_playbook_mode:
+        for name in sorted(cited - detectors - ungated):
+            flag(
+                f"scripts/{name}",
+                f"{name} is cited by a card's Audit cell but is neither in the "
+                "playbook-lint roster nor a registered ungated audit",
+            )
 
     if (root / SCRIPTS_README).is_file():
         table = _readme_table_names(root)
-        for name in sorted(local - table):
-            flag(
-                SCRIPTS_README, f"detector hook {name} is missing from the README table"
-            )
+        for name in sorted(detectors - table):
+            flag(SCRIPTS_README, f"detector {name} is missing from the README table")
     return findings
 
 
@@ -648,6 +673,8 @@ def audit(
     list_rules: Callable[[str, Path], list[str]],
     *,
     hook_repo_root: Path = HOOK_REPO_ROOT,
+    roster: tuple[str, ...] = DETECTORS,
+    ungated: frozenset[str] = UNGATED_AUDITS,
 ) -> list[Finding]:
     """Run every applicable rule over ``root`` and return the combined findings.
 
@@ -667,7 +694,7 @@ def audit(
     findings.extend(check_card_layout(root))
     findings.extend(check_catalog_order(root, dev_playbook_mode))
     findings.extend(check_rule_matrix(root, list_rules))
-    findings.extend(check_hook_surfaces(root, dev_playbook_mode))
+    findings.extend(check_hook_surfaces(root, dev_playbook_mode, roster, ungated))
     if not dev_playbook_mode:
         findings.extend(check_card_shadows_upstream(root, hook_repo_root))
     return findings

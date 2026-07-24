@@ -3,17 +3,7 @@ repos:
   - repo: https://github.com/GeoffNordling/dev-playbook
     rev: <pinned-sha>
     hooks:
-      - id: repo-lint
-      - id: python-lint
-      - id: testing-lint
-      - id: ref-lint
-      - id: okf-lint
-      - id: decisions-lint
-      - id: skill-lint
-      - id: judgments-lint
-      - id: prose-lint
-      - id: standards-lint
-      - id: validate-manifest
+      - id: playbook-lint
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:

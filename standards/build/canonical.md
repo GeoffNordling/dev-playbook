@@ -32,13 +32,14 @@ does not belong there.
 ## One config serves every repo
 
 The canonical [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-carries the dev-playbook hook set, the ruff, shellcheck, and shfmt hooks at
-canonical revs, and the pre-push `make check-judgments` hook, installing both
-the commit and push stages. It serves every repo unchanged: a hook with no matching files
-skips itself, and `judgments-lint` and `skill-lint` pass trivially where a
-repo has no `[tool.judgments]` table and no authored skills. A repo that
-authors skills carries `skill-lint` in its `.pre-commit-config.yaml` so those
-skills are audited. dev-playbook
+carries the pinned `playbook-lint` hook — dev-playbook's whole detector set
+behind one id ([distribution.md](/standards/build/distribution.md)) — the
+ruff, shellcheck, and shfmt hooks at canonical revs, and the pre-push
+`make check-judgments` hook, installing both the commit and push stages. It
+serves every repo unchanged: a hook with no matching files skips itself, and
+detectors like `judgments-lint` and `skill-lint` pass trivially where a repo
+has no `[tool.judgments]` table and no authored skills — which is why the
+roster can run everywhere without per-repo opt-ins. dev-playbook
 replaces the published block with its dogfood block
 ([distribution.md](/standards/build/distribution.md#dogfooding)).
 

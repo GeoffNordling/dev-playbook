@@ -345,6 +345,12 @@ def lint_cli(argv: list[str] | None = None) -> int:
         description="Lint a repo's judgment declarations against the schema and paths.",
     )
     parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="repository root to lint (default: current directory)",
+    )
+    parser.add_argument(
         "--list-rules",
         action="store_true",
         help="print the rule ids this detector can emit, one per line, and exit",
@@ -353,7 +359,7 @@ def lint_cli(argv: list[str] | None = None) -> int:
     if args.list_rules:
         return print_rules(JUDGMENTS_RULES)
 
-    findings = lint_findings(resolve_root())
+    findings = lint_findings(resolve_root(Path(args.directory)))
     for finding in findings:
         print(render(finding.location, finding.rule, finding.message))
     if findings:

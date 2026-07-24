@@ -46,10 +46,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from dev_playbook import gitrepo, md, pyast  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
-# Every rule id this detector can emit. Most answer the build card -- including
-# the skills-hook check, which asserts a build artifact (the pre-commit config)
-# carries the skill-lint hook. The CLAUDE.md ## Standards block answers the
-# claude-code card, and the README/CONTEXT doc-shape check answers the docs card.
+# Every rule id this detector can emit. Most answer the build card. The
+# CLAUDE.md ## Standards block answers the claude-code card, and the
+# README/CONTEXT doc-shape check answers the docs card.
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
@@ -63,7 +62,6 @@ NAME_MAPPING = "build.name-mapping"
 SCRIPT_SHEBANG = "build.script-shebang"
 SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
-SKILLS_HOOK = "build.skills-hook"
 STANDARDS_BLOCK = "claude-code.standards-block"
 AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
 GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
@@ -81,7 +79,6 @@ RULES = (
     SCRIPT_SHEBANG,
     SCRIPT_PYTHON,
     SELF_AUDIT,
-    SKILLS_HOOK,
     STANDARDS_BLOCK,
     AGENT_FACING_VOICE,
     GLOBAL_CLAUDE_SHAPE,
@@ -751,24 +748,6 @@ def hook_ids(config_text: str) -> list[tuple[str | None, str]]:
     return pairs
 
 
-def check_skills_hook(root: Path) -> list[Finding]:
-    if not any((root / skill_root).is_dir() for skill_root in SKILL_ROOTS):
-        return []
-    config = root / ".pre-commit-config.yaml"
-    if not config.is_file():
-        return []
-    ids = {hook for _, hook in hook_ids(config.read_text(encoding="utf-8"))}
-    if "skill-lint" in ids:
-        return []
-    return [
-        Finding(
-            ".pre-commit-config.yaml",
-            SKILLS_HOOK,
-            "this repo authors skills: append the skill-lint hook",
-        )
-    ]
-
-
 # --- self-audit: canonical artifacts (hook repo) and dogfood mirror (manifest) ---
 
 
@@ -859,7 +838,6 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_global_claude(root),
         *check_doc_shapes(root),
         *check_scripts(root, layers, python_files),
-        *check_skills_hook(root),
     ]
     if hook_repo:
         findings += check_canonical_artifacts(root)
