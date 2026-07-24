@@ -67,3 +67,27 @@ Staleness is detected on demand — workspace-lint
 ([enforcement.md](/standards/build/enforcement.md)) compares each consumer's
 pinned `rev` against dev-playbook's current `main` — never by a commit
 hook.
+
+## Which repos are consumers
+
+The consumer set is declared, in workspace-lint's `GOVERNED` roster. A repo
+sitting under the workspace root is not thereby a consumer: repos land there
+by cloning, vendoring, and experiment, and inferring governance from a
+directory listing would make `git clone` an act of enrollment.
+
+Inclusion is the decision, so the roster `MUST` name every governed repo and
+`MUST NOT` name anything else. A repo it omits is not audited and draws no
+output — silence is the omission, not a lesser finding. The reverse does
+close: a roster entry with no such repo under the root is a false claim, and
+the audit refuses to run rather than pass a quietly shorter sweep.
+
+Being on the roster is also what makes an absent pin wrong. A governed repo
+with no `.pre-commit-config.yaml`, or one whose config pins no dev-playbook
+`rev`, is a `build.pin` finding — where the same repo unlisted would say
+nothing at all.
+
+dev-playbook is the one governed repo exempt from the pin check, because it
+dogfoods from its working tree and has nothing to pin. The exemption is
+identity, not shape: a consumer that publishes a `.pre-commit-hooks.yaml` of
+its own is still a consumer, and its dev-playbook pin is audited like any
+other.

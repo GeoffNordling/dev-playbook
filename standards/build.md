@@ -20,8 +20,8 @@ Governs how a repository is laid out, built, and checked.
 
 - [repo-lint](/scripts/repo-lint) — structural conformance and canonical
   byte comparison for one repository
-- [workspace-lint](/scripts/workspace-lint) — workspace-wide drift: stale
-  pinned hook revs across repositories
+- [workspace-lint](/scripts/workspace-lint) — pin drift across the governed
+  repos: a stale pinned hook rev, or none at all
 
 ## Enforce
 
@@ -32,7 +32,8 @@ Governs how a repository is laid out, built, and checked.
 - `make check-judgments` ([Makefile.base](/standards/build/canonical/Makefile.base))
   — the **push gate**
 - thin CI ([ci.yml](/standards/build/canonical/ci.yml)) — the **CI gate**,
-  the same suite on every push and PR
+  the same suite on every push and PR, less `ref-lint`: its cross-repo
+  citations cannot resolve in a one-repo checkout
 
 ## Adopt
 

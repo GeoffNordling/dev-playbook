@@ -3,12 +3,13 @@
 
 Thin shim over ``dev_playbook.workspace_lint``: it puts the checkout's ``src``
 on the path and calls the library's ``main``. The audit reads GitHub repo
-settings and label/issue conformance over `gh api` and checks stale dev-playbook
-pins across every repo under the workspace root; it reports and never blocks.
-Run with ``--help`` for the full behavior.
+settings and label/issue conformance over `gh api` and checks dev-playbook pins
+across the governed repos; it reports and never blocks. Run with ``--help`` for
+the full behavior.
 
 Usage:
-    workspace-lint [--workspace DIR] [--pins-only | --settings-only]
+    workspace-lint [--workspace DIR] [--repos NAME,...]
+                   [--pins-only | --settings-only]
     workspace-lint --list-rules
 """
 # /// script

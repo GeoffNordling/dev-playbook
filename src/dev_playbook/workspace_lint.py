@@ -3,8 +3,11 @@
 The library behind the ``workspace-lint`` shim — the on-demand audit venue of
 the enforcement standard, the checks that live outside any single commit. It
 answers workspace-scope facts readable over `gh api`, and it reports and never
-blocks — GitHub sits outside every gate. For every git repo under the workspace
-root:
+blocks — GitHub sits outside every gate.
+
+The audited population is the ``GOVERNED`` roster, not whatever happens to sit
+under the workspace root: repos land there for reasons the standard has no say
+in, so governance is declared rather than inferred. For each governed repo:
 
   - **settings** — read the repo's merge settings over `gh api graphql` and
     compare them against the expected values (squash-only merges, PR title/body
@@ -22,7 +25,8 @@ root:
   - **pin** — read the dev-playbook `rev` pinned in the repo's
     `.pre-commit-config.yaml` and compare it against the hook repo's local
     `main`. Stale pins are reported but are not failures: a consumer catches up
-    when its pin is deliberately bumped.
+    when its pin is deliberately bumped. No pin at all is a failure — being
+    governed is what makes the absence wrong.
 
 Output:
     stdout — one finding per line, ``repo: card.rule message`` (the repo name
@@ -93,6 +97,22 @@ CANONICAL_CONFIG = (
     HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
 )
 
+# The governed repos — the workspace population the standards apply to, named
+# here because governance is an act rather than a property of sitting under the
+# workspace root. Inclusion is the decision: a repo absent from this tuple is
+# simply not governed, and the audit says nothing about it. That is what keeps
+# the roster a record of intent instead of a chore that fires on every clone.
+#
+# The default of the ``--repos`` option, exactly as ``~/workspace`` is the
+# default of ``--workspace``: both are facts about a machine's layout, not about
+# the standard, and both are overridable for a one-off run.
+GOVERNED = (
+    "dev-playbook",
+    "story-forge",
+    "spec-tools",
+    "mission-control",
+)
+
 # Expected GitHub settings, under the REST field names. The audit only reads;
 # the merge settings are set by hand per the repo-settings standard.
 EXPECTED_SETTINGS = {
@@ -149,7 +169,7 @@ class Line:
     @property
     def stale(self) -> bool:
         """Whether this line reports a stale (non-blocking) dev-playbook pin."""
-        return self.rule == PIN
+        return self.rule == PIN and not self.blocking
 
     def render(self) -> str:
         """The finding rendered as ``repo: card.rule message``."""
@@ -181,11 +201,23 @@ def hook_repo_main() -> str:
     return result.stdout.strip()
 
 
-def workspace_repos(workspace: Path) -> list[Path]:
-    """Every git repo directly under ``workspace``, sorted by path."""
+def workspace_repos(workspace: Path, roster: tuple[str, ...]) -> list[Path]:
+    """The roster's repos under ``workspace``, in roster order.
+
+    Only the listed repos are audited — an unlisted repo under the root is not
+    governed and draws no output. The reverse does not hold: a listed repo that
+    is not a git repo under the root is a false claim by the roster, and the
+    audit refuses to run rather than quietly auditing a shorter list.
+    """
     if not workspace.is_dir():
         raise ToolError(f"workspace root not found: {workspace}")
-    return sorted(entry for entry in workspace.iterdir() if (entry / ".git").exists())
+    repos = [workspace / name for name in roster]
+    missing = [repo.name for repo in repos if not (repo / ".git").exists()]
+    if missing:
+        raise ToolError(
+            f"governed repo(s) not found under {workspace}: {', '.join(missing)}"
+        )
+    return repos
 
 
 def origin_slug(repo: Path) -> str | None:
@@ -215,16 +247,26 @@ def pinned_rev(config_text: str, url: str) -> str | None:
 
 
 def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
-    """One pin line per consumer repo; None for the hook repo itself."""
-    if (repo / ".pre-commit-hooks.yaml").is_file():
-        return None  # the hook repo dogfoods from its working tree, no pin
+    """One pin line per consumer repo; None for the hook repo itself.
+
+    A governed repo carrying no pin at all is a finding, not an advisory: being
+    on the roster is what makes the absence wrong. A stale pin stays advisory —
+    the consumer catches up when its pin is deliberately bumped.
+    """
+    # Only dev-playbook itself is exempt, and identity is the test: it dogfoods
+    # from its working tree, so it has nothing to pin. Publishing a manifest is
+    # not the test — a consumer may publish hooks of its own and still pin
+    # dev-playbook, and reading the exemption off the manifest would drop that
+    # repo's pin from the audit entirely.
+    if repo.resolve() == HOOK_REPO_ROOT:
+        return None
     name = repo.name
     config = repo / ".pre-commit-config.yaml"
     if not config.is_file():
-        return Line(name, None, "no .pre-commit-config.yaml")
+        return Line(name, PIN, "no .pre-commit-config.yaml", blocking=True)
     rev = pinned_rev(config.read_text(encoding="utf-8"), url)
     if rev is None:
-        return Line(name, None, "no dev-playbook pin")
+        return Line(name, PIN, "no dev-playbook pin", blocking=True)
     current = main_sha == rev or (len(rev) >= 7 and main_sha.startswith(rev))
     if current:
         return Line(name, None, "pin current")
@@ -652,6 +694,12 @@ def main(argv: list[str] | None = None) -> int:
         help="workspace root holding the repos (default: ~/workspace)",
     )
     parser.add_argument(
+        "--repos",
+        type=lambda value: tuple(name for name in value.split(",") if name),
+        default=GOVERNED,
+        help="comma-separated repo names to audit (default: the governed roster)",
+    )
+    parser.add_argument(
         "--list-rules",
         action="store_true",
         help="print the rule ids this detector can emit, one per line, and exit",
@@ -668,7 +716,7 @@ def main(argv: list[str] | None = None) -> int:
         return print_rules(RULES)
 
     try:
-        repos = workspace_repos(args.workspace.resolve())
+        repos = workspace_repos(args.workspace.resolve(), args.repos)
         url = hook_repo_url()
         main_sha = hook_repo_main() if not args.settings_only else ""
         lines: list[Line] = []

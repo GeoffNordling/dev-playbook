@@ -141,15 +141,41 @@ def pin_config(rev: str) -> str:
 
 
 def run(
-    workspace: Path, *args: str, gh_data: Path | None = None, gh_dir: Path | None = None
+    workspace: Path,
+    *args: str,
+    gh_data: Path | None = None,
+    gh_dir: Path | None = None,
+    repos: str | None = None,
 ) -> subprocess.CompletedProcess:
+    """Run the audit over ``workspace``, governing every repo the test built.
+
+    The production roster names real repos, so tests pass their own via
+    ``--repos``. Defaulting it to the synthetic workspace's contents keeps each
+    test's subject exactly the repos it created; pass ``repos`` explicitly to
+    govern something else — including a name that is deliberately absent.
+    """
     env = dict(os.environ)
     if gh_dir is not None:
         env["PATH"] = f"{gh_dir}:{env['PATH']}"
     if gh_data is not None:
         env["FAKE_GH_DATA"] = str(gh_data)
+    if repos is None:
+        found = (
+            sorted(e.name for e in workspace.iterdir() if (e / ".git").exists())
+            if workspace.is_dir()
+            else []
+        )
+        repos = ",".join(found)
     return subprocess.run(
-        ["python3", str(SCRIPT), "--workspace", str(workspace), *args],
+        [
+            "python3",
+            str(SCRIPT),
+            "--workspace",
+            str(workspace),
+            "--repos",
+            repos,
+            *args,
+        ],
         capture_output=True,
         text=True,
         env=env,
@@ -212,13 +238,15 @@ def test_pin_current_stale_and_absent(tmp_path: Path) -> None:
     )
     make_workspace_repo(ws, "gamma", {"README.md": "# G\n"})
     result = run(ws, "--pins-only")
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode == 1, result.stdout + result.stderr
     assert "alpha: pin current" in result.stderr
     assert re.search(
         r"beta: build.pin 0{16} \(hook repo main is \w{12}\)", result.stdout
     )
-    assert "gamma: no .pre-commit-config.yaml" in result.stderr
-    assert "1 stale pin(s)" in result.stderr
+    assert "gamma: build.pin no .pre-commit-config.yaml" in result.stdout
+    # The stale pin is advisory and the absent one is a finding; the summary
+    # counts them apart even though both carry build.pin.
+    assert "1 finding(s), 1 stale pin(s)" in result.stderr
 
 
 def test_stale_pin_is_not_a_failure(tmp_path: Path) -> None:
@@ -251,14 +279,93 @@ def test_config_without_hook_repo_pin(tmp_path: Path) -> None:
         },
     )
     result = run(ws, "--pins-only")
-    assert "delta: no dev-playbook pin" in result.stderr
+    assert result.returncode == 1
+    assert "delta: build.pin no dev-playbook pin" in result.stdout
 
 
-def test_hook_repo_itself_has_no_pin_line(tmp_path: Path) -> None:
+def test_hook_repo_itself_has_no_pin_line() -> None:
+    # The real checkout, since the exemption is identity: dev-playbook dogfoods
+    # from its working tree and has nothing to pin.
+    result = run(HOOK_REPO.parent, "--pins-only", repos=HOOK_REPO.name)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert HOOK_REPO.name not in result.stdout
+
+
+def test_consumer_publishing_its_own_hooks_is_still_pin_checked(
+    tmp_path: Path,
+) -> None:
+    # A consumer may publish hooks of its own; that does not make it the hook
+    # repo, and its dev-playbook pin must still be audited. Reading the
+    # exemption off the manifest instead of off identity dropped exactly this
+    # repo's pin from the sweep.
     ws = tmp_path / "ws"
-    make_workspace_repo(ws, "hooks-repo", {".pre-commit-hooks.yaml": "- id: x\n"})
+    make_workspace_repo(
+        ws,
+        "publisher",
+        {
+            ".pre-commit-hooks.yaml": "- id: x\n",
+            ".pre-commit-config.yaml": pin_config("0000000000000000"),
+        },
+    )
     result = run(ws, "--pins-only")
-    assert "hooks-repo" not in result.stdout
+    assert "publisher: build.pin 0000000000000000" in result.stdout
+
+
+# --- the governed roster ---
+
+
+def test_ungoverned_repo_draws_no_output(tmp_path: Path) -> None:
+    # Inclusion is the decision: a repo nobody listed is not a finding, not an
+    # advisory, not a line. It is simply not this audit's business.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
+    )
+    make_workspace_repo(ws, "stranger", {"README.md": "# not ours\n"})
+    result = run(ws, "--pins-only", repos="alpha")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "stranger" not in result.stdout + result.stderr
+    assert "1 repos" in result.stderr
+
+
+def test_governed_repo_that_is_absent_stops_the_run(tmp_path: Path) -> None:
+    # The other direction does close: the roster claiming a repo that is not
+    # there is a false claim, and a shorter audit must not pass for a clean one.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
+    )
+    result = run(ws, "--pins-only", repos="alpha,ghost")
+    assert result.returncode == 2
+    assert "governed repo(s) not found" in result.stderr
+    assert "ghost" in result.stderr
+
+
+def test_governed_directory_without_git_is_not_a_repo(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    (ws / "plain").mkdir(parents=True)
+    result = run(ws, "--pins-only", repos="plain")
+    assert result.returncode == 2
+    assert "governed repo(s) not found" in result.stderr
+
+
+def test_roster_order_is_the_audit_order(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    for name in ("alpha", "beta"):
+        make_workspace_repo(
+            ws, name, {".pre-commit-config.yaml": pin_config(main_sha())}
+        )
+    result = run(ws, "--pins-only", repos="beta,alpha")
+    assert result.stderr.index("beta: pin current") < result.stderr.index(
+        "alpha: pin current"
+    )
+
+
+def test_default_roster_is_the_governed_constant() -> None:
+    # The roster is the --repos default, so the constant is what a bare run
+    # audits; nothing else in the module may narrow it.
+    assert workspace_lint.GOVERNED
+    assert "dev-playbook" in workspace_lint.GOVERNED
 
 
 # --- settings ---
@@ -375,8 +482,13 @@ def full_mode_repo(
     settings plus the given labels/issues, so a full-mode run surfaces only the
     label/issue findings under test."""
     ws = tmp_path / "ws"
+    # A current pin included deliberately: a governed repo carrying none is
+    # itself a finding, which would leak into every label/issue assertion here.
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+        ws,
+        "alpha",
+        {"README.md": "# A\n", ".pre-commit-config.yaml": pin_config(main_sha())},
+        origin="git@github.com:me/alpha.git",
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
