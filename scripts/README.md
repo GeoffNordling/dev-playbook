@@ -131,6 +131,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `griffe-outline` | Print class/function structure of a Python package |
 | `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
+| `bump-pins` | Move the dev-playbook `rev` pin across the governed consumer repos and re-run each one's commit gate — the release step of [distribution.md](/standards/build/distribution.md); commits nothing |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 
 Run any script with `--help`; each script's docstring documents its behavior in

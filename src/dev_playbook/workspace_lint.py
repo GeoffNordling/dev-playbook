@@ -234,16 +234,26 @@ def origin_slug(repo: Path) -> str | None:
     return match.group(1) if match else None
 
 
+def rev_line(lines: list[str], url: str) -> int | None:
+    """Index of the ``rev:`` line pinning ``url``, or None when there is none.
+
+    The one place a pinned block's rev line is located. The audit reads through
+    it and bump_pins rewrites through it, so the reader and the writer cannot
+    disagree about which line carries the pin.
+    """
+    for i, line in enumerate(lines):
+        if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
+            for follower in range(i + 1, min(i + 3, len(lines))):
+                if re.match(r"^\s*rev:\s*\S+", lines[follower]):
+                    return follower
+    return None
+
+
 def pinned_rev(config_text: str, url: str) -> str | None:
     """The ``rev`` pinned for ``url`` in a ``.pre-commit-config.yaml`` body, or None."""
     lines = config_text.splitlines()
-    for i, line in enumerate(lines):
-        if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
-            for follower in lines[i + 1 : i + 3]:
-                match = re.match(r"^\s*rev:\s*(\S+)", follower)
-                if match:
-                    return match.group(1)
-    return None
+    index = rev_line(lines, url)
+    return lines[index].split(":", 1)[1].strip() if index is not None else None
 
 
 def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:

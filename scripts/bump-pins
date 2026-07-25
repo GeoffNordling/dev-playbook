@@ -1,0 +1,26 @@
+#!/usr/bin/env -S uv run --script
+"""bump-pins — move the dev-playbook rev pin across the governed consumer repos.
+
+Thin shim over ``dev_playbook.bump_pins``: it puts the checkout's ``src`` on the
+path and calls the library's ``main``. The tool resolves the target sha, refuses
+one the remote has never seen, and for each consumer checks the baseline gate,
+rewrites the one ``rev:`` line, and re-runs the gate at the new pin. It commits
+nothing and pushes nothing — the bumped config and any findings are left in the
+working tree. Run with ``--help`` for the full behavior.
+
+Usage:
+    bump-pins [--workspace DIR] [--repos NAME,...] [--sha SHA] [--dry-run]
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.bump_pins import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())
