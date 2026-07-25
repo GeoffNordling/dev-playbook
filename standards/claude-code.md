@@ -21,11 +21,12 @@ from ordinary files, and what each may contain.
 
 ## Audit
 
-- [repo-lint](/scripts/repo-lint) — CLAUDE.md presence and its canonical
-  standards block; the agent-facing voice of every CLAUDE.md, root to global
+- [repo-lint](/scripts/repo-lint) — CLAUDE.md presence; the agent-facing
+  voice of every CLAUDE.md, root to global
   (`claude-code.agent-facing-voice`); and, in dev-playbook only, the global
-  CLAUDE.md source's two-element XML shape and well-formedness
-  (`claude-code.global-claude-shape`, `claude-code.global-claude-wellformed`)
+  CLAUDE.md source's two-section shape and the workspace-wide rules it must
+  carry (`claude-code.global-claude-shape`,
+  `claude-code.global-claude-rules`)
 - [skill-lint](/scripts/skill-lint) — skill bundles in
   skill-authoring repos, plus the `claude-code.skill-mirror`
   correspondence between authored and installed skills (dev-playbook)
@@ -42,5 +43,6 @@ from ordinary files, and what each may contain.
 
 ## Adopt
 
-- [CLAUDE.md.standards](/standards/build/canonical/CLAUDE.md.standards) —
-  the standards block, pasted verbatim into a repo's `CLAUDE.md`
+- [CLAUDE.md Content](/standards/claude-code/claude-content.md) — a repo
+  writes its own operating knowledge into its `CLAUDE.md` and nothing more;
+  the workspace-wide rules are already stationed in the global file

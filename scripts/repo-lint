@@ -37,7 +37,6 @@ import os
 import re
 import sys
 import tomllib
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -47,7 +46,7 @@ from dev_playbook import gitrepo, md, pyast  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
-# CLAUDE.md ## Standards block answers the claude-code card, the
+# CLAUDE.md voice and global-file checks answer the claude-code card, the
 # README/CONTEXT doc-shape check answers the docs card, and the rogue
 # future-work filenames answer the tracking card.
 # Each id is a module-level constant so every emission site references the
@@ -63,10 +62,9 @@ NAME_MAPPING = "build.name-mapping"
 SCRIPT_SHEBANG = "build.script-shebang"
 SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
-STANDARDS_BLOCK = "claude-code.standards-block"
 AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
 GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
-GLOBAL_CLAUDE_WELLFORMED = "claude-code.global-claude-wellformed"
+GLOBAL_CLAUDE_RULES = "claude-code.global-claude-rules"
 DOC_SHAPE = "knowledge-organization.doc-shape"
 ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
 
@@ -87,10 +85,9 @@ RULES = (
     SCRIPT_SHEBANG,
     SCRIPT_PYTHON,
     SELF_AUDIT,
-    STANDARDS_BLOCK,
     AGENT_FACING_VOICE,
     GLOBAL_CLAUDE_SHAPE,
-    GLOBAL_CLAUDE_WELLFORMED,
+    GLOBAL_CLAUDE_RULES,
     DOC_SHAPE,
     ROGUE_FUTURE_WORK,
 )
@@ -111,7 +108,6 @@ CANONICAL_MANIFEST = frozenset(
         "Makefile.aws",
         "Makefile.sdd",
         ".gitignore",
-        "CLAUDE.md.standards",
     }
 )
 
@@ -155,6 +151,12 @@ VOICE_PATTERNS = (
 # presence is the marker that gates the global-file structural checks to the
 # one repo that owns the file (claude-content.md — The global file).
 GLOBAL_CLAUDE = "dotfiles/dot-claude/CLAUDE.md"
+# The global file's two buckets, in order: dispositional stances, then
+# operating rules for named situations.
+GLOBAL_CLAUDE_SECTIONS = ("## Principles", "## Behaviors")
+# The workspace-wide rules the global file carries for every session, since no
+# repo's own CLAUDE.md restates them (claude-content.md — The global file).
+GLOBAL_CLAUDE_REQUIRED_RULES = ("### Read the standards", "### Navigate docs by index")
 
 
 class ToolError(Exception):
@@ -611,24 +613,6 @@ def body_lines(path: Path) -> list[str]:
     return [line.rstrip() for _, line in md.lines_outside_fences(text)]
 
 
-def check_claude_standards(root: Path) -> list[Finding]:
-    path = root / "CLAUDE.md"
-    if not path.is_file():
-        return []
-    consumer = path.read_text(encoding="utf-8").splitlines()
-    block = canonical_text("CLAUDE.md.standards").splitlines()
-    if find_run(consumer, block, 0) is None:
-        return [
-            Finding(
-                "CLAUDE.md",
-                STANDARDS_BLOCK,
-                "canonical '## Standards' block missing"
-                " (verbatim; the CLAUDE.md.standards artifact)",
-            )
-        ]
-    return []
-
-
 def check_agent_facing_voice(root: Path) -> list[Finding]:
     """Every CLAUDE.md — root, nested, and the dev-playbook global source — is
     agent-facing configuration, so it names the human "user" and never speaks in
@@ -656,33 +640,38 @@ def check_agent_facing_voice(root: Path) -> list[Finding]:
 
 
 def check_global_claude(root: Path) -> list[Finding]:
-    """The global CLAUDE.md source is a well-formed XML document with exactly two
-    top-level elements, <principles> then <behaviors> (claude-content.md — The
-    global file). Gated on the source file's presence, so it runs only in the
-    repo that owns it; other repos have no global file. Inline-code spans are
-    masked before the parse so backticked placeholders like the repo token do not
-    read as unclosed tags. The two elements are wrapped in a synthetic root
-    because a two-element document has no single root of its own.
+    """The global CLAUDE.md source buckets its rules under exactly two H2s,
+    '## Principles' then '## Behaviors', and carries the workspace-wide rules
+    every session needs (claude-content.md — The global file). Gated on the
+    source file's presence, so it runs only in the repo that owns it; other
+    repos have no global file. Headings inside fenced blocks do not count, so a
+    worked example in the file does not read as a section of it.
+
+    The required-rules check is what stations the workspace-wide instructions:
+    no repo's own CLAUDE.md restates them, so this file is the only place they
+    can be checked.
     """
     path = root / GLOBAL_CLAUDE
     if not path.is_file():
         return []
-    masked = md.INLINE_CODE_PATTERN.sub("", path.read_text(encoding="utf-8"))
-    try:
-        document = ET.fromstring(f"<claude-md>{masked}</claude-md>")
-    except ET.ParseError as err:
-        return [Finding(GLOBAL_CLAUDE, GLOBAL_CLAUDE_WELLFORMED, f"not well-formed XML: {err}")]
-    children = [child.tag for child in document]
-    if children != ["principles", "behaviors"]:
-        return [
+    headings = [line.strip() for _, line in md.content_lines(path) if line.startswith("#")]
+    sections = tuple(h for h in headings if h.startswith("## "))
+    findings = []
+    if sections != GLOBAL_CLAUDE_SECTIONS:
+        findings.append(
             Finding(
                 GLOBAL_CLAUDE,
                 GLOBAL_CLAUDE_SHAPE,
-                "top-level elements must be exactly <principles> then <behaviors>, "
-                f"got {children}",
+                f"H2 sections must be exactly {list(GLOBAL_CLAUDE_SECTIONS)},"
+                f" got {list(sections)}",
             )
-        ]
-    return []
+        )
+    findings.extend(
+        Finding(GLOBAL_CLAUDE, GLOBAL_CLAUDE_RULES, f"missing rule '{rule}'")
+        for rule in GLOBAL_CLAUDE_REQUIRED_RULES
+        if rule not in headings
+    )
+    return findings
 
 
 def check_doc_shapes(root: Path) -> list[Finding]:
@@ -854,7 +843,6 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_pyproject(root, layers, repo_name),
         *check_src_package(root, layers, files, repo_name),
         *check_cdk(root, layers, repo_name),
-        *check_claude_standards(root),
         *check_agent_facing_voice(root),
         *check_global_claude(root),
         *check_doc_shapes(root),
