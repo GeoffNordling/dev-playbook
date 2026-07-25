@@ -24,7 +24,8 @@ specified and kept conformant.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-lint at the **commit gate** in every repo's suite
+  — okf-lint at the **commit gate** in every repo's suite, dispatched by
+  the published `playbook-lint` hook
 
 ## Adopt
 

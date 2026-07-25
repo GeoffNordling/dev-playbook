@@ -25,7 +25,8 @@ Governs how hard-to-reverse or surprising decisions are recorded.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the **commit gate**, where decisions-lint blocks every commit
+  — the **commit gate**, where decisions-lint blocks every commit by way
+  of the published `playbook-lint` hook
 
 ## Adopt
 

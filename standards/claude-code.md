@@ -38,8 +38,9 @@ from ordinary files, and what each may contain.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — repo-lint and skill-lint both at the **commit gate** in every repo's
-  suite; skill-lint no-ops where a repo authors no skills
+  — its published `playbook-lint` hook dispatches to both repo-lint and
+  skill-lint at the **commit gate** in every repo's suite; skill-lint
+  no-ops where a repo authors no skills
 
 ## Adopt
 

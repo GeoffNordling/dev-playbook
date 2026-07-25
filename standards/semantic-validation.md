@@ -33,7 +33,8 @@ prompts, and records the passing verdicts.
   pre-push hook, until every judgment's exact content is judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — judgments-lint at the **commit gate** in every repo's suite
+  — judgments-lint at the **commit gate** in every repo's suite,
+  dispatched by the published `playbook-lint` hook
 
 ## Adopt
 

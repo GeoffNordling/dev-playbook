@@ -29,7 +29,8 @@ Governs how Python source code is written.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the **commit gate**, where python-lint and ruff block every commit
+  — the **commit gate**, where python-lint (dispatched by the published
+  `playbook-lint` hook) and ruff (its own pinned hook) block every commit
 - `make check-judgments` — the **push gate**, where mypy blocks every push
 
 ## Adopt

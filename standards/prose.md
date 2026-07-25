@@ -24,7 +24,8 @@ workspace document.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — the **commit gate**, where prose-lint blocks every commit
+  — the **commit gate**, where prose-lint blocks every commit by way of
+  the published `playbook-lint` hook
 
 ## Adopt
 

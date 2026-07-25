@@ -27,7 +27,7 @@ types, indexes, and cross-references.
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — okf-lint, ref-lint, and repo-lint at the **commit gate** in every
-  repo's suite
+  repo's suite, all three dispatched by the published `playbook-lint` hook
 
 ## Adopt
 
