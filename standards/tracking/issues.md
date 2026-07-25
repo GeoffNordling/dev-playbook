@@ -11,6 +11,14 @@ How GitHub Issues are authored in workspace repos. An issue plays one of two
 the agent **brief**, in one of three formats. Applies at intake — when an idea,
 or a rushed stub, becomes one or many tracked issues.
 
+An issue is **committed work**, at any size — an epic, an ordinary issue, or a
+one-line bug. Work not yet decided on is a Candidate in `CANDIDATES.md`
+([candidates.md](/standards/tracking/candidates.md)), and the two are
+exclusive: a unit of work sits in one home, never both. Deciding to write the
+brief below is the act of committing, so a specifiable idea nobody has chosen
+to build stays a Candidate — and promoting it deletes its entry as the issue is
+authored.
+
 ## Roles: epic and leaf
 
 Every issue is exactly one of two roles. The role is **derived**, never a label —
@@ -39,8 +47,9 @@ Readiness is a **lifecycle position, not a kind of issue** — the industry's
 *Definition of Ready*. Work is dispatched into an implementation node only on a
 leaf whose body meets the brief standard below; an under-specified leaf is not
 yet ready. The refinement interview — intake, or the `design` node — is the
-**promotion step** that carries a leaf to ready by authoring its brief. A leaf's
-role never changes as it readies; only its body and phase advance.
+**refinement step** that carries a leaf to ready by authoring its brief. A
+leaf's role never changes as it readies; only its body and phase advance.
+(**Promotion** is a different move, reserved for Candidate → issue.)
 
 ## The body is the brief
 

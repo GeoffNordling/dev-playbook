@@ -420,6 +420,35 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
     assert "docs/CONTEXT.md: build.forbidden" in result.stdout
 
 
+def test_rogue_future_work_files_forbidden_anywhere(tmp_path: Path) -> None:
+    files = base_files()
+    for name in ("ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"):
+        files[f"docs/{name}"] = "# Later\n\n- ship the thing\n"
+    files["TODO.md"] = "# Later\n\n- ship the thing\n"
+    result = run(make_repo(tmp_path, files))
+    for name in ("ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"):
+        assert f"docs/{name}: tracking.rogue-future-work-file" in result.stdout
+    assert "TODO.md: tracking.rogue-future-work-file" in result.stdout
+
+
+def test_root_candidates_md_is_allowed(tmp_path: Path) -> None:
+    files = base_files()
+    files["CANDIDATES.md"] = (
+        "---\ntype: Candidate-List\ntitle: Candidates\n"
+        "description: Uncommitted future work\n---\n\n# Candidates\n\n"
+        "- **Fuzzy matching** — matching is exact-prefix only today.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert "CANDIDATES.md" not in result.stdout
+
+
+def test_nested_candidates_md_forbidden(tmp_path: Path) -> None:
+    files = base_files()
+    files["docs/CANDIDATES.md"] = "# Nested\n"
+    result = run(make_repo(tmp_path, files))
+    assert "docs/CANDIDATES.md: build.forbidden" in result.stdout
+
+
 # --- python layer ---
 
 
@@ -835,8 +864,10 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "build.canonical-block" in ids
     assert "claude-code.standards-block" in ids
     assert "knowledge-organization.doc-shape" in ids
+    assert "tracking.rogue-future-work-file" in ids
     assert all(
-        rule.split(".")[0] in {"build", "claude-code", "knowledge-organization"}
+        rule.split(".")[0]
+        in {"build", "claude-code", "knowledge-organization", "tracking"}
         for rule in ids
     ), ids
 

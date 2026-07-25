@@ -106,6 +106,14 @@ One override applies on top, wherever the token appears:
   "user message", `user-invocable`. These are Claude Code's own names, not ours
   to translate.
 
+**Agent-facing instruction text never speaks in the first person.** No `I` and
+no `my` in the files listed above: they are commands addressed *to* the agent,
+so the only voices they carry are the imperative and `you`. A first-person
+sentence puts the document in the agent's mouth, which inverts who is
+instructing whom — and where the word means the human, it collides with the
+`user` rule in the same breath. `repo-lint` enforces this deterministically
+alongside the `human` ban.
+
 ## Point at canonical artifacts
 
 When a real file IS the standard, the doc directs the reader to it.

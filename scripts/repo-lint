@@ -47,8 +47,9 @@ from dev_playbook import gitrepo, md, pyast  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
-# CLAUDE.md ## Standards block answers the claude-code card, and the
-# README/CONTEXT doc-shape check answers the docs card.
+# CLAUDE.md ## Standards block answers the claude-code card, the
+# README/CONTEXT doc-shape check answers the docs card, and the rogue
+# future-work filenames answer the tracking card.
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
@@ -67,6 +68,13 @@ AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
 GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
 GLOBAL_CLAUDE_WELLFORMED = "claude-code.global-claude-wellformed"
 DOC_SHAPE = "knowledge-organization.doc-shape"
+ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
+
+# Filenames a CANDIDATES.md replaces. Uncommitted work lives in that one
+# register, committed work in issues; see standards/tracking/candidates.md.
+ROGUE_FUTURE_WORK_NAMES = frozenset(
+    {"ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"}
+)
 
 RULES = (
     REQUIRED_FILE,
@@ -84,6 +92,7 @@ RULES = (
     GLOBAL_CLAUDE_SHAPE,
     GLOBAL_CLAUDE_WELLFORMED,
     DOC_SHAPE,
+    ROGUE_FUTURE_WORK,
 )
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -394,6 +403,18 @@ def check_forbidden(
         elif base == "CONTEXT.md" and rel != "CONTEXT.md":
             findings.append(
                 Finding(rel, FORBIDDEN, "CONTEXT.md lives at the repo root only")
+            )
+        elif base in ROGUE_FUTURE_WORK_NAMES:
+            findings.append(
+                Finding(
+                    rel,
+                    ROGUE_FUTURE_WORK,
+                    "uncommitted work lives in CANDIDATES.md, committed work in issues",
+                )
+            )
+        elif base == "CANDIDATES.md" and rel != "CANDIDATES.md":
+            findings.append(
+                Finding(rel, FORBIDDEN, "CANDIDATES.md lives at the repo root only")
             )
     if layers.aws:
         if (root / "app.py").is_file():

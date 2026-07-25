@@ -76,6 +76,19 @@ A repository that consumes what dev-playbook defines — standards, published ho
 **Scope**
 The population a standard governs. **Workspace-scoped**: declared in dev-playbook, governing every repo in `~/workspace`. **Repo-scoped**: declared in one consumer, governing that repo alone. Exactly two values.
 
+### Tracking
+
+Where future work is recorded. A unit of work has exactly one home, decided by
+whether it is committed; the tracking standard defines both homes, and this
+fixes the words.
+
+**Candidate**
+A described but uncommitted unit of future work, recorded in a repo's `CANDIDATES.md`. Serious and repo-scoped — work the repo would genuinely implement if the decision were made — but not yet decided, so it carries no brief. Becomes committed work via **Promotion**.
+_Avoid_: backlog item, todo, roadmap item.
+
+**Promotion**
+The step that turns a **Candidate** into committed work: an issue is authored from the entry, and the entry is deleted in the same change. Deciding to write the brief is the act of committing — a Candidate may already be specifiable and stay a Candidate until that decision is made.
+
 ## Relationships
 
 - A **Module** has exactly one **Interface** (the surface it presents to callers and tests).
@@ -87,6 +100,9 @@ The population a standard governs. **Workspace-scoped**: declared in dev-playboo
 - A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 - A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
+- A unit of future work has exactly one home: a **Candidate** in `CANDIDATES.md` while uncommitted, or a GitHub issue once committed — never both.
+- **Promotion** moves a unit of work from **Candidate** to issue, deleting the **Candidate** entry in the same change.
+- A **Candidate** carries no brief: choosing to write the brief is what makes work committed, and therefore an issue.
 
 ## Example dialogue
 
@@ -110,6 +126,8 @@ The population a standard governs. **Workspace-scoped**: declared in dev-playboo
 - "check" and "audit" were blurred — resolved: an **Audit** is read-only and never blocks; a **Gate** is what blocks. A check that blocks is a gate; a check that only reports is an audit.
 - "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the check; an **Audit** is a run of one or more detectors.
 - "lint" and "audit" were blurred — "lint" survived in internals and prose with no defined status while every read-only detector was named an "audit" — resolved: a **Lint** is a Detector implemented as deterministic code, an **Audit** in the narrow sense is a Detector that is an LLM judge, and **Lint** ⊂ **Audit** (the umbrella read-only process). Deterministic scripts are `*-lint`; LLM judges keep "audit."
+- "backlog" floated with no definition as a name for both the register of uncommitted ideas and the queue of open issues — resolved: say **Candidate** for an uncommitted entry in `CANDIDATES.md`, and **issue** for committed work. "backlog" is retired.
+- "promotion" was used for two different moves — carrying an under-specified leaf to ready, and turning a Candidate into an issue — resolved: **Promotion** means Candidate → issue. The readiness interview is the **refinement step**.
 
 ## Rejected framings
 
