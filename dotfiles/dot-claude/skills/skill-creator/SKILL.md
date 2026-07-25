@@ -68,7 +68,3 @@ Revise based on feedback. Iterate until the user is satisfied.
 ## 7. Walk the checklist
 
 Walk the checklist in [skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md#checklist) and confirm each item passes. Fix any failures before considering the skill done.
-
-## 8. Sync dotfiles
-
-If the skill landed under `dotfiles/`, run `~/workspace/dev-playbook/dotfiles/bin/sync-dotfiles.sh` to update the Stow symlinks — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree. Restart Claude Code so the running session picks up the new skill — content is cached at startup.
