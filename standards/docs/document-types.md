@@ -26,6 +26,7 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 
 | Type | What it is |
 |------|------------|
+| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [tracking/candidates.md](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `General-Sheet` | A deliberately-broad genre for a working loop document whose precise genre is not yet settled — e.g. a live record read on a cadence (a board of declared metrics, a register of selected items). Used when no crisper genre fits and the document's shape may still change. |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
