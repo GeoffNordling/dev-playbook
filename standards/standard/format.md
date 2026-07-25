@@ -171,7 +171,7 @@ detector contract.
 - **Finding format.** A finding is one line, GNU format:
   `file:line: card.rule message` — a colon after the location, single spaces, a
   repo-relative path; `:line` is omitted for a file-level finding
-  (e.g. `README.md: docs.readme-missing …`).
+  (e.g. `README.md: knowledge-organization.doc-shape missing an H1 title`).
 
 ### Externally-managed and verbatim content
 

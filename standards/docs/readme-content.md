@@ -14,3 +14,10 @@ ceiling: depth varies by project ("Scope is standardized; depth is not" —
 prerequisites, quick-start, architecture overview, or examples as the
 project earns them. It `SHALL NOT` contain agent instructions or
 architecture decisions — those live in `CLAUDE.md` and `docs/decisions/`.
+
+It `SHALL NOT` enumerate the repo's skills or any other harness-injected
+files: Claude Code already puts each one's name and description into every
+session, so a hand-maintained roster duplicates what its reader already has
+and rots the moment a skill is added. An inventory of files the harness does
+*not* inject — the executables under `scripts/`, say — is legitimate README
+content, because nothing else hands the reader that list.

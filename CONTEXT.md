@@ -68,7 +68,7 @@ _Avoid_: venue (retired — say **gate**, or a rung name).
 An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect; a one-time human code review is not enforcement.
 
 **Finding**
-One output line from a detector, in GNU format: `file:line: card.rule message` — a colon after the location, single spaces, a repo-relative path. The `:line` is omitted for a file-level finding (e.g. `README.md: docs.readme-missing …`). The rule id is namespaced by the card whose question it answers.
+One output line from a detector, in GNU format: `file:line: card.rule message` — a colon after the location, single spaces, a repo-relative path. The `:line` is omitted for a file-level finding (e.g. `README.md: knowledge-organization.doc-shape missing an H1 title`). The rule id is namespaced by the card whose question it answers.
 
 **Consumer**
 A repository that consumes what dev-playbook defines — standards, published hooks, judgments machinery, methods. Consuming dev-playbook is the point of dev-playbook: every other workspace repo is a consumer.
