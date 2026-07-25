@@ -48,6 +48,41 @@ def refusal(repo: Path) -> bump_pins.Outcome:
     return outcome
 
 
+def fake_gate(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, code: int, output: str
+) -> None:
+    """Point the gate at a script printing ``output`` and exiting ``code``."""
+    script = tmp_path / "fake-gate"
+    script.write_text(
+        f"#!/bin/sh\ncat <<'BODY'\n{output}\nBODY\nexit {code}\n", encoding="utf-8"
+    )
+    script.chmod(0o755)
+    monkeypatch.setattr(bump_pins, "GATE", (str(script),))
+
+
+def green_then_crash(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """A gate that passes its first call and dies on its second.
+
+    The shape a lost network actually takes: the baseline runs from the cached
+    pin and is green, and only the verify — the run that must clone the new
+    rev — cannot reach GitHub.
+    """
+    script = tmp_path / "green-then-crash"
+    marker = tmp_path / "ran-once"
+    script.write_text(
+        "#!/bin/sh\n"
+        f"if [ -f {marker} ]; then\n"
+        "  echo 'An unexpected error has occurred: Proxy CONNECT aborted'\n"
+        "  exit 3\n"
+        "fi\n"
+        f"touch {marker}\n"
+        "echo 'playbook-lint Passed'\n",
+        encoding="utf-8",
+    )
+    script.chmod(0o755)
+    monkeypatch.setattr(bump_pins, "GATE", (str(script),))
+
+
 def test_rewritten_moves_only_the_rev_line() -> None:
     updated, old = bump_pins.rewritten(CONFIG, URL, NEW)
     assert old == OLD
@@ -128,3 +163,49 @@ def test_preflight_flags_a_consumer_with_no_config_at_all(tmp_path: Path) -> Non
     outcome = refusal(repo)
     assert outcome.status == bump_pins.NO_PIN
     assert outcome.open_work
+
+
+def test_run_gate_reports_a_clean_repo(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_gate(monkeypatch, tmp_path, 0, "playbook-lint Passed")
+    passed, output = bump_pins.run_gate(tmp_path)
+    assert passed
+    assert "Passed" in output
+
+
+def test_run_gate_reports_findings(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_gate(monkeypatch, tmp_path, 1, "CLAUDE.md: claude-code.shape bad heading")
+    passed, output = bump_pins.run_gate(tmp_path)
+    assert not passed
+    assert "claude-code.shape" in output
+
+
+def test_run_gate_refuses_to_call_a_crash_a_verdict(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_gate(monkeypatch, tmp_path, 3, "An unexpected error has occurred: whatever")
+    with pytest.raises(bump_pins.ToolError, match="could not run"):
+        bump_pins.run_gate(tmp_path)
+
+
+def test_run_gate_refuses_a_fatal_error_wearing_the_findings_exit_code(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_gate(monkeypatch, tmp_path, 1, "An error has occurred: InvalidConfigError")
+    with pytest.raises(bump_pins.ToolError, match="could not run"):
+        bump_pins.run_gate(tmp_path)
+
+
+def test_bump_restores_the_pin_when_the_gate_cannot_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = write_consumer(tmp_path / "consumer", CONFIG)
+    green_then_crash(monkeypatch, tmp_path)
+    plan = bump_pins.Plan(sha=NEW, url=URL, repos=[repo])
+    with pytest.raises(bump_pins.ToolError, match="could not run"):
+        bump_pins.bump(repo, plan, dry_run=False)
+    assert (repo / ".pre-commit-config.yaml").read_text(encoding="utf-8") == CONFIG
+    assert not bump_pins.git_out(repo, "status", "--porcelain")

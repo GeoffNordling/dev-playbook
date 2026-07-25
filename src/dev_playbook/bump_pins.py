@@ -26,7 +26,11 @@ Per repo, in order, with the refusal each step carries:
     alone.
   - **bump** — rewrite the one ``rev:`` line. Nothing else in the config moves.
   - **verify** — run the commit gate again. pre-commit clones the new rev during
-    this run, so this is the moment the new standard takes effect in that repo.
+    this run, so this is both the moment the new standard takes effect in that
+    repo and the only step that touches the network. A gate that dies rather
+    than judging aborts the run and puts that repo's config back: an
+    unverifiable bump is worse than no bump, and "could not check" reported as
+    "needs work" would name a repo for a problem it does not have.
 
 Nothing is committed and nothing is pushed. The bumped config and whatever the
 gate found are left in the working tree for review.
@@ -42,6 +46,7 @@ Output:
 """
 
 import argparse
+import os
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -59,6 +64,26 @@ GATE = ("uvx", "pre-commit", "run", "--all-files")
 # A cold `uvx` download plus a fresh clone of the new rev plus every hook over
 # every file. Generous, because expiry here is a hang, not a slow repo.
 GATE_TIMEOUT = 900
+
+# pre-commit's own exit codes: 0 clean, 1 a hook reported findings, 3 an
+# internal error, 130 interrupted. Only 0 and 1 are verdicts about the repo.
+# Anything else — and either banner pre-commit's error handler prints, which
+# covers the internal error it reports as 1 — means the gate never ran, which
+# must never be reported as findings.
+GATE_VERDICT_CODES = frozenset({0, 1})
+GATE_ERROR_BANNERS = ("An error has occurred:", "An unexpected error has occurred:")
+
+# Restores the proxy auth method under the spelling pre-commit preserves.
+# A sandboxed session reaches the network through an authenticating proxy and
+# configures git for it via GIT_CONFIG_PARAMETERS=http.proxyAuthMethod=basic.
+# pre-commit's no_git_env() drops every GIT_* variable outside a small
+# allowlist, and GIT_CONFIG_PARAMETERS is not on it — so the git pre-commit
+# spawns to clone a new rev falls back to `anyauth`, whose probe the proxy
+# rejects ("Proxy CONNECT aborted"). GIT_HTTP_PROXY_AUTHMETHOD is the older
+# spelling of the same setting and *is* on that allowlist, so it survives.
+# Outside a sandbox there is no proxy and git ignores it, so it is set
+# unconditionally rather than sniffed for.
+GATE_ENV = {"GIT_HTTP_PROXY_AUTHMETHOD": "basic"}
 
 CLEAN = "green"
 NEEDS_WORK = "needs work"
@@ -137,8 +162,13 @@ def rewritten(text: str, url: str, sha: str) -> tuple[str, str]:
 def run_gate(repo: Path) -> tuple[bool, str]:
     """The commit gate's (passed, combined output) for one repo.
 
-    A timeout is a tool error, not a red gate: an expired run has produced no
-    verdict, and reporting one would be a guess.
+    Only a run that reached a verdict returns. A missing runner, a timeout, and
+    a pre-commit that died before judging the repo all raise instead, because
+    "the gate could not run" and "the gate found something" are different facts
+    and reporting the first as the second names a repo for a problem it does not
+    have. The first gate run at a *new* pin is the one most likely to hit this:
+    it is where pre-commit clones the rev, so it is the only step that needs the
+    network.
     """
     try:
         result = subprocess.run(
@@ -147,6 +177,7 @@ def run_gate(repo: Path) -> tuple[bool, str]:
             capture_output=True,
             text=True,
             timeout=GATE_TIMEOUT,
+            env={**os.environ, **GATE_ENV},
         )
     except FileNotFoundError as err:
         raise ToolError(f"{GATE[0]} not found on PATH") from err
@@ -154,7 +185,16 @@ def run_gate(repo: Path) -> tuple[bool, str]:
         raise ToolError(
             f"the gate did not finish in {GATE_TIMEOUT}s in {repo}"
         ) from err
-    return result.returncode == 0, result.stdout + result.stderr
+    output = result.stdout + result.stderr
+    died = result.returncode not in GATE_VERDICT_CODES or any(
+        banner in output for banner in GATE_ERROR_BANNERS
+    )
+    if died:
+        raise ToolError(
+            f"the gate could not run in {repo} — pre-commit exited "
+            f"{result.returncode} without judging it:\n{output}"
+        )
+    return result.returncode == 0, output
 
 
 def resolve(workspace: Path, roster: tuple[str, ...], sha: str | None) -> Plan:
@@ -227,7 +267,13 @@ def bump(repo: Path, plan: Plan, *, dry_run: bool) -> Outcome:
 
     config.write_text(updated, encoding="utf-8")
     print(f"bump-pins: {name}: {move}, verifying", file=sys.stderr)
-    passed, output = run_gate(repo)
+    try:
+        passed, output = run_gate(repo)
+    except ToolError:
+        # A bump nothing has checked is worse than no bump: put the repo back
+        # exactly as it was found rather than leave an unverified pin behind.
+        config.write_text(text, encoding="utf-8")
+        raise
     if passed:
         return Outcome(name, CLEAN, move)
     return Outcome(name, NEEDS_WORK, move, output, open_work=True)
