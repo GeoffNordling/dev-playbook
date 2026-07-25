@@ -62,7 +62,6 @@ judgments:
       - scripts/skill-lint
       - judgments/claude-code.yaml
       - standards/build/canonical/.pre-commit-config.yaml
-      - standards/build/canonical/CLAUDE.md.standards
     model: claude-sonnet-5
     effort: high
 

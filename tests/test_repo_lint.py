@@ -57,7 +57,7 @@ def make_repo(
 def base_files() -> dict[str, str]:
     return {
         "README.md": "# Sample Repo\n\nOne line of purpose.\n",
-        "CLAUDE.md": canonical("CLAUDE.md.standards"),
+        "CLAUDE.md": "# Sample Repo\n",
         "index.md": "# Index\n",
         ".gitignore": canonical(".gitignore"),
         ".pre-commit-config.yaml": canonical(".pre-commit-config.yaml").replace(
@@ -270,37 +270,33 @@ def test_readme_without_h1_fails(tmp_path: Path) -> None:
     assert "README.md: knowledge-organization.doc-shape" in result.stdout
 
 
-def test_claude_md_missing_standards_block_fails(tmp_path: Path) -> None:
+def test_repo_claude_md_content_is_free(tmp_path: Path) -> None:
+    # A repo's own CLAUDE.md carries whatever that repo needs and nothing is
+    # mandated: the workspace-wide rules live in the global file.
     files = base_files()
-    files["CLAUDE.md"] = "## Rules\n\n- be good\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "CLAUDE.md: claude-code.standards-block" in result.stdout
-    assert "## Standards" in result.stdout
+    files["CLAUDE.md"] = "# Sample Repo\n\n## Rules\n\n- be good\n"
+    assert run(make_repo(tmp_path, files)).returncode == 0
 
 
-def test_claude_md_drifted_standards_block_fails(tmp_path: Path) -> None:
+def test_repo_claude_md_bare_heading_passes(tmp_path: Path) -> None:
+    # A repo with nothing repo-specific to say has nothing to write.
     files = base_files()
-    files["CLAUDE.md"] = files["CLAUDE.md"].replace(
-        "navigated by index", "navigated by vibes"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "CLAUDE.md: claude-code.standards-block" in result.stdout
-
-
-def test_claude_md_prose_around_standards_block_passes(tmp_path: Path) -> None:
-    files = base_files()
-    files["CLAUDE.md"] += "\n## Rules\n\n- be good\n"
+    files["CLAUDE.md"] = "# Sample Repo\n"
     assert run(make_repo(tmp_path, files)).returncode == 0
 
 
 # --- CLAUDE.md agent-facing voice ---
 
-# A well-formed global CLAUDE.md source: two top-level elements, no voice tokens.
+# A conformant global CLAUDE.md source: the two buckets, the workspace-wide
+# rules, no voice tokens.
 GLOBAL_VALID = (
-    "<principles>\n  <be-terse>Be terse.</be-terse>\n</principles>\n"
-    "<behaviors>\n  <sandbox>You run sandboxed.</sandbox>\n</behaviors>\n"
+    "# Global\n\n"
+    "## Principles\n\n"
+    "### Be terse\n\nBe terse.\n\n"
+    "## Behaviors\n\n"
+    "### Read the standards\n\nRead the catalog first.\n\n"
+    "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
+    "### Work in the sandbox\n\nYou run sandboxed.\n"
 )
 
 
@@ -349,9 +345,9 @@ def test_global_claude_valid_passes(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_global_claude_wrong_shape_fails(tmp_path: Path) -> None:
+def test_global_claude_extra_section_fails(tmp_path: Path) -> None:
     files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "<extra>nope</extra>\n"
+    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "\n## Extras\n\nNope.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
     assert (
@@ -360,27 +356,45 @@ def test_global_claude_wrong_shape_fails(tmp_path: Path) -> None:
     )
 
 
-def test_global_claude_malformed_xml_fails(tmp_path: Path) -> None:
+def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
     files = base_files()
     files["dotfiles/dot-claude/CLAUDE.md"] = (
-        "<principles><unclosed></principles>\n<behaviors></behaviors>\n"
+        "# Global\n\n"
+        "## Behaviors\n\n"
+        "### Read the standards\n\nRead the catalog first.\n\n"
+        "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
+        "## Principles\n\n"
+        "### Be terse\n\nBe terse.\n"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
     assert (
-        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-wellformed"
+        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-shape"
         in result.stdout
     )
 
 
-def test_global_claude_backticked_placeholder_passes(tmp_path: Path) -> None:
-    # Inline-code spans are masked before the parse, so a backticked `<repo>`
-    # token does not read as an unclosed tag.
+def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
+    # No repo's own CLAUDE.md restates these, so dropping one here would leave
+    # the instruction stationed nowhere.
+    files = base_files()
+    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID.replace(
+        "### Navigate docs by index\n\nWalk the index descriptions.\n\n", ""
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-rules"
+        in result.stdout
+    )
+    assert "Navigate docs by index" in result.stdout
+
+
+def test_global_claude_fenced_heading_is_not_a_section(tmp_path: Path) -> None:
+    # A worked example inside a fence is illustration, not structure.
     files = base_files()
     files["dotfiles/dot-claude/CLAUDE.md"] = (
-        "<principles>\n  <be-terse>Prefer `<repo>` over guessing.</be-terse>\n"
-        "</principles>\n<behaviors>\n  <sandbox>You run sandboxed.</sandbox>\n"
-        "</behaviors>\n"
+        GLOBAL_VALID + "\n```markdown\n## Extras\n\nAn example, not a section.\n```\n"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 0, result.stdout + result.stderr
@@ -862,7 +876,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     ids = set(result.stdout.split())
     assert "build.required-file" in ids
     assert "build.canonical-block" in ids
-    assert "claude-code.standards-block" in ids
+    assert "claude-code.agent-facing-voice" in ids
     assert "knowledge-organization.doc-shape" in ids
     assert "tracking.rogue-future-work-file" in ids
     assert all(
@@ -879,12 +893,15 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     assert "CLAUDE.md: build.required-file " in result.stdout
 
 
-def test_claude_standards_block_uses_claude_code_id(tmp_path: Path) -> None:
+def test_global_claude_shape_uses_claude_code_id(tmp_path: Path) -> None:
     files = base_files()
-    files["CLAUDE.md"] = "## Rules\n\n- be good\n"
+    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "\n## Extras\n\nNope.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "CLAUDE.md: claude-code.standards-block" in result.stdout
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-shape"
+        in result.stdout
+    )
 
 
 def test_canonical_dir_exempt_from_tree_rules(tmp_path: Path) -> None:

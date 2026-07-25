@@ -1,22 +1,5 @@
 # dev-playbook
 
-## Standards
-
-This workspace standardizes how repos are laid out, built, documented, and
-tested. Read `~/workspace/dev-playbook/standards/index.md` now, before the
-first task — it is the one-page catalog of every standard, and knowing what
-exists is what tells you when to look one up.
-
-## Docs
-
-Workspace docs are navigated by index, not crawled: every doc directory has
-an `index.md` listing each file with a one-line description, and child
-directories are reached through their own `index.md`. Walk the descriptions
-to the one file the task needs, confirming relevance from a doc's YAML
-frontmatter (`type`, `description`) before reading its body. The format
-(OKF) is defined at `~/workspace/dev-playbook/standards/docs/index.md`;
-consult it when authoring docs, not for navigation.
-
 ## Rules
 
 - This is a meta repo: what is authored here governs the population of

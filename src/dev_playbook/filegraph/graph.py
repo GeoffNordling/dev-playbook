@@ -78,7 +78,7 @@ def bucket(relpath: str, repo_root: Path) -> str:
     if suffix in CONFIG_EXTENSIONS or name.startswith(".") or name in CONFIG_NAMES:
         return "config"
     if relpath.startswith("standards/build/canonical/"):
-        return "config"  # canonical templates: Makefile.base, CLAUDE.md.standards
+        return "config"  # canonical templates: Makefile.base, ci.yml
     if (repo_root / relpath).stat().st_mode & 0o111:
         # Extensionless executables (hook and script entry points). Checked
         # after the extension buckets so an executable *.yaml/*.json stays

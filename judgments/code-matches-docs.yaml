@@ -57,9 +57,10 @@ judgments:
     claim: |
       Every check scripts/repo-lint performs that emits a `claude-code.`
       rule corresponds to a requirement stated in the claude-code standard:
-      the canonical CLAUDE.md standards block it checks CLAUDE.md carries.
-      The standard may state more than the tool checks; the tool must not
-      check more than the standard states.
+      the agent-facing voice of every CLAUDE.md, and the global file's
+      two-section shape and required workspace-wide rules. The standard may
+      state more than the tool checks; the tool must not check more than the
+      standard states.
     evidence:  [scripts/repo-lint]
     reference:
       - standards/claude-code/claude-content.md
@@ -85,13 +86,13 @@ judgments:
     claim: |
       dev-playbook's CLAUDE.md contains only content the claude-content
       contract permits: every kind of content in the file is one that
-      standards/claude-code/claude-content.md — together with the canonical
-      standards/build/canonical/CLAUDE.md.standards it governs — sanctions for
-      an injected CLAUDE.md. The contract may permit more than this file uses;
-      this file must not exceed it.
+      standards/claude-code/claude-content.md sanctions for a repo's own
+      injected CLAUDE.md — operating knowledge specific to this repo, and
+      nothing that holds for every repo, since that belongs to the global
+      file. The contract may permit more than this file uses; this file must
+      not exceed it.
     evidence:  [CLAUDE.md]
     reference:
       - standards/claude-code/claude-content.md
-      - standards/build/canonical/CLAUDE.md.standards
     model: claude-sonnet-5
     effort: high
