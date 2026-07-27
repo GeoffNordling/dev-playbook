@@ -22,7 +22,8 @@ them by these names.
 | **CI gate** | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
 
 The commit and push gates block locally, through the git hooks that invoke
-them. The CI gate has no branch protection behind it —
+them — hooks that live in `.git/`, so `uvx pre-commit install` has to run in
+every clone. The CI gate has no branch protection behind it —
 [repo-settings.md](/standards/tracking/repo-settings.md) configures no required
 status checks — so its block executes through the human's standing rule: **a
 red CI run is never merged**. That rule is nondiscretionary — no judgment is

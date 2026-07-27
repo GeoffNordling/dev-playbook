@@ -64,9 +64,11 @@ def test_stow_is_invoked_once_per_package_with_that_package_as_target(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     calls: list[list[str]] = []
-    monkeypatch.setattr(
-        subprocess, "run", lambda argv, **kwargs: calls.append(argv) or None
-    )
+
+    def record(argv: list[str], **kwargs: object) -> None:
+        calls.append(argv)
+
+    monkeypatch.setattr(subprocess, "run", record)
     dotfiles = tmp_path / "dotfiles"
     home = tmp_path / "home"
 
