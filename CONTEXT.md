@@ -76,6 +76,23 @@ A repository that consumes what dev-playbook defines — standards, published ho
 **Scope**
 The population a standard governs. **Workspace-scoped**: declared in dev-playbook, governing every repo in `~/workspace`. **Repo-scoped**: declared in one consumer, governing that repo alone. Exactly two values.
 
+### Machines
+
+The hosts the workspace runs on. The inventory — which machines exist and what
+differs between them — is in [machines.md](/docs/machines.md); this fixes the
+words.
+
+**Primary machine**
+The Fedora host, where development happens and every workspace repo is cloned. Exactly one exists. Every check runs here.
+_Avoid_: dev box, main machine.
+
+**Secondary machine**
+A Windows/WSL host. Carries only some of the workspace's repos and runs a reduced set of checks. Several exist, kept identical and sharing one configuration, so they are addressed collectively by the machine key `wsl`.
+_Avoid_: WSL box (say **secondary machine** when the distinction from the primary is the point).
+
+**Machine-local state**
+Input a detector needs that lives on the host rather than in the repository — a sibling repo's clone, a populated cache. A detector whose machine-local state is absent reports the environment, not the code, which is why such a detector is skipped rather than allowed to fail.
+
 ### Tracking
 
 Where future work is recorded. A unit of work has exactly one home, decided by
@@ -100,6 +117,8 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 - A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 - A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
+- There is exactly one **Primary machine**; every other host is a **Secondary machine**.
+- A **Detector** is skipped on a machine iff the **Machine-local state** it needs is absent there; the **Primary machine** lacks none, so every detector runs there.
 - A unit of future work has exactly one home: a **Candidate** in `CANDIDATES.md` while uncommitted, or a GitHub issue once committed — never both.
 - **Promotion** moves a unit of work from **Candidate** to issue, deleting the **Candidate** entry in the same change.
 - A **Candidate** carries no brief: choosing to write the brief is what makes work committed, and therefore an issue.

@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # Shell aliases — sourced by ~/.bashrc via ~/.bashrc.d/* loader.
 
-alias work='cd /home/geoff/workspace'
+alias work='cd "$HOME/workspace"'
 
 alias sso='aws sso login --sso-session geoff-sso'
 

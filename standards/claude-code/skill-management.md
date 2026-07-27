@@ -18,7 +18,7 @@ Failure modes of piecemeal adoption from an opinionated framework: voice fragmen
 
 | Path under `dotfiles/` | Source | Editable |
 |---|---|---|
-| `dot-claude/skills/` | Authored in this workspace, plus symlinks mirroring `.agents/skills/` | Yes for authored entries; symlinks are managed by `bin/sync-dotfiles.sh` |
+| `dot-claude/skills/` | Authored in this workspace, plus symlinks mirroring `.agents/skills/` | Yes for authored entries; symlinks are managed by `scripts/sync-dotfiles` |
 | `.agents/skills/` | Installed by the Vercel `skills` CLI | No — overwritten on update |
 
 Stow links `dot-claude/` into `~/.claude/` and `.agents/` into `~/.agents/`, so Claude Code reads the canonical content from the git-tracked dotfiles tree.
@@ -27,9 +27,9 @@ Stow links `dot-claude/` into `~/.claude/` and `.agents/` into `~/.agents/`, so 
 
 Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `dot-claude/skills/` pointing at it (`dot-claude/skills/<name>` → `../../.agents/skills/<name>`), with no stale symlinks and no authored skill colliding with an `.agents/skills/` name.
 
-Auditor and repairer are split, as [tracking](/standards/tracking.md) splits reporting from repair. The `claude-code.skill-mirror` rule in [skill-lint](/scripts/skill-lint) is the auditor: at the commit gate it reports any missing, mispointed, or stale symlink or authored/installed collision, and treats a committed `.agents/skills/` tree with no `dot-claude/skills/` mirror directory as an error state it fails loudly on. `bin/sync-dotfiles.sh` is the repairer: on every run it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
+Auditor and repairer are split, as [tracking](/standards/tracking.md) splits reporting from repair. The `claude-code.skill-mirror` rule in [skill-lint](/scripts/skill-lint) is the auditor: at the commit gate it reports any missing, mispointed, or stale symlink or authored/installed collision, and treats a committed `.agents/skills/` tree with no `dot-claude/skills/` mirror directory as an error state it fails loudly on. `scripts/sync-dotfiles` is the repairer: on every run it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
 
-After installing or removing a third-party skill (commands below), run `bin/sync-dotfiles.sh` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree.
+After installing or removing a third-party skill (commands below), run `scripts/sync-dotfiles` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree.
 
 ## Authored skills
 

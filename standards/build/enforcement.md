@@ -22,7 +22,8 @@ them by these names.
 | **CI gate** | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
 
 The commit and push gates block locally, through the git hooks that invoke
-them. The CI gate has no branch protection behind it —
+them — hooks that live in `.git/`, so `uvx pre-commit install` has to run in
+every clone. The CI gate has no branch protection behind it —
 [repo-settings.md](/standards/tracking/repo-settings.md) configures no required
 status checks — so its block executes through the human's standing rule: **a
 red CI run is never merged**. That rule is nondiscretionary — no judgment is
@@ -53,8 +54,12 @@ ritual, and at the push gate via `make check-judgments`); the table lists only
 what falls outside that pattern. The dev-playbook detectors reach those gates
 through the single published `playbook-lint` hook, which dispatches its whole
 roster ([distribution.md](/standards/build/distribution.md)); a per-detector
-skip (ref-lint's CI-gate exception) is a `SKIP=<detector>` environment entry
-the dispatcher honors.
+skip is a `SKIP=<detector>` environment entry the dispatcher honors. A skip is
+legitimate only where a detector's input is machine-local rather than held in
+the repository — the cited repos ref-lint resolves against, the judgment cache
+pytest reads — so the detector would otherwise report the environment as a
+defect in the code. Which machine skips what is recorded in
+[machines.md](/docs/machines.md); every skip announces itself on each run.
 
 | Detector | Owns | Gates |
 |---|---|---|
@@ -64,7 +69,7 @@ the dispatcher honors.
 | testing-lint | test privacy, mirror layout, no-logic | hook pattern |
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
 | decisions-lint | Decision Record sequential numbering, status vocabulary | hook pattern |
-| ref-lint | Links and Citations | hook pattern, except the CI gate (skipped) |
+| ref-lint | Links and Citations | hook pattern, except the CI gate and the secondary machines (skipped — neither carries the cited repos) |
 | prose-lint | prose spelling (the American `judgment`) | hook pattern |
 | judgments-lint | judgment declarations | hook pattern |
 | standards-lint | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
@@ -72,6 +77,6 @@ the dispatcher honors.
 | shfmt | shell formatting | hook pattern |
 | skill-lint | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
-| pytest | tests + judgments cache gate | push gate only — never the CI gate |
+| pytest | tests + judgments cache gate | push gate only — never the CI gate; the judgments cache gate is skipped on the secondary machines |
 | validate | spec graph | push gate only — never the CI gate (sdd repos) |
 | workspace-lint | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |

@@ -89,6 +89,7 @@ them per script. The library is the installed `dev_playbook` package:
 - `dev_playbook.testing_lint` — the Python-testing detector logic: the three test-file rules (privacy, mirror layout, no-logic) over one walk. Consumed by `testing-lint`.
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
+- `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
 loading/validation and the plan/render/record runner, behind `judgments-lint`
@@ -133,6 +134,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `bootstrap-labels` | Enforce GitHub label scheme in the current repo (auto-invoked by `/intake`) |
 | `bump-pins` | Move the dev-playbook `rev` pin across the governed consumer repos and re-run each one's commit gate — the release step of [distribution.md](/standards/build/distribution.md); commits nothing |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
+| `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages, mirror the externally managed skills, generate `~/.claude/settings.json` for this machine; `--check` reports settings drift and is what the session-start hook runs |
 
 Run any script with `--help`; each script's docstring documents its behavior in
 full.
@@ -175,9 +177,10 @@ Two traps, both of which cost real time to rediscover:
 
 - **The script must be excluded from the Claude Code sandbox.** It reaches the
   agentsview daemon on the host's loopback, which a sandboxed process cannot
-  see. `excludedCommands` in [`settings.json`](/dotfiles/dot-claude/settings.json)
+  see. `excludedCommands` in [`fedora.json`](/dotfiles/settings/fedora.json)
   matches the *top-level* command, so excluding `agentsview` does nothing for a
   script that merely spawns it — `transcript-export` itself carries the entry.
+  (The sandbox is a primary-machine feature; see [machines.md](/docs/machines.md).)
 - **A command excluded from the sandbox loses the sandbox's environment**, so
   `$TMPDIR` is unset. Pass a real output directory, not `"$TMPDIR/out"`.
 

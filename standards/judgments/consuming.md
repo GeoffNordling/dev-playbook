@@ -26,7 +26,7 @@ and point a `[tool.uv.sources]` entry at the dev-playbook repo root on disk:
 dev = ["dev-playbook"]
 
 [tool.uv.sources]
-dev-playbook = { path = "/home/geoff/workspace/dev-playbook", editable = true }
+dev-playbook = { path = "/home/<user>/workspace/dev-playbook", editable = true }
 ```
 
 Adjust `path` to wherever `dev-playbook` sits **on disk**, and keep it

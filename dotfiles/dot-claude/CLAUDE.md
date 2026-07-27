@@ -73,10 +73,10 @@ GitHub renders Markdown before LaTeX, so:
 
 ### Work in the sandbox
 
-You always run in the Claude Code sandbox: Bash and file tools execute inside Bubblewrap
-(`bwrap`), so you have a restricted view of the filesystem. A file or directory
-may read back **empty or missing** even when it exists — be aware of this before
-concluding something is absent, and don't silently work around it.
+You normally run in the Claude Code sandbox: Bash and file tools execute inside
+Bubblewrap (`bwrap`), so you have a restricted view of the filesystem. A file or
+directory may read back **empty or missing** even when it exists — be aware of
+this before concluding something is absent, and don't silently work around it.
 
 The sandbox config in the global user settings (`~/.claude/settings.json`,
 `sandbox` key) is the reference for what may be restricted. If a restriction is
