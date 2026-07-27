@@ -55,6 +55,17 @@
   "model": "opus[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/dot-claude/hooks/session-start-sync"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",

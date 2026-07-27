@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# SessionStart hook: refuse to open a session on a stale main.
+#
+# Multi-machine repos go stale silently — main moves on the other machine and
+# nothing here says so until work has already landed on the old base. This
+# checks, at every session start, whether GitHub's main holds commits this
+# checkout does not.
+#
+# Silent on success. stdout is the only signal, and every path exits 0: a
+# non-zero exit means "the hook broke", never "the check failed".
+#
+# The check is read-only over HTTPS with gh's keyring PAT, so it needs no
+# YubiKey tap. It therefore cannot pull — pulling is over the SSH remote and is
+# the user's to run.
+set -euo pipefail
+
+cd "${CLAUDE_PROJECT_DIR:-$PWD}"
+
+# Not applicable → silent. A non-git directory fails the remote lookup too, so
+# these two guards cover every case where there is nothing to compare.
+git remote get-url origin 2>/dev/null | grep -q github.com || exit 0
+git rev-parse --verify --quiet main >/dev/null || exit 0
+
+# Hooks are harness subprocesses, not Bash-tool calls: there is no bwrap jail
+# here, so wrapping gh in `timeout` is safe and keeps an offline machine from
+# stalling session start. Do not "fix" this into a bare top-level gh call.
+remote_sha=$(timeout 5 gh api "repos/{owner}/{repo}/branches/main" --jq .commit.sha 2>/dev/null) || {
+	echo "Could not reach GitHub to check whether main is current (gh call failed). Treat the base as unverified."
+	exit 0
+}
+
+# Containment, not equality. Local main being *ahead* of GitHub is the normal
+# state after any local commit, and equality would report it as stale — a false
+# alarm on most sessions. Ask instead whether GitHub's tip is already in local
+# history: yes covers both level and ahead, no covers both behind and diverged.
+git merge-base --is-ancestor "$remote_sha" main 2>/dev/null && exit 0
+
+cat <<EOF
+STOP — stale base. GitHub's main ($remote_sha) holds commits this checkout does not.
+Do not edit, commit, or branch until it is pulled.
+Tell the user to run: git pull   (needs their YubiKey — never run it yourself.)
+EOF
