@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/session-start-sync\""
+            "command": "bash \"$HOME/.claude/hooks/session-start-stale-base\""
           },
           {
             "type": "command",
