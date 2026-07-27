@@ -33,9 +33,9 @@ code changes, listed in
 were deliberately left undone.
 
 It is one-time in the sense that matters, though: the removed links came from
-an invocation the branch has retired (`stow -d ~/workspace/dev-playbook -t ~
-dotfiles`, which stows the *whole* `dotfiles` directory and so folds each
-subdirectory into a single link). Nothing on the branch creates a whole-package
+an invocation the branch has retired — `stow -d <repo> -t ~ dotfiles`, which
+stows the *whole* `dotfiles` directory and so folds each subdirectory into a
+single link. Nothing on the branch creates a whole-package
 link — `stow_packages()` targets each package at the directory it is named for
 and `mkdir`s a real one — so once the target is a real directory it stays one,
 and every subsequent run is a no-op. This machine will not need the manual step
