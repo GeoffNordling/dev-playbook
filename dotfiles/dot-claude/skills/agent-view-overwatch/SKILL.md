@@ -4,7 +4,7 @@ description: Fleet co-pilot in Agent view — reads the issue board, recommends 
 disable-model-invocation: true
 model: sonnet
 effort: xhigh
-allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *) AskUserQuestion
+allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
 ---
 
 # Agent-View Overwatch

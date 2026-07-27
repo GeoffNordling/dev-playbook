@@ -41,7 +41,7 @@ Use the epic (§1) to keep deferrals out of the gap list. Example: a stale name 
 
 ### 5. Resolve with the user — HITL gate
 
-Present all three tiers in one tight message, recommendation-first on every decision. Get the user's call on each tier-1 **Decision** — use AskUserQuestion where the choices are crisp. Then show the concrete rewrite you intend (resolved decisions plus the drafted gap-sentences) and land only on their nod. This gate is the skill's whole point: never guess a decision, and never overwrite the body without the nod. If the audit surfaced nothing at tier 1 or tier 2, say so and make no edit.
+Present all three tiers in one tight message, recommendation-first on every decision. Get the user's call on each tier-1 **Decision**, asked in prose — `AskUserQuestion` is denied globally. Then show the concrete rewrite you intend (resolved decisions plus the drafted gap-sentences) and land only on their nod. This gate is the skill's whole point: never guess a decision, and never overwrite the body without the nod. If the audit surfaced nothing at tier 1 or tier 2, say so and make no edit.
 
 ### 6. Rewrite the body in place
 

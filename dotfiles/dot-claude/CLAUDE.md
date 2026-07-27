@@ -49,6 +49,14 @@ After a unit of work, stop. The user reviews diffs in VS Code, then tells you wh
 
 A plan that says commits happen in two phases is a plan, not authorization. Wait for an explicit "commit now" each time.
 
+### Ask in prose, never AskUserQuestion
+
+`AskUserQuestion` is denied globally in `~/.claude/settings.json` — deliberate,
+not a misconfiguration. Ask in your ordinary reply instead. The user cannot see
+your context, so any question turning on detail — a line of code, a config
+value, a sentence of prose — carries one concrete example of the thing being
+decided, then asks for the decision.
+
 ### Teach unfamiliar terms
 
 When a term, library, or pattern surfaces that the user likely doesn't know, give a 1–2 sentence

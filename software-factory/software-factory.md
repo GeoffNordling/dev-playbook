@@ -196,7 +196,7 @@ Two modes of human engagement:
 A node skill does the node's work and reports; the issue overwatch launches it, sequences what follows, and writes the labels (intake excepted — its label tuple is the deliverable, per [Dispatch](#dispatch)). When a skill has required reading, it front-loads a `## Read first` section ending in a `READ: <files>` confirmation; when it has none, it omits the section entirely. This contract fixes structure; the authoring *style* behind the skills — voice, content, robustness, mechanics — lives in [skill-authoring.md](/software-factory/skill-authoring.md).
 
 - **Worktree.** Every file-touching node sits in the issue's worktree before doing anything else, per [Worktrees](#worktrees-and-branches). `intake` touches no files and uses no worktree.
-- **HITL** — the issue overwatch runs the node itself, so the body may gate on interviews and approvals — asked via `AskUserQuestion` or plain terminal prompts — and the node closes with a plain report.
+- **HITL** — the issue overwatch runs the node itself, so the body may gate on interviews and approvals — asked in prose at the terminal — and the node closes with a plain report.
 - **AFK** — a subagent runs the skill hands-off and terminates per the terminal report contract ([Dispatch](#dispatch)): `DONE:` on success, `ESCALATE:` when stuck, with the skill's escalation triggers listed in the table.
 - **Gate.** A committing node runs `make check` — the full gate, not just the commit hooks — before finishing its phase; a phase never closes over a red tree. The rule is per-phase, not per-commit: individual commits are already covered by the commit gate's hook suite, and the full gate is the phase-close ritual.
 

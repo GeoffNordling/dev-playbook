@@ -47,6 +47,9 @@
       "Bash(gh pr update-branch *)",
       "Bash(gh pr lock *)",
       "Bash(gh pr unlock *)"
+    ],
+    "deny": [
+      "AskUserQuestion"
     ]
   },
   "model": "opus[1m]",
