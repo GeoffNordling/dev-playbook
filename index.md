@@ -5,6 +5,7 @@ okf_version: "0.1"
 # dev-playbook — bundle index
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
+- [Fedora Test Instructions](/FEDORA-TEST.md) — Temporary — how the agent on the Fedora primary installs and verifies the cross-machine-sync branch, and reports back
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories
