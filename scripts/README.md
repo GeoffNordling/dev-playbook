@@ -175,9 +175,10 @@ Two traps, both of which cost real time to rediscover:
 
 - **The script must be excluded from the Claude Code sandbox.** It reaches the
   agentsview daemon on the host's loopback, which a sandboxed process cannot
-  see. `excludedCommands` in [`settings.json`](/dotfiles/dot-claude/settings.json)
+  see. `excludedCommands` in [`fedora.json`](/dotfiles/settings/fedora.json)
   matches the *top-level* command, so excluding `agentsview` does nothing for a
   script that merely spawns it — `transcript-export` itself carries the entry.
+  (The sandbox is a primary-machine feature; see [machines.md](/docs/machines.md).)
 - **A command excluded from the sandbox loses the sandbox's environment**, so
   `$TMPDIR` is unset. Pass a real output directory, not `"$TMPDIR/out"`.
 

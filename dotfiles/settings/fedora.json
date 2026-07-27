@@ -1,0 +1,69 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/workspace/sounds/play-sound-fedora.sh\""
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "paplay /usr/share/sounds/freedesktop/stereo/bell.oga"
+          }
+        ]
+      }
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "network": {
+      "allowedDomains": [
+        "127.0.0.1"
+      ]
+    },
+    "filesystem": {
+      "allowWrite": [
+        "~/workspace",
+        "~/.cache",
+        "~/.local",
+        "~/.npm",
+        "~/.agentsview"
+      ],
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.gnupg",
+        "~/.netrc"
+      ]
+    },
+    "excludedCommands": [
+      "gh",
+      "gh *",
+      "agentsview",
+      "agentsview *",
+      "transcript-export",
+      "transcript-export *",
+      "*/scripts/transcript-export",
+      "*/scripts/transcript-export *",
+      "bootstrap-labels",
+      "bootstrap-labels *",
+      "*/scripts/bootstrap-labels",
+      "*/scripts/bootstrap-labels *",
+      "git",
+      "git *",
+      "make check",
+      "make check *",
+      "uv run pytest",
+      "uv run pytest *"
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# SessionStart hook: report Claude Code settings that no longer match source.
+#
+# ~/.claude/settings.json is generated from dotfiles/settings/ (a shared base
+# plus this machine's fragment), because Claude Code reads one user-scope
+# settings file and offers no local override layer to hold the machine-specific
+# remainder. A generated file has a failure mode a symlink does not: pulling a
+# change to the source leaves the installed copy stale, and editing the
+# installed copy loses the edit at the next sync. Neither is visible without a
+# check, so this runs one at every session start.
+#
+# Informational, not blocking. By the time this runs the session has already
+# loaded the stale settings, so stopping the agent would not undo anything --
+# the useful act is telling the user to resync and restart.
+#
+# Silent on success, and every path exits 0: a non-zero exit means "the hook
+# broke", never "the check failed". stdout is the only signal reaching the
+# agent, so an up-to-date machine costs it no context at all.
+set -euo pipefail
+
+log="${XDG_CACHE_HOME:-$HOME/.cache}/claude-code/session-start-settings.log"
+
+note() {
+	mkdir -p "${log%/*}"
+	printf '%s %s\n' "$(date -Is)" "$1" >>"$log"
+}
+
+# This file is stowed into ~/.claude/hooks/, so its own resolved path is what
+# locates the checkout -- nothing here may assume where the repo was cloned.
+self="$(readlink -f "$0")"
+repo="${self%/dotfiles/dot-claude/hooks/*}"
+checker="$repo/scripts/sync-settings"
+
+[ -x "$checker" ] || {
+	note "skip: no $checker"
+	exit 0
+}
+
+if drift=$("$checker" --check 2>&1); then
+	note "current"
+	exit 0
+fi
+
+note "DRIFT"
+printf 'Tell the user their Claude Code settings need resyncing:\n%s\n' "$drift"

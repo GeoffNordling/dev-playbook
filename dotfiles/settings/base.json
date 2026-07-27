@@ -22,8 +22,8 @@
       "Bash(uvx pre-commit run *)",
       "Bash(git worktree add *)",
       "Bash(git worktree remove *)",
-      "Bash(/home/geoff/workspace/dev-playbook/scripts/ref-lint)",
-      "Bash(/home/geoff/workspace/dev-playbook/scripts/ref-lint *)",
+      "Bash(*/scripts/ref-lint)",
+      "Bash(*/scripts/ref-lint *)",
       "Bash(gh label list)",
       "Bash(gh label list *)",
       "Bash(gh label create *)",
@@ -61,29 +61,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/dot-claude/hooks/session-start-sync"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
+            "command": "bash \"$HOME/.claude/hooks/session-start-sync\""
+          },
           {
             "type": "command",
-            "command": "bash /home/geoff/workspace/sounds/play-sound-fedora.sh"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "paplay /usr/share/sounds/freedesktop/stereo/bell.oga"
+            "command": "bash \"$HOME/.claude/hooks/session-start-settings\""
           }
         ]
       }
@@ -95,50 +77,7 @@
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
-    "command": "bash /home/geoff/workspace/dev-playbook/dotfiles/dot-claude/statusline.sh"
-  },
-  "sandbox": {
-    "enabled": true,
-    "network": {
-      "allowedDomains": [
-        "127.0.0.1"
-      ]
-    },
-    "filesystem": {
-      "allowWrite": [
-        "~/workspace",
-        "~/.cache",
-        "~/.local",
-        "~/.npm",
-        "~/.agentsview"
-      ],
-      "denyRead": [
-        "~/.ssh",
-        "~/.aws",
-        "~/.gnupg",
-        "~/.netrc"
-      ]
-    },
-    "excludedCommands": [
-      "gh",
-      "gh *",
-      "agentsview",
-      "agentsview *",
-      "transcript-export",
-      "transcript-export *",
-      "*/scripts/transcript-export",
-      "*/scripts/transcript-export *",
-      "bootstrap-labels",
-      "bootstrap-labels *",
-      "*/scripts/bootstrap-labels",
-      "*/scripts/bootstrap-labels *",
-      "git",
-      "git *",
-      "make check",
-      "make check *",
-      "uv run pytest",
-      "uv run pytest *"
-    ]
+    "command": "bash \"$HOME/.claude/statusline.sh\""
   },
   "feedbackSurveyRate": 0,
   "effortLevel": "xhigh",
