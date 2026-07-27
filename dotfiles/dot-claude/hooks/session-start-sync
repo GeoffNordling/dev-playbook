@@ -6,25 +6,52 @@
 # checks, at every session start, whether GitHub's main holds commits this
 # checkout does not.
 #
-# Silent on success. stdout is the only signal, and every path exits 0: a
-# non-zero exit means "the hook broke", never "the check failed".
+# Silent on success. stdout is the only signal reaching the agent, and every
+# path exits 0: a non-zero exit means "the hook broke", never "the check
+# failed". An in-sync repo therefore costs the agent no context at all.
 #
 # The check is read-only over HTTPS with gh's keyring PAT, so it needs no
 # YubiKey tap. It therefore cannot pull — pulling is over the SSH remote and is
 # the user's to run.
+#
+# Every run appends one line to the log below. A hook that is silent by design
+# has no other way to show it is alive, and the logged `source` is the only
+# evidence of which SessionStart reasons actually reach it.
 set -euo pipefail
+
+log="${XDG_CACHE_HOME:-$HOME/.cache}/claude-code/session-start-sync.log"
+
+# The harness pipes a JSON payload in; a hand-run from a terminal has no stdin
+# and must not block waiting for one.
+source_event=unknown
+if [ ! -t 0 ]; then
+	source_event=$(cat | jq -r '.source // "unknown"' 2>/dev/null) || source_event=unknown
+fi
+
+note() {
+	mkdir -p "${log%/*}"
+	printf '%s source=%-8s %-24s %s\n' \
+		"$(date -Is)" "$source_event" "${PWD##*/}" "$1" >>"$log"
+}
 
 cd "${CLAUDE_PROJECT_DIR:-$PWD}"
 
 # Not applicable → silent. A non-git directory fails the remote lookup too, so
 # these two guards cover every case where there is nothing to compare.
-git remote get-url origin 2>/dev/null | grep -q github.com || exit 0
-git rev-parse --verify --quiet main >/dev/null || exit 0
+git remote get-url origin 2>/dev/null | grep -q github.com || {
+	note "skip: no github remote"
+	exit 0
+}
+git rev-parse --verify --quiet main >/dev/null || {
+	note "skip: no local main"
+	exit 0
+}
 
 # Hooks are harness subprocesses, not Bash-tool calls: there is no bwrap jail
 # here, so wrapping gh in `timeout` is safe and keeps an offline machine from
 # stalling session start. Do not "fix" this into a bare top-level gh call.
 remote_sha=$(timeout 5 gh api "repos/{owner}/{repo}/branches/main" --jq .commit.sha 2>/dev/null) || {
+	note "unverified: gh call failed"
 	echo "Could not reach GitHub to check whether main is current (gh call failed). Treat the base as unverified."
 	exit 0
 }
@@ -33,10 +60,16 @@ remote_sha=$(timeout 5 gh api "repos/{owner}/{repo}/branches/main" --jq .commit.
 # state after any local commit, and equality would report it as stale — a false
 # alarm on most sessions. Ask instead whether GitHub's tip is already in local
 # history: yes covers both level and ahead, no covers both behind and diverged.
-git merge-base --is-ancestor "$remote_sha" main 2>/dev/null && exit 0
+if git merge-base --is-ancestor "$remote_sha" main 2>/dev/null; then
+	note "fresh"
+	exit 0
+fi
 
+note "STALE: github at $remote_sha"
 cat <<EOF
-STOP — stale base. GitHub's main ($remote_sha) holds commits this checkout does not.
-Do not edit, commit, or branch until it is pulled.
-Tell the user to run: git pull   (needs their YubiKey — never run it yourself.)
+STOP — stale base. Do not answer the user's request yet.
+GitHub's main ($remote_sha) holds commits this checkout does not.
+Before anything else, tell the user their checkout is stale and must be pulled:
+    git pull        (needs their YubiKey — never run it yourself.)
+Do not read, edit, commit, or branch until they confirm the pull.
 EOF
