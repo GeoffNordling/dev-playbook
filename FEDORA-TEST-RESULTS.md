@@ -10,17 +10,27 @@ Run on the Fedora primary, 2026-07-27, against `cross-machine-sync` at
 `2717743`. Repo `~/workspace/dev-playbook`, starting from `main` at `279390b`,
 clean.
 
-**Outcome: the test failed at step 4.** `scripts/sync-dotfiles` aborts on its
-first package and installs nothing. Steps 5 and 6's verification were never
-reached. The machine is currently in the half-installed state the instructions
-name as the one worth avoiding: **`~/.claude/settings.json` no longer exists**,
-and `~/.claude/hooks/` was never created. Per rule 2 nothing was repaired.
+**Outcome: the test failed at step 4 as written, then passed in full once three
+legacy symlinks were removed by hand.** `scripts/sync-dotfiles` aborts on its
+first package and installs nothing, leaving the machine with no
+`~/.claude/settings.json` at all. After the author removed `~/.agents`,
+`~/.bashrc.d` and `~/bin` — links no step in the instructions removes — steps 4
+and 5 pass every predicted check. See
+[Second attempt](#second-attempt--after-removing-the-legacy-links).
 
 The headline finding is in [What broke](#what-broke): `stow_packages()` treats
 `~/.agents` as a directory to stow into, but on this machine it is a **symlink
 to the package directory itself**, left over from an older stow generation that
 step 2's unstow does not remove. Stow is therefore asked to link the package's
 files on top of themselves.
+
+**The manual removal is not a fix.** It is a one-time clearing of this
+machine's historical debris, done so the rest of the branch could be tested.
+The branch still cannot install onto a machine in the state this one was in an
+hour ago, and still destroys `~/.claude/settings.json` when it fails. Those are
+code changes, listed in
+[What the branch needs](#what-the-branch-needs-before-it-is-retested), and they
+were deliberately left undone.
 
 ## Deviations from the instructions
 
@@ -293,9 +303,10 @@ The repo itself is unharmed — `git status --short` is empty after the failed
 run, so `mirror_skills()` created no new mirror links and `stale_links()` did
 not delete anything inside the checkout.
 
-## Steps 5 and 6
+## Steps 5 and 6, first attempt
 
-Step 5 was not reached. For the record, the state the branch leaves behind is:
+Step 5 was not reached on the first attempt. For the record, the state the
+branch leaves behind when its install fails is:
 
 ```
 $ ls -l ~/.claude/settings.json
@@ -358,10 +369,128 @@ omission counted again. Fixing it properly means one line in `/index.md`,
 alongside the existing `FEDORA-TEST.md` entry, and both entries go away when
 the branch merges.
 
+## Second attempt — after removing the legacy links
+
+The author ran one command in their own terminal — the agent's `rm` was refused
+by the Claude Code permission classifier, and the `stow -D` inverse was declined
+too:
+
+```
+$ rm ~/.agents ~/.bashrc.d ~/bin && find ~ -maxdepth 1 -type l -printf '%p -> %l\n'
+(no output)
+```
+
+All three were symlinks, so this removed links only; `~/bin` was already
+dangling. `find` printing nothing confirms `$HOME` has no top-level links left.
+
+### Step 4, repeated
+
+```
+$ ~/workspace/dev-playbook/scripts/sync-dotfiles
+stowed: .agents .bashrc.d dot-claude
+installed settings for fedora
+run1 exit=0
+
+$ ~/workspace/dev-playbook/scripts/sync-dotfiles
+stowed: .agents .bashrc.d dot-claude
+settings already current (fedora)
+run2 exit=0
+```
+
+The second run prints `settings already current (fedora)` as predicted.
+
+**Small prediction problem.** The instructions add that the second run "must not
+report new work", but `stowed: .agents .bashrc.d dot-claude` is printed
+unconditionally — `sync()` appends it after every stow, changed or not, so it
+appears identically on a first install and a no-op re-run. The script's own
+docstring promises "one line per thing that changed". Either the line should be
+conditional on stow having done something, or the instruction should stop
+treating output volume as the idempotence signal. As written, the check cannot
+be read off the output.
+
+### Step 5, in full
+
+```
+$ ~/workspace/dev-playbook/scripts/sync-dotfiles --check ; echo "check exit=$?"
+check exit=0
+
+$ ls -ld ~/.bashrc.d ~/.agents ~/.claude
+drwxr-xr-x. 1 geoff geoff  44 Jul 27 16:01 /home/geoff/.agents
+drwxr-xr-x. 1 geoff geoff  70 Jul 27 16:01 /home/geoff/.bashrc.d
+drwxr-xr-x. 1 geoff geoff 630 Jul 27 16:01 /home/geoff/.claude
+
+$ ls ~/.bashrc.d/
+aliases.sh
+machine-env.sh
+worktree.sh
+
+$ ls -l ~/.claude/settings.json
+-rw-r--r--. 1 geoff geoff 4359 Jul 27 16:01 /home/geoff/.claude/settings.json
+
+$ ls -l ~/.claude/hooks/
+total 8
+-rwxr-xr-x. 1 geoff geoff 1319 Jul 27 15:51 session-start-settings
+-rwxr-xr-x. 1 geoff geoff 3113 Jul 27 15:51 session-start-stale-base
+
+$ ls ~/aliases.sh ~/worktree.sh ~/skills ~/sync-dotfiles.sh 2>&1
+ls: cannot access '/home/geoff/aliases.sh': No such file or directory
+ls: cannot access '/home/geoff/worktree.sh': No such file or directory
+ls: cannot access '/home/geoff/skills': No such file or directory
+ls: cannot access '/home/geoff/sync-dotfiles.sh': No such file or directory
+
+$ grep -c '"sandbox"' ~/.claude/settings.json
+1
+
+$ bash ~/.claude/hooks/session-start-settings </dev/null ; echo "settings hook exit=$?"
+settings hook exit=0
+
+$ bash ~/.claude/hooks/session-start-stale-base </dev/null ; echo "stale-base hook exit=$?"
+stale-base hook exit=0
+
+$ ls -ld ~/bin
+ls: cannot access '/home/geoff/bin': No such file or directory
+```
+
+Every predicted condition holds: `--check` silent and 0, three real
+directories, the three `.bashrc.d` fragments including the new `machine-env.sh`,
+`settings.json` a regular file, both hooks present with no `session-start-sync`,
+the four `$HOME` paths gone, one `"sandbox"` key from Fedora's fragment, both
+hooks silent and 0, `~/bin` retired.
+
+One wording note: `~/.claude/hooks` is itself a symlink —
+`~/.claude/hooks -> ../workspace/dev-playbook/dotfiles/dot-claude/hooks` — not a
+directory of individual links. That is ordinary stow tree-folding (the target
+directory did not exist, so stow linked the whole thing), and `ls -l
+~/.claude/hooks/` therefore lists the repo's real files. Harmless, but the
+instructions read as though a directory were expected, and folding is what will
+happen on any machine where `~/.claude/hooks` is absent.
+
+### The new-terminal check
+
+The agent cannot open a terminal, so this was approximated with a login
+interactive shell. **It is not the real check** and the author should still run
+it in a fresh terminal.
+
+```
+$ bash -lic 'echo "SKIP=$SKIP JUDGMENTS=$SKIP_JUDGMENTS"; alias work'
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+SKIP= JUDGMENTS=
+alias work='cd "$HOME/workspace"'
+```
+
+Both variables empty and `work` resolving to `cd "$HOME/workspace"` is the
+predicted Fedora result. The two `bash:` lines are artefacts of `-i` without a
+tty, not findings. `machine-env.sh` sets the skips only behind a
+`grep -qi microsoft /proc/version` test, so on this host it is correctly inert.
+
 ## What the branch needs before it is retested
 
 Not fixed here, per rule 2. Stated so the next attempt starts from a decision
-rather than a rediscovery.
+rather than a rediscovery. **This machine no longer exercises any of them** —
+its debris is gone, so a re-run here will pass whether they are fixed or not.
+Points 1–3 need a test on a machine that still has the old links, or a unit
+test that builds that state.
 
 1. **`stow_packages()` must own its target.** If `home/<name>` is a symlink,
    the install cannot proceed by pretending it is a directory — remove it (it
@@ -374,4 +503,13 @@ rather than a rediscovery.
 4. **Step 2 of `FEDORA-TEST.md` is not sufficient** on this machine, and the
    instructions should say the whole-package links exist. If the fix in (1)
    lands, step 2 becomes unnecessary instead.
-5. **Note the sandbox** — an agent must disable it for the mutating steps.
+5. **Note the sandbox** — an agent must disable it for the mutating steps, and
+   even then a `rm` in `$HOME` may be refused by the permission classifier and
+   have to go to the human.
+6. **Make the `stowed:` line conditional**, or drop the "must not report new
+   work" wording from step 4. Right now it prints on every run and the
+   idempotence check is unverifiable.
+
+Everything else on the branch works on Fedora: settings generation, machine
+detection, the `--check` gate, both session-start hooks, the `.bashrc.d`
+fragments.
