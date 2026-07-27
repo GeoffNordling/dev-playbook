@@ -9,10 +9,13 @@ from dev_playbook.dotfiles.sync import (
     LOADER_MARKER,
     PACKAGES,
     SyncError,
+    claim_targets,
     ensure_bashrc_loader,
     mirror_skills,
     stale_links,
     stow_packages,
+    stray_links,
+    sync,
     target_for,
 )
 
@@ -33,6 +36,19 @@ def a_home(tmp_path: Path) -> Path:
     for name in PACKAGES.values():
         (home / name).mkdir(parents=True)
     return home
+
+
+def a_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A repo complete enough for a whole sync run, on a host reporting `wsl`."""
+    repo = tmp_path / "repo"
+    dotfiles = a_dotfiles_tree(repo)
+    (dotfiles / ".bashrc.d").mkdir()
+    (dotfiles / "settings").mkdir()
+    (dotfiles / "settings" / "base.json").write_text('{"model": "opus"}')
+    (dotfiles / "settings" / "wsl.json").write_text("{}")
+    monkeypatch.setattr("dev_playbook.dotfiles.sync.detect_machine", lambda: "wsl")
+    monkeypatch.setattr("dev_playbook.dotfiles.sync.missing_tools", lambda: [])
+    return repo
 
 
 # --- package targeting -----------------------------------------------------
@@ -81,15 +97,95 @@ def test_stow_is_invoked_once_per_package_with_that_package_as_target(
     ]
 
 
-def test_stow_creates_a_target_directory_that_does_not_exist(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr(subprocess, "run", lambda argv, **kwargs: None)
+# --- claiming the targets --------------------------------------------------
+#
+# Stow refuses to stow a package over itself, so a target that is a symlink to
+# the package must become a real directory before stow sees it.
+
+
+def test_a_target_that_does_not_exist_is_created(tmp_path: Path) -> None:
     home = tmp_path / "home"
 
-    stow_packages(home, tmp_path / "dotfiles")
+    claim_targets(home, tmp_path / "dotfiles")
 
     assert (home / ".bashrc.d").is_dir()
+
+
+def test_a_target_linked_to_its_own_package_becomes_a_real_directory(
+    tmp_path: Path,
+) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = tmp_path / "home"
+    home.mkdir()
+    (home / ".agents").symlink_to(dotfiles / ".agents")
+
+    replaced = claim_targets(home, dotfiles)
+
+    assert replaced == [home / ".agents"]
+    assert (home / ".agents").is_dir() and not (home / ".agents").is_symlink()
+
+
+def test_a_target_linked_outside_the_repo_is_refused(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = tmp_path / "home"
+    home.mkdir()
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    (home / ".agents").symlink_to(elsewhere)
+
+    with pytest.raises(SyncError, match="does not manage"):
+        claim_targets(home, dotfiles)
+
+
+def test_a_target_occupied_by_a_file_is_refused(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    home.mkdir()
+    (home / ".agents").write_text("not a directory")
+
+    with pytest.raises(SyncError, match="needs a directory"):
+        claim_targets(home, tmp_path / "dotfiles")
+
+
+# --- stray links in $HOME --------------------------------------------------
+
+
+def test_a_link_loose_in_home_pointing_into_the_repo_is_a_stray(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = a_home(tmp_path)
+    (dotfiles / ".bashrc.d").mkdir()
+    (dotfiles / ".bashrc.d" / "aliases.sh").write_text("alias x=y")
+    stray = home / "aliases.sh"
+    stray.symlink_to(dotfiles / ".bashrc.d" / "aliases.sh")
+
+    assert stray_links(home, dotfiles) == [stray]
+
+
+def test_a_link_to_a_retired_package_is_a_stray(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = a_home(tmp_path)
+    stray = home / "bin"
+    stray.symlink_to(dotfiles / "bin")
+
+    assert stray_links(home, dotfiles) == [stray]
+
+
+def test_a_link_in_home_pointing_elsewhere_is_left_alone(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = a_home(tmp_path)
+    elsewhere = tmp_path / "notes.txt"
+    elsewhere.write_text("mine")
+    (home / "notes.txt").symlink_to(elsewhere)
+
+    assert stray_links(home, dotfiles) == []
+
+
+def test_a_package_target_is_never_a_stray(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = tmp_path / "home"
+    home.mkdir()
+    (home / ".agents").symlink_to(dotfiles / ".agents")
+
+    assert stray_links(home, dotfiles) == []
 
 
 # --- skill mirroring -------------------------------------------------------
@@ -142,15 +238,24 @@ def test_stale_links_finds_a_link_whose_target_is_gone(tmp_path: Path) -> None:
     assert stale_links(home, dotfiles) == [broken]
 
 
-def test_stale_links_finds_a_live_link_into_the_repo(tmp_path: Path) -> None:
+def test_stale_links_leaves_a_live_link_for_stow_to_keep_current(
+    tmp_path: Path,
+) -> None:
     dotfiles = a_dotfiles_tree(tmp_path)
     home = a_home(tmp_path)
     real = dotfiles / "dot-claude" / "CLAUDE.md"
     real.write_text("rules")
-    link = home / ".claude" / "CLAUDE.md"
-    link.symlink_to(real)
+    (home / ".claude" / "CLAUDE.md").symlink_to(real)
 
-    assert stale_links(home, dotfiles) == [link]
+    assert stale_links(home, dotfiles) == []
+
+
+def test_stale_links_leaves_someone_elses_broken_link_alone(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    home = a_home(tmp_path)
+    (home / ".claude" / "notes").symlink_to(tmp_path / "never-existed")
+
+    assert stale_links(home, dotfiles) == []
 
 
 def test_stale_links_leaves_a_hand_made_link_alone(tmp_path: Path) -> None:
@@ -204,3 +309,34 @@ def test_a_hand_rolled_loader_is_left_alone(tmp_path: Path) -> None:
 
 def test_no_bashrc_means_nothing_to_wire_up(tmp_path: Path) -> None:
     assert ensure_bashrc_loader(tmp_path / "absent") is False
+
+
+# --- the whole run ---------------------------------------------------------
+
+
+def test_a_stow_that_aborts_still_leaves_the_settings_file_installed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = a_repo(tmp_path, monkeypatch)
+    home = tmp_path / "home"
+
+    def fail(argv: list[str], **kwargs: object) -> None:
+        raise subprocess.CalledProcessError(1, argv)
+
+    monkeypatch.setattr(subprocess, "run", fail)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        sync(repo, home)
+
+    assert (home / ".claude" / "settings.json").is_file()
+
+
+def test_a_run_that_changes_nothing_reports_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = a_repo(tmp_path, monkeypatch)
+    home = tmp_path / "home"
+    monkeypatch.setattr(subprocess, "run", lambda argv, **kwargs: None)
+    sync(repo, home)
+
+    assert sync(repo, home) == []

@@ -46,6 +46,64 @@ def target_for(home: Path, package: str) -> Path:
     return home / PACKAGES[package]
 
 
+def _inside(path: Path, root: Path) -> bool:
+    """Whether path is root itself or sits somewhere under it."""
+    return path == root or root in path.parents
+
+
+def claim_targets(home: Path, dotfiles: Path) -> list[Path]:
+    """Make every package target a real directory. Returns the ones replaced.
+
+    A target that is a symlink into this repo points at the package about to be
+    stowed there, so stow is handed the same directory as both source and
+    destination and asked to link every file over itself. It aborts, and the
+    install stops on its first package.
+    """
+    replaced = []
+    for package in PACKAGES:
+        target = target_for(home, package)
+        if target.is_symlink():
+            if not _inside(target.resolve(), dotfiles.resolve()):
+                raise SyncError(
+                    f"{target} is a symlink to {target.resolve()}, which this "
+                    f"install does not manage. Move it aside and re-run."
+                )
+            target.unlink()
+            replaced.append(target)
+        elif target.exists() and not target.is_dir():
+            raise SyncError(f"{target} is a file; package {package} needs a directory")
+        target.mkdir(parents=True, exist_ok=True)
+    return replaced
+
+
+def stray_links(home: Path, dotfiles: Path) -> list[Path]:
+    """Links loose in $HOME that point into this repo.
+
+    A package stowed at $HOME rather than at its own directory scatters its
+    contents here, one level above where they belong. They are this install's
+    own links and no current package claims them.
+    """
+    dotfiles = dotfiles.resolve()
+    claimed = set(PACKAGES.values())
+    return [
+        path
+        for path in sorted(home.iterdir())
+        if path.name not in claimed
+        and path.is_symlink()
+        and _inside(path.resolve(), dotfiles)
+    ]
+
+
+def managed_links(home: Path) -> set[Path]:
+    """Every symlink inside the package targets — what stow has installed."""
+    found: set[Path] = set()
+    for name in PACKAGES.values():
+        directory = home / name
+        if directory.is_dir():
+            found.update(path for path in directory.rglob("*") if path.is_symlink())
+    return found
+
+
 def missing_tools() -> list[str]:
     """The required tools this host does not have, in declaration order."""
     return [tool for tool in REQUIRED_TOOLS if shutil.which(tool) is None]
@@ -81,14 +139,14 @@ def mirror_skills(dotfiles: Path) -> list[str]:
 
 
 def stale_links(home: Path, dotfiles: Path) -> list[Path]:
-    """Managed links stow should be left to recreate from scratch.
+    """Managed links pointing at something this repo no longer has.
 
-    Two kinds qualify: a broken link, whose target the repo renamed or deleted,
-    and a live link into this repo that stow did not make itself — stow refuses
-    to touch a link it does not own, so one it did not make blocks the package
-    that claims that path. Anything that is not a link into this repo is
-    someone else's and is left alone; a target directory holds unmanaged
-    content too (~/.claude also keeps session data).
+    A rename or a deletion inside a package leaves its link behind pointing at
+    nothing, and stow never returns to a path it has nothing to place at. A
+    live link is stow's own and stow keeps it current, so only the broken ones
+    are anyone's business here — and only those into this repo: a target
+    directory holds unmanaged content too, and someone else's broken link is
+    not this install's to remove.
     """
     found = []
     dotfiles = dotfiles.resolve()
@@ -97,20 +155,31 @@ def stale_links(home: Path, dotfiles: Path) -> list[Path]:
         if not directory.is_dir():
             continue
         for path in directory.rglob("*"):
-            if path.is_symlink() and (
-                not path.exists() or dotfiles in path.resolve().parents
+            if (
+                path.is_symlink()
+                and not path.exists()
+                and _inside(path.resolve(), dotfiles)
             ):
                 found.append(path)
     return found
 
 
 def stow_packages(home: Path, dotfiles: Path) -> None:
-    """Link every package's contents into the directory it is named for."""
+    """Link every package's contents into the directory it is named for.
+
+    Every target must already be a real directory; claim_targets makes it one.
+    """
     for package in PACKAGES:
-        target = target_for(home, package)
-        target.mkdir(parents=True, exist_ok=True)
         subprocess.run(
-            ["stow", "-d", str(dotfiles), "-t", str(target), package], check=True
+            [
+                "stow",
+                "-d",
+                str(dotfiles),
+                "-t",
+                str(target_for(home, package)),
+                package,
+            ],
+            check=True,
         )
 
 
@@ -143,19 +212,29 @@ def sync(repo: Path, home: Path) -> list[str]:
 
     changed = [f"mirrored skill: {name}" for name in mirror_skills(dotfiles)]
 
-    for link in stale_links(home, dotfiles):
+    for target in claim_targets(home, dotfiles):
+        changed.append(f"replaced the {target} link with a real directory")
+    for link in stray_links(home, dotfiles):
         link.unlink()
-    stow_packages(home, dotfiles)
-    changed.append(f"stowed: {' '.join(PACKAGES)}")
+        changed.append(f"removed stray link: {link}")
 
-    if ensure_bashrc_loader(home / ".bashrc"):
-        changed.append("appended the ~/.bashrc.d loader (open a new shell for it)")
-
+    # Settings before stow, and every removal below it: stow can abort, and a
+    # run that cannot finish must not leave the machine worse than it found it.
     target = home / ".claude" / "settings.json"
     if settings.install(dotfiles / "settings", machine, target):
         changed.append(f"installed settings for {machine}")
-    else:
-        changed.append(f"settings already current ({machine})")
+
+    installed = managed_links(home)
+    stow_packages(home, dotfiles)
+    if new := managed_links(home) - installed:
+        changed.append(f"stowed {len(new)} link(s)")
+
+    for link in stale_links(home, dotfiles):
+        link.unlink()
+        changed.append(f"removed dead link: {link}")
+
+    if ensure_bashrc_loader(home / ".bashrc"):
+        changed.append("appended the ~/.bashrc.d loader (open a new shell for it)")
 
     return changed
 
@@ -197,7 +276,9 @@ def run_cli() -> int:
             print(report)
             return 1
 
-        for line in sync(repo, home):
+        if not (changed := sync(repo, home)):
+            print("already installed; nothing to do")
+        for line in changed:
             print(line)
     except (SyncError, subprocess.CalledProcessError, ValueError) as error:
         print(f"sync-dotfiles: {error}", file=sys.stderr)

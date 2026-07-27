@@ -52,20 +52,11 @@ same bug seen from the other side.
 **Stop and report if `git status` shows uncommitted work.** That is this
 machine's own work and it is not yours to stash or discard.
 
-## Step 2 — remove the misplaced links, before checking out
+## Step 2 — nothing to do
 
-Order matters: this unstows using the *old* package list, and one of those
-packages (`bin`) does not exist on the branch.
-
-Run this only for the paths step 1 actually found:
-
-```bash
-stow -D -d ~/workspace/dev-playbook/dotfiles -t ~ .agents .bashrc.d bin
-```
-
-Nothing to remove is a fine outcome — record what it printed either way. A
-complaint that a link is "not owned by stow" is not a failure here; note it and
-continue.
+The install clears the old links itself: a target that is a symlink into the
+repo becomes a real directory, and a link loose in `$HOME` pointing into the
+repo is removed. Record what step 1 found and go to step 3.
 
 ## Step 3 — check out the branch
 
@@ -89,7 +80,7 @@ configuration is the one state worth avoiding.
 ```
 
 Then run it a second time. It is idempotent: the second run must print
-`settings already current (fedora)` and must not report new work.
+`already installed; nothing to do` and nothing else.
 
 ## Step 5 — verify
 
@@ -118,8 +109,8 @@ Passing looks like:
   the whole reason the file is generated per machine.
 - Both hooks exit 0 and print nothing.
 
-`~/bin` is deliberately gone; that package was retired. If a broken
-`~/bin/sync-dotfiles.sh` survives, remove it and note that you did.
+`~/bin` is deliberately gone: that package is retired, and the sync removes
+both it and anything it scattered into `$HOME`.
 
 Then open a **new terminal** and run:
 
