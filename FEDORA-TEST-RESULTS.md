@@ -497,6 +497,66 @@ predicted Fedora result. The two `bash:` lines are artefacts of `-i` without a
 tty, not findings. `machine-env.sh` sets the skips only behind a
 `grep -qi microsoft /proc/version` test, so on this host it is correctly inert.
 
+## The branch does not pass its own `make check`
+
+Surfaced on the author's attempt to push this file, from the `make-check`
+pre-push hook:
+
+```
+make check-judgments.....................................................Failed
+- hook id: make-check
+- exit code: 2
+
+/usr/bin/make check SKIP_JUDGMENTS=0
+make[1]: Entering directory '/home/geoff/workspace/dev-playbook'
+uv run ruff format --check .
+79 files already formatted
+uv run ruff check .
+All checks passed!
+uv run mypy src tests
+tests/test_dotfiles_sync.py:68: error: "append" of "list" does not return a value (it only ever returns None)  [func-returns-value]
+Found 1 error in 1 file (checked 78 source files)
+make[1]: *** [Makefile:11: typecheck] Error 1
+make[1]: Leaving directory '/home/geoff/workspace/dev-playbook'
+make: *** [Makefile:17: check-judgments] Error 2
+```
+
+Nothing to do with the results file — `git status` is clean and no Python was
+touched here. The offending line is branch-authored, in `273dbaa`:
+
+```python
+calls: list[list[str]] = []
+monkeypatch.setattr(
+    subprocess, "run", lambda argv, **kwargs: calls.append(argv) or None
+)
+```
+
+`list.append` returns `None`, so the `or None` is both redundant and the thing
+mypy rejects. The straightforward replacement is a named stub:
+
+```python
+def fake_run(argv: list[str], **kwargs: object) -> None:
+    calls.append(argv)
+
+monkeypatch.setattr(subprocess, "run", fake_run)
+```
+
+**Left unfixed on purpose** — it is the other agent's code, and fixing it here
+would erase the signal the same way the manual link removal erased defects 1–3.
+
+Two things make this more than a typo:
+
+- **It is not machine-specific.** `uv.lock` pins `mypy 2.1.0`, so the WSL
+  secondary runs the identical checker and gets the identical error.
+  `SKIP_JUDGMENTS` does not gate `typecheck` — the Makefile's `check` target
+  runs `format-check lint typecheck test` unconditionally, and `SKIP_JUDGMENTS`
+  only reaches the judgments. So this was red on the machine it was written on.
+- **`make-check` is `stages: [pre-push]`.** It never fires on commit, which is
+  how a red branch reached `origin` — the push that put it there either skipped
+  the hook or ran without it installed. Worth the other agent confirming their
+  pre-push hooks are installed, since this is the gate that was supposed to
+  catch it.
+
 ## What the branch needs before it is retested
 
 Not fixed here, per rule 2. Stated so the next attempt starts from a decision
@@ -522,6 +582,8 @@ test that builds that state.
 6. **Make the `stowed:` line conditional**, or drop the "must not report new
    work" wording from step 4. Right now it prints on every run and the
    idempotence check is unverifiable.
+7. **Fix `tests/test_dotfiles_sync.py:68`** so `make check` is green, and check
+   that the pre-push hooks are installed on the authoring machine.
 
 Everything else on the branch works on Fedora: settings generation, machine
 detection, the `--check` gate, both session-start hooks, the `.bashrc.d`
