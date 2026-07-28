@@ -11,10 +11,10 @@ argument-hint: "[what bit, one line]"
 
 Append one entry to the friction log —
 [friction/log.md](~/workspace/mission-control/friction/log.md) —
-commit it, and hand the user the push. The log feeds triage:
-twice-felt friction becomes a triage item mapped onto the idea
+commit it, and hand the user the push. The log feeds curation:
+twice-felt friction becomes a curation item mapped onto the idea
 archive, and only Selection scopes it into a Cycle.
-Recording friction is not a commitment to fix it — capture and move
+Recording friction is not a commitment to fix it — record and move
 on; never start fixing the friction as part of logging it.
 
 ## Friction: $ARGUMENTS

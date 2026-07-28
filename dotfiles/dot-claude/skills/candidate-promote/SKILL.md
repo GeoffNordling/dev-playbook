@@ -58,6 +58,6 @@ nothing is passed but the entry.
   intake leaves `CANDIDATES.md` untouched — losing the entry loses the work.
 - **Do not implement anything.** Promotion moves a record between homes; the
   issue is then dispatched through the software factory like any other.
-- **Not the capture path.** Random, unfiltered, or cross-repo ideas belong in
-  mission-control via /capture. This skill only moves entries that are already
+- **Not the idea path.** Random, unfiltered, or cross-repo ideas belong in
+  mission-control via /idea. This skill only moves entries that are already
   recorded as serious, repo-scoped Candidates.

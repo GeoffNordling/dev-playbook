@@ -1,30 +1,33 @@
 ---
-name: capture
-description: Deposit raw idea material verbatim into mission-control's inbox/ from any repo — a dictation, a pasted agent conversation, a dump of disjoint ideas — then commit it there and hand the owner the push. Use when the owner invokes /capture from a repo that is not mission-control, or throws idea material into the chat to be saved for later triage.
+name: idea
+description: Deposit raw idea material verbatim into mission-control's inbox/ from any repo — a dictation, a pasted agent conversation, a dump of disjoint ideas — then commit it there and hand the owner the push. Use when the owner invokes /idea from a repo that is not mission-control, or throws idea material into the chat to be saved for later curation.
 disable-model-invocation: true
 model: sonnet
 effort: xhigh
 argument-hint: "[raw idea material]"
 ---
 
-# Capture
+# Idea
 
-A thin pointer so `/capture` works from any repo on desktop without
+A thin pointer so `/idea` works from any repo on desktop without
 `cd`-ing into mission-control. The real skill lives in mission-control:
-read [.claude/skills/capture/SKILL.md](~/workspace/mission-control/.claude/skills/capture/SKILL.md)
-now and follow it **verbatim** — it owns the deposit format, the
-`CLAUDE_CODE_REMOTE` path-selection, and the receipt. Apply only the
-cwd-translation overrides below.
+read [.claude/skills/idea/SKILL.md](~/workspace/mission-control/.claude/skills/idea/SKILL.md)
+now and follow it **verbatim** — it owns the routing, the deposit
+format, the `CLAUDE_CODE_REMOTE` path-selection, and the receipt.
+Apply only the cwd-translation overrides below.
 
 ## Material: $ARGUMENTS
 
 ## Overrides
 
-mission-control's capture skill assumes the session's cwd **is**
+mission-control's idea skill assumes the session's cwd **is**
 mission-control, so it uses repo-relative paths (`inbox/…`) and a plain
 `git`. This pointer fires from another repo, so force mission-control as
 the target instead — the same discipline `log-friction` uses:
 
+- **Inbox path only.** The direct path (hand-off to /curate) is
+  unavailable outside mission-control; if the owner voiced direct
+  filing, deposit to inbox and say so in the receipt.
 - **Working repo is always `~/workspace/mission-control`**, whatever the
   session's cwd.
 - **Every file write goes under `~/workspace/mission-control/inbox/`** —
