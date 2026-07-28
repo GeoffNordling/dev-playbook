@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+"""Claude Code hook: append one hook event, raw and verbatim, to this machine's store.
+
+Wired async in dotfiles/settings/fedora.json, so capture never sits in a
+session's critical path. The harness pipes the event JSON in on stdin; this
+appends one row and exits.
+
+Storage is append-only and uninterpreted: no parsing for meaning, filtering,
+or deduplication at write time — a row dropped here is one no future query
+can ask for.
+
+Failure discipline — the one sanctioned exception to this workspace's
+fail-loud rule: a session must never fail because measurement did. Every path
+exits 0; a failure to record appends a line to errors.log beside the database,
+and a failure to write even that is swallowed. The gap in the data is the
+loud signal, raised at report time.
+
+Python 3 stdlib only, no configuration: a hook runs on every event of every
+session, so it may not depend on an interpreter's package set or a knob.
+"""
+
+import json
+import sqlite3
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+
+STORE = Path("~/.local/share/claude-measure").expanduser()
+DB_PATH = STORE / "events.db"
+ERROR_LOG = STORE / "errors.log"
+
+# Concurrent sessions write to one database. WAL lets their readers and this
+# writer coexist, and the busy timeout makes a collision queue rather than
+# fail — long enough to outlast any contention a hook insert can create, short
+# enough that a genuinely stuck database gives up while the session is young.
+BUSY_TIMEOUT_SECONDS = 5.0
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY,
+    received_at TEXT,
+    event TEXT,
+    session_id TEXT,
+    prompt_id TEXT,
+    payload TEXT
+)
+"""
+
+INSERT = """
+INSERT INTO events (received_at, event, session_id, prompt_id, payload)
+VALUES (?, ?, ?, ?, ?)
+"""
+
+# The payload keys that get their own column. Every other key stays in the
+# payload text and nowhere else.
+PROMOTED = ("hook_event_name", "session_id", "prompt_id")
+
+
+def promoted_values(payload: str) -> tuple[str | None, ...]:
+    """The promoted columns read out of one payload; NULL for whatever is absent.
+
+    A payload that is not a JSON object — malformed stdin, or valid JSON that
+    is a list or a bare string — promotes nothing. The row still lands, because
+    the text of an event nobody can parse is the only evidence that it arrived.
+    """
+    try:
+        parsed = json.loads(payload)
+    except ValueError:
+        return (None,) * len(PROMOTED)
+    if not isinstance(parsed, dict):
+        return (None,) * len(PROMOTED)
+    values = []
+    for key in PROMOTED:
+        value = parsed.get(key)
+        # Promoted columns are TEXT. A payload whose session_id arrived as a
+        # number or an object is still recorded whole; only the column is NULL.
+        values.append(value if isinstance(value, str) else None)
+    return tuple(values)
+
+
+def record(received_at: str, payload: str) -> None:
+    """Append one row, creating the store, the database, and the table as needed."""
+    STORE.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(DB_PATH, timeout=BUSY_TIMEOUT_SECONDS)
+    try:
+        # Persistent, so only the first write of the database's life changes
+        # anything; the rest read back the mode they already have.
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute(SCHEMA)
+        connection.execute(INSERT, (received_at, *promoted_values(payload), payload))
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def note_failure(received_at: str, error: BaseException) -> None:
+    """Append one line about an event that could not be recorded.
+
+    Best effort by construction: the reasons a row cannot be written — the
+    directory is gone, the disk is full, the store is not ours — are mostly
+    reasons this line cannot be written either. Where it lands it explains a
+    gap; where it does not, the gap still shows.
+    """
+    try:
+        STORE.mkdir(parents=True, exist_ok=True)
+        with ERROR_LOG.open("a", encoding="utf-8") as log:
+            log.write(f"{received_at} {type(error).__name__}: {error}\n")
+    except BaseException:
+        # Deliberately blind and silent: this is already the failure path, and
+        # a hook that raised here would fail the session it exists to observe.
+        pass
+
+
+def main() -> None:
+    """Read the event off stdin and record it. Never raises, never exits nonzero.
+
+    The timestamp is taken before stdin, so it dates the event's arrival at this
+    hook rather than the moment the harness finished handing it over.
+
+    The catch is deliberately blind, and wider than `Exception`: every reason
+    this can fail — a locked database, a full disk, a signal — is a reason to
+    lose one row, never a reason to fail a session.
+    """
+    received_at = datetime.now(UTC).isoformat(timespec="microseconds")
+    try:
+        # Bytes, then a decode this hook controls: stdin's own decoder follows
+        # the locale, which is not UTF-8 everywhere a session might start, and
+        # a payload that cannot be decoded is still a payload worth keeping.
+        raw = sys.stdin.buffer.read()
+        record(received_at, raw.decode("utf-8", errors="replace"))
+    except BaseException as error:
+        note_failure(received_at, error)
+
+
+if __name__ == "__main__":
+    main()
