@@ -177,10 +177,12 @@ about 35 % and loosens stability (CV 0.32 → 0.39); 120 s is the most stable
 but collapses toward a plain submission count; 600 s leaks away-time back in
 and is rejected.
 
-One measurement caveat stands open: a queued prompt's `UserPromptSubmit`
-appears to fire at dequeue rather than at the moment enter was pressed, which
-lets its window absorb some agent working time. The cap bounds the error
-either way, and #270 settles the timing against live data.
+One measurement caveat is accepted rather than researched: a queued prompt's
+`UserPromptSubmit` may fire at dequeue rather than at the moment enter was
+pressed, which lets its window absorb some agent working time. Queued prompts
+are rare, the cap bounds the error to one window, and no correction would be
+possible even with the timing known — so the bias is documented here and
+deliberately not investigated (#255, ruling 21).
 
 ### Waiting-on-human latency
 
