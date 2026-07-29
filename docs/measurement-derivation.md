@@ -82,13 +82,14 @@ is a stop.
 
 ## Event semantics
 
-Every payload carries `hook_event_name`, `session_id`, `transcript_path`, and
-`cwd`. `cwd` is per event rather than per session — a session moves between
-checkouts mid-flight and `gitBranch` moves with it — so attribution never keys
-on a session-level cwd (#266). `prompt_id` accompanies the prompt-bearing and
-turn-bearing events and is the exact join between them; positional pairing of
-the Nth `Stop` with the Nth prompt is wrong in every session studied, which
-shows up as sessions with more Stops than prompts (#266).
+Every payload carries `hook_event_name`, `session_id`, `transcript_path`,
+`cwd`, and `prompt_id` — the last on every event type, not only the
+prompt-bearing ones (#270). `cwd` is per event rather than per session — a
+session moves between checkouts mid-flight and `gitBranch` moves with it — so
+attribution never keys on a session-level cwd (#266). `prompt_id` is the exact
+join between a submission and the events of the turn it started; positional
+pairing of the Nth `Stop` with the Nth prompt is wrong in every session
+studied, which shows up as sessions with more Stops than prompts (#266).
 
 The fields named per event below are the ones the filters and formulas read,
 so their presence in a payload of that type is exactly what the third
@@ -101,17 +102,18 @@ assertion checks.
 | `UserPromptSubmit` | A submission, with the literal typed text in `prompt` | Fires for typed prose, for skill slash commands, and for harness pseudo-prompts alike — the last two are separated by the filters below. |
 | `UserPromptExpansion` | A typed command expanding, fired before its `UserPromptSubmit` and sharing its `prompt_id` | `command_name` and `command_args` — the human's own words, structured, when a skill is invoked with prose arguments — plus `expansion_type`, `command_source`, and the full literal `prompt`. |
 | `Stop` | The end of an agent turn | `prompt_id` pairs the turn with the submission that started it. No `Stop` fires when a human interrupts with ESC; the turn simply ends. |
-| `SubagentStart` | A subagent dispatch — the dispatch signal | Dispatches are counted here, never at `SubagentStop`. |
-| `SubagentStop` | A subagent finishing, plus phantoms | `agent_type` (empty on a phantom) and `agent_transcript_path`, which gives the child transcript outright — no derivation from the parent path needed. |
+| `SubagentStart` | A subagent dispatch — the dispatch signal | `agent_id` — the key a real `SubagentStop` matches on. Dispatches are counted here, never at `SubagentStop`. |
+| `SubagentStop` | A subagent finishing, plus phantoms | `agent_id`, which matches the stop to its `SubagentStart`; `agent_type` (empty on a phantom); and `agent_transcript_path` — on a real stop the child transcript outright, on a phantom a well-formed path to nothing, so any reader handles non-existence (#270). |
 | `PostToolUse`, Bash matcher | An executed Bash command | `tool_input` holds the command line as it ran — the source of phase transitions and session-to-issue binding. |
 | `PostCompact` | A compaction — the context-pressure signal | — |
 
-Two identity facts constrain all of the above (#258). A subagent's own tool
-events carry the **parent** session's `session_id` and `transcript_path`, so
-subagent attribution comes from `SubagentStart`/`SubagentStop` and
-`agent_transcript_path`, never from tool events. And a session opened in the
-agent view carries an extra `agent_type` field on its payloads where an
-ordinary session has none — a free discriminator between the two.
+Two identity facts constrain all of the above. A subagent's own tool events
+carry the **parent** session's `session_id` and `transcript_path` (#258) —
+but also their own `agent_id` and `agent_type`, so a subagent's tool work is
+directly attributable to it by `agent_id` (#270). And `agent_type` on a
+payload marks subagent work, not the agent view: ordinary interactive
+sessions carry it on every subagent-issued event, and its absence marks the
+parent's own work (#270, overriding #258's agent-view reading).
 
 ## Filters
 
@@ -120,7 +122,7 @@ Four exclusions apply to conforming rows before any metric is computed:
 | Filter | Rule | Why |
 |---|---|---|
 | Expansion/submit pairs | Collapse rows sharing a `prompt_id` into one human submission; take `command_name`/`command_args` from the expansion and the literal text from the submit. | A skill slash command fires `UserPromptExpansion` then `UserPromptSubmit` with the same `prompt_id`. Both describe one act, and counting both doubles every skill invocation (#258). |
-| Phantom `SubagentStop` | Drop rows with an empty `agent_type` or with no matching `SubagentStart` in the same session. | Hidden auxiliary model calls — prompt-suggestion generators, the compaction summarizer — emit them. One real subagent produced four `SubagentStop` events in the probe (#258). |
+| Phantom `SubagentStop` | Drop rows with an empty `agent_type` or with no `SubagentStart` in the same session matching on `agent_id`. | Hidden auxiliary model calls emit them (#258). Each phantom carries its own distinct `agent_id` — they are not repeat firings of real subagents — and the drop is verifiable: a phantom's `agent_id` is absent from agentsview and its `agent_transcript_path` points at nothing on disk (#270). |
 | Task-notification pseudo-prompts | Drop submissions whose `prompt` begins with the `<task-notification>` marker. | Harness-generated, not human, and they do fire `UserPromptSubmit` (#258). |
 | Ghost sessions | Drop session ids with zero human submissions after the filters above. | `SessionStart` fires for session slots that never materialize — no transcript is ever written, and `SessionEnd` follows on close (#258). |
 
@@ -199,8 +201,11 @@ at four hours retains 98.7 % of observations, leaves the median unmoved (112 s
 → 110 s), and stabilizes the p90 (1005 s → 811 s). Four hours also separates a
 long lunch from an overnight resumption cleanly: the shortest observed
 overnight gap is 6.6 h, and the one-to-four-hour band is 2.6 % of gaps. The
-censored gaps are reported as away time, never discarded. The `Stop`-to-prompt
-pairing is by `prompt_id`.
+censored gaps are reported as away time, never discarded. `prev Stop` is the
+chronological predecessor — the latest `Stop` of the same session strictly
+before t(s). Pairing by `prompt_id` is wrong here: a `Stop` shares its
+`prompt_id` with the submission that started its turn, so that join measures
+the agent's turn duration, not the human's waiting (#270).
 
 ### Interventions per issue
 
