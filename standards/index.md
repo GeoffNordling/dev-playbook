@@ -14,6 +14,7 @@ alphabetical; directories last.
 - [Decision Records](/standards/decisions.md) — Card for the decision-records standard — how hard-to-reverse decisions are recorded
 - [Instruments](/standards/instrument.md) — Card for the instrument standard — how purpose-built devices are specified and kept conformant
 - [Knowledge Organization](/standards/knowledge-organization.md) — Card for the knowledge-organization standard — how knowledge is organized in markdown
+- [Model Delegation](/standards/delegation.md) — Card for the model-delegation standard — how levels of work are delegated to different models
 - [Module Design](/standards/modules.md) — Card for the module-design standard — how modules are designed
 - [Prose](/standards/prose.md) — Card for the prose standard — how workspace prose is written
 - [Python](/standards/python.md) — Card for the Python standard — how Python source code is written
@@ -25,6 +26,7 @@ alphabetical; directories last.
 - [Tracking](/standards/tracking.md) — Card for the tracking standard — how committed and uncommitted work is tracked through issues, candidates, and repository settings
 - [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one
+- [Delegation Ladder](/standards/delegation/ladder.md) — The three delegation tiers — orchestrator, limited intelligence, no intelligence — what each is for, and how a session dispatches to them
 - [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
 - [Module Design](/standards/modules/design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability

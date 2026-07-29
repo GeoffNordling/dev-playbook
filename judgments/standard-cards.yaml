@@ -249,3 +249,17 @@ judgments:
       - scripts/decisions-lint
     model: claude-sonnet-5
     effort: high
+
+  - id: standard-card-delegation
+    claim: |
+      standards/delegation.md is an honest card: every pointer in its
+      define, audit, enforce, and adopt cells names a real artifact that
+      genuinely serves that cell's role for the model-delegation standard,
+      its empty cells are truly empty, and no cell misrepresents what its
+      targets do.
+    evidence:  [standards/delegation.md]
+    reference:
+      - standards/standard/format.md
+      - standards/delegation/ladder.md
+    model: claude-sonnet-5
+    effort: high
