@@ -14,7 +14,7 @@ agent harnesses (Claude Code, Codex CLI/App, Cursor, Gemini CLI,
 OpenCode, Factory Droid, GitHub Copilot CLI). Several internet
 luminaries in agentic-AI and data-science have publicly endorsed it,
 which prompted this audit. Working audit notes are in
-[docs/third-party-survey.md](~/workspace/dev-playbook/docs/third-party-survey.md).
+[docs/skill-management/2026-05-09-survey.md](~/workspace/dev-playbook/docs/skill-management/2026-05-09-survey.md).
 
 **Superpowers has a ton of great stuff in it.** Roughly 10k lines of
 markdown across 13 skills, plus a SessionStart bootstrap hook that

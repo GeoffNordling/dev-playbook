@@ -1,12 +1,33 @@
 ---
 type: Standard
 title: Skill Management
-description: Where skills live, how third-party skills are installed, and the mirror rule between authored and installed
+description: How third-party skills are taken in and recorded, where skills live, and the mirror rule between authored and installed
 ---
 
 # Skill Management
 
-Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](/standards/claude-code/skill-conventions.md).
+How third-party skills are taken in, where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](/standards/claude-code/skill-conventions.md).
+
+## Intake
+
+A third-party skill enters the workspace through a **sweep**: one pass over one upstream source, ending in a written record. Sweeps are periodic — a source is swept again whenever it has moved or enough time has passed to be worth another look — and their records accumulate into a dated series, so what the workspace has already examined is a matter of record rather than of memory.
+
+A sweep runs five steps, in order:
+
+1. **Notice.** An upstream source surfaces: a repo not seen before, a bundle that has published new skills, or a standing entry due for another look.
+2. **Pin.** Fix the state the comparison is made at — the upstream source repo and dev-playbook, each by commit SHA and that commit's timestamp. The pin is what lets the next sweep diff against exactly what this one saw.
+3. **Compare.** Read each upstream skill against what the workspace already holds: the authored toolbox, the standards a skill answers to, and the earlier records in the series.
+4. **Rule.** The human owner renders the verdict on each skill, against [When to adopt third-party skills](#when-to-adopt-third-party-skills). The verdict is the human's — an agent gathers, compares, and presents, and never decides.
+5. **Record.** Write the sweep into the record series below.
+
+## Sweep records
+
+Every sweep lands exactly one record in `docs/skill-management/`, named `YYYY-MM-DD-<source>.md` for the date it ran and the source it swept, and listed in [the series index](/docs/skill-management/index.md).
+
+A record carries two parts:
+
+- **A dual-SHA header.** Both repos as pinned in step 2 — the upstream source and dev-playbook, each with its commit SHA and that commit's timestamp.
+- **One row per upstream skill.** The skill, how it compares against what the workspace already holds, and the human's verdict on it.
 
 ## When to adopt third-party skills
 
