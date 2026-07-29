@@ -15,10 +15,11 @@ protocol by observing an executing agent's behavior.
 
 The protocol has two files — a tuple:
 
-- `protocols/align-map-execute/formulation.md` — the mathematical
-  formulation. This is the ground truth.
-- `protocols/align-map-execute/SKILL.md` — the
-  plain-language instruction that executing agents read.
+- [formulation.md](~/workspace/dev-playbook/protocols/align-map-execute/formulation.md) — the
+  mathematical formulation. This is the ground truth.
+- [protocol-align-map-execute/SKILL.md](~/workspace/dev-playbook/dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md) — the
+  plain-language instruction that executing agents read. This is the bundle
+  Claude Code loads, through the Stow link into `~/.claude/skills/`.
 
 The math is authoritative. When the two diverge, the instruction is wrong.
 
