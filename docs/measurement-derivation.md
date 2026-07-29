@@ -82,9 +82,12 @@ is a stop.
 
 ## Event semantics
 
-Every payload carries `hook_event_name`, `session_id`, `transcript_path`,
-`cwd`, and `prompt_id` — the last on every event type, not only the
-prompt-bearing ones (#270). `cwd` is per event rather than per session — a
+Every payload carries `hook_event_name`, `session_id`, `transcript_path`, and
+`cwd`. `prompt_id` appears on every event type, not only the prompt-bearing
+ones — but not on every row: a `SessionStart` that precedes any prompt
+(`startup`, `clear`) has no `prompt_id` key at all, and a `SessionEnd` fired
+by a UI builtin mints a fresh `prompt_id` that matches no submission (#270).
+`cwd` is per event rather than per session — a
 session moves between checkouts mid-flight and `gitBranch` moves with it — so
 attribution never keys on a session-level cwd (#266). `prompt_id` is the exact
 join between a submission and the events of the turn it started; positional
@@ -97,7 +100,7 @@ assertion checks.
 
 | Event | What it records | Fields that carry meaning |
 |---|---|---|
-| `SessionStart` | A session context beginning, including mid-session | `source` — one of `startup`, `resume`, `clear`, `compact`, `fork`. Only `startup` is a real start: a compaction fires this event inside the same `session_id`. Also `model`. |
+| `SessionStart` | A session context beginning, including mid-session | `source` — one of `startup`, `resume`, `clear`, `compact`, `fork`. Only `startup` is a real start: a compaction fires this event inside the same `session_id`, while `clear` ends the old session id and mints a fresh one. `model` accompanies some sources but not `clear`, so only `source` is asserted (#270). |
 | `SessionEnd` | A session context ending | `reason` — `clear`, `resume`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other`. Not paired 1:1 with `SessionStart`: closing the agent view emitted it for session ids that never emitted a start. |
 | `UserPromptSubmit` | A submission, with the literal typed text in `prompt` | Fires for typed prose, for skill slash commands, and for harness pseudo-prompts alike — the last two are separated by the filters below. |
 | `UserPromptExpansion` | A typed command expanding, fired before its `UserPromptSubmit` and sharing its `prompt_id` | `command_name` and `command_args` — the human's own words, structured, when a skill is invoked with prose arguments — plus `expansion_type`, `command_source`, and the full literal `prompt`. |
