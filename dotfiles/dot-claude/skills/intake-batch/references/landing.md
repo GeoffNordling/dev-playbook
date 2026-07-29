@@ -4,8 +4,8 @@ Read this only when the batch has cleared the landing checkpoint and the user ha
 the batched nod. Everything below writes to GitHub.
 
 **Before authoring the first brief**, read
-[issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) end-to-end —
-brief format, vertical-slice rules, native relationships — and report `READ: issues.md`.
+[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end —
+brief format, vertical-slice rules, native relationships — and report `READ: issue-authoring.md`.
 
 ## Blind-implementer certification — the per-issue gate
 
@@ -37,7 +37,7 @@ is self-contained, and fix it if not:
     if the work writes or modifies tests; `tests:no` + `phase:build` otherwise. No issue
     lands at `phase:design` — design-shaped questions were resolved with the user during
     grooming and are already encoded in the brief.
-- **Body** — the brief, per the issue conventions read above: authored complete, no
+- **Body** — the brief, per the issue authoring standard read above: authored complete, no
   changelog, structured for the blind implementer. Fold in what investigation proved;
   state tested claims plainly.
 - **Edges** — native blocked-by relationships only where sequencing is real. The

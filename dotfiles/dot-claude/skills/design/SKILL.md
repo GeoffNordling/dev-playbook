@@ -55,7 +55,7 @@ Present the approach for explicit approval, then wait:
 
 ## 5. Capture the approach
 
-On approval, append an `## Approach` section to the issue body — preserving the existing brief, never overwriting it — per [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md). `gh issue edit --body` replaces the whole body, so write back the brief unchanged plus the new section. Keep the Approach to what the implementation phase needs — the chosen solution, the decisions that constrain the build, and the tradeoffs behind them; it is the contract the implementation phase reads.
+On approval, append an `## Approach` section to the issue body — preserving the existing brief, never overwriting it — per [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md). `gh issue edit --body` replaces the whole body, so write back the brief unchanged plus the new section. Keep the Approach to what the implementation phase needs — the chosen solution, the decisions that constrain the build, and the tradeoffs behind them; it is the contract the implementation phase reads.
 
 ```bash
 gh issue edit <issue> --body "$(cat <<'EOF'

@@ -17,7 +17,7 @@ Every post-intake **leaf** carries the full four-tuple `(category:*, mode:*, tes
 - `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (implemented at `tdd`), doc/config/work not touching tests goes `tests:no` (implemented at `build`); `mode:spike` always carries `tests:no` — a spike merges no code — so the full-tuple invariant holds on every leaf.
 - `phase:*` — the current node in the graph below. An untriaged issue is at `phase:intake` — labelled so, or implied by carrying no labels at all. The graph is the inventory; see [Naming](#naming).
 
-Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](/standards/tracking/issues.md).
+Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue authoring § Relationships](/standards/tracking/issue-authoring.md).
 
 ### Valid labels
 
@@ -77,7 +77,7 @@ flowchart LR
 
 On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at the review stop.
 
-**The decompose exit.** When design concludes the issue is too big to build as one leaf, the issue becomes an **epic** and never builds itself. The decomposing design session performs the children's intake in place, minting each child as a ready leaf — full tuple, brief-complete body per the [tracking standard](/standards/tracking/issues.md) — with no round-trip through the intake node.
+**The decompose exit.** When design concludes the issue is too big to build as one leaf, the issue becomes an **epic** and never builds itself. The decomposing design session performs the children's intake in place, minting each child as a ready leaf — full tuple, brief-complete body per the [tracking standard](/standards/tracking/issue-authoring.md) — with no round-trip through the intake node.
 
 **The spike path.** `mode:spike` is a question whose deliverable is an answer, not merged code. The spike node runs AFK; its findings land in the issue's closing comment — plus a [Decision Record](/standards/decisions/records.md) if a one-way door was crossed. No PR opens, and the branch and worktree are disposable. A spike that needs a human interview mid-flight was design, not a spike — the subagent escalates rather than interviews.
 
@@ -166,7 +166,7 @@ Two terminals is the user's stated comprehension limit — a design constraint, 
 
 **Single label writer.** One writing session per issue — the session sequencing it. An AFK subagent never writes a label; a HITL skill runs inline in the sequencing session, so its label writes are that session's own. That is what lets intake — the one skill whose deliverable is the label tuple itself — write its four-tuple identically under the overwatch or run standalone by the human. Every other label move is the overwatch's, made as a node finishes: no subagent can advance the board out from under the session that sequences it.
 
-**Readiness.** An issue overwatch may launch on any **unblocked** issue — every issue in its blocked-by set closed (see [issue-conventions § Relationships](/standards/tracking/issues.md)) — with intake as its first HITL node when the issue is untriaged. Crossing into an implementation node requires more: the issue must be a **leaf** (epics never dispatch) with a brief-complete body per the [tracking standard](/standards/tracking/issues.md). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label.
+**Readiness.** An issue overwatch may launch on any **unblocked** issue — every issue in its blocked-by set closed (see [issue authoring § Relationships](/standards/tracking/issue-authoring.md)) — with intake as its first HITL node when the issue is untriaged. Crossing into an implementation node requires more: the issue must be a **leaf** (epics never dispatch) with a brief-complete body per the [tracking standard](/standards/tracking/issue-authoring.md). Blocked is a derived state GitHub surfaces in the Issues tab and Projects, not a label.
 
 Anthropic subscription billing requires interactive sessions: the human launches each issue overwatch and is present at its turn boundaries.
 

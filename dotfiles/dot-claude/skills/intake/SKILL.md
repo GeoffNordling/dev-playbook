@@ -18,9 +18,9 @@ The front door for work. Input arrives under-formed and leaves as a ready issue 
 Before doing anything else, read end-to-end:
 
 - [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md) — label scheme, state-machine graph.
-- [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) — body format, brief principles, vertical-slice rules.
+- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) — body format, brief principles, vertical-slice rules.
 
-Then report: `READ: software-factory.md, issue-conventions.md`. Proceed only after.
+Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after.
 
 ## Process
 
@@ -33,7 +33,7 @@ Either way, invoke `/grill-with-docs` to sharpen the raw idea, then return — *
 
 ### 2. Decide one issue or many
 
-Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies — and on whether the slices roll up under a tracking **epic** ([issue conventions → Relationships](~/workspace/dev-playbook/standards/tracking/issues.md)). Size each slice to the context budget (issue conventions → vertical-slice rules): split anything whose build would push an agent past ~30% context. The build agent won't resize the work, so the split has to happen here. When **adopting** a stub that turns out to be a multi-issue plan, the stub becomes the epic — rewrite it as the epic rather than a slice, and create every slice as a new issue; if the user declines an epic, refine the stub into the first slice instead.
+Single coherent piece → one issue. Plan crossing concerns or layers → break into vertical slices, quizzing the user on granularity and dependencies — and on whether the slices roll up under a tracking **epic** ([issue authoring → Relationships](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). Size each slice to the context budget (issue authoring → vertical-slice rules): split anything whose build would push an agent past ~30% context. The build agent won't resize the work, so the split has to happen here. When **adopting** a stub that turns out to be a multi-issue plan, the stub becomes the epic — rewrite it as the epic rather than a slice, and create every slice as a new issue; if the user declines an epic, refine the stub into the first slice instead.
 
 ### 3. For each issue, pick the four-tuple
 
@@ -46,7 +46,7 @@ The four-tuple is per slice; an epic carries `category:*` alone, per software-fa
 
 ### 4. Draft the brief
 
-Per the issue conventions. When **adopting**, rewriting the stub's body into the brief format is mandatory — there is no path where intake adopts an issue and leaves the body unwritten. Structure what the user wrote, don't discard it.
+Per the issue authoring standard. When **adopting**, rewriting the stub's body into the brief format is mandatory — there is no path where intake adopts an issue and leaves the body unwritten. Structure what the user wrote, don't discard it.
 
 ### 5. Confirm, then land
 
@@ -88,7 +88,7 @@ If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`
 
 ### 6. Wire relationships
 
-When intake produced more than one issue, set the native relationships per [issue conventions → Relationships](~/workspace/dev-playbook/standards/tracking/issues.md). Neither has a `gh` subcommand, so use `gh api`; both endpoints take the target issue's internal `id` (not its number), so resolve that first. `{owner}`/`{repo}` are filled from the current repo.
+When intake produced more than one issue, set the native relationships per [issue authoring → Relationships](~/workspace/dev-playbook/standards/tracking/issue-authoring.md). Neither has a `gh` subcommand, so use `gh api`; both endpoints take the target issue's internal `id` (not its number), so resolve that first. `{owner}`/`{repo}` are filled from the current repo.
 
 Mark each ordered slice **blocked-by** its predecessor:
 

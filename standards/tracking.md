@@ -13,7 +13,8 @@ candidates, and repository settings. Pull requests belong to the
 ## Define
 
 - [standards/tracking/](/standards/tracking/index.md) — the contract:
-  candidate conventions, issue conventions, and repository settings
+  candidate conventions, issue authoring, tracker operations, and repository
+  settings
 
 ## Audit
 

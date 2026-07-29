@@ -1,15 +1,17 @@
 ---
 type: Standard
-title: Issue Conventions
-description: GitHub issue conventions — epic and leaf roles, readiness, the three brief formats, vertical slices, and native relationships
+title: Issue Authoring
+description: How a GitHub issue is authored — epic and leaf roles, readiness, the three brief formats, vertical slices, and native relationships
 ---
 
-# Issue Conventions
+# Issue Authoring
 
 How GitHub Issues are authored in workspace repos. An issue plays one of two
 **roles** and, as a leaf, moves through a **readiness** lifecycle; its body is
 the agent **brief**, in one of three formats. Applies at intake — when an idea,
-or a rushed stub, becomes one or many tracked issues.
+or a rushed stub, becomes one or many tracked issues. Driving the tracker
+itself — the commands that create, link, and close issues — is
+[tracker-operations.md](/standards/tracking/tracker-operations.md).
 
 An issue is **committed work**, at any size — an epic, an ordinary issue, or a
 one-line bug. Work not yet decided on is a Candidate in `CANDIDATES.md`
@@ -40,6 +42,22 @@ label).
 `design` node concluding the work is too big for one leaf: the session
 decomposes it in place, turning the issue into an epic and minting its children
 as ready leaves (see [software-factory.md's decompose exit](/software-factory/software-factory.md)).
+
+### Two species of epic
+
+The two roles are the whole model, but an epic comes in two species, told apart
+by what its children are *for*:
+
+- **Build epic** — children are build leaves, each a vertical slice of the
+  outcome. This is the default species, and the one the epic body below
+  describes.
+- **Wayfinder map** — a **planning** epic whose children are decision tickets:
+  research, prototype, grilling, and task tickets that resolve open questions
+  rather than ship slices. A map is driven by the `/wayfinder` skill, which owns
+  its body shape, its labels, and its working loop; the skill is the definition,
+  and this standard restates none of it. The tracker moves a map is driven
+  through are in
+  [tracker-operations.md](/standards/tracking/tracker-operations.md).
 
 ## Readiness
 
@@ -89,6 +107,9 @@ What should happen after the work is complete. Be specific about edge cases and 
 - Adjacent features that are separate
 ```
 
+A brief reporting broken behavior may add a `Steps to reproduce` heading; it is
+optional, unenforced, and changes none of the six.
+
 ### The spike brief (`mode:spike`)
 
 A spike is a **question** whose deliverable is an **answer**, not
@@ -122,12 +143,57 @@ Why the work was sliced this way — the ordering constraints and shared surface
 that shaped the slices.
 ```
 
+#### Optional sections
+
+A long-running epic accumulates two things the required sections have no home
+for: a boundary that keeps getting re-asked, and a ruling made after the
+decomposition that binds more than one child. Each gets an **optional** section,
+added when — and only when — the epic actually accrues one. A fresh epic carries
+neither, and most never grow them; an empty heading is boilerplate, not
+structure.
+
+```markdown
+**Out of scope:**
+- What this epic will not do, and why. Link the child, where one was closed as mis-scoped.
+
+**Standing rulings:**
+1. The ruling in one line, stated as the constraint it puts on children.
+```
+
+**Out of scope** is the epic's scope boundary: work consciously ruled outside
+the outcome, which will never become a child and does not come back as the epic
+progresses. A boundary earns a line exactly when a reader could reasonably have
+assumed the opposite. Work that is inside the outcome but not yet sliced is a
+different thing — a child not created yet, and the decomposition rationale's
+business. So is a leaf's `Out of scope` heading, which rules out gold-plating
+*within* one slice, usually deferring it to a sibling; an epic rules out work no
+sibling will ever pick up.
+
+**Standing rulings** holds the rulings that still point **forward** — decisions
+taken after the epic was written that constrain children not yet built. A ruling
+earns its place by governing unbuilt work, which is what makes this neither an
+index of closed children nor a changelog of every decision the epic ever took. A
+numbered list, appended to and never renumbered, since the number is how a child
+issue or a later session cites a ruling. A decision binding exactly one child
+belongs in that child's brief instead, and a hard-to-reverse decision meeting the
+Decision Record bar gets a record under `docs/decisions/`
+([records.md](/standards/decisions/records.md)) that outlives the epic.
+
 ## Brief principles
 
 - **Durability over precision.** The issue may sit for days or weeks. Describe interfaces, types, and behavioural contracts. File paths and line numbers go stale.
 - **Behavioural, not procedural.** Describe what the system should do, not how to implement it. The agent will explore and decide.
 - **Testable acceptance criteria.** Each criterion is independently verifiable.
 - **Explicit out-of-scope.** Prevents gold-plating.
+
+**The prototype snippet is the exception.** A brief may carry a concrete,
+verbatim snippet produced by a prototype session — the answer that prototype was
+built to yield, written to lift into real code unchanged. Durability is not at
+risk, because the snippet is the durable artifact: it is what survived the
+prototype, and the issue exists to spend it. Nor is it procedural, because it
+states the settled shape rather than the steps to reach it. The test is
+provenance — a snippet a prototype answered for, not an implementation the brief
+guessed at on the author's behalf.
 
 ## Vertical-slice rules
 

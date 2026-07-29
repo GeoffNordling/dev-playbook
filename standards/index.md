@@ -40,4 +40,4 @@ alphabetical; directories last.
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
 - [judgments/](/standards/judgments/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
-- [tracking/](/standards/tracking/index.md) — The tracking standard's contract — issue conventions and repository settings
+- [tracking/](/standards/tracking/index.md) — The tracking standard's contract, one concern per document — candidate conventions, issue authoring, repository settings, tracker operations

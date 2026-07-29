@@ -39,7 +39,7 @@ Repeat until the issue merges, closes, or a stop point (§7): place the issue at
 
 When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue. A node whose skill doesn't exist is an escalation, not an improvisation.
 
-**Readiness gates the implementation nodes.** Before crossing into an implementation node, confirm the issue is a leaf with a brief-complete body per the [tracking standard](~/workspace/dev-playbook/standards/tracking/issues.md); escalate if unmet.
+**Readiness gates the implementation nodes.** Before crossing into an implementation node, confirm the issue is a leaf with a brief-complete body per the [tracking standard](~/workspace/dev-playbook/standards/tracking/issue-authoring.md); escalate if unmet.
 
 ## 3. AFK delegation
 

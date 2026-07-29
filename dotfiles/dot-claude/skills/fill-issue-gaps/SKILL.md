@@ -13,7 +13,7 @@ A pre-implementation readiness pass for **one child issue of an epic**. The issu
 
 ## Read first
 
-Before doing anything else, read [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) end-to-end — the brief format the rewritten body must conform to. Then report `READ: issue-conventions.md` and proceed.
+Before doing anything else, read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end — the brief format the rewritten body must conform to. Then report `READ: issue-authoring.md` and proceed.
 
 ## Process
 
@@ -45,7 +45,7 @@ Present all three tiers in one tight message, recommendation-first on every deci
 
 ### 6. Rewrite the body in place
 
-Fold the resolved decisions and the drafted gap-sentences **directly into the brief** — sharpen the desired-behavior section, tighten the acceptance criteria, add the missing specifics inline. No "Update:" banner, no changelog, no amendment marker: the body must read as if it were authored complete. Preserve the brief format ([issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md)) and the four-tuple untouched. Fold in a mechanical note only where it changes what gets built; drop the rest. Write with `gh issue edit $0 --body`.
+Fold the resolved decisions and the drafted gap-sentences **directly into the brief** — sharpen the desired-behavior section, tighten the acceptance criteria, add the missing specifics inline. No "Update:" banner, no changelog, no amendment marker: the body must read as if it were authored complete. Preserve the brief format ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)) and the four-tuple untouched. Fold in a mechanical note only where it changes what gets built; drop the rest. Write with `gh issue edit $0 --body`.
 
 ### 7. Report
 
