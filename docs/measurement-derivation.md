@@ -15,9 +15,10 @@ how cost is joined in. Each rule carries the issue that settled it, so a
 reporting session derives from here rather than re-researching.
 
 All interpretation happens at report time. Capture appends rows and does
-nothing else (issue #255, ruling 16), which is what makes a metric change a
-query change rather than lost data — and what makes every rule below a query's
-obligation rather than a guarantee the store already meets.
+nothing else beyond one mechanical trim (issue #255, rulings 16 and 23), which
+is what makes a metric change a query change rather than lost data — and what
+makes every rule below a query's obligation rather than a guarantee the store
+already meets.
 
 ## Standing and amendment
 
@@ -35,7 +36,9 @@ ISO-8601, stamped when the hook received the event), `event`, `session_id`,
 `prompt_id`, `payload`. `event`, `session_id`, and `prompt_id` are promoted
 copies of the payload's `hook_event_name`, `session_id`, and `prompt_id`, kept
 as columns for querying convenience; `payload` holds the harness's JSON
-byte-verbatim and is the authority for every field, promoted or not. A
+byte-verbatim — bar the single trim named under
+[Event semantics](/docs/measurement-derivation.md#event-semantics) (#255,
+ruling 23) — and is the authority for every field, promoted or not. A
 promoted column is NULL whenever its key was absent or arrived as something
 other than a string — including the whole-row case where stdin was not
 parseable JSON at all.
@@ -107,8 +110,9 @@ assertion checks.
 | `Stop` | The end of an agent turn | `prompt_id` pairs the turn with the submission that started it. No `Stop` fires when a human interrupts with ESC; the turn simply ends. |
 | `SubagentStart` | A subagent dispatch — the dispatch signal | `agent_id` — the key a real `SubagentStop` matches on. Dispatches are counted here, never at `SubagentStop`. |
 | `SubagentStop` | A subagent finishing, plus phantoms | `agent_id`, which matches the stop to its `SubagentStart`; `agent_type` (empty on a phantom); and `agent_transcript_path` — on a real stop the child transcript outright, on a phantom a well-formed path to nothing, so any reader handles non-existence (#270). |
-| `PostToolUse`, Bash matcher | An executed Bash command | `tool_input` holds the command line as it ran — the source of phase transitions and session-to-issue binding. |
+| `PostToolUse` | An executed tool call, any tool | `tool_name` and `duration_ms` on every row. A Bash row is byte-verbatim: `tool_input` holds the command line as it ran — the source of phase transitions and session-to-issue binding — and `tool_response` its output. Every other tool's row is the envelope alone, with `tool_input` and `tool_response` dropped at capture and so deliberately absent — the one exception to byte-verbatim payloads (#255, ruling 23). The third assertion therefore expects `tool_input` on Bash rows only; on the rest, `tool_name` and `duration_ms` are the fields that carry meaning. |
 | `PostCompact` | A compaction — the context-pressure signal | — |
+| `Notification` | A harness notification, including the permission-request and waiting-on-human moments the bell announces | Unverified: capture of this event begins with the wiring that added it (#255, ruling 23), so no field is named here — and none asserted — until real payloads are read. |
 
 Two identity facts constrain all of the above. A subagent's own tool events
 carry the **parent** session's `session_id` and `transcript_path` (#258) —
@@ -219,7 +223,7 @@ nonzero count is real regardless.
 
 ## Session-to-issue binding
 
-A session binds to an issue through executed commands, not prose. A
+A session binds to an issue through executed commands, not prose. A Bash
 `PostToolUse` row whose `tool_input` holds a `gh issue edit <N> … phase:*`
 command is deterministic evidence that a phase moved for issue `<N>` in that
 session (#255, ruling 2). A command that never ran records nothing, and

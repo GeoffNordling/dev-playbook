@@ -7,7 +7,9 @@ appends one row and exits.
 
 Storage is append-only and uninterpreted: no parsing for meaning, filtering,
 or deduplication at write time — a row dropped here is one no future query
-can ask for.
+can ask for. The one exception is mechanical rather than interpretive: a
+PostToolUse for a tool other than Bash has `tool_input` and `tool_response`
+dropped unread, storing the envelope alone (#255, ruling 23).
 
 Failure discipline — the one sanctioned exception to this workspace's
 fail-loud rule: a session must never fail because measurement did. Every path
@@ -55,6 +57,11 @@ VALUES (?, ?, ?, ?, ?)
 # payload text and nowhere else.
 PROMOTED = ("hook_event_name", "session_id", "prompt_id")
 
+# The payload keys a non-Bash tool use loses before storage. Deleted by name,
+# never inspected: the trim is a fixed rule about which tool, not a judgment
+# about what the content was worth.
+TRIMMED = ("tool_input", "tool_response")
+
 
 def promoted_values(payload: str) -> tuple[str | None, ...]:
     """The promoted columns read out of one payload; NULL for whatever is absent.
@@ -76,6 +83,32 @@ def promoted_values(payload: str) -> tuple[str | None, ...]:
         # number or an object is still recorded whole; only the column is NULL.
         values.append(value if isinstance(value, str) else None)
     return tuple(values)
+
+
+def for_storage(payload: str) -> str:
+    """One payload as it is stored: the text that arrived, bar one trim.
+
+    A `PostToolUse` naming a tool other than Bash stores its envelope —
+    `tool_name`, `duration_ms`, and the rest — re-serialized without
+    `tool_input` and `tool_response`, because no query needs a Read's file text
+    or an Edit's diff (#255, ruling 23). Bash keeps its content: the factory's
+    standardized commands are what future queries read.
+
+    Everything this cannot positively identify as a non-Bash tool use is
+    returned untouched, including stdin that does not parse and a `PostToolUse`
+    with no string `tool_name` — a payload that cannot be classified is the one
+    most worth keeping whole.
+    """
+    try:
+        parsed = json.loads(payload)
+    except ValueError:
+        return payload
+    if not isinstance(parsed, dict) or parsed.get("hook_event_name") != "PostToolUse":
+        return payload
+    tool_name = parsed.get("tool_name")
+    if not isinstance(tool_name, str) or tool_name == "Bash":
+        return payload
+    return json.dumps({k: v for k, v in parsed.items() if k not in TRIMMED})
 
 
 def record(received_at: str, payload: str) -> None:
@@ -127,7 +160,7 @@ def main() -> None:
         # the locale, which is not UTF-8 everywhere a session might start, and
         # a payload that cannot be decoded is still a payload worth keeping.
         raw = sys.stdin.buffer.read()
-        record(received_at, raw.decode("utf-8", errors="replace"))
+        record(received_at, for_storage(raw.decode("utf-8", errors="replace")))
     except BaseException as error:
         note_failure(received_at, error)
 
