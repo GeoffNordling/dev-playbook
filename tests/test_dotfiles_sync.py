@@ -192,30 +192,30 @@ def test_a_package_target_is_never_a_stray(tmp_path: Path) -> None:
 
 
 def test_mirror_skills_links_an_externally_managed_skill(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "zoom-out")
+    dotfiles = a_dotfiles_tree(tmp_path, "external")
 
     mirrored = mirror_skills(dotfiles)
 
-    link = dotfiles / "dot-claude" / "skills" / "zoom-out"
-    assert mirrored == ["zoom-out"]
-    assert link.resolve() == (dotfiles / ".agents" / "skills" / "zoom-out").resolve()
+    link = dotfiles / "dot-claude" / "skills" / "external"
+    assert mirrored == ["external"]
+    assert link.resolve() == (dotfiles / ".agents" / "skills" / "external").resolve()
 
 
 def test_mirror_skills_reports_nothing_on_a_second_run(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "zoom-out")
+    dotfiles = a_dotfiles_tree(tmp_path, "external")
     mirror_skills(dotfiles)
 
     assert mirror_skills(dotfiles) == []
 
 
 def test_mirror_skills_drops_a_link_whose_skill_was_removed(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "zoom-out")
+    dotfiles = a_dotfiles_tree(tmp_path, "external")
     mirror_skills(dotfiles)
-    (dotfiles / ".agents" / "skills" / "zoom-out").rmdir()
+    (dotfiles / ".agents" / "skills" / "external").rmdir()
 
     mirror_skills(dotfiles)
 
-    assert not (dotfiles / "dot-claude" / "skills" / "zoom-out").is_symlink()
+    assert not (dotfiles / "dot-claude" / "skills" / "external").is_symlink()
 
 
 def test_mirror_skills_refuses_to_shadow_an_authored_skill(tmp_path: Path) -> None:

@@ -124,10 +124,10 @@ that shaped the slices.
 
 ## Brief principles
 
-- **Self-contained for a blind reader.** The implementer reads the issue blind — holding only the body and the repo, never the refinement conversation, its notes, or its scratch files. Every brief is certified against that reader before it is written to GitHub:
-  - no private vocabulary from the refinement — worker ids, wave, probe, or checkpoint numbers, internal bucket names;
+- **Self-contained for a blind reader.** The implementer holds the issue as GitHub shows it — body and comments — plus the repo, never the refinement conversation, its notes, or its scratch files. Every brief is certified against a reader holding the body alone, before it is written to GitHub:
+  - no vocabulary private to the conversation that produced the issue — internal ids, phase or batch numbers, working category names;
   - every referenced artifact repo-resident — a path, file, or command the implementer can open;
-  - findings folded in as flat claims rather than citations to private evidence: "the `--refuted` flag has no caller", not "probe P4 refuted the caller hypothesis";
+  - findings folded in as flat claims rather than citations to private evidence: "the `--refuted` flag has no caller", not "the investigation refuted the caller hypothesis";
   - acceptance criteria runnable with only the repo in hand;
   - cross-references GitHub-native — blocked-by edges and issue links, never "as discussed" or "see the map".
 - **Durability over precision.** The issue may sit for days or weeks. Describe interfaces, types, and behavioural contracts. File paths and line numbers go stale.

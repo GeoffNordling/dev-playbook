@@ -313,7 +313,7 @@ this more than wishful:
   shape (gates, stops, transitions, artifacts) makes them the easiest to
   constrain: strict grammar there (today, the factory-node skills — intake,
   tdd, the reviews). Skills the human watches at every invocation, where a
-  bad run costs one conversational turn, stay free (orient, usage-report). "Can
+  bad run costs one conversational turn, stay free (orient, doc-rewrite). "Can
   be anything" remains available; it stops being the default for
   load-bearing skills.
 

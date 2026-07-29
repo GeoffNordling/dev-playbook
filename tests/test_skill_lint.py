@@ -117,19 +117,19 @@ def test_repo_self_scan_is_clean() -> None:
 
 def test_missing_mirror_symlink_is_a_skill_mirror_finding(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
-    agents_skill(repo, "caveman")
-    claude_skills_dir(repo)  # exists, but carries no mirror symlink for caveman
+    agents_skill(repo, "external")
+    claude_skills_dir(repo)  # exists, but carries no mirror symlink for external
 
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
     assert "claude-code.skill-mirror" in result.stdout
-    assert "caveman" in result.stdout
+    assert "external" in result.stdout
 
 
 def test_agents_tree_without_mirror_dir_fails_loudly(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
-    agents_skill(repo, "caveman")
+    agents_skill(repo, "external")
     # dotfiles/dot-claude/skills/ deliberately absent: an error state, since the
     # mirror directory always exists in a repo that has externally-managed skills.
 
@@ -167,8 +167,8 @@ def test_list_rules_includes_skill_mirror(tmp_path: Path) -> None:
 
 def test_correctly_mirrored_tree_is_clean(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
-    agents_skill(repo, "caveman")
-    mirror_link(repo, "caveman", "../../.agents/skills/caveman")
+    agents_skill(repo, "external")
+    mirror_link(repo, "external", "../../.agents/skills/external")
 
     result = run(repo)
 
