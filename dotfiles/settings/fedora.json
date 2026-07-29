@@ -90,7 +90,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -119,6 +119,11 @@
           {
             "type": "command",
             "command": "paplay /usr/share/sounds/freedesktop/stereo/bell.oga"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/measure-event\"",
+            "async": true
           }
         ]
       }
