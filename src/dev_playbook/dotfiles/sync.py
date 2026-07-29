@@ -24,7 +24,7 @@ PACKAGES = {
 }
 
 # stow itself, plus what the hooks this installs go on to call.
-REQUIRED_TOOLS = ("stow", "git", "jq")
+REQUIRED_TOOLS = ("stow", "git", "jq", "python3")
 
 LOADER_MARKER = "# >>> dev-playbook bashrc.d loader >>>"
 LOADER = f"""
