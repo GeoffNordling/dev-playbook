@@ -76,9 +76,9 @@ RULES = (
 )
 
 # The required headings of each brief format, stated here exactly as
-# standards/tracking/issue-authoring.md states them — the doc and this rule read one
-# contract and cannot disagree. A build leaf (mode:sdd, mode:direct) carries all
-# six; a spike leaf carries the spike shape.
+# standards/tracking/issue-authoring.md states them — the doc and this rule
+# read one contract and cannot disagree. A build leaf (mode:sdd, mode:direct)
+# carries all six; a spike leaf carries the spike shape.
 BUILD_HEADINGS = (
     "Summary",
     "Current behavior",

@@ -55,8 +55,7 @@ comes in two species, told apart by what its children are *for*:
   research, prototype, grilling, and task tickets that resolve open questions
   rather than ship slices. A map is driven by the `/wayfinder` skill, which owns
   its body shape, its labels, and its working loop; the skill is the definition,
-  and this standard restates none of it. The tracker moves a map is driven
-  through are in
+  and this standard restates none of it. Its tracker moves are in
   [tracker-operations.md](/standards/tracking/tracker-operations.md).
 
 A decision ticket is **not a factory leaf** and carries none of a leaf's
