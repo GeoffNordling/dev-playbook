@@ -16,8 +16,9 @@ from ordinary files, and what each may contain.
   registry and the CLAUDE.md content standard; start at Files
 - [Skill Conventions](/standards/claude-code/skill-conventions.md) — the skill-bundle
   format
-- [Skill Management](/standards/claude-code/skill-management.md) — where skills live
-  and the authored/installed mirror rule
+- [Skill Management](/standards/claude-code/skill-management.md) — how a
+  third-party skill is taken in, as a recorded sweep landing one record in a
+  dated series; then where skills live and the authored/installed mirror rule
 
 ## Audit
 

@@ -24,7 +24,7 @@ A sweep runs five steps, in order:
 
 Every sweep lands exactly one record in `docs/skill-management/`, named `YYYY-MM-DD-<source>.md` for the date it ran and the source it swept, and listed in [the series index](/docs/skill-management/index.md).
 
-A record carries two parts:
+A record declares `type: Survey` in its OKF frontmatter — it is an evaluative comparison gathered to inform the owner's verdict — and carries two parts:
 
 - **A dual-SHA header.** Both repos as pinned in step 2 — the upstream source and dev-playbook, each with its commit SHA and that commit's timestamp.
 - **One row per upstream skill.** The skill, how it compares against what the workspace already holds, and the human's verdict on it.

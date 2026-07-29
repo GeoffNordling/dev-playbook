@@ -31,7 +31,7 @@ profile. See [the OKF bundle boundary](/standards/docs/bundle.md).
 ```yaml
 ---
 name: <skill-name>
-description: <one-line summary>
+description: <what the skill does>. Use when <triggers>.
 disable-model-invocation: <true|false>
 model: <haiku|sonnet|opus|fable|inherit>
 effort: <low|medium|high|xhigh>
@@ -53,7 +53,7 @@ Every skill must have all five of these:
 | `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory — always present, never omitted. One mechanical fact bears on the choice, and it is about this frontmatter field alone: **the `model` pin governs only the turn that loads the skill**, reverting to the session model on the next prompt. So a pin binds a single-turn or batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
-**Model and effort are always the user's explicit decisions** — never an agent
+**A skill's `model` and `effort` are always the user's explicit decisions** — never an agent
 choice, never a machinery default; `inherit` is a permissible choice like any
 other, and no new frontmatter fields carry them.
 
@@ -68,7 +68,7 @@ something this standard sanctions.
 |-------|-----------------|
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
-| `disallowed-tools` | Denies a tool the skill must never reach, whatever the session's permissions would otherwise allow. Same format as `allowed-tools` — space-separated tool specs, e.g. `AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)`. Use it where an instruction alone is too weak to carry a guarantee. The standing example is the reviewer read-only guarantee: a review skill reports findings and never rewrites the work under review, so it denies the Edit/Write family in frontmatter rather than in prose. |
+| `disallowed-tools` | Denies a tool the skill must never reach, whatever the session's permissions would otherwise allow. Same format as `allowed-tools` — space-separated tool specs, e.g. `AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)`. Use it where an instruction alone is too weak to carry a guarantee. The standing example is the reviewer read-only guarantee: a review skill reports findings and never rewrites the work under review, so it denies the Edit/Write family in frontmatter rather than in prose. It takes both rows — `disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)` paired with `allowed-tools: Write(//tmp/**)` — because the deny is scoped by path (`/**` is the project tree, `//tmp/**` an absolute location outside it), and a review skill still has to stage its findings somewhere before posting them. |
 
 ### Fields we do not use
 
