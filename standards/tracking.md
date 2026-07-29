@@ -1,13 +1,14 @@
 ---
 type: Standard-Card
 title: Tracking
-description: Card for the tracking standard — how committed and uncommitted work is tracked through issues, candidates, and repository settings
+description: Card for the tracking standard — how committed and uncommitted work is tracked through issue authoring, tracker operations, candidates, and repository settings
 ---
 
 # Tracking
 
-Governs how work is tracked — committed work as issues, uncommitted work as
-candidates, and repository settings. Pull requests belong to the
+Governs how work is tracked — committed work as issues, from authoring a body
+to driving the tracker it lives in; uncommitted work as candidates; and
+repository settings. Pull requests belong to the
 [software factory standard](/software-factory/software-factory.md).
 
 ## Define

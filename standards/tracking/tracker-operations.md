@@ -14,10 +14,11 @@ covers the commands that move issues around.
 
 ## The issue surface
 
-- **Create** — `gh issue create --title "..." --body "..."`, a heredoc carrying
-  any multi-line body.
+- **Create** — `gh issue create --title "..." --body "$(cat <<'EOF' … EOF)"`,
+  a quoted heredoc so a multi-line body reaches the tracker with its backticks
+  and `$` unexpanded.
 - **Read** — `gh issue view <n> --comments`. Without the flag the body loads
-  alone, which is the cheaper read when the thread is archive.
+  alone, the cheaper read when the comment thread is pure archive.
 - **List** — `gh issue list --state open --json number,title,labels`, narrowed
   with `--label` and `--state` and shaped with `--jq`.
 - **Comment** — `gh issue comment <n> --body "..."`.
@@ -63,12 +64,11 @@ method; the tracker moves it makes are these.
 - **Ticket** — a child issue linked to the map as a native sub-issue, labelled
   `wayfinder:<type>` (`research`, `prototype`, `grilling`, or `task`).
 - **Ordering** — a ticket that must wait for another is linked blocked-by it.
-- **Frontier** — the map's open children, minus any carrying an open blocker or
-  an assignee; first in map order wins.
-- **Claim** — `gh issue edit <n> --add-assignee @me`, the session's first write.
+- **Frontier** — the map's open children, read with
+  `gh api repos/{owner}/{repo}/issues/<map>/sub_issues --jq '.[] | select(.state == "open") | .number'`
+- **Claim** — `gh issue edit <n> --add-assignee @me`.
 - **Resolve** — `gh issue comment <n>` carries the answer and
-  `gh issue close <n>` closes the ticket, after which the map gains a pointer to
-  it.
+  `gh issue close <n>` closes the ticket.
 
 ## Upstream seed
 

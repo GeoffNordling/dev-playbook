@@ -23,9 +23,9 @@ authored.
 
 ## Roles: epic and leaf
 
-Every issue is exactly one of two roles. The role is **derived**, never a label —
-the same principle as *blocked* (a derived dependency state, never minted as a
-label).
+Every issue carrying build work through the software factory is exactly one of
+two roles. The role is **derived**, never a label — the same principle as
+*blocked* (a derived dependency state, never minted as a label).
 
 - **Leaf** — the unit of work. A leaf is dispatched through the
   [software factory graph](/software-factory/software-factory.md) and carries the full four-tuple
@@ -45,8 +45,8 @@ as ready leaves (see [software-factory.md's decompose exit](/software-factory/so
 
 ### Two species of epic
 
-The two roles are the whole model, but an epic comes in two species, told apart
-by what its children are *for*:
+The two roles are the whole model for factory-tracked build work, but an epic
+comes in two species, told apart by what its children are *for*:
 
 - **Build epic** — children are build leaves, each a vertical slice of the
   outcome. This is the default species, and the one the epic body below
@@ -58,6 +58,11 @@ by what its children are *for*:
   and this standard restates none of it. The tracker moves a map is driven
   through are in
   [tracker-operations.md](/standards/tracking/tracker-operations.md).
+
+A decision ticket is **not a factory leaf** and carries none of a leaf's
+obligations: no four-tuple labels, no dispatch through the software factory
+graph, no build-leaf or spike brief. What a ticket does carry is the
+`/wayfinder` skill's to define.
 
 ## Readiness
 
