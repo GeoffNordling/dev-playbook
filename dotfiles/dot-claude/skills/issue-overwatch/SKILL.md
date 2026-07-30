@@ -1,6 +1,6 @@
 ---
 name: issue-overwatch
-description: Executes one issue's whole traverse through the software factory graph — dispatches every node, writes the labels, and stops wherever only the human can act. Launched per issue from Agent view.
+description: Executes one issue's whole traverse through the software factory graph — dispatches every node, writes the labels, and stops wherever only the user can act. Launched per issue from Agent view.
 disable-model-invocation: true
 model: inherit
 effort: xhigh
@@ -88,7 +88,7 @@ The semantic judgment gate is deferred to the very end of the traverse: every in
 2. **Commit the fixes inline** with the user's go-ahead, as with any HITL node's work. Judgment fixes never reopen review: no new cycle, no fresh audit — the user has already approved the substance.
 3. **Close green:** confirm with `make check-judgments`, then continue the approve sequence (§5) — refresh the merge message, and hand the user the final verified push (§7) if fixes were committed; with none, origin already holds the final diff and there is nothing to push.
 
-## 7. Turn boundaries — the human's commands
+## 7. Turn boundaries — the user's commands
 
 End your turn wherever only the user can act, stating the command once, paste-safe, one line:
 
