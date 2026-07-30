@@ -14,3 +14,4 @@ Ordering: reading order.
 - [Distribution](/standards/build/distribution.md) — The distribution channel — the pre-commit hook repo, pinned revs, dogfooding, and the rev-bump release
 - [Thin CI](/standards/build/ci.md) — Thin CI — the byte-identical workflow that runs exactly the hook suite on every push and PR
 - [Enforcement](/standards/build/enforcement.md) — The gate ladder — the three rungs where checks block the path to main, and the detector that owns each rule
+- [Bootstrap](/standards/build/bootstrap.md) — The fresh-repo procedure — repo-init scaffolds the conforming tree; GitHub creation, labels, settings, and roster enrollment complete adoption

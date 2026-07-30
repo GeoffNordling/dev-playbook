@@ -1,0 +1,26 @@
+#!/usr/bin/env -S uv run --script
+"""repo-init — scaffold a fresh workspace repository conforming to the build standard.
+
+Creates ~/workspace/<name> (override with --parent) with the base-layer
+skeleton — README.md, CLAUDE.md, index.md, .gitignore, the canonical
+.pre-commit-config.yaml pinned at dev-playbook's origin/main, Makefile, thin
+CI — and, with --python, the python layer: canonical pyproject.toml,
+.python-version, src/<package>/ with an empty __init__.py, tests/, and a
+uv.lock. Then runs git init -b main, stages everything, installs both
+pre-commit stages, and self-checks the result with repo-lint. The remaining
+GitHub-side steps are the bootstrap procedure
+(standards/build/bootstrap.md).
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.repo_init import main  # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(main())

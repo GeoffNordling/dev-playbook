@@ -38,4 +38,5 @@ Governs how a repository is laid out, built, and checked.
 
 ## Adopt
 
-- none
+- [Bootstrap](/standards/build/bootstrap.md) — the fresh-repo procedure:
+  scaffold with `repo-init`, then the GitHub tail and roster enrollment
