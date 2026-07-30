@@ -1,16 +1,16 @@
 ---
 type: Guide
 title: PR Feedback
-description: The comment surfaces a pull request carries, and how an implementation node re-enters on a rework lap
+description: The comment surfaces a pull request carries, and how a committing node re-enters on a rework lap
 ---
 
 # PR Feedback
 
 A pull request's feedback is spread across four surfaces, and no single `gh`
 command shows them all. This is what a node reads to see the whole of it, and
-how an implementation node re-enters when that feedback is its work list.
+how a committing node re-enters when that feedback is its work list.
 
-Reading is kept apart from reviewing on purpose: an implementation node loads
+Reading is kept apart from reviewing on purpose: a committing node loads
 this only on a rework lap, and never needs the
 [review contract](/software-factory/review-contract.md) to learn how to read a
 pull request.
@@ -32,7 +32,7 @@ two, so the two `gh api` calls carry the rest: a read that stops at
 
 ## Rework re-entry
 
-An implementation node checks for an existing PR with `gh pr view`:
+A committing node checks for an existing PR with `gh pr view`:
 
 - **A PR exists** — review has already run, and the complete feedback above is
   the rework work list.

@@ -21,7 +21,7 @@ Governs how an idea becomes a merged pull request.
 - [software-factory/review-contract.md](/software-factory/review-contract.md) — what the code
   and doc reviews do once dispatched: gate, cycle, findings comment, escalation boundary
 - [software-factory/pr-feedback.md](/software-factory/pr-feedback.md) — the comment surfaces a
-  PR carries, and how an implementation node re-enters on a rework lap
+  PR carries, and how a committing node re-enters on a rework lap
 - [software-factory/refactor-catalogue.md](/software-factory/refactor-catalogue.md) — the
   refactor candidates a build node looks for, and the step-size rule governing them
 
