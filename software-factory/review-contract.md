@@ -1,28 +1,31 @@
 ---
 type: Guide
 title: Review Contract
-description: The contract every factory review node runs under — its parameters, green gate, findings comment, and escalation boundary
+description: The contract the code and doc reviews run under — its parameters, green gate, findings comment, and escalation boundary
 ---
 
 # Review Contract
 
-What a review does once it is dispatched: the gate it runs before reading
-anything, the comment it leaves behind, and the line between a finding and an
-escalation. Which reviews run at a stop is
+What the code and doc reviews do once dispatched: the gate they run before
+reading anything, the comment they leave behind, and the line between a finding
+and an escalation. Which reviews run at a stop is
 [factory-operations.md](/software-factory/factory-operations.md#the-review-stop);
 how a pull request's existing feedback is read is
 [pr-feedback.md](/software-factory/pr-feedback.md).
 
-## The four parameters
+The bug review is a **partial citer**, bound only by the clauses it names at
+their point of use — judgments, anchoring, and the escalation boundary. It runs
+no gate, counts no cycle, and sets no Blocking severity, so the rest of this
+document passes it by.
 
-A review supplies four values and inherits everything below them:
+## The three parameters
 
-- **Review name** — the review's own name, `Code review` or `Doc review`. It
-  heads the comment and it is what the cycle count counts.
+A citing review supplies three values and inherits everything below them:
+
+- **Review name** — the review's own name, `Code review` for instance. It heads
+  the comment and it is what the cycle count counts.
 - **Staging filename** — the `/tmp` path the comment body is written to before
   posting.
-- **Post target** — where the comment lands: `gh pr comment` on the issue's PR,
-  or `gh issue comment <issue>` on the issue itself.
 - **What counts as Blocking** — one line, and it differs by review: a code
   review's Blocking is not a doc review's.
 
@@ -72,12 +75,12 @@ noticed incidentally is still reported.
 ## The findings comment
 
 The body is staged in the review's staging file — writes inside the worktree are
-denied, `/tmp` is allowed — and posted as one comment with `--body-file <path>`
-to the review's post target.
+denied, `/tmp` is allowed — and posted as one comment on the issue's PR with
+`gh pr comment --body-file <path>`.
 
 **The header carries the revision and the cycle.**
 `## <Review name> — <sha> · cycle <n>`, using the short HEAD sha
-(`git rev-parse --short HEAD`). Where the target already carries a prior comment
+(`git rev-parse --short HEAD`). Where the PR already carries a prior comment
 under this review's name, the header reads
 `## <Review name> — <sha> · cycle <n> (supersedes review of <prior-sha>)` and the
 comment opens with a one-line disposition of each prior finding — resolved or

@@ -65,7 +65,7 @@ You work without approval, but when something falls outside the plan — anythin
 ESCALATE: <repo>#<issue> · phase: build · <where you're stuck and the call you need>
 ```
 
-The user reads it, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md adds its own triggers to these:
+The user reads it, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries a further set of its own. In particular:
 
 - **The brief is wrong or underdetermined.** The work reveals the brief is mistaken, or it doesn't pin down what's wanted tightly enough to act. The brief is the user's; you don't edit the issue — surface it and let the user amend the issue or redirect.
 - **The tests label is wrong.** `tests:no` work turns out to touch behavior that should be covered by tests, or `tests:yes` work turns out to have no behavior to drive a test from — the issue was mis-triaged. Surface it; the user decides the label.

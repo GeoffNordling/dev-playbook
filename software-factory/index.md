@@ -13,4 +13,4 @@ Ordering: reading order.
 - [Skill authoring](/software-factory/skill-authoring.md) — Voice, content rules, and mechanics for authoring the software factory's phase node-skills
 - [PR Feedback](/software-factory/pr-feedback.md) — The comment surfaces a pull request carries, and how an implementation node re-enters on a rework lap
 - [Refactor Catalogue](/software-factory/refactor-catalogue.md) — The refactor candidates a build node looks for at slice and chunk scope, and the step-size rule governing them
-- [Review Contract](/software-factory/review-contract.md) — The contract every factory review node runs under — its parameters, green gate, findings comment, and escalation boundary
+- [Review Contract](/software-factory/review-contract.md) — The contract the code and doc reviews run under — its parameters, green gate, findings comment, and escalation boundary

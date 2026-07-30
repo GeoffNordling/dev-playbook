@@ -23,13 +23,12 @@ Read all three end-to-end, then report `READ: review-contract.md, pr-feedback.md
 - [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — every comment surface a PR carries, and the command that reaches each.
 - [doc conventions](~/workspace/dev-playbook/standards/prose/conventions.md) — the contract every doc answers to, whatever the diff holds.
 
-Your values for the contract's four parameters:
+Your values for the contract's three parameters:
 
 | Parameter | Value |
 |---|---|
 | Review name | `Doc review` |
 | Staging filename | `/tmp/doc-review-<issue>.md` |
-| Post target | `gh pr comment` on the issue's PR |
 | Blocking | a fidelity gap, a missed knock-on update, a contradiction between docs, a convention breach that matters |
 
 ## 1. Load context

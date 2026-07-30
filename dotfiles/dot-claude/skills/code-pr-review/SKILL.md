@@ -24,13 +24,12 @@ Read both end-to-end, then report `READ: review-contract.md, pr-feedback.md`. Pr
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md) — the stance, the green gate, the cycle count, the findings comment, the escalation boundary.
 - [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — every comment surface a PR carries, and the command that reaches each.
 
-Your values for the contract's four parameters:
+Your values for the contract's three parameters:
 
 | Parameter | Value |
 |---|---|
 | Review name | `Code review` |
 | Staging filename | `/tmp/code-review-<issue>.md` |
-| Post target | `gh pr comment` on the issue's PR |
 | Blocking | a fidelity gap, a convention breach that matters, a bug |
 
 ## 1. Load context

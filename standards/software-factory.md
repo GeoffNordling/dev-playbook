@@ -18,6 +18,12 @@ Governs how an idea becomes a merged pull request.
   point where the factory stops for the human, and what it owes them there
 - [software-factory/skill-authoring.md](/software-factory/skill-authoring.md) — voice and
   mechanics for the node skills
+- [software-factory/review-contract.md](/software-factory/review-contract.md) — what the code
+  and doc reviews do once dispatched: gate, cycle, findings comment, escalation boundary
+- [software-factory/pr-feedback.md](/software-factory/pr-feedback.md) — the comment surfaces a
+  PR carries, and how an implementation node re-enters on a rework lap
+- [software-factory/refactor-catalogue.md](/software-factory/refactor-catalogue.md) — the
+  refactor candidates a build node looks for, and the step-size rule governing them
 
 ## Audit
 
