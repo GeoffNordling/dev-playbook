@@ -34,6 +34,13 @@ the worktree is gone, escalate (§5) — don't start a fresh tree.
 Treat this diff as the whole review scope; no PR or an empty diff is an
 escalation (§5).
 
+**Judgments are not yours.** Never run the repo's semantic judgment gate —
+no `make check-judgments`, no bare `uv run pytest`, no judge. The user
+settles those judgments at the end of the traverse, so a stale or red
+judgment cache is the expected state here. Act as though judgments do not
+exist: skip any `judgments/*.yaml` the diff touches, and let no finding
+mention a judgment, its verdict, or its cache state.
+
 ## 2. Find candidates
 
 Run the **eight finder angles** defined in

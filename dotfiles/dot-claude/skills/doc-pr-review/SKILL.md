@@ -30,6 +30,8 @@ Review the documentation in an issue's PR diff against its issue brief, the doc 
 
 Run the gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root). Green: proceed to the audit. Red: the PR sits over a red tree — escalate (§5) rather than review broken work. Don't run individual lint tools yourself; where there's no `make check` to run, proceed to the audit.
 
+**Judgments are not yours.** `make check` leaves the repo's semantic judgment gate skipped, and that is the whole gate you run — never `make check-judgments`, never a bare `uv run pytest`, never a judge. The user settles those judgments at the end of the traverse; until then the cache is expected to be stale or red, and any skipped-judgment lines in the gate output are noise. Act as though judgments do not exist: skip any `judgments/*.yaml` the diff touches, cite no judgment's claim, and let no finding mention a judgment, its verdict, or its cache state.
+
 ## 3. Audit the change
 
 Read the changed docs whole, not as hunks — the brief and the docs together — against the standards they answer to. Pin each finding to its file and line and the rule or criterion it breaches.

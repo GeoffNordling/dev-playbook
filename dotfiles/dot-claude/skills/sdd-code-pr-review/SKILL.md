@@ -46,6 +46,8 @@ Then report: `READ: spec-standard.md, testing-conventions.md, python-style.md, m
 
 Run the gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root). Green: proceed to the audit. Red: build opened a PR over a red tree — escalate (§5) rather than review broken work. Don't run individual lint tools yourself.
 
+**Judgments are not yours.** `make check` leaves the repo's semantic judgment gate skipped, and that is the whole gate you run — never `make check-judgments`, never a bare `uv run pytest`, never a judge. The user settles those judgments at the end of the traverse; until then the cache is expected to be stale or red, and any skipped-judgment lines in the gate output are noise. Act as though judgments do not exist: skip any `judgments/*.yaml` the diff touches, cite no judgment's claim, and let no finding mention a judgment, its verdict, or its cache state.
+
 ## 3. Audit the change
 
 Read the change as a whole — the spec and the code together — against the conventions. Assess each dimension and collect what you find, pinning each finding to the file and line and the rule or spec item it breaches.
