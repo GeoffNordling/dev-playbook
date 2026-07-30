@@ -27,7 +27,7 @@ Two terminals, side by side. This file is the sole handoff artifact: any fresh s
    - **Pause 2 — judgments, conditional.** After review approves, the overwatch runs the judgments node as preparation for the final read. It pauses only when a failure's fix is ambiguous enough to want human advice; a clean green run pauses nothing.
    - **Pause 3 — final PR review.** The human reads the entire final diff and decides the merge. Presented 100% done: judgments green, merge message refreshed, verified push handed over, closing brief. Nothing left but the read and the merge.
 2. **Dedicated judgments node** at the end, after all review/rework cycles — judgments are expensive, slow, false-alarm-prone; keep attention off them during normal cycles.
-3. **software-factory.md split** into sub-files (currently a 227-line monolith).
+3. **software-factory.md split** into sub-files (landed at U3: hub + factory-operations.md + human-checkpoints.md).
 4. **Skills re-evaluated from scratch**, plus dedup into shared reference files with progressive disclosure.
 5. **Intake and design move outside the factory** — pre-factory intent extraction producing a factory-ready issue.
 6. **SDD stripped** (ratified 2026-07-30) — the factory does not support SDD for now; labels stay in the data, and the factory halts on any SDD-labeled issue.
@@ -55,59 +55,23 @@ Two terminals, side by side. This file is the sole handoff artifact: any fresh s
   - fill-issue-gaps deleted outright; /idea and mission-control's inbox/curation are out of scope entirely.
 - **U2 — skill mapping (ratified 2026-07-30):** the dispatch table is factory-only — `build` (`/build`, AFK, carries the commit token, TDD reference hard-gated on `tests:yes`), `pr_review` (`/open-pr` then the review tracks, AFK audits, verdict stop = pause 1), `judgments` (no skill — the overwatch runs `/run-judgments` inline; conditional pause 2). `/intake`, `/design`, `/candidate-promote` are definition-region, user-invoked, never dispatched. The `spike` node deliberately has **no skill** — a user-run session writes findings to the issue and closes it; skill-less nodes are an escalation only inside the factory. `pr_review` stays a single diamond: track selection (code/doc/fidelity) is a rule inside the one stop.
 - The user personally reviews every implementer diff before /commit — audit dispatches look for **mistakes and omissions only**, never brief-deviation reporting.
+- **Skills vs docs (ratified 2026-07-30, during U3):** logic and instructions read by **more than one actor** live in a document (software-factory.md or its sub-files) and are referenced from the skills; logic exercised by **exactly one skill** lives in that skill. Governs all remaining skill rewrites (U4–U6).
 
 ## Units — work in order
 
 Each unit lands whole before the next starts. U4→U5 is a real dependency (overwatch cites U4's files); U6 needs only U1+U3.
 
-**Next:** U3 — the first implementer unit; both design sessions (U1 definition region, U2 graph) are closed and fully ratified in Decisions. The SDD strip is landed in the codebase.
+**Next:** U4. U3 is landed (`ce9c49f` + `c0628b4`, audited): the factory docs are `software-factory/software-factory.md` (hub: graph, labels, parity, SDD halt) + `factory-operations.md` (states, transitions, engagement, permissions) + `human-checkpoints.md` (pause-1 and pause-3 contracts); scheme has `phase:judgments` and no `phase:tdd`; `make check` green. The audit's residual findings are folded into the unit briefs below as **U3 residuals**; skills still citing `tdd` are expected interim state until their owning unit rewrites them.
 
-- [ ] **U3 — doc restructure.** Rewrite `software-factory/software-factory.md` around the ratified whole-system graph — embed the mermaid and skill table from the section below **as drawn**: two-region opening per the U1 partition, definition region states, the factory line, the parity invariant (wording in Decisions), the SDD halt rule kept. Split into sub-files under `software-factory/`: the exact layout is the implementer's proposal — put it to the user at session start before writing (expectation: a hub doc plus contract sub-files; okf-lint requires an index + frontmatter per doc). Author the pause-1 four-part escalation-brief format and the pause-3 final-presentation contract (the conditional pause-2 text is U5's, not here); one home per rule. `standards/tracking.md` card gains the lifecycle pointer per the ownership split. `label_scheme.json`: add `phase:judgments`, drop `phase:tdd` — scheme and graph move together to preserve parity; update any tests naming those values. Re-point 12 inbound files / 9 anchors (ref-lint validates anchors; okf-lint forces index entries + frontmatter); fix un-linted stale refs: `scripts/bootstrap-labels` + `label_scheme.py` docstrings cite software-factory.md, `scripts/README.md:134` claims bootstrap-labels is "auto-invoked by /intake" (false); issues.md's spike-brief section cites "software-factory.md's spike path", which the graph no longer carries — re-point to the spike's definition-region home. No consumer pin bump (doc/label/dotfiles changes don't touch the published playbook-lint hook); consumers re-run bootstrap-labels after label changes. SDD-strip residuals to sweep: `workspace_lint.py:78` guard comment is now false (claims issues.md and the headings rule "cannot disagree" — post-strip the doc heading says `mode:direct` only while the code still routes sdd); the live `mode:sdd ⇒ tests:yes` lint rule has no doc home; the skill-families bullet in `standards/claude-code/skill-conventions.md` needs a non-sdd example.
-- [ ] **U4 — #276 dedup + the tdd/build merge** (design of record: issue #256 comment 5109029948; SDD skills deleted at U0). **The merge lands here:** delete `/tdd`, fold its discipline into `/build` as a TDD reference behind the `tests:yes` hard gate, per the U2 decision. Rule R1–R10 first, then three reference files flat under `software-factory/` (`review-contract.md` Standard, `pr-feedback.md` Guide, `refactor-catalogue.md` Guide opening with the new Fowler smallest-step rule), then rewrite live citers: code-pr-review, doc-pr-review, bug-pr-review (partial), and the merged build. **New absorbed-block candidate found this session:** the "Judgments are not yours" clause (added by 107c920, postdates the draft) is now ×4 across review skills → belongs in review-contract.md. R1–R10 one-liners: R1 placement dir (re-answer against the new split layout); R2 overwatch as 7th comment-surfaces citer (rec: yes, lands in U5); R3 bug-pr-review verbatim constraint (rec: partial citer); R4 deliberately-not-extracted list (rec: accept); R5 near-duplicate variations a–f need per-item rulings (sdd items moot — stripped); R6 doc-pr-review's degraded copy — extraction silently upgrades it, call out in PR body; R7 contract-wins clause — generic rule in reference, skill-local naming clause (sdd-tdd variant moot); R8 sdd-tdd drift (moot — skill deleted); R9 OKF types Standard/Guide/Guide; R10 unpinned cross-repo reads (rec: accept, existing class).
-- [ ] **U5 — overwatch rewrite** + agent-view-overwatch and open-pr light touches. Encodes the three-pause structure (pause-1 verdict briefs; conditional judgments pause; pause-3 final presentation); encodes U1's refusal rule (factory nodes only — definition-phase or unlabeled issues hard-refuse); renames "implementation nodes" → "committing nodes"; runs the judgments node inline per the ratified decision (machinery unchanged: run-judgments skill → judgments-run plan/render/record CLIs → machine-local SQLite seen-set; §6's endgame text moves to a progressive-disclosure reference loaded on entering the node); cites U4's references instead of carrying the 7th comment-surfaces copy.
-- [ ] **U6 — definition-region implementation** per U1's flow decision: rewrite /intake (accounting + routing; slicing/epic machinery and gh recipes out) and /design (research + decomposition; **#273 lands here** — design-it-twice parallel fan-out, cheap variant: 3–4 agents on minimize-surface / max-flexibility / common-caller / ports-and-adapters axes only when the interview flags the public surface as load-bearing, compared on depth, locality, seam placement; seam sketching before writing; decompose exit with no round-trip through intake). Home the decomposition rules and gh recipes once in the tracking standard (`tracker-operations.md` is a file to create, not cite — it does not exist yet); both skills cite it.
+- [ ] **U4 — #276 dedup + the tdd/build merge** (design of record: issue #256 comment 5109029948; SDD skills deleted at U0). **The merge lands here:** delete `/tdd`, fold its discipline into `/build` as a TDD reference behind the `tests:yes` hard gate, per the U2 decision. Rule R1–R10 first, then three reference files flat under `software-factory/` (`review-contract.md` Standard, `pr-feedback.md` Guide, `refactor-catalogue.md` Guide opening with the new Fowler smallest-step rule), then rewrite live citers: code-pr-review, doc-pr-review, bug-pr-review (partial), and the merged build. **New absorbed-block candidate found this session:** the "Judgments are not yours" clause (added by 107c920, postdates the draft) is now ×4 across review skills → belongs in review-contract.md. R1–R10 one-liners: R1 placement dir (re-answer against the new split layout); R2 overwatch as 7th comment-surfaces citer (rec: yes, lands in U5); R3 bug-pr-review verbatim constraint (rec: partial citer); R4 deliberately-not-extracted list (rec: accept); R5 near-duplicate variations a–f need per-item rulings (sdd items moot — stripped); R6 doc-pr-review's degraded copy — extraction silently upgrades it, call out in PR body; R7 contract-wins clause — generic rule in reference, skill-local naming clause (sdd-tdd variant moot); R8 sdd-tdd drift (moot — skill deleted); R9 OKF types Standard/Guide/Guide; R10 unpinned cross-repo reads (rec: accept, existing class). **U3 residuals (small doc fixes, land first — all in the new software-factory/ docs):** (a) software-factory.md:59 prose says "three solid edges" leave definition, but the epic→build edge is drawn dotted per the ratified graph — fix the prose, not the diagram; (b) factory-operations.md:43 "any unblocked issue" contradicts its own :30 factory-nodes-only refusal — launchable = unblocked AND phase in the factory region; (c) factory-operations.md:233 "three checkpoints" should read "three pauses" (human-checkpoints.md defines checkpoints broadly, reserves three for pauses); (d) skill-authoring.md:54 uses `HITL`, a term the same commit removed everywhere else — use the current vocabulary; (e) software-factory.md:107 claims the readiness bar is "defined once in issues.md" but *unblocked* isn't there and factory-operations.md:43-47 restates all three parts — add unblocked to issues.md §Readiness and make factory-operations cite instead of restate; (f) software-factory.md:135 "mints exactly these" undercounts — the four retained `phase:sdd-*` are also minted (:178 says so); (g) pending the dispatch-table ruling (Open questions): restore the node→skill/engagement table to its home — factory-operations.md §Engagement currently names `build` and the review audits but omits `/open-pr`, whose engagement is stated in no doc. Also in the build-skill rewrite: build/SKILL.md:58's escalation re-route "to /tdd" dies with the merge.
+- [ ] **U5 — overwatch rewrite** + agent-view-overwatch and open-pr light touches. Encodes the three-pause structure (pause-1 verdict briefs; conditional judgments pause; pause-3 final presentation); encodes U1's refusal rule (factory nodes only — definition-phase or unlabeled issues hard-refuse); renames "implementation nodes" → "committing nodes"; runs the judgments node inline per the ratified decision (machinery unchanged: run-judgments skill → judgments-run plan/render/record CLIs → machine-local SQLite seen-set; §6's endgame text moves to a progressive-disclosure reference loaded on entering the node); cites U4's references instead of carrying the 7th comment-surfaces copy. **U3 residuals swept by this rewrite (name them so nothing slips):** overwatch:58 still says the commit token rides "two implementation nodes — /tdd and /build"; overwatch:40 cites "the skill table", a section U3 deleted (re-point to the dispatch table's ruled home); overwatch:44 says track rules live in "the graph doc" then names factory-operations.md — the latter is correct. Note the pause-1/pause-3 contracts already exist in human-checkpoints.md (U3 authored them) — the overwatch cites, never restates.
+- [ ] **U6 — definition-region implementation** per U1's flow decision: rewrite /intake (accounting + routing; slicing/epic machinery and gh recipes out) and /design (research + decomposition; **#273 lands here** — design-it-twice parallel fan-out, cheap variant: 3–4 agents on minimize-surface / max-flexibility / common-caller / ports-and-adapters axes only when the interview flags the public surface as load-bearing, compared on depth, locality, seam placement; seam sketching before writing; decompose exit with no round-trip through intake). Home the decomposition rules and gh recipes once in the tracking standard (`tracker-operations.md` is a file to create, not cite — it does not exist yet); both skills cite it. **U3 residual swept by this rewrite:** intake/SKILL.md:45 still routes trivial `tests:yes` work to node `tdd` — a label the scheme no longer mints, so the `gh issue edit` would fail; the rewrite routes everything to `build`.
 - [ ] **U7 — closeout.** Delete PLAN.md; full gate; the `phase:tdd` migration (relabel open `phase:tdd` issues to `phase:build` in place across governed repos, before consumers re-run bootstrap-labels); PR body notes (R6 silent upgrade; consumer actions: the relabel + bootstrap-labels rerun); final presentation per the pause-3 contract.
 
 ## Open questions
 
 - **U4:** the R1–R10 rulings.
-
-## The ratified whole-system graph (2026-07-30)
-
-Dotted edges are informational; solid edges are state moves. The three crossing edges (intake's release, design's release, epic children entering) are the only factory entries.
-
-```mermaid
-flowchart LR
-    subgraph definition[Definition — human-led]
-        ideas([idea funnel]) -.-> cand[CANDIDATES.md]
-        cand -->|/candidate-promote| intake[intake]
-        stub([new or adopted issue]) --> intake
-        intake -->|needs thought| design[design]
-        intake -->|mode:spike| spike[spike]
-        design -.->|research question| spike
-        design -->|decompose| epic([epic + ready children])
-        spike -->|findings in closing comment| closed([closed])
-    end
-
-    subgraph factory[Factory — autonomous]
-        build[build] -->|pushed| pr_review{pr_review}
-        pr_review -->|reject: rework| build
-        pr_review -->|approve| judgments[judgments]
-        judgments -->|green, merge msg refreshed| done([merged])
-    end
-
-    intake -->|simple| build
-    design -->|single leaf| build
-    epic -.->|each child| build
-```
-
-The ratified skill table (factory dispatch; definition skills are user-invoked and never dispatched):
-
-| Node | Skill | Engagement |
-|---|---|---|
-| `build` | `/build` | AFK, commit token; `tests:yes` hard-gates the TDD reference load |
-| `pr_review` | `/open-pr`, then tracks: `/bug-pr-review` + fidelity, `/doc-pr-review` | AFK audits; verdict stop = pause 1 |
-| `judgments` | — | inline: overwatch invokes `/run-judgments` at its main loop; conditional pause 2 |
+- **U4 residual (g) — the dispatch table's home:** U3 deleted the node→skill/engagement table from software-factory.md without reproducing it; factory-operations.md §Engagement covers it only partially (omits `/open-pr`), and overwatch:40 still cites "the skill table". Per the skills-vs-docs ruling it is multi-actor (overwatch + humans) → belongs in a doc. Recommendation: a three-row table in factory-operations.md §Engagement.
 
 ## System map (scout digest, 2026-07-30)
 
@@ -118,7 +82,7 @@ The ratified skill table (factory dispatch; definition skills are user-invoked a
 
 ## Key files
 
-- `software-factory/software-factory.md` + `skill-authoring.md` — docs under refactor.
+- `software-factory/` — `software-factory.md` (hub), `factory-operations.md`, `human-checkpoints.md`, `skill-authoring.md`; U4 adds its three reference files here.
 - `dotfiles/dot-claude/skills/` — issue-overwatch, tdd, build, open-pr, {bug,code,doc}-pr-review, intake, design, run-judgments, agent-view-overwatch.
 - `src/dev_playbook/label_scheme.json`, `scripts/bootstrap-labels`, `src/dev_playbook/workspace_lint.py`.
 - #276 design of record: issue #256 comment 5109029948 (full R1–R10 text and per-skill rewrite maps).
