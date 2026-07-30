@@ -47,8 +47,8 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
 # CLAUDE.md voice and global-file checks answer the claude-code card, the
-# README/CONTEXT doc-shape check answers the docs card, and the rogue
-# future-work filenames answer the tracking card.
+# README/CONTEXT doc-shape check answers the knowledge-organization card, and
+# the rogue future-work filenames answer the tracking card.
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.

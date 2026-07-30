@@ -41,8 +41,9 @@ judgments:
 
   - id: repo-lint-docs-subset-of-standard
     claim: |
-      Every check scripts/repo-lint performs that emits a `docs.` rule
-      corresponds to a requirement stated in the standards/docs/ documents:
+      Every check scripts/repo-lint performs that emits the
+      `knowledge-organization.doc-shape` rule corresponds to a requirement
+      stated in the standards/docs/ documents:
       the README H1 and the CONTEXT.md sections it checks for are shape
       requirements those documents state. The standard may state more than
       the tool checks; the tool must not check more than the standard states.
