@@ -13,15 +13,19 @@ You own one issue's whole traverse: read the software factory graph, execute it 
 
 Two hard limits: you never push, and you never merge. Both are the user's.
 
+**⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ — you hold the commit token for this session.** It covers the fixes you make yourself at the judgments node: commit them as you land them, without waiting for a "commit now". It covers nothing else — you never touch the work under review, and a delegated node's commits are authorized by its own launch line (§3).
+
 **Everything the user needs reaches them in the terminal.** They are not reading the code, the diff, the PR, or its comments — that read comes at the end, on the final PR before they merge. So every question, verdict request, and bubbled escalation stands on its own: lay the background out plainly in a few sentences, quote the specific finding, line, or command the decision turns on, then ask for the decision. Whatever they need in order to decide, you put on screen.
 
 ## Read first
 
 The software factory is your subject, so know it cold:
 
-- [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the skill table, the worktree contract, the terminal report contract, readiness, and the review sequence. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
+- [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
+- [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — the dispatch table, the worktree contract, the terminal report contract, readiness, the review stop, and the judgments node.
+- [human-checkpoints.md](~/workspace/dev-playbook/software-factory/human-checkpoints.md) — every point you stop at, and what you owe the user there.
 
-Then report: `READ: software-factory.md`. Proceed only after.
+Then report: `READ: software-factory.md, factory-operations.md, human-checkpoints.md`. Proceed only after.
 
 ## 1. Orient
 
@@ -37,7 +41,7 @@ Repeat until the issue merges, closes, or a stop point (§7): place the issue at
 
 - **HITL** — run it yourself: invoke the node's skill inline (the `Skill` tool, issue number as argument) and interview the user directly.
 - **AFK** — delegate to a subagent (§3).
-- **Review stop** — run `/open-pr` first (always), then select the tracks yourself by the graph doc's track rules: the **code track** (`/bug-pr-review` and `/code-pr-review`) whenever the diff touches code, scripts, tests, or machine-read config; the **doc track** (`/doc-pr-review`) only when docs are a substantive deliverable of the diff — never for mechanical echoes of a code change, small doc edits (roughly under 10 changed doc lines), or doc content the user already wrote or approved inline at a HITL node this traverse; doubt skips. Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait; the user can retroactively cancel a launched audit or launch a skipped one. On a lockdown re-review (the PR already carries two or more `## Code review — …` comments), dispatch only `/code-pr-review` on the code track — a lockdown verifies fixes and needs no fresh bug hunt. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence and the track rules are software-factory.md's review sequence.
+- **Review stop** — run `/open-pr` first (always), then select the tracks yourself by the graph doc's track rules: the **code track** (`/bug-pr-review` and `/code-pr-review`) whenever the diff touches code, scripts, tests, or machine-read config; the **doc track** (`/doc-pr-review`) only when docs are a substantive deliverable of the diff — never for mechanical echoes of a code change, small doc edits (roughly under 10 changed doc lines), or doc content the user already wrote or approved inline at a HITL node this traverse; doubt skips. Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait; the user can retroactively cancel a launched audit or launch a skipped one. On a lockdown re-review (the PR already carries two or more `## Code review — …` comments), dispatch only `/code-pr-review` on the code track — a lockdown verifies fixes and needs no fresh bug hunt. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5). The full sequence and the track rules are factory-operations.md's review stop.
 
 When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue. A node whose skill doesn't exist is an escalation, not an improvisation.
 
@@ -77,7 +81,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 The audit subagents post findings and terminate; the verdict interview is yours. First read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) Then brief the user on what the audits found — the background plainly, then the findings' own words for each call you need — answer their questions, help them weigh, and act only on an explicit verdict. Rework is Blocking-driven by default — Suggestions alone don't call for a rework lap. You never touch the work under review; a fix is the author's, routed through rework. The judgment endgame (§6) is the lone exception: post-approve, its fixes are yours.
 
-- **approve** — follow the graph's approve edge. At the `pr_review` stop the verdict opens the judgment endgame (§6) — run it first: its fixes change the final diff. Then refresh the merge message — regenerate the PR title and body from the final diff with a tap-free `gh pr edit`, per the [merge-message recipe](~/workspace/dev-playbook/software-factory/software-factory.md#the-merge-message-recipe), so the squash message the GitHub-UI merge picks up reflects what shipped — hand the user the final verified push if the endgame committed fixes (§7), and the user merges in the GitHub UI (you can't); report and stop. Worktree teardown is the Agent-view overwatch's, not yours.
+- **approve** — follow the graph's approve edge. At the `pr_review` stop the verdict opens the judgment endgame (§6) — run it first: its fixes change the final diff. Then refresh the merge message — regenerate the PR title and body from the final diff with a tap-free `gh pr edit`, per the [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe), so the squash message the GitHub-UI merge picks up reflects what shipped — hand the user the final verified push if the endgame committed fixes (§7), and the user merges in the GitHub UI (you can't); report and stop. Worktree teardown is the Agent-view overwatch's, not yours.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment` / `gh pr comment`), then move the label back along the rework edge (routed by `tests:*` on the direct path).
 
 ## 6. The judgment endgame — HITL
@@ -85,7 +89,7 @@ The audit subagents post findings and terminate; the verdict interview is yours.
 The semantic judgment gate is deferred to the very end of the traverse: every intermediary push rides `--no-verify` (§7), so a red judgment cache never blocks a work cycle. The bill comes due exactly once, on the approve verdict at a PR review stop — and it is yours, run inline with the user present:
 
 1. **Run the judgments yourself:** invoke `/run-judgments` (the `Skill` tool) in the issue's worktree. It enumerates the misses, dispatches the judges, records the passes, and makes focused fixes for refutations — weigh any fix with the user and take over the ones it sets aside; this is an interview, not a delegation.
-2. **Commit the fixes inline** with the user's go-ahead, as with any HITL node's work. Judgment fixes never reopen review: no new cycle, no fresh audit — the user has already approved the substance.
+2. **Commit the fixes yourself**, on the token you hold — no go-ahead to wait for. Judgment fixes never reopen review: no new cycle, no fresh audit — the user has already approved the substance.
 3. **Close green:** confirm with `make check-judgments`, then continue the approve sequence (§5) — refresh the merge message, and hand the user the final verified push (§7) if fixes were committed; with none, origin already holds the final diff and there is nothing to push.
 
 ## 7. Turn boundaries — the user's commands

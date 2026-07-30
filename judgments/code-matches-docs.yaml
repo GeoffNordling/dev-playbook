@@ -74,10 +74,11 @@ judgments:
       src/dev_playbook/label_scheme.json mints exactly the labels
       software-factory/software-factory.md states: its fixed-value dimensions (category, mode,
       tests) produce exactly the seven labels of the doc's Valid
-      labels table, and its phase dimension produces exactly the phase labels
-      the doc's graph-derived phase inventory names (one per work node, with
-      `_` mapped to `-`). The scheme mints no label the doc does not state,
-      and states none the doc omits.
+      labels table, and its phase dimension satisfies the doc's parity
+      invariant — one value per work node of the graph, with `_` mapped to
+      `-`, plus exactly the retained values the invariant exempts and no
+      others. The scheme mints no label the doc does not state, and states
+      none the doc omits.
     evidence:  [src/dev_playbook/label_scheme.json]
     reference: [software-factory/software-factory.md]
     model: claude-sonnet-5

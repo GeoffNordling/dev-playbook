@@ -37,7 +37,7 @@ the path to main — they are references here, not rungs:
 
 | Non-gate | When | What runs | Blocks |
 |---|---|---|---|
-| agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [software-factory.md's node-skill contract](/software-factory/software-factory.md#node-skill-contract) |
+| agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [the node-skill contract](/software-factory/factory-operations.md#the-node-skill-contract) |
 | workspace-lint | on demand and via the periodic review | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-lint`](/scripts/workspace-lint) | no — reports, never blocks |
 
 The re-run of `make check` at review start is the review node's **green gate**:

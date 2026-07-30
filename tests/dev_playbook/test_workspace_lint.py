@@ -747,7 +747,7 @@ def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:
 
 
 def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
-    labels = ["category:extension", "phase:tdd"]
+    labels = ["category:extension", "phase:build"]
     result = run_with_issue(tmp_path, issue(3, labels, sub_issues_total=4))
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#3" in result.stdout
@@ -856,7 +856,7 @@ def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
 
 def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     result = run_with_issue(
-        tmp_path, issue(11, ["phase:tdd"], body="", pull_request=True)
+        tmp_path, issue(11, ["phase:build"], body="", pull_request=True)
     )
     assert "software-factory.tuple-valid" not in result.stdout
     assert "tracking.issue-brief-shape" not in result.stdout

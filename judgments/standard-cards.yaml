@@ -186,6 +186,8 @@ judgments:
     reference:
       - standards/standard/format.md
       - software-factory/software-factory.md
+      - software-factory/factory-operations.md
+      - software-factory/human-checkpoints.md
       - software-factory/skill-authoring.md
       - scripts/workspace-lint
     model: claude-sonnet-5

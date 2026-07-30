@@ -25,15 +25,15 @@ EXPECTED_LABELS = [
     ("tests:yes", "cccccc", "Tests: yes."),
     ("tests:no", "cccccc", "Tests: no."),
     ("phase:intake", "fbca04", "Phase: intake."),
+    ("phase:design", "fbca04", "Phase: design."),
+    ("phase:spike", "fbca04", "Phase: spike."),
+    ("phase:build", "fbca04", "Phase: build."),
+    ("phase:pr-review", "fbca04", "Phase: pr-review."),
+    ("phase:judgments", "fbca04", "Phase: judgments."),
     ("phase:sdd-specs", "fbca04", "Phase: sdd-specs."),
     ("phase:sdd-spec-review", "fbca04", "Phase: sdd-spec-review."),
     ("phase:sdd-tdd", "fbca04", "Phase: sdd-tdd."),
     ("phase:sdd-pr-review", "fbca04", "Phase: sdd-pr-review."),
-    ("phase:design", "fbca04", "Phase: design."),
-    ("phase:tdd", "fbca04", "Phase: tdd."),
-    ("phase:build", "fbca04", "Phase: build."),
-    ("phase:pr-review", "fbca04", "Phase: pr-review."),
-    ("phase:spike", "fbca04", "Phase: spike."),
 ]
 
 

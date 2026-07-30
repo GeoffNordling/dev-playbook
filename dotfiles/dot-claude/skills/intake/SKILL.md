@@ -17,7 +17,7 @@ The front door for work. Input arrives under-formed and leaves as a ready issue 
 
 Before doing anything else, read end-to-end:
 
-- [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md) — label scheme, state-machine graph.
+- [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md) — label scheme, state-machine graph, and where an issue goes when intake releases it.
 - [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) — body format, brief principles, vertical-slice rules.
 
 Then report: `READ: software-factory.md, issue-conventions.md`. Proceed only after.

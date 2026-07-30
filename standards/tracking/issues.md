@@ -26,7 +26,7 @@ the same principle as *blocked* (a derived dependency state, never minted as a
 label).
 
 - **Leaf** — the unit of work. A leaf is dispatched through the
-  [software factory graph](/software-factory/software-factory.md) and carries the full four-tuple
+  [software factory graph](/software-factory/software-factory.md#the-graph) and carries the full four-tuple
   `(category:*, mode:*, tests:*, phase:*)`. Its body is a build-leaf brief or a
   spike brief (below).
 - **Epic** — an issue decomposed into sub-issues. An epic is **never built
@@ -39,7 +39,7 @@ label).
 **A design session produces an epic.** The common way an epic is born is the
 `design` node concluding the work is too big for one leaf: the session
 decomposes it in place, turning the issue into an epic and minting its children
-as ready leaves (see [software-factory.md's decompose exit](/software-factory/software-factory.md)).
+as ready leaves (see [the decompose exit](/software-factory/software-factory.md#the-definition-region)).
 
 ## Readiness
 
@@ -93,7 +93,7 @@ What should happen after the work is complete. Be specific about edge cases and 
 
 A spike is a **question** whose deliverable is an **answer**, not
 merged code — the findings land in the issue's closing comment, and no PR opens
-(see [software-factory.md's spike path](/software-factory/software-factory.md)). The spike brief carries
+(see [the spike state](/software-factory/software-factory.md#the-definition-region)). The spike brief carries
 these headings:
 
 ```markdown

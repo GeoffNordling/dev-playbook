@@ -15,5 +15,5 @@ okf_version: "0.1"
 - [instruments/](/instruments/index.md) — Purpose-built artifact formats and their tooling
 - [protocols/](/protocols/index.md) — Formal human–agent collaboration protocols — problem-decomposition algorithms and the skills that operationalize them
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
-- [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the intake-to-merge state machine and the standards defining each phase
+- [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its human checkpoints
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace

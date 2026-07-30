@@ -48,7 +48,7 @@ Every skill must have all five of these:
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, the description `SHALL` include a second sentence beginning `Use when …` that lists the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
-| `disable-model-invocation` | `false` is the standard — per the [dispatch model](/software-factory/software-factory.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
+| `disable-model-invocation` | `false` is the standard — per the [dispatch model](/software-factory/factory-operations.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
 | `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory — always present, never omitted. Which value a skill takes is the author's choice; this standard sets no default. One mechanical fact bears on it: **a pinned model only governs the turn that loads the skill** and reverts to the session model on the next prompt, so a pin binds a single-turn/batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. |
 
@@ -153,6 +153,7 @@ conflict; they are different paths and different concerns.
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
   Good: `commit`, `ref-lint`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
+  Example: `doc-format`, `doc-present-state`, `doc-rewrite`.
 - **Descriptions**: see the [Required Fields](#required-fields) row for
   format. Examples — good (auto-invocable):
   `Write tests from a spec item before any implementation lands. Use when

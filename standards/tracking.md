@@ -7,8 +7,11 @@ description: Card for the tracking standard — how committed and uncommitted wo
 # Tracking
 
 Governs how work is tracked — committed work as issues, uncommitted work as
-candidates, and repository settings. Pull requests belong to the
-[software factory standard](/software-factory/software-factory.md).
+candidates, and repository settings. This card owns the **shapes**: what an
+issue, a candidate, and a brief must look like. The **lifecycle** they move
+through — the states an issue occupies and the moves between them — belongs to
+the [software factory standard](/software-factory/software-factory.md), as do
+[pull requests](/software-factory/factory-operations.md#pull-requests).
 
 ## Define
 
