@@ -16,7 +16,7 @@ One machine runs one configuration, and the machines differ — see [machines.md
 
 ```
 dot-claude/          -> ~/.claude/
-  skills/      Claude Code skills (SDD workflow, commit, tool wrappers, etc.)
+  skills/      Claude Code skills (software factory nodes, commit, tool wrappers, etc.)
   rules/       Global rules applied to every conversation
   hooks/       Claude Code hook scripts
 .agents/             -> ~/.agents/

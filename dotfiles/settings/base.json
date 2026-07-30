@@ -6,10 +6,7 @@
     "allow": [
       "Skill(tdd)",
       "Skill(build)",
-      "Skill(sdd-tdd)",
       "Skill(open-pr)",
-      "Skill(sdd-agent-spec-review)",
-      "Skill(sdd-agent-code-review)",
       "Skill(agent-code-review)",
       "Skill(code-review)",
       "Bash(uv run pytest)",

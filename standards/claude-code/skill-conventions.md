@@ -153,7 +153,6 @@ conflict; they are different paths and different concerns.
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
   Good: `commit`, `ref-lint`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
-  Example: `sdd-func-reqs`, `sdd-design`, `sdd-red`, `sdd-green`.
 - **Descriptions**: see the [Required Fields](#required-fields) row for
   format. Examples — good (auto-invocable):
   `Write tests from a spec item before any implementation lands. Use when

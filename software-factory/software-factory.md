@@ -12,11 +12,6 @@ The software factory: how ideas become merged PRs — or, on the spike path, ans
 
 Every post-intake **leaf** carries the full four-tuple `(category:*, mode:*, tests:*, phase:*)`, with `phase:*` naming its current node. Before intake, a rushed issue may carry only `phase:intake` or no labels at all — either way it is untriaged, with `phase:intake` the implied default. Assigning the metadata triple and advancing the phase is intake's job. An **epic** — an issue decomposed into sub-issues — is not a leaf: it never dispatches and needs only `category:*`; its children carry the work. The state of a post-intake leaf is the `(mode, tests, phase)` sub-triple — each node below is one reachable combination. Category is required metadata but does not affect routing.
 
-- `category:*` — `category:maintenance` (maintains shipped state: a fix, hygiene, or polish that adds no new capability) or `category:extension` (extends a system past its shipped line, giving it a capability it does not have today). Picked at intake; it names the work's nature and does not affect routing.
-- `mode:*` — `mode:sdd`, `mode:direct`, or `mode:spike`. Picked at intake.
-- `tests:*` — `tests:yes` or `tests:no`. Picked at intake. `mode:sdd` always carries `tests:yes`; `mode:direct` is split — testable work goes `tests:yes` (implemented at `tdd`), doc/config/work not touching tests goes `tests:no` (implemented at `build`); `mode:spike` always carries `tests:no` — a spike merges no code — so the full-tuple invariant holds on every leaf.
-- `phase:*` — the current node in the graph below. An untriaged issue is at `phase:intake` — labelled so, or implied by carrying no labels at all. The graph is the inventory; see [Naming](#naming).
-
 Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) — are tracked natively, separate from this label tuple; see [issue-conventions § Relationships](/standards/tracking/issues.md).
 
 ### Valid labels
@@ -27,18 +22,20 @@ Issue **relationships** — hierarchy (sub-issues) and dependency (blocked-by) �
 |---|---|---|
 | Category | `category:maintenance` | Maintains shipped state — a fix, hygiene, or polish that adds no new capability. |
 | Category | `category:extension` | Extends a system past its shipped line — a capability it does not have today. |
-| Mode | `mode:sdd` | SDD path: spec → design → TDD ceremony. |
-| Mode | `mode:direct` | Direct path: no spec/design ceremony. |
-| Mode | `mode:spike` | Spike path: a question; the answer closes the issue, no PR. |
-| Tests | `tests:yes` | Issue involves writing or modifying tests. |
-| Tests | `tests:no` | Issue does not touch tests. |
+| Mode | `mode:direct` | Direct path: no spec/design ceremony. Split by `tests:*`. |
+| Mode | `mode:spike` | Spike path: a question; the answer closes the issue, no PR. Always `tests:no` — a spike merges no code. |
+| Mode | `mode:sdd` | Retained value, **not supported** — the factory halts on it; see [SDD is not supported](#sdd-is-not-supported). |
+| Tests | `tests:yes` | Issue involves writing or modifying tests; on the direct path it implements at `tdd`. |
+| Tests | `tests:no` | Issue does not touch tests; on the direct path it implements at `build`. |
+
+Every mode either fixes `tests:*` or splits on it, so the four-tuple is complete on every leaf.
 
 ### Graph-based flow
 
 Each node engages the human one of two ways — the taxonomy [Dispatch](#dispatch) executes:
 
-- **AFK** (away from keyboard) — the issue overwatch delegates the node to a subagent, which does the work and reports (e.g. `tdd`, `build`, `sdd_tdd`, `spike`).
-- **HITL** (human in the loop) — the issue overwatch itself interviews the user and does the work with them (e.g. `intake`, `sdd_specs`, `design`).
+- **AFK** (away from keyboard) — the issue overwatch delegates the node to a subagent, which does the work and reports (e.g. `tdd`, `build`, `spike`).
+- **HITL** (human in the loop) — the issue overwatch itself interviews the user and does the work with them (e.g. `intake`, `design`).
 
 A review node (diamond) is one or more AFK delegations followed by a HITL follow-up — subagents audit and post findings, then the overwatch takes the user's verdict — sequenced by the issue overwatch within the one node.
 
@@ -46,19 +43,10 @@ A review node (diamond) is one or more AFK delegations followed by a HITL follow
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart LR
     new([new issue]) --> intake[intake]
-    intake -->|"mode:sdd — frozen"| sdd_specs[sdd_specs]
     intake -->|mode:direct, needs design| design[design]
     intake -->|mode:direct, no design, tests:yes| tdd[tdd]
     intake -->|mode:direct, no design, tests:no| build[build]
     intake -->|mode:spike| spike[spike]
-
-    subgraph sdd["SDD path — frozen"]
-        sdd_specs -->|pushed| sdd_spec_review{sdd_spec_review}
-        sdd_spec_review -->|reject: rework| sdd_specs
-        sdd_spec_review -->|approve| sdd_tdd[sdd_tdd]
-        sdd_tdd -->|pushed| sdd_pr_review{sdd_pr_review}
-        sdd_pr_review -->|reject: rework| sdd_tdd
-    end
 
     subgraph direct[Direct path]
         design -->|tests:yes| tdd
@@ -71,11 +59,8 @@ flowchart LR
     end
 
     spike -->|findings in closing comment| closed([closed])
-    sdd_pr_review -->|approve: merge| done([merged])
-    pr_review -->|approve: merge| done
+    pr_review -->|approve: merge| done([merged])
 ```
-
-**The SDD path is frozen.** Ratified 2026-07-30: the subgraph above is retained — for reference, and for issues already sitting inside it — but nothing enters and nothing dispatches. Intake must not mint `mode:sdd`; every new issue takes the direct or the spike path. An issue overwatch orienting onto any `phase:sdd-*` issue escalates *SDD temporarily disabled* instead of dispatching the node. The four `sdd-*` skills stay on disk and the `mode:sdd` and `phase:sdd-*` labels stay valid, so existing issues keep their tuples and the label invariants still hold; what is off is the routing.
 
 On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at the review stop.
 
@@ -83,9 +68,17 @@ On the direct path, intake also decides whether the work needs a **design** pass
 
 **The spike path.** `mode:spike` is a question whose deliverable is an answer, not merged code. The spike node runs AFK; its findings land in the issue's closing comment — plus a [Decision Record](/standards/decisions/records.md) if a one-way door was crossed. No PR opens, and the branch and worktree are disposable. A spike that needs a human interview mid-flight was design, not a spike — the subagent escalates rather than interviews.
 
+### SDD is not supported
+
+Ratified 2026-07-30: the factory has no SDD path. The subgraph, its nodes, and its skills are gone — every new issue takes the direct or the spike path, and intake never mints `mode:sdd`.
+
+This is a temporary simplification; SDD returns later, so its **label values are retained**: `mode:sdd` and the four `phase:sdd-*` values stay in the [label scheme](/src/dev_playbook/label_scheme.json) and [bootstrap-labels](/scripts/bootstrap-labels) still mints them. No node answers to any of them.
+
+So an issue overwatch that finds `mode:sdd` — or a residual `phase:sdd-*` — **halts immediately and reports**: no dispatch, no routing, no improvised re-triage onto the direct path. Where the issue goes next is the human's call.
+
 ### Naming
 
-Phase labels derive from graph node ids by `_`→`-`: node `sdd_spec_review` → label `phase:sdd-spec-review`. The set of work nodes — the graph's rectangles and diamonds; terminal markers mint nothing — IS the phase-label inventory. A work node is usually served by a slash-command of the same name (`design` → `/design`), but a review diamond is a generic stop that dispatches several content-specific skills, none named after the node — `pr_review` launches `/code-pr-review` and `/doc-pr-review`; `sdd_pr_review` launches `/sdd-code-pr-review` and `/doc-pr-review`.
+Phase labels derive from graph node ids by `_`→`-`: node `pr_review` → label `phase:pr-review`. Every work node — the graph's rectangles and diamonds; terminal markers mint nothing — mints a phase label; the inventory additionally holds the retained `phase:sdd-*` values, **not supported** and answered by no node (see [SDD is not supported](#sdd-is-not-supported)). A work node is usually served by a slash-command of the same name (`design` → `/design`), but a review diamond is a generic stop that dispatches several content-specific skills, none named after the node — `pr_review` launches `/code-pr-review` and `/doc-pr-review`.
 
 The issue overwatch moves the `phase:*` label to the next node when a node finishes — one writing session per issue, per [Dispatch](#dispatch); node skills do the work and report. The exception is intake, whose label writes are the deliverable: triage *is* the four-tuple. Nothing launches itself: the overwatch sequences every node, and the human launches the overwatch.
 
@@ -143,7 +136,7 @@ Title and body are written from one recipe, so a message born at `/open-pr` and 
 The message has two owners across the issue's life, the one recipe between them:
 
 - **Born good — `/open-pr`, on create.** When the PR is created, `/open-pr` synthesizes the title and body per the recipe from the brief and the diff as it then stands — never a bare `Closes #<N>`. On intermediate re-reviews it finds the PR already open and leaves the message untouched: refreshing mid-flight is not its job.
-- **Stays true — the approve verdict, before merge.** Rework mutates the diff after the message is born, so on the approve verdict at a PR review stop the issue overwatch regenerates the title and body from the final diff (a tap-free `gh pr edit`), per the same recipe — so what squash-lands reflects what actually shipped. The refresh runs after the judgment endgame's fixes land (see [the review sequence](#skills)), so the diff it reads is truly final. This binds both PR review stops (`pr_review`, `sdd_pr_review`); spec review opens no PR and is unaffected.
+- **Stays true — the approve verdict, before merge.** Rework mutates the diff after the message is born, so on the approve verdict at a PR review stop the issue overwatch regenerates the title and body from the final diff (a tap-free `gh pr edit`), per the same recipe — so what squash-lands reflects what actually shipped. The refresh runs after the judgment endgame's fixes land (see [the review sequence](#skills)), so the diff it reads is truly final.
 
 ## Dispatch
 
@@ -203,24 +196,20 @@ A node skill does the node's work and reports; the issue overwatch launches it, 
 - **Gate.** A committing node runs `make check` — the full gate, not just the commit hooks — before finishing its phase; a phase never closes over a red tree. The rule is per-phase, not per-commit: individual commits are already covered by the commit gate's hook suite, and the full gate is the phase-close ritual.
 - **Judgments sit outside every node skill.** `make check` leaves the semantic [cache gate](/standards/judgments/cache-gate.md) skipped, and no node skill arms it or runs a judge — the whole semantic bill is settled once by the overwatch at the judgment endgame, with the human present (see [the review sequence](#skills)). For a **review** skill the exclusion is total: the `judgments/*.yaml` declarations are outside its jurisdiction whether or not the diff changes them, and a judgment — its content, its verdict, or its cache state — appears nowhere in its findings. A stale or red cache mid-traverse is the expected condition, not a defect to report.
 
-The table lists every skill the issue overwatch dispatches. Nodes and skills intersect imperfectly: most work nodes are served by a skill of the same name; a review node is a generic stop that dispatches several — `/open-pr` first, then the track skills the overwatch selects by the review sequence's track rules (`/bug-pr-review` and the mode's fidelity skill — `/code-pr-review` direct, `/sdd-code-pr-review` SDD — on the code track; `/doc-pr-review` on the doc track); and `spike` is a node with no skill yet — the overwatch escalates rather than dispatching a skill that doesn't exist. Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
+The table lists every skill the issue overwatch dispatches. Nodes and skills intersect imperfectly: most work nodes are served by a skill of the same name; a review node is a generic stop that dispatches several — `/open-pr` first, then the track skills the overwatch selects by the review sequence's track rules (`/bug-pr-review` and `/code-pr-review` on the code track; `/doc-pr-review` on the doc track); and `spike` is a node with no skill yet — the overwatch escalates rather than dispatching a skill that doesn't exist. Helpers a node skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces and stay out. Every file-touching skill also escalates when the issue's worktree is missing, per [the worktree contract](#the-worktree-contract); the stale-base check belongs to the overwatch at worktree-open, so the table lists only each skill's own triggers beyond both.
 
 | Skill | Engagement | Escalation triggers |
 |-------|------|---------------------|
 | `/intake` | HITL | — |
-| `/sdd-specs` | HITL | — |
 | `/design` | HITL | — |
-| `/sdd-tdd` | AFK | Interface amendment / spec gap; stalling ambiguity; issue too big for one session; test red after 2 attempts |
 | `/tdd` | AFK | Brief wrong or underdetermined; issue too big for one session; test red after 2 attempts |
 | `/build` | AFK | Brief wrong or underdetermined; issue too big for one session; work needs tests (mis-triaged) |
 | `/open-pr` | AFK | branch not pushed to origin |
 | `/bug-pr-review` | AFK | PR/diff missing |
-| `/sdd-spec-review` | AFK | Consistency gate red (malformed spec); specs absent/unreadable |
-| `/sdd-code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
 | `/code-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing |
 | `/doc-pr-review` | AFK | Green gate red (PR over red tree); PR/diff missing; no docs in the diff (mis-launched) |
 
-**The review sequence.** At `pr_review` and `sdd_pr_review` the issue overwatch runs `/open-pr` first — creating the PR from the just-pushed branch — then selects the tracks itself by the track rules below, announces the selection and its reasons on screen, and dispatches immediately: no confirmation wait — the human is generally not watching this decision, and can retroactively cancel a launched audit or launch a skipped one. The selected audits all run in parallel — the two code-track skills included. On the code track `/bug-pr-review` posts its bug findings while our review skill adds the fidelity and convention findings it does not cover, each deduplicating only against prior cycles' comments. On a lockdown re-review (cycle 3 on) only the fidelity skill runs — a lockdown verifies fixes and needs no fresh bug hunt. On the doc track `/doc-pr-review` audits the diff's documentation. Each audit posts its own PR comment; with them complete, the overwatch interviews the human for one verdict on the stop: merge, or rework back to the implementation node. The human has read none of it — not the diff, not the PR, not the audits' comments — and is not asked to: the overwatch briefs them in the terminal, laying the background out plainly and quoting the specific finding behind each call it needs, then takes the verdict. Whatever a decision turns on goes on screen; the human's own read of the diff comes at the end, on the final PR before the merge. On the merge verdict the overwatch first settles the **judgment endgame** — the traverse's one armed pass of the semantic [cache gate](/standards/judgments/cache-gate.md), deferred here by the `--no-verify` intermediary pushes: it runs the `run-judgments` skill inline, HITL, fixing refuted judgments in collaboration with the human and committing the fixes on the issue branch; judgment fixes never reopen review — no new cycle, no fresh audit. Then it refreshes the PR's merge message from the final diff per [the two-owner lifecycle](#the-two-owner-lifecycle); when the endgame committed fixes, the human's final push runs verified — the armed gate's single blocking run on the issue's path to merge — and the human merges.
+**The review sequence.** At `pr_review` the issue overwatch runs `/open-pr` first — creating the PR from the just-pushed branch — then selects the tracks itself by the track rules below, announces the selection and its reasons on screen, and dispatches immediately: no confirmation wait — the human is generally not watching this decision, and can retroactively cancel a launched audit or launch a skipped one. The selected audits all run in parallel — the two code-track skills included. On the code track `/bug-pr-review` posts its bug findings while `/code-pr-review` adds the fidelity and convention findings it does not cover, each deduplicating only against prior cycles' comments. On a lockdown re-review (cycle 3 on) only `/code-pr-review` runs — a lockdown verifies fixes and needs no fresh bug hunt. On the doc track `/doc-pr-review` audits the diff's documentation. Each audit posts its own PR comment; with them complete, the overwatch interviews the human for one verdict on the stop: merge, or rework back to the implementation node. The human has read none of it — not the diff, not the PR, not the audits' comments — and is not asked to: the overwatch briefs them in the terminal, laying the background out plainly and quoting the specific finding behind each call it needs, then takes the verdict. Whatever a decision turns on goes on screen; the human's own read of the diff comes at the end, on the final PR before the merge. On the merge verdict the overwatch first settles the **judgment endgame** — the traverse's one armed pass of the semantic [cache gate](/standards/judgments/cache-gate.md), deferred here by the `--no-verify` intermediary pushes: it runs the `run-judgments` skill inline, HITL, fixing refuted judgments in collaboration with the human and committing the fixes on the issue branch; judgment fixes never reopen review — no new cycle, no fresh audit. Then it refreshes the PR's merge message from the final diff per [the two-owner lifecycle](#the-two-owner-lifecycle); when the endgame committed fixes, the human's final push runs verified — the armed gate's single blocking run on the issue's path to merge — and the human merges.
 
 **Track rules.** Content kind picks the track, not file format — by hard rule, announced, never asked:
 

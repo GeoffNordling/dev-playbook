@@ -61,7 +61,7 @@ checks on live leaves — so this document and the rule cannot disagree.
 Dependencies and hierarchy are **not** body fields — they are native GitHub
 relationships; see [Relationships](#relationships).
 
-### The build-leaf brief (`mode:sdd`, `mode:direct`)
+### The build-leaf brief (`mode:direct`)
 
 A build leaf carries **all six** headings — none optional. `Key interfaces`
 states "none" when there are none, rather than being omitted.

@@ -52,7 +52,7 @@ Provide commands under **state once, then trust**. When you hand the user a laun
    | ⚑ | Handle | PR | Purpose | Node | Notes |
    |---|---|---|---|---|---|
    | ✈️💚 | `dev-playbook#103` | #178 | judgments library | pr-review | audit running → verdict at its overwatch |
-   | 💤💚 | `dev-playbook#105` | | dispatch-graph edges | sdd-tdd | push pending at its overwatch |
+   | 💤💚 | `dev-playbook#105` | | dispatch-graph edges | tdd | push pending at its overwatch |
    | 💤❌ | `dev-playbook#101` | | judgment orchestration | design | blocked by #103 |
    | 💤💚 | `dev-playbook#106` | | rework reads inline comments | intake | launchable now |
    | 💤⏸️ | `claude-transcript-tool` | | export Claude transcripts | Ralph | parked by choice — lower priority right now |
