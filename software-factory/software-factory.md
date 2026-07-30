@@ -18,7 +18,7 @@ The system has two **regions**, divided by what kind of work each does:
   its skills are invoked by the human directly.
 - **The factory — autonomous.** Implementation in the wide sense: build, review,
   rework, and the path to merge. Handed a ready issue it runs unattended,
-  stopping only where the human's capability or judgment is required. Its
+  stopping only where the human's capability or decision is required. Its
   operating contract is
   [factory-operations.md](/software-factory/factory-operations.md); every point
   where it stops is

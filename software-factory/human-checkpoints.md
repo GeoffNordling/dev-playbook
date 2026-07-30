@@ -11,8 +11,8 @@ where it stops and the human acts, and there are only two reasons for one:
 
 - **Capability** — the agent *cannot* do it. Pushing, pulling, and merging need
   credentials or a hardware tap it does not have.
-- **Judgment** — the decision is *not the agent's*. A verdict on reviewed work,
-  an ambiguous fix, the final read before merge.
+- **Decision** — the call is *not the agent's*. A verdict on reviewed work, an
+  ambiguous fix, the final read before merge.
 
 This document collects both, and fixes what the factory owes the human at each.
 The nodes these checkpoints interrupt are
