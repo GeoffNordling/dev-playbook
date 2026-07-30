@@ -40,11 +40,11 @@ writes as that session. Every label move is the overwatch's, made as a node
 finishes, so no subagent can advance the board out from under the session
 sequencing it.
 
-**Readiness at the crossing.** An overwatch may launch on any **unblocked** issue
-— every issue in its blocked-by set closed. Crossing into the factory requires
-more: the issue must be a **leaf** (epics never dispatch) with a brief-complete
-body per the [tracking standard](/standards/tracking/issues.md). Blocked is a
-derived state GitHub surfaces in the Issues tab and Projects, not a label.
+**Readiness at the crossing.** Two things gate a launch. The issue's phase must
+sit in the factory region, per the refusal above; and the issue must meet the
+readiness bar — a leaf, unblocked, with a brief-complete body — defined once in
+the [tracking standard](/standards/tracking/issues.md#readiness) and checked
+here, at the crossing.
 
 ## Permissions
 
@@ -99,15 +99,28 @@ Each node engages the human one of two ways:
 A review node (a diamond) is several AFK delegations followed by the overwatch's
 own verdict interview, sequenced within the one node.
 
+### The dispatch table
+
+The factory's nodes, what runs each, and how each engages the human:
+
+| Node | Skill | Engagement |
+|---|---|---|
+| `build` | `/build` | AFK; the subagent carries the commit token. |
+| `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict)). |
+| `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
+
+The table is factory-only. The definition region's skills — `/intake`,
+`/design`, `/candidate-promote` — are invoked by the human and never dispatched,
+and the `spike` node has no skill at all.
+
 **Delegation.** An AFK node is delegated to a subagent whose prompt is the launch
 line `run /<skill> <N>` and nothing more — nodes stay skills. The subagent gets a
 fresh context window and inherits the issue's worktree as cwd; it reloads what it
 needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
 ends with a terminal report. Nothing carries over from the overwatch's context.
 A committing node's launch line is prefixed with the commit token, per
-[Permissions](#permissions). The factory's delegated nodes are `build`, served by
-`/build`, and the review stop's audits; a helper a skill invokes itself
-(`/commit`, `/grill-with-docs`) is not a node and is never dispatched.
+[Permissions](#permissions). A helper a skill invokes itself (`/commit`,
+`/grill-with-docs`) is not a node and is never dispatched.
 
 **The terminal report contract.** A subagent's final message MUST begin at
 character one with exactly `DONE: <one-line outcome>` or
@@ -231,7 +244,7 @@ never by asking.
   lockdown verifies fixes and needs no fresh bug hunt.
 
 There is exactly one verdict per stop, and it is the human's — the first of the
-three checkpoints, briefed per
+three pauses, briefed per
 [pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict). A
 **reject** returns the issue to `build`, with the deciding reason recorded where
 the findings live so the rework carries it. An **approve** advances it to

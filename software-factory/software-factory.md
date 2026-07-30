@@ -56,8 +56,10 @@ flowchart LR
     epic -.->|each child| build
 ```
 
-The three solid edges leaving the definition subgraph — intake's release,
-design's single leaf, an epic's children — are the only entries to the factory.
+Three edges leave the definition subgraph, and they are the only entries to the
+factory: intake's release and design's single leaf, both state moves, plus an
+epic's children — dotted because the epic itself never crosses; each child enters
+`build` as a leaf of its own.
 
 ## The definition region
 
@@ -106,8 +108,8 @@ not a spike.
 
 **The readiness bar.** What makes an issue ready to leave the region — a leaf,
 unblocked, with a brief-complete body — is defined once in
-[issues.md](/standards/tracking/issues.md), and the factory checks it at the
-crossing.
+[issues.md](/standards/tracking/issues.md#readiness), and the factory checks it
+at the crossing.
 
 ## The factory
 
@@ -133,8 +135,9 @@ tuple.
 ### Valid labels
 
 [bootstrap-labels](/scripts/bootstrap-labels) mints exactly these: the seven
-fixed-value labels below, plus one `phase:*` label per work node, derived per
-[Naming](#naming).
+fixed-value labels below, one `phase:*` label per work node, derived per
+[Naming](#naming), and the four retained `phase:sdd-*` values that
+[SDD is not supported](#sdd-is-not-supported) keeps in the scheme.
 
 | Dimension | Label | Meaning |
 |---|---|---|

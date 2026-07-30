@@ -44,11 +44,19 @@ as ready leaves (see [the decompose exit](/software-factory/software-factory.md#
 ## Readiness
 
 Readiness is a **lifecycle position, not a kind of issue** — the industry's
-*Definition of Ready*. Work is dispatched into an implementation node only on a
-leaf whose body meets the brief standard below; an under-specified leaf is not
-yet ready. The refinement interview — intake, or the `design` node — is the
-**refinement step** that carries a leaf to ready by authoring its brief. A
-leaf's role never changes as it readies; only its body and phase advance.
+*Definition of Ready*. Three things make an issue ready, and work is dispatched
+only when all three hold:
+
+- **A leaf** — an epic is decomposed, never built
+  ([Roles](#roles-epic-and-leaf)).
+- **Unblocked** — every issue it is blocked-by is closed
+  ([Relationships](#relationships)).
+- **A brief-complete body**, meeting the brief standard below; an
+  under-specified leaf is not yet ready.
+
+The refinement interview — intake, or the `design` node — is the **refinement
+step** that carries a leaf to ready by authoring its brief. A leaf's role never
+changes as it readies; only its body and phase advance.
 (**Promotion** is a different move, reserved for Candidate → issue.)
 
 ## The body is the brief
