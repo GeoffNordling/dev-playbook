@@ -48,23 +48,15 @@ derived state GitHub surfaces in the Issues tab and Projects, not a label.
 
 ## Permissions
 
-The issue overwatch's session runs in **auto mode** — a permission mode (toggled
-like `acceptEdits`/`plan`, or set at launch) in which a classifier judges each
-tool call and self-approves the safe ones, blocking whatever escalates beyond the
-request, targets unrecognized infrastructure, or looks driven by hostile content
-it read. Auto mode does not honor the tool-pattern `permissions.allow` list the
-way default mode does — on entry it drops broad and wildcarded `Bash(...)` allows
-— so each command is weighed by the classifier, not waved through by a saved
-pattern.
-
-To permit something the classifier would otherwise block, add an entry to the
-`autoMode.allow` list in `settings.json`. Entries are natural-language
-descriptions, not tool patterns — the classifier reads them as rules — and are
-honored from user scope (`~/.claude/settings.json`) and project-local
-(`.claude/settings.local.json`), but not from checked-in project settings. The
-list's first entry is the literal string `"$defaults"`: it tells the classifier to
-keep its built-in rule set in force, so added entries **extend** the defaults
-rather than replace them.
+The issue overwatch's session runs in **auto mode**: a classifier judges each
+tool call and self-approves the safe ones. It does not honor the tool-pattern
+`permissions.allow` list — on entry it drops broad and wildcarded `Bash(...)`
+allows — so nothing reaches a node on a saved pattern. To permit something the
+classifier would otherwise block, add a natural-language entry to the
+`autoMode.allow` list in `settings.json`, whose first entry is the literal
+`"$defaults"` so added entries extend the built-in rules rather than replace
+them. It is honored from user and project-local scope, never from checked-in
+project settings.
 
 **The commit-authorization token.** The literal token
 `⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` pre-authorizes `Skill(commit)` for the session
@@ -113,7 +105,9 @@ fresh context window and inherits the issue's worktree as cwd; it reloads what i
 needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
 ends with a terminal report. Nothing carries over from the overwatch's context.
 A committing node's launch line is prefixed with the commit token, per
-[Permissions](#permissions).
+[Permissions](#permissions). The factory's delegated nodes are `build`, served by
+`/build`, and the review stop's audits; a helper a skill invokes itself
+(`/commit`, `/grill-with-docs`) is not a node and is never dispatched.
 
 **The terminal report contract.** A subagent's final message MUST begin at
 character one with exactly `DONE: <one-line outcome>` or
@@ -199,37 +193,15 @@ lives in [skill-authoring.md](/software-factory/skill-authoring.md).
   verdict, or its cache state — appears nowhere in its findings. A stale or red
   cache mid-traverse is the expected condition, not a defect to report.
 
-## The dispatch table
-
-Every skill the issue overwatch dispatches, and nothing else. Helpers a node
-skill invokes itself (`/commit`, `/grill-with-docs`) are not dispatch surfaces.
-The definition region's skills — `/intake`, `/design`, `/candidate-promote` — are
-invoked by the human and never appear here.
-
-| Node | Skill | Engagement |
-|---|---|---|
-| `build` | `/build` | AFK, commit token; `tests:yes` hard-gates the TDD reference load |
-| `pr_review` | `/open-pr`, then tracks: `/bug-pr-review` + fidelity, `/doc-pr-review` | AFK audits; verdict stop = pause 1 |
-| `judgments` | — | inline: overwatch invokes `/run-judgments` at its main loop; conditional pause 2 |
-
-Nodes and skills intersect imperfectly. `build` is served by a skill of its own
-name. `pr_review` is a generic stop dispatching several, none named after it —
-the fidelity audit named in the table is `/code-pr-review`. `judgments` has no
-skill at all: it is the overwatch's own work.
-
 ## Pull requests
 
 One PR per issue — spikes open none — born at the review stop and squash-merged
-by the human. [Repository settings](/standards/tracking/repo-settings.md) make
-every merge squash-only with the message taken from the PR, so the PR title and
-body become the permanent commit message on `main`. It is therefore authored
-deliberately from the issue brief and the current diff — never left as a
-placeholder — and kept current as the diff changes.
+by the human. Because [repository settings](/standards/tracking/repo-settings.md)
+take the squash message from the PR, its title and body become the permanent
+commit message on `main`: they are authored from the issue brief and the diff,
+never left as a placeholder.
 
 ### The merge-message recipe
-
-Title and body are written from one recipe, so a message born at `/open-pr` and
-one refreshed at the verdict cannot diverge:
 
 - **Title** — states the change: it is the commit subject `main`'s history will
   carry.
@@ -237,42 +209,32 @@ one refreshed at the verdict cannot diverge:
   the current diff, plus the mandatory `Closes #<N>` line that closes the issue
   on merge.
 
-### The two-owner lifecycle
+### The two owners
 
-The message has two owners across the issue's life, the one recipe between them:
-
-- **Born good — `/open-pr`, on create.** `/open-pr` is the review stop's first
-  delegation; it creates the PR once the branch is on origin, tap-free, and
-  synthesizes the title and body per the recipe from the brief and the diff as it
-  then stands — never a bare `Closes #<N>`. If the branch isn't pushed yet it
-  escalates rather than guessing. On later cycles it finds the PR already open and
-  leaves the message untouched: refreshing mid-flight is not its job.
-- **Stays true — the approve verdict, before merge.** Rework mutates the diff
-  after the message is born, so the overwatch regenerates the title and body from
-  the final diff (a tap-free `gh pr edit`) per the same recipe. The refresh runs
-  after [the judgments node](#the-judgments-node) lands its fixes, so the diff it
-  reads is truly final.
+The message is written twice from that one recipe, so the two cannot diverge:
+`/open-pr` authors it when it creates the PR, and the overwatch regenerates it
+from the final diff at the approve verdict (a tap-free `gh pr edit`), after
+[the judgments node](#the-judgments-node) has landed its fixes. Nothing
+refreshes it in between — a message rewritten mid-traverse is authored against a
+diff still moving.
 
 ## The review stop
 
-At `pr_review` the issue overwatch runs `/open-pr` first, then selects the tracks
-itself by the [track rules](#track-rules), announces the selection and its
-reasons on screen, and dispatches immediately — no confirmation wait, since the
-human is generally not watching this decision and can retroactively cancel a
-launched audit or launch a skipped one. The selected audits all run in parallel.
+`pr_review` is a diamond: audits run, then the human gives one verdict on the
+whole stop. Which audits run is fixed by the [track rules](#track-rules) below,
+never by asking.
 
-- **Code track.** `/bug-pr-review` posts its bug findings while `/code-pr-review`
-  adds the fidelity and convention findings it does not cover. Each deduplicates
-  only against prior cycles' comments.
+- **Code track.** `/bug-pr-review` posts its bug findings; `/code-pr-review` adds
+  the fidelity and convention findings it does not cover.
 - **Doc track.** `/doc-pr-review` audits the diff's documentation.
 - **Lockdown re-review.** From the third cycle on, only `/code-pr-review` runs: a
   lockdown verifies fixes and needs no fresh bug hunt.
 
-Each audit posts its own PR comment. With them complete, the overwatch takes the
-human's single verdict on the stop — the first of the three checkpoints, briefed
-per [pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict).
-A **reject** returns the issue to `build` with the deciding reason recorded where
-the findings live; an **approve** advances it to
+There is exactly one verdict per stop, and it is the human's — the first of the
+three checkpoints, briefed per
+[pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict). A
+**reject** returns the issue to `build`, with the deciding reason recorded where
+the findings live so the rework carries it. An **approve** advances it to
 [the judgments node](#the-judgments-node).
 
 ### Track rules
@@ -304,11 +266,10 @@ comes due here, once, after review approves and before the human's final read.
 The node is preparation for that read: it exists so the human meets a PR whose
 judgments are already green.
 
-**The overwatch runs it inline, at its own main loop.** This node cannot be
-delegated: `/run-judgments` drives a scatter-gather workflow, and a subagent has
-no `Workflow` tool — absent from both its inventory and its deferred index
-(probed 2026-07-30). So there is no wrapper skill and no subagent; the overwatch
-invokes `/run-judgments` itself, in the issue's worktree.
+**The overwatch runs it inline, at its own main loop.** The node cannot be
+delegated — `/run-judgments` dispatches its judges through the `Workflow` tool,
+which a subagent does not have — so there is no wrapper skill and no subagent:
+the overwatch invokes `/run-judgments` itself, in the issue's worktree.
 
 - **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
   and on the issue branch, and committed on the overwatch's own commit token
@@ -319,8 +280,5 @@ invokes `/run-judgments` itself, in the issue's worktree.
   a clean green run stops for nothing.
 - **No back edge.** Judgment fixes never reopen review — no new cycle, no fresh
   audit; the human has already approved the substance. A gate that stays red
-  parks the issue at the node rather than routing it anywhere.
-
-The node closes green: `make check-judgments` confirms, the merge message is
-refreshed from the final diff, and the issue is handed to the human for
-[pause 3](/software-factory/human-checkpoints.md#pause-3-the-final-review).
+  parks the issue at the node rather than routing it anywhere. The node closes
+  only green.

@@ -35,4 +35,4 @@ Governs how an idea becomes a merged pull request.
 
 - the skills in `dotfiles/dot-claude/skills/` — intake and design carry an issue
   to ready; build, open-pr, and the review skills carry it to merge
-  ([the dispatch table](/software-factory/factory-operations.md#the-dispatch-table))
+  ([delegation](/software-factory/factory-operations.md#engagement))

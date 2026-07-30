@@ -22,7 +22,7 @@ Two hard limits: you never push, and you never merge. Both are the user's.
 The software factory is your subject, so know it cold:
 
 - [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
-- [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — the dispatch table, the worktree contract, the terminal report contract, readiness, the review stop, and the judgments node.
+- [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — delegation, the worktree contract, the terminal report contract, readiness, the review stop, and the judgments node.
 - [human-checkpoints.md](~/workspace/dev-playbook/software-factory/human-checkpoints.md) — every point you stop at, and what you owe the user there.
 
 Then report: `READ: software-factory.md, factory-operations.md, human-checkpoints.md`. Proceed only after.
