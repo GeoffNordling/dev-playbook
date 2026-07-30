@@ -102,9 +102,9 @@ Promotion turns a Candidate into committed work: an issue is authored from the
 entry, and the entry is deleted in the same change, so the work never sits in
 both homes.
 
-Promoting a parent is a decomposition decision made during the intake
-interview, not a mechanical transform of its subtree — the slicing question is
-the same one any multi-issue plan faces
+Promoting a parent promotes its subtree as **one** issue, not as an issue per
+child: intake does not slice, so the subtree's decomposition is deferred to the
+`design` node like any other multi-issue plan
 ([issues.md](/standards/tracking/issues.md)).
 
 Deleting an entry without promoting it is ordinary editing. A Candidate that no

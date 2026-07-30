@@ -97,7 +97,7 @@ When the work is bigger than one build, the issue becomes an **epic** and never 
 Only once the user has explicitly agreed design is done. No label moves in this region on the agent's own authority.
 
 1. **Move the phase** — single leaf only: `gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"`, and the issue crosses into the factory. A decomposed issue shed its phase at §7 and stays an epic; its children carry the work.
-2. **Delete the prototype tree**, if §5 opened one: `ExitWorktree`, then `git worktree remove --force .claude/worktrees/design-<issue>` and `git branch -D worktree-design-<issue>`. Nothing from it is kept.
+2. **Delete the prototype tree**, if §5 opened one: `ExitWorktree(action: "remove", discard_changes: true)` — the uncommitted scratch is exactly what that flag is for, and the answer already reached the issue at §7. If the tool reports no worktree session (this session re-entered the tree by path after a `/clear`, so it doesn't own it), use `ExitWorktree(action: "keep")` and then `git worktree remove --force .claude/worktrees/design-<issue>` and `git branch -D worktree-design-<issue>`.
 3. Report and stop:
    ```
    <repo>#<issue> · phase: design · <released to build | epic + N ready children> · brief in issue

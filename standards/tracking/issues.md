@@ -8,8 +8,9 @@ description: GitHub issue conventions — epic and leaf roles, readiness, the th
 
 How GitHub Issues are authored in workspace repos. An issue plays one of two
 **roles** and, as a leaf, moves through a **readiness** lifecycle; its body is
-the agent **brief**, in one of three formats. Applies at intake — when an idea,
-or a rushed stub, becomes one or many tracked issues.
+the agent **brief**, in one of three formats. Applies wherever issues are
+authored — at intake, when an idea or a rushed stub becomes a tracked issue, and
+at the `design` node, when one issue becomes an epic and its children.
 
 An issue is **committed work**, at any size — an epic, an ordinary issue, or a
 one-line bug. Work not yet decided on is a Candidate in `CANDIDATES.md`
@@ -150,7 +151,7 @@ Create slices in dependency order, then wire the native relationships (see [Rela
 
 ## Relationships
 
-Two independent relationships connect issues. Both are **native GitHub relationships** — not body fields, not labels — set at intake. They are orthogonal: a parent says nothing about order, and a blocker says nothing about parentage.
+Two independent relationships connect issues. Both are **native GitHub relationships** — not body fields, not labels — wired when the work is decomposed, at the `design` node. They are orthogonal: a parent says nothing about order, and a blocker says nothing about parentage.
 
 - **Dependency — blocked-by.** The "must finish first" relationship, and the workhorse for sequencing slices. An issue is *blocked* while any issue it is blocked-by is still open, and *ready* once they all close. Blocked is a derived state, never a label — don't mint one.
 - **Hierarchy — sub-issues.** The "part of" relationship: a parent issue and its children. Use it to group the slices of a large feature under a tracking **epic** — which is exactly what derives the epic role (see [Roles](#roles-epic-and-leaf)). Decomposition only — it implies no ordering, and a sub-issue is not blocked by its siblings unless a blocked-by edge says so.
