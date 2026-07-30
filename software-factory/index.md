@@ -11,3 +11,6 @@ Ordering: reading order.
 - [Factory Operations](/software-factory/factory-operations.md) — The factory's operating contract — how a ready issue is dispatched, built, reviewed, and carried to the merge
 - [Human Checkpoints](/software-factory/human-checkpoints.md) — Every point where the factory stops for the human — the capability boundary, escalation, and the three review-stretch pauses
 - [Skill authoring](/software-factory/skill-authoring.md) — Voice, content rules, and mechanics for authoring the software factory's phase node-skills
+- [PR Feedback](/software-factory/pr-feedback.md) — The comment surfaces a pull request carries, and how an implementation node re-enters on a rework lap
+- [Refactor Catalogue](/software-factory/refactor-catalogue.md) — The refactor candidates a build node looks for at slice and chunk scope, and the step-size rule governing them
+- [Review Contract](/software-factory/review-contract.md) — The contract every factory review node runs under — its parameters, green gate, findings comment, and escalation boundary

@@ -11,11 +11,27 @@ argument-hint: "<issue-number>"
 
 # Code & PR Review
 
-Review a direct-mode issue's PR diff against its issue brief and the project's conventions, and attach your findings to the PR. The review is an audit only: you never modify the code under review, and the verdict on the findings is not yours to take — post them and stop.
+Review a direct-mode issue's PR diff against its issue brief and the project's conventions, and attach your findings to the PR.
 
-A bug-review pass (`/bug-pr-review`) runs in parallel with you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover. The audit runs hands-off; finding code problems is its output, not a reason to stop.
+A bug-review pass (`/bug-pr-review`) runs in parallel with you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover.
 
 **Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
+
+## Read first
+
+Read both end-to-end, then report `READ: review-contract.md, pr-feedback.md`. Proceed only after.
+
+- [review contract](~/workspace/dev-playbook/software-factory/review-contract.md) — the stance, the green gate, the cycle count, the findings comment, the escalation boundary.
+- [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — every comment surface a PR carries, and the command that reaches each.
+
+Your values for the contract's four parameters:
+
+| Parameter | Value |
+|---|---|
+| Review name | `Code review` |
+| Staging filename | `/tmp/code-review-<issue>.md` |
+| Post target | `gh pr comment` on the issue's PR |
+| Blocking | a fidelity gap, a convention breach that matters, a bug |
 
 ## 1. Load context
 
@@ -25,38 +41,34 @@ A bug-review pass (`/bug-pr-review`) runs in parallel with you and posts its own
 
 - `gh issue view <issue> --comments` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
-- The PR's existing feedback — prior review cycles' findings; to avoid re-flagging what they caught, read **every** comment surface on the PR: its body, top-level conversation comments, review summary bodies, and inline diff comments, from both user and agent reviewers. (`gh pr view --comments` shows the body and conversation but omits the inline diff comments, which live at `gh api repos/{owner}/{repo}/pulls/<pr>/comments`; review summaries are at `.../pulls/<pr>/reviews`.) The `/bug-pr-review` pass runs in parallel with you — its comment for this cycle may not exist yet; don't wait for it or dedup against it.
+- The PR's existing feedback, across every surface — prior review cycles' findings, so you don't re-flag what they caught. The `/bug-pr-review` pass runs in parallel with you; its comment for this cycle may not exist yet, so don't wait for it or dedup against it.
 - Where the change includes code, the tests under `tests/` and code under `src/` — the full picture behind the diff.
 
-## 2. Green gate
+## 2. Read what the diff calls for
 
-Run the gate — `make -C <subproject> check` (or `make check` when the `Makefile` is at the repo root). Green: proceed to the audit. Red: build opened a PR over a red tree — escalate (§5) rather than review broken work. Don't run individual lint tools yourself; where there's no `make check` to run, proceed to the audit.
+The diff's content picks the standards that bind this review. Read the ones it calls for, end-to-end, then report `READ: <what you read>`:
 
-**Judgments are not yours.** `make check` leaves the repo's semantic judgment gate skipped, and that is the whole gate you run — never `make check-judgments`, never a bare `uv run pytest`, never a judge. The user settles those judgments at the end of the traverse; until then the cache is expected to be stale or red, and any skipped-judgment lines in the gate output are noise. Act as though judgments do not exist: skip any `judgments/*.yaml` the diff touches, cite no judgment's claim, and let no finding mention a judgment, its verdict, or its cache state.
+| The diff carries | Read |
+|---|---|
+| tests | [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) |
+| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md) and [module design](~/workspace/dev-playbook/standards/modules/design.md) |
+| shell scripts | [shell conventions](~/workspace/dev-playbook/standards/shell/conventions.md) |
+
+The implementer read at most the testing conventions, so enforcing all of these is yours alone.
 
 ## 3. Audit the change
 
-Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches.
+Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. Every dimension below whose content the diff carries is audited, and those are also the dimensions the comment enumerates when they come back clean.
 
-**Know your cycle first.** The cycle number is the count of prior `## Code review — …` comments on the PR, plus one. Cycles 1 and 2 are full reviews across the dimensions below. From cycle 3 on, the review is a lockdown: its sole job is verifying the prior review's Blocking findings are fixed — don't hunt for new findings, though anything you notice incidentally still gets reported.
-
-Read [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md), [python style](~/workspace/dev-playbook/standards/python/style.md), and [module design](~/workspace/dev-playbook/standards/modules/design.md) first; the implementer read at most the testing conventions, so enforcing these is yours alone:
-
-- **Brief fidelity.** Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
-- **Testing conventions.** Where the change includes tests, they conform to testing-conventions.md — structure, naming, behavioral focus.
+- **Brief fidelity**, always. Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
+- **Testing conventions.** The tests conform to testing-conventions.md — structure, naming, behavioral focus.
 - **Python style.** The code conforms to python-style.md — docstrings, the fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a helper earns its place or stays inline), annotation style.
 - **Module design.** The change conforms to modules/design.md — deep modules behind small interfaces, no pass-throughs that fail the deletion test, seams only where something varies — plus clear naming, no dead code or needless duplication.
+- **Shell conventions.** The scripts conform to shell-conventions.md — above all the glue-only boundary: an executable script reaching for a function, an array, or argument parsing has outgrown shell and belongs in Python. shellcheck and shfmt already proved the mechanical rules at the gate, so spend the dimension on the boundary call, which is a reviewer's alone.
 
 ## 4. Attach findings
 
-Stage the comment body in a `/tmp` file (e.g. `/tmp/code-review-<issue>.md`) — writes inside the worktree are denied, `/tmp` is allowed — then post one PR comment with `gh pr comment --body-file <path>`.
-
-- **Head it with the reviewed revision and the cycle.** `## Code review — <sha> · cycle <n>`, using the short HEAD sha (`git rev-parse --short HEAD`) and the cycle number from §3. On a re-review — the PR already carries a prior `## Code review — …` comment — head it `## Code review — <sha> · cycle <n> (supersedes review of <prior-sha>)` and open with a one-line disposition of each prior finding (resolved / still open), so neither the user nor a later read treats the stale findings as live.
-- **Every finding is a problem plus its fix.** State the believed problem and the action it calls for, grouped by severity — **Blocking** (a fidelity gap, a convention breach that matters, a bug) or **Suggestion** (a non-disqualifying improvement). Write nothing that isn't actionable: no "acceptable as written", "no action needed", "just noting", and no explaining why a clean thing is clean — detail belongs to Blocking and Suggestion findings alone. Where you are genuinely unsure, raise it as a question or risk, naming the decision the user faces.
-- **A real problem outside this PR's scope** — highlight it and recommend a follow-up issue; never open one yourself.
-- Anchor each finding to its location with a blob link — `https://github.com/<owner>/<repo>/blob/<full-sha>/<path>#L<start>-L<end>`, using the full SHA from `git rev-parse HEAD` so GitHub renders a code preview — and name the rule or criterion it breaches. Enumerate the clean dimensions bare — names only, no per-dimension justification; if the whole diff is clean, say so plainly — a clean review is a real outcome.
-
-Emit the terminal line, then stop:
+Write and post the comment per the review contract, using your parameter values above. Then emit the terminal line and stop:
 
 ```
 DONE: <repo>#<issue> · phase: pr-review · findings on PR #<n>
@@ -64,15 +76,13 @@ DONE: <repo>#<issue> · phase: pr-review · findings on PR #<n>
 
 ## 5. Escalations
 
-Whenever you can't produce the review, surface it and stop, emitting a terminal `ESCALATE:` line:
+Your line:
 
 ```
 ESCALATE: <repo>#<issue> · phase: pr-review · <where you're stuck and the call you need>
 ```
 
-In particular:
+Your blocks:
 
 - **Green gate red.** The check gate fails: build opened a PR over a red tree. Surface it; don't review broken work.
 - **PR or diff missing.** There is no PR to review, or the issue isn't in the state this phase expects.
-
-Findings are not escalations. A code problem you can describe goes in the §4 comment; you escalate only when something stops you from producing the review at all.

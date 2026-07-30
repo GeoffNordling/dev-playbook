@@ -34,12 +34,10 @@ the worktree is gone, escalate (§5) — don't start a fresh tree.
 Treat this diff as the whole review scope; no PR or an empty diff is an
 escalation (§5).
 
-**Judgments are not yours.** Never run the repo's semantic judgment gate —
-no `make check-judgments`, no bare `uv run pytest`, no judge. The user
-settles those judgments at the end of the traverse, so a stale or red
-judgment cache is the expected state here. Act as though judgments do not
-exist: skip any `judgments/*.yaml` the diff touches, and let no finding
-mention a judgment, its verdict, or its cache state.
+Read [the review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
+now — three of its clauses bind this review: **judgments are not yours**,
+findings are anchored its way, and findings are not escalations. You run no
+gate here, so the diff stays the whole scope.
 
 ## 2. Find candidates
 
@@ -74,10 +72,8 @@ denied, `/tmp` is allowed), then post one PR comment with
 - **Head it `## Bug review — <sha>`**, using the short HEAD sha
   (`git rev-parse --short HEAD`) — that exact header, no other.
 - **Rank findings most-severe first.** Each finding: `file:line`, its
-  one-sentence summary, and its failure scenario. Anchor it with a blob
-  link — `https://github.com/<owner>/<repo>/blob/<full-sha>/<path>#L<start>-L<end>`,
-  using the full SHA from `git rev-parse HEAD` — so GitHub renders a code
-  preview.
+  one-sentence summary, and its failure scenario, anchored per
+  [the review contract](~/workspace/dev-playbook/software-factory/review-contract.md#anchoring).
 
 Emit the terminal line, then stop:
 
@@ -94,5 +90,5 @@ gone — surface it and stop, emitting a terminal `ESCALATE:` line:
 ESCALATE: <repo>#<issue> · phase: pr-review · <where you're stuck and the call you need>
 ```
 
-Findings are not escalations. A bug you can describe goes in the §4 comment;
-you escalate only when something stops you from producing the review at all.
+[Findings are not escalations](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-not-escalations):
+a bug you can describe goes in the §4 comment.

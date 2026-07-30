@@ -4,7 +4,6 @@
   },
   "permissions": {
     "allow": [
-      "Skill(tdd)",
       "Skill(build)",
       "Skill(open-pr)",
       "Skill(agent-code-review)",
