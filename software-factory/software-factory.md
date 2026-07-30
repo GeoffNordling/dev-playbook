@@ -46,13 +46,13 @@ A review node (diamond) is one or more AFK delegations followed by a HITL follow
 %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart LR
     new([new issue]) --> intake[intake]
-    intake -->|mode:sdd| sdd_specs[sdd_specs]
+    intake -->|"mode:sdd — frozen"| sdd_specs[sdd_specs]
     intake -->|mode:direct, needs design| design[design]
     intake -->|mode:direct, no design, tests:yes| tdd[tdd]
     intake -->|mode:direct, no design, tests:no| build[build]
     intake -->|mode:spike| spike[spike]
 
-    subgraph sdd[SDD path]
+    subgraph sdd["SDD path — frozen"]
         sdd_specs -->|pushed| sdd_spec_review{sdd_spec_review}
         sdd_spec_review -->|reject: rework| sdd_specs
         sdd_spec_review -->|approve| sdd_tdd[sdd_tdd]
@@ -74,6 +74,8 @@ flowchart LR
     sdd_pr_review -->|approve: merge| done([merged])
     pr_review -->|approve: merge| done
 ```
+
+**The SDD path is frozen.** Ratified 2026-07-30: the subgraph above is retained — for reference, and for issues already sitting inside it — but nothing enters and nothing dispatches. Intake must not mint `mode:sdd`; every new issue takes the direct or the spike path. An issue overwatch orienting onto any `phase:sdd-*` issue escalates *SDD temporarily disabled* instead of dispatching the node. The four `sdd-*` skills stay on disk and the `mode:sdd` and `phase:sdd-*` labels stay valid, so existing issues keep their tuples and the label invariants still hold; what is off is the routing.
 
 On the direct path, intake also decides whether the work needs a **design** pass. Substantive work routes through `design` first — where the approach is explored (and prototyped, in the issue's worktree) and the chosen solution and its tradeoffs are written into the issue body; trivial work bypasses it and lands straight at its implementation node. One `design` node serves both `tests:*` values, routing onward to `tdd` or `build` by the test dimension. The direct path carries no design-review gate — the design is captured in the issue and validated downstream at the review stop.
 

@@ -40,7 +40,7 @@ Single coherent piece → one issue. Plan crossing concerns or layers → break 
 The four-tuple is per slice; an epic carries `category:*` alone, per software-factory.md's label scheme — it never dispatches.
 
 - `category:*` — pick one.
-- `mode:*` — pick one. Check for a top-level `specs/` directory; ask the user if SDD applicability is unclear.
+- `mode:*` — pick one. `mode:sdd` is **frozen** and must never be minted, per the freeze rule in [software-factory.md → Graph-based flow](~/workspace/dev-playbook/software-factory/software-factory.md#graph-based-flow); the choice is `mode:direct` or `mode:spike`.
 - `tests:*` — `mode:sdd` is always `tests:yes`. For `mode:direct`, ask the user.
 - `phase:*` — the first work node per the state-machine graph. `mode:sdd` starts at `sdd-specs`. For `mode:direct`, decide whether the work needs a design pass: substantive work that wants solution exploration, prototyping, or tradeoff analysis starts at `design`; trivial work bypasses to its implementation node — `tdd` (`tests:yes`) or `build` (`tests:no`). Ask the user when the call isn't clear. Intake always leaves the issue at this node, never at `phase:intake`.
 
