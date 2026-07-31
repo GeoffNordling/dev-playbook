@@ -4,7 +4,7 @@ description: Audits the documentation in an issue's PR against its brief, the do
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
+disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---

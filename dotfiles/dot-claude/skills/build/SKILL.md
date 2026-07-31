@@ -4,7 +4,6 @@ description: Carries out a direct-mode issue against its brief — test-first wh
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 

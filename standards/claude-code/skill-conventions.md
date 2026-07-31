@@ -31,11 +31,12 @@ profile. See [the OKF bundle boundary](/standards/docs/bundle.md).
 ```yaml
 ---
 name: <skill-name>
-description: <one-line summary>
+description: <what it does. Use when …>
 disable-model-invocation: <true|false>
 model: <haiku|sonnet|opus|fable|inherit>
 effort: <low|medium|high|xhigh>
 allowed-tools: <tool spec>          # optional
+disallowed-tools: <tool spec>       # optional
 argument-hint: "<hint>"             # optional
 ---
 ```
@@ -47,19 +48,23 @@ Every skill must have all five of these:
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
-| `description` | Plain text, max 1024 chars, third person. First sentence states what the skill does. For skills with `disable-model-invocation: false`, the description `SHALL` include a second sentence beginning `Use when …` that lists the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. For `disable-model-invocation: true`, a short label is enough. |
+| `description` | Plain text, max 1024 chars, third person. **Exactly two sentences**, binding every authored skill — no exemption for `disable-model-invocation: true`. The first states what the skill does; the second `SHALL` begin with the literal words `Use when` and name the trigger keywords, contexts, or file types verbatim — this is the auto-invocation match surface, so be specific. Keep the wording minimal; nothing checks length. Sentences are counted dumbly: `.`, `!`, or `?` ends one when whitespace or the string's end follows, so `CANDIDATES.md` is safe mid-sentence but `e.g.` ends a sentence early. |
 | `disable-model-invocation` | `false` is the standard — per the [dispatch model](/software-factory/factory-operations.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
-| `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory — always present, never omitted. Which value a skill takes is the author's choice; this standard sets no default. One mechanical fact bears on it: **a pinned model only governs the turn that loads the skill** and reverts to the session model on the next prompt, so a pin binds a single-turn/batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
-| `effort` | `low`, `medium`, `high`, or `xhigh`. |
+| `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory — always present, never omitted. **The user decides `model` and `effort` explicitly**, never an agent and never a machinery default; `inherit` is a choice like any other. This governs the values persisted here, not a session's runtime pick of a subagent's model. One mechanical fact bears on the choice: **a pinned model only governs the turn that loads the skill** and reverts to the session model on the next prompt, so a pin binds a single-turn/batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
+| `effort` | `low`, `medium`, `high`, or `xhigh`. No default — the user's decision, same as `model`. |
 
 ### Optional fields
 
 | Field | When to include |
 |-------|-----------------|
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
+| `disallowed-tools` | Denies tools outright. Same format as `allowed-tools`. The mechanism behind the reviewer read-only guarantee — the pr-review skills carry `Edit MultiEdit NotebookEdit Write(/**)`, so a write is refused, not merely discouraged. Don't restate a workspace-wide denial from the settings. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 
-### Fields we do not use
+### The vocabulary is closed
+
+These eight fields are the whole vocabulary; a new one requires an edit here
+before its first use.
 
 - **`user-invocable`** — do not include this field. If a skill should not be
   user-invoked, use `disable-model-invocation: true` and rely on the skill's
@@ -90,7 +95,7 @@ After the front matter, the body is Markdown.
   judgment.
 - Content decisions (what sections to include, what patterns to use) are
   made per skill, not prescribed by this standard.
-- Keep SKILL.md under ~100 lines. When content exceeds that, has distinct
+- Keep SKILL.md under ~500 lines. When content exceeds that, has distinct
   sub-domains, or contains rarely-needed advanced material, spill into
   `references/` and link from SKILL.md so the agent loads it on demand.
 - Avoid time-sensitive content (hardcoded version numbers, dates,
@@ -154,13 +159,13 @@ conflict; they are different paths and different concerns.
   Good: `commit`, `ref-lint`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
   Example: `doc-format`, `doc-present-state`, `doc-rewrite`.
-- **Descriptions**: see the [Required Fields](#required-fields) row for
-  format. Examples — good (auto-invocable):
-  `Write tests from a spec item before any implementation lands. Use when
-  starting the red phase of TDD, when a spec~* item has no covering tests,
-  or when the user asks for "spec-first" tests.` Good (user-only):
-  `Author a new Claude Code skill following workspace conventions`.
-  Bad (no triggers, generic): `Helps with tests`.
+- **Descriptions**: see the [Required Fields](#required-fields) row for the
+  rule. Good: `Write tests from a spec item before any implementation lands.
+  Use when starting the red phase of TDD, when a spec~* item has no covering
+  tests, or when the user asks for "spec-first" tests.`
+  Bad: `A helpful utility that assists with various testing-related tasks and
+  workflows. Use when needed.` — the first sentence pads instead of naming
+  the job, and the second names no trigger.
 
 ## Checklist
 
@@ -168,9 +173,9 @@ Before shipping a new skill:
 
 - [ ] Directory name matches `name` field
 - [ ] All five required front matter fields present
-- [ ] Description follows the format rules (auto-invocable skills include `Use when …`)
+- [ ] Description is exactly two sentences, the second beginning `Use when …`
 - [ ] Body starts with an `# H1` title
-- [ ] SKILL.md under ~100 lines (or content beyond that lives in `references/`)
+- [ ] SKILL.md under ~500 lines (or content beyond that lives in `references/`)
 - [ ] References are one level deep
 - [ ] Arguments use `$ARGUMENTS` or `$0`/`$1` per the conventions above
 - [ ] No time-sensitive content (versions, dates, release paths)
