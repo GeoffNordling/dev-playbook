@@ -33,8 +33,6 @@ Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after
 
 Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **every time**, in both Capture and Adopt. No fuzziness condition, no escape hatch: understanding intent always precedes authoring. Run it once, over the raw idea, and always before the §3 draft and the §4 write.
 
-**The grill here is read-only.** It extracts intent and writes no files: no `CONTEXT.md` update, no Decision Record created or offered because the factory may run issues in parallel and they contend on those files.
-
 ### 2. Pick the four-tuple
 
 - `category:*` — pick one.
