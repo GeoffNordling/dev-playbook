@@ -168,9 +168,13 @@ judgments:
     evidence:  [standards/tracking.md]
     reference:
       - standards/standard/format.md
-      - standards/tracking/issues.md
+      - standards/tracking/index.md
+      - standards/tracking/candidates.md
+      - standards/tracking/issue-authoring.md
       - standards/tracking/repo-settings.md
+      - standards/tracking/tracker-operations.md
       - scripts/workspace-lint
+      - scripts/repo-lint
       - scripts/bootstrap-labels
     model: claude-sonnet-5
     effort: high

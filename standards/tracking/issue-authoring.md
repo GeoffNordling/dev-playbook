@@ -1,16 +1,18 @@
 ---
 type: Standard
-title: Issue Conventions
-description: GitHub issue conventions — epic and leaf roles, readiness, the three brief formats, vertical slices, and native relationships
+title: Issue Authoring
+description: How a GitHub issue is authored — epic and leaf roles, readiness, the three brief formats, vertical slices, and native relationships
 ---
 
-# Issue Conventions
+# Issue Authoring
 
 How GitHub Issues are authored in workspace repos. An issue plays one of two
 **roles** and, as a leaf, moves through a **readiness** lifecycle; its body is
 the agent **brief**, in one of three formats. Applies wherever issues are
 authored — at intake, when an idea or a rushed stub becomes a tracked issue, and
-at the `design` node, when one issue becomes an epic and its children.
+at the `design` node, when one issue becomes an epic and its children. Driving
+the tracker itself — the commands that create, link, and close issues — is
+[tracker-operations.md](/standards/tracking/tracker-operations.md).
 
 An issue is **committed work**, at any size — an epic, an ordinary issue, or a
 one-line bug. Work not yet decided on is a Candidate in `CANDIDATES.md`
@@ -22,9 +24,9 @@ authored.
 
 ## Roles: epic and leaf
 
-Every issue is exactly one of two roles. The role is **derived**, never a label —
-the same principle as *blocked* (a derived dependency state, never minted as a
-label).
+Every issue carrying build work through the software factory is exactly one of
+two roles. The role is **derived**, never a label — the same principle as
+*blocked* (a derived dependency state, never minted as a label).
 
 - **Leaf** — the unit of work. A leaf is dispatched through the
   [software factory graph](/software-factory/software-factory.md#the-graph) and carries the full four-tuple
@@ -41,6 +43,27 @@ label).
 `design` node concluding the work is too big for one leaf: the session
 decomposes it in place, turning the issue into an epic and minting its children
 as ready leaves (see [the decompose exit](/software-factory/software-factory.md#the-definition-region)).
+
+### Two species of epic
+
+The two roles are the whole model for factory-tracked build work, but an epic
+comes in two species, told apart by what its children are *for*:
+
+- **Wayfinder map** — a **planning** epic whose children are decision tickets:
+  research, prototype, grilling, and task tickets that close by producing an
+  answer rather than shipping a slice. A map is driven by the `/wayfinder`
+  skill, which owns its body shape, its labels, and its working loop; the skill
+  is the definition, and this standard restates none of it. The tracker moves a
+  map runs on are in
+  [tracker-operations.md](/standards/tracking/tracker-operations.md).
+- **Build epic** — children are build leaves, each a vertical slice of the
+  outcome. This is the default species, and the one the epic body below
+  describes.
+
+A decision ticket is **not a factory leaf** and carries none of a leaf's
+obligations: no four-tuple, no dispatch through the software factory graph, no
+build-leaf or spike brief. What a ticket does carry is the `/wayfinder` skill's
+to define.
 
 ## Readiness
 
@@ -98,6 +121,9 @@ What should happen after the work is complete. Be specific about edge cases and 
 - Adjacent features that are separate
 ```
 
+A brief reporting broken behavior may add a `Steps to reproduce` heading; it is
+optional, unenforced, and changes none of the six.
+
 ### The spike brief (`mode:spike`)
 
 A spike is a **question** whose deliverable is an **answer**, not
@@ -131,12 +157,50 @@ Why the work was sliced this way — the ordering constraints and shared surface
 that shaped the slices.
 ```
 
+#### Optional sections
+
+A long-running epic accumulates two things the required sections have no home
+for: a boundary that keeps getting re-asked, and a ruling made after the
+decomposition that binds more than one child. Each gets an **optional** section,
+added when — and only when — the epic actually accrues one. A fresh epic carries
+neither, and most never grow them; an empty heading is boilerplate, not
+structure.
+
+```markdown
+**Out of scope:**
+- What this epic will not do, and why. Link the child, where one was closed as mis-scoped.
+
+**Standing rulings:**
+1. The ruling in one line, stated as the constraint it puts on children.
+```
+
+**Out of scope** rules work outside the outcome: it will never become a child. A
+boundary earns a line when a reader could reasonably have assumed the opposite.
+Work inside the outcome but not yet sliced is a child not created yet — the
+decomposition rationale's business. A leaf's `Out of scope` defers gold-plating
+to a sibling; an epic's rules out work no sibling will pick up.
+
+**Standing rulings** holds decisions taken after the epic was written that
+constrain children not yet built. Governing unbuilt work is what earns a ruling
+its place — this is not an index of closed children, nor a changelog. Numbered,
+appended to, never renumbered: the number is how a child cites a ruling. A
+decision binding one child belongs in that child's brief; one meeting the
+Decision Record bar gets a record under `docs/decisions/`
+([records.md](/standards/decisions/records.md)).
+
 ## Brief principles
 
 - **Durability over precision.** The issue may sit for days or weeks. Describe interfaces, types, and behavioural contracts. File paths and line numbers go stale.
 - **Behavioural, not procedural.** Describe what the system should do, not how to implement it. The agent will explore and decide.
 - **Testable acceptance criteria.** Each criterion is independently verifiable.
 - **Explicit out-of-scope.** Prevents gold-plating.
+
+**The prototype snippet is the exception.** A brief may carry a verbatim snippet
+a prototype session produced — the answer it was built to yield, written to lift
+into real code unchanged. The snippet is the durable artifact, not a fragile
+detail: it is what survived the prototype. And it states a settled shape, not
+steps. The test is provenance — a snippet a prototype answered for, not an
+implementation the brief guessed at.
 
 ## Vertical-slice rules
 

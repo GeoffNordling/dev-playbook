@@ -18,9 +18,9 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 Before doing anything else, read end-to-end:
 
 - [module design](~/workspace/dev-playbook/standards/modules/design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. The lens for weighing a solution's shape.
-- [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) — the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on.
+- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) — the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on.
 
-Then report: `READ: module-design.md, issue-conventions.md`. Proceed only after.
+Then report: `READ: module-design.md, issue-authoring.md`. Proceed only after.
 
 ## 1. Load context
 
@@ -77,7 +77,7 @@ Nothing below this line is written to GitHub before the user approves.
 
 ### Single leaf
 
-Re-author the issue's brief in place across the six build-leaf headings ([issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md)). The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
+Re-author the issue's brief in place across the six build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
 
 `gh issue edit --body` replaces the whole body, so write the complete brief back:
 
