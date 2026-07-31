@@ -10,8 +10,11 @@ Governs how claims only language can check — accuracy, honesty, scope —
 are validated and kept from drifting as the underlying files change.
 
 The [`judgments-run`](/scripts/judgments-run) CLI is the deterministic engine
-the `run-judgments` skill drives: it plans the docket, renders the judge
-prompts, and records the passing verdicts.
+behind the `run-judgments` skill: it plans the docket, renders the judge
+prompts, and records the passing verdicts. The skill reaches it through the
+[judgments workflow](/harness-recipes/recipes/judgments.md), which runs those
+three steps and the judge fan-out outside any context window, so the skill is
+left with only the refutations to weigh.
 
 ## Define
 

@@ -14,6 +14,15 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
+  - id: ralph-loop-recipe-matches-workflow
+    claim: |
+      harness-recipes/recipes/ralph-loop.md accurately documents the ralph-loop
+      workflow script it describes.
+    evidence:  [harness-recipes/recipes/ralph-loop.md]
+    reference: [dotfiles/dot-claude/workflows/ralph-loop.js]
+    model: claude-sonnet-5
+    effort: high
+
   - id: judgments-standard-matches-loader
     claim: |
       standards/judgments/declarations.md accurately documents the judgment
@@ -24,15 +33,28 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
+  - id: judgments-recipe-matches-workflow
+    claim: |
+      harness-recipes/recipes/judgments.md accurately documents the judgments
+      workflow script it describes.
+    evidence:  [harness-recipes/recipes/judgments.md]
+    reference:
+      - dotfiles/dot-claude/workflows/judgments.js
+      - src/dev_playbook/judgments/runner.py
+    model: claude-sonnet-5
+    effort: high
+
   - id: run-judgments-skill-matches-tooling
     claim: |
       The run-judgments skill accurately documents how it dispatches
-      cache-missed judgments through the scatter-gather workflow and records
-      the passing verdicts.
-    evidence:  [dotfiles/dot-claude/skills/run-judgments/SKILL.md]
+      cache-missed judgments through the judgments workflow, what that
+      workflow returns, and how the passing verdicts get recorded.
+    evidence:
+      - dotfiles/dot-claude/skills/run-judgments/SKILL.md
+      - dotfiles/dot-claude/skills/run-judgments/references/recording-without-a-judge.md
     reference:
       - src/dev_playbook/judgments/runner.py
-      - dotfiles/dot-claude/workflows/scatter-gather.js
+      - dotfiles/dot-claude/workflows/judgments.js
     model: claude-sonnet-5
     effort: high
 

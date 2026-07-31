@@ -6,9 +6,11 @@ bench -> content key and judge prompt) and the ``skipcache`` seen-set. No
 LLM, no network: this is the deterministic half the judge skill stands on.
 
 - ``plan``  -- key every judgment, partition by cache membership, emit one JSON
-  object ``{schema, seen, unseen}`` with both lists ordered by id.
+  object ``{cli, schema, seen_count, unseen}`` with ``unseen`` ordered by id.
 - ``render <id>`` -- print exactly the judge prompt for one judgment.
 - ``record <id>...`` -- record the passing judgments' keys idempotently.
+- ``--root <path>`` -- name the repo root explicitly instead of resolving it from
+  the current directory, so a fully-specified command works from anywhere.
 - ``--list-rules`` -- print nothing and exit 0: this CLI records passing verdicts
   but emits no findings, so it answers the detector protocol with an empty rule set.
 """
@@ -24,35 +26,63 @@ from dev_playbook.judgments.loader import Declaration, by_id, load, resolve_root
 from dev_playbook.skipcache import seen
 
 _DISPATCH_PROMPT = (
-    "Run the shell command `judgments-run render {id}`. Its stdout is your complete "
-    "instructions and the material to judge -- follow it and return your verdict."
+    "Run this exact command: {cli} render {id}\n"
+    "Its stdout is your complete instructions and the material to judge -- follow "
+    "it and return your verdict. The command is absolute and needs no PATH lookup, "
+    "no virtualenv activation, and no particular working directory; run it "
+    "verbatim and do not substitute a shorter spelling."
 )
 
 
-def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object]:
-    """Partition the judgments by cache membership into a ``{schema, seen, unseen}``.
+def invocation(root: Path) -> str:
+    """The absolute, fully-specified command that re-invokes this CLI over ``root``.
 
-    ``seen`` is the sorted ids whose key is already cached; ``unseen`` is the
-    sorted-by-id list of ``{id, model, effort, prompt}`` the judge skill must still
-    run -- each a ready-to-dispatch job whose ``prompt`` bootstraps a judge agent.
+    Judge agents are handed this string inside their prompt and consumers append a
+    subcommand to it. It names the running interpreter by absolute path and reaches
+    the CLI as a module, so it resolves without a PATH lookup, without an activated
+    virtualenv, and without ``uv run`` -- the three ways a bare ``judgments-run``
+    has been observed to fail in a worktree. ``--root`` is baked in for the same
+    reason: the command must not depend on the caller's working directory. The root
+    only locates files and never enters a content key, so naming it explicitly
+    cannot change a verdict's identity.
+    """
+    return f"{sys.executable} -m dev_playbook.judgments.runner --root {root}"
+
+
+def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object]:
+    """Partition by cache membership into a ``{cli, schema, seen_count, unseen}``.
+
+    ``seen_count`` is how many judgments are already cached -- a count, not a list,
+    because no caller needs the ids and every one of them costs an orchestrating
+    agent context. ``unseen`` is the sorted-by-id list of ``{id, model, effort,
+    prompt}`` the judge skill must still run -- each a ready-to-dispatch job whose
+    ``prompt`` bootstraps a judge agent. ``cli`` is the absolute invocation a caller
+    appends ``record <id>...`` to, so it never has to spell the command itself.
     """
     keyed = [(d, _prepared(d, root)) for d in declarations]
     cached = set(seen.filter([prepared.key for _, prepared in keyed]).seen)
-    seen_ids = sorted(d.id for d, prepared in keyed if prepared.key in cached)
+    resolved = root if root is not None else Path.cwd()
+    cli = invocation(resolved)
     unseen = sorted(
         (
             {
                 "id": d.id,
                 "model": d.model,
                 "effort": d.effort,
-                "prompt": _DISPATCH_PROMPT.format(id=d.id),
+                "prompt": _DISPATCH_PROMPT.format(cli=cli, id=d.id),
             }
             for d, prepared in keyed
             if prepared.key not in cached
         ),
         key=lambda entry: entry["id"],
     )
-    return {"schema": SCHEMA, "seen": seen_ids, "unseen": unseen}
+    seen_count = sum(1 for _, prepared in keyed if prepared.key in cached)
+    return {
+        "cli": cli,
+        "schema": SCHEMA,
+        "seen_count": seen_count,
+        "unseen": unseen,
+    }
 
 
 def render_prompt(declaration: Declaration, root: Path | None) -> str:
@@ -96,7 +126,19 @@ def main(argv: list[str]) -> int:
     if args.command is None:
         print("judgments-run: a subcommand is required", file=sys.stderr)
         return 2
-    root = resolve_root()
+    # An explicit --root wins over the walk-up search, so a command generated for
+    # a judge agent runs identically from any working directory.
+    root: Path | None
+    if args.root is not None:
+        root = Path(args.root)
+        if not (root / "pyproject.toml").is_file():
+            print(
+                f"judgments-run: --root {args.root!r} has no pyproject.toml",
+                file=sys.stderr,
+            )
+            return 1
+    else:
+        root = resolve_root()
     try:
         declarations = load(root)
         if args.command == "plan":
@@ -133,6 +175,11 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="print the rule ids this detector can emit, one per line, and exit",
     )
+    parser.add_argument(
+        "--root",
+        default=None,
+        help="repo root to operate on (default: resolve it from the current directory)",
+    )
     sub = parser.add_subparsers(dest="command")
     sub.add_parser("plan", help="emit {schema, seen, unseen} as JSON")
     render_parser = sub.add_parser("render", help="print one judgment's judge prompt")
@@ -142,3 +189,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         "ids", nargs="*", help="the passing judgment ids to record"
     )
     return parser.parse_args(argv)
+
+
+# Makes `python -m dev_playbook.judgments.runner` a first-class entry point, which
+# is the spelling invocation() hands to judge agents: it needs only an interpreter
+# that can import the package, never a console script on PATH.
+if __name__ == "__main__":  # pragma: no cover - exercised as a subprocess
+    sys.exit(run_cli())

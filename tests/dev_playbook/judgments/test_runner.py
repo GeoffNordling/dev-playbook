@@ -1,6 +1,7 @@
 """Behavioral tests for the judgments-run CLI: plan, render, record."""
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -52,16 +53,46 @@ def test_plan_reports_an_uncached_judgment_as_unseen(
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
     assert output["schema"] == SCHEMA
-    assert output["seen"] == []
+    assert output["seen_count"] == 0
     (entry,) = output["unseen"]
     assert entry.keys() == {"id", "model", "effort", "prompt"}
     assert entry["id"] == "j1"
     assert entry["model"] == "claude-sonnet-4-6"
     assert entry["effort"] == "high"
-    assert "judgments-run render j1" in entry["prompt"]
+    assert "render j1" in entry["prompt"]
 
 
-def test_plan_with_no_config_emits_empty_lists(
+def test_plan_counts_cached_judgments_without_listing_them(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # The ids of already-passing judgments are context an orchestrating agent
+    # pays for and never reads, so plan reports how many there are, not which.
+    assert main(["record", "j1"]) == 0
+
+    assert main(["plan"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["seen_count"] == 1
+    assert "seen" not in output
+
+
+def test_plan_hands_back_a_self_contained_invocation(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Every command the plan hands out -- the judge prompts and the `cli` a caller
+    # appends `record` to -- must run without a PATH lookup, an activated
+    # virtualenv, or a particular working directory, because judge agents have
+    # none of those guaranteed. It names an absolute interpreter and its own root.
+    assert main(["plan"]) == 0
+    output = json.loads(capsys.readouterr().out)
+
+    assert output["cli"].startswith(sys.executable)
+    assert f"--root {repo}" in output["cli"]
+    assert output["unseen"][0]["prompt"].startswith(
+        f"Run this exact command: {sys.executable}"
+    )
+
+
+def test_plan_with_no_config_emits_an_empty_docket(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     bare = tmp_path / "bare"
@@ -73,7 +104,9 @@ def test_plan_with_no_config_emits_empty_lists(
 
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
-    assert output == {"schema": SCHEMA, "seen": [], "unseen": []}
+    assert output["schema"] == SCHEMA
+    assert output["seen_count"] == 0
+    assert output["unseen"] == []
 
 
 def test_render_prints_exactly_the_prepared_prompt(
@@ -101,8 +134,32 @@ def test_record_then_plan_reports_the_judgment_as_seen(
 
     assert main(["plan"]) == 0
     output = json.loads(capsys.readouterr().out)
-    assert output["seen"] == ["j1"]
+    assert output["seen_count"] == 1
     assert output["unseen"] == []
+
+
+def test_root_option_runs_from_an_unrelated_directory(
+    repo: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The whole point of --root: a judge agent gets a fully-specified command and
+    # runs it wherever it happens to be standing.
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    monkeypatch.chdir(elsewhere)
+
+    assert main(["--root", str(repo), "render", "j1"]) == 0
+
+
+def test_root_option_rejects_a_directory_that_is_not_a_repo(
+    repo: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    not_a_repo = tmp_path / "not-a-repo"
+    not_a_repo.mkdir()
+
+    exit_code = main(["--root", str(not_a_repo), "plan"])
+
+    assert exit_code == 1
+    assert "no pyproject.toml" in capsys.readouterr().err
 
 
 def test_record_is_idempotent(repo: Path) -> None:
