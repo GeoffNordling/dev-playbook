@@ -90,6 +90,7 @@ them per script. The library is the installed `dev_playbook` package:
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
+- `dev_playbook.voice` — the agent-facing voice vocabulary: the words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `repo-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one.
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `repo-lint` self-check). Consumed by `repo-init`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration

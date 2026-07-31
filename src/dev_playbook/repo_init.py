@@ -14,6 +14,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from dev_playbook import voice
+
 PLAYBOOK_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_DIR = PLAYBOOK_ROOT / "standards" / "build" / "canonical"
 REV_PLACEHOLDER = "<pinned-sha>"
@@ -60,6 +62,15 @@ def pinned_rev() -> str:
 
 def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
     """Map each file the new repo needs to its content, per the skeleton."""
+    # The name becomes the CLAUDE.md H1, which repo-lint reads as agent-facing
+    # prose. Refuse it here, before anything is written, rather than let the
+    # scaffold fail its own self-check with the tree already on disk.
+    fault = voice.first_fault(spec.name)
+    if fault is not None:
+        raise RepoInitError(
+            f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
+            f"{fault}; choose another name"
+        )
     if spec.python and not spec.package.isidentifier():
         raise RepoInitError(
             f"'{spec.name}' maps to '{spec.package}', not a valid import package"

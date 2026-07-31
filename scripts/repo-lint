@@ -42,7 +42,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from dev_playbook import gitrepo, md, pyast  # noqa: E402
+from dev_playbook import gitrepo, md, pyast, voice  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
@@ -149,25 +149,12 @@ CONTEXT_SECTIONS = (
     "## Flagged ambiguities",
 )
 
-# Agent-facing instruction text names the human actor "user" and never speaks in
-# first person. Four tokens: the actor-noun "human" (but not the
-# "human-readable" compound) and the first-person "I" (but not the "I/O"
-# abbreviation), "me", and "my". Only "human" and "I" carry an exemption —
-# nothing in the workspace's vocabulary spells "me" or "my" as anything but the
-# first person, so neither gets a speculative guard. Inline code, fenced
-# blocks, and double-quoted spans are stripped before matching so a backticked
-# example or a quoted utterance is not mistaken for prose. Each pattern carries
-# its own message: an actor-noun hit and a first-person hit are two different
-# faults (conventions.md — Terminology: human vs user).
-VOICE_PATTERNS = (
-    (
-        re.compile(r"\bhuman\b(?!-)", re.IGNORECASE),
-        "name the human 'user', not 'human'",
-    ),
-    (re.compile(r"\bI\b(?!/O)"), "never speak in first person: 'I'"),
-    (re.compile(r"\b[Mm]e\b"), "never speak in first person: 'me'"),
-    (re.compile(r"\b[Mm]y\b"), "never speak in first person: 'my'"),
-)
+# The words agent-facing instruction text may not speak in live in
+# dev_playbook.voice, which repo-init reads too — a fresh repo's name becomes
+# the H1 of the CLAUDE.md it scaffolds, so the same vocabulary decides whether
+# a name is legal. Inline code, fenced blocks, and double-quoted spans are
+# stripped here before matching, so a backticked example or a quoted utterance
+# is not mistaken for prose.
 
 # A double-quoted span on one line is somebody else's voice — the phrasing a
 # user types to trigger a skill, the reaction a prototype is built to provoke —
@@ -697,7 +684,7 @@ def check_agent_facing_voice(root: Path) -> list[Finding]:
             continue
         for num, line in md.content_lines(path):
             masked = QUOTED_SPEECH_PATTERN.sub("", md.INLINE_CODE_PATTERN.sub("", line))
-            for pattern, fault in VOICE_PATTERNS:
+            for pattern, fault in voice.VOICE_PATTERNS:
                 if pattern.search(masked):
                     findings.append(
                         Finding(rel, AGENT_FACING_VOICE, f"line {num}: {fault}")
