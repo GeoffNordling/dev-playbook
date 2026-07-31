@@ -4,10 +4,6 @@
   },
   "permissions": {
     "allow": [
-      "Skill(build)",
-      "Skill(open-pr)",
-      "Skill(agent-code-review)",
-      "Skill(code-review)",
       "Bash(uv run pytest)",
       "Bash(uv run pytest *)",
       "Bash(uv run ruff check *)",

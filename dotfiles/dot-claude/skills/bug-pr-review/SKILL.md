@@ -4,7 +4,7 @@ description: Runs a bug review over an issue's PR diff — eight finder angles, 
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
+disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---

@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
+description: Compact the current conversation into a handoff document a fresh agent can resume from. Use when the user asks for a handoff, or wants to carry this session's work into a new one.
 disable-model-invocation: true
 model: opus
 effort: medium

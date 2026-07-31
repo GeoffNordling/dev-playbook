@@ -1,6 +1,6 @@
 ---
 name: doc-rewrite
-description: Rewrite a Markdown document from scratch, preserving content by default
+description: Rewrite a Markdown document from scratch, rebuilding its structure while preserving content by default. Use when the user asks to rewrite, restructure, or rebuild a Markdown document rather than edit it in place.
 disable-model-invocation: true
 model: opus
 effort: xhigh
