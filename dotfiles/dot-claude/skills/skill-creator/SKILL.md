@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Author a new Claude Code skill following workspace conventions
+description: Author a new Claude Code skill bundle following workspace conventions. Use when the user asks to create a skill, add a slash command, or scaffold a SKILL.md bundle.
 disable-model-invocation: true
 model: inherit
 effort: xhigh
@@ -21,9 +21,9 @@ Discuss with the user. Ask the questions the standard leaves to choice:
 - **Purpose** — what does this skill do? What problem does it solve? What's the success criterion?
 - **Use cases** — what specific scenarios should it handle? Any edge cases worth calling out?
 - **Invocation mode** — `disable-model-invocation: true` (user-only, slash-command) or `false` (Claude auto-invokes when relevant)?
-- **Triggers** (auto-invocable only) — what keywords, contexts, or file types should make Claude reach for it? These go into the description.
+- **Triggers** — what keywords, contexts, or file types should make Claude reach for it, or which fixed dispatcher launches it? These go into the description's `Use when …` sentence.
 - **Model** — ask the user which model the skill runs under (`haiku` / `sonnet` / `opus` / `fable`, or `inherit` to follow the session model); it's their call, not a default you set. The one mechanic to surface when they decide: a pin only governs the turn that loads the skill, so for an interactive, multi-turn skill `inherit` is what honestly reflects the rest of the interaction.
-- **Effort** — default to `xhigh` unless the user says otherwise (`low` / `medium` / `high` / `xhigh`).
+- **Effort** — ask the user which effort the skill runs at (`low` / `medium` / `high` / `xhigh`); there is no default, and it is their call, not one you set.
 - **Arguments** — none, single free-form (`$ARGUMENTS`), or positional (`$0`/`$1`/...)?
 - **References** — does the body need supporting files under `references/`?
 - **Scripts** — does the skill invoke helper scripts that should live under `scripts/` (deterministic ops, repeated logic, places where reliability matters)?
@@ -31,20 +31,18 @@ Discuss with the user. Ask the questions the standard leaves to choice:
 
 ## 3. Write the description
 
-The description is the only metadata the model sees when deciding to load an auto-invocable skill. It is the matcher's input, not a comment for humans.
-
-For `disable-model-invocation: false`, both sentences are required:
+Every skill's description is **exactly two sentences**, whatever its invocation mode. For an auto-invocable skill it is also the only metadata the model sees when deciding to load the skill — the matcher's input, not a comment for humans.
 
 - First sentence: what the skill does, third person.
-- Second sentence: `SHALL` start with `Use when …` and name trigger keywords, contexts, and file types verbatim. Be specific — generic descriptions get matched poorly. The lint (`scripts/skill-lint`) hard-fails on missing `Use when …`.
+- Second sentence: `SHALL` start with `Use when …` and name trigger keywords, contexts, and file types verbatim. Be specific — generic descriptions get matched poorly.
 
-For `disable-model-invocation: true`, a short third-person label is enough; no triggers needed since the user invokes by name.
+The lint (`scripts/skill-lint`) hard-fails on both halves — a count other than two, or a second sentence not opening `Use when` — on every authored bundle, `disable-model-invocation: true` included. Keep the wording minimal; nothing checks length, so brevity is on you.
 
 See [skill-conventions.md — Required Fields](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md#required-fields) for the format rules and worked examples.
 
 ## 4. Decide on bundle layout
 
-Keep `SKILL.md` under ~100 lines. If the body would exceed that, has distinct sub-domains, or contains rarely-needed advanced material, spill into `references/`. References are one level deep — reference files do not link to other reference files.
+Keep `SKILL.md` under ~500 lines. If the body would exceed that, has distinct sub-domains, or contains rarely-needed advanced material, spill into `references/`. References are one level deep — reference files do not link to other reference files.
 
 If the skill needs helper scripts, put them in `scripts/` and reference them with relative links from SKILL.md (`[check.py](scripts/check.py)`). The skill-bundle `scripts/` is distinct from any project-root `scripts/`; both may coexist.
 

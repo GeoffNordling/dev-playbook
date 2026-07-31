@@ -1,6 +1,6 @@
 ---
 name: improve-protocol
-description: Observe an executing agent and improve the protocol based on what you see
+description: Prime a session for improving the Align, Map, Execute protocol from observations of an executing agent. Use when the user wants to feed observed agent behavior back into the protocol's formulation and instruction files.
 disable-model-invocation: true
 model: opus
 effort: high

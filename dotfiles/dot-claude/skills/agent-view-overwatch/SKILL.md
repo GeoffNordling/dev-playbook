@@ -1,6 +1,6 @@
 ---
 name: agent-view-overwatch
-description: Fleet co-pilot in Agent view — reads the issue board, recommends the next issue-overwatch launch, and tears down worktrees after confirmed merges.
+description: Fleet co-pilot in Agent view — reads the issue board, recommends the next issue-overwatch launch, and tears down worktrees after confirmed merges. Use when the user launches it from Agent view to run the fleet across every in-flight issue.
 disable-model-invocation: true
 model: sonnet
 effort: xhigh

@@ -1,6 +1,6 @@
 ---
 name: doc-present-state
-description: Remind model to document only present-state, via forward-looking prose.
+description: Steer documentation toward present state and next steps, dropping history an agent does not need in order to act. Use when the user asks for present-state documentation or wants historical narration stripped from a doc.
 disable-model-invocation: true
 model: opus
 effort: xhigh

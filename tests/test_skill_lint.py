@@ -13,9 +13,23 @@ SKILL_LINT = Path(__file__).resolve().parents[1] / "scripts" / "skill-lint"
 
 def valid_skill(name: str = "greet", body: str = "# Greet\n\nDo the thing.\n") -> str:
     return (
-        f"---\nname: {name}\ndescription: A greeting skill\n"
+        f"---\nname: {name}\n"
+        "description: Greet the user by name. Use when the user asks for a greeting.\n"
         "disable-model-invocation: true\nmodel: sonnet\neffort: low\n---\n\n"
     ) + body
+
+
+def with_field(skill: str, line: str) -> str:
+    """Return `skill` with one extra front matter line after `effort`."""
+    return skill.replace("effort: low\n", f"effort: low\n{line}\n", 1)
+
+
+def with_description(skill: str, description: str) -> str:
+    return skill.replace(
+        "description: Greet the user by name. Use when the user asks for a greeting.",
+        f"description: {description}",
+        1,
+    )
 
 
 def make_repo(tmp_path: Path, skills: dict[str, str]) -> Path:
@@ -82,7 +96,7 @@ def test_name_mismatch_is_flagged(tmp_path: Path) -> None:
 
 
 def test_body_length_is_a_stderr_advisory_that_never_fails(tmp_path: Path) -> None:
-    long_body = "# Greet\n\n" + "\n".join(f"line {i}" for i in range(200)) + "\n"
+    long_body = "# Greet\n\n" + "\n".join(f"line {i}" for i in range(600)) + "\n"
     repo = make_repo(tmp_path, {"greet": valid_skill(body=long_body)})
 
     result = run(repo)
@@ -91,6 +105,125 @@ def test_body_length_is_a_stderr_advisory_that_never_fails(tmp_path: Path) -> No
     assert result.stdout == ""
     assert "body is" in result.stderr
     assert "body-length" not in result.stdout
+
+
+def test_body_under_the_advisory_threshold_is_silent(tmp_path: Path) -> None:
+    """251 lines tripped the old ~100-line threshold; at ~500 it does not."""
+    body = "# Greet\n\n" + "\n".join(f"line {i}" for i in range(249)) + "\n"
+    repo = make_repo(tmp_path, {"greet": valid_skill(body=body)})
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "body is" not in result.stderr
+
+
+def test_description_that_is_not_two_sentences_blocks(tmp_path: Path) -> None:
+    skill = with_description(valid_skill(), "Greet the user by name.")
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.description-sentences" in result.stdout
+
+
+def test_unterminated_description_counts_as_zero_sentences(tmp_path: Path) -> None:
+    """A bare fragment with no terminal punctuation is not one sentence."""
+    skill = with_description(valid_skill(), "Greet the user by name")
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "is 0 sentence(s)" in result.stdout
+
+
+def test_trigger_rule_binds_user_only_skills(tmp_path: Path) -> None:
+    """The 'Use when' rule has no carve-out for disable-model-invocation: true."""
+    skill = with_description(
+        valid_skill(), "Greet the user by name. Invoked from the greeting menu."
+    )
+    repo = make_repo(tmp_path, {"greet": skill})
+    assert "disable-model-invocation: true" in skill
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.description-trigger" in result.stdout
+
+
+def test_use_when_must_open_the_second_sentence(tmp_path: Path) -> None:
+    """A substring match is not enough — the marker anchors sentence two."""
+    skill = with_description(
+        valid_skill(), "Greet the user by name. Reach for it when needed."
+    )
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.description-trigger" in result.stdout
+
+
+def test_period_inside_a_token_does_not_end_a_sentence(tmp_path: Path) -> None:
+    skill = with_description(
+        valid_skill(),
+        "Promote a candidate to an issue. Use when the user names an entry in "
+        "CANDIDATES.md they now want built.",
+    )
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_unknown_frontmatter_field_blocks(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {"greet": with_field(valid_skill(), "turns: many")})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.unknown-field" in result.stdout
+    assert "turns" in result.stdout
+
+
+def test_disallowed_tools_is_a_documented_field(tmp_path: Path) -> None:
+    skill = with_field(valid_skill(), "disallowed-tools: Edit MultiEdit Write(/**)")
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_user_invocable_is_reported_once_as_a_banned_field(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path, {"greet": with_field(valid_skill(), "user-invocable: true")}
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.banned-field" in result.stdout
+    assert "claude-code.unknown-field" not in result.stdout
+
+
+def test_dot_directory_under_a_skill_root_is_not_a_skill(tmp_path: Path) -> None:
+    """Harness scratch (e.g. .cc-writes) must not be counted as a bundle."""
+    repo = make_repo(tmp_path, {"greet": valid_skill()})
+    scratch = repo / ".claude" / "skills" / ".cc-writes"
+    scratch.mkdir(parents=True)
+    (scratch / "note.txt").write_text("harness scratch\n")
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+    assert "1 internal skills" in result.stderr
 
 
 def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
@@ -104,6 +237,8 @@ def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
     ids = result.stdout.split()
     assert "claude-code.required-field" in ids
     assert "claude-code.body-h1" in ids
+    assert "claude-code.description-sentences" in ids
+    assert "claude-code.unknown-field" in ids
     assert "body-length" not in " ".join(ids)
     assert all(rule.startswith("claude-code.") for rule in ids), ids
 

@@ -1,6 +1,6 @@
 ---
 name: protocol-align-map-execute
-description: "Align, Map, Execute: structured human-agent collaboration on large-scope tasks"
+description: Run the Align, Map, Execute protocol for structured human-agent collaboration on large-scope tasks. Use when a task is too large for the user to evaluate raw results and the agent's model of their intent is still incomplete.
 disable-model-invocation: true
 model: inherit
 effort: xhigh

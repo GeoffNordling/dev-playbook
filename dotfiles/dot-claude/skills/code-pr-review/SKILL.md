@@ -4,7 +4,7 @@ description: Audits the code in a direct-mode issue's PR against its issue brief
 disable-model-invocation: false
 model: opus
 effort: xhigh
-disallowed-tools: AskUserQuestion Edit MultiEdit NotebookEdit Write(/**)
+disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(//tmp/**)
 argument-hint: "<issue-number>"
 ---

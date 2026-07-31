@@ -4,7 +4,6 @@ description: Opens the long-lived PR for an issue once its branch is on origin â
 disable-model-invocation: false
 model: sonnet
 effort: low
-disallowed-tools: AskUserQuestion
 argument-hint: "<issue-number>"
 ---
 
