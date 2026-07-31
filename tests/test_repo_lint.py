@@ -39,6 +39,7 @@ def make_repo(
     files: dict[str, str],
     name: str = "sample-repo",
     executable: tuple[str, ...] = (),
+    symlinks: tuple[tuple[str, str], ...] = (),
 ) -> Path:
     repo = tmp_path / name
     for rel, content in files.items():
@@ -47,6 +48,10 @@ def make_repo(
         path.write_text(content)
     for rel in executable:
         os.chmod(repo / rel, 0o755)
+    for rel, target in symlinks:
+        link = repo / rel
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(target)
     subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)
     subprocess.run(
         ["git", "-C", str(repo), "add", "-A"], check=True, capture_output=True
@@ -285,7 +290,7 @@ def test_repo_claude_md_bare_heading_passes(tmp_path: Path) -> None:
     assert run(make_repo(tmp_path, files)).returncode == 0
 
 
-# --- CLAUDE.md agent-facing voice ---
+# --- agent-facing voice (CLAUDE.md, skill bodies, rule bodies) ---
 
 # A conformant global CLAUDE.md source: the two buckets, the workspace-wide
 # rules, no voice tokens.
@@ -333,6 +338,145 @@ def test_nested_claude_md_voice_checked(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
     assert "sub/CLAUDE.md: claude-code.agent-facing-voice" in result.stdout
+
+
+def test_skill_body_human_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files[".claude/skills/demo/SKILL.md"] = (
+        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
+        "# Demo\n\nAsk the human before deleting.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert (
+        ".claude/skills/demo/SKILL.md: claude-code.agent-facing-voice" in result.stdout
+    )
+    assert "'human'" in result.stdout
+
+
+def test_skill_body_first_person_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["dotfiles/dot-claude/skills/demo/SKILL.md"] = (
+        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
+        "# Demo\n\nI check my work before reporting.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "dotfiles/dot-claude/skills/demo/SKILL.md" in result.stdout
+    assert "'I'" in result.stdout
+    assert "'my'" in result.stdout
+
+
+def test_rule_body_human_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["dotfiles/dot-claude/rules/commands.md"] = (
+        "# Commands\n\nHand the command to the human.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert (
+        "dotfiles/dot-claude/rules/commands.md: claude-code.agent-facing-voice"
+        in result.stdout
+    )
+    assert "'human'" in result.stdout
+
+
+def test_rule_body_first_person_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files[".claude/rules/commands.md"] = "# Commands\n\nI run my own checks.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert ".claude/rules/commands.md: claude-code.agent-facing-voice" in result.stdout
+    assert "'I'" in result.stdout
+    assert "'my'" in result.stdout
+
+
+def test_rule_body_object_pronoun_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files[".claude/rules/commands.md"] = "# Commands\n\nHand the command to me.\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert ".claude/rules/commands.md: claude-code.agent-facing-voice" in result.stdout
+    assert "'me'" in result.stdout
+
+
+def test_vendored_skill_not_inspected(tmp_path: Path) -> None:
+    # Third-party skills are carried verbatim under .agents/ and published under
+    # the skills root by symlink; neither the vendored file nor the link is ours
+    # to hold to the workspace voice.
+    files = base_files()
+    files[".agents/skills/vendor/SKILL.md"] = (
+        "---\nname: vendor\ndescription: Upstream skill.\n---\n\n"
+        "# Vendor\n\nI ask the human to tell me my options.\n"
+    )
+    repo = make_repo(
+        tmp_path,
+        files,
+        symlinks=(
+            (
+                ".claude/skills/vendor/SKILL.md",
+                "../../../.agents/skills/vendor/SKILL.md",
+            ),
+        ),
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_skill_code_exempt(tmp_path: Path) -> None:
+    # A backticked token and a fenced example are code, not voice.
+    files = base_files()
+    files[".claude/skills/demo/SKILL.md"] = (
+        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
+        "# Demo\n\n"
+        "Ask before running `I am human`.\n\n"
+        "```text\nI told my human to run it.\n```\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_skill_frontmatter_in_scope(tmp_path: Path) -> None:
+    # The description is prose the agent reads to choose the skill, so it
+    # answers to the same voice as the body.
+    files = base_files()
+    files[".claude/skills/demo/SKILL.md"] = (
+        "---\nname: demo\ndescription: Use when the human asks for my demo.\n---\n\n"
+        "# Demo\n\nRun the demo.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "line 3: " in result.stdout
+    assert "'human'" in result.stdout
+    assert "'my'" in result.stdout
+
+
+def test_skill_quoted_speech_exempt(tmp_path: Path) -> None:
+    # A quoted utterance is the user's voice, not the document's — the trigger
+    # phrasing a skill is written to recognize.
+    files = base_files()
+    files[".claude/skills/demo/SKILL.md"] = (
+        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
+        "# Demo\n\n"
+        'Use when the user says "Show me my options before I commit."\n'
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_skill_prose_outside_quotes_still_fails(tmp_path: Path) -> None:
+    # The exemption ends at the closing quote; the sentence around it is the
+    # document speaking.
+    files = base_files()
+    files[".claude/skills/demo/SKILL.md"] = (
+        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
+        "# Demo\n\n"
+        'When the user says "ship it", I commit my work.\n'
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "'I'" in result.stdout
+    assert "'my'" in result.stdout
 
 
 # --- global CLAUDE.md structure (dev-playbook only) ---

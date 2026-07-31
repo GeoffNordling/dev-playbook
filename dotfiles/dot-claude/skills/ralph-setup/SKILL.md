@@ -66,6 +66,6 @@ If the chosen gate is red, surface it and stop — do not scaffold a repo whose 
 
 ## 7. Hand off the launch command
 
-Surface the full launch command for the human to run, with the decided values filled in — `planFile`, `progressFile`, and the `checkCmd` gate are fixed by this setup; the human picks `model` and `maxIters` at launch:
+Surface the full launch command for the user to run, with the decided values filled in — `planFile`, `progressFile`, and the `checkCmd` gate are fixed by this setup; the user picks `model` and `maxIters` at launch:
 
     Workflow({ name: "ralph-loop", args: { model: "<model>", maxIters: <n>, planFile: "<planFile>", progressFile: "<progressFile>", checkCmd: "<gate, or \"\" for no checks>" } })

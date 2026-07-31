@@ -47,8 +47,8 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
 # CLAUDE.md voice and global-file checks answer the claude-code card, the
-# README/CONTEXT doc-shape check answers the docs card, and the rogue
-# future-work filenames answer the tracking card.
+# README/CONTEXT doc-shape check answers the knowledge-organization card, and
+# the rogue future-work filenames answer the tracking card.
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
@@ -70,9 +70,7 @@ ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
 
 # Filenames a CANDIDATES.md replaces. Uncommitted work lives in that one
 # register, committed work in issues; see standards/tracking/candidates.md.
-ROGUE_FUTURE_WORK_NAMES = frozenset(
-    {"ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"}
-)
+ROGUE_FUTURE_WORK_NAMES = frozenset({"ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"})
 
 RULES = (
     REQUIRED_FILE,
@@ -124,9 +122,24 @@ BASE_REQUIRED = (
     ".github/workflows/ci.yml",
 )
 MYPY_ROOTS = ("src", "tests", "scripts")
-LOCKFILES = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb")
+LOCKFILES = (
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "bun.lock",
+    "bun.lockb",
+)
 # The same two roots skill-lint scans.
 SKILL_ROOTS = (".claude/skills", "dotfiles/dot-claude/skills")
+# The rule bodies' matching pair: a consumer repo carries its rules under
+# .claude/, dev-playbook authors them in the Stow source tree.
+RULE_ROOTS = (".claude/rules", "dotfiles/dot-claude/rules")
+# The directory name any repo vendors third-party skills under — dev-playbook's
+# dotfiles/.agents, a consumer's own copy. Its contents are carried verbatim so
+# they can be re-synced from upstream, so authored-voice rules do not reach
+# them; the mirror symlinks that publish them under a skills root are excluded
+# with them (conventions.md — Skills vendored verbatim are exempt).
+VENDORED_DIR = ".agents"
 UV_SHEBANG = "#!/usr/bin/env -S uv run --script"
 PEP723_OPEN = "# /// script"
 CONTEXT_SECTIONS = (
@@ -136,16 +149,32 @@ CONTEXT_SECTIONS = (
     "## Flagged ambiguities",
 )
 
-# CLAUDE.md is agent-facing configuration at every level, so it names the human
-# actor "user" and never speaks in first person. These match the actor-noun
-# "human" (but not the "human-readable" compound) and the first-person "I"/"my"
-# (but not the "I/O" abbreviation); inline code and fenced blocks are stripped
-# before matching so a backticked token or example is not mistaken for prose.
+# Agent-facing instruction text names the human actor "user" and never speaks in
+# first person. Four tokens: the actor-noun "human" (but not the
+# "human-readable" compound) and the first-person "I" (but not the "I/O"
+# abbreviation), "me", and "my". Only "human" and "I" carry an exemption —
+# nothing in the workspace's vocabulary spells "me" or "my" as anything but the
+# first person, so neither gets a speculative guard. Inline code, fenced
+# blocks, and double-quoted spans are stripped before matching so a backticked
+# example or a quoted utterance is not mistaken for prose. Each pattern carries
+# its own message: an actor-noun hit and a first-person hit are two different
+# faults (conventions.md — Terminology: human vs user).
 VOICE_PATTERNS = (
-    ("human", re.compile(r"\bhuman\b(?!-)", re.IGNORECASE)),
-    ("I", re.compile(r"\bI\b(?!/O)")),
-    ("my", re.compile(r"\b[Mm]y\b")),
+    (
+        re.compile(r"\bhuman\b(?!-)", re.IGNORECASE),
+        "name the human 'user', not 'human'",
+    ),
+    (re.compile(r"\bI\b(?!/O)"), "never speak in first person: 'I'"),
+    (re.compile(r"\b[Mm]e\b"), "never speak in first person: 'me'"),
+    (re.compile(r"\b[Mm]y\b"), "never speak in first person: 'my'"),
 )
+
+# A double-quoted span on one line is somebody else's voice — the phrasing a
+# user types to trigger a skill, the reaction a prototype is built to provoke —
+# so the document is quoting, not speaking. Quotes do not span lines here: a
+# lone quotation mark closes at the newline rather than swallowing the rest of
+# the file.
+QUOTED_SPEECH_PATTERN = re.compile(r'"[^"\n]*"')
 
 # The dev-playbook global CLAUDE.md source, Stow-symlinked to ~/.claude/. Its
 # presence is the marker that gates the global-file structural checks to the
@@ -298,7 +327,9 @@ def check_precommit_config(root: Path, hook_repo: bool) -> list[Finding]:
     return findings
 
 
-def check_makefile(root: Path, layers: Layers, python_files: list[Path]) -> list[Finding]:
+def check_makefile(
+    root: Path, layers: Layers, python_files: list[Path]
+) -> list[Finding]:
     path = root / "Makefile"
     if not path.is_file():
         return []
@@ -429,19 +460,28 @@ def check_forbidden(
             )
         if any(rel.startswith("cdk.out/") for rel in tracked):
             findings.append(
-                Finding("cdk.out/", FORBIDDEN, "synth output is gitignored, never committed")
+                Finding(
+                    "cdk.out/", FORBIDDEN, "synth output is gitignored, never committed"
+                )
             )
     return findings
 
 
 def check_canonical_bytes(root: Path) -> list[Finding]:
     findings = []
-    pairs = ((".github/workflows/ci.yml", "ci.yml"), (".python-version", ".python-version"))
+    pairs = (
+        (".github/workflows/ci.yml", "ci.yml"),
+        (".python-version", ".python-version"),
+    )
     for rel, canon in pairs:
         path = root / rel
         if path.is_file() and path.read_bytes() != canonical_raw(canon):
             findings.append(
-                Finding(rel, CANONICAL_BYTES, f"must be byte-identical to the canonical {canon}")
+                Finding(
+                    rel,
+                    CANONICAL_BYTES,
+                    f"must be byte-identical to the canonical {canon}",
+                )
             )
     return findings
 
@@ -598,13 +638,20 @@ def check_cdk(root: Path, layers: Layers, repo_name: str) -> list[Finding]:
     actual = data.get("app")
     if actual != expected:
         return [
-            Finding("cdk.json", CANONICAL_VALUE, f"app must be {expected!r}, got {actual!r}")
+            Finding(
+                "cdk.json", CANONICAL_VALUE, f"app must be {expected!r}, got {actual!r}"
+            )
         ]
     return []
 
 
 def body_lines(path: Path) -> list[str]:
-    """A doc's lines outside frontmatter and fenced code, right-stripped."""
+    """A doc's lines outside frontmatter and fenced code, right-stripped.
+
+    Frontmatter is split textually rather than through md.parse_frontmatter
+    because this script declares no dependencies and that helper needs pyyaml
+    on the interpreter.
+    """
     text = path.read_text(encoding="utf-8", errors="replace")
     if text.startswith("---\n"):
         end = text.find("\n---\n", 4)
@@ -613,28 +660,47 @@ def body_lines(path: Path) -> list[str]:
     return [line.rstrip() for _, line in md.lines_outside_fences(text)]
 
 
-def check_agent_facing_voice(root: Path) -> list[Finding]:
-    """Every CLAUDE.md — root, nested, and the dev-playbook global source — is
-    agent-facing configuration, so it names the human "user" and never speaks in
-    first person (claude-content.md, conventions.md). Runs in every repo but
-    inspects only that repo's own CLAUDE.md files. Inline code and fenced blocks
-    are skipped so a backticked token or example does not read as prose.
+def is_vendored(root: Path, path: Path) -> bool:
+    """Whether a scanned file is third-party content under a vendored root.
+
+    Two ways a file can be one: it sits inside the vendored tree, or it is a
+    mirror symlink published under a skills root, which git lists under its own
+    path — so the resolved target is tested too, and a target outside the repo
+    is tested whole.
     """
+    real = path.resolve()
+    real_parts = (
+        real.relative_to(root).parts if real.is_relative_to(root) else real.parts
+    )
+    return VENDORED_DIR in path.relative_to(root).parts or VENDORED_DIR in real_parts
+
+
+def check_agent_facing_voice(root: Path) -> list[Finding]:
+    """Agent-facing instruction text — every CLAUDE.md (root, nested, and the
+    dev-playbook global source) plus every first-party skill and rule body — is
+    written for the executing agent alone, so it names the human "user" and
+    never speaks in first person (claude-content.md, conventions.md). Runs in
+    every repo, inspecting only that repo's own files; a consumer's skills and
+    rules sit under .claude/, dev-playbook's under the Stow source tree, and
+    vendored third-party skills are exempt wherever they surface. A skill's
+    frontmatter is in scope: its description is prose the agent reads to choose
+    the skill. Inline code, fenced blocks, and quoted speech are skipped so a
+    backticked example or a quoted utterance does not read as prose.
+    """
+    instruction_roots = tuple(f"{r}/" for r in SKILL_ROOTS + RULE_ROOTS)
     findings = []
     for path in md.find_md_files(root):
-        if path.name != "CLAUDE.md":
-            continue
         rel = path.relative_to(root).as_posix()
+        if path.name != "CLAUDE.md" and not rel.startswith(instruction_roots):
+            continue
+        if is_vendored(root, path):
+            continue
         for num, line in md.content_lines(path):
-            masked = md.INLINE_CODE_PATTERN.sub("", line)
-            for token, pattern in VOICE_PATTERNS:
+            masked = QUOTED_SPEECH_PATTERN.sub("", md.INLINE_CODE_PATTERN.sub("", line))
+            for pattern, fault in VOICE_PATTERNS:
                 if pattern.search(masked):
                     findings.append(
-                        Finding(
-                            rel,
-                            AGENT_FACING_VOICE,
-                            f"line {num}: name the human 'user', not '{token}'",
-                        )
+                        Finding(rel, AGENT_FACING_VOICE, f"line {num}: {fault}")
                     )
     return findings
 
@@ -654,7 +720,9 @@ def check_global_claude(root: Path) -> list[Finding]:
     path = root / GLOBAL_CLAUDE
     if not path.is_file():
         return []
-    headings = [line.strip() for _, line in md.content_lines(path) if line.startswith("#")]
+    headings = [
+        line.strip() for _, line in md.content_lines(path) if line.startswith("#")
+    ]
     sections = tuple(h for h in headings if h.startswith("## "))
     findings = []
     if sections != GLOBAL_CLAUDE_SECTIONS:
@@ -692,7 +760,9 @@ def check_doc_shapes(root: Path) -> list[Finding]:
     return findings
 
 
-def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[Finding]:
+def check_scripts(
+    root: Path, layers: Layers, python_files: list[Path]
+) -> list[Finding]:
     if not layers.scripts_python:
         return []
     # Each script's PEP 723 floor must equal the repo's interpreter pin; with
@@ -727,7 +797,11 @@ def check_scripts(root: Path, layers: Layers, python_files: list[Path]) -> list[
                 (
                     m.group(1)
                     for line in lines
-                    if (m := re.match(r'#\s*requires-python\s*=\s*"([^"]*)"', line.strip()))
+                    if (
+                        m := re.match(
+                            r'#\s*requires-python\s*=\s*"([^"]*)"', line.strip()
+                        )
+                    )
                 ),
                 None,
             )
@@ -799,11 +873,17 @@ def check_dogfood_mirror(root: Path) -> list[Finding]:
     manifest = root / ".pre-commit-hooks.yaml"
     published = {
         m.group(1)
-        for m in re.finditer(r"^- +id:\s*(\S+)", manifest.read_text(encoding="utf-8"), re.M)
+        for m in re.finditer(
+            r"^- +id:\s*(\S+)", manifest.read_text(encoding="utf-8"), re.M
+        )
     }
     config = root / ".pre-commit-config.yaml"
     local = (
-        {hook for repo, hook in hook_ids(config.read_text(encoding="utf-8")) if repo == "local"}
+        {
+            hook
+            for repo, hook in hook_ids(config.read_text(encoding="utf-8"))
+            if repo == "local"
+        }
         if config.is_file()
         else set()
     )

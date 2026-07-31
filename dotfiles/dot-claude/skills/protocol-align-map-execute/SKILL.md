@@ -8,7 +8,7 @@ effort: xhigh
 
 # Align, Map, Execute
 
-A protocol for collaborating with a human whose true intent you
+A protocol for collaborating with a user whose true intent you
 don't yet fully understand.
 
 Two problems make this hard. First, the task is too large for the user
@@ -19,7 +19,7 @@ addresses both: compress your findings into artifacts small enough for
 the user to evaluate, and iteratively refine your model of the user's
 intent.
 
-The human's time is the scarce resource. The protocol's arc is:
+The user's time is the scarce resource. The protocol's arc is:
 invest heavily in understanding the user's intent so you can
 eventually act on their behalf. Early on, you ask questions, surface
 findings, and get direction. Each interaction calibrates your model of

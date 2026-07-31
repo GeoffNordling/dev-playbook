@@ -27,26 +27,6 @@
       "skillFolderHash": "83f41f700757c3225c189a78d186cebce312b13e",
       "installedAt": "2026-04-28T21:07:18.001Z",
       "updatedAt": "2026-04-28T21:07:18.001Z"
-    },
-    "caveman": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/mattpocock/skills.git",
-      "skillPath": "skills/productivity/caveman/SKILL.md",
-      "skillFolderHash": "17972a1bdbf5909b9dbdc435ad348f0bf45f8664",
-      "pluginName": "mattpocock-skills",
-      "installedAt": "2026-04-29T15:46:13.942Z",
-      "updatedAt": "2026-04-29T15:46:13.942Z"
-    },
-    "zoom-out": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/mattpocock/skills.git",
-      "skillPath": "skills/engineering/zoom-out/SKILL.md",
-      "skillFolderHash": "6ecebabdea814d12888f56a611da7bf182b5fb26",
-      "pluginName": "mattpocock-skills",
-      "installedAt": "2026-04-29T15:46:32.019Z",
-      "updatedAt": "2026-04-29T15:46:32.019Z"
     }
   },
   "dismissed": {

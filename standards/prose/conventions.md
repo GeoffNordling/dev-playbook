@@ -106,13 +106,27 @@ One override applies on top, wherever the token appears:
   "user message", `user-invocable`. These are Claude Code's own names, not ours
   to translate.
 
-**Agent-facing instruction text never speaks in the first person.** No `I` and
-no `my` in the files listed above: they are commands addressed *to* the agent,
+**Agent-facing instruction text never speaks in the first person.** No `I`, `me`,
+or `my` in the files listed above: they are commands addressed *to* the agent,
 so the only voices they carry are the imperative and `you`. A first-person
 sentence puts the document in the agent's mouth, which inverts who is
 instructing whom — and where the word means the human, it collides with the
 `user` rule in the same breath. `repo-lint` enforces this deterministically
-alongside the `human` ban.
+alongside the `human` ban, over the body of every first-party skill and rule as
+well as `CLAUDE.md`.
+
+The ban governs the document's own voice, so quoting someone else's is
+untouched: a double-quoted utterance is exempt. Write the phrasing a user types
+to trigger a skill, or the reaction a prototype exists to provoke, in their
+words — `"Show me a few options before I commit."` — and reserve the
+surrounding prose for the imperative. A skill's frontmatter is not exempt: its
+`description` is prose the agent reads to choose the skill, so it answers to the
+same voice as the body.
+
+**Skills vendored verbatim are exempt.** A third-party skill under an `.agents/`
+path is an external dependency, carried unmodified so it can be re-synced from
+upstream; its voice is its author's to set. The ban governs what this workspace
+writes and owns — the skills under `.claude/`.
 
 ## Point at canonical artifacts
 

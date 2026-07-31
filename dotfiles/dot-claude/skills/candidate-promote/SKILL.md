@@ -31,25 +31,26 @@ nothing is passed but the entry.
    and ask which one. Never guess between two plausible entries.
 
 3. **Decide the scope with the user.** An entry with nested children is a
-   decomposition question, not a mechanical transform: ask whether they want
-   the whole subtree promoted as an epic with children, one child alone, or the
-   parent collapsed into a single issue. An entry with no children promotes as
-   itself.
+   scoping question: ask whether they want the whole subtree promoted, or one
+   child alone. An entry with no children promotes as itself. Either way this
+   skill lands **one** issue — intake does not slice and never mints an epic, so
+   a subtree promotes whole and its decomposition waits for the `design` node.
 
 4. **Invoke /intake**, passing the entry's name and prose — plus the children's
    text when promoting a subtree — as the free-form idea. A one-line entry is
    the expected input, not a problem to solve first: intake grills the idea,
-   authors the brief and four-tuple, and lands the issue(s) on its own
-   confirmation gate. Never pre-author the brief here, and never turn an entry
-   away for being thin.
+   authors the brief and four-tuple, and lands the issue on its own confirmation
+   gate, routing a subtree to `phase:design`. Never pre-author the brief here,
+   and never turn an entry away for being thin.
 
 5. **Delete the promoted entries** from `CANDIDATES.md` once intake reports the
-   issue number(s). Remove the whole subtree when the subtree was promoted; when
-   only one child was promoted, remove that child and leave the parent. If
+   issue number. Remove the whole subtree when the subtree was promoted — the
+   work is committed to that one issue now, wherever design later splits it;
+   when only one child was promoted, remove that child and leave the parent. If
    removing the last child of a parent leaves it childless, keep the parent —
    an outcome with no remaining decomposition is still a Candidate.
 
-6. **Report** the issue number(s) and which entries were removed. Leave the
+6. **Report** the issue number and which entries were removed. Leave the
    change uncommitted for the user's review unless they ask otherwise.
 
 ## Boundaries

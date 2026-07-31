@@ -77,8 +77,11 @@ RULES = (
 
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issues.md states them — the doc and this rule read one
-# contract and cannot disagree. A build leaf (mode:sdd, mode:direct) carries all
-# six; a spike leaf carries the spike shape.
+# contract and cannot disagree. A build leaf carries all six; a spike leaf
+# carries the spike shape. A retained ``mode:sdd`` leaf is checked against the
+# build shape it was authored under, per software-factory.md's retained-value
+# rule: the factory no longer routes such an issue, but a live one must not
+# become a finding by standing still.
 BUILD_HEADINGS = (
     "Summary",
     "Current behavior",
@@ -567,6 +570,8 @@ def _tuple_findings(
             )
     mode = present["mode"][0] if len(present["mode"]) == 1 else None
     tests = present["tests"][0] if len(present["tests"]) == 1 else None
+    # mode:sdd is retained but unsupported; its pairing is held so a residual
+    # leaf still audits exactly as it did before the factory dropped the path.
     if mode == "sdd" and tests != "yes":
         lines.append(
             Line(

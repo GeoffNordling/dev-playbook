@@ -37,12 +37,12 @@ the mark. For each observation:
    convey what the math specifies? Or does the math itself not capture
    what the user actually wants? Often it is both. Conclusions must be
    supported by the evidence the observation actually provides:
-   - An agent correcting after explicit human direction is not evidence
-     that the instruction is sufficient — it only shows the agent can
-     follow a direct command.
+   - An agent correcting after explicit direction from the user is not
+     evidence that the instruction is sufficient — it only shows the agent
+     can follow a direct command.
    - The test for instruction sufficiency is whether a fresh agent,
-     reading only the instruction, would behave correctly without human
-     correction.
+     reading only the instruction, would behave correctly without a
+     correction from the user.
    - When the evidence is ambiguous, say so. Do not resolve ambiguity
      by asserting a conclusion.
 2. **Align.** Discuss the fix with the user before editing. The user

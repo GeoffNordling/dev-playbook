@@ -8,8 +8,9 @@ description: GitHub issue conventions — epic and leaf roles, readiness, the th
 
 How GitHub Issues are authored in workspace repos. An issue plays one of two
 **roles** and, as a leaf, moves through a **readiness** lifecycle; its body is
-the agent **brief**, in one of three formats. Applies at intake — when an idea,
-or a rushed stub, becomes one or many tracked issues.
+the agent **brief**, in one of three formats. Applies wherever issues are
+authored — at intake, when an idea or a rushed stub becomes a tracked issue, and
+at the `design` node, when one issue becomes an epic and its children.
 
 An issue is **committed work**, at any size — an epic, an ordinary issue, or a
 one-line bug. Work not yet decided on is a Candidate in `CANDIDATES.md`
@@ -26,7 +27,7 @@ the same principle as *blocked* (a derived dependency state, never minted as a
 label).
 
 - **Leaf** — the unit of work. A leaf is dispatched through the
-  [software factory graph](/software-factory/software-factory.md) and carries the full four-tuple
+  [software factory graph](/software-factory/software-factory.md#the-graph) and carries the full four-tuple
   `(category:*, mode:*, tests:*, phase:*)`. Its body is a build-leaf brief or a
   spike brief (below).
 - **Epic** — an issue decomposed into sub-issues. An epic is **never built
@@ -39,16 +40,24 @@ label).
 **A design session produces an epic.** The common way an epic is born is the
 `design` node concluding the work is too big for one leaf: the session
 decomposes it in place, turning the issue into an epic and minting its children
-as ready leaves (see [software-factory.md's decompose exit](/software-factory/software-factory.md)).
+as ready leaves (see [the decompose exit](/software-factory/software-factory.md#the-definition-region)).
 
 ## Readiness
 
 Readiness is a **lifecycle position, not a kind of issue** — the industry's
-*Definition of Ready*. Work is dispatched into an implementation node only on a
-leaf whose body meets the brief standard below; an under-specified leaf is not
-yet ready. The refinement interview — intake, or the `design` node — is the
-**refinement step** that carries a leaf to ready by authoring its brief. A
-leaf's role never changes as it readies; only its body and phase advance.
+*Definition of Ready*. Three things make an issue ready, and work is dispatched
+only when all three hold:
+
+- **A leaf** — an epic is decomposed, never built
+  ([Roles](#roles-epic-and-leaf)).
+- **Unblocked** — every issue it is blocked-by is closed
+  ([Relationships](#relationships)).
+- **A brief-complete body**, meeting the brief standard below; an
+  under-specified leaf is not yet ready.
+
+The refinement interview — intake, or the `design` node — is the **refinement
+step** that carries a leaf to ready by authoring its brief. A leaf's role never
+changes as it readies; only its body and phase advance.
 (**Promotion** is a different move, reserved for Candidate → issue.)
 
 ## The body is the brief
@@ -61,7 +70,7 @@ checks on live leaves — so this document and the rule cannot disagree.
 Dependencies and hierarchy are **not** body fields — they are native GitHub
 relationships; see [Relationships](#relationships).
 
-### The build-leaf brief (`mode:sdd`, `mode:direct`)
+### The build-leaf brief (`mode:direct`)
 
 A build leaf carries **all six** headings — none optional. `Key interfaces`
 states "none" when there are none, rather than being omitted.
@@ -93,7 +102,7 @@ What should happen after the work is complete. Be specific about edge cases and 
 
 A spike is a **question** whose deliverable is an **answer**, not
 merged code — the findings land in the issue's closing comment, and no PR opens
-(see [software-factory.md's spike path](/software-factory/software-factory.md)). The spike brief carries
+(see [the spike state](/software-factory/software-factory.md#the-definition-region)). The spike brief carries
 these headings:
 
 ```markdown
@@ -142,7 +151,7 @@ Create slices in dependency order, then wire the native relationships (see [Rela
 
 ## Relationships
 
-Two independent relationships connect issues. Both are **native GitHub relationships** — not body fields, not labels — set at intake. They are orthogonal: a parent says nothing about order, and a blocker says nothing about parentage.
+Two independent relationships connect issues. Both are **native GitHub relationships** — not body fields, not labels — wired when the work is decomposed, at the `design` node. They are orthogonal: a parent says nothing about order, and a blocker says nothing about parentage.
 
 - **Dependency — blocked-by.** The "must finish first" relationship, and the workhorse for sequencing slices. An issue is *blocked* while any issue it is blocked-by is still open, and *ready* once they all close. Blocked is a derived state, never a label — don't mint one.
 - **Hierarchy — sub-issues.** The "part of" relationship: a parent issue and its children. Use it to group the slices of a large feature under a tracking **epic** — which is exactly what derives the epic role (see [Roles](#roles-epic-and-leaf)). Decomposition only — it implies no ordering, and a sub-issue is not blocked by its siblings unless a blocked-by edge says so.
