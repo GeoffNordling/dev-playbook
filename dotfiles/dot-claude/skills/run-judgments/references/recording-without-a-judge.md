@@ -1,7 +1,8 @@
 # Recording a pass without a judge
 
-Recording is the `judgments` workflow's job, not yours — it records only what its
-judges actually passed. There are exactly two exceptions, both of which require the
+You run the `record` command, but you never choose what goes in it — the workflow
+builds it from the ids its judges actually passed, and you copy it verbatim. There
+are exactly two exceptions where you name an id yourself, both of which require the
 user present in the loop, and both done with one command from the repo root:
 
 ```

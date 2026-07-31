@@ -13,10 +13,11 @@ LLM judge, declared as YAML and gated by a deterministic pytest that passes iff 
 judgment's exact content has already been judged-and-passed. A miss is a red gate.
 See `standards/judgments/declarations.md` for the declaration format.
 
-This skill turns a red gate green. The mechanical half — planning the docket,
-dispatching the judges, partitioning the verdicts, recording the passes — belongs to
-the `judgments` workflow and happens outside your context window. Your job is the
-half that needs a mind: **weighing each refutation and making the fixes it warrants.**
+This skill turns a red gate green. Steps 1–3 below are mechanical: run a command,
+pass its output on untouched, run the command you get back. **Copy, never compose** —
+each hand-off is one opaque string, and reading, summarizing, or editing it is how
+this goes wrong. Your judgment is spent on step 4 and nowhere else: **weighing each
+refutation and making the fixes it warrants.**
 
 **Main loop only.** The `Workflow` tool exists only at the main loop; a subagent does
 not have it, must **surface** a red gate rather than work around it, and must never
@@ -25,40 +26,56 @@ the fixed output schema, producing off-bench verdicts that must not be recorded.
 
 ## The loop
 
-### 1. Run the workflow
+### 1. Plan
 
-```js
-Workflow({ name: "judgments" })
+```
+uv run judgments-run plan
 ```
 
-That is the whole invocation. It takes no arguments, reads the docket itself, and
-judges every uncached judgment in parallel. Once you have set judgments aside
-(step 3), name them so they are not re-judged:
+Run it in your own working directory — do not `cd` first. If you are standing in a
+worktree, that worktree is the repository to judge. It prints one line of JSON: the
+workflow's complete argument payload, already filtered and ready.
+
+The one thing you read in it is `jobs`. **`"jobs": []` ends the loop** — every
+judgment is either cached or set aside, and there is nothing to dispatch. Otherwise
+the whole line goes to step 2 untouched.
+
+### 2. Judge
 
 ```js
-Workflow({ name: "judgments", args: { skip: ["some-id", "another-id"] } })
+Workflow({ name: "judgments", args: <the JSON from step 1, verbatim> })
 ```
 
-### 2. Read the result
+That JSON becomes the `args` value itself — an object in the tool call, not a quoted
+string wrapping one. Change nothing inside it.
 
 The result arrives inline in the workflow's task notification. If you instead open
 the task's output file, that file is a wrapper — the workflow's own return value is
 under its top-level **`result`** key, not at the top level.
 
 ```json
-{ "cached": 25, "ran": 3, "passed": ["id-a"],
+{ "record": "/…/python -m … --root /… record id-a",
+  "cached": 25, "ran": 3, "passed": ["id-a"],
   "refuted": [ {"id": "id-b", "opinion": "…what to fix…"} ],
   "crashed": ["id-c"], "skipped": [], "green": false }
 ```
 
-`passed` is already recorded — nothing for you to do. `green` is true when the gate
-should now be satisfied. **`refuted` is the only actionable field.**
+### 3. Record
+
+`record` is a complete shell command. Run it verbatim. It is `null` when nothing
+passed — then there is nothing to run. If it fails, the copy was mangled: it records
+all or nothing, so copy it again exactly rather than retyping it or dropping an id.
+
+Do this before anything else. Until it runs, the verdicts exist only in that result,
+and a re-plan will re-judge everything that passed.
+
+### 4. Weigh each refutation, then act
+
+`refuted` is the only field that needs a mind. `green` means nothing in this run does.
 
 A **crash is not a verdict** — that judgment was never ruled on, stays uncached, and
-is picked up by simply running the workflow again; no fix, no attempt consumed. Twice
-running is an environment problem: set it aside and say so.
-
-### 3. Weigh each refutation, then act
+is picked up by simply looping again; no fix, no attempt consumed. Twice running is
+an environment problem: set it aside and say so.
 
 **Investigate, don't comply.** A refuted verdict is *one low-intelligence, stochastic
 judge's claim, not a proven defect*. We run these judges constantly and will get false
@@ -82,15 +99,19 @@ Two limits govern this, and you track both yourself as you loop:
 - **Focused fixes only.** A refutation needing more than one focused edit is set
   aside, unfixed.
 
-### 4. Loop
+### 5. Loop
 
-Run the workflow again. Your edits re-key the judgments you touched, so it picks up
-exactly those plus anything that crashed. Stop when `ran` is 0 or nothing is left
-but set-aside judgments.
+Back to step 1. Your edits re-key the judgments you touched, so the next plan picks
+up exactly those plus anything that crashed. Name what you have set aside so it is
+not re-judged:
 
-With the user present, two narrow cases let you record a pass without a judge — a
-false positive they concur is wrong, and a small edit they watched you make. Both
-are governed by
+```
+uv run judgments-run plan --skip some-id --skip another-id
+```
+
+The loop ends at step 1, when the plan comes back with an empty `jobs`. With the
+user present, two narrow cases let you record a pass without a judge — a false positive they concur is wrong, and a small edit they
+watched you make — both governed by
 [recording-without-a-judge.md](references/recording-without-a-judge.md); an
 autonomous run does neither.
 

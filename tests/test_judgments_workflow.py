@@ -1,22 +1,24 @@
-"""Guards the judgments workflow's mirror of the fixed judge output schema.
+"""Guards the seam between ``judgments-run plan`` and the judgments workflow.
 
-The workflow script pins every judge agent to a structured-output schema written
-as a JavaScript literal. That schema is hashed into each judgment's content key
-by ``judgments.core``, so if the two ever disagreed the cache would record passes
-for a schema the judges never actually answered under -- a silent corruption no
-runtime check would catch, because the Python side would go on hashing its own
-constant regardless.
+The workflow does no planning: the CLI emits its entire argument payload and the
+orchestrating agent copies that JSON across without reading it. That makes the
+payload's shape a contract between a Python function and a JavaScript file which
+share no bytes and cannot import each other, so nothing at runtime would catch
+them drifting apart -- the workflow would simply reject every plan, or worse,
+accept one with a field quietly missing.
 
-The mirror is deliberate: the alternative is transcribing the schema through an
-LLM at dispatch time, which puts a model in the path of a key-critical value.
-Duplicating it and testing the duplicate is the cheaper trade, and this is the
-test that makes it safe.
+These tests are that check. They read the workflow source as text and assert the
+two constants it validates plans against still match what ``plan`` produces, plus
+the two structural invariants that keep shell commands out of the workflow layer
+entirely: it spells no command of its own, and every agent it spawns is a judge.
 """
 
-import json
+import re
 from pathlib import Path
 
-from dev_playbook.judgments.core import SCHEMA
+import pytest
+
+from dev_playbook.judgments.runner import ID_PLACEHOLDER, plan
 
 WORKFLOW = (
     Path(__file__).resolve().parents[1]
@@ -26,42 +28,58 @@ WORKFLOW = (
     / "judgments.js"
 )
 
-DECLARATION = "const VERDICT_SCHEMA = "
+SOURCE = WORKFLOW.read_text(encoding="utf-8")
 
 
-def _object_literal(source: str, declaration: str) -> str:
-    """The balanced ``{...}`` block that ``declaration`` assigns, as raw text.
-
-    Scans braces rather than matching a regex so nesting is handled exactly. The
-    workflow keeps this particular literal in JSON-compatible form -- quoted keys,
-    no trailing commas -- so the caller can parse the returned text directly.
-    """
-    start = source.index(declaration) + len(declaration)
-    assert source[start] == "{", "VERDICT_SCHEMA must be assigned an object literal"
-    depth = 0
-    for offset, character in enumerate(source[start:], start=start):
-        if character == "{":
-            depth += 1
-        elif character == "}":
-            depth -= 1
-            if depth == 0:
-                return source[start : offset + 1]
-    raise AssertionError("unbalanced braces in the VERDICT_SCHEMA literal")
+def _string_array(name: str) -> list[str]:
+    """The elements of a ``const <name> = ['a', 'b']`` array literal in the source."""
+    match = re.search(rf"const {name} = \[(.*?)\]", SOURCE, re.DOTALL)
+    assert match is not None, f"{name} is not declared as an array literal"
+    return re.findall(r"'([^']*)'", match.group(1))
 
 
-def test_workflow_verdict_schema_mirrors_the_python_constant() -> None:
-    literal = _object_literal(WORKFLOW.read_text(encoding="utf-8"), DECLARATION)
+def _string_constant(name: str) -> str:
+    """The value of a ``const <name> = '...'`` declaration in the source."""
+    match = re.search(rf"const {name} = '([^']*)'", SOURCE)
+    assert match is not None, f"{name} is not declared as a string literal"
+    return match.group(1)
 
-    assert json.loads(literal) == SCHEMA
+
+@pytest.fixture
+def empty_plan(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
+    """A plan over no declarations: the payload's shape, against a throwaway cache."""
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
+    return plan([], tmp_path)
 
 
-def test_workflow_dispatches_judges_without_a_path_lookup() -> None:
-    # The judge prompts come from the CLI, but the workflow's own two bootstrap
-    # commands are spelled here. The planner is allowed `uv run` -- it is the one
-    # call that cannot yet know the absolute invocation -- while the recorder must
-    # use the absolute one the CLI handed back, never a bare or `uv`-prefixed name.
-    source = WORKFLOW.read_text(encoding="utf-8")
+def test_workflow_validates_exactly_the_keys_the_cli_emits(
+    empty_plan: dict[str, object],
+) -> None:
+    # The workflow requires all of PLAN_KEYS and rejects anything outside it, so
+    # this list and plan()'s output keys must be the same set or every run fails.
+    assert set(_string_array("PLAN_KEYS")) == set(empty_plan)
 
-    assert "uv run judgments-run plan" in source
-    assert "${plan.cli} record" in source
-    assert "uv run judgments-run record" not in source
+
+def test_workflow_substitutes_the_placeholder_the_cli_leaves_behind(
+    empty_plan: dict[str, object],
+) -> None:
+    # The judge prompt ships once, with a marker where each job's id goes. The
+    # marker is authored in Python and substituted in JavaScript.
+    assert _string_constant("ID_PLACEHOLDER") == ID_PLACEHOLDER
+    assert ID_PLACEHOLDER in str(empty_plan["judge_prompt"])
+
+
+def test_workflow_builds_every_command_from_the_plan() -> None:
+    # `cli` names an absolute interpreter and an explicit --root, so a command
+    # built from it runs without a PATH lookup, an activated virtualenv, or a
+    # particular working directory -- none of which a judge agent is guaranteed.
+    # `uv run` is the spelling that assumes all three; it is what the deleted
+    # planning agent used, and what sent it looking for a project to run under.
+    assert "${PLAN.cli} record " in SOURCE
+    assert "uv run" not in SOURCE
+
+
+def test_every_agent_the_workflow_spawns_is_a_judge() -> None:
+    # Planning and recording are shell work and belong at the layer with a shell.
+    # One agent() call site means this workflow can only judge.
+    assert SOURCE.count("await agent(") == 1

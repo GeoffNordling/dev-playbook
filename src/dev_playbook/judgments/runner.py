@@ -5,8 +5,11 @@ two already-built dependencies -- ``judgments.core.prepare`` (claim + files +
 bench -> content key and judge prompt) and the ``skipcache`` seen-set. No
 LLM, no network: this is the deterministic half the judge skill stands on.
 
-- ``plan``  -- key every judgment, partition by cache membership, emit one JSON
-  object ``{cli, schema, seen_count, unseen}`` with ``unseen`` ordered by id.
+- ``plan`` -- key every judgment, partition by cache membership, and emit the
+  ``judgments`` workflow's entire argument payload as one JSON object. The
+  orchestrating agent copies that object into its ``Workflow`` call verbatim; it
+  never parses, reshapes, or composes anything, so no model stands between the
+  cache and the fan-out. :func:`plan` documents the fields.
 - ``render <id>`` -- print exactly the judge prompt for one judgment.
 - ``record <id>...`` -- record the passing judgments' keys idempotently.
 - ``--root <path>`` -- name the repo root explicitly instead of resolving it from
@@ -25,8 +28,15 @@ from dev_playbook.judgments.core import SCHEMA, Prepared, prepare
 from dev_playbook.judgments.loader import Declaration, by_id, load, resolve_root
 from dev_playbook.skipcache import seen
 
-_DISPATCH_PROMPT = (
-    "Run this exact command: {cli} render {id}\n"
+# The judge prompt is one template for the whole run rather than one copy per
+# judgment: the only part that varies is the id, and repeating the rest across a
+# docket of judgments would multiply the payload the orchestrating agent carries
+# by roughly ten for nothing. ID_PLACEHOLDER is the substitution point, and the
+# workflow replaces it -- the wording stays here, with the CLI whose contract it
+# describes, instead of being re-authored in JavaScript.
+ID_PLACEHOLDER = "{id}"
+
+_JUDGE_PROMPT_TAIL = (
     "Its stdout is your complete instructions and the material to judge -- follow "
     "it and return your verdict. The command is absolute and needs no PATH lookup, "
     "no virtualenv activation, and no particular working directory; run it "
@@ -49,39 +59,69 @@ def invocation(root: Path) -> str:
     return f"{sys.executable} -m dev_playbook.judgments.runner --root {root}"
 
 
-def plan(declarations: list[Declaration], root: Path | None) -> dict[str, object]:
-    """Partition by cache membership into a ``{cli, schema, seen_count, unseen}``.
+def judge_prompt(cli: str) -> str:
+    """The judge-bootstrap prompt, with :data:`ID_PLACEHOLDER` where the id goes.
 
-    ``seen_count`` is how many judgments are already cached -- a count, not a list,
-    because no caller needs the ids and every one of them costs an orchestrating
-    agent context. ``unseen`` is the sorted-by-id list of ``{id, model, effort,
-    prompt}`` the judge skill must still run -- each a ready-to-dispatch job whose
-    ``prompt`` bootstraps a judge agent. ``cli`` is the absolute invocation a caller
-    appends ``record <id>...`` to, so it never has to spell the command itself.
+    A judge is told to run one command and obey its stdout; that stdout -- the
+    claim plus the full text of every evidence file -- is produced by ``render``
+    inside the judge's own context, so the heavy bytes never cross the workflow
+    script or the orchestrating agent's window.
+    """
+    return (
+        f"Run this exact command: {cli} render {ID_PLACEHOLDER}\n{_JUDGE_PROMPT_TAIL}"
+    )
+
+
+def plan(
+    declarations: list[Declaration], root: Path | None, skip: list[str] | None = None
+) -> dict[str, object]:
+    """The ``judgments`` workflow's complete argument payload, ready to hand over.
+
+    This is the whole planning step, done deterministically: every judgment is
+    keyed, the keys are looked up in the seen-set, and what comes back is exactly
+    what the fan-out needs and nothing else. The orchestrating agent's entire
+    involvement is copying this object into its ``Workflow`` call.
+
+    - ``cli`` -- the absolute invocation every later command is built from, so
+      neither the workflow nor a judge ever spells one itself.
+    - ``root`` -- the repository these judgments were planned over, for the
+      workflow's progress log; ``cli`` carries it too, as ``--root <path>``, but
+      naming it saves parsing it back out.
+    - ``schema`` -- the fixed ``{verdict, opinion}`` structured-output contract
+      every judge answers under. It is hashed into each judgment's content key, so
+      shipping it here rather than mirroring it in the workflow keeps a single
+      source: a judge cannot answer under a schema the cache did not record.
+    - ``judge_prompt`` -- the one bootstrap prompt, :data:`ID_PLACEHOLDER` marking
+      where the workflow substitutes each job's id.
+    - ``cached`` -- how many judgments are already cached. A count, not a list:
+      no caller needs the ids and every one of them costs agent context.
+    - ``jobs`` -- the sorted-by-id ``{id, model, effort}`` to judge, each pinned
+      to the bench its own declaration names.
+    - ``skipped`` -- the ``skip`` ids that would otherwise have been judged. Ids
+      that are already cached are not "skipped" from anything and never appear
+      here, so the workflow can treat a non-empty list as "the gate stays red".
     """
     keyed = [(d, _prepared(d, root)) for d in declarations]
     cached = set(seen.filter([prepared.key for _, prepared in keyed]).seen)
+    uncached = [d for d, prepared in keyed if prepared.key not in cached]
+    set_aside = set(skip or ())
     resolved = root if root is not None else Path.cwd()
     cli = invocation(resolved)
-    unseen = sorted(
-        (
-            {
-                "id": d.id,
-                "model": d.model,
-                "effort": d.effort,
-                "prompt": _DISPATCH_PROMPT.format(cli=cli, id=d.id),
-            }
-            for d, prepared in keyed
-            if prepared.key not in cached
-        ),
-        key=lambda entry: entry["id"],
-    )
-    seen_count = sum(1 for _, prepared in keyed if prepared.key in cached)
     return {
         "cli": cli,
+        "root": str(resolved),
         "schema": SCHEMA,
-        "seen_count": seen_count,
-        "unseen": unseen,
+        "judge_prompt": judge_prompt(cli),
+        "cached": len(keyed) - len(uncached),
+        "jobs": sorted(
+            (
+                {"id": d.id, "model": d.model, "effort": d.effort}
+                for d in uncached
+                if d.id not in set_aside
+            ),
+            key=lambda job: job["id"],
+        ),
+        "skipped": sorted(d.id for d in uncached if d.id in set_aside),
     }
 
 
@@ -142,7 +182,11 @@ def main(argv: list[str]) -> int:
     try:
         declarations = load(root)
         if args.command == "plan":
-            print(json.dumps(plan(declarations, root)))
+            # Resolving each --skip id here rejects a typo loudly instead of
+            # quietly planning a judgment the caller believes it set aside.
+            for id in args.skip:
+                by_id(declarations, id)
+            print(json.dumps(plan(declarations, root, args.skip)))
         elif args.command == "render":
             print(render_prompt(by_id(declarations, args.id), root))
         elif args.command == "record":
@@ -153,6 +197,9 @@ def main(argv: list[str]) -> int:
                 )
                 return 2
             record([by_id(declarations, id) for id in args.ids], root)
+            # A silent success is indistinguishable from a command that never
+            # ran, and the caller reports what was recorded to a human.
+            print(f"judgments-run: recorded {len(args.ids)} judgment(s)")
     except (ValueError, OSError) as error:
         print(f"judgments-run: {error}", file=sys.stderr)
         return 1
@@ -181,7 +228,16 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="repo root to operate on (default: resolve it from the current directory)",
     )
     sub = parser.add_subparsers(dest="command")
-    sub.add_parser("plan", help="emit {schema, seen, unseen} as JSON")
+    plan_parser = sub.add_parser(
+        "plan", help="emit the judgments workflow's argument payload as JSON"
+    )
+    plan_parser.add_argument(
+        "--skip",
+        action="append",
+        default=[],
+        metavar="ID",
+        help="a judgment to leave unjudged (repeatable); unknown ids are an error",
+    )
     render_parser = sub.add_parser("render", help="print one judgment's judge prompt")
     render_parser.add_argument("id", help="the judgment id to render")
     record_parser = sub.add_parser("record", help="record verdicts over judgments")
