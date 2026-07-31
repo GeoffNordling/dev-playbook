@@ -11,9 +11,11 @@ export const meta = {
 //           'xhigh' | 'max') are per-job and required on every job — no batch-level identity.
 //   schema  optional JSON Schema applied to every job's structured output
 //
-// NOTE (2026-06-25): the Workflow runtime's own docs are wrong here — they say objects/arrays
-// reach the script verbatim, but every args value actually arrives JSON-serialized to a string
-// (or undefined when omitted), so the contract is: the caller passes an object, this script parses it.
+// NOTE (2026-06-25, re-probed 2026-07-31): the Workflow runtime's own docs are wrong here — they
+// say objects/arrays reach the script verbatim, but every args value actually arrives
+// JSON-serialized to a string (or undefined when omitted), so the contract is: the caller passes
+// an object, this script parses it. Re-verified directly against the runtime with a probe workflow
+// that reported `typeof args` for both a passed object ("string") and an omitted one ("undefined").
 const ALLOWED = ['jobs', 'schema']
 
 // Pre-flight batch limit. Scatter-gather spawns one agent per job in a single parallel() call,

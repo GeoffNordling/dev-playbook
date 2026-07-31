@@ -127,23 +127,21 @@ const MAX_JUDGMENTS = 1000
 // `args` is a runtime-supplied global holding whatever the caller passed. The
 // normal call is Workflow({name: "judgments"}) with no args at all.
 //
-// It is accepted in either encoding on purpose. The runtime's own documentation
-// and its observed behaviour have disagreed about whether an object argument
-// arrives verbatim or JSON-serialized to a string, and a caller getting that
-// wrong is one of the failures this workflow exists to eliminate. Normalizing
-// both spellings of the same value is not a silent fallback -- anything that is
-// neither still throws, and throws before a single agent spawns.
+// The runtime delivers it in exactly two shapes, both probed against the live
+// runtime rather than taken from documentation: omitting args yields `undefined`,
+// and anything passed arrives JSON-**serialized to a string** — never as a live
+// object, despite what the Workflow tool's own docs claim. So the caller writes an
+// object and this parses the text of it. Any third shape is a real surprise about
+// the runtime and throws, before a single agent spawns.
 function parseArgs(raw) {
   if (raw == null) return {}
-  let opts = raw
-  if (typeof raw === 'string') {
-    // An empty string means "no arguments", the same as omitting them.
-    if (raw.trim() === '') return {}
-    try {
-      opts = JSON.parse(raw)
-    } catch (e) {
-      throw new Error(`judgments: args is a string but not valid JSON (${e.message})`)
-    }
+  if (typeof raw !== 'string')
+    throw new Error(`judgments: args must arrive as a JSON string, got ${typeof raw}`)
+  let opts
+  try {
+    opts = JSON.parse(raw)
+  } catch (e) {
+    throw new Error(`judgments: args is not valid JSON (${e.message})`)
   }
   if (opts === null || typeof opts !== 'object' || Array.isArray(opts))
     throw new Error('judgments: args must be an object, e.g. {skip: ["some-id"]}')

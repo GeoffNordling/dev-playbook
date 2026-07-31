@@ -62,9 +62,9 @@ Build the batch and call the workflow by name, passing the batch as `args`:
 `effort`; `schema` is optional. A missing or malformed arg throws.
 
 Note the asymmetry between that call and the script: the caller passes an **object**,
-but the script parses a **JSON string** and rejects an object outright. The script is
-written on an observation recorded in its own source — that the Workflow runtime
-serializes every `args` value on the way in, contrary to the runtime's own
-documentation. The two spellings are the same batch; only the encoding differs, and
-which side is right about it is a property of the runtime, not of this recipe. Source:
+but the script parses a **JSON string** and rejects an object outright. Both are
+correct, because the Workflow runtime serializes every `args` value on the way in —
+a passed object reaches the script as JSON text, and an omitted one as `undefined`.
+It never arrives as a live object, contrary to the runtime's own documentation. Every
+workflow here is written to that contract. Source:
 [`scatter-gather.js`](/dotfiles/dot-claude/workflows/scatter-gather.js).

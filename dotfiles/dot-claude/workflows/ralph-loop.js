@@ -13,9 +13,11 @@ export const meta = {
 //   checkCmd      the iteration check gate: a shell command meaning "green" (e.g. 'make check',
 //                 'make -C tools check', an && -chain); '' or whitespace-only means no gate
 //
-// NOTE (2026-06-25): the Workflow runtime's own docs are wrong here — they say objects/arrays
-// reach the script verbatim, but every args value actually arrives JSON-serialized to a string
-// (or undefined when omitted), so the contract is: the caller passes an object, this script parses it.
+// NOTE (2026-06-25, re-probed 2026-07-31): the Workflow runtime's own docs are wrong here — they
+// say objects/arrays reach the script verbatim, but every args value actually arrives
+// JSON-serialized to a string (or undefined when omitted), so the contract is: the caller passes
+// an object, this script parses it. Re-verified directly against the runtime with a probe workflow
+// that reported `typeof args` for both a passed object ("string") and an omitted one ("undefined").
 const ARG_TYPES = { model: 'string', maxIters: 'number', planFile: 'string', progressFile: 'string', checkCmd: 'string' }
 
 function parseArgs(raw) {
