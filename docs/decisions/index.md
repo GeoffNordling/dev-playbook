@@ -1,5 +1,8 @@
 # docs/decisions/ — index
 
+The workspace's decisions and the reasoning that produced them — a record is
+superseded by a later one, never rewritten.
+
 Ordering: Decision Record number order.
 
 - [Decision Records](/docs/decisions/README.md) — The decision records directory — numbered, immutable records of decisions and their rationale

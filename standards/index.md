@@ -22,7 +22,7 @@ alphabetical; directories last.
 - [Shell](/standards/shell.md) — Card for the shell standard — how shell is written
 - [Software Factory](/standards/software-factory.md) — Card for the software factory standard — how an idea becomes a merged pull request
 - [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
-- [Tracking](/standards/tracking.md) — Card for the tracking standard — how committed and uncommitted work is tracked through issues, candidates, and repository settings
+- [Tracking](/standards/tracking.md) — Card for the tracking standard — how committed and uncommitted work is tracked through issue authoring, tracker operations, candidates, and repository settings
 - [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one
 - [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
@@ -40,4 +40,4 @@ alphabetical; directories last.
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
 - [judgments/](/standards/judgments/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
-- [tracking/](/standards/tracking/index.md) — The tracking standard's contract — issue conventions and repository settings
+- [tracking/](/standards/tracking/index.md) — The tracking standard's contract, one concern per document — candidate conventions, issue authoring, repository settings, tracker operations

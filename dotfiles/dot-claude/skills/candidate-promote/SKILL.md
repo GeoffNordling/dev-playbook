@@ -3,7 +3,7 @@ name: candidate-promote
 description: Promote a Candidate from the current repo's CANDIDATES.md into a committed GitHub issue, deleting the entry as the issue lands. Use when the user invokes /candidate-promote, says "promote this candidate", "turn that candidate into an issue", or names an entry in CANDIDATES.md they now want built.
 disable-model-invocation: false
 model: inherit
-effort: high
+effort: xhigh
 argument-hint: "[candidate name]"
 ---
 

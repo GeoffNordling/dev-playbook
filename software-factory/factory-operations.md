@@ -43,8 +43,8 @@ sequencing it.
 **Readiness at the crossing.** Two things gate a launch. The issue's phase must
 sit in the factory region, per the refusal above; and the issue must meet the
 readiness bar — a leaf, unblocked, with a brief-complete body — defined once in
-the [tracking standard](/standards/tracking/issues.md#readiness) and checked
-here, at the crossing.
+the [tracking standard](/standards/tracking/issue-authoring.md#readiness) and
+checked here, at the crossing.
 
 ## Permissions
 
@@ -76,9 +76,14 @@ exception. Two sessions carry it, and no others:
 
 **Subagent permissions are consciously wide.** Subagent-level tool permissions
 are out of scope for this model: subagents run under auto mode with wide
-permissions, and the reviewer read-only guarantee — a reviewer reports findings,
-never rewrites the work under review — is prompt-level for now. This is accepted
-deliberately; a later pass may tighten it.
+permissions. This is accepted deliberately; a later pass may tighten it.
+
+**The reviewer read-only guarantee is enforced, not asked for.** A reviewer
+reports findings and never rewrites the work under review, and the harness holds
+it to that: `code-pr-review`, `bug-pr-review`, and `doc-pr-review` each carry a
+`disallowed-tools` entry denying `Edit`, `MultiEdit`, `NotebookEdit`, and
+`Write`, so an attempted write is refused rather than merely discouraged by the
+prompt.
 
 From the first file-touching node on, the session is cwd-bound to the issue's
 worktree, which confines its file reach.

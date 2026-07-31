@@ -7,7 +7,7 @@ settled on this exit — the single-leaf exit needs none of it.
 The children's intake happens here, in place. Each child leaves design **ready**
 — a leaf, unblocked or explicitly blocked, with a brief-complete body — so none
 round-trips through `intake`. The readiness bar is
-[issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md#readiness);
+[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness);
 the factory checks it at the crossing.
 
 ## 1. Rewrite the issue as the epic
@@ -29,7 +29,7 @@ EOF
 ## 2. Slice
 
 Vertical slices, per
-[the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issues.md#vertical-slice-rules)
+[the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slice-rules)
 — each one a thin complete path through every layer, sized so building it keeps
 an agent well inside its context budget. The builder will not resize the work,
 so the split has to be right here.
@@ -56,7 +56,7 @@ EOF
 ## 4. Wire the relationships
 
 Two independent native relationships, per
-[Relationships](~/workspace/dev-playbook/standards/tracking/issues.md#relationships):
+[Relationships](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#relationships):
 each ordered slice **blocked-by** its predecessor, and every slice a
 **sub-issue** of the epic. Neither is a body field and neither is a label.
 

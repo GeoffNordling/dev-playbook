@@ -8,8 +8,9 @@ description: The CANDIDATES.md register of uncommitted future work — entry sha
 
 A repo records the future work it has not committed to in one root file,
 `CANDIDATES.md`. Committed work lives in GitHub issues
-([issues.md](/standards/tracking/issues.md)); a **Candidate** is work described
-but not yet decided. A unit of work has exactly one home — never both.
+([issue-authoring.md](/standards/tracking/issue-authoring.md)); a **Candidate**
+is work described but not yet decided. A unit of work has exactly one home —
+never both.
 
 ## The commitment test
 
@@ -105,7 +106,7 @@ both homes.
 Promoting a parent promotes its subtree as **one** issue, not as an issue per
 child: intake does not slice, so the subtree's decomposition is deferred to the
 `design` node like any other multi-issue plan
-([issues.md](/standards/tracking/issues.md)).
+([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 
 Deleting an entry without promoting it is ordinary editing. A Candidate that no
 longer appeals is removed, and nothing records that it was once considered.
