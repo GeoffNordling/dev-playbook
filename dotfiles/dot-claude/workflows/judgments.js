@@ -172,7 +172,13 @@ phase('Plan')
 // invocation that `plan` is about to hand back for every later call.
 const plan = await agent(
   [
-    'Run this shell command from the repository root:',
+    'Work in your current working directory. Do NOT `cd` anywhere first, and do not',
+    'go looking for a better place to run this. You may be standing in a git worktree',
+    'under a .claude/worktrees/ path — if so, THAT is the repository you must read,',
+    'not the main checkout above it. Moving would read the wrong repo and silently',
+    'judge the wrong files.',
+    '',
+    'Run exactly this command, unmodified:',
     '',
     '    uv run judgments-run plan',
     '',
@@ -181,9 +187,10 @@ const plan = await agent(
     'renumber anything, and do not add entries of your own. `unseen` may be empty;',
     'that is a valid answer meaning every judgment is already cached.',
     '',
-    'If the command fails, do not try to work around it with a different command and',
-    'do not invent a result. Report the failure: set `error` to the exact error output,',
-    '`cli` to the empty string, `seen_count` to 0, and `unseen` to an empty list.',
+    'If the command fails, do not work around it with a different command, a different',
+    'directory, or a different spelling, and do not invent a result. Report the failure:',
+    'set `error` to the exact error output, `cli` to the empty string, `seen_count` to 0,',
+    'and `unseen` to an empty list.',
   ].join('\n'),
   { label: 'plan', phase: 'Plan', schema: PLAN_SCHEMA, ...CLERK },
 )
@@ -212,6 +219,12 @@ if (plan.unseen.length > MAX_JUDGMENTS)
 const docket = plan.unseen.filter((job) => !skipSet.has(job.id))
 const skipped = plan.unseen.filter((job) => skipSet.has(job.id)).map((job) => job.id)
 
+// Surface which repo was actually planned. The planner is the one step whose command
+// depends on where its agent is standing, so naming the root it resolved turns a
+// wrong-directory run into something visible in the progress log rather than a silent
+// judging of the wrong files. `cli` carries it as `--root <path>`.
+const plannedRoot = plan.cli.slice(plan.cli.indexOf('--root ') + '--root '.length).trim()
+log(`judgments: root ${plannedRoot}`)
 log(`judgments: ${plan.seen_count} cached, ${docket.length} to judge${skipped.length ? `, ${skipped.length} set aside` : ''}`)
 
 // Nothing to do. Return the same summary shape as a full run so the caller has
