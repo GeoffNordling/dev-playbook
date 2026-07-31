@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Indexes
-description: The index.md listing — per-directory content rules, child-index delegation, authored not generated
+description: The index.md file — its required introduction, per-directory listing rules, child-index delegation, authored not generated
 ---
 
 # Indexes
@@ -12,6 +12,32 @@ without opening every file. `index.md` is **typeless**: it carries no OKF
 `type` and is not itself a concept document.
 
 ## Content
+
+An `index.md` opens with an **introduction**, then **lists** what its
+directory holds.
+
+### The introduction
+
+The introduction is the prose between the H1 and the first listed entry. It
+is **required**, and it opens with a single sentence: a noun phrase naming
+what the directory holds, in that directory's own vocabulary.
+
+Restating the path is not an introduction — "the files in `standards/`"
+tells a reader nothing the H1 did not. Name the thing, as the live indexes
+do: *the catalog*; *the layered repo standard, one concern per document*;
+*purpose-built artifact formats and their tooling*. Where the sole entry's
+`description` already says what the directory holds, say what it is **for**
+instead.
+
+After that sentence, add only what a reader needs before the listing makes
+sense: a start-here pointer, where the governing concept is defined, or a
+structural fact the listing hides — such as half the directory's material
+living elsewhere. The `Ordering:` marker goes last, on its own line
+([Ordering](#ordering)).
+
+No deterministic detector checks this.
+
+### The listing
 
 An `index.md` lists, for its own directory:
 
