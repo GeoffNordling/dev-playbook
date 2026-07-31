@@ -311,11 +311,11 @@ this more than wishful:
   unattended and write durable state — commits, PRs, labels that downstream
   consumers read — are where undetected drift compounds, and their regular
   shape (gates, stops, transitions, artifacts) makes them the easiest to
-  constrain: strict grammar there (today, the factory-node skills — intake,
-  tdd, the reviews). Skills the human watches at every invocation, where a
-  bad run costs one conversational turn, stay free (caveman, orient). "Can
-  be anything" remains available; it stops being the default for
-  load-bearing skills.
+  constrain: strict grammar there (today, the factory-node skills — build,
+  the reviews, judgments). Skills the human watches at every invocation,
+  where a bad run costs one conversational turn, stay free (orient,
+  usage-report). "Can be anything" remains available; it stops being the
+  default for load-bearing skills.
 
 Shelved deliberately: the human understands their skills today (designed
 them all, uses them routinely), so this is not where effort goes now. It's
