@@ -109,7 +109,10 @@ class TestClassify:
             ("protocols/align-map-execute/formulation.md", "concept"),
             ("CLAUDE.md", "harness"),
             ("dotfiles/dot-claude/CLAUDE.md", "harness"),
-            ("protocols/align-map-execute/SKILL.md", "harness"),
+            (
+                "dotfiles/dot-claude/skills/protocol-align-map-execute/SKILL.md",
+                "harness",
+            ),
             ("dotfiles/dot-claude/rules/bash-commands.md", "harness"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
