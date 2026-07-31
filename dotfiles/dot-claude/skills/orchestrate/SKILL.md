@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Own a problem as a high-level orchestrator — hold the intent, talk to the user only at that level, and delegate detailed research and construction down to less-intelligent subagents. Use when the user turns on Fable orchestration mode, sending small low-ambiguity jobs to Opus subagents and research or verbatim extraction to Sonnet ones.
+description: Own a problem as a high-level orchestrator — hold the intent, talk to the user only at that level, and delegate detailed research and construction down to less-intelligent subagents. Use when the user turns on Fable orchestration mode.
 disable-model-invocation: true
 model: inherit
 effort: xhigh
