@@ -18,10 +18,6 @@ class TestIsExternallyManaged:
         # directory that merely shares the leaf name is authored content.
         assert not external.is_externally_managed("src/.agents/note.md")
 
-    def test_dead_dhub_root_is_not_external(self) -> None:
-        # .dhub was dropped: it no longer names an externally-managed root.
-        assert not external.is_externally_managed("dotfiles/.dhub/whatever.md")
-
 
 class TestIsVerbatimDoc:
     def test_reference_type_is_verbatim(self) -> None:

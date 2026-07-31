@@ -57,7 +57,3 @@ npx skills@latest remove SKILL_NAME -g
 ```
 
 Files under `dotfiles/.agents/skills/` are overwritten on the next `skills update`; edits there do not survive. To diverge a skill's behavior, fork its source repo and reinstall pointing at the fork.
-
-## Decision hub
-
-The Decision Hub registry (`dhub` CLI) is out of scope. Every skill available via DHub is also on GitHub and installable through the Vercel CLI.
