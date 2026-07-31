@@ -20,9 +20,9 @@ The front door for work, and the first state of the [definition region](~/worksp
 Before doing anything else, read end-to-end:
 
 - [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md) — the two regions, the label scheme, and where an issue goes when intake releases it.
-- [issue conventions](~/workspace/dev-playbook/standards/tracking/issues.md) — the brief formats, brief principles, and the readiness bar.
+- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) — the brief formats, brief principles, and the readiness bar.
 
-Then report: `READ: software-factory.md, issue-conventions.md`. Proceed only after.
+Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after.
 
 ## Process
 

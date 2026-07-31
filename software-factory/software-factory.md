@@ -95,7 +95,7 @@ exits one of two ways:
   place — minting each as a ready, brief-complete leaf with its relationships
   wired — so no child round-trips through the intake node. The epic body carries
   the outcome and the decomposition rationale
-  ([issues.md](/standards/tracking/issues.md)).
+  ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 
 **`spike` — a question, not a change.** A spike is an issue whose deliverable is
 an answer. Everything it produces lands on the issue itself: the findings in its
@@ -108,8 +108,8 @@ not a spike.
 
 **The readiness bar.** What makes an issue ready to leave the region — a leaf,
 unblocked, with a brief-complete body — is defined once in
-[issues.md](/standards/tracking/issues.md#readiness), and the factory checks it
-at the crossing.
+[issue-authoring.md](/standards/tracking/issue-authoring.md#readiness), and the
+factory checks it at the crossing.
 
 ## The factory
 
@@ -125,7 +125,8 @@ The state of an issue is written on the issue, as labels. Every **leaf** — the
 unit of work — carries the full four-tuple `(category:*, mode:*, tests:*,
 phase:*)`, with `phase:*` naming its current node. An **epic** is not a leaf: it
 never dispatches and carries `category:*` alone; its children carry the work.
-Roles are derived, never labeled ([issues.md](/standards/tracking/issues.md)).
+Roles are derived, never labeled
+([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 
 An untriaged issue may carry `phase:intake` or no labels at all — either way it
 is untriaged, with `phase:intake` the implied default. Issue **relationships** —

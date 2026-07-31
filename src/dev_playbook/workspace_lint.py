@@ -76,9 +76,9 @@ RULES = (
 )
 
 # The required headings of each brief format, stated here exactly as
-# standards/tracking/issues.md states them — the doc and this rule read one
-# contract and cannot disagree. A build leaf carries all six; a spike leaf
-# carries the spike shape. A retained ``mode:sdd`` leaf is checked against the
+# standards/tracking/issue-authoring.md states them — the doc and this rule
+# read one contract and cannot disagree. A build leaf carries all six; a spike
+# leaf carries the spike shape. A retained ``mode:sdd`` leaf is checked against the
 # build shape it was authored under, per software-factory.md's retained-value
 # rule: the factory no longer routes such an issue, but a live one must not
 # become a finding by standing still.

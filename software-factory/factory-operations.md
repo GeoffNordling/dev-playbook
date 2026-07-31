@@ -43,8 +43,8 @@ sequencing it.
 **Readiness at the crossing.** Two things gate a launch. The issue's phase must
 sit in the factory region, per the refusal above; and the issue must meet the
 readiness bar — a leaf, unblocked, with a brief-complete body — defined once in
-the [tracking standard](/standards/tracking/issues.md#readiness) and checked
-here, at the crossing.
+the [tracking standard](/standards/tracking/issue-authoring.md#readiness) and
+checked here, at the crossing.
 
 ## Permissions
 
