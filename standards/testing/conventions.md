@@ -51,7 +51,7 @@ When testing systems with non-deterministic components (LLM calls, network reque
 
 ## Test doubles
 
-There are three kinds of test doubles. Choose the lightest one that verifies the behavior under test. A dependency reached over the network gets a seam built for it first, and the double then sits at that seam.
+Choose the lightest test double that verifies the behavior under test: a real object, a fake, or a mock. A dependency reached over the network gets a **port** built for it first, and the double then sits at that seam.
 
 ### Real objects (integration tests)
 
