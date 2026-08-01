@@ -71,16 +71,42 @@ judgments:
 
   - id: scheme-vs-graph
     claim: |
-      src/dev_playbook/label_scheme.json mints exactly the labels
-      software-factory/software-factory.md states: its fixed-value dimensions (category, mode,
-      tests) produce exactly the seven labels of the doc's Valid
-      labels table, and its phase dimension satisfies the doc's parity
-      invariant — one value per work node of the graph, with `_` mapped to
-      `-`, plus exactly the retained values the invariant exempts and no
-      others. The scheme mints no label the doc does not state, and states
-      none the doc omits.
+      src/dev_playbook/label_scheme.json's factory dimensions — category, mode,
+      tests, and phase — mint exactly the labels
+      software-factory/software-factory.md states: the fixed-value dimensions
+      produce the labels of the doc's Valid labels table, and the phase
+      dimension satisfies the doc's parity invariant — one value per work node
+      of the graph, with `_` mapped to `-`, plus the retained values the
+      invariant exempts and no others. Ignore any other dimension the scheme
+      declares — it is outside this claim.
     evidence:  [src/dev_playbook/label_scheme.json]
     reference: [software-factory/software-factory.md]
+    model: claude-sonnet-5
+    effort: high
+
+  - id: scheme-vs-tracker
+    claim: |
+      src/dev_playbook/label_scheme.json's wayfinder dimension mints exactly the
+      labels standards/tracking/tracker-operations.md states in its Wayfinding
+      operations section: the map label and the ticket types, and nothing else.
+      The scheme declares no dimension beyond wayfinder and the factory's —
+      category, mode, tests, and phase; one that is neither violates this claim.
+    evidence:  [src/dev_playbook/label_scheme.json]
+    reference: [standards/tracking/tracker-operations.md]
+    model: claude-sonnet-5
+    effort: high
+
+  - id: wayfinder-lint-mirrors-skill
+    claim: |
+      src/dev_playbook/workspace_lint.py's checks on the shape of a wayfinder
+      map and a decision ticket restate only what the /wayfinder skill states:
+      the map's body sections, the ticket's body section, the ticket types, and
+      the map/ticket distinction. The skill may state more than the lint checks;
+      the lint must not check more of their shape than the skill states. Ignore
+      the lint's rule that a map or ticket carries no factory-dimension label —
+      that comes from the tracking standard, not the skill.
+    evidence:  [src/dev_playbook/workspace_lint.py]
+    reference: [dotfiles/.agents/skills/wayfinder/SKILL.md]
     model: claude-sonnet-5
     effort: high
 

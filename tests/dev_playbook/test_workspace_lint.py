@@ -794,6 +794,112 @@ def test_epic_with_invalid_category_value_is_a_finding(tmp_path: Path) -> None:
     assert "#15" in result.stdout
 
 
+# --- wayfinder species: the map and the decision ticket ---
+
+MAP_BODY = (
+    "## Destination\n\nd\n\n## Notes\n\nn\n\n## Decisions so far\n\n- x\n\n"
+    "## Not yet specified\n\nf\n\n## Out of scope\n\no\n"
+)
+TICKET_BODY = "## Question\n\nq\n"
+
+
+def test_wellformed_map_raises_no_finding(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(16, ["wayfinder:map"], body=MAP_BODY, sub_issues_total=3)
+    )
+    assert "tracking.wayfinder-shape" not in result.stdout
+    assert "tracking.epic-shape" not in result.stdout
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_map_is_told_by_its_label_not_by_having_children(tmp_path: Path) -> None:
+    # A freshly charted map with no tickets yet is still a map, not a leaf.
+    result = run_with_issue(
+        tmp_path, issue(17, ["wayfinder:map"], body=MAP_BODY, sub_issues_total=0)
+    )
+    assert "tracking.wayfinder-shape" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
+
+
+def test_map_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
+    labels = ["wayfinder:map", "category:extension", "phase:build"]
+    result = run_with_issue(
+        tmp_path, issue(18, labels, body=MAP_BODY, sub_issues_total=2)
+    )
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "#18" in result.stdout
+    assert "category:extension" in result.stdout
+    assert "phase:build" in result.stdout
+
+
+def test_map_missing_a_body_section_is_a_finding(tmp_path: Path) -> None:
+    body = MAP_BODY.replace("## Not yet specified\n\nf\n\n", "")
+    result = run_with_issue(
+        tmp_path, issue(19, ["wayfinder:map"], body=body, sub_issues_total=2)
+    )
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "Not yet specified" in result.stdout
+
+
+def test_map_also_carrying_a_ticket_type_is_a_finding(tmp_path: Path) -> None:
+    labels = ["wayfinder:map", "wayfinder:research"]
+    result = run_with_issue(
+        tmp_path, issue(21, labels, body=MAP_BODY, sub_issues_total=2)
+    )
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "a map is not a ticket" in result.stdout
+
+
+def test_wellformed_ticket_raises_no_finding(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(22, ["wayfinder:research"], body=TICKET_BODY)
+    )
+    assert "tracking.wayfinder-shape" not in result.stdout
+    assert "software-factory.tuple-valid" not in result.stdout
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_ticket_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
+    # A ticket carries no phase label, so it used to fall past the post-intake
+    # gate entirely; it is now checked against its own contract.
+    labels = ["wayfinder:grilling", "mode:direct", "tests:no"]
+    result = run_with_issue(tmp_path, issue(23, labels, body=TICKET_BODY))
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "#23" in result.stdout
+    assert "a decision ticket carries no factory label" in result.stdout
+
+
+def test_ticket_missing_its_question_section_is_a_finding(tmp_path: Path) -> None:
+    result = run_with_issue(tmp_path, issue(24, ["wayfinder:task"], body=""))
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "Question" in result.stdout
+
+
+def test_ticket_with_two_wayfinder_labels_is_a_finding(tmp_path: Path) -> None:
+    labels = ["wayfinder:research", "wayfinder:grilling"]
+    result = run_with_issue(tmp_path, issue(25, labels, body=TICKET_BODY))
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "multiple wayfinder labels" in result.stdout
+
+
+def test_ticket_with_an_out_of_scheme_type_is_a_finding(tmp_path: Path) -> None:
+    result = run_with_issue(
+        tmp_path, issue(26, ["wayfinder:frobnicate"], body=TICKET_BODY)
+    )
+    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "is not a scheme value" in result.stdout
+
+
+def test_childed_issue_without_a_wayfinder_label_still_checks_as_an_epic(
+    tmp_path: Path,
+) -> None:
+    # The species dispatch keys on the wayfinder labels; an ordinary issue with
+    # children is still a build epic and still carries the epic's shape.
+    result = run_with_issue(tmp_path, issue(27, [], sub_issues_total=2))
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "#27" in result.stdout
+
+
 def test_null_sub_issues_summary_does_not_crash(tmp_path: Path) -> None:
     # GitHub can return sub_issues_summary as JSON null (key present, value null);
     # a valid leaf so shaped must be classified as a leaf, not crash the audit.

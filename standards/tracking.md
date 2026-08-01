@@ -25,11 +25,17 @@ between them — belongs to the
 
 - [workspace-lint](/scripts/workspace-lint) — across repositories via
   `gh api`: GitHub settings drift, label-scheme parity and the blocked-label
-  ban, and every open post-intake leaf's brief shape and every epic's
-  category-only shape
+  ban, every open post-intake leaf's brief shape, every epic's category-only
+  shape, and every wayfinder map's and decision ticket's shape
 - [repo-lint](/scripts/repo-lint) — a `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or
   `IDEAS.md` at any depth (`tracking.rogue-future-work-file`), and a
   `CANDIDATES.md` outside the repo root (`build.forbidden`)
+- [judgments/code-matches-docs.yaml](/judgments/code-matches-docs.yaml) — the
+  LLM-judged `scheme-vs-tracker` claim that the label scheme's `wayfinder`
+  dimension mints exactly what
+  [tracker-operations.md](/standards/tracking/tracker-operations.md#wayfinding-operations)
+  states, and `wayfinder-lint-mirrors-skill` that workspace-lint's map and
+  ticket rules restate only what the `/wayfinder` skill states
 
 A `CANDIDATES.md` carries `Candidate-List` frontmatter and an index entry like
 any concept doc; okf-lint checks both under the
