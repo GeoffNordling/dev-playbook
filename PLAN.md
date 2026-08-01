@@ -66,6 +66,19 @@ them whenever you learn something a future iteration would otherwise rediscover.
   not a JSON object), `{}` (an input naming no file), or `{"file_path": ...}`.
 - Tests load the extensionless hook by path with `SourceFileLoader` — see
   `tests/test_measure_event.py`. Reuse that; do not add a `.py` shim.
+- The `measure` extra exists in `pyproject.toml`, and the `dev` group
+  self-references `dev-playbook[measure]`, so `uv run` (and therefore
+  `make check`) has it. Adding another dependency means `uv lock` + `uv sync`,
+  which need the network the sandbox blocks — run those two with the sandbox
+  disabled. pandas and numpy are locked; **plotly is not in the uv cache**, so
+  task 8's lock is a real download.
+- `dev_playbook.measure.store.load_events(db_path=DEFAULT_STORE)` is the one
+  door onto the store. Columns: `id`, `received_at` (datetime64[us, UTC]),
+  `payload` (the parsed dict, for event-specific fields), `event`,
+  `session_id`, `prompt_id`, `cwd`, `transcript_path`. It raises `StoreError`
+  on a payload that is not a JSON object or that lacks `hook_event_name`,
+  `session_id`, `cwd` or `transcript_path` — all four hold on every row of the
+  real store. `prompt_id` is the one that is legitimately None (86 rows).
 
 ## Tasks
 
@@ -76,7 +89,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       hook stdlib-only. Add tests covering each tool class, and update the
       hook's module docstring and the capture section of
       `docs/measurement-prototype.md` to match.
-- [ ] Create `src/dev_playbook/measure/` with a read-only loader that opens the
+- [x] Create `src/dev_playbook/measure/` with a read-only loader that opens the
       store via a `mode=ro` URI, reads the `events` table, parses each payload,
       and returns a tidy dataframe with one row per event and the common fields
       promoted to columns. Add the optional dependency extra. Cover the loader

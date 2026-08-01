@@ -12,3 +12,8 @@ before starting, to see what the iterations before it already did.
   whole on Skill, still dropping every `tool_response`; 12 tests in
   `tests/test_measure_event.py` and `docs/measurement-prototype.md` updated to
   match. Next: task 2, the read-only loader in `src/dev_playbook/measure/`.
+- Task 2: `src/dev_playbook/measure/store.py` loads the store through a
+  `mode=ro` URI into a tidy frame (payload is the authority, not the promoted
+  columns); `measure` extra added and pulled into the dev group; 13 tests in
+  `tests/test_measure_store.py` against fixture databases. Next: task 3, the
+  four row-cleaning functions.
