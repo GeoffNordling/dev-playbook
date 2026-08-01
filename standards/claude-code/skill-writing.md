@@ -67,8 +67,8 @@ load**, so a description earns even harder pruning than the body:
   **duplication** — "build features using TDD … asks for test-first
   development" is one branch written twice. Collapse them; keep only genuinely
   distinct branches.
-- **Cut identity that's already in the body.** Keep the description to
-  triggers, plus any "when another skill needs…" reach clause.
+- **Cut identity that's already in the body.** Beyond naming the job, keep the
+  description to triggers, plus any "when another skill needs…" reach clause.
 
 ## Information hierarchy
 
@@ -197,4 +197,5 @@ Use these to diagnose issues the human may be having with the skill.
   elephant* names the elephant and makes it more available, not less. Prompt
   the **positive** — state the target behavior so the banned one is never
   spoken; keep a prohibition only as a hard guardrail that cannot be phrased
-  positively, and even then pair it with what to do instead.
+  positively, and even then pair it with what to do instead — the skill-body
+  case of [prose/conventions.md — Voice](/standards/prose/conventions.md#voice).
