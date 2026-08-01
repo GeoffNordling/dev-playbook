@@ -10,8 +10,13 @@ carried out by running the slice loop until every behavior in its scope is
 covered by a passing test, then closing with the whole-chunk refactor pass. The
 gate and the commit are build's own steps, unchanged.
 
-Two things ride along in build's plan: the chunk's slice ordering, and the
-current state of the suite — run `make test` before the first chunk to see it.
+Three things ride along in build's plan: the chunk's seams, its slice ordering,
+and the current state of the suite — run `make test` before the first chunk to
+see it.
+
+**Choose the seams first.** A **seam** is a public surface where a behavior is
+observable without reaching inside the code that produces it. Work out the seams
+the chunk's tests cut at before writing the first test; if the brief names seams, respect them.
 
 ## The slice loop
 

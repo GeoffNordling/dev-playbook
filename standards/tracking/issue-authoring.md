@@ -217,6 +217,7 @@ When one idea becomes many issues, break the plan into **tracer bullet** issues.
 - A completed slice is demoable or verifiable on its own.
 - Prefer many thin slices over few thick ones.
 - **Size to the context budget.** Slice thin enough that building one issue keeps the agent well under ~30% of its context window. Split anything bigger.
+- **Slice a wide migration expand–contract.** A mechanical change whose blast radius hits every call site at once — renaming a shared symbol, retyping a column — has no vertical slice that lands green. Sequence it instead: **expand**, adding the new form beside the old; then migrate the callers in batches sized by blast radius, one issue per batch, each blocked-by the expand; then **contract**, deleting the old form once no caller remains, blocked-by every batch. Every issue in the sequence leaves the system working.
 
 Create slices in dependency order, then wire the native relationships (see [Relationships](#relationships)): mark each ordered slice **blocked-by** its predecessor. Creating in order means the blocker exists before the dependent links to it.
 

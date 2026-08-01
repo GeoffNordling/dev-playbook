@@ -24,6 +24,7 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 - **One concept per test.** Each test verifies one behavior or scenario. Multiple assertions are fine when they all verify aspects of the same concept.
 - **Descriptive names.** Test names read like behavior descriptions: `test_login_rejects_expired_token`, not `test_login_2`. The name alone conveys what the test verifies.
 - **No logic in tests.** No if/else, no try/except in test bodies. Tests are boring and linear.
+- **Expected values come from outside the code.** A known-good literal, a worked example, or the spec supplies the expected value. A *tautological* test recomputes it the way the code under test computes it, so it passes by construction and can never disagree with the code.
 
 ## Behavioral focus
 
@@ -33,6 +34,7 @@ Tests verify **what** the system does, not **how** it does it. This is the singl
 - **Assert on observable outputs.** Return values, state changes (records stored, files written), raised exceptions. Never assert on internal state, private attributes, or implementation details.
 - **Assert on outcomes, not call sequences.** Prefer "the record is in the store" over "insert was called once with these arguments." When using mocks, assert on the minimum necessary to verify the contract; do not over-specify call counts, argument shapes, or call ordering unless the ordering is part of the contract.
 - **Name by capability, not mechanism.** `test_request_includes_trace_id`, not `test_structlog_processor_adds_trace_id`. The test should survive an implementation swap without changes.
+- **Replace, don't layer.** Once tests cover a module through its own interface, the unit tests on the smaller pieces underneath are waste — delete them rather than keeping both layers.
 
 ## The humble object pattern
 
@@ -49,7 +51,7 @@ When testing systems with non-deterministic components (LLM calls, network reque
 
 ## Test doubles
 
-There are three kinds of test doubles. Choose the lightest one that verifies the behavior under test.
+There are three kinds of test doubles. Choose the lightest one that verifies the behavior under test. A dependency reached over the network gets a seam built for it first, and the double then sits at that seam.
 
 ### Real objects (integration tests)
 
@@ -76,6 +78,10 @@ Use `unittest.mock` to:
 - **Stub a non-deterministic or expensive boundary**; the LLM client, an external API, a cloud service. The Humble Object pattern identifies these boundaries.
 
 **Do not mock internal implementation details.** Needing a mock deep inside the code under test signals a design problem — extract an interface and use a fake instead. Where a function-level dependency genuinely must be isolated, mock at the boundary (the function's entry point), not deep in the call chain.
+
+### Ports (services you own, reached over the network)
+
+A service you own but call over the network — an internal API, a queue consumer — has no local stand-in to swap in and is too slow to call for real. Give it a **port**: the interface at the seam, owned by the calling module. The logic stays in that module; the transport is an injected **adapter** — an HTTP, gRPC, or queue client in production, an in-memory adapter in tests. [Module design](/standards/modules/design.md) covers when a seam earns its keep.
 
 ## Fixtures and setup
 

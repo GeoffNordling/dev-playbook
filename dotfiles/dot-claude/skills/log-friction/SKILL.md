@@ -26,15 +26,11 @@ session context and confirm it with the user before writing anything.
 1. Read [friction/log.md](~/workspace/mission-control/friction/log.md).
    Follow the entry format defined there — the log file, not this
    skill, owns the format.
-2. Decide: is this a **repeat bite** of an existing entry (add a
-   `Felt:` line to it) or **new friction** (new entry)? Match on what
-   actually bit, not on surface wording; if genuinely ambiguous, ask.
-3. Write the entry in the owner's register — one or two plain lines,
+2. Write the entry in the owner's register — one or two plain lines,
    dated, stating what happened and where, and carrying a proposed
    fix only where the user gave one.
-4. Commit via /commit, applied to `~/workspace/mission-control`
+3. Commit via /commit, applied to `~/workspace/mission-control`
    (use `git -C`; the session's cwd is usually another repo). Stage
-   **only** `friction/log.md` — the repo may hold unrelated work
-   awaiting the owner's diff review.
-5. Remind the user to push (their YubiKey): hand them, as one line,
+   **only** `friction/log.md` — the repo may hold unrelated work; ignore it.
+4. Remind the user to push (their YubiKey): hand them, as one line,
    `git -C ~/workspace/mission-control push`.
