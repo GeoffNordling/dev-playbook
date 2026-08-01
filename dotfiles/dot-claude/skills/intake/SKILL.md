@@ -13,7 +13,7 @@ The front door for work, and the first state of the [definition region](~/worksp
 - **Capture** — the user passes a free-form idea as text. Intake creates the issue.
 - **Adopt** — the user passes the number or URL of an issue someone threw up rushed and incomplete. It sits untriaged at `phase:intake` — or carries no labels at all; treat both the same. Intake triages it in place and rewrites its body.
 
-**One issue, never many.** Intake does not slice and never mints an epic. Work that turns out to be a plan rather than a piece routes to `design`, which owns decomposition (§2).
+**One issue, never many.** Intake does not slice and never mints an epic. Work that turns out to be a plan rather than a piece routes to `design`, which owns decomposition; §3 makes that routing call.
 
 ## Read first
 
@@ -31,9 +31,18 @@ Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after
 - **Capture** — the text passed in is the raw idea.
 - **Adopt** — `gh issue view <issue> --comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
 
-Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **every time**, in both Capture and Adopt, run once over the raw idea and always before the §3 draft and the §4 write. Understanding intent precedes authoring, with no fuzziness condition that lets the grill be skipped.
+Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **every time**, in both Capture and Adopt, run once over the raw idea and always before the §4 draft and the §5 write. Understanding intent precedes authoring, with no fuzziness condition that lets the grill be skipped.
 
-### 2. Pick the four-tuple
+### 2. Check the idea against the repo
+
+Two checks, both run before a line of the brief is written:
+
+- **Redundancy.** Search dev-playbook's skills, standards, and scripts, plus the open issues of the repo the idea belongs to, for work that already covers the idea. Search by concept, not by the wording the idea arrived in.
+- **Claims.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and check it against the tree.
+
+Report what both checks found and where you looked. On a hit — existing coverage, or a claim that fails — put the evidence to the user; the proceed-or-kill call is theirs.
+
+### 3. Pick the four-tuple
 
 - `category:*` — pick one.
 - `mode:*` — `mode:direct` or `mode:spike`. `mode:sdd` is a retained label the factory does **not** support and intake never mints, per [software-factory.md → SDD is not supported](~/workspace/dev-playbook/software-factory/software-factory.md#sdd-is-not-supported).
@@ -50,21 +59,21 @@ Routing, given the mode:
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.
 
-### 3. Draft the brief
+### 4. Draft the brief
 
 Per the issue conventions: the build-leaf brief for `mode:direct`, the spike brief for `mode:spike`. When **adopting**, rewriting the stub's body into the brief format is mandatory — every adopted issue leaves with an authored body. Structure what the user wrote, don't discard it.
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is checked at the crossing into the factory, not here.
 
-### 4. Confirm, then land
+### 5. Confirm, then land
 
 Before writing anything to GitHub, reflect your read back to the user and land only on their **explicit nod**. This is a non-optional **hard gate**, not a courtesy: no label lands in the definition region on the agent's own authority, and **adopt** *overwrites* the existing body, so without the nod the rewrite lands silently. In one message, show:
 
 - **Intent** — a one- or two-line restatement of the work as you understand it.
 - **The four-tuple** — `category` / `mode` / `tests` / routed `phase`, each with a few words of why.
-- **The brief, in miniature** — a few-line sketch of the §3 draft: scope, the load-bearing decisions, the shape of the acceptance criteria. Never the body verbatim — the full text lands on the issue, where it's read. For **adopt**, say in a line what the rewrite keeps and drops from the stub.
+- **The brief, in miniature** — a few-line sketch of the §4 draft: scope, the load-bearing decisions, the shape of the acceptance criteria. Never the body verbatim — the full text lands on the issue, where it's read. For **adopt**, say in a line what the rewrite keeps and drops from the stub.
 
-Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §4 confirms the *authored artifact*; neither substitutes for the other. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
+Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*; neither substitutes for the other. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
 
 On the nod:
 

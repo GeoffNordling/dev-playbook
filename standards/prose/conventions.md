@@ -128,6 +128,22 @@ path is an external dependency, carried unmodified so it can be re-synced from
 upstream; its voice is its author's to set. The ban governs what this workspace
 writes and owns — the skills under `.claude/`.
 
+## Choose each format by argument
+
+Every block's form is a decision with a reason behind it. The arguments that
+recur:
+
+- **Prose vs list.** Prose carries an argument; a list carries parallel items.
+  Items that aren't genuinely parallel read better as prose.
+- **Inline vs callout.** A callout earns the break in flow when the aside would
+  derail the argument inline.
+- **Table vs repeated structure.** The same shape with the same fields three or
+  more times is a table; anything fewer or uneven is prose with bold leads.
+- **Quote vs paraphrase.** Quote where the original wording is the point;
+  paraphrase where only the idea is.
+- **Code block vs inline code.** Multi-line, runnable, or illustrative goes in a
+  block; a single token or identifier stays inline.
+
 ## Point at canonical artifacts
 
 When a real file IS the standard, the doc directs the reader to it.
