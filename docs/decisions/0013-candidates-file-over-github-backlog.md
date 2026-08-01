@@ -3,6 +3,7 @@ type: Decision-Record
 title: Uncommitted Work Lives in CANDIDATES.md, Not GitHub
 status: accepted
 description: Record uncommitted future work in a per-repo CANDIDATES.md rather than as open GitHub issues, reserving issues for work already committed to
+date: 2026-07-24
 ---
 
 # Uncommitted Work Lives in CANDIDATES.md, Not GitHub

@@ -2,13 +2,14 @@
 type: Decision-Record
 title: Harvest Pocock's `prototype` and `handoff` Skills
 description: Harvest Pocock's prototype and handoff skills into authored bundles rather than taking a direct dependency
+date: null
 ---
 
 # Harvest Pocock's `prototype` and `handoff` Skills
 
 ## Context
 
-Matt Pocock published two skills after [Decision Record 0004](0004-remove-pocock-direct-dependency.md): `engineering/prototype` and `productivity/handoff`. The Pocock entry in [third-party-survey.md](~/workspace/dev-playbook/docs/third-party-survey.md) directs new skills through the [Decision Record 0003](0003-decline-superpowers.md) rule — adopt only when conventions integrate cleanly, otherwise harvest the technique into an authored skill. Both were evaluated against that rule.
+Matt Pocock published two skills after [Decision Record 0004](0004-remove-pocock-direct-dependency.md): `engineering/prototype` and `productivity/handoff`. The Pocock entry in `third-party-survey.md` (the survey doc, retired 2026-08-01) directed new skills through the [Decision Record 0003](0003-decline-superpowers.md) rule — adopt only when conventions integrate cleanly, otherwise harvest the technique into an authored skill. Both were evaluated against that rule.
 
 ## Decision
 

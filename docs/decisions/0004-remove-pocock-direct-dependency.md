@@ -2,6 +2,7 @@
 type: Decision-Record
 title: Remove Pocock Direct Dependency, Absorb Conventions, Lift Engineering Skills
 description: Cut the Pocock direct dependency — absorb load-bearing conventions into standards, lift four engineering skills into bundles, keep two utilities
+date: 2026-05-09
 ---
 
 # Remove Pocock Direct Dependency, Absorb Conventions, Lift Engineering Skills

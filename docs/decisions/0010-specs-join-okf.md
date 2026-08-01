@@ -2,6 +2,7 @@
 type: Decision-Record
 title: Specs Join OKF — Reversing the specs/ Carve-Out
 description: Reverse the planned specs/ carve-out from the OKF bundle — SDD spec items gain OKF frontmatter and per-folder indexes instead of being exempted
+date: 2026-07-13
 ---
 
 # Specs Join OKF — Reversing the specs/ Carve-Out

@@ -39,6 +39,7 @@ An easy-to-reverse decision is simply reversed, not recorded. An unsurprising on
 - **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
 - **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
 - **Rejected alternatives when the rejection is non-obvious.** When GraphQL was considered and REST won for subtle reasons, record it — otherwise GraphQL gets proposed again in six months.
+- **External-convention evaluations.** A deliberate look at something outside the workspace — a skill, a skill collection, a framework, a technique — ends in a record, pinning exactly what was examined (repo SHA, version, date). Adopting nothing is still a decision; the record is what stops the same source being re-evaluated from scratch in six months.
 
 ## Template
 
@@ -47,6 +48,7 @@ An easy-to-reverse decision is simply reversed, not recorded. An unsurprising on
 type: Decision-Record
 title: {Short title of the decision}
 description: {One-line summary of the decision, for triage and the index}
+date: {YYYY-MM-DD}
 ---
 
 # {Short title of the decision}
@@ -57,6 +59,10 @@ description: {One-line summary of the decision, for triage and the index}
 That's it. A Decision Record can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
 A Decision Record is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/docs/document-types.md)). The `description` is the record's triage line and feeds `docs/decisions/index.md`; on a one-sentence record it will echo the body — that's fine, the description is the triage surface and the body is the record.
+
+## Date
+
+Every record carries a `date` frontmatter key: the day the decision was made, `YYYY-MM-DD`. A record written after the fact carries the decision's date, not the writing date. Where the day is genuinely unrecoverable, `date: null` — never a guess. Records predating this key (introduced 2026-08-01) were backfilled from the dates their own text or git history could prove, null otherwise.
 
 ## Immutability
 
