@@ -60,3 +60,10 @@ before starting, to see what the iterations before it already did.
   session lanes in a 5.1 MiB self-contained page. Next: task 9, the console-script
   command that runs the pipeline over a window and rewrites the doc's
   "Work required".
+- Task 9: `src/dev_playbook/measure/cli.py` runs the whole pipeline over a chosen
+  window and writes the page, wired as the `measure-timeline` console script; the
+  run prints what it dropped, how many turns are still open, the fitted model, and
+  both levels' wall and expected totals per state; 24 tests in
+  `tests/test_measure_cli.py` against a fixture store, and the doc's "Work
+  required" is now "The pipeline" (how to run it, plus a stage-by-module table)
+  followed by "What remains". Every task in the plan is complete.

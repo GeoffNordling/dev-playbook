@@ -291,9 +291,45 @@ sessions are reachable from either side, since `SubagentStop`'s
 `agent_transcript_path` equals agentsview's `sessions.file_path`. Nothing here
 depends on it being present.
 
-## Work required
+## The pipeline
 
-### 1. Extend capture beyond Bash — done
+Everything above is built, in [`src/dev_playbook/measure/`](/src/dev_playbook/measure/),
+and one command runs it end to end:
+
+```bash
+uv sync --extra measure                  # pandas and plotly, once
+uv run measure-timeline activity.html    # the whole store, one lane per session
+```
+
+`--since` and `--until` choose the window and are read as UTC, as the store
+keeps it; either one left out falls back to the store's own edge. `--lane`
+pivots the picture to `repo`, `issue_writes`, `issue_reads` or `skill` instead
+of sessions, `--title` names the page, and `--db` reads a store somewhere else.
+Nothing is written but the page: the store is opened read-only, and the interval
+table is recomputed from it on every run rather than persisted, because the
+derivation is still moving and a stale table would be believed.
+
+The page is self-contained — plotly is inlined, so it is a few megabytes and
+opens with no network.
+
+Each run prints what the page cannot show: how many rows were read and how many
+each cleaning removed, how many turns are still open, the fitted presence model,
+and each state's totals at both levels, as wall clock and confidence-weighted.
+Every figure quoted in this document comes from such a run; the store is live,
+so a rerun moves them a little.
+
+| Stage | Module | What it does |
+|---|---|---|
+| Load | [`measure/store.py`](/src/dev_playbook/measure/store.py) | The `events` table through a `mode=ro` URI into one tidy frame |
+| Clean | [`measure/clean.py`](/src/dev_playbook/measure/clean.py) | The four techniques above, each reporting its own removed count |
+| Attribute | [`measure/attribute.py`](/src/dev_playbook/measure/attribute.py) | `repo`, `issue_writes`, `issue_reads` and `skill` per event row |
+| Definitive intervals | [`measure/intervals.py`](/src/dev_playbook/measure/intervals.py) | `claude_active`, `interrupted` and `dormant` rows at confidence 1.0 |
+| Graded intervals | [`measure/presence.py`](/src/dev_playbook/measure/presence.py) | One `human_present` row per gap, at the fitted probability |
+| Roll up | [`measure/rollup.py`](/src/dev_playbook/measure/rollup.py) | The same table across the machine, and the totals at either level |
+| Draw | [`measure/timeline.py`](/src/dev_playbook/measure/timeline.py) | Lanes, gapped bars, confidence as opacity |
+| Run | [`measure/cli.py`](/src/dev_playbook/measure/cli.py) | The window, the report, and the page |
+
+### 1. Capture beyond Bash
 
 The hook dropped `tool_input` and `tool_response` wholesale for non-Bash tools.
 That was right for volume — `Read` responses carry whole files and `Edit` inputs
@@ -308,7 +344,7 @@ negligible storage cost. Forward-only: existing rows stay as they are, so code
 reading either field must treat its absence on an older row as a fact about
 capture history rather than an error.
 
-### 2. Build the interval table — done
+### 2. The interval table
 
 One table: `start`, `end`, `state`, `session_id`, `confidence`. Every report and
 both levels are a grouping of it.
@@ -354,7 +390,7 @@ no session in existence at all — for 11.5 of the 99. Wall clock only falls goi
 up a level, and expected presence falls with it, because a union charges one
 moment once however many sessions were idle through it.
 
-### 3. Fit the presence mixture — done
+### 3. The presence mixture
 
 A `Stop` with a submit next after it in the same session bounds a span nothing
 observes. There are 533 of them over the store, 128 hours in total against 15
@@ -393,6 +429,30 @@ best-scoring one that converged. And the fit cannot decline: two modes are what
 it looks for, so two modes are what it reports, over a window that was worked
 straight through as readily as over one holding a night's sleep. The fitted
 parameters travel with the rows they graded so a reader can see which they got.
+
+## What remains
+
+Nothing below blocks a run; each is a place the answer is weaker than it looks.
+
+- **File attribution.** Capture keeps `file_path` on every `Read`, `Edit` and
+  `Write` written since the change, and nothing reads it yet. It is the one goal
+  above with no derivation behind it.
+- **The `interrupted` upper bound.** An interrupted turn still ends at the next
+  submit, which can be a night away. The tail after an interrupt is the same
+  unobserved thing as a `Stop`-to-submit gap and could take the same fitted
+  probability instead of being counted whole.
+- **Presence at the global level is optimistic.** Sessions combine by
+  complement, which reads two terminals idle through one hour as two chances the
+  human was there rather than one absence. Correcting it needs a model of how
+  sessions share a human, and the numbers are reported uncorrected until there
+  is one.
+- **Cost and which model did the work.** Both are out of scope above, and both
+  would come from the agentsview join rather than from this store.
+- **No backfill.** The forward-only fields — file paths, agent-invoked skills —
+  begin at the capture change. Rows before it stay as they are.
+- **One window at a time.** The command answers a question and writes a page; it
+  is not a recurring device. Shipping it as one is a separate decision (see the
+  instrument and skill references below).
 
 ## What this gives us
 

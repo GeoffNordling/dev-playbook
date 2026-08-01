@@ -18,9 +18,13 @@ measure = [
 # Console scripts so a consumer that installs this package resolves the
 # judgments CLIs on its venv PATH. They wrap the same library entry points the
 # scripts/ pre-commit shims call, so the two channels behave identically.
+# `measure-timeline` has no scripts/ shim on purpose: it needs the `measure`
+# extra, so it runs from the project venv (`uv run measure-timeline`) rather
+# than from a self-bootstrapping `uv run --script` file.
 [project.scripts]
 judgments-run = "dev_playbook.judgments.runner:run_cli"
 judgments-lint = "dev_playbook.judgments.loader:lint_cli"
+measure-timeline = "dev_playbook.measure.cli:run_cli"
 
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network

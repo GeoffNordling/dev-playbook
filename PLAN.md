@@ -184,7 +184,17 @@ them whenever you learn something a future iteration would otherwise rediscover.
 - plotly 6.9 is locked and synced, and it was the last dependency this plan
   needs, so task 9 requires no network. `presence._human` is now public as
   `presence.human_seconds`, shared with the view's hover labels.
-- The whole pipeline task 9 has to wire, in order: `store.load_events` → the
+- `dev_playbook.measure.cli` is the assembled pipeline: `pipeline(db_path,
+  since, until, workspace)` returns a `Run` carrying the window, the row counts,
+  every `Cleaning`, the attributed events, the one interval table, the open-turn
+  count and the fit; `report(run)` renders it; `main(argv, workspace=...)` is
+  the `measure-timeline` console script. The window is cut **before** cleaning,
+  which is the order the cleanings were written for, and the same window goes to
+  `definitive_intervals` so dormancy is measured against what was asked for.
+- No `scripts/` shim for `measure-timeline`: it needs the `measure` extra, so it
+  runs from the project venv (`uv run measure-timeline`) rather than from a
+  self-bootstrapping `uv run --script` file like the stdlib-only shims.
+- The whole pipeline task 9 wires, in order: `store.load_events` → the
   four cleanings in the order they appear in `clean` → `attribute.attributed` →
   `pd.concat` of `intervals.definitive_intervals(...).frame` and
   `presence.presence_intervals(...).frame` → `timeline.laned` →
@@ -238,7 +248,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       observed. Make the lane key a parameter so the same view pivots to repo or
       issue. Write a self-contained HTML file. Design details are the
       implementer's call.
-- [ ] Add one command that runs the whole pipeline over a chosen time window and
+- [x] Add one command that runs the whole pipeline over a chosen time window and
       writes the HTML view, wired as a console script in `pyproject.toml`.
       Document how to run it in `docs/measurement-prototype.md`, replacing the
       "Work required" section with what now exists and what remains.
