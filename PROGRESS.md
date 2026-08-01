@@ -17,3 +17,7 @@ before starting, to see what the iterations before it already did.
   columns); `measure` extra added and pulled into the dev group; 13 tests in
   `tests/test_measure_store.py` against fixture databases. Next: task 3, the
   four row-cleaning functions.
+- Task 3: `src/dev_playbook/measure/clean.py` adds the four techniques as
+  separate functions, each returning `Cleaning(technique, frame, removed)`;
+  19 tests in `tests/test_measure_clean.py` build frames in memory through
+  `store.event_row`. Next: task 4, the definitive interval rows.

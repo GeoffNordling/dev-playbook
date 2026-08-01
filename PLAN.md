@@ -80,6 +80,20 @@ them whenever you learn something a future iteration would otherwise rediscover.
   `session_id`, `cwd` or `transcript_path` — all four hold on every row of the
   real store. `prompt_id` is the one that is legitimately None (86 rows).
 
+- `dev_playbook.measure.clean` holds the four techniques, each
+  `frame -> Cleaning(technique, frame, removed)`. Compose them in the order
+  they appear in the module; each returns a new frame with a fresh
+  `RangeIndex`, so an index from before a cleaning step is meaningless after
+  it. `collapse_expansions` keeps the **submit** row and folds the expansion's
+  `command_name`/`command_args` onto its payload — that is where task 7's
+  human-typed skill attribution comes from.
+- Store facts the cleaning rests on, measured on the real store: a `Stop`
+  carries the same `prompt_id` as its submit, so anything keyed on `prompt_id`
+  alone hits both; expansions pair 1:1 with submits (109 of 109, none
+  duplicated, none unpaired); and 1312 of 1522 `SubagentStop` rows have an
+  empty `agent_type` against only 233 `SubagentStart` rows, so phantoms are
+  the majority, not the exception.
+
 ## Tasks
 
 - [x] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
@@ -95,7 +109,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       promoted to columns. Add the optional dependency extra. Cover the loader
       with tests against a small fixture database built in the test, never
       against the real store.
-- [ ] Add the four row-cleaning techniques from the prototype doc as separate,
+- [x] Add the four row-cleaning techniques from the prototype doc as separate,
       individually testable functions: collapse expansion/submit pairs sharing a
       `prompt_id`, drop phantom `SubagentStop` rows, drop task-notification
       pseudo-prompts, and drop ghost sessions. Each returns a filtered frame and
