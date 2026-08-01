@@ -174,6 +174,24 @@ them whenever you learn something a future iteration would otherwise rediscover.
   skill invocations, every one of them human-typed, because all 81 stored
   `Skill` tool rows were written before capture began keeping their input.
 
+- `dev_playbook.measure.timeline` owns the view. `laned(frame, key, events)` adds
+  the `lane` column and is the only pivot — `key` is `session` (needing no
+  events) or any of the four attribution columns; `timeline_figure` draws a
+  laned frame and `write_timeline(frame, path, title)` writes the page. The lane
+  rule is **what was in force at the interval's start**, and a row naming two
+  issues is duplicated into both lanes, so **a laned frame must never be
+  totalled** — `rollup.state_seconds` is for that.
+- plotly 6.9 is locked and synced, and it was the last dependency this plan
+  needs, so task 9 requires no network. `presence._human` is now public as
+  `presence.human_seconds`, shared with the view's hover labels.
+- The whole pipeline task 9 has to wire, in order: `store.load_events` → the
+  four cleanings in the order they appear in `clean` → `attribute.attributed` →
+  `pd.concat` of `intervals.definitive_intervals(...).frame` and
+  `presence.presence_intervals(...).frame` → `timeline.laned` →
+  `timeline.write_timeline`. Measured over the real store: 1353 interval rows
+  over 62 sessions, giving 6 repo lanes, 18 issue-write lanes, 15 skill lanes,
+  and a 5.1 MiB self-contained page.
+
 ## Tasks
 
 - [x] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
@@ -214,7 +232,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       comment) and read signals (view) kept as separate columns, and skills from
       both `UserPromptExpansion.command_name` and Skill-tool rows. Never merge
       the read and write issue signals into one column.
-- [ ] Build the Plotly timeline view: time on the x axis, one lane per session
+- [x] Build the Plotly timeline view: time on the x axis, one lane per session
       stacked vertically, bars drawn only where there is activity so gaps read as
       gaps, and confidence rendered so inferred presence is visibly weaker than
       observed. Make the lane key a parameter so the same view pivots to repo or

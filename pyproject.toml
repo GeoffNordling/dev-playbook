@@ -12,6 +12,7 @@ dependencies = [
 [project.optional-dependencies]
 measure = [
     "pandas>=3.0",
+    "plotly>=6.0",
 ]
 
 # Console scripts so a consumer that installs this package resolves the

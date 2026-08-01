@@ -158,11 +158,11 @@ class MixtureFit:
                 f"({self.iterations} EM steps, "
                 f"log-likelihood {self.log_likelihood:.2f})",
                 f"  working mode: {self.present.weight:.1%} of gaps, median "
-                f"{_human(self.present.median_seconds)}",
+                f"{human_seconds(self.present.median_seconds)}",
                 f"  away mode:    {self.absent.weight:.1%} of gaps, median "
-                f"{_human(self.absent.median_seconds)}",
+                f"{human_seconds(self.absent.median_seconds)}",
                 f"  shared log-sd {self.sd:.3f}; presence reaches even odds at "
-                f"{_human(self.crossover_seconds)}",
+                f"{human_seconds(self.crossover_seconds)}",
             )
         )
 
@@ -284,6 +284,21 @@ def presence_intervals(events: pd.DataFrame) -> Presence:
     )
 
 
+def human_seconds(seconds: float) -> str:
+    """A duration as the coarsest two units that describe it, for reading.
+
+    The quantities here span seconds to hours in the same report, and a summary
+    line that prints 20729 s beside 73 s makes the reader do the conversion the
+    model exists to explain. Public because the timeline's hover labels face the
+    same spread and must read the same way.
+    """
+    if seconds < 60:
+        return f"{seconds:.0f}s"
+    if seconds < 3600:
+        return f"{seconds // 60:.0f}m {seconds % 60:.0f}s"
+    return f"{seconds // 3600:.0f}h {seconds % 3600 // 60:.0f}m"
+
+
 # --- the mixture's arithmetic -------------------------------------------------
 
 
@@ -309,20 +324,6 @@ def _log_sum_exp(left: float, right: float) -> float:
     """`log(exp(left) + exp(right))`, evaluated without leaving the log domain."""
     larger = max(left, right)
     return larger + math.log(math.exp(left - larger) + math.exp(right - larger))
-
-
-def _human(seconds: float) -> str:
-    """A duration as the coarsest two units that describe it, for reading.
-
-    The fitted quantities span seconds to hours in the same report, and a
-    summary line that prints 20729 s beside 73 s makes the reader do the
-    conversion the model exists to explain.
-    """
-    if seconds < 60:
-        return f"{seconds:.0f}s"
-    if seconds < 3600:
-        return f"{seconds // 60:.0f}m {seconds % 60:.0f}s"
-    return f"{seconds // 3600:.0f}h {seconds % 3600 // 60:.0f}m"
 
 
 # --- expectation-maximization -------------------------------------------------

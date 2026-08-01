@@ -50,3 +50,13 @@ before starting, to see what the iterations before it already did.
   `tests/test_measure_attribute.py`, and the doc's attribution section now
   carries the parse rule and re-measured coverage. Next: task 8, the Plotly
   timeline view.
+- Task 8: `src/dev_playbook/measure/timeline.py` draws the interval table as
+  gapped bars — one lane per session, confidence as opacity so inferred presence
+  reads faint, dormancy built but switched off in the legend, and `laned` pivoting
+  the same table to a repo, issue or skill lane by what was in force at each
+  interval's start; plotly added to the `measure` extra and locked, `_human`
+  promoted to `presence.human_seconds`, 24 tests in
+  `tests/test_measure_timeline.py`, and a real-store run gives 1353 rows over 62
+  session lanes in a 5.1 MiB self-contained page. Next: task 9, the console-script
+  command that runs the pipeline over a window and rewrites the doc's
+  "Work required".
