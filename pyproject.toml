@@ -38,8 +38,8 @@ paths = ["judgments/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# src/ exposes the dev_playbook package; tests/ carries a bare-imported
-# transcript_fakes helper two suites pull in.
+# src/ exposes the dev_playbook package; tests/ carries the bare-imported
+# transcript_fakes and measure_fakes helpers that several suites pull in.
 pythonpath = ["src", "tests"]
 
 [dependency-groups]

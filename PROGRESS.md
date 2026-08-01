@@ -21,3 +21,9 @@ before starting, to see what the iterations before it already did.
   separate functions, each returning `Cleaning(technique, frame, removed)`;
   19 tests in `tests/test_measure_clean.py` build frames in memory through
   `store.event_row`. Next: task 4, the definitive interval rows.
+- Task 4: `src/dev_playbook/measure/intervals.py` derives the definitive rows —
+  `claude_active`, `interrupted`, `dormant`, all at confidence 1.0 — through the
+  one `interval_frame` constructor; frame builders moved to
+  `tests/measure_fakes.py` and 22 tests added; the doc's interval section now
+  matches the code and records that an `interrupted` span is a loose upper
+  bound. Next: task 5, the `Stop`-to-submit gaps and the fitted mixture.

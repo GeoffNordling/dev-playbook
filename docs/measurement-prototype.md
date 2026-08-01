@@ -289,19 +289,33 @@ negligible storage cost. Forward-only: existing rows stay as they are, so code
 reading either field must treat its absence on an older row as a fact about
 capture history rather than an error.
 
-### 2. Build the interval table
+### 2. Build the interval table — definitive rows done
 
 One table: `start`, `end`, `state`, `session_id`, `confidence`. Every report and
 both levels are a grouping of it.
 
-Compute it in memory on each run rather than persisting it. The derivation logic
-will change as the assumptions are tuned, and a stale persisted table is worse
-than none. The store is small enough that recomputing from scratch is free.
+It is computed in memory on each run rather than persisted. The derivation will
+change as the assumptions are tuned, and a stale persisted table is worse than
+none. The store is small enough that recomputing from scratch is free.
 
-Use SQL to flatten the JSON payloads and to find the previous `Stop` before each
-submit. Use pandas for the interval logic, because unioning overlapping
-intervals across sessions for the global view is awkward in SQL and trivial in a
-dataframe.
+The rows that need no inference exist, in three states: `claude_active` for a
+submit and the `Stop` carrying its `prompt_id` (assumption 2), `interrupted` for
+a submit whose turn produced no `Stop`, closed at the next submit in that session
+(assumption 5), and `dormant` for the window either side of a session's own
+events (assumption 3). All three carry confidence 1.0.
+
+Pairing is by `prompt_id` throughout, and the whole derivation is pandas over the
+loaded frame — no SQL beyond the loader's single `SELECT`, since the payloads are
+already parsed by the time any interval logic runs.
+
+One caveat the numbers make sharp: an `interrupted` row's end is an upper bound,
+not the interrupt instant, and summing it into Claude-active time is wrong. Its
+median across the store is 29 seconds and its maximum 15.7 hours — an interrupt
+before the human left for the night swallows the night. Tightening it needs the
+same fitting the next item gives a gap.
+
+Still to build: the global union of the per-session rows, and the graded rows
+below.
 
 ### 3. Fit the presence mixture
 

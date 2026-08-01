@@ -94,6 +94,28 @@ them whenever you learn something a future iteration would otherwise rediscover.
   empty `agent_type` against only 233 `SubagentStart` rows, so phantoms are
   the majority, not the exception.
 
+- `dev_playbook.measure.intervals` owns the interval table. Build **every** new
+  row through `intervals.interval_frame(rows)` — it is the one constructor for
+  the schema, and it pins `start`/`end` to `datetime64[us, UTC]` and
+  `confidence` to float even when there are no rows, so frames from different
+  stages concat cleanly. `definitive_intervals(events, window=None)` returns
+  `Intervals(frame, unresolved)`; omit the window and the frame's own span is
+  used. Feed it cleaned events — it does not clean.
+- Measured over the whole real store, cleaned: 583 `claude_active` rows
+  (14 h 34 m), 100 `interrupted`, 110 `dormant`, 5 unresolved turns, across a
+  4-day window and 56 sessions. Sanity numbers for any later change.
+- **Never sum `interrupted` into Claude-active time.** Median 29 s but maximum
+  15.7 h — an interrupt before the human left for the night swallows the night.
+  Task 5 should consider that an interrupt's tail is the same unobserved thing
+  as a `Stop`-to-submit gap and could take the same fitted probability.
+- 102 `Stop` rows in the cleaned store match no submit; that is expected, not a
+  defect — dropping the task-notification pseudo-prompts strands their stops.
+  Zero submits or stops have a null `prompt_id`, no `prompt_id` carries two
+  stops, and no stop precedes its submit, so pairing by `prompt_id` is exact.
+- Test frames come from `tests/measure_fakes.py` (`a_payload`, `a_frame`, and
+  `at(n)` for the timestamp of the nth payload). `pyproject.toml` already puts
+  `tests` on `pythonpath`, so import it bare: `from measure_fakes import ...`.
+
 ## Tasks
 
 - [x] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
@@ -114,7 +136,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       `prompt_id`, drop phantom `SubagentStop` rows, drop task-notification
       pseudo-prompts, and drop ghost sessions. Each returns a filtered frame and
       reports how many rows it removed, so a caller can show its own blind spots.
-- [ ] Build the definitive part of the interval table: Claude-active spans from
+- [x] Build the definitive part of the interval table: Claude-active spans from
       each submit to its `Stop`, dormant spans outside each session's first and
       last event, and interrupt detection where two submits share a session with
       no `Stop` between them. Emit the interval schema `start`, `end`, `state`,
