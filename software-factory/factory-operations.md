@@ -183,7 +183,7 @@ intermediary push rides `--no-verify`, deferring the semantic gate to
 A node skill does the node's work and reports; the issue overwatch launches it,
 sequences what follows, and writes the labels. This contract fixes structure; the
 authoring *style* behind the skills — voice, content, robustness, mechanics —
-lives in [skill-authoring.md](/software-factory/skill-authoring.md).
+lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
 
 - **Read first.** When a skill has required reading, it front-loads a
   `## Read first` section ending in a `READ: <files>` confirmation; when it has
@@ -195,8 +195,15 @@ lives in [skill-authoring.md](/software-factory/skill-authoring.md).
   [the terminal report contract](#engagement): `DONE:` on success, `ESCALATE:`
   when stuck. Each skill states its own escalation triggers in its body.
 - **Inline** — a skill the human invokes directly, as the definition region's
-  are, may gate on interviews and approvals, asked in prose at the terminal, and
-  closes with a plain report rather than a report line.
+  are, may gate on interviews and approvals, asked in prose at the terminal.
+- **The report line.** Every node closes on one ` · `-delimited line: the handle
+  `<repo>#<N>` · `phase: <node>`. A committing node appends
+  `commit <sha> · check green · unpushed`; a node whose real output landed on
+  GitHub appends a pointer only (`findings on PR #<n>`, `brief in issue`), never
+  a re-paste — the line points, GitHub holds the detail. An AFK skill carries it
+  on the `DONE:`/`ESCALATE:` line per
+  [the terminal report contract](#engagement); an inline skill omits the token
+  and closes with the line alone.
 - **Gate.** A committing node runs `make check` — the full gate, not just the
   commit hooks — before finishing its phase; a phase never closes over a red
   tree. The rule is per-phase, not per-commit: individual commits are already
