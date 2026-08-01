@@ -46,23 +46,23 @@ How a skill is reached — and the two loads paid for the choice.
 
 ### Model-invoked
 
-A skill the agent can see and fire autonomously, while the human can still
-type its name — so model-invocation always *includes* user reach. There is no
+A skill the agent can see and fire autonomously — and the human can still type
+its name, so model-invocation always *includes* user reach. There is no
 model-only state: agent discovery only ever *adds* to the human's, never
 removes it. Pays a permanent **context load** on every turn in exchange for
 that discoverability. Reachable by other skills, because what makes it
 agent-discoverable makes it invocable. A model-invoked skill whose content is
 all **reference** is also one home for shared reference: another skill can
-invoke it, so reference needed by several skills lives in one place. Chosen
-only when the agent must reach the skill on its own; a skill that never fires
-except by hand pays no context load instead. Set by
+invoke it, so reference needed by several skills lives in one place. Pick
+model-invocation only when the agent must reach the skill on its own; if it
+never fires except by hand, pay no context load. Set by
 `disable-model-invocation: false`.
 
 *Avoid*: ability, tool, capability
 
 ### User-invoked
 
-A skill out of the agent's reach, invocable only by the human typing its name
+A skill invisible to the agent — reachable only by the human typing its name
 (user-*only*, where **model-invoked** is user-*and-agent*). Trades
 agent-discoverability for zero **context load**. Because the agent cannot see
 it, nothing but the human can reach it: no other skill can fire it. Set by
@@ -74,9 +74,9 @@ it, nothing but the human can reach it: no other skill can fire it. Set by
 
 The skill's machine-readable trigger, and the one **context pointer** a
 **model-invoked** skill is forced to keep loaded at all times. Every skill
-carries one, whatever its invocation mode; what
-`disable-model-invocation` decides is whether a model ever reads it, and so
-whether it costs **context load**. Its form is binding and is stated once, in
+carries one, whatever its invocation mode; what `disable-model-invocation`
+decides is whether a model ever reads it. The source of a model-invoked
+skill's **context load**. Its form is binding and is stated once, in
 [skill-conventions.md — Required fields](/standards/claude-code/skill-conventions.md#required-fields).
 
 *Avoid*: frontmatter, summary
@@ -88,8 +88,8 @@ material and encodes the condition for reaching it. The **description** is the
 top-level context pointer (context window → skill); pointers to disclosed
 files are the same object one level down. Its wording, not the target, decides
 *when* the agent reaches — and *how reliably*. A must-have target behind a
-weakly worded pointer is a variance bug: sharpen the wording first, and inline
-the material only if that fails.
+weakly worded pointer is a variance bug: fix the wording first, and inline the
+material only if sharpening fails.
 
 *Avoid*: link, reference, import
 
@@ -118,7 +118,7 @@ it where human judgment matters; remove it where it does not.
 A **user-invoked** skill whose job is to point at the other user-invoked
 skills — naming each and when to reach for it — so the human has one skill to
 remember instead of many. It can only hint, never fire them: nothing but the
-human can reach a user-invoked skill. The cure for **cognitive load** when
+human can reach them. The cure for **cognitive load** when
 user-invoked skills multiply.
 
 *Avoid*: dispatcher, menu, registry, index, router procedure
@@ -202,9 +202,7 @@ Moving **reference** down the ladder — out of `SKILL.md` and behind a
 optimization; it is how the **information hierarchy** is protected. Licensed
 by **branching**: disclose what only some branches need, inline what every
 path needs, and if a pointer fires unreliably on must-have material, sharpen
-its wording, and pull it back inline only if that fails. The bundle mechanics
-are in
-[skill-conventions.md — References directory](/standards/claude-code/skill-conventions.md#references-directory).
+its wording, and pull it back inline only if that fails.
 
 *Avoid*: lazy loading, chunking
 
@@ -259,7 +257,7 @@ model already holds (e.g. *lesson*, *proximal zone of development*, *fog of
 war*, *tracer bullets*). Repeated as a token, never as a sentence, it
 accumulates a distributed definition across the skill and anchors a whole
 region of behavior. Coining one works if it is defined clearly, but a made-up
-word recruits no priors — the definition costs the tokens a pretrained word
+word recruits no priors — definition tokens pay for what a pretrained word
 gives free. Reach for an existing word first.
 
 A leading word serves **predictability** twice. In the body it anchors
@@ -326,8 +324,8 @@ is the necessary condition: a sharp bound resists the pull no matter how many
 later steps are visible, so a step that never rushes needs no defending. Two
 levers hold a step that does, but reach for them in order: **sharpen the bound
 first** — it is local and cheap. Only when the criterion is irreducibly fuzzy
-*and* the rush is actually observed does **hiding the later steps** earn its
-cost — and hiding only works across a real context boundary (a user-invoked
+*and* the rush is actually observed, **hide the later steps** — and hiding
+only works across a real context boundary (a user-invoked
 hand-off or a subagent dispatch; an inline model-invoked call leaves the later
 steps in context and clears nothing). One cause of thin legwork, but distinct
 from it: legwork can be thin even when a step runs to full completion.
@@ -405,7 +403,7 @@ test: does a line change behavior versus the default? A line can be perfectly
 word** free make a no-op worthless.
 
 A leading word is a *technique*; no-op is a *verdict* on a line — and they
-cross. A leading word too weak to beat the default is a no-op (*be thorough*,
+cross. A leading word too weak to beat the default is a no-op (*be thorough*
 when the agent is already thorough-ish), and the fix is a stronger word that
 passes the verdict (*relentless*), not a different technique. So the no-op
 test — does it change behavior versus the default? — is also how to grade
