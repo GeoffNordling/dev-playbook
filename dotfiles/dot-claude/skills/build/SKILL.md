@@ -45,7 +45,7 @@ Before you start, state your plan — to anchor the work and keep it visible to 
 - **Approach.** How you'll satisfy each criterion.
 - **Ambiguities.** Anything in the brief you expect to resolve; if one stalls the work, escalate per §5.
 
-The plan is your map, not a gate — proceed without waiting for approval.
+The plan is your map, not a gate.
 
 ## 4. Do the work
 
@@ -58,7 +58,7 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 
 ## 5. Escalations
 
-You work without approval, but when something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
+When something falls outside the plan — anything unexpected, or any wish to deviate — surface it and stop, emitting a terminal `ESCALATE:` line:
 
 ```
 ESCALATE: <repo>#<issue> · phase: build · <where you're stuck and the call you need>

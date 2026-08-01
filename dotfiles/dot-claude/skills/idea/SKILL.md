@@ -9,7 +9,7 @@ argument-hint: "[raw idea material]"
 
 # Idea
 
-A thin pointer so `/idea` works from any repo on desktop without
+A thin pointer so /idea works from any repo on desktop without
 `cd`-ing into mission-control. The real skill lives in mission-control:
 read [.claude/skills/idea/SKILL.md](~/workspace/mission-control/.claude/skills/idea/SKILL.md)
 now and follow it **verbatim** — it owns the routing, the deposit
@@ -23,7 +23,7 @@ Apply only the cwd-translation overrides below.
 mission-control's idea skill assumes the session's cwd **is**
 mission-control, so it uses repo-relative paths (`inbox/…`) and a plain
 `git`. This pointer fires from another repo, so force mission-control as
-the target instead — the same discipline `log-friction` uses:
+the target instead — the same discipline /log-friction uses:
 
 - **Inbox path only.** The direct path (hand-off to /curate) is
   unavailable outside mission-control; if the owner voiced direct

@@ -1,7 +1,7 @@
 ---
 name: orient
 description: Orient to the current repository. Use when invoked by the user.
-disable-model-invocation: false
+disable-model-invocation: true
 model: sonnet
 effort: xhigh
 allowed-tools: Bash(ls *) Bash(gh issue list *)
@@ -10,8 +10,9 @@ argument-hint: "[focus]"
 
 # Orient
 
-Quickly orient yourself to this repository using its documentation hierarchy.
-Do NOT launch explore agents or do deep code searches.
+Orient to this repository from its **documentation hierarchy** — what the docs
+say, read quickly at the top level. That hierarchy is the whole search: no
+explore agents, no deep code searches.
 
 ## Optional focus
 
@@ -20,8 +21,8 @@ $ARGUMENTS
 If the line above is empty, run the default top-level orientation. If it holds a
 hint, still complete every step below at the top level, but spend extra time on
 the docs, directories, and code the hint points to — read those files more
-closely and weight your summary toward them. Keep the no-explore-agents,
-no-deep-search constraint either way.
+closely and weight your summary toward them. The documentation hierarchy bounds
+the reading either way.
 
 ## Step 1 — see the shape of the repo
 
@@ -41,7 +42,7 @@ The trailing `; true` keeps the call green when paths are missing, so sibling pa
 
 ## Step 3 — read what exists
 
-Read each file that exists. Do not chase cross-references or read every nested reference — unless a focus was given, in which case you may follow references that bear on it.
+Read each file that exists, stopping at its cross-references — unless a focus was given, in which case follow the references that bear on it.
 
 Then report: `READ: {list of files you read}`. Proceed only after.
 

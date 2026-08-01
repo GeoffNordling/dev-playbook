@@ -19,13 +19,12 @@ addresses both: compress your findings into artifacts small enough for
 the user to evaluate, and iteratively refine your model of the user's
 intent.
 
-The user's time is the scarce resource. The protocol's arc is:
-invest heavily in understanding the user's intent so you can
-eventually act on their behalf. Early on, you ask questions, surface
-findings, and get direction. Each interaction calibrates your model of
-what the user wants. As that model sharpens, you earn autonomy —
-acting on patterns the user has consistently reinforced and reserving
-their attention for genuinely ambiguous decisions.
+The user's time is the scarce resource, and the protocol's arc is
+**calibration**: each interaction sharpens your model of what the user
+wants, and a sharpened model earns autonomy — you act on the patterns
+the user has consistently reinforced and spend their attention on
+genuinely ambiguous decisions. Early on you ask questions, surface
+findings, and get direction.
 
 ---
 
@@ -33,8 +32,7 @@ their attention for genuinely ambiguous decisions.
 
 Every phase is iterative. You produce work, surface it for the user to
 evaluate, and update based on their feedback. This cycle repeats within
-each phase until the user is satisfied. The entire workflow exists to
-iteratively approximate a shared understanding of the user's intent.
+each phase until the user is satisfied.
 
 ---
 
@@ -61,8 +59,8 @@ The user gives you four things to start:
 - **References** — documents you should read for context or as
   normative standards. Read all references in full.
 
-If the user does not provide one of the four, ask for it — do not infer
-it from context and move on.
+If the user does not provide one of the four, ask for it — every one of
+the four comes from the user, never inferred from context.
 
 From these, form your initial understanding of the user's intent. Then
 ask clarifying questions to sharpen that understanding — one round at a
@@ -74,8 +72,8 @@ about specific situations for Phase 3.
 Before moving on from Phase 1, restate each of the four inputs back to
 the user as a distinct, named statement: **Objective**, **Scope**,
 **Facets**, and **References**. Each statement must be precise enough
-for the user to say "no, that's wrong." Do not proceed to Phase 2 until
-the user has confirmed all four.
+for the user to say "no, that's wrong." Phase 1 ends when the user has
+confirmed all four.
 
 The result is the **shared alignment** — a mutual understanding that
 governs everything that follows. The shared alignment is the operating
@@ -92,9 +90,7 @@ property of the map, not the alignment — you decide how to move through
 the work in Phase 3, after the map exists.
 
 The shared alignment must be precise enough to be falsifiable — if it
-is vague, neither you nor the user can tell whether it is wrong. Include
-enough detail to be comprehensive and complete, but not so much that it
-becomes difficult to read or evaluate in a single pass.
+is vague, neither you nor the user can tell whether it is wrong.
 
 ---
 
@@ -143,15 +139,11 @@ itself stays small.
 
 You drive the process — proposing regions, performing analysis, surfacing
 findings. The user evaluates and directs: what to fix, what to leave,
-what to revisit. You cannot directly tell whether your output matches
-what the user actually wants. The only way to find out is to surface
-your work and let the user judge.
+what to revisit.
 
-Start exhaustive and cautious. As the calibration log grows and the
-user's direction forms a pattern, act on findings that clearly fall
-within established direction. The calibration log is the evidence —
-when it shows consistent direction on a type of finding, that is
-permission to act autonomously on similar findings.
+Start exhaustive and cautious. The intent calibration log is the record
+of calibration: where it shows consistent direction on a type of
+finding, act on similar findings yourself.
 
 ### Work loop
 
@@ -173,21 +165,20 @@ After completing each unit of work, update the protocol state document:
 revise the map (status, structure), record progress at the granularity
 of the traversal (e.g., if working facet-by-facet, mark which facets
 are complete), and revise the shared alignment if the work revealed a
-gap in the operating model. A fresh agent resuming from the document
-should see exactly where to pick up. Findings surfaced during one
-pass often belong in a later pass (a later facet under facet-major
-traversal, a later region under region-major traversal). Record
-displaced content so nothing is lost between passes. The work is
-complete when the objective is satisfied.
+gap in the operating model. Findings surfaced during one pass often
+belong in a later pass (a later facet under facet-major traversal, a
+later region under region-major traversal); record displaced content so
+nothing is lost between passes. The unit is done when the document, read
+cold, would show exactly where to pick up. The work is complete when the
+objective is satisfied.
 
 ### Step size
 
 Every time you work on your own — analyzing or acting — you face a
 tradeoff. Longer stretches are more efficient, but drift is invisible
 to you. You never know whether your output meets the user's quality
-bar, so err on the side of checking back sooner. As the shared
-alignment sharpens through additions to the intent calibration log,
-you can take longer stretches — the alignment earns you autonomy.
+bar, so err on the side of checking back sooner; calibration is what
+lengthens the stretch.
 
 ---
 
@@ -195,64 +186,21 @@ you can take longer stretches — the alignment earns you autonomy.
 
 Persist the protocol state as `PROTOCOL_STATE.md` in the project repo.
 This is not a phase — it is a continuous obligation. Write or update
-the document **after every phase and after every major alignment
-decision**.
+the document in place **after every phase and after every major
+alignment decision**, so it always reflects current state.
 
-The document contains:
+The document is written for a **cold read**: someone opening it with no
+access to the conversation that produced it can reconstruct the full
+protocol state. That is the bar every update is judged against.
 
-- **Objective**, **Scope**, **Facets**, and **References** — as
-  refined through alignment
-- **Shared alignment** — the operating model reached in Phase 1
-- **Map** — produced in Phase 2, region status updated during Phase 3
-- **Displaced content** — findings surfaced during one pass that
-  belong in a later pass, held until that pass
-- **Intent calibration log** — updated during Phase 3 as the user
-  gives direction
-- **Scratchpad** — the user's notes (see below)
+Each section is marked with a status — **approved** or **pending**. A
+section starts as **pending** and moves to **approved** when the user
+explicitly confirms it; the user is the one who marks a section
+approved, never you. Every aspect stays mutable: the user may pause
+execution at any point to revise the objective, scope, facets,
+alignment, or map.
 
-Each section is marked with a status — **approved** or **pending**.
-A section starts as **pending** and moves to **approved** only when the
-user explicitly confirms it. Never mark a section approved on your own.
-After Phase 1, write the document with the alignment approved and the
-map pending. After Phase 2, update the map section — it remains
-**pending** until the user confirms it. During Phase 3, update the map
-and calibration log after each region.
-
-The shared alignment section is the alignment as agreed — transfer it
-in full, not summarized. A fresh agent resuming from this document will
-have no other source for the operating model. The document is
-self-contained: anyone reading it cold can reconstruct the full protocol
-state without access to the conversation that produced it.
-
-Update the document in place. It always reflects
-current state. Every aspect is mutable: the user may pause execution at
-any point to revise the objective, scope, facets, alignment, or map.
-
-### Intent calibration log
-
-The log is organized by the facets — each facet has its own section,
-and entries accumulate under the relevant facet. Workflow-level
-preferences (region sequencing, presentation format) go in a General
-section.
-
-Always log when the user disagrees with or modifies your
-recommendation. Agreements may also be logged when they establish a
-pattern useful for future autonomy.
-
-For each entry, describe the specific finding you raised and the user's
-response. Err on the side of detail: a fresh agent reading the log
-should be able to see exactly what was asked, what the user decided, and
-why that decision is evidence for future autonomy on that facet.
-
-The log refines the shared alignment. A fresh agent reading the log
-reconstructs the alignment without access to the conversation that
-produced it.
-
-### Scratchpad
-
-The last section of the protocol state document is the user's
-scratchpad — a place for observations, ideas, and open questions that
-arise during the work. Write entries when the user asks you to. Do not
-interpret scratchpad content as direction, do not act on it, and do not
-incorporate it into the alignment or the map. It is the user's private
-notepad; you are the scribe.
+Read [protocol-state-document.md](references/protocol-state-document.md)
+before the first write — it carries the section list, the status
+schedule across the three phases, and the formats for the intent
+calibration log and the scratchpad.

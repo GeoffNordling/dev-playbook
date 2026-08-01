@@ -31,7 +31,7 @@ Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after
 - **Capture** — the text passed in is the raw idea.
 - **Adopt** — `gh issue view <issue> --comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
 
-Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **every time**, in both Capture and Adopt. No fuzziness condition, no escape hatch: understanding intent always precedes authoring. Run it once, over the raw idea, and always before the §3 draft and the §4 write.
+Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **every time**, in both Capture and Adopt, run once over the raw idea and always before the §3 draft and the §4 write. Understanding intent precedes authoring, with no fuzziness condition that lets the grill be skipped.
 
 ### 2. Pick the four-tuple
 
@@ -52,7 +52,7 @@ Ask the user when the call isn't clear. Routing is a one-way handoff — nothing
 
 ### 3. Draft the brief
 
-Per the issue conventions: the build-leaf brief for `mode:direct`, the spike brief for `mode:spike`. When **adopting**, rewriting the stub's body into the brief format is mandatory — there is no path where intake adopts an issue and leaves the body unwritten. Structure what the user wrote, don't discard it.
+Per the issue conventions: the build-leaf brief for `mode:direct`, the spike brief for `mode:spike`. When **adopting**, rewriting the stub's body into the brief format is mandatory — every adopted issue leaves with an authored body. Structure what the user wrote, don't discard it.
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is checked at the crossing into the factory, not here.
 

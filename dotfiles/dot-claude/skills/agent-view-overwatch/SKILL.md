@@ -32,29 +32,35 @@ Provide commands under **state once, then trust**. When you hand the user a laun
 2. **Recommend the next launch.** An issue is launchable when it is unblocked per factory-operations.md's readiness rule **and** its `phase:*` sits in the factory region — a definition-phase issue is not launchable, per the [factory-nodes-only rule](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch); it waits on the user running its definition skill. Among the launchable, recommend what to launch next and say why — dependency order, a verdict waiting, work going stale.
 3. **Emit the launch command.** One issue overwatch per issue, launched in the issue's repo: `/issue-overwatch <N>`. Hand over the literal command — the user launches it. Never auto-launch, never advance a label yourself: every label move belongs to the issue's own overwatch.
 4. **Tear down after a confirmed merge.** Worktree teardown is yours, and only after the user *tells you* the merge happened — never on inference, and with no API verification step. Then run the cheap local cleanup: `git -C ~/workspace/<repo> worktree remove .claude/worktrees/issue-<N>` and `git -C ~/workspace/<repo> branch -D issue-<N>`. A closed spike's worktree goes the same way.
-5. **Show the board.** Close each turn with the board: one row per in-flight issue. **The board is a glance, not a report — and there is a lot of information here, so the failure mode is packing too much into it.** Render an actual Markdown table (header row, `---` separator, one issue per line); never a stack of paragraphs split by `---` rules. Keep every cell to a few words — if a cell wants a sentence, it's too much: compress it or lift it out. The reasoning, the recommendation, and the launch commands live in prose around the table, not inside its cells. Try hard to keep it tight. It leads with the issue's **state** — two **orthogonal** dimensions, **Activity** (is a session working the issue, as far as you've been told?) and **Status** (where the issue stands, health-wise), rendered as two glyphs side by side with no space between them, Activity first then Status (e.g. `✈️💚`). They stay orthogonal — read each glyph on its own, and never let one stand in for the other — they just share one column to spare the table's width.
+5. **Show the board.** Close every turn with the board, built to the spec under **The board** below — the turn is finished once the table is rendered with a row for every in-flight issue.
 
-   | Column | Contents |
-   |---|---|
-   | **State** | Activity then Status, no space: ✈️/💤 followed by 💚/❌/⏸️/❗ (e.g. `✈️💚`) |
-   | **Handle** | `<repo>#<N>`, or a plain session handle for non-issue work (e.g. `claude-transcript-tool`) |
-   | **PR** | the issue's open PR as `#<n>` if one exists, else blank |
-   | **Purpose** | the issue's purpose phrase, verbatim as coined |
-   | **Node** | current node / `phase:*` position |
-   | **Notes** | blockers, the specific next action and whose it is, dependencies |
+## The board
 
-   **Activity** (binary), tracked from what the user tells you — you can't observe another session: ✈️ **in flight** — the user launched the issue's overwatch and hasn't reported it coming to rest; presume work is underway. 💤 **grounded** — no session working it as far as you know: not launched this stretch, or the user reported its overwatch stopped (turn boundary, escalation, finished).
+The board is a **glance**, not a report — and there is a lot of information here, so the failure mode is packing too much into it. Render an actual Markdown table (header row, `---` separator, one issue per line); never a stack of paragraphs split by `---` rules. Keep every cell to a few words — if a cell wants a sentence, it's too much: compress it or lift it out. The reasoning, the recommendation, and the launch commands live in prose around the table, not inside its cells.
 
-   **Status** (health): 💚 **healthy** — in progress or ready to advance; nothing wrong. ❌ **blocked** — cannot proceed; a dependency is unmet. ⏸️ **paused** — deliberately tabled. ❗ **escalated** — an overwatch stopped and is waiting for the user's attention.
+It leads with the issue's **state** — two **orthogonal** dimensions, **Activity** (is a session working the issue, as far as you've been told?) and **Status** (where the issue stands, health-wise), rendered as two glyphs side by side with no space between them, Activity first then Status (e.g. `✈️💚`). They stay orthogonal — read each glyph on its own, and never let one stand in for the other — they just share one column to spare the table's width.
 
-   Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A push, merge, or verdict pending at an issue's own overwatch is not its own glyph — it reads as 💤💚 with the action named in **Notes**; the command itself is that overwatch's to surface, not yours.
+| Column | Contents |
+|---|---|
+| **State** | Activity then Status, no space: ✈️/💤 followed by 💚/❌/⏸️/❗ (e.g. `✈️💚`) |
+| **Handle** | `<repo>#<N>`, or a plain session handle for non-issue work (e.g. `claude-transcript-tool`) |
+| **PR** | the issue's open PR as `#<n>` if one exists, else blank |
+| **Purpose** | the issue's purpose phrase, verbatim as coined |
+| **Node** | current node / `phase:*` position |
+| **Notes** | blockers, the specific next action and whose it is, dependencies |
 
-   ```
-   | ⚑ | Handle | PR | Purpose | Node | Notes |
-   |---|---|---|---|---|---|
-   | ✈️💚 | `dev-playbook#103` | #178 | judgments library | pr-review | audit running → verdict at its overwatch |
-   | 💤💚 | `dev-playbook#105` | | dispatch-graph edges | build | push pending at its overwatch |
-   | 💤❌ | `dev-playbook#101` | | judgment orchestration | design | blocked by #103 |
-   | 💤💚 | `dev-playbook#106` | | rework reads inline comments | intake | waiting on the user's /intake |
-   | 💤⏸️ | `claude-transcript-tool` | | export Claude transcripts | Ralph | parked by choice — lower priority right now |
-   ```
+**Activity** (binary), tracked from what the user tells you — you can't observe another session: ✈️ **in flight** — the user launched the issue's overwatch and hasn't reported it coming to rest; presume work is underway. 💤 **grounded** — no session working it as far as you know: not launched this stretch, or the user reported its overwatch stopped (turn boundary, escalation, finished).
+
+**Status** (health): 💚 **healthy** — in progress or ready to advance; nothing wrong. ❌ **blocked** — cannot proceed; a dependency is unmet. ⏸️ **paused** — deliberately tabled. ❗ **escalated** — an overwatch stopped and is waiting for the user's attention.
+
+Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A push, merge, or verdict pending at an issue's own overwatch is not its own glyph — it reads as 💤💚 with the action named in **Notes**; the command itself is that overwatch's to surface, not yours.
+
+```
+| ⚑ | Handle | PR | Purpose | Node | Notes |
+|---|---|---|---|---|---|
+| ✈️💚 | `dev-playbook#103` | #178 | judgments library | pr-review | audit running → verdict at its overwatch |
+| 💤💚 | `dev-playbook#105` | | dispatch-graph edges | build | push pending at its overwatch |
+| 💤❌ | `dev-playbook#101` | | judgment orchestration | design | blocked by #103 |
+| 💤💚 | `dev-playbook#106` | | rework reads inline comments | intake | waiting on the user's /intake |
+| 💤⏸️ | `claude-transcript-tool` | | export Claude transcripts | Ralph | parked by choice — lower priority right now |
+```

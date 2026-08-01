@@ -88,6 +88,6 @@ python3 <skill-dir>/scripts/check_datasheet.py readings/datasheet/<subject>.html
 
 Findings mean the sheet is nonconformant — fix by regenerating, never by
 hand-patching the HTML, and re-run until clean. If a contract rule cannot be
-satisfied, delete the output and report why instead; never ship a violating
-sheet. Then give the user the sheet path, the checker's one-line summary, and
+satisfied, delete the output and report why instead of shipping the sheet.
+Then give the user the sheet path, the checker's one-line summary, and
 the Behavior labels used. Committing is the user's call.

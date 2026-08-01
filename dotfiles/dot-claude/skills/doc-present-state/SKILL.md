@@ -8,4 +8,4 @@ effort: xhigh
 
 # Present-State Documentation
 
-Write documentation in a way that focuses on the current state and future next steps, providing minimal but sufficient information for an agent to act from the current state moving forward. Do not reference past historical information unless it is an important historical condition needed for an agent to understand the current state and take appropriate steps going forward.
+Write the doc as a map of now: current state and next steps, the minimum an agent needs to act. History earns a sentence only when the present is unintelligible without it — a constraint that still binds, a decision that still governs.

@@ -40,8 +40,7 @@ nothing is passed but the entry.
    text when promoting a subtree — as the free-form idea. A one-line entry is
    the expected input, not a problem to solve first: intake grills the idea,
    authors the brief and four-tuple, and lands the issue on its own confirmation
-   gate, routing a subtree to `phase:design`. Never pre-author the brief here,
-   and never turn an entry away for being thin.
+   gate, routing a subtree to `phase:design`.
 
 5. **Delete the promoted entries** from `CANDIDATES.md` once intake reports the
    issue number. Remove the whole subtree when the subtree was promoted — the
@@ -57,8 +56,8 @@ nothing is passed but the entry.
 
 - **Never delete an entry before intake lands the issue.** A failed or abandoned
   intake leaves `CANDIDATES.md` untouched — losing the entry loses the work.
-- **Do not implement anything.** Promotion moves a record between homes; the
-  issue is then dispatched through the software factory like any other.
-- **Not the idea path.** Random, unfiltered, or cross-repo ideas belong in
-  mission-control via /idea. This skill only moves entries that are already
-  recorded as serious, repo-scoped Candidates.
+- **Promotion moves a record between homes.** The work itself is then dispatched
+  through the software factory like any other issue; the building happens there.
+- **Repo-scoped Candidates only.** This skill moves entries already recorded as
+  serious, repo-scoped Candidates; random, unfiltered, or cross-repo ideas go to
+  mission-control via /idea.
