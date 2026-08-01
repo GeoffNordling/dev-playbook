@@ -37,10 +37,28 @@ fi
 # land on the same weekday as today, so it needs the date.
 #
 # glide-path deviation: each rate-limit window is assumed to consume its quota
-# linearly from window start (resets_at - duration) to window end (resets_at).
-# expected% = elapsed_fraction * 100; deviation = used% - expected%, in whole
-# percentage points. Positive means burning faster than linear pace.
-jq -r '
+# at a steady pace across the time it's actually usable. expected% = (elapsed
+# usable time / total usable time) * 100; deviation = used% - expected%, in
+# whole percentage points. Positive means burning faster than the assumed
+# pace. five_hour treats the whole window as usable — a session-scale window
+# has no structural dead time. seven_day does not: nobody runs Claude Code
+# around the clock, so treating all 168 hours as usable overstates expected
+# usage overnight. seven_day instead assumes zero usage 22:00-08:00
+# America/New_York (a fixed personal-schedule assumption, not geo-aware —
+# if you're traveling or working odd hours, the glide number will read more
+# anomalous than it really is). Hardcoded to America/New_York rather than the
+# host's ambient TZ so the report means the same thing regardless of what
+# timezone the machine running it happens to be set to.
+#
+# DST is handled per-instant, not by picking one offset for the whole week:
+# `mktime(localtime(t)) - t` asks the system tzdata what UTC offset was
+# actually in effect at instant t, so a DST transition inside the trailing
+# 7 days resolves correctly on both sides. US Eastern transitions land at
+# 02:00 local, outside the 08:00-22:00 active window, so a full 7-day span
+# always nets exactly 98 active hours regardless of whether it crosses one —
+# what per-instant handling actually buys is a correct *partial* elapsed-
+# active figure when "now" falls after a transition inside the window.
+TZ="America/New_York" jq -r '
   def fmtk:
     if . == null then "?"
     elif . >= 1000 then ((./1000*10|round)/10|tostring) + "k"
@@ -48,17 +66,55 @@ jq -r '
     end;
   def signed:
     if . > 0 then "+\(.)" elif . < 0 then "\(.)" else "0" end;
+
+  # Exact UTC offset (seconds) in effect at instant `.`, per tzdata for the
+  # process TZ. Not a fixed offset — evaluated per instant so it tracks DST.
+  def local_offset: . as $t | ($t | localtime | mktime) - $t;
+
+  # Seconds of local 08:00-22:00 "active" time between t1 and t2 (t1 <= t2).
+  # Sums the active window ([local 08:00, local 22:00), converted to real
+  # epoch via the local_offset for that day) over each spanned calendar day,
+  # clamped to [t1, t2]. Day bucketing uses one seed offset with a 1-day margin on
+  # each side; that only affects which days get iterated, not the per-day
+  # math, and spurious days clamp to a zero contribution.
+  def active_seconds($t1; $t2):
+    if $t2 <= $t1 then 0
+    else
+      ($t1 | local_offset) as $seed
+      | (($t1 + $seed) / 86400 | floor) as $day0
+      | (($t2 + $seed) / 86400 | floor) as $day1
+      | reduce range($day0 - 1; $day1 + 2) as $d
+          (0; . + (
+            ($d * 86400 + 43200 - $seed) as $noon_guess
+            | ($noon_guess | local_offset) as $off_d
+            | ($d * 86400 + 28800 - $off_d) as $active_start
+            | ($d * 86400 + 79200 - $off_d) as $active_end
+            | ([$active_end, $t2] | min) as $hi
+            | ([$active_start, $t1] | max) as $lo
+            | ([$hi - $lo, 0] | max)
+          ))
+    end;
+
+  # strflocaltime %Z/%z are unreliable on this jq build — %Z always prints
+  # the standard-time abbreviation and %z always prints +0000, regardless of
+  # the real offset at that instant (verified: a known-EDT epoch still
+  # prints EST / +0000). The hour/date fields it produces ARE correctly
+  # localized, so format without a zone directive and append a fixed "ET"
+  # label instead of trusting a broken one.
   def win(w; tag; fmt; dur):
     if w == null then "\(tag)  ABSENT"
     else
       (w.resets_at - dur) as $start
       | ((now - $start) / dur) as $frac
       | if $frac < 0 or $frac > 1 then
-          "\(tag)  \(w.used_percentage | round)%  glide UNKNOWN (window boundary stale)  resets \(w.resets_at | strflocaltime(fmt))"
+          "\(tag)  \(w.used_percentage | round)%  glide UNKNOWN (window boundary stale)  resets \(w.resets_at | strflocaltime(fmt)) ET"
         else
-          ($frac * 100) as $expected
+          (if tag == "seven_day"
+           then (active_seconds($start; now) / active_seconds($start; w.resets_at) * 100)
+           else ($frac * 100)
+           end) as $expected
           | ((w.used_percentage - $expected) | round) as $dev
-          | "\(tag)  \(w.used_percentage | round)%  glide \($dev|signed)pp (limit \($expected|round)%)  resets \(w.resets_at | strflocaltime(fmt))"
+          | "\(tag)  \(w.used_percentage | round)%  glide \($dev|signed)pp (limit \($expected|round)%)  resets \(w.resets_at | strflocaltime(fmt)) ET"
         end
     end;
   (if .context_window == null then "context    ABSENT"
@@ -66,6 +122,6 @@ jq -r '
      ((.context_window.total_input_tokens // 0) + (.context_window.total_output_tokens // 0)) as $used
      | "context    \(.context_window.used_percentage | round)%  \($used|fmtk)/\(.context_window.context_window_size|fmtk) tokens"
    end),
-  win(.rate_limits.five_hour; "five_hour"; "%H:%M %Z"; 18000),
-  win(.rate_limits.seven_day; "seven_day"; "%b %-d %H:%M %Z"; 604800)
+  win(.rate_limits.five_hour; "five_hour"; "%H:%M"; 18000),
+  win(.rate_limits.seven_day; "seven_day"; "%b %-d %H:%M"; 604800)
 ' "$cache"
