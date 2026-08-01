@@ -34,6 +34,12 @@
         "sdd-tdd",
         "sdd-pr-review"
       ]
+    },
+    {
+      "name": "wayfinder",
+      "color": "1d76db",
+      "description": "Wayfinder: {value}.",
+      "values": ["map", "research", "prototype", "grilling", "task"]
     }
   ]
 }

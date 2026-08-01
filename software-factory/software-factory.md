@@ -135,10 +135,16 @@ tuple.
 
 ### Valid labels
 
-[bootstrap-labels](/scripts/bootstrap-labels) mints exactly these: the seven
-fixed-value labels below, one `phase:*` label per work node, derived per
-[Naming](#naming), and the four retained `phase:sdd-*` values that
+The factory's labels are exactly these: the fixed-value labels in the table
+below, one `phase:*` label per work node, derived per [Naming](#naming), and the
+retained `phase:sdd-*` values that
 [SDD is not supported](#sdd-is-not-supported) keeps in the scheme.
+[bootstrap-labels](/scripts/bootstrap-labels) mints them.
+
+The scheme carries dimensions beyond the factory's. Each is governed where it is
+defined — `wayfinder` by
+[Wayfinding operations](/standards/tracking/tracker-operations.md#wayfinding-operations)
+— and this doc restates none of their values.
 
 | Dimension | Label | Meaning |
 |---|---|---|

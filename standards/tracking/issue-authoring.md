@@ -65,6 +65,13 @@ obligations: no four-tuple, no dispatch through the software factory graph, no
 build-leaf or spike brief. What a ticket does carry is the `/wayfinder` skill's
 to define.
 
+**Neither species carries a factory label.** A map and a ticket both stay outside
+the factory graph; they do not carry `category:*`, `mode:*`, `tests:*`, or
+`phase:*` labels. That much is this standard's rule, and workspace-lint reports
+it. The rest of their shape — the map's body sections, the ticket's question, the
+`wayfinder:<type>` vocabulary — stays the skill's, and the lint mirrors the
+skill's own statement of it rather than a restatement here.
+
 ## Readiness
 
 Readiness is a **lifecycle position, not a kind of issue** — the industry's

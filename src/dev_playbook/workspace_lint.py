@@ -19,9 +19,10 @@ in, so governance is declared rather than inferred. For each governed repo:
   - **labels** — compare the repo's labels against the canonical scheme at full
     parity (a finding exactly when bootstrap-labels would repair), and flag any
     label naming a blocked state.
-  - **issues** — from one open-issues read, check every post-intake leaf's
-    four-tuple validity and brief shape, and every epic's category-only shape;
-    epic/leaf comes from ``sub_issues_summary``.
+  - **issues** — from one open-issues read, check each open issue against the
+    shape rules of its species: a build leaf's four-tuple validity and brief
+    shape, a build epic's category-only shape, and a wayfinder map's or decision
+    ticket's shape. Species comes from the label set and ``sub_issues_summary``.
   - **pin** — read the dev-playbook `rev` pinned in the repo's
     `.pre-commit-config.yaml` and compare it against the hook repo's local
     `main`. Stale pins are reported but are not failures: a consumer catches up
@@ -50,8 +51,9 @@ from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
 # Every rule id this detector can emit. Repo-settings drift, reachability, and
 # the live-repo tracking checks (label scheme, blocked labels, brief shape, epic
-# shape) answer the tracking card; four-tuple validity answers the software-factory
-# card; a stale dev-playbook pin answers the build card (non-blocking).
+# shape, wayfinder shape) answer the tracking card; four-tuple validity answers
+# the software-factory card; a stale dev-playbook pin answers the build card
+# (non-blocking).
 # Informational pin lines carry no rule id. Each id is a module-level constant so
 # every emission site references the constant, never a raw literal, and RULES
 # (what --list-rules prints) cannot drift from what the detector actually emits.
@@ -61,6 +63,7 @@ LABEL_SCHEME = "tracking.label-scheme"
 NO_BLOCKED_LABEL = "tracking.no-blocked-label"
 ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
 EPIC_SHAPE = "tracking.epic-shape"
+WAYFINDER_SHAPE = "tracking.wayfinder-shape"
 TUPLE_VALID = "software-factory.tuple-valid"
 PIN = "build.pin"
 
@@ -71,6 +74,7 @@ RULES = (
     NO_BLOCKED_LABEL,
     ISSUE_BRIEF_SHAPE,
     EPIC_SHAPE,
+    WAYFINDER_SHAPE,
     TUPLE_VALID,
     PIN,
 )
@@ -91,6 +95,24 @@ BUILD_HEADINGS = (
     "Out of scope",
 )
 SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
+
+# The body sections of a wayfinder map and of a decision ticket, stated here
+# exactly as the ``/wayfinder`` skill states them (``§ The map body`` and
+# ``§ Tickets`` of dotfiles/.agents/skills/wayfinder/SKILL.md). The skill — not
+# this workspace — is the definition of a map's shape, per
+# standards/tracking/issue-authoring.md § Two species of epic, so this rule
+# mirrors the skill directly, the way BUILD_HEADINGS mirrors the brief standard.
+# The bundle is installed verbatim at a pin, which is what makes the mirror
+# stable: a pin bump delta-checks these tuples against the upstream text.
+# Wayfinder writes ``##`` sections, not the bold headings a brief uses.
+MAP_SECTIONS = (
+    "Destination",
+    "Notes",
+    "Decisions so far",
+    "Not yet specified",
+    "Out of scope",
+)
+TICKET_SECTIONS = ("Question",)
 
 # The four dimensions of the state-machine tuple (status is not part of it).
 TUPLE_DIMENSIONS = ("category", "mode", "tests", "phase")
@@ -475,11 +497,127 @@ def _has_heading(body: str, heading: str) -> bool:
     return re.search(pattern, body, re.IGNORECASE) is not None
 
 
+def _has_section(body: str, section: str) -> bool:
+    """Whether the body carries the markdown section heading.
+
+    Wayfinder bodies are ``##``-sectioned rather than bold-headed, so this is the
+    section counterpart of ``_has_heading``. Any heading level reads as present:
+    the level is the skill's formatting, the section's presence is the rule.
+    """
+    pattern = rf"^\s{{0,3}}#{{1,6}}\s+{re.escape(section)}\s*#*\s*$"
+    return re.search(pattern, body, re.IGNORECASE | re.MULTILINE) is not None
+
+
 def _dimension_values(labels: set[str], dim: str) -> list[str]:
     """The sorted values a label set carries for one ``<dim>:`` prefix."""
     return sorted(
         label.split(":", 1)[1] for label in labels if label.startswith(f"{dim}:")
     )
+
+
+def _factory_labels(labels: set[str]) -> list[str]:
+    """The sorted factory-dimension labels a label set carries.
+
+    The four dimensions that route an issue through the software factory. A
+    wayfinder issue carries none of them: it never enters the graph.
+    """
+    prefixes = tuple(f"{dim}:" for dim in TUPLE_DIMENSIONS)
+    return sorted(label for label in labels if label.startswith(prefixes))
+
+
+def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[Line]:
+    """Findings for a wayfinder map that breaks its shape.
+
+    A map is a planning epic, so it carries no factory-dimension label and is not
+    itself a ticket; its body carries the sections the ``/wayfinder`` skill
+    states. The map/build-epic split is the species distinction — this is the
+    map's own shape rule, not an exemption from the build epic's.
+    """
+    lines: list[Line] = []
+    offending = _factory_labels(labels)
+    if offending:
+        lines.append(
+            Line(
+                name,
+                WAYFINDER_SHAPE,
+                f"#{number} map carries {offending}; a map carries no factory label",
+                blocking=True,
+            )
+        )
+    types = sorted(set(_dimension_values(labels, "wayfinder")) - {"map"})
+    if types:
+        lines.append(
+            Line(
+                name,
+                WAYFINDER_SHAPE,
+                f"#{number} map also carries ticket types {types}; a map is not a ticket",
+                blocking=True,
+            )
+        )
+    lines.extend(
+        Line(
+            name,
+            WAYFINDER_SHAPE,
+            f"#{number} map missing {section} section",
+            blocking=True,
+        )
+        for section in MAP_SECTIONS
+        if not _has_section(body, section)
+    )
+    return lines
+
+
+def _ticket_findings(
+    name: str, number: int, labels: set[str], body: str, scheme: dict[str, set[str]]
+) -> list[Line]:
+    """Findings for a decision ticket that breaks its shape.
+
+    A ticket is not a factory leaf: it carries exactly one in-scheme
+    ``wayfinder:<type>``, no factory-dimension label, and the body section the
+    ``/wayfinder`` skill states. This mirrors the leaf's tuple and brief rules at
+    the ticket's own, much smaller, contract.
+    """
+    lines: list[Line] = []
+    offending = _factory_labels(labels)
+    if offending:
+        lines.append(
+            Line(
+                name,
+                WAYFINDER_SHAPE,
+                f"#{number} ticket carries {offending}; a decision ticket carries no factory label",
+                blocking=True,
+            )
+        )
+    types = _dimension_values(labels, "wayfinder")
+    if len(types) > 1:
+        lines.append(
+            Line(
+                name,
+                WAYFINDER_SHAPE,
+                f"#{number} ticket has multiple wayfinder labels: {types}",
+                blocking=True,
+            )
+        )
+    elif types[0] not in scheme["wayfinder"]:
+        lines.append(
+            Line(
+                name,
+                WAYFINDER_SHAPE,
+                f"#{number} ticket wayfinder:{types[0]} is not a scheme value",
+                blocking=True,
+            )
+        )
+    lines.extend(
+        Line(
+            name,
+            WAYFINDER_SHAPE,
+            f"#{number} ticket missing {section} section",
+            blocking=True,
+        )
+        for section in TICKET_SECTIONS
+        if not _has_section(body, section)
+    )
+    return lines
 
 
 def _epic_findings(
@@ -619,10 +757,16 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
 
 
 def check_issues(name: str, issues: list) -> list[Line]:
-    """Every open post-intake leaf's four-tuple and brief shape, plus every epic's category-only shape.
+    """Every open issue against the shape rules of its species.
 
-    Epic/leaf comes from sub_issues_summary — no per-issue API call. Pull requests
-    the issues endpoint returns are skipped.
+    Four species, each with its own contract: a **wayfinder map** and a
+    **decision ticket** (told by their ``wayfinder:*`` labels, shaped as the
+    ``/wayfinder`` skill states), a **build epic** (told by having children,
+    category-only), and a **build leaf** (the four-tuple and brief shape, checked
+    only once triaged past intake).
+
+    Species comes off the label set and sub_issues_summary — no per-issue API
+    call. Pull requests the issues endpoint returns are skipped.
     """
     scheme = values_by_dimension()
     lines: list[Line] = []
@@ -633,10 +777,20 @@ def check_issues(name: str, issues: list) -> list[Line]:
         # is a malformed response, so index it and let the KeyError surface.
         labels = {label["name"] for label in issue["labels"]}
         number = issue["number"]
+        body = issue.get("body") or ""
         # GitHub returns sub_issues_summary as null (not absent) for an issue
         # with no children, so `or {}` covers both the missing and null cases.
         total = (issue.get("sub_issues_summary") or {}).get("total", 0)
-        if total > 0:
+        wayfinder = set(_dimension_values(labels, "wayfinder"))
+        if "map" in wayfinder:
+            # A map is told by its label, not by having children: a freshly
+            # charted map with no tickets yet is still a map.
+            lines.extend(_map_findings(name, number, labels, body))
+        elif wayfinder:
+            # A ticket carries a wayfinder type and no phase label, so it would
+            # otherwise fall past the post-intake gate unchecked.
+            lines.extend(_ticket_findings(name, number, labels, body, scheme))
+        elif total > 0:
             # An epic (issue with children) carries a category label only — the
             # invariant holds regardless of triage state, so the epic branch is
             # not gated on post-intake (a phase label on an epic is itself a
@@ -645,7 +799,7 @@ def check_issues(name: str, issues: list) -> list[Line]:
         elif _post_intake(labels):
             # A leaf is checked only once triaged; untriaged leaves are out.
             lines.extend(_tuple_findings(name, number, labels, scheme))
-            lines.extend(_brief_findings(name, number, labels, issue.get("body") or ""))
+            lines.extend(_brief_findings(name, number, labels, body))
     return lines
 
 

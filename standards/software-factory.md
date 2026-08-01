@@ -31,8 +31,8 @@ Governs how an idea becomes a merged pull request.
   open post-intake leaf (`software-factory.tuple-valid`), across repositories via
   `gh api`
 - [judgments/code-matches-docs.yaml](/judgments/code-matches-docs.yaml) — the
-  LLM-judged `scheme-vs-graph` claim that `src/dev_playbook/label_scheme.json`
-  mints exactly the labels this standard states, [the parity
+  LLM-judged `scheme-vs-graph` claim that the scheme's factory dimensions mint
+  exactly the labels this standard states, [the parity
   invariant](/software-factory/software-factory.md#naming) between the graph's
   work nodes and the `phase:*` values included
 
@@ -41,9 +41,10 @@ Governs how an idea becomes a merged pull request.
 - the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
   — reds `make check-judgments` at the **push gate** until `scheme-vs-graph` is
   judged-and-passed, so a label scheme that has drifted from the graph cannot be
-  pushed. This gates the label *vocabulary* only: GitHub itself sits outside
-  every gate, so the state machine stays the human dispatcher's to operate and
-  workspace-lint reports without blocking a skipped phase or a malformed tuple
+  pushed. This gates the factory label *vocabulary* only: GitHub itself sits
+  outside every gate, so the state machine stays the human dispatcher's to
+  operate and workspace-lint reports without blocking a skipped phase or a
+  malformed tuple
 
 ## Adopt
 

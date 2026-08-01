@@ -15,7 +15,8 @@ from dev_playbook import label_scheme
 BOOTSTRAP = Path(__file__).resolve().parents[2] / "scripts" / "bootstrap-labels"
 
 # The canonical scheme, in mint order: the seven fixed-value metadata labels
-# (category, mode, tests) grey, then every phase label yellow.
+# (category, mode, tests) grey, then every phase label yellow, then the wayfinder
+# labels blue — a planning dimension, coloured to read differently at a glance.
 EXPECTED_LABELS = [
     ("category:maintenance", "cccccc", "Category: maintenance."),
     ("category:extension", "cccccc", "Category: extension."),
@@ -34,6 +35,11 @@ EXPECTED_LABELS = [
     ("phase:sdd-spec-review", "fbca04", "Phase: sdd-spec-review."),
     ("phase:sdd-tdd", "fbca04", "Phase: sdd-tdd."),
     ("phase:sdd-pr-review", "fbca04", "Phase: sdd-pr-review."),
+    ("wayfinder:map", "1d76db", "Wayfinder: map."),
+    ("wayfinder:research", "1d76db", "Wayfinder: research."),
+    ("wayfinder:prototype", "1d76db", "Wayfinder: prototype."),
+    ("wayfinder:grilling", "1d76db", "Wayfinder: grilling."),
+    ("wayfinder:task", "1d76db", "Wayfinder: task."),
 ]
 
 
@@ -56,6 +62,12 @@ def test_values_by_dimension_exposes_the_tuple_dimensions() -> None:
     assert values["tests"] == {"yes", "no"}
     assert "spike" in values["phase"]
     assert "pr-review" in values["phase"]
+
+
+def test_values_by_dimension_exposes_the_wayfinder_dimension() -> None:
+    values = label_scheme.values_by_dimension()
+
+    assert values["wayfinder"] == {"map", "research", "prototype", "grilling", "task"}
 
 
 # --- the bootstrap-labels shim mints from the scheme ---

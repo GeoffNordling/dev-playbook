@@ -6,10 +6,12 @@ carries its label color, a description recipe, and its values — so the two
 consumers read one authority and cannot disagree: ``bootstrap-labels`` mints the
 scheme into a repo, and ``workspace-lint`` checks live repos against it.
 
-The semantic authority for what the labels *mean* stays software-factory.md's label
-table and state-machine graph; this file is the operational data. The
-scheme-vs-graph consistency between the two is left to a judgment, never parsed
-here.
+The semantic authority for what the labels *mean* stays with the doc that governs
+each dimension: software-factory.md's label table and state-machine graph for the
+four factory dimensions (category, mode, tests, phase), and
+standards/tracking/tracker-operations.md for the wayfinder dimension. This file is
+the operational data either way. The scheme-vs-graph consistency between the
+factory dimensions and the factory doc is left to a judgment, never parsed here.
 """
 
 import json
