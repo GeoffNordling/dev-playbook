@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Commit staged work locally with a clean message; the user pushes. Use when the user asks to commit changes or invokes /commit, or when a software factory skill needs to commit its work via Skill(commit).
+description: Commit staged work locally with a clean message; the user pushes. Use when the user asks to commit changes, or when a software factory skill needs to commit its work.
 disable-model-invocation: false
 model: sonnet
 effort: low

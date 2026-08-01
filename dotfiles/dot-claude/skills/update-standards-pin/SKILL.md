@@ -1,6 +1,6 @@
 ---
 name: update-standards-pin
-description: Roll a dev-playbook standards release out to the governed consumer repos — bump each pin, verify each gate, and work whatever the bump reddens. Use when the user asks to update the standards pin, cut a standards release, or propagate dev-playbook changes downstream.
+description: Roll a dev-playbook standards release out to the governed consumer repos, working whatever the bump reddens. Use when the user asks to update the standards pin.
 disable-model-invocation: true
 model: opus
 effort: xhigh
@@ -34,8 +34,8 @@ Unequal means the release is unpushed: hand the user the push and stop, since
 ## 2. Run it
 
 From the dev-playbook checkout, `scripts/bump-pins --dry-run` to see what would
-move, then `scripts/bump-pins` to move it. It commits nothing and pushes
-nothing. The population is the `GOVERNED` roster in
+move, then `scripts/bump-pins` to move it. The population is the `GOVERNED`
+roster in
 [workspace_lint.py](~/workspace/dev-playbook/src/dev_playbook/workspace_lint.py);
 a repo absent from it is not governed and is neither audited nor bumped.
 
@@ -51,15 +51,15 @@ One line per consumer:
 | `skipped — already red at its current pin` | Pre-existing breakage, unrelated to this release. Surface it separately. |
 | `skipped — no dev-playbook pin` | Governed but unwired. An adoption question, not a bump. |
 
-**An aborted run is not a finding.** If the script raises `the gate could not
-run`, pre-commit died before judging anything and that repo's pin is already
-restored. Report it as the environment fault it is — never as a repo problem.
+**An aborted run is an environment fault, not a finding.** If the script raises
+`the gate could not run`, pre-commit died before judging anything and that
+repo's pin is already restored — report it as the fault it is.
 
 ## 4. Work the findings, one repo at a time
 
-Never in parallel. A finding is sometimes not the consumer's fault but a defect
-in the release itself, and then the fix goes back into dev-playbook — a new
-commit, a new push, a new target sha.
+Finish one repo before opening the next. A finding is sometimes not the
+consumer's fault but a defect in the release itself, and then the fix goes back
+into dev-playbook — a new commit, a new push, a new target sha.
 
 That is not a disaster, because re-running is safe: a repo already at the
 target reports `already current` and costs nothing, and a repo still on the
@@ -73,7 +73,7 @@ or the sweep passes it by in silence.
 A requirement retired upstream is still enforced by the check that ships
 **inside the pinned clone**. Delete what it demands before the pin moves and
 the repo goes red against its own old pin. So: bump, verify green, then trim,
-then commit both together. The whole cascade turns on that order.
+then commit both together.
 
 ## 6. Commit, then hand back the pushes
 
@@ -82,8 +82,8 @@ they are one act, and the commit gate runs at the new pin, so a green commit is
 a second verification.
 
 Pushes need the user's YubiKey. Hand back one short line per repo and say to
-run them separately, in order: they are independent repos, and one failing must
-not skip the rest.
+run them separately, in order: they are independent repos, and each must get
+its own attempt.
 
 ## 7. Collect the garbage
 
