@@ -14,10 +14,10 @@ Three things ride along in build's plan: the chunk's seams, its slice ordering,
 and the current state of the suite — run `make test` before the first chunk to
 see it.
 
-**Choose the seams first.** A **seam** is a public surface where a behavior is
-observable without reaching inside the code that produces it. Work out the seams
-the chunk's tests cut at before writing the first test. A brief may name seams;
-where it does, respect them.
+**Choose the seams first.** A **seam** is a place where a test can replace or
+observe behavior without reaching inside the code that produces it. Work out the
+seams the chunk's tests cut at before writing the first test. A brief may name
+seams; where it does, respect them.
 
 ## The slice loop
 
