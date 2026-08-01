@@ -212,9 +212,16 @@ inference is a probability rather than a state.
 
 ### Repository — definitive, available today
 
-Every row carries `cwd`. 29 distinct values in the current store, all repo or
+Every row carries `cwd`. 33 distinct values in the current store, all repo or
 worktree paths. Repo attribution needs no capture change and no inference. It
 resolves per row, never per session, because `cwd` moves mid-session.
+
+The repo is the first path segment under `~/workspace`, which spares a worktree
+a rule of its own: one sits at `<repo>/.claude/worktrees/<name>`, so it and every
+subdirectory attribute to the repo they belong to. A cwd that is the workspace
+root itself, or anywhere outside it, belongs to no repo. That is 27 rows of the
+cleaned store, and a real state rather than a bad row — a session can start
+anywhere.
 
 ### GitHub issue — approximate, available today
 
@@ -232,9 +239,9 @@ Measured coverage in the current store:
 | | sessions bound | distinct issues |
 |---|---|---|
 | writes only | 15 | 25 |
-| writes and reads | 23 | 37 |
+| writes and reads | 23 | 38 |
 
-That is 23 of the 49 sessions that ran any Bash. Reads roughly double coverage
+That is 23 of the 55 sessions that ran any Bash. Reads roughly double coverage
 and are far more frequent — 287 `gh issue view` calls against 73
 `gh issue edit`. Thirteen issues are reachable only through a read.
 
@@ -244,14 +251,24 @@ writes give intent, and averaging them into one number would mislead.
 
 Recovery requires parsing shell text, so it is approximate by construction. A
 session that worked an issue without running any `gh` command against it leaves
-no trace.
+no trace, and a comment body quoting a `gh issue view` line leaves the trace of a
+contact that never happened. `gh issue create` and `gh issue list` attribute
+nothing at all: neither names a number on the command line, create's being in the
+response.
+
+An issue is recorded as `<repo>#<number>` rather than as a bare number, because
+issue numbers collide across repos and a report keyed on `272` would merge two
+repos' work into one. The repo is the invocation's own `--repo` where it carries
+one — read within that invocation's own bounds, since one line can chain two `gh`
+calls against different repos — and the row's own repo otherwise, with the owner
+dropped from both so that the two forms name one issue.
 
 ### Skills — both paths, one of them forward-only
 
 | Invocation | Visible? |
 |---|---|
 | Human types `/skill` | Fully, over the whole store. `UserPromptExpansion` carries `command_name` and `command_args`. 109 invocations, 13 distinct skills. |
-| Agent calls the Skill tool | Since capture was extended: the row keeps `tool_input` whole, which names the skill. The 71 `Skill` rows written before that keep timing and calling agent alone. |
+| Agent calls the Skill tool | Since capture was extended: the row keeps `tool_input` whole, which names the skill. The 81 `Skill` rows written before that keep timing and calling agent alone. |
 
 The asymmetry was backwards for a factory meant to run hands-off — the human's
 own skill use fully measured and the agents' invisible — which is why capture

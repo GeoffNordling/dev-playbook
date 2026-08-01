@@ -42,3 +42,11 @@ before starting, to see what the iterations before it already did.
   rule and what the level costs (14.6 session-hours of Claude-active time are
   12.6 machine-hours). Next: task 7, the repo, issue, and skill attribution
   columns.
+- Task 7: `src/dev_playbook/measure/attribute.py` adds `repo`, `issue_writes`,
+  `issue_reads` and `skill` to a cleaned event frame — repo from the first
+  segment under `~/workspace` so worktrees fold into their repo, issues from the
+  `gh` verbs with reads and writes never merged and each reference qualified
+  `<repo>#<number>`, skills from both invocation paths; 27 tests in
+  `tests/test_measure_attribute.py`, and the doc's attribution section now
+  carries the parse rule and re-measured coverage. Next: task 8, the Plotly
+  timeline view.

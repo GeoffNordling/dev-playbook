@@ -153,6 +153,27 @@ them whenever you learn something a future iteration would otherwise rediscover.
   passes, so per-session rows of one state genuinely are disjoint — keep any new
   interval producer that way rather than relaxing the check.
 
+- `dev_playbook.measure.attribute` adds four columns to a **cleaned event
+  frame**: `repo`, `issue_writes`, `issue_reads`, `skill`.
+  `attributed(events, workspace=WORKSPACE)` is the door; pass `workspace` in
+  tests so no assertion depends on whose home it runs in. The two issue columns
+  hold **tuples** of `<repo>#<number>` references — a caller wanting one row per
+  issue explodes the column it wants, and never adds the two together.
+- Attribution is per event row. **Task 8 still has to join it onto the interval
+  rows** — an interval spans many event rows, whose `cwd` can differ — so the
+  lane key is a grouping decision that task, not this one, makes.
+- pandas 3 types a column of strings as `str` and stores absence as NaN, but an
+  all-absent column as object holding None. `repo` and `skill` are therefore
+  pinned to `str` (`NAME_DTYPE`) so the shape does not turn on the data; read
+  absence with `pd.isna`, never `is None`. The same trap waits for any new
+  string column.
+- Measured over the cleaned real store: 5 repos (dev-playbook 9.8k rows, then
+  media-tools, fedora-playbook, story-forge, mission-control) and 27 rows in no
+  repo; 113 write rows over 15 sessions and 25 issues, 280 read rows over 23
+  sessions and 37 issues, 38 issues either way, 13 of them read-only; and 116
+  skill invocations, every one of them human-typed, because all 81 stored
+  `Skill` tool rows were written before capture began keeping their input.
+
 ## Tasks
 
 - [x] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
@@ -188,7 +209,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       human-present if any session shows presence. Same interval schema, no
       `session_id`. Test that session and global rollups agree on total
       Claude-active time.
-- [ ] Add attribution columns: repo from each row's `cwd`, GitHub issue from
+- [x] Add attribution columns: repo from each row's `cwd`, GitHub issue from
       `gh` commands in Bash `tool_input` with write signals (edit, close,
       comment) and read signals (view) kept as separate columns, and skills from
       both `UserPromptExpansion.command_name` and Skill-tool rows. Never merge
