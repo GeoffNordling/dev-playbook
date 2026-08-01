@@ -34,3 +34,11 @@ before starting, to see what the iterations before it already did.
   `tests/test_measure_presence.py`, `a_timed_frame` added to the fakes, and the
   doc's section 3 now carries the fitted numbers and why the variance is tied.
   Next: task 6, the global union of the per-session intervals.
+- Task 6: `src/dev_playbook/measure/rollup.py` rolls the table up across the
+  machine — a sweep cutting at every bound, union for the active and presence
+  states, intersection for `dormant`, complement where graded rows overlap — plus
+  `state_seconds`/`expected_seconds` for totalling either level; 17 tests in
+  `tests/test_measure_rollup.py`, and the doc's section 2 now carries the global
+  rule and what the level costs (14.6 session-hours of Claude-active time are
+  12.6 machine-hours). Next: task 7, the repo, issue, and skill attribution
+  columns.

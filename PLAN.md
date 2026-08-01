@@ -135,6 +135,24 @@ them whenever you learn something a future iteration would otherwise rediscover.
   1.7 %, even odds at 2 h 14 m, ~36 expected present hours. The store is live,
   so a rerun drifts these by a few minutes.
 
+- `dev_playbook.measure.rollup` owns the global level. `global_intervals(frame)`
+  cuts the whole table at every bound and combines each state by its own rule —
+  union for `claude_active`/`interrupted`/`human_present`, intersection for
+  `dormant` against the session count of the *whole* frame — and returns rows
+  with `session_id` None. `state_seconds` and `expected_seconds` total any
+  interval frame, session-level or global, which is how the two levels are
+  compared. Feed it the concat of the definitive and graded frames.
+- Measured over the real store (99.2 h window, 62 sessions): `claude_active`
+  14.6 session-hours against 12.6 global, `human_present` 128 h wall against
+  73 h global (35.9 expected hours against 25.5), `dormant` 11.5 h globally.
+  1400 global rows, of which 889 are presence — the sweep cuts a gap wherever
+  another session's row begins or ends, so global presence rows are fragments,
+  not one row per gap. Task 8's view should expect that.
+- `union_intervals` refuses a frame where one session claims the same moment
+  twice, since the complement rule would read one claim as two. The real store
+  passes, so per-session rows of one state genuinely are disjoint — keep any new
+  interval producer that way rather than relaxing the check.
+
 ## Tasks
 
 - [x] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
@@ -165,7 +183,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       Emit those gaps as interval rows with confidence set to the fitted
       probability. Record the fitted parameters in the run's output so the model
       is inspectable rather than hidden.
-- [ ] Add the global level: union the per-session intervals across the machine
+- [x] Add the global level: union the per-session intervals across the machine
       so a moment counts as Claude-active if any session is mid-turn, and as
       human-present if any session shows presence. Same interval schema, no
       `session_id`. Test that session and global rollups agree on total

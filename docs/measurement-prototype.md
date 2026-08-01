@@ -291,7 +291,7 @@ negligible storage cost. Forward-only: existing rows stay as they are, so code
 reading either field must treat its absence on an older row as a fact about
 capture history rather than an error.
 
-### 2. Build the interval table — definitive rows done
+### 2. Build the interval table — done
 
 One table: `start`, `end`, `state`, `session_id`, `confidence`. Every report and
 both levels are a grouping of it.
@@ -317,7 +317,25 @@ before the human left for the night swallows the night. Tightening it needs the
 fitting the next item gives a gap: after the interrupt, the two are the same
 unobserved thing. That is not done.
 
-Still to build: the global union of the per-session rows.
+The global level is that same table cut across the machine, not a second
+derivation. Each state combines by its own rule: `claude_active`, `interrupted`
+and `human_present` union, so a moment belongs to the machine if any session
+claims it, while `dormant` intersects, since the machine is only dormant when
+every session is — including the sessions that ran the whole window and so have
+no dormant row of their own. Where graded rows overlap, their confidences
+combine by complement, which is assumption 8's global form: presence is one
+minus the chance every session was absent at once. That takes the sessions as
+independent evidence about one human, so two terminals idle through the same
+hour read as two chances the human was there rather than one absence. Global
+rows carry no session id.
+
+What the level costs is what overlapping sessions were double-counted below it.
+Over the store's 99-hour window and 62 sessions, 14.6 session-hours of
+Claude-active time are 12.6 hours of the machine's clock, and 35.9 expected
+present session-hours are 25.5 expected hours globally; the machine is dormant —
+no session in existence at all — for 11.5 of the 99. Wall clock only falls going
+up a level, and expected presence falls with it, because a union charges one
+moment once however many sessions were idle through it.
 
 ### 3. Fit the presence mixture — done
 
