@@ -13,7 +13,7 @@ The front door for work, and the first state of the [definition region](~/worksp
 - **Capture** — the user passes a free-form idea as text. Intake creates the issue.
 - **Adopt** — the user passes the number or URL of an issue someone threw up rushed and incomplete. It sits untriaged at `phase:intake` — or carries no labels at all; treat both the same. Intake triages it in place and rewrites its body.
 
-**One issue, never many.** Intake does not slice and never mints an epic. Work that turns out to be a plan rather than a piece routes to `design`, which owns decomposition (§3).
+**One issue, never many.** Intake does not slice and never mints an epic. Work that turns out to be a plan rather than a piece routes to `design`, which owns decomposition; §3 makes that routing call.
 
 ## Read first
 

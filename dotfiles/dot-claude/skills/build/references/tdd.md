@@ -16,7 +16,8 @@ see it.
 
 **Choose the seams first.** A **seam** is a public surface where a behavior is
 observable without reaching inside the code that produces it. Work out the seams
-the chunk's tests cut at before writing the first test; if the brief names seams, respect them.
+the chunk's tests cut at before writing the first test. A brief may name seams;
+where it does, respect them.
 
 ## The slice loop
 
