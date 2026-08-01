@@ -57,7 +57,9 @@ judgments:
       - standards/claude-code/files.md
       - standards/claude-code/claude-content.md
       - standards/claude-code/skill-conventions.md
+      - standards/claude-code/skill-glossary.md
       - standards/claude-code/skill-management.md
+      - standards/claude-code/skill-writing.md
       - scripts/repo-lint
       - scripts/skill-lint
       - judgments/claude-code.yaml
