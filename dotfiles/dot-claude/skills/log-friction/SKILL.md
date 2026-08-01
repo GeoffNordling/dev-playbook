@@ -14,8 +14,7 @@ Append one entry to the friction log —
 commit it, and hand the user the push. The log feeds curation:
 twice-felt friction becomes a curation item mapped onto the idea
 archive, and only Selection scopes it into a Cycle.
-Recording friction is not a commitment to fix it — record and move
-on; never start fixing the friction as part of logging it.
+Recording friction is not a commitment to fix it — record and move on.
 
 ## Friction: $ARGUMENTS
 
@@ -31,8 +30,8 @@ session context and confirm it with the user before writing anything.
    `Felt:` line to it) or **new friction** (new entry)? Match on what
    actually bit, not on surface wording; if genuinely ambiguous, ask.
 3. Write the entry in the owner's register — one or two plain lines,
-   dated, stating what happened and where. No analysis, no proposed
-   fix unless the user gave one.
+   dated, stating what happened and where, and carrying a proposed
+   fix only where the user gave one.
 4. Commit via /commit, applied to `~/workspace/mission-control`
    (use `git -C`; the session's cwd is usually another repo). Stage
    **only** `friction/log.md` — the repo may hold unrelated work

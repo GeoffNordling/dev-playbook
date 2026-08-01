@@ -11,7 +11,7 @@ effort: low
 A **judgment** is a specific yes/no question about specific files, ruled on by an
 LLM judge, declared as YAML and gated by a deterministic pytest that passes iff that
 judgment's exact content has already been judged-and-passed. A miss is a red gate.
-See `standards/judgments/declarations.md` for the declaration format.
+See the [declaration format](~/workspace/dev-playbook/standards/judgments/declarations.md).
 
 This skill turns a red gate green. Steps 1–3 below are mechanical: run a command,
 pass its output on untouched, run the command you get back. **Copy, never compose** —

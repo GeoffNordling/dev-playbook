@@ -9,9 +9,9 @@ argument-hint: "[doc-hint]"
 
 # Doc Format
 
-Make the formatting and style of a Markdown document consistent throughout.
-This is a formatting-only pass — do not change the content, meaning, wording,
-or structure of any section.
+Make the formatting and style of a Markdown document consistent throughout. The
+content stays exactly as it is: this is a **formatting-only pass**, bounded by
+the rules at the bottom.
 
 ## Target
 
@@ -36,13 +36,13 @@ the flatter, simpler option.
 Review the entire document and standardize each of these. Pick one convention
 per dimension and apply it everywhere.
 
-- **Heading hierarchy.** Consistent nesting depth. Do not introduce new levels
-  unless already present.
-- **Bullets vs. prose.** Matching similar sections to one style; do not mix.
+- **Heading hierarchy.** Consistent nesting depth, using only the levels the
+  document already has.
+- **Bullets vs. prose.** Comparable sections settle on one style.
 - **Nested bullets.** Either used consistently or flattened to a single level.
-- **Bullet lead-in style.** Either bullets begin with **bold lead-ins**
-  followed by a period and explanation, or they are plain sentences. Do not
-  mix.
+- **Bullet lead-in style.** Bullets throughout either begin with **bold
+  lead-ins** followed by a period and explanation, or read as plain sentences —
+  one shape for the whole document.
 - **Sentence casing and terminal punctuation** in bullets and headings.
 - **Emphasis conventions.** Consistent use of bold vs. italics for the same
   kind of thing (e.g., terms, UI labels, filenames).
@@ -56,15 +56,15 @@ per dimension and apply it everywhere.
 
 1. Resolve the target document from `$ARGUMENTS` per the **Target** rules.
 2. Read the entire target document.
-3. For each dimension, pick the convention per the **Convention Selection**
+3. For each dimension, pick the convention per the **Convention selection**
    rule.
 4. Edit the file in place to bring every section into line.
 5. Report a short summary of the conventions chosen and what was changed.
 
 ## Rules
 
-- Do NOT change wording, add content, remove content, or reorganize sections.
-- Do NOT rename headings or alter their meaning — only adjust their level or
-  casing for consistency.
+- **The words survive the pass.** Wording, content, section order, and heading
+  text all come through unchanged; a heading's level or casing may move for
+  consistency, its text and meaning stay put.
 - If a section's content genuinely requires a different structure (e.g., a
   table vs. a list), leave it; consistency applies within comparable sections.

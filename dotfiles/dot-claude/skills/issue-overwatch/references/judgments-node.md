@@ -3,7 +3,7 @@
 The traverse's one armed pass of the semantic judgment gate — run after review
 approves, before the user's final read. Work through it in order.
 
-1. **Run the judgments yourself.** Invoke `/run-judgments` (the `Skill` tool) at
+1. **Run the judgments yourself.** Invoke /run-judgments (the `Skill` tool) at
    your own main loop, in the issue's worktree. It is never delegated, for the
    reason [the judgments node](~/workspace/dev-playbook/software-factory/factory-operations.md#the-judgments-node)
    gives. It enumerates the misses, dispatches the judges, records the passes,

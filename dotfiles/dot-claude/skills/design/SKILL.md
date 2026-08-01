@@ -52,7 +52,7 @@ Invoke /grill-with-docs to sharpen the approach against the codebase, capturing 
 
 When §2 settled that the public surface is load-bearing, read [design-it-twice.md](references/design-it-twice.md) and work through it: three or four subagents in parallel proposing the surface along different axes, compared on depth, locality, and seam placement.
 
-Not an always-on step. An ordinary surface — internal, one caller, cheap to change — skips it, and skips that file.
+An ordinary surface — internal, one caller, cheap to change — skips it, and skips that file.
 
 ## 5. Prototype — only where reading can't settle it
 

@@ -11,7 +11,7 @@ argument-hint: "[goal description]"
 
 The Ralph loop boots a fresh, memoryless agent each iteration; its only inputs are a plan file, a progress file, and a green check gate (or none). This skill produces those — above all a plan **chunked** so each fresh agent can do the next task without re-deriving the whole.
 
-The interview and the chunking are the value here. A vague plan makes a loop that thrashes; a well-ordered one makes a loop that grinds to done.
+A vague plan makes a loop that thrashes; a well-ordered one grinds to done.
 
 ## Read first
 
@@ -25,7 +25,7 @@ Then report `READ: ralph-loop.md` and proceed.
 
 - Confirm the cwd is the repo or worktree where the loop will run — agents inherit it, so the plan and progress files must live here and be named with relative paths. Ask if it isn't obvious.
 - Choose the plan and progress filenames (default `PLAN.md` and `PROGRESS.md`); these become the loop's `planFile` and `progressFile`.
-- If either file already exists, stop and ask — never overwrite an existing plan or progress file.
+- If either file already exists, stop and ask before writing anything — the file on disk stands until the user says otherwise.
 
 ## 2. Interview for intent
 
@@ -57,7 +57,7 @@ Settle it now, before writing anything:
 - Run the chosen gate and confirm it passes green (or confirm there is genuinely no gate to run).
 - Confirm the git tree is clean and committed.
 
-If the chosen gate is red, surface it and stop — do not scaffold a repo whose gate already fails. A repo with no gate is fine; that is not a reason to stop.
+If the chosen gate is red, surface it and stop — scaffolding waits on a green tree.
 
 ## 6. Write the files
 

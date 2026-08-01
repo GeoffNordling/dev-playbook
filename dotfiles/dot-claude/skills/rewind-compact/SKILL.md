@@ -11,18 +11,14 @@ argument-hint: "<rewind target>"
 
 Long tangential explorations (document polishing, design iteration, prototyping, etc.) can consume many turns whose outcome is fully captured on disk. Rewinding past them compacts the context — but past-self has no memory of what happened after the rewind target. This skill produces a parsimonious "Tangential compaction summary" that the user pastes in after rewinding, bringing past-self up-to-date with minimal context usage.
 
-The `/rewind` command allows the user to select any previous **user-typed message** as a checkpoint — your replies and tool results are not selectable. Picking one rewinds the conversation to the state *just before the selected message was sent*: the picked message and everything after it are discarded.
-
-This skill relies on the concept of a **rewind target**: the specific **user-typed message** the user desires to rewind the conversation to. All relevant information between the **rewind target** and the current turn is compressed into the **Tangential compaction summary**, which the user will copy to clipboard and add back to the context window after performing the `/rewind`.
+The **rewind target** is the **user-typed message** the user wants to return to — the turn that initiated the tangent. `/rewind` offers only user-typed messages as checkpoints; your replies and tool results are not selectable. Picking one rewinds the conversation to the state *just before that message was sent*: the target and everything after it are discarded, so whatever is worth keeping from that stretch travels in the summary the user pastes back in.
 
 ## Procedure
 
 1. **Confirm the rewind target.** Scan backward to find the turn matching `$ARGUMENTS`, which is a semantic description of the point the user wants to rewind to.
-   - The **rewind target** is always a **user-typed message**. It is the point in the conversation that initiated the tangent.
-   - The **rewind target**, and all messages after it, will be deleted by this procedure.
 
 2. **Commit all uncommitted work.**
-   - Use `/commit` and label the commit specifically as a /rewind-compact point.
+   - Use /commit and label the commit specifically as a /rewind-compact point.
 
 3. **Inventory state-on-disk changes** between the rewind target and now:
    - Files written or edited (list paths).
@@ -31,7 +27,7 @@ This skill relies on the concept of a **rewind target**: the specific **user-typ
 
 4. **Inventory in-conversation information** between the rewind target and now:
    - Instructions, decisions, side notes, insights, asides.
-   - Include only what can't be recovered by re-reading the committed files — anything already captured on disk is dropped.
+   - Include only what can't be recovered by re-reading the committed files.
    - Prepare to summarize this information in a concise, compact form that conveys the important ideas without all the little details.
 
 5. **Output two artifacts**:

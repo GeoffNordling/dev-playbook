@@ -21,9 +21,8 @@ Each slice is one test, one implementation, then a brief refactor.
 failing test exercising it through the public surface. Run `make test`; confirm
 it fails for the expected reason.
 
-**Never modify a written test.** Once you've written a test, make it pass by
-changing code, not the test. If you feel the need to change the test, escalate —
-don't edit it yourself.
+**Never modify a written test.** Once a test is written, make it pass by
+changing code; where you feel the need to change the test instead, escalate.
 
 **Stub on first contact.** When a test names a symbol with no stub yet, create
 the stub it needs — you design the signature here, since the brief pins

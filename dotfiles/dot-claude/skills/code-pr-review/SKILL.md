@@ -13,7 +13,7 @@ argument-hint: "<issue-number>"
 
 Review a direct-mode issue's PR diff against its issue brief and the project's conventions, and attach your findings to the PR.
 
-A bug-review pass (`/bug-pr-review`) runs in parallel with you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover.
+A bug-review pass (/bug-pr-review) runs in parallel with you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover.
 
 **Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
 
@@ -40,7 +40,7 @@ Your values for the contract's three parameters:
 
 - `gh issue view <issue> --comments` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
-- The PR's existing feedback, across every surface — prior review cycles' findings, so you don't re-flag what they caught. The `/bug-pr-review` pass runs in parallel with you; its comment for this cycle may not exist yet, so don't wait for it or dedup against it.
+- The PR's existing feedback, across every surface — prior review cycles' findings, so you don't re-flag what they caught. The /bug-pr-review pass runs in parallel with you; its comment for this cycle may not exist yet, so don't wait for it or dedup against it.
 - Where the change includes code, the tests under `tests/` and code under `src/` — the full picture behind the diff.
 
 ## 2. Read what the diff calls for

@@ -42,7 +42,7 @@ Repeat until the issue merges, closes, or a stop point (§7): place the issue at
 
 - **AFK** — delegate to a subagent (§3).
 - **Inline** — run the node yourself, at your own main loop, with the user present.
-- **Review stop** — run `/open-pr` first (always), then select the tracks yourself per the [review stop](~/workspace/dev-playbook/software-factory/factory-operations.md#the-review-stop). Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5).
+- **Review stop** — run /open-pr first (always), then select the tracks yourself per the [review stop](~/workspace/dev-playbook/software-factory/factory-operations.md#the-review-stop). Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5).
 
 When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue.
 
@@ -56,13 +56,13 @@ Every file-touching node sits in the issue's worktree — open it before the fir
 Run /<skill> <N>.
 ```
 
-**The commit token rides the committing node.** `/build` is the one AFK node that writes and commits code, so its launch line alone carries the prefix:
+**The commit token rides the committing node.** /build is the one AFK node that writes and commits code, so its launch line alone carries the prefix:
 
 ```
 ⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /build <N>.
 ```
 
-The PR and review nodes — `/open-pr`, `/bug-pr-review`, `/code-pr-review`, `/doc-pr-review` — are gh-only actions or read-only audits that never commit, so they get the bare launch line.
+The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-review — are gh-only actions or read-only audits that never commit, so they get the bare launch line.
 
 Parse the subagent's final message per the [terminal report contract](~/workspace/dev-playbook/software-factory/factory-operations.md#engagement):
 

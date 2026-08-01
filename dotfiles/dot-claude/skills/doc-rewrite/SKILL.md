@@ -14,7 +14,7 @@ structure and rebuild it from the ground up, preserving content by default —
 information is dropped only with the user's explicit approval, asked for
 during the workflow.
 
-Markdown documents only. Do not apply this skill to code.
+Markdown documents only.
 
 ## Target
 
@@ -38,14 +38,13 @@ a description like "the auth setup doc."
    should be able to do after reading it. Surface it explicitly before
    rewriting so it can guide every structural choice.
 4. **Interview the user only when a genuine ambiguity would change the
-   rewrite.** Default is no interview. Ask when, and only when, the source
-   leaves a question whose answer would materially redirect the rewrite —
-   for example, the document's purpose is unclear and two readings produce
-   different structures, two sections appear to contradict and you cannot
-   tell which is current, or a section's relevance hinges on a decision
-   not visible in the document. Batch targeted questions into one round.
-   Do not use the interview to confirm choices you can already make from
-   the source, or to gather content the document does not contain.
+   rewrite.** Ask when, and only when, the source leaves a question whose
+   answer would materially redirect the rewrite — for example, the
+   document's purpose is unclear and two readings produce different
+   structures, two sections appear to contradict and you cannot tell which
+   is current, or a section's relevance hinges on a decision not visible in
+   the document. Batch those questions into one round; every other call is
+   yours to make from the source.
 5. **Inventory the substantive content.** List every fact, rule, example,
    constraint, and reference the document contains. As you go, flag two
    categories of candidates for removal:
@@ -55,8 +54,7 @@ a description like "the auth setup doc."
      not earn their place in a tighter rewrite.
 6. **Ask the user about cuts before rewriting.** Present the flagged items
    in one batch, grouped by category, and ask which to drop and which to
-   keep. Default-keep anything the user does not explicitly approve
-   cutting. Do not ask about items you intend to preserve.
+   keep.
 7. **Rewrite the document from scratch**, applying the doc conventions.
    Preserve every item except those the user approved cutting in step 6.
 8. **Verify against the inventory.** Confirm every preserved item is
@@ -75,8 +73,8 @@ a description like "the auth setup doc."
   rephrasing, and surfacing implicit structure are in scope; inventing new
   rules or examples is not.
 - Ground the rewrite in the current document and any interview answers
-  only. Do not consult git history, related files, or other surrounding
-  context to research the document's evolution, reconstruct intent, or
-  track recent work. The rewrite is not a synthesis of project state.
+  alone — git history, related files, and the surrounding project context
+  stay out of it. The rewrite restructures one document; it does not
+  synthesize project state.
 - If a section genuinely cannot be restructured without losing meaning,
   leave it and say so in the report.
