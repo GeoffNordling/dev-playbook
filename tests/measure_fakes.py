@@ -16,11 +16,12 @@ from dev_playbook.measure import store
 BASE = pd.Timestamp("2026-07-28T19:00:00Z")
 
 
-def at(second: int) -> pd.Timestamp:
+def at(second: float) -> pd.Timestamp:
     """The timestamp `second` seconds into the window.
 
-    Payloads land one second apart starting at `at(1)`, so the Nth payload of a
-    frame — counting from one — is at `at(N)`.
+    `a_frame` lands payloads one second apart starting at `at(1)`, so the Nth
+    payload of such a frame — counting from one — is at `at(N)`. A frame built
+    by `a_timed_frame` lands each payload at the second it was given.
     """
     return BASE + pd.Timedelta(seconds=second)
 
@@ -38,9 +39,19 @@ def a_payload(event: str, session: str = "5b1f", **fields: object) -> dict:
 
 def a_frame(payloads: list[dict]) -> pd.DataFrame:
     """The loader's output shape, one row per payload, a second apart in order."""
+    return a_timed_frame(list(enumerate(payloads, start=1)))
+
+
+def a_timed_frame(timed: list[tuple[float, dict]]) -> pd.DataFrame:
+    """The loader's output shape, each payload landing at the second it is paired with.
+
+    For anything whose derivation turns on how long something took. Ids follow
+    list order, which is the store's own total order, so a pair whose seconds
+    run backwards is a genuine out-of-order arrival rather than a broken frame.
+    """
     records = [
-        store.event_row(index, at(index).isoformat(), json.dumps(payload))
-        for index, payload in enumerate(payloads, start=1)
+        store.event_row(index, at(second).isoformat(), json.dumps(payload))
+        for index, (second, payload) in enumerate(timed, start=1)
     ]
     frame = pd.DataFrame(records, columns=list(store.COLUMNS), dtype=object)
     frame["received_at"] = pd.to_datetime(

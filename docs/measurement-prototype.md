@@ -188,7 +188,9 @@ are Claude Code working.
 
 The gap distribution is bimodal — a working mode of a couple of minutes and an
 away mode of hours — so a two-component mixture gives a graded answer instead of
-an arbitrary threshold.
+an arbitrary threshold. Fitted, those two modes are 1 m 13 s and 5 h 45 m, and
+the crossover between them lands at 2 h 14 m rather than anywhere a person would
+have picked; the fit is below.
 
 ### The asymmetry that shapes all of this
 
@@ -312,15 +314,50 @@ One caveat the numbers make sharp: an `interrupted` row's end is an upper bound,
 not the interrupt instant, and summing it into Claude-active time is wrong. Its
 median across the store is 29 seconds and its maximum 15.7 hours — an interrupt
 before the human left for the night swallows the night. Tightening it needs the
-same fitting the next item gives a gap.
+fitting the next item gives a gap: after the interrupt, the two are the same
+unobserved thing. That is not done.
 
-Still to build: the global union of the per-session rows, and the graded rows
-below.
+Still to build: the global union of the per-session rows.
 
-### 3. Fit the presence mixture
+### 3. Fit the presence mixture — done
 
-Fit the two-component model on observed gap durations, then attach a presence
-probability to every gap. This replaces every hand-picked threshold above.
+A `Stop` with a submit next after it in the same session bounds a span nothing
+observes. There are 533 of them over the store, 128 hours in total against 15
+hours of Claude-active time, so how that silence is counted decides most of the
+answer. Each gap becomes one `human_present` row whose confidence is the fitted
+probability — the graded rows the interval table was given a `confidence` column
+for. Gaps tile the session against the turns and never overlap them.
+
+The model is two lognormal components over gap length, fitted by
+expectation-maximization. Over the whole store:
+
+| Mode | Share of gaps | Median gap |
+|---|---|---|
+| Working — read the reply, typed the next prompt | 98.3 % | 1 m 13 s |
+| Away — came back later | 1.7 % | 5 h 45 m |
+
+The shared log standard deviation is 1.61, which puts presence at even odds at
+2 h 14 m, 0.85 at an hour and 0.006 at a day. Expected present time across the
+128 gap hours is 36 hours.
+
+**The two components share one variance, and that constraint is the point.**
+Free variances fit better — log-likelihood -1030 against -1046 — but they split
+the gaps into a narrow component over the bulk and a broad one over everything
+else, and the shortest gaps in the store then belong to the *broad* component,
+so a two-second gap reads as absence. A presence probability that is not
+monotone in gap length is not a presence probability. Tying the variance makes
+the posterior a logistic function of log gap length: monotone, with both the
+crossover and its sharpness fitted. That is what assumption 8 promised — a
+threshold taken from the data instead of picked.
+
+Two properties of the fitting are worth knowing before trusting a number from
+it. EM finds a local optimum, and on this store all but the widest start fall
+into a valley where both means collapse onto the overall mean and the posterior
+goes flat; the fit therefore runs several deterministic starts and keeps the
+best-scoring one that converged. And the fit cannot decline: two modes are what
+it looks for, so two modes are what it reports, over a window that was worked
+straight through as readily as over one holding a night's sleep. The fitted
+parameters travel with the rows they graded so a reader can see which they got.
 
 ## What this gives us
 

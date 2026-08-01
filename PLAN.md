@@ -115,6 +115,25 @@ them whenever you learn something a future iteration would otherwise rediscover.
 - Test frames come from `tests/measure_fakes.py` (`a_payload`, `a_frame`, and
   `at(n)` for the timestamp of the nth payload). `pyproject.toml` already puts
   `tests` on `pythonpath`, so import it bare: `from measure_fakes import ...`.
+  `a_timed_frame([(second, payload), ...])` is the one to use when a derivation
+  turns on how long something took — `a_frame` is now a wrapper on it.
+
+- `dev_playbook.measure.presence` owns the graded rows. `stop_gaps` pairs each
+  `Stop` with the submit *immediately* after it in its session (a `Stop` with
+  another `Stop` before that submit opens no gap, or the inner turn would be
+  counted twice); `fit_presence(seconds)` returns the `MixtureFit`;
+  `presence_intervals(events)` returns `Presence(frame, fit)` with one
+  `human_present` row per gap at the fitted confidence, built through
+  `intervals.interval_frame`. Feed it cleaned events.
+- **No mixture-fitting library was added.** The fit is a hand-written
+  tied-variance EM over `math` — so plotly is the only dependency left needing
+  a real `uv lock` download, at task 8. The tie is load-bearing, not laziness:
+  free variances score better but put the store's shortest gaps in the broad
+  component, so presence stops being monotone in gap length. Do not free them.
+- Measured on the real store: 533 gaps, 128 hours of them against ~15 h of
+  `claude_active`; working mode 73 s carrying 98.3 %, away mode 5.8 h carrying
+  1.7 %, even odds at 2 h 14 m, ~36 expected present hours. The store is live,
+  so a rerun drifts these by a few minutes.
 
 ## Tasks
 
@@ -141,7 +160,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
       last event, and interrupt detection where two submits share a session with
       no `Stop` between them. Emit the interval schema `start`, `end`, `state`,
       `session_id`, `confidence`, with confidence 1.0 for these rows.
-- [ ] Extract every `Stop`-to-next-submit gap, fit a two-component mixture to
+- [x] Extract every `Stop`-to-next-submit gap, fit a two-component mixture to
       the observed durations, and attach a presence probability to each gap.
       Emit those gaps as interval rows with confidence set to the fitted
       probability. Record the fitted parameters in the run's output so the model

@@ -27,3 +27,10 @@ before starting, to see what the iterations before it already did.
   `tests/measure_fakes.py` and 22 tests added; the doc's interval section now
   matches the code and records that an `interrupted` span is a loose upper
   bound. Next: task 5, the `Stop`-to-submit gaps and the fitted mixture.
+- Task 5: `src/dev_playbook/measure/presence.py` extracts every
+  `Stop`-to-next-submit gap and grades it with a tied-variance two-component
+  lognormal mixture fitted by hand-written EM (no new dependency); the fit
+  travels with the rows and prints through `MixtureFit.summary`; 22 tests in
+  `tests/test_measure_presence.py`, `a_timed_frame` added to the fakes, and the
+  doc's section 3 now carries the fitted numbers and why the variance is tied.
+  Next: task 6, the global union of the per-session intervals.
