@@ -1,6 +1,6 @@
 ---
 name: log-friction
-description: Capture a friction entry — pain felt, time lost, a manual intervention — into mission-control's friction log from any repo, commit it there, and hand the user the push. Use when the user invokes /log-friction, says "log this friction", "that was friction", "add to the friction log", or asks to record a recurring pain or intervention.
+description: Record a friction entry — pain felt, time lost, a manual intervention — in mission-control's friction log from any repo. Use when the user says to log friction, or asks to record a recurring pain or manual intervention.
 disable-model-invocation: false
 model: sonnet
 effort: xhigh

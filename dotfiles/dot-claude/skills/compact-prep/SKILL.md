@@ -1,6 +1,6 @@
 ---
 name: compact-prep
-description: Commit outstanding work and get the session ready before the user runs /compact. Use when the user says they are about to compact, or asks to commit everything and get ready for a compaction.
+description: Commit outstanding work and get the session ready before the user runs /compact. Use when the user says they are about to compact.
 disable-model-invocation: true
 model: inherit
 effort: xhigh

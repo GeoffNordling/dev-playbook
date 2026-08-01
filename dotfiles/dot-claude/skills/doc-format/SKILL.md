@@ -1,6 +1,6 @@
 ---
 name: doc-format
-description: Standardize formatting and style across a Markdown document without changing its content. Use when the user asks to tidy, normalize, or make consistent the formatting of a Markdown file.
+description: Standardize formatting and style across a Markdown document without changing its content. Use when the user asks to tidy a Markdown file's formatting.
 disable-model-invocation: true
 model: opus
 effort: xhigh

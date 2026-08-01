@@ -1,6 +1,6 @@
 ---
 name: bug-pr-review
-description: Runs a bug review over an issue's PR diff — eight finder angles, deduped without verification, at most eight findings posted as one PR comment; an audit that never edits code. Use when the issue overwatch dispatches the code track at a review stop.
+description: Runs a bug-hunting review over an issue's PR diff and posts its findings to the PR, never editing code. Use when the issue overwatch dispatches the code track at a review stop.
 disable-model-invocation: false
 model: opus
 effort: xhigh
