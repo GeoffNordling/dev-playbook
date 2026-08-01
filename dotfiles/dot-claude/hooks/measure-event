@@ -8,8 +8,11 @@ appends one row and exits.
 Storage is append-only and uninterpreted: no parsing for meaning, filtering,
 or deduplication at write time — a row dropped here is one no future query
 can ask for. The one exception is mechanical rather than interpretive: a
-PostToolUse for a tool other than Bash has `tool_input` and `tool_response`
-dropped unread, storing the envelope alone (#255, ruling 23).
+PostToolUse for a tool other than Bash loses its `tool_response`, and loses
+its `tool_input` too unless the tool is one of four whose input is an
+identifier rather than content (#255, ruling 23) — `Read`, `Edit` and `Write`
+keep `file_path` alone, and `Skill` keeps its input whole. Keys are kept and
+dropped by name, never by what they hold.
 
 Failure discipline — the one sanctioned exception to this workspace's
 fail-loud rule: a session must never fail because measurement did. Every path
@@ -62,6 +65,15 @@ PROMOTED = ("hook_event_name", "session_id", "prompt_id")
 # about what the content was worth.
 TRIMMED = ("tool_input", "tool_response")
 
+# The non-Bash tools whose `tool_input` survives the trim, and in what form.
+# PATH_TOOLS keep KEPT_INPUT_KEYS out of their input and nothing else, so a row
+# names the file it touched without carrying the file's text or a diff's two
+# sides. WHOLE_INPUT_TOOLS keep their input as it arrived, being a name and
+# short arguments. Every other tool keeps neither key, as before.
+PATH_TOOLS = ("Read", "Edit", "Write")
+WHOLE_INPUT_TOOLS = ("Skill",)
+KEPT_INPUT_KEYS = ("file_path",)
+
 
 def promoted_values(payload: str) -> tuple[str | None, ...]:
     """The promoted columns read out of one payload; NULL for whatever is absent.
@@ -85,14 +97,40 @@ def promoted_values(payload: str) -> tuple[str | None, ...]:
     return tuple(values)
 
 
+def kept_input(tool_name: str, parsed: dict) -> dict:
+    """The `tool_input` entry a non-Bash tool's stored row keeps — often none.
+
+    A `Skill` row keeps its input as it arrived: a skill name and short
+    arguments, the only record of which skill an agent ran. A `Read`, `Edit` or
+    `Write` row keeps `file_path` and nothing else, which is what makes the row
+    attributable to a file while its text, its diff, and its offsets go.
+
+    An input that is not a JSON object cannot be reduced to a key, so a path
+    tool holding one keeps nothing — the same as any other non-Bash tool, and
+    the shape this hook stored for all of them before the identifiers were
+    kept.
+    """
+    if "tool_input" not in parsed:
+        return {}
+    arrived = parsed["tool_input"]
+    if tool_name in WHOLE_INPUT_TOOLS:
+        return {"tool_input": arrived}
+    if tool_name in PATH_TOOLS and isinstance(arrived, dict):
+        return {
+            "tool_input": {k: v for k, v in arrived.items() if k in KEPT_INPUT_KEYS}
+        }
+    return {}
+
+
 def for_storage(payload: str) -> str:
     """One payload as it is stored: the text that arrived, bar one trim.
 
     A `PostToolUse` naming a tool other than Bash stores its envelope —
     `tool_name`, `duration_ms`, and the rest — re-serialized without
-    `tool_input` and `tool_response`, because no query needs a Read's file text
-    or an Edit's diff (#255, ruling 23). Bash keeps its content: the factory's
-    standardized commands are what future queries read.
+    `tool_response` and without whatever of `tool_input` `kept_input` does not
+    keep, because no query needs a Read's file text or an Edit's diff (#255,
+    ruling 23). Bash keeps its content: the factory's standardized commands are
+    what future queries read.
 
     Everything this cannot positively identify as a non-Bash tool use is
     returned untouched, including stdin that does not parse and a `PostToolUse`
@@ -108,7 +146,8 @@ def for_storage(payload: str) -> str:
     tool_name = parsed.get("tool_name")
     if not isinstance(tool_name, str) or tool_name == "Bash":
         return payload
-    return json.dumps({k: v for k, v in parsed.items() if k not in TRIMMED})
+    stored = {k: v for k, v in parsed.items() if k not in TRIMMED}
+    return json.dumps(stored | kept_input(tool_name, parsed))
 
 
 def record(received_at: str, payload: str) -> None:

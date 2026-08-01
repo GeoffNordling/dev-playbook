@@ -90,7 +90,7 @@ A reader opens the database read-only.
 | `Stop` | The end of an agent turn | `prompt_id` pairs the turn with the submission that started it; `last_assistant_message` holds the full reply text. No `Stop` fires when a human interrupts with ESC. |
 | `SubagentStart` | A subagent dispatch | `agent_id` — the key a real `SubagentStop` matches on. |
 | `SubagentStop` | A subagent finishing, plus phantoms | `agent_id`; `agent_type` (empty on a phantom); `agent_transcript_path` — on a real stop the child transcript, on a phantom a well-formed path to nothing. |
-| `PostToolUse` | An executed tool call, any tool | `tool_name` and `duration_ms`. A Bash row is byte-verbatim: `tool_input` holds the command line as it ran and `tool_response` its output. Every other tool's row is the envelope alone, with `tool_input` and `tool_response` dropped at capture. |
+| `PostToolUse` | An executed tool call, any tool | `tool_name` and `duration_ms`. A Bash row is byte-verbatim: `tool_input` holds the command line as it ran and `tool_response` its output. Every other tool loses `tool_response` at capture, and loses `tool_input` too unless it is `Read`, `Edit` or `Write` (which keep `file_path` alone) or `Skill` (which keeps `tool_input` whole). |
 | `PostCompact` | A compaction | `trigger`, and the full `compact_summary` text. |
 | `Notification` | A harness notification | `notification_type` — overwhelmingly `idle_prompt`, with occasional `permission_prompt` and `agent_needs_input`. |
 
@@ -244,21 +244,23 @@ Recovery requires parsing shell text, so it is approximate by construction. A
 session that worked an issue without running any `gh` command against it leaves
 no trace.
 
-### Skills — half available
+### Skills — both paths, one of them forward-only
 
 | Invocation | Visible? |
 |---|---|
-| Human types `/skill` | Fully. `UserPromptExpansion` carries `command_name` and `command_args`. 109 invocations, 13 distinct skills. |
-| Agent calls the Skill tool | Partly. 71 `Skill` tool calls are recorded with timing and calling agent, but **the skill name is stripped.** |
+| Human types `/skill` | Fully, over the whole store. `UserPromptExpansion` carries `command_name` and `command_args`. 109 invocations, 13 distinct skills. |
+| Agent calls the Skill tool | Since capture was extended: the row keeps `tool_input` whole, which names the skill. The 71 `Skill` rows written before that keep timing and calling agent alone. |
 
-This asymmetry is backwards for a factory meant to run hands-off: the human's
-own skill use is fully measured and the agents' is invisible.
+The asymmetry was backwards for a factory meant to run hands-off — the human's
+own skill use fully measured and the agents' invisible — which is why capture
+changed. It closes going forward; the older rows stay as they are.
 
-### Files — not available
+### Files — forward-only
 
-`Read`, `Edit` and `Write` rows carry the tool name and duration and nothing
-else — no path, no content. The hook deletes `tool_input` and `tool_response`
-for every tool except Bash.
+`Read`, `Edit` and `Write` rows keep `file_path` and nothing else: no content,
+no diff, no offsets. Rows written before capture was extended carry no path at
+all, and there is no backfill, so file attribution begins at the change rather
+than at the store's first row.
 
 ### Cost — not in this store
 
@@ -272,18 +274,20 @@ depends on it being present.
 
 ## Work required
 
-### 1. Extend capture beyond Bash
+### 1. Extend capture beyond Bash — done
 
-The hook drops `tool_input` and `tool_response` wholesale for non-Bash tools.
+The hook dropped `tool_input` and `tool_response` wholesale for non-Bash tools.
 That was right for volume — `Read` responses carry whole files and `Edit` inputs
-carry both sides of every diff — but it discards cheap identifiers along with
-the bulk. Change it to keep the identifier and still drop the content:
+carry both sides of every diff — but it discarded cheap identifiers along with
+the bulk. It now keeps the identifier and still drops the content:
 
-- `Read`, `Edit`, `Write` — keep `file_path`, drop everything else.
-- `Skill` — keep `tool_input` whole. It is a skill name and short arguments.
+- `Read`, `Edit`, `Write` — `file_path` alone.
+- `Skill` — `tool_input` whole. It is a skill name and short arguments.
 
-This unblocks file attribution and agent-invoked skill attribution at negligible
-storage cost. Forward-only; existing rows stay as they are.
+That unblocked file attribution and agent-invoked skill attribution at
+negligible storage cost. Forward-only: existing rows stay as they are, so code
+reading either field must treat its absence on an older row as a fact about
+capture history rather than an error.
 
 ### 2. Build the interval table
 
@@ -312,16 +316,17 @@ Broken down by repository today, and by issue approximately.
 
 ## What it does not give us
 
-Which model did the work. What anything cost. Which files changed, until capture
-is extended. Which skill an agent invoked, until capture is extended.
+Which model did the work. What anything cost. Which files changed, or which
+skill an agent invoked, in any row written before capture was extended — both
+start at that change, with no backfill behind it.
 
 And it can never prove absence — only that nothing was observed.
 
 ## References
 
 - [`dotfiles/dot-claude/hooks/measure-event`](/dotfiles/dot-claude/hooks/measure-event)
-  — the capture hook. The trim rule lives in its `for_storage` function; this is
-  the file that changes to extend capture.
+  — the capture hook. The trim rule lives in its `for_storage` and `kept_input`
+  functions; this is the file that changes to extend capture again.
 - [`dotfiles/settings/fedora.json`](/dotfiles/settings/fedora.json) — the hook
   wiring, and the authority on which events are captured.
 - [Machines](/docs/machines.md) — capture runs on the primary machine only.

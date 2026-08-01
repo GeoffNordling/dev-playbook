@@ -58,10 +58,18 @@ them whenever you learn something a future iteration would otherwise rediscover.
 - Capture changes are forward-only. Existing rows keep their current shape, so
   any code reading `file_path` or Skill `tool_input` must tolerate its absence
   on older rows — that absence is a fact about capture history, not an error.
+- The hook change rides this branch, while the live `~/.claude/hooks/` is stowed
+  from the main checkout, so the real store gains no `file_path` row until this
+  merges. Expect none when querying it; test attribution against fixtures.
+- A Read/Edit/Write row now stores `tool_input` reduced to `file_path` alone. A
+  reader meets three shapes: the key absent (an older row, or an input that was
+  not a JSON object), `{}` (an input naming no file), or `{"file_path": ...}`.
+- Tests load the extensionless hook by path with `SourceFileLoader` — see
+  `tests/test_measure_event.py`. Reuse that; do not add a `.py` shim.
 
 ## Tasks
 
-- [ ] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
+- [x] Extend the capture hook so a `PostToolUse` for Read, Edit, or Write keeps
       only `file_path` from `tool_input`, and one for Skill keeps `tool_input`
       whole, while every other non-Bash tool keeps behaving as it does today and
       file contents, diff bodies, and tool responses are still dropped. Keep the
