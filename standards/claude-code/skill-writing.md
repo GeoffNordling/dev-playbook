@@ -27,7 +27,9 @@ workspace's constraints — its declarative voice and spelling, and the closed
 frontmatter vocabulary and two-sentence description rule that
 `skill-conventions.md` binds. Its sibling `GLOSSARY.md` at the same pin is
 seeded as [skill-glossary.md](/standards/claude-code/skill-glossary.md). The
-pin is what a later sweep delta-checks both files against.
+pin is what a later sweep delta-checks both files against — for drift in what
+was seeded, not as a ceiling: both files also carry workspace-original material
+the seed has no counterpart for.
 
 ## Invocation
 
@@ -82,7 +84,9 @@ a ladder ranked by how immediately the agent needs the material:
    condition that tells the agent the work is done. Make it *checkable* (can
    the agent tell done from not-done?) and, where it matters, *exhaustive*
    ("every modified model accounted for", not "produce a change list") — a
-   vague criterion invites **premature completion**.
+   vague criterion invites **premature completion**. Where a check is the
+   criterion, say the check itself is not to be weakened: a failing test is
+   fixed, never edited to pass.
 2. **In-skill reference** — a definition, rule, or fact in `SKILL.md`,
    consulted on demand. Often a legitimately flat peer-set (every rule of a
    review on one rung) — a fine arrangement, not a smell.

@@ -16,8 +16,8 @@ Governs how an idea becomes a merged pull request.
   factory's operating contract: dispatch, worktrees, node contracts, review, judgments
 - [software-factory/human-checkpoints.md](/software-factory/human-checkpoints.md) — every
   point where the factory stops for the human, and what it owes them there
-- [software-factory/skill-authoring.md](/software-factory/skill-authoring.md) — voice and
-  mechanics for the node skills
+- [software-factory/node-skill-authoring.md](/software-factory/node-skill-authoring.md) — the
+  authoring style behind the node skills: voice, content, robustness, mechanics
 - [software-factory/review-contract.md](/software-factory/review-contract.md) — what the code
   and doc reviews do once dispatched: gate, cycle, findings comment, escalation boundary
 - [software-factory/pr-feedback.md](/software-factory/pr-feedback.md) — the comment surfaces a
