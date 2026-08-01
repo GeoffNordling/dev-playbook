@@ -2,6 +2,7 @@
 type: Decision-Record
 title: Adopt Matt Pocock's Conventions
 description: Adopt Matt Pocock's repository conventions wholesale — 4-digit Decision Records, per-repo agent config, triage vocabulary, vertical-slice discipline — rejecting only his PRD format
+date: 2026-04-29
 ---
 
 # Adopt Matt Pocock's Conventions

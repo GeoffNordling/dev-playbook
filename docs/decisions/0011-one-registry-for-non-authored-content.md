@@ -2,6 +2,7 @@
 type: Decision-Record
 title: One Registry for Content the Repo Doesn't Author
 description: Exclude non-authored content from the authored-content detectors through one shared registry — vendored trees by root, verbatim mirrors by OKF type — never a per-detector path-skip
+date: 2026-07-20
 ---
 
 # One Registry for Content the Repo Doesn't Author

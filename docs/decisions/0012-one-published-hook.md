@@ -2,6 +2,7 @@
 type: Decision-Record
 title: One Published Hook — Enrollment Rides the Pin
 description: Collapse the published per-detector hook ids into one playbook-lint aggregate whose in-clone roster enrolls every consumer at pin bump
+date: 2026-07-24
 ---
 
 # One Published Hook — Enrollment Rides the Pin

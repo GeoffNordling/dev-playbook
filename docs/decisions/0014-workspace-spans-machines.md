@@ -3,6 +3,7 @@ type: Decision-Record
 title: The Workspace Spans Machines — Differences Live in Two Files
 status: accepted
 description: Confine every machine difference to two files named by machine key, and allow a check to be skipped only where its input is machine-local rather than held in the repository
+date: 2026-07-27
 ---
 
 # The Workspace Spans Machines — Differences Live in Two Files
