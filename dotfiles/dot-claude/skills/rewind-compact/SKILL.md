@@ -1,6 +1,6 @@
 ---
 name: rewind-compact
-description: Prepare a limited conversation rewind, compressing the discarded turns into a Tangential compaction summary the user pastes back in. Use when the user wants to rewind past a long tangent whose outcome is already captured on disk.
+description: Prepare a limited conversation rewind, compressing the discarded turns into a Tangential compaction summary. Use when the user wants to rewind past a long tangent whose outcome is already captured on disk.
 disable-model-invocation: true
 model: opus
 effort: medium

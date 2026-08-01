@@ -1,6 +1,6 @@
 ---
 name: doc-present-state
-description: Steer documentation toward present state and next steps, dropping history an agent does not need in order to act. Use when the user asks for present-state documentation or wants historical narration stripped from a doc.
+description: Steer documentation toward present state and next steps, dropping history an agent does not need in order to act. Use when the user asks for a doc to be made present-state.
 disable-model-invocation: true
 model: opus
 effort: xhigh

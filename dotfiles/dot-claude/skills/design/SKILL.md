@@ -1,6 +1,6 @@
 ---
 name: design
-description: Works out how a direct-mode issue should be built — research, prototypes, tradeoffs — then leaves it factory-ready as one re-authored leaf or as an epic with ready children. Use when the user invokes /design on an issue, when intake parks work whose approach needs thought first, or when an issue looks too big for one build and needs slicing.
+description: Works out how a direct-mode issue should be built, then leaves it factory-ready. Use when an issue's approach needs thought before it can be built, when intake parks work for design, or when an issue looks too big for one build and needs slicing.
 disable-model-invocation: false
 model: inherit
 effort: xhigh
