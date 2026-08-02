@@ -38,7 +38,7 @@ the path to main — they are references here, not rungs:
 | Non-gate | When | What runs | Blocks |
 |---|---|---|---|
 | agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [the node-skill contract](/software-factory/factory-operations.md#the-node-skill-contract) |
-| workspace-lint | on demand and via the periodic review | GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-lint`](/scripts/workspace-lint) | no — reports, never blocks |
+| workspace-lint | on demand and via the periodic review | GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-lint`](/scripts/workspace-lint) | no — reports, never blocks |
 
 The re-run of `make check` at review start is the review node's **green gate**:
 the code-review skills run it before auditing and escalate if it is red, even
@@ -79,4 +79,4 @@ defect in the code. Which machine skips what is recorded in
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments cache gate | push gate only — never the CI gate; the judgments cache gate is skipped on the secondary machines |
 | validate | spec graph | push gate only — never the CI gate (sdd repos) |
-| workspace-lint | GitHub settings ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |
+| workspace-lint | GitHub settings and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |

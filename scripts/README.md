@@ -132,7 +132,7 @@ Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
 | `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout, `--html` assembles the viz |
 | `judgments-run` | Plan / render / record over a repo's judgment declarations (driven by the `/run-judgments` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
+| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
 | `bump-pins` | Move the dev-playbook `rev` pin across the governed consumer repos and re-run each one's commit gate — the release step of [distribution.md](/standards/build/distribution.md); commits nothing |
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `repo-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
