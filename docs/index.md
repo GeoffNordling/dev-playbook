@@ -8,6 +8,7 @@ Nothing here governs; the standards do that.
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
 - [Sandboxing Claude agents](/docs/sandboxing.md) — Comparing sandbox solutions for isolating a Claude agent's filesystem, network, and processes
+- [Workflow-runtime primitives and agent definitions](/docs/workflow-runtime-primitives.md) — The Workflow runtime's scripting primitives and the custom agent-definition frontmatter surface, each claim traced to a primary source
 
 ## Directories
 
