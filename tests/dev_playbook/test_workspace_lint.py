@@ -28,6 +28,15 @@ FAKE_GH = """\
 #!/usr/bin/env python3
 import json, os, sys
 
+# The audit's auth preflight. FAKE_GH_AUTH set to "0" (the default) stands for a
+# usable credential; any other value is the exit code an unauthenticated `gh`
+# returns, which the audit must treat as a precondition failure.
+if sys.argv[1:3] == ["auth", "status"]:
+    code = int(os.environ.get("FAKE_GH_AUTH", "0"))
+    if code:
+        sys.stderr.write("The token in default is invalid.\\n")
+    sys.exit(code)
+
 # Two `gh api` forms are faked, matching the two the audit issues. Settings come
 # over `gh api graphql -f query=... -f owner=... -f name=...`, so the slug is
 # rebuilt from the variables; every other resource comes over REST, whose path
@@ -37,11 +46,28 @@ graphql = args[0] == "graphql"
 if graphql:
     variables = dict(a.split("=", 1) for a in args[1:] if "=" in a)
     slug = variables["owner"] + "/" + variables["name"]
-    resource = "settings"
+    # Two GraphQL queries now share the -f owner/-f name shape, so the query
+    # body is what tells them apart.
+    protection = "defaultBranchRef" in variables["query"]
+    resource = "protection" if protection else "settings"
 else:
     segs = args[0].split("?", 1)[0].split("/")
     slug = "/".join(segs[1:3])
     resource = segs[3] if len(segs) > 3 else "settings"
+
+# What a resource answers when a test says nothing about it. Protection defaults
+# to fully protected so that a test about merge settings or labels does not have
+# to restate the branch rules to stay clean.
+DEFAULTS = {
+    "labels": [],
+    "issues": [],
+    "protection": {
+        "defaultBranchRef": {
+            "name": "main",
+            "rules": {"nodes": [{"type": "NON_FAST_FORWARD"}, {"type": "DELETION"}]},
+        }
+    },
+}
 
 data = json.load(open(os.environ["FAKE_GH_DATA"]))
 if slug not in data:
@@ -49,15 +75,15 @@ if slug not in data:
 entry = data[slug]
 
 # An entry is either a bare settings dict (legacy) or a wrapper carrying any of
-# settings / labels / issues. A bare entry answers the base repo path with its
-# settings and every sub-resource with an empty list.
+# settings / protection / labels / issues. A bare entry answers the base repo
+# path with its settings and every other resource with that resource's default.
 wrapper = isinstance(entry, dict) and any(
-    k in entry for k in ("settings", "labels", "issues")
+    k in entry for k in ("settings", "protection", "labels", "issues")
 )
 if wrapper:
-    payload = entry.get(resource, [] if resource in ("labels", "issues") else {})
+    payload = entry.get(resource, DEFAULTS.get(resource, {}))
 else:
-    payload = entry if resource == "settings" else []
+    payload = entry if resource == "settings" else DEFAULTS.get(resource, {})
 # A resource set to the sentinel "__unreachable__" simulates a non-zero `gh api`
 # exit (rate limit, permissions, transient 5xx) for that one resource.
 if payload == "__unreachable__":
@@ -99,6 +125,20 @@ GOOD_SETTINGS = {
     "squashMergeCommitTitle": "PR_TITLE",
     "squashMergeCommitMessage": "PR_BODY",
 }
+
+
+def protection(*types: str, branch: str = "main") -> dict:
+    """A default-branch rules payload as GraphQL serves it.
+
+    No arguments is the unprotected repo — a default branch with an empty rule
+    list, which is what a repo carrying no ruleset answers.
+    """
+    return {
+        "defaultBranchRef": {
+            "name": branch,
+            "rules": {"nodes": [{"type": t} for t in types]},
+        }
+    }
 
 
 def hook_repo_url() -> str:
@@ -146,6 +186,7 @@ def run(
     gh_data: Path | None = None,
     gh_dir: Path | None = None,
     repos: str | None = None,
+    gh_auth: str | None = None,
 ) -> subprocess.CompletedProcess:
     """Run the audit over ``workspace``, governing every repo the test built.
 
@@ -159,6 +200,8 @@ def run(
         env["PATH"] = f"{gh_dir}:{env['PATH']}"
     if gh_data is not None:
         env["FAKE_GH_DATA"] = str(gh_data)
+    if gh_auth is not None:
+        env["FAKE_GH_AUTH"] = gh_auth
     if repos is None:
         found = (
             sorted(e.name for e in workspace.iterdir() if (e / ".git").exists())
@@ -368,6 +411,58 @@ def test_default_roster_is_the_governed_constant() -> None:
     assert "dev-playbook" in workspace_lint.GOVERNED
 
 
+# --- auth preflight ---
+
+
+def test_unauthenticated_gh_stops_the_run(tmp_path: Path) -> None:
+    # The whole point: unauthenticated, the settings read fails on every repo
+    # while a public repo's other reads still answer, so a per-repo degradation
+    # would mix fiction into real findings. Exit 2 says "could not run" instead.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(ws, gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "no usable credential" in result.stderr
+    # No finding may be printed: a half-answered audit is what this prevents.
+    assert result.stdout == ""
+
+
+def test_unauthenticated_gh_reports_ghs_own_reason(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
+    assert "The token in default is invalid." in result.stderr
+
+
+def test_pins_only_needs_no_auth(tmp_path: Path) -> None:
+    # --pins-only reads nothing over the network, so requiring a credential
+    # would refuse a run that could answer correctly.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {})
+    result = run(ws, "--pins-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "alpha: pin current" in result.stderr
+
+
+def test_authenticated_gh_runs_normally(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="0")
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 # --- settings ---
 
 
@@ -467,6 +562,161 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     assert (
         "alpha: tracking.remote no GitHub origin; settings unchecked" in result.stdout
     )
+
+
+# --- branch protection ---
+
+
+def test_protected_default_branch_passes(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection("NON_FAST_FORWARD", "DELETION"),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_unprotected_default_branch_is_two_findings(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {"me/alpha": {"settings": GOOD_SETTINGS, "protection": protection()}}
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        "alpha: tracking.branch-protection main is not protected against force-push"
+        in result.stdout
+    )
+    assert (
+        "alpha: tracking.branch-protection main is not protected against deletion"
+        in result.stdout
+    )
+
+
+def test_each_missing_rule_is_reported_alone(tmp_path: Path) -> None:
+    # Half-protected is its own state: the rule that is present must not be
+    # reported, or a repo cannot tell which half it still owes.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection("DELETION"),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "not protected against force-push" in result.stdout
+    assert "not protected against deletion" not in result.stdout
+
+
+def test_unrelated_rules_do_not_satisfy_the_requirement(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection("PULL_REQUEST", "REQUIRED_SIGNATURES"),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "not protected against force-push" in result.stdout
+    assert "not protected against deletion" in result.stdout
+
+
+def test_extra_rules_alongside_the_required_two_are_fine(tmp_path: Path) -> None:
+    # The requirement is a floor, not an exact set — a repo may protect more.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection(
+                    "DELETION", "NON_FAST_FORWARD", "PULL_REQUEST"
+                ),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_finding_names_the_actual_default_branch(tmp_path: Path) -> None:
+    # The branch name comes from the API, so a repo whose default is not main
+    # is told about the branch it actually has.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection(branch="trunk"),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "trunk is not protected against force-push" in result.stdout
+
+
+def test_unreadable_rules_are_surfaced_not_read_as_unprotected(tmp_path: Path) -> None:
+    # A failed read must never masquerade as a clean answer or as drift: the
+    # audit cannot tell whether the branch is protected, and says so.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {"me/alpha": {"settings": GOOD_SETTINGS, "protection": "__unreachable__"}},
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        "alpha: tracking.branch-protection rules unreachable via gh api (me/alpha)"
+        in result.stdout
+    )
+    assert "not protected against" not in result.stdout
+
+
+def test_repo_without_origin_draws_one_finding_not_two(tmp_path: Path) -> None:
+    # tracking.remote already says the origin is missing; protection stays quiet
+    # rather than reporting the same absent repo a second time.
+    ws = tmp_path / "ws"
+    make_workspace_repo(ws, "alpha", {"README.md": "# A\n"})
+    gh_dir, gh_data = make_fake_gh(tmp_path, {})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "tracking.branch-protection" not in result.stdout
+    assert len(result.stdout.strip().splitlines()) == 1
 
 
 # --- label scheme (full mode; settings clean so only label findings surface) ---

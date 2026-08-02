@@ -24,7 +24,8 @@ between them — belongs to the
 ## Audit
 
 - [workspace-lint](/scripts/workspace-lint) — across repositories via
-  `gh api`: GitHub settings drift, label-scheme parity and the blocked-label
+  `gh api`: GitHub settings drift, the default branch's protection against
+  destructive operations, label-scheme parity and the blocked-label
   ban, every open post-intake leaf's brief shape, every epic's category-only
   shape, and every wayfinder map's and decision ticket's shape
 - [repo-lint](/scripts/repo-lint) — a `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or

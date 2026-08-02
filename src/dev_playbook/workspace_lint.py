@@ -16,6 +16,10 @@ in, so governance is declared rather than inferred. For each governed repo:
     whose body simply lacks them, whatever permissions the token carries — which
     would read as six drifted settings on every repo. A repo the API cannot
     reach, or with no GitHub origin, is reported loudly.
+  - **protection** — read the rules in force on the default branch and require
+    the two that deny destructive operations: no force-push, no deletion. The
+    read is of the branch's effective rules, not of the ruleset list, so how a
+    repo organizes its rulesets is its own business.
   - **labels** — compare the repo's labels against the canonical scheme at full
     parity (a finding exactly when bootstrap-labels would repair), and flag any
     label naming a blocked state.
@@ -28,6 +32,12 @@ in, so governance is declared rather than inferred. For each governed repo:
     `main`. Stale pins are reported but are not failures: a consumer catches up
     when its pin is deliberately bumped. No pin at all is a failure — being
     governed is what makes the absence wrong.
+
+Every check but the pin reads GitHub, so an authenticated `gh` is a precondition
+of the run rather than a per-repo condition: the audit checks it once up front
+and refuses to start without it, because an unauthenticated `gh` degrades to
+anonymous requests instead of failing (see ``check_auth``). ``--pins-only``
+reads nothing over the network and so is exempt.
 
 Output:
     stdout — one finding per line, ``repo: card.rule message`` (the repo name
@@ -58,6 +68,7 @@ from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 # every emission site references the constant, never a raw literal, and RULES
 # (what --list-rules prints) cannot drift from what the detector actually emits.
 SETTINGS = "tracking.settings"
+PROTECTION = "tracking.branch-protection"
 REMOTE = "tracking.remote"
 LABEL_SCHEME = "tracking.label-scheme"
 NO_BLOCKED_LABEL = "tracking.no-blocked-label"
@@ -69,6 +80,7 @@ PIN = "build.pin"
 
 RULES = (
     SETTINGS,
+    PROTECTION,
     REMOTE,
     LABEL_SCHEME,
     NO_BLOCKED_LABEL,
@@ -171,6 +183,35 @@ SETTINGS_QUERY = """query($owner: String!, $name: String!) {
     deleteBranchOnMerge
     squashMergeCommitTitle
     squashMergeCommitMessage
+  }
+}"""
+
+# The rule types the default branch must carry, each mapped to the operation it
+# denies, so a finding names the exposure rather than the GraphQL enum. Together
+# these two are what "protected against destructive operations" means: history
+# cannot be rewritten under the branch, and the branch cannot be removed.
+REQUIRED_RULES = {
+    "NON_FAST_FORWARD": "force-push",
+    "DELETION": "deletion",
+}
+
+# Rules are read off the default branch rather than out of the ruleset list, so
+# the audit asks what protects the branch instead of how the protection is
+# organized. ``defaultBranchRef.rules`` is the effective view — every rule
+# reaching the branch from every ruleset, whatever those rulesets are named, how
+# many there are, or which ref patterns they match — so a repo may reorganize
+# its rulesets freely without moving this detector. The branch name comes back
+# with it, so nothing here assumes ``main``.
+PROTECTION_QUERY = """query($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    defaultBranchRef {
+      name
+      rules(first: 100) {
+        nodes {
+          type
+        }
+      }
+    }
   }
 }"""
 
@@ -345,6 +386,36 @@ def _gh_json(argv: list[str]) -> object | None:
     return parsed
 
 
+def check_auth() -> None:
+    """Stop the run when `gh` holds no usable credential.
+
+    Authentication is a precondition of the whole audit, not a per-repo
+    condition, because an unauthenticated `gh` does not fail — it degrades to
+    anonymous requests, and anonymity is answered three different ways. A public
+    repo serves its REST resources, so labels and issues return real findings. A
+    private repo answers 404, indistinguishable from one that was deleted.
+    GraphQL has no anonymous mode at all, so the settings check fails on every
+    repo whatever its visibility. The audit would then print a mix of genuine
+    findings and per-repo unreachable lines under one exit 1, with nothing in the
+    output telling a reader which was which. Refusing to start is the only honest
+    answer.
+    """
+    try:
+        result = subprocess.run(
+            ["gh", "auth", "status"], capture_output=True, text=True
+        )
+    except FileNotFoundError as err:
+        raise ToolError("gh not found on PATH") from err
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout).strip()
+        raise ToolError(
+            "gh holds no usable credential, so every GitHub read would "
+            "silently degrade to an anonymous request. Run `gh auth login`, or "
+            "re-run where the credential store is readable — a sandbox that "
+            f"hides it produces exactly this.\n{detail}"
+        )
+
+
 def gh_graphql(query: str, **variables: str) -> object | None:
     """Parsed JSON from ``gh api graphql``, or None when the call fails.
 
@@ -380,6 +451,42 @@ def fetch_settings(slug: str) -> dict | None:
     ):
         return None
     return {rest: repository[field] for field, rest in SETTINGS_FIELDS.items()}
+
+
+def fetch_protection(slug: str) -> tuple[str, set[str]] | None:
+    """The default branch's name and the rule types in force on it, or None.
+
+    Its own round trip rather than extra fields on ``SETTINGS_QUERY``: the two
+    reads then degrade independently, so a repo that answers one and not the
+    other still reports what it could answer. The audit runs on demand over a
+    roster of five, which is what makes the second call affordable.
+
+    An empty rule list is data, not a failure — it is precisely the unprotected
+    repo, and reporting it is the point. None is reserved for a read that could
+    not be trusted: an unusable response, or a repository with no default branch
+    at all (an empty repo), where there is no branch whose protection to judge.
+    """
+    owner, _, name = slug.partition("/")
+    data = gh_graphql(PROTECTION_QUERY, owner=owner, name=name)
+    if not isinstance(data, dict):
+        return None
+    payload = data.get("data")
+    repository = payload.get("repository") if isinstance(payload, dict) else None
+    if not isinstance(repository, dict):
+        return None
+    ref = repository.get("defaultBranchRef")
+    if not isinstance(ref, dict) or not isinstance(ref.get("name"), str):
+        return None
+    rules = ref.get("rules")
+    nodes = rules.get("nodes") if isinstance(rules, dict) else None
+    if not isinstance(nodes, list):
+        return None
+    types = {
+        node["type"]
+        for node in nodes
+        if isinstance(node, dict) and isinstance(node.get("type"), str)
+    }
+    return ref["name"], types
 
 
 def fetch_labels(slug: str) -> list | None:
@@ -425,6 +532,39 @@ def check_settings(repo: Path, slug: str | None) -> list[Line]:
         )
         for field, want in EXPECTED_SETTINGS.items()
         if settings.get(field) != want
+    ]
+
+
+def check_protection(repo: Path, slug: str | None) -> list[Line]:
+    """The default branch's protection against destructive operations.
+
+    A repo with no GitHub origin draws nothing here: ``check_settings`` already
+    reports that once, and one missing origin should not print twice under two
+    rule ids.
+    """
+    name = repo.name
+    if slug is None:
+        return []
+    found = fetch_protection(slug)
+    if found is None:
+        return [
+            Line(
+                name,
+                PROTECTION,
+                f"rules unreachable via gh api ({slug})",
+                blocking=True,
+            )
+        ]
+    branch, rules = found
+    return [
+        Line(
+            name,
+            PROTECTION,
+            f"{branch} is not protected against {operation}",
+            blocking=True,
+        )
+        for rule, operation in REQUIRED_RULES.items()
+        if rule not in rules
     ]
 
 
@@ -879,7 +1019,10 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument(
         "--settings-only",
         action="store_true",
-        help="run only the settings checks (skip pins and the tracking gh-api checks)",
+        help=(
+            "run only the repo-settings checks — merge settings and default-branch "
+            "protection (skip pins and the tracking gh-api checks)"
+        ),
     )
     args = parser.parse_args(argv)
     if args.list_rules:
@@ -887,6 +1030,8 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         repos = workspace_repos(args.workspace.resolve(), args.repos)
+        if not args.pins_only:
+            check_auth()
         url = hook_repo_url()
         main_sha = hook_repo_main() if not args.settings_only else ""
         lines: list[Line] = []
@@ -898,6 +1043,7 @@ def main(argv: list[str] | None = None) -> int:
             if not args.pins_only:
                 slug = origin_slug(repo)
                 lines.extend(check_settings(repo, slug))
+                lines.extend(check_protection(repo, slug))
                 if not args.settings_only:
                     lines.extend(check_tracking(repo, slug))
     except ToolError as err:
