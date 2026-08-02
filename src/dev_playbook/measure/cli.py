@@ -175,7 +175,9 @@ def pipeline(
     definitive = intervals.definitive_intervals(rows, window)
     graded = presence.presence_intervals(rows)
     table = (
-        pd.concat([definitive.frame, graded.frame])
+        pd.concat(
+            [presence.grade_interrupts(definitive.frame, graded.fit), graded.frame]
+        )
         .sort_values(["start", "session_id"], kind="stable")
         .reset_index(drop=True)
     )
@@ -232,6 +234,7 @@ def main(argv: list[str], workspace: Path = WORKSPACE) -> int:
             timeline.laned(run.table, args.lane, run.events),
             Path(args.output),
             args.title or _title(args.lane, run.window),
+            args.zone,
         )
     except (
         AttributionError,
@@ -330,6 +333,11 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         choices=timeline.LANE_KEYS,
         default=timeline.SESSION_LANE,
         help="what each lane of the picture is (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--zone",
+        default=timeline.DISPLAY_ZONE,
+        help="the time zone the picture is drawn in (default: %(default)s)",
     )
     parser.add_argument(
         "--title",

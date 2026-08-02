@@ -244,3 +244,88 @@ def test_graded_rows_and_the_turns_they_follow_do_not_overlap() -> None:
         end <= start
         for end, start in zip(together["end"][:-1], together["start"][1:], strict=True)
     )
+
+
+# --- grading an interrupted turn ----------------------------------------------
+
+
+def _bimodal_gaps() -> list[float]:
+    """Gaps shaped like the store's own: many short, a few overnight.
+
+    Spread rather than repeated, because a component of identical lengths has no
+    variance and the fit has nothing to estimate.
+    """
+    working = [40.0 + index * 7 for index in range(40)]
+    away = [30000.0 + index * 900 for index in range(8)]
+    return working + away
+
+
+def test_a_short_interrupt_keeps_its_confidence() -> None:
+    fit = presence.fit_presence(_bimodal_gaps())
+    frame = intervals.interval_frame(
+        [
+            {
+                "start": at(0),
+                "end": at(30),
+                "state": intervals.INTERRUPTED,
+                "session_id": "one",
+                "confidence": 1.0,
+            }
+        ]
+    )
+
+    graded = presence.grade_interrupts(frame, fit)
+
+    assert graded["confidence"][0] > 0.9
+
+
+def test_an_interrupt_that_swallowed_a_night_falls_to_near_zero() -> None:
+    fit = presence.fit_presence(_bimodal_gaps())
+    frame = intervals.interval_frame(
+        [
+            {
+                "start": at(0),
+                "end": at(15.7 * 60 * 60),
+                "state": intervals.INTERRUPTED,
+                "session_id": "one",
+                "confidence": 1.0,
+            }
+        ]
+    )
+
+    graded = presence.grade_interrupts(frame, fit)
+
+    assert graded["confidence"][0] < 0.1
+
+
+def test_every_other_state_is_left_alone() -> None:
+    fit = presence.fit_presence(_bimodal_gaps())
+    frame = intervals.interval_frame(
+        [
+            {
+                "start": at(0),
+                "end": at(15.7 * 60 * 60),
+                "state": intervals.CLAUDE_ACTIVE,
+                "session_id": "one",
+                "confidence": 1.0,
+            },
+            {
+                "start": at(0),
+                "end": at(15.7 * 60 * 60),
+                "state": intervals.DORMANT,
+                "session_id": "one",
+                "confidence": 1.0,
+            },
+        ]
+    )
+
+    graded = presence.grade_interrupts(frame, fit)
+
+    assert list(graded["confidence"]) == [1.0, 1.0]
+
+
+def test_an_empty_table_grades_to_itself() -> None:
+    fit = presence.fit_presence(_bimodal_gaps())
+    frame = intervals.interval_frame([])
+
+    assert presence.grade_interrupts(frame, fit).empty

@@ -8,13 +8,15 @@ a lane that happens to be a paler shade of busy.
 
 Three decisions carry most of what the picture says:
 
-- **Confidence is opacity.** A `claude_active` row is an event pair and draws
-  solid; a `human_present` row is a fitted probability and draws as faint as the
-  model is unsure. Inferred time therefore cannot be mistaken for observed time
-  at a glance, which is the one way a reader could be misled by this table.
-  Opacity has a floor: a gap the model puts at 0.6 % still draws faintly,
-  because "we think nobody was here" and "nothing exists here" must not look the
-  same.
+- **Confidence is thickness, and opacity too.** A `claude_active` row is an
+  event pair and draws solid and full height; a graded row draws thinner and
+  fainter the less the model backs it. Thickness is the one that matters. A bar
+  is as wide as its span, so an overnight gap the model puts at 0.6 % is twenty
+  times the width of a real turn and would otherwise dominate a picture it
+  contributes eight minutes of expected time to. Grading the height puts visual
+  weight back on `duration × confidence`, which is where the meaning is. Both
+  have floors, because "we think nobody was here" and "nothing exists here" must
+  not look the same.
 - **Dormant rows are drawn but hidden.** A session is dormant for most of any
   wide window, so drawing dormancy by default paints the whole page and buries
   the activity. The trace is built and left switched off in the legend, one
@@ -33,6 +35,13 @@ totalling. Bars sharing a lane overlay rather than stack, so a repo lane fed by
 six sessions reads as the union of their activity, which is the question a repo
 lane is asking.
 
+**The clock is local, and says so.** The store is UTC throughout, which is right
+for storage and wrong for a picture a human reads against their own day: a bar
+at 02:00 means something different from one at 14:00, and only local time says
+which. Timestamps are converted to the display zone for drawing, every tick
+carries its day of the week, and the axis names the zone. Night is shaded behind
+the bars, so a stretch of silence reads as "asleep" rather than as "idle".
+
 The output is one self-contained HTML file: plotly.js is inlined rather than
 fetched from a CDN, so the file opens from a laptop with no network and keeps
 working when the CDN version moves on. It costs about four megabytes.
@@ -41,6 +50,7 @@ working when the CDN version moves on. It costs about four megabytes.
 from bisect import bisect_right
 from dataclasses import dataclass
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -81,8 +91,32 @@ LEGEND_ONLY = (DORMANT,)
 # stays distinguishable from a span the table makes no claim about at all.
 MIN_OPACITY = 0.12
 
+# The share of a lane's height a confidence of zero still draws at. A hairline
+# rather than nothing, for the same reason the opacity has a floor — but thin
+# enough that a 24-hour overnight guess cannot outweigh the turns beside it.
+MIN_THICKNESS = 0.06
+
+# The height a full-confidence bar draws at, in lane units. Below 1.0 so that
+# neighbouring lanes keep a visible gutter between them.
+FULL_THICKNESS = 0.72
+
 # A date axis measures a bar's length in milliseconds.
 MILLISECONDS = 1000
+
+# The zone the picture is read in. The store is UTC; this is presentation only.
+DISPLAY_ZONE = "America/New_York"
+
+# Weekday, date, and time on every tick. A picture spanning days is read by
+# which day as much as by which hour, and a bare "07-31 14:00" makes the reader
+# work out the weekday themselves.
+TICK_FORMAT = "%a %d %b<br>%H:%M"
+
+# Night, in local hours: the band shaded behind the bars. Not a claim about
+# sleep — a backdrop that lets a reader tell an overnight silence from a
+# mid-afternoon one without reading the axis.
+NIGHT_FROM = 22
+NIGHT_TO = 6
+NIGHT_COLOUR = "rgba(148, 163, 184, 0.13)"
 
 # Layout, in pixels: the figure grows with the number of lanes so that ten lanes
 # and a hundred are both readable, with room at the top for the title and legend.
@@ -176,11 +210,16 @@ def laned(
     return frame.iloc[positions].assign(lane=lanes).reset_index(drop=True)
 
 
-def timeline_figure(frame: pd.DataFrame, title: str = DEFAULT_TITLE) -> go.Figure:
+def timeline_figure(
+    frame: pd.DataFrame, title: str = DEFAULT_TITLE, zone: str = DISPLAY_ZONE
+) -> go.Figure:
     """The laned interval table as a figure: one bar per row, one row of bars per lane.
 
     Lanes run down the page in the order they first show activity, which puts
     the window's opening lane at the top and reads as the session list growing.
+
+    Drawn against `zone`'s wall clock, not UTC. The conversion happens here and
+    nowhere else: the table stays UTC, and only the picture is local.
     """
     if "lane" not in frame.columns:
         raise TimelineError("frame carries no lane column; pass it through laned first")
@@ -188,14 +227,19 @@ def timeline_figure(frame: pd.DataFrame, title: str = DEFAULT_TITLE) -> go.Figur
     if unknown:
         raise TimelineError(f"no colour is defined for state {', '.join(unknown)}")
 
-    order = _lane_order(frame)
+    local = _localised(frame, zone)
+    order = _lane_order(local)
     figure = go.Figure(
         [
-            _state_bars(state, frame[frame["state"] == state])
+            _state_bars(state, local[local["state"] == state])
             for state in STATE_COLOURS
-            if (frame["state"] == state).any()
+            if (local["state"] == state).any()
         ]
     )
+    for start, end in _night_bands(local):
+        figure.add_vrect(
+            x0=start, x1=end, fillcolor=NIGHT_COLOUR, line_width=0, layer="below"
+        )
     figure.update_layout(
         title=title,
         barmode="overlay",
@@ -203,9 +247,15 @@ def timeline_figure(frame: pd.DataFrame, title: str = DEFAULT_TITLE) -> go.Figur
         height=CHROME_HEIGHT + LANE_HEIGHT * len(order),
         hovermode="closest",
         legend={"orientation": "h", "y": 1.03, "yanchor": "bottom"},
-        margin={"l": LEFT_MARGIN, "r": 30, "t": 80, "b": 40},
+        margin={"l": LEFT_MARGIN, "r": 30, "t": 80, "b": 60},
         plot_bgcolor="white",
-        xaxis={"type": "date", "gridcolor": GRID_COLOUR, "showgrid": True},
+        xaxis={
+            "type": "date",
+            "gridcolor": GRID_COLOUR,
+            "showgrid": True,
+            "tickformat": TICK_FORMAT,
+            "title": {"text": _zone_label(local, zone)},
+        },
         yaxis={
             "type": "category",
             "categoryorder": "array",
@@ -221,17 +271,75 @@ def timeline_figure(frame: pd.DataFrame, title: str = DEFAULT_TITLE) -> go.Figur
     return figure
 
 
-def write_timeline(frame: pd.DataFrame, path: Path, title: str = DEFAULT_TITLE) -> Path:
+def write_timeline(
+    frame: pd.DataFrame,
+    path: Path,
+    title: str = DEFAULT_TITLE,
+    zone: str = DISPLAY_ZONE,
+) -> Path:
     """The laned table written to `path` as one self-contained HTML file.
 
     plotly.js is inlined, so the file is about four megabytes and needs no
     network to open. Returns the path, for a caller that wants to report it.
     """
     path.write_text(
-        timeline_figure(frame, title).to_html(include_plotlyjs="inline"),
+        timeline_figure(frame, title, zone).to_html(include_plotlyjs="inline"),
         encoding="utf-8",
     )
     return path
+
+
+# --- the local clock ----------------------------------------------------------
+
+
+def _localised(frame: pd.DataFrame, zone: str) -> pd.DataFrame:
+    """`frame` with its bounds moved to `zone`'s wall clock and the offset dropped.
+
+    Dropped rather than carried: plotly renders a tz-aware timestamp by its UTC
+    instant, so the only way to draw a local clock is to hand it the local
+    reading as if it were naive. Everything downstream of here is presentation.
+    """
+    try:
+        ZoneInfo(zone)
+    except Exception as error:
+        raise TimelineError(f"{zone!r} is not a time zone: {error}") from error
+    moved = frame.copy()
+    for column in ("start", "end"):
+        moved[column] = frame[column].dt.tz_convert(zone).dt.tz_localize(None)
+    return moved
+
+
+def _zone_label(local: pd.DataFrame, zone: str) -> str:
+    """The axis title: the zone, and the abbreviation in force over the window.
+
+    Taken from the window's own first instant rather than from now, so a picture
+    of a week in January says EST when it is read in July.
+    """
+    moment = local["start"].min()
+    if pd.isna(moment):
+        return zone
+    abbreviation = moment.tz_localize(zone).strftime("%Z")
+    return f"{zone} ({abbreviation})" if abbreviation else zone
+
+
+def _night_bands(local: pd.DataFrame) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+    """Every night the window touches, as local-clock spans to shade.
+
+    Emitted one calendar day at a time and clipped to the window, so a window
+    opening mid-evening gets the remainder of that night and no more.
+    """
+    first, last = local["start"].min(), local["end"].max()
+    if pd.isna(first) or pd.isna(last):
+        return []
+    bands = []
+    day = first.normalize() - pd.Timedelta(days=1)
+    while day <= last.normalize():
+        start = day + pd.Timedelta(hours=NIGHT_FROM)
+        end = day + pd.Timedelta(days=1, hours=NIGHT_TO)
+        if end > first and start < last:
+            bands.append((max(start, first), min(end, last)))
+        day += pd.Timedelta(days=1)
+    return bands
 
 
 # --- what each session was working on, moment by moment -----------------------
@@ -298,6 +406,7 @@ def _state_bars(state: str, rows: pd.DataFrame) -> go.Bar:
         base=rows["start"],
         x=seconds * MILLISECONDS,
         y=rows["lane"],
+        width=[_thickness(value) for value in rows["confidence"]],
         orientation="h",
         marker={
             "color": [_shade(state, value) for value in rows["confidence"]],
@@ -316,11 +425,21 @@ def _shade(state: str, confidence: float) -> str:
     return f"rgba({red}, {green}, {blue}, {opacity:.3f})"
 
 
+def _thickness(confidence: float) -> float:
+    """How much of its lane a bar fills, in lane units.
+
+    The correction that keeps a long guess from reading as a long fact. Width is
+    already spoken for — it is the span — so height is the only channel left to
+    carry how much the row is worth, and a reader's eye multiplies the two.
+    """
+    return FULL_THICKNESS * (MIN_THICKNESS + (1 - MIN_THICKNESS) * confidence)
+
+
 def _hover_text(rows: pd.DataFrame) -> list[str]:
     """One label per row: what it claims, where, when, for how long, how strongly."""
     return [
         f"<b>{row.state}</b> — {row.lane}<br>"
-        f"{row.start:%Y-%m-%d %H:%M:%S} → {row.end:%H:%M:%S}<br>"
+        f"{row.start:%a %d %b %H:%M:%S} → {row.end:%a %d %b %H:%M:%S}<br>"
         f"{human_seconds((row.end - row.start).total_seconds())} "
         f"at {row.confidence:.0%} confidence"
         for row in rows.itertuples()

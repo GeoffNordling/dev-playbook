@@ -53,7 +53,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from dev_playbook.measure.intervals import STOP, SUBMIT, interval_frame
+from dev_playbook.measure.intervals import INTERRUPTED, STOP, SUBMIT, interval_frame
 
 HUMAN_PRESENT = "human_present"
 
@@ -281,6 +281,40 @@ def presence_intervals(events: pd.DataFrame) -> Presence:
             drop=True
         ),
         fit,
+    )
+
+
+def grade_interrupts(frame: pd.DataFrame, fit: MixtureFit) -> pd.DataFrame:
+    """`frame` with each `interrupted` row's confidence refitted to its own length.
+
+    An interrupted turn is closed at the next submit, which is the interrupt
+    instant only if the human resubmitted straight away. Everything after the
+    interrupt is the same unobserved thing a `Stop`-to-submit gap is, so it takes
+    the same fitted probability: an interrupt the human returned from in thirty
+    seconds stays all but certain, and one that swallowed a night falls to near
+    zero along with the claim that Claude was working through it.
+
+    Left at 1.0 these rows are the loudest thing in the picture — over the whole
+    store one 15.7-hour row carries 83 % of all interrupted time, drawn as solid
+    as a measured turn. Grading is what stops the longest and least trustworthy
+    span from also being the most visible.
+
+    Every other state is returned untouched, so this composes onto a table that
+    already holds definitive and graded rows alike.
+    """
+    if frame.empty:
+        return frame
+    lengths = (frame["end"] - frame["start"]).dt.total_seconds()
+    if (lengths[frame["state"] == INTERRUPTED] <= 0).any():
+        raise PresenceError("an interrupted row spans zero seconds, which has no fit")
+    graded = [
+        fit.presence(length) if state == INTERRUPTED else confidence
+        for state, length, confidence in zip(
+            frame["state"], lengths, frame["confidence"], strict=True
+        )
+    ]
+    return frame.assign(
+        confidence=pd.Series(graded, index=frame.index, dtype="float64")
     )
 
 

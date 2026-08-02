@@ -222,7 +222,12 @@ def test_a_bar_is_drawn_only_where_an_interval_claims_a_span() -> None:
     figure = timeline.timeline_figure(timeline.laned(table))
     bars = trace_named(figure, "claude_active")
 
-    assert list(pd.to_datetime(bars.base, utc=True)) == [at(1), at(20)]
+    # Bars are drawn against the display zone's wall clock, so the bases come
+    # back naive and shifted by that zone's offset.
+    assert list(pd.to_datetime(bars.base)) == [
+        at(second).tz_convert(timeline.DISPLAY_ZONE).tz_localize(None)
+        for second in (1, 20)
+    ]
     assert list(bars.x) == [2000.0, 1000.0]
 
 
@@ -311,3 +316,87 @@ def test_the_written_page_carries_the_title_it_was_given(tmp_path: Path) -> None
     timeline.write_timeline(timeline.laned(table), tmp_path / "view.html", "a Tuesday")
 
     assert "a Tuesday" in (tmp_path / "view.html").read_text(encoding="utf-8")
+
+
+# --- confidence carried as thickness ------------------------------------------
+
+
+def test_a_certain_bar_draws_at_full_thickness() -> None:
+    table = a_table(an_interval(1, 2, confidence=1.0))
+
+    figure = timeline.timeline_figure(timeline.laned(table))
+
+    assert figure.data[0].width[0] == pytest.approx(timeline.FULL_THICKNESS)
+
+
+def test_an_all_but_certain_absence_draws_as_a_hairline() -> None:
+    table = a_table(an_interval(1, 2, state="human_present", confidence=0.006))
+
+    figure = timeline.timeline_figure(timeline.laned(table))
+
+    assert figure.data[0].width[0] < timeline.FULL_THICKNESS / 10
+
+
+def test_a_zero_confidence_bar_still_draws() -> None:
+    table = a_table(an_interval(1, 2, state="human_present", confidence=0.0))
+
+    figure = timeline.timeline_figure(timeline.laned(table))
+
+    assert figure.data[0].width[0] > 0
+
+
+def test_thickness_rises_with_confidence() -> None:
+    table = a_table(
+        an_interval(1, 2, state="human_present", confidence=0.1),
+        an_interval(3, 4, state="human_present", confidence=0.9),
+    )
+
+    widths = timeline.timeline_figure(timeline.laned(table)).data[0].width
+
+    assert widths[0] < widths[1]
+
+
+# --- the local clock ----------------------------------------------------------
+
+
+def test_bars_are_drawn_against_the_display_zone_rather_than_utc() -> None:
+    table = a_table(an_interval(1, 2))
+
+    figure = timeline.timeline_figure(timeline.laned(table), zone="America/New_York")
+
+    drawn = pd.Timestamp(figure.data[0].base[0])
+    assert drawn.tzinfo is None
+    assert drawn == at(1).tz_convert("America/New_York").tz_localize(None)
+
+
+def test_the_axis_names_the_zone_it_is_drawn_in() -> None:
+    table = a_table(an_interval(1, 2))
+
+    figure = timeline.timeline_figure(timeline.laned(table), zone="America/New_York")
+
+    assert "America/New_York" in figure.layout.xaxis.title.text
+
+
+def test_ticks_carry_the_day_of_the_week() -> None:
+    table = a_table(an_interval(1, 2))
+
+    figure = timeline.timeline_figure(timeline.laned(table))
+
+    assert "%a" in figure.layout.xaxis.tickformat
+
+
+def test_a_zone_that_does_not_exist_is_refused() -> None:
+    table = a_table(an_interval(1, 2))
+
+    with pytest.raises(timeline.TimelineError, match="not a time zone"):
+        timeline.timeline_figure(timeline.laned(table), zone="Mars/Olympus")
+
+
+def test_night_is_shaded_behind_the_bars() -> None:
+    table = a_table(an_interval(0, 60 * 60 * 30))
+
+    figure = timeline.timeline_figure(timeline.laned(table))
+
+    shaded = [shape for shape in figure.layout.shapes if shape.type == "rect"]
+    assert shaded
+    assert all(shape.layer == "below" for shape in shaded)
