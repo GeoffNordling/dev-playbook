@@ -8,6 +8,7 @@ Nothing here governs; the standards do that.
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
 - [Sandboxing Claude agents](/docs/sandboxing.md) — Comparing sandbox solutions for isolating a Claude agent's filesystem, network, and processes
+- [Tapless Conversion Inventory](/docs/tapless-conversion-inventory.md) — Point-in-time inventory of SSH/tap-era literals, prose, and config across the repo, feeding the tapless conversion issues under map #322
 
 ## Directories
 
