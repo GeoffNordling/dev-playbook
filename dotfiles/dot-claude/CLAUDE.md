@@ -49,6 +49,23 @@ After a unit of work, stop. The user reviews diffs in VS Code, then tells you wh
 
 A plan that says commits happen in two phases is a plan, not authorization. Wait for an explicit "commit now" each time.
 
+### Always pin a subagent's model
+
+Never launch an agent without its model specified — the Agent tool, a Workflow
+`agent()` call, any of them. An omitted model inherits the session's, which on
+an expensive session silently spends expensive tokens on simpler scouting work.
+Pin it every time, and name the pick on screen in the same message — e.g.
+"three Sonnet scouts on the file inventory, one Opus on the coupling analysis."
+
+Choose by the character of the job, never by what the session is running on:
+
+- **Sonnet** — research and exploration, where nothing is decided: reading an
+  API, extracting text verbatim, summarizing.
+- **Opus** — anything more complex than Sonnet handles: small decisions with
+  low ambiguity, or construction of small artifacts — mapping territory,
+  research spikes, building to a written brief.
+- **Fable** — never, unless the user asked for it by name.
+
 ### Ask in prose, never AskUserQuestion
 
 `AskUserQuestion` is denied globally in `~/.claude/settings.json` — deliberate,
