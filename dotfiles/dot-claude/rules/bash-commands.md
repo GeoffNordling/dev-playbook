@@ -135,19 +135,16 @@ reached through the credential helper. So `git fetch`, `git pull`, and
 to the push rules below. No remote git operation in this workspace is
 interactive, so none of them belong in the hand-off section above.
 
-The canonical commands, each already granted in settings:
-
-    git push -u origin <branch>
-    git push --no-verify -u origin <branch>
-    git fetch --prune origin
-    git pull --ff-only origin main
-
-Three push families are denied outright, by permission rule and by the
+Four push families are denied outright, by permission rule and by the
 `git-authority` PreToolUse hook: anything targeting `main`, anything forcing
-(including `--force-with-lease`), and anything deleting a remote ref. **A denied
-operation is refused, never re-spelled** — do not look for a wording that gets
-past the rule. Hand it to the user for their own terminal and say why. See
-[git-authority](~/workspace/dev-playbook/software-factory/git-authority.md).
+(including `--force-with-lease`), anything deleting a remote ref, and a bare
+`git push` naming neither remote nor refspec. **A denied operation is refused,
+never re-spelled** — do not look for a wording that gets past the rule. Hand it
+to the user for their own terminal and say why.
+
+[git-authority](~/workspace/dev-playbook/software-factory/git-authority.md)
+holds the canonical spellings the allowlist grants — write a remote command
+that way, because a variant meaning the same thing may still prompt.
 
 For a read-only check that needs no clone state (e.g. "does local `main` match
 `origin/main`?"), `gh api` is still the cheapest route:

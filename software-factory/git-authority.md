@@ -8,12 +8,14 @@ description: The layers deciding which git operations an agent may run, the push
 
 Every remote is HTTPS and git authenticates with the same keyring PAT `gh`
 uses, reached through the credential helper. Nothing in this workspace needs a
-hardware token, so pushing is no longer a human-only act — which makes the
-question "may this agent run this git command?" one the machine has to answer,
-every time, on its own.
+hardware token, so pushing is an agent's own act — which makes the question
+"may this agent run this git command?" one the machine has to answer, every
+time, on its own.
 
-Four layers answer it. Each is narrower than the last, and the binding rule
-across all of them is one sentence:
+Five layers answer it: three decide (the deny block, the hook, the allowlist),
+one says the same thing in prose to the hands-off classifier, and one is
+GitHub's own last backstop. The binding rule across all of them is one
+sentence:
 
 > **A denied operation is refused, never re-spelled.**
 
@@ -58,22 +60,31 @@ Three families are refused outright, in every spelling:
   delete-on-merge. `--delete`, `-d` and the empty-source refspec `:branch` all
   delete.
 
-Two further rules protect the first three:
+Three further rules protect the first three:
 
 - **A push must name both a remote and a refspec.** Bare `git push`, and
   `git push origin` with no ref, leave the target to configuration — invisible
   state, and unreviewable.
-- **A push the hook cannot read is refused unread.** Behind `bash -c`, a
-  command substitution, a variable expansion, or in a segment that will not
-  lex, the hook cannot see what would run. It fails closed.
+- **A push must name the branch it writes.** `HEAD` and its `@` synonym are
+  whatever branch the checkout is standing on, which on a main checkout is
+  main. Write the branch, or the `HEAD:issue-9` form.
+- **A push the hook cannot read is refused unread.** Behind `bash -c`, inside a
+  command substitution, or with a variable expansion where the remote or the
+  refspec belongs, the hook cannot see what would run. It fails closed.
 
-The hook splits a command on `&&`, `||`, `;`, `|`, `&` and newlines and judges
-each segment, so chaining hides nothing.
+The hook splits a command on `&&`, `||`, `;`, `|`, `&` and newlines — respecting
+quoting, so a `;` inside a commit message separates nothing — and judges each
+segment on its own lexed argv, so chaining hides nothing. A segment that will
+not lex at all is refused only where its text resolves to a `git … push`: an
+ordinary command carrying the word "push" is not a push, and refusing it would
+stop work this hook has no authority over.
 
 **The commit rule family** — the commit lanes, their agent allowlist and the
 `/commit-on` marker — is not built yet. It lands in slice B of
 [#341](https://github.com/GeoffNordling/dev-playbook/issues/341) and extends
-this file. Until then `git commit` is governed exactly as it always was.
+this file. Until then no layer here holds an opinion on `git commit`: it is
+governed by the permission rules alone, and the hook reads `git push` segments
+only.
 
 ## The canonical commands
 

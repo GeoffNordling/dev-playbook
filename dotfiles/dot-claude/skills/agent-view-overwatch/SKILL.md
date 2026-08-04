@@ -53,7 +53,7 @@ It leads with the issue's **state** — two **orthogonal** dimensions, **Activit
 
 **Status** (health): 💚 **healthy** — in progress or ready to advance; nothing wrong. ❌ **blocked** — cannot proceed; a dependency is unmet. ⏸️ **paused** — deliberately tabled. ❗ **escalated** — an overwatch stopped and is waiting for the user's attention.
 
-Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A merge or verdict pending at an issue's own overwatch is not its own glyph — it reads as 💤💚 with the action named in **Notes**; acting on it is that overwatch's job, not yours.
+Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A merge or verdict pending at an issue's own overwatch is not its own glyph — it reads as 💤💚 with the action named in **Notes**; carrying it to the user is that overwatch's job, not yours.
 
 ```
 | ⚑ | Handle | PR | Purpose | Node | Notes |

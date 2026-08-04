@@ -29,7 +29,7 @@ DONE: <repo>#<issue> · phase: <node> · PR #<n> open
 
 ## Escalate
 
-Origin doesn't hold the implementation as committed — the branch was never pushed, or local commits sit ahead of the last push. Either way the committing node left work behind, which is its problem to fix and not this skill's to paper over. Emit the terminal line naming which, then stop:
+Origin doesn't hold the implementation as committed — the branch was never pushed, or local commits sit ahead of the last push. Emit the terminal line naming which, then stop:
 
 ```
 ESCALATE: <repo>#<issue> · phase: <node> · branch issue-<issue> <isn't on origin | is stale on origin> — local commits unpushed

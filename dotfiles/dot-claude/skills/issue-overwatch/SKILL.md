@@ -89,7 +89,7 @@ The audit subagents post findings and terminate; the verdict interview is yours.
 
 On entering `phase:judgments`, read [judgments-node.md](references/judgments-node.md) and follow it.
 
-## 7. Pushes, and the one turn boundary left
+## 7. Pushes, and the merge boundary
 
 The git commands the traverse needs are yours to run, each as its own top-level call:
 
