@@ -15,7 +15,8 @@ in, so governance is declared rather than inferred. For each governed repo:
     repository object omits every merge field for a fine-grained token — a 200
     whose body simply lacks them, whatever permissions the token carries — which
     would read as six drifted settings on every repo. A repo the API cannot
-    reach, or with no GitHub origin, is reported loudly.
+    reach, or whose origin is missing or not in canonical HTTPS form, is
+    reported loudly.
   - **protection** — read the rules in force on the default branch and require
     the two that deny destructive operations: no force-push, no deletion. The
     read is of the branch's effective rules, not of the ruleset list, so how a
@@ -562,9 +563,10 @@ def check_settings(repo: Path, origin: Origin) -> list[Line]:
 def check_protection(repo: Path, slug: str | None) -> list[Line]:
     """The default branch's protection against destructive operations.
 
-    A repo with no GitHub origin draws nothing here: ``check_settings`` already
-    reports that once, and one missing origin should not print twice under two
-    rule ids.
+    A repo whose origin this cannot use — absent, or in a form the workspace
+    does not operate — draws nothing here: ``check_settings`` already reports
+    which of the two it is, and one unusable origin should not print twice
+    under two rule ids.
     """
     name = repo.name
     if slug is None:
@@ -994,8 +996,9 @@ def _fetch_or_report(
 def check_tracking(repo: Path, slug: str | None) -> list[Line]:
     """The live-repo label and issue checks, from one labels and one issues fetch.
 
-    Skipped when the repo has no GitHub origin — check_settings has already
-    reported that.
+    Skipped when the repo's origin is unusable — absent, or in a form the
+    workspace does not operate — because check_settings has already reported
+    which of the two it is.
     """
     if slug is None:
         return []

@@ -208,9 +208,17 @@ def resolve(workspace: Path, roster: tuple[str, ...], sha: str | None) -> Plan:
     """
     url = workspace_lint.hook_repo_url()
     target = sha or workspace_lint.hook_repo_main()
-    slug = workspace_lint.origin_of(HOOK_REPO_ROOT).slug
-    if slug is None:
-        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}; cannot verify {target}")
+    origin = workspace_lint.origin_of(HOOK_REPO_ROOT)
+    if origin.slug is None:
+        # The two unusable origins call for different repairs, and naming the
+        # wrong one sends the operator hunting a remote that is plainly there.
+        raise ToolError(
+            f"no GitHub origin in {HOOK_REPO_ROOT}; cannot verify {target}"
+            if origin.url is None
+            else f"origin of {HOOK_REPO_ROOT} is not in canonical HTTPS form "
+            f"({origin.url}); cannot verify {target}"
+        )
+    slug = origin.slug
     if workspace_lint.gh_api(f"repos/{slug}/commits/{target}") is None:
         raise ToolError(
             f"{target} is not on {slug}; push dev-playbook before bumping consumers"

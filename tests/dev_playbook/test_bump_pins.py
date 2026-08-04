@@ -209,3 +209,36 @@ def test_bump_restores_the_pin_when_the_gate_cannot_run(
         bump_pins.bump(repo, plan, dry_run=False)
     assert (repo / ".pre-commit-config.yaml").read_text(encoding="utf-8") == CONFIG
     assert not bump_pins.git_out(repo, "status", "--porcelain")
+
+
+def stub_origin(monkeypatch: pytest.MonkeyPatch, origin: workspace_lint.Origin) -> None:
+    """The hook repo's origin as resolve() will read it, with the network shut off."""
+    monkeypatch.setattr(workspace_lint, "origin_of", lambda repo: origin)
+    monkeypatch.setattr(workspace_lint, "hook_repo_url", lambda: URL)
+    monkeypatch.setattr(workspace_lint, "hook_repo_main", lambda: NEW)
+
+
+def test_resolve_names_a_wrongly_spelled_origin_rather_than_a_missing_one(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stub_origin(
+        monkeypatch,
+        workspace_lint.Origin(
+            url="git@github.com:GeoffNordling/dev-playbook", slug=None
+        ),
+    )
+
+    with pytest.raises(bump_pins.ToolError) as caught:
+        bump_pins.resolve(Path("/nowhere"), (), None)
+
+    assert "git@github.com:GeoffNordling/dev-playbook" in str(caught.value)
+    assert "no GitHub origin" not in str(caught.value)
+
+
+def test_resolve_reports_a_repo_with_no_origin_at_all_as_having_none(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stub_origin(monkeypatch, workspace_lint.Origin(url=None, slug=None))
+
+    with pytest.raises(bump_pins.ToolError, match="no GitHub origin"):
+        bump_pins.resolve(Path("/nowhere"), (), None)
