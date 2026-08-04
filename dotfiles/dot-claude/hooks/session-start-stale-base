@@ -3,8 +3,9 @@
 #
 # Multi-machine repos go stale silently — main moves on the other machine and
 # nothing here says so until work has already landed on the old base. This
-# checks, at every session start on a checkout standing on main, whether
-# GitHub's main holds commits this checkout does not.
+# checks, at every session start, whether GitHub's main holds commits the local
+# main ref does not. Worktrees share that ref, so the answer is the same from
+# anywhere in the repo and every session gets told.
 #
 # Silent on success. stdout is the only signal reaching the agent, and every
 # path exits 0: a non-zero exit means "the hook broke", never "the check
@@ -48,17 +49,17 @@ git rev-parse --verify --quiet main >/dev/null || {
 	exit 0
 }
 
-# Only a checkout standing on main can act on this. The remedy below moves the
-# very ref the comparison reads, and `git pull --ff-only origin main` moves it
-# only from main: elsewhere it merges origin/main into whatever branch is out,
-# which fails the moment that branch holds a commit and leaves local main —
-# and so the next session's verdict — untouched. Worktrees share refs, so
-# without this guard the comparison passes on main while HEAD sits on an issue
-# branch, and every factory node opens with a false halt it cannot clear.
-[ "$(git branch --show-current)" = "main" ] || {
-	note "skip: not on main"
-	exit 0
-}
+# The remedy has to run where main is checked out. `git pull --ff-only origin
+# main` moves the ref this check reads only from main: run anywhere else it
+# merges origin/main into whatever branch is out, which fails the moment that
+# branch holds a commit and leaves local main — and so the next session's
+# verdict — untouched. `--git-common-dir` names the main checkout's .git from
+# anywhere in the repo, worktrees included, so its parent is the directory the
+# pull is prescribed against. Worktrees share the ref it moves, which is what
+# lets a worktree session clear this without leaving its own branch.
+main_checkout=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
+main_checkout_branch=$(git -C "$main_checkout" branch --show-current)
+main_checkout_branch=${main_checkout_branch:-a detached HEAD}
 
 # Hooks are harness subprocesses, not Bash-tool calls: there is no bwrap jail
 # here, so wrapping gh in `timeout` is safe and keeps an offline machine from
@@ -82,8 +83,23 @@ note "STALE: github at $remote_sha"
 cat <<EOF
 STOP — stale base. Do not answer the user's request yet.
 GitHub's main ($remote_sha) holds commits this checkout does not.
-Before anything else, bring the checkout current:
-    git pull --ff-only origin main
-Do not read, edit, commit, or branch until that succeeds. If it cannot
-fast-forward, the checkout has diverged — say so and stop; do not force it.
 EOF
+
+if [ "$main_checkout_branch" = "main" ]; then
+	cat <<EOF
+Before anything else, bring main current:
+    git -C $main_checkout pull --ff-only origin main
+Every worktree of this repo shares the ref that moves, so this one command
+clears the check for this session too, wherever it is standing. Do not read,
+edit, commit, or branch until it succeeds. If it cannot fast-forward, main has
+diverged — say so and stop; do not force it.
+EOF
+else
+	cat <<EOF
+Main cannot be refreshed from here: its checkout ($main_checkout) is standing
+on $main_checkout_branch, and the pull that moves main only moves it from main.
+Tell the user, and stop. Do not read, edit, commit, or branch, and do not pull
+into the branch that is out instead — that merges origin/main into it and
+leaves main stale.
+EOF
+fi
