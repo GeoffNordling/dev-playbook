@@ -135,6 +135,21 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
     return front, body
 
 
+# The two directories the harness reads agent definitions from: a consumer repo
+# carries them under .claude/, dev-playbook authors them in the Stow source
+# tree. Anchored at the repo root rather than matched on the directory name,
+# because "agents" is an ordinary word for a directory of prose — a governed
+# repo's docs/agents/ is documentation, and must keep its OKF frontmatter and
+# the type-lint that reads it.
+AGENT_ROOTS = (".claude/agents", "dotfiles/dot-claude/agents")
+
+
+def is_agent_definition(relpath: str) -> bool:
+    """Whether ``relpath`` is a file in the harness's subagent spawn registry."""
+    posix = PurePosixPath(relpath).as_posix()
+    return any(posix.startswith(f"{root}/") for root in AGENT_ROOTS)
+
+
 def classify(relpath: str) -> str:
     """Classify a repo-relative path within the OKF bundle taxonomy.
 
@@ -151,9 +166,10 @@ def classify(relpath: str) -> str:
       is subject to the type-lint.
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
-      ``references/``/``scripts/``, ``rules/``, ``agents/`` (the subagent spawn
-      registry — each file an agent definition the harness reads at session
-      start), every top-level ``tests/`` tree (parser fixtures — tool-consumed,
+      ``references/``/``scripts/``, ``rules/``, the two ``AGENT_ROOTS`` (the
+      subagent spawn registry — each file an agent definition the harness reads
+      at session start), every top-level ``tests/`` tree (parser fixtures —
+      tool-consumed,
       often deliberately malformed; see the tests-tree boundary in
       standards/docs/bundle.md), and every non-``.md`` file.
 
@@ -180,7 +196,7 @@ def classify(relpath: str) -> str:
         return "index"
     if name in {"CLAUDE.md", "SKILL.md"}:
         return "harness"
-    if "rules" in dirparts or "agents" in dirparts:
+    if "rules" in dirparts or is_agent_definition(relpath):
         return "harness"
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):
         return "harness"

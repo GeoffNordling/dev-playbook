@@ -116,6 +116,11 @@ class TestClassify:
             ("dotfiles/dot-claude/rules/bash-commands.md", "harness"),
             ("dotfiles/dot-claude/agents/builder.md", "harness"),
             (".claude/agents/reviewer.md", "harness"),
+            # An agents/ directory the harness never reads is ordinary prose,
+            # and keeps its OKF frontmatter and the type-lint with it.
+            ("docs/agents/roles.md", "concept"),
+            ("readings/agents/notes.md", "concept"),
+            ("standards/agents/index.md", "index"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
             ("tools/bin/ref-lint", "harness"),
