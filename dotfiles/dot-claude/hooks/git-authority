@@ -1,0 +1,226 @@
+#!/usr/bin/env python3
+"""Claude Code PreToolUse hook: the client-side authority over git push.
+
+Reads one PreToolUse event on stdin and either says nothing — the no-opinion
+verdict, which falls the call through to the permission rules — or denies.
+
+Python 3 stdlib only, no configuration: a hook runs on every Bash call of every
+session, so it may not depend on an interpreter's package set or a knob.
+"""
+
+import json
+import re
+import shlex
+import sys
+
+# The shell operators the harness itself recognizes as command separators. A
+# rule that read only the first command would be evaded by chaining, so each
+# segment is parsed and judged on its own.
+SEPARATORS = re.compile(r"&&|\|\||;|\||&|\n")
+
+# Wrappers that put a command out of reach of argv parsing. A push that is only
+# reachable through one of these is denied unread: the hook cannot see what it
+# would run, and an unreadable push is not a push anyone has authorized.
+WRAPPERS = frozenset({"bash", "sh", "zsh", "dash", "env", "xargs", "timeout", "eval"})
+
+# Substitutions that hide a command inside another one, by the same reasoning.
+SUBSTITUTIONS = ("$(", "`", "${")
+
+# git's own options, taken before the subcommand, that consume the next token.
+GIT_VALUE_OPTIONS = frozenset(
+    {
+        "-C",
+        "-c",
+        "--git-dir",
+        "--work-tree",
+        "--namespace",
+        "--exec-path",
+        "--config-env",
+    }
+)
+
+# git push options that consume the next token.
+PUSH_VALUE_OPTIONS = frozenset(
+    {"-o", "--push-option", "--receive-pack", "--exec", "--repo"}
+)
+
+# Every option spelling that forces. --force-with-lease is here with the rest by
+# ruling: it is safer than --force and still rewrites published history.
+FORCE_FLAGS = frozenset({"-f", "--force", "--force-with-lease", "--force-if-includes"})
+
+# Every option spelling that deletes a remote ref. The empty-source refspec
+# (``:branch``) deletes too, and is caught on the operands rather than here.
+DELETE_FLAGS = frozenset({"-d", "--delete"})
+
+
+def deny(reason: str) -> None:
+    """Print the deny decision and exit.
+
+    The reason reaches the model verbatim, so it names the ruling rather than
+    the mechanism: a denied operation is refused, never re-spelled.
+    """
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": reason,
+                }
+            }
+        )
+    )
+    sys.exit(0)
+
+
+def segments(command: str) -> list[str]:
+    """The command's shell segments — what the harness matches independently."""
+    return [part.strip() for part in SEPARATORS.split(command) if part.strip()]
+
+
+def unreadable_push(segment: str) -> bool:
+    """Whether ``segment`` may be a push this hook cannot read.
+
+    Fails closed. A push behind ``bash -c``, a command substitution, or a
+    variable expansion is a push whose target this cannot see, and a segment
+    that will not lex at all could be anything. None of those can be cleared,
+    so all of them are refused — which is also why no rule here has an
+    override marker: the escape hatch is the human's own terminal.
+    """
+    if "push" not in segment:
+        return False
+    if any(marker in segment for marker in SUBSTITUTIONS):
+        return True
+    try:
+        argv = shlex.split(segment)
+    except ValueError:
+        return True
+    return bool(argv) and argv[0] in WRAPPERS
+
+
+def push_argv(segment: str) -> list[str] | None:
+    """The argv of ``segment`` after its ``push`` token, or None if it is no push."""
+    argv = shlex.split(segment)
+    if not argv or argv[0] != "git":
+        return None
+    index = 1
+    while index < len(argv) and argv[index].startswith("-"):
+        if argv[index] in GIT_VALUE_OPTIONS:
+            index += 2
+        else:
+            index += 1
+    if index >= len(argv) or argv[index] != "push":
+        return None
+    return argv[index + 1 :]
+
+
+def flags(argv: list[str]) -> set[str]:
+    """Every option token in ``argv``, with short bundles split into letters.
+
+    ``-fu`` is git's own spelling of ``-f -u``, so a rule reading tokens alone
+    would miss a forced push written that way.
+    """
+    found: set[str] = set()
+    for token in argv:
+        if not token.startswith("-") or token == "-":
+            continue
+        if token.startswith("--"):
+            found.add(token.split("=", 1)[0])
+        elif re.fullmatch(r"-[A-Za-z]+", token):
+            found.update(f"-{letter}" for letter in token[1:])
+        else:
+            found.add(token)
+    return found
+
+
+def operands(argv: list[str]) -> list[str]:
+    """The non-option arguments of a push — the remote, then its refspecs."""
+    found: list[str] = []
+    skip = False
+    for token in argv:
+        if skip:
+            skip = False
+            continue
+        if token.startswith("-") and token != "-":
+            if token in PUSH_VALUE_OPTIONS:
+                skip = True
+            continue
+        found.append(token)
+    return found
+
+
+def destination(refspec: str) -> str:
+    """The branch a refspec writes to, normalized to a bare short name.
+
+    ``main``, ``HEAD:main``, ``issue-9:refs/heads/main`` and ``+HEAD:main`` all
+    write to main; each carries the destination on the right of the colon, or
+    is the destination entire when there is no colon.
+    """
+    target = refspec.removeprefix("+")
+    _, colon, right = target.partition(":")
+    if colon:
+        target = right
+    return target.removeprefix("refs/heads/")
+
+
+def judge(argv: list[str]) -> str | None:
+    """The ruling one push's argv breaks, or None when it breaks none."""
+    found = operands(argv)
+    if len(found) < 2:
+        return (
+            "git push must name both a remote and a refspec — a push whose "
+            "target is implied is invisible state. Write it out in full."
+        )
+    refspecs = found[1:]
+    written = flags(argv)
+    if any(destination(refspec) == "main" for refspec in refspecs):
+        return (
+            "main is written by merging a pull request, never by pushing to "
+            "it. Open a PR from this branch instead."
+        )
+    if written & FORCE_FLAGS or any(refspec.startswith("+") for refspec in refspecs):
+        return (
+            "A forced push rewrites published history, including with "
+            "--force-with-lease. There is no agent lane for it: discuss the "
+            "repair with the top-level session, and the human types it in "
+            "their own terminal."
+        )
+    if written & DELETE_FLAGS or any(refspec.startswith(":") for refspec in refspecs):
+        return (
+            "The only remote-branch deletion is GitHub's delete-on-merge. "
+            "Leave the branch alone."
+        )
+    return None
+
+
+def main() -> None:
+    """Read the event off stdin and print the verdict, if there is one."""
+    try:
+        event = json.loads(sys.stdin.read())
+    except ValueError:
+        return
+    if not isinstance(event, dict) or event.get("tool_name") != "Bash":
+        return
+    tool_input = event.get("tool_input")
+    if not isinstance(tool_input, dict):
+        return
+    command = tool_input.get("command")
+    if not isinstance(command, str):
+        return
+    for segment in segments(command):
+        if unreadable_push(segment):
+            deny(
+                "This hook reads every push before it runs, and it cannot read "
+                "this one — it is wrapped, substituted, or unlexable. Write the "
+                "push out as a plain, top-level command."
+            )
+        argv = push_argv(segment)
+        if argv is None:
+            continue
+        reason = judge(argv)
+        if reason is not None:
+            deny(reason)
+
+
+if __name__ == "__main__":
+    main()

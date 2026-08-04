@@ -38,15 +38,82 @@
       "Bash(gh pr checkout *)",
       "Bash(gh pr update-branch *)",
       "Bash(gh pr lock *)",
-      "Bash(gh pr unlock *)"
+      "Bash(gh pr unlock *)",
+      "Bash(git push origin *)",
+      "Bash(git push -u origin *)",
+      "Bash(git push --no-verify -u origin *)",
+      "Bash(git push --no-verify origin *)",
+      "Bash(git -C * push origin *)",
+      "Bash(git -C * push -u origin *)",
+      "Bash(git -C * push --no-verify -u origin *)",
+      "Bash(git -C * push --no-verify origin *)",
+      "Bash(git fetch)",
+      "Bash(git fetch *)",
+      "Bash(git -C * fetch)",
+      "Bash(git -C * fetch *)",
+      "Bash(git pull --ff-only origin main)",
+      "Bash(git -C * pull --ff-only origin main)"
     ],
     "deny": [
-      "AskUserQuestion"
+      "AskUserQuestion",
+      "Bash(git push)",
+      "Bash(git push * main)",
+      "Bash(git push * main *)",
+      "Bash(git push * HEAD:main)",
+      "Bash(git push * HEAD:main *)",
+      "Bash(git push --force)",
+      "Bash(git push --force *)",
+      "Bash(git push * --force)",
+      "Bash(git push * --force *)",
+      "Bash(git push -f)",
+      "Bash(git push -f *)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(git push --force-with-lease)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git push * --force-with-lease)",
+      "Bash(git push * --force-with-lease *)",
+      "Bash(git push --delete *)",
+      "Bash(git push * --delete *)",
+      "Bash(git push -d *)",
+      "Bash(git push * -d *)",
+      "Bash(git -C * push)",
+      "Bash(git -C * push * main)",
+      "Bash(git -C * push * main *)",
+      "Bash(git -C * push * HEAD:main)",
+      "Bash(git -C * push * HEAD:main *)",
+      "Bash(git -C * push --force)",
+      "Bash(git -C * push --force *)",
+      "Bash(git -C * push * --force)",
+      "Bash(git -C * push * --force *)",
+      "Bash(git -C * push -f)",
+      "Bash(git -C * push -f *)",
+      "Bash(git -C * push * -f)",
+      "Bash(git -C * push * -f *)",
+      "Bash(git -C * push --force-with-lease)",
+      "Bash(git -C * push --force-with-lease *)",
+      "Bash(git -C * push * --force-with-lease)",
+      "Bash(git -C * push * --force-with-lease *)",
+      "Bash(git -C * push --delete *)",
+      "Bash(git -C * push * --delete *)",
+      "Bash(git -C * push -d *)",
+      "Bash(git -C * push * -d *)"
     ]
   },
   "model": "opus[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/git-authority\""
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "startup|resume",
@@ -86,7 +153,8 @@
   "autoMode": {
     "allow": [
       "$defaults",
-      "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The software factory's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure."
+      "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The software factory's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure.",
+      "Routine git pushes that name both a remote and a branch refspec are approved — `git push -u origin issue-42`, `git push --no-verify origin issue-42`, and the same commands written with `git -C <path>` — as are `git fetch` in any spelling and the fast-forward-only main pull `git pull --ff-only origin main`. The software factory's hands-off nodes push their own issue branch and refresh their base; these are ordinary writes to a feature branch of our own repository. Pushes that target main in any spelling, force in any spelling (including `--force-with-lease`), or delete a remote ref are never approved and are never re-spelled into an approved form — a denied push is refused and handed to the human, not rewritten."
     ]
   },
   "voiceEnabled": true
