@@ -3,8 +3,8 @@
 #
 # Multi-machine repos go stale silently — main moves on the other machine and
 # nothing here says so until work has already landed on the old base. This
-# checks, at every session start, whether GitHub's main holds commits this
-# checkout does not.
+# checks, at every session start on a checkout standing on main, whether
+# GitHub's main holds commits this checkout does not.
 #
 # Silent on success. stdout is the only signal reaching the agent, and every
 # path exits 0: a non-zero exit means "the hook broke", never "the check
@@ -45,6 +45,18 @@ git remote get-url origin 2>/dev/null | grep -q github.com || {
 }
 git rev-parse --verify --quiet main >/dev/null || {
 	note "skip: no local main"
+	exit 0
+}
+
+# Only a checkout standing on main can act on this. The remedy below moves the
+# very ref the comparison reads, and `git pull --ff-only origin main` moves it
+# only from main: elsewhere it merges origin/main into whatever branch is out,
+# which fails the moment that branch holds a commit and leaves local main —
+# and so the next session's verdict — untouched. Worktrees share refs, so
+# without this guard the comparison passes on main while HEAD sits on an issue
+# branch, and every factory node opens with a false halt it cannot clear.
+[ "$(git branch --show-current)" = "main" ] || {
+	note "skip: not on main"
 	exit 0
 }
 
