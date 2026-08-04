@@ -42,8 +42,12 @@ allow — so it is the layer that actually makes the rulings complete.
 All of it lives in `base.json`, never in `fedora.json` or `wsl.json`: the
 authority over a push is a fact about the work, not about the machine doing it.
 `fedora.json` keeps its wholesale `git` sandbox exclusion, which answers a
-different question — *can git reach its credentials* — not *is this operation
-allowed*.
+different question — *can git run correctly here* — not *is this operation
+allowed*. git is excluded because the harness's protection of `.git/config` and
+`.git/hooks` is not user-overridable and broke sandboxed `git status` and
+`git commit`, per [sandboxing](/docs/sandboxing.md). Narrowing that exemption
+is [#261](https://github.com/GeoffNordling/dev-playbook/issues/261)'s subject,
+and nothing here depends on how it lands.
 
 ## The push rule family
 

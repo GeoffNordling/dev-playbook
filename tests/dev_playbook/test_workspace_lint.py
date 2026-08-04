@@ -1260,7 +1260,7 @@ def _add_origin(repo: Path, url: str) -> None:
     )
 
 
-def test_ambient_git_dir_does_not_redirect_origin_slug(
+def test_ambient_git_dir_does_not_redirect_the_origin_lookup(
     tmp_path: Path, ambient_git_dir: Callable[[str], Path]
 ) -> None:
     target = tmp_path / "target"

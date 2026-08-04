@@ -11,7 +11,7 @@ argument-hint: "<issue-number>"
 
 You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node — nothing launches itself — and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
 
-One hard limit: you never merge — that is the user's, in the GitHub UI. You do push the issue branch yourself (§7), within the push rules: nothing targeting main, nothing forcing, nothing deleting a remote ref.
+One hard limit: you never merge — that is the user's, in the GitHub UI. You do push the issue branch yourself (§7), within the rules [git authority](~/workspace/dev-playbook/software-factory/git-authority.md) holds.
 
 **⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ — you hold the commit token for this session.** It covers the fixes you make yourself at the judgments node: commit them as you land them, without waiting for a "commit now". It covers nothing else — you never touch the work under review, and a delegated node's commits are authorized by its own launch line (§3).
 
@@ -73,7 +73,7 @@ Parse the subagent's final message per the [terminal report contract](~/workspac
 
 You open it, once, before the issue's first file-touching node, per the worktree contract:
 
-1. Confirm the base is fresh: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — refresh it yourself with `git -C ~/workspace/<repo> pull --ff-only origin main`, then re-check before continuing.
+1. Confirm the base is fresh: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — refresh it yourself with the pull in §7, on the condition stated there, then re-check before continuing.
 2. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
@@ -98,6 +98,8 @@ The git commands the traverse needs are yours to run, each as its own top-level 
 - **Pull, on a stale base:** `git -C ~/workspace/<repo> pull --ff-only origin main`
 
 `--no-verify` on the intermediary push is deliberate: the judgments phase is the verification act, so intermediary pushes skip the pre-push gate by standing ruling.
+
+The pull moves `main` only from a checkout standing on `main`; run anywhere else it merges `origin/main` into whatever branch is out. So confirm `~/workspace/<repo>` is on `main` — `git -C ~/workspace/<repo> branch --show-current` — and escalate if it is parked elsewhere rather than pulling into that branch.
 
 If a push is denied, it is denied — do not re-spell it. Report what you tried and why it was refused, and let the user decide.
 
