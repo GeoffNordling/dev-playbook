@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
-"""Claude Code PreToolUse hook: the client-side authority over git push.
+"""Claude Code PreToolUse hook: the client-side authority over git.
 
 Reads one PreToolUse event on stdin and either says nothing — the no-opinion
 verdict, which falls the call through to the permission rules — or denies.
+
+Two rule families, judged the same way and posted the same way. The **push**
+family reads what a push would do and refuses the forbidden spellings; the
+**commit** family reads who is asking and refuses every commit but the two
+lanes allow. Both walk the same segmentation and the same resolved argv, so a
+chained, wrapped or substituted command hides nothing from either.
 
 Python 3 stdlib only, no configuration: a hook runs on every Bash call of every
 session, so it may not depend on an interpreter's package set or a knob.
@@ -25,6 +31,12 @@ SEPARATORS = ("&&", "||", ";", "|", "&", "\n")
 # judges lexed argv, because a command that merely mentions pushing is not a
 # push and must not be refused as one.
 GIT_PUSH_TEXT = re.compile(r"\bgit\b.*\bpush\b", re.DOTALL)
+
+# The same last resort for ``git … commit``, consulted on the same terms: only
+# where a string a wrapper would re-lex could not be lexed. Everywhere else a
+# commit is identified by its subcommand token, because "commit" in a path or a
+# message is ordinary work.
+GIT_COMMIT_TEXT = re.compile(r"\bgit\b.*\bcommit\b", re.DOTALL)
 
 # A shell expansion in a push operand. Whatever remote or refspec it stands for
 # is decided when the command runs, so the hook cannot see where the push lands.
@@ -81,6 +93,46 @@ UNREADABLE = (
     "plain, top-level command."
 )
 
+# The factory families that commit, named by the frontmatter ``name`` of the
+# agent definition a subagent is spawned as. The harness writes the value into
+# the payload, so no prompt, brief or skill can claim membership; adding one
+# here is adding a committing family to the factory.
+ALLOWED_AGENT_TYPES = frozenset({"builder", "judgment-facilitator"})
+
+# The harness-written marker a typed slash command leaves in the transcript.
+# Assembled from pieces, never spelled whole: a file carrying it could be
+# pasted into a user turn and read here as a grant nobody typed — which is also
+# why no authored file in the workspace may contain it. The leading slash is
+# optional because the harness has been seen writing the name both ways.
+MARKER_OPEN = "<command-" + "name>"
+MARKER_CLOSE = "</command-" + "name>"
+MARKER = re.compile(MARKER_OPEN + r"/?commit-(on|off)" + MARKER_CLOSE)
+
+# The commit family's two denials, one per lane. Each reaches the model
+# verbatim, so each names what would open the lane and who opens it — never a
+# spelling to try instead.
+NOT_A_COMMITTING_TYPE = (
+    "git commit is denied: this session is a subagent, and only the factory's "
+    "committing agent types commit — builder, judgment-facilitator. A grant "
+    "typed at a parent session never reaches a subagent. Report the refusal "
+    "instead of re-spelling it."
+)
+
+NO_GRANT = (
+    "git commit is denied unless this session holds a live grant, and it holds "
+    "none. The user types /commit-on to give one and /commit-off to revoke it. "
+    "Ask for the grant, or hand the commit to the user; do not re-spell this."
+)
+
+# What a fault in this hook's own machinery says. Failing closed is the ruling:
+# a bug here blocks the command loudly instead of waving it through unjudged,
+# and the fault is named so the hook gets fixed rather than worked around.
+INTERNAL = (
+    "The git-authority hook could not judge this command and denied it rather "
+    "than let it run unjudged — {fault}. Report this: the hook needs repair, "
+    "and the command is not to be re-spelled meanwhile."
+)
+
 
 class Command(NamedTuple):
     """One command the shell will run, and how the hook reached it.
@@ -134,7 +186,7 @@ def segments(command: str) -> list[str]:
     found: list[str] = []
     current: list[str] = []
     quote = ""
-    substitutions = 0
+    depth = 0
     backtick = False
     index = 0
     while index < len(command):
@@ -160,16 +212,16 @@ def segments(command: str) -> list[str]:
             index += 1
             continue
         if command.startswith("$(", index):
-            substitutions += 1
+            depth += 1
             current.append("$(")
             index += 2
             continue
-        if substitutions and char == ")":
-            substitutions -= 1
+        if depth and char == ")":
+            depth -= 1
             current.append(char)
             index += 1
             continue
-        if backtick or substitutions:
+        if backtick or depth:
             current.append(char)
             index += 1
             continue
@@ -294,28 +346,51 @@ def command_argv(argv: list[str]) -> list[str]:
     return [rest[0].rpartition("/")[2], *rest[1:]]
 
 
-def push_argv(argv: list[str]) -> list[str] | None:
-    """The arguments after ``argv``'s ``push`` token, or None if it is no push."""
+def subcommand_argv(argv: list[str], subcommand: str) -> list[str] | None:
+    """``argv``'s arguments after ``subcommand``, or None if it runs another one.
+
+    The one place a git subcommand is identified. It is read off the resolved
+    argv rather than matched in the text, because a path, a message or another
+    command's output may carry the word: only the token git itself would take
+    as the subcommand makes the command one. git's own options come first and
+    some consume the token after them, so they are walked past, not skipped by
+    count.
+    """
     argv = command_argv(argv)
     if not argv or argv[0] != "git":
         return None
     index = 1
     while index < len(argv) and argv[index].startswith("-"):
         index += 2 if argv[index] in GIT_VALUE_OPTIONS else 1
-    if index >= len(argv) or argv[index] != "push":
+    if index >= len(argv) or argv[index] != subcommand:
         return None
     return argv[index + 1 :]
 
 
-def reaches_push(argv: list[str]) -> bool:
-    """Whether a push sits in ``argv`` somewhere this hook cannot judge it.
+def push_argv(argv: list[str]) -> list[str] | None:
+    """The arguments after ``argv``'s ``push`` token, or None if it is no push."""
+    return subcommand_argv(argv, "push")
 
-    A push behind another command still runs — ``sudo git push …``,
-    ``nohup git push …``, ``timeout 5 git push …`` — but not as the command the
-    segment names, so the hook cannot hold the whole call to account and refuses
-    it unread. A wrapper hides one further still, inside a string it re-lexes.
+
+def commit_argv(argv: list[str]) -> list[str] | None:
+    """The arguments after ``argv``'s ``commit`` token, or None if it is none."""
+    return subcommand_argv(argv, "commit")
+
+
+def reaches(argv: list[str], subcommand: str, mention: re.Pattern[str]) -> bool:
+    """Whether ``subcommand`` sits in ``argv`` somewhere this hook cannot judge it.
+
+    A git subcommand behind another command still runs — ``sudo git push …``,
+    ``nohup git commit …``, ``timeout 5 git push …`` — but not as the command
+    the segment names, so the hook cannot hold the whole call to account and
+    reads it as reaching the subcommand anyway. A wrapper hides one further
+    still, inside a string it re-lexes; ``mention`` is the text form consulted
+    only where that string will not lex.
     """
-    if any(push_argv(argv[start:]) is not None for start in range(1, len(argv))):
+    if any(
+        subcommand_argv(argv[start:], subcommand) is not None
+        for start in range(1, len(argv))
+    ):
         return True
     if not argv or argv[0] not in WRAPPERS:
         return False
@@ -325,12 +400,25 @@ def reaches_push(argv: list[str]) -> bool:
         try:
             inner = shlex.split(token)
         except ValueError:
-            if GIT_PUSH_TEXT.search(token):
+            if mention.search(token):
                 return True
             continue
-        if any(push_argv(inner[start:]) is not None for start in range(len(inner))):
+        if any(
+            subcommand_argv(inner[start:], subcommand) is not None
+            for start in range(len(inner))
+        ):
             return True
     return False
+
+
+def reaches_push(argv: list[str]) -> bool:
+    """Whether a push sits in ``argv`` somewhere this hook cannot judge it."""
+    return reaches(argv, "push", GIT_PUSH_TEXT)
+
+
+def reaches_commit(argv: list[str]) -> bool:
+    """Whether a commit sits in ``argv`` somewhere this hook cannot judge it."""
+    return reaches(argv, "commit", GIT_COMMIT_TEXT)
 
 
 def flags(argv: list[str]) -> set[str]:
@@ -453,12 +541,104 @@ def verdict(command: Command) -> str | None:
     return UNREADABLE if command.substituted else judge(after)
 
 
-def main() -> None:
-    """Read the event off stdin and print the verdict, if there is one."""
+def commits(command: Command) -> bool:
+    """Whether ``command`` runs a git commit, in any spelling the hook can reach.
+
+    The same reading the push family gets, and the same failing-closed
+    direction: a segment that will not lex counts as a commit where its text
+    resolves to a ``git … commit``, and one reachable only behind a wrapper or
+    a position counts too. What the hook cannot read, it does not wave through
+    — the lanes below still decide whether it runs.
+    """
     try:
-        event = json.loads(sys.stdin.read())
+        argv = command_argv(shlex.split(command.text))
     except ValueError:
-        return
+        return bool(GIT_COMMIT_TEXT.search(command.text))
+    if commit_argv(argv) is not None:
+        return True
+    return reaches_commit(argv)
+
+
+def user_texts(transcript_path: str) -> list[str]:
+    """The text of every genuine user turn in the transcript, in order.
+
+    Genuine is the whole point: a marker only counts where the harness wrote it
+    because the user typed the command. An assistant turn, and a user-role turn
+    carrying a ``tool_result``, are both text the model put there — a file it
+    read, a command's output — so neither is read for markers at all. A line
+    that will not parse is skipped: a transcript is appended to live, and its
+    last line may be half-written when the hook reads it.
+    """
+    found: list[str] = []
+    with open(transcript_path, encoding="utf-8", errors="replace") as transcript:
+        for line in transcript:
+            try:
+                entry = json.loads(line)
+            except ValueError:
+                continue
+            if not isinstance(entry, dict) or entry.get("type") != "user":
+                continue
+            message = entry.get("message")
+            content = message.get("content") if isinstance(message, dict) else None
+            if isinstance(content, str):
+                found.append(content)
+                continue
+            if not isinstance(content, list):
+                continue
+            if any(
+                isinstance(block, dict) and block.get("type") == "tool_result"
+                for block in content
+            ):
+                continue
+            found.extend(
+                str(block.get("text", ""))
+                for block in content
+                if isinstance(block, dict) and block.get("type") == "text"
+            )
+    return found
+
+
+def granted(transcript_path: str) -> bool:
+    """Whether the session's last typed marker was the grant, not the revocation.
+
+    Later wins, so a grant survives everything before it and nothing after it:
+    the user turns /commit-on and /commit-off as often as they like, and the
+    hook reads the one they typed last.
+    """
+    verdicts = [
+        match.group(1)
+        for text in user_texts(transcript_path)
+        for match in MARKER.finditer(text)
+    ]
+    return bool(verdicts) and verdicts[-1] == "on"
+
+
+def lane(event: dict) -> str | None:
+    """The reason this session may not commit, or None when a lane opens.
+
+    The two lanes are disjoint by spawn context, and that exclusivity is what
+    keeps a grant where it was typed: a subagent inherits its parent's
+    transcript, so a session judged by both lanes would extend one user's
+    ``/commit-on`` to every node beneath it. A payload carrying ``agent_type``
+    is a subagent — judged by the allowlist alone, whatever the transcript
+    holds.
+    """
+    if "agent_type" in event:
+        if event.get("agent_type") in ALLOWED_AGENT_TYPES:
+            return None
+        return NOT_A_COMMITTING_TYPE
+    transcript_path = event.get("transcript_path")
+    if not isinstance(transcript_path, str) or not transcript_path:
+        return NO_GRANT
+    return None if granted(transcript_path) else NO_GRANT
+
+
+def evaluate(event: object) -> None:
+    """Print the verdict on one PreToolUse event, if there is one.
+
+    An event naming no Bash command is nothing this hook rules on and draws no
+    opinion; everything past that point is judged.
+    """
     if not isinstance(event, dict) or event.get("tool_name") != "Bash":
         return
     tool_input = event.get("tool_input")
@@ -467,10 +647,29 @@ def main() -> None:
     line = tool_input.get("command")
     if not isinstance(line, str):
         return
-    for command in commands(line):
+    found = commands(line)
+    for command in found:
         reason = verdict(command)
         if reason is not None:
             deny(reason)
+    if any(commits(command) for command in found):
+        reason = lane(event)
+        if reason is not None:
+            deny(reason)
+
+
+def main() -> None:
+    """Read the event off stdin and judge it, failing closed on any fault.
+
+    The trap covers the whole path, an unparseable event included: everything
+    that can go wrong in here is this hook's own doing, and a hook that cannot
+    reach a verdict has not cleared the command — it has failed to judge it.
+    ``deny`` leaves through SystemExit, so a denial is not caught here.
+    """
+    try:
+        evaluate(json.loads(sys.stdin.read()))
+    except Exception as fault:
+        deny(INTERNAL.format(fault=f"{type(fault).__name__}: {fault}"))
 
 
 if __name__ == "__main__":
