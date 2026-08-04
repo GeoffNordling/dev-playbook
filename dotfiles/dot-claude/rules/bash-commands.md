@@ -84,10 +84,11 @@ cancelled too. Prefer single quotes by default for regex/pattern data.
 
 ## Keep sandbox-excluded commands leading and top-level
 
-`gh` and `git` are sandbox-excluded: each escapes the bwrap jail to reach an
-out-of-jail resource — the keyring holding `gh`'s PAT, the SSH remote for
-`git`. That escape works **only when the command is the first, top-level thing
-on its line.** Every rule below protects that.
+`gh` and `git` are sandbox-excluded: each escapes the bwrap jail to reach the
+same out-of-jail resource — the keyring holding the PAT, which `gh` reads
+directly and `git` reaches through the credential helper. That escape works
+**only when the command is the first, top-level thing on its line.** Every rule
+below protects that.
 
 **Do:**
 
@@ -109,7 +110,8 @@ on its line.** Every rule below protects that.
 
 - **Nesting jails the command.** Inside `$(…)`, a `for`/`while` loop,
   `bash -c '…'`, or behind `env`/`timeout`/`xargs`, it runs *inside* the jail
-  and auth fails (`gh`: HTTP 401; `git` push/pull: no key). To capture a value,
+  and auth fails: the keyring is out of reach, so `gh` returns HTTP 401 and
+  `git` push/pull fails with an invalid or missing PAT. To capture a value,
   write it to a file on its own top-level `gh` line, then `id=$(cat file)` on a
   separate line — `$(cat …)` is fine, `$(gh …)` is not.
 - **`$TMPDIR` is empty on the escaped line.** The escape context drops session
@@ -125,13 +127,28 @@ Right — capture a value for a follow-on command in the same call:
     gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id' > /tmp/claude-1000/id
     id=$(cat /tmp/claude-1000/id)
 
-## SSH-bound git operations
+## Remote git operations
 
-If the remote is `git@github.com:...`, then `git fetch`, `git pull`, and
-`git push` all require the user's SSH key — hardware-token taps in this
-workspace. Treat them like any other interactive command:
+Remotes are HTTPS, and git authenticates with the same keyring PAT `gh` uses,
+reached through the credential helper. So `git fetch`, `git pull`, and
+`git push` are ordinary non-interactive commands — run them yourself, subject
+to the push rules below. No remote git operation in this workspace is
+interactive, so none of them belong in the hand-off section above.
 
-- For read-only checks (e.g. "does local `main` match `origin/main`?"), use
-  `gh api` instead — it goes over HTTPS with a PAT and needs no tap.
-  Example: `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`
-- For pushes, hand the command back to the user.
+The canonical commands, each already granted in settings:
+
+    git push -u origin <branch>
+    git push --no-verify -u origin <branch>
+    git fetch --prune origin
+    git pull --ff-only origin main
+
+Three push families are denied outright, by permission rule and by the
+`git-authority` PreToolUse hook: anything targeting `main`, anything forcing
+(including `--force-with-lease`), and anything deleting a remote ref. **A denied
+operation is refused, never re-spelled** — do not look for a wording that gets
+past the rule. Hand it to the user for their own terminal and say why. See
+[git-authority](~/workspace/dev-playbook/software-factory/git-authority.md).
+
+For a read-only check that needs no clone state (e.g. "does local `main` match
+`origin/main`?"), `gh api` is still the cheapest route:
+`gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`

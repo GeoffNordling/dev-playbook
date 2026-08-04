@@ -9,7 +9,7 @@ argument-hint: "<issue-number>"
 
 # Open PR
 
-Ensure the issue's pull request exists, so the review steps that follow have something to comment on. The branch is `issue-<issue>`; the user pushed it before the review launched. You create the PR — a tap-free `gh` call — but you never push.
+Ensure the issue's pull request exists, so the review steps that follow have something to comment on. The branch is `issue-<issue>`, pushed by the committing node that ran before this one. This skill only reads and creates the PR; it does not push. If the branch isn't on origin, that is the previous node's work missing, so escalate rather than pushing it here.
 
 ## Do
 
@@ -29,7 +29,7 @@ DONE: <repo>#<issue> · phase: <node> · PR #<n> open
 
 ## Escalate
 
-Origin doesn't hold the implementation as committed — the branch was never pushed, or local commits sit ahead of the last push. Emit the terminal line naming which, then stop:
+Origin doesn't hold the implementation as committed — the branch was never pushed, or local commits sit ahead of the last push. Either way the committing node left work behind, which is its problem to fix and not this skill's to paper over. Emit the terminal line naming which, then stop:
 
 ```
 ESCALATE: <repo>#<issue> · phase: <node> · branch issue-<issue> <isn't on origin | is stale on origin> — local commits unpushed

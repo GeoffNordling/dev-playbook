@@ -10,9 +10,10 @@
 # path exits 0: a non-zero exit means "the hook broke", never "the check
 # failed". An in-sync repo therefore costs the agent no context at all.
 #
-# The check is read-only over HTTPS with gh's keyring PAT, so it needs no
-# YubiKey tap. It therefore cannot pull — pulling is over the SSH remote and is
-# the user's to run.
+# The check is read-only over HTTPS with gh's keyring PAT. It deliberately does
+# not pull: a SessionStart hook runs before the agent has read anything, and
+# moving the checkout out from under a session that has not started is worse
+# than telling it to pull. The instruction below is the whole remedy.
 #
 # Every run appends one line to the log below. A hook that is silent by design
 # has no other way to show it is alive, and the logged `source` is the only
@@ -69,7 +70,8 @@ note "STALE: github at $remote_sha"
 cat <<EOF
 STOP — stale base. Do not answer the user's request yet.
 GitHub's main ($remote_sha) holds commits this checkout does not.
-Before anything else, tell the user their checkout is stale and must be pulled:
-    git pull        (needs their YubiKey — never run it yourself.)
-Do not read, edit, commit, or branch until they confirm the pull.
+Before anything else, bring the checkout current:
+    git pull --ff-only origin main
+Do not read, edit, commit, or branch until that succeeds. If it cannot
+fast-forward, the checkout has diverged — say so and stop; do not force it.
 EOF
