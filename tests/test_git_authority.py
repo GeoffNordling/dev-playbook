@@ -283,51 +283,42 @@ def test_a_tool_other_than_bash_draws_no_opinion() -> None:
     assert decision("git push origin main", tool_name="Edit") is None
 
 
-# --- text the shell never runs ----------------------------------------------
+# --- text the hook misreads must not hide the command after it ---------------
 #
-# A `#` comment and a heredoc body are both text: one the shell skips, the
-# other data being written somewhere. Reading either as a command is the
-# false-deny class that matters most here, because this workspace's own
-# documentation, PR comments and skills are full of the words "git commit".
+# Every case here was a fail-open on this branch before the lexing that caused
+# it was reverted: a `<<` that opens no heredoc swallowed every following line,
+# and a `#` inside a word truncated the argv. Each let a push at main run
+# unjudged, so each is pinned rather than left to the next reader to rediscover.
 
 
 @pytest.mark.parametrize(
     "command",
     [
-        "# remember to git commit later",
-        "set -e\n# stage then git commit -m x\nmake check",
-        "make check  # run before the git commit",
-        "# the rules deny git push origin main",
-        "gh pr comment 350 --body-file - <<'EOF'\n"
-        "lane 1 authorizes a git commit by agent type\n"
-        "EOF",
-        "cat > SKILL.md <<'EOF'\n"
-        "Commit via /commit; the git commit is denied without a lane.\n"
-        "EOF",
-        "cat > notes.md <<EOF\ngit push origin main is refused outright\nEOF",
-        "gh pr comment 350 --body-file - <<-'EOF'\n\tthe git commit lanes\n\tEOF",
+        'read -r a b <<<"$line"\ngit push origin main:main',
+        'jq . <<<"$json"\ngit push origin main',
+        "echo $((1 << 2))\ngit push origin main",
+        'gh pr comment 350 --body "the hook drops\n'
+        "<<EOF bodies handed to gh\n"
+        'as data" && git push origin main',
     ],
 )
-def test_text_the_shell_never_runs_draws_no_opinion(command: str) -> None:
-    assert decision(command) is None
-
-
-@pytest.mark.parametrize(
-    "command",
-    [
-        "bash <<'EOF'\ngit commit -m t\nEOF",
-        "sh <<EOF\ngit commit -m t\nEOF",
-        "timeout 60 bash <<'EOF'\ncd /tmp && git commit -m t\nEOF",
-    ],
-)
-def test_a_commit_in_a_shell_heredoc_still_needs_a_lane(command: str) -> None:
-    # A heredoc feeding a shell interpreter is a script, not data: its body
-    # runs, so it is read as commands like any other.
+def test_a_line_opening_no_heredoc_does_not_hide_the_next_push(command: str) -> None:
     assert decision(command) == "deny"
 
 
-def test_a_push_in_a_shell_heredoc_is_denied() -> None:
-    assert decision("bash <<'EOF'\ngit push origin main\nEOF") == "deny"
+@pytest.mark.parametrize(
+    "command",
+    [
+        "git -C /tmp/a#b push origin main",
+        "git -C /tmp/a#b push --force origin issue-342",
+    ],
+)
+def test_a_push_from_a_path_holding_a_hash_is_denied(command: str) -> None:
+    assert decision(command) == "deny"
+
+
+def test_a_commit_from_a_path_holding_a_hash_needs_a_lane() -> None:
+    assert decision("git -C /tmp/a#b commit -m t") == "deny"
 
 
 # --- the commit family: what counts as a commit -----------------------------

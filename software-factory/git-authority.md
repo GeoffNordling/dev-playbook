@@ -63,20 +63,24 @@ not lex at all is refused only where its text resolves to a `git … push` or a
 `git … commit`: an ordinary command carrying the word is not the operation, and
 refusing it would stop work this hook has no authority over.
 
-Two shapes are text rather than commands, and are read as text:
+**Text the shell would never run is read as a command anyway, and that is an
+accepted false deny.** Newlines split segments and comments are not stripped, so
+a `#` line and a heredoc body both arrive as ordinary commands: `# remember to
+git commit later` is refused, and so is the body of a `gh pr comment … <<'EOF'`
+that names a git verb. This workspace writes about its own git rules constantly,
+so it is hit often. The way through is to stop making the text a shell argument
+— write the body to a file and pass `--body-file`, or `git commit -F` — never a
+re-spelling of the git command itself.
 
-- **A `#` comment**, taken the way the shell takes it. A note to commit later is
-  a note.
-- **A heredoc body**, where the command receiving it is not a shell. `gh pr
-  comment … <<'EOF'` and `cat > file <<'EOF'` hand their bodies somewhere as
-  data, so the body is dropped before the split. A body fed to `bash`, `sh`,
-  `zsh`, `dash` or `ksh` *is* a script and is read line by line like any other
-  command — that stays fail-closed, and a line the hook cannot lex counts as the
-  script case.
-
-This matters more here than the shape of it suggests: "commit" saturates this
-workspace's own documentation, so without it the gate would refuse the authoring
-of documents about itself.
+It is a false deny by choice. One attempt to read those two shapes the way bash
+reads them was reverted after it opened three fail-opens, each a partial parser
+disagreeing with another about a shape neither had been written for; a herestring
+and an arithmetic shift both blinded the hook for the rest of the command. A loud
+refusal is recoverable in seconds and a silent hole is not, so the trade goes to
+the refusal. The measurements are on
+[#348](https://github.com/GeoffNordling/dev-playbook/issues/348), and the real
+fix — one tokenizing pass in place of the hand-rolled walkers — is
+[#355](https://github.com/GeoffNordling/dev-playbook/issues/355).
 
 **Both families fail closed on a fault in the hook's own machinery**, bounded by
 what the hook has authority over: a fault denies where the command reads as a
