@@ -111,11 +111,18 @@ MARKER = re.compile(MARKER_OPEN + r"/?commit-(on|off)" + MARKER_CLOSE)
 # The commit family's two denials, one per lane. Each reaches the model
 # verbatim, so each names what would open the lane and who opens it — never a
 # spelling to try instead.
+#
+# The lane-1 denial names the agent type it read and stops there. Why a session
+# carries that type is not something this hook can see, and a reader told
+# "you are a subagent" by a hook that cannot verify it is left with a diagnosis
+# instead of a fact; the value is the fact, and it is what makes the refusal
+# reportable.
 NOT_A_COMMITTING_TYPE = (
-    "git commit is denied: this session is a subagent, and only the factory's "
-    "committing agent types commit — builder, judgment-facilitator. A grant "
-    "typed at a parent session never reaches a subagent. Report the refusal "
-    "instead of re-spelling it."
+    "git commit is denied: this session is judged by its agent type, which is "
+    "{agent_type!r}, and only the factory's committing types commit — builder, "
+    "judgment-facilitator. A typed /commit-on grant is read only for a session "
+    "carrying no agent type at all, so it cannot open this lane. Report the "
+    "refusal with the type named above; do not re-spell the command."
 )
 
 NO_GRANT = (
@@ -124,9 +131,10 @@ NO_GRANT = (
     "Ask for the grant, or hand the commit to the user; do not re-spell this."
 )
 
-# What a fault in this hook's own machinery says. Failing closed is the ruling:
-# a bug here blocks the command loudly instead of waving it through unjudged,
-# and the fault is named so the hook gets fixed rather than worked around.
+# What a fault in this hook's own machinery says, where the hook had authority
+# over the command. Failing closed is the ruling: a bug here blocks the push or
+# the commit loudly instead of waving it through unjudged, and the fault is
+# named so the hook gets fixed rather than worked around.
 INTERNAL = (
     "The git-authority hook could not judge this command and denied it rather "
     "than let it run unjudged — {fault}. Report this: the hook needs repair, "
@@ -367,16 +375,6 @@ def subcommand_argv(argv: list[str], subcommand: str) -> list[str] | None:
     return argv[index + 1 :]
 
 
-def push_argv(argv: list[str]) -> list[str] | None:
-    """The arguments after ``argv``'s ``push`` token, or None if it is no push."""
-    return subcommand_argv(argv, "push")
-
-
-def commit_argv(argv: list[str]) -> list[str] | None:
-    """The arguments after ``argv``'s ``commit`` token, or None if it is none."""
-    return subcommand_argv(argv, "commit")
-
-
 def reaches(argv: list[str], subcommand: str, mention: re.Pattern[str]) -> bool:
     """Whether ``subcommand`` sits in ``argv`` somewhere this hook cannot judge it.
 
@@ -535,7 +533,7 @@ def verdict(command: Command) -> str | None:
         argv = command_argv(shlex.split(command.text))
     except ValueError:
         return UNREADABLE if GIT_PUSH_TEXT.search(command.text) else None
-    after = push_argv(argv)
+    after = subcommand_argv(argv, "push")
     if after is None:
         return UNREADABLE if reaches_push(argv) else None
     return UNREADABLE if command.substituted else judge(after)
@@ -554,7 +552,7 @@ def commits(command: Command) -> bool:
         argv = command_argv(shlex.split(command.text))
     except ValueError:
         return bool(GIT_COMMIT_TEXT.search(command.text))
-    if commit_argv(argv) is not None:
+    if subcommand_argv(argv, "commit") is not None:
         return True
     return reaches_commit(argv)
 
@@ -624,13 +622,41 @@ def lane(event: dict) -> str | None:
     holds.
     """
     if "agent_type" in event:
-        if event.get("agent_type") in ALLOWED_AGENT_TYPES:
+        agent_type = event.get("agent_type")
+        if agent_type in ALLOWED_AGENT_TYPES:
             return None
-        return NOT_A_COMMITTING_TYPE
+        return NOT_A_COMMITTING_TYPE.format(agent_type=agent_type)
     transcript_path = event.get("transcript_path")
     if not isinstance(transcript_path, str) or not transcript_path:
         return NO_GRANT
     return None if granted(transcript_path) else NO_GRANT
+
+
+def command_text(event: object) -> str:
+    """The Bash command an event names, or the empty string where it names none.
+
+    Every shape that is not a Bash command line reads as no command at all,
+    because this hook rules on nothing else — and because the fault handler
+    below asks the same question of an event that has already gone wrong.
+    """
+    if not isinstance(event, dict) or event.get("tool_name") != "Bash":
+        return ""
+    tool_input = event.get("tool_input")
+    if not isinstance(tool_input, dict):
+        return ""
+    line = tool_input.get("command")
+    return line if isinstance(line, str) else ""
+
+
+def governed(text: str) -> bool:
+    """Whether ``text`` reads as a git push or commit — this hook's own subject.
+
+    The coarsest possible reading, and consulted in one place only: deciding
+    whether a fault in the hook's machinery is a fault over a command the hook
+    had any authority over. Reading too much is the failing-closed direction
+    here, since a false match denies a push or a commit that was never judged.
+    """
+    return bool(GIT_PUSH_TEXT.search(text) or GIT_COMMIT_TEXT.search(text))
 
 
 def evaluate(event: object) -> None:
@@ -639,13 +665,10 @@ def evaluate(event: object) -> None:
     An event naming no Bash command is nothing this hook rules on and draws no
     opinion; everything past that point is judged.
     """
-    if not isinstance(event, dict) or event.get("tool_name") != "Bash":
+    if not isinstance(event, dict):
         return
-    tool_input = event.get("tool_input")
-    if not isinstance(tool_input, dict):
-        return
-    line = tool_input.get("command")
-    if not isinstance(line, str):
+    line = command_text(event)
+    if not line:
         return
     found = commands(line)
     for command in found:
@@ -659,17 +682,29 @@ def evaluate(event: object) -> None:
 
 
 def main() -> None:
-    """Read the event off stdin and judge it, failing closed on any fault.
+    """Read the event off stdin and judge it, failing closed where it rules.
 
     The trap covers the whole path, an unparseable event included: everything
     that can go wrong in here is this hook's own doing, and a hook that cannot
     reach a verdict has not cleared the command — it has failed to judge it.
     ``deny`` leaves through SystemExit, so a denial is not caught here.
+
+    Failing closed is bounded by authority, though. This hook runs on *every*
+    Bash call of every session, and a fault denying them all would take out
+    ``ls`` and ``make check`` everywhere at once over a command it was never
+    going to rule on. So a fault denies only what ``governed`` reads as a push
+    or a commit. The one fault that cannot be scoped that way is an event that
+    would not parse: there is no command to read, so it fails closed whole —
+    ``event`` is still None there, and nowhere else, because an event that
+    parses to None is judged without fault.
     """
+    event: object = None
     try:
-        evaluate(json.loads(sys.stdin.read()))
+        event = json.loads(sys.stdin.read())
+        evaluate(event)
     except Exception as fault:
-        deny(INTERNAL.format(fault=f"{type(fault).__name__}: {fault}"))
+        if event is None or governed(command_text(event)):
+            deny(INTERNAL.format(fault=f"{type(fault).__name__}: {fault}"))
 
 
 if __name__ == "__main__":

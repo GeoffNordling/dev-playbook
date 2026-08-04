@@ -59,8 +59,8 @@ def hook(stdin: str) -> dict | None:
     return dict(output)
 
 
-def decision(command: str, tool_name: str = "Bash", **payload: object) -> str | None:
-    """The hook's permission decision for one command, or None when it has none.
+def outcome(command: str, tool_name: str = "Bash", **payload: object) -> dict | None:
+    """The hook's whole output for one command, or None when it has none.
 
     ``payload`` adds the session fields the harness writes beside the command —
     ``agent_type`` for a subagent, ``transcript_path`` for the session's
@@ -72,7 +72,12 @@ def decision(command: str, tool_name: str = "Bash", **payload: object) -> str | 
         "tool_input": {"command": command},
     }
     event.update(payload)
-    output = hook(json.dumps(event))
+    return hook(json.dumps(event))
+
+
+def decision(command: str, tool_name: str = "Bash", **payload: object) -> str | None:
+    """The hook's permission decision for one command, or None when it has none."""
+    output = outcome(command, tool_name, **payload)
     return None if output is None else str(output["permissionDecision"])
 
 
@@ -342,6 +347,23 @@ def test_a_subagent_of_another_type_may_not_commit() -> None:
     assert decision("git commit -m t", agent_type="general-purpose") == "deny"
 
 
+def test_a_denied_session_is_told_the_agent_type_it_carries() -> None:
+    # The reason reaches the model verbatim, and the type it names is the one
+    # fact the hook actually has: whoever reads the denial can report a value
+    # rather than a diagnosis nothing here can check.
+    output = outcome("git commit -m t", agent_type="general-purpose")
+
+    assert output is not None
+    assert "general-purpose" in output["permissionDecisionReason"]
+
+
+def test_a_denied_session_carrying_an_empty_agent_type_still_names_it() -> None:
+    output = outcome("git commit -m t", agent_type="")
+
+    assert output is not None
+    assert "''" in output["permissionDecisionReason"]
+
+
 def test_a_subagent_never_commits_on_a_parents_grant(tmp_path: Path) -> None:
     granted = transcript(tmp_path / "granted.jsonl", [user_turn(marker("commit-on"))])
 
@@ -458,6 +480,28 @@ def test_a_grant_typed_after_a_revocation_opens_the_lane(tmp_path: Path) -> None
 
 
 # --- the commit family fails closed -----------------------------------------
+#
+# Failing closed is bounded by what the hook has authority over. A fault in its
+# own machinery denies a push or a commit loudly, and says nothing at all about
+# a command it was never going to rule on: one bug here must not take out `ls`
+# and `make check` in every session on the machine.
+
+# A substitution nested past the interpreter's recursion limit. The hook's own
+# machinery faults on it, which is what makes it a stand-in for any internal
+# fault — no command spelling is under test here, only what a fault decides.
+NESTED = "$(" * 2000 + "true" + ")" * 2000
+
+
+def test_an_internal_fault_on_a_command_the_hook_cannot_rule_draws_no_opinion() -> None:
+    assert decision("echo " + NESTED) is None
+
+
+def test_an_internal_fault_on_a_commit_is_denied() -> None:
+    assert decision("git commit -m t " + NESTED) == "deny"
+
+
+def test_an_internal_fault_on_a_push_is_denied() -> None:
+    assert decision("git push origin issue-9 " + NESTED) == "deny"
 
 
 def test_an_event_that_will_not_parse_is_denied() -> None:
