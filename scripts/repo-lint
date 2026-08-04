@@ -721,8 +721,15 @@ def check_command_marker(root: Path) -> list[Finding]:
 
     Every file in the checkout is read, not just markdown: an @-mention carries
     whatever it points at. Anything that will not decode as UTF-8 is not
-    authored prose and is skipped, as is the vendored tree, whose contents are
-    carried verbatim from upstream and are not this repo's to hold to the rule.
+    authored prose and is skipped. The vendored tree is skipped too, as an
+    accepted gap rather than a clean exemption — those files are published under
+    the skills root by symlink and so are live skill text, but they are carried
+    verbatim from upstream and cannot be edited, so a hit there would be a
+    permanently red gate on something nobody can fix. The Guide records it.
+
+    Nothing else is caught. This check is the sole enforcement of a rule lane 2
+    rests on, so a file it could not read is a file it did not clear, and
+    reporting clean anyway is the silent skip this repo bans.
     """
     findings = []
     for rel in gitrepo.git_files(root):
@@ -731,7 +738,7 @@ def check_command_marker(root: Path) -> list[Finding]:
             continue
         try:
             text = path.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
+        except UnicodeDecodeError:
             continue
         for num, line in enumerate(text.splitlines(), start=1):
             if COMMAND_MARKER_PATTERN.search(line):

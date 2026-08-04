@@ -456,6 +456,23 @@ def test_the_marker_check_reads_files_that_are_not_markdown(tmp_path: Path) -> N
     assert "fixtures/turn.json: claude-code.command-marker" in result.stdout
 
 
+def test_a_vendored_file_carrying_the_command_marker_is_not_inspected(
+    tmp_path: Path,
+) -> None:
+    # The accepted gap the Guide records: a vendored skill is live skill text, so
+    # a marker in one would be read like any other, but the tree is carried
+    # verbatim from upstream and cannot be edited — enforcing here would fail the
+    # gate on something nobody can fix. The exemption is pinned rather than left
+    # to a bare `continue`.
+    files = base_files()
+    files[".agents/skills/vendor/SKILL.md"] = (
+        "---\nname: vendor\ndescription: Upstream skill.\n---\n\n"
+        f"# Vendor\n\nThe harness writes {MARKER} into the turn.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_a_repo_free_of_the_command_marker_passes(tmp_path: Path) -> None:
     files = base_files()
     files["docs/notes.md"] = (

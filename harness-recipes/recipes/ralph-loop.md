@@ -33,7 +33,7 @@ Each iteration is one fresh `agent()` that:
    broken),
 2. reads the plan and the progress log,
 3. implements the single next incomplete task,
-4. brings the gate back to green when one is configured, so that what it goes on to commit is never red,
+4. brings the gate back to green when one is configured, so the tree the next iteration inherits is not broken,
 5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
 6. attempts a commit via the `/commit` skill,
 7. reports whether the plan is complete.
@@ -42,11 +42,20 @@ The runtime repeats this until an agent reports done. No agent remembers the
 last — continuity lives entirely on disk.
 
 **Step 6 currently has no commit authorization.** `git commit` is deny-by-default
-under the `git-authority` hook's commit rule family, and an iteration agent holds
-neither lane: it is not one of the committing factory agent types, and lane
-exclusivity keeps it off a grant typed at the launching session. Disk is the
-loop's only memory, so a loop run this way makes no durable progress. Giving the
-iteration a lane is
+under the `git-authority` hook's commit rule family, and an iteration agent is
+not one of the committing factory agent types, so lane 1 refuses it. Whether
+lane 2 is even reachable from here is unmeasured: it turns on whether a Workflow
+`agent()` payload carries an `agent_type` key at all. If it does, lane
+exclusivity shuts lane 2 outright; if it does not, the iteration falls through to
+the launching session's transcript, and a `/commit-on` typed before launch would
+open the lane — the cross-session reach lane exclusivity exists to prevent. That
+is an assumption either way, not a measured fact.
+
+The conclusion holds under both branches: expect the commit to be denied unless
+someone granted the launching session first, and do not rely on it. Disk is the
+loop's only memory, so a loop run this way makes no durable progress, and the
+runtime stops on the denial rather than grinding out iterations nothing records.
+Giving the iteration a lane of its own, and measuring the payload, is
 [#351](https://github.com/GeoffNordling/dev-playbook/issues/351); until it lands,
 treat this recipe as describing the loop's shape rather than a working commit
 path.
