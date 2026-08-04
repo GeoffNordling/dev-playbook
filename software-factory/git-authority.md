@@ -32,7 +32,7 @@ nothing an agent writes can mint it.
 |---|---|---|
 | Server-side ruleset | GitHub, per [repo settings](/standards/tracking/repo-settings.md) | The last backstop: main rejects force-pushes and deletion whatever the client did |
 | Deny block | `permissions.deny` in `dotfiles/settings/base.json` | Refuses the forbidden push spellings before anything else is consulted |
-| `git-authority` hook | `dotfiles/dot-claude/hooks/git-authority`, wired as a `PreToolUse` hook on `Bash` in `base.json` | Parses every `git push` and `git commit` in the command: refuses the forbidden push spellings, in *any* spelling, and every commit but the two lanes allow |
+| `git-authority` hook | `dotfiles/dot-claude/hooks/git-authority`, wired as a `PreToolUse` hook on `Bash` in `base.json` | Parses every `git push` and `git commit` in the command: refuses the forbidden push spellings, in *any* spelling, and every commit no lane opens |
 | Allowlist | `permissions.allow` in `base.json` | Lets the routine commands run without a prompt |
 | Auto-mode entry | `autoMode.allow` in `base.json` | Tells the hands-off classifier the same thing in prose |
 
@@ -50,6 +50,42 @@ allowed*. git is excluded because the harness's protection of `.git/config` and
 `git commit`, per [sandboxing](/docs/sandboxing.md). Narrowing that exemption
 is [#261](https://github.com/GeoffNordling/dev-playbook/issues/261)'s subject,
 and nothing here depends on how it lands.
+
+## What both families read
+
+Both families walk the same command first, so a chained, wrapped or substituted
+command hides nothing from either.
+
+The hook splits a command on `&&`, `||`, `;`, `|`, `&` and newlines — respecting
+quoting, so a `;` inside a commit message separates nothing — and judges each
+segment on its own lexed argv, so chaining hides nothing. A segment that will
+not lex at all is refused only where its text resolves to a `git … push` or a
+`git … commit`: an ordinary command carrying the word is not the operation, and
+refusing it would stop work this hook has no authority over.
+
+Two shapes are text rather than commands, and are read as text:
+
+- **A `#` comment**, taken the way the shell takes it. A note to commit later is
+  a note.
+- **A heredoc body**, where the command receiving it is not a shell. `gh pr
+  comment … <<'EOF'` and `cat > file <<'EOF'` hand their bodies somewhere as
+  data, so the body is dropped before the split. A body fed to `bash`, `sh`,
+  `zsh`, `dash` or `ksh` *is* a script and is read line by line like any other
+  command — that stays fail-closed, and a line the hook cannot lex counts as the
+  script case.
+
+This matters more here than the shape of it suggests: "commit" saturates this
+workspace's own documentation, so without it the gate would refuse the authoring
+of documents about itself.
+
+**Both families fail closed on a fault in the hook's own machinery**, bounded by
+what the hook has authority over: a fault denies where the command reads as a
+push or a commit, and draws no opinion on anything else, because this hook runs
+on every Bash call and one fault must not take out `ls` and `make check`
+everywhere at once. The one fault it cannot scope that way is an event that will
+not parse off stdin — there is no command to read, so that denies whole. The
+residual harness-level fail-open (interpreter missing, script unreadable) is
+accepted.
 
 ## The push rule family
 
@@ -78,13 +114,6 @@ Three further rules protect the first three:
   command substitution, or with a variable expansion where the remote or the
   refspec belongs, the hook cannot see what would run. It fails closed.
 
-The hook splits a command on `&&`, `||`, `;`, `|`, `&` and newlines — respecting
-quoting, so a `;` inside a commit message separates nothing — and judges each
-segment on its own lexed argv, so chaining hides nothing. A segment that will
-not lex at all is refused only where its text resolves to a `git … push`: an
-ordinary command carrying the word "push" is not a push, and refusing it would
-stop work this hook has no authority over.
-
 ## The commit rule family
 
 `git commit` is deny-by-default: the hook refuses it unless exactly one of
@@ -107,17 +136,37 @@ Lane exclusivity is load-bearing: subagents inherit the parent session's
 transcript path, so honoring a parent's grant inside a subagent would extend
 one typed `/commit-on` to every node under a factory manager. It never does.
 
-The commit family fails **closed**, bounded by what it has authority over: a
-fault in the hook's own machinery denies where the command reads as a push or a
-commit, and draws no opinion on anything else, because this hook runs on every
-Bash call and one fault must not take out `ls` and `make check` everywhere at
-once. The one fault it cannot scope that way is an event that will not parse off
-stdin — there is no command to read, so that denies whole. The residual
-harness-level fail-open (interpreter missing, script unreadable) is accepted.
+A transcript the hook cannot open holds no grant it can see, so that is the
+ungranted state and not a fault: the denial names the missing grant, because
+telling its reader the hook needs repair would send them to fix working
+machinery instead of typing the grant.
+
+**A commit inside a `$(…)` or a backtick body is judged by its lane like any
+other, which is deliberately not what the push family does there.** The two
+families answer different questions. The push family asks *is this push
+watched*, because a push is irreversible publication into shared history, and a
+substituted push is one whose output nobody sees — so it fails closed wherever
+it sits. The commit family asks *who is committing*, and the lane answers that
+identically wherever the command sits; refusing a substituted commit would deny
+a granted user's own scripted commit and buy nothing, since the lane already
+said who was asking. The asymmetry is this ruling, not an artifact of where the
+check happens to sit.
 
 One authoring rule protects lane 2: no authored content anywhere in the repo may
 contain the literal marker wrapper string; the hook, the tests, and the
 `claude-code.command-marker` check that enforces it all assemble it from pieces.
+The rule itself is stated for every governed repo in
+[files.md](/standards/claude-code/files.md); this file is the mechanism's home,
+not the rule's.
+
+That check exempts the vendored tree, and it is an **accepted gap** rather than
+a clean boundary. Vendored skills are published under the skills root by symlink
+and stowed into `~/.claude/skills/`, so they are live skill text, and the hook
+reads a marker without reading its provenance — reachability is what makes a
+file dangerous here, not ownership. The tree is carried verbatim from upstream
+and cannot be edited, so enforcing there would mean a permanently red gate on
+something nobody can fix. The exemption is recorded here and pinned by a test
+rather than left to be inferred from the code.
 
 Two limits are stated rather than fixed, each with an issue:
 

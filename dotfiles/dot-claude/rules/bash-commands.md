@@ -133,7 +133,21 @@ Right — capture a value for a follow-on command in the same call:
     gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id' > /tmp/claude-1000/id
     id=$(cat /tmp/claude-1000/id)
 
-## Remote git operations
+## Which git commands you may run
+
+[git-authority](~/workspace/dev-playbook/software-factory/git-authority.md) is
+the authority, and it rules on two things: which pushes are allowed, and whether
+this session may commit at all. Both are enforced by a hook that runs before the
+command, so a refusal arrives instead of the command running.
+
+**A denied operation is refused, never re-spelled** — do not look for a wording
+that gets past the rule. Report what you tried and why it was refused, and let
+the user decide. This governs a denied commit exactly as it governs a denied
+push.
+
+`git commit` is deny-by-default: a session commits only through a factory agent
+type or a `/commit-on` the user typed, so a denial there is the gate asking for
+the user's word, never a thing to route around.
 
 Remotes are HTTPS, and git authenticates with the same keyring PAT `gh` uses,
 reached through the credential helper. So `git fetch`, `git pull`, and
@@ -141,17 +155,11 @@ reached through the credential helper. So `git fetch`, `git pull`, and
 to the push rules. No remote git operation in this workspace is interactive, so
 none of them belong in the hand-off section above.
 
-[git-authority](~/workspace/dev-playbook/software-factory/git-authority.md)
-holds the whole push rule family and the canonical spellings the allowlist
-grants. Write a remote command the canonical way, because a variant meaning the
-same thing may still prompt — and read the rules there before writing a push
-you have not written before, **including one reached through `bash -c`, a
-`$(…)`, or a variable**, which the section above makes habitual and the
-`git-authority` hook refuses unread.
-
-**A denied operation is refused, never re-spelled** — do not look for a wording
-that gets past the rule. Report what you tried and why it was refused, and let
-the user decide.
+Write a remote command the canonical way the Guide lists, because a variant
+meaning the same thing may still prompt — and read the rules there before
+writing a push you have not written before, **including one reached through
+`bash -c`, a `$(…)`, or a variable**, which the section above makes habitual and
+the `git-authority` hook refuses unread.
 
 For a read-only check that needs no clone state (e.g. "does local `main` match
 `origin/main`?"), `gh api` is still the cheapest route:

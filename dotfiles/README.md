@@ -21,7 +21,8 @@ dot-claude/          -> ~/.claude/
   agents/      Agent definitions — the subagent spawn registry, read at session start
   hooks/       Claude Code hook scripts
   workflows/   Workflow tool programs (the ralph loop, the judgments fan-out)
-  statusline.sh  The status line Claude Code renders
+  statusline.sh
+               The status line Claude Code renders
 .agents/             -> ~/.agents/
   skills/      Externally managed skills, mirrored into dot-claude/skills/
 .bashrc.d/           -> ~/.bashrc.d/

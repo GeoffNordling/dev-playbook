@@ -58,14 +58,24 @@ unit of work unless the user has said to commit as you go.
 factory type (`builder`, `judgment-facilitator`) commits as its skill and
 definition direct, with no grant and no per-commit word: the hook authorizes
 it by agent type, and its work is reviewed at the PR instead of diff-by-diff.
+Every other subagent holds no lane at all — the hook judges a subagent by its
+type alone, so no `/commit-on` typed anywhere reaches one. Report the denial
+and hand the commit up; asking for a grant will not lift it.
 
 ### Always pin a subagent's model
 
-Never launch an agent without its model specified — the Agent tool, a Workflow
-`agent()` call, any of them. An omitted model inherits the session's, which on
-an expensive session silently spends expensive tokens on simpler scouting work.
-Pin it every time, and name the pick on screen in the same message — e.g.
-"three Sonnet scouts on the file inventory, one Opus on the coupling analysis."
+Never launch an *untyped* agent without its model specified — the Agent tool, a
+Workflow `agent()` call, any of them. An omitted model there inherits the
+session's, which on an expensive session silently spends expensive tokens on
+simpler scouting work. Pin it every time.
+
+A spawn by agent type is the exception. The definition pins the model, a passed
+model overrides it, and a ruled pin is not yours to override — so spawn a typed
+agent (`builder`, say) with no model argument at all.
+
+Either way, name the model on screen in the same message — e.g. "three Sonnet
+scouts on the file inventory, one Opus on the coupling analysis" — reading a
+typed agent's pin off its definition.
 
 Choose by the character of the job, never by what the session is running on:
 
