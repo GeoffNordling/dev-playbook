@@ -30,7 +30,7 @@ ROUTINE = [
     "git push origin issue-342",
     "git push --no-verify -u origin issue-342",
     "git push --no-verify origin issue-342",
-    "git -C ~/workspace/mission-control push origin main-notes",
+    "git -C ~/workspace/dev-playbook/.claude/worktrees/issue-342 push origin issue-342",
     "git fetch --prune origin",
     "git pull --ff-only origin main",
 ]
@@ -153,9 +153,38 @@ def test_push_the_hook_cannot_read_is_denied(command: str) -> None:
 @pytest.mark.parametrize(
     "command",
     [
+        "git push origin HEAD",
+        "git push origin @",
+        "git push -u origin HEAD",
+        "git push origin issue-342:HEAD",
+        "git -C ~/workspace/mission-control push origin HEAD",
+    ],
+)
+def test_push_to_a_symbolic_destination_is_denied(command: str) -> None:
+    assert decision(command) == "deny"
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "git push origin $TARGET",
+        'git push -u origin "$branch"',
+        "git push $REMOTE issue-342",
+        "git push origin $(git branch --show-current)",
+    ],
+)
+def test_push_to_a_target_the_hook_cannot_expand_is_denied(command: str) -> None:
+    assert decision(command) == "deny"
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
         "cd /tmp && git push origin main",
         "git status; git push --force origin issue-342",
         "git log | head && git push origin :issue-342",
+        "git log --format='%h | %s' && git push origin main:main",
+        "echo don't && git push origin issue-342:main",
     ],
 )
 def test_a_forbidden_push_is_found_in_any_segment(command: str) -> None:
@@ -171,6 +200,27 @@ def test_a_chained_routine_push_still_draws_no_opinion() -> None:
 
 def test_a_commit_mentioning_push_draws_no_opinion() -> None:
     assert decision('git commit -m "push authority" && git status') is None
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "ls -la",
+        "gh pr list --jq '.[] | .number'",
+        "rg 'push|pull' -n",
+        "grep -n 'push|pull' file",
+        "sed -n '1,5p;10p' file",
+        'echo "a && b"',
+        "git log --format='%h | %s'",
+        'gh pr comment 345 --body "covers A & B"',
+        'gh pr comment 345 --body "the push & the pull"',
+        'git commit -m "push authority; landed"',
+        "echo don't && ls",
+        'echo "the cost is $(date)"',
+    ],
+)
+def test_a_command_that_pushes_nothing_draws_no_opinion(command: str) -> None:
+    assert decision(command) is None
 
 
 def test_a_tool_other_than_bash_draws_no_opinion() -> None:
@@ -208,9 +258,13 @@ DENY_ROWS = [
     "Bash(git push --force-with-lease *)",
     "Bash(git push * --force-with-lease)",
     "Bash(git push * --force-with-lease *)",
+    "Bash(git push --delete)",
     "Bash(git push --delete *)",
+    "Bash(git push * --delete)",
     "Bash(git push * --delete *)",
+    "Bash(git push -d)",
     "Bash(git push -d *)",
+    "Bash(git push * -d)",
     "Bash(git push * -d *)",
     "Bash(git -C * push)",
     "Bash(git -C * push * main)",
@@ -229,9 +283,13 @@ DENY_ROWS = [
     "Bash(git -C * push --force-with-lease *)",
     "Bash(git -C * push * --force-with-lease)",
     "Bash(git -C * push * --force-with-lease *)",
+    "Bash(git -C * push --delete)",
     "Bash(git -C * push --delete *)",
+    "Bash(git -C * push * --delete)",
     "Bash(git -C * push * --delete *)",
+    "Bash(git -C * push -d)",
     "Bash(git -C * push -d *)",
+    "Bash(git -C * push * -d)",
     "Bash(git -C * push * -d *)",
 ]
 
