@@ -43,11 +43,21 @@ consult it when authoring docs, not for navigation.
 
 ### Commit when told
 
-After a unit of work, stop. The user reviews diffs in VS Code, then tells you when to commit. Never run `git commit` until the user explicitly says to — committing clears VS Code's diff view, so an unauthorized commit costs the user their review.
+After a unit of work, stop. The user reviews diffs in VS Code, then tells you
+when to commit — an unauthorized commit clears the diff view and costs them
+their review.
 
-**`⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` — the exception.** If this session's launch prompt contains that exact bracketed token, the `commit` skill (`Skill(commit)`) is pre-authorized to run autonomously for the whole session — no "commit now" needed, and no diff review to protect, because these are hands-off software factory nodes that commit to their own issue branch and get reviewed at the PR later.
+Committing at all requires this session to hold a live grant: the user types
+`/commit-on` to give one, `/commit-off` to revoke it, and the later marker
+wins. The `git-authority` hook denies `git commit` without a grant, so an
+unauthorized attempt fails loudly. The grant makes a commit *possible*; the
+user's word makes it *wanted* — under a live grant, still stop after each
+unit of work unless the user has said to commit as you go.
 
-A plan that says commits happen in two phases is a plan, not authorization. Wait for an explicit "commit now" each time.
+**Factory nodes are the exception.** A subagent running as a committing
+factory type (`builder`, `judgment-facilitator`) commits as its skill and
+definition direct, with no grant and no per-commit word: the hook authorizes
+it by agent type, and its work is reviewed at the PR instead of diff-by-diff.
 
 ### Always pin a subagent's model
 

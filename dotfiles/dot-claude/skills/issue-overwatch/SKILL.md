@@ -13,7 +13,7 @@ You own one issue's traverse through the factory: read the software factory grap
 
 One hard limit: you never merge — that is the user's, in the GitHub UI. You do push the issue branch yourself (§7), within the rules [git authority](~/workspace/dev-playbook/software-factory/git-authority.md) holds.
 
-**⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ — you hold the commit token for this session.** It covers the fixes you make yourself at the judgments node: commit them as you land them, without waiting for a "commit now". It covers nothing else — you never touch the work under review, and a delegated node's commits are authorized by its own launch line (§3).
+**Your own commits ride the user's grant.** The commit gate denies your session's commits unless the user has typed `/commit-on` (lane 2) — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md). That covers the fixes you make yourself at the judgments node: ask for the grant when the gate refuses one, and never re-spell a refused command. You commit nothing else — the work under review is never yours to touch. A delegated node's commits are authorized by its own agent type (§3).
 
 **The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-briefing-rule).
 
@@ -56,13 +56,13 @@ Every file-touching node sits in the issue's worktree — open it before the fir
 Run /<skill> <N>.
 ```
 
-**The commit token rides the committing node.** /build is the one AFK node that writes and commits code, so its launch line alone carries the prefix:
+**Committing nodes are typed.** /build is the one AFK node that writes and commits code: spawn it as a `builder`-typed subagent — lane 1 of the commit gate authorizes its commits by that type, so the launch line stays bare:
 
 ```
-⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /build <N>.
+Run /build <N>.
 ```
 
-The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-review — are gh-only actions or read-only audits that never commit, so they get the bare launch line.
+The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-review — are gh-only actions or read-only audits that never commit; they spawn as ordinary subagents with the bare launch line.
 
 Parse the subagent's final message per the [terminal report contract](~/workspace/dev-playbook/software-factory/factory-operations.md#engagement):
 

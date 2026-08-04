@@ -12,7 +12,7 @@ allowed-tools: Bash(git *)
 
 Commit locally without narration; speak up only when something is unexpected.
 
-This skill commits and stops there. Pushing is a separate act with its own authority — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md) — so don't fold a push into a commit request the user didn't make.
+This skill commits and stops there. Whether the session may commit at all is the git-authority hook's ruling, not this skill's — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md). Pushing is likewise a separate act with its own authority, so don't fold a push into a commit request the user didn't make.
 
 ## Args: $ARGUMENTS
 

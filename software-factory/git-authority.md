@@ -21,8 +21,10 @@ sentence:
 
 An agent that hits a denial reports what it tried and why it was refused. It
 does not search for a wording that gets past the rule, and it does not ask
-another agent to run it. The escape hatch is the human's own terminal — there
-is no override marker, and no grant lane.
+another agent to run it. The push family has no override marker and no grant
+lane — its escape hatch is the human's own terminal. The commit family has
+exactly one grant lane, the human-typed `/commit-on` marker (below), and
+nothing an agent writes can mint it.
 
 ## The layers
 
@@ -30,7 +32,7 @@ is no override marker, and no grant lane.
 |---|---|---|
 | Server-side ruleset | GitHub, per [repo settings](/standards/tracking/repo-settings.md) | The last backstop: main rejects force-pushes and deletion whatever the client did |
 | Deny block | `permissions.deny` in `dotfiles/settings/base.json` | Refuses the forbidden push spellings before anything else is consulted |
-| `git-authority` hook | `dotfiles/dot-claude/hooks/git-authority`, wired as a `PreToolUse` hook on `Bash` in `base.json` | Parses every `git push` in the command and refuses the forbidden ones in *any* spelling |
+| `git-authority` hook | `dotfiles/dot-claude/hooks/git-authority`, wired as a `PreToolUse` hook on `Bash` in `base.json` | Parses every `git push` and `git commit` in the command: refuses the forbidden push spellings, in *any* spelling, and every commit but the two lanes allow |
 | Allowlist | `permissions.allow` in `base.json` | Lets the routine commands run without a prompt |
 | Auto-mode entry | `autoMode.allow` in `base.json` | Tells the hands-off classifier the same thing in prose |
 
@@ -83,12 +85,39 @@ not lex at all is refused only where its text resolves to a `git … push`: an
 ordinary command carrying the word "push" is not a push, and refusing it would
 stop work this hook has no authority over.
 
-**The commit rule family** — the commit lanes, their agent allowlist and the
-`/commit-on` marker — is not built yet. It lands in slice B of
-[#341](https://github.com/GeoffNordling/dev-playbook/issues/341) and extends
-this file. Until then no layer here holds an opinion on `git commit`: it is
-governed by the permission rules alone, and the hook reads `git push` segments
-only.
+## The commit rule family
+
+`git commit` is deny-by-default: the hook refuses it unless exactly one of
+two lanes allows, and the lanes never mix.
+
+- **Lane 1 — factory agent types.** A subagent session's hook payload carries
+  an `agent_type` key; when its value is on the allowlist (`builder`,
+  `judgment-facilitator`) the commit runs. The value comes from the
+  human-authored agent definition the subagent was spawned as — no prompt,
+  brief, or skill can write it. A payload carrying `agent_type` is judged by
+  this lane *only*.
+- **Lane 2 — the human's marker.** A main session (no `agent_type` key)
+  commits when its transcript holds a `/commit-on` command marker in a
+  genuine user turn — harness-written when the human types the command, and
+  never read from tool results or assistant turns. `/commit-off` revokes; the
+  later marker wins. The grant survives a `--continue` resume and does not
+  survive `/clear`, which starts a new transcript.
+
+Lane exclusivity is load-bearing: subagents inherit the parent session's
+transcript path, so honoring a parent's grant inside a subagent would extend
+one typed `/commit-on` to every node under a factory manager. It never does.
+
+The commit family fails **closed**: an internal hook error — including an
+event that will not parse off stdin — denies with the error named, rather
+than passing silently. The residual harness-level fail-open (interpreter
+missing, script unreadable) is accepted. One authoring rule protects lane 2:
+no authored content anywhere in the repo may contain the literal marker
+wrapper string; the hook and the tests assemble it from pieces.
+
+Commit authorization never rides a delegation prompt or brief — the
+auto-mode classifier kills a node whose prompt asserts authority it
+structurally lacks. That is enforcement, not etiquette: authorization lives
+only in what the human authored — the definitions, and the typed marker.
 
 ## The canonical commands
 
