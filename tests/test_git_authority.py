@@ -283,6 +283,53 @@ def test_a_tool_other_than_bash_draws_no_opinion() -> None:
     assert decision("git push origin main", tool_name="Edit") is None
 
 
+# --- text the shell never runs ----------------------------------------------
+#
+# A `#` comment and a heredoc body are both text: one the shell skips, the
+# other data being written somewhere. Reading either as a command is the
+# false-deny class that matters most here, because this workspace's own
+# documentation, PR comments and skills are full of the words "git commit".
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "# remember to git commit later",
+        "set -e\n# stage then git commit -m x\nmake check",
+        "make check  # run before the git commit",
+        "# the rules deny git push origin main",
+        "gh pr comment 350 --body-file - <<'EOF'\n"
+        "lane 1 authorizes a git commit by agent type\n"
+        "EOF",
+        "cat > SKILL.md <<'EOF'\n"
+        "Commit via /commit; the git commit is denied without a lane.\n"
+        "EOF",
+        "cat > notes.md <<EOF\ngit push origin main is refused outright\nEOF",
+        "gh pr comment 350 --body-file - <<-'EOF'\n\tthe git commit lanes\n\tEOF",
+    ],
+)
+def test_text_the_shell_never_runs_draws_no_opinion(command: str) -> None:
+    assert decision(command) is None
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "bash <<'EOF'\ngit commit -m t\nEOF",
+        "sh <<EOF\ngit commit -m t\nEOF",
+        "timeout 60 bash <<'EOF'\ncd /tmp && git commit -m t\nEOF",
+    ],
+)
+def test_a_commit_in_a_shell_heredoc_still_needs_a_lane(command: str) -> None:
+    # A heredoc feeding a shell interpreter is a script, not data: its body
+    # runs, so it is read as commands like any other.
+    assert decision(command) == "deny"
+
+
+def test_a_push_in_a_shell_heredoc_is_denied() -> None:
+    assert decision("bash <<'EOF'\ngit push origin main\nEOF") == "deny"
+
+
 # --- the commit family: what counts as a commit -----------------------------
 #
 # Detection is the false-deny guard: "commit" in a path, a message, or another
@@ -511,21 +558,27 @@ def test_an_event_that_will_not_parse_is_denied() -> None:
     assert output["permissionDecision"] == "deny"
 
 
-def test_an_internal_failure_denies_with_the_fault_named(tmp_path: Path) -> None:
-    # A transcript path naming a directory: the read raises where the hook
-    # expects a file, standing in for any fault in the hook's own machinery.
-    event = {
-        "hook_event_name": "PreToolUse",
-        "tool_name": "Bash",
-        "tool_input": {"command": "git commit -m t"},
-        "transcript_path": str(tmp_path),
-    }
-
-    output = hook(json.dumps(event))
+def test_an_internal_failure_denies_with_the_fault_named() -> None:
+    output = outcome("git commit -m t " + NESTED)
 
     assert output is not None
     assert output["permissionDecision"] == "deny"
-    assert "IsADirectoryError" in output["permissionDecisionReason"]
+    assert "RecursionError" in output["permissionDecisionReason"]
+
+
+@pytest.mark.parametrize("path", ["gone.jsonl", ""])
+def test_a_transcript_the_hook_cannot_read_holds_no_grant(
+    tmp_path: Path, path: str
+) -> None:
+    # A missing transcript, and a path naming the directory rather than a file.
+    # Neither is a fault in the hook: the session simply holds no grant the hook
+    # can see, and telling its reader the hook needs repair would send them to
+    # fix working machinery instead of typing the grant.
+    output = outcome("git commit -m t", transcript_path=str(tmp_path / path))
+
+    assert output is not None
+    assert output["permissionDecision"] == "deny"
+    assert "/commit-on" in output["permissionDecisionReason"]
 
 
 # --- the permission rows ----------------------------------------------------

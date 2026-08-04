@@ -54,6 +54,17 @@ SYMBOLIC = re.compile(r"(HEAD|@)([~^{@].*)?")
 # by position instead, which needs no list.
 WRAPPERS = frozenset({"bash", "sh", "zsh", "dash", "env", "xargs", "timeout", "eval"})
 
+# The interpreters that read a heredoc body as a script. Everything else fed a
+# heredoc is being handed data — a PR comment, a file being written — and the
+# body is text rather than commands. Which of the two it is decides whether the
+# body is read at all, so the test errs toward the script reading: a token
+# anywhere in the line is enough.
+SHELL_INTERPRETERS = frozenset({"bash", "sh", "zsh", "dash", "ksh"})
+
+# The shell metacharacters that end an unquoted word, used where a heredoc
+# delimiter is read off the redirection that opens it.
+WORD_BREAKS = "<>|&;()"
+
 # A leading environment assignment — `GIT_DIR=x git push …` runs git with the
 # variable set, so the command is the token after it, not the assignment.
 ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
@@ -148,10 +159,15 @@ class Command(NamedTuple):
     ``substituted`` marks a command found inside a ``$(…)`` or backtick body.
     It runs like any other, but its output is swallowed by the command around
     it, so a push there is judged differently — see ``verdict``.
+
+    ``argv`` is the command lexed once, at construction, and None where the text
+    will not lex at all. Both families read it, and a hook that runs on every
+    Bash call of every session has no business lexing the same line twice.
     """
 
     text: str
     substituted: bool
+    argv: list[str] | None
 
 
 def deny(reason: str) -> None:
@@ -322,16 +338,137 @@ def substitutions(text: str) -> list[str]:
     return found
 
 
+def heredoc_delimiters(line: str) -> list[tuple[str, bool]]:
+    """The heredoc delimiters ``line`` opens, in order, each with its dash form.
+
+    ``<<WORD`` ends the command line and starts a body running to a line holding
+    WORD alone; ``<<-WORD`` lets that line be indented with tabs. Both are read
+    here by walking the line rather than by pattern, because a ``<<`` inside
+    quotes redirects nothing: ``echo "a << b"`` opens no body, and reading one
+    there would swallow every command after it. ``<<<`` is a herestring, which
+    has no body, and is skipped.
+    """
+    found: list[tuple[str, bool]] = []
+    quote = ""
+    index = 0
+    while index < len(line):
+        char = line[index]
+        if char == "\\" and quote != "'" and index + 1 < len(line):
+            index += 2
+            continue
+        if quote:
+            quote = "" if char == quote else quote
+            index += 1
+            continue
+        if char in "'\"":
+            quote = char
+            index += 1
+            continue
+        if not line.startswith("<<", index) or line.startswith("<<<", index):
+            index += 1
+            continue
+        index += 2
+        dashed = line.startswith("-", index)
+        index += 1 if dashed else 0
+        while index < len(line) and line[index] in " \t":
+            index += 1
+        word: list[str] = []
+        while index < len(line):
+            char = line[index]
+            if char == "\\" and quote != "'" and index + 1 < len(line):
+                word.append(line[index + 1])
+                index += 2
+                continue
+            if quote:
+                if char == quote:
+                    quote = ""
+                else:
+                    word.append(char)
+                index += 1
+                continue
+            if char in "'\"":
+                quote = char
+                index += 1
+                continue
+            if char.isspace() or char in WORD_BREAKS:
+                break
+            word.append(char)
+            index += 1
+        if word:
+            found.append(("".join(word), dashed))
+    return found
+
+
+def runs_a_script(line: str) -> bool:
+    """Whether ``line`` hands its heredoc body to something that will run it.
+
+    A body fed to a shell is a script and is read as commands; a body fed to
+    anything else is data — the text of a PR comment, the contents of a file
+    being written — and reading it as commands is how a document *about*
+    committing is refused as a commit. A line that will not lex is treated as
+    the script case, which is the failing-closed direction.
+    """
+    try:
+        argv = shlex.split(line, comments=True)
+    except ValueError:
+        return True
+    return any(token.rpartition("/")[2] in SHELL_INTERPRETERS for token in argv)
+
+
+def without_heredoc_data(text: str) -> str:
+    """``text`` with every heredoc body the shell will not run removed.
+
+    The bodies a shell *will* run are left where they are, so a
+    ``bash <<'EOF'`` script is still segmented and judged line by line. What
+    goes is the rest: without this, every line of a heredoc handed to `gh` or
+    `cat` is segmented as its own command, and a sentence about committing is
+    denied as a commit.
+    """
+    lines = text.split("\n")
+    kept: list[str] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        kept.append(line)
+        index += 1
+        script = runs_a_script(line)
+        for delimiter, dashed in heredoc_delimiters(line):
+            body: list[str] = []
+            while index < len(lines):
+                candidate = lines[index]
+                index += 1
+                if (candidate.lstrip("\t") if dashed else candidate) == delimiter:
+                    break
+                body.append(candidate)
+            if script:
+                kept.extend(body)
+    return "\n".join(kept)
+
+
+def lex(text: str) -> list[str] | None:
+    """``text`` as the argv it runs, or None where it will not lex.
+
+    Comments go the way the shell takes them: a ``#`` starts text that never
+    runs, and reading it as argv is how a note to commit later becomes a commit.
+    """
+    try:
+        return command_argv(shlex.split(text, comments=True))
+    except ValueError:
+        return None
+
+
 def commands(text: str, substituted: bool = False) -> list[Command]:
     """Every command ``text`` runs — its own segments, and every substituted one.
 
     Flattening the whole line first is what makes chaining, grouping and
     substitution all one problem: each command is then judged on its own, and
-    none of them can hide behind the shape of another.
+    none of them can hide behind the shape of another. Heredoc data is dropped
+    before the split, because it is text the shell hands somewhere rather than
+    commands it runs.
     """
     found: list[Command] = []
-    for segment in segments(text):
-        found.append(Command(segment, substituted))
+    for segment in segments(without_heredoc_data(text)):
+        found.append(Command(segment, substituted, lex(segment)))
         for body in substitutions(segment):
             found.extend(commands(body, substituted=True))
     return found
@@ -396,7 +533,7 @@ def reaches(argv: list[str], subcommand: str, mention: re.Pattern[str]) -> bool:
         if " " not in token:
             continue
         try:
-            inner = shlex.split(token)
+            inner = shlex.split(token, comments=True)
         except ValueError:
             if mention.search(token):
                 return True
@@ -520,22 +657,22 @@ def judge(argv: list[str]) -> str | None:
 def verdict(command: Command) -> str | None:
     """The ruling ``command`` breaks, or None when it breaks none.
 
-    One lex, inside one guard. A command that will not lex is one this hook
-    cannot read, and it is refused only where its text resolves to a git push:
-    an ordinary command carrying the word "push" is not a push, and denying it
-    would stop work this hook has no authority over.
+    A command that will not lex is one this hook cannot read, and it is refused
+    only where its text resolves to a git push: an ordinary command carrying the
+    word "push" is not a push, and denying it would stop work this hook has no
+    authority over.
 
     A push inside a substitution is never judged on its merits. Its output is
     consumed by the enclosing command rather than reported, so even a routine
     spelling there is a push nobody watched, and it fails closed with the rest.
+    The commit family draws the opposite conclusion from the same shape, by
+    ruling — see the Guide.
     """
-    try:
-        argv = command_argv(shlex.split(command.text))
-    except ValueError:
+    if command.argv is None:
         return UNREADABLE if GIT_PUSH_TEXT.search(command.text) else None
-    after = subcommand_argv(argv, "push")
+    after = subcommand_argv(command.argv, "push")
     if after is None:
-        return UNREADABLE if reaches_push(argv) else None
+        return UNREADABLE if reaches_push(command.argv) else None
     return UNREADABLE if command.substituted else judge(after)
 
 
@@ -548,13 +685,11 @@ def commits(command: Command) -> bool:
     a position counts too. What the hook cannot read, it does not wave through
     — the lanes below still decide whether it runs.
     """
-    try:
-        argv = command_argv(shlex.split(command.text))
-    except ValueError:
+    if command.argv is None:
         return bool(GIT_COMMIT_TEXT.search(command.text))
-    if subcommand_argv(argv, "commit") is not None:
+    if subcommand_argv(command.argv, "commit") is not None:
         return True
-    return reaches_commit(argv)
+    return reaches_commit(command.argv)
 
 
 def user_texts(transcript_path: str) -> list[str]:
@@ -602,12 +737,17 @@ def granted(transcript_path: str) -> bool:
     Later wins, so a grant survives everything before it and nothing after it:
     the user turns /commit-on and /commit-off as often as they like, and the
     hook reads the one they typed last.
+
+    A transcript that will not open holds no grant this hook can see, which is
+    the ungranted state and not a fault in the hook. Letting the error escape
+    would report a defect in working machinery and send the reader to repair it,
+    instead of to the one thing that opens the lane — typing the grant.
     """
-    verdicts = [
-        match.group(1)
-        for text in user_texts(transcript_path)
-        for match in MARKER.finditer(text)
-    ]
+    try:
+        texts = user_texts(transcript_path)
+    except OSError:
+        return False
+    verdicts = [match.group(1) for text in texts for match in MARKER.finditer(text)]
     return bool(verdicts) and verdicts[-1] == "on"
 
 
@@ -646,17 +786,6 @@ def command_text(event: object) -> str:
         return ""
     line = tool_input.get("command")
     return line if isinstance(line, str) else ""
-
-
-def governed(text: str) -> bool:
-    """Whether ``text`` reads as a git push or commit — this hook's own subject.
-
-    The coarsest possible reading, and consulted in one place only: deciding
-    whether a fault in the hook's machinery is a fault over a command the hook
-    had any authority over. Reading too much is the failing-closed direction
-    here, since a false match denies a push or a commit that was never judged.
-    """
-    return bool(GIT_PUSH_TEXT.search(text) or GIT_COMMIT_TEXT.search(text))
 
 
 def evaluate(event: object) -> None:
@@ -703,7 +832,13 @@ def main() -> None:
         event = json.loads(sys.stdin.read())
         evaluate(event)
     except Exception as fault:
-        if event is None or governed(command_text(event)):
+        # The coarsest possible reading of the command, asked in this one place:
+        # was the fault over something this hook had any authority over? Reading
+        # too much is the failing-closed direction, since a false match denies a
+        # push or a commit that was never judged, while a false miss waves one
+        # through.
+        text = command_text(event)
+        if event is None or GIT_PUSH_TEXT.search(text) or GIT_COMMIT_TEXT.search(text):
             deny(INTERNAL.format(fault=f"{type(fault).__name__}: {fault}"))
 
 
