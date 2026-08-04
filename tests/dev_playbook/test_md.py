@@ -114,6 +114,8 @@ class TestClassify:
                 "harness",
             ),
             ("dotfiles/dot-claude/rules/bash-commands.md", "harness"),
+            ("dotfiles/dot-claude/agents/builder.md", "harness"),
+            (".claude/agents/reviewer.md", "harness"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
             ("tools/bin/ref-lint", "harness"),

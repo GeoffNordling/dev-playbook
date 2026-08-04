@@ -24,3 +24,4 @@ different file set and would get its own standard.
 | `settings.json`, `settings.local.json` | read as configuration | none yet |
 | `hooks/` | run as code around harness events | none yet |
 | `.claude/workflows/*.js` | run as code by the Workflow tool | none yet |
+| `agents/*.md` | read at session start as the subagent spawn registry; each file a named agent definition (frontmatter identity + standing system prompt) | none yet |
