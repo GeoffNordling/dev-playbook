@@ -89,8 +89,11 @@ terms where they apply, with no obligation to extend it.
 One actor — the dispatcher, reviewer, and approver — wears two names, chosen by
 voice. **Agent-facing instruction text says `user`**: `CLAUDE.md` at every level
 — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike — plus the
-skill and rule bodies under `dotfiles/dot-claude/skills/` and
-`dotfiles/dot-claude/rules/`. None of these are written for a human reader; every
+skill, rule, and agent-definition bodies under `dotfiles/dot-claude/skills/`,
+`dotfiles/dot-claude/rules/`, and `dotfiles/dot-claude/agents/` (a consumer repo
+carries the same three under `.claude/`). An agent definition is a standing
+system prompt, which is as agent-facing as text gets.
+None of these are written for a human reader; every
 one of them has exactly one real audience, the executing agent, so all of them
 name that person the way Claude Code does (`AskUserQuestion`). CLAUDE.md does not
 split by location — its content is commands to the agent

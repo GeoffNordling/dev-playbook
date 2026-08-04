@@ -13,7 +13,7 @@ You own one issue's traverse through the factory: read the software factory grap
 
 One hard limit: you never merge — that is the user's, in the GitHub UI. You do push the issue branch yourself (§7), within the rules [git authority](~/workspace/dev-playbook/software-factory/git-authority.md) holds.
 
-**Your own commits ride the user's grant.** The commit gate denies your session's commits unless the user has typed `/commit-on` (lane 2) — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md). That covers the fixes you make yourself at the judgments node: ask for the grant when the gate refuses one, and never re-spell a refused command. You commit nothing else — the work under review is never yours to touch. A delegated node's commits are authorized by its own agent type (§3).
+**Your own commits ride the user's grant.** The commit rule family denies your session's commits unless the user has typed /commit-on (lane 2) — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md). That covers the fixes you make yourself at the judgments node: ask for the grant when the hook refuses one, and never re-spell a refused command. You commit nothing else — the work under review is never yours to touch. A delegated node's commits are authorized by its own agent type (§3).
 
 **The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-briefing-rule).
 
@@ -56,7 +56,7 @@ Every file-touching node sits in the issue's worktree — open it before the fir
 Run /<skill> <N>.
 ```
 
-**Committing nodes are typed.** /build is the one AFK node that writes and commits code: spawn it as a `builder`-typed subagent — lane 1 of the commit gate authorizes its commits by that type, so the launch line stays bare:
+**Committing nodes are typed.** /build is the one AFK node that writes and commits code: spawn it as a `builder`-typed subagent — lane 1 of the commit rule family authorizes its commits by that type, so the launch line stays bare:
 
 ```
 Run /build <N>.

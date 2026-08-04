@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Git Authority
-description: The layers deciding which git operations an agent may run, the push rule family, and the canonical command set
+description: The layers deciding which git operations an agent may run, the push and commit rule families, and the canonical command set
 ---
 
 # Git Authority
@@ -107,12 +107,32 @@ Lane exclusivity is load-bearing: subagents inherit the parent session's
 transcript path, so honoring a parent's grant inside a subagent would extend
 one typed `/commit-on` to every node under a factory manager. It never does.
 
-The commit family fails **closed**: an internal hook error — including an
-event that will not parse off stdin — denies with the error named, rather
-than passing silently. The residual harness-level fail-open (interpreter
-missing, script unreadable) is accepted. One authoring rule protects lane 2:
-no authored content anywhere in the repo may contain the literal marker
-wrapper string; the hook and the tests assemble it from pieces.
+The commit family fails **closed**, bounded by what it has authority over: a
+fault in the hook's own machinery denies where the command reads as a push or a
+commit, and draws no opinion on anything else, because this hook runs on every
+Bash call and one fault must not take out `ls` and `make check` everywhere at
+once. The one fault it cannot scope that way is an event that will not parse off
+stdin — there is no command to read, so that denies whole. The residual
+harness-level fail-open (interpreter missing, script unreadable) is accepted.
+
+One authoring rule protects lane 2: no authored content anywhere in the repo may
+contain the literal marker wrapper string; the hook, the tests, and the
+`claude-code.command-marker` check that enforces it all assemble it from pieces.
+
+Two limits are stated rather than fixed, each with an issue:
+
+- **The family reads `git commit` and nothing else.** `git revert`, `merge`,
+  `cherry-pick`, `am`, `rebase --continue` and `commit-tree` all write commit
+  objects and draw no opinion here, so "a commit needs a lane" is true of
+  `git commit` specifically, not of every way a commit can be made. Which verbs
+  belong, and at what false-deny cost, is
+  [#353](https://github.com/GeoffNordling/dev-playbook/issues/353).
+- **Lane 2 rests on `disable-model-invocation` being a hard refusal.** The
+  marker skills carry that flag so only a typed command can plant a marker. If
+  the harness treats it as a listing omission rather than a refusal at the Skill
+  tool, a model could mint its own grant and the lane is forgeable. That is an
+  assumption, not a measured fact;
+  [#354](https://github.com/GeoffNordling/dev-playbook/issues/354) settles it.
 
 Commit authorization never rides a delegation prompt or brief — the
 auto-mode classifier kills a node whose prompt asserts authority it

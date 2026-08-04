@@ -9,8 +9,8 @@ approves, before the user's final read. Work through it in order.
    gives. It enumerates the misses, dispatches the judges, records the passes,
    and makes focused fixes for refutations; take over the ones it sets aside.
 
-2. **Commit each fix as it lands.** Your commits ride lane 2 of the commit
-   gate — the user's typed `/commit-on`. If the gate denies, ask the user for
+2. **Commit each fix as it lands.** Your commits ride lane 2 of the commit rule
+   family — the user's typed /commit-on. If the hook denies, ask the user for
    the grant (or hand them the commit); never re-spell a refused command. The
    grant stands for the session, so no per-fix go-ahead.
 

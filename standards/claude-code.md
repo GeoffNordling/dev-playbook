@@ -26,10 +26,12 @@ from ordinary files, and what each may contain.
 ## Audit
 
 - [repo-lint](/scripts/repo-lint) — CLAUDE.md presence; the agent-facing
-  voice of every CLAUDE.md, root to global
-  (`claude-code.agent-facing-voice`); and, in dev-playbook only, the global
-  CLAUDE.md source's two-section shape and the workspace-wide rules it must
-  carry (`claude-code.global-claude-shape`,
+  voice of every CLAUDE.md, skill, rule, and agent definition
+  (`claude-code.agent-facing-voice`); the absence of a harness command marker
+  from authored content, which the git-authority hook would read as a typed
+  commit grant (`claude-code.command-marker`); and, in dev-playbook only, the
+  global CLAUDE.md source's two-section shape and the workspace-wide rules it
+  must carry (`claude-code.global-claude-shape`,
   `claude-code.global-claude-rules`)
 - [skill-lint](/scripts/skill-lint) — skill bundles in
   skill-authoring repos, plus the `claude-code.skill-mirror`

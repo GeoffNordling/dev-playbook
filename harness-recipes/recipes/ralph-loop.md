@@ -33,13 +33,23 @@ Each iteration is one fresh `agent()` that:
    broken),
 2. reads the plan and the progress log,
 3. implements the single next incomplete task,
-4. brings the gate back to green when one is configured — never commits red,
+4. brings the gate back to green when one is configured, so that what it goes on to commit is never red,
 5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
-6. commits via the `/commit` skill,
+6. attempts a commit via the `/commit` skill,
 7. reports whether the plan is complete.
 
 The runtime repeats this until an agent reports done. No agent remembers the
 last — continuity lives entirely on disk.
+
+**Step 6 currently has no commit authorization.** `git commit` is deny-by-default
+under the `git-authority` hook's commit rule family, and an iteration agent holds
+neither lane: it is not one of the committing factory agent types, and lane
+exclusivity keeps it off a grant typed at the launching session. Disk is the
+loop's only memory, so a loop run this way makes no durable progress. Giving the
+iteration a lane is
+[#351](https://github.com/GeoffNordling/dev-playbook/issues/351); until it lands,
+treat this recipe as describing the loop's shape rather than a working commit
+path.
 
 ## Running it
 

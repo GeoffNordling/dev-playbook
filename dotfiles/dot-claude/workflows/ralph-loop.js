@@ -80,7 +80,10 @@ The plan is in ${PLAN}; the running log of work so far is in ${PROGRESS}. Both m
 3. Find the next incomplete task in the plan and implement it — one task only, small enough to finish cleanly in this iteration.
 4. ${step4}
 5. Mark that task complete in ${PLAN}. Optionally record in Working notes an important, durable fact that future iterations would need. Append a one-line entry to ${PROGRESS}: what you did, and what is next.
-6. Commit this iteration's work by invoking the /commit skill.
+6. Commit this iteration's work by invoking the /commit skill. Expect this to be
+   denied: an iteration holds no lane of the git-authority hook's commit rule
+   family, so the loop has no commit authorization of its own — see issue #351.
+   Report the denial through blocker rather than re-spelling the command.
 7. Report: summary = one line on what you did; done = true only if every task in the plan is now complete; blocker = null unless step 1 stopped you.`
 
 let iteration = 0, done = false

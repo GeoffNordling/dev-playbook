@@ -108,7 +108,7 @@ The factory's nodes, what runs each, and how each engages the human:
 
 | Node | Skill | Engagement |
 |---|---|---|
-| `build` | `/build` | AFK, as a `builder`-typed subagent (lane 1 of the commit gate). |
+| `build` | `/build` | AFK, as a `builder`-typed subagent (lane 1 of the commit rule family). |
 | `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict)). |
 | `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
 
@@ -122,7 +122,7 @@ fresh context window and inherits the issue's worktree as cwd; it reloads what i
 needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
 ends with a terminal report. Nothing carries over from the overwatch's context.
 A committing node is spawned as its factory agent type (`builder` for /build),
-which is what lane 1 of the commit gate reads, per
+which is what lane 1 of the commit rule family reads, per
 [Permissions](#permissions); its launch line carries no authorization. A helper
 a skill invokes itself (`/commit`,
 `/grill-with-docs`) is not a node and is never dispatched.
@@ -297,10 +297,10 @@ which a subagent does not have — so there is no wrapper skill and no subagent:
 the overwatch invokes `/run-judgments` itself, in the issue's worktree.
 
 - **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
-  and on the issue branch, and committed through lane 2 of the commit gate —
-  the human's typed `/commit-on` (see [Permissions](#permissions)). The grant
-  stands for the session, so no per-fix go-ahead; a denial is the gate asking
-  for the human's word, never a thing to work around.
+  and on the issue branch, and committed through lane 2 of the commit rule
+  family — the human's typed `/commit-on` (see [Permissions](#permissions)).
+  The grant stands for the session, so no per-fix go-ahead; a denial is the
+  hook asking for the human's word, never a thing to work around.
 - **An ambiguous failure escalates.** Where a fix is unclear enough to want human
   advice, the node stops and asks
   ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional));

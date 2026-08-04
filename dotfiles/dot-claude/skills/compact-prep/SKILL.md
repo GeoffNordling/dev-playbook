@@ -14,9 +14,11 @@ not an audit.
 
 ## Procedure
 
-1. **Commit everything.** Invoking this skill is the user's authorization to
-   commit — the standing "commit when told" rule is satisfied. Use /commit.
-   Split unrelated changes into separate commits.
+1. **Commit everything.** Use /commit under the session's live grant, splitting
+   unrelated changes into separate commits. Invoking this skill authorizes
+   nothing on its own: only the user's typed /commit-on opens the lane, so if
+   the commit is denied, ask for the grant right away — this runs at the edge
+   of the context window, where unsaved work is least recoverable.
 
 2. **Mention anything important at risk — only if something already stands
    out.** Compaction is itself trying to preserve the conversation and is
