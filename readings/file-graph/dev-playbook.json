@@ -2614,7 +2614,7 @@
    "target": "software-factory/git-authority.md",
    "kind": "internal",
    "form": "citation",
-   "line": 150,
+   "line": 145,
    "status": "ok"
   },
   {
@@ -3182,7 +3182,7 @@
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "citation",
-   "line": 31,
+   "line": 32,
    "status": "ok"
   },
   {
@@ -5606,7 +5606,7 @@
    "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
-   "line": 29,
+   "line": 31,
    "status": "ok"
   },
   {
@@ -5614,7 +5614,7 @@
    "target": "dotfiles/settings/base.json",
    "kind": "internal",
    "form": "prose-path",
-   "line": 30,
+   "line": 32,
    "status": "ok"
   },
   {
@@ -5622,7 +5622,7 @@
    "target": "dotfiles/settings/base.json",
    "kind": "internal",
    "form": "prose-path",
-   "line": 125,
+   "line": 136,
    "status": "ok"
   },
   {
@@ -5630,7 +5630,7 @@
    "target": "tests/test_git_authority.py",
    "kind": "internal",
    "form": "prose-path",
-   "line": 128,
+   "line": 139,
    "status": "ok"
   },
   {
@@ -6246,7 +6246,7 @@
    "target": "standards/tracking/issue-authoring.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 95,
+   "line": 96,
    "status": "ok"
   },
   {
@@ -6254,7 +6254,7 @@
    "target": "dotfiles/.agents/skills/wayfinder/SKILL.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 113,
+   "line": 114,
    "status": "ok"
   },
   {
@@ -6262,7 +6262,7 @@
    "target": "standards/tracking/issue-authoring.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 115,
+   "line": 116,
    "status": "ok"
   },
   {
@@ -10326,7 +10326,7 @@
    "target": "software-factory/git-authority.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 189,
+   "line": 239,
    "status": "ok"
   },
   {
@@ -11568,9 +11568,7 @@
   ".gitignore:.mypy_cache/": 18,
   ".gitignore:.ruff_cache/": 13,
   ".gitignore:.pytest_cache/": 5,
-  "standards/build/canonical/.gitignore:.ruff_cache/": 2,
-  "/home/geoff/workspace/dev-playbook/.git/info/exclude:**/.claude/scheduled_tasks.json": 1,
-  "/home/geoff/.config/git/ignore:**/.claude/settings.local.json": 1
+  "standards/build/canonical/.gitignore:.ruff_cache/": 2
  },
  "excluded": {
   "readings/file-graph/": 2,

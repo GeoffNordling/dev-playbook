@@ -221,17 +221,13 @@ def stub_origin(monkeypatch: pytest.MonkeyPatch, origin: workspace_lint.Origin) 
 def test_resolve_names_a_wrongly_spelled_origin_rather_than_a_missing_one(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    stub_origin(
-        monkeypatch,
-        workspace_lint.Origin(
-            url="git@github.com:GeoffNordling/dev-playbook", slug=None
-        ),
-    )
+    spelled_wrong = "ssh://git@github.com/GeoffNordling/dev-playbook.git"
+    stub_origin(monkeypatch, workspace_lint.Origin(url=spelled_wrong, slug=None))
 
     with pytest.raises(bump_pins.ToolError) as caught:
         bump_pins.resolve(Path("/nowhere"), (), None)
 
-    assert "git@github.com:GeoffNordling/dev-playbook" in str(caught.value)
+    assert spelled_wrong in str(caught.value)
     assert "no GitHub origin" not in str(caught.value)
 
 
