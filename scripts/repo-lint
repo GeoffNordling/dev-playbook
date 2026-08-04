@@ -720,8 +720,11 @@ def check_command_marker(root: Path) -> list[Finding]:
     turn, and nothing fails until it does. This is the detector behind the rule.
 
     Every file in the checkout is read, not just markdown: an @-mention carries
-    whatever it points at. Anything that will not decode as UTF-8 is not
-    authored prose and is skipped. The vendored tree is skipped too, as an
+    whatever it points at, and undecodable bytes are replaced rather than
+    treated as a reason to stop — the hook reads transcript text the same way,
+    so a file carrying the marker beside one stray byte still mints a grant.
+    Replacement costs nothing: a binary cannot match the pattern anyway. The
+    vendored tree is skipped, as an
     accepted gap rather than a clean exemption — those files are published under
     the skills root by symlink and so are live skill text, but they are carried
     verbatim from upstream and cannot be edited, so a hit there would be a
@@ -736,10 +739,7 @@ def check_command_marker(root: Path) -> list[Finding]:
         path = root / rel
         if is_vendored(root, path):
             continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
         for num, line in enumerate(text.splitlines(), start=1):
             if COMMAND_MARKER_PATTERN.search(line):
                 findings.append(

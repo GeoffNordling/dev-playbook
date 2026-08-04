@@ -456,6 +456,27 @@ def test_the_marker_check_reads_files_that_are_not_markdown(tmp_path: Path) -> N
     assert "fixtures/turn.json: claude-code.command-marker" in result.stdout
 
 
+def test_a_file_the_marker_check_cannot_decode_is_still_read(tmp_path: Path) -> None:
+    # The hook reads transcript text with undecodable bytes replaced, so a file
+    # carrying the marker plus one stray byte still mints a grant nobody typed.
+    # A check that skipped what it could not decode would report clean on
+    # exactly the file that matters, which is the silent skip this repo bans.
+    files = base_files()
+    files["fixtures/turn.json"] = "placeholder\n"
+    repo = make_repo(tmp_path, files)
+    (repo / "fixtures" / "turn.json").write_bytes(
+        b"\xff\xfe" + f'{{"content": "{MARKER}"}}\n'.encode()
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "add", "-A"], check=True, capture_output=True
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 1
+    assert "fixtures/turn.json: claude-code.command-marker" in result.stdout
+
+
 def test_a_vendored_file_carrying_the_command_marker_is_not_inspected(
     tmp_path: Path,
 ) -> None:
