@@ -84,7 +84,7 @@ cancelled too. Prefer single quotes by default for regex/pattern data.
 
 ## Keep sandbox-excluded commands leading and top-level
 
-`gh` and `git` both escape the bwrap jail, for different reasons.  `gh`'s token
+`gh` and `git` both escape the bwrap jail, for different reasons. `gh`'s token
 lives in the system keyring behind a D-Bus socket the sandbox blocks, so a
 sandboxed `gh` falls back to unauthenticated and 401s. `git` is excluded
 because the harness's protection of `.git/config` and `.git/hooks` — denied
