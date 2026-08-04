@@ -215,9 +215,11 @@ PROTECTION_QUERY = """query($owner: String!, $name: String!) {
   }
 }"""
 
-REMOTE_SLUG_PATTERN = re.compile(
-    r"^(?:git@github\.com:|https://github\.com/)([^/\s]+/[^/\s]+?)(?:\.git)?$"
-)
+# HTTPS is the only origin form this workspace operates. git reaches GitHub with
+# the keyring PAT through the credential helper, so an SSH-form origin would want
+# a key nothing here holds — it is a misconfiguration to report, not an
+# alternative to accept.
+REMOTE_SLUG_PATTERN = re.compile(r"^https://github\.com/([^/\s]+/[^/\s]+?)(?:\.git)?$")
 
 
 class ToolError(Exception):
@@ -287,8 +289,23 @@ def workspace_repos(workspace: Path, roster: tuple[str, ...]) -> list[Path]:
     return repos
 
 
-def origin_slug(repo: Path) -> str | None:
-    """``owner/name`` from the repo's GitHub origin, or None if there is none."""
+@dataclass(frozen=True)
+class Origin:
+    """A repo's ``origin`` as the audit reads it.
+
+    Three states, and the audit answers each differently: no origin at all
+    (``url`` None), an origin in some form other than canonical HTTPS (``url``
+    set, ``slug`` None), and a usable one (both set). The middle state is why
+    this is a pair rather than a bare slug — a repo whose origin is merely
+    spelled wrong must not be reported as having no origin.
+    """
+
+    url: str | None
+    slug: str | None
+
+
+def origin_of(repo: Path) -> Origin:
+    """The repo's ``origin`` remote, and the ``owner/name`` it yields if it is usable."""
     result = subprocess.run(
         ["git", "-C", str(repo), "remote", "get-url", "origin"],
         capture_output=True,
@@ -296,9 +313,10 @@ def origin_slug(repo: Path) -> str | None:
         env=gitrepo.no_git_env(),
     )
     if result.returncode != 0:
-        return None
-    match = REMOTE_SLUG_PATTERN.match(result.stdout.strip())
-    return match.group(1) if match else None
+        return Origin(url=None, slug=None)
+    url = result.stdout.strip()
+    match = REMOTE_SLUG_PATTERN.match(url)
+    return Origin(url=url, slug=match.group(1) if match else None)
 
 
 def rev_line(lines: list[str], url: str) -> int | None:
@@ -509,17 +527,23 @@ def fetch_issues(slug: str) -> list | None:
     return data if isinstance(data, list) else None
 
 
-def check_settings(repo: Path, slug: str | None) -> list[Line]:
+def check_settings(repo: Path, origin: Origin) -> list[Line]:
     """A repo's GitHub merge settings against the expected values.
 
-    A loud finding when the repo has no GitHub origin (``slug`` is None) or the
-    settings API is unreachable; otherwise one finding per drifted field.
+    A loud finding when the repo has no usable GitHub origin or the settings API
+    is unreachable; otherwise one finding per drifted field. The two unusable
+    origins are reported apart: nothing to push to at all, versus an origin in a
+    form this workspace does not operate. They call for different repairs.
     """
     name = repo.name
+    slug = origin.slug
     if slug is None:
-        return [
-            Line(name, REMOTE, "no GitHub origin; settings unchecked", blocking=True)
-        ]
+        message = (
+            "no GitHub origin; settings unchecked"
+            if origin.url is None
+            else f"origin not in canonical HTTPS form ({origin.url}); settings unchecked"
+        )
+        return [Line(name, REMOTE, message, blocking=True)]
     settings = fetch_settings(slug)
     if settings is None:
         return [Line(name, SETTINGS, f"unreachable via gh api ({slug})", blocking=True)]
@@ -1041,11 +1065,11 @@ def main(argv: list[str] | None = None) -> int:
                 if pin is not None:
                     lines.append(pin)
             if not args.pins_only:
-                slug = origin_slug(repo)
-                lines.extend(check_settings(repo, slug))
-                lines.extend(check_protection(repo, slug))
+                origin = origin_of(repo)
+                lines.extend(check_settings(repo, origin))
+                lines.extend(check_protection(repo, origin.slug))
                 if not args.settings_only:
-                    lines.extend(check_tracking(repo, slug))
+                    lines.extend(check_tracking(repo, origin.slug))
     except ToolError as err:
         print(f"workspace-lint: {err}", file=sys.stderr)
         return 2

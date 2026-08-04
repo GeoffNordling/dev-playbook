@@ -208,7 +208,7 @@ def resolve(workspace: Path, roster: tuple[str, ...], sha: str | None) -> Plan:
     """
     url = workspace_lint.hook_repo_url()
     target = sha or workspace_lint.hook_repo_main()
-    slug = workspace_lint.origin_slug(HOOK_REPO_ROOT)
+    slug = workspace_lint.origin_of(HOOK_REPO_ROOT).slug
     if slug is None:
         raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}; cannot verify {target}")
     if workspace_lint.gh_api(f"repos/{slug}/commits/{target}") is None:
