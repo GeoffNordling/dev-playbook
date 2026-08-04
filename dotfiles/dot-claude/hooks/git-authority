@@ -12,6 +12,7 @@ import json
 import re
 import shlex
 import sys
+from typing import NamedTuple
 
 # The shell operators the harness itself recognizes as command separators, in
 # match order so `&&` is seen before `&`. A rule that read only the first
@@ -25,10 +26,6 @@ SEPARATORS = ("&&", "||", ";", "|", "&", "\n")
 # push and must not be refused as one.
 GIT_PUSH_TEXT = re.compile(r"\bgit\b.*\bpush\b", re.DOTALL)
 
-# The body of a command substitution — ``$(…)`` or a backtick pair. A push in
-# there never appears in the argv this hook parses, so the body is read for one.
-SUBSTITUTION_BODY = re.compile(r"\$\((.*?)\)|`(.*?)`", re.DOTALL)
-
 # A shell expansion in a push operand. Whatever remote or refspec it stands for
 # is decided when the command runs, so the hook cannot see where the push lands.
 EXPANSION = re.compile(r"[$`]")
@@ -38,10 +35,16 @@ EXPANSION = re.compile(r"[$`]")
 # readable than an expansion.
 SYMBOLIC = re.compile(r"(HEAD|@)([~^{@].*)?")
 
-# Wrappers that put a command out of reach of argv parsing. A push that is only
-# reachable through one of these is denied unread: the hook cannot see what it
-# would run, and an unreadable push is not a push anyone has authorized.
+# Wrappers that re-lex a string argument, running a command that never appears
+# as argv tokens of its own. Enumerated because looking inside a quoted token is
+# only right where something will run it: `printf 'see git push rules'` prints a
+# sentence. Every *other* way of putting a push behind another command is caught
+# by position instead, which needs no list.
 WRAPPERS = frozenset({"bash", "sh", "zsh", "dash", "env", "xargs", "timeout", "eval"})
+
+# A leading environment assignment — `GIT_DIR=x git push …` runs git with the
+# variable set, so the command is the token after it, not the assignment.
+ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
 
 # git's own options, taken before the subcommand, that consume the next token.
 GIT_VALUE_OPTIONS = frozenset(
@@ -79,6 +82,18 @@ UNREADABLE = (
 )
 
 
+class Command(NamedTuple):
+    """One command the shell will run, and how the hook reached it.
+
+    ``substituted`` marks a command found inside a ``$(…)`` or backtick body.
+    It runs like any other, but its output is swallowed by the command around
+    it, so a push there is judged differently — see ``verdict``.
+    """
+
+    text: str
+    substituted: bool
+
+
 def deny(reason: str) -> None:
     """Print the deny decision and exit.
 
@@ -102,20 +117,30 @@ def deny(reason: str) -> None:
 def segments(command: str) -> list[str]:
     """The command's shell segments — what the harness matches independently.
 
-    Split on unquoted operators only. A ``;`` inside ``git commit -m "push;
-    done"`` separates nothing, and a split blind to quoting does damage in both
-    directions: it fractures ordinary commands into fragments that will not
-    lex, and it hides a real push behind them.
+    Split on unquoted operators only, and only where they really separate
+    commands. A ``;`` inside ``git commit -m "push; done"`` separates nothing,
+    and a split blind to structure does damage in both directions: it fractures
+    ordinary commands into pieces that will not lex, and it hides a real push
+    behind them. Three structures are therefore tracked:
+
+    - **Quotes.** Their contents are one token, operators included.
+    - **Command substitutions**, ``$(…)`` and backtick pairs. A separator inside
+      one belongs to the substitution; splitting there would leave the body
+      unbalanced, and the push in it unseen. The body is judged separately.
+    - **Subshell grouping**, ``(…)``. Here the parentheses *are* boundaries:
+      ``(git push origin main)`` runs a push as its own command, and a splitter
+      that kept the paren attached would read the command as ``(git``.
     """
     found: list[str] = []
     current: list[str] = []
     quote = ""
+    substitutions = 0
+    backtick = False
     index = 0
     while index < len(command):
         char = command[index]
         if char == "\\" and quote != "'" and index + 1 < len(command):
-            current.append(char)
-            current.append(command[index + 1])
+            current.append(command[index : index + 2])
             index += 2
             continue
         if quote:
@@ -129,7 +154,28 @@ def segments(command: str) -> list[str]:
             current.append(char)
             index += 1
             continue
+        if char == "`":
+            backtick = not backtick
+            current.append(char)
+            index += 1
+            continue
+        if command.startswith("$(", index):
+            substitutions += 1
+            current.append("$(")
+            index += 2
+            continue
+        if substitutions and char == ")":
+            substitutions -= 1
+            current.append(char)
+            index += 1
+            continue
+        if backtick or substitutions:
+            current.append(char)
+            index += 1
+            continue
         separator = next((s for s in SEPARATORS if command.startswith(s, index)), None)
+        if separator is None and char in "()":
+            separator = char
         if separator is not None:
             found.append("".join(current))
             current = []
@@ -141,18 +187,116 @@ def segments(command: str) -> list[str]:
     return [part.strip() for part in found if part.strip()]
 
 
-def hidden_push(segment: str) -> bool:
-    """Whether a command substitution in ``segment`` carries a push inside it."""
-    return any(
-        GIT_PUSH_TEXT.search(body)
-        for match in SUBSTITUTION_BODY.finditer(segment)
-        for body in match.groups()
-        if body is not None
-    )
+def balanced(text: str, start: int, opener: str | None, closer: str) -> tuple[str, int]:
+    """The substitution body opening at ``start``, and the index past its closer.
+
+    Nesting is counted, so ``$(a $(b) c)`` yields the whole outer body rather
+    than stopping at the first ``)``. An unclosed substitution yields the rest
+    of the text: reading too much is the failing-closed direction, because what
+    is read is then judged.
+    """
+    depth = 1
+    quote = ""
+    index = start
+    while index < len(text):
+        char = text[index]
+        if char == "\\" and quote != "'" and index + 1 < len(text):
+            index += 2
+            continue
+        if quote:
+            if char == quote:
+                quote = ""
+            index += 1
+            continue
+        if char in "'\"":
+            quote = char
+            index += 1
+            continue
+        if opener is not None and char == opener:
+            depth += 1
+        elif char == closer:
+            depth -= 1
+            if depth == 0:
+                return text[start:index], index + 1
+        index += 1
+    return text[start:], len(text)
+
+
+def substitutions(text: str) -> list[str]:
+    """The body of every command substitution in ``text``.
+
+    ``$(…)`` and a backtick pair each run a command whose argv never appears in
+    the enclosing one, so the body is pulled out to be read on its own. Single
+    quotes make both inert; double quotes do not, which is why the walk below
+    keeps looking inside a ``"…"`` run.
+    """
+    found: list[str] = []
+    quote = ""
+    index = 0
+    while index < len(text):
+        char = text[index]
+        if char == "\\" and quote != "'" and index + 1 < len(text):
+            index += 2
+            continue
+        if quote == "'":
+            quote = "" if char == "'" else quote
+            index += 1
+            continue
+        if quote == '"' and char == '"':
+            quote = ""
+            index += 1
+            continue
+        if not quote and char in "'\"":
+            quote = char
+            index += 1
+            continue
+        if text.startswith("$(", index):
+            body, index = balanced(text, index + 2, "(", ")")
+            found.append(body)
+            continue
+        if char == "`":
+            body, index = balanced(text, index + 1, None, "`")
+            found.append(body)
+            continue
+        index += 1
+    return found
+
+
+def commands(text: str, substituted: bool = False) -> list[Command]:
+    """Every command ``text`` runs — its own segments, and every substituted one.
+
+    Flattening the whole line first is what makes chaining, grouping and
+    substitution all one problem: each command is then judged on its own, and
+    none of them can hide behind the shape of another.
+    """
+    found: list[Command] = []
+    for segment in segments(text):
+        found.append(Command(segment, substituted))
+        for body in substitutions(segment):
+            found.extend(commands(body, substituted=True))
+    return found
+
+
+def command_argv(argv: list[str]) -> list[str]:
+    """``argv`` reduced to the command it actually runs, and that command's name.
+
+    A leading run of environment assignments belongs to the shell, not the
+    command, and a command named by path is the same command: ``GIT_DIR=x git``
+    and ``/usr/bin/git`` both run git, and a rule reading argv[0] literally
+    would let either write main unjudged.
+    """
+    index = 0
+    while index < len(argv) and ASSIGNMENT.match(argv[index]):
+        index += 1
+    rest = argv[index:]
+    if not rest:
+        return rest
+    return [rest[0].rpartition("/")[2], *rest[1:]]
 
 
 def push_argv(argv: list[str]) -> list[str] | None:
     """The arguments after ``argv``'s ``push`` token, or None if it is no push."""
+    argv = command_argv(argv)
     if not argv or argv[0] != "git":
         return None
     index = 1
@@ -163,16 +307,18 @@ def push_argv(argv: list[str]) -> list[str] | None:
     return argv[index + 1 :]
 
 
-def wrapped_push(argv: list[str]) -> bool:
-    """Whether a wrapper's argv carries a push, on its line or in a quoted string.
+def reaches_push(argv: list[str]) -> bool:
+    """Whether a push sits in ``argv`` somewhere this hook cannot judge it.
 
-    ``timeout 5 git push …`` leaves the push in further tokens; ``bash -c "git
-    push …"`` puts it in one string the wrapper re-lexes. Both are looked
-    through here, and neither is judged on its merits — a push reachable only
-    through a wrapper is refused whatever it would have done.
+    A push behind another command still runs — ``sudo git push …``,
+    ``nohup git push …``, ``timeout 5 git push …`` — but not as the command the
+    segment names, so the hook cannot hold the whole call to account and refuses
+    it unread. A wrapper hides one further still, inside a string it re-lexes.
     """
-    if any(push_argv(argv[start:]) is not None for start in range(len(argv))):
+    if any(push_argv(argv[start:]) is not None for start in range(1, len(argv))):
         return True
+    if not argv or argv[0] not in WRAPPERS:
+        return False
     for token in argv:
         if " " not in token:
             continue
@@ -228,12 +374,19 @@ def destination(refspec: str) -> str:
     ``main``, ``HEAD:main``, ``issue-9:refs/heads/main`` and ``+HEAD:main`` all
     write to main; each carries the destination on the right of the colon, or
     is the destination entire when there is no colon.
+
+    A destination not starting with ``refs/`` is resolved by git against the
+    remote's existing refs, so the partial form ``heads/main`` names
+    ``refs/heads/main`` too. Only the branch namespace is stripped: a
+    ``refs/tags/main`` destination writes a tag, not the branch.
     """
     target = refspec.removeprefix("+")
     _, colon, right = target.partition(":")
     if colon:
         target = right
-    return target.removeprefix("refs/heads/")
+    if target.startswith("refs/heads/"):
+        return target.removeprefix("refs/heads/")
+    return target.removeprefix("heads/")
 
 
 def judge(argv: list[str]) -> str | None:
@@ -278,24 +431,26 @@ def judge(argv: list[str]) -> str | None:
     return None
 
 
-def verdict(segment: str) -> str | None:
-    """The ruling ``segment`` breaks, or None when it breaks none.
+def verdict(command: Command) -> str | None:
+    """The ruling ``command`` breaks, or None when it breaks none.
 
-    One lex, inside one guard. A segment that will not lex is a segment this
+    One lex, inside one guard. A command that will not lex is one this hook
     cannot read, and it is refused only where its text resolves to a git push:
     an ordinary command carrying the word "push" is not a push, and denying it
     would stop work this hook has no authority over.
+
+    A push inside a substitution is never judged on its merits. Its output is
+    consumed by the enclosing command rather than reported, so even a routine
+    spelling there is a push nobody watched, and it fails closed with the rest.
     """
-    if hidden_push(segment):
-        return UNREADABLE
     try:
-        argv = shlex.split(segment)
+        argv = command_argv(shlex.split(command.text))
     except ValueError:
-        return UNREADABLE if GIT_PUSH_TEXT.search(segment) else None
-    if argv and argv[0] in WRAPPERS and wrapped_push(argv):
-        return UNREADABLE
+        return UNREADABLE if GIT_PUSH_TEXT.search(command.text) else None
     after = push_argv(argv)
-    return None if after is None else judge(after)
+    if after is None:
+        return UNREADABLE if reaches_push(argv) else None
+    return UNREADABLE if command.substituted else judge(after)
 
 
 def main() -> None:
@@ -309,11 +464,11 @@ def main() -> None:
     tool_input = event.get("tool_input")
     if not isinstance(tool_input, dict):
         return
-    command = tool_input.get("command")
-    if not isinstance(command, str):
+    line = tool_input.get("command")
+    if not isinstance(line, str):
         return
-    for segment in segments(command):
-        reason = verdict(segment)
+    for command in commands(line):
+        reason = verdict(command)
         if reason is not None:
             deny(reason)
 

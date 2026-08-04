@@ -31,8 +31,10 @@ ROUTINE = [
     "git push --no-verify -u origin issue-342",
     "git push --no-verify origin issue-342",
     "git -C ~/workspace/dev-playbook/.claude/worktrees/issue-342 push origin issue-342",
+    "git -C ~/workspace/dev-playbook/.claude/worktrees/issue-342 push --no-verify -u origin issue-342",
     "git fetch --prune origin",
     "git pull --ff-only origin main",
+    "git -C ~/workspace/dev-playbook pull --ff-only origin main",
 ]
 
 
@@ -96,6 +98,12 @@ def test_push_without_an_explicit_remote_and_ref_is_denied(command: str) -> None
         "git push origin HEAD:refs/heads/main",
         "git push origin issue-342 main",
         "git -C ~/workspace/dev-playbook push origin main",
+        "/usr/bin/git push origin main",
+        "GIT_DIR=x git push origin main",
+        "(git push origin main)",
+        "cd /tmp && (git push origin main)",
+        "git push origin heads/main",
+        "git push origin issue-342:heads/main",
     ],
 )
 def test_main_targeting_push_is_denied(command: str) -> None:
@@ -144,6 +152,14 @@ def test_remote_deleting_push_is_denied(command: str) -> None:
         "timeout 5 git push origin issue-342",
         "git push origin ${BRANCH}",
         'git push origin "issue-342',
+        "sudo git push origin main",
+        "command git push origin main",
+        "nohup git push origin main",
+        "time git push origin main",
+        "echo $(git status; git push origin main)",
+        "x=$(cd /tmp; git push --force origin issue-1)",
+        "echo `git status && git push origin main`",
+        'echo "$(git push origin main)"',
     ],
 )
 def test_push_the_hook_cannot_read_is_denied(command: str) -> None:
@@ -217,6 +233,9 @@ def test_a_commit_mentioning_push_draws_no_opinion() -> None:
         'git commit -m "push authority; landed"',
         "echo don't && ls",
         'echo "the cost is $(date)"',
+        'echo "$(git log --grep=push)"',
+        "git commit -m \"$(printf 'see git push rules')\"",
+        "git log --oneline | grep push",
     ],
 )
 def test_a_command_that_pushes_nothing_draws_no_opinion(command: str) -> None:
