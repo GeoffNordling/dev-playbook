@@ -11,7 +11,7 @@ argument-hint: "<issue-number>"
 
 You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node — nothing launches itself — and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
 
-Two hard limits: you never push, and you never merge. Both are the user's.
+One hard limit: you never merge — that is the user's, in the GitHub UI. You do push the issue branch yourself (§7), within the rules [git authority](~/workspace/dev-playbook/software-factory/git-authority.md) holds.
 
 **⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ — you hold the commit token for this session.** It covers the fixes you make yourself at the judgments node: commit them as you land them, without waiting for a "commit now". It covers nothing else — you never touch the work under review, and a delegated node's commits are authorized by its own launch line (§3).
 
@@ -66,14 +66,14 @@ The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-r
 
 Parse the subagent's final message per the [terminal report contract](~/workspace/dev-playbook/software-factory/factory-operations.md#engagement):
 
-- **DONE** — move the label and continue, or end the turn at a push boundary (§7).
+- **DONE** — move the label and continue, pushing the branch where §7 calls for it.
 - **ESCALATE** — bubble it to the user per the [escalation rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#escalation), and stop.
 
 ## 4. The worktree
 
 You open it, once, before the issue's first file-touching node, per the worktree contract:
 
-1. Confirm the base is fresh, tap-free: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — hand the user the pull (§7) and stop.
+1. Confirm the base is fresh: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — refresh it yourself with the pull in §7, on the condition stated there, then re-check before continuing.
 2. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
@@ -89,16 +89,21 @@ The audit subagents post findings and terminate; the verdict interview is yours.
 
 On entering `phase:judgments`, read [judgments-node.md](references/judgments-node.md) and follow it.
 
-## 7. Turn boundaries — the user's commands
+## 7. Pushes, and the merge boundary
 
-End your turn wherever the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). Where the ending carries one of the user's commands, state it once, paste-safe, one line:
+The git commands the traverse needs are yours to run, each as its own top-level call:
 
 - **Intermediary push, after any committing node:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push --no-verify -u origin issue-<N>`
 - **Final push, when the judgments node committed fixes:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push origin issue-<N>`
-- **Pull, on a stale base:** `git -C ~/workspace/<repo> pull`
-- **Merge, on the final approval** — in the GitHub UI; you can't.
+- **Pull, on a stale base:** `git -C ~/workspace/<repo> pull --ff-only origin main`
 
-When the user returns, pick the traverse back up from the labels.
+`--no-verify` on the intermediary push is deliberate: the judgments phase is the verification act, so intermediary pushes skip the pre-push gate by standing ruling.
+
+The pull moves `main` only from a checkout standing on `main`; run anywhere else it merges `origin/main` into whatever branch is out. So confirm `~/workspace/<repo>` is on `main` — `git -C ~/workspace/<repo> branch --show-current` — and escalate if it is parked elsewhere rather than pulling into that branch.
+
+If a push is denied, it is denied — do not re-spell it. Report what you tried and why it was refused, and let the user decide.
+
+The merge remains the user's, in the GitHub UI. End your turn there, and at any other point where the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). When the user returns, pick the traverse back up from the labels.
 
 ## Report
 

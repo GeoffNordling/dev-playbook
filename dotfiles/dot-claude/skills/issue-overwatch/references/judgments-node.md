@@ -20,11 +20,11 @@ approves, before the user's final read. Work through it in order.
 4. **Close green.** Confirm with `make check-judgments`.
 
 5. **Refresh the merge message.** Regenerate the PR title and body from the final
-   diff with a tap-free `gh pr edit`, per the
+   diff with `gh pr edit`, per the
    [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe).
 
-6. **Hand over the final verified push** if you committed fixes in step 2 — the
-   command template is your own turn-boundary list. With no fixes, origin
+6. **Run the final push** if you committed fixes in step 2 — the command your
+   **Pushes, and the merge boundary** section gives. With no fixes, origin
    already holds the final diff.
 
 7. **Present the final read** per

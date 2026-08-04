@@ -1,0 +1,477 @@
+#!/usr/bin/env python3
+"""Claude Code PreToolUse hook: the client-side authority over git push.
+
+Reads one PreToolUse event on stdin and either says nothing — the no-opinion
+verdict, which falls the call through to the permission rules — or denies.
+
+Python 3 stdlib only, no configuration: a hook runs on every Bash call of every
+session, so it may not depend on an interpreter's package set or a knob.
+"""
+
+import json
+import re
+import shlex
+import sys
+from typing import NamedTuple
+
+# The shell operators the harness itself recognizes as command separators, in
+# match order so `&&` is seen before `&`. A rule that read only the first
+# command would be evaded by chaining, so each segment is parsed and judged on
+# its own.
+SEPARATORS = ("&&", "||", ";", "|", "&", "\n")
+
+# A ``git … push`` in text that could not be lexed into argv. Consulted only
+# where reading the command properly has already failed — every other rule here
+# judges lexed argv, because a command that merely mentions pushing is not a
+# push and must not be refused as one.
+GIT_PUSH_TEXT = re.compile(r"\bgit\b.*\bpush\b", re.DOTALL)
+
+# A shell expansion in a push operand. Whatever remote or refspec it stands for
+# is decided when the command runs, so the hook cannot see where the push lands.
+EXPANSION = re.compile(r"[$`]")
+
+# Destinations naming whatever ref the checkout happens to sit on, rather than a
+# branch. ``HEAD`` from a main checkout writes main, so these are no more
+# readable than an expansion.
+SYMBOLIC = re.compile(r"(HEAD|@)([~^{@].*)?")
+
+# Wrappers that re-lex a string argument, running a command that never appears
+# as argv tokens of its own. Enumerated because looking inside a quoted token is
+# only right where something will run it: `printf 'see git push rules'` prints a
+# sentence. Every *other* way of putting a push behind another command is caught
+# by position instead, which needs no list.
+WRAPPERS = frozenset({"bash", "sh", "zsh", "dash", "env", "xargs", "timeout", "eval"})
+
+# A leading environment assignment — `GIT_DIR=x git push …` runs git with the
+# variable set, so the command is the token after it, not the assignment.
+ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
+
+# git's own options, taken before the subcommand, that consume the next token.
+GIT_VALUE_OPTIONS = frozenset(
+    {
+        "-C",
+        "-c",
+        "--git-dir",
+        "--work-tree",
+        "--namespace",
+        "--exec-path",
+        "--config-env",
+    }
+)
+
+# git push options that consume the next token.
+PUSH_VALUE_OPTIONS = frozenset(
+    {"-o", "--push-option", "--receive-pack", "--exec", "--repo"}
+)
+
+# Every option spelling that forces. --force-with-lease is here with the rest by
+# ruling: it is safer than --force and still rewrites published history.
+FORCE_FLAGS = frozenset({"-f", "--force", "--force-with-lease", "--force-if-includes"})
+
+# Every option spelling that deletes a remote ref. The empty-source refspec
+# (``:branch``) deletes too, and is caught on the operands rather than here.
+DELETE_FLAGS = frozenset({"-d", "--delete"})
+
+# The one reason covering every push the hook cannot read. Failing closed is the
+# whole posture: none of these can be cleared, which is also why no rule here
+# has an override marker — the escape hatch is the human's own terminal.
+UNREADABLE = (
+    "This hook reads every push before it runs, and it cannot read this one — "
+    "it is wrapped, substituted, or will not lex. Write the push out as a "
+    "plain, top-level command."
+)
+
+
+class Command(NamedTuple):
+    """One command the shell will run, and how the hook reached it.
+
+    ``substituted`` marks a command found inside a ``$(…)`` or backtick body.
+    It runs like any other, but its output is swallowed by the command around
+    it, so a push there is judged differently — see ``verdict``.
+    """
+
+    text: str
+    substituted: bool
+
+
+def deny(reason: str) -> None:
+    """Print the deny decision and exit.
+
+    The reason reaches the model verbatim, so it names the ruling rather than
+    the mechanism: a denied operation is refused, never re-spelled.
+    """
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": reason,
+                }
+            }
+        )
+    )
+    sys.exit(0)
+
+
+def segments(command: str) -> list[str]:
+    """The command's shell segments — what the harness matches independently.
+
+    Split on unquoted operators only, and only where they really separate
+    commands. A ``;`` inside ``git commit -m "push; done"`` separates nothing,
+    and a split blind to structure does damage in both directions: it fractures
+    ordinary commands into pieces that will not lex, and it hides a real push
+    behind them. Three structures are therefore tracked:
+
+    - **Quotes.** Their contents are one token, operators included.
+    - **Command substitutions**, ``$(…)`` and backtick pairs. A separator inside
+      one belongs to the substitution; splitting there would leave the body
+      unbalanced, and the push in it unseen. The body is judged separately.
+    - **Subshell grouping**, ``(…)``. Here the parentheses *are* boundaries:
+      ``(git push origin main)`` runs a push as its own command, and a splitter
+      that kept the paren attached would read the command as ``(git``.
+    """
+    found: list[str] = []
+    current: list[str] = []
+    quote = ""
+    substitutions = 0
+    backtick = False
+    index = 0
+    while index < len(command):
+        char = command[index]
+        if char == "\\" and quote != "'" and index + 1 < len(command):
+            current.append(command[index : index + 2])
+            index += 2
+            continue
+        if quote:
+            current.append(char)
+            if char == quote:
+                quote = ""
+            index += 1
+            continue
+        if char in "'\"":
+            quote = char
+            current.append(char)
+            index += 1
+            continue
+        if char == "`":
+            backtick = not backtick
+            current.append(char)
+            index += 1
+            continue
+        if command.startswith("$(", index):
+            substitutions += 1
+            current.append("$(")
+            index += 2
+            continue
+        if substitutions and char == ")":
+            substitutions -= 1
+            current.append(char)
+            index += 1
+            continue
+        if backtick or substitutions:
+            current.append(char)
+            index += 1
+            continue
+        separator = next((s for s in SEPARATORS if command.startswith(s, index)), None)
+        if separator is None and char in "()":
+            separator = char
+        if separator is not None:
+            found.append("".join(current))
+            current = []
+            index += len(separator)
+            continue
+        current.append(char)
+        index += 1
+    found.append("".join(current))
+    return [part.strip() for part in found if part.strip()]
+
+
+def balanced(text: str, start: int, opener: str | None, closer: str) -> tuple[str, int]:
+    """The substitution body opening at ``start``, and the index past its closer.
+
+    Nesting is counted, so ``$(a $(b) c)`` yields the whole outer body rather
+    than stopping at the first ``)``. An unclosed substitution yields the rest
+    of the text: reading too much is the failing-closed direction, because what
+    is read is then judged.
+    """
+    depth = 1
+    quote = ""
+    index = start
+    while index < len(text):
+        char = text[index]
+        if char == "\\" and quote != "'" and index + 1 < len(text):
+            index += 2
+            continue
+        if quote:
+            if char == quote:
+                quote = ""
+            index += 1
+            continue
+        if char in "'\"":
+            quote = char
+            index += 1
+            continue
+        if opener is not None and char == opener:
+            depth += 1
+        elif char == closer:
+            depth -= 1
+            if depth == 0:
+                return text[start:index], index + 1
+        index += 1
+    return text[start:], len(text)
+
+
+def substitutions(text: str) -> list[str]:
+    """The body of every command substitution in ``text``.
+
+    ``$(…)`` and a backtick pair each run a command whose argv never appears in
+    the enclosing one, so the body is pulled out to be read on its own. Single
+    quotes make both inert; double quotes do not, which is why the walk below
+    keeps looking inside a ``"…"`` run.
+    """
+    found: list[str] = []
+    quote = ""
+    index = 0
+    while index < len(text):
+        char = text[index]
+        if char == "\\" and quote != "'" and index + 1 < len(text):
+            index += 2
+            continue
+        if quote == "'":
+            quote = "" if char == "'" else quote
+            index += 1
+            continue
+        if quote == '"' and char == '"':
+            quote = ""
+            index += 1
+            continue
+        if not quote and char in "'\"":
+            quote = char
+            index += 1
+            continue
+        if text.startswith("$(", index):
+            body, index = balanced(text, index + 2, "(", ")")
+            found.append(body)
+            continue
+        if char == "`":
+            body, index = balanced(text, index + 1, None, "`")
+            found.append(body)
+            continue
+        index += 1
+    return found
+
+
+def commands(text: str, substituted: bool = False) -> list[Command]:
+    """Every command ``text`` runs — its own segments, and every substituted one.
+
+    Flattening the whole line first is what makes chaining, grouping and
+    substitution all one problem: each command is then judged on its own, and
+    none of them can hide behind the shape of another.
+    """
+    found: list[Command] = []
+    for segment in segments(text):
+        found.append(Command(segment, substituted))
+        for body in substitutions(segment):
+            found.extend(commands(body, substituted=True))
+    return found
+
+
+def command_argv(argv: list[str]) -> list[str]:
+    """``argv`` reduced to the command it actually runs, and that command's name.
+
+    A leading run of environment assignments belongs to the shell, not the
+    command, and a command named by path is the same command: ``GIT_DIR=x git``
+    and ``/usr/bin/git`` both run git, and a rule reading argv[0] literally
+    would let either write main unjudged.
+    """
+    index = 0
+    while index < len(argv) and ASSIGNMENT.match(argv[index]):
+        index += 1
+    rest = argv[index:]
+    if not rest:
+        return rest
+    return [rest[0].rpartition("/")[2], *rest[1:]]
+
+
+def push_argv(argv: list[str]) -> list[str] | None:
+    """The arguments after ``argv``'s ``push`` token, or None if it is no push."""
+    argv = command_argv(argv)
+    if not argv or argv[0] != "git":
+        return None
+    index = 1
+    while index < len(argv) and argv[index].startswith("-"):
+        index += 2 if argv[index] in GIT_VALUE_OPTIONS else 1
+    if index >= len(argv) or argv[index] != "push":
+        return None
+    return argv[index + 1 :]
+
+
+def reaches_push(argv: list[str]) -> bool:
+    """Whether a push sits in ``argv`` somewhere this hook cannot judge it.
+
+    A push behind another command still runs — ``sudo git push …``,
+    ``nohup git push …``, ``timeout 5 git push …`` — but not as the command the
+    segment names, so the hook cannot hold the whole call to account and refuses
+    it unread. A wrapper hides one further still, inside a string it re-lexes.
+    """
+    if any(push_argv(argv[start:]) is not None for start in range(1, len(argv))):
+        return True
+    if not argv or argv[0] not in WRAPPERS:
+        return False
+    for token in argv:
+        if " " not in token:
+            continue
+        try:
+            inner = shlex.split(token)
+        except ValueError:
+            if GIT_PUSH_TEXT.search(token):
+                return True
+            continue
+        if any(push_argv(inner[start:]) is not None for start in range(len(inner))):
+            return True
+    return False
+
+
+def flags(argv: list[str]) -> set[str]:
+    """Every option token in ``argv``, with short bundles split into letters.
+
+    ``-fu`` is git's own spelling of ``-f -u``, so a rule reading tokens alone
+    would miss a forced push written that way.
+    """
+    found: set[str] = set()
+    for token in argv:
+        if not token.startswith("-") or token == "-":
+            continue
+        if token.startswith("--"):
+            found.add(token.split("=", 1)[0])
+        elif re.fullmatch(r"-[A-Za-z]+", token):
+            found.update(f"-{letter}" for letter in token[1:])
+        else:
+            found.add(token)
+    return found
+
+
+def operands(argv: list[str]) -> list[str]:
+    """The non-option arguments of a push — the remote, then its refspecs."""
+    found: list[str] = []
+    skip = False
+    for token in argv:
+        if skip:
+            skip = False
+            continue
+        if token.startswith("-") and token != "-":
+            if token in PUSH_VALUE_OPTIONS:
+                skip = True
+            continue
+        found.append(token)
+    return found
+
+
+def destination(refspec: str) -> str:
+    """The branch a refspec writes to, normalized to a bare short name.
+
+    ``main``, ``HEAD:main``, ``issue-9:refs/heads/main`` and ``+HEAD:main`` all
+    write to main; each carries the destination on the right of the colon, or
+    is the destination entire when there is no colon.
+
+    A destination not starting with ``refs/`` is resolved by git against the
+    remote's existing refs, so the partial form ``heads/main`` names
+    ``refs/heads/main`` too. Only the branch namespace is stripped: a
+    ``refs/tags/main`` destination writes a tag, not the branch.
+    """
+    target = refspec.removeprefix("+")
+    _, colon, right = target.partition(":")
+    if colon:
+        target = right
+    if target.startswith("refs/heads/"):
+        return target.removeprefix("refs/heads/")
+    return target.removeprefix("heads/")
+
+
+def judge(argv: list[str]) -> str | None:
+    """The ruling one push's argv breaks, or None when it breaks none."""
+    found = operands(argv)
+    if len(found) < 2:
+        return (
+            "git push must name both a remote and a refspec — a push whose "
+            "target is implied is invisible state. Write it out in full."
+        )
+    refspecs = found[1:]
+    written = flags(argv)
+    if any(EXPANSION.search(operand) for operand in found):
+        return (
+            "This hook reads where a push would land before it runs, and a "
+            "shell expansion settles that only once the command runs. Write "
+            "the remote and the branch out as literal text."
+        )
+    if any(destination(refspec) == "main" for refspec in refspecs):
+        return (
+            "main is written by merging a pull request, never by pushing to "
+            "it. Open a PR from this branch instead."
+        )
+    if written & FORCE_FLAGS or any(refspec.startswith("+") for refspec in refspecs):
+        return (
+            "A forced push rewrites published history, including with "
+            "--force-with-lease. There is no agent lane for it: discuss the "
+            "repair with the top-level session, and the human types it in "
+            "their own terminal."
+        )
+    if written & DELETE_FLAGS or any(refspec.startswith(":") for refspec in refspecs):
+        return (
+            "The only remote-branch deletion is GitHub's delete-on-merge. "
+            "Leave the branch alone."
+        )
+    if any(SYMBOLIC.fullmatch(destination(refspec)) for refspec in refspecs):
+        return (
+            "HEAD is whatever branch the checkout is standing on, which on a "
+            "main checkout is main. Name the branch the push writes: "
+            "git push origin issue-9, or the HEAD:issue-9 form."
+        )
+    return None
+
+
+def verdict(command: Command) -> str | None:
+    """The ruling ``command`` breaks, or None when it breaks none.
+
+    One lex, inside one guard. A command that will not lex is one this hook
+    cannot read, and it is refused only where its text resolves to a git push:
+    an ordinary command carrying the word "push" is not a push, and denying it
+    would stop work this hook has no authority over.
+
+    A push inside a substitution is never judged on its merits. Its output is
+    consumed by the enclosing command rather than reported, so even a routine
+    spelling there is a push nobody watched, and it fails closed with the rest.
+    """
+    try:
+        argv = command_argv(shlex.split(command.text))
+    except ValueError:
+        return UNREADABLE if GIT_PUSH_TEXT.search(command.text) else None
+    after = push_argv(argv)
+    if after is None:
+        return UNREADABLE if reaches_push(argv) else None
+    return UNREADABLE if command.substituted else judge(after)
+
+
+def main() -> None:
+    """Read the event off stdin and print the verdict, if there is one."""
+    try:
+        event = json.loads(sys.stdin.read())
+    except ValueError:
+        return
+    if not isinstance(event, dict) or event.get("tool_name") != "Bash":
+        return
+    tool_input = event.get("tool_input")
+    if not isinstance(tool_input, dict):
+        return
+    line = tool_input.get("command")
+    if not isinstance(line, str):
+        return
+    for command in commands(line):
+        reason = verdict(command)
+        if reason is not None:
+            deny(reason)
+
+
+if __name__ == "__main__":
+    main()

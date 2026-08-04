@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Commit staged work locally with a clean message; the user pushes. Use when the user asks to commit changes, or when a software factory skill needs to commit its work.
+description: Commit staged work locally with a clean message. Use when the user asks to commit changes, or when a software factory skill needs to commit its work.
 disable-model-invocation: false
 model: sonnet
 effort: low
@@ -12,7 +12,7 @@ allowed-tools: Bash(git *)
 
 Commit locally without narration; speak up only when something is unexpected.
 
-`git push` requires a YubiKey tap, so the user pushes — never run `git push` yourself.
+This skill commits and stops there. Pushing is a separate act with its own authority — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md) — so don't fold a push into a commit request the user didn't make.
 
 ## Args: $ARGUMENTS
 
