@@ -152,10 +152,14 @@ optional, unenforced, and changes none of the required headings.
 
 A brief whose deliverables include prose files or substantial new prose
 sections — a skill, a standard's section — carries them verbatim in an
-optional `## Artifacts` section: one `### <destination path>` subsection per
-file, the approved content in a code fence. Content that itself contains
+optional `## Artifacts` section: one `###` subsection per installed block,
+each naming what it changes and where it lands, the approved content in a
+code fence. Several blocks commonly share one destination file; the
+destination may be named in the subsection heading, or fixed once for the
+section where every block shares it. Content that itself contains
 triple-backtick fences uses a four-backtick outer fence. The acceptance
-criteria cite the section ("install the artifacts at their stated paths").
+criteria cite the section ("install the artifacts as their subsections
+state").
 The approved words are not the builder's to edit — but everything about
 fitting them in is: placement, heading levels, stitching into surrounding
 text are ordinary build judgment under the brief's intent, and a placement
@@ -238,9 +242,11 @@ Decision Record bar gets a record under `docs/decisions/`
 - **One goal.** A brief serves one master. Test any doubtful part with two
   questions: would the outcome still stand if this part slipped
   indefinitely, and could it ship later as its own issue without reopening
-  this one? Both yes — it must be deferred: mint a real tracker stub (never
-  a Candidate) and name it in `Out of scope`. This binds at leaf and at epic
-  altitude, applied when slicing and backstopped at issue review.
+  this one? Both yes — it must be deferred: mint a real tracker stub at
+  `phase:intake` (never a Candidate — the deferred part is committed work
+  already, by sitting inside an approved outcome) and name it in
+  `Out of scope`. This binds at leaf and at epic altitude, applied when
+  slicing and backstopped at issue review.
 - **Written for the human reader.** The human sees only the issue — never
   the author's context. Any reference to existing file content, especially
   an artifact placement note, quotes the text it amends verbatim,
@@ -253,8 +259,8 @@ that specific thing against the real substrate — real transport, real hook,
 real filesystem — with the run's observed output in the committed record.
 Everything the prototype faked is a declared stub, and a stubbed thing can
 never be cited as proven: honesty about fidelity is required, fidelity is
-not. Prototypes commit to a `prototype/<issue>` branch carrying the code, the
-stub list, and the run outputs; the brief cites branch + path, and a
+not. Prototypes commit to a `worktree-design-<issue>` branch carrying the
+code, the stub list, and the run outputs; the brief cites branch + path, and a
 prototype claim with no citable committed artifact is demoted to assumed. The
 branch survives until everything citing it has merged.
 
