@@ -32,5 +32,7 @@ session context and confirm it with the user before writing anything.
 3. Commit via /commit, applied to `~/workspace/mission-control`
    (use `git -C`; the session's cwd is usually another repo). Stage
    **only** `friction/log.md` — the repo may hold unrelated work; ignore it.
+   The commit rides the session's live grant; ask the user for /commit-on if
+   it is denied.
 4. Push it, naming the remote and the branch:
    `git -C ~/workspace/mission-control push -u origin <branch>`.

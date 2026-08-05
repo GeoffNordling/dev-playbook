@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Git Authority
-description: The layers deciding which git operations an agent may run, the push rule family, and the canonical command set
+description: The layers deciding which git operations an agent may run, the push and commit rule families, and the canonical command set
 ---
 
 # Git Authority
@@ -21,8 +21,10 @@ sentence:
 
 An agent that hits a denial reports what it tried and why it was refused. It
 does not search for a wording that gets past the rule, and it does not ask
-another agent to run it. The escape hatch is the human's own terminal — there
-is no override marker, and no grant lane.
+another agent to run it. The push family has no override marker and no grant
+lane — its escape hatch is the human's own terminal. The commit family has
+exactly one grant lane, the human-typed `/commit-on` marker (below), and
+nothing an agent writes can mint it.
 
 ## The layers
 
@@ -30,7 +32,7 @@ is no override marker, and no grant lane.
 |---|---|---|
 | Server-side ruleset | GitHub, per [repo settings](/standards/tracking/repo-settings.md) | The last backstop: main rejects force-pushes and deletion whatever the client did |
 | Deny block | `permissions.deny` in `dotfiles/settings/base.json` | Refuses the forbidden push spellings before anything else is consulted |
-| `git-authority` hook | `dotfiles/dot-claude/hooks/git-authority`, wired as a `PreToolUse` hook on `Bash` in `base.json` | Parses every `git push` in the command and refuses the forbidden ones in *any* spelling |
+| `git-authority` hook | `dotfiles/dot-claude/hooks/git-authority`, wired as a `PreToolUse` hook on `Bash` in `base.json` | Parses every `git push` and `git commit` in the command: refuses the forbidden push spellings, in *any* spelling, and every commit no lane opens |
 | Allowlist | `permissions.allow` in `base.json` | Lets the routine commands run without a prompt |
 | Auto-mode entry | `autoMode.allow` in `base.json` | Tells the hands-off classifier the same thing in prose |
 
@@ -48,6 +50,46 @@ allowed*. git is excluded because the harness's protection of `.git/config` and
 `git commit`, per [sandboxing](/docs/sandboxing.md). Narrowing that exemption
 is [#261](https://github.com/GeoffNordling/dev-playbook/issues/261)'s subject,
 and nothing here depends on how it lands.
+
+## What both families read
+
+Both families walk the same command first, so a chained, wrapped or substituted
+command hides nothing from either.
+
+The hook splits a command on `&&`, `||`, `;`, `|`, `&` and newlines — respecting
+quoting, so a `;` inside a commit message separates nothing — and judges each
+segment on its own lexed argv, so chaining hides nothing. A segment that will
+not lex at all is refused only where its text resolves to a `git … push` or a
+`git … commit`: an ordinary command carrying the word is not the operation, and
+refusing it would stop work this hook has no authority over.
+
+**Text the shell would never run is read as a command anyway, and that is an
+accepted false deny.** Newlines split segments and comments are not stripped, so
+a `#` line and a heredoc body both arrive as ordinary commands: `# remember to
+git commit later` is refused, and so is the body of a `gh pr comment … <<'EOF'`
+that names a git verb. This workspace writes about its own git rules constantly,
+so it is hit often. The way through is to stop making the text a shell argument
+— write the body to a file and pass `--body-file`, or `git commit -F` — never a
+re-spelling of the git command itself.
+
+It is a false deny by choice. One attempt to read those two shapes the way bash
+reads them was reverted after it opened three fail-opens, each a partial parser
+disagreeing with another about a shape neither had been written for; a herestring
+and an arithmetic shift both blinded the hook for the rest of the command. A loud
+refusal is recoverable in seconds and a silent hole is not, so the trade goes to
+the refusal. The measurements are on
+[#348](https://github.com/GeoffNordling/dev-playbook/issues/348), and the real
+fix — one tokenizing pass in place of the hand-rolled walkers — is
+[#355](https://github.com/GeoffNordling/dev-playbook/issues/355).
+
+**Both families fail closed on a fault in the hook's own machinery**, bounded by
+what the hook has authority over: a fault denies where the command reads as a
+push or a commit, and draws no opinion on anything else, because this hook runs
+on every Bash call and one fault must not take out `ls` and `make check`
+everywhere at once. The one fault it cannot scope that way is an event that will
+not parse off stdin — there is no command to read, so that denies whole. The
+residual harness-level fail-open (interpreter missing, script unreadable) is
+accepted.
 
 ## The push rule family
 
@@ -76,19 +118,90 @@ Three further rules protect the first three:
   command substitution, or with a variable expansion where the remote or the
   refspec belongs, the hook cannot see what would run. It fails closed.
 
-The hook splits a command on `&&`, `||`, `;`, `|`, `&` and newlines — respecting
-quoting, so a `;` inside a commit message separates nothing — and judges each
-segment on its own lexed argv, so chaining hides nothing. A segment that will
-not lex at all is refused only where its text resolves to a `git … push`: an
-ordinary command carrying the word "push" is not a push, and refusing it would
-stop work this hook has no authority over.
+## The commit rule family
 
-**The commit rule family** — the commit lanes, their agent allowlist and the
-`/commit-on` marker — is not built yet. It lands in slice B of
-[#341](https://github.com/GeoffNordling/dev-playbook/issues/341) and extends
-this file. Until then no layer here holds an opinion on `git commit`: it is
-governed by the permission rules alone, and the hook reads `git push` segments
-only.
+`git commit` is deny-by-default: the hook refuses it unless exactly one of
+two lanes allows, and the lanes never mix.
+
+- **Lane 1 — factory agent types.** A subagent session's hook payload carries
+  an `agent_type` key; when its value is on the allowlist (`builder`,
+  `judgment-facilitator`) the commit runs. The value comes from the
+  human-authored agent definition the subagent was spawned as — no prompt,
+  brief, or skill can write it. A payload carrying `agent_type` is judged by
+  this lane *only*.
+- **Lane 2 — the human's marker.** A main session (no `agent_type` key)
+  commits when its transcript holds a `/commit-on` command marker in a
+  genuine user turn — harness-written when the human types the command, and
+  never read from tool results or assistant turns. `/commit-off` revokes; the
+  later marker wins. The grant survives a `--continue` resume and does not
+  survive `/clear`, which starts a new transcript.
+
+Lane exclusivity is load-bearing. A subagent writes a transcript of its own —
+not the parent's — and the first user turn in it is the launch prompt the parent
+model wrote. A subagent judged by lane 2 would therefore read one model's prompt
+to another as a typed grant, minting its own authorization on the way in.
+Judging it by its type alone is what keeps the grant with the person who typed
+it.
+
+A transcript the hook cannot open holds no grant it can see, so that is the
+ungranted state and not a fault: the denial names the missing grant, because
+telling its reader the hook needs repair would send them to fix working
+machinery instead of typing the grant.
+
+**A commit inside a `$(…)` or a backtick body is judged by its lane like any
+other, which is deliberately not what the push family does there.** The two
+families answer different questions. The push family asks *is this push
+watched*, because a push is irreversible publication into shared history, and a
+substituted push is one whose output nobody sees — so it fails closed wherever
+it sits. The commit family asks *who is committing*, and the lane answers that
+identically wherever the command sits; refusing a substituted commit would deny
+a granted user's own scripted commit and buy nothing, since the lane already
+said who was asking. The asymmetry is this ruling, not an artifact of where the
+check happens to sit.
+
+One authoring rule protects lane 2: no authored content anywhere in the repo may
+contain the literal marker wrapper string; the hook, the tests, and the
+`claude-code.command-marker` check that enforces it all assemble it from pieces.
+The rule itself is stated for every governed repo in
+[files.md](/standards/claude-code/files.md); this file is the mechanism's home,
+not the rule's.
+
+That check exempts the vendored tree, and it is an **accepted gap** rather than
+a clean boundary. Vendored skills are published under the skills root by symlink
+and stowed into `~/.claude/skills/`, so they are live skill text, and the hook
+reads a marker without reading its provenance — reachability is what makes a
+file dangerous here, not ownership. The tree is carried verbatim from upstream
+and cannot be edited, so enforcing there would mean a permanently red gate on
+something nobody can fix. The exemption is recorded here and pinned by a test
+rather than left to be inferred from the code.
+
+Three limits are stated rather than fixed, each with an issue:
+
+- **The family reads `git commit` and nothing else.** `git revert`, `merge`,
+  `cherry-pick`, `am`, `rebase --continue` and `commit-tree` all write commit
+  objects and draw no opinion here, so "a commit needs a lane" is true of
+  `git commit` specifically, not of every way a commit can be made. Which verbs
+  belong, and at what false-deny cost, is
+  [#353](https://github.com/GeoffNordling/dev-playbook/issues/353).
+- **Lane 2 rests on `disable-model-invocation` being a hard refusal.** The
+  marker skills carry that flag so only a typed command can plant a marker. If
+  the harness treats it as a listing omission rather than a refusal at the Skill
+  tool, a model could mint its own grant and the lane is forgeable. That is an
+  assumption, not a measured fact;
+  [#354](https://github.com/GeoffNordling/dev-playbook/issues/354) settles it.
+- **A compaction summary is a user turn lane 2 trusts.** After a `/compact` the
+  harness records the model's summary of the session as a `user` turn in that
+  session's own transcript. Neither guard above reaches it: the authoring rule
+  covers files and lane exclusivity covers subagents, while this is a main
+  session's own transcript, which is exactly what lane 2 reads. The sessions
+  likeliest to write the marker into a summary are the ones discussing this
+  hook. Measured rather than assumed;
+  [#357](https://github.com/GeoffNordling/dev-playbook/issues/357) settles it.
+
+Commit authorization never rides a delegation prompt or brief — the
+auto-mode classifier kills a node whose prompt asserts authority it
+structurally lacks. That is enforcement, not etiquette: authorization lives
+only in what the human authored — the definitions, and the typed marker.
 
 ## The canonical commands
 

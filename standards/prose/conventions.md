@@ -89,13 +89,15 @@ terms where they apply, with no obligation to extend it.
 One actor — the dispatcher, reviewer, and approver — wears two names, chosen by
 voice. **Agent-facing instruction text says `user`**: `CLAUDE.md` at every level
 — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike — plus the
-skill and rule bodies under `dotfiles/dot-claude/skills/` and
-`dotfiles/dot-claude/rules/`. None of these are written for a human reader; every
-one of them has exactly one real audience, the executing agent, so all of them
-name that person the way Claude Code does (`AskUserQuestion`). CLAUDE.md does not
-split by location — its content is commands to the agent
-([claude-content.md](/standards/claude-code/claude-content.md)), never a
-description of the system for a human to read, at any level.
+skill, rule, and agent-definition bodies under `dotfiles/dot-claude/skills/`,
+`dotfiles/dot-claude/rules/`, and `dotfiles/dot-claude/agents/` (a consumer repo
+carries the same three under `.claude/`). An agent definition is a standing
+system prompt, which is as agent-facing as text gets. None of these are written
+for a human reader; every one of them has exactly one real audience, the
+executing agent, so all of them name that person the way Claude Code does
+(`AskUserQuestion`). CLAUDE.md does not split by location — its content is
+commands to the agent ([claude-content.md](/standards/claude-code/claude-content.md)),
+never a description of the system for a human to read, at any level.
 **Declarative documentation says `human`**: `software-factory/`, `standards/`, `docs/`,
 and `README.md` describe the system in third person, where the actor is the
 human dispatcher.
@@ -112,8 +114,8 @@ so the only voices they carry are the imperative and `you`. A first-person
 sentence puts the document in the agent's mouth, which inverts who is
 instructing whom — and where the word means the human, it collides with the
 `user` rule in the same breath. `repo-lint` enforces this deterministically
-alongside the `human` ban, over the body of every first-party skill and rule as
-well as `CLAUDE.md`.
+alongside the `human` ban, over the body of every first-party skill, rule, and
+agent definition as well as `CLAUDE.md`.
 
 The ban governs the document's own voice, so quoting someone else's is
 untouched: a double-quoted utterance is exempt. Write the phrasing a user types

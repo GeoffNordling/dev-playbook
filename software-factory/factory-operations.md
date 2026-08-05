@@ -58,21 +58,21 @@ classifier would otherwise block, add a natural-language entry to the
 them. It is honored from user and project-local scope, never from checked-in
 project settings.
 
-**The commit-authorization token.** The literal token
-`⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` pre-authorizes `Skill(commit)` for the session
-carrying it — an uncommon bracketed string recognized as the lone commit
-exception. Two sessions carry it, and no others:
-
-- **A committing node's subagent**, from the delegation prompt the overwatch
-  prefixes. A subagent is a separate session, its delegation prompt is its launch
-  prompt, and it commits with no human present to say "commit now" — the token is
-  what lets it, with the work reviewed at the PR rather than diff-by-diff. A node
-  that only reads or only calls `gh` gets the bare launch line; granting the token
-  where it goes unused is privilege the node doesn't need.
-- **The issue overwatch**, from its own skill, for one purpose: the fixes it makes
-  at [the judgments node](#the-judgments-node) are its own work, made with the
-  human present, and they land without a checkpoint of their own. It commits
-  nothing else — the work under review is never the overwatch's to touch.
+**Commit authorization.** `git commit` is deny-by-default: the `git-authority`
+PreToolUse hook permits it through exactly two mutually exclusive lanes, per
+[git-authority](/software-factory/git-authority.md). A factory subagent
+commits through lane 1 — its `agent_type` is on the hook's allowlist
+(`builder`, `judgment-facilitator`), read from the payload the harness
+writes, which no prompt or brief can forge. A human's interactive session
+commits through lane 2 — a typed `/commit-on` marker in its transcript. The
+overwatch's own fixes at [the judgments node](#the-judgments-node) are
+exactly that: lane-2 commits under the grant the human types, made with the
+human present. The lanes never mix: a subagent is judged by its type alone,
+whatever its transcript holds. That exclusivity is what stops a node minting
+its own grant — a subagent's transcript opens with the launch prompt its parent
+model wrote, which lane 2 would otherwise read as a grant a human typed.
+Delegation prompts carry no authorization of any kind — the classifier kills
+a node whose brief asserts authority it structurally lacks.
 
 **Subagent permissions are consciously wide.** Subagent-level tool permissions
 are out of scope for this model: subagents run under auto mode with wide
@@ -110,7 +110,7 @@ The factory's nodes, what runs each, and how each engages the human:
 
 | Node | Skill | Engagement |
 |---|---|---|
-| `build` | `/build` | AFK; the subagent carries the commit token. |
+| `build` | `/build` | AFK, as a `builder`-typed subagent (lane 1 of the commit rule family). |
 | `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict)). |
 | `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
 
@@ -123,9 +123,11 @@ line `run /<skill> <N>` and nothing more — nodes stay skills. The subagent get
 fresh context window and inherits the issue's worktree as cwd; it reloads what it
 needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
 ends with a terminal report. Nothing carries over from the overwatch's context.
-A committing node's launch line is prefixed with the commit token, per
-[Permissions](#permissions). A helper a skill invokes itself (`/commit`,
-`/grill-with-docs`) is not a node and is never dispatched.
+A committing node is spawned as its factory agent type (`builder` for /build),
+which is what lane 1 of the commit rule family reads, per
+[Permissions](#permissions); its launch line carries no authorization. A helper
+a skill invokes itself (`/commit`, `/grill-with-docs`) is not a node and is
+never dispatched.
 
 **The terminal report contract.** A subagent's final message MUST begin at
 character one with exactly `DONE: <one-line outcome>` or
@@ -297,8 +299,10 @@ which a subagent does not have — so there is no wrapper skill and no subagent:
 the overwatch invokes `/run-judgments` itself, in the issue's worktree.
 
 - **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
-  and on the issue branch, and committed on the overwatch's own commit token
-  (see [Permissions](#permissions)) — no separate go-ahead.
+  and on the issue branch, and committed through lane 2 of the commit rule
+  family — the human's typed `/commit-on` (see [Permissions](#permissions)).
+  The grant stands for the session, so no per-fix go-ahead; a denial is the
+  hook asking for the human's word, never a thing to work around.
 - **An ambiguous failure escalates.** Where a fix is unclear enough to want human
   advice, the node stops and asks
   ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional));

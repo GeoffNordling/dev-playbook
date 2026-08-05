@@ -1,6 +1,6 @@
 {
  "repo": "dev-playbook",
- "root": "/home/geoff/workspace/dev-playbook/.claude/worktrees/issue-342",
+ "root": "/home/geoff/workspace/dev-playbook/.claude/worktrees/issue-343",
  "nodes": {
   ".claude/skills/improve-protocol/SKILL.md": "harness-skill-authored",
   ".github/workflows/ci.yml": "config",
@@ -85,6 +85,8 @@
   "dotfiles/.stow-local-ignore": "config",
   "dotfiles/README.md": "concept",
   "dotfiles/dot-claude/CLAUDE.md": "harness-session",
+  "dotfiles/dot-claude/agents/builder.md": "harness-session",
+  "dotfiles/dot-claude/agents/judgment-facilitator.md": "harness-session",
   "dotfiles/dot-claude/hooks/git-authority": "code",
   "dotfiles/dot-claude/hooks/measure-event": "code",
   "dotfiles/dot-claude/hooks/session-start-settings": "code",
@@ -99,6 +101,8 @@
   "dotfiles/dot-claude/skills/candidate-promote/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/clean-up-branch-worktree/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/code-pr-review/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/commit-off/SKILL.md": "harness-skill-authored",
+  "dotfiles/dot-claude/skills/commit-on/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/commit/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/compact-prep/SKILL.md": "harness-skill-authored",
   "dotfiles/dot-claude/skills/datasheet/SKILL.md": "harness-skill-authored",
@@ -2582,7 +2586,7 @@
    "target": "standards/docs/cross-references.md",
    "kind": "internal",
    "form": "prose-path",
-   "line": 104,
+   "line": 114,
    "status": "ok"
   },
   {
@@ -2799,6 +2803,22 @@
    "kind": "internal",
    "form": "citation",
    "line": 54,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/commit-off/SKILL.md",
+   "target": "software-factory/git-authority.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 17,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/commit-on/SKILL.md",
+   "target": "software-factory/git-authority.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 19,
    "status": "ok"
   },
   {
@@ -3059,6 +3079,14 @@
   },
   {
    "source": "dotfiles/dot-claude/skills/issue-overwatch/SKILL.md",
+   "target": "software-factory/git-authority.md",
+   "kind": "internal",
+   "form": "citation",
+   "line": 16,
+   "status": "ok"
+  },
+  {
+   "source": "dotfiles/dot-claude/skills/issue-overwatch/SKILL.md",
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "citation",
@@ -3182,7 +3210,7 @@
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "citation",
-   "line": 17,
+   "line": 19,
    "status": "ok"
   },
   {
@@ -3190,7 +3218,7 @@
    "target": "software-factory/factory-operations.md",
    "kind": "internal",
    "form": "citation",
-   "line": 24,
+   "line": 26,
    "status": "ok"
   },
   {
@@ -3198,7 +3226,7 @@
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "citation",
-   "line": 31,
+   "line": 33,
    "status": "ok"
   },
   {
@@ -5443,10 +5471,10 @@
   },
   {
    "source": "software-factory/factory-operations.md",
-   "target": "software-factory/factory-operations.md",
+   "target": "software-factory/git-authority.md",
    "kind": "internal",
-   "form": "relative",
-   "line": 73,
+   "form": "link",
+   "line": 63,
    "status": "ok"
   },
   {
@@ -5454,7 +5482,15 @@
    "target": "software-factory/factory-operations.md",
    "kind": "internal",
    "form": "relative",
-   "line": 114,
+   "line": 68,
+   "status": "ok"
+  },
+  {
+   "source": "software-factory/factory-operations.md",
+   "target": "software-factory/factory-operations.md",
+   "kind": "internal",
+   "form": "relative",
+   "line": 112,
    "status": "ok"
   },
   {
@@ -5462,7 +5498,7 @@
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "link",
-   "line": 114,
+   "line": 112,
    "status": "ok"
   },
   {
@@ -5470,7 +5506,7 @@
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "link",
-   "line": 115,
+   "line": 113,
    "status": "ok"
   },
   {
@@ -5478,7 +5514,7 @@
    "target": "software-factory/factory-operations.md",
    "kind": "internal",
    "form": "relative",
-   "line": 127,
+   "line": 126,
    "status": "ok"
   },
   {
@@ -5614,7 +5650,7 @@
    "target": "software-factory/human-checkpoints.md",
    "kind": "internal",
    "form": "link",
-   "line": 304,
+   "line": 306,
    "status": "ok"
   },
   {
@@ -5622,7 +5658,7 @@
    "target": "standards/tracking/repo-settings.md",
    "kind": "internal",
    "form": "link",
-   "line": 31,
+   "line": 33,
    "status": "ok"
   },
   {
@@ -5630,7 +5666,7 @@
    "target": "docs/sandboxing.md",
    "kind": "internal",
    "form": "link",
-   "line": 48,
+   "line": 50,
    "status": "ok"
   },
   {
@@ -5638,7 +5674,7 @@
    "target": "dotfiles/settings/base.json",
    "kind": "internal",
    "form": "prose-path",
-   "line": 32,
+   "line": 34,
    "status": "ok"
   },
   {
@@ -5646,7 +5682,7 @@
    "target": "dotfiles/settings/base.json",
    "kind": "internal",
    "form": "prose-path",
-   "line": 140,
+   "line": 169,
    "status": "ok"
   },
   {
@@ -5654,7 +5690,7 @@
    "target": "tests/test_git_authority.py",
    "kind": "internal",
    "form": "prose-path",
-   "line": 143,
+   "line": 172,
    "status": "ok"
   },
   {
@@ -6094,7 +6130,7 @@
    "target": "standards/docs/bundle.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 156,
+   "line": 158,
    "status": "ok"
   },
   {
@@ -6102,7 +6138,7 @@
    "target": "standards/claude-code/files.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 161,
+   "line": 162,
    "status": "ok"
   },
   {
@@ -9210,6 +9246,14 @@
    "status": "ok"
   },
   {
+   "source": "tests/dev_playbook/test_md.py",
+   "target": "dotfiles/dot-claude/agents/builder.md",
+   "kind": "internal",
+   "form": "code-ref",
+   "line": 117,
+   "status": "ok"
+  },
+  {
    "source": "tests/dev_playbook/test_prose_lint.py",
    "target": "src/dev_playbook/prose_lint.py",
    "kind": "internal",
@@ -10350,7 +10394,7 @@
    "target": "software-factory/git-authority.md",
    "kind": "internal",
    "form": "code-ref",
-   "line": 258,
+   "line": 496,
    "status": "ok"
   },
   {
@@ -11588,11 +11632,13 @@
  ],
  "ignored": {
   ".gitignore:.venv/": 2269,
-  ".gitignore:__pycache__/": 83,
+  ".gitignore:__pycache__/": 84,
   ".gitignore:.mypy_cache/": 18,
-  ".gitignore:.ruff_cache/": 13,
+  ".gitignore:.ruff_cache/": 14,
   ".gitignore:.pytest_cache/": 5,
-  "standards/build/canonical/.gitignore:.ruff_cache/": 2
+  "standards/build/canonical/.gitignore:.ruff_cache/": 2,
+  "/home/geoff/workspace/dev-playbook/.git/info/exclude:**/.claude/scheduled_tasks.json": 1,
+  "/home/geoff/.config/git/ignore:**/.claude/settings.local.json": 1
  },
  "excluded": {
   "readings/file-graph/": 2,
@@ -11603,24 +11649,24 @@
    "nodes_by_bucket": {
     "code": 114,
     "concept": 97,
+    "harness-skill-authored": 44,
     "harness-skill-thirdparty": 44,
-    "harness-skill-authored": 42,
     "config": 27,
     "index": 16,
-    "reading": 5,
-    "harness-session": 4
+    "harness-session": 6,
+    "reading": 5
    },
    "edges_by_form": {
-    "code-ref": 494,
-    "link": 486,
+    "code-ref": 495,
+    "link": 487,
     "relative": 226,
-    "citation": 95,
+    "citation": 98,
     "prose-path": 54,
     "bundle": 46,
     "resource": 3
    },
    "edges_by_status": {
-    "ok": 1390,
+    "ok": 1395,
     "wrong-form": 9,
     "broken": 5
    }
@@ -11629,12 +11675,16 @@
    "seeds": [
     "CLAUDE.md",
     "dotfiles/dot-claude/CLAUDE.md",
+    "dotfiles/dot-claude/agents/builder.md",
+    "dotfiles/dot-claude/agents/judgment-facilitator.md",
     "dotfiles/dot-claude/rules/bash-commands.md",
     "dotfiles/dot-claude/rules/edit-in-dev-playbook.md"
    ],
    "reached": {
     "CLAUDE.md": 0,
     "dotfiles/dot-claude/CLAUDE.md": 0,
+    "dotfiles/dot-claude/agents/builder.md": 0,
+    "dotfiles/dot-claude/agents/judgment-facilitator.md": 0,
     "dotfiles/dot-claude/rules/bash-commands.md": 0,
     "dotfiles/dot-claude/rules/edit-in-dev-playbook.md": 0,
     "docs/sandboxing.md": 1,
@@ -11785,7 +11835,7 @@
     "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md": 7
    },
    "reached_by_distance": {
-    "0": 4,
+    "0": 6,
     "1": 6,
     "2": 46,
     "3": 62,
@@ -11797,7 +11847,7 @@
    "unreached_by_bucket": {
     "code": 86,
     "harness-skill-thirdparty": 43,
-    "harness-skill-authored": 39,
+    "harness-skill-authored": 41,
     "config": 10,
     "concept": 9,
     "index": 7,
@@ -11872,6 +11922,8 @@
     "dotfiles/dot-claude/skills/candidate-promote/SKILL.md",
     "dotfiles/dot-claude/skills/clean-up-branch-worktree/SKILL.md",
     "dotfiles/dot-claude/skills/code-pr-review/SKILL.md",
+    "dotfiles/dot-claude/skills/commit-off/SKILL.md",
+    "dotfiles/dot-claude/skills/commit-on/SKILL.md",
     "dotfiles/dot-claude/skills/commit/SKILL.md",
     "dotfiles/dot-claude/skills/compact-prep/SKILL.md",
     "dotfiles/dot-claude/skills/datasheet/SKILL.md",
@@ -12130,6 +12182,7 @@
    "dotfiles/.bashrc.d/aliases.sh": "code",
    "dotfiles/.bashrc.d/worktree.sh": "code",
    "dotfiles/.stow-local-ignore": "config",
+   "dotfiles/dot-claude/agents/judgment-facilitator.md": "harness-session",
    "dotfiles/dot-claude/hooks/git-authority": "code",
    "dotfiles/dot-claude/hooks/session-start-stale-base": "code",
    "dotfiles/dot-claude/rules/edit-in-dev-playbook.md": "harness-session",
