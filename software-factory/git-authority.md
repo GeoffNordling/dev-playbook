@@ -136,9 +136,12 @@ two lanes allows, and the lanes never mix.
   later marker wins. The grant survives a `--continue` resume and does not
   survive `/clear`, which starts a new transcript.
 
-Lane exclusivity is load-bearing: subagents inherit the parent session's
-transcript path, so honoring a parent's grant inside a subagent would extend
-one typed `/commit-on` to every node under a factory manager. It never does.
+Lane exclusivity is load-bearing. A subagent writes a transcript of its own —
+not the parent's — and the first user turn in it is the launch prompt the parent
+model wrote. A subagent judged by lane 2 would therefore read one model's prompt
+to another as a typed grant, minting its own authorization on the way in.
+Judging it by its type alone is what keeps the grant with the person who typed
+it.
 
 A transcript the hook cannot open holds no grant it can see, so that is the
 ungranted state and not a fault: the denial names the missing grant, because
@@ -172,7 +175,7 @@ and cannot be edited, so enforcing there would mean a permanently red gate on
 something nobody can fix. The exemption is recorded here and pinned by a test
 rather than left to be inferred from the code.
 
-Two limits are stated rather than fixed, each with an issue:
+Three limits are stated rather than fixed, each with an issue:
 
 - **The family reads `git commit` and nothing else.** `git revert`, `merge`,
   `cherry-pick`, `am`, `rebase --continue` and `commit-tree` all write commit
@@ -186,6 +189,14 @@ Two limits are stated rather than fixed, each with an issue:
   tool, a model could mint its own grant and the lane is forgeable. That is an
   assumption, not a measured fact;
   [#354](https://github.com/GeoffNordling/dev-playbook/issues/354) settles it.
+- **A compaction summary is a user turn lane 2 trusts.** After a `/compact` the
+  harness records the model's summary of the session as a `user` turn in that
+  session's own transcript. Neither guard above reaches it: the authoring rule
+  covers files and lane exclusivity covers subagents, while this is a main
+  session's own transcript, which is exactly what lane 2 reads. The sessions
+  likeliest to write the marker into a summary are the ones discussing this
+  hook. Measured rather than assumed;
+  [#357](https://github.com/GeoffNordling/dev-playbook/issues/357) settles it.
 
 Commit authorization never rides a delegation prompt or brief — the
 auto-mode classifier kills a node whose prompt asserts authority it

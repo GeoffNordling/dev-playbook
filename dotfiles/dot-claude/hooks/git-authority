@@ -640,11 +640,12 @@ def lane(event: dict) -> str | None:
     """The reason this session may not commit, or None when a lane opens.
 
     The two lanes are disjoint by spawn context, and that exclusivity is what
-    keeps a grant where it was typed: a subagent inherits its parent's
-    transcript, so a session judged by both lanes would extend one user's
-    ``/commit-on`` to every node beneath it. A payload carrying ``agent_type``
-    is a subagent — judged by the allowlist alone, whatever the transcript
-    holds.
+    keeps a grant out of reach of anything that did not type it. A subagent
+    writes a transcript of its own, and the first user turn in it is the launch
+    prompt its parent model wrote — so a subagent judged by lane 2 would read
+    one model's prompt to another as a grant, minting its own authorization on
+    the way in. A payload carrying ``agent_type`` is a subagent, judged by the
+    allowlist alone, whatever its transcript holds.
     """
     if "agent_type" in event:
         agent_type = event.get("agent_type")

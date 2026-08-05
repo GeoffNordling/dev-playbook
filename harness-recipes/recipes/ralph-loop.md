@@ -46,13 +46,15 @@ under the `git-authority` hook's commit rule family, and an iteration agent is
 not one of the committing factory agent types, so lane 1 refuses it. Whether
 lane 2 is even reachable from here is unmeasured: it turns on whether a Workflow
 `agent()` payload carries an `agent_type` key at all. If it does, lane
-exclusivity shuts lane 2 outright; if it does not, the iteration falls through to
-the launching session's transcript, and a `/commit-on` typed before launch would
-open the lane — the cross-session reach lane exclusivity exists to prevent. That
-is an assumption either way, not a measured fact.
+exclusivity shuts lane 2 outright. If it does not, the iteration is judged by
+lane 2 against *its own* transcript — an agent writes its own, so there is no
+falling through to the launching session's and no `/commit-on` typed before
+launch that could reach it. That transcript opens with the prompt `ralph-loop.js`
+wrote, which carries no typed marker, so lane 2 finds no grant either. Which
+branch holds is an assumption, not a measured fact.
 
-The conclusion holds under both branches: expect the commit to be denied unless
-someone granted the launching session first, and do not rely on it. Disk is the
+The conclusion holds under both branches: expect the commit to be denied, and do
+not rely on it. Disk is the
 loop's only memory, so a loop run this way makes no durable progress, and the
 runtime stops on the denial rather than grinding out iterations nothing records.
 Giving the iteration a lane of its own, and measuring the payload, is

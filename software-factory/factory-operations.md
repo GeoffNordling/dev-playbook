@@ -67,8 +67,10 @@ writes, which no prompt or brief can forge. A human's interactive session
 commits through lane 2 — a typed `/commit-on` marker in its transcript. The
 overwatch's own fixes at [the judgments node](#the-judgments-node) are
 exactly that: lane-2 commits under the grant the human types, made with the
-human present. The lanes never mix: a subagent is judged by type alone, so a
-`/commit-on` typed at any parent session grants its nodes nothing.
+human present. The lanes never mix: a subagent is judged by its type alone,
+whatever its transcript holds. That exclusivity is what stops a node minting
+its own grant — a subagent's transcript opens with the launch prompt its parent
+model wrote, which lane 2 would otherwise read as a grant a human typed.
 Delegation prompts carry no authorization of any kind — the classifier kills
 a node whose brief asserts authority it structurally lacks.
 
