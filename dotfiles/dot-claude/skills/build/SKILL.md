@@ -19,7 +19,7 @@ Committing needs a lane open at the git-authority hook, and which one depends on
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-**Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
+**Work in the tree you are standing in.** Placement is your launcher's, not this skill's: a traverse build node is spawned into a fenced throwaway worktree, so `.claude/worktrees/issue-<issue>` does not exist yet — the issue's own worktree opens at the review stop — and its absence is the normal case, never a reason to stop. What you do confirm is that the tree is a worktree rather than the repo's main checkout: `git rev-parse --git-dir` differs from `git rev-parse --git-common-dir` in a worktree and matches in the main checkout. Escalate (§5) when the two match, and never build or commit in the main checkout. Run inline in the user's own session instead, the issue's worktree is where the work belongs — enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)` when you are not already there.
 
 - `gh issue view <issue> --comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
 - **Rework re-entry.** Follow [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — read it now if `gh pr view` finds a PR, and skip it otherwise. The brief is the contract it names: where a finding conflicts with the brief, the brief wins.

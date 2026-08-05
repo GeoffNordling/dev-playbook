@@ -31,9 +31,12 @@ is one launch, not an investigation into resumable state.
 
 ## Nodes and the fence
 
-Traverse nodes are ephemeral agents spawned with `isolation: 'worktree'`
-from the root-anchored session; the harness fence is the containment —
-writes outside the node's own worktree are refused. Node briefs carry
+The traverse's **working** nodes — builder and judgment-facilitator — are
+ephemeral agents spawned with `isolation: 'worktree'` from the root-anchored
+session; the harness fence is the containment — writes outside the node's own
+worktree are refused. The clerk and the reaper run **unfenced**, and
+deliberately so: the clerk touches nothing but labels, through `gh`, and
+cleanup reaches across worktrees by nature. Node briefs carry
 **data only** (repo, issue number, verdicts, commands, carrier state);
 procedure lives in the agent definitions under `dotfiles/dot-claude/agents/`.
 Models ride the definitions' frontmatter; the script pins `effort` per node
@@ -53,8 +56,12 @@ and outside a run label authority is the sequencing session's.
 ## The carrier
 
 The `issue-<N>` branch **on origin** is the sole carrier of work between
-nodes and between runs. It is born via `git push origin HEAD:issue-<N>` from
-inside the fence — the harness-named local branch is never renamed. A node
+nodes and between runs. It is born via
+`git push --no-verify origin HEAD:issue-<N>` from inside the fence — the
+harness-named local branch is never renamed. `--no-verify` is structural, not
+a shortcut: the pre-push hook arms the semantic cache gate, which is red by
+construction until the judgments phase settles it, so a verified push could
+never publish the carrier at all. A node
 that starts from published work adopts the carrier as its first act:
 `git fetch origin issue-<N>`, then
 `git switch -c <worktree-name>-adopt origin/issue-<N>`, where
@@ -70,9 +77,11 @@ survives a node.
 
 ## The build arc
 
-One builder-typed node in a fenced worktree: adopt the carrier when the
-brief says it exists (a rework relaunch rebuilding on published work), run
-/build, commit through its agent type, publish the carrier. On its `done`
+One builder-typed node in a fenced worktree: probe origin for the carrier and
+adopt it when it exists (a rework relaunch rebuilding on published work), run
+/build, commit through its agent type, publish the carrier. The probe is the
+node's own — no launcher can supply the fact, since a first build and a
+rework relaunch read identically from the labels. On its `done`
 the clerk moves `phase:build` → `phase:pr-review`, the reaper cleans the
 run's worktrees, and the run returns DONE. The review stop that follows is
 the sequencing session's.
@@ -99,19 +108,37 @@ through the human's final read and merge. The sequencing session's close-out
 
 ## The escalate contract
 
-On any node's `escalate`, the run stops — no further nodes, no reap, labels
-untouched — and the ESCALATE payload is the run's return value. It carries:
-issue handle · node · one-line reason · a node-authored brief · a
-cwd/worktree/branch/SHA state block. The state block is a **report, not a
-guarantee** — harness auto-clean removes unchanged trees at agent end
-regardless, so consumers tolerate dead paths. The launcher posts the payload
-verbatim as a comment on the issue (escalations are durable on the issue)
-and relays the node-authored brief to the human.
+On a working node's `escalate`, the run stops — no further nodes, no reap,
+labels untouched — and the ESCALATE payload is the run's return value. It
+carries: `status: 'ESCALATE'` · issue handle · node · one-line reason · a
+node-authored brief · a cwd/worktree/branch/SHA state block. The state block
+is a **report, not a guarantee** — harness auto-clean removes unchanged trees
+at agent end regardless, so consumers tolerate dead paths. The launcher posts
+the payload verbatim as a comment on the issue (escalations are durable on
+the issue) and relays the node-authored brief to the human.
+
+**The reaper is the one exception**, because it runs *after* the arc's own
+label move has landed, so "labels untouched" cannot hold there. A failed
+sweep degrades to DONE carrying the failure in its detail — never to an
+escalation. Cleanup is bookkeeping: stranding a completed build on it would
+leave the issue at a phase no arc answers to, where relaunch, the universal
+recovery, refuses as `wrong-phase`.
+
+Both returns are discriminated by an **uppercase** `status` field —
+`status: 'DONE'` or `status: 'ESCALATE'` — and that is what the launcher
+parses. It is deliberately distinct from the lowercase `status: done|escalate`
+every node schema requires, so a node's own status can never be mistaken for
+the run's.
 
 ## The error lane
 
 Every `agent()` result is checked. The harness swallows agent errors into
-`null`, so a `null` gets one retry, then a self-describing throw. At the
+`null`, so a `null` gets one retry, then a self-describing throw. The retry
+is confined to nodes with **no side effects** — the clerk's read, the reaper.
+A node that died partway is indistinguishable from one that never started, so
+retrying a fixer that had already recorded and republished would re-run its
+record command against its own fixes, caching passes against content no judge
+ever saw. A side-effecting node that returns `null` throws on the spot. At the
 launcher, a `failed` run and a completed run whose return parses as neither
 DONE nor ESCALATE are both handled as escalations, never ignored. The
 auto-mode classifier's gating is stochastic: a blocked launch or node is a
@@ -124,11 +151,21 @@ Recovery is relaunch, on the human's word only. A relaunched run resumes
 from fresh labels, `origin/issue-<N>`, and the seen-set. `resumeFromRunId`
 is same-session cache replay and is never used on live work.
 
+## Run state
+
+The launcher records each run's `runId` durably in `.factory/state.json`, at
+the root of the checkout it is standing in — never across a worktree fence,
+whose writes the harness refuses. The file is gitignored, and this slice's
+schema is minimal, per issue: `{"status": "<free text>", "runIds": []}`. It
+is an accounting record, not an input: no run reads it, and recovery is
+relaunch rather than resumption from it.
+
 ## Reaping
 
 On the clean DONE path the run's last node is the reaper, handed the
 worktree prefixes its nodes reported: it removes those worktrees and
 branches by prefix, never by guessed count, tolerating already-cleaned
-entries. An escalated run's trees are left standing (best-effort) for
-inspection; sweeping them belongs to the manager conversion, not to any
-run.
+entries. A sweep that fails does not fail the run — it degrades to DONE with
+the failure in the detail, per the escalate contract above. An escalated
+run's trees are left standing (best-effort) for inspection; sweeping them
+belongs to the manager conversion, not to any run.

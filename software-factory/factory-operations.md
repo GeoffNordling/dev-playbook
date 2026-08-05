@@ -157,19 +157,21 @@ a checkout.
 
 ### The worktree contract
 
-Every file-touching node sits in the issue's worktree:
+Every file-touching node sits in a worktree; which one depends on the phase:
 
 - **Open (the review stop).** The sequencing session opens it —
   `EnterWorktree(name=issue-<N>)`, rename to the bare `issue-<N>` — then
-  syncs it to the carrier with `git pull --ff-only origin issue-<N>`, which
-  refuses rather than discards on divergence. The same `--ff-only` pull
-  re-syncs it each later review cycle. (`worktree.baseRef` pinned to `fresh`
-  makes `EnterWorktree` branch from `origin/main`; the pull then
-  fast-forwards to the published carrier tip.)
-- **Inherit (everything after).** AFK subagents inherit the worktree as their
-  cwd; the overwatch keeps it across `/clear`. Every later node confirms the
-  worktree is present — escalating if it's gone, since the issue's work would be
-  lost.
+  syncs it so the tree stands at the carrier's tip, re-syncing the same way
+  each later review cycle. The sync never discards committed work, and a
+  sync that cannot land without discarding is an escalation.
+  (`worktree.baseRef` pinned to `fresh` makes `EnterWorktree` branch from
+  `origin/main`, so the fresh branch is *not* an ancestor of the carrier
+  whenever `main` advanced during the build — a plain `--ff-only` pull would
+  refuse there, and a routine merge to `main` would block every review stop.)
+- **Inherit (the review stop's audits).** Audit subagents inherit the review
+  worktree as their cwd, and the sequencing session keeps it across `/clear`.
+  A machine-phase node inherits nothing: the traverse spawns it into a fenced
+  tree of its own, and the carrier on origin is what it starts from.
 - **Tear down (Agent-view overwatch, post-merge).** When the issue lands, the
   Agent-view overwatch removes the local side —
   `git worktree remove .claude/worktrees/issue-<N>` and
@@ -177,7 +179,7 @@ Every file-touching node sits in the issue's worktree:
   spike's worktree goes the same way when its issue closes.
 
 **The branch is pushed by its nodes.** A committing node publishes the
-carrier itself — `git push origin HEAD:issue-<N>`, within
+carrier itself — `git push --no-verify origin HEAD:issue-<N>`, within
 [git-authority](/software-factory/git-authority.md)'s push rules — so origin
 holds the work the moment a node ends, and the PR opens at the review stop
 against a branch already published. Every intermediary push rides

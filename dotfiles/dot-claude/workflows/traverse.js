@@ -149,11 +149,17 @@ const SCHEMA = {
     detail: { type: 'string', description: 'One line: what the sweep came to.' },
   }),
   builder: nodeSchema({
-    worktree: { type: 'string', description: 'The absolute path of the worktree you worked in.' },
+    worktree: {
+      type: ['string', 'null'],
+      description: 'The absolute path of the worktree you worked in. Null if you never established one.',
+    },
     detail: { type: 'string', description: 'One line: what you built and whether you published the carrier.' },
   }),
   'judgment-facilitator': nodeSchema({
-    worktree: { type: 'string', description: 'The absolute path of the worktree you worked in.' },
+    worktree: {
+      type: ['string', 'null'],
+      description: 'The absolute path of the worktree you worked in. Null if you never established one.',
+    },
     plan: {
       type: ['string', 'null'],
       description: 'The stdout of `judgments-run plan`, byte-exact and whole. Null only when status is escalate.',
@@ -174,7 +180,23 @@ const SCHEMA = {
 // gating is stochastic, so a blocked node is a normal operational event rather
 // than a factory defect. A second null is not survivable state to guess at: the
 // throw names the node so the run's failure is self-describing.
-async function node(agentType, brief, label, phaseTitle) {
+//
+// `retryOnNull` IS THE SAFETY INTERLOCK, and it is required at every call site
+// so the decision is made rather than inherited. A node that died partway is
+// indistinguishable from one that never started, so only a node whose work is
+// safe to repeat may be retried:
+//
+//   - The clerk's READ retries: it reads and returns, changing nothing.
+//   - The reaper retries: it removes by prefix, and reaper.md makes an
+//     already-cleaned entry the expected case, so a repeat is a no-op.
+//   - The clerk's MOVE, the builder, and the fixer do NOT. The worst case is
+//     the fixer: retrying one that had already recorded and republished would
+//     re-run its record command against its own fixes, caching passes against
+//     content no judge ever saw — a softened gate, cached permanently in the
+//     seen-set. A side-effecting null throws on the spot instead.
+async function node(agentType, brief, label, phaseTitle, { retryOnNull }) {
+  if (typeof retryOnNull !== 'boolean')
+    throw new Error(`traverse: ${label} was called without an explicit retryOnNull — the error lane has no default`)
   const options = {
     agentType,
     label,
@@ -183,7 +205,8 @@ async function node(agentType, brief, label, phaseTitle) {
     schema: SCHEMA[agentType],
     ...(FENCED.has(agentType) ? { isolation: 'worktree' } : {}),
   }
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  const attempts = retryOnNull ? 2 : 1
+  for (let attempt = 1; attempt <= attempts; attempt++) {
     let result = null
     try {
       result = await agent(brief, options)
@@ -191,10 +214,11 @@ async function node(agentType, brief, label, phaseTitle) {
       log(`traverse: ${label} threw on attempt ${attempt}: ${e?.message ?? e}`)
     }
     if (result != null) return result
-    if (attempt === 1) log(`traverse: ${label} returned null — retrying once`)
+    if (attempt < attempts) log(`traverse: ${label} returned null — retrying once`)
   }
   throw new Error(
-    `traverse: ${HANDLE} — the ${label} node (agentType ${agentType}) returned null twice. ` +
+    `traverse: ${HANDLE} — the ${label} node (agentType ${agentType}) returned null ` +
+      `${retryOnNull ? 'twice' : 'and is not safe to retry, since it may have acted before it died'}. ` +
       `The harness swallows an agent error into null, so the node's own account is lost. ` +
       `Recovery is relaunching the traverse, which re-reads the labels and resumes from origin/${CARRIER}.`,
   )
@@ -204,20 +228,28 @@ async function node(agentType, brief, label, phaseTitle) {
 // Return payloads
 //
 // An escalation is the run's RETURN VALUE, never a throw: the launcher posts it
-// verbatim as a comment on the issue, so it has to survive as data. On any
+// verbatim as a comment on the issue, so it has to survive as data. On a WORKING
 // node's escalate the run stops where it stands — no further nodes, no reap,
-// labels untouched.
+// labels untouched. The reaper is the one exception, handled at reap() below.
 // ---------------------------------------------------------------------------
 
 // The state block is a REPORT, NOT A GUARANTEE. The harness auto-removes an
 // unchanged worktree when its agent ends, so a path here may already be dead by
 // the time anyone reads it. Consumers tolerate that; nothing acts on it blind.
-// `status` is destructured out deliberately: a node's own lowercase `escalate`
-// must never reach the spread below, where it would overwrite the uppercase
-// marker the launcher parses. Whatever else the node returned rides along — its
-// detail, labels, or fixed ids are exactly the context an escalation wants.
+//
+// Two fields are destructured out deliberately, for opposite reasons:
+//   - `status`, because a node's own lowercase `escalate` must never reach the
+//     spread below, where it would overwrite the uppercase marker the launcher
+//     parses.
+//   - `plan`, because a fixer's plan is `judgments-run plan` stdout whole —
+//     judge_prompt, the judge output schema, and every job. The launcher posts
+//     this payload verbatim as an issue comment, and GitHub caps a comment at
+//     65536 characters, so the plan must be dropped here rather than trusted to
+//     a node that is already failing.
+// Whatever else the node returned rides along — its detail, labels, or fixed
+// ids are exactly the context an escalation wants.
 function escalation(nodeName, result) {
-  const { status, reason, brief, cwd, worktree, branch, sha, ...rest } = result
+  const { status, reason, brief, cwd, worktree, branch, sha, plan, ...rest } = result
   return {
     status: 'ESCALATE',
     issue: HANDLE,
@@ -248,23 +280,15 @@ const clerkRead = () => [...head(), 'instruction: read'].join('\n')
 
 const clerkMove = (from, to) => [...head(), `instruction: ${from} -> ${to}`].join('\n')
 
-// The builder needs to know whether the carrier already exists: if it does, this
-// is a rework pass and the node adopts published work before building; if not,
-// this is a first build and the node's push is what gives the carrier birth.
-//
-// This script cannot establish that fact. It has no shell, and the clerk — the
+// The brief names the carrier and stops there. WHETHER the carrier already
+// exists is the builder's own probe (builder.md step 2), not brief data, and
+// this script could not supply it in any case: it has no shell, the clerk — the
 // only node running before the builder — touches labels and nothing else by its
-// own definition. Nor do the labels answer it: `phase:build` reads identically
-// on a first build and on a rework relaunch. So the brief settles the question
-// with a deterministic probe rather than an assertion this script would be
-// guessing at. `git ls-remote` is a read, and a command in a brief is data.
-const buildBrief = () =>
-  [
-    ...head(),
-    `carrier branch: ${CARRIER}`,
-    `carrier exists on origin: establish it with \`git ls-remote --heads origin ${CARRIER}\` before anything else.` +
-      ` Output means it exists — a rework pass, so adopt it. No output means it does not — a first build, and your push is what creates it.`,
-  ].join('\n')
+// own definition, and the labels do not answer it, since `phase:build` reads
+// identically on a first build and on a rework relaunch. Putting the probe in
+// the brief instead would be procedure in a brief, and a second copy of the
+// adoption sequence free to drift from the definition that owns it.
+const buildBrief = () => [...head(), `carrier branch: ${CARRIER}`].join('\n')
 
 // The entry round carries neither a record command nor verdicts: its job is the
 // plan alone. Every later round carries exactly what the prior round's judges
@@ -275,7 +299,9 @@ const fixerBrief = (verdicts) => {
     lines.push('round: entry — no record command and no refuted verdicts. The fresh plan is your whole job.')
     return lines.join('\n')
   }
-  lines.push(`record command: ${verdicts.record ?? 'none — nothing passed in the prior round'}`)
+  // `record` is checked by checkVerdicts before it reaches here, so a null is a
+  // ruled fact — nothing passed — and never a key that quietly went missing.
+  lines.push(`record command: ${verdicts.record === null ? 'none — nothing passed in the prior round' : verdicts.record}`)
   lines.push(`refuted verdicts (${verdicts.refuted.length}):`)
   lines.push(JSON.stringify(verdicts.refuted, null, 2))
   if (verdicts.crashed.length)
@@ -301,7 +327,10 @@ const reaperBrief = (prefixes) => [`repo: ${REPO}`, 'prefixes:', ...prefixes.map
 function runPrefixes(worktreePaths) {
   const prefixes = new Set()
   for (const path of worktreePaths) {
-    if (typeof path !== 'string' || path.trim() === '') continue
+    if (typeof path !== 'string' || path.trim() === '') {
+      log(`traverse: a node reported no worktree path (${JSON.stringify(path)}) — it left nothing this sweep can name`)
+      continue
+    }
     const base = path.replace(/\/+$/, '').split('/').pop()
     const match = /^(wf_.+-)\d+$/.exec(base)
     if (!match) {
@@ -314,14 +343,34 @@ function runPrefixes(worktreePaths) {
   return [...prefixes]
 }
 
+// A FAILED SWEEP NEVER FAILS THE RUN, so reap() returns a note to append to the
+// DONE detail rather than anything the caller could escalate on. The reaper runs
+// AFTER the arc's own label move has landed, which is exactly why the escalate
+// contract's "labels untouched" cannot hold here: escalating would strand a
+// completed arc at a phase no arc answers to, where relaunch — the universal
+// recovery — refuses as wrong-phase. Cleanup is bookkeeping; the work is
+// published on the carrier either way, and the leftovers are named in the note.
 async function reap(worktreePaths) {
   const prefixes = runPrefixes(worktreePaths)
   if (prefixes.length === 0) {
     log('traverse: no reapable prefixes reported — nothing to reap')
-    return null
+    return ''
   }
   phase('Reap')
-  return await node('reaper', reaperBrief(prefixes), 'reaper', 'Reap')
+  let swept
+  try {
+    swept = await node('reaper', reaperBrief(prefixes), 'reaper', 'Reap', { retryOnNull: true })
+  } catch (e) {
+    return sweepFailed(e?.message ?? String(e))
+  }
+  if (swept.status === 'escalate') return sweepFailed(swept.reason ?? 'the reaper gave no reason')
+  log(`traverse: swept ${swept.removed.length} leaving(s), ${swept.alreadyGone.length} already gone`)
+  return ''
+}
+
+function sweepFailed(detail) {
+  log(`traverse: the sweep did not complete — ${detail}`)
+  return ` · cleanup incomplete, throwaway trees left behind under ${'`wf_…`'}: ${detail}`
 }
 
 // ---------------------------------------------------------------------------
@@ -332,7 +381,11 @@ async function reap(worktreePaths) {
 // pass against the current content. Deciding that is mechanical, so it is done
 // here in plain code rather than by a model — and a plan this script cannot
 // read is fatal, never assumed green. Judgments are never softened to pass.
-function jobCount(planString) {
+//
+// The ids come back with the count because they are what a red cap has to
+// report: the uncached judgments are the ones still holding the gate shut, and
+// a bare number tells the human nothing they can act on.
+function planJobIds(planString) {
   if (typeof planString !== 'string' || planString.trim() === '')
     throw new Error(`traverse: ${HANDLE} — the judgments round returned no plan; \`judgments-run plan\` stdout is what decides green`)
   let plan
@@ -343,18 +396,34 @@ function jobCount(planString) {
   }
   if (plan === null || typeof plan !== 'object' || !Array.isArray(plan.jobs))
     throw new Error(`traverse: ${HANDLE} — the round's plan has no "jobs" array; this script and judgments-run have drifted apart`)
-  return plan.jobs.length
+  return plan.jobs.map((job, index) => {
+    if (typeof job?.id !== 'string' || job.id === '')
+      throw new Error(`traverse: ${HANDLE} — plan job ${index} has no "id" string; this script and judgments-run have drifted apart`)
+    return job.id
+  })
 }
 
 // The nested judgments run returns the object judgments.js builds. Anything else
 // means the runtime's nesting contract has moved under us, and the next round's
 // brief would carry nonsense — so it throws here instead.
+//
+// `record` is checked as strictly as the arrays, and for a sharper reason: it is
+// the one field the next round's brief turns into an ACT. Were it merely
+// defaulted when absent, the fixer would be told nothing passed, skip its record
+// step, leave the prior round's passes uncached, and see them re-listed by the
+// next plan — burning every remaining round on work already judged, then
+// escalating red. So a missing key is separated from a legitimate null: null is
+// judgments.js saying nothing passed, absence is drift.
 function checkVerdicts(verdicts, round) {
   if (verdicts === null || typeof verdicts !== 'object' || Array.isArray(verdicts))
     throw new Error(`traverse: ${HANDLE} — round ${round}'s nested judgments run returned ${typeof verdicts}, not a verdict object`)
   for (const key of ['passed', 'refuted', 'crashed'])
     if (!Array.isArray(verdicts[key]))
       throw new Error(`traverse: ${HANDLE} — round ${round}'s verdicts are missing the "${key}" array`)
+  if (!('record' in verdicts))
+    throw new Error(`traverse: ${HANDLE} — round ${round}'s verdicts have no "record" key; this script and judgments.js have drifted apart`)
+  if (typeof verdicts.record !== 'string' && verdicts.record !== null)
+    throw new Error(`traverse: ${HANDLE} — round ${round}'s "record" is ${typeof verdicts.record}, not the record command or null`)
   return verdicts
 }
 
@@ -378,7 +447,7 @@ log(`traverse: ${HANDLE}, carrier ${CARRIER}`)
 
 phase('Dispatch')
 
-const read = await node('clerk', clerkRead(), 'clerk:read', 'Dispatch')
+const read = await node('clerk', clerkRead(), 'clerk:read', 'Dispatch', { retryOnNull: true })
 if (read.status === 'escalate') return escalation('clerk', read)
 
 const arc = arcOf(read.labels)
@@ -390,20 +459,19 @@ log(`traverse: labels [${read.labels.join(', ')}] → arc ${arc ?? 'none'}`)
 
 if (arc === 'build') {
   phase('Build')
-  const built = await node('builder', buildBrief(), 'builder', 'Build')
+  const built = await node('builder', buildBrief(), 'builder', 'Build', { retryOnNull: false })
   if (built.status === 'escalate') return escalation('builder', built)
   log(`traverse: build done — ${built.detail}`)
 
-  const moved = await node('clerk', clerkMove('phase:build', 'phase:pr-review'), 'clerk:move', 'Build')
+  const moved = await node('clerk', clerkMove('phase:build', 'phase:pr-review'), 'clerk:move', 'Build', { retryOnNull: false })
   if (moved.status === 'escalate') return escalation('clerk', moved)
 
-  const swept = await reap([built.worktree])
-  if (swept?.status === 'escalate') return escalation('reaper', swept)
+  const sweep = await reap([built.worktree])
 
   // The traverse ends here by design. The review stop that follows — /open-pr,
   // the audit tracks, the human's one verdict — is the sequencing session's,
   // and the judgments arc is entered only by that human's approve verdict.
-  return done('build', `built and published origin/${CARRIER}; the issue now stands at phase:pr-review`)
+  return done('build', `built and published origin/${CARRIER}; the issue now stands at phase:pr-review${sweep}`)
 }
 
 // ---------------------------------------------------------------------------
@@ -419,27 +487,50 @@ if (arc === 'judgments') {
   // record the final judged round's passes and re-plan. If THAT plan still has
   // jobs, the gate is genuinely red and the run escalates with the refutations.
   for (let round = 1; round <= JUDGED_ROUND_CAP + 1; round++) {
-    const fix = await node('judgment-facilitator', fixerBrief(verdicts), `judgments:round-${round}`, 'Judgments')
+    const fix = await node('judgment-facilitator', fixerBrief(verdicts), `judgments:round-${round}`, 'Judgments', {
+      retryOnNull: false,
+    })
     if (fix.status === 'escalate') return escalation('judgment-facilitator', fix)
     trees.push(fix.worktree)
 
-    const jobs = jobCount(fix.plan)
-    log(`traverse: round ${round} — ${jobs} uncached judgment(s); fixed [${fix.fixed.join(', ')}]`)
-    if (jobs === 0) break
+    const uncached = planJobIds(fix.plan)
+    log(`traverse: round ${round} — ${uncached.length} uncached judgment(s); fixed [${fix.fixed.join(', ')}]`)
+    if (uncached.length === 0) break
 
-    if (round === JUDGED_ROUND_CAP + 1)
+    // The cap's payload reports the FRESH plan's uncached ids, not the prior
+    // round's refutations: the last fixer has already attempted those and
+    // republished, so a bare refutation list would describe content that no
+    // longer exists while saying nothing about what is actually holding the
+    // gate shut. `crashed` rides too — judgments.js puts an unruled judge
+    // there rather than in `refuted`, so a run that burned every round on
+    // crashing judges would otherwise escalate with an empty list and no
+    // account of why.
+    if (round === JUDGED_ROUND_CAP + 1) {
+      const refuted = verdicts?.refuted ?? []
+      const crashed = verdicts?.crashed ?? []
       return escalation('judgments-red', {
-        reason: `the judgment gate is still red after ${JUDGED_ROUND_CAP} judged rounds`,
+        reason: `the judgment gate is still red after ${JUDGED_ROUND_CAP} judged rounds — ${uncached.length} judgment(s) still uncached`,
         brief:
-          `The semantic gate on ${HANDLE} did not close in ${JUDGED_ROUND_CAP} judged rounds. The refuted verdicts are below, ` +
-          `and the work stands on origin/${CARRIER}. Judgments are never softened to pass, so the call is yours: the artifact ` +
-          `needs a fix the rounds could not make, or a judgment itself is wrong and its declaration needs changing.`,
+          `The semantic gate on ${HANDLE} did not close in ${JUDGED_ROUND_CAP} judged rounds, and the work stands on ` +
+          `origin/${CARRIER}. Still uncached, and so still holding the gate shut: ${uncached.join(', ')}. ` +
+          (refuted.length
+            ? `The last judged round refuted ${refuted.length} of them, opinions below. `
+            : 'The last judged round refuted nothing. ') +
+          (crashed.length
+            ? `${crashed.length} judgment(s) crashed unruled rather than being judged — ${crashed.join(', ')} — and a crash ` +
+              `is not a refutation, so the rounds had nothing to fix for those. `
+            : '') +
+          `Judgments are never softened to pass, so the call is yours: the artifact needs a fix the rounds could not make, ` +
+          `a judgment is itself wrong and its declaration needs changing, or a crashing judge needs looking at.`,
         worktree: fix.worktree,
         cwd: fix.cwd,
         branch: fix.branch,
         sha: fix.sha,
-        refuted: verdicts?.refuted ?? [],
+        uncached,
+        refuted,
+        crashed,
       })
+    }
 
     // The nested call spends the one legal nesting level, and the plan travels
     // as a string, byte-identical — the child re-validates it before a single
@@ -448,12 +539,11 @@ if (arc === 'judgments') {
     log(`traverse: round ${round} judged — ${verdicts.passed.length} passed, ${verdicts.refuted.length} refuted, ${verdicts.crashed.length} crashed`)
   }
 
-  const swept = await reap(trees)
-  if (swept?.status === 'escalate') return escalation('reaper', swept)
+  const sweep = await reap(trees)
 
   // No onward label move: the issue sits at phase:judgments through the human's
   // final read and merge. The sequencing session's close-out follows this DONE.
-  return done('judgments', `the judgment gate is green on origin/${CARRIER}`)
+  return done('judgments', `the judgment gate is green on origin/${CARRIER}${sweep}`)
 }
 
 // ---------------------------------------------------------------------------

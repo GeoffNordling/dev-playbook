@@ -56,7 +56,7 @@ Launch the workflow by name, with one plain string argument:
 Workflow({name: 'traverse', args: '{owner}/{repo} <N>'})
 ```
 
-Record the returned runId in `.factory/state.json` at the repo's main-checkout root — append it to the issue's `runIds` and set `status` at launch, and update `status` at completion. The file is gitignored and its schema in this slice is minimal, per issue: `{"status": "<free text>", "runIds": []}`.
+Record the returned runId in `.factory/state.json` at the root of the checkout you are standing in — the main checkout before the review worktree is open (§4), that worktree afterwards. Never the main checkout's path from inside the worktree: a worktree-isolated session's writes outside its own tree are refused by the harness, so the record would simply fail. Append the runId to the issue's `runIds` and set `status` at launch, then update `status` at completion. The file is gitignored and its schema in this slice is minimal, per issue: `{"status": "<free text>", "runIds": []}`.
 
 Handle the run's return per the [traverse Guide](~/workspace/dev-playbook/software-factory/traverse.md):
 
@@ -71,9 +71,9 @@ The review-stop audits (§5) are not traverse nodes: spawn each as an ordinary s
 The machine phases never use a persistent worktree — traverse nodes work in throwaway trees, and the `issue-<N>` branch on origin carries the work. You open the issue's worktree at the review stop, where the audits need a checkout:
 
 1. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
-2. Sync it to the carrier: `git pull --ff-only origin issue-<N>` — it refuses rather than discards if the tree has somehow diverged; a refusal is an escalation, never a forced sync.
+2. Sync it to the carrier, so the tree stands at `origin/issue-<N>`'s tip. Note what you are syncing from: `EnterWorktree` branches from `origin/main`, so the fresh branch is *not* an ancestor of the carrier whenever `main` advanced during the build, and a plain `git pull --ff-only origin issue-<N>` refuses — a routine merge to `main` would block every review stop. Choose a spelling that lands on the carrier tip without discarding committed work, and that re-syncs the same way on a later cycle, when the tree *is* an ancestor of the carrier. A sync that cannot land without discarding is an escalation, never a forced sync.
 
-When `git worktree list` shows the worktree already exists (a later review cycle), enter it instead — `EnterWorktree(path=.claude/worktrees/issue-<N>)` — and re-run the same `--ff-only` pull to pick up what the rework traverse republished. When the branch `issue-<N>` exists locally but its worktree is gone, escalate rather than improvising a re-attach. Audit subagents inherit the worktree as cwd; you keep it across `/clear`.
+When `git worktree list` shows the worktree already exists (a later review cycle), enter it instead — `EnterWorktree(path=.claude/worktrees/issue-<N>)` — and re-sync it the same way to pick up what the rework traverse republished. When the branch `issue-<N>` exists locally but its worktree is gone, escalate rather than improvising a re-attach. Audit subagents inherit the worktree as cwd; you keep it across `/clear`.
 
 ## 5. The review stop
 
