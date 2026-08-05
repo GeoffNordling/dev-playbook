@@ -58,13 +58,15 @@ judgments:
     claim: |
       Every check scripts/repo-lint performs that emits a `claude-code.`
       rule corresponds to a requirement stated in the claude-code standard:
-      the agent-facing voice of every CLAUDE.md, and the global file's
-      two-section shape and required workspace-wide rules. The standard may
-      state more than the tool checks; the tool must not check more than the
-      standard states.
+      the agent-facing voice of every CLAUDE.md and of the skill, rule, and
+      agent-definition bodies; the global file's two-section shape and
+      required workspace-wide rules; and the rule that no file carries a
+      harness command marker. The standard may state more than the tool
+      checks; the tool must not check more than the standard states.
     evidence:  [scripts/repo-lint]
     reference:
       - standards/claude-code/claude-content.md
+      - standards/claude-code/files.md
       - standards/prose/conventions.md
     model: claude-sonnet-5
     effort: high
