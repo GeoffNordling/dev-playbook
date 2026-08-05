@@ -19,9 +19,6 @@ The **rewind target** is the **user-typed message** the user wants to return to 
 
 2. **Commit all uncommitted work.**
    - Use /commit and label the commit specifically as a /rewind-compact point.
-   - The commit rides the session's live grant. If it is denied, ask the user
-     for /commit-on before going further: everything after the rewind target
-     is discarded, so uncommitted work is lost work.
 
 3. **Inventory state-on-disk changes** between the rewind target and now:
    - Files written or edited (list paths).

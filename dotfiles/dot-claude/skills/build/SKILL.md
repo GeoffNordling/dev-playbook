@@ -13,8 +13,6 @@ Carry out a direct-mode issue against its brief. The brief's acceptance criteria
 
 Work without waiting for approval: plan, make the changes, and commit on your own, pausing only to escalate on the §5 triggers. The user reviews the finished work separately, not mid-build.
 
-Committing needs a lane open at the git-authority hook, and which one depends on how this skill was reached. Dispatched as a `builder`-typed subagent, that agent type is the lane and nothing further is needed. Run inline in the user's own session, the lane is their typed /commit-on — so if a commit is denied, ask for the grant and never re-spell the command.
-
 ## 1. Load context
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.

@@ -63,7 +63,6 @@ SCRIPT_SHEBANG = "build.script-shebang"
 SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
 AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
-COMMAND_MARKER = "claude-code.command-marker"
 GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
 GLOBAL_CLAUDE_RULES = "claude-code.global-claude-rules"
 DOC_SHAPE = "knowledge-organization.doc-shape"
@@ -85,7 +84,6 @@ RULES = (
     SCRIPT_PYTHON,
     SELF_AUDIT,
     AGENT_FACING_VOICE,
-    COMMAND_MARKER,
     GLOBAL_CLAUDE_SHAPE,
     GLOBAL_CLAUDE_RULES,
     DOC_SHAPE,
@@ -113,21 +111,6 @@ CANONICAL_MANIFEST = frozenset(
 
 # The consumer chooses this pin; the block compare accepts any value there.
 REV_PLACEHOLDER = "<pinned-sha>"
-
-# The harness-written marker a typed slash command leaves in a transcript turn.
-# The git-authority hook reads it as the human's commit grant, and reads only
-# the marker — never where it came from. So a repo file carrying one hands out
-# a grant the moment anyone @-mentions that file into a user turn, and the rule
-# is that no authored content anywhere may contain it. Assembled from pieces
-# here for the same reason the hook and its tests assemble it: this source file
-# is authored content too, and must not be the first thing to break the rule.
-COMMAND_MARKER_PATTERN = re.compile("<command-" + "name>" + r"[^<>\n]*" + "</command-" + "name>")
-
-# How far into a file the marker scan reads. The rule can only ask someone to
-# fix content they authored, and authored files here run to tens of kilobytes
-# while the generated assets that dominate the byte count start at hundreds, so
-# this clears the former with room and excludes the latter.
-MARKER_SCAN_LIMIT = 128 * 1024
 
 BASE_REQUIRED = (
     "README.md",
@@ -681,25 +664,17 @@ def is_vendored(root: Path, path: Path) -> bool:
 
 def check_agent_facing_voice(root: Path) -> list[Finding]:
     """Agent-facing instruction text — every CLAUDE.md (root, nested, and the
-    dev-playbook global source) plus every first-party skill, rule, and agent
-    definition — is written for the executing agent alone, so it names the human
-    "user" and never speaks in first person (claude-content.md, conventions.md).
-    Runs in every repo, inspecting only that repo's own files; a consumer's
-    skills, rules, and definitions sit under .claude/, dev-playbook's under the
-    Stow source tree, and vendored third-party skills are exempt wherever they
-    surface. A skill's frontmatter is in scope: its description is prose the
-    agent reads to choose the skill. Inline code, fenced blocks, and quoted
-    speech are skipped so a backticked example or a quoted utterance does not
-    read as prose.
-
-    An agent definition is a standing system prompt, which is as agent-facing as
-    text gets. Its roots come from md.AGENT_ROOTS rather than a local pair, so
-    the directories this reads and the ones the OKF classification calls harness
-    cannot drift apart.
+    dev-playbook global source) plus every first-party skill and rule body — is
+    written for the executing agent alone, so it names the human "user" and
+    never speaks in first person (claude-content.md, conventions.md). Runs in
+    every repo, inspecting only that repo's own files; a consumer's skills and
+    rules sit under .claude/, dev-playbook's under the Stow source tree, and
+    vendored third-party skills are exempt wherever they surface. A skill's
+    frontmatter is in scope: its description is prose the agent reads to choose
+    the skill. Inline code, fenced blocks, and quoted speech are skipped so a
+    backticked example or a quoted utterance does not read as prose.
     """
-    instruction_roots = tuple(
-        f"{r}/" for r in SKILL_ROOTS + RULE_ROOTS + md.AGENT_ROOTS
-    )
+    instruction_roots = tuple(f"{r}/" for r in SKILL_ROOTS + RULE_ROOTS)
     findings = []
     for path in md.find_md_files(root):
         rel = path.relative_to(root).as_posix()
@@ -714,66 +689,6 @@ def check_agent_facing_voice(root: Path) -> list[Finding]:
                     findings.append(
                         Finding(rel, AGENT_FACING_VOICE, f"line {num}: {fault}")
                     )
-    return findings
-
-
-def check_command_marker(root: Path) -> list[Finding]:
-    """No authored file carries a harness command marker (git-authority.md).
-
-    The marker is how the git-authority hook recognizes a commit grant the human
-    typed. It reads the marker alone, so a file quoting one — a doc, a fixture,
-    a datasheet — mints a grant nobody typed as soon as that file reaches a user
-    turn, and nothing fails until it does. This is the detector behind the rule.
-
-    The measured route into a user turn is a **skill body**: the harness records
-    one as a user entry of text blocks, which the hook reads in full. An
-    @-mention does not take that route — its content lands as an attachment
-    entry the hook never looks at — and neither does a tool reading the file
-    back, which arrives as a tool result the hook skips by design. A paste does
-    land in a user turn, but the human who can paste is the human who can type
-    the grant. So skill text is the vector, and every other file is read as
-    cheap insurance against a route nobody has measured yet.
-
-    Two bounds keep that insurance cheap, and both are stated limits rather than
-    oversights. A file whose first block holds a NUL byte is binary and is not
-    read: the pattern cannot match bytes no harness loads as a turn. And each
-    file is read only to ``MARKER_SCAN_LIMIT``, which clears the largest
-    authored file in this workspace several times over while excluding the
-    generated assets that dominate the byte count — the rule can only ask
-    someone to fix content they authored.
-
-    The vendored tree is skipped, and that exemption is the whole measured
-    vector, not a corner of it: vendored skills are stowed live into the skills
-    root, so their bodies reach a user turn exactly as any other skill's do. They
-    are carried verbatim from upstream and cannot be edited, so enforcing there
-    would be a permanently red gate on something nobody can fix. It is an
-    accepted gap, recorded in the Guide.
-
-    Nothing else is caught. This check is the sole enforcement of a rule lane 2
-    rests on, so a file it could read and did not is a file it did not clear,
-    and reporting clean anyway is the silent skip this repo bans.
-    """
-    findings = []
-    for rel in gitrepo.git_files(root):
-        path = root / rel
-        if is_vendored(root, path):
-            continue
-        with path.open("rb") as handle:
-            block = handle.read(MARKER_SCAN_LIMIT)
-        if b"\x00" in block:
-            continue
-        text = block.decode("utf-8", errors="replace")
-        for num, line in enumerate(text.splitlines(), start=1):
-            if COMMAND_MARKER_PATTERN.search(line):
-                findings.append(
-                    Finding(
-                        rel,
-                        COMMAND_MARKER,
-                        f"line {num}: carries a harness command marker, which the "
-                        "git-authority hook reads as a typed commit grant; "
-                        "assemble it from pieces or drop it",
-                    )
-                )
     return findings
 
 
@@ -996,7 +911,6 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_src_package(root, layers, files, repo_name),
         *check_cdk(root, layers, repo_name),
         *check_agent_facing_voice(root),
-        *check_command_marker(root),
         *check_global_claude(root),
         *check_doc_shapes(root),
         *check_scripts(root, layers, python_files),

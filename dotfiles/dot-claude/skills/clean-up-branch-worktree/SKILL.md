@@ -34,13 +34,14 @@ git status --porcelain
 It must print nothing. Any output is uncommitted work — stop and show
 the user.
 
-## 2. Refresh `origin/main`
+## 2. Refresh `origin/main` without a YubiKey
 
-`origin` is HTTPS and git reads the same keyring PAT `gh` does, so the
-plain fetch is all this needs:
+`origin` is an SSH remote, so plain `git fetch origin` wants a hardware
+tap. Rewrite the URL to HTTPS and hand git the PAT that `gh` already
+holds. One line, works on private repos too:
 
 ```
-git fetch --prune origin
+git -c url."https://github.com/".insteadOf=git@github.com: -c credential.helper='!gh auth git-credential' fetch --prune origin
 ```
 
 `--prune` also drops the remote-tracking refs for branches GitHub

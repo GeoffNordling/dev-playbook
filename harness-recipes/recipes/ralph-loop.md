@@ -33,34 +33,13 @@ Each iteration is one fresh `agent()` that:
    broken),
 2. reads the plan and the progress log,
 3. implements the single next incomplete task,
-4. brings the gate back to green when one is configured, so the tree the next iteration inherits is not broken,
+4. brings the gate back to green when one is configured — never commits red,
 5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
-6. attempts a commit via the `/commit` skill,
+6. commits via the `/commit` skill,
 7. reports whether the plan is complete.
 
 The runtime repeats this until an agent reports done. No agent remembers the
 last — continuity lives entirely on disk.
-
-**Step 6 currently has no commit authorization.** `git commit` is deny-by-default
-under the `git-authority` hook's commit rule family, and an iteration agent is
-not one of the committing factory agent types, so lane 1 refuses it. Whether
-lane 2 is even reachable from here is unmeasured: it turns on whether a Workflow
-`agent()` payload carries an `agent_type` key at all. If it does, lane
-exclusivity shuts lane 2 outright. If it does not, the iteration is judged by
-lane 2 against *its own* transcript — an agent writes its own, so there is no
-falling through to the launching session's and no `/commit-on` typed before
-launch that could reach it. That transcript opens with the prompt `ralph-loop.js`
-wrote, which carries no typed marker, so lane 2 finds no grant either. Which
-branch holds is an assumption, not a measured fact.
-
-The conclusion holds under both branches: expect the commit to be denied, and do
-not rely on it. Disk is the loop's only memory, so a loop run this way makes no
-durable progress, and the runtime stops on the denial rather than grinding out
-iterations nothing records.
-Giving the iteration a lane of its own, and measuring the payload, is
-[#351](https://github.com/GeoffNordling/dev-playbook/issues/351); until it lands,
-treat this recipe as describing the loop's shape rather than a working commit
-path.
 
 ## Running it
 

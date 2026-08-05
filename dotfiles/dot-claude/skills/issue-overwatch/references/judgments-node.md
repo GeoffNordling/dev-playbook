@@ -9,10 +9,8 @@ approves, before the user's final read. Work through it in order.
    gives. It enumerates the misses, dispatches the judges, records the passes,
    and makes focused fixes for refutations; take over the ones it sets aside.
 
-2. **Commit each fix as it lands.** Your commits ride lane 2 of the commit rule
-   family — the user's typed /commit-on. If the hook denies, ask the user for
-   the grant (or hand them the commit); never re-spell a refused command. The
-   grant stands for the session, so no per-fix go-ahead.
+2. **Commit each fix as it lands**, on the token you hold — no go-ahead to wait
+   for.
 
 3. **Ask where a fix is ambiguous** — a refutation that may be wrong about the
    code, or right about code that should change — per
@@ -22,11 +20,11 @@ approves, before the user's final read. Work through it in order.
 4. **Close green.** Confirm with `make check-judgments`.
 
 5. **Refresh the merge message.** Regenerate the PR title and body from the final
-   diff with `gh pr edit`, per the
+   diff with a tap-free `gh pr edit`, per the
    [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe).
 
-6. **Run the final push** if you committed fixes in step 2 — the command your
-   **Pushes, and the merge boundary** section gives. With no fixes, origin
+6. **Hand over the final verified push** if you committed fixes in step 2 — the
+   command template is your own turn-boundary list. With no fixes, origin
    already holds the final diff.
 
 7. **Present the final read** per
