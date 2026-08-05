@@ -272,6 +272,7 @@
     display: block;
   }
   .cmd-box.ceo .who { font-family: var(--font-human); font-style: normal; font-size: var(--s-md); }
+  .cmd-box.session .who { font-family: var(--font-human); font-size: var(--s-md); }
 
   .cmd-leaf {
     border: 1px dashed var(--rule);
@@ -447,6 +448,14 @@
     background-image: repeating-linear-gradient(45deg, var(--rule-soft) 0 6px, transparent 6px 12px);
   }
   .card.is-human { border-left-color: var(--accent); border-left-width: 4px; }
+
+  /* Not skills: no slug, no invocation — so they speak in the human voice. */
+  .card.is-human .card-id,
+  .card.is-session .card-id {
+    font-family: var(--font-human);
+    font-weight: 400;
+    font-size: var(--s-md);
+  }
 
   .card.dim { opacity: .32; }
 
@@ -742,8 +751,8 @@
       <div class="fork" aria-hidden="true"></div>
       <div class="cmd-pair">
         <div class="cmd-col">
-          <div class="cmd-box">
-            <span class="who">chief-of-staff</span>
+          <div class="cmd-box session">
+            <span class="who">Claude Code session</span>
             <span class="role">Chief of Staff</span>
           </div>
           <div class="drop" aria-hidden="true"></div>
@@ -826,6 +835,17 @@
       not agent runs. A role can be hired many times a day or never; the box stays the same size.
     </p>
     <p>
+      <b>What is actually a skill.</b> Thirty-eight boxes are skills &mdash; files on disk with a
+      name you can type. Two are not, and are set in this typeface to say so: Geoff, and the
+      interactive session that dispatches on his behalf. There is no skill file behind the session
+      and nothing to invoke. The three contract agencies are Workflow scripts, not skills.
+    </p>
+    <p>
+      <b>Job titles are invented.</b> Every title here &mdash; Director of Triage, General Counsel,
+      Ombudsman &mdash; was made up for the conceit. The names, model pins, reporting lines, dates
+      and counts are all read from the repo.
+    </p>
+    <p>
       <b>Two founding dates.</b> The company was incorporated on GitHub on 2 April 2026, but the
       surviving git history begins with a single <code>Initial commit</code> on 2 June 2026. Everything
       before that was squashed out of existence, so five pull requests on the ledger are older than
@@ -878,6 +898,14 @@
         : b === "human" ? "var(--accent)"
           : "var(--band-" + b + ")";
     }
+    /* Only skills own an invocable slug. Everything else gets its real name. */
+    var LABELS = {
+      "geoff": "Geoff",
+      "chief-of-staff": "Claude Code session",
+      "judgments-bench": "judgments"
+    };
+    function labelOf(p) { return LABELS[p.id] || p.id; }
+
     function fmt(n) { return n.toLocaleString("en-GB"); }
     function esc(s) {
       return String(s).replace(/[&<>"]/g, function (c) {
@@ -974,14 +1002,15 @@
     function cardHTML(p) {
       var band = bandOf(p);
       var cls = "card" + (p.kind === "contract" ? " is-contract" : "") +
-        (p.kind === "human" ? " is-human" : "");
+        (p.kind === "human" ? " is-human" : "") +
+        (p.kind === "session" ? " is-session" : "");
       var meta = p.kind === "skill"
         ? shortDate(p.hired) + " · " + p.commits + " rev"
         : (p.kind === "human" ? "since day one" : "per session");
       var chip = p.kind === "skill" ? (p.model || "inherit") : (p.kind === "human" ? "human" : "session");
       return '<button class="' + cls + '" type="button" data-id="' + esc(p.id) + '" data-band="' + band +
         '" style="--band:' + bandVar(band) + '">' +
-        '<span class="card-id">' + esc(p.id) + '</span>' +
+        '<span class="card-id">' + esc(labelOf(p)) + '</span>' +
         '<span class="card-title">' + esc(p.title) + '</span>' +
         '<span class="card-right">' +
         '<span class="band-chip">' + esc(chip) + '</span>' +
@@ -1068,7 +1097,7 @@
       .filter(function (p) { return p.kind === "contract"; })
       .map(function (p) {
         return '<button class="temp" type="button" data-id="' + esc(p.id) + '" data-band="contract">' +
-          '<span class="temp-id">' + esc(p.id) + '</span>' +
+          '<span class="temp-id">' + esc(labelOf(p)) + '</span>' +
           '<span class="temp-role">' + esc(p.title) + '</span>' +
           '<span class="temp-badge">' + esc(p.badge) + '</span>' +
           '</button>';
@@ -1095,7 +1124,8 @@
 
       var rows = [];
       rows.push(["Division", DATA.divisions[p.division]]);
-      if (mgr) rows.push(["Reports to", mgr.id + " — " + mgr.title]);
+      if (mgr) rows.push(["Reports to", labelOf(mgr) + " — " + mgr.title]);
+      if (p.kind === "session") rows.push(["What this is", "the interactive session — no skill file, nothing to invoke"]);
       if (p.kind === "skill") {
         rows.push(["Seniority", (p.model || "inherit") + (p.effort ? " · effort " + p.effort : "")]);
         rows.push(["Hired", shortDate(p.hired) + (p.portable ? " (transferred in)" : "")]);
@@ -1114,7 +1144,7 @@
 
       document.getElementById("drawer-in").innerHTML =
         '<div class="drawer-top">' +
-        '<div><div class="drawer-id" id="drawer-id">' + esc(p.id) + '</div>' +
+        '<div><div class="drawer-id" id="drawer-id">' + esc(labelOf(p)) + '</div>' +
         '<div class="drawer-role">' + esc(p.title) + '</div></div>' +
         '<button class="close" type="button" aria-label="Close">×</button>' +
         '</div>' +
@@ -1126,7 +1156,7 @@
         (reports.length
           ? '<div class="jd"><b>Direct reports (' + reports.length + ')</b><div class="reports">' +
           reports.map(function (r) {
-            return '<button class="rep" type="button" data-goto="' + esc(r.id) + '">' + esc(r.id) + '</button>';
+            return '<button class="rep" type="button" data-goto="' + esc(r.id) + '">' + esc(labelOf(r)) + '</button>';
           }).join("") + '</div></div>'
           : '');
 
