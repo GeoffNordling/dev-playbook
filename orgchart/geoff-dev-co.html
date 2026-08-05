@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geoff-Dev-Co — Organisational Chart</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8F%A2</text></svg>">
+<style>
+  :root {
+    --ground: #E9ECEF;
+    --surface: #F7F8FA;
+    --surface-2: #FDFDFE;
+    --ink: #131B23;
+    --ink-2: #46535F;
+    --ink-3: #6F7D8A;
+    --rule: #C6CFD7;
+    --rule-soft: #DCE2E8;
+    --accent: #8A6212;
+    --accent-ink: #6E4E0E;
+    --accent-wash: #EFE6D2;
+    --band-opus: #7A46B8;
+    --band-sonnet: #0E8551;
+    --band-inherit: #3F6FB5;
+    --band-contract: #6F7D8A;
+    --shadow: 0 1px 2px rgba(19, 27, 35, .07), 0 4px 14px rgba(19, 27, 35, .05);
+
+    --font-human: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --font-machine: ui-monospace, "JetBrains Mono", "SF Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+
+    --s-xs: .6875rem;
+    --s-sm: .8125rem;
+    --s-base: .9375rem;
+    --s-md: 1.0625rem;
+    --s-lg: 1.375rem;
+    --s-xl: 2rem;
+    --s-2xl: clamp(2.4rem, 7vw, 3.6rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0F151A;
+      --surface: #161E25;
+      --surface-2: #1C262E;
+      --ink: #E6ECF2;
+      --ink-2: #A9B7C3;
+      --ink-3: #7E8D9B;
+      --rule: #2E3B46;
+      --rule-soft: #222D36;
+      --accent: #D9A93F;
+      --accent-ink: #E8BE60;
+      --accent-wash: #33290F;
+      --band-opus: #9B72D8;
+      --band-sonnet: #22A86B;
+      --band-inherit: #5A8BD6;
+      --band-contract: #8494A1;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0F151A;
+    --surface: #161E25;
+    --surface-2: #1C262E;
+    --ink: #E6ECF2;
+    --ink-2: #A9B7C3;
+    --ink-3: #7E8D9B;
+    --rule: #2E3B46;
+    --rule-soft: #222D36;
+    --accent: #D9A93F;
+    --accent-ink: #E8BE60;
+    --accent-wash: #33290F;
+    --band-opus: #9B72D8;
+    --band-sonnet: #22A86B;
+    --band-inherit: #5A8BD6;
+    --band-contract: #8494A1;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .28);
+  }
+
+  :root[data-theme="light"] {
+    --ground: #E9ECEF;
+    --surface: #F7F8FA;
+    --surface-2: #FDFDFE;
+    --ink: #131B23;
+    --ink-2: #46535F;
+    --ink-3: #6F7D8A;
+    --rule: #C6CFD7;
+    --rule-soft: #DCE2E8;
+    --accent: #8A6212;
+    --accent-ink: #6E4E0E;
+    --accent-wash: #EFE6D2;
+    --band-opus: #7A46B8;
+    --band-sonnet: #0E8551;
+    --band-inherit: #3F6FB5;
+    --band-contract: #6F7D8A;
+    --shadow: 0 1px 2px rgba(19, 27, 35, .07), 0 4px 14px rgba(19, 27, 35, .05);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-machine);
+    font-size: var(--s-base);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem) 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: .9rem; }
+
+  .eyebrow {
+    font-size: var(--s-xs);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem .9rem;
+    align-items: center;
+  }
+
+  .eyebrow .stamp {
+    border: 1px solid var(--accent);
+    color: var(--accent-ink);
+    padding: .15rem .5rem;
+    letter-spacing: .14em;
+  }
+
+  h1 {
+    font-family: var(--font-human);
+    font-size: var(--s-2xl);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-family: var(--font-human);
+    font-size: var(--s-md);
+    color: var(--ink-2);
+    max-width: 60ch;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .masthead-rule { height: 3px; background: var(--accent); width: 100%; }
+
+  .provenance {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1.6rem;
+    font-size: var(--s-xs);
+    color: var(--ink-3);
+    letter-spacing: .04em;
+  }
+  .provenance b { color: var(--ink-2); font-weight: 500; }
+
+  /* ---------- stats ---------- */
+
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+  }
+
+  .stat-n {
+    font-size: var(--s-xl);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.03em;
+  }
+  .stat-l {
+    font-size: var(--s-xs);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ink-3);
+  }
+  .stat-sub { font-size: var(--s-xs); color: var(--ink-3); }
+
+  /* ---------- section furniture ---------- */
+
+  section { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .sec-head { display: flex; flex-direction: column; gap: .4rem; }
+
+  h2 {
+    font-family: var(--font-human);
+    font-size: var(--s-lg);
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+
+  .sec-note {
+    font-family: var(--font-human);
+    color: var(--ink-2);
+    font-size: var(--s-base);
+    max-width: 68ch;
+    margin: 0;
+  }
+
+  /* ---------- chain of command ---------- */
+
+  .cmd { display: flex; flex-direction: column; align-items: center; }
+
+  .cmd-top { display: flex; justify-content: center; width: 100%; }
+
+  .fork { position: relative; width: 100%; height: 40px; }
+  .fork::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 50%;
+    height: 20px;
+    border-left: 1px solid var(--rule);
+  }
+  .fork::after {
+    content: "";
+    position: absolute;
+    top: 20px; left: 25%;
+    width: 50%; height: 20px;
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+  }
+
+  .cmd-pair { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .cmd-col { display: flex; flex-direction: column; align-items: center; padding: 0 .5rem; }
+
+  .drop { width: 0; height: 22px; border-left: 1px solid var(--rule); }
+
+  .cmd-box {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: .7rem .95rem;
+    text-align: center;
+    min-width: 0;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: var(--shadow);
+  }
+  .cmd-box.ceo { border-color: var(--accent); border-width: 2px; background: var(--surface-2); }
+  .cmd-box .who { font-size: var(--s-base); }
+  .cmd-box .role {
+    font-family: var(--font-human);
+    font-style: italic;
+    color: var(--ink-2);
+    font-size: var(--s-sm);
+    display: block;
+  }
+  .cmd-box.ceo .who { font-family: var(--font-human); font-style: normal; font-size: var(--s-md); }
+
+  .cmd-leaf {
+    border: 1px dashed var(--rule);
+    background: transparent;
+    padding: .55rem .8rem;
+    font-size: var(--s-xs);
+    color: var(--ink-3);
+    text-align: center;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    max-width: 300px;
+    width: 100%;
+  }
+
+  @media (max-width: 620px) {
+    .cmd-pair { grid-template-columns: 1fr; gap: 0; }
+    .fork::after { display: none; }
+    .fork { height: 22px; }
+    .fork::before { height: 22px; }
+    .cmd-col + .cmd-col { margin-top: 0; }
+    .cmd-col + .cmd-col::before {
+      content: "";
+      width: 0; height: 22px;
+      border-left: 1px solid var(--rule);
+    }
+  }
+
+  /* ---------- controls ---------- */
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    padding: .75rem;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+
+  .ctl-label {
+    font-size: var(--s-xs);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ink-3);
+    margin-right: .3rem;
+  }
+
+  .chipbtn {
+    font-family: var(--font-machine);
+    font-size: var(--s-sm);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    border: 1px solid var(--rule);
+    padding: .3rem .6rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    transition: background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .chipbtn:hover { border-color: var(--ink-3); color: var(--ink); }
+  .chipbtn[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  .chipbtn .swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .chipbtn .n { font-variant-numeric: tabular-nums; opacity: .7; font-size: var(--s-xs); }
+
+  .swatch.opus { background: var(--band-opus); }
+  .swatch.sonnet { background: var(--band-sonnet); }
+  .swatch.inherit { background: var(--band-inherit); }
+  .swatch.contract {
+    background: repeating-linear-gradient(45deg, var(--band-contract) 0 2px, transparent 2px 4px);
+    border: 1px solid var(--band-contract);
+    border-radius: 50%;
+  }
+
+  .spacer { flex: 1 1 auto; }
+
+  /* ---------- register ---------- */
+
+  .division { border: 1px solid var(--rule); background: var(--surface); }
+
+  .div-head {
+    display: flex;
+    align-items: baseline;
+    gap: .75rem;
+    width: 100%;
+    text-align: left;
+    background: var(--surface-2);
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    padding: .8rem 1rem;
+    cursor: pointer;
+    font-family: var(--font-machine);
+    color: var(--ink);
+  }
+  .div-head:hover { background: var(--accent-wash); }
+  .div-name {
+    font-family: var(--font-human);
+    font-size: var(--s-md);
+  }
+  .div-count {
+    font-size: var(--s-xs);
+    color: var(--ink-3);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .div-mark { margin-left: auto; color: var(--ink-3); font-size: var(--s-sm); }
+
+  .div-body { padding: .9rem 1rem 1.1rem; display: flex; flex-direction: column; gap: .4rem; }
+  .division[data-open="false"] .div-body { display: none; }
+
+  .node { display: flex; flex-direction: column; gap: .4rem; }
+
+  .children { display: flex; flex-direction: column; gap: .4rem; margin-top: .4rem; }
+  .node[data-open="false"] > .children { display: none; }
+
+  .children > .node {
+    position: relative;
+    padding-left: 20px;
+  }
+  .children > .node::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-left: 1px solid var(--rule);
+  }
+  .children > .node:last-child::before { bottom: auto; height: 24px; }
+  .children > .node::after {
+    content: "";
+    position: absolute;
+    left: 0; top: 24px;
+    width: 14px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .node-head { display: flex; align-items: stretch; gap: .4rem; }
+
+  .tog {
+    flex: none;
+    width: 22px;
+    border: 1px solid var(--rule);
+    background: var(--surface-2);
+    color: var(--ink-3);
+    cursor: pointer;
+    font-family: var(--font-machine);
+    font-size: var(--s-sm);
+    line-height: 1;
+    padding: 0;
+  }
+  .tog:hover { color: var(--ink); border-color: var(--ink-3); }
+  .tog-spacer { flex: none; width: 22px; }
+
+  .card {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: .1rem .9rem;
+    align-items: center;
+    text-align: left;
+    font-family: var(--font-machine);
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--band);
+    padding: .55rem .75rem;
+    cursor: pointer;
+    color: var(--ink);
+    min-width: 0;
+    transition: border-color .12s ease, background .12s ease, transform .12s ease;
+  }
+  .card:hover { background: var(--accent-wash); transform: translateX(1px); }
+
+  .card.is-contract {
+    border-left-color: var(--band-contract);
+    background-image: repeating-linear-gradient(45deg, var(--rule-soft) 0 6px, transparent 6px 12px);
+  }
+  .card.is-human { border-left-color: var(--accent); border-left-width: 4px; }
+
+  .card.dim { opacity: .32; }
+
+  .card-id { font-size: var(--s-base); font-weight: 600; letter-spacing: -.01em; overflow-wrap: anywhere; }
+  .card-title {
+    grid-column: 1;
+    font-family: var(--font-human);
+    font-style: italic;
+    font-size: var(--s-sm);
+    color: var(--ink-2);
+    line-height: 1.35;
+  }
+  .card-right {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex: none;
+  }
+
+  .band-chip {
+    font-size: var(--s-xs);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--band);
+    border: 1px solid var(--band);
+    padding: .1rem .4rem;
+    white-space: nowrap;
+  }
+  .card.is-contract .band-chip { color: var(--band-contract); border-color: var(--band-contract); }
+
+  .card-meta {
+    font-size: var(--s-xs);
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .card { grid-template-columns: 1fr; }
+    .card-right { grid-column: 1; grid-row: auto; margin-top: .3rem; }
+    .card-meta { white-space: normal; }
+  }
+
+  /* ---------- contract labour ---------- */
+
+  .temps { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 1rem; }
+
+  .temp {
+    border: 1px dashed var(--band-contract);
+    background: var(--surface);
+    background-image: repeating-linear-gradient(45deg, var(--rule-soft) 0 6px, transparent 6px 12px);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    text-align: left;
+    font-family: var(--font-machine);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .temp:hover { border-style: solid; }
+  .temp-id { font-size: var(--s-md); font-weight: 600; }
+  .temp-role { font-family: var(--font-human); font-style: italic; color: var(--ink-2); font-size: var(--s-sm); }
+  .temp-badge {
+    font-size: var(--s-xs);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--band-contract);
+    border-top: 1px solid var(--rule);
+    padding-top: .5rem;
+    margin-top: auto;
+  }
+
+  /* ---------- chart ---------- */
+
+  .chart-wrap { border: 1px solid var(--rule); background: var(--surface); padding: 1.1rem 1rem .8rem; }
+  .chart-head { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: baseline; margin-bottom: .8rem; }
+  .chart-title { font-family: var(--font-human); font-size: var(--s-md); }
+  .chart-sub { font-size: var(--s-xs); color: var(--ink-3); }
+  .chart-scroll { overflow-x: auto; }
+  svg { display: block; width: 100%; height: auto; }
+  .grid-line { stroke: var(--rule-soft); stroke-width: 1; }
+  .axis-text { fill: var(--ink-3); font-size: 11px; font-family: var(--font-machine); }
+  .val-text { fill: var(--ink-2); font-size: 11px; font-family: var(--font-machine); font-variant-numeric: tabular-nums; }
+  .bar { fill: var(--accent); }
+  .bar.partial { fill: var(--accent); opacity: .45; }
+  .bar-hit { fill: transparent; cursor: pointer; }
+  .bar-hit:hover + .bar, .bar-hit:focus + .bar { fill: var(--accent-ink); }
+
+  .chart-table { width: 100%; border-collapse: collapse; margin-top: .9rem; font-size: var(--s-sm); }
+  .chart-table th, .chart-table td { text-align: left; padding: .3rem .6rem .3rem 0; border-bottom: 1px solid var(--rule-soft); font-variant-numeric: tabular-nums; }
+  .chart-table th { font-weight: 500; color: var(--ink-3); font-size: var(--s-xs); text-transform: uppercase; letter-spacing: .08em; }
+  details > summary {
+    cursor: pointer;
+    font-size: var(--s-xs);
+    color: var(--ink-3);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-top: .7rem;
+  }
+
+  /* ---------- notes ---------- */
+
+  .notes {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+    font-family: var(--font-human);
+    font-size: var(--s-sm);
+    color: var(--ink-2);
+    max-width: 72ch;
+  }
+  .notes h3 {
+    font-size: var(--s-xs);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--ink-3);
+    margin: 0;
+    font-family: var(--font-machine);
+    font-weight: 500;
+  }
+  .notes p { margin: 0; }
+  .notes code { font-family: var(--font-machine); font-size: .95em; color: var(--ink); }
+
+  /* ---------- drawer ---------- */
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 14, 18, .45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease;
+    z-index: 40;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: min(420px, 100%);
+    background: var(--surface);
+    border-left: 1px solid var(--rule);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, .18);
+    transform: translateX(100%);
+    transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-in { padding: 1.4rem 1.4rem 3rem; display: flex; flex-direction: column; gap: 1rem; }
+
+  .drawer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  .drawer-id { font-size: var(--s-lg); font-weight: 600; letter-spacing: -.01em; overflow-wrap: anywhere; }
+  .drawer-role { font-family: var(--font-human); font-style: italic; color: var(--ink-2); font-size: var(--s-md); }
+  .close {
+    flex: none;
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-2);
+    width: 30px; height: 30px;
+    cursor: pointer;
+    font-family: var(--font-machine);
+    line-height: 1;
+  }
+  .close:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  .drawer-note {
+    font-family: var(--font-human);
+    color: var(--ink);
+    font-size: var(--s-base);
+    line-height: 1.6;
+    border-left: 3px solid var(--band, var(--accent));
+    padding-left: .8rem;
+  }
+
+  .kv { display: grid; grid-template-columns: minmax(90px, auto) 1fr; gap: .35rem .9rem; font-size: var(--s-sm); }
+  .kv dt { color: var(--ink-3); font-size: var(--s-xs); text-transform: uppercase; letter-spacing: .08em; padding-top: .15rem; }
+  .kv dd { margin: 0; overflow-wrap: anywhere; }
+
+  .jd {
+    font-family: var(--font-human);
+    font-size: var(--s-sm);
+    color: var(--ink-2);
+    line-height: 1.6;
+    border-top: 1px solid var(--rule);
+    padding-top: .8rem;
+  }
+  .jd b { display: block; font-family: var(--font-machine); font-size: var(--s-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); font-weight: 500; margin-bottom: .3rem; }
+
+  .reports { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .rep {
+    font-size: var(--s-xs);
+    border: 1px solid var(--rule);
+    background: var(--surface-2);
+    padding: .18rem .45rem;
+    cursor: pointer;
+    font-family: var(--font-machine);
+    color: var(--ink-2);
+  }
+  .rep:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  /* ---------- tooltip ---------- */
+
+  .tip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--ink);
+    color: var(--ground);
+    font-size: var(--s-xs);
+    padding: .3rem .5rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .1s ease;
+    z-index: 60;
+    font-variant-numeric: tabular-nums;
+  }
+  .tip.on { opacity: 1; }
+
+  .theme-toggle {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-2);
+    font-family: var(--font-machine);
+    font-size: var(--s-xs);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .2rem .55rem;
+    cursor: pointer;
+  }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span class="stamp">Internal</span>
+      <span>Personnel Register</span>
+      <span>&middot;</span>
+      <span id="pv-repo">GeoffNordling/dev-playbook</span>
+      <button class="theme-toggle" id="theme-toggle" type="button">Theme</button>
+    </div>
+    <h1>Geoff-Dev-Co</h1>
+    <div class="masthead-rule"></div>
+    <p class="lede">
+      A wholly-owned agentic concern with a headcount of <b id="lede-heads">38</b>, no payroll, and
+      one human employee. Every role below is a written job description that gets hired, does a
+      shift, and is dissolved. This is the org chart of who tells whom what to do.
+    </p>
+    <div class="provenance">
+      <span>Incorporated <b id="pv-inc">2026-04-02</b></span>
+      <span>Re-incorporated <b id="pv-reinc">2026-06-02</b></span>
+      <span>Register current to <b id="pv-cur">2026-08-05</b></span>
+    </div>
+  </header>
+
+  <div class="stat-strip" id="stats"></div>
+
+  <section>
+    <div class="sec-head">
+      <h2>Chain of command</h2>
+      <p class="sec-note">
+        Two lines run out of the corner office. One goes to the session you happen to be talking to,
+        which hires specialists on request. The other goes to the factory, where work is dispatched
+        by supervisors who never touch the work themselves.
+      </p>
+    </div>
+
+    <div class="cmd">
+      <div class="cmd-top">
+        <div class="cmd-box ceo">
+          <span class="who">Geoff</span>
+          <span class="role">Founder &amp; Chief Executive Officer</span>
+        </div>
+      </div>
+      <div class="fork" aria-hidden="true"></div>
+      <div class="cmd-pair">
+        <div class="cmd-col">
+          <div class="cmd-box">
+            <span class="who">chief-of-staff</span>
+            <span class="role">Chief of Staff</span>
+          </div>
+          <div class="drop" aria-hidden="true"></div>
+          <div class="cmd-leaf" id="leaf-cos">departments</div>
+        </div>
+        <div class="cmd-col">
+          <div class="cmd-box">
+            <span class="who">agent-view-overwatch</span>
+            <span class="role">VP of Operations</span>
+          </div>
+          <div class="drop" aria-hidden="true"></div>
+          <div class="cmd-box">
+            <span class="who">issue-overwatch</span>
+            <span class="role">Line Manager &mdash; one per issue</span>
+          </div>
+          <div class="drop" aria-hidden="true"></div>
+          <div class="cmd-leaf" id="leaf-floor">factory floor</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Personnel register</h2>
+      <p class="sec-note">
+        Everyone on the books, filed under the person who dispatches them. Click a name for the
+        full record. Seniority is the model the role is pinned to &mdash; and a good number of staff
+        simply wear whatever the person who hired them is wearing.
+      </p>
+    </div>
+
+    <div class="controls">
+      <span class="ctl-label">Seniority</span>
+      <div id="filters" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+      <span class="spacer"></span>
+      <button class="chipbtn" id="expand-all" type="button">Expand all</button>
+      <button class="chipbtn" id="collapse-all" type="button">Collapse all</button>
+    </div>
+
+    <div id="register" style="display:flex;flex-direction:column;gap:1rem"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Contract labour</h2>
+      <p class="sec-note">
+        Not on the org chart proper, because they do not survive the job. Three agencies supply
+        workers by the batch: one judge per question, one grinder per iteration, one hand per
+        parallel job. Nothing carries between them except what somebody wrote to disk.
+      </p>
+    </div>
+    <div class="temps" id="temps"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Production record</h2>
+      <p class="sec-note">
+        What the floor actually shipped, by month, straight off the pull-request ledger.
+      </p>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <span class="chart-title">Pull requests merged, by month</span>
+        <span class="chart-sub" id="chart-sub"></span>
+      </div>
+      <div class="chart-scroll"><svg id="chart" viewBox="0 0 720 260" role="img" aria-label="Bar chart of pull requests merged each month"></svg></div>
+      <details>
+        <summary>View as table</summary>
+        <table class="chart-table" id="chart-table"></table>
+      </details>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h3>Notes on the register</h3>
+    <p>
+      <b>Headcount</b> counts written job descriptions &mdash; the skills this workspace carries &mdash;
+      not agent runs. A role can be hired many times a day or never; the box stays the same size.
+    </p>
+    <p>
+      <b>Two founding dates.</b> The company was incorporated on GitHub on 2 April 2026, but the
+      surviving git history begins with a single <code>Initial commit</code> on 2 June 2026. Everything
+      before that was squashed out of existence, so five pull requests on the ledger are older than
+      any commit that still exists. Hire dates are read from the surviving history and can only be as
+      old as it is.
+    </p>
+    <p>
+      <b>Seconded staff.</b> Eight roles are symlinked in from the portable skills library and show a
+      transfer date rather than a true hire date &mdash; their revision counts reflect the move, not
+      their working life.
+    </p>
+    <p>
+      <b>Scope.</b> One repository only. The factory ships into other repos across the workspace, and
+      none of that output is counted here, so the production figures understate the estate.
+    </p>
+  </section>
+
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-id" tabindex="-1">
+  <div class="drawer-in" id="drawer-in"></div>
+</aside>
+<div class="tip" id="tip"></div>
+
+<script id="orgdata" type="application/json">{"company":"Geoff-Dev-Co","repo":"GeoffNordling/dev-playbook","incorporated":"2026-04-02","reincorporated":"2026-06-02","latest":"2026-08-05","divisions":{"executive":"Executive","operations":"Software Factory \u2014 Operations","definition":"Strategy & Definition","docs":"Documentation","internal":"Internal Systems","session":"Session Operations","rnd":"Research & Development","contract":"Contract Labour"},"people":[{"id":"geoff","title":"Founder & Chief Executive Officer","division":"executive","manager":null,"note":"Types the ideas in, reads every diff, and says when to commit. The headcount below is entirely his fault.","kind":"human"},{"id":"chief-of-staff","title":"Chief of Staff","division":"executive","manager":"geoff","note":"The interactive session you are talking to. Takes an idea, picks a specialist, dispatches. Forgets the lot at /clear.","kind":"session"},{"id":"agent-view-overwatch","title":"VP of Operations","division":"operations","manager":"geoff","note":"Reads the board across every open issue and recommends who to staff next. Never touches a machine and never auto-launches \u2014 the CEO gives the word.","kind":"skill","model":"sonnet","effort":"xhigh","description":"Fleet co-pilot in Agent view \u2014 reads the issue board and recommends the next issue-overwatch launch. Use when the user runs the fleet across every in-flight issue from Agent view.","hired":"2026-07-10T12:30:38-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":16,"bytes":8262,"files":1,"portable":false,"invoke":"/agent-view-overwatch"},{"id":"issue-overwatch","title":"Line Manager, one per issue","division":"operations","manager":"agent-view-overwatch","note":"Hired for the life of a single issue. Sole authority to move a label. Nothing on the floor launches itself \u2014 every dispatch is theirs.","kind":"skill","model":"inherit","effort":"xhigh","description":"Executes one issue's traverse through the software factory, stopping wherever the user must act or decide. Use when the user launches it against a single issue number from Agent view.","hired":"2026-07-10T12:30:38-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":16,"bytes":9470,"files":2,"portable":false,"invoke":"/issue-overwatch"},{"id":"build","title":"Senior Engineer, Factory Floor","division":"operations","manager":"issue-overwatch","note":"Does the actual work. Carries the commit token \u2014 the only employee trusted to write and commit code unsupervised.","kind":"skill","model":"opus","effort":"xhigh","description":"Carries out a direct-mode issue against its brief \u2014 test-first where the issue calls for tests, directly where it doesn't. Use when the issue overwatch launches the `build` node.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":21,"bytes":7930,"files":2,"portable":false,"invoke":"/build"},{"id":"open-pr","title":"Filing Clerk","division":"operations","manager":"issue-overwatch","note":"Opens the pull request and is always first through the door at a review stop. Idempotent: will not double-file.","kind":"skill","model":"sonnet","effort":"low","description":"Opens the long-lived PR for an issue once its branch is on origin \u2014 idempotent. Use when the issue overwatch reaches a review stop.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":16,"bytes":2202,"files":1,"portable":false,"invoke":"/open-pr"},{"id":"bug-pr-review","title":"Inspector, Defects","division":"operations","manager":"issue-overwatch","note":"Hunts bugs in the diff and never edits code. Stood down from review cycle three onward under the lockdown rule.","kind":"skill","model":"opus","effort":"xhigh","description":"Runs a bug-hunting review over an issue's PR diff and posts its findings to the PR, never editing code. Use when the issue overwatch dispatches the code track at a review stop.","hired":"2026-07-20T16:22:43-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":4,"bytes":7694,"files":2,"portable":false,"invoke":"/bug-pr-review"},{"id":"code-pr-review","title":"Inspector, Conventions","division":"operations","manager":"issue-overwatch","note":"Audits the diff against the issue brief and house conventions. The only inspector still working during lockdown.","kind":"skill","model":"opus","effort":"xhigh","description":"Audits the code in a direct-mode issue's PR against its issue brief and the project conventions, and attaches findings to the PR. Use when the issue overwatch dispatches the code track at the `pr_review` stop.","hired":"2026-06-08T15:23:41-04:00","last_active":"2026-08-01T14:32:56-04:00","commits":12,"bytes":5654,"files":1,"portable":false,"invoke":"/code-pr-review"},{"id":"doc-pr-review","title":"Inspector, Documentation","division":"operations","manager":"issue-overwatch","note":"Audits the prose against the doc standards and every adjacent doc it has to agree with.","kind":"skill","model":"opus","effort":"xhigh","description":"Audits the documentation in an issue's PR against its brief, the doc standards, and the adjacent docs it must agree with, and attaches findings to the PR. Use when the issue overwatch dispatches the doc track at a review stop.","hired":"2026-07-11T12:39:30-04:00","last_active":"2026-08-01T16:51:59-04:00","commits":5,"bytes":6507,"files":1,"portable":false,"invoke":"/doc-pr-review"},{"id":"run-judgments","title":"General Counsel","division":"operations","manager":"issue-overwatch","note":"Convenes the benches when the cache gate goes red. Cannot be delegated \u2014 subagents have no Workflow tool, so the line manager runs it personally.","kind":"skill","model":"opus","effort":"low","description":"Run the judgments workflow. Use when the judgment cache-gate (pytest) is red, or when the user asks to run the judgments.","hired":"2026-06-27T17:29:17-04:00","last_active":"2026-08-01T14:32:56-04:00","commits":11,"bytes":7770,"files":2,"portable":false,"invoke":"/run-judgments"},{"id":"commit","title":"Notary","division":"operations","manager":"issue-overwatch","note":"Writes the message and commits what it was given. Never pushes. Also on call to the CEO directly.","kind":"skill","model":"sonnet","effort":"low","description":"Commit staged work locally with a clean message; the user pushes. Use when the user asks to commit changes, or when a software factory skill needs to commit its work.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":12,"bytes":1993,"files":1,"portable":false,"invoke":"/commit"},{"id":"clean-up-branch-worktree","title":"Custodian","division":"operations","manager":"agent-view-overwatch","note":"Tears down the branch and worktree once a PR is merged.","kind":"skill","model":"sonnet","effort":"low","description":"Prove a merged worktree branch is fully absorbed into main, then remove the worktree and its branch. Use when the PR has merged and the user asks to tear down the branch and its worktree.","hired":"2026-07-31T12:15:09-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":4,"bytes":2973,"files":1,"portable":false,"invoke":"/clean-up-branch-worktree"},{"id":"idea","title":"Suggestion Box","division":"definition","manager":"chief-of-staff","note":"Takes raw, unshaped thoughts and deposits them in mission-control's inbox before they evaporate.","kind":"skill","model":"sonnet","effort":"xhigh","description":"Deposit raw idea material verbatim into mission-control's inbox/ from any repo \u2014 a dictation, a pasted agent conversation, a dump of disjoint ideas. Use when the owner throws idea material into the chat to be saved for later curation.","hired":"2026-07-27T20:52:31-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":5,"bytes":2011,"files":1,"portable":false,"invoke":"/idea"},{"id":"candidate-promote","title":"Talent Scout","division":"definition","manager":"chief-of-staff","note":"Turns a line in CANDIDATES.md into a real, committed issue.","kind":"skill","model":"inherit","effort":"xhigh","description":"Promote a Candidate from the current repo's CANDIDATES.md into a committed GitHub issue. Use when the user asks to promote a candidate, or names an entry in CANDIDATES.md they now want built.","hired":"2026-07-24T20:45:16-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":6,"bytes":3168,"files":1,"portable":false,"invoke":"/candidate-promote"},{"id":"intake","title":"Director of Triage","division":"definition","manager":"chief-of-staff","note":"Triages everything at the front door and routes it \u2014 straight to the floor, or parked for design. Human-invoked only; the factory cannot summon them.","kind":"skill","model":"inherit","effort":"xhigh","description":"Triage work at the front door \u2014 adopt a rushed, untriaged issue or capture a fresh idea, and leave it briefed and routed. Use when the user hands over a raw idea or a rushed stub to be triaged, or when /candidate-promote passes a promoted entry through.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":21,"bytes":6822,"files":1,"portable":false,"invoke":"/intake"},{"id":"design","title":"Chief Architect","division":"definition","manager":"chief-of-staff","note":"Works out how a thing should be built, or slices something oversized into an epic's children.","kind":"skill","model":"inherit","effort":"xhigh","description":"Works out how a direct-mode issue should be built, then leaves it factory-ready. Use when an issue's approach needs thought before it can be built, when intake parks work for design, or when an issue looks too big for one build and needs slicing.","hired":"2026-06-03T13:47:20-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":14,"bytes":13325,"files":3,"portable":false,"invoke":"/design"},{"id":"wayfinder","title":"Cartographer","division":"definition","manager":"design","note":"Maps work too big to hold in one head as a shared board of decision tickets.","kind":"skill","model":"inherit","effort":"","description":"Plan a huge chunk of work \u2014 more than one agent session can hold \u2014 as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.","hired":"2026-08-01T11:46:36-04:00","last_active":"2026-08-01T11:46:36-04:00","commits":1,"bytes":12044,"files":2,"portable":true,"invoke":"/wayfinder"},{"id":"research","title":"Research Analyst","division":"definition","manager":"design","note":"Reads the primary sources so nobody else has to, and files the findings as Markdown.","kind":"skill","model":"inherit","effort":"","description":"Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.","hired":"2026-07-31T16:43:34-04:00","last_active":"2026-07-31T16:43:34-04:00","commits":1,"bytes":893,"files":2,"portable":true,"invoke":"/research"},{"id":"prototype","title":"Skunkworks","division":"definition","manager":"design","note":"Builds throwaway things to answer exactly one design question, then bins them.","kind":"skill","model":"inherit","effort":"","description":"Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-07-31T16:43:34-04:00","commits":11,"bytes":15495,"files":4,"portable":true,"invoke":"/prototype"},{"id":"grill-with-docs","title":"Head of Interrogation","division":"definition","manager":"chief-of-staff","note":"The front door to a grilling run against the project's own language. Convened this very chart's requirements meeting.","kind":"skill","model":"inherit","effort":"xhigh","description":"Front door onto a /grilling session run with the /domain-modeling skill. Use when the user wants to stress-test a plan against their project's language and documented decisions, or when intake, design, or ralph-setup reaches its interview beat.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":10,"bytes":858,"files":1,"portable":false,"invoke":"/grill-with-docs"},{"id":"grilling","title":"Interrogator","division":"definition","manager":"grill-with-docs","note":"Asks the question you were hoping to skip, then asks it again.","kind":"skill","model":"inherit","effort":"","description":"Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.","hired":"2026-07-31T16:43:34-04:00","last_active":"2026-07-31T16:43:34-04:00","commits":1,"bytes":948,"files":2,"portable":true,"invoke":"/grilling"},{"id":"domain-modeling","title":"Company Lexicographer","division":"definition","manager":"grill-with-docs","note":"Keeps the glossary honest and writes the decision records when a call is hard to reverse.","kind":"skill","model":"inherit","effort":"","description":"Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.","hired":"2026-07-31T16:43:34-04:00","last_active":"2026-07-31T16:43:34-04:00","commits":1,"bytes":8593,"files":4,"portable":true,"invoke":"/domain-modeling"},{"id":"orchestrate","title":"Managing Director, Special Projects","division":"definition","manager":"chief-of-staff","note":"Delegates rather than does. Treats everything below it as staff to be dispatched in parallel.","kind":"skill","model":"inherit","effort":"xhigh","description":"Own a problem as a high-level orchestrator, delegating research and construction down to subagents. Use when the user turns on Fable orchestration mode.","hired":"2026-07-22T10:15:31-04:00","last_active":"2026-08-03T11:05:49-04:00","commits":7,"bytes":2168,"files":1,"portable":false,"invoke":"/orchestrate"},{"id":"protocol-align-map-execute","title":"Programme Director","division":"definition","manager":"chief-of-staff","note":"Runs Align / Map / Execute for collaborations too large for a single sitting.","kind":"skill","model":"inherit","effort":"xhigh","description":"Run the Align, Map, Execute protocol for structured human-agent collaboration on large-scope tasks. Use when a task is too large for the user to evaluate raw results and the agent's model of their intent is still incomplete.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T14:32:56-04:00","commits":7,"bytes":11131,"files":2,"portable":false,"invoke":"/protocol-align-map-execute"},{"id":"ralph-setup","title":"Foreman, Amnesia Division","division":"definition","manager":"chief-of-staff","note":"Scaffolds the plan and progress files that the memoryless night shift grinds through.","kind":"skill","model":"inherit","effort":"xhigh","description":"Scaffolds a Ralph loop \u2014 the plan and progress files a memoryless agent grinds through one task at a time. Use when the user asks to set up or scaffold a ralph loop.","hired":"2026-06-25T12:52:58-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":6,"bytes":6248,"files":3,"portable":false,"invoke":"/ralph-setup"},{"id":"doc-format","title":"Copy Editor","division":"docs","manager":"chief-of-staff","note":"Touches formatting and nothing else. Will not rewrite your argument.","kind":"skill","model":"opus","effort":"xhigh","description":"Standardize formatting and style across a Markdown document without changing its content. Use when the user asks to tidy a Markdown file's formatting.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":6,"bytes":3003,"files":1,"portable":false,"invoke":"/doc-format"},{"id":"doc-present-state","title":"Continuity Editor","division":"docs","manager":"chief-of-staff","note":"Drags a doc back to present tense \u2014 what is true now, and what happens next.","kind":"skill","model":"opus","effort":"xhigh","description":"Steer documentation toward present state and next steps, dropping history an agent does not need in order to act. Use when the user asks for a doc to be made present-state.","hired":"2026-06-10T16:10:00-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":6,"bytes":545,"files":1,"portable":false,"invoke":"/doc-present-state"},{"id":"doc-rewrite","title":"Ghostwriter","division":"docs","manager":"chief-of-staff","note":"Rewrites a document from scratch when editing it would be the slower road.","kind":"skill","model":"opus","effort":"xhigh","description":"Rewrite a Markdown document from scratch, rebuilding its structure while preserving content by default. Use when the user asks to rewrite a Markdown document rather than edit it in place.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":7,"bytes":3968,"files":1,"portable":false,"invoke":"/doc-rewrite"},{"id":"datasheet","title":"Technical Writer","division":"docs","manager":"chief-of-staff","note":"Produces the datasheet for a subject and keeps it refreshed.","kind":"skill","model":"opus","effort":"xhigh","description":"Produce or refresh a datasheet for a chosen subject and file scope. Use when the user asks to generate or refresh a datasheet, or names the subject and scope paths for one.","hired":"2026-07-02T15:00:45-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":7,"bytes":8554,"files":2,"portable":false,"invoke":"/datasheet"},{"id":"skill-creator","title":"Head of Talent Acquisition","division":"internal","manager":"chief-of-staff","note":"Writes new employees. Most of the roster on this page was hired by this one role.","kind":"skill","model":"opus","effort":"xhigh","description":"Author a new Claude Code skill bundle against the workspace's skill conventions and skill-writing standards. Use when the user says to create a skill.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T13:48:11-04:00","commits":12,"bytes":5789,"files":1,"portable":false,"invoke":"/skill-creator"},{"id":"update-standards-pin","title":"Compliance Officer","division":"internal","manager":"chief-of-staff","note":"Rolls a standards release out across every consumer repo in the workspace.","kind":"skill","model":"opus","effort":"xhigh","description":"Roll a dev-playbook standards release out to the governed consumer repos, working whatever the bump reddens. Use when the user asks to update the standards pin.","hired":"2026-07-25T11:48:07-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":5,"bytes":4172,"files":1,"portable":false,"invoke":"/update-standards-pin"},{"id":"log-friction","title":"Ombudsman","division":"internal","manager":"chief-of-staff","note":"The grievance desk: records what hurt, how long it cost, and where it keeps happening.","kind":"skill","model":"sonnet","effort":"xhigh","description":"Record a friction entry \u2014 pain felt, time lost, a manual intervention \u2014 in mission-control's friction log from any repo. Use when the user says to log friction, or asks to record a recurring pain or manual intervention.","hired":"2026-07-08T21:51:19-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":11,"bytes":1584,"files":1,"portable":false,"invoke":"/log-friction"},{"id":"orient","title":"Onboarding Guide","division":"session","manager":"chief-of-staff","note":"Walks a fresh session around the repo it just woke up in.","kind":"skill","model":"sonnet","effort":"xhigh","description":"Orient to the current repository. Use when invoked by the user.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T14:32:56-04:00","commits":6,"bytes":1792,"files":1,"portable":false,"invoke":"/orient"},{"id":"compact-prep","title":"Facilities","division":"session","manager":"chief-of-staff","note":"Tidies the session before the context gets compacted.","kind":"skill","model":"inherit","effort":"xhigh","description":"Commit outstanding work and get the session ready before the user runs /compact. Use when the user says they are about to compact.","hired":"2026-07-31T14:31:08-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":6,"bytes":1559,"files":1,"portable":false,"invoke":"/compact-prep"},{"id":"handoff","title":"Records & Handover","division":"session","manager":"chief-of-staff","note":"Compresses a whole session into a handoff document for whoever comes next.","kind":"skill","model":"opus","effort":"medium","description":"Compact the current conversation into a handoff document a fresh agent can resume from. Use when the user asks to carry this session's work into a new one.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-08-01T16:09:38-04:00","commits":7,"bytes":1150,"files":1,"portable":false,"invoke":"/handoff"},{"id":"rewind-compact","title":"Archivist","division":"session","manager":"chief-of-staff","note":"Compresses the turns you threw away, so a rewind doesn't lose what was learned.","kind":"skill","model":"opus","effort":"medium","description":"Prepare a limited conversation rewind, compressing the discarded turns into a Tangential compaction summary. Use when the user wants to rewind past a long tangent whose outcome is already captured on disk.","hired":"2026-06-03T14:24:13-04:00","last_active":"2026-08-05T13:37:37-04:00","commits":10,"bytes":3554,"files":1,"portable":false,"invoke":"/rewind-compact"},{"id":"usage-report","title":"Metering & Payroll","division":"session","manager":"chief-of-staff","note":"Reports how much of the rate-limit window the kingdom has already spent.","kind":"skill","model":"sonnet","effort":"low","description":"Report the five_hour and seven_day subscription rate-limit usage from the status-line cache. Use when the user asks about rate-limit usage, remaining quota, or how much of the subscription window is spent.","hired":"2026-07-16T20:01:12-04:00","last_active":"2026-08-01T18:39:53-04:00","commits":4,"bytes":7001,"files":2,"portable":false,"invoke":"/usage-report"},{"id":"pymc-modeling","title":"Chief Statistician","division":"rnd","manager":"chief-of-staff","note":"Bayesian modelling \u2014 priors, sampling, convergence, and telling you the model is wrong.","kind":"skill","model":"inherit","effort":"","description":">","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-06-02T13:10:05-04:00","commits":1,"bytes":188642,"files":14,"portable":true,"invoke":"/pymc-modeling"},{"id":"marimo-notebook","title":"Notebook Specialist","division":"rnd","manager":"chief-of-staff","note":"Writes marimo notebooks in the house format.","kind":"skill","model":"inherit","effort":"","description":"Write a marimo notebook in a Python file in the right format.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-06-02T13:10:05-04:00","commits":1,"bytes":37035,"files":13,"portable":true,"invoke":"/marimo-notebook"},{"id":"marimo-batch","title":"Batch Scheduling Specialist","division":"rnd","manager":"chief-of-staff","note":"Prepares a notebook for unattended scheduled runs.","kind":"skill","model":"inherit","effort":"","description":"An opintionated skill to prepare a marimo notebook to make it ready for a scheduled run.","hired":"2026-06-02T13:10:05-04:00","last_active":"2026-06-02T13:10:05-04:00","commits":1,"bytes":8205,"files":2,"portable":true,"invoke":"/marimo-batch"},{"id":"judgments-bench","title":"The Bench \u2014 judicial temps","division":"contract","manager":"run-judgments","note":"One judge hired per uncached judgment, each pinned to the model its own declaration names. Up to 1,000 in a single sitting.","kind":"contract","badge":"1 per judgment \u00b7 cap 1,000/run","model":"per-job","effort":"","description":"","hired":null,"commits":0,"portable":false},{"id":"ralph-loop","title":"The Amnesiacs \u2014 night shift","division":"contract","manager":"ralph-setup","note":"A fresh worker every iteration, with no memory of the last one. Disk is the only thing that carries over: the plan file, the progress file, git.","kind":"contract","badge":"1 per iteration \u00b7 memoryless","model":"per-job","effort":"","description":"","hired":null,"commits":0,"portable":false},{"id":"scatter-gather","title":"The Day Pool \u2014 casual labour","division":"contract","manager":"orchestrate","note":"N isolated jobs fired off in one shot, nothing shared between them. Every job must name its own model and effort \u2014 no inheriting the boss's.","kind":"contract","badge":"N per batch \u00b7 no shared state","model":"per-job","effort":"","description":"","hired":null,"commits":0,"portable":false}],"stats":{"headcount":38,"commits":182,"prs_merged":125,"prs_total":134,"prs_abandoned":9,"issues":232,"issues_closed":209,"issues_open":23,"additions":83643,"deletions":39699,"files_touched":2143,"review_comments":225},"merged_by_month":[["2026-04",1],["2026-05",4],["2026-06",36],["2026-07",72],["2026-08",12]],"commits_by_month":[["2026-06",50],["2026-07",116],["2026-08",16]],"labels":[["mode:direct",83],["tests:no",59],["category:extension",40],["phase:pr-review",39],["tests:yes",35],["category:maintenance",20],["phase:build",15],["wayfinder:grilling",14],["mode:spike",11],["phase:spike",11],["phase:intake",9],["wayfinder:research",8],["wayfinder:map",2],["wayfinder:task",2],["phase:design",2],["phase:judgments",1],["wayfinder:prototype",1]]}</script>
+
+<script>
+  (function () {
+    "use strict";
+
+    var DATA = JSON.parse(document.getElementById("orgdata").textContent);
+    var people = DATA.people;
+    var byId = {};
+    people.forEach(function (p) { byId[p.id] = p; });
+
+    var kids = {};
+    people.forEach(function (p) {
+      if (!p.manager) return;
+      (kids[p.manager] = kids[p.manager] || []).push(p.id);
+    });
+
+    function bandOf(p) {
+      if (p.kind === "contract") return "contract";
+      if (p.kind === "human" || p.kind === "session") return "human";
+      return p.model || "inherit";
+    }
+    function bandVar(b) {
+      return b === "contract" ? "var(--band-contract)"
+        : b === "human" ? "var(--accent)"
+          : "var(--band-" + b + ")";
+    }
+    function fmt(n) { return n.toLocaleString("en-GB"); }
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c];
+      });
+    }
+    function shortDate(d) {
+      if (!d) return "—";
+      var m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      var p = d.slice(0, 10).split("-");
+      return p[2].replace(/^0/, "") + " " + m[+p[1] - 1] + " " + p[0];
+    }
+    function monthLabel(ym) {
+      var m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      var p = ym.split("-");
+      return m[+p[1] - 1] + " " + p[0].slice(2);
+    }
+
+    /* ---------- masthead + stats ---------- */
+
+    document.getElementById("pv-repo").textContent = DATA.repo;
+    document.getElementById("pv-inc").textContent = shortDate(DATA.incorporated);
+    document.getElementById("pv-reinc").textContent = shortDate(DATA.reincorporated);
+    document.getElementById("pv-cur").textContent = shortDate(DATA.latest);
+    document.getElementById("lede-heads").textContent = DATA.stats.headcount;
+
+    var S = DATA.stats;
+    var STATS = [
+      { n: S.headcount, l: "Roles on the books", s: "written job descriptions" },
+      { n: S.prs_merged, l: "PRs merged", s: S.prs_abandoned + " abandoned on the floor" },
+      { n: S.issues, l: "Issues raised", s: S.issues_closed + " closed · " + S.issues_open + " open" },
+      { n: S.commits, l: "Commits", s: "since re-incorporation" },
+      { n: S.additions, l: "Lines added", s: fmt(S.deletions) + " taken back out" },
+      { n: S.review_comments, l: "Review comments", s: "across " + S.prs_total + " pull requests" }
+    ];
+    document.getElementById("stats").innerHTML = STATS.map(function (s) {
+      return '<div class="stat"><span class="stat-n">' + fmt(s.n) + '</span>' +
+        '<span class="stat-l">' + esc(s.l) + '</span>' +
+        '<span class="stat-sub">' + esc(s.s) + '</span></div>';
+    }).join("");
+
+    /* ---------- chain-of-command leaf counts ---------- */
+
+    function subtreeCount(id) {
+      var n = 0;
+      (kids[id] || []).forEach(function (k) {
+        if (byId[k].kind === "contract") return;
+        n += 1 + subtreeCount(k);
+      });
+      return n;
+    }
+    var cosKids = (kids["chief-of-staff"] || []).filter(function (k) { return byId[k].kind !== "contract"; });
+    var cosDivs = {};
+    cosKids.forEach(function (k) { cosDivs[byId[k].division] = 1; });
+    document.getElementById("leaf-cos").textContent =
+      Object.keys(cosDivs).length + " departments · " + subtreeCount("chief-of-staff") + " roles";
+    document.getElementById("leaf-floor").textContent =
+      subtreeCount("issue-overwatch") + " roles on the floor";
+
+    /* ---------- filters ---------- */
+
+    var BANDS = [
+      { k: "opus", label: "Opus", note: "senior staff" },
+      { k: "sonnet", label: "Sonnet", note: "line staff" },
+      { k: "inherit", label: "Inherit", note: "wears the boss's model" },
+      { k: "contract", label: "Contract", note: "hired by the batch" }
+    ];
+    var counts = {};
+    people.forEach(function (p) { var b = bandOf(p); counts[b] = (counts[b] || 0) + 1; });
+
+    var active = null;
+    document.getElementById("filters").innerHTML = BANDS.map(function (b) {
+      return '<button class="chipbtn" type="button" data-band="' + b.k + '" aria-pressed="false" title="' +
+        esc(b.note) + '"><span class="swatch ' + b.k + '"></span>' + b.label +
+        ' <span class="n">' + (counts[b.k] || 0) + '</span></button>';
+    }).join("");
+
+    document.getElementById("filters").addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-band]");
+      if (!btn) return;
+      var band = btn.getAttribute("data-band");
+      active = (active === band) ? null : band;
+      [].forEach.call(this.querySelectorAll("[data-band]"), function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-band") === active));
+      });
+      [].forEach.call(document.querySelectorAll(".card, .temp"), function (c) {
+        var b = c.getAttribute("data-band");
+        c.classList.toggle("dim", !!active && b !== active);
+      });
+    });
+
+    /* ---------- register ---------- */
+
+    function cardHTML(p) {
+      var band = bandOf(p);
+      var cls = "card" + (p.kind === "contract" ? " is-contract" : "") +
+        (p.kind === "human" ? " is-human" : "");
+      var meta = p.kind === "skill"
+        ? shortDate(p.hired) + " · " + p.commits + " rev"
+        : (p.kind === "human" ? "since day one" : "per session");
+      var chip = p.kind === "skill" ? (p.model || "inherit") : (p.kind === "human" ? "human" : "session");
+      return '<button class="' + cls + '" type="button" data-id="' + esc(p.id) + '" data-band="' + band +
+        '" style="--band:' + bandVar(band) + '">' +
+        '<span class="card-id">' + esc(p.id) + '</span>' +
+        '<span class="card-title">' + esc(p.title) + '</span>' +
+        '<span class="card-right">' +
+        '<span class="band-chip">' + esc(chip) + '</span>' +
+        '<span class="card-meta">' + esc(meta) + '</span>' +
+        '</span></button>';
+    }
+
+    function nodeHTML(p, division) {
+      var childIds = (kids[p.id] || []).filter(function (k) {
+        return byId[k].division === division && byId[k].kind !== "contract";
+      });
+      var inner = childIds.map(function (k) { return nodeHTML(byId[k], division); }).join("");
+      return '<div class="node" data-open="true">' +
+        '<div class="node-head">' +
+        (childIds.length
+          ? '<button class="tog" type="button" aria-expanded="true" aria-label="Collapse reports of ' + esc(p.id) + '">−</button>'
+          : '<span class="tog-spacer"></span>') +
+        cardHTML(p) +
+        '</div>' +
+        (childIds.length ? '<div class="children">' + inner + '</div>' : '') +
+        '</div>';
+    }
+
+    var divOrder = ["executive", "operations", "definition", "docs", "internal", "session", "rnd"];
+    document.getElementById("register").innerHTML = divOrder.map(function (dk) {
+      var members = people.filter(function (p) { return p.division === dk && p.kind !== "contract"; });
+      if (!members.length) return "";
+      var roots = members.filter(function (p) {
+        return !p.manager || !byId[p.manager] || byId[p.manager].division !== dk;
+      });
+      var body = roots.map(function (p) { return nodeHTML(p, dk); }).join("");
+      return '<div class="division" data-open="true">' +
+        '<button class="div-head" type="button" aria-expanded="true">' +
+        '<span class="div-name">' + esc(DATA.divisions[dk]) + '</span>' +
+        '<span class="div-count">' + members.length + ' role' + (members.length === 1 ? '' : 's') + '</span>' +
+        '<span class="div-mark">−</span>' +
+        '</button>' +
+        '<div class="div-body">' + body + '</div>' +
+        '</div>';
+    }).join("");
+
+    document.getElementById("register").addEventListener("click", function (e) {
+      var head = e.target.closest(".div-head");
+      if (head) {
+        var div = head.parentElement;
+        var open = div.getAttribute("data-open") !== "false";
+        div.setAttribute("data-open", String(!open));
+        head.setAttribute("aria-expanded", String(!open));
+        head.querySelector(".div-mark").textContent = open ? "+" : "−";
+        return;
+      }
+      var tog = e.target.closest(".tog");
+      if (tog) {
+        var node = tog.closest(".node");
+        var isOpen = node.getAttribute("data-open") !== "false";
+        node.setAttribute("data-open", String(!isOpen));
+        tog.setAttribute("aria-expanded", String(!isOpen));
+        tog.textContent = isOpen ? "+" : "−";
+        return;
+      }
+      var card = e.target.closest(".card");
+      if (card) openDrawer(card.getAttribute("data-id"));
+    });
+
+    function setAll(open) {
+      [].forEach.call(document.querySelectorAll(".division"), function (d) {
+        d.setAttribute("data-open", String(open));
+        var h = d.querySelector(".div-head");
+        h.setAttribute("aria-expanded", String(open));
+        h.querySelector(".div-mark").textContent = open ? "−" : "+";
+      });
+      [].forEach.call(document.querySelectorAll(".node"), function (n) {
+        n.setAttribute("data-open", String(open));
+        var t = n.querySelector(":scope > .node-head > .tog");
+        if (t) { t.setAttribute("aria-expanded", String(open)); t.textContent = open ? "−" : "+"; }
+      });
+    }
+    document.getElementById("expand-all").addEventListener("click", function () { setAll(true); });
+    document.getElementById("collapse-all").addEventListener("click", function () { setAll(false); });
+
+    /* ---------- contract labour ---------- */
+
+    document.getElementById("temps").innerHTML = people
+      .filter(function (p) { return p.kind === "contract"; })
+      .map(function (p) {
+        return '<button class="temp" type="button" data-id="' + esc(p.id) + '" data-band="contract">' +
+          '<span class="temp-id">' + esc(p.id) + '</span>' +
+          '<span class="temp-role">' + esc(p.title) + '</span>' +
+          '<span class="temp-badge">' + esc(p.badge) + '</span>' +
+          '</button>';
+      }).join("");
+
+    document.getElementById("temps").addEventListener("click", function (e) {
+      var t = e.target.closest(".temp");
+      if (t) openDrawer(t.getAttribute("data-id"));
+    });
+
+    /* ---------- drawer ---------- */
+
+    var drawer = document.getElementById("drawer");
+    var scrim = document.getElementById("scrim");
+    var lastFocus = null;
+
+    function openDrawer(id) {
+      var p = byId[id];
+      if (!p) return;
+      lastFocus = document.activeElement;
+      var band = bandOf(p);
+      var mgr = p.manager ? byId[p.manager] : null;
+      var reports = (kids[p.id] || []).map(function (k) { return byId[k]; });
+
+      var rows = [];
+      rows.push(["Division", DATA.divisions[p.division]]);
+      if (mgr) rows.push(["Reports to", mgr.id + " — " + mgr.title]);
+      if (p.kind === "skill") {
+        rows.push(["Seniority", (p.model || "inherit") + (p.effort ? " · effort " + p.effort : "")]);
+        rows.push(["Hired", shortDate(p.hired) + (p.portable ? " (transferred in)" : "")]);
+        rows.push(["Last active", shortDate(p.last_active)]);
+        rows.push(["Revisions", p.commits + " commit" + (p.commits === 1 ? "" : "s")]);
+        rows.push(["Job spec", fmt(p.bytes) + " bytes across " + p.files + " file" + (p.files === 1 ? "" : "s")]);
+        rows.push(["Summoned by", p.invoke]);
+      } else if (p.kind === "contract") {
+        rows.push(["Engagement", p.badge]);
+        rows.push(["Seniority", "set per job, never inherited"]);
+      } else if (p.kind === "human") {
+        rows.push(["Seniority", "the one with the credit card"]);
+      } else {
+        rows.push(["Seniority", "whatever model the session is running"]);
+      }
+
+      document.getElementById("drawer-in").innerHTML =
+        '<div class="drawer-top">' +
+        '<div><div class="drawer-id" id="drawer-id">' + esc(p.id) + '</div>' +
+        '<div class="drawer-role">' + esc(p.title) + '</div></div>' +
+        '<button class="close" type="button" aria-label="Close">×</button>' +
+        '</div>' +
+        '<p class="drawer-note" style="--band:' + bandVar(band) + '">' + esc(p.note) + '</p>' +
+        '<dl class="kv">' + rows.map(function (r) {
+          return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>";
+        }).join("") + '</dl>' +
+        (p.description ? '<div class="jd"><b>Job description, as filed</b>' + esc(p.description) + '</div>' : '') +
+        (reports.length
+          ? '<div class="jd"><b>Direct reports (' + reports.length + ')</b><div class="reports">' +
+          reports.map(function (r) {
+            return '<button class="rep" type="button" data-goto="' + esc(r.id) + '">' + esc(r.id) + '</button>';
+          }).join("") + '</div></div>'
+          : '');
+
+      drawer.classList.add("open");
+      scrim.classList.add("open");
+      drawer.focus();
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      scrim.classList.remove("open");
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    drawer.addEventListener("click", function (e) {
+      if (e.target.closest(".close")) return closeDrawer();
+      var go = e.target.closest("[data-goto]");
+      if (go) openDrawer(go.getAttribute("data-goto"));
+    });
+    scrim.addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+    });
+
+    /* ---------- production chart ---------- */
+
+    var series = DATA.merged_by_month;
+    var W = 720, H = 260, PL = 44, PR = 16, PT = 26, PB = 40;
+    var iw = W - PL - PR, ih = H - PT - PB;
+    var max = Math.max.apply(null, series.map(function (d) { return d[1]; }));
+    var ticks = [0, Math.round(max / 3), Math.round(2 * max / 3), max];
+    var lastMonth = series[series.length - 1][0];
+
+    var svg = "";
+    ticks.forEach(function (t) {
+      var y = PT + ih - (t / max) * ih;
+      svg += '<line class="grid-line" x1="' + PL + '" y1="' + y.toFixed(1) + '" x2="' + (W - PR) + '" y2="' + y.toFixed(1) + '"/>';
+      svg += '<text class="axis-text" x="' + (PL - 8) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + t + "</text>";
+    });
+
+    var slot = iw / series.length;
+    var bw = Math.min(64, slot - 16);
+    series.forEach(function (d, i) {
+      var h = (d[1] / max) * ih;
+      var x = PL + slot * i + (slot - bw) / 2;
+      var y = PT + ih - h;
+      var partial = d[0] === lastMonth;
+      var r = Math.min(4, h);
+      var path = "M" + x + " " + (y + h) + " L" + x + " " + (y + r) +
+        " Q" + x + " " + y + " " + (x + r) + " " + y +
+        " L" + (x + bw - r) + " " + y +
+        " Q" + (x + bw) + " " + y + " " + (x + bw) + " " + (y + r) +
+        " L" + (x + bw) + " " + (y + h) + " Z";
+      svg += '<rect class="bar-hit" x="' + (PL + slot * i) + '" y="' + PT + '" width="' + slot + '" height="' + ih +
+        '" data-m="' + d[0] + '" data-v="' + d[1] + '" tabindex="0" role="img" aria-label="' +
+        monthLabel(d[0]) + ": " + d[1] + ' merged"></rect>';
+      svg += '<path class="bar' + (partial ? " partial" : "") + '" d="' + path + '"/>';
+      svg += '<text class="val-text" x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 7).toFixed(1) +
+        '" text-anchor="middle">' + d[1] + "</text>";
+      svg += '<text class="axis-text" x="' + (x + bw / 2).toFixed(1) + '" y="' + (PT + ih + 20) +
+        '" text-anchor="middle">' + monthLabel(d[0]) + "</text>";
+    });
+    document.getElementById("chart").innerHTML = svg;
+
+    document.getElementById("chart-sub").textContent =
+      "Final bar is a part-month — " + monthLabel(lastMonth) + " to " + shortDate(DATA.latest);
+
+    document.getElementById("chart-table").innerHTML =
+      "<thead><tr><th>Month</th><th>Merged</th></tr></thead><tbody>" +
+      series.map(function (d) {
+        return "<tr><td>" + monthLabel(d[0]) + (d[0] === lastMonth ? " (part)" : "") + "</td><td>" + d[1] + "</td></tr>";
+      }).join("") + "</tbody>";
+
+    var tip = document.getElementById("tip");
+    var chartEl = document.getElementById("chart");
+    function showTip(e, el) {
+      tip.textContent = monthLabel(el.getAttribute("data-m")) + " — " + el.getAttribute("data-v") + " merged";
+      var r = el.getBoundingClientRect();
+      var x = (e && e.clientX) ? e.clientX : r.left + r.width / 2;
+      tip.style.left = Math.min(window.innerWidth - 150, x + 12) + "px";
+      tip.style.top = (r.top + 8) + "px";
+      tip.classList.add("on");
+    }
+    chartEl.addEventListener("mousemove", function (e) {
+      var hit = e.target.closest(".bar-hit");
+      if (hit) showTip(e, hit); else tip.classList.remove("on");
+    });
+    chartEl.addEventListener("mouseleave", function () { tip.classList.remove("on"); });
+    chartEl.addEventListener("focusin", function (e) {
+      var hit = e.target.closest(".bar-hit");
+      if (hit) showTip(null, hit);
+    });
+    chartEl.addEventListener("focusout", function () { tip.classList.remove("on"); });
+
+    /* ---------- theme toggle (stands in for the hosted viewer's) ---------- */
+
+    var root = document.documentElement;
+    document.getElementById("theme-toggle").addEventListener("click", function () {
+      var cur = root.getAttribute("data-theme");
+      if (!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      root.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+    });
+  })();
+</script>
+</body>
+</html>
