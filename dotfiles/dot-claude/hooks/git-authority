@@ -706,15 +706,26 @@ def main() -> None:
     Failing closed is bounded by authority, though. This hook runs on *every*
     Bash call of every session, and a fault denying them all would take out
     ``ls`` and ``make check`` everywhere at once over a command it was never
-    going to rule on. So a fault denies only what ``governed`` reads as a push
-    or a commit. The one fault that cannot be scoped that way is an event that
-    would not parse: there is no command to read, so it fails closed whole —
-    ``event`` is still None there, and nowhere else, because an event that
-    parses to None is judged without fault.
+    going to rule on. So a fault denies only where the command reads as a push
+    or a commit — ``command_text`` below, tested against the same two text
+    patterns the readable path falls back on. The one fault that cannot be
+    scoped that way is an event that arrived and would not parse: there is no
+    command to read, so it fails closed whole — ``event`` is still None there,
+    and nowhere else, because an event that parses to None is judged without
+    fault.
+
+    Stdin that is empty or blank is not that fault. It carries no event at all,
+    which is the shape a closed or truncated pipe takes, and nothing in it says
+    a git verb was ever involved — so it draws no opinion rather than denying
+    every Bash call on the machine at once. What arrives and will not parse is
+    still denied whole.
     """
     event: object = None
     try:
-        event = json.loads(sys.stdin.read())
+        arriving = sys.stdin.read()
+        if not arriving.strip():
+            return
+        event = json.loads(arriving)
         evaluate(event)
     except Exception as fault:
         # The coarsest possible reading of the command, asked in this one place:
