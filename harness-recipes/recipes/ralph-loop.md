@@ -54,9 +54,9 @@ wrote, which carries no typed marker, so lane 2 finds no grant either. Which
 branch holds is an assumption, not a measured fact.
 
 The conclusion holds under both branches: expect the commit to be denied, and do
-not rely on it. Disk is the
-loop's only memory, so a loop run this way makes no durable progress, and the
-runtime stops on the denial rather than grinding out iterations nothing records.
+not rely on it. Disk is the loop's only memory, so a loop run this way makes no
+durable progress, and the runtime stops on the denial rather than grinding out
+iterations nothing records.
 Giving the iteration a lane of its own, and measuring the payload, is
 [#351](https://github.com/GeoffNordling/dev-playbook/issues/351); until it lands,
 treat this recipe as describing the loop's shape rather than a working commit

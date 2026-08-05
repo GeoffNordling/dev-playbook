@@ -709,11 +709,12 @@ def main() -> None:
     ``ls`` and ``make check`` everywhere at once over a command it was never
     going to rule on. So a fault denies only where the command reads as a push
     or a commit — ``command_text`` below, tested against the same two text
-    patterns the readable path falls back on. The one fault that cannot be
-    scoped that way is an event that arrived and would not parse: there is no
-    command to read, so it fails closed whole — ``event`` is still None there,
-    and nowhere else, because an event that parses to None is judged without
-    fault.
+    patterns the readable path falls back on. The faults that cannot be scoped
+    that way are the ones parsing never survives: stdin that arrived and will
+    not parse, and the rarer read that itself faults — undecodable bytes on
+    the pipe. Either way there is no command to read and ``event`` is still
+    None, so both fail closed whole: what arrives corrupted is denied, not
+    guessed at.
 
     Stdin that is empty or blank is not that fault. It carries no event at all,
     which is the shape a closed or truncated pipe takes, and nothing in it says

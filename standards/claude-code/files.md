@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Claude Code Files
-description: The registry of repo files the Claude Code harness consumes — each member's role and its content standard
+description: The registry of repo files the Claude Code harness consumes — each member's role and its content standard — plus the rule that no file in a governed repo carries a harness command marker
 ---
 
 # Claude Code Files

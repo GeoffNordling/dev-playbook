@@ -549,12 +549,25 @@ def test_an_event_that_will_not_parse_is_denied() -> None:
     assert output["permissionDecision"] == "deny"
 
 
+def test_stdin_that_will_not_decode_is_denied() -> None:
+    # Bytes arrived but cannot be read as text: the same corrupted-event class
+    # as JSON that will not parse, so the stdin-hardening rider denies whole.
+    result = subprocess.run(
+        [sys.executable, str(HOOK)],
+        input=b"\xff\xfe git commit",
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stderr
+    output = json.loads(result.stdout)["hookSpecificOutput"]
+    assert output["permissionDecision"] == "deny"
+
+
 @pytest.mark.parametrize("stdin", ["", "  \n"])
 def test_stdin_carrying_no_event_at_all_draws_no_opinion(stdin: str) -> None:
     # Empty stdin is the common shape of a broken pipe, and it names no command:
     # denying it would deny every Bash call in every session on the machine at
     # once — `ls` and `make check` included — over nothing this hook rules on.
-    # The event that arrives and will not parse is the one that denies whole.
+    # What arrives and will not parse — or decode — is what denies whole.
     assert hook(stdin) is None
 
 

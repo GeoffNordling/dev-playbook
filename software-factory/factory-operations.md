@@ -126,8 +126,8 @@ ends with a terminal report. Nothing carries over from the overwatch's context.
 A committing node is spawned as its factory agent type (`builder` for /build),
 which is what lane 1 of the commit rule family reads, per
 [Permissions](#permissions); its launch line carries no authorization. A helper
-a skill invokes itself (`/commit`,
-`/grill-with-docs`) is not a node and is never dispatched.
+a skill invokes itself (`/commit`, `/grill-with-docs`) is not a node and is
+never dispatched.
 
 **The terminal report contract.** A subagent's final message MUST begin at
 character one with exactly `DONE: <one-line outcome>` or
