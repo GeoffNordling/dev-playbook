@@ -48,16 +48,6 @@ SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
 SLUG_DROP = re.compile(r"[^\w\s\-]", re.UNICODE)
 SLUG_WHITESPACE = re.compile(r"\s")
 
-# The two directories the harness reads agent definitions from: a consumer repo
-# carries them under .claude/, dev-playbook authors them in the Stow source
-# tree. Anchored at the repo root rather than matched on the directory name,
-# because "agents" is an ordinary word for a directory of prose — a governed
-# repo's docs/agents/ is documentation, and must keep its OKF frontmatter and
-# the type-lint that reads it. Read across modules: repo-lint scopes its
-# agent-facing voice scan to these, so the directories called harness here and
-# the ones checked there cannot drift apart.
-AGENT_ROOTS = (".claude/agents", "dotfiles/dot-claude/agents")
-
 
 def github_slug(heading_text: str) -> str:
     """Compute the GitHub-style anchor slug for a heading.
@@ -145,12 +135,6 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
     return front, body
 
 
-def is_agent_definition(relpath: str) -> bool:
-    """Whether ``relpath`` is a file in the harness's subagent spawn registry."""
-    posix = PurePosixPath(relpath).as_posix()
-    return any(posix.startswith(f"{root}/") for root in AGENT_ROOTS)
-
-
 def classify(relpath: str) -> str:
     """Classify a repo-relative path within the OKF bundle taxonomy.
 
@@ -167,11 +151,10 @@ def classify(relpath: str) -> str:
       is subject to the type-lint.
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
-      ``references/``/``scripts/``, ``rules/``, the two ``AGENT_ROOTS`` (the
-      subagent spawn registry — each file an agent definition the harness reads
-      at session start), every top-level ``tests/`` tree (parser fixtures —
-      tool-consumed, often deliberately malformed; see the tests-tree boundary
-      in standards/docs/bundle.md), and every non-``.md`` file.
+      ``references/``/``scripts/``, ``rules/``, every top-level ``tests/`` tree
+      (parser fixtures — tool-consumed, often deliberately malformed; see the
+      tests-tree boundary in standards/docs/bundle.md), and every non-``.md``
+      file.
 
     The concept/harness split mirrors the bundle boundary in the docs
     standard and the Claude Code file registry
@@ -196,7 +179,7 @@ def classify(relpath: str) -> str:
         return "index"
     if name in {"CLAUDE.md", "SKILL.md"}:
         return "harness"
-    if "rules" in dirparts or is_agent_definition(relpath):
+    if "rules" in dirparts:
         return "harness"
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):
         return "harness"

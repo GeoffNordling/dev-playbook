@@ -9,7 +9,7 @@ argument-hint: "<issue-number>"
 
 # Open PR
 
-Ensure the issue's pull request exists, so the review steps that follow have something to comment on. The branch is `issue-<issue>`, pushed by the committing node that ran before this one. This skill only reads and creates the PR; it does not push. If the branch isn't on origin, that is the previous node's work missing, so escalate rather than pushing it here.
+Ensure the issue's pull request exists, so the review steps that follow have something to comment on. The branch is `issue-<issue>`; the user pushed it before the review launched. You create the PR — a tap-free `gh` call — but you never push.
 
 ## Do
 

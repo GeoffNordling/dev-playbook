@@ -11,9 +11,9 @@ argument-hint: "<issue-number>"
 
 You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node — nothing launches itself — and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
 
-One hard limit: you never merge — that is the user's, in the GitHub UI. You do push the issue branch yourself (§7), within the rules [git authority](~/workspace/dev-playbook/software-factory/git-authority.md) holds.
+Two hard limits: you never push, and you never merge. Both are the user's.
 
-**Your own commits ride the user's grant.** The commit rule family denies your session's commits unless the user has typed /commit-on (lane 2) — see [git-authority](~/workspace/dev-playbook/software-factory/git-authority.md). That covers the fixes you make yourself at the judgments node: ask for the grant when the hook refuses one, and never re-spell a refused command. You commit nothing else — the work under review is never yours to touch. A delegated node's commits are authorized by its own agent type (§3).
+**⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ — you hold the commit token for this session.** It covers the fixes you make yourself at the judgments node: commit them as you land them, without waiting for a "commit now". It covers nothing else — you never touch the work under review, and a delegated node's commits are authorized by its own launch line (§3).
 
 **The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-briefing-rule).
 
@@ -56,24 +56,24 @@ Every file-touching node sits in the issue's worktree — open it before the fir
 Run /<skill> <N>.
 ```
 
-**Committing nodes are typed.** /build is the one AFK node that writes and commits code: spawn it as a `builder`-typed subagent — lane 1 of the commit rule family authorizes its commits by that type, so the launch line stays bare:
+**The commit token rides the committing node.** /build is the one AFK node that writes and commits code, so its launch line alone carries the prefix:
 
 ```
-Run /build <N>.
+⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /build <N>.
 ```
 
-The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-review — are gh-only actions or read-only audits that never commit; they spawn as ordinary subagents with the bare launch line.
+The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-review — are gh-only actions or read-only audits that never commit, so they get the bare launch line.
 
 Parse the subagent's final message per the [terminal report contract](~/workspace/dev-playbook/software-factory/factory-operations.md#engagement):
 
-- **DONE** — move the label and continue, pushing the branch where §7 calls for it.
+- **DONE** — move the label and continue, or end the turn at a push boundary (§7).
 - **ESCALATE** — bubble it to the user per the [escalation rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#escalation), and stop.
 
 ## 4. The worktree
 
 You open it, once, before the issue's first file-touching node, per the worktree contract:
 
-1. Confirm the base is fresh: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — refresh it yourself with the pull in §7, on the condition stated there, then re-check before continuing.
+1. Confirm the base is fresh, tap-free: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — hand the user the pull (§7) and stop.
 2. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
@@ -89,21 +89,16 @@ The audit subagents post findings and terminate; the verdict interview is yours.
 
 On entering `phase:judgments`, read [judgments-node.md](references/judgments-node.md) and follow it.
 
-## 7. Pushes, and the merge boundary
+## 7. Turn boundaries — the user's commands
 
-The git commands the traverse needs are yours to run, each as its own top-level call:
+End your turn wherever the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). Where the ending carries one of the user's commands, state it once, paste-safe, one line:
 
 - **Intermediary push, after any committing node:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push --no-verify -u origin issue-<N>`
 - **Final push, when the judgments node committed fixes:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push origin issue-<N>`
-- **Pull, on a stale base:** `git -C ~/workspace/<repo> pull --ff-only origin main`
+- **Pull, on a stale base:** `git -C ~/workspace/<repo> pull`
+- **Merge, on the final approval** — in the GitHub UI; you can't.
 
-`--no-verify` on the intermediary push is deliberate: the judgments phase is the verification act, so intermediary pushes skip the pre-push gate by standing ruling.
-
-The pull moves `main` only from a checkout standing on `main`; run anywhere else it merges `origin/main` into whatever branch is out. So confirm `~/workspace/<repo>` is on `main` — `git -C ~/workspace/<repo> branch --show-current` — and escalate if it is parked elsewhere rather than pulling into that branch.
-
-If a push is denied, it is denied — do not re-spell it. Report what you tried and why it was refused, and let the user decide.
-
-The merge remains the user's, in the GitHub UI. End your turn there, and at any other point where the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). When the user returns, pick the traverse back up from the labels.
+When the user returns, pick the traverse back up from the labels.
 
 ## Report
 

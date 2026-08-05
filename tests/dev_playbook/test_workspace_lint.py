@@ -14,7 +14,6 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
-import pytest
 from conftest import init_repo
 
 from dev_playbook import gitrepo, workspace_lint
@@ -421,7 +420,7 @@ def test_unauthenticated_gh_stops_the_run(tmp_path: Path) -> None:
     # would mix fiction into real findings. Exit 2 says "could not run" instead.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
@@ -434,7 +433,7 @@ def test_unauthenticated_gh_stops_the_run(tmp_path: Path) -> None:
 def test_unauthenticated_gh_reports_ghs_own_reason(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
@@ -457,7 +456,7 @@ def test_pins_only_needs_no_auth(tmp_path: Path) -> None:
 def test_authenticated_gh_runs_normally(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="0")
@@ -470,7 +469,7 @@ def test_authenticated_gh_runs_normally(tmp_path: Path) -> None:
 def test_conforming_settings_pass(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
@@ -497,7 +496,7 @@ def test_drifted_setting_is_a_finding(tmp_path: Path) -> None:
 def test_unreachable_repo_is_a_finding(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/unknown.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/unknown.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
@@ -516,7 +515,7 @@ def test_response_without_merge_fields_is_unreachable_not_six_drifts(
     # unreadable, and reporting six confident drifts per repo is a wrong answer.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": {"settings": {}}})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
@@ -531,7 +530,7 @@ def test_partial_response_is_unreachable_not_partial_drift(tmp_path: Path) -> No
     # a repo whose remaining settings are all None.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     partial = {"settings": {"squashMergeAllowed": True, "mergeCommitAllowed": False}}
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": partial})
@@ -546,7 +545,7 @@ def test_null_repository_is_unreachable(tmp_path: Path) -> None:
     # GraphQL answers 200 with a null repository when the token cannot see it.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": {"settings": None}})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
@@ -565,39 +564,13 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     )
 
 
-# HTTPS is the only origin form the workspace runs: git reaches GitHub with the
-# keyring PAT through the credential helper, and an SSH-form origin would want a
-# key nothing here holds. So a non-HTTPS origin is its own finding — the repo has
-# an origin, it is simply in a form the workspace no longer operates.
-@pytest.mark.parametrize(
-    "origin",
-    [
-        "ssh://git@github.com/me/alpha.git",
-        "git://github.com/me/alpha.git",
-        "http://github.com/me/alpha.git",
-    ],
-)
-def test_non_https_origin_is_its_own_finding(tmp_path: Path, origin: str) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(ws, "alpha", {"README.md": "# A\n"}, origin=origin)
-    gh_dir, gh_data = make_fake_gh(tmp_path, {})
-
-    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
-
-    assert result.returncode == 1
-    assert f"alpha: tracking.remote origin not in canonical HTTPS form ({origin})" in (
-        result.stdout
-    )
-    assert "no GitHub origin" not in result.stdout
-
-
 # --- branch protection ---
 
 
 def test_protected_default_branch_passes(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -616,7 +589,7 @@ def test_protected_default_branch_passes(tmp_path: Path) -> None:
 def test_unprotected_default_branch_is_two_findings(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path, {"me/alpha": {"settings": GOOD_SETTINGS, "protection": protection()}}
@@ -638,7 +611,7 @@ def test_each_missing_rule_is_reported_alone(tmp_path: Path) -> None:
     # reported, or a repo cannot tell which half it still owes.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -657,7 +630,7 @@ def test_each_missing_rule_is_reported_alone(tmp_path: Path) -> None:
 def test_unrelated_rules_do_not_satisfy_the_requirement(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -678,7 +651,7 @@ def test_extra_rules_alongside_the_required_two_are_fine(tmp_path: Path) -> None
     # The requirement is a floor, not an exact set — a repo may protect more.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -700,7 +673,7 @@ def test_finding_names_the_actual_default_branch(tmp_path: Path) -> None:
     # is told about the branch it actually has.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -720,7 +693,7 @@ def test_unreadable_rules_are_surfaced_not_read_as_unprotected(tmp_path: Path) -
     # audit cannot tell whether the branch is protected, and says so.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -765,7 +738,7 @@ def full_mode_repo(
         ws,
         "alpha",
         {"README.md": "# A\n", ".pre-commit-config.yaml": pin_config(main_sha())},
-        origin="https://github.com/me/alpha.git",
+        origin="git@github.com:me/alpha.git",
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -863,7 +836,7 @@ def test_label_containing_blocked_substring_is_not_a_blocked_finding(
 def test_labels_fetch_failure_is_surfaced(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -878,7 +851,7 @@ def test_labels_fetch_failure_is_surfaced(tmp_path: Path) -> None:
 def test_issues_fetch_failure_is_surfaced(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -904,10 +877,10 @@ def test_bad_json_response_reports_repo_unreachable_and_run_survives(
     # audited (alpha sorts first, so beta's finding proves the loop continued).
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     make_workspace_repo(
-        ws, "beta", {"README.md": "# B\n"}, origin="https://github.com/me/beta.git"
+        ws, "beta", {"README.md": "# B\n"}, origin="git@github.com:me/beta.git"
     )
     drifted = dict(GOOD_SETTINGS, mergeCommitAllowed=True)
     gh_dir, gh_data = make_fake_gh(
@@ -928,7 +901,7 @@ def test_wrong_shape_response_is_surfaced_not_crash(tmp_path: Path) -> None:
     # traceback that blinds the audit to the rest of the repo.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {"README.md": "# A\n"}, origin="https://github.com/me/alpha.git"
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -1260,13 +1233,13 @@ def _add_origin(repo: Path, url: str) -> None:
     )
 
 
-def test_ambient_git_dir_does_not_redirect_the_origin_lookup(
+def test_ambient_git_dir_does_not_redirect_origin_slug(
     tmp_path: Path, ambient_git_dir: Callable[[str], Path]
 ) -> None:
     target = tmp_path / "target"
     init_repo(target)
-    _add_origin(target, "https://github.com/target/target.git")
+    _add_origin(target, "git@github.com:target/target.git")
     decoy = ambient_git_dir("leaked.txt")
-    _add_origin(decoy, "https://github.com/decoy/decoy.git")
+    _add_origin(decoy, "git@github.com:decoy/decoy.git")
 
-    assert workspace_lint.origin_of(target).slug == "target/target"
+    assert workspace_lint.origin_slug(target) == "target/target"

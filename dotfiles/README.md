@@ -18,11 +18,7 @@ One machine runs one configuration, and the machines differ — see [machines.md
 dot-claude/          -> ~/.claude/
   skills/      Claude Code skills (software factory nodes, commit, tool wrappers, etc.)
   rules/       Global rules applied to every conversation
-  agents/      Agent definitions — the subagent spawn registry, read at session start
   hooks/       Claude Code hook scripts
-  workflows/   Workflow tool programs (the ralph loop, the judgments fan-out)
-  statusline.sh
-               The status line Claude Code renders
 .agents/             -> ~/.agents/
   skills/      Externally managed skills, mirrored into dot-claude/skills/
 .bashrc.d/           -> ~/.bashrc.d/

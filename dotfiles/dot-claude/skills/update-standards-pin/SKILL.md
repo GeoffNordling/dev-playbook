@@ -28,9 +28,8 @@ git rev-parse main
 gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
 ```
 
-Unequal means the release is unpushed. A push to `main` is denied outright —
-main moves by merging a pull request, never by pushing at it — so stop here and
-tell the user the release still has to land on main.
+Unequal means the release is unpushed: hand the user the push and stop, since
+`git push` needs their YubiKey.
 
 ## 2. Run it
 
@@ -76,16 +75,15 @@ A requirement retired upstream is still enforced by the check that ships
 the repo goes red against its own old pin. So: bump, verify green, then trim,
 then commit both together.
 
-## 6. Commit, then push
+## 6. Commit, then hand back the pushes
 
 One commit per consumer carrying the pin move and any adaptation together —
 they are one act, and the commit gate runs at the new pin, so a green commit is
 a second verification.
 
-Then push each consumer's branch yourself, one repo per top-level command:
-`git -C ~/workspace/<repo> push -u origin <branch>`. They are independent
-repos, so run them separately and report any that fail rather than stopping the
-sweep on the first one.
+Pushes need the user's YubiKey. Hand back one short line per repo and say to
+run them separately, in order: they are independent repos, and each must get
+its own attempt.
 
 ## 7. Collect the garbage
 

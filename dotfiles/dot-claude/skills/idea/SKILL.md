@@ -37,10 +37,10 @@ the target instead — the same discipline /log-friction uses:
   both hold unrelated work awaiting the owner's diff review.
 - **Touch nothing in the current repo.**
 - Follow the mission-control skill's own `CLAUDE_CODE_REMOTE`
-  path-selection — in practice always the desktop path here: a
-  commit on mission-control's branch, then the push below.
-- Push it, naming the remote and the branch, as one line:
+  path-selection — in practice always the desktop path here: a local
+  commit on mission-control's branch, no push.
+- Hand the owner the push, as one line:
 
   ```
-  git -C ~/workspace/mission-control push -u origin <branch>
+  git -C ~/workspace/mission-control push
   ```
