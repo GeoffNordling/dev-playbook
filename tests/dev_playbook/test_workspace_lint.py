@@ -917,7 +917,8 @@ def test_wrong_shape_response_is_surfaced_not_crash(tmp_path: Path) -> None:
 # --- issue rules: tuple validity, brief shape, epic shape (full mode) ---
 
 BUILD_BODY = (
-    "**Summary:** s\n\n**Current behavior:** c\n\n**Desired behavior:** d\n\n"
+    "**Summary:** s\n\n**User intent:** i\n\n"
+    "**Current behavior:** c\n\n**Desired behavior:** d\n\n"
     "**Key interfaces:** none\n\n**Acceptance criteria:** a\n\n**Out of scope:** o\n"
 )
 SPIKE_BODY = "**Summary:** s\n\n**Question:** q\n\n**Deliverable:** d\n"
@@ -1191,6 +1192,16 @@ def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     assert "Out of scope" in result.stdout
 
 
+def test_build_leaf_missing_user_intent_is_a_finding(tmp_path: Path) -> None:
+    # User intent is a required build-leaf heading, not an optional one: a brief
+    # that never says why the work exists leaves the builder with no way to
+    # choose among permitted fixes.
+    body = BUILD_BODY.replace("**User intent:** i\n\n", "")
+    result = run_with_issue(tmp_path, issue(32, VALID_DIRECT, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "User intent" in result.stdout
+
+
 def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:no", "phase:spike"]
     body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
@@ -1203,10 +1214,36 @@ def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
     # `**Summary**:` (colon after the close markers) reads as a present heading
     # to a human; it must not draw a false brief-shape finding.
     body = (
-        "**Summary**: s\n\n**Current behavior**: c\n\n**Desired behavior**: d\n\n"
+        "**Summary**: s\n\n**User intent**: i\n\n"
+        "**Current behavior**: c\n\n**Desired behavior**: d\n\n"
         "**Key interfaces**: none\n\n**Acceptance criteria**: a\n\n**Out of scope**: o\n"
     )
     result = run_with_issue(tmp_path, issue(31, VALID_DIRECT, body=body))
+    assert "tracking.issue-brief-shape" not in result.stdout
+
+
+def test_heading_only_inside_a_code_fence_is_a_finding(tmp_path: Path) -> None:
+    # A brief quoting a template in a code fence is showing the heading, not
+    # carrying it. A fenced occurrence must not forge a heading the brief lacks.
+    body = BUILD_BODY.replace(
+        "**Out of scope:** o\n",
+        "```markdown\n**Out of scope:** the template's line\n```\n",
+    )
+    result = run_with_issue(tmp_path, issue(33, VALID_DIRECT, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "Out of scope" in result.stdout
+
+
+def test_headings_beside_a_quoted_template_pass(tmp_path: Path) -> None:
+    # The other direction: a brief carrying every heading for real, plus an
+    # Artifacts fence quoting a brief template, is well-shaped — fence awareness
+    # must not swallow the real headings around the fence.
+    body = (
+        BUILD_BODY
+        + "\n## Artifacts\n\n````markdown\n**Summary:** one-line description\n\n"
+        "**User intent:**\nWhy this issue exists.\n```\nnested fence\n```\n````\n"
+    )
+    result = run_with_issue(tmp_path, issue(34, VALID_DIRECT, body=body))
     assert "tracking.issue-brief-shape" not in result.stdout
 
 

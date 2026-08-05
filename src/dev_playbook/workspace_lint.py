@@ -93,13 +93,14 @@ RULES = (
 
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issue-authoring.md states them — the doc and this rule
-# read one contract and cannot disagree. A build leaf carries all six; a spike
-# leaf carries the spike shape. A retained ``mode:sdd`` leaf is checked against the
-# build shape it was authored under, per software-factory.md's retained-value
-# rule: the factory no longer routes such an issue, but a live one must not
-# become a finding by standing still.
+# read one contract and cannot disagree. A build leaf carries all seven; a
+# spike leaf carries the spike shape. A retained ``mode:sdd`` leaf is checked
+# against the build-leaf headings as the standard defines them today, per
+# software-factory.md's retained-value rule: the factory no longer routes such
+# an issue, and a live one may accrue new findings as the brief standard grows.
 BUILD_HEADINGS = (
     "Summary",
+    "User intent",
     "Current behavior",
     "Desired behavior",
     "Key interfaces",
@@ -107,6 +108,13 @@ BUILD_HEADINGS = (
     "Out of scope",
 )
 SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
+
+# A markdown code fence: three or more backticks or tildes, indented no more
+# than three spaces. A closing fence carries no info string, which is what lets
+# a four-backtick artifact fence wrap three-backtick content without ending
+# early.
+FENCE_LINE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+FENCE_CLOSE = re.compile(r"^ {0,3}(?:`{3,}|~{3,})\s*$")
 
 # The body sections of a wayfinder map and of a decision ticket, stated here
 # exactly as the ``/wayfinder`` skill states them (``§ The map body`` and
@@ -627,14 +635,46 @@ def _post_intake(labels: set[str]) -> bool:
     )
 
 
+def _outside_fences(body: str) -> str:
+    """The body with every fenced code block dropped.
+
+    A brief quotes templates inside code fences — the brief template itself, an
+    approved artifact under ``## Artifacts`` — and a quoted heading is being
+    *shown*, not carried. Fences nest by length (a four-backtick fence wraps
+    three-backtick content), so a block closes only on a fence of the same
+    character, at least as long as the one that opened it, and carrying no info
+    string. An unclosed fence swallows the rest of the body, as CommonMark has
+    it.
+    """
+    kept: list[str] = []
+    marker: str | None = None
+    for line in body.splitlines():
+        opening = FENCE_LINE.match(line)
+        if marker is None:
+            if opening:
+                marker = opening.group(1)
+            else:
+                kept.append(line)
+        elif (
+            opening
+            and FENCE_CLOSE.match(line)
+            and opening.group(1)[0] == marker[0]
+            and len(opening.group(1)) >= len(marker)
+        ):
+            marker = None
+    return "\n".join(kept)
+
+
 def _has_heading(body: str, heading: str) -> bool:
-    """Whether the body carries the bold heading.
+    """Whether the body carries the bold heading, in prose rather than in a fence.
 
     The colon may sit inside or outside the markers — both ``**Heading:**`` and
-    ``**Heading**:`` read as present.
+    ``**Heading**:`` read as present. Fenced code is excluded, so a heading
+    inside a fence neither satisfies a required heading nor forges one the brief
+    lacks.
     """
     pattern = rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:"
-    return re.search(pattern, body, re.IGNORECASE) is not None
+    return re.search(pattern, _outside_fences(body), re.IGNORECASE) is not None
 
 
 def _has_section(body: str, section: str) -> bool:
