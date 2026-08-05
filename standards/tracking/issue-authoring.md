@@ -102,11 +102,26 @@ relationships; see [Relationships](#relationships).
 
 ### The build-leaf brief (`mode:direct`)
 
-A build leaf carries **all six** headings — none optional. `Key interfaces`
+A build leaf carries **all seven** headings — none optional. `Key interfaces`
 states "none" when there are none, rather than being omitted.
+
+`User intent` answers why this issue exists and which way to lean when goods
+collide — the priority ordering, and which error direction is cheap. Its
+decisions come from above — the epic, or the design work behind it — already
+made and not re-asked: writing this section is distillation, not a new
+interview. But the *text* is written fresh for each leaf, because slices of
+one epic need different orderings; copy-pasting one epic-level block into
+every child is the defect this rule bans. The implementing agent consults it
+for micro-decisions and for choosing among permitted fixes; it is never
+grounds for whether a deviation is permitted. Build-leaf briefs only — spike
+briefs and epic bodies never carry it.
 
 ```markdown
 **Summary:** one-line description
+
+**User intent:**
+Why this issue exists — the goal the acceptance criteria are a proxy for —
+and what wins when goods collide. Free prose, five lines at most.
 
 **Current behavior:**
 What happens now (or status quo for an enhancement).
@@ -129,7 +144,26 @@ What should happen after the work is complete. Be specific about edge cases and 
 ```
 
 A brief reporting broken behavior may add a `Steps to reproduce` heading; it is
-optional, unenforced, and changes none of the six.
+optional, unenforced, and changes none of the required headings.
+
+#### Optional sections of a build-leaf brief
+
+##### The Artifacts section
+
+A brief whose deliverables include prose files or substantial new prose
+sections — a skill, a standard's section — carries them verbatim in an
+optional `## Artifacts` section: one `### <destination path>` subsection per
+file, the approved content in a code fence. Content that itself contains
+triple-backtick fences uses a four-backtick outer fence. The acceptance
+criteria cite the section ("install the artifacts at their stated paths").
+The approved words are not the builder's to edit — but everything about
+fitting them in is: placement, heading levels, stitching into surrounding
+text are ordinary build judgment under the brief's intent, and a placement
+note is guidance, not a script. Trouble with the words themselves is a
+deviation. Approval of the text is part of the issue-review verdict. If
+artifacts push the body toward GitHub's size limit, they overflow to issue
+comments — stated loudly in the section, never silently. Mechanical edits
+need no artifact.
 
 ### The spike brief (`mode:spike`)
 
@@ -201,13 +235,39 @@ Decision Record bar gets a record under `docs/decisions/`
 - **Behavioural, not procedural.** Describe what the system should do, not how to implement it. The agent will explore and decide.
 - **Testable acceptance criteria.** Each criterion is independently verifiable.
 - **Explicit out-of-scope.** Prevents gold-plating.
+- **One goal.** A brief serves one master. Test any doubtful part with two
+  questions: would the outcome still stand if this part slipped
+  indefinitely, and could it ship later as its own issue without reopening
+  this one? Both yes — it must be deferred: mint a real tracker stub (never
+  a Candidate) and name it in `Out of scope`. This binds at leaf and at epic
+  altitude, applied when slicing and backstopped at issue review.
+- **Written for the human reader.** The human sees only the issue — never
+  the author's context. Any reference to existing file content, especially
+  an artifact placement note, quotes the text it amends verbatim,
+  before/after style. A brief the human cannot follow unaided is defective
+  even when the implementer could follow it.
 
-**The prototype snippet is the exception.** A brief may carry a verbatim snippet
-a prototype session produced — the answer it was built to yield, written to lift
-into real code unchanged. The snippet is the durable artifact, not a fragile
-detail: it is what survived the prototype. And it states a settled shape, not
-steps. The test is provenance — a snippet a prototype answered for, not an
-implementation the brief guessed at.
+**Prototype claims.** A brief may cite a prototype as proof, and may carry a
+verbatim snippet a prototype produced. "Proven" means the prototype executed
+that specific thing against the real substrate — real transport, real hook,
+real filesystem — with the run's observed output in the committed record.
+Everything the prototype faked is a declared stub, and a stubbed thing can
+never be cited as proven: honesty about fidelity is required, fidelity is
+not. Prototypes commit to a `prototype/<issue>` branch carrying the code, the
+stub list, and the run outputs; the brief cites branch + path, and a
+prototype claim with no citable committed artifact is demoted to assumed. The
+branch survives until everything citing it has merged.
+
+### Claim provenance
+
+Every empirical claim a brief makes about existing reality carries one of two
+grades: measured — the probe was run, and its observed output is cited — or
+assumed. Evidence lives in a probe-record comment on the issue (the probe
+command and its observed output); a one-line output may sit inline instead. A
+measured claim without checkable evidence is demoted to assumed at issue
+review. Grades are authored where the claim is authored; the authoring
+session surfaces the claims it believes load-bearing and the human picks
+which to probe.
 
 ## Vertical-slice rules
 

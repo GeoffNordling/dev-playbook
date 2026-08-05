@@ -188,11 +188,11 @@ This is a temporary simplification; SDD returns later, so its **label values are
 retained**: `mode:sdd` and the four `phase:sdd-*` values stay in the
 [label scheme](/src/dev_playbook/label_scheme.json) and
 [bootstrap-labels](/scripts/bootstrap-labels) still mints them. Retained values
-keep the shape they were authored under — a residual `mode:sdd` leaf still pairs
-with `tests:yes` and still carries the six build-leaf headings — so the
-[four-tuple audit](/scripts/workspace-lint) reads it exactly as it did before the
-strip, and a live issue does not become a finding by standing still. No node
-answers to any of them.
+follow the current build shape — a residual `mode:sdd` leaf still pairs with
+`tests:yes` and is checked against the build-leaf headings as the standard
+defines them today, so it may accrue new findings when the brief standard
+grows; none are live to be affected (measured, 2026-08-05). No node answers to
+any of them.
 
 An overwatch that finds `mode:sdd` — or a residual `phase:sdd-*` — **halts
 immediately and reports**: no dispatch, no routing, no improvised re-triage onto
