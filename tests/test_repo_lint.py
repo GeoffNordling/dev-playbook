@@ -477,6 +477,42 @@ def test_a_file_the_marker_check_cannot_decode_is_still_read(tmp_path: Path) -> 
     assert "fixtures/turn.json: claude-code.command-marker" in result.stdout
 
 
+# The cap the check reads to, pinned here as repo-lint spells it: the seam is a
+# subprocess, so the number cannot be imported. The largest authored file in
+# this workspace is ~48 KB and the smallest generated asset ~280 KB, so the cap
+# clears authored content — the only content the rule can ask anyone to fix.
+MARKER_SCAN_LIMIT = 128 * 1024
+
+
+def test_a_binary_file_is_not_read_for_the_marker(tmp_path: Path) -> None:
+    # A NUL in the first block is what says "binary": the marker pattern cannot
+    # match a byte sequence the harness would never load as a turn, so decoding
+    # megabytes of committed image and archive data buys the rule nothing.
+    files = base_files()
+    files["assets/logo.bin"] = "placeholder\n"
+    repo = make_repo(tmp_path, files)
+    (repo / "assets" / "logo.bin").write_bytes(b"\x89PNG\x00\x1a\n" + MARKER.encode())
+    subprocess.run(
+        ["git", "-C", str(repo), "add", "-A"], check=True, capture_output=True
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_a_marker_past_the_scan_cap_is_not_read(tmp_path: Path) -> None:
+    # The cap is a stated limit, not an oversight: past it lie generated assets
+    # nobody authors, and the vector the rule guards — a skill body loaded as a
+    # user turn — is markdown orders of magnitude smaller than this.
+    files = base_files()
+    files["readings/generated.json"] = "x" * MARKER_SCAN_LIMIT + MARKER + "\n"
+
+    result = run(make_repo(tmp_path, files))
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_a_vendored_file_carrying_the_command_marker_is_not_inspected(
     tmp_path: Path,
 ) -> None:

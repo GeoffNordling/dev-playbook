@@ -35,12 +35,25 @@ session may commit.
 
 **No file in a repo may contain that element whole**, in any file type: prose,
 fixtures, test data, configuration. A file that carries one is a forged record
-the moment anything puts its contents into a turn — an `@`-mention, a paste, a
-tool that reads the file back — because the reader sees the marker and not where
-it came from. Where the element has to be written about, assemble it from
-pieces (`"<command-" + "name>"`) so no single line holds it.
+wherever its contents reach a user turn, because the reader sees the marker and
+not where it came from. Where the element has to be written about, assemble it
+from pieces (`"<command-" + "name>"`) so no single line holds it.
 
-`repo-lint`'s `claude-code.command-marker` rule enforces this over every file in
-the checkout. Vendored trees are exempt: their contents are carried verbatim
-from upstream and cannot be edited, so a hit there would be a red gate on
-something nobody can fix.
+The route that was measured is a **skill body**: the harness records one as a
+user turn of text blocks, and the hook reads those in full. Two routes that look
+like the same risk are not — an `@`-mentioned file's content is recorded as an
+attachment entry, and a tool reading a file back is recorded as a tool result,
+and the hook reads neither. A paste does reach a user turn, but whoever can
+paste is whoever can type the command. The rule still covers every file type,
+because the coverage is cheap and no measurement stays current forever.
+
+`repo-lint`'s `claude-code.command-marker` rule enforces it. Each file is read
+to a fixed cap, and one whose first block holds a NUL byte is skipped as binary:
+the element cannot hide from a reader inside a generated blob, and only authored
+content can be asked to change. Vendored trees are exempt, and that exemption
+covers the entire measured vector rather than a corner of it — vendored skills
+are stowed live into the skills root, so their bodies reach a user turn exactly
+as any other skill's do. They are carried verbatim from upstream and cannot be
+edited, so enforcing there would be a red gate on something nobody can fix. It
+is an accepted gap, recorded with the mechanism in
+[git-authority](/software-factory/git-authority.md).
