@@ -34,11 +34,13 @@ an unlabeled one — it refuses outright and names the skill the human should ru
 instead. Definition is human-led by construction; an overwatch that improvised
 its way through intake would be extracting intent with nobody to extract it from.
 
-**Single label writer.** One writing session per issue — the session sequencing
-it. A subagent never writes a label; a skill run inline in the sequencing session
-writes as that session. Every label move is the overwatch's, made as a node
-finishes, so no subagent can advance the board out from under the session
-sequencing it.
+**Single label writer.** One writer per issue at any moment: the session
+sequencing it — or, while a traverse-workflow run is live, that run's clerk,
+acting on the script's instruction. An ordinary subagent never writes a
+label; a skill run inline in the sequencing session writes as that session.
+The sequencing session makes no label move while a run is live, and the
+clerk makes none outside one, so the board never advances out from under
+whoever is sequencing it.
 
 **Readiness at the crossing.** Two things gate a launch. The issue's phase must
 sit in the factory region, per the refusal above; and the issue must meet the
@@ -64,10 +66,11 @@ PreToolUse hook permits it through exactly two mutually exclusive lanes, per
 commits through lane 1 — its `agent_type` is on the hook's allowlist
 (`builder`, `judgment-facilitator`), read from the payload the harness
 writes, which no prompt or brief can forge. A human's interactive session
-commits through lane 2 — a typed `/commit-on` marker in its transcript. The
-overwatch's own fixes at [the judgments node](#the-judgments-node) are
-exactly that: lane-2 commits under the grant the human types, made with the
-human present. The lanes never mix: a subagent is judged by its type alone,
+commits through lane 2 — a typed `/commit-on` marker in its transcript.
+Every factory commit is a node's own: the traverse workflow's builder and
+judgment-facilitator nodes commit through lane 1, and the sequencing
+session commits nothing. Lane 2 remains the human's own interactive lane,
+outside the factory. The lanes never mix: a subagent is judged by its type alone,
 whatever its transcript holds. That exclusivity is what stops a node minting
 its own grant — a subagent's transcript opens with the launch prompt its parent
 model wrote, which lane 2 would otherwise read as a grant a human typed.
@@ -110,9 +113,9 @@ The factory's nodes, what runs each, and how each engages the human:
 
 | Node | Skill | Engagement |
 |---|---|---|
-| `build` | `/build` | AFK, as a `builder`-typed subagent (lane 1 of the commit rule family). |
+| `build` | `/build` | AFK, inside the traverse workflow — a `builder`-typed node (lane 1 of the commit rule family). |
 | `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict)). |
-| `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
+| `judgments` | none — the traverse workflow's judgment-facilitator rounds | AFK, entered only by the human's approve verdict; an ambiguous fix escalates ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the human and never dispatched,
@@ -123,9 +126,10 @@ line `run /<skill> <N>` and nothing more — nodes stay skills. The subagent get
 fresh context window and inherits the issue's worktree as cwd; it reloads what it
 needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
 ends with a terminal report. Nothing carries over from the overwatch's context.
-A committing node is spawned as its factory agent type (`builder` for /build),
-which is what lane 1 of the commit rule family reads, per
-[Permissions](#permissions); its launch line carries no authorization. A helper
+The committing nodes are the traverse workflow's own — spawned by the
+script as their factory agent types, with data-only briefs; no committing
+node is delegated from the sequencing session, and no launch line carries
+authorization of any kind. A helper
 a skill invokes itself (`/commit`, `/grill-with-docs`) is not a node and is
 never dispatched.
 
@@ -138,30 +142,30 @@ overwatch does with an escalation is
 
 ## Worktrees and branches
 
-An issue runs under one issue overwatch that builds a continuous line of work
-across its nodes. Isolation — from other issues and from the main checkout —
-comes from giving each issue its own **git worktree**, opened once and kept for
-the issue's life.
+Isolation — from other issues and from the main checkout — comes from git
+worktrees, of two kinds. The machine phases run in the traverse workflow's
+**throwaway fenced worktrees**, one per node, reaped when the run ends; the
+`issue-<N>` branch on origin — the carrier — is what persists between them
+([traverse.md](/software-factory/traverse.md)). The sequencing session opens
+one **persistent review worktree** at the review stop, where the audits need
+a checkout.
 
-- **One worktree, one branch, one PR per issue,** at
-  `<repo>/.claude/worktrees/issue-<N>` on branch `issue-<N>` (`N` is the issue
-  number).
-- **Opened once, then persisted.** cwd and worktree survive a `/clear`, so an
-  overwatch re-invoked after one inherits them with no re-entry.
+- **One branch, one PR per issue:** branch `issue-<N>` on origin carries the
+  work; the review worktree lives at `<repo>/.claude/worktrees/issue-<N>`.
+- **Opened at the review stop, then persisted.** cwd and worktree survive a
+  `/clear`, so a sequencing session re-invoked after one inherits them.
 
 ### The worktree contract
 
 Every file-touching node sits in the issue's worktree:
 
-- **Open (first file-touching node).** The issue overwatch opens it, gated on a
-  tap-free check that the local `origin/main` ref matches origin
-  (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base
-  escalates, since pulling is the human's. Open with
-  `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because
-  `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is
-  `origin/main` whatever branch the main checkout sits on. Then rename the branch
-  to the bare `issue-<N>`: Agent view's cleanup keys on the `worktree-` prefix, so
-  dropping it lets the worktree outlive a torn-down session.
+- **Open (the review stop).** The sequencing session opens it —
+  `EnterWorktree(name=issue-<N>)`, rename to the bare `issue-<N>` — then
+  syncs it to the carrier with `git pull --ff-only origin issue-<N>`, which
+  refuses rather than discards on divergence. The same `--ff-only` pull
+  re-syncs it each later review cycle. (`worktree.baseRef` pinned to `fresh`
+  makes `EnterWorktree` branch from `origin/main`; the pull then
+  fast-forwards to the published carrier tip.)
 - **Inherit (everything after).** AFK subagents inherit the worktree as their
   cwd; the overwatch keeps it across `/clear`. Every later node confirms the
   worktree is present — escalating if it's gone, since the issue's work would be
@@ -172,12 +176,13 @@ Every file-touching node sits in the issue's worktree:
   `git branch -D issue-<N>` — only after the human confirms the merge happened. A
   spike's worktree goes the same way when its issue closes.
 
-**The branch is pushed by the human.** A committing node commits and stops; the
-push needs a hardware tap the agent cannot give, so it is a checkpoint — see
-[the capability boundary](/software-factory/human-checkpoints.md#the-agent-capability-boundary).
-Two consequences shape everything downstream: a node can never open the PR
-itself, because the branch isn't on origin when the node ends; and every
-intermediary push rides `--no-verify`, deferring the semantic gate to
+**The branch is pushed by its nodes.** A committing node publishes the
+carrier itself — `git push origin HEAD:issue-<N>`, within
+[git-authority](/software-factory/git-authority.md)'s push rules — so origin
+holds the work the moment a node ends, and the PR opens at the review stop
+against a branch already published. Every intermediary push rides
+`--no-verify` by standing ruling: the judgments phase is the verification
+act, and the semantic bill settles there, once — see
 [the judgments node](#the-judgments-node).
 
 ## The node-skill contract
@@ -239,11 +244,11 @@ never left as a placeholder.
 ### The two owners
 
 The message is written twice from that one recipe, so the two cannot diverge:
-`/open-pr` authors it when it creates the PR, and the overwatch regenerates it
-from the final diff at the approve verdict (a tap-free `gh pr edit`), after
-[the judgments node](#the-judgments-node) has landed its fixes. Nothing
-refreshes it in between — a message rewritten mid-traverse is authored against a
-diff still moving.
+`/open-pr` authors it when it creates the PR, and the sequencing session
+regenerates it from the final diff (a tap-free `gh pr edit`) after the
+judgments phase returns green — the last act before the human's final read.
+Nothing refreshes it in between — a message rewritten mid-traverse is authored
+against a diff still moving.
 
 ## The review stop
 
@@ -262,6 +267,7 @@ three pauses, briefed per
 [pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict). A
 **reject** returns the issue to `build`, with the deciding reason recorded where
 the findings live so the rework carries it. An **approve** advances it to
+`phase:judgments`, where the traverse workflow settles the semantic gate — see
 [the judgments node](#the-judgments-node).
 
 ### Track rules
@@ -293,21 +299,23 @@ comes due here, once, after review approves and before the human's final read.
 The node is preparation for that read: it exists so the human meets a PR whose
 judgments are already green.
 
-**The overwatch runs it inline, at its own main loop.** The node cannot be
-delegated — `/run-judgments` dispatches its judges through the `Workflow` tool,
-which a subagent does not have — so there is no wrapper skill and no subagent:
-the overwatch invokes `/run-judgments` itself, in the issue's worktree.
+**The traverse workflow runs it,** entered only by the human's approve
+verdict: a script loop of at most 3 judged rounds, each one
+judgment-facilitator node that records the prior round's passes, applies
+focused fixes for its refuted verdicts, republishes the carrier, and
+returns the fresh plan — a zero-job plan is green. Fixes commit through
+lane 1; the sequencing session commits nothing. The full mechanics are
+[traverse.md](/software-factory/traverse.md).
 
-- **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
-  and on the issue branch, and committed through lane 2 of the commit rule
-  family — the human's typed `/commit-on` (see [Permissions](#permissions)).
-  The grant stands for the session, so no per-fix go-ahead; a denial is the
-  hook asking for the human's word, never a thing to work around.
-- **An ambiguous failure escalates.** Where a fix is unclear enough to want human
-  advice, the node stops and asks
+- **An ambiguous verdict escalates.** A refuted judgment that may be wrong
+  about the code, or right about code that should change, ends the run as
+  an escalation
   ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional));
   a clean green run stops for nothing.
-- **No back edge.** Judgment fixes never reopen review — no new cycle, no fresh
-  audit; the human has already approved the substance. A gate that stays red
-  parks the issue at the node rather than routing it anywhere. The node closes
-  only green.
+- **A red cap escalates.** Still red after the final round, the run
+  escalates with the refuted verdicts; judgments are never softened to
+  pass, and nothing routes the issue anywhere while red.
+- **No back edge.** Judgment fixes never reopen review — no new cycle, no
+  fresh audit; the human has already approved the substance. The phase
+  closes only green, and the sequencing session's close-out (merge-message
+  refresh, the final read) follows.

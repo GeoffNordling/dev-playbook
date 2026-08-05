@@ -11,6 +11,7 @@ Ordering: reading order.
 - [Factory Operations](/software-factory/factory-operations.md) — The factory's operating contract — how a ready issue is dispatched, built, reviewed, and carried to the merge
 - [Human Checkpoints](/software-factory/human-checkpoints.md) — Every point where the factory stops for the human — the capability boundary, escalation, and the three review-stretch pauses
 - [Git Authority](/software-factory/git-authority.md) — The layers deciding which git operations an agent may run, the push and commit rule families, and the canonical command set
+- [Traverse](/software-factory/traverse.md) — The traverse workflow — the arcs it runs over an issue's machine phases, the node topology and carrier, the judgments loop, and its escalate and error contracts
 - [Node-Skill Authoring](/software-factory/node-skill-authoring.md) — Voice, content rules, and mechanics for authoring the software factory's node skills
 - [PR Feedback](/software-factory/pr-feedback.md) — The comment surfaces a pull request carries, and how a committing node re-enters on a rework lap
 - [Refactor Catalogue](/software-factory/refactor-catalogue.md) — The refactor candidates a build node looks for at slice and chunk scope, and the step-size rule governing them

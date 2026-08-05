@@ -106,6 +106,19 @@ _Avoid_: backlog item, todo, roadmap item.
 **Promotion**
 The step that turns a **Candidate** into committed work: an issue is authored from the entry, and the entry is deleted in the same change. Deciding to write the brief is the act of committing — a Candidate may already be specifiable and stay a Candidate until that decision is made.
 
+### Factory
+
+Who executes an issue's passage through the factory region. The machinery is
+[traverse.md](/software-factory/traverse.md); this fixes the words.
+
+**Traverse**
+One issue's passage through the factory region — build, review, judgments —
+from readiness to merge. Its machine phases (build, judgments) are executed
+by the **traverse workflow**, one contiguous arc per run, so a traverse may
+span several runs; the review stop belongs to the issue's sequencing
+session.
+_Avoid_: run (a run is one workflow launch, not the passage).
+
 ## Relationships
 
 - A **Module** has exactly one **Interface** (the surface it presents to callers and tests).

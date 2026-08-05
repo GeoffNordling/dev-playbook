@@ -11,6 +11,9 @@ __pycache__/
 # per-issue git worktrees (see standards/issue-implementation.md)
 .claude/worktrees/
 
+# software factory run state (see software-factory/traverse.md)
+.factory/
+
 # dotfiles — machine-local and ephemeral files
 dotfiles/dot-claude/settings.local.json
 dotfiles/dot-claude/history.jsonl
