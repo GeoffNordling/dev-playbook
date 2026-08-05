@@ -55,7 +55,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import gitrepo
+from dev_playbook import gitrepo, md
 from dev_playbook.findings import print_rules, render
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
@@ -108,13 +108,6 @@ BUILD_HEADINGS = (
     "Out of scope",
 )
 SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
-
-# A markdown code fence: three or more backticks or tildes, indented no more
-# than three spaces. A closing fence carries no info string, which is what lets
-# a four-backtick artifact fence wrap three-backtick content without ending
-# early.
-FENCE_LINE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
-FENCE_CLOSE = re.compile(r"^ {0,3}(?:`{3,}|~{3,})\s*$")
 
 # The body sections of a wayfinder map and of a decision ticket, stated here
 # exactly as the ``/wayfinder`` skill states them (``§ The map body`` and
@@ -635,46 +628,20 @@ def _post_intake(labels: set[str]) -> bool:
     )
 
 
-def _outside_fences(body: str) -> str:
-    """The body with every fenced code block dropped.
-
-    A brief quotes templates inside code fences — the brief template itself, an
-    approved artifact under ``## Artifacts`` — and a quoted heading is being
-    *shown*, not carried. Fences nest by length (a four-backtick fence wraps
-    three-backtick content), so a block closes only on a fence of the same
-    character, at least as long as the one that opened it, and carrying no info
-    string. An unclosed fence swallows the rest of the body, as CommonMark has
-    it.
-    """
-    kept: list[str] = []
-    marker: str | None = None
-    for line in body.splitlines():
-        opening = FENCE_LINE.match(line)
-        if marker is None:
-            if opening:
-                marker = opening.group(1)
-            else:
-                kept.append(line)
-        elif (
-            opening
-            and FENCE_CLOSE.match(line)
-            and opening.group(1)[0] == marker[0]
-            and len(opening.group(1)) >= len(marker)
-        ):
-            marker = None
-    return "\n".join(kept)
-
-
 def _has_heading(body: str, heading: str) -> bool:
     """Whether the body carries the bold heading, in prose rather than in a fence.
 
     The colon may sit inside or outside the markers — both ``**Heading:**`` and
     ``**Heading**:`` read as present. Fenced code is excluded, so a heading
     inside a fence neither satisfies a required heading nor forges one the brief
-    lacks.
+    lacks: a brief quotes templates inside fences — the brief template itself,
+    an approved artifact under ``## Artifacts`` — and a quoted heading is being
+    *shown*, not carried. ``md.lines_outside_fences`` is the workspace's single
+    home for that mechanic, including the nesting rule an artifact's
+    four-backtick fence depends on.
     """
-    pattern = rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:"
-    return re.search(pattern, _outside_fences(body), re.IGNORECASE) is not None
+    pattern = re.compile(rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:", re.IGNORECASE)
+    return any(pattern.search(line) for _, line in md.lines_outside_fences(body))
 
 
 def _has_section(body: str, section: str) -> bool:

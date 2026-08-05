@@ -45,6 +45,27 @@ class TestLinesOutsideFences:
         got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
         assert got == ["a", "b"]
 
+    def test_longer_fence_wraps_shorter_fenced_content(self) -> None:
+        # A four-backtick fence exists to wrap content that carries its own
+        # triple-backtick fences — the form issue-authoring.md mandates for
+        # artifact blocks. The inner fence must not close the outer block.
+        text = "a\n````\n```\nhidden\n```\n````\nb\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["a", "b"]
+
+    def test_other_fence_character_does_not_close_a_block(self) -> None:
+        # A tilde run inside a backtick block is content, not a delimiter.
+        text = "a\n```\n~~~\nhidden\n~~~\n```\nb\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["a", "b"]
+
+    def test_fence_carrying_an_info_string_does_not_close_a_block(self) -> None:
+        # A closing fence carries no info string, so a same-length run that
+        # names a language is content — the form a quoted example takes.
+        text = "a\n```markdown\n```python\nhidden\n```\nb\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["a", "b"]
+
 
 class TestMarkdownLinks:
     def test_extracts_text_and_target(self) -> None:

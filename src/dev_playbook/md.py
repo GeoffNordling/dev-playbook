@@ -21,7 +21,11 @@ from pathlib import Path, PurePosixPath
 from dev_playbook import gitrepo
 from dev_playbook.external import is_externally_managed
 
-FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
+# A CommonMark code fence: a run of three or more backticks or tildes, group 1,
+# followed by group 2's info string (empty on a closing fence). Capturing the
+# whole run rather than a fixed three is what lets lines_outside_fences nest by
+# length; see its docstring for the closing rule.
+FENCE_PATTERN = re.compile(r"^\s*(`{3,}|~{3,})\s*(.*?)\s*$")
 # A CommonMark inline code span: an opening run of N backticks closes on the
 # next run of exactly N (the trailing (?!`) rejects a longer run). The
 # backreference ties the closing length to the opening one, so a double-backtick
@@ -71,15 +75,29 @@ def lines_outside_fences(text: str) -> Iterator[tuple[int, str]]:
     The single place that knows how to skip ``` / ~~~ fenced code blocks.
     Line numbers are 1-based and count fence-delimiter lines too, so a
     reported line matches what an editor shows.
+
+    Fences nest by length, as CommonMark has them: a block closes only on a run
+    of the same character, at least as long as the one that opened it, and
+    carrying no info string. That is what makes a four-backtick fence able to
+    wrap three-backtick content — the form issue-authoring.md mandates for an
+    artifact block whose content carries its own fences — instead of ending on
+    the first inner fence. An unclosed fence swallows the rest of the text.
     """
-    in_fence = False
+    marker: str | None = None
     for line_num, line in enumerate(text.splitlines(keepends=True), start=1):
-        if FENCE_PATTERN.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
-        yield line_num, line
+        fence = FENCE_PATTERN.match(line)
+        if marker is None:
+            if fence:
+                marker = fence.group(1)
+            else:
+                yield line_num, line
+        elif (
+            fence
+            and not fence.group(2)
+            and fence.group(1)[0] == marker[0]
+            and len(fence.group(1)) >= len(marker)
+        ):
+            marker = None
 
 
 def content_lines(filepath: Path) -> Iterator[tuple[int, str]]:

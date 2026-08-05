@@ -162,6 +162,28 @@ def test_root_link_inside_fenced_block_is_skipped(
     assert "no cross-references found" in result.stderr
 
 
+def test_root_link_inside_a_four_backtick_artifact_fence_is_skipped(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """A four-backtick fence wrapping three-backtick content stays one block.
+
+    This is the artifact form issue-authoring.md mandates for approved prose
+    that carries its own fences; a link quoted inside it is being shown, not
+    made, so ref-lint must not resolve it.
+    """
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(
+        repo / "docs.md",
+        "intro\n````markdown\n```\n[x](/gone.md)\n```\nafter\n````\nend\n",
+    )
+
+    result = run_ref_lint(repo, tmp_path)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "no cross-references found" in result.stderr
+
+
 def test_root_link_to_directory_with_fragment_is_out_of_scope(
     tmp_path: Path, workspace: Path
 ) -> None:

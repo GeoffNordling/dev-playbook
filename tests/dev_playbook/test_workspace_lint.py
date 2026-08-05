@@ -1247,6 +1247,20 @@ def test_headings_beside_a_quoted_template_pass(tmp_path: Path) -> None:
     assert "tracking.issue-brief-shape" not in result.stdout
 
 
+def test_heading_inside_a_nested_fence_does_not_forge(tmp_path: Path) -> None:
+    # A four-backtick artifact fence wraps three-backtick content without
+    # closing early, so a heading between the inner fences is still quoted. The
+    # real heading is dropped from the brief, so the assertion fails the moment
+    # the outer fence is allowed to close on the inner one.
+    body = BUILD_BODY.replace("**Out of scope:** o\n", "") + (
+        "\n## Artifacts\n\n````markdown\n**Summary:** t\n"
+        "```\n**Out of scope:** forged\n```\n````\n"
+    )
+    result = run_with_issue(tmp_path, issue(35, VALID_DIRECT, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "Out of scope" in result.stdout
+
+
 def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(11, ["phase:build"], body="", pull_request=True)
