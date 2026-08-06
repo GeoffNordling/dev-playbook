@@ -281,8 +281,11 @@ never by asking.
 - **Code track.** `/bug-pr-review` posts its bug findings; `/code-pr-review` adds
   the fidelity and convention findings it does not cover.
 - **Doc track.** `/doc-pr-review` audits the diff's documentation.
-- **Lockdown re-review.** From the third cycle on, only `/code-pr-review` runs: a
-  lockdown verifies fixes and needs no fresh bug hunt.
+- **Lockdown re-review.** From the third cycle on, each live track runs its
+  fidelity-and-convention review alone — `/code-pr-review` on the code track,
+  `/doc-pr-review` on the doc track — and `/bug-pr-review` stands down: a
+  lockdown verifies fixes and needs no fresh bug hunt. The track rules still
+  elect the tracks, so a doc-only diff is re-reviewed by the doc track.
 
 There is exactly one verdict per stop, and it is the human's — the first of the
 three pauses, briefed per
