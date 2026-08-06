@@ -22,7 +22,7 @@ The system has two **regions**, divided by what kind of work each does:
   operating contract is
   [factory-operations.md](/software-factory/factory-operations.md); every point
   where it stops is
-  [human-checkpoints.md](/software-factory/human-checkpoints.md).
+  [checkpoints.md](/software-factory/checkpoints.md).
 
 This document is the map both regions share: the states, the moves between them,
 and the labels that name them.

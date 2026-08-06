@@ -10,7 +10,7 @@ How the factory carries a ready issue from `build` to a merged pull request with
 nobody driving it. The map it executes — the two regions, the states, the labels
 — is [software-factory.md](/software-factory/software-factory.md); every point
 where it stops for the human is
-[human-checkpoints.md](/software-factory/human-checkpoints.md).
+[checkpoints.md](/software-factory/checkpoints.md).
 
 ## Dispatch
 
@@ -102,8 +102,8 @@ The factory's nodes, what runs each, and how each engages the human:
 | Node | Skill | Engagement |
 |---|---|---|
 | `build` | `/build` | AFK. |
-| `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict)). |
-| `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
+| `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/checkpoints.md#pause-1-the-review-verdict)). |
+| `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/checkpoints.md#pause-2-judgments-conditional)). |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the human and never dispatched,
@@ -122,7 +122,7 @@ character one with exactly `DONE: <one-line outcome>` or
 `ESCALATE: <one-line reason>`; detail follows below. Any non-matching final
 message is treated as ESCALATE — malformed fails safe, toward the human. What the
 overwatch does with an escalation is
-[human-checkpoints.md](/software-factory/human-checkpoints.md#escalation).
+[checkpoints.md](/software-factory/checkpoints.md#escalation).
 
 ## Worktrees and branches
 
@@ -272,7 +272,7 @@ never by asking.
 
 There is exactly one verdict per stop, and it is the human's — the first of the
 three pauses, briefed per
-[pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict). A
+[pause 1](/software-factory/checkpoints.md#pause-1-the-review-verdict). A
 **reject** returns the issue to `build`, with the deciding reason recorded where
 the findings live so the rework carries it. An **approve** advances it to
 [the judgments node](#the-judgments-node).
@@ -315,7 +315,7 @@ the overwatch invokes `/run-judgments` itself, in the issue's worktree.
   and on the issue branch, and committed as it lands — no separate go-ahead.
 - **An ambiguous failure escalates.** Where a fix is unclear enough to want human
   advice, the node stops and asks
-  ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional));
+  ([pause 2](/software-factory/checkpoints.md#pause-2-judgments-conditional));
   a clean green run stops for nothing.
 - **No back edge.** Judgment fixes never reopen review — no new cycle, no fresh
   audit; the human has already approved the substance. A gate that stays red

@@ -1,10 +1,10 @@
 ---
 type: Standard
-title: Human Checkpoints
-description: Every point where the factory stops for the human — the capability boundary, escalation, the issue-review verdict, and the three review-stretch pauses
+title: Checkpoints
+description: Every point where the factory stops for the user — the capability boundary, escalation, the issue-review verdict, and the three review-stretch pauses
 ---
 
-# Human Checkpoints
+# Checkpoints
 
 The factory runs unattended between checkpoints. A **checkpoint** is a point
 where it stops and the human acts, and there are only two reasons for one:

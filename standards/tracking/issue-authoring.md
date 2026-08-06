@@ -90,7 +90,7 @@ only when all four hold:
 - **Released at an issue-review verdict** — the definition session dispatched
   the two review lenses, the human ruled on the consolidated dispositions, and
   the verdict-record comment on the issue evidences it
-  ([human-checkpoints.md](/software-factory/human-checkpoints.md#the-issue-review-verdict)).
+  ([checkpoints.md](/software-factory/checkpoints.md#the-issue-review-verdict)).
   Setting `phase:build` is that verdict's consequence, not a separate act. The
   human may always skip or override the beat; the release is theirs either way.
   Factory-bound leaves only: a spike's deliverable is an answer, not a build,

@@ -14,7 +14,7 @@ Governs how an idea becomes a merged pull request.
   issue moves through, idea to merge, and the labels naming them
 - [software-factory/factory-operations.md](/software-factory/factory-operations.md) — the
   factory's operating contract: dispatch, worktrees, node contracts, review, judgments
-- [software-factory/human-checkpoints.md](/software-factory/human-checkpoints.md) — every
+- [software-factory/checkpoints.md](/software-factory/checkpoints.md) — every
   point where the factory stops for the human, and what it owes them there
 - [software-factory/node-skill-authoring.md](/software-factory/node-skill-authoring.md) — the
   authoring style behind the node skills: voice, content, robustness, mechanics
