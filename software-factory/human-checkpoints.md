@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Human Checkpoints
-description: Every point where the factory stops for the human — the capability boundary, escalation, and the three review-stretch pauses
+description: Every point where the factory stops for the human — the capability boundary, escalation, the issue-review verdict, and the three review-stretch pauses
 ---
 
 # Human Checkpoints
@@ -147,6 +147,27 @@ Nothing is outstanding at pause 3 but the read and the merge. Anything still
 pending — a red gate, an unrefreshed message, an unpushed commit, an open
 question — means the issue has not reached pause 3 yet, and presenting it as
 though it had spends the human's one full read on work that is still moving.
+
+## The issue-review verdict
+
+One decision checkpoint sits before the factory rather than inside it: the
+**issue-review verdict**, at the end of a factory-bound leaf's definition beat.
+It interrupts nothing unattended — the definition session is manned — but the
+call is not the agent's. The session dispatches the two fresh-context review
+lenses, **claims audit** and **implementation simulation**, synthesizes their
+findings into a **consolidated disposition list**, and briefs the human on
+dispositions, never raw findings one by one. The verdict is the human's:
+
+- **Pass** — apply or demote per the dispositions (the brief is editable until
+  launch), then move the leaf to `phase:build`.
+- **Not yet** — the leaf stays at its definition phase; re-review is a full
+  fresh run of both lenses.
+
+After the ruling the session posts one **verdict-record comment** on the issue —
+date, lenses run, findings count, disposition gist, verdict. It is the evidence
+behind the readiness bar's "set at an issue-review verdict" and, on a not-yet,
+the next session's work order. The review binds the factory's autonomous path,
+never the human, who may always skip the beat, cut it short, or advance anyway.
 
 ## What is not a checkpoint
 
