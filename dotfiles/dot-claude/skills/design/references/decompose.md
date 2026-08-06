@@ -5,8 +5,9 @@ The exit taken when the work is bigger than one build. The issue becomes an
 settled on this exit — the single-leaf exit needs none of it.
 
 The children's intake happens here, in place. Each child leaves design **ready**
-— a leaf, unblocked or explicitly blocked, with a brief-complete body — so none
-round-trips through `intake`. The readiness bar is
+— a leaf, unblocked or explicitly blocked, brief-complete, its `phase:build` set
+at an issue-review verdict — so none round-trips through `intake`. The readiness
+bar is
 [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness);
 the factory checks it at the crossing.
 
@@ -41,8 +42,10 @@ a blocker that must already exist.
 
 One `gh issue create` per slice, in dependency order, each with a full
 four-tuple and a brief-complete body in the build-leaf format. The phase is the
-node that takes it next — normally `phase:build`, since the approach was just
-settled and there is nothing left for that child's own design pass to decide.
+node that takes it next. There is nothing left for a child's own design pass to
+decide — the approach was just settled — but `phase:build` is never set at
+creation: per the readiness bar above, it is set at the child's issue-review
+verdict. Mint the child at `phase:design` and let the verdict move it.
 
 ```bash
 gh issue create --title "..." \

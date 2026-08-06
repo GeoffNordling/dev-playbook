@@ -75,8 +75,8 @@ skill's own statement of it rather than a restatement here.
 ## Readiness
 
 Readiness is a **lifecycle position, not a kind of issue** — the industry's
-*Definition of Ready*. Three things make an issue ready, and work is dispatched
-only when all three hold:
+*Definition of Ready*. Four things make an issue ready, and work is dispatched
+only when all four hold:
 
 - **A leaf** — an epic is decomposed, never built
   ([Roles](#roles-epic-and-leaf)).
@@ -84,9 +84,17 @@ only when all three hold:
   ([Relationships](#relationships)).
 - **A brief-complete body**, meeting the brief standard below; an
   under-specified leaf is not yet ready.
+- **`phase:build` set at an issue-review verdict** — the definition session
+  dispatched the two review lenses, the human ruled on the consolidated
+  dispositions, and the verdict-record comment on the issue evidences it
+  ([human-checkpoints.md](/software-factory/human-checkpoints.md#the-issue-review-verdict)).
+  The human may always skip or override the beat; the label move is theirs
+  either way. Factory-bound leaves only: a spike's deliverable is an answer,
+  not a build, so a spike is ready on the first three conditions.
 
 The refinement interview — intake, or the `design` node — is the **refinement
-step** that carries a leaf to ready by authoring its brief. A leaf's role never
+step** that carries a leaf to ready by authoring its brief; the issue-review
+verdict at the beat's end is what sets `phase:build`. A leaf's role never
 changes as it readies; only its body and phase advance.
 (**Promotion** is a different move, reserved for Candidate → issue.)
 

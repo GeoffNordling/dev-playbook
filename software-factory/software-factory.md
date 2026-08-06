@@ -107,7 +107,8 @@ epic slices. A question that turns out to need an interview to answer was design
 not a spike.
 
 **The readiness bar.** What makes an issue ready to leave the region — a leaf,
-unblocked, with a brief-complete body — is defined once in
+unblocked, brief-complete, its `phase:build` set at an issue-review verdict — is
+defined once in
 [issue-authoring.md](/standards/tracking/issue-authoring.md#readiness), and the
 factory checks it at the crossing.
 
