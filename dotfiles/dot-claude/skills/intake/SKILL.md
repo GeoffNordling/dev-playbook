@@ -38,23 +38,23 @@ Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **e
 Two checks, both run before a line of the brief is written:
 
 - **Redundancy.** Search dev-playbook's skills, standards, and scripts, plus the open issues of the repo the idea belongs to, for work that already covers the idea. Search by concept, not by the wording the idea arrived in.
-- **Claims.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and check it against the tree.
+- **Claims — surface and pick.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and sort it: the ones the approach stands on go to the user as a **proposed-probe list**, and they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)); peripheral claims ride as `assumed` freely. Run the picked probes immediately, in-context, as ordinary tool calls, keeping each probe's command and observed output for the probe-record comment §5 posts.
 
-Report what both checks found and where you looked. On a hit — existing coverage, or a claim that fails — put the evidence to the user; the proceed-or-kill call is theirs.
+Report what both checks found and where you looked. On a hit — existing coverage, or a picked probe that fails — put the evidence to the user; the proceed-or-kill call is theirs.
 
 ### 3. Pick the four-tuple
 
 - `category:*` — pick one.
 - `mode:*` — `mode:direct` or `mode:spike`. `mode:sdd` is a retained label the factory does **not** support and intake never mints, per [software-factory.md → SDD is not supported](~/workspace/dev-playbook/software-factory/software-factory.md#sdd-is-not-supported).
 - `tests:*` — for `mode:direct`, ask the user; `mode:spike` is always `tests:no`.
-- `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake`.
+- `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it, or the user parks the beat and the issue holds here for the next session.
 
 Routing, given the mode:
 
 | The work | Routes to | Why |
 |---|---|---|
 | `mode:spike` | `phase:spike` | A question is answered inside the definition region; it never enters the factory. |
-| `mode:direct`, specifiable on the spot | `phase:build`, set at the issue-review verdict | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
+| `mode:direct`, specifiable on the spot | `phase:build`, set at §6's issue-review verdict — §5 writes `phase:intake` | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
 | `mode:direct`, needing exploration, tradeoffs, or slicing | `phase:design` | The approach isn't settled, or the work is bigger than one build. Design re-authors the brief or decomposes. |
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.
@@ -75,9 +75,9 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 
 Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*; neither substitutes for the other. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
 
-On the nod:
+On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6's verdict sets and nothing here does; the hold is momentary, since §6 runs next in this same session — unless the user parks the beat, and then it holds here for the next session.
 
-**Capture** — create the issue at its routed phase:
+**Capture** — create the issue at that phase:
 
 ```bash
 gh issue create --title "..." \
@@ -99,8 +99,18 @@ EOF
 )"
 ```
 
-If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`; if it carried no labels, there is nothing to remove. Either way the issue ends at its routed phase.
+For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.
+
+### 6. The issue-review beat — fast path only
+
+An issue routed to `phase:build` is released by the [issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict), never by the §5 nod alone. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
+
+1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
+2. **Synthesize the consolidated disposition list** — both lenses' findings merged and deduplicated, each disposition carrying a recommendation. The user rules on dispositions, never on raw findings one by one.
+3. **Take the verdict.** *Pass* — apply or demote per the ruled dispositions (the body is editable until launch), post the **verdict-record comment** — date, lenses run, findings count, disposition gist, verdict — then `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. *Back to design* — the brief needs more than the front door gives it: post the verdict-record comment, then route the issue there (`gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit, the verdict record its work order. Re-review is always a full fresh run of both lenses.
+
+The user may always skip the beat, cut it short, or advance anyway — the review binds the factory's autonomous path, never the user.
 
 ## Output
 
-Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`.
+Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`. Where the user parked §6's beat, `routed to <phase>` reads `awaiting verdict` instead: the issue holds at `phase:intake`, and nothing is routed until the verdict comes.

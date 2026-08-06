@@ -40,7 +40,7 @@ flowchart LR
         intake -->|needs thought| design[design]
         intake -->|mode:spike| spike[spike]
         design -.->|research question| spike
-        design -->|decompose| epic([epic + ready children])
+        design -->|decompose| epic([epic + children])
         spike -->|findings in closing comment| closed([closed])
     end
 
@@ -83,17 +83,21 @@ deliverable — triage *is* the four-tuple.
 
 **`design` — research and decomposition.** The approach is explored here:
 research, prototypes, tradeoffs. Prototyping happens in a disposable worktree
-that is deleted on exit — nothing merges out of definition. A design session
-exits one of two ways:
+that is deleted on exit; the `prototype/<issue>` branch pushed from it survives
+as the citable artifact
+([issue-authoring.md](/standards/tracking/issue-authoring.md#brief-principles)).
+Nothing merges out of definition — a prototype branch never merges, and pushing
+a dead-end branch is not merging. A design session exits one of two ways:
 
 - **A single leaf.** The chosen approach is written back into the issue by
-  re-authoring its brief, and the issue is released to the factory. The thinking
-  lands in the brief's own headings; there is no separate approach section for a
-  builder to reconcile against.
+  re-authoring its brief, and the issue-review verdict releases the issue to the
+  factory. The thinking lands in the brief's own headings; there is no separate
+  approach section for a builder to reconcile against.
 - **Decomposition.** When the work is too big for one leaf, the issue becomes an
-  **epic** and never builds itself. The session performs the children's intake in
-  place — minting each as a ready, brief-complete leaf with its relationships
-  wired — so no child round-trips through the intake node. The epic body carries
+  **epic** and never builds itself; its children carry the work. Children are
+  minted here rather than at the intake node, brief-complete but unreleased —
+  each crosses into the factory on its own issue-review verdict, taken at its
+  own design exit. The epic body carries
   the outcome and the decomposition rationale
   ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 
