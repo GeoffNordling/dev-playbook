@@ -27,7 +27,7 @@ Output:
     stdout — one finding per line, `file:line: docs.rule message`, for each
              reference that does not resolve (broken) or uses the wrong form
              (a same-repo Citation from a fixed-root source).
-    stderr — one human-readable summary line.
+    stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:

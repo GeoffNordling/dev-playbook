@@ -223,7 +223,7 @@ judgments:
   - id: standard-card-legibility
     claim: |
       standards/legibility.md is an honest card: its define cell points at
-      the instrument specs that genuinely answer how a human understands a
+      the instrument specs that genuinely answer how a user understands a
       large system without reading it, its empty cells are truly empty,
       and no cell misrepresents what its targets do.
     evidence:  [standards/legibility.md]

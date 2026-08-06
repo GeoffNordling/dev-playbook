@@ -22,7 +22,7 @@ See standards/testing/conventions.md for the conventions these rules enforce.
 
 Output:
     stdout — one finding per line, ``file:line: testing.rule message``.
-    stderr — one human-readable summary line.
+    stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:

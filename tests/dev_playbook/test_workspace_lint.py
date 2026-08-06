@@ -1212,7 +1212,7 @@ def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
 
 def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
     # `**Summary**:` (colon after the close markers) reads as a present heading
-    # to a human; it must not draw a false brief-shape finding.
+    # to a reader; it must not draw a false brief-shape finding.
     body = (
         "**Summary**: s\n\n**User intent**: i\n\n"
         "**Current behavior**: c\n\n**Desired behavior**: d\n\n"

@@ -20,7 +20,7 @@ match exactly; additions are free).
 
 Output:
     stdout — one finding per line, ``path: card.rule message``.
-    stderr — one human-readable summary line, including the inferred layers.
+    stderr — one readable summary line, including the inferred layers.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:

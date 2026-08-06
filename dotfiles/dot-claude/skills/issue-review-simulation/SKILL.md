@@ -64,7 +64,7 @@ Each hit is a finding.
 
 ## Return
 
-Your final message is data for the dispatching session, not a human-facing
+Your final message is data for the dispatching session, not a user-facing
 report. Return, raw: findings grouped Q3–Q7, each concrete — the file or
 section, the defect, why it meets the wrong-or-halt bar — with one line per
 question that came back empty. If clean overall, say so plainly.

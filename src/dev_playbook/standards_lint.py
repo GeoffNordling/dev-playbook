@@ -36,7 +36,7 @@ each namespaced under the meta card (``standard.*``):
 
 Output:
     stdout — one finding per line, ``file:line: standard.rule message``.
-    stderr — one human-readable summary line.
+    stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:

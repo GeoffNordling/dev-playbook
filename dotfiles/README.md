@@ -40,5 +40,5 @@ scatter them one level too high — `scripts/sync-dotfiles` holds the mapping.
 ## Workflow
 
 1. Edit files here (never chase symlinks into `~/.claude/`)
-2. Run `scripts/sync-dotfiles` after adding or removing files — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree
+2. Run `scripts/sync-dotfiles` after adding or removing files — from the main checkout only; it relinks live `~/.claude`, so it's a step the user runs, never one from a per-issue worktree
 3. Edits to existing files take effect immediately (already symlinked) — except under `settings/`, which needs a sync to reinstall

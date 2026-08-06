@@ -19,7 +19,7 @@ per file via the registry's ``is_verbatim_doc`` (``type: Reference`` documents).
 
 Output:
     stdout — one finding per line, ``file:line: prose.rule message``.
-    stderr — one human-readable summary line.
+    stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:

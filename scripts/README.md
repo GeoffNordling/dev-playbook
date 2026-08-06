@@ -125,7 +125,7 @@ dev-playbook and a consumer repo before pushing.
 
 ## Utility scripts
 
-Run ad hoc on human or skill demand; not part of the pre-commit pipeline.
+Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 
 | Script | Purpose |
 |--------|---------|
@@ -147,7 +147,7 @@ full.
 dev-playbook commits its own file graph under `readings/file-graph/` — a
 reading like any other, regenerated manually on demand by running the executor
 with this repo's scope, never hand-edited and free to lag until you rerun it.
-Run this only when a human asks for a fresh graph — never as part of a
+Run this only when the user asks for a fresh graph — never as part of a
 refactor or rename sweep:
 
 ```bash
