@@ -109,8 +109,7 @@ not a spike.
 **The readiness bar.** What makes an issue ready to leave the region — a leaf,
 unblocked, brief-complete, released at an issue-review verdict — is
 defined once in
-[issue-authoring.md](/standards/tracking/issue-authoring.md#readiness), and the
-factory checks it at the crossing.
+[issue-authoring.md](/standards/tracking/issue-authoring.md#readiness).
 
 ## The factory
 

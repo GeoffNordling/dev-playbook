@@ -63,7 +63,7 @@ Ask the user when the call isn't clear. Routing is a one-way handoff — nothing
 
 Per the issue conventions: the build-leaf brief for `mode:direct`, the spike brief for `mode:spike`. When **adopting**, rewriting the stub's body into the brief format is mandatory — every adopted issue leaves with an authored body. Structure what the user wrote, don't discard it.
 
-Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is checked at the crossing into the factory, not here.
+Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is settled at the issue-review verdict that releases the issue, not here.
 
 ### 5. Confirm, then land
 
