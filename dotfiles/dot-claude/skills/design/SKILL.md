@@ -92,7 +92,7 @@ EOF
 
 ### Decompose
 
-When the work is bigger than one build, the issue becomes an **epic** and never builds itself, and its children are minted ready here rather than round-tripping through `intake`. Read [decompose.md](references/decompose.md) and work through it — the epic rewrite, the slicing, the children, and the relationship wiring.
+When the work is bigger than one build, the issue becomes an **epic** and never builds itself, and its children are minted brief-complete here rather than round-tripping through `intake` — each released by its own verdict at [decompose.md](references/decompose.md) step 6, never ready on minting alone. Read [decompose.md](references/decompose.md) and work through it — the epic rewrite, the slicing, the children, and the relationship wiring.
 
 ## 8. Close the phase
 
@@ -103,6 +103,6 @@ Only once the user has explicitly agreed design is done. No label moves in this 
 3. **Keep the branch, drop the tree**, if §5 opened one. The prototype is already committed on `prototype/<issue>` (§5). Exit with `ExitWorktree(action: "keep")` — never `"remove"`, which deletes the branch too — then `git worktree remove .claude/worktrees/design-<issue>`, and leave the pointer /prototype asks for: `gh issue comment <issue> --body "Prototype preserved on branch prototype/<issue> at <dir>."`, where `<dir>` is the prototype's directory **inside that branch** — not the tree the previous command just deleted. The branch is local-only here and stays that way: pushing it needs a hardware tap, so it is the user's at [the agent-capability boundary](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-agent-capability-boundary), flagged on step 4's report line rather than run. Once pushed it survives until everything citing it has merged; after that it is deletable garbage with no purge duty.
 4. Report and stop:
    ```
-   <repo>#<issue> · phase: design · <released to build | epic + N ready children | awaiting verdict> · brief in issue
+   <repo>#<issue> · phase: design · <released to build | epic + N children, M released | awaiting verdict> · brief in issue
    ```
    Where §5 opened a tree, append ` · prototype/<issue> unpushed` — the pending push stated as a flag for the user, never as a step ([node-skill authoring](~/workspace/dev-playbook/software-factory/node-skill-authoring.md#mechanics)).

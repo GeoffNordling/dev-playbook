@@ -40,7 +40,7 @@ flowchart LR
         intake -->|needs thought| design[design]
         intake -->|mode:spike| spike[spike]
         design -.->|research question| spike
-        design -->|decompose| epic([epic + ready children])
+        design -->|decompose| epic([epic + children])
         spike -->|findings in closing comment| closed([closed])
     end
 
@@ -95,8 +95,10 @@ a dead-end branch is not merging. A design session exits one of two ways:
   approach section for a builder to reconcile against.
 - **Decomposition.** When the work is too big for one leaf, the issue becomes an
   **epic** and never builds itself. The session performs the children's intake in
-  place — minting each as a ready, brief-complete leaf with its relationships
-  wired — so no child round-trips through the intake node. The epic body carries
+  place — minting each as a brief-complete leaf with its relationships
+  wired — so no child round-trips through the intake node. Each child is
+  released by its own issue-review verdict, so decomposition mints children,
+  never ready ones. The epic body carries
   the outcome and the decomposition rationale
   ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 

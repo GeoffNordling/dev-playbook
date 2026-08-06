@@ -4,10 +4,11 @@ The exit taken when the work is bigger than one build. The issue becomes an
 **epic** and never builds itself; its children carry the work. Read only when §6
 settled on this exit — the single-leaf exit needs none of it.
 
-The children's intake happens here, in place. Each child leaves design **ready**
-— a leaf, unblocked or explicitly blocked, brief-complete, released at an
-issue-review verdict — so none round-trips through `intake`. The readiness
-bar is
+The children's intake happens here, in place, so none round-trips through
+`intake`. Minting carries a child to **brief-complete** — a leaf, unblocked or
+explicitly blocked, with an authored body — and step 6's issue-review verdict
+is what makes it **ready**. A child the verdict sends back to design leaves
+this session unreleased. The readiness bar is
 [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness).
 
 ## 1. Rewrite the issue as the epic
@@ -44,7 +45,7 @@ so the split has to be right here.
 Order the slices by dependency before creating any of them; step 4 links each to
 a blocker that must already exist.
 
-## 3. Mint each child ready
+## 3. Mint each child brief-complete
 
 One `gh issue create` per slice, in dependency order, each with a full
 four-tuple and a brief-complete body in the build-leaf format. The phase is the
