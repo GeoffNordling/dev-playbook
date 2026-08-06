@@ -11,7 +11,7 @@ argument-hint: "[what bit, one line]"
 
 Append one entry to the friction log —
 [friction/log.md](~/workspace/mission-control/friction/log.md) —
-commit it, and hand the user the push. The log feeds curation:
+and commit it. The log feeds curation:
 twice-felt friction becomes a curation item mapped onto the idea
 archive, and only Selection scopes it into a Cycle.
 Recording friction is not a commitment to fix it — record and move on.
@@ -32,5 +32,4 @@ session context and confirm it with the user before writing anything.
 3. Commit via /commit, applied to `~/workspace/mission-control`
    (use `git -C`; the session's cwd is usually another repo). Stage
    **only** `friction/log.md` — the repo may hold unrelated work; ignore it.
-4. Remind the user to push (their YubiKey): hand them, as one line,
-   `git -C ~/workspace/mission-control push`.
+   The commit skill pushes as part of the commit.

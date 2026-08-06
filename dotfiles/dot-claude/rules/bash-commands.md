@@ -85,9 +85,10 @@ cancelled too. Prefer single quotes by default for regex/pattern data.
 ## Keep sandbox-excluded commands leading and top-level
 
 `gh` and `git` are sandbox-excluded: each escapes the bwrap jail to reach an
-out-of-jail resource — the keyring holding `gh`'s PAT, the SSH remote for
-`git`. That escape works **only when the command is the first, top-level thing
-on its line.** Every rule below protects that.
+out-of-jail resource — the keyring holding the GitHub PAT (`gh` uses it
+directly; `git` reaches it through its credential helper). That escape works
+**only when the command is the first, top-level thing on its line.** Every
+rule below protects that.
 
 **Do:**
 
@@ -109,7 +110,7 @@ on its line.** Every rule below protects that.
 
 - **Nesting jails the command.** Inside `$(…)`, a `for`/`while` loop,
   `bash -c '…'`, or behind `env`/`timeout`/`xargs`, it runs *inside* the jail
-  and auth fails (`gh`: HTTP 401; `git` push/pull: no key). To capture a value,
+  and auth fails (`gh`: HTTP 401; `git` push/pull: no credential). To capture a value,
   write it to a file on its own top-level `gh` line, then `id=$(cat file)` on a
   separate line — `$(cat …)` is fine, `$(gh …)` is not.
 - **`$TMPDIR` is empty on the escaped line.** The escape context drops session
@@ -124,14 +125,3 @@ Right — capture a value for a follow-on command in the same call:
 
     gh api graphql -f query='query { repository(owner:"o", name:"r") { id } }' --jq '.data.repository.id' > /tmp/claude-1000/id
     id=$(cat /tmp/claude-1000/id)
-
-## SSH-bound git operations
-
-If the remote is `git@github.com:...`, then `git fetch`, `git pull`, and
-`git push` all require the user's SSH key — hardware-token taps in this
-workspace. Treat them like any other interactive command:
-
-- For read-only checks (e.g. "does local `main` match `origin/main`?"), use
-  `gh api` instead — it goes over HTTPS with a PAT and needs no tap.
-  Example: `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`
-- For pushes, hand the command back to the user.

@@ -28,8 +28,9 @@ git rev-parse main
 gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
 ```
 
-Unequal means the release is unpushed: hand the user the push and stop, since
-`git push` needs their YubiKey.
+Unequal means the release is unpushed — escalate and stop. Commits push as
+they land, so an unpushed main means something upstream went wrong; surface
+it rather than pushing someone else's unreviewed work.
 
 ## 2. Run it
 
@@ -75,15 +76,13 @@ A requirement retired upstream is still enforced by the check that ships
 the repo goes red against its own old pin. So: bump, verify green, then trim,
 then commit both together.
 
-## 6. Commit, then hand back the pushes
+## 6. Commit and push, one repo at a time
 
 One commit per consumer carrying the pin move and any adaptation together —
 they are one act, and the commit gate runs at the new pin, so a green commit is
-a second verification.
-
-Pushes need the user's YubiKey. Hand back one short line per repo and say to
-run them separately, in order: they are independent repos, and each must get
-its own attempt.
+a second verification. Push each repo as its commit lands: they are independent
+repos, so each push gets its own attempt, and one failure never blocks the rest —
+report per-repo results.
 
 ## 7. Collect the garbage
 
