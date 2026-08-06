@@ -24,8 +24,11 @@ from dev_playbook.external import is_externally_managed
 # A CommonMark code fence: a run of three or more backticks or tildes, group 1,
 # followed by group 2's info string (empty on a closing fence). Capturing the
 # whole run rather than a fixed three is what lets lines_outside_fences nest by
-# length; see its docstring for the closing rule.
-FENCE_PATTERN = re.compile(r"^\s*(`{3,}|~{3,})\s*(.*?)\s*$")
+# length; see its docstring for the closing rule. The indent is capped at three
+# spaces, as CommonMark caps it: past that the run is literal text inside an
+# indented code block, so an indented transcript carrying a stray backtick line
+# does not open a block that swallows the rest of the document.
+FENCE_PATTERN = re.compile(r"^ {0,3}(`{3,}|~{3,})\s*(.*?)\s*$")
 # A CommonMark inline code span: an opening run of N backticks closes on the
 # next run of exactly N (the trailing (?!`) rejects a longer run). The
 # backreference ties the closing length to the opening one, so a double-backtick
@@ -51,6 +54,28 @@ SLUG_STAR = re.compile(r"(\*{1,2})(.+?)\1")
 SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
 SLUG_DROP = re.compile(r"[^\w\s\-]", re.UNICODE)
 SLUG_WHITESPACE = re.compile(r"\s")
+
+
+class UnclosedFence(ValueError):
+    """A fenced code block that nothing ever closes.
+
+    Every consumer of this module scans a document in order to report on it, so
+    a block left open swallows the rest of the file while the scan still comes
+    back clean — silence exactly where a finding belongs. Raised rather than
+    swallowed, on the same footing as :func:`parse_frontmatter`'s malformed
+    YAML: a parse failure is surfaced.
+
+    ``source`` names the file when one is known (:func:`content_lines` supplies
+    it); scanning a bare string, only the opening line number is available.
+    """
+
+    def __init__(self, marker: str, line: int, source: str | None = None) -> None:
+        """Name the fence run, the line it opened on, and the file if known."""
+        self.marker = marker
+        self.line = line
+        self.source = source
+        where = f"{source}:{line}" if source else f"line {line}"
+        super().__init__(f"unclosed {marker} code fence opened at {where}")
 
 
 def github_slug(heading_text: str) -> str:
@@ -81,14 +106,22 @@ def lines_outside_fences(text: str) -> Iterator[tuple[int, str]]:
     carrying no info string. That is what makes a four-backtick fence able to
     wrap three-backtick content — the form issue-authoring.md mandates for an
     artifact block whose content carries its own fences — instead of ending on
-    the first inner fence. An unclosed fence swallows the rest of the text.
+    the first inner fence.
+
+    A block still open when the text runs out raises :class:`UnclosedFence`.
+    Yielding the truncated view instead would leave every consumer scanning
+    nothing for the rest of the document and still reporting clean, and one
+    mistyped closer — a run that repeats the opener's info string — is all it
+    takes.
     """
     marker: str | None = None
+    opened_at = 0
     for line_num, line in enumerate(text.splitlines(keepends=True), start=1):
         fence = FENCE_PATTERN.match(line)
         if marker is None:
             if fence:
                 marker = fence.group(1)
+                opened_at = line_num
             else:
                 yield line_num, line
         elif (
@@ -98,12 +131,22 @@ def lines_outside_fences(text: str) -> Iterator[tuple[int, str]]:
             and len(fence.group(1)) >= len(marker)
         ):
             marker = None
+    if marker is not None:
+        raise UnclosedFence(marker, opened_at)
 
 
 def content_lines(filepath: Path) -> Iterator[tuple[int, str]]:
-    """Yield (line_number, line) for every line of a file outside a fence."""
+    """Yield (line_number, line) for every line of a file outside a fence.
+
+    An :class:`UnclosedFence` from the scan is re-raised naming the file, so a
+    checkout-wide run points at the document to fix rather than at a line
+    number with no home.
+    """
     text = filepath.read_text(encoding="utf-8", errors="replace")
-    yield from lines_outside_fences(text)
+    try:
+        yield from lines_outside_fences(text)
+    except UnclosedFence as unclosed:
+        raise UnclosedFence(unclosed.marker, unclosed.line, str(filepath)) from None
 
 
 @functools.cache

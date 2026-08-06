@@ -66,6 +66,55 @@ class TestLinesOutsideFences:
         got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
         assert got == ["a", "b"]
 
+    def test_a_longer_run_closes_a_shorter_block(self) -> None:
+        # The closing rule is "at least as long as the opener", not "equal":
+        # a four-backtick run legally ends a three-backtick block, so the
+        # block must not run on to the end of the text.
+        text = "a\n```\ninner\n````\nb\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["a", "b"]
+
+    def test_tilde_fences_nest_by_length(self) -> None:
+        # The nesting rule is the fence character's, not the backtick's: a
+        # four-tilde block wraps three-tilde content the same way.
+        text = "a\n~~~~\n~~~\nhidden\n~~~\n~~~~\nb\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["a", "b"]
+
+    def test_a_run_indented_past_three_spaces_does_not_open_a_block(self) -> None:
+        # CommonMark caps an opening fence at three spaces of indentation;
+        # past that the backticks are literal text inside an indented code
+        # block. An indented transcript carrying a stray backtick run must
+        # stay content rather than opening a block that swallows the rest.
+        text = "a\n    ```\nb\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["a", "    ```", "b"]
+
+    def test_a_block_left_open_at_the_end_is_reported(self) -> None:
+        # A closer carrying an info string does not close, so this block runs
+        # to the end of the text and every line after it drops out of the
+        # scanned view. That silence blinds every consumer for the rest of the
+        # document, so the parser names the defect rather than truncating.
+        text = "intro\n```markdown\ncode\n```markdown\nafter\ntail\n"
+
+        with pytest.raises(md.UnclosedFence) as raised:
+            list(md.lines_outside_fences(text))
+
+        assert "line 2" in str(raised.value)
+
+
+class TestContentLines:
+    def test_an_open_block_is_reported_against_its_file(self, tmp_path: Path) -> None:
+        # Reading from a file, the report names the file too: the consumers
+        # scan whole checkouts, so the defect has to be locatable.
+        path = tmp_path / "doc.md"
+        path.write_text("intro\n```markdown\ncode\n```markdown\ntail\n")
+
+        with pytest.raises(md.UnclosedFence) as raised:
+            list(md.content_lines(path))
+
+        assert f"{path}:2" in str(raised.value)
+
 
 class TestMarkdownLinks:
     def test_extracts_text_and_target(self) -> None:

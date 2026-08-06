@@ -1261,6 +1261,21 @@ def test_heading_inside_a_nested_fence_does_not_forge(tmp_path: Path) -> None:
     assert "Out of scope" in result.stdout
 
 
+def test_body_with_an_unclosed_fence_is_a_finding(tmp_path: Path) -> None:
+    # A closer carrying an info string does not close, so the block runs to the
+    # end of the body and the headings after it drop out of the scanned view.
+    # The audit names the fence rather than reporting the headings it can no
+    # longer see — and the run survives, so one malformed body does not blind
+    # the audit for every other issue.
+    body = "**Summary:** s\n\n```markdown\nquoted\n```markdown\n" + BUILD_BODY
+
+    result = run_with_issue(tmp_path, issue(36, VALID_DIRECT, body=body))
+
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "unclosed" in result.stdout
+    assert "missing" not in result.stdout
+
+
 def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(11, ["phase:build"], body="", pull_request=True)
