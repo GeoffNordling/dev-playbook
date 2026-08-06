@@ -75,7 +75,7 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 
 Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*; neither substitutes for the other. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
 
-On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6's verdict sets and nothing here does; the hold is momentary, since §6 runs next in this same session.
+On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6's verdict sets and nothing here does; the hold is momentary, since §6 runs next in this same session — unless the user parks the beat, and then it holds here for the next session.
 
 **Capture** — create the issue at that phase:
 
