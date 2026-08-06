@@ -39,6 +39,8 @@ A committing node checks for an existing PR with `gh pr view`:
 - **No PR** — this is first implementation, and the work list is the issue
   brief alone.
 
-**The contract wins.** Where a finding conflicts with the node's contract, the
-contract stands and the finding yields; the node names its own contract where it
-cites this.
+**The contract wins.** Where a finding merely disagrees with the node's
+contract, the contract stands and the finding yields; the node names its own
+contract where it cites this. A finding that shows the contract contradicting
+reality is different — for a build node that is a deviation, handled under the
+[deviation contract](/software-factory/deviation-contract.md).

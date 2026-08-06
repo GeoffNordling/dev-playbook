@@ -86,7 +86,11 @@ An escalation is a node reporting that it cannot proceed. It always reaches the
 human: the issue overwatch adds its own context — which node, what it dispatched,
 what the report says — and stops. It never overrides, retries, or self-fixes a
 node's escalation; the human's call routes the issue onward. A node whose skill
-doesn't exist is an escalation, not an improvisation.
+doesn't exist is an escalation, not an improvisation. For a deviation escalation
+the call is also recorded: spoken in the terminal, it is transcribed onto the
+issue or PR by the overwatch, per the
+[deviation contract](/software-factory/deviation-contract.md#escalation) —
+limiter 3 binds later deviations only to what is written there.
 
 An escalation is not a finding. A problem a review node can describe belongs in
 its findings; it escalates only when something stops it producing the review at
