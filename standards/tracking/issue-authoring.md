@@ -276,7 +276,7 @@ which to probe.
 ### The brief freeze
 
 A brief is frozen when its issue launches into the factory: the body is
-never amended after launch — not by agents, not by user rulings. Rulings
+never amended after launch — not by agents, not by human rulings. Rulings
 live as comments on the issue or PR; the launch baseline, the
 [deviation ledger](/software-factory/deviation-contract.md#the-deviation-ledger),
 and the rulings together make the issue's full drift visible.
