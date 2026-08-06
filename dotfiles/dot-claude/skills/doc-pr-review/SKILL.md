@@ -17,11 +17,13 @@ Review the documentation in an issue's PR diff against its issue brief, the doc 
 
 ## Read first
 
-Read all three end-to-end, then report `READ: review-contract.md, pr-feedback.md, doc-conventions.md`. Proceed only after.
+Before doing anything else, read end-to-end:
 
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md) — the stance, the green gate, the cycle count, the findings comment, the escalation boundary.
 - [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — every comment surface a PR carries, and the command that reaches each.
 - [doc conventions](~/workspace/dev-playbook/standards/prose/conventions.md) — the contract every doc answers to, whatever the diff holds.
+
+Then report: `READ: review-contract.md, pr-feedback.md, doc-conventions.md`. Proceed only after.
 
 Your values for the contract's three parameters:
 

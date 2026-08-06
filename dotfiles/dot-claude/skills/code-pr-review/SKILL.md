@@ -19,10 +19,12 @@ A bug-review pass (/bug-pr-review) runs in parallel with you and posts its own P
 
 ## Read first
 
-Read both end-to-end, then report `READ: review-contract.md, pr-feedback.md`. Proceed only after.
+Before doing anything else, read end-to-end:
 
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md) — the stance, the green gate, the cycle count, the findings comment, the escalation boundary.
 - [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — every comment surface a PR carries, and the command that reaches each.
+
+Then report: `READ: review-contract.md, pr-feedback.md`. Proceed only after.
 
 Your values for the contract's three parameters:
 

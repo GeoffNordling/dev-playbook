@@ -15,11 +15,11 @@ A vague plan makes a loop that thrashes; a well-ordered one grinds to done.
 
 ## Read first
 
-Read what the loop requires of the files you'll write:
+Before doing anything else, read end-to-end:
 
-- [ralph-loop.md](~/workspace/dev-playbook/harness-recipes/recipes/ralph-loop.md) — the recipe.
+- [ralph-loop.md](~/workspace/dev-playbook/harness-recipes/recipes/ralph-loop.md) — the recipe: what the loop requires of the files you'll write.
 
-Then report `READ: ralph-loop.md` and proceed.
+Then report: `READ: ralph-loop.md`. Proceed only after.
 
 ## 1. Establish the target
 

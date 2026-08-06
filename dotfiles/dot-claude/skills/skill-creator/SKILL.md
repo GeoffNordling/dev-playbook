@@ -107,6 +107,22 @@ Write `SKILL.md` and any reference files against the answers from step 2.
 - Keep each meaning in one place, and run the no-op test on each sentence:
   drop the whole sentence when the model would behave that way regardless.
 - Include a concrete example wherever a rule earns one.
+- Mirror the siblings: where the workspace's skills already share a shape
+  for a section, read two of them and match it before inventing one. The
+  standing example is the Read-first section — "Before doing anything else,
+  read end-to-end:", one glossed bullet per doc, then "Then report:
+  `READ: <files>`. Proceed only after." — whose report line is what makes
+  the read checkable.
+- Cite standards for shared rules; another skill's bundle internals are
+  reached only as a deliberate pointer, named as such.
+- The person in an agent-facing skill is "the user", never "the human" —
+  playbook-lint's agent-facing-voice check blocks the commit otherwise.
+- A rule belongs to the session that obeys it. When a drafted rule governs
+  a *later* session's behavior rather than this skill's own run, move it
+  into the artifact that reaches that session — a seeded ruling, a minted
+  issue body — and have the skill install the artifact. Restating the rule
+  in the skill's own prose makes a second source of truth in a place its
+  audience never reads.
 
 ## 6. Review with the user
 
@@ -126,3 +142,8 @@ Walk the checklist in
 [skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md#checklist)
 and confirm each item passes. Fix any failures before considering the skill
 done.
+
+Then run dev-playbook's `scripts/skill-lint` over the **repo root** of the
+repo holding the bundle. Pointing it at the bundle directory finds no skill
+roots and passes vacuously ("0 internal skills, all ok") — a pass only
+counts when the summary line shows a nonzero skill count.
