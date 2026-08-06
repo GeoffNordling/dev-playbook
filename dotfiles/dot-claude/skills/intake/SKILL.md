@@ -47,14 +47,14 @@ Report what both checks found and where you looked. On a hit — existing covera
 - `category:*` — pick one.
 - `mode:*` — `mode:direct` or `mode:spike`. `mode:sdd` is a retained label the factory does **not** support and intake never mints, per [software-factory.md → SDD is not supported](~/workspace/dev-playbook/software-factory/software-factory.md#sdd-is-not-supported).
 - `tests:*` — for `mode:direct`, ask the user; `mode:spike` is always `tests:no`.
-- `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake`.
+- `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it.
 
 Routing, given the mode:
 
 | The work | Routes to | Why |
 |---|---|---|
 | `mode:spike` | `phase:spike` | A question is answered inside the definition region; it never enters the factory. |
-| `mode:direct`, specifiable on the spot | `phase:build`, set at the issue-review verdict | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
+| `mode:direct`, specifiable on the spot | `phase:build`, set at §6's issue-review verdict — §5 writes `phase:intake` | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
 | `mode:direct`, needing exploration, tradeoffs, or slicing | `phase:design` | The approach isn't settled, or the work is bigger than one build. Design re-authors the brief or decomposes. |
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.
@@ -75,9 +75,9 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 
 Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*; neither substitutes for the other. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
 
-On the nod:
+On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6's verdict sets and nothing here does; the hold is momentary, since §6 runs next in this same session.
 
-**Capture** — create the issue at its routed phase:
+**Capture** — create the issue at that phase:
 
 ```bash
 gh issue create --title "..." \
@@ -99,7 +99,7 @@ EOF
 )"
 ```
 
-Work routed to `phase:design` or `phase:spike` lands at its routed phase directly — for **adopt**, drop a carried `phase:intake` with `--remove-label "phase:intake"`. The fast path lands at `phase:intake` instead — mint it (capture) or keep it (adopt) — because `phase:build` is set at the §6 verdict, never here. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.
+For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.
 
 ### 6. The issue-review beat — fast path only
 
@@ -113,4 +113,4 @@ The user may always skip the beat, cut it short, or advance anyway — the revie
 
 ## Output
 
-Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`.
+Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`. Where the user parked §6's beat, `routed to <phase>` reads `awaiting verdict` instead: the issue holds at `phase:intake`, and nothing is routed until the verdict comes.
