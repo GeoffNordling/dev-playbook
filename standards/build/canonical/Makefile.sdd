@@ -1,4 +1,0 @@
-.PHONY: validate
-validate:
-	uv run spec-tools validate .
-check: validate

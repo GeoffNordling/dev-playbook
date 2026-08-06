@@ -19,7 +19,6 @@ the authority ([enforcement.md](/standards/build/enforcement.md)).
 | python · src | `src/` exists | the importable package |
 | python · scripts | `scripts/` holds Python | tested, runnable Python scripts |
 | python · aws | `cdk.json` exists | the CDK shape and deploy targets — [aws.md](/standards/build/aws.md); requires src |
-| sdd | `specs/` exists | the `validate` spec-graph gate wired into `check` — requires python |
 | js | `package.json` exists | a committed lockfile alongside `package.json`; nothing more yet |
 
 `tests/` is not a layer: it is required the moment `src/` exists or `scripts/`

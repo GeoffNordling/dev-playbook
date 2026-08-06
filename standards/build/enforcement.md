@@ -78,5 +78,4 @@ defect in the code. Which machine skips what is recorded in
 | skill-lint | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments cache gate | push gate only — never the CI gate; the judgments cache gate is skipped on the secondary machines |
-| validate | spec graph | push gate only — never the CI gate (sdd repos) |
 | workspace-lint | GitHub settings and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |
