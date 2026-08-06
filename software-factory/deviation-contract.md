@@ -48,11 +48,11 @@ every later deviation to it — escalations feed the limiter system.
 
 ## The deviation ledger
 
-Every factory PR description carries a `## Deviation ledger` section. One
-entry per deviation: *brief said / reality was / what was done / the three
-limiter answers*. Written at PR-open, appended during rework. When there
-were no deviations the section reads `No deviations.` explicitly — a
-missing section is a checkable defect, never an ambiguous absence.
+The `## Deviation ledger` section of a factory PR description is mandated by
+[the merge-message recipe](/software-factory/factory-operations.md#the-merge-message-recipe),
+which also fixes its empty marker. What goes in it is this contract's: one
+entry per deviation — *brief said / reality was / what was done / the three
+limiter answers* — written at PR-open, appended during rework.
 
 The entries originate with the building session — the only party that knows
 them. On the lap that precedes the PR it records them on the issue at close;

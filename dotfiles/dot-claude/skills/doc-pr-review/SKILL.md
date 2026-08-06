@@ -13,7 +13,7 @@ argument-hint: "<issue-number>"
 
 Review the documentation in an issue's PR diff against its issue brief, the doc standards, and the documents around it, and attach your findings to the PR.
 
-**Jurisdiction: docs.** Findings post only on the diff's non-spec markdown and prose artifacts. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them.
+**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec markdown and prose artifacts, and on the PR body, for the presence check alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them.
 
 ## Read first
 
@@ -29,7 +29,7 @@ Your values for the contract's three parameters:
 |---|---|
 | Review name | `Doc review` |
 | Staging filename | `/tmp/doc-review-<issue>.md` |
-| Blocking | a fidelity gap, a missed knock-on update, a contradiction between docs, a convention breach that matters |
+| Blocking | a missing PR-description section, a fidelity gap, a missed knock-on update, a contradiction between docs, a convention breach that matters |
 
 ## 1. Load context
 
@@ -53,8 +53,15 @@ The diff's content picks the standards that bind this review on top of the doc c
 
 ## 3. Audit the change
 
-Read the changed docs whole, not as hunks — the brief and the docs together — against the standards they answer to. Pin each finding to its file and line and the rule or criterion it breaches. All five dimensions are audited, and they are also the dimensions the comment enumerates when they come back clean.
+Read the changed docs whole, not as hunks — the brief and the docs together — against the standards they answer to. Pin each finding to its file and line and the rule or criterion it breaches. All six dimensions are audited — the presence check against the PR body, the rest against the docs — and they are also the dimensions the comment enumerates when they come back clean.
 
+- **The presence check**, first and mechanical. The PR body carries the
+  three mandatory sections of the
+  [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)
+  — `## Summary`, `## Deviation ledger`, `## Deferred` — with the explicit
+  empty-markers (`No deviations.`, `Nothing deferred.`) accepted. A missing
+  section is an automatic Blocking finding; absence is checkable, so this
+  dimension involves no judgment call.
 - **Brief fidelity.** Every acceptance criterion the docs answer to is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope.
 - **Doc conventions.** The prose conforms to doc-conventions.md — voice, structure, one rule per section, current-state only.
 - **The doc-type contract.** Each changed doc does what its type declares — a standard states rules a reviewer could cite, a card stays thin pointers, an index lists and delegates, a README orients.
