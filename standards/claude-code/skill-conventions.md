@@ -88,7 +88,7 @@ Reference the variable in the body where the skill consumes it:
 
 After the front matter, the body is Markdown.
 
-- Start with an `# H1` title. Use the skill's human-readable name, not the
+- Start with an `# H1` title. Use the skill's readable name, not the
   kebab-case ID.
 - Use `##` sections to organize instructions. The number and depth of
   sections should match the skill's complexity — no formula here, use
@@ -111,7 +111,7 @@ A skill has **no fixed repo root**. The same skill can be invoked from a session
 |---|---|---|
 | File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
 | File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Prose conventions](~/workspace/dev-playbook/standards/prose/conventions.md)` |
-| File in the human's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
+| File in the user's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
 | Directory | Inline code | `` `docs/decisions/` `` |
 | Slash-skill invocation | Bare — no markup | `/commit` |
 

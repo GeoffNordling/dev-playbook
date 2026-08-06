@@ -61,7 +61,7 @@ An instrument's artifacts land under `readings/<instrument>/<subject>.<ext>`
 re-running the instrument when someone wants a fresh one, never by
 hand-editing the output and never on an automatic sync. A committed reading
 may lag the code or repository it describes until it is next regenerated;
-that staleness is expected, not a defect to chase. On demand means a human
+that staleness is expected, not a defect to chase. On demand means a user
 asks for a fresh reading. A change that stales a committed reading — moved
 files, renamed paths, refactors — is not a demand: exclude `readings/`
 from reference sweeps and leave the reading lagging. Readings carry no OKF

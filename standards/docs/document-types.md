@@ -45,7 +45,7 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 Every concept document opens with a YAML frontmatter block:
 
 - **`type`** — REQUIRED. Exactly one of the names above.
-- **`title`** — the human title.
+- **`title`** — the readable title.
 - **`description`** — the one-line summary that powers triage and the authored
   `index.md` listings: a sentence fragment naming what the document *is* or what
   it *governs*, present tense, no trailing period, leading with the

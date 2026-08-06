@@ -84,36 +84,30 @@ Pick one name per concept and use it across the document. The repo's root
 [`CONTEXT.md`](/CONTEXT.md) holds the established vocabulary; a doc uses its
 terms where they apply, with no obligation to extend it.
 
-## Terminology: human vs user
+## Terminology: the person is the user
 
-One actor — the dispatcher, reviewer, and approver — wears two names, chosen by
-voice. **Agent-facing instruction text says `user`**: `CLAUDE.md` at every level
-— root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike — plus the
-skill and rule bodies under `dotfiles/dot-claude/skills/` and
-`dotfiles/dot-claude/rules/`. None of these are written for a human reader; every
-one of them has exactly one real audience, the executing agent, so all of them
-name that person the way Claude Code does (`AskUserQuestion`). CLAUDE.md does not
-split by location — its content is commands to the agent
-([claude-content.md](/standards/claude-code/claude-content.md)), never a
-description of the system for a human to read, at any level.
-**Declarative documentation says `human`**: `software-factory/`, `standards/`, `docs/`,
-and `README.md` describe the system in third person, where the actor is the
-human dispatcher.
+One actor — the dispatcher, reviewer, and approver — carries one name
+everywhere: the `user`. Agent-facing instruction text uses it because that is
+what Claude Code calls the person (`AskUserQuestion`): `CLAUDE.md` at every
+level — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike —
+plus the skill and rule bodies under `dotfiles/dot-claude/skills/` and
+`dotfiles/dot-claude/rules/`. Declarative documentation uses the same word
+where it describes that actor in third person: `software-factory/`,
+`standards/`, `docs/`, and `README.md`.
 
-One override applies on top, wherever the token appears:
-
-- **Platform tokens stay `user`** — the `~/.claude/` "User" settings tier, a
-  "user message", `user-invocable`. These are Claude Code's own names, not ours
-  to translate.
+**One word, no synonyms.** The actor is `user` in every authored file — never
+an alternative noun for the same person, in any case, plural, or hyphenated
+compound. Where such a compound is the natural phrase, drop it rather than
+translate it: "readable", not "readable by a person". Only text this workspace
+does not own is exempt — skills vendored under an `.agents/` path, and verbatim
+mirrors of external specifications.
 
 **Agent-facing instruction text never speaks in the first person.** No `I`, `me`,
 or `my` in the files listed above: they are commands addressed *to* the agent,
 so the only voices they carry are the imperative and `you`. A first-person
 sentence puts the document in the agent's mouth, which inverts who is
-instructing whom — and where the word means the human, it collides with the
-`user` rule in the same breath. `repo-lint` enforces this deterministically
-alongside the `human` ban, over the body of every first-party skill and rule as
-well as `CLAUDE.md`.
+instructing whom. `repo-lint` enforces this deterministically over the body of
+every first-party skill and rule as well as `CLAUDE.md`.
 
 The ban governs the document's own voice, so quoting someone else's is
 untouched: a double-quoted utterance is exempt. Write the phrasing a user types

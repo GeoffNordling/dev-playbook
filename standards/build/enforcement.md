@@ -25,7 +25,7 @@ The commit and push gates block locally, through the git hooks that invoke
 them — hooks that live in `.git/`, so `uvx pre-commit install` has to run in
 every clone. The CI gate has no branch protection behind it —
 [repo-settings.md](/standards/tracking/repo-settings.md) configures no required
-status checks — so its block executes through the human's standing rule: **a
+status checks — so its block executes through the user's standing rule: **a
 red CI run is never merged**. That rule is nondiscretionary — no judgment is
 exercised — which is what keeps the CI gate a gate rather than a review; the
 block sits at the merge button, not in branch-protection settings.

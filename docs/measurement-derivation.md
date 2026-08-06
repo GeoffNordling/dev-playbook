@@ -106,13 +106,13 @@ assertion checks.
 | `SessionStart` | A session context beginning, including mid-session | `source` — one of `startup`, `resume`, `clear`, `compact`, `fork`. Only `startup` is a real start: a compaction fires this event inside the same `session_id`, while `clear` ends the old session id and mints a fresh one. `model` accompanies some sources but not `clear`, so only `source` is asserted (#270). |
 | `SessionEnd` | A session context ending | `reason` — `clear`, `resume`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other`. Not paired 1:1 with `SessionStart`: closing the agent view emitted it for session ids that never emitted a start. |
 | `UserPromptSubmit` | A submission, with the literal typed text in `prompt` | Fires for typed prose, for skill slash commands, and for harness pseudo-prompts alike — the last two are separated by the filters below. |
-| `UserPromptExpansion` | A typed command expanding, fired before its `UserPromptSubmit` and sharing its `prompt_id` | `command_name` and `command_args` — the human's own words, structured, when a skill is invoked with prose arguments — plus `expansion_type`, `command_source`, and the full literal `prompt`. |
-| `Stop` | The end of an agent turn | `prompt_id` pairs the turn with the submission that started it. No `Stop` fires when a human interrupts with ESC; the turn simply ends. |
+| `UserPromptExpansion` | A typed command expanding, fired before its `UserPromptSubmit` and sharing its `prompt_id` | `command_name` and `command_args` — the user's own words, structured, when a skill is invoked with prose arguments — plus `expansion_type`, `command_source`, and the full literal `prompt`. |
+| `Stop` | The end of an agent turn | `prompt_id` pairs the turn with the submission that started it. No `Stop` fires when a user interrupts with ESC; the turn simply ends. |
 | `SubagentStart` | A subagent dispatch — the dispatch signal | `agent_id` — the key a real `SubagentStop` matches on. Dispatches are counted here, never at `SubagentStop`. |
 | `SubagentStop` | A subagent finishing, plus phantoms | `agent_id`, which matches the stop to its `SubagentStart`; `agent_type` (empty on a phantom); and `agent_transcript_path` — on a real stop the child transcript outright, on a phantom a well-formed path to nothing, so any reader handles non-existence (#270). |
 | `PostToolUse` | An executed tool call, any tool | `tool_name` and `duration_ms` on every row. A Bash row is byte-verbatim: `tool_input` holds the command line as it ran — the source of phase transitions and session-to-issue binding — and `tool_response` its output. Every other tool's row is the envelope alone, with `tool_input` and `tool_response` dropped at capture and so deliberately absent — the one exception to byte-verbatim payloads (#255, ruling 23). The third assertion therefore expects `tool_input` on Bash rows only; on the rest, `tool_name` and `duration_ms` are the fields that carry meaning. |
 | `PostCompact` | A compaction — the context-pressure signal | — |
-| `Notification` | A harness notification, including the permission-request and waiting-on-human moments the bell announces | Unverified: capture of this event begins with the wiring that added it (#255, ruling 23), so no field is named here — and none asserted — until real payloads are read. |
+| `Notification` | A harness notification, including the permission-request and waiting-on-user moments the bell announces | Unverified: capture of this event begins with the wiring that added it (#255, ruling 23), so no field is named here — and none asserted — until real payloads are read. |
 
 Two identity facts constrain all of the above. A subagent's own tool events
 carry the **parent** session's `session_id` and `transcript_path` (#258) —
@@ -128,14 +128,14 @@ Four exclusions apply to conforming rows before any metric is computed:
 
 | Filter | Rule | Why |
 |---|---|---|
-| Expansion/submit pairs | Collapse rows sharing a `prompt_id` into one human submission; take `command_name`/`command_args` from the expansion and the literal text from the submit. | A skill slash command fires `UserPromptExpansion` then `UserPromptSubmit` with the same `prompt_id`. Both describe one act, and counting both doubles every skill invocation (#258). |
+| Expansion/submit pairs | Collapse rows sharing a `prompt_id` into one user submission; take `command_name`/`command_args` from the expansion and the literal text from the submit. | A skill slash command fires `UserPromptExpansion` then `UserPromptSubmit` with the same `prompt_id`. Both describe one act, and counting both doubles every skill invocation (#258). |
 | Phantom `SubagentStop` | Drop rows with an empty `agent_type` or with no `SubagentStart` in the same session matching on `agent_id`. | Hidden auxiliary model calls emit them (#258). Each phantom carries its own distinct `agent_id` — they are not repeat firings of real subagents — and the drop is verifiable: a phantom's `agent_id` is absent from agentsview and its `agent_transcript_path` points at nothing on disk (#270). |
-| Task-notification pseudo-prompts | Drop submissions whose `prompt` begins with the `<task-notification>` marker. | Harness-generated, not human, and they do fire `UserPromptSubmit` (#258). |
-| Ghost sessions | Drop session ids with zero human submissions after the filters above. | `SessionStart` fires for session slots that never materialize — no transcript is ever written, and `SessionEnd` follows on close (#258). |
+| Task-notification pseudo-prompts | Drop submissions whose `prompt` begins with the `<task-notification>` marker. | Harness-generated, not user, and they do fire `UserPromptSubmit` (#258). |
+| Ghost sessions | Drop session ids with zero user submissions after the filters above. | `SessionStart` fires for session slots that never materialize — no transcript is ever written, and `SessionEnd` follows on close (#258). |
 
 **Known blind spots.** UI slash builtins such as `/model`, `/compact`, and
 `/exit` fire neither `UserPromptSubmit` nor `UserPromptExpansion`, and ESC
-interrupts fire nothing at all. Together they are roughly a fifth of human
+interrupts fire nothing at all. Together they are roughly a fifth of user
 actions, and all of it is low-signal — UI commands plus interrupts (#258).
 Skill commands and the prose inside their arguments are fully captured. A
 report states this blind spot rather than presenting counts as complete;
@@ -144,7 +144,7 @@ interrupts are the one intervention signal with no capture path.
 **The hook stream outranks the transcript.** Resubmitting an edited prompt
 creates a sibling branch that the transcript's live path hides, so a
 transcript walk undercounts submissions by around 8 % against the hook stream.
-The human really did submit twice — two interventions, two attention windows —
+The user really did submit twice — two interventions, two attention windows —
 so the hook stream is the accurate source and is never reconciled toward the
 transcript (#266).
 
@@ -158,21 +158,21 @@ metric-definitions study (#266); the targets they feed are declared in
 
 ```
 hands_on_seconds(work item) =
-    Σ over human submissions s in the work item:
+    Σ over user submissions s in the work item:
         min( t(s) − boundary_before(s),  180 )
 
 boundary_before(s) = the latest Stop or SessionStart event of the same session,
                      strictly before t(s)
 ```
 
-A human submission is one deduplicated row from the filters above, so a skill
+A user submission is one deduplicated row from the filters above, so a skill
 invocation counts once.
 
 The cap is the whole instrument. Uncapped, the metric spans 34× between its
 10th and 90th percentile across sessions; at 180 s it spans 2.7×, and no
 amount of overnight idling, resumption, or weekend can inflate it. The value
 180 s is not chosen for looks: it is Claude Code's own away threshold, the
-modal lag of 876 measured `away_summary` firings. The metric charges the human
+modal lag of 876 measured `away_summary` firings. The metric charges the user
 for no agent time, needs only hook events, and degrades gracefully — a missing
 `Stop` after an interrupt, or a late timestamp on a queued prompt, costs at
 most one 180 s window instead of corrupting the session.
@@ -193,10 +193,10 @@ are rare, the cap bounds the error to one window, and no correction would be
 possible even with the timing known — so the bias is documented here and
 deliberately not investigated (#255, ruling 21).
 
-### Waiting-on-human latency
+### Waiting-on-user latency
 
 ```
-gaps = { t(s) − t(prev Stop) : for each human submission s }
+gaps = { t(s) − t(prev Stop) : for each user submission s }
 
 report:  median and p90 over gaps ≤ 14400 s
          plus the count and total duration of gaps > 14400 s, separately, as away time
@@ -212,11 +212,11 @@ censored gaps are reported as away time, never discarded. `prev Stop` is the
 chronological predecessor — the latest `Stop` of the same session strictly
 before t(s). Pairing by `prompt_id` is wrong here: a `Stop` shares its
 `prompt_id` with the submission that started its turn, so that join measures
-the agent's turn duration, not the human's waiting (#270).
+the agent's turn duration, not the user's waiting (#270).
 
 ### Interventions per issue
 
-Interventions are the human submissions in the session bound to the issue,
+Interventions are the user submissions in the session bound to the issue,
 beyond the launch prompt that started the overwatch (#255). The count is a
 lower bound, since ESC interrupts leave no event; the target is zero, so any
 nonzero count is real regardless.

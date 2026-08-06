@@ -42,7 +42,7 @@ This resolves the first and third frictions outright and the second for the `fea
 ## Consequences
 
 - Two skills removed (`sdd-requirements`, `sdd-design`); one added (`sdd-specs`).
-- `workflow.md`: the two SDD authoring nodes collapse to one in the graph; the `(human, work)` example and the skills table fold to a single `/sdd-specs` row (HITL; escalates only on a stale base).
+- `workflow.md`: the two SDD authoring nodes collapse to one in the graph; the `(user, work)` example and the skills table fold to a single `/sdd-specs` row (HITL; escalates only on a stale base).
 - `bootstrap-labels`: two phase labels retired, one added. Re-run per repo to mint `phase:sdd-specs`; the retired labels linger until deleted by hand (the script only adds, on this path).
 - Any in-flight issue sitting at `phase:sdd-requirements` or `phase:sdd-design` needs a one-time relabel to `phase:sdd-specs`.
 - `intake`'s `mode:sdd` entry and `sdd-tdd`'s spec-amendment escape hatch retarget to `sdd-specs`.

@@ -1,12 +1,12 @@
 ---
 type: Standard-Card
 title: System Legibility
-description: Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
+description: Card for the system-legibility standard — how a user understands a large system they did not write and will not read directly
 ---
 
 # System Legibility
 
-Governs how a human understands a large system they did not write and
+Governs how a user understands a large system they did not write and
 will not read directly.
 
 ## Define

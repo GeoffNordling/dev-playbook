@@ -7,7 +7,7 @@ description: The documentation bundle — its purpose, principles, and the conce
 # The OKF Bundle
 
 Every documentation file in a workspace repository has a defined content
-scope, so any human or agent can open a repo cold and immediately orient —
+scope, so any user or agent can open a repo cold and immediately orient —
 what it is, how to operate it, and where to find the rest. Which files must
 exist is declared once, in the build standard's
 [file skeleton](/standards/build/skeleton.md); what goes inside each is
@@ -43,7 +43,7 @@ Not every file in the repo is a concept document. The bundle divides in two:
 The test is *how the file is used*, not where it sits: everything is in the
 repo, hence in the bundle; harness-owned files are simply in-bundle
 non-concept-documents. `CLAUDE.md` is the worked example — it is prose a
-human could read, but Claude Code loads it as operating configuration, so
+user could read, but Claude Code loads it as operating configuration, so
 it is harness-owned and carries no OKF frontmatter.
 
 ## Principles

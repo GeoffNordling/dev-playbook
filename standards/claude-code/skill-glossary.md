@@ -46,9 +46,9 @@ How a skill is reached — and the two loads paid for the choice.
 
 ### Model-invoked
 
-A skill the agent can see and fire autonomously — and the human can still type
+A skill the agent can see and fire autonomously — and the user can still type
 its name, so model-invocation always *includes* user reach. There is no
-model-only state: agent discovery only ever *adds* to the human's, never
+model-only state: agent discovery only ever *adds* to the user's, never
 removes it. Pays a permanent **context load** on every turn in exchange for
 that discoverability. Reachable by other skills, because what makes it
 agent-discoverable makes it invocable. A model-invoked skill whose content is
@@ -62,10 +62,10 @@ never fires except by hand, pay no context load. Set by
 
 ### User-invoked
 
-A skill invisible to the agent — reachable only by the human typing its name
+A skill invisible to the agent — reachable only by the user typing its name
 (user-*only*, where **model-invoked** is user-*and-agent*). Trades
 agent-discoverability for zero **context load**. Because the agent cannot see
-it, nothing but the human can reach it: no other skill can fire it. Set by
+it, nothing but the user can reach it: no other skill can fire it. Set by
 `disable-model-invocation: true`.
 
 *Avoid*: procedure, workflow, command
@@ -104,21 +104,21 @@ reach, and the brake on splitting into more model-invoked skills.
 
 ### Cognitive load
 
-The cost a **user-invoked** skill imposes on the human — what they must hold
-in their head: which skills exist and when to reach for each (the human is the
+The cost a **user-invoked** skill imposes on the user — what they must hold
+in their head: which skills exist and when to reach for each (the user is the
 index). What **model-invocation** removes by being agent-discoverable, and the
 brake on splitting into more user-invoked skills. Not a cost to minimize: it
-is the price of human agency, the reason some skills stay user-invoked. Spend
-it where human judgment matters; remove it where it does not.
+is the price of user agency, the reason some skills stay user-invoked. Spend
+it where user judgment matters; remove it where it does not.
 
-*Avoid*: human index, burden, overhead
+*Avoid*: user index, burden, overhead
 
 ### Router skill
 
 A **user-invoked** skill whose job is to point at the other user-invoked
-skills — naming each and when to reach for it — so the human has one skill to
+skills — naming each and when to reach for it — so the user has one skill to
 remember instead of many. It can only hint, never fire them: nothing but the
-human can reach them. The cure for **cognitive load** when
+user can reach them. The cure for **cognitive load** when
 user-invoked skills multiply.
 
 *Avoid*: dispatcher, menu, registry, index, router procedure
@@ -128,10 +128,10 @@ user-invoked skills multiply.
 How finely skills are divided. Finer division spends one of the two loads:
 more **model-invoked** skills spend **context load** (more descriptions
 crowding the window and competing for attention); more **user-invoked** skills
-spend **cognitive load** (more for the human to remember and reach for). Two
+spend **cognitive load** (more for the user to remember and reach for). Two
 cuts guide the division. By **invocation**, split off a model-invoked skill
 where there is a distinct **leading word** to trigger it — a trigger word the
-human actually uses in their prompts. By **sequence**, split a run of **steps**
+user actually uses in their prompts. By **sequence**, split a run of **steps**
 where a step's **post-completion steps** need hiding, since isolating it in its
 own context clears what follows. Beware the reverse: merging sequences exposes
 each step's post-completion steps to what follows, inviting premature
@@ -265,9 +265,9 @@ A leading word serves **predictability** twice. In the body it anchors
 appears, and inside flat reference it focuses attention on a class of thing to
 look for, recruiting the right checks each run. In the **description** it
 anchors **invocation** — and not only within the skill: when the same word
-lives in the human's prompts, their docs, and their codebase, the agent links
+lives in the user's prompts, their docs, and their codebase, the agent links
 that shared language to the skill and fires it more reliably. Word a
-description with the leading words the human actually uses when they want the
+description with the leading words the user actually uses when they want the
 skill.
 
 *Avoid*: keyword, term, motif
@@ -292,7 +292,7 @@ strongest criteria are both checkable and exhaustive.
 
 The work an agent does behind the scenes within a single step — reading files,
 exploring the codebase, making changes, digging up what it needs rather than
-offloading to the human. It lives below the step structure: never written as
+offloading to the user. It lives below the step structure: never written as
 its own step, latent in the wording, controlled by the agent rather than the
 skill. The within-step counterpart to **post-completion steps**' across-step
 pull. Raised by a **leading word** (*comprehensive*, *thorough*) or a

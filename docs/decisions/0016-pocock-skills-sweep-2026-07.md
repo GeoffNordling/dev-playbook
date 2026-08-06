@@ -14,7 +14,7 @@ Three verdicts, plus one bookkeeping value:
 - **verbatim** — installed from upstream and pin-owned, never edited by us.
 - **adapt** — the technique harvested into our own authored material; the upstream skill itself not installed.
 - **reject** — considered and declined.
-- **never considered** — present at the pin, but no human ruling exists. Recorded as-is rather than backfilled.
+- **never considered** — present at the pin, but no user ruling exists. Recorded as-is rather than backfilled.
 
 Prior Pocock decisions this record does not restate: [0001](0001-adopt-matt-pocock-conventions.md) (adopt his conventions), [0004](0004-remove-pocock-direct-dependency.md) (cut the direct dependency, absorb the conventions), [0006](0006-harvest-pocock-prototype-and-handoff.md) (harvest `prototype` and `handoff`).
 
@@ -33,7 +33,7 @@ Prior Pocock decisions this record does not restate: [0001](0001-adopt-matt-poco
 | domain-modeling | engineering | **verbatim** | Installed, lock-tracked |
 | grill-with-docs | engineering | adapt | Ours rewritten as a thin front door onto `/grilling` + `/domain-modeling`, mirroring upstream's decomposition; upstream not installed — its `disable-model-invocation: true` would break our four call sites |
 | implement | engineering | reject | The factory graph already does this with more rigor |
-| improve-codebase-architecture | engineering | **never considered** | An agent proposed a narrow harvest; no human ever ruled |
+| improve-codebase-architecture | engineering | **never considered** | An agent proposed a narrow harvest; no user ever ruled |
 | prototype | engineering | **verbatim** | Installed, lock-tracked; the authored fork deleted |
 | research | engineering | **verbatim** | Installed, lock-tracked |
 | resolving-merge-conflicts | engineering | reject | Catalogued adapt, then dropped in the 2026-07-31 rescope |
