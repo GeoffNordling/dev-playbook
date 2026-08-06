@@ -108,6 +108,9 @@ the full SHA from `git rev-parse HEAD` so GitHub renders a code preview — and
 names the rule or criterion it breaches. A finding on a file the diff leaves
 untouched anchors the same way.
 
+A finding whose subject is not a repo file has no path to link. It anchors by
+naming that subject and the rule that governs it, in place of the blob link.
+
 ### Worked examples
 
 A well-formed finding: one problem, the action it calls for, the rule it

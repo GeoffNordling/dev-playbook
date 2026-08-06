@@ -15,7 +15,7 @@ Review a direct-mode issue's PR diff against its issue brief and the project's c
 
 A bug-review pass (/bug-pr-review) runs in parallel with you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover.
 
-**Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
+**Jurisdiction: code, plus the PR body.** Findings post on the diff's code files — source, tests, scripts, config, build — and on the PR body, for the presence check alone. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
 
 ## Read first
 
@@ -30,7 +30,7 @@ Your values for the contract's three parameters:
 |---|---|
 | Review name | `Code review` |
 | Staging filename | `/tmp/code-review-<issue>.md` |
-| Blocking | a fidelity gap, a convention breach that matters, a bug |
+| Blocking | a missing PR-description section, a fidelity gap, a convention breach that matters, a bug |
 
 ## 1. Load context
 
@@ -57,8 +57,15 @@ The implementer read at most the testing conventions, so enforcing all of these 
 
 ## 3. Audit the change
 
-Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. Every dimension below whose content the diff carries is audited, and those are also the dimensions the comment enumerates when they come back clean.
+Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. The presence check always runs — its subject is the PR body, not the diff — and every other dimension below whose content the diff carries is audited; the dimensions that ran are also the ones the comment enumerates when they come back clean.
 
+- **The presence check**, first and mechanical. The PR body carries the
+  three mandatory sections of the
+  [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)
+  — `## Summary`, `## Deviation ledger`, `## Deferred` — with the explicit
+  empty-markers (`No deviations.`, `Nothing deferred.`) accepted. A missing
+  section is an automatic Blocking finding; absence is checkable, so this
+  dimension involves no judgment call.
 - **Brief fidelity**, always. Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
 - **Testing conventions.** The tests conform to testing-conventions.md — structure, naming, behavioral focus.
 - **Python style.** The code conforms to python-style.md — docstrings, the fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a helper earns its place or stays inline), annotation style.
