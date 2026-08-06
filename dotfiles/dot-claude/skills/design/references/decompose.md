@@ -98,9 +98,9 @@ dispatch both lenses in one message, as fresh-context subagents — one invokes
 `/issue-review-claims <child#>`, the other `/issue-review-simulation <child#>`,
 each pinned to the model its skill file names; they read only the issue and the
 repo and return findings raw. Synthesize the **consolidated disposition list**,
-take the human verdict, and on a *pass* apply or demote per the ruled
+take the user verdict, and on a *pass* apply or demote per the ruled
 dispositions, post the **verdict-record comment**, and move the child:
 `gh issue edit <child#> --remove-label "phase:design" --add-label "phase:build"`.
 On a *back to design* the child stays at `phase:design`, its verdict record the
-work order for the next session. The human may always skip a child's beat, cut
+work order for the next session. The user may always skip a child's beat, cut
 it short, or advance anyway.

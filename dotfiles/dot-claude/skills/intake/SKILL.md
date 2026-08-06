@@ -106,10 +106,10 @@ Work routed to `phase:design` or `phase:spike` lands at its routed phase directl
 An issue routed to `phase:build` is released by the [issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict), never by the §5 nod alone. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
 
 1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
-2. **Synthesize the consolidated disposition list** — both lenses' findings merged and deduplicated, each disposition carrying a recommendation. The human rules on dispositions, never on raw findings one by one.
+2. **Synthesize the consolidated disposition list** — both lenses' findings merged and deduplicated, each disposition carrying a recommendation. The user rules on dispositions, never on raw findings one by one.
 3. **Take the verdict.** *Pass* — apply or demote per the ruled dispositions (the body is editable until launch), post the **verdict-record comment** — date, lenses run, findings count, disposition gist, verdict — then `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. *Back to design* — the brief needs more than the front door gives it: post the verdict-record comment, then route the issue there (`gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit, the verdict record its work order. Re-review is always a full fresh run of both lenses.
 
-The human may always skip the beat, cut it short, or advance anyway — the review binds the factory's autonomous path, never the human.
+The user may always skip the beat, cut it short, or advance anyway — the review binds the factory's autonomous path, never the user.
 
 ## Output
 
