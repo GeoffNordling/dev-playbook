@@ -84,17 +84,23 @@ only when all four hold:
   ([Relationships](#relationships)).
 - **A brief-complete body**, meeting the brief standard below; an
   under-specified leaf is not yet ready.
-- **`phase:build` set at an issue-review verdict** — the definition session
-  dispatched the two review lenses, the human ruled on the consolidated
-  dispositions, and the verdict-record comment on the issue evidences it
+- **Released at an issue-review verdict** — the definition session dispatched
+  the two review lenses, the human ruled on the consolidated dispositions, and
+  the verdict-record comment on the issue evidences it
   ([human-checkpoints.md](/software-factory/human-checkpoints.md#the-issue-review-verdict)).
-  The human may always skip or override the beat; the label move is theirs
-  either way. Factory-bound leaves only: a spike's deliverable is an answer,
-  not a build, so a spike is ready on the first three conditions.
+  Setting `phase:build` is that verdict's consequence, not a separate act. The
+  human may always skip or override the beat; the release is theirs either way.
+  Factory-bound leaves only: a spike's deliverable is an answer, not a build,
+  so a spike is ready on the first three conditions.
+
+The bar governs the **one crossing out of definition**, not every occurrence of
+`phase:build`. An issue the review stop sends back to `build` is already inside
+the factory and does not re-cross: the rework lap carries the original release,
+and no fresh issue review is owed.
 
 The refinement interview — intake, or the `design` node — is the **refinement
 step** that carries a leaf to ready by authoring its brief; the issue-review
-verdict at the beat's end is what sets `phase:build`. A leaf's role never
+verdict at the beat's end is what releases it. A leaf's role never
 changes as it readies; only its body and phase advance.
 (**Promotion** is a different move, reserved for Candidate → issue.)
 

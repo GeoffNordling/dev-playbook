@@ -16,7 +16,11 @@ where it stops and the human acts, and there are only two reasons for one:
 
 This document collects both, and fixes what the factory owes the human at each.
 The nodes these checkpoints interrupt are
-[factory-operations.md](/software-factory/factory-operations.md).
+[factory-operations.md](/software-factory/factory-operations.md). One checkpoint
+sits just outside that span — the
+[issue-review verdict](#the-issue-review-verdict), which rules on a leaf before
+the factory ever picks it up — and it is collected here too, because what it
+owes the human is the same.
 
 ## The agent-capability boundary
 
@@ -165,8 +169,8 @@ dispositions, never raw findings one by one. The verdict is the human's:
 
 After the ruling the session posts one **verdict-record comment** on the issue —
 date, lenses run, findings count, disposition gist, verdict. It is the evidence
-behind the readiness bar's "set at an issue-review verdict" and, on a not-yet,
-the next session's work order. The review binds the factory's autonomous path,
+behind the readiness bar's "released at an issue-review verdict" and, on a
+not-yet, the next session's work order. The review binds the factory's autonomous path,
 never the human, who may always skip the beat, cut it short, or advance anyway.
 
 ## What is not a checkpoint

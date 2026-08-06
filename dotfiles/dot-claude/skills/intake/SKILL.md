@@ -54,7 +54,7 @@ Routing, given the mode:
 | The work | Routes to | Why |
 |---|---|---|
 | `mode:spike` | `phase:spike` | A question is answered inside the definition region; it never enters the factory. |
-| `mode:direct`, specifiable on the spot | `phase:build` | The brief is complete, so the issue is ready and the factory takes it from here. |
+| `mode:direct`, specifiable on the spot | `phase:build`, set at the issue-review verdict | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
 | `mode:direct`, needing exploration, tradeoffs, or slicing | `phase:design` | The approach isn't settled, or the work is bigger than one build. Design re-authors the brief or decomposes. |
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.

@@ -96,7 +96,7 @@ When the work is bigger than one build, the issue becomes an **epic** and never 
 
 Only once the user has explicitly agreed design is done. No label moves in this region on the agent's own authority.
 
-1. **Move the phase** — single leaf only: `gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"`, and the issue crosses into the factory. A decomposed issue shed its phase at §7 and stays an epic; its children carry the work.
+1. **Move the phase** — single leaf only, and only at the issue-review verdict that releases it, never on the design nod alone: `gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"`, and the issue crosses into the factory. The same mechanic governs a decomposed child ([decompose.md](references/decompose.md)). A decomposed issue shed its phase at §7 and stays an epic; its children carry the work.
 2. **Keep the branch, drop the tree**, if §5 opened one. The prototype is already committed on `worktree-design-<issue>` (§5). Exit with `ExitWorktree(action: "keep")` — never `"remove"`, which deletes the branch too — then `git worktree remove .claude/worktrees/design-<issue>`, and leave the pointer /prototype asks for: `gh issue comment <issue> --body "Prototype preserved on branch worktree-design-<issue>."` The same two commands work when this session doesn't own the tree (entered by path, or after a `/clear`).
 3. Report and stop:
    ```
