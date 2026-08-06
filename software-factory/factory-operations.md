@@ -9,15 +9,15 @@ description: The factory's operating contract — how a ready issue is dispatche
 How the factory carries a ready issue from `build` to a merged pull request with
 nobody driving it. The map it executes — the two regions, the states, the labels
 — is [software-factory.md](/software-factory/software-factory.md); every point
-where it stops for the human is
+where it stops for the user is
 [checkpoints.md](/software-factory/checkpoints.md).
 
 ## Dispatch
 
-The unit of dispatch is the **issue**. The human launches one **issue overwatch**
+The unit of dispatch is the **issue**. The user launches one **issue overwatch**
 per issue in **Agent view** — the official name of the `claude agents` dashboard
 — and that overwatch owns the issue's whole traverse: it reads the graph and
-executes it, delegating each node and stopping where the human must act. The node
+executes it, delegating each node and stopping where the user must act. The node
 sequence is never hard-coded into any skill — the graph is the single source.
 
 Two overwatch scopes, two screens:
@@ -25,13 +25,13 @@ Two overwatch scopes, two screens:
 - **Agent-view overwatch** — fleet scope: reads the board,
   recommends what to launch next, tears down worktrees after confirmed merges.
 - **Issue overwatch** — issue scope, one per issue: executes that
-  issue's traverse and surfaces its human git commands.
+  issue's traverse and surfaces the git commands the user must run.
 
 **Factory nodes only.** An issue overwatch executes the factory region and
 nothing else. Launched on an issue whose phase sits in
 [definition](/software-factory/software-factory.md#the-definition-region) — or on
-an unlabeled one — it refuses outright and names the skill the human should run
-instead. Definition is human-led by construction; an overwatch that improvised
+an unlabeled one — it refuses outright and names the skill the user should run
+instead. Definition is user-led by construction; an overwatch that improvised
 its way through intake would be extracting intent with nobody to extract it from.
 
 **Single label writer.** One writing session per issue — the session sequencing
@@ -49,7 +49,7 @@ verdict — defined once in the
 What the crossing checks is the first three: each is observable on the issue,
 and an overwatch escalates when one fails. The release is a definition-region
 obligation — evidenced by the verdict-record comment, and overridable by the
-human — so the crossing takes it as given rather than re-deriving it. A rework
+user — so the crossing takes it as given rather than re-deriving it. A rework
 lap is not a crossing: the issue never left the factory, so nothing is
 re-checked.
 
@@ -85,28 +85,28 @@ Canonical front-matter and syntax:
 
 ## Engagement
 
-Each node engages the human one of two ways:
+Each node engages the user one of two ways:
 
 - **AFK** (away from keyboard) — the overwatch delegates the node to a subagent,
-  which does the work hands-off and reports. The human sees only the report.
+  which does the work hands-off and reports. The user sees only the report.
 - **Inline** — the overwatch runs the node itself at its own main loop, with the
-  human present in the terminal.
+  user present in the terminal.
 
 A review node (a diamond) is several AFK delegations followed by the overwatch's
 own verdict interview, sequenced within the one node.
 
 ### The dispatch table
 
-The factory's nodes, what runs each, and how each engages the human:
+The factory's nodes, what runs each, and how each engages the user:
 
 | Node | Skill | Engagement |
 |---|---|---|
 | `build` | `/build` | AFK. |
-| `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/checkpoints.md#pause-1-the-review-verdict)). |
+| `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the user's verdict on the whole stop ([pause 1](/software-factory/checkpoints.md#pause-1-the-review-verdict)). |
 | `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/checkpoints.md#pause-2-judgments-conditional)). |
 
 The table is factory-only. The definition region's skills — `/intake`,
-`/design`, `/candidate-promote` — are invoked by the human and never dispatched,
+`/design`, `/candidate-promote` — are invoked by the user and never dispatched,
 and the `spike` node has no skill at all.
 
 **Delegation.** An AFK node is delegated to a subagent whose prompt is the launch
@@ -120,7 +120,7 @@ A helper a skill invokes itself (`/commit`,
 **The terminal report contract.** A subagent's final message MUST begin at
 character one with exactly `DONE: <one-line outcome>` or
 `ESCALATE: <one-line reason>`; detail follows below. Any non-matching final
-message is treated as ESCALATE — malformed fails safe, toward the human. What the
+message is treated as ESCALATE — malformed fails safe, toward the user. What the
 overwatch does with an escalation is
 [checkpoints.md](/software-factory/checkpoints.md#escalation).
 
@@ -157,7 +157,7 @@ Every file-touching node sits in the issue's worktree:
 - **Tear down (Agent-view overwatch, post-merge).** When the issue lands, the
   Agent-view overwatch removes the local side —
   `git worktree remove .claude/worktrees/issue-<N>` and
-  `git branch -D issue-<N>` — only after the human confirms the merge happened. A
+  `git branch -D issue-<N>` — only after the user confirms the merge happened. A
   spike's worktree goes the same way when its issue closes.
 
 **The branch is pushed as it is committed.** A committing node pushes what it
@@ -184,7 +184,7 @@ lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
 - **AFK** — the skill runs hands-off and terminates per
   [the terminal report contract](#engagement): `DONE:` on success, `ESCALATE:`
   when stuck. Each skill states its own escalation triggers in its body.
-- **Inline** — a skill the human invokes directly, as the definition region's
+- **Inline** — a skill the user invokes directly, as the definition region's
   are, may gate on interviews and approvals, asked in prose at the terminal.
 - **The report line.** Every node closes on one ` · `-delimited line: the handle
   `<repo>#<N>` · `phase: <node>`. A committing node appends
@@ -211,7 +211,7 @@ lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
 ## Pull requests
 
 One PR per issue — spikes open none — born at the review stop and squash-merged
-by the human. Because [repository settings](/standards/tracking/repo-settings.md)
+by the user. Because [repository settings](/standards/tracking/repo-settings.md)
 take the squash message from the PR, its title and body become the permanent
 commit message on `main`: they are authored from the issue brief, the diff, and
 the record the issue and its PR carry, never left as a placeholder.
@@ -231,7 +231,7 @@ the record the issue and its PR carry, never left as a placeholder.
     explicitly when empty.
   - `## Deferred` — orthogonal work discovered after the brief froze:
     incidental bugs, cleanups, adjacent improvements, and review findings
-    the human rules real-but-not-this-issue. Each entry is a real tracker
+    the user rules real-but-not-this-issue. Each entry is a real tracker
     stub at `phase:intake`, named by issue link — never a Candidate
     ([the one-goal principle](/standards/tracking/issue-authoring.md#brief-principles)).
     `Nothing deferred.` explicitly when empty.
@@ -257,7 +257,7 @@ is authored against a diff still moving.
 
 ## The review stop
 
-`pr_review` is a diamond: audits run, then the human gives one verdict on the
+`pr_review` is a diamond: audits run, then the user gives one verdict on the
 whole stop. Which audits run is fixed by the [track rules](#track-rules) below,
 never by asking.
 
@@ -270,7 +270,7 @@ never by asking.
   lockdown verifies fixes and needs no fresh bug hunt. The track rules still
   elect the tracks, so a doc-only diff is re-reviewed by the doc track.
 
-There is exactly one verdict per stop, and it is the human's — the first of the
+There is exactly one verdict per stop, and it is the user's — the first of the
 three pauses, briefed per
 [pause 1](/software-factory/checkpoints.md#pause-1-the-review-verdict). A
 **reject** returns the issue to `build`, with the deciding reason recorded where
@@ -290,7 +290,7 @@ asked:
   section, or the issue's brief names docs as a deliverable. Skip when the doc
   changes are incidental to a code deliverable — mechanical echoes such as
   renames, links, and wording the code change forces, or small edits (roughly
-  under 10 changed doc lines). Always skip when the human already wrote or
+  under 10 changed doc lines). Always skip when the user already wrote or
   approved those doc changes inline this traverse: a review there re-litigates an
   approval.
 - **Doubt skips.** A skipped track is one retroactive command away; an
@@ -302,8 +302,8 @@ asked:
 The traverse's one armed pass of the semantic
 [cache gate](/standards/judgments/cache-gate.md). Every intermediary push rode
 `--no-verify`, so a red cache never blocked a work cycle; the whole semantic bill
-comes due here, once, after review approves and before the human's final read.
-The node is preparation for that read: it exists so the human meets a PR whose
+comes due here, once, after review approves and before the user's final read.
+The node is preparation for that read: it exists so the user meets a PR whose
 judgments are already green.
 
 **The overwatch runs it inline, at its own main loop.** The node cannot be
@@ -313,11 +313,11 @@ the overwatch invokes `/run-judgments` itself, in the issue's worktree.
 
 - **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
   and on the issue branch, and committed as it lands — no separate go-ahead.
-- **An ambiguous failure escalates.** Where a fix is unclear enough to want human
-  advice, the node stops and asks
+- **An ambiguous failure escalates.** Where a fix is unclear enough to want the
+  user's advice, the node stops and asks
   ([pause 2](/software-factory/checkpoints.md#pause-2-judgments-conditional));
   a clean green run stops for nothing.
 - **No back edge.** Judgment fixes never reopen review — no new cycle, no fresh
-  audit; the human has already approved the substance. A gate that stays red
+  audit; the user has already approved the substance. A gate that stays red
   parks the issue at the node rather than routing it anywhere. The node closes
   only green.

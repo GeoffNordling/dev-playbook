@@ -33,7 +33,7 @@ A citing review supplies three values and inherits everything below them:
 
 A review is an **audit only**. It never modifies the work under review, and the
 verdict on its findings is not its to take — it posts them and stops. Defects
-route back to the authoring node through the human's rework verdict, never
+route back to the authoring node through the user's rework verdict, never
 through the reviewer's hand.
 
 The audit runs hands-off: finding problems is its output, not a reason to stop.
@@ -84,14 +84,14 @@ denied, `/tmp` is allowed — and posted as one comment on the issue's PR with
 under this review's name, the header reads
 `## <Review name> — <sha> · cycle <n> (supersedes review of <prior-sha>)` and the
 comment opens with a one-line disposition of each prior finding — resolved or
-still open — so neither the human nor a later read treats stale findings as live.
+still open — so neither the user nor a later read treats stale findings as live.
 
 **Every finding is a problem plus its fix**, grouped by severity: **Blocking**,
 as the review defines it, or **Suggestion**, a non-disqualifying improvement.
 Nothing unactionable is written — no "acceptable as written", "no action
 needed", "just noting", and no explaining why a clean thing is clean; detail
 belongs to Blocking and Suggestion findings alone. Genuine uncertainty is still
-surfaced, as a question or risk naming the decision the human faces.
+surfaced, as a question or risk naming the decision the user faces.
 
 **A real problem outside the work's scope** is highlighted with a recommended
 follow-up issue; the review never opens one itself.

@@ -37,5 +37,5 @@ All repos live under a single root directory: `~/workspace/`. One meta repo gove
 
 The top-level directories are listed in [`index.md`](/index.md).
 
-> **`dotfiles/`** — after adding or removing files, run `scripts/sync-dotfiles` from the main checkout only; it relinks live `$HOME`, so it's a human step, never run from a per-issue worktree.
+> **`dotfiles/`** — after adding or removing files, run `scripts/sync-dotfiles` from the main checkout only; it relinks live `$HOME`, so it's a user step, never run from a per-issue worktree.
 

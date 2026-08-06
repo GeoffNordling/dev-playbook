@@ -1,7 +1,7 @@
 ---
 type: Survey
 title: Abstraction Calibration
-description: Where the human should live in an AI-written repo — the slop trench, the pandas standard, and the bet on invented, deterministically-enforced primitives
+description: Where the user should live in an AI-written repo — the slop trench, the pandas standard, and the bet on invented, deterministically-enforced primitives
 ---
 
 # Abstraction Calibration

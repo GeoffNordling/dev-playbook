@@ -11,14 +11,14 @@ question.
 
 The system has two **regions**, divided by what kind of work each does:
 
-- **Definition — human-led.** Intent extraction. An idea becomes a tracked issue
+- **Definition — user-led.** Intent extraction. An idea becomes a tracked issue
   carrying a brief an implementer can build from: what the work is, why, and
-  where it stops. Most of what gets decided here is only in the human's head, so
+  where it stops. Most of what gets decided here is only in the user's head, so
   the region is interview-shaped and unhurried by design. Its states are below;
-  its skills are invoked by the human directly.
+  its skills are invoked by the user directly.
 - **The factory — autonomous.** Implementation in the wide sense: build, review,
   rework, and the path to merge. Handed a ready issue it runs unattended,
-  stopping only where the human's capability or decision is required. Its
+  stopping only where the user's capability or decision is required. Its
   operating contract is
   [factory-operations.md](/software-factory/factory-operations.md); every point
   where it stops is
@@ -33,7 +33,7 @@ Solid edges are state moves; dotted edges are informational.
 
 ```mermaid
 flowchart LR
-    subgraph definition[Definition — human-led]
+    subgraph definition[Definition — user-led]
         ideas([idea funnel]) -.-> cand[CANDIDATES.md]
         cand -->|/candidate-promote| intake[intake]
         stub([new or adopted issue]) --> intake
@@ -64,7 +64,7 @@ epic's children — dotted because the epic itself never crosses; each child ent
 ## The definition region
 
 Work enters as an idea and leaves as an issue a factory node can pick up. Every
-state below is human-led; the skills serving them are invoked by the human, never
+state below is user-led; the skills serving them are invoked by the user, never
 dispatched by the factory.
 
 **Before the issue.** The idea funnel feeds `CANDIDATES.md`, a repo's register of
@@ -118,8 +118,8 @@ defined once in
 
 ## The factory
 
-`build` implements, `pr_review` audits and takes the human's verdict, and
-`judgments` settles the semantic gate before the human's final read and merge. A
+`build` implements, `pr_review` audits and takes the user's verdict, and
+`judgments` settles the semantic gate before the user's final read and merge. A
 rejected review returns to `build`; nothing else re-enters. What each node does,
 who runs it, and under what contract is
 [factory-operations.md](/software-factory/factory-operations.md).

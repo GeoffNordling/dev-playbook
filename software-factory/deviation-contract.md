@@ -37,7 +37,7 @@ On any yes: stop work, commit what is done so the branch holds it, and post
 **one structured comment** — the deviation (brief said / reality is), which
 limiter tripped, two or three fix options with a recommendation, and any
 ledger entries already logged on this lap — to the PR if one exists,
-otherwise to the issue — always the most current of the two. The human's
+otherwise to the issue — always the most current of the two. The user's
 reply is the ruling: given as a comment, or spoken in the terminal and
 transcribed onto the issue or PR by the session that received the
 escalation, so it is always recorded. The brief body itself is never the

@@ -17,7 +17,7 @@ pull request.
 
 ## The comment surfaces
 
-All four are read, from human and agent reviewers alike:
+All four are read, from user and agent reviewers alike:
 
 | Surface | Where it lives |
 |---|---|
