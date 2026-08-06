@@ -15,7 +15,7 @@ Review a direct-mode issue's PR diff against its issue brief and the project's c
 
 A bug-review pass (/bug-pr-review) runs in parallel with you and posts its own PR comment; you add the brief-fidelity and convention findings it does not cover.
 
-**Jurisdiction: code.** Findings post only on the diff's code files — source, tests, scripts, config, build. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
+**Jurisdiction: code, plus the PR body.** Findings post on the diff's code files — source, tests, scripts, config, build — and on the PR body, for the presence check alone. Docs in the diff are fidelity evidence only: a code change that demands a doc update the diff lacks is a brief-fidelity finding, not a prose finding — the doc track, running in parallel, owns the prose.
 
 ## Read first
 
@@ -30,7 +30,7 @@ Your values for the contract's three parameters:
 |---|---|
 | Review name | `Code review` |
 | Staging filename | `/tmp/code-review-<issue>.md` |
-| Blocking | a fidelity gap, a convention breach that matters, a bug |
+| Blocking | a missing PR-description section, a fidelity gap, a convention breach that matters, a bug |
 
 ## 1. Load context
 

@@ -13,7 +13,7 @@ argument-hint: "<issue-number>"
 
 Review the documentation in an issue's PR diff against its issue brief, the doc standards, and the documents around it, and attach your findings to the PR.
 
-**Jurisdiction: docs.** Findings post only on the diff's non-spec markdown and prose artifacts. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them.
+**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec markdown and prose artifacts, and on the PR body, for the presence check alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them.
 
 ## Read first
 
@@ -29,7 +29,7 @@ Your values for the contract's three parameters:
 |---|---|
 | Review name | `Doc review` |
 | Staging filename | `/tmp/doc-review-<issue>.md` |
-| Blocking | a fidelity gap, a missed knock-on update, a contradiction between docs, a convention breach that matters |
+| Blocking | a missing PR-description section, a fidelity gap, a missed knock-on update, a contradiction between docs, a convention breach that matters |
 
 ## 1. Load context
 
