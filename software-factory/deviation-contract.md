@@ -40,8 +40,9 @@ ledger entries already logged on this lap — to the PR if one exists,
 otherwise to the issue — always the most current of the two. The human's
 reply is the ruling: given as a comment, or spoken in the terminal and
 transcribed onto the issue or PR by the session that received the
-escalation, so it is always recorded. The brief body itself is never the place — it is frozen,
-per [the brief freeze](/standards/tracking/issue-authoring.md#the-brief-freeze).
+escalation, so it is always recorded. The brief body itself is never the
+place — it is frozen, per
+[the brief freeze](/standards/tracking/issue-authoring.md#the-brief-freeze).
 Because the ruling lands on the issue or PR, limiter 3 automatically binds
 every later deviation to it — escalations feed the limiter system.
 
