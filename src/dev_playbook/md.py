@@ -247,8 +247,8 @@ def classify(relpath: str) -> str:
     return "concept"
 
 
-def find_md_files(root: Path) -> list[Path]:
-    """All ``.md`` files in ``root``'s git checkout, honoring ``.gitignore``.
+def find_files(root: Path) -> list[Path]:
+    """Every file in ``root``'s git checkout, honoring ``.gitignore``.
 
     Uses ``git ls-files`` rather than a filesystem walk so discovery is both
     gitignore-aware and worktree-scoped: from inside a worktree, git's
@@ -276,9 +276,14 @@ def find_md_files(root: Path) -> list[Path]:
     )
     results = []
     for rel in result.stdout.split("\0"):
-        if not rel.endswith(".md"):
+        if not rel:
             continue
         path = root / rel
         if path.is_file():
             results.append(path)
     return sorted(results)
+
+
+def find_md_files(root: Path) -> list[Path]:
+    """All ``.md`` files in ``root``'s git checkout, honoring ``.gitignore``."""
+    return [path for path in find_files(root) if path.name.endswith(".md")]

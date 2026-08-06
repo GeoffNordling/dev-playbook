@@ -3,10 +3,10 @@
 # the executing agent in the second person, naming the person "user", and reading
 # as operating instructions rather than a third-person description of the system.
 # Evidence is the file(s) on trial; reference is the voice standard they answer
-# to. The deterministic detector bans the first-person "I"/"my" and the disallowed
-# actor noun, but only a reader can tell whether the prose is actually agent-facing
-# or merely token-clean declarative third person — that semantic gap is what this
-# family guards.
+# to. Deterministic detectors ban the first-person "I"/"my" (repo-lint) and the
+# disallowed actor noun (prose-lint), but only a reader can tell whether the prose
+# is actually agent-facing or merely token-clean declarative third person — that
+# semantic gap is what this family guards.
 # See standards/judgments/.
 judgments:
   - id: claude-md-agent-facing-voice

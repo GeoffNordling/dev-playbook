@@ -655,8 +655,8 @@ def is_vendored(root: Path, path: Path) -> bool:
 def check_agent_facing_voice(root: Path) -> list[Finding]:
     """Agent-facing instruction text — every CLAUDE.md (root, nested, and the
     dev-playbook global source) plus every first-party skill and rule body — is
-    written for the executing agent alone, so it names the human "user" and
-    never speaks in first person (claude-content.md, conventions.md). Runs in
+    written for the executing agent alone, so it never speaks in first person
+    (claude-content.md, conventions.md). Runs in
     every repo, inspecting only that repo's own files; a consumer's skills and
     rules sit under .claude/, dev-playbook's under the Stow source tree, and
     vendored third-party skills are exempt wherever they surface. A skill's

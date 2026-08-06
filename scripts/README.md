@@ -67,7 +67,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
-| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment`, over all authored Markdown outside code spans |
+| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, and the banned actor noun over every tracked file |
 | `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
@@ -90,7 +90,7 @@ them per script. The library is the installed `dev_playbook` package:
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
-- `dev_playbook.voice` — the agent-facing voice vocabulary: the words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `repo-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one.
+- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `repo-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `repo-lint` self-check). Consumed by `repo-init`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration

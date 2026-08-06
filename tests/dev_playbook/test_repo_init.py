@@ -94,7 +94,6 @@ def test_base_layer_omits_the_python_project() -> None:
 @pytest.mark.parametrize(
     ("name", "word"),
     [
-        ("the-human", "human"),
         ("I-tool", "I"),
         ("notify-me", "me"),
         ("my-tool", "my"),
@@ -109,7 +108,7 @@ def test_name_carrying_an_agent_facing_voice_word_is_refused(
         render_tree(spec, REV)
 
 
-@pytest.mark.parametrize("name", ["metrics", "mystery", "human-readable"])
+@pytest.mark.parametrize("name", ["metrics", "mystery"])
 def test_name_merely_embedding_a_voice_word_is_allowed(name: str) -> None:
     spec = RepoSpec(name=name, description="A demo repo", python=False)
 

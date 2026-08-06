@@ -14,7 +14,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import voice
+from dev_playbook import prose_lint, voice
 
 PLAYBOOK_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_DIR = PLAYBOOK_ROOT / "standards" / "build" / "canonical"
@@ -70,6 +70,11 @@ def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
         raise RepoInitError(
             f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
             f"{fault}; choose another name"
+        )
+    if prose_lint.BANNED_PATTERN.search(spec.name):
+        raise RepoInitError(
+            f"'{spec.name}' would write a CLAUDE.md that prose-lint rejects — "
+            f"the person is the 'user'; choose another name"
         )
     if spec.python and not spec.package.isidentifier():
         raise RepoInitError(

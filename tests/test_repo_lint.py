@@ -290,15 +290,6 @@ GLOBAL_VALID = (
 )
 
 
-def test_claude_md_bare_human_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files["CLAUDE.md"] += "\n## Rules\n\n- Ask the human before deleting.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "CLAUDE.md: claude-code.agent-facing-voice" in result.stdout
-    assert "'human'" in result.stdout
-
-
 def test_claude_md_first_person_fails(tmp_path: Path) -> None:
     files = base_files()
     files["CLAUDE.md"] += "\n## Rules\n\n- I want my tests to pass.\n"
@@ -310,33 +301,19 @@ def test_claude_md_first_person_fails(tmp_path: Path) -> None:
 
 
 def test_claude_md_voice_guards_compounds(tmp_path: Path) -> None:
-    # "human-readable" and "I/O" are not actor-noun / first-person violations.
+    # "I/O" is an abbreviation, not a first-person violation.
     files = base_files()
-    files["CLAUDE.md"] += "\n## Rules\n\n- Produce human-readable I/O.\n"
+    files["CLAUDE.md"] += "\n## Rules\n\n- Produce well-formed I/O.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_nested_claude_md_voice_checked(tmp_path: Path) -> None:
     files = base_files()
-    files["sub/CLAUDE.md"] = "Tell the human to run it.\n"
+    files["sub/CLAUDE.md"] = "I run the tool from here.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
     assert "sub/CLAUDE.md: claude-code.agent-facing-voice" in result.stdout
-
-
-def test_skill_body_human_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files[".claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
-        "# Demo\n\nAsk the human before deleting.\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert (
-        ".claude/skills/demo/SKILL.md: claude-code.agent-facing-voice" in result.stdout
-    )
-    assert "'human'" in result.stdout
 
 
 def test_skill_body_first_person_fails(tmp_path: Path) -> None:
@@ -350,20 +327,6 @@ def test_skill_body_first_person_fails(tmp_path: Path) -> None:
     assert "dotfiles/dot-claude/skills/demo/SKILL.md" in result.stdout
     assert "'I'" in result.stdout
     assert "'my'" in result.stdout
-
-
-def test_rule_body_human_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files["dotfiles/dot-claude/rules/commands.md"] = (
-        "# Commands\n\nHand the command to the human.\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert (
-        "dotfiles/dot-claude/rules/commands.md: claude-code.agent-facing-voice"
-        in result.stdout
-    )
-    assert "'human'" in result.stdout
 
 
 def test_rule_body_first_person_fails(tmp_path: Path) -> None:
@@ -392,7 +355,7 @@ def test_vendored_skill_not_inspected(tmp_path: Path) -> None:
     files = base_files()
     files[".agents/skills/vendor/SKILL.md"] = (
         "---\nname: vendor\ndescription: Upstream skill.\n---\n\n"
-        "# Vendor\n\nI ask the human to tell me my options.\n"
+        "# Vendor\n\nI ask you to tell me my options.\n"
     )
     repo = make_repo(
         tmp_path,
@@ -414,8 +377,8 @@ def test_skill_code_exempt(tmp_path: Path) -> None:
     files[".claude/skills/demo/SKILL.md"] = (
         "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
         "# Demo\n\n"
-        "Ask before running `I am human`.\n\n"
-        "```text\nI told my human to run it.\n```\n"
+        "Ask before running `I am ready`.\n\n"
+        "```text\nI told my agent to run it.\n```\n"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 0, result.stdout + result.stderr
@@ -426,13 +389,13 @@ def test_skill_frontmatter_in_scope(tmp_path: Path) -> None:
     # answers to the same voice as the body.
     files = base_files()
     files[".claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when the human asks for my demo.\n---\n\n"
+        "---\nname: demo\ndescription: Use when I run my demo.\n---\n\n"
         "# Demo\n\nRun the demo.\n"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
     assert "line 3: " in result.stdout
-    assert "'human'" in result.stdout
+    assert "'I'" in result.stdout
     assert "'my'" in result.stdout
 
 

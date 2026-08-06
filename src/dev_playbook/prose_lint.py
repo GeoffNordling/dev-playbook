@@ -1,21 +1,32 @@
-"""Audit authored Markdown prose against the workspace prose standard.
+"""Audit authored content against the workspace prose standard.
 
-prose-lint is the detector behind the Prose card. It walks a repo's Markdown
-files once (via dev_playbook.md.find_md_files, so gitignore-aware and
-worktree-scoped) and applies one deterministic rule:
+prose-lint is the detector behind the Prose card. It walks a repo's files once
+(via dev_playbook.md.find_files, so gitignore-aware and worktree-scoped) and
+applies two deterministic rules:
 
   - **judgment-spelling** — the house spelling is American ``judgment``; the
-    British ``judgement`` / ``judgements`` is flagged. The check runs over prose
-    *outside* fenced blocks and inline code spans, so an identifier or a doc
-    that must name the forbidden form in backticks does not self-trip.
+    British ``judgement`` / ``judgements`` is flagged. The check runs over
+    authored Markdown prose *outside* fenced blocks and inline code spans, so
+    an identifier or a doc that must name the forbidden form in backticks does
+    not self-trip.
+  - **banned-word** — the person operating the workspace is the ``user``; the
+    actor noun ``human`` (bare, plural, or hyphenated compound, any case)
+    appears in no authored file (prose/conventions.md — Terminology). The ban
+    is absolute, so the check runs over every tracked file of every type,
+    whole-file — frontmatter, fenced blocks, and inline code spans included;
+    there is no backtick escape hatch.
 
-Scope is **all authored Markdown, harness files included** (``CLAUDE.md``,
-rules, skills) — deliberately wider than ``md.classify``'s concept-only split,
-since the spelling is house-wide. What is out is ``classify``'s ``"excluded"``
-category: externally-managed vendored trees (which ``classify`` decides through
-the shared dev_playbook.external registry) and transient scratch (``PLAN.md`` /
-``PROGRESS.md``, the root ``tmp/`` tree). Verbatim upstream mirrors are excluded
-per file via the registry's ``is_verbatim_doc`` (``type: Reference`` documents).
+Scope is **all authored content, harness files included** (``CLAUDE.md``,
+rules, skills; for the banned-word rule, code and config too). What is out is
+``md.classify``'s ``"excluded"`` category: externally-managed vendored trees
+(which ``classify`` decides through the shared dev_playbook.external registry)
+and transient scratch (``PLAN.md`` / ``PROGRESS.md``, the root ``tmp/`` tree).
+Verbatim upstream mirrors are excluded per file via the registry's
+``is_verbatim_doc`` (``type: Reference`` documents). Symlinks are skipped: a
+link's content belongs to its target, which is scanned at its own path when
+authored here and is not ours when vendored. The banned-word rule additionally
+exempts exactly two files — this module and its test file — which must name
+the word to ban it.
 
 Output:
     stdout — one finding per line, ``file:line: prose.rule message``.
@@ -50,13 +61,14 @@ class CannotRun(Exception):
     """
 
 
-# The one rule id this detector emits, namespaced by the Prose card whose
-# question it answers. Kept a module-level constant so every emission site
-# references it, never a raw literal, and RULES (what --list-rules prints)
+# The rule ids this detector emits, namespaced by the Prose card whose
+# questions they answer. Kept module-level constants so every emission site
+# references them, never a raw literal, and RULES (what --list-rules prints)
 # cannot drift from what the detector emits.
 JUDGMENT_SPELLING = "prose.judgment-spelling"
+BANNED_WORD = "prose.banned-word"
 
-RULES = (JUDGMENT_SPELLING,)
+RULES = (JUDGMENT_SPELLING, BANNED_WORD)
 
 # The British form: the word "judgement", optionally pluralized, as a whole word
 # so "judgemental" and the American "judgment" are both left alone. Matched
@@ -64,6 +76,27 @@ RULES = (JUDGMENT_SPELLING,)
 JUDGEMENT_PATTERN = re.compile(r"\bjudgements?\b", re.IGNORECASE)
 
 JUDGMENT_MESSAGE = "British `judgement`/`judgements`; the house spelling is `judgment`"
+
+# The banned actor noun: bare or plural, any case. The trailing \b sits at a
+# hyphen too, so compounds like "human-readable" are caught, while longer words
+# that merely contain the sequence ("humane", "superhuman") are not the actor
+# noun and pass.
+BANNED_PATTERN = re.compile(r"\bhumans?\b", re.IGNORECASE)
+
+BANNED_MESSAGE = (
+    "the person is the `user`; the word `human` appears in no authored file "
+    "(prose/conventions.md — Terminology)"
+)
+
+# The two files that must name the banned word in order to ban it: this module
+# (pattern, message, docstring) and its behavioral tests. The one sanctioned
+# residue — nothing else in an authored file may carry the word, in any form.
+BANNED_EXEMPT = frozenset(
+    {
+        "src/dev_playbook/prose_lint.py",
+        "tests/dev_playbook/test_prose_lint.py",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -101,52 +134,66 @@ def scan_text(rel: str, text: str, line_offset: int = 0) -> list[Finding]:
     return findings
 
 
-def scan_file(path: Path, root: Path) -> list[Finding]:
-    """Every finding one Markdown file yields; verbatim mirrors are skipped.
+def scan_banned(rel: str, text: str) -> list[Finding]:
+    """Flag every banned-word occurrence anywhere in ``text``.
 
-    Only the body is scanned — frontmatter is structured YAML, not prose, and a
-    YAML scalar has no backtick escape hatch, so a title carrying the forbidden
-    form must not be flagged. The body offset keeps reported line numbers
-    absolute. A malformed frontmatter block raises :class:`CannotRun` rather than
-    an uncaught YAML traceback, matching the sibling detectors.
+    Deliberately maskless: frontmatter, fenced blocks, inline code spans, and
+    non-Markdown file content all count. The ban is absolute, so unlike the
+    spelling rule there is no backtick escape hatch.
     """
-    rel = str(path.relative_to(root))
-    text = path.read_text(encoding="utf-8", errors="replace")
-    try:
-        frontmatter, body = md.parse_frontmatter(text)
-    except yaml.YAMLError as err:
-        raise CannotRun(f"{rel}: malformed frontmatter: {err}") from err
-    if is_verbatim_doc(frontmatter):
-        return []
-    offset = text.count("\n", 0, len(text) - len(body))
-    return scan_text(rel, body, offset)
+    findings: list[Finding] = []
+    for line_num, line in enumerate(text.splitlines(), start=1):
+        for _ in BANNED_PATTERN.finditer(line):
+            findings.append(Finding(rel, line_num, BANNED_WORD, BANNED_MESSAGE))
+    return findings
 
 
 def audit(root: Path) -> list[Finding]:
-    """Scan every authored Markdown file under ``root`` for the spelling rule.
+    """Scan every authored file under ``root`` for both prose rules.
 
-    Scope is wider than ``md.classify``'s concept split — harness files are in —
-    but ``classify``'s ``"excluded"`` category is out: externally-managed
-    vendored trees, the ``.git`` tree, and the transient scratch that is not
-    authored content (``PLAN.md`` / ``PROGRESS.md`` and the root ``tmp/`` tree).
-    Reusing that one boundary keeps vendored-tree exclusion on the shared
-    registry (``classify`` consults it) and stops the gate firing on scratch.
-    Verbatim Reference docs are excluded per file in ``scan_file``.
+    Scope is wider than ``md.classify``'s concept split — harness files are in,
+    and the banned-word rule reads every tracked file, not just Markdown — but
+    ``classify``'s ``"excluded"`` category is out: externally-managed vendored
+    trees, the ``.git`` tree, and the transient scratch that is not authored
+    content (``PLAN.md`` / ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing
+    that one boundary keeps vendored-tree exclusion on the shared registry
+    (``classify`` consults it) and stops the gate firing on scratch. Verbatim
+    Reference docs are excluded per file; symlinks and binary files (NUL byte)
+    are skipped.
     """
     findings: list[Finding] = []
-    for path in md.find_md_files(root):
+    for path in md.find_files(root):
         rel = str(path.relative_to(root))
         if md.classify(rel) == "excluded":
             continue
-        findings.extend(scan_file(path, root))
+        if path.is_symlink():
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if "\0" in text:
+            continue
+        if rel.endswith(".md"):
+            # Only the body carries the spelling rule — frontmatter is
+            # structured YAML, not prose, and a YAML scalar has no backtick
+            # escape hatch, so a title carrying the forbidden spelling must not
+            # be flagged. The body offset keeps reported line numbers absolute.
+            try:
+                frontmatter, body = md.parse_frontmatter(text)
+            except yaml.YAMLError as err:
+                raise CannotRun(f"{rel}: malformed frontmatter: {err}") from err
+            if is_verbatim_doc(frontmatter):
+                continue
+            offset = text.count("\n", 0, len(text) - len(body))
+            findings.extend(scan_text(rel, body, offset))
+        if rel not in BANNED_EXEMPT:
+            findings.extend(scan_banned(rel, text))
     return findings
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Scan a repo's Markdown and print one finding per line; return the exit code."""
+    """Scan a repo's files and print one finding per line; return the exit code."""
     parser = argparse.ArgumentParser(
         prog="prose-lint",
-        description="Lint authored Markdown prose: judgment spelling.",
+        description="Lint authored prose: judgment spelling, the banned actor noun.",
     )
     parser.add_argument(
         "directory",

@@ -70,7 +70,7 @@ defect in the code. Which machine skips what is recorded in
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
 | decisions-lint | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-lint | Links and Citations | hook pattern, except the CI gate and the secondary machines (skipped — neither carries the cited repos) |
-| prose-lint | prose spelling (the American `judgment`) | hook pattern |
+| prose-lint | prose spelling (the American `judgment`); the banned actor noun | hook pattern |
 | judgments-lint | judgment declarations | hook pattern |
 | standards-lint | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |
