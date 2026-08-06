@@ -54,7 +54,7 @@ Routing, given the mode:
 | The work | Routes to | Why |
 |---|---|---|
 | `mode:spike` | `phase:spike` | A question is answered inside the definition region; it never enters the factory. |
-| `mode:direct`, specifiable on the spot | `phase:build` | The brief is complete, so the issue is ready and the factory takes it from here. |
+| `mode:direct`, specifiable on the spot | `phase:build`, set at the issue-review verdict | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
 | `mode:direct`, needing exploration, tradeoffs, or slicing | `phase:design` | The approach isn't settled, or the work is bigger than one build. Design re-authors the brief or decomposes. |
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.
@@ -63,7 +63,7 @@ Ask the user when the call isn't clear. Routing is a one-way handoff — nothing
 
 Per the issue conventions: the build-leaf brief for `mode:direct`, the spike brief for `mode:spike`. When **adopting**, rewriting the stub's body into the brief format is mandatory — every adopted issue leaves with an authored body. Structure what the user wrote, don't discard it.
 
-Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is checked at the crossing into the factory, not here.
+Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is settled at the issue-review verdict that releases the issue, not here.
 
 ### 5. Confirm, then land
 

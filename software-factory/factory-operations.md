@@ -42,9 +42,16 @@ sequencing it.
 
 **Readiness at the crossing.** Two things gate a launch. The issue's phase must
 sit in the factory region, per the refusal above; and the issue must meet the
-readiness bar — a leaf, unblocked, with a brief-complete body — defined once in
-the [tracking standard](/standards/tracking/issue-authoring.md#readiness) and
-checked here, at the crossing.
+readiness bar — a leaf, unblocked, brief-complete, released at an issue-review
+verdict — defined once in the
+[tracking standard](/standards/tracking/issue-authoring.md#readiness).
+
+What the crossing checks is the first three: each is observable on the issue,
+and an overwatch escalates when one fails. The release is a definition-region
+obligation — evidenced by the verdict-record comment, and overridable by the
+human — so the crossing takes it as given rather than re-deriving it. A rework
+lap is not a crossing: the issue never left the factory, so nothing is
+re-checked.
 
 ## Permissions
 

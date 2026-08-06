@@ -9,7 +9,7 @@ Ordering: reading order.
 - [Software Factory](/software-factory/README.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its human checkpoints
 - [Software Factory](/software-factory/software-factory.md) — The path an issue takes from idea to merged software — its states, the moves between them, and the labels naming them
 - [Factory Operations](/software-factory/factory-operations.md) — The factory's operating contract — how a ready issue is dispatched, built, reviewed, and carried to the merge
-- [Human Checkpoints](/software-factory/human-checkpoints.md) — Every point where the factory stops for the human — the capability boundary, escalation, and the three review-stretch pauses
+- [Human Checkpoints](/software-factory/human-checkpoints.md) — Every point where the factory stops for the human — the capability boundary, escalation, the issue-review verdict, and the three review-stretch pauses
 - [Node-Skill Authoring](/software-factory/node-skill-authoring.md) — Voice, content rules, and mechanics for authoring the software factory's node skills
 - [PR Feedback](/software-factory/pr-feedback.md) — The comment surfaces a pull request carries, and how a committing node re-enters on a rework lap
 - [Deviation Contract](/software-factory/deviation-contract.md) — The contract a deviation runs under — the three limiters, escalation, and the deviation ledger
