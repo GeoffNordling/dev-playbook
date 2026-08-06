@@ -90,18 +90,9 @@ Before closing the phase, show the user the epic, the ordered children with
 their four-tuples, and the two relationship graphs — they do not align, and a
 mis-wired blocker strands work silently.
 
-## 6. Run the issue-review beat, child by child
-
-Every child is released by the
-[issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict)
-— a decomposed child is always factory-bound. In dependency order, per child:
-dispatch both lenses in one message, as fresh-context subagents — one invokes
-`/issue-review-claims <child#>`, the other `/issue-review-simulation <child#>`,
-each pinned to the model its skill file names; they read only the issue and the
-repo and return findings raw. Synthesize the **consolidated disposition list**,
-take the user verdict, and on a *pass* apply or demote per the ruled
-dispositions, post the **verdict-record comment**, and move the child:
-`gh issue edit <child#> --remove-label "phase:design" --add-label "phase:build"`.
-On a *back to design* the child stays at `phase:design`, its verdict record the
-work order for the next session. The user may always skip a child's beat, cut
-it short, or advance anyway.
+Children leave here at `phase:design`, brief-complete and unreleased. Each is
+released by its own
+[issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict),
+taken in its own `/design` session at §8 — one issue, one beat, full attention.
+Running every child's beat here instead would spend the thinnest attention of
+the longest session in the region on the work that most needs care.
