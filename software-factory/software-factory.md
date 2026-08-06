@@ -95,9 +95,10 @@ a dead-end branch is not merging. A design session exits one of two ways:
   approach section for a builder to reconcile against.
 - **Decomposition.** When the work is too big for one leaf, the issue becomes an
   **epic** and never builds itself; its children carry the work. Children are
-  minted here rather than at the intake node, brief-complete but unreleased —
-  each crosses into the factory on its own issue-review verdict, taken at its
-  own design exit. The epic body carries
+  minted here rather than at the intake node, carrying a starting brief and
+  unreleased — a child is incomplete when it leaves the decomposing session.
+  Each returns to `design` in a session of its own, which re-authors its brief
+  and crosses it into the factory on its issue-review verdict. The epic body carries
   the outcome and the decomposition rationale
   ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 

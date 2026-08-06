@@ -5,10 +5,11 @@ The exit taken when the work is bigger than one build. The issue becomes an
 settled on this exit — the single-leaf exit needs none of it.
 
 The children's intake happens here, in place, so none round-trips through
-`intake`. Minting carries a child to **brief-complete** — a leaf, unblocked or
-explicitly blocked, with an authored body — and step 6's issue-review verdict
-is what makes it **ready**. A child the verdict sends back to design leaves
-this session unreleased. The readiness bar is
+`intake`. Minting carries a child only as far as a **starting brief** — a leaf
+with the four-tuple, the seven headings, and its relationships wired, but its
+substance still provisional. Every child leaves this session incomplete. Each
+becomes **brief-complete** in its own `/design` session, which re-authors that
+brief, and **ready** at that session's issue-review verdict. The readiness bar is
 [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness).
 
 ## 1. Rewrite the issue as the epic
@@ -45,14 +46,20 @@ so the split has to be right here.
 Order the slices by dependency before creating any of them; step 4 links each to
 a blocker that must already exist.
 
-## 3. Mint each child brief-complete
+## 3. Mint each child with a starting brief
 
 One `gh issue create` per slice, in dependency order, each with a full
-four-tuple and a brief-complete body in the build-leaf format. The phase is the
-node that takes it next. There is nothing left for a child's own design pass to
-decide — the approach was just settled — but `phase:build` is never set at
-creation: per the readiness bar above, it is set at the child's issue-review
-verdict. Mint the child at `phase:design` and let the verdict move it.
+four-tuple and all seven build-leaf headings — the headings are required from
+minting, and a leaf missing one is a lint finding whatever its phase.
+
+Write into them what this session actually settled: the slice's outcome, its
+boundary, and the intent it inherits from the epic. The rest is a draft. A
+child's brief is not finished here and is not meant to be — its own design
+session re-authors it against the code as it stands by then, which is not the
+code this session is looking at.
+
+So every child is minted at `phase:design`, never `phase:build`. Its own
+issue-review verdict, in its own session, is what moves it.
 
 ```bash
 gh issue create --title "..." \
@@ -90,9 +97,10 @@ Before closing the phase, show the user the epic, the ordered children with
 their four-tuples, and the two relationship graphs — they do not align, and a
 mis-wired blocker strands work silently.
 
-Children leave here at `phase:design`, brief-complete and unreleased. Each is
-released by its own
-[issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict),
-taken in its own `/design` session at §8 — one issue, one beat, full attention.
-Running every child's beat here instead would spend the thinnest attention of
-the longest session in the region on the work that most needs care.
+Children leave here incomplete and unreleased, at `phase:design`. Each is
+finished by its own `/design` session: that session re-authors the starting
+brief and then takes the
+[issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict)
+at its §8 — one issue, one design pass, full attention. Finishing every child
+here instead would spend the thinnest attention of the longest session in the
+region on the work that most needs care.

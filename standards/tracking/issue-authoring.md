@@ -42,7 +42,10 @@ two roles. The role is **derived**, never a label — the same principle as
 **A design session produces an epic.** The common way an epic is born is the
 `design` node concluding the work is too big for one leaf: the session
 decomposes it in place, turning the issue into an epic and minting its children
-as ready leaves (see [the decompose exit](/software-factory/software-factory.md#the-definition-region)).
+as leaves carrying a **starting brief** — not ready ones. A child is incomplete
+when it is minted; it returns to `design` in a session of its own, which
+re-authors its brief and takes it to ready (see
+[the decompose exit](/software-factory/software-factory.md#the-definition-region)).
 
 ### Two species of epic
 

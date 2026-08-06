@@ -79,7 +79,7 @@ Nothing below this line is written to GitHub before the user approves.
 
 ### Single leaf
 
-Re-author the issue's brief in place across the seven build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
+Re-author the issue's brief in place across the seven build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
 
 `gh issue edit --body` replaces the whole body, so write the complete brief back:
 
@@ -92,7 +92,7 @@ EOF
 
 ### Decompose
 
-When the work is bigger than one build, the issue becomes an **epic** and never builds itself, and its children are minted brief-complete here rather than round-tripping through `intake` — each released later by its own verdict, in its own design session, never ready on minting alone. Read [decompose.md](references/decompose.md) and work through it — the epic rewrite, the slicing, the children, and the relationship wiring.
+When the work is bigger than one build, the issue becomes an **epic** and never builds itself, and its children are minted here rather than round-tripping through `intake` — each carrying a starting brief only, never a finished one. A child is completed and released later, in its own design session. Read [decompose.md](references/decompose.md) and work through it — the epic rewrite, the slicing, the children, and the relationship wiring.
 
 ## 8. Close the phase
 
