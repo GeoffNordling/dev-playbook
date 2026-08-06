@@ -189,9 +189,9 @@ retained**: `mode:sdd` and the four `phase:sdd-*` values stay in the
 [label scheme](/src/dev_playbook/label_scheme.json) and
 [bootstrap-labels](/scripts/bootstrap-labels) still mints them. Retained values
 follow the current build shape — a residual `mode:sdd` leaf still pairs with
-`tests:yes` and is checked against the build-leaf headings as the standard
-defines them today, so it may accrue new findings when the brief standard
-grows. No node answers to any of them.
+`tests:yes` and is checked by [workspace-lint](/scripts/workspace-lint) against
+the build-leaf headings as the standard defines them today, so it may accrue new
+findings when the brief standard grows. No node answers to any of them.
 
 An overwatch that finds `mode:sdd` — or a residual `phase:sdd-*` — **halts
 immediately and reports**: no dispatch, no routing, no improvised re-triage onto

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Issue Authoring
-description: How a GitHub issue is authored — epic and leaf roles, readiness, the three brief formats, vertical slices, and native relationships
+description: How a GitHub issue is authored — epic and leaf roles, readiness, the three brief formats and the optional Artifacts section, the brief principles governing claim provenance and prototype claims, vertical slices, and native relationships
 ---
 
 # Issue Authoring
@@ -146,9 +146,7 @@ What should happen after the work is complete. Be specific about edge cases and 
 A brief reporting broken behavior may add a `Steps to reproduce` heading; it is
 optional, unenforced, and changes none of the required headings.
 
-#### Optional sections of a build-leaf brief
-
-##### The Artifacts section
+#### The Artifacts section
 
 A brief whose deliverables include prose files or substantial new prose
 sections — a skill, a standard's section — carries them verbatim in an

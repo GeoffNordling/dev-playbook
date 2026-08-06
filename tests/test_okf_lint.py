@@ -338,6 +338,9 @@ def test_bullet_inside_a_four_backtick_artifact_fence_is_not_read_as_an_entry(
     result = run_okf_lint(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
+    # The clean marker, not just the exit code: a bundle that stopped being
+    # scanned at all would pass on the return code alone while covering nothing.
+    assert "clean" in result.stderr
 
 
 def test_tests_tree_malformed_markdown_is_not_flagged(tmp_path: Path) -> None:
