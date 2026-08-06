@@ -77,13 +77,13 @@ Nothing below this line is written to GitHub before the user approves.
 
 ### Single leaf
 
-Re-author the issue's brief in place across the six build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
+Re-author the issue's brief in place across the seven build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
 
 `gh issue edit --body` replaces the whole body, so write the complete brief back:
 
 ```bash
 gh issue edit <issue> --body "$(cat <<'EOF'
-...the six headings, re-authored...
+...the seven headings, re-authored...
 EOF
 )"
 ```

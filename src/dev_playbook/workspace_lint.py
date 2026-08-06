@@ -55,7 +55,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import gitrepo
+from dev_playbook import gitrepo, md
 from dev_playbook.findings import print_rules, render
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
@@ -93,13 +93,14 @@ RULES = (
 
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issue-authoring.md states them — the doc and this rule
-# read one contract and cannot disagree. A build leaf carries all six; a spike
-# leaf carries the spike shape. A retained ``mode:sdd`` leaf is checked against the
-# build shape it was authored under, per software-factory.md's retained-value
-# rule: the factory no longer routes such an issue, but a live one must not
-# become a finding by standing still.
+# read one contract and cannot disagree. A build leaf carries all seven; a
+# spike leaf carries the spike shape. A retained ``mode:sdd`` leaf is checked
+# against the build-leaf headings as the standard defines them today, per
+# software-factory.md's retained-value rule: the factory no longer routes such
+# an issue, and a live one may accrue new findings as the brief standard grows.
 BUILD_HEADINGS = (
     "Summary",
+    "User intent",
     "Current behavior",
     "Desired behavior",
     "Key interfaces",
@@ -627,22 +628,32 @@ def _post_intake(labels: set[str]) -> bool:
     )
 
 
-def _has_heading(body: str, heading: str) -> bool:
-    """Whether the body carries the bold heading.
+def _has_heading(prose: list[str], heading: str) -> bool:
+    """Whether the brief's prose lines carry the bold heading.
 
     The colon may sit inside or outside the markers — both ``**Heading:**`` and
-    ``**Heading**:`` read as present.
+    ``**Heading**:`` read as present. The lines come already stripped of fenced
+    code, so a heading inside a fence neither satisfies a required heading nor
+    forges one the brief lacks: a brief quotes templates inside fences — the
+    brief template itself, an approved artifact under ``## Artifacts`` — and a
+    quoted heading is being *shown*, not carried. The caller does the stripping
+    once per body rather than once per heading.
     """
-    pattern = rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:"
-    return re.search(pattern, body, re.IGNORECASE) is not None
+    pattern = re.compile(rf"\*\*\s*{re.escape(heading)}\s*(?:\*\*)?\s*:", re.IGNORECASE)
+    return any(pattern.search(line) for line in prose)
 
 
 def _has_section(body: str, section: str) -> bool:
     """Whether the body carries the markdown section heading.
 
     Wayfinder bodies are ``##``-sectioned rather than bold-headed, so this is the
-    section counterpart of ``_has_heading``. Any heading level reads as present:
-    the level is the skill's formatting, the section's presence is the rule.
+    section counterpart of ``_has_heading`` in what it looks for. It is not its
+    counterpart in fence handling: this scans the raw body, so a ``##`` section
+    quoted inside a fence forges one the map lacks. Deliberate — fence awareness
+    was scoped to the brief-shape audit — and tracked in GeoffNordling/dev-playbook#386.
+
+    Any heading level reads as present: the level is the skill's formatting, the
+    section's presence is the rule.
     """
     pattern = rf"^\s{{0,3}}#{{1,6}}\s+{re.escape(section)}\s*#*\s*$"
     return re.search(pattern, body, re.IGNORECASE | re.MULTILINE) is not None
@@ -884,6 +895,23 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
         required = BUILD_HEADINGS
     else:
         return []  # an unknown mode value is tuple-valid's finding
+    try:
+        prose = [line for _, line in md.lines_outside_fences(body)]
+    except md.UnclosedFence as unclosed:
+        # An issue body is authored on GitHub, past the reach of any hook that
+        # could have caught this at commit time, and the audit sweeps every open
+        # issue of every governed repo — so the fence is reported as this
+        # issue's finding and the sweep goes on, rather than the exception
+        # ending the run. The headings past the fence are unreadable, so they
+        # are not reported as missing on top of it.
+        return [
+            Line(
+                name,
+                ISSUE_BRIEF_SHAPE,
+                f"#{number} body has an {unclosed}",
+                blocking=True,
+            )
+        ]
     return [
         Line(
             name,
@@ -892,7 +920,7 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
             blocking=True,
         )
         for heading in required
-        if not _has_heading(body, heading)
+        if not _has_heading(prose, heading)
     ]
 
 

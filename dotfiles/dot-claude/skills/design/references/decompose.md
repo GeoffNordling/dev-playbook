@@ -48,7 +48,7 @@ settled and there is nothing left for that child's own design pass to decide.
 gh issue create --title "..." \
   --label "<category>" --label "<mode>" --label "<tests>" --label "<phase>" \
   --body "$(cat <<'EOF'
-...the six build-leaf headings...
+...the seven build-leaf headings...
 EOF
 )"
 ```

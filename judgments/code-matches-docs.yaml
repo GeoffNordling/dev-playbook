@@ -110,6 +110,23 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
+  - id: brief-headings-match-standard
+    claim: |
+      src/dev_playbook/workspace_lint.py's required-heading tuples for the
+      tracking.issue-brief-shape audit name exactly the headings
+      standards/tracking/issue-authoring.md states: BUILD_HEADINGS is the
+      build-leaf brief's required headings, with the names and in the order
+      the standard's build-leaf section gives them, and SPIKE_HEADINGS is the
+      spike brief's. This one is exact agreement rather than the file's usual
+      subset claim — neither tuple may omit a heading the standard requires,
+      nor add one it does not, because the standard declares the tuples and
+      its own lists to be one contract. A heading the standard marks optional
+      or unenforced (Steps to reproduce) belongs in neither tuple.
+    evidence:  [src/dev_playbook/workspace_lint.py]
+    reference: [standards/tracking/issue-authoring.md]
+    model: claude-sonnet-5
+    effort: high
+
   - id: claude-md-subset
     claim: |
       dev-playbook's CLAUDE.md contains only content the claude-content

@@ -313,6 +313,36 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
     assert "more than once" in result.stdout
 
 
+def test_bullet_inside_a_four_backtick_artifact_fence_is_not_read_as_an_entry(
+    tmp_path: Path,
+) -> None:
+    """A four-backtick fence wrapping three-backtick content stays one block.
+
+    An index illustrating the artifact form issue-authoring.md mandates quotes
+    a bullet inside such a fence; the quoted bullet is shown, not listed, so it
+    draws no index finding.
+    """
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n\n"
+        "An index entry is written like this:\n\n"
+        "````markdown\n"
+        "```\n"
+        "- [Rules](/standards/rules/naming.md) — not a concept doc\n"
+        "```\n"
+        "````\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    # The clean marker, not just the exit code: a bundle that stopped being
+    # scanned at all would pass on the return code alone while covering nothing.
+    assert "clean" in result.stderr
+
+
 def test_tests_tree_malformed_markdown_is_not_flagged(tmp_path: Path) -> None:
     """Malformed markdown under a top-level tests/ tree is parser fixture data,
     not a concept document — okf-lint emits no findings on it."""
