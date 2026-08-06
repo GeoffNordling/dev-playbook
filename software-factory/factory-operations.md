@@ -230,8 +230,8 @@ lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
 One PR per issue — spikes open none — born at the review stop and squash-merged
 by the human. Because [repository settings](/standards/tracking/repo-settings.md)
 take the squash message from the PR, its title and body become the permanent
-commit message on `main`: they are authored from the issue brief and the diff,
-never left as a placeholder.
+commit message on `main`: they are authored from the issue brief, the diff, and
+the record the issue and its PR carry, never left as a placeholder.
 
 ### The merge-message recipe
 
@@ -253,10 +253,8 @@ never left as a placeholder.
     ([the one-goal principle](/standards/tracking/issue-authoring.md#brief-principles)).
     `Nothing deferred.` explicitly when empty.
 
-A missing section is a checkable defect: the review skills open with a
+A missing section is a checkable defect: the code and doc reviews open with a
 mechanical presence check, and absence is an automatic Blocking finding.
-There is no GitHub PR template — `gh pr create --body` bypasses templates,
-so one would be a second, drift-prone copy of this list.
 
 ### The two owners
 

@@ -57,7 +57,7 @@ The implementer read at most the testing conventions, so enforcing all of these 
 
 ## 3. Audit the change
 
-Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. The presence check always runs — its subject is the PR body, not the diff — and every other dimension below whose content the diff carries is audited; those are also the dimensions the comment enumerates when they come back clean.
+Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. The presence check always runs — its subject is the PR body, not the diff — and every other dimension below whose content the diff carries is audited; the dimensions that ran are also the ones the comment enumerates when they come back clean.
 
 - **The presence check**, first and mechanical. The PR body carries the
   three mandatory sections of the

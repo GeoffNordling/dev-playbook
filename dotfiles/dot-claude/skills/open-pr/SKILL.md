@@ -20,7 +20,7 @@ Ensure the issue's pull request exists, so the review steps that follow have som
 3. **Create it, with an authored merge message.** Synthesize the title and body from the issue brief and its comments (`gh issue view <issue> --comments`) and the diff the branch carries (`git diff origin/main...issue-<issue>`), per the [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe). The body carries the recipe's three mandatory sections:
    - `## Summary` — what changed and why, ending with the mandatory `Closes #<issue>` line — merging the PR closes the issue.
    - `## Deviation ledger` — lift the entries from the issue comment headed `## Deviation ledger`, recorded at build's close; no such comment means `No deviations.` explicitly.
-   - `## Deferred` — the deferred tracker stubs the issue's comments record, each named by issue link; none means `Nothing deferred.` explicitly.
+   - `## Deferred` — `Nothing deferred.` explicitly, unless the issue's comments already carry deferred tracker stubs; name each of those by issue link.
 
    Then `gh pr create --head issue-<issue> --title "<title>" --body "<body>"`, taking the default base branch.
 
