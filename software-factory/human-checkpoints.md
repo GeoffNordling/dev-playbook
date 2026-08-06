@@ -80,10 +80,6 @@ needed them:
 - **Merge**, on the final approval — in the GitHub UI; it lands the PR, drops the
   origin branch, and closes the issue.
 
-`/clear` is the human's context reset, available at any checkpoint: cwd and
-worktree survive it, and the overwatch re-orients from the issue's labels and the
-worktree it still sits in.
-
 ## Escalation
 
 An escalation is a node reporting that it cannot proceed. It always reaches the
@@ -142,10 +138,10 @@ obvious.
 ### Pause 3: the final review
 
 The last checkpoint, and the only one where the human reads the diff. It is
-reached only when the issue is **100% done**: judgments green, the merge message
-refreshed from the final diff, the verified push already handed over if the
-judgments node committed fixes, and a closing brief on what shipped and what
-changed since the approve verdict.
+reached only when the issue is **100% done**: judgments green, the merge
+message regenerated from the whole PR record, the verified push already
+handed over if the judgments node committed fixes, and a closing brief on
+what shipped and what changed since the approve verdict.
 
 Nothing is outstanding at pause 3 but the read and the merge. Anything still
 pending — a red gate, an unrefreshed message, an unpushed commit, an open

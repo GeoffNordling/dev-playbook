@@ -237,18 +237,42 @@ never left as a placeholder.
 
 - **Title** — states the change: it is the commit subject `main`'s history will
   carry.
-- **Body** — a summary of what changed and why, drawn from the issue brief and
-  the current diff, plus the mandatory `Closes #<N>` line that closes the issue
-  on merge.
+- **Body** — three mandatory sections, each checkable by absence:
+  - `## Summary` — what changed and why, drawn from the issue brief and the
+    current diff, ending with the mandatory `Closes #<N>` line that closes
+    the issue on merge. The claim that the acceptance criteria are met
+    lives here as prose.
+  - `## Deviation ledger` — the deviation entries of the
+    [deviation contract](/software-factory/deviation-contract.md#the-deviation-ledger),
+    which defines the entry shape and the hand-off; `No deviations.`
+    explicitly when empty.
+  - `## Deferred` — orthogonal work discovered after the brief froze:
+    incidental bugs, cleanups, adjacent improvements, and review findings
+    the human rules real-but-not-this-issue. Each entry is a real tracker
+    stub at `phase:intake`, named by issue link — never a Candidate
+    ([the one-goal principle](/standards/tracking/issue-authoring.md#brief-principles)).
+    `Nothing deferred.` explicitly when empty.
+
+A missing section is a checkable defect: the review skills open with a
+mechanical presence check, and absence is an automatic Blocking finding.
+There is no GitHub PR template — `gh pr create --body` bypasses templates,
+so one would be a second, drift-prone copy of this list.
 
 ### The two owners
 
 The message is written twice from that one recipe, so the two cannot diverge:
-`/open-pr` authors it when it creates the PR, and the overwatch regenerates it
-from the final diff at the approve verdict (a tap-free `gh pr edit`), after
-[the judgments node](#the-judgments-node) has landed its fixes. Nothing
-refreshes it in between — a message rewritten mid-traverse is authored against a
-diff still moving.
+`/open-pr` authors it when it creates the PR — lifting the build session's
+recorded entries into `## Deviation ledger` per the
+[contract's hand-off](/software-factory/deviation-contract.md#the-deviation-ledger)
+— and the overwatch regenerates it at the approve verdict (a tap-free
+`gh pr edit`), after [the judgments node](#the-judgments-node) has landed its
+fixes. The regeneration synthesizes the entire PR record — the final diff,
+the comments, and the rulings — into an accurate squash-commit message for
+the whole issue, preserving the mandatory sections' content rather than
+rewriting from the recipe alone: the body is `main`'s permanent record, and
+the accuracy of the final record wins. In between, only the ledger moves —
+rework laps append its entries by spec; a full message rewritten mid-traverse
+is authored against a diff still moving.
 
 ## The review stop
 

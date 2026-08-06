@@ -82,7 +82,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [pause 1](~/workspace/dev-playbook/software-factory/human-checkpoints.md#pause-1-the-review-verdict), answer their questions, help them weigh, and act only on an explicit verdict.
 
-- **approve** — the label move is the first act: `gh issue edit <N> --remove-label "phase:pr-review" --add-label "phase:judgments"`. Then enter the node (§6), which carries the issue to the user's final read and merge.
+- **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then the label move: `gh issue edit <N> --remove-label "phase:pr-review" --add-label "phase:judgments"`. Then enter the node (§6), which carries the issue to the user's final read and merge.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment` / `gh pr comment`), then move the label back along the rework edge.
 
 ## 6. The judgments node

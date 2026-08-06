@@ -53,8 +53,15 @@ The diff's content picks the standards that bind this review on top of the doc c
 
 ## 3. Audit the change
 
-Read the changed docs whole, not as hunks — the brief and the docs together — against the standards they answer to. Pin each finding to its file and line and the rule or criterion it breaches. All five dimensions are audited, and they are also the dimensions the comment enumerates when they come back clean.
+Read the changed docs whole, not as hunks — the brief and the docs together — against the standards they answer to. Pin each finding to its file and line and the rule or criterion it breaches. All six dimensions are audited — the presence check against the PR body, the rest against the docs — and they are also the dimensions the comment enumerates when they come back clean.
 
+- **The presence check**, first and mechanical. The PR body carries the
+  three mandatory sections of the
+  [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)
+  — `## Summary`, `## Deviation ledger`, `## Deferred` — with the explicit
+  empty-markers (`No deviations.`, `Nothing deferred.`) accepted. A missing
+  section is an automatic Blocking finding; absence is checkable, so this
+  dimension involves no judgment call.
 - **Brief fidelity.** Every acceptance criterion the docs answer to is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope.
 - **Doc conventions.** The prose conforms to doc-conventions.md — voice, structure, one rule per section, current-state only.
 - **The doc-type contract.** Each changed doc does what its type declares — a standard states rules a reviewer could cite, a card stays thin pointers, an index lists and delegates, a README orients.

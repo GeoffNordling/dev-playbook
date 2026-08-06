@@ -57,8 +57,15 @@ The implementer read at most the testing conventions, so enforcing all of these 
 
 ## 3. Audit the change
 
-Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. Every dimension below whose content the diff carries is audited, and those are also the dimensions the comment enumerates when they come back clean.
+Read the change as a whole — the brief and the change together — against the standards it answers to; pin each finding to its file and line and the rule or criterion it breaches. The presence check always runs — its subject is the PR body, not the diff — and every other dimension below whose content the diff carries is audited; those are also the dimensions the comment enumerates when they come back clean.
 
+- **The presence check**, first and mechanical. The PR body carries the
+  three mandatory sections of the
+  [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)
+  — `## Summary`, `## Deviation ledger`, `## Deferred` — with the explicit
+  empty-markers (`No deviations.`, `Nothing deferred.`) accepted. A missing
+  section is an automatic Blocking finding; absence is checkable, so this
+  dimension involves no judgment call.
 - **Brief fidelity**, always. Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
 - **Testing conventions.** The tests conform to testing-conventions.md — structure, naming, behavioral focus.
 - **Python style.** The code conforms to python-style.md — docstrings, the fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a helper earns its place or stays inline), annotation style.
