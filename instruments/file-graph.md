@@ -113,7 +113,7 @@ the artifact is one JSON document — nodes, edges, ignored-pattern counts,
 and query results as separate keys — rebuilt in full each time the tool is
 run, never patched incrementally and never hand-edited.
 
-The human-facing layer over that JSON is an interactive visualization: a
+The user-facing layer over that JSON is an interactive visualization: a
 force-directed graph coloring nodes by bucket or by reach distance from the
 root `CLAUDE.md`, encoding each file's family as its shape, with search,
 shortest-path tracing between two files, and in-place reading of any file's
