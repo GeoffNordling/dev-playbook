@@ -45,7 +45,7 @@ Report what both checks found and where you looked. On a hit — existing covera
 ### 3. Pick the four-tuple
 
 - `category:*` — pick one.
-- `mode:*` — `mode:direct` or `mode:spike`. `mode:sdd` is a retained label the factory does **not** support and intake never mints, per [software-factory.md → SDD is not supported](~/workspace/dev-playbook/software-factory/software-factory.md#sdd-is-not-supported).
+- `mode:*` — `mode:direct` or `mode:spike`; those are the only two the scheme carries.
 - `tests:*` — for `mode:direct`, ask the user; `mode:spike` is always `tests:no`.
 - `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it, or the user parks the beat and the issue holds here for the next session.
 

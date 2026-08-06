@@ -141,9 +141,7 @@ tuple.
 ### Valid labels
 
 The factory's labels are exactly these: the fixed-value labels in the table
-below, one `phase:*` label per work node, derived per [Naming](#naming), and the
-retained `phase:sdd-*` values that
-[SDD is not supported](#sdd-is-not-supported) keeps in the scheme.
+below, plus one `phase:*` label per work node, derived per [Naming](#naming).
 [bootstrap-labels](/scripts/bootstrap-labels) mints them.
 
 The scheme carries dimensions beyond the factory's. Each is governed where it is
@@ -157,7 +155,6 @@ defined — `wayfinder` by
 | Category | `category:extension` | Extends a system past its shipped line — a capability it does not have today. |
 | Mode | `mode:direct` | The ordinary path: an issue that ends in merged code. |
 | Mode | `mode:spike` | A question; the answer closes the issue, no PR. Always `tests:no` — a spike merges nothing. |
-| Mode | `mode:sdd` | Retained value, **not supported** — the factory halts on it; see [SDD is not supported](#sdd-is-not-supported). |
 | Tests | `tests:yes` | The work writes or modifies tests, so `build` runs it test-first. |
 | Tests | `tests:no` | The work touches no tests, so `build` implements directly. |
 
@@ -173,31 +170,13 @@ A phase label is its node id with `_` mapped to `-`, `phase:`-prefixed: node
 mapped that way must equal the scheme's `phase:*` values exactly. The inventory:
 `intake, design, spike, build, pr-review, judgments`. A scheme value no node
 answers to, or a node no scheme value names, is the violation; the
-`scheme-vs-graph` judgment enforces it. Three things are exempt, and only these:
+`scheme-vs-graph` judgment enforces it. Two things are exempt, and only these:
 
 - **Pre-issue states** — `CANDIDATES.md` and the idea funnel. No issue exists, so
   there is nothing to label.
 - **Terminal endpoints** — merged, closed. An issue leaves the graph there rather
   than occupying a state.
-- **The four retained `phase:sdd-*` values**, which the halt rule below names.
 
 A work node is usually served by a slash-command of the same name (`design` →
 `/design`), but the mapping is not guaranteed: a review diamond dispatches
 several skills, none named after the node.
-
-### SDD is not supported
-
-Ratified 2026-07-30: the factory has no SDD path. Intake never mints `mode:sdd`.
-
-This is a temporary simplification; SDD returns later, so its **label values are
-retained**: `mode:sdd` and the four `phase:sdd-*` values stay in the
-[label scheme](/src/dev_playbook/label_scheme.json) and
-[bootstrap-labels](/scripts/bootstrap-labels) still mints them. Retained values
-follow the current build shape — a residual `mode:sdd` leaf still pairs with
-`tests:yes` and is checked by [workspace-lint](/scripts/workspace-lint) against
-the build-leaf headings as the standard defines them today, so it may accrue new
-findings when the brief standard grows. No node answers to any of them.
-
-An overwatch that finds `mode:sdd` — or a residual `phase:sdd-*` — **halts
-immediately and reports**: no dispatch, no routing, no improvised re-triage onto
-the ordinary path. Where the issue goes next is the human's call.

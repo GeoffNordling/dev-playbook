@@ -983,11 +983,11 @@ def test_leaf_invalid_phase_value_is_a_finding(tmp_path: Path) -> None:
     assert "phase" in result.stdout
 
 
-def test_sdd_leaf_requires_tests_yes(tmp_path: Path) -> None:
-    labels = ["category:extension", "mode:sdd", "tests:no", "phase:sdd-tdd"]
+def test_leaf_invalid_mode_value_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:extension", "mode:frobnicate", "tests:yes", "phase:build"]
     result = run_with_issue(tmp_path, issue(9, labels, body=BUILD_BODY))
     assert "alpha: software-factory.tuple-valid" in result.stdout
-    assert "tests:yes" in result.stdout
+    assert "mode:frobnicate is not a scheme value" in result.stdout
 
 
 def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:

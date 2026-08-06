@@ -10,7 +10,7 @@
       "name": "mode",
       "color": "cccccc",
       "description": "Mode: {value}.",
-      "values": ["sdd", "direct", "spike"]
+      "values": ["direct", "spike"]
     },
     {
       "name": "tests",
@@ -28,11 +28,7 @@
         "spike",
         "build",
         "pr-review",
-        "judgments",
-        "sdd-specs",
-        "sdd-spec-review",
-        "sdd-tdd",
-        "sdd-pr-review"
+        "judgments"
       ]
     },
     {

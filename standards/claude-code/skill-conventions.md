@@ -110,7 +110,7 @@ A skill has **no fixed repo root**. The same skill can be invoked from a session
 | Target | Style | Example |
 |---|---|---|
 | File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
-| File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Spec standard](~/workspace/spec-tools/sdd-standards/spec-standard.md)` |
+| File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[Prose conventions](~/workspace/dev-playbook/standards/prose/conventions.md)` |
 | File in the human's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
 | Directory | Inline code | `` `docs/decisions/` `` |
 | Slash-skill invocation | Bare — no markup | `/commit` |
@@ -160,9 +160,9 @@ conflict; they are different paths and different concerns.
 - **Skill families**: prefix related skills with a shared namespace.
   Example: `doc-format`, `doc-present-state`, `doc-rewrite`.
 - **Descriptions**: see the [Required Fields](#required-fields) row for the
-  rule. Good: `Write tests from a spec item before any implementation lands.
-  Use when starting the red phase of TDD, when a spec~* item has no covering
-  tests, or when the user asks for "spec-first" tests.`
+  rule. Good: `Write the failing tests for a change before any implementation
+  lands. Use when starting the red phase of TDD, when a build leaf carries
+  tests:yes, or when the user asks for test-first work.`
   Bad: `A helpful utility that assists with various testing-related tasks and
   workflows. Use when needed.` — the first sentence pads instead of naming
   the job, and the second names no trigger.
