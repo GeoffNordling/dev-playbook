@@ -50,7 +50,7 @@ H1 uses Title Case. H2 and below use sentence case.
 `# File Skeleton` at H1; `## Authored, not generated` at H2.
 
 Proper nouns and code identifiers keep their native case at every level:
-`# CLAUDE.md Content`, `## pyproject.toml`, `### SSH-bound git operations`.
+`# CLAUDE.md Content`, `## pyproject.toml`, `### Ask in prose, never AskUserQuestion`.
 
 ## Open with purpose
 

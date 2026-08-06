@@ -14,9 +14,8 @@ not an audit.
 
 ## Procedure
 
-1. **Commit everything.** Invoking this skill is the user's authorization to
-   commit — the standing "commit when told" rule is satisfied. Use /commit.
-   Split unrelated changes into separate commits.
+1. **Commit everything.** Use /commit. Split unrelated changes into separate
+   commits.
 
 2. **Mention anything important at risk — only if something already stands
    out.** Compaction is itself trying to preserve the conversation and is

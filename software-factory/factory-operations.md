@@ -65,22 +65,6 @@ classifier would otherwise block, add a natural-language entry to the
 them. It is honored from user and project-local scope, never from checked-in
 project settings.
 
-**The commit-authorization token.** The literal token
-`⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` pre-authorizes `Skill(commit)` for the session
-carrying it — an uncommon bracketed string recognized as the lone commit
-exception. Two sessions carry it, and no others:
-
-- **A committing node's subagent**, from the delegation prompt the overwatch
-  prefixes. A subagent is a separate session, its delegation prompt is its launch
-  prompt, and it commits with no human present to say "commit now" — the token is
-  what lets it, with the work reviewed at the PR rather than diff-by-diff. A node
-  that only reads or only calls `gh` gets the bare launch line; granting the token
-  where it goes unused is privilege the node doesn't need.
-- **The issue overwatch**, from its own skill, for one purpose: the fixes it makes
-  at [the judgments node](#the-judgments-node) are its own work, made with the
-  human present, and they land without a checkpoint of their own. It commits
-  nothing else — the work under review is never the overwatch's to touch.
-
 **Subagent permissions are consciously wide.** Subagent-level tool permissions
 are out of scope for this model: subagents run under auto mode with wide
 permissions. This is accepted deliberately; a later pass may tighten it.
@@ -117,7 +101,7 @@ The factory's nodes, what runs each, and how each engages the human:
 
 | Node | Skill | Engagement |
 |---|---|---|
-| `build` | `/build` | AFK; the subagent carries the commit token. |
+| `build` | `/build` | AFK. |
 | `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the human's verdict on the whole stop ([pause 1](/software-factory/human-checkpoints.md#pause-1-the-review-verdict)). |
 | `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional)). |
 
@@ -130,8 +114,7 @@ line `run /<skill> <N>` and nothing more — nodes stay skills. The subagent get
 fresh context window and inherits the issue's worktree as cwd; it reloads what it
 needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
 ends with a terminal report. Nothing carries over from the overwatch's context.
-A committing node's launch line is prefixed with the commit token, per
-[Permissions](#permissions). A helper a skill invokes itself (`/commit`,
+A helper a skill invokes itself (`/commit`,
 `/grill-with-docs`) is not a node and is never dispatched.
 
 **The terminal report contract.** A subagent's final message MUST begin at
@@ -159,9 +142,9 @@ the issue's life.
 Every file-touching node sits in the issue's worktree:
 
 - **Open (first file-touching node).** The issue overwatch opens it, gated on a
-  tap-free check that the local `origin/main` ref matches origin
-  (`git rev-parse origin/main` against `gh api …/branches/main`); a stale base
-  escalates, since pulling is the human's. Open with
+  check that the local `origin/main` ref matches origin
+  (`git rev-parse origin/main` against `gh api …/branches/main`); on a stale
+  base the overwatch pulls the main checkout current and re-checks. Open with
   `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because
   `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is
   `origin/main` whatever branch the main checkout sits on. Then rename the branch
@@ -177,13 +160,13 @@ Every file-touching node sits in the issue's worktree:
   `git branch -D issue-<N>` — only after the human confirms the merge happened. A
   spike's worktree goes the same way when its issue closes.
 
-**The branch is pushed by the human.** A committing node commits and stops; the
-push needs a hardware tap the agent cannot give, so it is a checkpoint — see
-[the capability boundary](/software-factory/human-checkpoints.md#the-agent-capability-boundary).
-Two consequences shape everything downstream: a node can never open the PR
-itself, because the branch isn't on origin when the node ends; and every
-intermediary push rides `--no-verify`, deferring the semantic gate to
-[the judgments node](#the-judgments-node).
+**The branch is pushed as it is committed.** A committing node pushes what it
+commits — the push is part of `/commit` — so the branch is on origin whenever
+the node ends. Every intermediary push rides `--no-verify`, deferring the
+semantic gate to [the judgments node](#the-judgments-node): the traverse's one
+armed run happens there, and verifying mid-traverse would red every rework
+cycle for nothing. The deterministic guarantee for the cycle is the phase-close
+`make check`.
 
 ## The node-skill contract
 
@@ -205,7 +188,7 @@ lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
   are, may gate on interviews and approvals, asked in prose at the terminal.
 - **The report line.** Every node closes on one ` · `-delimited line: the handle
   `<repo>#<N>` · `phase: <node>`. A committing node appends
-  `commit <sha> · check green · unpushed`; a node whose real output landed on
+  `commit <sha> · check green · pushed`; a node whose real output landed on
   GitHub appends a pointer only (`findings on PR #<n>`, `brief in issue`), never
   a re-paste — the line points, GitHub holds the detail. An AFK skill carries it
   on the `DONE:`/`ESCALATE:` line per
@@ -262,8 +245,8 @@ The message is written twice from that one recipe, so the two cannot diverge:
 `/open-pr` authors it when it creates the PR — lifting the build session's
 recorded entries into `## Deviation ledger` per the
 [contract's hand-off](/software-factory/deviation-contract.md#the-deviation-ledger)
-— and the overwatch regenerates it at the approve verdict (a tap-free
-`gh pr edit`), after [the judgments node](#the-judgments-node) has landed its
+— and the overwatch regenerates it at the approve verdict (`gh pr edit`),
+after [the judgments node](#the-judgments-node) has landed its
 fixes. The regeneration synthesizes the entire PR record — the final diff,
 the comments, and the rulings — into an accurate squash-commit message for
 the whole issue, preserving the mandatory sections' content rather than
@@ -329,8 +312,7 @@ which a subagent does not have — so there is no wrapper skill and no subagent:
 the overwatch invokes `/run-judgments` itself, in the issue's worktree.
 
 - **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
-  and on the issue branch, and committed on the overwatch's own commit token
-  (see [Permissions](#permissions)) — no separate go-ahead.
+  and on the issue branch, and committed as it lands — no separate go-ahead.
 - **An ambiguous failure escalates.** Where a fix is unclear enough to want human
   advice, the node stops and asks
   ([pause 2](/software-factory/human-checkpoints.md#pause-2-judgments-conditional));

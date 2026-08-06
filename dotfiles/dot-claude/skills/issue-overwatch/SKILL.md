@@ -11,15 +11,14 @@ argument-hint: "<issue-number>"
 
 You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node — nothing launches itself — and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
 
-Two hard limits: you never push, and you never merge. Both are the user's.
-
-**⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ — you hold the commit token for this session.** It covers the fixes you make yourself at the judgments node: commit them as you land them, without waiting for a "commit now". It covers nothing else — you never touch the work under review, and a delegated node's commits are authorized by its own launch line (§3).
+One hard limit: you never merge. That is the user's.
 
 **The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-briefing-rule).
 
 ## Read first
 
-The software factory is your subject, so know it cold:
+Before doing anything else, read end-to-end — the software factory is your
+subject, so know it cold:
 
 - [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
 - [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — delegation, the worktree contract, the terminal report contract, readiness, the review stop, and the judgments node.
@@ -56,24 +55,16 @@ Every file-touching node sits in the issue's worktree — open it before the fir
 Run /<skill> <N>.
 ```
 
-**The commit token rides the committing node.** /build is the one AFK node that writes and commits code, so its launch line alone carries the prefix:
-
-```
-⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧ Run /build <N>.
-```
-
-The PR and review nodes — /open-pr, /bug-pr-review, /code-pr-review, /doc-pr-review — are gh-only actions or read-only audits that never commit, so they get the bare launch line.
-
 Parse the subagent's final message per the [terminal report contract](~/workspace/dev-playbook/software-factory/factory-operations.md#engagement):
 
-- **DONE** — move the label and continue, or end the turn at a push boundary (§7).
+- **DONE** — move the label and continue.
 - **ESCALATE** — bubble it to the user per the [escalation rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#escalation), and stop.
 
 ## 4. The worktree
 
 You open it, once, before the issue's first file-touching node, per the worktree contract:
 
-1. Confirm the base is fresh, tap-free: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — hand the user the pull (§7) and stop.
+1. Confirm the base is fresh: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — pull the main checkout (`git -C ~/workspace/<repo> pull`), re-check, then proceed.
 2. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
@@ -91,11 +82,8 @@ On entering `phase:judgments`, read [judgments-node.md](references/judgments-nod
 
 ## 7. Turn boundaries — the user's commands
 
-End your turn wherever the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). Where the ending carries one of the user's commands, state it once, paste-safe, one line:
+End your turn wherever the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). Where the ending carries the user's command, state it once, paste-safe, one line:
 
-- **Intermediary push, after any committing node:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push --no-verify -u origin issue-<N>`
-- **Final push, when the judgments node committed fixes:** `git -C ~/workspace/<repo>/.claude/worktrees/issue-<N> push origin issue-<N>`
-- **Pull, on a stale base:** `git -C ~/workspace/<repo> pull`
 - **Merge, on the final approval** — in the GitHub UI; you can't.
 
 When the user returns, pick the traverse back up from the labels.

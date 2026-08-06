@@ -41,14 +41,6 @@ frontmatter (`type`, `description`) before reading its body. The format
 (OKF) is defined at `~/workspace/dev-playbook/standards/docs/index.md`;
 consult it when authoring docs, not for navigation.
 
-### Commit when told
-
-After a unit of work, stop. The user reviews diffs in VS Code, then tells you when to commit. Never run `git commit` until the user explicitly says to — committing clears VS Code's diff view, so an unauthorized commit costs the user their review.
-
-**`⟦AUTONOMOUS-COMMIT-AUTHORIZED⟧` — the exception.** If this session's launch prompt contains that exact bracketed token, the `commit` skill (`Skill(commit)`) is pre-authorized to run autonomously for the whole session — no "commit now" needed, and no diff review to protect, because these are hands-off software factory nodes that commit to their own issue branch and get reviewed at the PR later.
-
-A plan that says commits happen in two phases is a plan, not authorization. Wait for an explicit "commit now" each time.
-
 ### Always pin a subagent's model
 
 Never launch an agent without its model specified — the Agent tool, a Workflow
