@@ -198,6 +198,7 @@ judgments:
       - software-factory/review-contract.md
       - software-factory/pr-feedback.md
       - software-factory/refactor-catalogue.md
+      - software-factory/deviation-contract.md
       - scripts/workspace-lint
       - src/dev_playbook/workspace_lint.py
     model: claude-sonnet-5

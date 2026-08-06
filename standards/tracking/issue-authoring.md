@@ -273,6 +273,14 @@ review. Grades are authored where the claim is authored; the authoring
 session surfaces the claims it believes load-bearing and the human picks
 which to probe.
 
+### The brief freeze
+
+A brief is frozen when its issue launches into the factory: the body is
+never amended after launch — not by agents, not by user rulings. Rulings
+live as comments on the issue or PR; the launch baseline, the
+[deviation ledger](/software-factory/deviation-contract.md#the-deviation-ledger),
+and the rulings together make the issue's full drift visible.
+
 ## Vertical-slice rules
 
 When one idea becomes many issues, break the plan into **tracer bullet** issues. Each issue is a thin vertical slice cutting through ALL integration layers end-to-end, not a horizontal slice of one layer.

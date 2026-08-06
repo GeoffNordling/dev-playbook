@@ -12,5 +12,6 @@ Ordering: reading order.
 - [Human Checkpoints](/software-factory/human-checkpoints.md) — Every point where the factory stops for the human — the capability boundary, escalation, and the three review-stretch pauses
 - [Node-Skill Authoring](/software-factory/node-skill-authoring.md) — Voice, content rules, and mechanics for authoring the software factory's node skills
 - [PR Feedback](/software-factory/pr-feedback.md) — The comment surfaces a pull request carries, and how a committing node re-enters on a rework lap
+- [Deviation Contract](/software-factory/deviation-contract.md) — The contract a deviation runs under — the three limiters, escalation, and the deviation ledger
 - [Refactor Catalogue](/software-factory/refactor-catalogue.md) — The refactor candidates a build node looks for at slice and chunk scope, and the step-size rule governing them
 - [Review Contract](/software-factory/review-contract.md) — The contract the code and doc reviews run under — its parameters, green gate, findings comment, and escalation boundary
