@@ -164,14 +164,16 @@ dispositions, never raw findings one by one. The verdict is the human's:
 
 - **Pass** — apply or demote per the dispositions (the brief is editable until
   launch), then move the leaf to `phase:build`.
-- **Not yet** — the leaf stays at its definition phase; re-review is a full
-  fresh run of both lenses.
+- **Back to design** — the leaf returns to design for re-authoring: a fast-path
+  leaf moves to `phase:design`, a design-exit leaf stays there. Re-review is a
+  full fresh run of both lenses.
 
 After the ruling the session posts one **verdict-record comment** on the issue —
 date, lenses run, findings count, disposition gist, verdict. It is the evidence
 behind the readiness bar's "released at an issue-review verdict" and, on a
-not-yet, the next session's work order. The review binds the factory's autonomous path,
-never the human, who may always skip the beat, cut it short, or advance anyway.
+back-to-design, the next session's work order. The review binds the factory's
+autonomous path, never the human, who may always skip the beat, cut it short, or
+advance anyway.
 
 ## What is not a checkpoint
 

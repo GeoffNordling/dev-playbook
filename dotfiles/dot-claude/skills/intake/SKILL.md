@@ -38,9 +38,9 @@ Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **e
 Two checks, both run before a line of the brief is written:
 
 - **Redundancy.** Search dev-playbook's skills, standards, and scripts, plus the open issues of the repo the idea belongs to, for work that already covers the idea. Search by concept, not by the wording the idea arrived in.
-- **Claims.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and check it against the tree.
+- **Claims — surface and pick.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and sort it: the ones the approach stands on go to the user as a **proposed-probe list**, and they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)); peripheral claims ride as `assumed` freely. Run the picked probes immediately, in-context, as ordinary tool calls, keeping each probe's command and observed output for the probe-record comment §5 posts.
 
-Report what both checks found and where you looked. On a hit — existing coverage, or a claim that fails — put the evidence to the user; the proceed-or-kill call is theirs.
+Report what both checks found and where you looked. On a hit — existing coverage, or a picked probe that fails — put the evidence to the user; the proceed-or-kill call is theirs.
 
 ### 3. Pick the four-tuple
 
@@ -99,7 +99,17 @@ EOF
 )"
 ```
 
-If the stub carried `phase:intake`, drop it with `--remove-label "phase:intake"`; if it carried no labels, there is nothing to remove. Either way the issue ends at its routed phase.
+Work routed to `phase:design` or `phase:spike` lands at its routed phase directly — for **adopt**, drop a carried `phase:intake` with `--remove-label "phase:intake"`. The fast path lands at `phase:intake` instead — mint it (capture) or keep it (adopt) — because `phase:build` is set at the §6 verdict, never here. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.
+
+### 6. The issue-review beat — fast path only
+
+An issue routed to `phase:build` is released by the [issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict), never by the §5 nod alone. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
+
+1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
+2. **Synthesize the consolidated disposition list** — both lenses' findings merged and deduplicated, each disposition carrying a recommendation. The human rules on dispositions, never on raw findings one by one.
+3. **Take the verdict.** *Pass* — apply or demote per the ruled dispositions (the body is editable until launch), post the **verdict-record comment** — date, lenses run, findings count, disposition gist, verdict — then `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. *Back to design* — the brief needs more than the front door gives it: post the verdict-record comment, then route the issue there (`gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit, the verdict record its work order. Re-review is always a full fresh run of both lenses.
+
+The human may always skip the beat, cut it short, or advance anyway — the review binds the factory's autonomous path, never the human.
 
 ## Output
 
