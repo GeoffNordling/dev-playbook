@@ -20,7 +20,9 @@ workspace document.
   `prose.judgment-spelling`, flagging the British `judgement`/`judgements`
   form in all authored Markdown outside code spans, and `prose.banned-word`,
   flagging the banned actor noun (Terminology: the person is the user) in
-  every tracked file with no code-span or fence escape
+  every tracked file this workspace authors, of any type, with no code-span or
+  fence escape — vendored `.agents/` trees and verbatim `type: Reference`
+  mirrors are outside the scan, as Terminology exempts them
 
 ## Enforce
 

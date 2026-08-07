@@ -15,7 +15,7 @@ approves, before the user's final read. Work through it in order.
 
 3. **Ask where a fix is ambiguous** — a refutation that may be wrong about the
    code, or right about code that should change — per
-   [pause 2](~/workspace/dev-playbook/software-factory/checkpoints.md#pause-2-judgments-conditional).
+   [pause 2](~/workspace/dev-playbook/software-factory/user-checkpoints.md#pause-2-judgments-conditional).
    A clean green run asks nothing.
 
 4. **Close green.** Confirm with `make check-judgments`.
@@ -30,5 +30,5 @@ approves, before the user's final read. Work through it in order.
    real-but-not-this-issue land in `## Deferred` as their tracker stubs.
 
 6. **Present the final read** per
-   [pause 3](~/workspace/dev-playbook/software-factory/checkpoints.md#pause-3-the-final-review),
+   [pause 3](~/workspace/dev-playbook/software-factory/user-checkpoints.md#pause-3-the-final-review),
    then stop. The user merges in the GitHub UI.

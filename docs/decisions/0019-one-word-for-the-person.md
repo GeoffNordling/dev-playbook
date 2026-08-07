@@ -52,11 +52,19 @@ this workspace does not own is exempt and unchanged — skills vendored under an
 `.agents/` path, and verbatim mirrors of external specifications
 (`standards/references/okf-spec.md`).
 
+Dropping is the default, not a rule against ever naming the actor. Where the
+qualifier is doing real work — distinguishing which of several things is meant,
+rather than decorating a noun that already implies the actor — the replacement
+translates instead. The factory's checkpoints document is the case: the system
+pauses at many points and only some are the user's, so
+`software-factory/user-checkpoints.md` states which kind the document covers.
+The test is whether removing the word loses a distinction a reader needs.
+
 The swap ran across roughly 300 occurrences in about 70 files, in four
 commits — `software-factory/` and the root docs, `standards/` and `docs/`, the
 harness and code and judgments, and the rename of the factory's checkpoints
 document, whose own filename carried the banned noun, to
-`software-factory/checkpoints.md`. The revised rule now lives in `standards/prose/conventions.md` under
+`software-factory/user-checkpoints.md`. The revised rule now lives in `standards/prose/conventions.md` under
 "Terminology: the person is the user"; it states the ban positively, naming
 only the allowed word, because a rule that spelled the forbidden one would be
 its own violation.
@@ -82,9 +90,21 @@ before scaffolding, so a repo name carrying the noun is refused up front.
 
 The rule id names no noun (`prose.banned-word`, not the word itself): the scan
 reads whole files, so a card or README quoting the id would otherwise trip the
-rule it documents. Exactly two files may still carry the word — the detector
-`src/dev_playbook/prose_lint.py` and its test — and that roster is a constant
-in the detector, not a convention.
+rule it documents.
+
+Two different things let a file still carry the word, and they are not the same
+kind of thing:
+
+- **Out of scope.** The scan never reads text this workspace does not author —
+  the vendored `.agents/` trees (reached through their symlinks too, since a
+  symlink's content belongs to its target) and verbatim `type: Reference`
+  mirrors such as `standards/references/okf-spec.md`. Three such files carry
+  the word today; the ban has no opinion about them, because the swap never
+  claimed them either.
+- **Exempted inside scope.** Exactly two authored files are excused by name:
+  the detector `src/dev_playbook/prose_lint.py` and its test, which must spell
+  the word to ban it. That roster is a constant in the detector rather than a
+  convention, so a third exemption is a code change and a visible one.
 
 ## Recovery
 

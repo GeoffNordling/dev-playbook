@@ -193,7 +193,7 @@ judgments:
       - standards/standard/format.md
       - software-factory/software-factory.md
       - software-factory/factory-operations.md
-      - software-factory/checkpoints.md
+      - software-factory/user-checkpoints.md
       - software-factory/node-skill-authoring.md
       - software-factory/review-contract.md
       - software-factory/pr-feedback.md

@@ -67,7 +67,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
 | `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
-| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, and the banned actor noun over every tracked file |
+| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, and the banned actor noun over every tracked file of any type, less the vendored `.agents/` trees and verbatim `type: Reference` mirrors |
 | `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,

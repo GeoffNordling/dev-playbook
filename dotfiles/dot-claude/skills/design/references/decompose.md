@@ -100,7 +100,7 @@ mis-wired blocker strands work silently.
 Children leave here incomplete and unreleased, at `phase:design`. Each is
 finished by its own `/design` session: that session re-authors the starting
 brief and then takes the
-[issue-review verdict](~/workspace/dev-playbook/software-factory/checkpoints.md#the-issue-review-verdict)
+[issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)
 at its §8 — one issue, one design pass, full attention. Finishing every child
 here instead would spend the thinnest attention of the longest session in the
 region on the work that most needs care.

@@ -98,7 +98,12 @@ where it describes that actor in third person: `software-factory/`,
 **One word, no synonyms.** The actor is `user` in every authored file — never
 an alternative noun for the same person, in any case, plural, or hyphenated
 compound. Where such a compound is the natural phrase, drop it rather than
-translate it: "readable", not "readable by a person". Only text this workspace
+translate it: "readable", not "readable by a person". Translate instead only
+where the qualifier carries a distinction the reader needs — the system pauses
+at many points and `software-factory/user-checkpoints.md` covers the subset
+that are the user's, so dropping the word there would name the wrong set. The
+test is whether removing it loses a distinction, not whether it reads well.
+Only text this workspace
 does not own is exempt — skills vendored under an `.agents/` path, and verbatim
 mirrors of external specifications.
 
