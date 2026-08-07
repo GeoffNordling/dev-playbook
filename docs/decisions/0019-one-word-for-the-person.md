@@ -70,17 +70,21 @@ word is swapped, nothing else in those files changes, ever. The waiver covers
 the word wherever it appears in them, including inside code spans and inside a
 quotation of an external source.
 
-### The enforcing lint is a follow-up, not part of this change
+### The enforcing lint landed with the swap
 
-`repo-lint`'s `agent-facing-voice` check still bans the noun only within
-agent-facing files, and its supporting vocabulary module still describes the
-two-name rule. Replacing it with a deterministic repo-wide ban — over every
-authored file, with the vendored and verbatim-mirror exemptions above — is
-owner-driven work that follows this record. Until it lands, four files
-deliberately still carry the banned word: `src/dev_playbook/voice.py`,
-`scripts/repo-lint`, `tests/test_repo_lint.py`, and
-`tests/dev_playbook/test_repo_init.py`. They are the machinery being replaced,
-and rewriting them ahead of the replacement would have been wasted work.
+The half-repo check was replaced rather than left standing. `prose-lint` gained
+`prose.banned-word`, a deterministic ban over **every tracked file** of any
+type — no code-span and no fence escape, since a banned word inside backticks
+is still the word — with the vendored and verbatim-mirror exemptions above.
+`repo-lint`'s `agent-facing-voice` check narrowed to the first person it still
+owns, and `dev_playbook.voice` narrowed with it; `repo-init` consults the ban
+before scaffolding, so a repo name carrying the noun is refused up front.
+
+The rule id names no noun (`prose.banned-word`, not the word itself): the scan
+reads whole files, so a card or README quoting the id would otherwise trip the
+rule it documents. Exactly two files may still carry the word — the detector
+`src/dev_playbook/prose_lint.py` and its test — and that roster is a constant
+in the detector, not a convention.
 
 ## Recovery
 
@@ -99,11 +103,12 @@ carve-out it relied on (the `~/.claude/` settings tier, a "user message",
 `user-invocable` — Claude Code's own names, never translated), which the
 collapse makes moot.
 
-The four swap commits on `worktree-simplify`, in order, are `b1aad6d` (the
+The swap commits on `worktree-simplify`, in order, are `b1aad6d` (the
 checkpoints-document rename), `f7c5d9f` (`software-factory/` and the root
-docs), `75dec08` (`standards/` and `docs/`), and `955964a` (the harness, the
-code, and the judgments). Any individual file's pre-swap text is
-`git show 207a1bf:<path>`.
+docs), `75dec08` (`standards/` and `docs/`), `955964a` (the harness, the
+code, and the judgments), `43af60c` (two files no sweep's scope had reached),
+and `f251469` (the lint, which swapped the replaced machinery as it landed).
+Any individual file's pre-swap text is `git show 207a1bf:<path>`.
 
 ## Consequences
 
@@ -117,10 +122,11 @@ code, and the judgments). Any individual file's pre-swap text is
   quotation. The owner ruled that it stands as swapped — the ban admits no
   exception for quotations. Cite the upstream source, not this record, when the
   exact wording matters.
-- **The gap between rule and enforcement is real until the ban lint lands.**
-  Between this record and that follow-up, nothing stops the banned noun
-  reappearing outside agent-facing files. The existing check is not evidence
-  of compliance over the rest of the repo.
+- **Every consumer repo inherits the ban at its next pin bump.** The published
+  `playbook-lint` hook dispatches `prose-lint`, so a consumer that bumps its
+  dev-playbook `rev` starts failing its own commit gate on every occurrence it
+  carries. Each repo needs its own swap before it bumps
+  ([distribution.md](/standards/build/distribution.md)).
 - **Reinstating a second noun means re-deciding this.** The collapse is a
   vocabulary decision, not a formatting one; a future document that wants a
   different word for the actor argues against this record rather than adding an
