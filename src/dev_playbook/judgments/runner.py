@@ -198,7 +198,7 @@ def main(argv: list[str]) -> int:
                 return 2
             record([by_id(declarations, id) for id in args.ids], root)
             # A silent success is indistinguishable from a command that never
-            # ran, and the caller reports what was recorded to a human.
+            # ran, and the caller reports what was recorded to the user.
             print(f"judgments-run: recorded {len(args.ids)} judgment(s)")
     except (ValueError, OSError) as error:
         print(f"judgments-run: {error}", file=sys.stderr)

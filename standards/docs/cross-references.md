@@ -49,7 +49,7 @@ A reference to a document in a *different* repo uses its **full workspace
 path**, beginning with `~/workspace/`:
 
 ```markdown
-[SDD standards index](~/workspace/spec-tools/sdd-standards/README.md)
+[Friction log](~/workspace/mission-control/friction/log.md)
 ```
 
 A cross-repo citation always resolves to that repo's canonical main

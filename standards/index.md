@@ -21,7 +21,7 @@ alphabetical; directories last.
 - [Semantic Validation](/standards/semantic-validation.md) — Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
 - [Shell](/standards/shell.md) — Card for the shell standard — how shell is written
 - [Software Factory](/standards/software-factory.md) — Card for the software factory standard — how an idea becomes a merged pull request
-- [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a human understands a large system they did not write and will not read directly
+- [System Legibility](/standards/legibility.md) — Card for the system-legibility standard — how a user understands a large system they did not write and will not read directly
 - [Tracking](/standards/tracking.md) — Card for the tracking standard — how committed and uncommitted work is tracked through issue authoring, tracker operations, candidates, and repository settings
 - [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one

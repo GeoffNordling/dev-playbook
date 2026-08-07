@@ -32,11 +32,9 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
 | `Instrument-Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
-| `Protocol` | A formal algorithm for structured human–agent collaboration. |
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `Spec-Item` | One SDD spec item — a `feat`/`req`/`dsn` node in a `specs/` tree; body format owned by the [SDD standards](~/workspace/spec-tools/sdd-standards/README.md); frontmatter exists for OKF navigation only. |
 | `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work. |
 | `Standard-Card` | The thin catalog record for one standard — four pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
@@ -47,7 +45,7 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 Every concept document opens with a YAML frontmatter block:
 
 - **`type`** — REQUIRED. Exactly one of the names above.
-- **`title`** — the human title.
+- **`title`** — the readable title.
 - **`description`** — the one-line summary that powers triage and the authored
   `index.md` listings: a sentence fragment naming what the document *is* or what
   it *governs*, present tense, no trailing period, leading with the

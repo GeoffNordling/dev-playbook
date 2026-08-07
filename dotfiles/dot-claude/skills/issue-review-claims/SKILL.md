@@ -67,7 +67,7 @@ and move on.
 
 ## Return
 
-Your final message is data for the dispatching session, not a human-facing
+Your final message is data for the dispatching session, not a user-facing
 report. Return, raw: a numbered list of findings — each states the claim or
 quote at issue, what reality shows, and why it meets the wrong-or-halt bar —
 then one line per sweep performed that came back clean.

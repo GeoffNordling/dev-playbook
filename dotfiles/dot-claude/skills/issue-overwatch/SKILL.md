@@ -13,7 +13,7 @@ You own one issue's traverse through the factory: read the software factory grap
 
 One hard limit: you never merge. That is the user's.
 
-**The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-briefing-rule).
+**The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule).
 
 ## Read first
 
@@ -22,9 +22,9 @@ subject, so know it cold:
 
 - [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
 - [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — delegation, the worktree contract, the terminal report contract, readiness, the review stop, and the judgments node.
-- [human-checkpoints.md](~/workspace/dev-playbook/software-factory/human-checkpoints.md) — every point you stop at, and what you owe the user there.
+- [user-checkpoints.md](~/workspace/dev-playbook/software-factory/user-checkpoints.md) — every point you stop at, and what you owe the user there.
 
-Then report: `READ: software-factory.md, factory-operations.md, human-checkpoints.md`. Proceed only after.
+Then report: `READ: software-factory.md, factory-operations.md, user-checkpoints.md`. Proceed only after.
 
 ## 1. Orient
 
@@ -58,7 +58,7 @@ Run /<skill> <N>.
 Parse the subagent's final message per the [terminal report contract](~/workspace/dev-playbook/software-factory/factory-operations.md#engagement):
 
 - **DONE** — move the label and continue.
-- **ESCALATE** — bubble it to the user per the [escalation rule](~/workspace/dev-playbook/software-factory/human-checkpoints.md#escalation), and stop.
+- **ESCALATE** — bubble it to the user per the [escalation rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#escalation), and stop.
 
 ## 4. The worktree
 
@@ -71,7 +71,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 ## 5. Verdicts at the review stop
 
-The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [pause 1](~/workspace/dev-playbook/software-factory/human-checkpoints.md#pause-1-the-review-verdict), answer their questions, help them weigh, and act only on an explicit verdict.
+The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [pause 1](~/workspace/dev-playbook/software-factory/user-checkpoints.md#pause-1-the-review-verdict), answer their questions, help them weigh, and act only on an explicit verdict.
 
 - **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then the label move: `gh issue edit <N> --remove-label "phase:pr-review" --add-label "phase:judgments"`. Then enter the node (§6), which carries the issue to the user's final read and merge.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment` / `gh pr comment`), then move the label back along the rework edge.
@@ -82,7 +82,7 @@ On entering `phase:judgments`, read [judgments-node.md](references/judgments-nod
 
 ## 7. Turn boundaries — the user's commands
 
-End your turn wherever the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/human-checkpoints.md#turn-boundaries). Where the ending carries the user's command, state it once, paste-safe, one line:
+End your turn wherever the user must act or decide, per [turn boundaries](~/workspace/dev-playbook/software-factory/user-checkpoints.md#turn-boundaries). Where the ending carries the user's command, state it once, paste-safe, one line:
 
 - **Merge, on the final approval** — in the GitHub UI; you can't.
 

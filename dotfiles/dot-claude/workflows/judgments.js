@@ -214,7 +214,7 @@ log(`judgments: ${passed.length} passed, ${refuted.length} refuted, ${crashed.le
 // an agent, and only passes ever appear -- so the caller runs the string as given
 // rather than assembling one. It is null when nothing passed.
 //
-// `green` says nothing in this run needs a human mind: every judgment that ran
+// `green` says nothing in this run needs the user: every judgment that ran
 // passed, none crashed, and none was set aside. The gate itself goes green only
 // after `record` runs.
 return {

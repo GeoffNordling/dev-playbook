@@ -1,12 +1,12 @@
 ---
 type: README
 title: Software Factory
-description: What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its human checkpoints
+description: What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its user checkpoints
 ---
 
 # Software Factory
 
-How an idea moves through this workspace to shipped code: the human-led
+How an idea moves through this workspace to shipped code: the user-led
 **definition** region where intent becomes a ready issue, and the autonomous
 **factory** that carries it from build to merge.
 

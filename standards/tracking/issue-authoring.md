@@ -88,11 +88,11 @@ only when all four hold:
 - **A brief-complete body**, meeting the brief standard below; an
   under-specified leaf is not yet ready.
 - **Released at an issue-review verdict** — the definition session dispatched
-  the two review lenses, the human ruled on the consolidated dispositions, and
+  the two review lenses, the user ruled on the consolidated dispositions, and
   the verdict-record comment on the issue evidences it
-  ([human-checkpoints.md](/software-factory/human-checkpoints.md#the-issue-review-verdict)).
+  ([user-checkpoints.md](/software-factory/user-checkpoints.md#the-issue-review-verdict)).
   Setting `phase:build` is that verdict's consequence, not a separate act. The
-  human may always skip or override the beat; the release is theirs either way.
+  user may always skip or override the beat; the release is theirs either way.
   Factory-bound leaves only: a spike's deliverable is an answer, not a build,
   so a spike is ready on the first three conditions.
 
@@ -262,10 +262,10 @@ Decision Record bar gets a record under `docs/decisions/`
   already, by sitting inside an approved outcome) and name it in
   `Out of scope`. This binds at leaf and at epic altitude, applied when
   slicing and backstopped at issue review.
-- **Written for the human reader.** The human sees only the issue — never
+- **Written for the user.** The user sees only the issue — never
   the author's context. Any reference to existing file content, especially
   an artifact placement note, quotes the text it amends verbatim,
-  before/after style. A brief the human cannot follow unaided is defective
+  before/after style. A brief the user cannot follow unaided is defective
   even when the implementer could follow it.
 
 **Prototype claims.** A brief may cite a prototype as proof, and may carry a
@@ -288,13 +288,13 @@ assumed. Evidence lives in a probe-record comment on the issue (the probe
 command and its observed output); a one-line output may sit inline instead. A
 measured claim without checkable evidence is demoted to assumed at issue
 review. Grades are authored where the claim is authored; the authoring
-session surfaces the claims it believes load-bearing and the human picks
+session surfaces the claims it believes load-bearing and the user picks
 which to probe.
 
 ### The brief freeze
 
 A brief is frozen when its issue launches into the factory: the body is
-never amended after launch — not by agents, not by human rulings. Rulings
+never amended after launch — not by agents, not by user rulings. Rulings
 live as comments on the issue or PR; the launch baseline, the
 [deviation ledger](/software-factory/deviation-contract.md#the-deviation-ledger),
 and the rulings together make the issue's full drift visible.

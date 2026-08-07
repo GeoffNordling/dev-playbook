@@ -80,7 +80,6 @@ judgments:
       - standards/build/canonical/Makefile.base
       - standards/build/canonical/Makefile.python
       - standards/build/canonical/Makefile.aws
-      - standards/build/canonical/Makefile.sdd
       - standards/build/canonical/ci.yml
       - standards/build/canonical/pyproject.toml
       - standards/build/canonical/.pre-commit-config.yaml

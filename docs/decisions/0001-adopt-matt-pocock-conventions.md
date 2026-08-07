@@ -48,7 +48,7 @@ one adaptation.
 - `CONTEXT.md` glossary at the repo root, lazily created by
   `/grill-with-docs` on first ambiguity (not backfilled upfront).
 - Triage label vocabulary (`needs-triage`, `needs-info`,
-  `ready-for-agent`, `ready-for-human`, `wontfix`) plus the two
+  `ready-for-agent`, `ready-for-user`, `wontfix`) plus the two
   category labels.
 - Vertical-slice issue breakdown (tracer bullets, HITL/AFK markers,
   blocked-by chains).

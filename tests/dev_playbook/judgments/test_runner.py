@@ -193,7 +193,7 @@ def test_record_confirms_what_it_recorded(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     # A silent success cannot be told apart from a command that never ran, and
-    # the caller reports what was recorded to a human.
+    # the caller reports what was recorded to the user.
     assert main(["record", "j1"]) == 0
 
     assert "recorded 1 judgment(s)" in capsys.readouterr().out

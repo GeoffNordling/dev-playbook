@@ -45,7 +45,7 @@ Report what both checks found and where you looked. On a hit — existing covera
 ### 3. Pick the four-tuple
 
 - `category:*` — pick one.
-- `mode:*` — `mode:direct` or `mode:spike`. `mode:sdd` is a retained label the factory does **not** support and intake never mints, per [software-factory.md → SDD is not supported](~/workspace/dev-playbook/software-factory/software-factory.md#sdd-is-not-supported).
+- `mode:*` — `mode:direct` or `mode:spike`; those are the only two the scheme carries.
 - `tests:*` — for `mode:direct`, ask the user; `mode:spike` is always `tests:no`.
 - `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it, or the user parks the beat and the issue holds here for the next session.
 
@@ -103,7 +103,7 @@ For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with
 
 ### 6. The issue-review beat — fast path only
 
-An issue routed to `phase:build` is released by the [issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict), never by the §5 nod alone. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
+An issue routed to `phase:build` is released by the [issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict), never by the §5 nod alone. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
 
 1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
 2. **Synthesize the consolidated disposition list** — both lenses' findings merged and deduplicated, each disposition carrying a recommendation. The user rules on dispositions, never on raw findings one by one.

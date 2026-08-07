@@ -14,9 +14,8 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 
 ## Organization
 
-- **Mirror source structure.** Test files mirror the source directory layout: `src/auth/login.py` -> `tests/auth/test_login.py`. This scales naturally and avoids naming collisions. The mirror relationship holds directly beneath `tests/`, or beneath any of the three SDD scope roots — `tests/unit/`, `tests/integration/`, `tests/agent_review/` — whose names are semantic input to SDD traceability (see [sdd-standards/spec-standard.md — Verifiers](~/workspace/spec-tools/sdd-standards/spec-standard.md#3-verifiers)): `tests/unit/auth/test_login.py` mirrors the same module. A flat placement directly inside a scope root (`tests/unit/test_login.py`) is nonconformant — the package path is still required.
+- **Mirror source structure.** Test files mirror the source directory layout: `src/auth/login.py` -> `tests/auth/test_login.py`. This scales naturally and avoids naming collisions. The mirror is the one accepted location — the package path is always required.
 - **Conftest hierarchy.** Place `conftest.py` at each directory level for fixtures relevant to that scope. Root `conftest.py` holds shared fixtures; subdirectory `conftest.py` files hold domain-specific fixtures.
-- **Coverage markers.** Every test is marked with the spec item it covers: `@pytest.mark.covers("<id>")`. The ID names the closest upstream item — whichever `feat`, `req`, or `dsn` declared `Needs: utest` (or `Needs: itest`); typically a `dsn`. This is the test's `Covers:` line, expressed in code, and enables traceability verification via `pytest-sdd`. See [sdd-standards/spec-standard.md — ID](~/workspace/spec-tools/sdd-standards/spec-standard.md#22-id) for the format.
 
 ## Test structure
 

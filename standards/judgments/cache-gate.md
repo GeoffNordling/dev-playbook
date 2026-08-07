@@ -75,6 +75,6 @@ every consumer's gate test calls — so it covers any test shape (the single or
 parametrized recipes above) with **no per-test markers** and no change to
 those recipes. `make check-judgments` is the
 [pre-push hook](/standards/build/canonical/.pre-commit-config.yaml)'s entry, so
-a miss blocks the push; the human or main-loop agent then runs `run-judgments`
+a miss blocks the push; the user or main-loop agent then runs `run-judgments`
 and retries. A subagent running plain `make check` never meets an
 unresolvable red.

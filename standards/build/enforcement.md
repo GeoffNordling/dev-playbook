@@ -25,7 +25,7 @@ The commit and push gates block locally, through the git hooks that invoke
 them — hooks that live in `.git/`, so `uvx pre-commit install` has to run in
 every clone. The CI gate has no branch protection behind it —
 [repo-settings.md](/standards/tracking/repo-settings.md) configures no required
-status checks — so its block executes through the human's standing rule: **a
+status checks — so its block executes through the user's standing rule: **a
 red CI run is never merged**. That rule is nondiscretionary — no judgment is
 exercised — which is what keeps the CI gate a gate rather than a review; the
 block sits at the merge button, not in branch-protection settings.
@@ -70,7 +70,7 @@ defect in the code. Which machine skips what is recorded in
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
 | decisions-lint | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-lint | Links and Citations | hook pattern, except the CI gate and the secondary machines (skipped — neither carries the cited repos) |
-| prose-lint | prose spelling (the American `judgment`) | hook pattern |
+| prose-lint | prose spelling (the American `judgment`); the banned actor noun | hook pattern |
 | judgments-lint | judgment declarations | hook pattern |
 | standards-lint | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |
@@ -78,5 +78,4 @@ defect in the code. Which machine skips what is recorded in
 | skill-lint | skill bundles (skill-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments cache gate | push gate only — never the CI gate; the judgments cache gate is skipped on the secondary machines |
-| validate | spec graph | push gate only — never the CI gate (sdd repos) |
 | workspace-lint | GitHub settings and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |

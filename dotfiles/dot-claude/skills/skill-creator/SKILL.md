@@ -115,8 +115,9 @@ Write `SKILL.md` and any reference files against the answers from step 2.
   the read checkable.
 - Cite standards for shared rules; another skill's bundle internals are
   reached only as a deliberate pointer, named as such.
-- The person in an agent-facing skill is "the user", never "the human" —
-  playbook-lint's agent-facing-voice check blocks the commit otherwise.
+- The person in an agent-facing skill is "the user" — one word, no
+  synonyms; playbook-lint's agent-facing-voice check blocks the commit
+  otherwise.
 - A rule belongs to the session that obeys it. When a drafted rule governs
   a *later* session's behavior rather than this skill's own run, move it
   into the artifact that reaches that session — a seeded ruling, a minted

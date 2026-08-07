@@ -29,7 +29,7 @@ Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.
 
 Auditor and repairer are split, as [tracking](/standards/tracking.md) splits reporting from repair. The `claude-code.skill-mirror` rule in [skill-lint](/scripts/skill-lint) is the auditor: at the commit gate it reports any missing, mispointed, or stale symlink or authored/installed collision, and treats a committed `.agents/skills/` tree with no `dot-claude/skills/` mirror directory as an error state it fails loudly on. `scripts/sync-dotfiles` is the repairer: on every run it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
 
-After installing or removing a third-party skill (commands below), run `scripts/sync-dotfiles` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a human step, never run from a per-issue worktree.
+After installing or removing a third-party skill (commands below), run `scripts/sync-dotfiles` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a step the user runs, never from a per-issue worktree.
 
 ## Authored skills
 

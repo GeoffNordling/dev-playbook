@@ -102,7 +102,7 @@ class Outcome:
     status: str
     detail: str = ""
     gate_output: str = ""
-    # Whether this repo ends the run needing a human or an agent to act on it.
+    # Whether this repo ends the run needing the user or an agent to act on it.
     open_work: bool = False
 
     def render(self) -> str:

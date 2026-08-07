@@ -14,7 +14,7 @@ Output:
              --exclude census, and the query results (census, reachability,
              components, orphans, defects). With --output: written to that
              path instead.
-    stderr — one human-readable summary line.
+    stderr — one readable summary line.
     exit   — 0 graph built, 2 cannot run.
 
 Usage:

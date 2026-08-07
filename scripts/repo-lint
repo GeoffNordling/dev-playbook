@@ -20,7 +20,7 @@ match exactly; additions are free).
 
 Output:
     stdout — one finding per line, ``path: card.rule message``.
-    stderr — one human-readable summary line, including the inferred layers.
+    stderr — one readable summary line, including the inferred layers.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:
@@ -104,7 +104,6 @@ CANONICAL_MANIFEST = frozenset(
         "Makefile.base",
         "Makefile.python",
         "Makefile.aws",
-        "Makefile.sdd",
         ".gitignore",
     }
 )
@@ -195,7 +194,6 @@ class Layers:
     src: bool
     scripts_python: bool
     aws: bool
-    sdd: bool
     js: bool
 
     def names(self) -> list[str]:
@@ -204,7 +202,6 @@ class Layers:
             ("src", self.src),
             ("scripts", self.scripts_python),
             ("aws", self.aws),
-            ("sdd", self.sdd),
             ("js", self.js),
         ]
         return ["base"] + [name for name, on in flags if on]
@@ -218,7 +215,6 @@ def infer_layers(root: Path, python_files: list[Path]) -> Layers:
             p.relative_to(root).parts[:1] == ("scripts",) for p in python_files
         ),
         aws=(root / "cdk.json").is_file(),
-        sdd=(root / "specs").is_dir(),
         js=(root / "package.json").is_file(),
     )
 
@@ -324,8 +320,6 @@ def check_makefile(
     fragments = ["Makefile.python" if layers.python else "Makefile.base"]
     if layers.aws:
         fragments.append("Makefile.aws")
-    if layers.sdd:
-        fragments.append("Makefile.sdd")
     findings = []
     for name in fragments:
         text = canonical_text(name)
@@ -388,10 +382,6 @@ def check_presence(
         )
     if layers.aws and not layers.src:
         findings.append(Finding("cdk.json", LAYER_SHAPE, "the aws layer requires src/"))
-    if layers.sdd and not layers.python:
-        findings.append(
-            Finding("specs/", LAYER_SHAPE, "the sdd layer requires the python layer")
-        )
     return findings
 
 
@@ -665,8 +655,8 @@ def is_vendored(root: Path, path: Path) -> bool:
 def check_agent_facing_voice(root: Path) -> list[Finding]:
     """Agent-facing instruction text — every CLAUDE.md (root, nested, and the
     dev-playbook global source) plus every first-party skill and rule body — is
-    written for the executing agent alone, so it names the human "user" and
-    never speaks in first person (claude-content.md, conventions.md). Runs in
+    written for the executing agent alone, so it never speaks in first person
+    (claude-content.md, conventions.md). Runs in
     every repo, inspecting only that repo's own files; a consumer's skills and
     rules sit under .claude/, dev-playbook's under the Stow source tree, and
     vendored third-party skills are exempt wherever they surface. A skill's

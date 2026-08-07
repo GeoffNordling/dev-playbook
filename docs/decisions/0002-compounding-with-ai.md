@@ -34,7 +34,7 @@ Audited this workspace against the source article above. Three gaps to close, se
 - **Codified always-loaded reading order in CLAUDE.md.** Different sessions do different things; reading order belongs in skills (e.g. `/orient`), invoked when the session warrants it.
 - **INDEX.md per project.** Useful for corporate/team repos with significant out-of-repo context (Slack, Drive); not yet applicable to this workspace's largely self-contained repos. Revisit if a business repo lands.
 - **Per-repo CLAUDE.md as onboarding/glossary doc.** Existing taxonomic style kept; `/orient` handles the day-one reading-order role.
-- **Auto-memory.** `autoMemoryEnabled: false` retained. The human is the programmer of context; auto-memory makes that uncontrolled.
+- **Auto-memory.** `autoMemoryEnabled: false` retained. The user is the programmer of context; auto-memory makes that uncontrolled.
 - **Global ruff install.** Drifts from per-repo `pyproject.toml` / `uv.lock` pins; would cause format-bounce loops where the hook formats one way and CI formats it back another.
 - **Folding rules into the global CLAUDE.md.** `~/.claude/rules/*.md` kept as separate files; loading semantics are equivalent and the split keeps each rule self-contained.
 
@@ -58,7 +58,7 @@ The change makes the instruction surface explicitly **tiered**:
 
 Before this Decision Record, universal preferences were either absent or scattered. After, each piece of instruction has exactly one home and one load trigger.
 
-The edit-time hook closes the verification loop. Pre-commit was the only ruff gate; the model would only learn about lint issues after a human committed and saw the failure. Now the model sees them inside the same edit loop and corrects without round-trips.
+The edit-time hook closes the verification loop. Pre-commit was the only ruff gate; the model would only learn about lint issues after a user committed and saw the failure. Now the model sees them inside the same edit loop and corrects without round-trips.
 
 Project-local ruff is the only stable answer. Each repo's `pyproject.toml` pins a specific ruff version; CI uses that pin. A global ruff would diverge in version, in selected rules, or in formatter behavior, producing edit-time → CI bounce. Walk-up resolution guarantees the hook uses the same ruff the project will.
 
@@ -80,7 +80,7 @@ Project-local ruff is the only stable answer. Each repo's `pyproject.toml` pins 
 - Modified: `standards/repo-documentation.md` — `## CLAUDE.md hierarchy` section + `<sub-project>/CLAUDE.md` row in the Files table.
 - Modified: `CLAUDE.md` (dev-playbook root) — LaTeX-in-Markdown rules promoted to global; "no secrets" line dropped (already part of base behavior).
 - Removed: `dotfiles/CLAUDE.md`. Its content was redundant with `rules/edit-in-dev-playbook.md` and the dev-playbook root CLAUDE.md, and it was being loaded universally as a side effect of where Stow placed its symlink.
-- New rule that any future hook script `SHALL` flow signal to Claude (exit 2 + stderr) or stay silent (exit 0). Other non-zero exit codes go only to the human-visible terminal scrollback and are not used.
+- New rule that any future hook script `SHALL` flow signal to Claude (exit 2 + stderr) or stay silent (exit 0). Other non-zero exit codes go only to the user-visible terminal scrollback and are not used.
 - Open follow-ups (deliberately deferred):
   - Watcher-pair pattern for execution/direction drift on long sessions.
   - `bin/transcript-reader` to enable transcript mining for config gaps.

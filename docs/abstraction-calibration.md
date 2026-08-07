@@ -1,17 +1,17 @@
 ---
 type: Survey
 title: Abstraction Calibration
-description: Where the human should live in an AI-written repo — the slop trench, the pandas standard, and the bet on invented, deterministically-enforced primitives
+description: Where the user should live in an AI-written repo — the slop trench, the pandas standard, and the bet on invented, deterministically-enforced primitives
 ---
 
 # Abstraction Calibration
 
 A conversation-derived survey (2026-07-25) of a central problem in
-AI-assisted development: once an AI writes most of the code, the human's
+AI-assisted development: once an AI writes most of the code, the user's
 understanding of the system stops accumulating for free — it used to be a
 byproduct of typing, and now it has to be engineered deliberately. The fix is
 neither "read more code" nor "trust the AI more"; it is choosing, on purpose,
-the abstraction level the human operates at, and enforcing it by mechanism.
+the abstraction level the user operates at, and enforcing it by mechanism.
 The material here is an analysis and a bet, not a decision — nothing below
 commits us to building anything.
 
@@ -19,29 +19,29 @@ commits us to building anything.
 
 The workspace repos (dev-playbook, story-forge, mission-control, spec-tools
 itself) are a mix of code and Markdown — and the Markdown is English code: it
-instructs agents, so it executes. The AI reads all of it; no human reads all
+instructs agents, so it executes. The AI reads all of it; no user reads all
 of it. Left unmanaged, that asymmetry has a known failure mode: the AI
-surfaces summaries and escalates decisions framed below the human's operating
-level, and the human either rubber-stamps or slows to a crawl. That's the slop trench —
+surfaces summaries and escalates decisions framed below the user's operating
+level, and the user either rubber-stamps or slows to a crawl. That's the slop trench —
 nominal ownership of a system whose details have outpaced inspection. This
 survey is about the mechanisms that keep a workspace out of it.
 
-Human understanding is naturally strongest at the surface and thins toward
+The user's understanding is naturally strongest at the surface and thins toward
 implementation detail — for dev-playbook, script names and roles are readily
 at hand while internals are AI-owned. That distribution is not itself the
-problem; it's exactly how we intended to operate in an AI-first world and it worked well in the pre-AI era, with humans writing high-level code against low-level APIs. The gap is that deterministic software has
+problem; it's exactly how we intended to operate in an AI-first world and it worked well in the pre-AI era, with developers writing high-level code against low-level APIs. The gap is that deterministic software has
 a deliberately designed API surface to be fluent *in*, while AI repos don't.
 
 The full componentization of the original notes:
 
 1. **The problem** — the slop trench, as above.
-2. **The thought experiment** — if the human had hand-typed everything in dev-playbook, including all the Python and all the English text, they'd understand the APIs, the objects, and their ownership
+2. **The thought experiment** — if the user had hand-typed everything in dev-playbook, including all the Python and all the English text, they'd understand the APIs, the objects, and their ownership
    intuitively. That kind of knowledge is the target.
 3. **Current-state assessment** — the operating level has drifted high
    without a designed surface beneath it; the mental model is thinner than
    the pandas standard demands.
 4. **The proposed artifact** — an intermediary layer: precise enough to carry
-   intent to the AI, small enough for the human to hold and grep all of it,
+   intent to the AI, small enough for the user to hold and grep all of it,
    and bidirectional — both parties read and write it.
 5. **The enforcement requirement** — the layer must be deterministically
    lintable: claims made at that layer are proven against the code by
@@ -55,7 +55,7 @@ The full componentization of the original notes:
 
 ## The pandas standard
 
-Before AI, the human operated pandas for years without ever (or rarely)
+Before AI, the user operated pandas for years without ever (or rarely)
 reading inside a pandas method. Yet they knew the API like the back of their
 hand: which objects exist, which methods and functions fit which task, how
 they compose, which patterns are idiomatic. DataFrame, then Index, then
@@ -68,8 +68,8 @@ pandas internals were owned by the pandas maintainers.
 
 Two mechanics made pandas fluency happen, and both matter for reproducing it:
 
-- **The human was the caller, daily.** Fluency was the residue of thousands
-  of invocations, not of reading documentation. Every layer the human is
+- **The user was the caller, daily.** Fluency was the residue of thousands
+  of invocations, not of reading documentation. Every layer the user is
   fluent in today (pandas, git, the software factory) was learned by
   operating through it; every layer they're not fluent in (the script
   internals) is one they never call — pre-commit calls it.
@@ -83,10 +83,10 @@ Two mechanics made pandas fluency happen, and both matter for reproducing it:
 There is a latent optimal point on the abstraction/detail axis, and neither
 party knows it a priori:
 
-- **Too low** (low abstraction, high detail): the human either wastes time
+- **Too low** (low abstraction, high detail): the user either wastes time
   doing things the AI could do, or — more realistically — stops paying
   attention entirely and the session becomes slop anyway.
-- **Too high** (high abstraction, low detail): the human cannot understand
+- **Too high** (high abstraction, low detail): the user cannot understand
   what's happening, and it's slop no matter how hard they try to pay
   attention.
 
@@ -98,7 +98,7 @@ rejects a malformed mental model; the model just gets quietly worked around.
 So the default operating point is non-principled — not by anyone's choice,
 but because nothing constrains it. That is where slop is born.
 
-The human knows git branches, worktrees, and the filesystem not from reading
+The user knows git branches, worktrees, and the filesystem not from reading
 but because the products they consume (Claude Code, computers in general, etc.) compel living
 in those abstractions. The repos' internals stopped compelling anything the
 day the AI started typing the code.
@@ -112,14 +112,14 @@ layer claims fail the gate when they drift" is a mechanism.
 
 ## The bet: invented, enforced primitives
 
-Unlike pandas — where someone else built the primitives and the human learned
+Unlike pandas — where someone else built the primitives and the user learned
 them — here we are free to invent our own. And "skills/markdown can be
 literally anything" is an upper bound, not an obligation: we are allowed to
 constrain ourselves.
 
 The bet: build intermediary layers out of invented primitives that are
 
-1. **human-graspable** — a small noun-set the human can hold and grep
+1. **user-graspable** — a small noun-set the user can hold and grep
    entirely, and
 2. **deterministically validated to the maximum practical extent** — with
    the proven/unproven boundary kept explicitly visible.
@@ -155,8 +155,8 @@ deterministically verified functional and design requirements, expressed
 without looking inside the system. Nothing here condemns it.
 
 The narrower question this survey asks is whether spec-tools is the right
-vehicle for *this* problem — the inhabitable human layer — and the answer is:
-not convinced. Full spec-tools items are walls of normative text; the human
+vehicle for *this* problem — the layer the user can inhabit — and the answer is:
+not convinced. Full spec-tools items are walls of normative text; the user
 cannot live at that layer and would fall asleep if they tried.
 For this use, the surface-to-formality ratio is wrong: everything is the
 formal layer.
@@ -216,7 +216,7 @@ gate fails.
 ### OKF — the control case, closed
 
 "We use OKF on all our non-harness-injected Markdown." One sentence; both
-parties understand it; fully linted (okf-lint). The human understands it
+parties understand it; fully linted (okf-lint). The user understands it
 because they read the spec when it came out and directed the implementation.
 Nothing to build. This is what a *solved* artifact looks like: trivial
 noun-set, full enforcement.
@@ -224,7 +224,7 @@ noun-set, full enforcement.
 ### Standard — the full pattern, already built
 
 This was a deliberate earlier attempt to operate at the correct level, and it
-worked. The human holds four role-primitives — **define** (markdown),
+worked. The user holds four role-primitives — **define** (markdown),
 **audit** (a detector: linter or judgment), **enforce** (the pre-commit
 gate), **adopt** (markdown) — and knows what each is made of, without having
 memorized the rule prose, the scripts, or the judges.
@@ -237,23 +237,23 @@ surface. "This rule is enforced" is not a belief; it's a linted claim. (In
 conversation the matrix "rang a bell but hadn't been thought about in a long
 time" — which is correct: it's below the public API, like logic inside a
 pandas method. Consulted, not memorized. Things below the public API are
-*expected* to fall out of the human's head; the layer is what's kept.)
+*expected* to fall out of the user's head; the layer is what's kept.)
 
-Verdict: the division of ownership — human holds the primitives and the
+Verdict: the division of ownership — user holds the primitives and the
 coverage boundary; AI holds the rule prose, scripts, and judgments — is
 correct. Standard is the template: the only artifact so far with both
 inhabitation *and* proof.
 
 The test that keeps the division honest: every decision the AI escalates must
 be expressible at the layer. "Should this rule be a linter or a judgment?" —
-layer-level; the human rules on it. "Should `ROOTLESS_SEGMENTS` exempt this
+layer-level; the user rules on it. "Should `ROOTLESS_SEGMENTS` exempt this
 path?" — below the layer; the correct move is not to descend but to force the
 question up: either it restates in layer terms ("should Decision Records be
 exempt from the citation-form rule?") or the layer is missing a noun.
 
 ### Software factory — inhabited, unproven
 
-The human understands the factory through four primitives: the **mermaid
+The user understands the factory through four primitives: the **mermaid
 graph** (the state machine), the **four-tuple labels**, the **skills**
 attached to each node, and the **git procedures** as it runs. This is not
 vibes — it's real fluency, earned the same way pandas fluency was: they
@@ -265,13 +265,13 @@ Two lessons the factory teaches:
 - **Correct layer size is a property of design quality, not system size.**
   The factory spans dozens of files, and file count says nothing about how
   hard it is to hold — that's an AI-centric metric (how much must be read to
-  verify a claim). By the human's metric — do named primitives predict
+  verify a claim). By the user's metric — do named primitives predict
   behavior? — the factory is easy. Pandas is enormous and compresses to a
   few shapes; the factory compresses to four primitives. An artifact whose
   layer won't compress is a smell about the artifact.
 - The factory is the **existence proof** that the layer approach works — and
   simultaneously the demonstration of the missing half: the skill bodies are
-  AI-authored English the human doesn't read, and nothing lints that the
+  AI-authored English the user doesn't read, and nothing lints that the
   graph matches what the skills actually do. Graph-in-head and prose-in-repo
   stay in sync only by discipline. Inhabited, unproven — the mirror image of
   a hypothetical fully-linted layer nobody lives in.
@@ -284,16 +284,16 @@ second one.
 ### Skills — the signature idea, shelved
 
 Skills are the closest non-code thing to code: English that executes. Their
-problem is that they can be literally anything, so the human reads the title,
+problem is that they can be literally anything, so the user reads the title,
 develops an intuition from watching sessions, and everything beneath operates
-below the surface. Their advantage: the human lives in them all day, so
+below the surface. Their advantage: the user lives in them all day, so
 intuition does accumulate.
 
 The idea worth recording: **give skills a signature.** A pandas method is a
 signature (typed, enforced at every call) plus a docstring (freeform prose);
 skills today are all docstring. A skill could carry a small set of declared,
 machine-checkable claims — gates it runs, scope it may touch, stops where it
-waits for a human — with the prose staying prose around them. Two things make
+waits for a user — with the prose staying prose around them. Two things make
 this more than wishful:
 
 - **Declarations can bind at runtime, not just describe.** Statically linting
@@ -312,12 +312,12 @@ this more than wishful:
   consumers read — are where undetected drift compounds, and their regular
   shape (gates, stops, transitions, artifacts) makes them the easiest to
   constrain: strict grammar there (today, the factory-node skills — build,
-  the reviews, judgments). Skills the human watches at every invocation,
+  the reviews, judgments). Skills the user watches at every invocation,
   where a bad run costs one conversational turn, stay free (orient,
   usage-report). "Can be anything" remains available; it stops being the
   default for load-bearing skills.
 
-Shelved deliberately: the human understands their skills today (designed
+Shelved deliberately: the user understands their skills today (designed
 them all, uses them routinely), so this is not where effort goes now. It's
 recorded because it's the clearest articulation of the general mechanism.
 
@@ -334,7 +334,7 @@ Extracted from the examples — not invented:
    checks. (The card↔rule matrix; `--list-rules` equality; hook-enforced
    scope.)
 4. **A visible coverage boundary** — what's proven vs. what's prose-only.
-   The human need not know rule internals, but must know which side of the
+   The user need not know rule internals, but must know which side of the
    line a claim sits on, because that's what says how much to trust it.
 
 ## Cross-repo generalization
@@ -350,16 +350,16 @@ them. What generalizes:
 - **Per-repo domain nouns**, each declared in that repo's `CONTEXT.md` —
   which is exactly what [CONTEXT.md](/CONTEXT.md) already is for this repo.
 
-Total surface the human would hold: roughly a pandas cheat sheet. That is the
+Total surface the user would hold: roughly a pandas cheat sheet. That is the
 feasibility argument — the size is right.
 
 ## The two hard parts (neither is tooling)
 
-**Inhabitation.** Every layer the human actually knows, they know from
+**Inhabitation.** Every layer the user actually knows, they know from
 operating through it daily, not from reading it. So the layer must become the
-language of the human↔AI interface itself: decisions, issues, gate failures,
-and the AI's questions all expressed in layer nouns. The human is the caller
-again — that's what made pandas stick. And the human is *always* working;
+language of the user↔AI interface itself: decisions, issues, gate failures,
+and the AI's questions all expressed in layer nouns. The user is the caller
+again — that's what made pandas stick. And the user is *always* working;
 no version of this system has them walking away to the beach. The design goal
 is never absence — it is the correct altitude, held by mechanism.
 
@@ -378,10 +378,10 @@ Two rules fall out that change day-to-day behavior immediately, before any
 tooling exists:
 
 1. **Escalation discipline.** The AI is never allowed to escalate a question
-   to the human from below the layer. Either the question restates in layer
+   to the user from below the layer. Either the question restates in layer
    nouns, or the AI proposes a new noun for the layer. The slop trench, in
-   one sentence, is the AI asking questions from below the human's layer and
-   the human trying to answer down there. The human gets stuck in the mud.
+   one sentence, is the AI asking questions from below the user's layer and
+   the user trying to answer down there. The user gets stuck in the mud.
 2. **Extraction over invention.** As above: primitives are named from what
    recurs, never legislated a priori; n≥2 or it's shelved.
 

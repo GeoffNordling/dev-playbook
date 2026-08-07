@@ -36,13 +36,13 @@ the seed has no counterpart for.
 Two choices, trading different costs:
 
 - A **model-invoked** skill is reachable by the agent, so it fires
-  autonomously *and* other skills can reach it (the human can still type its
+  autonomously *and* other skills can reach it (the user can still type its
   name too). It contributes to **context load** — the description sits in the
   window every turn. Mechanics: `disable-model-invocation: false`, and write a
   model-facing description with rich trigger phrasing.
-- A **user-invoked** skill is out of the agent's reach: only the human, typing
+- A **user-invoked** skill is out of the agent's reach: only the user, typing
   its name, can invoke it — and no other skill can. Zero context load, but it
-  spends **cognitive load**: *the human* is the index that must remember it
+  spends **cognitive load**: *the user* is the index that must remember it
   exists. Mechanics: set `disable-model-invocation: true`; the description is
   still authored and still bound to the same form, and no model reads it.
 
@@ -53,7 +53,7 @@ Pick model-invocation only when the agent must reach the skill on its own, or
 another skill must. If it only ever fires by hand, make it user-invoked and
 pay no context load.
 
-When user-invoked skills multiply past what the human can remember, that
+When user-invoked skills multiply past what the user can remember, that
 piled-up cognitive load is cured by a **router skill**: one user-invoked skill
 that names the others and when to reach for each.
 
@@ -156,7 +156,7 @@ tokens, by recruiting priors the model already holds.
 
 It serves predictability twice. In the body it anchors *execution*: the agent
 reaches for the same behavior every time the word appears. In the description
-it anchors *invocation*: when the same word lives in the human's prompts,
+it anchors *invocation*: when the same word lives in the user's prompts,
 docs, and code, the agent links that shared language to the skill and fires it
 more reliably.
 
@@ -176,7 +176,7 @@ leading words retire — go find them.
 
 ## Failure modes
 
-Use these to diagnose issues the human may be having with the skill.
+Use these to diagnose issues the user may be having with the skill.
 
 - **Premature completion** — ending a step before it's genuinely done,
   attention slipping to *being done*. Defense, in order: sharpen the

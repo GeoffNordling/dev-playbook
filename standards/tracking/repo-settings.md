@@ -45,5 +45,5 @@ Extra rules are free — this is a floor, not an exact set.
 
 This is deliberately not [branch protection with required status
 checks](/standards/build/enforcement.md): nothing here makes CI a merge
-precondition, which stays the human's standing rule. It denies only the two
+precondition, which stays the user's standing rule. It denies only the two
 operations that destroy history.

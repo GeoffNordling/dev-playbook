@@ -26,11 +26,8 @@ skill at the main loop:
 | `typecheck` | python | `uv run mypy <code-roots>` — whichever of `src tests scripts` hold `.py` files |
 | `test` | python | `uv run pytest` |
 | `synth` / `diff` / `deploy` | aws | `npx cdk synth` / `npx cdk diff` / `npx cdk deploy` |
-| `validate` | sdd | `uv run spec-tools validate .` — the spec-graph gate |
 
-In a python repo, `check: format-check lint typecheck test`. In an sdd repo
-(`specs/` present), the `Makefile.sdd` fragment appends `validate` to
-`check`'s prerequisites via a recipe-less `check: validate` line. All targets
+In a python repo, `check: format-check lint typecheck test`. All targets
 are `.PHONY`. Repos `MAY` add targets; the canonical ones are enforced
 verbatim ([canonical.md](/standards/build/canonical.md)). Because `check` is
 a strict superset of [thin CI](/standards/build/ci.md), a green local `check`

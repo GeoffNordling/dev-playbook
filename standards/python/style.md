@@ -39,7 +39,7 @@ with `D401` (imperative mood) disabled to preserve the noun-phrase voice and
 `tests/` plus `__init__.py` exempted.
 
 Rationale: a name says what something is called; a docstring says what it
-does. Readers (human and agent) should not have to read the body to learn
+does. Readers (user and agent) should not have to read the body to learn
 the contract.
 
 **Exception: tests.** Pytest test functions follow a `test_<behavior>` naming
@@ -102,7 +102,7 @@ slips past review because nobody saw it.
 
 ## Future imports
 
-`from __future__ import annotations` is banned. Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`), builtin generics (`list[int]`), and string-quoted forward references. The `python-lint` pre-commit hook (its `no-future-annotations` rule) auto-rejects the import. If a future import is truly necessary, ask the human for permission.
+`from __future__ import annotations` is banned. Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`), builtin generics (`list[int]`), and string-quoted forward references. The `python-lint` pre-commit hook (its `no-future-annotations` rule) auto-rejects the import. If a future import is truly necessary, ask the user for permission.
 
 ## Helpers
 

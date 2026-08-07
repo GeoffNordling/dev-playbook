@@ -35,8 +35,8 @@ source is `dotfiles/dot-claude/CLAUDE.md`, Stow-symlinked into `~/.claude/`,
 so the governed artifact lives in dev-playbook and rides the normal review
 path. As a `CLAUDE.md` it is already a registry member
 ([files.md](/standards/claude-code/files.md)) and already agent-facing
-configuration, so it holds to the agent-facing voice — second person, the
-human named as `user` ([conventions.md](/standards/prose/conventions.md)).
+configuration, so it holds to the agent-facing voice — second person, never
+first ([conventions.md](/standards/prose/conventions.md)).
 
 The file `SHALL` bucket its rules under exactly two H2 sections, in order:
 

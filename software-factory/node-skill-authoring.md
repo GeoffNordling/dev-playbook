@@ -26,10 +26,10 @@ The body is read by an agent running one node who does not know the software fac
 
 - **Check, don't assume prior-phase state.** A node may be the first to run on a region — check for what you need and establish it if absent, rather than trusting an upstream node to have left it.
 - **Defer rather than scaffold.** An unfinished region is left undone and reported as deferred, not filled with placeholder content a later node would only delete.
-- **Decide only what's yours.** A node skill doesn't make calls that belong to a human or an upstream node — it takes them as input; handed a scope, it neither widens nor narrows it.
+- **Decide only what's yours.** A node skill doesn't make calls that belong to the user or an upstream node — it takes them as input; handed a scope, it neither widens nor narrows it.
 
 ## Mechanics
 
 - **A skill does not enumerate its permissions.** They are the session's: auto mode judges each call, and subagent permissions are consciously wide ([factory-operations.md § Permissions](/software-factory/factory-operations.md#permissions)). The exception is a role boundary the harness must enforce rather than merely be asked for — a reviewer's read-only stance is stated in the skill's prose *and* nailed down by `disallowed-tools` ([skill-conventions.md — Optional fields](/standards/claude-code/skill-conventions.md#optional-fields)).
-- **An AFK skill escalates, it never waits.** It runs in a subagent with no human attached, so a mid-work "wait for the human" step waits forever — a subagent yields only by ending its run. When it needs a human call it ends with `ESCALATE:`, and human review lives at the dedicated review nodes rather than mid-skill. An interview skill is the reverse: the human is at the terminal, so it interviews freely in prose and gates on the answers.
+- **An AFK skill escalates, it never waits.** It runs in a subagent with no user attached, so a mid-work "wait for the user" step waits forever — a subagent yields only by ending its run. When it needs a call from the user it ends with `ESCALATE:`, and review by the user lives at the dedicated review nodes rather than mid-skill. An interview skill is the reverse: the user is at the terminal, so it interviews freely in prose and gates on the answers.
 - **Report state, not next steps.** A node reports its own state and stops; what runs next — the next node, a label move — is the issue overwatch's concern, surfaced outside the skill. State a pending hand-off as a flag (`awaiting verdict`), never as an instruction to run.

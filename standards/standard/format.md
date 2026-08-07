@@ -8,7 +8,7 @@ description: What a standard is and the standard-card format — four pointer ce
 
 Returning to a topic months later should not require re-deriving shared
 understanding over several turns of conversation. Each standard therefore
-gets a **standard card**: a small fixed-format record that tells a human or
+gets a **standard card**: a small fixed-format record that tells a user or
 agent where to look. The card does not define the standard — the files it
 points at do that. It aggregates pointers so a thought that originates at
 the abstract level ("how do we do X here?") resolves to concrete files in

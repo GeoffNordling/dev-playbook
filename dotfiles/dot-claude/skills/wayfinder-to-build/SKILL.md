@@ -143,7 +143,7 @@ four-tuple at `phase:design`. Assigning that four-tuple is the children's
 intake, done here in place — no child round-trips through the intake node,
 same as a design decomposition's children. Each child is carried to brief-complete — and
 released at its own
-[issue-review verdict](~/workspace/dev-playbook/software-factory/human-checkpoints.md#the-issue-review-verdict)
+[issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)
 — later, in its own design session with full attention; nothing here authors
 a brief.
 

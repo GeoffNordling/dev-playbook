@@ -94,10 +94,7 @@ RULES = (
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issue-authoring.md states them — the doc and this rule
 # read one contract and cannot disagree. A build leaf carries all seven; a
-# spike leaf carries the spike shape. A retained ``mode:sdd`` leaf is checked
-# against the build-leaf headings as the standard defines them today, per
-# software-factory.md's retained-value rule: the factory no longer routes such
-# an issue, and a live one may accrue new findings as the brief standard grows.
+# spike leaf carries the spike shape.
 BUILD_HEADINGS = (
     "Summary",
     "User intent",
@@ -859,17 +856,6 @@ def _tuple_findings(
             )
     mode = present["mode"][0] if len(present["mode"]) == 1 else None
     tests = present["tests"][0] if len(present["tests"]) == 1 else None
-    # mode:sdd is retained but unsupported; its pairing is held so a residual
-    # leaf still audits exactly as it did before the factory dropped the path.
-    if mode == "sdd" and tests != "yes":
-        lines.append(
-            Line(
-                name,
-                TUPLE_VALID,
-                f"#{number} mode:sdd requires tests:yes",
-                blocking=True,
-            )
-        )
     if mode == "spike" and tests != "no":
         lines.append(
             Line(
@@ -891,7 +877,7 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
     required: tuple[str, ...]
     if mode == "spike":
         required = SPIKE_HEADINGS
-    elif mode in ("sdd", "direct"):
+    elif mode == "direct":
         required = BUILD_HEADINGS
     else:
         return []  # an unknown mode value is tuple-valid's finding

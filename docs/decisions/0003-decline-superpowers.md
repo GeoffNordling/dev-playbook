@@ -79,7 +79,7 @@ skills). We declined.
 **Piecemeal adoption opens a can of SpaghettiOs.**
 
 - **Voice fragmentation.** Superpowers writes in a distinctive register —
-  "your human partner," "Iron Law," "EXTREMELY-IMPORTANT" XML tags,
+  "your user partner," "Iron Law," "EXTREMELY-IMPORTANT" XML tags,
   Red Flags tables. Pocock's voice differs. The workspace's own SDD
   skills differ again. Mixing three voices in one toolbox makes agent
   behavior less predictable and harder to mentally model.

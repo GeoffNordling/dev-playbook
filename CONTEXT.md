@@ -65,7 +65,7 @@ An automatic, unmanned blocking point on the path to main. There are exactly thr
 _Avoid_: venue (retired — say **gate**, or a rung name).
 
 **Enforcement**
-An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect; a one-time human code review is not enforcement.
+An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect; a one-time code review by the user is not enforcement.
 
 **Finding**
 One output line from a detector, in GNU format: `file:line: card.rule message` — a colon after the location, single spaces, a repo-relative path. The `:line` is omitted for a file-level finding (e.g. `README.md: knowledge-organization.doc-shape missing an H1 title`). The rule id is namespaced by the card whose question it answers.

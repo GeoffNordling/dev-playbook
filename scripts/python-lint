@@ -15,7 +15,7 @@ standard's question rather than Python's.
 
 Output:
     stdout — one finding per line, ``file:line: card.rule message``.
-    stderr — one human-readable summary line.
+    stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
 Usage:

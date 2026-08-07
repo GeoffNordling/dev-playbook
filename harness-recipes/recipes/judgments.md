@@ -105,8 +105,8 @@ before anything else:
 ```
 
 `record` is the exact command to run, over ids this script computed and no agent
-chose; it is `null` when nothing passed. `green` means nothing in this run needs a
-human mind — everything that ran passed, nothing crashed, nothing was set aside —
+chose; it is `null` when nothing passed. `green` means nothing in this run needs the
+user — everything that ran passed, nothing crashed, nothing was set aside —
 but the gate itself goes green only once `record` has run.
 
 The workflow is stateless. Fix attempts, set-aside decisions, and every judgment
