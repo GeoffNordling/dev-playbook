@@ -7,9 +7,45 @@ description: Working plan for the bootstrap run of /pocock-sweep — every verdi
 # Pocock Sweep 2026-08 — Bootstrap Plan
 
 Working state for the `worktree-pocock-sweep` branch. A fresh agent picking up
-this branch reads this file and knows every decision made, why, and what
-remains to land. Everything lands atomically in this branch and ships as one
-PR. This file is deleted before merge.
+this branch reads this file first — the Operating procedure below says what
+here is ruled and what is only guidance. Everything lands atomically in this
+branch and ships as one PR. This file is deleted before merge.
+
+## Operating procedure (set by the user, 2026-08-07)
+
+This file is a doubly-compacted, lossy record of two long sessions. Its
+epistemic status is split: the **per-skill verdict tables are ruled and
+trusted** — which skills install verbatim, which adapt, which reject. Every
+other section (blast radius, edit lists, landing details) is **guidance to
+re-verify**. Decisions may also exist that neither the user nor this file
+remembers; surfacing such candidates is part of each stage's fresh look.
+
+- **One stage per context window.** Expect a compact or fresh start between
+  stages; this file is the handoff. A stage ends by recording its outcome in
+  the stage tracker below, inside that stage's own commit.
+- **Interpretive stages (2–4) open with fresh-look-and-align.** Read the
+  installed bundles and the workspace docs as they actually are, put the
+  stage's proposed edit list to the user in chat, write the agreed list into
+  this file, then execute. Mechanical stages move faster, but the user still
+  reviews record text (the ledger, the DR) before it lands.
+- **Commit and push after every stage.** Push with `--no-verify` — that skips
+  only the pre-push judgment gate; the commit-gate lints always run.
+- **Judgments run exactly once, at step 9 — never earlier, never as a side
+  effect of a push.** (On 2026-08-07 the two re-keyed judgments were
+  accidentally run once — both passed; the verdicts were discarded
+  unrecorded.)
+
+## Stage tracker
+
+| Stage | Status |
+|---|---|
+| 1. Installs | **Done** — commit `7115b70`. Nine bundles vendored byte-identical; committed folder tree SHAs equal their lock entries; six mirror symlinks; the lock-hash algorithm was validated against the byte-identical `research`/`domain-modeling` entries before any hash was written. Landed early out of stage 3 because the commit gate forced it: `shellcheck`/`shfmt` `exclude: ^dotfiles/\.agents/` in `.pre-commit-config.yaml`, after shfmt rewrote two vendored scripts on the first commit attempt (upstream bytes restored and re-verified). The prose half — the shell standard's vendored-scripts exemption — still lands in stage 3. |
+| 2. Deferrals | Not started. Plan correction, user-acknowledged: `design-it-twice.md` carries no internal-seams passage — that deferral row is a no-op; record it in DR 0020. |
+| 3.–10. | Not started. |
+
+Out-of-scope finding, not acted on this sweep: `marimo-batch`'s vendored
+tree (`d8589525…`) does not match its lock entry (`d2800038…`); the other
+three pre-existing vendored skills match exactly.
 
 ## Mission
 
@@ -260,8 +296,8 @@ sweep atomic, installs and bumps are vendored as file edits in the worktree:
    user-invoked authored descriptions.
 5. **Records** — ledger rewrite, DR 0020, indexes, pin strings.
 6. **Gates** — full commit-gate suite (`skill-lint`, `ref-lint`,
-   `okf-lint`, `prose-lint`, the rest via `make check` equivalents);
-   re-run the two wayfinder judgments; expect identical verdicts.
+   `okf-lint`, `prose-lint`, the rest via `make check` equivalents).
+   Judgments are NOT run here — they wait for step 9.
 7. **Audit** — adversarial pass: mirror rule clean; no authored/installed
    name collisions; every call site of the five bumped skills still true;
    supersede-rule duplication scan (`CONTEXT.md`, standards vs. all eleven
@@ -277,7 +313,12 @@ sweep atomic, installs and bumps are vendored as file edits in the worktree:
    ledger + thin DR → PR ending in a habit brief. Settled frontmatter:
    user-invoked only, `model: inherit`, `effort: xhigh`, no arguments, no
    references dir, no scripts.
-9. **PR** — one PR from this branch; body carries the change inventory and
+9. **Judgments** — the one and only judgments run, via the `/run-judgments`
+   loop: everything the sweep re-keyed (the two wayfinder judgments — both
+   passed the discarded 2026-08-07 run, so identical verdicts are expected —
+   plus whatever the standards edits re-key). Record the verdicts; the push
+   gate goes green here.
+10. **PR** — one PR from this branch; body carries the change inventory and
    the **habit brief**: what changes for an operator who knew the prior
    state (grilling now lands in rounds — answer by number; logic prototypes
    arrive as double-click HTML demos with walkthrough tabs; `/improve-codebase-architecture`
