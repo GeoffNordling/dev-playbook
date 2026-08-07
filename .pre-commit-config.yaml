@@ -16,10 +16,15 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
+        # dotfiles/.agents holds vendored external skill bundles, carried
+        # byte-identical to their upstream pin — linters and formatters must
+        # not touch them. See standards/shell/conventions.md.
+        exclude: ^dotfiles/\.agents/
   - repo: https://github.com/maxwinterstein/shfmt-py
     rev: v4.0.0
     hooks:
       - id: shfmt
+        exclude: ^dotfiles/\.agents/
   - repo: local
     hooks:
       - id: make-check
