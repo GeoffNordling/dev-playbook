@@ -28,8 +28,10 @@ remembers; surfacing such candidates is part of each stage's fresh look.
   stage's proposed edit list to the user in chat, write the agreed list into
   this file, then execute. Mechanical stages move faster, but the user still
   reviews record text (the ledger, the DR) before it lands.
-- **Commit and push after every stage.** Push with `--no-verify` — that skips
-  only the pre-push judgment gate; the commit-gate lints always run.
+- **Commit and push after every stage — but only after the user has approved
+  that stage's diffs in chat.** The user is in the loop on every stage: show
+  the diffs, get the approval, then commit. Push with `--no-verify` — that
+  skips only the pre-push judgment gate; the commit-gate lints always run.
 - **Judgments run exactly once, at step 9 — never earlier, never as a side
   effect of a push.** (On 2026-08-07 the two re-keyed judgments were
   accidentally run once — both passed; the verdicts were discarded
