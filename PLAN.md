@@ -60,8 +60,8 @@ guidance to re-verify, never a script to execute blind.
 | 2. Deferrals | **Done** — `aecb3b1` |
 | 3. Standards edits | **Done** — `2971ff6` |
 | 4. Lint split | **Done** — `a7e32c1` |
-| 5. Records | **Done** — `STAGE5SHA` |
-| 6. Gates | **Done** — `STAGE6SHA` |
+| 5. Records | **Done** — `2585ebd` |
+| 6. Gates | **Done** — `2585ebd` |
 | 7. Audit | Not started |
 | 8. Write `/pocock-sweep` | Not started |
 | 9. Judgments | Not started — the only permitted run |
@@ -284,7 +284,7 @@ places.
   "rely on the skill's description to communicate its purpose" clause dropped,
   since under the split that description reaches no model.
 
-### 5. Records — done (`STAGE5SHA`)
+### 5. Records — done (`2585ebd`)
 
 **Brief.**
 
@@ -324,7 +324,7 @@ places.
   closed, five declines, the two plan corrections, and the one cut outside
   principle 1.
 
-### 6. Gates — done (`STAGE6SHA`)
+### 6. Gates — done (`2585ebd`)
 
 **Brief.** Full commit-gate suite (`skill-lint`, `ref-lint`, `okf-lint`,
 `prose-lint`, the rest via `make check` equivalents). Judgments are NOT run
