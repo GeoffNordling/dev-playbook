@@ -60,8 +60,8 @@ guidance to re-verify, never a script to execute blind.
 | 2. Deferrals | **Done** — `aecb3b1` |
 | 3. Standards edits | **Done** — `2971ff6` |
 | 4. Lint split | **Done** — `a7e32c1` |
-| 5. Records | Not started |
-| 6. Gates | Not started |
+| 5. Records | **Done** — `STAGE5SHA` |
+| 6. Gates | **Done** — `STAGE6SHA` |
 | 7. Audit | Not started |
 | 8. Write `/pocock-sweep` | Not started |
 | 9. Judgments | Not started — the only permitted run |
@@ -284,7 +284,9 @@ places.
   "rely on the skill's description to communicate its purpose" clause dropped,
   since under the split that description reaches no model.
 
-### 5. Records — not started
+### 5. Records — done (`STAGE5SHA`)
+
+**Brief.**
 
 | File | Edit |
 |---|---|
@@ -292,11 +294,49 @@ places.
 | `docs/decisions/0020-pocock-skills-sweep-2026-08.md` (+ index) | Thin DR: this sweep's rulings and reversals (codebase-design, diagnosing-bugs, wizard, to-questionnaire reopen/re-reject, writing-for-agents, to-spec/to-tickets reject with reevaluate markers, resolving-merge-conflicts fresh reason, tdd fresh reasons); the minted principles (2, 3, 4, 9); the harvest-style-adapt relabels; both 0016 dangling fragments closed (12-smell lands, small-step retired); the recorded declines; and the two stage-2 plan corrections. |
 | `standards/tracking/tracker-operations.md` | Upstream-seed pin string → `6acc160` (content verified still accurate). |
 
-### 6. Gates — not started
+**Outcome.**
 
-Full commit-gate suite (`skill-lint`, `ref-lint`, `okf-lint`, `prose-lint`,
-the rest via `make check` equivalents). Judgments are NOT run here — they wait
-for stage 9.
+- **The v1.2.3 clone was gone** with the earlier session's scratchpad and was
+  re-cloned; HEAD re-verified as `6acc160e…`. All 35 skills counted against the
+  pin directly: engineering 18, productivity 7, in-progress 6, misc 4. One
+  refinement — `deprecated/` still exists upstream but holds only a README, so
+  it is the *skills* that are gone, not the directory; `personal/` is gone
+  outright.
+- **The tracker-operations pin bump was earned, not asserted.** The plan said
+  "content verified still accurate"; the actual delta-check found two additions
+  in upstream's `issue-tracker-github.md` at v1.2.3 — the frontier query now
+  drops blocked and already-claimed tickets, and Resolve appends a context
+  pointer to the map's Decisions-so-far. Both are *method*, and the workspace
+  file scopes itself to tracker moves and cedes method to the skill ("The skill
+  owns the method; the moves it makes on the tracker are these") — and
+  `/wayfinder` is installed verbatim at this pin, so it carries them. No content
+  edit. The pin now names the release tag as well as the SHA, per principle 7.
+- **A third general-rules edit was needed.** The plan named two (vocabulary,
+  supersede rule). The tier-policy section also endorsed harvesting ideas out of
+  unpromoted skills — the practice principle 2 retires — and now says 0016
+  allowed that and no longer does.
+- The ledger's `§ mattpocock/skills` is rewritten to 35 rows across four tiers;
+  seven deleted skills retire into a closing paragraph rather than staying as
+  rows. `marimo-team/skills` and `pymc-labs/pymc-modeling` untouched.
+- DR 0020 written as a **delta record**: what moved and why, with the ledger
+  named as the place to ask where a skill stands today. It carries the four
+  minted principles, the vocabulary change with its reason, both 0016 fragments
+  closed, five declines, the two plan corrections, and the one cut outside
+  principle 1.
+
+### 6. Gates — done (`STAGE6SHA`)
+
+**Brief.** Full commit-gate suite (`skill-lint`, `ref-lint`, `okf-lint`,
+`prose-lint`, the rest via `make check` equivalents). Judgments are NOT run
+here — they wait for stage 9.
+
+**Outcome.** `make check` green end to end: `ruff format --check` (83 files),
+`ruff check`, `mypy` (82 source files, no issues), `pytest` — **909 passed, 31
+skipped** — and `pre-commit run --all-files` across all five hooks. shellcheck
+and shfmt both **ran and passed** rather than being skipped, which is the live
+proof that stage 1's `exclude: ^dotfiles/\.agents/` holds over the nine
+vendored bundles. `playbook-lint`'s 11 detectors clean, 578 references
+resolved, 97 concept docs and 15 indexes consistent. No judgment was run.
 
 ### 7. Audit — not started
 
