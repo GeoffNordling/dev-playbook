@@ -58,7 +58,7 @@ guidance to re-verify, never a script to execute blind.
 |---|---|
 | 1. Installs | **Done** — `7115b70` |
 | 2. Deferrals | **Done** — `aecb3b1` |
-| 3. Standards edits | **Done** — `1b4b846` |
+| 3. Standards edits | **Done** — `2971ff6` |
 | 4. Lint split | Not started |
 | 5. Records | Not started |
 | 6. Gates | Not started |
@@ -158,7 +158,7 @@ under principle 4; fix every inbound reference (ref-lint hunts danglers).
 workspace-original, wins on collision) · **workflow** = `/skill-creator`
 (step 1 rewired to read conventions + invoke `/writing-for-agents`).
 
-### 3. Standards edits — done (`1b4b846`)
+### 3. Standards edits — done (`2971ff6`)
 
 **Brief, as ruled after the fresh look.** The question this stage answers: where
 do the workspace's own policies, procedures, and standards now fail to fit the
