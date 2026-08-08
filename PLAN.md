@@ -59,7 +59,7 @@ guidance to re-verify, never a script to execute blind.
 | 1. Installs | **Done** — `7115b70` |
 | 2. Deferrals | **Done** — `aecb3b1` |
 | 3. Standards edits | **Done** — `2971ff6` |
-| 4. Lint split | **Done** — `STAGE4SHA` |
+| 4. Lint split | **Done** — `a7e32c1` |
 | 5. Records | Not started |
 | 6. Gates | Not started |
 | 7. Audit | Not started |
@@ -229,7 +229,7 @@ them):
 
 The user asked to pause after this stage for review.
 
-### 4. Lint split — done (`STAGE4SHA`)
+### 4. Lint split — done (`a7e32c1`)
 
 **Brief, as ruled after the fresh look.** Principle 9's split, landed in four
 places.
