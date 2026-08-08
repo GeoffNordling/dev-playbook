@@ -17,19 +17,19 @@ that decided it. `$ARGUMENTS` names the map.
 
 ## Read first
 
-Before doing anything else, read end-to-end:
+Before doing anything else:
 
-- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
-  — the epic body format, the readiness bar, the One-goal test, the
+- Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
+  end-to-end — the epic body format, the readiness bar, the One-goal test, the
   vertical-slice rules, and native relationships.
-- [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
-  — the two regions, the label scheme, and where the minted children go next.
-- [module design](~/workspace/dev-playbook/standards/modules/design.md)
-  — deep modules, interfaces, the deletion test: the qualities a good slice
-  boundary preserves.
+- Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
+  end-to-end — the two regions, the label scheme, and where the minted children
+  go next.
+- Invoke /codebase-design — deep modules, interfaces, the deletion test: the
+  qualities a good slice boundary preserves.
 
 Then report: `READ: issue-authoring.md, software-factory.md,
-module-design.md`. Proceed only after.
+codebase-design`. Proceed only after.
 
 ## Standalone, with provenance
 

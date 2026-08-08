@@ -52,7 +52,7 @@ The diff's content picks the standards that bind this review. Read the ones it c
 | The diff carries | Read |
 |---|---|
 | tests | [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) |
-| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md) and [module design](~/workspace/dev-playbook/standards/modules/design.md) |
+| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md), plus /codebase-design invoked for the module-design contract |
 | shell scripts | [shell conventions](~/workspace/dev-playbook/standards/shell/conventions.md) |
 
 The implementer read at most the testing conventions, so enforcing all of these is yours alone.
@@ -71,7 +71,7 @@ Read the change as a whole — the brief and the change together — against the
 - **Brief fidelity**, always. Every acceptance criterion is satisfied, the desired behavior is captured with no silent gap, and nothing reaches past the brief's stated scope. Where the change carries tests, the gate proves they pass but not that they are honest — check each genuinely exercises the behavior the brief calls for rather than passing vacuously; where it carries none, check the change does what each criterion asks.
 - **Testing conventions.** The tests conform to testing-conventions.md — structure, naming, behavioral focus.
 - **Python style.** The code conforms to python-style.md — docstrings, the fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a helper earns its place or stays inline), annotation style.
-- **Module design.** The change conforms to modules/design.md — deep modules behind small interfaces, no pass-throughs that fail the deletion test, seams only where something varies — plus clear naming, no dead code or needless duplication.
+- **Module design.** The change conforms to /codebase-design — deep modules behind small interfaces, no pass-throughs that fail the deletion test, seams only where something varies — plus clear naming, no dead code or needless duplication.
 - **Shell conventions.** The scripts conform to shell-conventions.md — above all the glue-only boundary: an executable script reaching for a function, an array, or argument parsing has outgrown shell and belongs in Python. shellcheck and shfmt already proved the mechanical rules at the gate, so spend the dimension on the boundary call, which is a reviewer's alone.
 
 ## 4. Attach findings

@@ -42,8 +42,65 @@ remembers; surfacing such candidates is part of each stage's fresh look.
 | Stage | Status |
 |---|---|
 | 1. Installs | **Done** — commit `7115b70`. Nine bundles vendored byte-identical; committed folder tree SHAs equal their lock entries; six mirror symlinks; the lock-hash algorithm was validated against the byte-identical `research`/`domain-modeling` entries before any hash was written. Landed early out of stage 3 because the commit gate forced it: `shellcheck`/`shfmt` `exclude: ^dotfiles/\.agents/` in `.pre-commit-config.yaml`, after shfmt rewrote two vendored scripts on the first commit attempt (upstream bytes restored and re-verified). The prose half — the shell standard's vendored-scripts exemption — still lands in stage 3. |
-| 2. Deferrals | Not started. Plan correction, user-acknowledged: `design-it-twice.md` carries no internal-seams passage — that deferral row is a no-op; record it in DR 0020. |
-| 3.–10. | Not started. |
+| 2. Deferrals | **Done.** All five deferral rows executed or closed; 771 lines deleted, 57 added; all 11 commit-gate detectors clean. Fresh-look findings and rulings are in the section below. |
+| 3.–10. | Not started. Two stage-3 Edits rows are already discharged by stage 2 (below); do not re-do them. |
+
+### Stage 2 outcome — what the fresh look changed
+
+- `standards/modules/design.md` **deleted outright** (user ruling, overriding
+  PLAN's "gut to a thin pointer"). Verified a pure mirror first: all four
+  principles, both diagrams, and the three testability rules with their
+  TypeScript examples are in the installed bundle; nothing workspace-original
+  survived. A redirect file was drafted and then rejected on the format
+  standard's own terms — a card exists so a lookup "resolves to concrete files
+  in one hop", and a second file naming the same question and pointing at the
+  same answer makes it two. **`standards/modules.md` keeps the concern in the
+  catalog and its Define cell now cites the installed bundle directly**,
+  matching what `standards/claude-code.md` does for `writing-for-agents`. The
+  `standards/modules/` directory is gone.
+- Six call sites re-pointed at `/codebase-design`: `design/SKILL.md` and
+  `wayfinder-to-build/SKILL.md` (each `Read first` list now mixes reads with an
+  invoke, and its `READ:` report line names `codebase-design`),
+  `code-pr-review/SKILL.md` (the source-type table and the Module design
+  dimension), `design-it-twice.md`, and `testing/conventions.md`.
+- `CONTEXT.md § Architecture` **cut further than PLAN said.** PLAN kept the
+  flagged-ambiguities log; the fresh look found all four architecture entries
+  (boundary, component/service/unit, depth-as-ratio, narrow-interface) restate
+  the skill's own `_Avoid_` lines and Rejected framings, so principle 4 takes
+  them. Also removed: the eight term definitions (replaced by a four-line
+  pointer stub), the five architecture Relationship bullets, the Postgres/fake
+  dialogue, and the whole `## Rejected framings` section (all three entries
+  were upstream's, and the section is optional per `context-content.md`). The
+  four repo-lint-required sections all survive on workspace-native content.
+- `standards/claude-code/{skill-writing,skill-glossary}.md` **deleted** (619
+  lines), with **nothing folded forward**. PLAN named one surviving
+  workspace-original — "a failing test is fixed, never edited to pass" — and
+  that is a **plan correction**: the rule is not original, it restates
+  `build/references/tdd.md:30` ("**Never modify a written test.**"), which
+  states it in the skill that actually runs tests. The generalized copy in a
+  format standard was duplication with no bite; retired deliberately, not lost.
+  The nearest live analogue, `run-judgments/SKILL.md:90`, shows the workspace
+  pattern: state the rule locally in the skill whose step is gated on a check.
+  Every other line of both files maps to the installed bundle; the glossary's
+  `_Avoid_` lines were dropped as unenforced. **Record this correction in DR
+  0020.**
+- `skill-conventions.md` **gained the craft pointer and the precedence
+  sentence** (a stage-3 Edits row, pulled forward): deleting the advisory layer
+  without landing its inverse would have left the collision unresolved for a
+  whole stage. The split description rule stays in stage 4 with `skill-lint`.
+- `design-it-twice.md` **carries no internal-seams passage — that half of the
+  deferral row is confirmed a no-op.** Its one edit is the call-site re-point
+  above.
+- Reference repair (ref-lint would have blocked): `skill-creator/SKILL.md`
+  step 1 now reads conventions and *invokes* `/writing-for-agents` (the other
+  stage-3 Edits row, discharged); `doc-pr-review` skills row re-pointed;
+  `node-skill-authoring.md` re-pointed twice, including the `#pruning` anchor,
+  which now resolves into the installed bundle; `standard/format.md`'s
+  gerund-compound example swapped to a file that still exists.
+- Cards and indexes: `standards/claude-code.md` Define now names the installed
+  bundle by path with the precedence clause; `standards/modules.md` Define
+  drops its `CONTEXT.md` bullet; both `standard-cards.yaml` judgments re-keyed
+  (`standard-card-claude-code`, `standard-card-modules`) — they run at step 9.
 
 Out-of-scope finding, not acted on this sweep: `marimo-batch`'s vendored
 tree (`d8589525…`) does not match its lock entry (`d2800038…`); the other

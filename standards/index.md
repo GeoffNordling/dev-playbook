@@ -27,7 +27,6 @@ alphabetical; directories last.
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one
 - [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
-- [Module Design](/standards/modules/design.md) — How to design modules with good interfaces — deep modules, the deletion test, designing for testability
 - [Python Style](/standards/python/style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
 - [Shell Conventions](/standards/shell/conventions.md) — How shell is written — glue-only boundary, strict mode, declared bash, shellcheck-clean
 - [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
@@ -36,7 +35,7 @@ alphabetical; directories last.
 ## Directories
 
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement, bootstrap
-- [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard, one concern per document — the member registry, CLAUDE.md content, skill conventions, skill management, skill writing and its glossary
+- [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard, one concern per document — the member registry, CLAUDE.md content, skill conventions, skill management
 - [docs/](/standards/docs/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
 - [judgments/](/standards/judgments/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading

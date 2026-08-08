@@ -67,7 +67,7 @@ catches the collision at the consumer's commit gate.
 A standard's filename is kebab-case and names its topic as a noun: a plain
 noun (`conventions.md`, `records.md`, `distribution.md`), a noun compound
 (`cache-gate.md`, `context-content.md`), or a gerund compound
-(`issue-authoring.md`, `skill-writing.md`) — never a bare verb
+(`issue-authoring.md`, `node-skill-authoring.md`) — never a bare verb
 (`skill-write.md`). When a directory has an established family prefix
 (`skill-conventions.md`, `skill-management.md`), a new sibling on the same
 subject keeps it.

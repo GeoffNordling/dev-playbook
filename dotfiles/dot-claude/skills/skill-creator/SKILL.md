@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Author a new Claude Code skill bundle against the workspace's skill conventions and skill-writing standards. Use when the user says to create a skill.
+description: Author a new Claude Code skill bundle against the workspace's skill conventions and the writing-for-agents craft layer. Use when the user says to create a skill.
 disable-model-invocation: false
 model: opus
 effort: xhigh
@@ -18,17 +18,20 @@ the first line of `SKILL.md` gets written at step 5, with the answers in hand.
 
 ## 1. Read the standards
 
-Read both before going further. They split along one seam: conventions is
-binding, writing is craft.
+Do both before going further. They split along one seam: conventions is
+binding, craft is the skill.
 
-- [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md)
+- Read
+  [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md)
   — the format `scripts/skill-lint` enforces at the commit gate: front matter,
   file structure, length, naming, references, checklist.
-- [skill-writing.md](~/workspace/dev-playbook/standards/claude-code/skill-writing.md)
-  — how a skill is written so it behaves predictably: the two loads,
-  the information hierarchy, steering, pruning, and the failure modes.
+- Invoke /writing-for-agents — how a document an agent consumes is written so
+  it behaves predictably: the two loads, the information hierarchy, completion
+  criteria, leading words, pruning, and the failure modes. Its
+  `SKILL-MECHANICS.md` carries the skill-specific half.
 
 This skill is the workflow over those two; the rules live there, not here.
+Where they collide, skill-conventions.md wins.
 
 ## 2. Gather requirements
 

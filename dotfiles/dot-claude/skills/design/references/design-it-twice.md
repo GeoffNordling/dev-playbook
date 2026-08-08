@@ -32,8 +32,7 @@ Judge the returns on three things, in this order:
 
 - **Depth.** How much implementation each interface hides. A surface that
   restates its implementation is shallow whatever else it gets right — the
-  first thing [module design](~/workspace/dev-playbook/standards/modules/design.md)
-  asks for.
+  first thing /codebase-design asks for.
 - **Locality.** How much of a plausible future change stays in one place. Spread
   a change across three modules and the seams are in the wrong spots.
 - **Seam placement.** Where each seam falls, and whether it falls where

@@ -15,12 +15,12 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 
 ## Read first
 
-Before doing anything else, read end-to-end:
+Before doing anything else:
 
-- [module design](~/workspace/dev-playbook/standards/modules/design.md) — small interface, deep implementation; accept dependencies, return results; keep the surface small. The lens for weighing a solution's shape.
-- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) — the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on.
+- Invoke /codebase-design — small interface, deep implementation; accept dependencies, return results; keep the surface small. The lens for weighing a solution's shape.
+- Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end — the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on.
 
-Then report: `READ: module-design.md, issue-authoring.md`. Proceed only after.
+Then report: `READ: codebase-design, issue-authoring.md`. Proceed only after.
 
 ## 1. Load context
 

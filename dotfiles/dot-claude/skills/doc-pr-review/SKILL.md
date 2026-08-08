@@ -49,7 +49,7 @@ The diff's content picks the standards that bind this review on top of the doc c
 
 | The diff carries | Read |
 |---|---|
-| skills | [skill writing](~/workspace/dev-playbook/standards/claude-code/skill-writing.md) — the craft every skill answers to; and for a `phase:*` skill, [node-skill authoring](~/workspace/dev-playbook/software-factory/node-skill-authoring.md) on top |
+| skills | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus /writing-for-agents for the craft every skill answers to; and for a `phase:*` skill, [node-skill authoring](~/workspace/dev-playbook/software-factory/node-skill-authoring.md) on top |
 | standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
 | structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/docs/index.md) |
 
