@@ -23,7 +23,7 @@ Governs how an idea becomes a merged pull request.
 - [software-factory/pr-feedback.md](/software-factory/pr-feedback.md) — the comment surfaces a
   PR carries, and how a committing node re-enters on a rework lap
 - [software-factory/refactor-catalogue.md](/software-factory/refactor-catalogue.md) — the
-  refactor candidates a build node looks for, and the step-size rule governing them
+  structural candidates with their cues and moves, and the step-size rule governing them
 - [software-factory/deviation-contract.md](/software-factory/deviation-contract.md) — what a
   build agent does when reality contradicts its brief: the three limiters, escalation,
   the deviation ledger

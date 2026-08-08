@@ -73,8 +73,10 @@ Done when: every child ticket of the map has been read in full.
 ## 3. Slice, with the user
 
 The map planned; it did not slice. **The slicing is this skill's decision to
-take, here, with the user** — never assume the map made it. Propose, then let
-the user rule, one question at a time with a recommendation each:
+take, here, with the user** — never assume the map made it. Invoke /grilling and
+work these three branches as its design tree — each round asks the whole
+frontier in the skill's numbered question-and-recommendation format, and the
+user rules every question before the next round:
 
 1. **The delivery surface** — for each load-bearing resolution, the files and
    systems it lands on.

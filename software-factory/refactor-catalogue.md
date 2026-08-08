@@ -1,13 +1,13 @@
 ---
 type: Guide
 title: Refactor Catalogue
-description: The refactor candidates a build node looks for at slice and chunk scope, and the step-size rule governing them
+description: The structural candidates — the cue and the move for each — and the step-size rule governing a refactor step
 ---
 
 # Refactor Catalogue
 
-What to look for when the suite is green and the next move is structural, and
-how large that move is allowed to be.
+What to look for when the next move is structural, and how large that move is
+allowed to be.
 
 ## Step size
 
@@ -46,27 +46,37 @@ and the move it calls for.
   tuple carries a rule about its own validity, and that rule is re-checked at
   every use. *Move:* give it a type that enforces the rule at construction, so
   the checks collapse to one.
+- **Mysterious name → rename it.** *Cue:* a function, variable, or type whose
+  name does not reveal what it does or holds. *Move:* rename it; where no honest
+  name comes, the murk is in the design, not the label.
+- **Data clumps → bundle them into a type.** *Cue:* the same few fields or
+  parameters keep travelling together. *Move:* give the group one type and pass
+  that — a type wanting to be born.
+- **Repeated switches → replace with polymorphism.** *Cue:* the same `if`- or
+  `match`-cascade on the same type recurs in more than one place. *Move:*
+  dispatch on the type itself, or collapse the cascades to one map both sites
+  share.
+- **Message chains → hide the walk.** *Cue:* long `a.b().c().d()` navigation
+  that couples the caller to a structure two objects away. *Move:* put one
+  method on the first object that answers the question directly.
+- **Middle man → cut the delegate.** *Cue:* a class or function whose body is
+  mostly forwarding to something else. *Move:* call the real target directly and
+  delete the pass-through.
+- **Refused bequest → prefer composition.** *Cue:* a subclass or implementer
+  ignores or overrides most of what it inherits. *Move:* drop the inheritance
+  and hold the thing it actually needs.
+- **Speculative generality → delete it.** *Cue:* abstraction, parameters, or
+  hooks serving a need the brief does not have. *Move:* inline it back until a
+  real caller shows up.
+- **Divergent change → split the module.** *Cue:* one file is edited for several
+  unrelated reasons. *Move:* separate it so each module changes for one reason.
+- **Shotgun surgery → gather what changes together.** *Cue:* one logical change
+  forces scattered edits across many files. *Move:* pull the scattered pieces
+  into the one module that owns the concern. The inverse of divergent change.
 - **Existing code the new code reveals as problematic.** *Cue:* the change lands
   cleanly, but it makes an older seam, name, or duplication visibly wrong in a
   way it was not before. *Move:* fix it in its own step, separate from the
   change that exposed it.
-
-## The two scopes
-
-The catalogue is applied twice, at different reach.
-
-- **Slice scope.** With the suite green after one behavior lands, the candidates
-  are looked for **inside the module just touched** — its duplication, its
-  shallow seams, its primitives. `make test` runs after each step.
-- **Chunk scope.** With a whole chunk green, **every module the chunk touched**
-  is reviewed for what no single slice could see: duplication spread across
-  modules, a module worth deepening now that several call sites exist,
-  abstraction misalignments, primitive obsession. `make test` runs after each
-  step.
-
-Both scopes share one escalation trigger — a refactor that surfaces a structural
-problem beyond one module's seam — and the citing skill states it, with its own
-terminal line and wording.
 
 For test-quality patterns and mocking guidance, see
 [testing conventions](/standards/testing/conventions.md).

@@ -25,4 +25,8 @@ Governs how modules are designed — interfaces, depth, and seams.
 
 ## Adopt
 
-- none
+- [improve-codebase-architecture](/dotfiles/.agents/skills/improve-codebase-architecture/SKILL.md)
+  — the migration procedure, installed verbatim from mattpocock/skills: scans a
+  codebase for shallow modules in this standard's vocabulary, reports the
+  candidates, then grills the one picked; invoke it as
+  `/improve-codebase-architecture`

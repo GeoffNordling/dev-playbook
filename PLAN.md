@@ -58,7 +58,7 @@ guidance to re-verify, never a script to execute blind.
 |---|---|
 | 1. Installs | **Done** — `7115b70` |
 | 2. Deferrals | **Done** — `aecb3b1` |
-| 3. Standards edits | Not started — two rows already discharged |
+| 3. Standards edits | **Done** — `1b4b846` |
 | 4. Lint split | Not started |
 | 5. Records | Not started |
 | 6. Gates | Not started |
@@ -158,16 +158,74 @@ under principle 4; fix every inbound reference (ref-lint hunts danglers).
 workspace-original, wins on collision) · **workflow** = `/skill-creator`
 (step 1 rewired to read conventions + invoke `/writing-for-agents`).
 
-### 3. Standards edits — not started
+### 3. Standards edits — done (`1b4b846`)
+
+**Brief, as ruled after the fresh look.** The question this stage answers: where
+do the workspace's own policies, procedures, and standards now fail to fit the
+eleven installed bundles? Six edits.
 
 | File | Edit |
 |---|---|
-| `standards/shell/conventions.md` | Vendored-scripts exemption (wizard's `template.sh` et al.). The mechanical half landed in stage 1 as the `.pre-commit-config.yaml` excludes; this is the prose half. |
-| `standards/tracking/issue-authoring.md` | Prototype run-outputs widened: "for a click-driven demo, the observed states captured as text or screenshots." |
-| `dotfiles/dot-claude/skills/code-pr-review/SKILL.md` | Fowler 12-smell baseline as a new audit dimension + in-file catalog (explicit ruling; see the `code-review` verdict row). |
-| `dotfiles/dot-claude/skills/wayfinder-to-build/SKILL.md` | Slicing interview: one-question-at-a-time → rounds; nest a `/grilling` call if it fits cleanly. |
+| `standards/shell/conventions.md` | Vendored-shell exemption prose — all four rules yield for shell under an `.agents/` path, mirroring the prose standard's existing exemption paragraph and naming `external.py` as the root registry. The mechanical half landed in stage 1 as the `.pre-commit-config.yaml` excludes, whose comment currently points at this file, which says nothing. |
+| `standards/tracking/issue-authoring.md` + `design/SKILL.md` | Prototype run-outputs widened for `prototype`'s new logic branch (double-click HTML demo, no stdout): "for a click-driven demo, the observed states captured as text or screenshots." `design/SKILL.md:63` restates the standard's three-item list and goes stale with it — the restatement is dropped for a citation, since the skill's Read-first already reads the standard end-to-end. |
+| `software-factory/refactor-catalogue.md` + `code-pr-review/SKILL.md` | Fowler 12-smell baseline (explicit ruling; see the `code-review` verdict row). **Landing site ruled after the fresh look:** the catalogue already carries three of the twelve in its own words, so the nine missing smells merge into its one `## The candidates` list — no new section, no second catalogue — and `code-pr-review` gains a dimension citing it. The catalogue stays a list of cues and moves and says nothing about who reads it; the two binding rules (a standard overrides the catalogue, every hit a judgment call and never Blocking) live only in the review dimension, where blocking severity is decided. The build node gains nine refactor candidates; accepted. |
+| `dotfiles/dot-claude/skills/wayfinder-to-build/SKILL.md` | Slicing interview: `one question at a time` (the only such site in the repo) → invoke `/grilling`, whose v1.2.3 bump replaced that phrasing with round-by-round frontier questioning. Bare `/grilling`, not `/grill-with-docs` — slicing needs no ADR or `CONTEXT.md` translation. |
+| `standards/standard/format.md` + `.pre-commit-config.yaml` | Stage 1 breached the meta-standard: format.md names **ruff** as "the one exception" to the import-the-registry rule, and requires such a detector's comment to name `external.py` as the authority. Stage 1 added shellcheck and shfmt, commented at the shell standard. Generalize the exception; repoint both comments. |
+| `standards/modules.md` | Adopt cell (`none`) → `improve-codebase-architecture`: the card's Adopt cell is for migration procedures, and that is exactly what the skill is for this standard. Re-keys `standard-card-modules` again. |
 | ~~`dotfiles/dot-claude/skills/skill-creator/SKILL.md`~~ | **Discharged in stage 2** — step 1 reads conventions and invokes `/writing-for-agents`. |
 | ~~`standards/claude-code/index.md`, `standards/claude-code.md` card~~ | **Discharged in stage 2** — retired files removed, cells re-pointed. |
+
+**Declined at this stage** (user rulings, recorded so no later stage re-finds
+them):
+
+- **The `docs/adr/` translation stays homeless.** Three installed bundles name
+  ADRs; the only translation lives in `grill-with-docs`, which two of them never
+  load. Proposed fix was a rule in the global `CLAUDE.md`. **Declined** — an
+  agent that finds no `docs/adr/` will reach `docs/decisions/` on its own, and
+  that is cheaper than a standing global rule.
+- **No shell carve-out for a generated wizard.** Upstream's step 4 tells the
+  agent to commit a repeatable wizard, which would be authored shell breaching
+  the glue-only boundary. **Declined** — `wizard` is installed as a curiosity
+  and is not expected to run; the vendored exemption is all the standard needs.
+- **`build/references/tdd.md` is not fenced against `diagnosing-bugs`.** Its
+  phase 5 lets a missing regression-test seam be a finding rather than an
+  escalation, which the build node's TDD does not allow. **Declined** — same
+  reason: the skill is a curiosity, TDD is used constantly, and the workspace's
+  procedure is not complicated to guard a case that may never arise.
+
+**Outcome — what the fresh look and the review changed.**
+
+- All six edits landed as briefed. Scope: 13 files, +95/−21 before the
+  catalogue trim below; 11 commit-gate detectors clean throughout.
+- **The Fowler merge stayed a merge.** Nine smells joined
+  `refactor-catalogue.md`'s one `## The candidates` list, compressed into its
+  `*Cue:* / *Move:*` shape rather than pasted from upstream — principle 2
+  forbids mining upstream prose, and the user's exception licensed the
+  *baseline*, not the text. `code-pr-review` gained a `Structural smells`
+  dimension and a source-in-any-language row in its §2 read table.
+- **The catalogue names no reader.** A first draft had it announce its two
+  callers in the H1 blurb and the frontmatter description; the user cut that —
+  a document states what it is and what it instructs, never who invokes it.
+  Note the pre-sweep description already named one ("the refactor candidates
+  **a build node** looks for"); that is gone too.
+- **Two sections were deleted from `refactor-catalogue.md` on user ruling**,
+  each after the same test — *what is the point of this?*
+  - A drafted `## Flagged rather than fixed` carrying the ruling's two binding
+    rules. Cut: it duplicated the review dimension that also states them, and
+    "a documented standard overrides the catalogue" is a no-op in a workspace
+    where a Standard already outranks a Guide. Both rules now live **only** in
+    `code-pr-review`'s dimension, where blocking severity is decided.
+  - The pre-existing `## The two scopes`. Cut: `build/references/tdd.md` is the
+    file's only caller and already states both scopes, their reach, and the
+    `make test` cadence; its closing paragraph pointed at an escalation trigger
+    stated in `tdd.md:63` and actionable nowhere else. The one thing it did
+    carry — which candidates suit which reach — moved into `tdd.md`'s two
+    refactor passes, and `tdd.md` no longer says "slice-scope candidates" of a
+    catalogue that never labelled them. **This cut sits outside principle 1**
+    (upstream speaks on the smell baseline, not on refactor scopes); the user
+    ruled it rides this branch anyway. **Record in DR 0020.**
+- The catalogue ends as step size, then the candidates, then the testing
+  pointer — 15 candidates, one shape, no meta-commentary.
 
 The user asked to pause after this stage for review.
 

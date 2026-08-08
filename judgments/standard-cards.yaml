@@ -244,6 +244,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - dotfiles/.agents/skills/codebase-design/SKILL.md
+      - dotfiles/.agents/skills/improve-codebase-architecture/SKILL.md
     model: claude-sonnet-5
     effort: high
 

@@ -16,14 +16,18 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
-        # dotfiles/.agents holds vendored external skill bundles, carried
-        # byte-identical to their upstream pin — linters and formatters must
-        # not touch them. See standards/shell/conventions.md.
+        # Externally-managed vendored trees, carried byte-identical to their
+        # upstream pin. The authoritative list of roots is
+        # src/dev_playbook/external.py (is_externally_managed); pre-commit
+        # config cannot import Python, so this literal mirrors that source of
+        # truth — keep the two in sync. See standards/shell/conventions.md.
         exclude: ^dotfiles/\.agents/
   - repo: https://github.com/maxwinterstein/shfmt-py
     rev: v4.0.0
     hooks:
       - id: shfmt
+        # Same externally-managed roots as shellcheck above; the authority is
+        # src/dev_playbook/external.py (is_externally_managed).
         exclude: ^dotfiles/\.agents/
   - repo: local
     hooks:
