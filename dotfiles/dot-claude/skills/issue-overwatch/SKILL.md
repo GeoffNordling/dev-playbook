@@ -1,6 +1,6 @@
 ---
 name: issue-overwatch
-description: Executes one issue's traverse through the software factory, stopping wherever the user must act or decide. Use when the user launches it against a single issue number from Agent view.
+description: Executes one issue's traverse through the software factory, stopping wherever the user must act or decide.
 disable-model-invocation: true
 model: inherit
 effort: xhigh

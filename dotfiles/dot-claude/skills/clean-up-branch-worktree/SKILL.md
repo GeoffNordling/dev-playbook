@@ -1,6 +1,6 @@
 ---
 name: clean-up-branch-worktree
-description: Prove a merged worktree branch is fully absorbed into main, then remove the worktree and its branch. Use when the PR has merged and the user asks to tear down the branch and its worktree.
+description: Prove a merged worktree branch is fully absorbed into main, then remove the worktree and its branch.
 disable-model-invocation: true
 model: sonnet
 effort: low

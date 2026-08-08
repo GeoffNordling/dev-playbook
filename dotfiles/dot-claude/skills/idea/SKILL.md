@@ -1,6 +1,6 @@
 ---
 name: idea
-description: Deposit raw idea material verbatim into mission-control's inbox/ from any repo — a dictation, a pasted agent conversation, a dump of disjoint ideas. Use when the owner throws idea material into the chat to be saved for later curation.
+description: Deposit raw idea material verbatim into mission-control's inbox/ from any repo — a dictation, a pasted agent conversation, a dump of disjoint ideas.
 disable-model-invocation: true
 model: sonnet
 effort: xhigh

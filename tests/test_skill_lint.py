@@ -15,7 +15,7 @@ def valid_skill(name: str = "greet", body: str = "# Greet\n\nDo the thing.\n") -
     return (
         f"---\nname: {name}\n"
         "description: Greet the user by name. Use when the user asks for a greeting.\n"
-        "disable-model-invocation: true\nmodel: sonnet\neffort: low\n---\n\n"
+        "disable-model-invocation: false\nmodel: sonnet\neffort: low\n---\n\n"
     ) + body
 
 
@@ -29,6 +29,13 @@ def with_description(skill: str, description: str) -> str:
         "description: Greet the user by name. Use when the user asks for a greeting.",
         f"description: {description}",
         1,
+    )
+
+
+def with_user_invocation(skill: str) -> str:
+    """Return `skill` switched to user-invoked only."""
+    return skill.replace(
+        "disable-model-invocation: false", "disable-model-invocation: true", 1
     )
 
 
@@ -86,6 +93,18 @@ def test_missing_required_field_is_a_claude_code_finding(tmp_path: Path) -> None
     assert ".claude/skills/greet/SKILL.md: claude-code.required-field" in result.stdout
 
 
+def test_unclosed_front_matter_names_what_is_wrong(tmp_path: Path) -> None:
+    """The parse finding says the delimiter is missing, not 'substring not found'."""
+    skill = valid_skill().replace("---\n\n", "\n", 1)
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.parse" in result.stdout
+    assert "never closed" in result.stdout
+
+
 def test_name_mismatch_is_flagged(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, {"greet": valid_skill(name="hello")})
 
@@ -119,6 +138,7 @@ def test_body_under_the_advisory_threshold_is_silent(tmp_path: Path) -> None:
 
 
 def test_description_that_is_not_two_sentences_blocks(tmp_path: Path) -> None:
+    """The two-sentence shape, on the model-invoked skills it binds."""
     skill = with_description(valid_skill(), "Greet the user by name.")
     repo = make_repo(tmp_path, {"greet": skill})
 
@@ -139,18 +159,57 @@ def test_unterminated_description_counts_as_zero_sentences(tmp_path: Path) -> No
     assert "is 0 sentence(s)" in result.stdout
 
 
-def test_trigger_rule_binds_user_only_skills(tmp_path: Path) -> None:
-    """The 'Use when' rule has no carve-out for disable-model-invocation: true."""
+def test_trigger_rule_binds_a_model_invoked_skill(tmp_path: Path) -> None:
+    """A second sentence that names no trigger fails the match-surface rule."""
     skill = with_description(
         valid_skill(), "Greet the user by name. Invoked from the greeting menu."
     )
     repo = make_repo(tmp_path, {"greet": skill})
-    assert "disable-model-invocation: true" in skill
 
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
     assert "claude-code.description-trigger" in result.stdout
+
+
+def test_a_user_invoked_description_is_one_sentence(tmp_path: Path) -> None:
+    """No model loads it, so it is the user's one-line label and nothing more."""
+    skill = with_user_invocation(
+        with_description(valid_skill(), "Greet the user by name.")
+    )
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_a_user_invoked_description_carrying_a_trigger_blocks(tmp_path: Path) -> None:
+    """The two-sentence form fails the other way round: one sentence is the rule."""
+    skill = with_user_invocation(valid_skill())
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.description-sentences" in result.stdout
+    assert "must be exactly 1" in result.stdout
+
+
+def test_a_malformed_invocation_field_keeps_the_strict_description_rule(
+    tmp_path: Path,
+) -> None:
+    """Only a literal `true` opens the free-shape path; anything else is strict."""
+    skill = with_description(valid_skill(), "Greet the user by name.").replace(
+        "disable-model-invocation: false", "disable-model-invocation: sometimes", 1
+    )
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "claude-code.description-sentences" in result.stdout
 
 
 def test_use_when_must_open_the_second_sentence(tmp_path: Path) -> None:
@@ -224,6 +283,18 @@ def test_dot_directory_under_a_skill_root_is_not_a_skill(tmp_path: Path) -> None
     assert result.returncode == 0, result.stdout + result.stderr
     assert result.stdout == ""
     assert "1 internal skills" in result.stderr
+
+
+def test_a_directory_with_no_skill_md_is_an_error_state(tmp_path: Path) -> None:
+    """Auditing nothing would leave it in a skill count the scan never covered."""
+    repo = make_repo(tmp_path, {"greet": valid_skill()})
+    (repo / ".claude" / "skills" / "halfbuilt").mkdir()
+
+    result = run(repo)
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "halfbuilt" in result.stderr
+    assert "no SKILL.md" in result.stderr
 
 
 def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
@@ -339,9 +410,11 @@ def test_stale_mirror_symlink_is_a_finding(tmp_path: Path) -> None:
 def test_real_entry_colliding_with_agents_skill_is_a_finding(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     agents_skill(repo, "foo")
-    # dot-claude/skills/foo is a real directory, not a symlink: an authored skill
+    # dot-claude/skills/foo is a real bundle, not a symlink: an authored skill
     # collides with the same-named externally-managed one.
-    (claude_skills_dir(repo) / "foo").mkdir()
+    foo = claude_skills_dir(repo) / "foo"
+    foo.mkdir()
+    (foo / "SKILL.md").write_text(valid_skill(name="foo"))
 
     result = run(repo)
 

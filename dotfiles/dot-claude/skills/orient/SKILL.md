@@ -1,6 +1,6 @@
 ---
 name: orient
-description: Orient to the current repository. Use when invoked by the user.
+description: Orient to the current repository.
 disable-model-invocation: true
 model: sonnet
 effort: xhigh

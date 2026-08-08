@@ -59,7 +59,7 @@ guidance to re-verify, never a script to execute blind.
 | 1. Installs | **Done** — `7115b70` |
 | 2. Deferrals | **Done** — `aecb3b1` |
 | 3. Standards edits | **Done** — `2971ff6` |
-| 4. Lint split | Not started |
+| 4. Lint split | **Done** — `STAGE4SHA` |
 | 5. Records | Not started |
 | 6. Gates | Not started |
 | 7. Audit | Not started |
@@ -229,13 +229,60 @@ them):
 
 The user asked to pause after this stage for review.
 
-### 4. Lint split — not started
+### 4. Lint split — done (`STAGE4SHA`)
+
+**Brief, as ruled after the fresh look.** Principle 9's split, landed in four
+places.
 
 | File | Edit |
 |---|---|
-| `standards/claude-code/skill-conventions.md` | Split description rule (principle 9). Its other stage-3 obligations are closed: the precedence sentence landed in stage 2, the craft-line fold turned out to be a no-op, and the always-explicit + dispatcher fact is already in the required-fields table. |
-| `scripts/skill-lint` | Branch the description check on `disable-model-invocation`: two-sentence `Use when` when false, one-liner allowed when true. |
-| All user-invoked authored skills | Descriptions shortened to one human-facing line (inventory at landing). |
+| `scripts/skill-lint` | `check_description` branches on `disable-model-invocation`: the expected sentence count is 1 when it is literally `true` and 2 otherwise, and the `Use when` rule is asked only of the latter. `is True`, not truthiness, so a missing or non-boolean field falls to the model-invoked path. |
+| `standards/claude-code/skill-conventions.md` | The `description` required-fields row, the checklist item, and the naming-conventions example carry the split. The precedence paragraph's collision list narrows to "the model-invoked description form" — the user-invoked form now follows upstream. Its other stage-3 obligations are closed: the precedence sentence landed in stage 2, the craft-line fold turned out to be a no-op, and the always-explicit + dispatcher fact is already in the required-fields table. |
+| `tests/test_skill_lint.py` | **Added to the brief at landing** — the stage changes a lint's behavior. `valid_skill()` flips to `disable-model-invocation: false`; the test asserting the old no-carve-out policy by name is replaced by four: the trigger rule on a model-invoked skill, a one-sentence user-invoked description passing, a two-sentence one blocking, and a malformed invocation field falling to the model-invoked path. |
+| 15 user-invoked authored skills | Second sentence dropped. Every first sentence was already a single terminated sentence, so all fifteen are pure deletions. |
+
+**Outcome.**
+
+- Landed as briefed. 19 files; 11 commit-gate detectors clean; 46 tests pass.
+- **Upstream was checked before the shape was fixed**, on the user's challenge
+  that a verbatim-installed skill might already rule on this.
+  `writing-for-agents/SKILL-MECHANICS.md` states both halves — model-invoked
+  gets "a model-facing description carrying the trigger branches", user-invoked
+  gets "a one-line summary, trigger lists stripped" — and his own bundles bear
+  it out: the model-invoked ones carry two-sentence `Use when`, the three
+  user-invoked ones (`wayfinder`, `improve-codebase-architecture`,
+  `wait-what`) are one-liners. Principle 9 read him correctly.
+- **Both branches are enforced; neither is a carve-out.** The user-invoked
+  rule is exactly one sentence, ruled by the user after a first pass left the
+  shape unchecked. The one cost, accepted: upstream's own `wait-what`
+  description (`Stop. That last message did not land — re-pitch it.`) is one
+  line but two sentences and would fail this rule. It never meets it —
+  skill-lint skips externally-managed bundles — but an authored skill wanting
+  that shape has to fold the two clauses into one sentence.
+- **This stage overturns a decision the workspace had argued for explicitly.**
+  Three sites stated the old no-carve-out rule in as many words —
+  `skill-conventions.md`'s "binding every authored skill — no exemption",
+  `skill-lint`'s "one rule and one lint path", and a test named
+  `test_trigger_rule_binds_user_only_skills`. All three are rewritten.
+  **Record in DR 0020.**
+- **Two defects fixed in `skill-lint`, found on a fresh read of the whole
+  file.** An unterminated front matter reported `claude-code.parse substring
+  not found` — `str(IndexError)` leaking through the broad `except Exception`;
+  `parse_skill` now raises a `ValueError` naming the missing delimiter. And a
+  directory under a skill root with no `SKILL.md` was audited as nothing while
+  still counting toward the summary's skill total; it now raises `ToolError`
+  (exit 2), on the user's ruling that a missing bundle is an exception and that
+  no summary may ever print a count the scan did not cover. An abort now prints
+  the findings it had already collected rather than discarding them. Both have
+  tests. One existing test was corrected rather than accommodated: its "authored
+  skill" colliding with an externally-managed name was an empty directory, and
+  a real authored skill has a `SKILL.md`.
+- **One unrelated bug fixed in the same file.** The closed-vocabulary section's
+  `user-invocable` bullet was inverted — it said to use
+  `disable-model-invocation: true` when a skill "should not be user-invoked",
+  which is what that field does the opposite of. Rewritten, and its trailing
+  "rely on the skill's description to communicate its purpose" clause dropped,
+  since under the split that description reaches no model.
 
 ### 5. Records — not started
 

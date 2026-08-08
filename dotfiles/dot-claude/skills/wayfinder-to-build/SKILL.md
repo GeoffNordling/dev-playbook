@@ -1,6 +1,6 @@
 ---
 name: wayfinder-to-build
-description: Hands a completed wayfinder map off to the software factory — slices the destination with the user, then mints a build epic and thin child stubs tied to the map's resolutions as provenance. Use when every ticket on a wayfinder map is closed and the user asks to turn the map into build issues.
+description: Hands a completed wayfinder map off to the software factory — slices the destination with the user, then mints a build epic and thin child stubs tied to the map's resolutions as provenance.
 disable-model-invocation: true
 model: inherit
 effort: xhigh

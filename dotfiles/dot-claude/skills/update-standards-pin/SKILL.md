@@ -1,6 +1,6 @@
 ---
 name: update-standards-pin
-description: Roll a dev-playbook standards release out to the governed consumer repos, working whatever the bump reddens. Use when the user asks to update the standards pin.
+description: Roll a dev-playbook standards release out to the governed consumer repos, working whatever the bump reddens.
 disable-model-invocation: true
 model: opus
 effort: xhigh
