@@ -45,8 +45,9 @@ Ask the user the questions the standards leave to choice:
   name)? Surface the trade the standard names: model-invocation spends context
   load on every turn, user-invocation spends the user's own memory.
 - **Triggers** — what keywords, contexts, or file types should make Claude
-  reach for it, or which fixed dispatcher launches it? These go into the
-  description's `Use when …` sentence.
+  reach for it, or which fixed dispatcher launches it? Ask this only where the
+  invocation-mode answer above was model-invoked; a user-invoked description
+  carries no triggers.
 - **Model** — ask the user which model the skill runs under (`haiku` /
   `sonnet` / `opus` / `fable`, or `inherit` to follow the session model); it's
   their call, not a default you set. The one mechanic to surface when they
@@ -69,26 +70,16 @@ This step is done when every question above carries the user's own answer.
 
 ## 3. Write the description
 
-The format is binding and `scripts/skill-lint` blocks on it — two sentences,
-the second opening `Use when`, on every bundle whatever its invocation mode.
-What goes inside that shape is the craft:
-
-- Front-load the skill's leading word — the word the user already says when
-  they want this skill.
-- One trigger per branch. Synonyms renaming a single branch are duplication;
-  collapse them and keep the distinct ones.
-- Past the sentence naming what the skill does, spend the words on triggers.
-
-Every word is loaded on every turn the model can reach the skill, so prune the
-description harder than the body.
+`scripts/skill-lint` blocks the commit on the shape, and step 2's
+invocation-mode answer picks it: model-invoked is exactly two sentences, the
+second opening `Use when` and naming the triggers verbatim, since that
+sentence is the auto-invocation match surface; user-invoked is exactly one
+sentence, triggers dropped, because no model ever reads it.
 
 ## 4. Decide on bundle layout
 
-Rank the content on the information hierarchy: ordered steps first, in-skill
-reference next, and reference pushed under `references/` last. Branching is
-the test for that last cut — inline what every branch needs, push behind a
-pointer what only some branches reach. A pointer's wording, not its target,
-decides how reliably the agent follows it.
+Rank the content on the information hierarchy. The workspace constrains the
+result further.
 
 Keep `SKILL.md` under ~500 lines, and keep references one level deep. Helper
 scripts go in `scripts/`, linked relatively (`[check.py](scripts/check.py)`);
@@ -102,12 +93,6 @@ in the dotfiles repo's `dotfiles/dot-claude/skills/` for cross-project skills.
 
 Write `SKILL.md` and any reference files against the answers from step 2.
 
-- End every step on a completion criterion the agent can check, and make it
-  exhaustive where the work must be thorough.
-- State each instruction as the behavior to take. Where a guardrail must
-  forbid something, pair the prohibition with the positive target.
-- Keep each meaning in one place, and run the no-op test on each sentence:
-  drop the whole sentence when the model would behave that way regardless.
 - Include a concrete example wherever a rule earns one.
 - Mirror the siblings: where the workspace's skills already share a shape
   for a section, read two of them and match it before inventing one. The
@@ -134,8 +119,8 @@ Show the draft. Ask:
 - Does this cover the use cases you described?
 - Anything missing or unclear?
 - Should any section be more or less detailed?
-- Does the description's `Use when …` clause cover the contexts where you'd
-  want the skill to fire?
+- Where the skill is model-invoked, does the description's `Use when …` clause
+  cover the contexts where you'd want it to fire?
 
 Revise based on feedback. Iterate until the user is satisfied.
 

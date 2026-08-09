@@ -64,7 +64,7 @@ guidance to re-verify, never a script to execute blind.
 | 4. Lint split | **Done** — `a7e32c1` |
 | 5. Records | **Done** — `2585ebd` |
 | 6. Gates | **Done** — `2585ebd` |
-| 7. Audit | **In progress** — findings 3–8 landed; 1–2 (`skill-creator`) open |
+| 7. Audit | **Done** — `9c3ebb2` + follow-up |
 | 8. Write `/pocock-sweep` | Not started |
 | 9. Judgments | Not started — the only permitted run |
 | 10. PR | Not started |
@@ -340,7 +340,7 @@ proof that stage 1's `exclude: ^dotfiles/\.agents/` holds over the nine
 vendored bundles. `playbook-lint`'s 11 detectors clean, 578 references
 resolved, 97 concept docs and 15 indexes consistent. No judgment was run.
 
-### 7. Audit — in progress
+### 7. Audit — done
 
 **Brief.** Adversarial pass: mirror rule clean; no authored/installed name collisions;
 every call site of the five bumped skills still true; supersede-rule
@@ -357,20 +357,26 @@ immutable DRs 0004 and 0016 name them, correctly; the ledger's 35 rows tally
 read true. `make check` green: 909 passed, 31 skipped, five hooks, 11
 detectors.
 
-**Eight findings. Six landed; the two `skill-creator` ones are open.**
+**Eight findings, all landed.** Findings 3–8 in `9c3ebb2`; 1–2, both in
+`skill-creator`, in the follow-up commit — deferred deliberately, because
+stage 8 is the first thing to run that skill and it had to be right first.
 
-1. **`skill-creator` §3 teaches the rule stage 4 retired — OPEN.** It still
-   says two sentences "on every bundle whatever its invocation mode", so an
-   author who picks `disable-model-invocation: true` and follows step 3 writes
-   a description the commit gate rejects. Same assumption in §2's Triggers
-   bullet and §6's review question. Match
-   `skill-conventions.md`'s `description` row and Checklist item.
-2. **`skill-creator` §3–§5 restate `/writing-for-agents` — OPEN.** Step 1 says
-   "the rules live there, not here", then §3 repeats its *Context pointers*,
+1. **`skill-creator` §3 taught the rule stage 4 retired.** It said two
+   sentences "on every bundle whatever its invocation mode", so an author who
+   picked `disable-model-invocation: true` and followed step 3 wrote a
+   description the commit gate rejects; §2's Triggers bullet and §6's review
+   question carried the same assumption. All three now branch on the
+   invocation mode, matching `skill-conventions.md`'s `description` row and
+   Checklist item.
+2. **`skill-creator` §3–§5 restated `/writing-for-agents`.** Step 1 says "the
+   rules live there, not here", and §3 then repeated its *Context pointers*,
    §4 its *Information hierarchy*, §5 its *Steps and completion criteria*,
-   *Leading words*, and *Pruning*. Keep the workspace-original bullets: mirror
-   the siblings / Read-first shape, cite standards, "the user" as one word, a
-   rule belongs to the session that obeys it, concrete examples.
+   *Leading words*, and *Pruning* — all of which step 1's invoke has already
+   put in context. Cut, with no re-pointer added: a sentence sending the agent
+   back to a skill it just loaded fails the no-op test. The workspace-original
+   bullets stay — mirror the siblings / Read-first shape, cite standards, "the
+   user" as one word, a rule belongs to the session that obeys it, concrete
+   examples.
 3. **The craft-layer enumeration was copied at four sites and had drifted.**
    `standards/claude-code.md`, `skill-conventions.md`,
    `node-skill-authoring.md`, `skill-creator`. All four promised "the failure
