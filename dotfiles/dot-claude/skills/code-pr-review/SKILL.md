@@ -51,8 +51,8 @@ The diff's content picks the standards that bind this review. Read the ones it c
 
 | The diff carries | Read |
 |---|---|
-| source in any language | [refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md) — the structural candidates and their cues |
 | tests | [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) |
+| source in any language | [refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md) — the structural candidates and their cues |
 | Python source | [python style](~/workspace/dev-playbook/standards/python/style.md), plus /codebase-design invoked for the module-design contract |
 | shell scripts | [shell conventions](~/workspace/dev-playbook/standards/shell/conventions.md) |
 

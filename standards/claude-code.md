@@ -20,9 +20,9 @@ from ordinary files, and what each may contain.
   and the authored/installed mirror rule
 - [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —
   the craft layer beside the binding format, installed verbatim from
-  mattpocock/skills: the two loads, the information hierarchy, completion
-  criteria, leading words, pruning, and the failure modes; Skill Conventions
-  wins where the two collide
+  mattpocock/skills: how any document an agent consumes is written so the
+  agent behaves predictably; invoke it as `/writing-for-agents`, and Skill
+  Conventions wins where the two collide
 
 ## Audit
 

@@ -18,6 +18,10 @@ smallest move that changes the shape at all: the smaller the step, the shorter
 the window in which the program is not demonstrably working, and the cheaper the
 revert when a step turns out wrong.
 
+Where a change lands cleanly but leaves an older seam, name, or duplication
+visibly wrong in a way it was not before, that fix is its own step, separate
+from the change that exposed it.
+
 ## The candidates
 
 Each entry is a cue — what the code looks like when the candidate is present —
@@ -73,10 +77,6 @@ and the move it calls for.
 - **Shotgun surgery → gather what changes together.** *Cue:* one logical change
   forces scattered edits across many files. *Move:* pull the scattered pieces
   into the one module that owns the concern. The inverse of divergent change.
-- **Existing code the new code reveals as problematic.** *Cue:* the change lands
-  cleanly, but it makes an older seam, name, or duplication visibly wrong in a
-  way it was not before. *Move:* fix it in its own step, separate from the
-  change that exposed it.
 
 For test-quality patterns and mocking guidance, see
 [testing conventions](/standards/testing/conventions.md).

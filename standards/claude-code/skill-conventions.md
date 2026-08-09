@@ -11,10 +11,9 @@ feature reference (subagent execution, shell injection, hooks, etc.), see the
 [official skill documentation](https://code.claude.com/docs/en/skills).
 
 This standard is binding, and [skill-lint](/scripts/skill-lint) enforces it at
-the commit gate. The craft beside it — the two loads, the information
-hierarchy, completion criteria, leading words, pruning, and the failure modes
-— is the installed `/writing-for-agents` skill, which covers any document an
-agent consumes and discloses its skill-specific half to `SKILL-MECHANICS.md`.
+the commit gate. The craft beside it is the installed `/writing-for-agents`
+skill, which covers any document an agent consumes and discloses its
+skill-specific half to `SKILL-MECHANICS.md`.
 Invoke it when authoring or editing a skill. Where the two collide this
 standard wins: it fixes workspace facts the skill has no view on — the closed
 frontmatter vocabulary, the always-explicit `disable-model-invocation`, and

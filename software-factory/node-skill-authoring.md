@@ -8,7 +8,7 @@ description: Voice, content rules, and mechanics for authoring the software fact
 
 Conventions for writing the software factory's node skills — the `phase:*` skills in `dotfiles/dot-claude/skills/`. Three documents bind what those skills *do*, and this one restates none of them: [software-factory.md](/software-factory/software-factory.md) defines the graph and the states; [factory-operations.md](/software-factory/factory-operations.md) defines the dispatch model and the [node-skill contract](/software-factory/factory-operations.md#the-node-skill-contract) — `## Read first`, the worktree, the gate, the terminal report contract and its report line; [review-contract.md](/software-factory/review-contract.md) defines everything a review does once dispatched, from its stance to its findings comment. What follows is the authoring *style* behind them.
 
-Its base is the general skill machinery, equally unrestated: [skill-conventions.md](/standards/claude-code/skill-conventions.md) binds the bundle format, the installed [`/writing-for-agents`](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) skill carries the craft — the two loads, the information hierarchy, completion criteria, pruning, and the failure modes — and the `skill-creator` skill is the workflow over both. What follows is what a node skill needs on top of them.
+Its base is the general skill machinery, equally unrestated: [skill-conventions.md](/standards/claude-code/skill-conventions.md) binds the bundle format, the installed [`/writing-for-agents`](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) skill carries the craft, and the `skill-creator` skill is the workflow over both. What follows is what a node skill needs on top of them.
 
 ## Voice
 

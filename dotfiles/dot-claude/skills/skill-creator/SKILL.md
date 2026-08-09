@@ -26,9 +26,8 @@ binding, craft is the skill.
   — the format `scripts/skill-lint` enforces at the commit gate: front matter,
   file structure, length, naming, references, checklist.
 - Invoke /writing-for-agents — how a document an agent consumes is written so
-  it behaves predictably: the two loads, the information hierarchy, completion
-  criteria, leading words, pruning, and the failure modes. Its
-  `SKILL-MECHANICS.md` carries the skill-specific half.
+  it behaves predictably. Its `SKILL-MECHANICS.md` carries the skill-specific
+  half.
 
 This skill is the workflow over those two; the rules live there, not here.
 Where they collide, skill-conventions.md wins.

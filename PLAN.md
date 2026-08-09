@@ -17,9 +17,11 @@ itself is written at the end of this branch, from what actually worked, via
 
 Working state for the `worktree-pocock-sweep` branch. A fresh agent picking up
 this branch reads this file first. Everything lands atomically in this branch
-and ships as one PR. **This file is deleted before merge** — at stage 7, after
-DR 0020 has taken what it needs from the completed stages, which is why a done
-stage keeps both its brief and its outcome.
+and ships as one PR. **This file is deleted at stage 10**, in the commit that
+readies the branch for its PR. It carries the briefs for every stage that has
+not run, so it outlives each stage that does; DR 0020 holds what the completed
+stages leave behind, which is why a done stage keeps both its brief and its
+outcome.
 
 ## Operating procedure
 
@@ -62,7 +64,7 @@ guidance to re-verify, never a script to execute blind.
 | 4. Lint split | **Done** — `a7e32c1` |
 | 5. Records | **Done** — `2585ebd` |
 | 6. Gates | **Done** — `2585ebd` |
-| 7. Audit | Not started |
+| 7. Audit | **In progress** — findings 3–8 landed; 1–2 (`skill-creator`) open |
 | 8. Write `/pocock-sweep` | Not started |
 | 9. Judgments | Not started — the only permitted run |
 | 10. PR | Not started |
@@ -338,14 +340,69 @@ proof that stage 1's `exclude: ^dotfiles/\.agents/` holds over the nine
 vendored bundles. `playbook-lint`'s 11 detectors clean, 578 references
 resolved, 97 concept docs and 15 indexes consistent. No judgment was run.
 
-### 7. Audit — not started
+### 7. Audit — in progress
 
-Adversarial pass: mirror rule clean; no authored/installed name collisions;
+**Brief.** Adversarial pass: mirror rule clean; no authored/installed name collisions;
 every call site of the five bumped skills still true; supersede-rule
 duplication scan (`CONTEXT.md`, standards vs. all eleven installed bundles),
 checked against [Adaptations that stay authored](#adaptations-that-stay-authored);
 no dangling references to retired files; ledger internally consistent with the
-DR. Delete this file.
+DR.
+
+**Clean on the brief's own checks.** Mirror rule holds (33 internal skills, 14
+external skipped, every install symlinked); no authored bundle collides with an
+installed name; no dangling reference to the four retired files — only the
+immutable DRs 0004 and 0016 name them, correctly; the ledger's 35 rows tally
+11/1/23 exactly as DR 0020 states. The five bumped skills' call sites all still
+read true. `make check` green: 909 passed, 31 skipped, five hooks, 11
+detectors.
+
+**Eight findings. Six landed; the two `skill-creator` ones are open.**
+
+1. **`skill-creator` §3 teaches the rule stage 4 retired — OPEN.** It still
+   says two sentences "on every bundle whatever its invocation mode", so an
+   author who picks `disable-model-invocation: true` and follows step 3 writes
+   a description the commit gate rejects. Same assumption in §2's Triggers
+   bullet and §6's review question. Match
+   `skill-conventions.md`'s `description` row and Checklist item.
+2. **`skill-creator` §3–§5 restate `/writing-for-agents` — OPEN.** Step 1 says
+   "the rules live there, not here", then §3 repeats its *Context pointers*,
+   §4 its *Information hierarchy*, §5 its *Steps and completion criteria*,
+   *Leading words*, and *Pruning*. Keep the workspace-original bullets: mirror
+   the siblings / Read-first shape, cite standards, "the user" as one word, a
+   rule belongs to the session that obeys it, concrete examples.
+3. **The craft-layer enumeration was copied at four sites and had drifted.**
+   `standards/claude-code.md`, `skill-conventions.md`,
+   `node-skill-authoring.md`, `skill-creator`. All four promised "the failure
+   modes", which is not a section of the installed skill (sprawl, negation, and
+   premature completion sit inside three others); none listed *Context
+   pointers* or *When to split*; `node-skill-authoring` alone had already lost
+   "leading words". Collapsed to a single descriptive sentence in the card and
+   a bare pointer everywhere else — on the user's ruling that a pointer needs
+   no enumeration even in one place.
+4. **`code-pr-review` §2 put code above tests.** The new refactor-catalogue row
+   landed at the top of the read table, breaking `node-skill-authoring`'s
+   spec → test → code rule. Moved below `tests`.
+5. **`refactor-catalogue`'s 15th candidate broke the shape of the other 14.**
+   No `Name → move` arrow, and it prescribed step separation rather than naming
+   a smell. Its rule moved into `## Step size` as a paragraph and the bullet
+   went; the list is now 14 entries, one shape.
+6. **`marimo-batch`'s lock mismatch was a ruff scar, not staleness.** `ruff
+   format` had rewritten the vendored `references/starting-point.py` — pure
+   88-column wrapping, nothing semantic. The lock was right: `d2800038…` is
+   upstream commit `39fe986`, while our tree hash matched no upstream revision
+   of that folder, ever. Restored the file to the pinned bytes, which makes the
+   tree hash equal the lock with no lock edit — the opposite of the tempting
+   fix. Verified the gate holds: the real `ruff-format` hook and a full
+   `pre-commit run --all-files` both leave the restored bytes untouched. A
+   hand-run `ruff format <path>` still bypasses `extend-exclude`, which is the
+   likely origin and is left unguarded. Recorded in DR 0020, which now names
+   two changes outside the direction rule rather than one.
+7. **Closed by finding 3.** The two card cells this sweep wrote disagreed;
+   `standards/claude-code.md` picked up the `invoke it as` clause
+   `standards/modules.md` already had.
+8. **`tdd.md`'s chunk-scope fold had dropped `primitive obsession`.** Restored,
+   so the fold carries all four items the deleted section held.
 
 ### 8. Write `/pocock-sweep` — not started
 
@@ -376,7 +433,8 @@ HTML demos with walkthrough tabs; `/improve-codebase-architecture` and
 `/diagnosing-bugs` now exist and when to reach for them; `/writing-for-agents`
 replaces the two retired standards files when authoring skills; `/wizard` for
 click-through procedures; `/wait-what` to force a re-pitch; architecture
-vocabulary now lives behind `/codebase-design`, not `CONTEXT.md`).
+vocabulary now lives behind `/codebase-design`, not `CONTEXT.md`). Delete this
+file in the same commit — nothing after this stage reads it.
 
 ## Principles
 

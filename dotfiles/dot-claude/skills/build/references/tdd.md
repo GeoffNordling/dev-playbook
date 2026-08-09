@@ -48,8 +48,8 @@ primitives. Run `make test` after each step.
 With every behavior in the chunk's scope covered and the suite green, apply the
 catalogue across **every module the chunk touched** — what no single slice could
 see: duplication spread between modules, a module worth deepening now that
-several call sites exist, abstraction misalignments. Run `make test` after each
-step. Then the chunk goes to build's gate and commit.
+several call sites exist, abstraction misalignments, primitive obsession. Run
+`make test` after each step. Then the chunk goes to build's gate and commit.
 
 ## Escalations
 

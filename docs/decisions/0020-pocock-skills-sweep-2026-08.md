@@ -165,17 +165,32 @@ here rather than left in a deleted planning file:
   a supersede-rule trim there; the passage did not exist, so that half of the
   row was a no-op.
 
-## One cut sits outside the sweep's direction
+## Two changes sit outside the sweep's direction
 
 A sweep walks from the upstream package into the workspace, and workspace
 material enters scope only where the package currently speaks on its subject.
-One change breaks that rule knowingly: `refactor-catalogue.md`'s `## The two
-scopes` section was deleted, and upstream speaks on the smell baseline, not on
-refactor scopes.
+Two changes break that rule knowingly, and are recorded here so a later sweep
+finds a reason rather than an unexplained edit.
+
+The first: `refactor-catalogue.md`'s `## The two scopes` section was deleted,
+and upstream speaks on the smell baseline, not on refactor scopes.
 
 It was cut because its only caller, `build/references/tdd.md`, already stated
 both scopes, their reach, and the test cadence, and its closing paragraph
 pointed at an escalation trigger stated in that same file. The one fact it
 carried alone — which candidates suit which reach — moved into `tdd.md`'s two
-refactor passes. The user ruled it rides this branch. It is recorded here so a
-later sweep finds a reason rather than an unexplained deletion.
+refactor passes. The user ruled it rides this branch.
+
+The second belongs to a different upstream entirely. The sweep's audit found
+`marimo-batch`'s vendored tree disagreeing with its lock entry, and the cause
+was not drift upstream: `ruff format` had rewritten
+`references/starting-point.py` inside the vendored bundle, wrapping four call
+sites to 88 columns and changing nothing else. The lock was right and the bytes
+were wrong, so the file was restored to the pinned upstream revision and the
+tree hash now equals the lock again — the opposite of the tempting fix, which
+would have rewritten the lock to bless locally reformatted bytes as upstream's.
+The gate that would repeat this is already shut: ruff's `extend-exclude` covers
+`dotfiles/.agents`, and ruff-pre-commit passes `--force-exclude` so the
+exclusion survives pre-commit naming the file explicitly. What is not shut is a
+hand-run `ruff format <path>`, which bypasses `extend-exclude` on an explicitly
+named file; that is the likely origin, and no guard against it was built.
