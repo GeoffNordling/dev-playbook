@@ -52,6 +52,16 @@ Genuine adaptations — workspace machinery built around an adopted technique �
 stay authored, and each sweep checks them for creep rather than for removal.
 Running that duplication check is part of every sweep.
 
+These are the adaptations it checks. The question at each is whether an
+installed skill has grown to cover it, never whether it should exist.
+
+| File | Why it stays authored |
+|---|---|
+| [testing/conventions.md](/standards/testing/conventions.md) | `tdd` is rejected, and the file is mostly workspace-original pytest material. |
+| [build/references/tdd.md](/dotfiles/dot-claude/skills/build/references/tdd.md) | The factory's own TDD procedure, wired to briefs and gates, with deliberate divergences from upstream's — autonomous seam forethought, in-loop refactor passes. |
+| [design/references/design-it-twice.md](/dotfiles/dot-claude/skills/design/references/design-it-twice.md) | An adaptation wired into the `/design` node: Opus pinning, worktrees, the synthesis diet. |
+| [skill-conventions.md](/standards/claude-code/skill-conventions.md) | The binding format layer, almost entirely workspace-original, and it wins where `/writing-for-agents` collides with it. |
+
 ## Tier policy
 
 Nothing from a tier its upstream author has not promoted is installed — what an
