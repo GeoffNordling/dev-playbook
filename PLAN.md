@@ -64,7 +64,7 @@ guidance to re-verify, never a script to execute blind.
 | 4. Lint split | **Done** — `a7e32c1` |
 | 5. Records | **Done** — `2585ebd` |
 | 6. Gates | **Done** — `2585ebd` |
-| 7. Audit | **Done** — `9c3ebb2` + follow-up |
+| 7. Audit | **Done** — `9c3ebb2`, `8433720` |
 | 8. Write `/pocock-sweep` | Not started |
 | 9. Judgments | Not started — the only permitted run |
 | 10. PR | Not started |
@@ -358,8 +358,8 @@ read true. `make check` green: 909 passed, 31 skipped, five hooks, 11
 detectors.
 
 **Eight findings, all landed.** Findings 3–8 in `9c3ebb2`; 1–2, both in
-`skill-creator`, in the follow-up commit — deferred deliberately, because
-stage 8 is the first thing to run that skill and it had to be right first.
+`skill-creator`, in `8433720` — deferred deliberately, because stage 8 is the
+first thing to run that skill and it had to be right first.
 
 1. **`skill-creator` §3 taught the rule stage 4 retired.** It said two
    sentences "on every bundle whatever its invocation mode", so an author who
@@ -420,7 +420,15 @@ never rulings) → whole-skill verdicts only: verbatim / adapt-minimal /
 reject, no fragment mining → land atomically in a worktree branch → audit →
 ledger + thin DR → PR ending in a habit brief. Settled frontmatter:
 user-invoked only, `model: inherit`, `effort: xhigh`, no arguments, no
-references dir, no scripts.
+references dir, no scripts. Bundle goes in `dotfiles/dot-claude/skills/` —
+nothing under `.claude/` is tracked in this repo.
+
+**Pacing is undecided, by user ruling, and the skill says so.** This bootstrap
+run worked one stage per context window against this plan file, but whether a
+sweep must do that or can run straight through is not known yet — it gets
+settled the first time the skill actually runs, months from now. The skill
+stays flexible on it and states the openness rather than inventing a cadence
+nobody has tested.
 
 ### 9. Judgments — not started
 
