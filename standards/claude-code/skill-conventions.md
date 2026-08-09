@@ -10,6 +10,15 @@ Conventions for Claude Code skill bundles in this workspace. For the full
 feature reference (subagent execution, shell injection, hooks, etc.), see the
 [official skill documentation](https://code.claude.com/docs/en/skills).
 
+This standard is binding, and [skill-lint](/scripts/skill-lint) enforces it at
+the commit gate. The craft beside it is the installed `/writing-for-agents`
+skill, which covers any document an agent consumes and discloses its
+skill-specific half to `SKILL-MECHANICS.md`.
+Invoke it when authoring or editing a skill. Where the two collide this
+standard wins: it fixes workspace facts the skill has no view on — the closed
+frontmatter vocabulary, the always-explicit `disable-model-invocation`, and
+the model-invoked description form.
+
 ## File structure
 
 ```
@@ -48,7 +57,7 @@ Every skill must have all five of these:
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
-| `description` | Plain text, max 1024 chars, third person. **Exactly two sentences**, binding every authored skill — no exemption for `disable-model-invocation: true`. The first states what the skill does; the second `SHALL` begin with the literal words `Use when` and name the trigger keywords, contexts, or file types verbatim — for a model-invoked skill this is the auto-invocation match surface, so be specific. Keep the wording minimal; nothing checks length. Sentences are counted dumbly: `.`, `!`, or `?` ends one when whitespace or the string's end follows, so `CANDIDATES.md` is safe mid-sentence but `e.g.` ends a sentence early. |
+| `description` | Plain text, max 1024 chars, third person. **A model-invoked skill's description is exactly two sentences.** The first states what the skill does; the second `SHALL` begin with the literal words `Use when` and name the trigger keywords, contexts, or file types verbatim — it is the auto-invocation match surface, so be specific. Keep the wording minimal; nothing checks length. Sentences are counted dumbly: `.`, `!`, or `?` ends one when whitespace or the string's end follows, so `CANDIDATES.md` is safe mid-sentence but `e.g.` ends a sentence early. **Under `disable-model-invocation: true` it is exactly one sentence** — no model loads the description, so it is the one-line summary the user reads in the slash-command list, trigger list dropped. |
 | `disable-model-invocation` | `false` is the standard — per the [dispatch model](/software-factory/factory-operations.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
 | `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory — always present, never omitted. **The user decides `model` and `effort` explicitly**, never an agent and never a machinery default; `inherit` is a choice like any other. This governs the values persisted here, not a session's runtime pick of a subagent's model. One mechanical fact bears on the choice: **a pinned model only governs the turn that loads the skill** and reverts to the session model on the next prompt, so a pin binds a single-turn/batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. No default — the user's decision, same as `model`. |
@@ -66,9 +75,10 @@ Every skill must have all five of these:
 These eight fields are the whole vocabulary; a new one requires an edit here
 before its first use.
 
-- **`user-invocable`** — do not include this field. If a skill should not be
-  user-invoked, use `disable-model-invocation: true` and rely on the skill's
-  description to communicate its purpose.
+- **`user-invocable`** — do not include this field. To make a skill
+  user-invoked only, set `disable-model-invocation: true`; there is no field
+  that hides a skill from the user, since model invocation always includes
+  user reach.
 
 ## Arguments
 
@@ -165,7 +175,9 @@ conflict; they are different paths and different concerns.
   tests:yes, or when the user asks for test-first work.`
   Bad: `A helpful utility that assists with various testing-related tasks and
   workflows. Use when needed.` — the first sentence pads instead of naming
-  the job, and the second names no trigger.
+  the job, and the second names no trigger. Under
+  `disable-model-invocation: true` that first sentence stands alone: `Write
+  the failing tests for a change before any implementation lands.`
 
 ## Checklist
 
@@ -174,6 +186,7 @@ Before shipping a new skill:
 - [ ] Directory name matches `name` field
 - [ ] All five required front matter fields present
 - [ ] Description is exactly two sentences, the second beginning `Use when …`
+      — or, under `disable-model-invocation: true`, exactly one sentence
 - [ ] Body starts with an `# H1` title
 - [ ] SKILL.md under ~500 lines (or content beyond that lives in `references/`)
 - [ ] References are one level deep

@@ -12,6 +12,14 @@ the one bar every shell file clears. shellcheck and shfmt enforce the
 mechanical parts at the commit gate; rules 1–3 are prose by choice — a
 reviewer's call, not a detector's.
 
+**Shell inside an externally-managed tree is exempt from all four.** A vendored
+third-party skill bundle is an external dependency, carried byte-identical to
+its upstream pin so it can be re-synced; the scripts it ships are its author's
+to write, and holding them to a boundary their author never agreed to would only
+force a fork. The commit gate skips those trees for the same reason, and the
+roots are declared once in `src/dev_playbook/external.py` — see
+[externally-managed and verbatim content](/standards/standard/format.md#externally-managed-and-verbatim-content).
+
 ## Boundary — shell is glue only
 
 Shell exists to wire tools together, nothing more. The moment an **executable

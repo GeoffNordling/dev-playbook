@@ -1,6 +1,6 @@
 ---
 name: commit-off
-description: Suspends committing for the rest of the session — finished work stays in the working tree so the user can review every diff before it lands. Use when the user invokes /commit-off or says to hold commits while they review.
+description: Suspends committing for the rest of the session — finished work stays in the working tree so the user can review every diff before it lands.
 disable-model-invocation: true
 model: inherit
 effort: low

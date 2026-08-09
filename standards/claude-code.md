@@ -18,10 +18,11 @@ from ordinary files, and what each may contain.
   format
 - [Skill Management](/standards/claude-code/skill-management.md) — where skills live
   and the authored/installed mirror rule
-- [Skill Writing](/standards/claude-code/skill-writing.md) — the craft layer beside
-  the binding format: predictability and the levers that serve it, with its
-  domain model disclosed to
-  [Skill Glossary](/standards/claude-code/skill-glossary.md)
+- [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —
+  the craft layer beside the binding format, installed verbatim from
+  mattpocock/skills: how any document an agent consumes is written so the
+  agent behaves predictably; invoke it as `/writing-for-agents`, and Skill
+  Conventions wins where the two collide
 
 ## Audit
 

@@ -80,7 +80,7 @@ Use `unittest.mock` to:
 
 ### Ports (services you own, reached over the network)
 
-A service you own but call over the network — an internal API, a queue consumer — has no local stand-in to swap in and is too slow to call for real. Give it a **port**: the interface at the seam, owned by the calling module. The logic stays in that module; the transport is an injected **adapter** — an HTTP, gRPC, or queue client in production, an in-memory adapter in tests. [Module design](/standards/modules/design.md) covers when a seam earns its keep.
+A service you own but call over the network — an internal API, a queue consumer — has no local stand-in to swap in and is too slow to call for real. Give it a **port**: the interface at the seam, owned by the calling module. The logic stays in that module; the transport is an injected **adapter** — an HTTP, gRPC, or queue client in production, an in-memory adapter in tests. The `/codebase-design` skill covers when a seam earns its keep.
 
 ## Fixtures and setup
 

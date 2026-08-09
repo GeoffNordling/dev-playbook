@@ -38,16 +38,18 @@ methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 **Green.** Write the minimal implementation that makes the failing test pass.
 Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 
-**Refactor.** With the suite green, apply the slice-scope candidates in
-[the refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md).
-Run `make test` after each step.
+**Refactor.** With the suite green, apply
+[the refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md)
+**inside the module just touched** — its duplication, its shallow seams, its
+primitives. Run `make test` after each step.
 
 ## The whole-chunk refactor pass
 
 With every behavior in the chunk's scope covered and the suite green, apply the
-catalogue's chunk-scope candidates across every module the chunk touched — what
-no single slice could see. Run `make test` after each step. Then the chunk goes
-to build's gate and commit.
+catalogue across **every module the chunk touched** — what no single slice could
+see: duplication spread between modules, a module worth deepening now that
+several call sites exist, abstraction misalignments, primitive obsession. Run
+`make test` after each step. Then the chunk goes to build's gate and commit.
 
 ## Escalations
 

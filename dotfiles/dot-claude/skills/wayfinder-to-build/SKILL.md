@@ -1,6 +1,6 @@
 ---
 name: wayfinder-to-build
-description: Hands a completed wayfinder map off to the software factory — slices the destination with the user, then mints a build epic and thin child stubs tied to the map's resolutions as provenance. Use when every ticket on a wayfinder map is closed and the user asks to turn the map into build issues.
+description: Hands a completed wayfinder map off to the software factory — slices the destination with the user, then mints a build epic and thin child stubs tied to the map's resolutions as provenance.
 disable-model-invocation: true
 model: inherit
 effort: xhigh
@@ -17,19 +17,19 @@ that decided it. `$ARGUMENTS` names the map.
 
 ## Read first
 
-Before doing anything else, read end-to-end:
+Before doing anything else:
 
-- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
-  — the epic body format, the readiness bar, the One-goal test, the
+- Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
+  end-to-end — the epic body format, the readiness bar, the One-goal test, the
   vertical-slice rules, and native relationships.
-- [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
-  — the two regions, the label scheme, and where the minted children go next.
-- [module design](~/workspace/dev-playbook/standards/modules/design.md)
-  — deep modules, interfaces, the deletion test: the qualities a good slice
-  boundary preserves.
+- Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
+  end-to-end — the two regions, the label scheme, and where the minted children
+  go next.
+- Invoke /codebase-design — deep modules, interfaces, the deletion test: the
+  qualities a good slice boundary preserves.
 
 Then report: `READ: issue-authoring.md, software-factory.md,
-module-design.md`. Proceed only after.
+codebase-design`. Proceed only after.
 
 ## Standalone, with provenance
 
@@ -73,8 +73,10 @@ Done when: every child ticket of the map has been read in full.
 ## 3. Slice, with the user
 
 The map planned; it did not slice. **The slicing is this skill's decision to
-take, here, with the user** — never assume the map made it. Propose, then let
-the user rule, one question at a time with a recommendation each:
+take, here, with the user** — never assume the map made it. Invoke /grilling and
+work these three branches as its design tree — each round asks the whole
+frontier in the skill's numbered question-and-recommendation format, and the
+user rules every question before the next round:
 
 1. **The delivery surface** — for each load-bearing resolution, the files and
    systems it lands on.

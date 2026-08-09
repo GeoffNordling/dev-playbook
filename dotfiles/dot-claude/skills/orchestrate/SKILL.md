@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Own a problem as a high-level orchestrator, delegating research and construction down to subagents. Use when the user turns on Fable orchestration mode.
+description: Own a problem as a high-level orchestrator, delegating research and construction down to subagents.
 disable-model-invocation: true
 model: inherit
 effort: xhigh

@@ -22,7 +22,8 @@ colliding entries under dotfiles/dot-claude/skills/. It is inert elsewhere.
 Output:
     stdout — one finding per line, `file: claude-code.rule message`.
     stderr — non-failing advisories (body length) and one summary line.
-    exit   — 0 clean, 1 findings, 2 error state (agents tree without its mirror).
+    exit   — 0 clean, 1 findings, 2 error state (an agents tree without its
+             mirror, or a directory under a skill root with no SKILL.md).
 
 Usage:
     skill-lint [directory]
@@ -104,7 +105,8 @@ LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 # dumb: no abbreviation list, no semantic analysis, so an author can predict it.
 SENTENCE_END_RE = re.compile(r"""[.!?]["')\]]*(?:\s+|$)""")
 DESCRIPTION_MAX = 1024
-DESCRIPTION_SENTENCE_COUNT = 2
+MODEL_INVOKED_SENTENCES = 2
+USER_INVOKED_SENTENCES = 1
 TRIGGER_PREFIX = "Use when"
 BODY_MAX_LINES = 500
 
@@ -129,7 +131,11 @@ def parse_skill(path: Path) -> tuple[dict | None, str]:
     if not text.startswith("---\n"):
         return None, text
 
-    end = text.index("\n---\n", 4)
+    end = text.find("\n---\n", 4)
+    if end == -1:
+        # Left to str(IndexError) this surfaces as "substring not found", which
+        # names neither the file's problem nor its fix.
+        raise ValueError("front matter opens with '---' but is never closed")
     front_matter = yaml.safe_load(text[4:end])
     body = text[end + 5 :]
     return front_matter, body
@@ -208,22 +214,33 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
             )
         )
 
-    # Binds every authored bundle, disable-model-invocation: true included —
-    # one rule and one lint path, no carve-out for the descriptions no model
-    # reads. The trigger test only runs once the count is right; with any
-    # other count there is no "second sentence" to judge.
+    # The second sentence is the auto-invocation match surface, so it is
+    # demanded only of the bundles a model can reach. A user-invoked
+    # description is the one-line label the user reads in the slash-command
+    # list: one sentence, trigger list dropped. `is True`, not truthiness — a
+    # missing or non-boolean field already carries its own finding and must
+    # never redirect this check.
+    user_invoked = fm.get("disable-model-invocation") is True
+    expected = USER_INVOKED_SENTENCES if user_invoked else MODEL_INVOKED_SENTENCES
+    shape = (
+        "the one-line summary the user reads"
+        if user_invoked
+        else f"what the skill does, then '{TRIGGER_PREFIX} …'"
+    )
+
+    # The trigger test only runs once the count is right; with any other count
+    # there is no "second sentence" to judge.
     sentences = split_sentences(desc)
-    if len(sentences) != DESCRIPTION_SENTENCE_COUNT:
+    if len(sentences) != expected:
         findings.append(
             Finding(
                 rel,
                 DESCRIPTION_SENTENCES,
                 f"description is {len(sentences)} sentence(s), must be exactly "
-                f"{DESCRIPTION_SENTENCE_COUNT} — what the skill does, then "
-                f"'{TRIGGER_PREFIX} …'",
+                f"{expected} — {shape}",
             )
         )
-    elif not sentences[1].startswith(TRIGGER_PREFIX):
+    elif not user_invoked and not sentences[1].startswith(TRIGGER_PREFIX):
         findings.append(
             Finding(
                 rel,
@@ -361,7 +378,13 @@ def audit_skill(skill_dir: Path, repo_root: Path) -> tuple[list[Finding], list[s
     """
     skill_md = skill_dir / "SKILL.md"
     if not skill_md.is_file():
-        return [], []
+        # Neither a bundle nor harness scratch. Auditing nothing and moving on
+        # would leave it in the skill count, and the summary would report a
+        # number of skills the scan never looked at.
+        raise ToolError(
+            f"{skill_dir.relative_to(repo_root)} sits under a skill root but "
+            "has no SKILL.md"
+        )
 
     rel = str(skill_md.relative_to(repo_root))
     rel_dir = str(skill_dir.relative_to(repo_root))
@@ -507,12 +530,6 @@ def main():
 
     repo_root = Path(args.directory).resolve()
 
-    try:
-        all_findings: list[Finding] = list(check_skill_mirror(repo_root))
-    except ToolError as err:
-        print(f"skill-lint: {err}", file=sys.stderr)
-        sys.exit(2)
-
     skill_roots = [
         p
         for p in (
@@ -529,11 +546,21 @@ def main():
         internal_skills.extend(roots_internal)
         skipped += roots_skipped
 
+    all_findings: list[Finding] = []
     all_advisories: list[str] = []
-    for skill_dir in internal_skills:
-        findings, advisories = audit_skill(skill_dir, repo_root)
-        all_findings.extend(findings)
-        all_advisories.extend(advisories)
+    try:
+        all_findings.extend(check_skill_mirror(repo_root))
+        for skill_dir in internal_skills:
+            findings, advisories = audit_skill(skill_dir, repo_root)
+            all_findings.extend(findings)
+            all_advisories.extend(advisories)
+    except ToolError as err:
+        # An abort still prints what the scan did reach. The error state is a
+        # stopping condition, not a reason to withhold findings already made.
+        for f in all_findings:
+            print(f.render())
+        print(f"skill-lint: {err}", file=sys.stderr)
+        sys.exit(2)
 
     for f in all_findings:
         print(f.render())

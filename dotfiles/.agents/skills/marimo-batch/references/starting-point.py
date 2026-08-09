@@ -53,13 +53,9 @@ def _(ModelParams, mo, wandb):
 
     is_script_mode = mo.app_meta().mode == "script"
 
-    env_config = mo.ui.anywidget(
-        EnvConfig(
-            {
-                "WANDB_API_KEY": lambda k: wandb.login(key=k, verify=True),
-            }
-        )
-    )
+    env_config = mo.ui.anywidget(EnvConfig({
+        "WANDB_API_KEY": lambda k: wandb.login(key=k, verify=True),
+    }))
 
     if is_script_mode and not mo.cli_args():
         from rich.console import Console
@@ -73,11 +69,7 @@ def _(ModelParams, mo, wandb):
 
         for name, field in ModelParams.model_fields.items():
             flag = f"--{name.replace('_', '-')}"
-            type_name = (
-                field.annotation.__name__
-                if hasattr(field.annotation, "__name__")
-                else str(field.annotation)
-            )
+            type_name = field.annotation.__name__ if hasattr(field.annotation, "__name__") else str(field.annotation)
             table.add_row(flag, type_name, str(field.default), field.description or "")
 
         Console().print(table)
@@ -113,12 +105,8 @@ def _():
     class ModelParams(BaseModel):
         epochs: int = Field(default=25, description="Number of training epochs.")
         batch_size: int = Field(default=32, description="Training batch size.")
-        learning_rate: float = Field(
-            default=1e-4, description="Learning rate for AdamW."
-        )
-        wandb_project: str = Field(
-            default="batch-sizes", description="W&B project name (empty to skip)."
-        )
+        learning_rate: float = Field(default=1e-4, description="Learning rate for AdamW.")
+        wandb_project: str = Field(default="batch-sizes", description="W&B project name (empty to skip).")
 
         @computed_field
         @property
@@ -134,9 +122,7 @@ def _():
                 "batch_size": self.batch_size,
                 "learning_rate": self.learning_rate,
             }
-            h = hashlib.md5(
-                json.dumps(params_dict, sort_keys=True).encode()
-            ).hexdigest()[:6]
+            h = hashlib.md5(json.dumps(params_dict, sort_keys=True).encode()).hexdigest()[:6]
             return "-".join(parts) + f"-{h}"
 
     return (ModelParams,)
@@ -144,23 +130,17 @@ def _():
 
 @app.cell
 def _(mo):
-    params_form = (
-        mo.md("""
+    params_form = mo.md("""
     ## Model parameters
 
     {epochs}
     {batch_size}
     {learning_rate}
-    """)
-        .batch(
-            epochs=mo.ui.slider(10, 50, value=50, step=1, label="epochs"),
-            batch_size=mo.ui.slider(8, 512, value=32, step=8, label="batch size"),
-            learning_rate=mo.ui.slider(
-                1e-5, 5e-4, value=1e-4, step=1e-5, label="learning rate"
-            ),
-        )
-        .form()
-    )
+    """).batch(
+        epochs=mo.ui.slider(10, 50, value=50, step=1, label="epochs"),
+        batch_size=mo.ui.slider(8, 512, value=32, step=8, label="batch size"),
+        learning_rate=mo.ui.slider(1e-5, 5e-4, value=1e-4, step=1e-5, label="learning rate"),
+    ).form()
     return (params_form,)
 
 

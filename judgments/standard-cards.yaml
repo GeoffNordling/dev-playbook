@@ -57,9 +57,8 @@ judgments:
       - standards/claude-code/files.md
       - standards/claude-code/claude-content.md
       - standards/claude-code/skill-conventions.md
-      - standards/claude-code/skill-glossary.md
       - standards/claude-code/skill-management.md
-      - standards/claude-code/skill-writing.md
+      - dotfiles/.agents/skills/writing-for-agents/SKILL.md
       - scripts/repo-lint
       - scripts/skill-lint
       - judgments/claude-code.yaml
@@ -244,8 +243,8 @@ judgments:
     evidence:  [standards/modules.md]
     reference:
       - standards/standard/format.md
-      - standards/modules/design.md
-      - CONTEXT.md
+      - dotfiles/.agents/skills/codebase-design/SKILL.md
+      - dotfiles/.agents/skills/improve-codebase-architecture/SKILL.md
     model: claude-sonnet-5
     effort: high
 

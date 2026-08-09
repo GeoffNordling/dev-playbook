@@ -67,7 +67,7 @@ catches the collision at the consumer's commit gate.
 A standard's filename is kebab-case and names its topic as a noun: a plain
 noun (`conventions.md`, `records.md`, `distribution.md`), a noun compound
 (`cache-gate.md`, `context-content.md`), or a gerund compound
-(`issue-authoring.md`, `skill-writing.md`) — never a bare verb
+(`issue-authoring.md`, `node-skill-authoring.md`) — never a bare verb
 (`skill-write.md`). When a directory has an established family prefix
 (`skill-conventions.md`, `skill-management.md`), a new sibling on the same
 subject keeps it.
@@ -192,10 +192,11 @@ upstream external one (`type: Reference`). A detector that can import the
 registry excludes such content by consulting the shared registry
 `src/dev_playbook/external.py` —
 `is_externally_managed` for vendored roots, `is_verbatim_doc` for verbatim
-mirrors — never a path-skip hardcoded in the detector. (The one exception is a
-detector whose configuration cannot import Python — ruff, whose exclude list is
-static config — which keeps a hand-synced literal mirror of the roots, carrying
-a comment that names `external.py` as the authority.) The registry is the one
+mirrors — never a path-skip hardcoded in the detector. (The exception is a
+detector whose configuration cannot import Python — ruff, shellcheck, and shfmt
+today, whose exclude lists are static config — which keeps a hand-synced literal
+mirror of the roots, carrying a comment that names `external.py` as the
+authority.) The registry is the one
 place an externally-managed root is declared, so every detector that can reach
 it excludes the same trees; the drift this norm forbids is an unsynced,
 undocumented per-detector skip list, not the acknowledged mirror.
