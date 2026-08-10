@@ -53,7 +53,7 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 
 1. Make the changes for a coherent piece of the scope. Under `tests:yes` that piece is a chunk, driven by the loops in [tdd.md](references/tdd.md).
 2. Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root — and resolve failures.
-3. Commit the piece with /commit; the push rides `--no-verify` — the pre-push judgment gate's one armed run belongs to the traverse's judgments node, not here.
+3. Commit the piece with /commit.
 4. Move to the next piece, or to §6 once the issue's scope is fully carried out.
 
 ## 5. Escalations
@@ -75,7 +75,7 @@ The user reads it, decides, and relaunches; you don't push past the obstacle on 
 With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
-2. **Commit** the remaining changes with /commit — same `--no-verify` push as §4.
+2. **Commit** the remaining changes with /commit.
 3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape: before a PR exists, as one issue comment headed `## Deviation ledger` for the PR opener to lift; on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`). No deviations — record nothing here; the PR section states `No deviations.` explicitly.
 4. Emit the terminal line, then stop:
    ```

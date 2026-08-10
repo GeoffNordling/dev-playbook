@@ -180,13 +180,7 @@ the positions declined so a later sweep does not re-find them, and any
 correction to a claim the sweep made along the way. Where a skill stands today
 is the ledger's question, not the record's.
 
-## 10. Run the judgments
-
-Once, here, after the record text is final — every judgment the sweep re-keyed.
-Running them earlier spends a model call on text that changes again before the
-PR.
-
-## 11. Open the PR
+## 10. Open the PR
 
 The body carries the change inventory and ends with the **habit brief**: what
 changes for an operator who already knew the prior state. Behavior, not files

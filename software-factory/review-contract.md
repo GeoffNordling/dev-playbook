@@ -14,7 +14,7 @@ how a pull request's existing feedback is read is
 [pr-feedback.md](/software-factory/pr-feedback.md).
 
 The bug review is a **partial citer**, bound only by the clauses it names at
-their point of use — judgments, anchoring, and the escalation boundary. It runs
+their point of use — anchoring and the escalation boundary. It runs
 no gate, counts no cycle, and sets no Blocking severity, so the rest of this
 document passes it by.
 
@@ -47,20 +47,6 @@ review of broken work.
 
 The gate is the whole of what the review runs; individual lint tools are never
 run on their own. Where there is no `make check` to run, the audit proceeds.
-
-## Judgments sit outside the review
-
-The semantic judgment gate is settled once, at
-[the judgments node](/software-factory/factory-operations.md#the-judgments-node),
-after review approves. No review arms it and no review runs a judge: never
-`make check-judgments`, never a bare `uv run pytest`. Where a review runs
-`make check`, the gate is left skipped, and skipped-judgment lines in the output
-are noise.
-
-Until the judgments node runs, a stale or red cache is the expected condition,
-not a defect. A review acts as though judgments do not exist: it skips any
-`judgments/*.yaml` the diff touches, cites no judgment's claim, and mentions no
-judgment, verdict, or cache state in any finding.
 
 ## The cycle
 

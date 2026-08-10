@@ -103,7 +103,6 @@ The factory's nodes, what runs each, and how each engages the user:
 |---|---|---|
 | `build` | `/build` | AFK. |
 | `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the user's verdict on the whole stop ([pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict)). |
-| `judgments` | none — the overwatch invokes `/run-judgments` | Inline; it stops only where a fix is ambiguous ([pause 2](/software-factory/user-checkpoints.md#pause-2-judgments-conditional)). |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the user and never dispatched,
@@ -162,11 +161,8 @@ Every file-touching node sits in the issue's worktree:
 
 **The branch is pushed as it is committed.** A committing node pushes what it
 commits — the push is part of `/commit` — so the branch is on origin whenever
-the node ends. Every intermediary push rides `--no-verify`, deferring the
-semantic gate to [the judgments node](#the-judgments-node): the traverse's one
-armed run happens there, and verifying mid-traverse would red every rework
-cycle for nothing. The deterministic guarantee for the cycle is the phase-close
-`make check`.
+the node ends, verified by the pre-push hook's full `make check` on the way
+out.
 
 ## The node-skill contract
 
@@ -201,9 +197,9 @@ lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
   ritual.
 - **Judgments sit outside every node skill.** `make check` leaves the semantic
   [cache gate](/standards/judgments/cache-gate.md) skipped, and no node skill
-  arms it or runs a judge — the whole semantic bill is settled once, at
-  [the judgments node](#the-judgments-node). For a **review** skill the exclusion
-  is total: the `judgments/*.yaml` declarations are outside its jurisdiction
+  arms it or runs a judge — judgments are settled by the periodic sweep, outside
+  the factory. For a **review** skill the exclusion is total: the
+  `judgments/*.yaml` declarations are outside its jurisdiction
   whether or not the diff changes them, and a judgment — its content, its
   verdict, or its cache state — appears nowhere in its findings. A stale or red
   cache mid-traverse is the expected condition, not a defect to report.
@@ -245,9 +241,8 @@ The message is written twice from that one recipe, so the two cannot diverge:
 `/open-pr` authors it when it creates the PR — lifting the build session's
 recorded entries into `## Deviation ledger` per the
 [contract's hand-off](/software-factory/deviation-contract.md#the-deviation-ledger)
-— and the overwatch regenerates it at the approve verdict (`gh pr edit`),
-after [the judgments node](#the-judgments-node) has landed its
-fixes. The regeneration synthesizes the entire PR record — the final diff,
+— and the overwatch regenerates it at the approve verdict (`gh pr edit`).
+The regeneration synthesizes the entire PR record — the final diff,
 the comments, and the rulings — into an accurate squash-commit message for
 the whole issue, preserving the mandatory sections' content rather than
 rewriting from the recipe alone: the body is `main`'s permanent record, and
@@ -271,11 +266,11 @@ never by asking.
   elect the tracks, so a doc-only diff is re-reviewed by the doc track.
 
 There is exactly one verdict per stop, and it is the user's — the first of the
-three pauses, briefed per
+two pauses, briefed per
 [pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict). A
 **reject** returns the issue to `build`, with the deciding reason recorded where
-the findings live so the rework carries it. An **approve** advances it to
-[the judgments node](#the-judgments-node).
+the findings live so the rework carries it. An **approve** advances it to the
+user's final read and merge.
 
 ### Track rules
 
@@ -296,28 +291,3 @@ asked:
 - **Doubt skips.** A skipped track is one retroactive command away; an
   over-launched audit spends a review on content nobody questioned and posts
   noise to the PR.
-
-## The judgments node
-
-The traverse's one armed pass of the semantic
-[cache gate](/standards/judgments/cache-gate.md). Every intermediary push rode
-`--no-verify`, so a red cache never blocked a work cycle; the whole semantic bill
-comes due here, once, after review approves and before the user's final read.
-The node is preparation for that read: it exists so the user meets a PR whose
-judgments are already green.
-
-**The overwatch runs it inline, at its own main loop.** The node cannot be
-delegated — `/run-judgments` dispatches its judges through the `Workflow` tool,
-which a subagent does not have — so there is no wrapper skill and no subagent:
-the overwatch invokes `/run-judgments` itself, in the issue's worktree.
-
-- **Fixes are the overwatch's own.** A refuted judgment is fixed here, focused
-  and on the issue branch, and committed as it lands — no separate go-ahead.
-- **An ambiguous failure escalates.** Where a fix is unclear enough to want the
-  user's advice, the node stops and asks
-  ([pause 2](/software-factory/user-checkpoints.md#pause-2-judgments-conditional));
-  a clean green run stops for nothing.
-- **No back edge.** Judgment fixes never reopen review — no new cycle, no fresh
-  audit; the user has already approved the substance. A gate that stays red
-  parks the issue at the node rather than routing it anywhere. The node closes
-  only green.

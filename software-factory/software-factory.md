@@ -47,8 +47,7 @@ flowchart LR
     subgraph factory[Factory — autonomous]
         build[build] -->|pushed| pr_review{pr_review}
         pr_review -->|reject: rework| build
-        pr_review -->|approve| judgments[judgments]
-        judgments -->|green, merge msg refreshed| done([merged])
+        pr_review -->|approve, merge msg refreshed| done([merged])
     end
 
     intake -->|simple| build
@@ -118,10 +117,9 @@ defined once in
 
 ## The factory
 
-`build` implements, `pr_review` audits and takes the user's verdict, and
-`judgments` settles the semantic gate before the user's final read and merge. A
-rejected review returns to `build`; nothing else re-enters. What each node does,
-who runs it, and under what contract is
+`build` implements, and `pr_review` audits and takes the user's verdict before
+the user's final read and merge. A rejected review returns to `build`; nothing
+else re-enters. What each node does, who runs it, and under what contract is
 [factory-operations.md](/software-factory/factory-operations.md).
 
 ## Labels
@@ -168,7 +166,7 @@ A phase label is its node id with `_` mapped to `-`, `phase:`-prefixed: node
 
 **The parity invariant.** The graph's work nodes — its rectangles and diamonds —
 mapped that way must equal the scheme's `phase:*` values exactly. The inventory:
-`intake, design, spike, build, pr-review, judgments`. A scheme value no node
+`intake, design, spike, build, pr-review`. A scheme value no node
 answers to, or a node no scheme value names, is the violation; the
 `scheme-vs-graph` judgment enforces it. Two things are exempt, and only these:
 

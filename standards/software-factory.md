@@ -13,7 +13,7 @@ Governs how an idea becomes a merged pull request.
 - [software-factory/software-factory.md](/software-factory/software-factory.md) — the states an
   issue moves through, idea to merge, and the labels naming them
 - [software-factory/factory-operations.md](/software-factory/factory-operations.md) — the
-  factory's operating contract: dispatch, worktrees, node contracts, review, judgments
+  factory's operating contract: dispatch, worktrees, node contracts, review
 - [software-factory/user-checkpoints.md](/software-factory/user-checkpoints.md) — every
   point where the factory stops for the user, and what it owes them there
 - [software-factory/node-skill-authoring.md](/software-factory/node-skill-authoring.md) — the
@@ -41,13 +41,11 @@ Governs how an idea becomes a merged pull request.
 
 ## Enforce
 
-- the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
-  — reds `make check-judgments` at the **push gate** until `scheme-vs-graph` is
-  judged-and-passed, so a label scheme that has drifted from the graph cannot be
-  pushed. This gates the factory label *vocabulary* only: GitHub itself sits
-  outside every gate, so the state machine stays the user dispatcher's to
-  operate and workspace-lint reports without blocking a skipped phase or a
-  malformed tuple
+- nothing blocks: `scheme-vs-graph` is sweep-only, so a label scheme that has
+  drifted from the graph surfaces at the next periodic judgments sweep.
+  GitHub itself sits outside every gate, so the state
+  machine stays the user dispatcher's to operate and workspace-lint reports
+  without blocking a skipped phase or a malformed tuple
 
 ## Adopt
 

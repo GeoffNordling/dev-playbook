@@ -35,9 +35,8 @@ Treat this diff as the whole review scope; no PR or an empty diff is an
 escalation (§5).
 
 Read [the review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
-now — three of its clauses bind this review: **judgments are not yours**,
-findings are anchored its way, and findings are not escalations. You run no
-gate here, so the diff stays the whole scope.
+now — two of its clauses bind this review: findings are anchored its way, and
+findings are not escalations.
 
 ## 2. Find candidates
 
