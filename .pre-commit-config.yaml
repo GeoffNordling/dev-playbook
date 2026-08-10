@@ -32,8 +32,8 @@ repos:
   - repo: local
     hooks:
       - id: make-check
-        name: make check-judgments
-        entry: make check-judgments
+        name: make check-judgments-cache
+        entry: make check-judgments-cache
         language: system
         pass_filenames: false
         always_run: true

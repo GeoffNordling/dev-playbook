@@ -65,7 +65,7 @@ keyed off one environment variable, `SKIP_JUDGMENTS`, read inside
 | Invocation | `SKIP_JUDGMENTS` | The gate |
 |---|---|---|
 | `make check`, `make test` | `1` (the Makefile default, exported) | **skipped** |
-| `make check-judgments` | `0` (`$(MAKE) check SKIP_JUDGMENTS=0`) | **armed** |
+| `make check-judgments-cache` | `0` (`$(MAKE) check SKIP_JUDGMENTS=0`) | **armed** |
 | bare `uv run pytest` | unset | **armed** (fail-safe) |
 
 When `SKIP_JUDGMENTS` is exactly `1`, the helper **skips** each case with a
@@ -73,7 +73,7 @@ visible pytest skip naming the id — never a silent pass; any other value, or
 unset, arms the check. The lever lives in the helper — the one choke point
 every consumer's gate test calls — so it covers any test shape (the single or
 parametrized recipes above) with **no per-test markers** and no change to
-those recipes. `make check-judgments` is the
+those recipes. `make check-judgments-cache` is the
 [pre-push hook](/standards/build/canonical/.pre-commit-config.yaml)'s entry, so
 a miss blocks the push; the user or main-loop agent then runs `run-judgments`
 and retries. A subagent running plain `make check` never meets an

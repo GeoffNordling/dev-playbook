@@ -90,7 +90,7 @@ restate the content of their targets.
   **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
   A cell cites the single rung where the detector is stationed — where its
   wiring lives (pre-commit hooks → the commit gate; tools that run only inside
-  `make check` / `make check-judgments` → the push gate); the hook pattern in enforcement.md's Map
+  `make check` / `make check-judgments-cache` → the push gate); the hook pattern in enforcement.md's Map
   implies the echoes at the other rungs. Enforcement is automatic and
   continuously in effect; a code review is a one-time checkpoint, not
   enforcement, and never an Enforce pointer.

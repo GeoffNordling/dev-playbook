@@ -33,8 +33,9 @@ copies two opaque strings and is left with only the refutations to weigh.
 ## Enforce
 
 - the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
-  — reds `make check-judgments`, wired to the **push gate** by the canonical
-  pre-push hook, until every judgment's exact content is judged-and-passed
+  — reds `make check-judgments-cache`, wired to the **push gate** by the
+  canonical pre-push hook, until every judgment's exact content is
+  judged-and-passed
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — judgments-lint at the **commit gate** in every repo's suite,
