@@ -21,8 +21,9 @@ workspace document.
   form in all authored Markdown outside code spans, and `prose.banned-word`,
   flagging the banned actor noun (Terminology: the person is the user) in
   every tracked file this workspace authors, of any type, with no code-span or
-  fence escape — vendored `.agents/` trees and verbatim `type: Reference`
-  mirrors are outside the scan, as Terminology exempts them
+  fence escape — vendored `.agents/` trees, verbatim `type: Reference`
+  mirrors, and the paths a repo declares in its root `.prose-lint-exempt` are
+  outside the scan, as Terminology exempts them
 
 ## Enforce
 

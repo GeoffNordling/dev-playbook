@@ -103,9 +103,19 @@ where the qualifier carries a distinction the reader needs — the system pauses
 at many points and `software-factory/user-checkpoints.md` covers the subset
 that are the user's, so dropping the word there would name the wrong set. The
 test is whether removing it loses a distinction, not whether it reads well.
-Only text this workspace
-does not own is exempt — skills vendored under an `.agents/` path, and verbatim
-mirrors of external specifications.
+
+**Exemption is declared per repo in `.prose-lint-exempt`.** Text the rule does
+not govern — captured external documents, prose authored for an outside
+audience in that audience's vocabulary, a tool file that must name the word to
+process it — is exempted by listing its path in a tracked `.prose-lint-exempt`
+at the repo root: one repo-relative file or directory per line, a directory
+covering its whole subtree, `#` opening a comment line. Any file is listable,
+an `index.md` included — an index description that must carry the word exempts
+its index the same way. This file is the one suppression surface, so every
+exemption is a reviewable line, ideally under a comment saying why. Two
+structural exemptions stand alongside it: skills vendored under an `.agents/`
+path, and Markdown verbatim mirrors carrying `type: Reference` frontmatter,
+which follows the document wherever it lives.
 
 **Agent-facing instruction text never speaks in the first person.** No `I`, `me`,
 or `my` in the files listed above: they are commands addressed *to* the agent,

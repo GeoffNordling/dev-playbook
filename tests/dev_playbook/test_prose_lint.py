@@ -2,9 +2,9 @@
 
 The rule prose.judgment-spelling flags the British judgement / judgements form
 in authored Markdown; prose.banned-word flags the banned actor noun "human" in
-every tracked file, with no code-span or fence escape. This test file is one of
-the two files exempt from the ban (prose_lint.BANNED_EXEMPT) — its fixtures
-must name the word to test it. The scanning logic is tested with string inputs;
+every tracked file, with no code-span or fence escape. This test file is listed
+in dev-playbook's own .prose-lint-exempt — its fixtures must name the word to
+test it. The scanning logic is tested with string inputs;
 the discovery, exclusion, and CLI behaviors are tested over throwaway git repos
 (discovery goes through git ls-files, so every fixture is a git repo).
 """
@@ -265,15 +265,60 @@ def test_ban_skips_vendored_and_verbatim(tmp_path: Path) -> None:
     assert prose_lint.audit(repo) == []
 
 
-def test_ban_exempt_roster_is_honored(tmp_path: Path) -> None:
-    # The detector and its tests must name the word to ban it — the one
-    # sanctioned residue.
+def test_exempt_file_entry_exempts_that_file(tmp_path: Path) -> None:
+    # A .prose-lint-exempt entry naming a file exempts it from both rules —
+    # spelling and ban alike — while its siblings stay governed.
     repo = make_repo(
         tmp_path,
         {
-            "src/dev_playbook/prose_lint.py": "BANNED = 'human'\n",
-            "tests/dev_playbook/test_prose_lint.py": "text = 'a human'\n",
+            ".prose-lint-exempt": "docs/essay.md\n",
+            "docs/essay.md": "a judgement about the human condition\n",
+            "docs/other.md": "the human next door\n",
         },
+    )
+
+    findings = prose_lint.audit(repo)
+
+    assert [f.file for f in findings] == ["docs/other.md"]
+
+
+@pytest.mark.parametrize("entry", ["data/postings", "data/postings/"])
+def test_exempt_directory_entry_exempts_its_subtree(tmp_path: Path, entry: str) -> None:
+    # A directory entry — trailing slash or not — covers everything beneath it,
+    # but never a sibling whose name merely shares the prefix.
+    repo = make_repo(
+        tmp_path,
+        {
+            ".prose-lint-exempt": f"{entry}\n",
+            "data/postings/role.txt": "human resources experience required\n",
+            "data/postings/deep/role.txt": "human-in-the-loop controls\n",
+            "data/postings-notes.md": "notes on the human reviewer\n",
+        },
+    )
+
+    findings = prose_lint.audit(repo)
+
+    assert [f.file for f in findings] == ["data/postings-notes.md"]
+
+
+def test_exempt_comments_and_blank_lines_are_ignored(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            ".prose-lint-exempt": "# why: captured external text\n\ndata/x.txt\n",
+            "data/x.txt": "the human author\n",
+        },
+    )
+
+    assert prose_lint.audit(repo) == []
+
+
+def test_exempt_declaration_itself_is_never_scanned(tmp_path: Path) -> None:
+    # An entry may legitimately name a path carrying the banned word, so the
+    # declaration file is structurally exempt — listed or not.
+    repo = make_repo(
+        tmp_path,
+        {".prose-lint-exempt": "# human-facing captures\nassets/human-vs-agent.jpg\n"},
     )
 
     assert prose_lint.audit(repo) == []
