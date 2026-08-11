@@ -63,7 +63,7 @@ Done when: the map is verified complete, or the session ended on that report.
 
 The map body first — destination, notes, every line of Decisions so far.
 Then every child ticket in full — question body and all comments
-(`gh issue view <n> --comments`): harvest corpora, amendments, and linked
+(`gh issue view <n> --json title,body,comments`): harvest corpora, amendments, and linked
 assets ride in the trail. Resolutions are
 the canonical decisions this hand-off executes; the epic re-litigates none
 of them.

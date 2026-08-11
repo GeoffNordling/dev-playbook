@@ -26,7 +26,7 @@ Then report: `READ: codebase-design, issue-authoring.md`. Proceed only after.
 
 `$ARGUMENTS` is the issue number; below, `<issue>` is that number.
 
-- `gh issue view <issue> --comments` — the brief is what you re-author or decompose. Comments may carry context the body doesn't.
+- `gh issue view <issue> --json title,body,comments` — the brief is what you re-author or decompose. Comments may carry context the body doesn't.
 - **Brownfield reconnaissance.** Read the existing code the issue touches — the modules in play, their public surfaces, the seams a solution would use.
 
 Reading needs no worktree; work in the checkout the session is already in. A tree is opened only if §5 prototypes, and it is a throwaway — never the issue's factory worktree, which design has no business creating.

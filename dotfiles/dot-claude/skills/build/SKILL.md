@@ -19,7 +19,7 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 
 **Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
-- `gh issue view <issue> --comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
+- `gh issue view <issue> --json title,body,comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
 - **Rework re-entry.** Follow [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — read it now if `gh pr view` finds a PR, and skip it otherwise. The brief is the contract it names: where a finding merely disagrees with the brief, the brief wins; where it shows the brief contradicting reality, that is a deviation — run the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md)'s limiters like any other contradiction.
 - The existing files the brief concerns — there may be partial work from a prior cycle.
 - Read the standard that governs the artifact you're changing, where one applies — e.g. [documentation conventions](~/workspace/dev-playbook/standards/prose/conventions.md) for docs, [the build standard](~/workspace/dev-playbook/standards/build/index.md) for the build or the pre-commit hooks.

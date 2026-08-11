@@ -40,7 +40,7 @@ Your values for the contract's three parameters:
 
 **Be in the issue's worktree.** The session is normally already there (cwd `.claude/worktrees/issue-<issue>`, carried across `/clear`); if not, re-enter it with `EnterWorktree(path=.claude/worktrees/issue-<issue>)`. If the worktree is gone, escalate (§5) — don't start a fresh tree.
 
-- `gh issue view <issue> --comments` — the brief is the contract the work set out to satisfy.
+- `gh issue view <issue> --json title,body,comments` — the brief is the contract the work set out to satisfy.
 - `gh pr diff` — the change under review (resolves the current branch's PR).
 - The PR's existing feedback, across every surface — prior review cycles' findings, so you don't re-flag what they caught. The /bug-pr-review pass runs in parallel with you; its comment for this cycle may not exist yet, so don't wait for it or dedup against it.
 - Where the change includes code, the tests under `tests/` and code under `src/` — the full picture behind the diff.

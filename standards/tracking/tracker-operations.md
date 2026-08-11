@@ -19,8 +19,9 @@ this document's.
 - **Create** — `gh issue create --title "..." --body "$(cat <<'EOF' … EOF)"`,
   a quoted heredoc so a multi-line body reaches the tracker with its backticks
   and `$` unexpanded.
-- **Read** — `gh issue view <n> --comments`. Without the flag the body loads
-  alone, the cheaper read when the comment thread is pure archive.
+- **Read** — `gh issue view <n>` renders the body alone; `--comments` renders
+  the comments alone — each rendering omits the other's half. The whole issue
+  in one call is `gh issue view <n> --json title,body,comments`.
 - **List** — `gh issue list --state open --json number,title,labels`, narrowed
   with `--label` and `--state` and shaped with `--jq`.
 - **Comment** — `gh issue comment <n> --body "..."`.

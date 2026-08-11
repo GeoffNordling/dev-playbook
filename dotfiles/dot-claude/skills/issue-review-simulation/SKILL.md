@@ -18,11 +18,12 @@ dispatching session in your final message.
 
 ## Read first
 
-- The issue under audit: `gh issue view $ARGUMENTS --comments`. The body is
-  the brief; comments may carry probe records, rulings, and verdict records.
+- The issue under audit: `gh issue view $ARGUMENTS --json title,body,comments`.
+  The body is the brief; comments may carry probe records, rulings, and
+  verdict records.
 - Its parent epic, if it has one — `gh issue view $ARGUMENTS --json parent`
-  names it, since `--comments` does not surface it: the epic's standing
-  rulings bind the brief and calibrate this review.
+  names it, since the body-and-comments read does not surface it: the epic's
+  standing rulings bind the brief and calibrate this review.
 - The files the work touches — everything the brief names, and whatever you
   find the change brushes.
 

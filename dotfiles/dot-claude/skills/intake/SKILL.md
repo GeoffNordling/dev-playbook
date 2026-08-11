@@ -29,7 +29,7 @@ Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after
 ### 1. Read the input
 
 - **Capture** — the text passed in is the raw idea.
-- **Adopt** — `gh issue view <issue> --comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
+- **Adopt** — `gh issue view <issue> --json title,body,comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
 
 Either way, invoke /grill-with-docs to sharpen the raw idea, then return — **every time**, in both Capture and Adopt, run once over the raw idea and always before the §4 draft and the §5 write. Understanding intent precedes authoring, with no fuzziness condition that lets the grill be skipped.
 
