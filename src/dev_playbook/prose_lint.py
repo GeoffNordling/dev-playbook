@@ -24,9 +24,11 @@ and transient scratch (``PLAN.md`` / ``PROGRESS.md``, the root ``tmp/`` tree).
 Verbatim upstream mirrors are excluded per file via the registry's
 ``is_verbatim_doc`` (``type: Reference`` documents). Symlinks are skipped: a
 link's content belongs to its target, which is scanned at its own path when
-authored here and is not ours when vendored. The banned-word rule additionally
-exempts exactly two files — this module and its test file — which must name
-the word to ban it.
+authored here and is not ours when vendored. Beyond those structural
+exclusions, each repo declares its own: a tracked root-level
+``.prose-lint-exempt`` lists the paths — files or whole directories — that
+both rules skip (dev-playbook's own lists this module and its test file,
+which must name the banned word to ban it).
 
 Output:
     stdout — one finding per line, ``file:line: prose.rule message``.
@@ -88,15 +90,14 @@ BANNED_MESSAGE = (
     "(prose/conventions.md — Terminology)"
 )
 
-# The two files that must name the banned word in order to ban it: this module
-# (pattern, message, docstring) and its behavioral tests. The one sanctioned
-# residue — nothing else in an authored file may carry the word, in any form.
-BANNED_EXEMPT = frozenset(
-    {
-        "src/dev_playbook/prose_lint.py",
-        "tests/dev_playbook/test_prose_lint.py",
-    }
-)
+# The per-repo exemption declaration: a tracked file at the repo root, one
+# repo-relative path per line, a directory entry (trailing slash optional)
+# covering its whole subtree. Blank lines and `#` lines are comments. Listed
+# paths are skipped by both rules — the repo's reviewable declaration of what
+# its prose rules do not govern (prose/conventions.md — Terminology). The file
+# itself is never scanned, because an entry may legitimately name a path that
+# carries the banned word.
+EXEMPT_FILE = ".prose-lint-exempt"
 
 
 @dataclass(frozen=True)
@@ -148,6 +149,35 @@ def scan_banned(rel: str, text: str) -> list[Finding]:
     return findings
 
 
+def exempt_paths(root: Path) -> tuple[str, ...]:
+    """The paths ``root``'s ``.prose-lint-exempt`` declares, or empty.
+
+    Entries come back with any trailing slash stripped, so a directory written
+    either way matches the same subtree in :func:`is_exempt`.
+    """
+    declaration = root / EXEMPT_FILE
+    if not declaration.is_file():
+        return ()
+    entries = []
+    for line in declaration.read_text(encoding="utf-8").splitlines():
+        entry = line.strip()
+        if not entry or entry.startswith("#"):
+            continue
+        entries.append(entry.rstrip("/"))
+    return tuple(entries)
+
+
+def is_exempt(rel: str, exempt: tuple[str, ...]) -> bool:
+    """Whether a repo-relative path is covered by a declared exemption.
+
+    An entry covers itself and, when it names a directory, everything beneath
+    it. The declaration file is always exempt, listed or not.
+    """
+    if rel == EXEMPT_FILE:
+        return True
+    return any(rel == entry or rel.startswith(entry + "/") for entry in exempt)
+
+
 def audit(root: Path) -> list[Finding]:
     """Scan every authored file under ``root`` for both prose rules.
 
@@ -158,13 +188,14 @@ def audit(root: Path) -> list[Finding]:
     content (``PLAN.md`` / ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing
     that one boundary keeps vendored-tree exclusion on the shared registry
     (``classify`` consults it) and stops the gate firing on scratch. Verbatim
-    Reference docs are excluded per file; symlinks and binary files (NUL byte)
-    are skipped.
+    Reference docs are excluded per file, the repo's ``.prose-lint-exempt``
+    declarations per path; symlinks and binary files (NUL byte) are skipped.
     """
+    exempt = exempt_paths(root)
     findings: list[Finding] = []
     for path in md.find_files(root):
         rel = str(path.relative_to(root))
-        if md.classify(rel) == "excluded":
+        if md.classify(rel) == "excluded" or is_exempt(rel, exempt):
             continue
         if path.is_symlink():
             continue
@@ -184,8 +215,7 @@ def audit(root: Path) -> list[Finding]:
                 continue
             offset = text.count("\n", 0, len(text) - len(body))
             findings.extend(scan_text(rel, body, offset))
-        if rel not in BANNED_EXEMPT:
-            findings.extend(scan_banned(rel, text))
+        findings.extend(scan_banned(rel, text))
     return findings
 
 
