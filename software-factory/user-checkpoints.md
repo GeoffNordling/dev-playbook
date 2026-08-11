@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: User Checkpoints
-description: Every point where the factory stops for the user — the capability boundary, escalation, the issue-review verdict, and the two review-stretch pauses
+description: Every point where the factory stops for the user — the merge prohibition, escalation, the issue-review verdict, and the two review-stretch pauses
 ---
 
 # User Checkpoints
@@ -9,8 +9,8 @@ description: Every point where the factory stops for the user — the capability
 The factory runs unattended between checkpoints. A **checkpoint** is a point
 where it stops and the user acts, and there are only two reasons for one:
 
-- **Capability** — the agent *cannot* do it. Merging a PR is denied to its
-  credential.
+- **Prohibition** — the agent *can* do it and *must not*. Merging a PR is the
+  only one ([The merge prohibition](#the-merge-prohibition)).
 - **Decision** — the call is *not the agent's*. A verdict on reviewed work, an
   ambiguous fix, the final read before merge.
 
@@ -22,23 +22,25 @@ sits just outside that span — the
 the factory ever picks it up — and it is collected here too, because what it
 owes the user is the same.
 
-## The agent-capability boundary
+## The merge prohibition
 
-What the agent can do on GitHub is set by its PAT: it authorizes the HTTPS API —
-the `gh` family and REST endpoints — and `git push`/`git pull` over the HTTPS
-remote, but not merging a PR (`mergePullRequest` is forbidden to it). So one
-operation falls to the user: merging the PR, in the GitHub UI. Everything else —
-push, pull, and all purely-local git — the agent does inside a skill. Under auto
-mode the PAT is necessary but not sufficient: the classifier must also pass each
-`gh` write, per
+The agent's PAT *can* merge a PR — GitHub's `Pull requests: write` permission
+bundles create, edit, close, comment, and merge, indivisibly — and nothing
+server-side prevents it: `protect-main` blocks only force-pushes and deletion.
+The written rule is the only control.
+
+The rule: **no agent merges a pull request — ever**, by any route — `gh pr
+merge`, the merge API, auto-merge, or landing a branch on `main` by hand. A PR
+ready to merge ends the agent's turn; the user merges it in the GitHub UI.
+Under auto mode the classifier must additionally pass each `gh` write, per
 [Permissions](/software-factory/factory-operations.md#permissions).
 
-| | Agent-capable | Owner |
-|---|---|---|
-| merge the PR (in the GitHub UI) | no | user |
-| `git push` (rides every commit) / `git pull` (keep local `main` current) | yes | skills |
-| `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | yes | skills |
-| commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | yes | skills |
+| | Agent-capable | Permitted to the agent | Owner |
+|---|---|---|---|
+| merge the PR (in the GitHub UI) | yes | **no — never** | user |
+| `git push` (rides every commit) / `git pull` (keep local `main` current) | yes | yes | skills |
+| `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | yes | yes | skills |
+| commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | yes | yes | skills |
 
 ## The briefing rule
 

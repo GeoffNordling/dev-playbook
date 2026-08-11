@@ -58,6 +58,12 @@ Choose by the character of the job, never by what the session is running on:
   research spikes, building to a written brief.
 - **Fable** — never, unless the user asked for it by name.
 
+### Never merge a pull request
+
+Never merge a pull request — no `gh pr merge`, no merge API call, no
+auto-merge, no landing a branch on `main` by hand. When a PR is ready, say so
+and stop; merging is the user's, in every repo, always.
+
 ### Ask in prose, never AskUserQuestion
 
 `AskUserQuestion` is denied globally in `~/.claude/settings.json` — deliberate,
