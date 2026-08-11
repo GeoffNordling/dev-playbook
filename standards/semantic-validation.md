@@ -30,8 +30,8 @@ copies two opaque strings and is left with only the refutations to weigh.
   deterministically
 - [the LLM judgments](/standards/judgments/declarations.md) — an LLM judge
   rules on each declared claim against its evidence, dispatched by the
-  periodic sweep; the audit-kind detector no deterministic lint can stand
-  in for
+  periodic `judgments-sweep` — for an ungated judgment, the only checker
+  there is; the audit-kind detector no deterministic lint can stand in for
 
 ## Enforce
 
@@ -39,10 +39,6 @@ copies two opaque strings and is left with only the refutations to weigh.
   — the **push gate** for gated judgments: a pytest naming a judgment's id
   reds `make check-judgments-cache` until that exact content is
   judged-and-passed; a repo gates all, some, or none of its judgments
-- the periodic
-  [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
-  — the only checker of ungated judgments, re-judging every declaration
-  that drifts out of the cache
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — judgments-lint at the **commit gate** in every repo's suite,
