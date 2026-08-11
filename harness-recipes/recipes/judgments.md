@@ -17,7 +17,8 @@ are shell work, and this layer has no shell.
 ## When to use it
 
 When a judgments sweep is dispatching its docket. This is the engine behind the
-`judgments-sweep` skill, which is the ordinary way to reach it.
+[`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
+skill, which is the ordinary way to reach it.
 
 It is shaped like [scatter-gather](/harness-recipes/recipes/scatter-gather.md)
 rather than built on it: the fan-out is the same single `parallel()` over

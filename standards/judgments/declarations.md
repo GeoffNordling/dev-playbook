@@ -9,10 +9,13 @@ description: The judgment model and YAML declaration format — claim, evidence,
 A **judgment** is a single yes/no question about one or more files, ruled
 on by an LLM judge — for example, *"docs/errors.md lists every exception
 type that src/exceptions.py raises."* A judgment is declared as data on
-disk; the deterministic [cache gate](/standards/judgments/cache-gate.md)
-passes it **iff its exact content has already been judged-and-passed**, and
-the `run-judgments` skill fills the cache by actually running the judge on
-the misses.
+disk; a machine-local cache remembers **which exact content has already
+been judged-and-passed**; the periodic
+[`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
+skill fills that
+cache by actually running the judge on whatever drifted out; and the
+deterministic [cache gate](/standards/judgments/cache-gate.md) — where a
+repo wires one — turns a miss into a failing pytest.
 
 ## What a judgment is
 
@@ -41,13 +44,25 @@ under the same `id` is a miss.
 ## The bar
 
 Not every true statement about a repo deserves a judgment. A judgment is
-expensive — an LLM re-runs whenever the bytes of any input change — so it
-is spent only where it buys the most: **targeted semantic glue at a
-high-risk point**, a specific claim about specific files whose silent drift
-would be costly and that no deterministic detector can catch. A judgment is
-never a catch-all, and never a blanket family stretched over a whole
-population of documents — a population is a detector's job, or no one's.
-When in doubt, do not add one.
+expensive — every sweep re-judges it whenever the bytes of any input
+change, and each re-run is a fresh chance for a stochastic false refutation
+someone must weigh — so it is spent only where it buys the most: **targeted
+semantic glue at a high-risk point**, a specific claim about specific files
+whose silent drift would be costly and that no deterministic detector can
+catch. A judgment is never a catch-all, and never a blanket family
+stretched over a whole population of documents — a population is a
+detector's job, or no one's. When in doubt, do not add one.
+
+## Maintenance
+
+Declarations are peer documentation: whoever edits an artifact updates,
+removes, or adds the declarations that describe it in the same change — and
+never runs judges or touches the cache; judging belongs to the periodic
+`judgments-sweep`. Kept this way, the sweep opens on declarations that mean
+what they say instead of a pile of stale claims nobody remembers changing.
+
+Additions stay rare ([The bar](#the-bar)). Success in daily work is keeping
+existing declarations accurate, not minting new ones.
 
 ## The YAML declaration format
 

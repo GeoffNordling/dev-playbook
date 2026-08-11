@@ -40,11 +40,13 @@ Two checks depend on state that is local to a machine rather than present in
 the repository, so on a secondary they would report the environment as a defect
 in the code. Both are skipped there, and both announce the skip on every run.
 
-- **Judgments.** The cache-gate's seen-set lives in `~/.cache/skipcache` and is
-  filled by a `judgments-sweep` run. Judgments are neither installed nor
-  ever expected to run on a secondary; `SKIP_JUDGMENTS=1` turns each into a
-  named pytest skip, and `NO_JUDGMENT_CACHE=1` keeps the push gate from
-  checking the cache either ([make.md](/standards/build/make.md)).
+- **Judgments.** The seen-set lives in `~/.cache/skipcache`, filled by
+  [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
+  runs — the cache is local to the primary, so the sweep
+  is a primary-machine activity. Judges never run on a secondary;
+  `SKIP_JUDGMENTS=1` turns each gated judgment into a named pytest skip,
+  and `NO_JUDGMENT_CACHE=1` keeps the push gate from checking the cache
+  either ([make.md](/standards/build/make.md)).
 - **`ref-lint`.** Cross-repo Citations resolve only where the cited repo is
   cloned, and a secondary deliberately carries only some of the workspace's
   repos. `SKIP=ref-lint` stands the detector down.

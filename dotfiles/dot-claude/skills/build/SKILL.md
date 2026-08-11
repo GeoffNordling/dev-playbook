@@ -56,6 +56,8 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 3. Commit the piece with /commit.
 4. Move to the next piece, or to §6 once the issue's scope is fully carried out.
 
+Declarations under `judgments/` are documentation: keep the ones your edits affect accurate as you edit; add new ones rarely — see [The bar](~/workspace/dev-playbook/standards/judgments/declarations.md#the-bar).
+
 ## 5. Escalations
 
 When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt: post the contract's structured escalation comment to the PR if one exists, otherwise to the issue, then emit a terminal `ESCALATE:` line. Anything else unexpected that stalls the work escalates the same way, minus the limiter step:

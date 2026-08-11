@@ -13,8 +13,9 @@ deterministic check whose remedy is in the repo's own hands. Its recipe is
 identical in every repo — run the full hook suite — and layers add
 prerequisites. `check-judgments-cache` is `check` plus the semantic
 [cache gate](/standards/judgments/cache-gate.md) armed; it is what the
-pre-push hook runs, because that gate's only remedy is the `run-judgments`
-skill at the main loop:
+pre-push hook runs, because that gate's only remedy is a
+[`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
+run:
 
 | Target | Layer | Recipe |
 |---|---|---|
@@ -33,12 +34,13 @@ verbatim ([canonical.md](/standards/build/canonical.md)). Because `check` is
 a strict superset of [thin CI](/standards/build/ci.md), a green local `check`
 guarantees a green cloud run.
 
-The `test` target carries the judgments cache gate — a deterministic pytest,
-no LLM ([cache-gate.md](/standards/judgments/cache-gate.md)) — but `make test`
-and `make check` **skip** it by default (they export `SKIP_JUDGMENTS=1`), so a
-subagent never hits a miss it cannot fill. `make check-judgments-cache` arms
-it and is the pre-push hook's entry; a bare `uv run pytest` arms it too
-(fail-safe).
+The `test` target carries whatever judgment cache tripwires the repo has
+wired via pytest — deterministic checks, no LLM
+([cache-gate.md](/standards/judgments/cache-gate.md)) — but `make test`
+and `make check` **skip** them by default (they export `SKIP_JUDGMENTS=1`), so
+a subagent never hits a miss it cannot fill. `make check-judgments-cache` arms
+them and is the pre-push hook's entry — a repo with none wired passes it
+vacuously; a bare `uv run pytest` arms them too (fail-safe).
 
 The judgment cache exists only on the Fedora primary. Every other machine sets
 `NO_JUDGMENT_CACHE=1`, and `check-judgments-cache` skips that one check there.
