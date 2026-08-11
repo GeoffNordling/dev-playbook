@@ -270,16 +270,16 @@ Decision Record bar gets a record under `docs/decisions/`
 
 **Prototype claims.** A brief may cite a prototype as proof, and may carry a
 verbatim snippet a prototype produced. "Proven" means the prototype executed
-that specific thing against the real substrate — real transport, real hook,
-real filesystem — with the run's observed output in the committed record.
-Everything the prototype faked is a declared stub, and a stubbed thing can
-never be cited as proven: honesty about fidelity is required, fidelity is
-not. Prototypes commit to a `prototype/<issue>` branch — suffixed when one
-issue carries several, `prototype/<issue>-<slug>` — carrying the code, the
-stub list, and the run outputs, which for a click-driven demo are the observed
-states captured as text or screenshots; the brief cites branch + path, and a prototype
-claim with no citable committed artifact is demoted to assumed. The branch
-survives until everything citing it has merged.
+that specific thing for real — real transport, real hook, real filesystem —
+as the code stood when it ran. Everything the prototype faked is a stub, and
+a stubbed thing can never be cited as proven: honesty about fidelity is
+required, fidelity is not. Capture is the `/prototype` skill's: the code on
+a throwaway branch off main, the answer — the verdict and the question it
+settled — in the issue or a commit. Push the branch: remotes are never
+pruned, so a pushed throwaway branch is disposable and permanently citable
+at once. The brief cites branch + path and names the stubs bearing on the
+claim; a prototype claim with no citable committed artifact is demoted to
+assumed.
 
 ### Claim provenance
 
