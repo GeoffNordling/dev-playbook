@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Consuming Judgments
-description: The consumer-repo recipe — editable path dependency, declarations, pytest gate, lint hook, cache fill
+description: The consumer-repo recipe — editable path dependency, declarations, a position on the gate spectrum, lint hook, sweep pickup
 ---
 
 # Consuming Judgments
@@ -66,10 +66,21 @@ The root is the consumer's own repo — the nearest ancestor with a
 `[tool.judgments]` table — and every evidence/reference path resolves
 against it.
 
-## 3. Gate the judgments in pytest
+## 3. Choose the repo's position on the gate spectrum
 
-Add the cache gate as an ordinary test in the consumer's suite, using the
-parametrized form from [cache-gate.md](/standards/judgments/cache-gate.md):
+Gating is per-judgment and optional
+([cache-gate.md](/standards/judgments/cache-gate.md)): a judgment is
+gate-enforced iff some pytest in the consumer's suite calls
+`assert_judgment_cached` with its id. Choose a position by what the suite
+wires:
+
+- **None gated** — write no gate test. Every judgment is sweep-only;
+  nothing judgment-related ever blocks a push.
+- **Some gated** — one explicit test per load-bearing judgment, naming its
+  id (the single-test recipe in cache-gate.md), or a filtered parametrize
+  over the chosen subset.
+- **All gated** — the parametrized recipe, unfiltered, enumerating every
+  declaration through the loader:
 
 ```python
 import pytest
@@ -83,7 +94,7 @@ def test_judgment_cached(jid):
 ```
 
 The check is deterministic and offline; it reads the same machine-local
-seen-set the `run-judgments` skill fills, so it needs no LLM and no API key
+seen-set the judgments sweep fills, so it needs no LLM and no API key
 on CI.
 
 The gate is two-tier, keyed off one environment variable `SKIP_JUDGMENTS` that
@@ -91,15 +102,18 @@ The gate is two-tier, keyed off one environment variable `SKIP_JUDGMENTS` that
 exactly `1` skips the check with a visible pytest skip, any other value or
 unset arms it. The canonical [Makefile](/standards/build/make.md) defaults it
 to `1` and exports it, so `make check` and `make test` **skip** the gate — a
-subagent running them never hits a miss only `run-judgments` (main loop) can
-fill. `make check-judgments` runs `check` with `SKIP_JUDGMENTS=0`, arming the
-gate, and is the entry of the canonical pre-push hook: a miss blocks the push
-until the cache is filled. A bare `uv run pytest` arms it too (fail-safe).
+subagent running them never hits a miss only a sweep can fill.
+`make check-judgments-cache` arms the gate — except on machines without the
+cache, where the `NO_JUDGMENT_CACHE` conditional keeps it skipped
+([make.md](/standards/build/make.md)) — and is the entry of the canonical
+pre-push hook: a miss blocks the push until the cache is filled, and a repo
+with nothing gated passes vacuously. A bare `uv run pytest` arms it too
+(fail-safe).
 
 **Same-commit adoption.** A repo taking the new Makefile fragment `MUST`
-repoint its pre-push hook to `make check-judgments` in the **same commit**.
-Otherwise its `make check` stops running the gate while nothing at the push
-enforces it — a window with zero mechanical enforcement.
+repoint its pre-push hook to `make check-judgments-cache` in the
+**same commit**. Otherwise its `make check` stops running the gate while
+nothing at the push enforces it — a window with zero mechanical enforcement.
 
 ## 4. Lint the declarations on commit
 
@@ -115,9 +129,14 @@ The hook runs from pre-commit's own clone of dev-playbook at the pinned
 package nor a checkout path — it is independent of the editable dependency
 in step 1.
 
-## 5. Fill the cache with the run-judgments skill
+## 5. Let the periodic sweep fill the cache
 
-A cache miss — a failing gate — is filled by the global `run-judgments`
-skill: it runs the LLM judge on each miss and records the passing verdicts
-into the machine-local seen-set. The skill is available in any repo on the
-machine; run it whenever the cache gate is red.
+The [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
+skill judges whatever has drifted out of the cache
+and records the passing verdicts into the machine-local seen-set. Its bare
+invocation sweeps every judgment-bearing repo on the machine — the
+`[tool.judgments]` table from step 2 is what makes this repo one of them —
+so the periodic sweep picks the repo up with no further wiring, gated or
+not. For gated judgments the sweep pre-fills the cache, so the push gate is
+usually already green; when a push still blocks on a miss, run the sweep ad
+hoc naming the repo as a root.

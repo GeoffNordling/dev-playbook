@@ -1,7 +1,7 @@
 export const meta = {
   name: 'judgments',
-  description: 'Judge a docket of uncached judgments in one parallel fan-out: one agent per judgment, pinned to the bench its declaration names, verdicts partitioned deterministically.',
-  whenToUse: 'The judgment cache gate is red. Pass the stdout of `judgments-run plan` as args, verbatim — that command is the planner, and this workflow judges what it hands over. Returns the `record` command to run and the refutations to weigh.',
+  description: 'Judge a docket of uncached judgments from any number of repos in one parallel fan-out: one agent per judgment, pinned to the bench its declaration names, verdicts partitioned deterministically.',
+  whenToUse: 'A judgments sweep is dispatching its docket. Pass the stdout of `judgments-run plan` as args, verbatim — that command is the planner, and this workflow judges what it hands over. Returns the per-root `record` commands to run and the refutations to weigh.',
   phases: [{ title: 'Judge', detail: 'one pinned judge agent per uncached judgment' }],
 }
 
@@ -65,16 +65,18 @@ export const meta = {
 // loudly, before a single agent spawns -- rather than half-working with a field
 // silently missing. tests/test_judgments_workflow.py asserts this list still
 // equals what plan() actually produces, so the two cannot drift.
-const PLAN_KEYS = ['cli', 'root', 'schema', 'judge_prompt', 'cached', 'jobs', 'skipped']
+const PLAN_KEYS = ['cli', 'schema', 'judge_prompt', 'roots', 'jobs', 'skipped']
 
-// The substitution point inside `judge_prompt`. The prompt's wording lives with
+// The substitution points inside `judge_prompt`. The prompt's wording lives with
 // the CLI whose contract it describes; the only thing done to it here is putting
-// each job's id where this marker is.
+// each job's invocation, root, and id where these markers are.
+const CLI_PLACEHOLDER = '{cli}'
+const ROOT_PLACEHOLDER = '{root}'
 const ID_PLACEHOLDER = '{id}'
 
 // One agent is spawned per judgment in a single fan-out, so the binding ceiling
 // is the runtime's agent-lifetime cap rather than the larger per-call item cap.
-// A repo with more uncached judgments than this has outgrown one run.
+// A sweep with more uncached judgments than this has outgrown one run.
 const MAX_JUDGMENTS = 1000
 
 // ---------------------------------------------------------------------------
@@ -126,22 +128,36 @@ function parsePlan(raw) {
     if (!PLAN_KEYS.includes(key))
       throw new Error(`judgments: plan has an unexpected key "${key}" — this workflow and judgments-run have drifted apart`)
 
-  // Every command in the run is built from `cli`, and every real one carries an
-  // explicit --root. Its absence means we are holding something other than what
-  // the CLI printed, and running it would judge an unknown repository.
-  if (typeof plan.cli !== 'string' || !plan.cli.includes('--root '))
+  // Every command in the run is built from `cli` plus a per-job substituted
+  // `--root`. An empty cli, or a template missing a marker, means we are holding
+  // something other than what the CLI printed, and running it would judge an
+  // unknown repository.
+  if (typeof plan.cli !== 'string' || plan.cli === '')
     throw new Error(`judgments: plan.cli is not a usable invocation: ${plan.cli}`)
-  if (typeof plan.judge_prompt !== 'string' || !plan.judge_prompt.includes(ID_PLACEHOLDER))
-    throw new Error(`judgments: plan.judge_prompt has no ${ID_PLACEHOLDER} placeholder to substitute an id into`)
+  for (const marker of [CLI_PLACEHOLDER, ROOT_PLACEHOLDER, ID_PLACEHOLDER])
+    if (typeof plan.judge_prompt !== 'string' || !plan.judge_prompt.includes(marker))
+      throw new Error(`judgments: plan.judge_prompt has no ${marker} placeholder to substitute into`)
   if (plan.schema === null || typeof plan.schema !== 'object')
     throw new Error('judgments: plan.schema must be the judge output schema object')
+  if (plan.roots === null || typeof plan.roots !== 'object' || Array.isArray(plan.roots) || Object.keys(plan.roots).length === 0)
+    throw new Error('judgments: plan.roots must map each swept root to its cache summary')
+  for (const [root, summary] of Object.entries(plan.roots))
+    if (typeof summary?.cached !== 'number')
+      throw new Error(`judgments: plan.roots["${root}"] has no numeric "cached"`)
   if (!Array.isArray(plan.jobs) || !Array.isArray(plan.skipped))
     throw new Error('judgments: plan.jobs and plan.skipped must both be arrays')
 
   plan.jobs.forEach((job, index) => {
-    for (const field of ['id', 'model', 'effort'])
+    for (const field of ['id', 'root', 'model', 'effort'])
       if (typeof job?.[field] !== 'string' || job[field] === '')
         throw new Error(`judgments: job ${index} is missing a non-empty "${field}"`)
+    if (!(job.root in plan.roots))
+      throw new Error(`judgments: job ${index} names a root outside plan.roots: ${job.root}`)
+  })
+  plan.skipped.forEach((entry, index) => {
+    for (const field of ['id', 'root'])
+      if (typeof entry?.[field] !== 'string' || entry[field] === '')
+        throw new Error(`judgments: skipped entry ${index} is missing a non-empty "${field}"`)
   })
   if (plan.jobs.length > MAX_JUDGMENTS)
     throw new Error(`judgments: ${plan.jobs.length} judgments exceeds the single-run limit of ${MAX_JUDGMENTS}`)
@@ -151,42 +167,54 @@ function parsePlan(raw) {
 
 const PLAN = parsePlan(args)
 
-// Naming the repository in the progress log makes a run against the wrong
+// Naming each repository in the progress log makes a run against the wrong
 // checkout something you can see rather than infer from a surprising docket --
-// worth one line in a workspace where worktrees and their main checkout sit side
-// by side and hold the same judgment ids.
-log(`judgments: root ${PLAN.root}`)
-log(`judgments: ${PLAN.cached} cached, ${PLAN.jobs.length} to judge${PLAN.skipped.length ? `, ${PLAN.skipped.length} set aside` : ''}`)
+// worth a line per root in a workspace where worktrees and their main checkout
+// sit side by side and hold the same judgment ids.
+for (const [root, summary] of Object.entries(PLAN.roots))
+  log(`judgments: root ${root} — ${summary.cached} cached, ${PLAN.jobs.filter((job) => job.root === root).length} to judge`)
+log(`judgments: ${PLAN.jobs.length} to judge in all${PLAN.skipped.length ? `, ${PLAN.skipped.length} set aside` : ''}`)
 
 // ---------------------------------------------------------------------------
 // Judge
 // ---------------------------------------------------------------------------
 
-// One isolated agent per judgment, all at once, each pinned to the model and
-// effort its own declaration names and constrained to the plan's output schema.
-// The prompt is a bootstrap: it tells the agent to run `... render <id>`, whose
-// stdout is the real prompt plus the full text of every evidence file. That is
-// deliberate -- the heavy bytes materialize inside the judge's own context and
-// never pass through this script or the calling agent's window.
+// One isolated agent per judgment across every root, all in one fan-out -- a
+// bulk sweep costs one round, never a per-repo loop -- each agent pinned to the
+// model and effort its own declaration names and constrained to the plan's
+// output schema. The prompt is a bootstrap: it tells the agent to run
+// `... --root <root> render <id>`, whose stdout is the real prompt plus the full
+// text of every evidence file. That is deliberate -- the heavy bytes materialize
+// inside the judge's own context and never pass through this script or the
+// calling agent's window.
+//
+// The label carries the root's last path segment beside the id because a
+// multi-root docket may hold the same id twice -- two repos can each declare it.
 //
 // The try/catch is inside each job so a crashed judge yields a null result that
-// KEEPS its id. Without it, parallel() would return a bare null and we would lose
-// track of which judgment it belonged to.
+// KEEPS its id and root. Without it, parallel() would return a bare null and we
+// would lose track of which judgment it belonged to.
 phase('Judge')
+
+const repoName = (root) => root.split('/').filter(Boolean).pop() ?? root
 
 const verdicts = await parallel(
   PLAN.jobs.map((job) => async () => {
+    const prompt = PLAN.judge_prompt
+      .replaceAll(CLI_PLACEHOLDER, PLAN.cli)
+      .replaceAll(ROOT_PLACEHOLDER, job.root)
+      .replaceAll(ID_PLACEHOLDER, job.id)
     try {
-      const result = await agent(PLAN.judge_prompt.replaceAll(ID_PLACEHOLDER, job.id), {
-        label: `judge:${job.id}`,
+      const result = await agent(prompt, {
+        label: `judge:${repoName(job.root)}:${job.id}`,
         phase: 'Judge',
         model: job.model,
         effort: job.effort,
         schema: PLAN.schema,
       })
-      return { id: job.id, result: result ?? null }
+      return { id: job.id, root: job.root, result: result ?? null }
     } catch {
-      return { id: job.id, result: null }
+      return { id: job.id, root: job.root, result: null }
     }
   }),
 )
@@ -195,12 +223,18 @@ const verdicts = await parallel(
 // passed is a mechanical fact about the returned data, and letting a model decide
 // it would put discretion where none belongs. Only `verdict === true` is ever
 // treated as a pass -- a crash (result null) is NOT a false verdict, it means the
-// judgment was never ruled on at all.
-const passed = verdicts.filter((v) => v.result?.verdict === true).map((v) => v.id)
+// judgment was never ruled on at all. Every entry keeps its root: the same id
+// can appear under two roots, and a refutation is weighed against the repo that
+// declared it.
+const passed = verdicts
+  .filter((v) => v.result?.verdict === true)
+  .map((v) => ({ id: v.id, root: v.root }))
 const refuted = verdicts
   .filter((v) => v.result?.verdict === false)
-  .map((v) => ({ id: v.id, opinion: v.result.opinion }))
-const crashed = verdicts.filter((v) => v.result === null).map((v) => v.id)
+  .map((v) => ({ id: v.id, root: v.root, opinion: v.result.opinion }))
+const crashed = verdicts
+  .filter((v) => v.result === null)
+  .map((v) => ({ id: v.id, root: v.root }))
 
 log(`judgments: ${passed.length} passed, ${refuted.length} refuted, ${crashed.length} crashed`)
 
@@ -209,17 +243,26 @@ log(`judgments: ${passed.length} passed, ${refuted.length} refuted, ${crashed.le
 // ---------------------------------------------------------------------------
 
 // `record` comes first because it is the one thing the caller must act on before
-// anything else: recording is a shell command, so it belongs at the layer that
-// has a shell. The ids in it were computed above by this script, never chosen by
-// an agent, and only passes ever appear -- so the caller runs the string as given
-// rather than assembling one. It is null when nothing passed.
+// anything else: recording is shell work, so it belongs at the layer that has a
+// shell. One pre-assembled command per root that had passes -- the seen-set is
+// shared, but `record` resolves ids against a single root's declarations at a
+// time. The ids in each were computed above by this script, never chosen by an
+// agent, and only passes ever appear -- so the caller runs every string as given
+// rather than assembling one. Empty when nothing passed.
 //
 // `green` says nothing in this run needs the user: every judgment that ran
-// passed, none crashed, and none was set aside. The gate itself goes green only
-// after `record` runs.
+// passed, none crashed, and none was set aside. The cache itself fills only
+// after every `record` command has run.
+const record = Object.keys(PLAN.roots)
+  .map((root) => {
+    const ids = passed.filter((p) => p.root === root).map((p) => p.id)
+    return ids.length ? `${PLAN.cli} --root ${root} record ${ids.join(' ')}` : null
+  })
+  .filter((command) => command !== null)
+
 return {
-  record: passed.length ? `${PLAN.cli} record ${passed.join(' ')}` : null,
-  cached: PLAN.cached,
+  record,
+  roots: PLAN.roots,
   ran: PLAN.jobs.length,
   passed,
   refuted,

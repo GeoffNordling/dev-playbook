@@ -10,10 +10,10 @@ The gate is two-tier via one environment variable, ``SKIP_JUDGMENTS``. When it
 is exactly ``"1"`` the check is skipped (a visible pytest skip), so a subagent
 running ``make check``/``make test`` -- which default it to ``1`` -- never hits
 an unresolvable red it lacks the tooling to fill. Any other value, or unset,
-runs the gate: a bare ``pytest`` and the ``make check-judgments`` push tripwire
-(which sets it to ``0``) are fail-safe. The lever lives here, the one choke
-point every consumer's gate test calls, so it covers any test shape with no
-per-test markers.
+runs the gate: a bare ``pytest`` and the ``make check-judgments-cache`` push
+tripwire (which sets it to ``0``) are fail-safe. The lever lives here, the
+one choke point every consumer's gate test calls, so it covers any test
+shape with no per-test markers.
 """
 
 import os

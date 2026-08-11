@@ -34,8 +34,8 @@ The canonical [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-c
 carries the pinned `playbook-lint` hook — dev-playbook's whole detector set
 behind one id ([distribution.md](/standards/build/distribution.md)) — the
 ruff, shellcheck, and shfmt hooks at canonical revs, and the pre-push
-`make check-judgments` hook, installing both the commit and push stages. It
-serves every repo unchanged: a hook with no matching files skips itself, and
+`make check-judgments-cache` hook, installing both the commit and push stages.
+It serves every repo unchanged: a hook with no matching files skips itself, and
 detectors like `judgments-lint` and `skill-lint` pass trivially where a repo
 has no `[tool.judgments]` table and no authored skills — which is why the
 roster can run everywhere without per-repo opt-ins. dev-playbook

@@ -14,11 +14,11 @@ from dev_playbook import gitrepo
 def _clean_git_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Strip ambient git redirection variables from every test's environment.
 
-    The suite runs inside the pre-push hook (``make check-judgments``), and from
-    a linked worktree -- where the software factory works -- git exports an
-    absolute ``GIT_DIR`` into that hook. It outranks ``git -C`` and ``cwd=`` in
-    every fixture subprocess: ``git init`` becomes a silent no-op and
-    ``ls-files`` reads the wrong index, so no test may inherit it.
+    The suite runs inside the pre-push hook (``make check-judgments-cache``),
+    and from a linked worktree -- where the software factory works -- git
+    exports an absolute ``GIT_DIR`` into that hook. It outranks ``git -C``
+    and ``cwd=`` in every fixture subprocess: ``git init`` becomes a silent
+    no-op and ``ls-files`` reads the wrong index, so no test may inherit it.
 
     The set removed is ``gitrepo.no_git_env``'s, not a second hand-written copy
     -- one policy governs the code under test and the environment it is tested

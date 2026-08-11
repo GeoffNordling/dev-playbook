@@ -44,14 +44,14 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: run-judgments-skill-matches-tooling
+  - id: judgments-sweep-skill-matches-tooling
     claim: |
-      The run-judgments skill accurately documents how it dispatches
-      cache-missed judgments through the judgments workflow, what that
-      workflow returns, and how the passing verdicts get recorded.
+      The judgments-sweep skill accurately documents how it plans a
+      multi-root docket, dispatches it through the judgments workflow, what
+      that workflow returns, and how the passing verdicts get recorded.
     evidence:
-      - dotfiles/dot-claude/skills/run-judgments/SKILL.md
-      - dotfiles/dot-claude/skills/run-judgments/references/recording-without-a-judge.md
+      - dotfiles/dot-claude/skills/judgments-sweep/SKILL.md
+      - dotfiles/dot-claude/skills/judgments-sweep/references/recording-without-a-judge.md
     reference:
       - src/dev_playbook/judgments/runner.py
       - dotfiles/dot-claude/workflows/judgments.js

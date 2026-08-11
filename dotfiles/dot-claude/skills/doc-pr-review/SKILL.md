@@ -13,7 +13,7 @@ argument-hint: "<issue-number>"
 
 Review the documentation in an issue's PR diff against its issue brief, the doc standards, and the documents around it, and attach your findings to the PR.
 
-**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec markdown and prose artifacts, and on the PR body, for the presence check alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them.
+**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec markdown and prose artifacts, and on the PR body, for the presence check alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them. Judgment declarations under `judgments/` are ordinary docs here — a review may flag one as stale against the artifacts it names ([Maintenance](~/workspace/dev-playbook/standards/judgments/declarations.md#maintenance)); cache state is never a finding.
 
 ## Read first
 

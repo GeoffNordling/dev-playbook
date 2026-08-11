@@ -1,4 +1,4 @@
-.PHONY: format format-check lint typecheck test check check-judgments
+.PHONY: format format-check lint typecheck test check check-judgments-cache
 SKIP_JUDGMENTS ?= 1
 export SKIP_JUDGMENTS
 format:
@@ -13,8 +13,8 @@ test:
 	uv run pytest
 check: format-check lint typecheck test
 	uvx pre-commit run --all-files
-# The judgment cache exists only on the Fedora primary, which checks it before
-# every push. The WSL secondaries have no cache, so they set
-# NO_JUDGMENT_CACHE=1 and this skips that one check there.
-check-judgments:
+# Arms the judgment cache gate: asserts the cache is passed for whatever
+# judgments the repo has tripwired via pytest; finding none passes vacuously.
+# Machines without the cache set NO_JUDGMENT_CACHE=1 to skip the cache check.
+check-judgments-cache:
 	$(MAKE) check SKIP_JUDGMENTS=$(if $(NO_JUDGMENT_CACHE),1,0)

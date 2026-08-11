@@ -29,7 +29,6 @@ EXPECTED_LABELS = [
     ("phase:spike", "fbca04", "Phase: spike."),
     ("phase:build", "fbca04", "Phase: build."),
     ("phase:pr-review", "fbca04", "Phase: pr-review."),
-    ("phase:judgments", "fbca04", "Phase: judgments."),
     ("wayfinder:map", "1d76db", "Wayfinder: map."),
     ("wayfinder:research", "1d76db", "Wayfinder: research."),
     ("wayfinder:prototype", "1d76db", "Wayfinder: prototype."),

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: User Checkpoints
-description: Every point where the factory stops for the user — the capability boundary, escalation, the issue-review verdict, and the three review-stretch pauses
+description: Every point where the factory stops for the user — the capability boundary, escalation, the issue-review verdict, and the two review-stretch pauses
 ---
 
 # User Checkpoints
@@ -81,9 +81,9 @@ all. The mechanics of the report itself — the `DONE:`/`ESCALATE:` line a subag
 must emit — are
 [the terminal report contract](/software-factory/factory-operations.md#engagement).
 
-## The three pauses
+## The two pauses
 
-Everything above interrupts the factory wherever it happens. The three **pauses**
+Everything above interrupts the factory wherever it happens. The two **pauses**
 are different: they are scheduled, they all sit after implementation, and
 together they are the whole of the user's decision-making inside the factory.
 Until the first of them, the factory asks the user for nothing.
@@ -109,25 +109,16 @@ Blocking-driven by default: suggestions alone do not call for a rework lap. The
 overwatch never touches the work under review; a fix is the author's, routed
 through rework.
 
-### Pause 2: judgments, conditional
-
-The judgments node runs unattended and usually finishes without a word. It pauses
-only where a refuted judgment's fix is ambiguous enough to want the user's
-advice — a claim that may be wrong about the code, or right about code that
-should change.
-A clean green run pauses nothing, and neither does a refutation whose fix is
-obvious.
-
-### Pause 3: the final review
+### Pause 2: the final review
 
 The last checkpoint, and the only one where the user reads the diff. It is
-reached only when the issue is **100% done**: judgments green, the merge
-message regenerated from the whole PR record, every commit on origin, and a
-closing brief on what shipped and what changed since the approve verdict.
+reached only when the issue is **100% done**: the merge message regenerated
+from the whole PR record, every commit on origin, and a closing brief on what
+shipped and what changed since the approve verdict.
 
-Nothing is outstanding at pause 3 but the read and the merge. Anything still
+Nothing is outstanding at pause 2 but the read and the merge. Anything still
 pending — a red gate, an unrefreshed message, an unpushed commit, an open
-question — means the issue has not reached pause 3 yet, and presenting it as
+question — means the issue has not reached pause 2 yet, and presenting it as
 though it had spends the user's one full read on work that is still moving.
 
 ## The issue-review verdict
@@ -160,7 +151,6 @@ The factory decides these itself, announcing rather than asking:
 - **Which review tracks run.** Selected by hard rule and announced on screen;
   dispatch is immediate, with no confirmation wait. A skipped audit is one
   retroactive command away.
-- **A green judgments run**, and any refutation whose fix is obvious.
 - **Doc changes the user already wrote or approved inline this traverse** — a
   review there re-litigates an approval.
 - **Anything the graph already answers.** Where a node goes next is read from the

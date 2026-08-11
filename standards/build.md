@@ -30,7 +30,7 @@ Governs how a repository is laid out, built, and checked.
   — the hook suite every repo runs at the **commit gate**; repo-lint
   reaches it through the published `playbook-lint` hook, which dispatches
   to the whole roster
-- `make check-judgments` ([Makefile.base](/standards/build/canonical/Makefile.base))
+- `make check-judgments-cache` ([Makefile.base](/standards/build/canonical/Makefile.base))
   — the **push gate**
 - thin CI ([ci.yml](/standards/build/canonical/ci.yml)) — the **CI gate**,
   the same suite on every push and PR, less `ref-lint`: its cross-repo

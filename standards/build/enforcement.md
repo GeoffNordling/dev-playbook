@@ -18,7 +18,7 @@ them by these names.
 | Gate | Trigger | What runs |
 |---|---|---|
 | **commit gate** | `git commit` | the pre-commit hook suite, on staged files |
-| **push gate** | `git push` | `make check-judgments`, via the pre-push stage |
+| **push gate** | `git push` | `make check-judgments-cache`, via the pre-push stage |
 | **CI gate** | every push and PR on GitHub | [thin CI](/standards/build/ci.md) |
 
 The commit and push gates block locally, through the git hooks that invoke
@@ -50,7 +50,7 @@ outside every gate: it hosts the CI gate but is not itself one.
 
 Where each detector's rules fire. Every pre-commit hook fires at the **commit
 gate, in the CI gate, and inside every `make check`** (hence also in the agent
-ritual, and at the push gate via `make check-judgments`); the table lists only
+ritual, and at the push gate via `make check-judgments-cache`); the table lists only
 what falls outside that pattern. The dev-playbook detectors reach those gates
 through the single published `playbook-lint` hook, which dispatches its whole
 roster ([distribution.md](/standards/build/distribution.md)); a per-detector

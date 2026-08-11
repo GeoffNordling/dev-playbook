@@ -7,7 +7,12 @@ from pathlib import Path
 import pytest
 
 from dev_playbook.judgments.core import SCHEMA, prepare
-from dev_playbook.judgments.runner import ID_PLACEHOLDER, main
+from dev_playbook.judgments.runner import (
+    CLI_PLACEHOLDER,
+    ID_PLACEHOLDER,
+    ROOT_PLACEHOLDER,
+    main,
+)
 
 CONFIG = '[tool.judgments]\npaths = ["judgments/*.yaml"]\n'
 
@@ -27,22 +32,44 @@ EVIDENCE = {
 }
 
 
-@pytest.fixture
-def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Stand up a judgments repo, chdir into it, and isolate the seen-set cache."""
-    root = tmp_path / "repo"
-    files = {
-        "pyproject.toml": CONFIG,
-        "judgments/a.yaml": ONE_JUDGMENT,
-        **EVIDENCE,
-    }
+def _write_repo(root: Path, files: dict[str, str]) -> Path:
+    """Write a judgments repo from a {relative path: contents} map."""
     for relpath, contents in files.items():
         path = root / relpath
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(contents)
+    return root
+
+
+@pytest.fixture
+def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Stand up a judgments repo, chdir into it, and isolate the seen-set cache."""
+    root = _write_repo(
+        tmp_path / "repo",
+        {"pyproject.toml": CONFIG, "judgments/a.yaml": ONE_JUDGMENT, **EVIDENCE},
+    )
     monkeypatch.chdir(root)
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
     return root
+
+
+@pytest.fixture
+def second_repo(tmp_path: Path) -> Path:
+    """A second judgments repo beside ``repo``, declaring its own judgment j2.
+
+    Its evidence bytes differ from ``repo``'s so the two repos' judgments key
+    differently -- content keys are root-invariant, and identical bytes under
+    two roots would collapse into one cache entry.
+    """
+    return _write_repo(
+        tmp_path / "repo2",
+        {
+            "pyproject.toml": CONFIG,
+            "judgments/b.yaml": ONE_JUDGMENT.replace("j1", "j2"),
+            "docs/errors.md": "second errors doc\n",
+            "src/exceptions.py": "class Bang(Exception): ...\n",
+        },
+    )
 
 
 def test_plan_emits_a_ready_to_dispatch_job_per_uncached_judgment(
@@ -53,24 +80,33 @@ def test_plan_emits_a_ready_to_dispatch_job_per_uncached_judgment(
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
     assert output["schema"] == SCHEMA
-    assert output["cached"] == 0
+    assert output["roots"] == {str(repo): {"cached": 0}}
     assert output["skipped"] == []
     (job,) = output["jobs"]
-    assert job == {"id": "j1", "model": "claude-sonnet-4-6", "effort": "high"}
+    assert job == {
+        "id": "j1",
+        "root": str(repo),
+        "model": "claude-sonnet-4-6",
+        "effort": "high",
+    }
 
 
 def test_plan_ships_the_judge_prompt_once_with_a_placeholder(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    # One prompt for the whole docket, not one copy per job: only the id varies,
-    # and the workflow substitutes it. Repeating the rest would multiply the
-    # payload the orchestrating agent carries for nothing.
+    # One prompt for the whole docket, not one copy per job: only the
+    # invocation, root, and id vary, and the workflow substitutes them.
+    # Repeating the rest would multiply the payload the orchestrating agent
+    # carries for nothing.
     assert main(["plan"]) == 0
     output = json.loads(capsys.readouterr().out)
 
-    assert ID_PLACEHOLDER in output["judge_prompt"]
-    assert f"render {ID_PLACEHOLDER}" in output["judge_prompt"]
+    assert (
+        f"{CLI_PLACEHOLDER} --root {ROOT_PLACEHOLDER} render {ID_PLACEHOLDER}"
+        in output["judge_prompt"]
+    )
     assert "j1" not in output["judge_prompt"]
+    assert str(repo) not in output["judge_prompt"]
 
 
 def test_plan_counts_cached_judgments_without_listing_them(
@@ -83,25 +119,24 @@ def test_plan_counts_cached_judgments_without_listing_them(
 
     assert main(["plan"]) == 0
     output = json.loads(capsys.readouterr().out)
-    assert output["cached"] == 1
+    assert output["roots"] == {str(repo): {"cached": 1}}
     assert output["jobs"] == []
 
 
 def test_plan_hands_back_a_self_contained_invocation(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    # Every command the plan hands out -- the judge prompt and the `cli` the
-    # workflow appends `record` to -- must run without a PATH lookup, an activated
+    # Every command the plan hands out is built from `cli` plus a substituted
+    # `--root`, and must then run without a PATH lookup, an activated
     # virtualenv, or a particular working directory, because judge agents have
-    # none of those guaranteed. It names an absolute interpreter and its own root.
+    # none of those guaranteed. `cli` itself names an absolute interpreter and
+    # no root: one invocation serves every root in the docket.
     assert main(["plan"]) == 0
     output = json.loads(capsys.readouterr().out)
 
-    assert output["cli"].startswith(sys.executable)
-    assert f"--root {repo}" in output["cli"]
-    assert output["root"] == str(repo)
+    assert output["cli"] == f"{sys.executable} -m dev_playbook.judgments.runner"
     assert output["judge_prompt"].startswith(
-        f"Run this exact command: {sys.executable}"
+        f"Run this exact command: {CLI_PLACEHOLDER} --root {ROOT_PLACEHOLDER}"
     )
 
 
@@ -114,20 +149,20 @@ def test_plan_skips_a_named_judgment(
     output = json.loads(capsys.readouterr().out)
 
     assert output["jobs"] == []
-    assert output["skipped"] == ["j1"]
+    assert output["skipped"] == [{"id": "j1", "root": str(repo)}]
 
 
 def test_plan_does_not_report_a_cached_judgment_as_skipped(
     repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     # A cached judgment is not being skipped from anything. Reporting it as
-    # skipped would tell the workflow the gate must stay red when it need not.
+    # skipped would tell the caller a judgment went unjudged when it need not.
     assert main(["record", "j1"]) == 0
     capsys.readouterr()  # drop record's confirmation line
 
     assert main(["plan", "--skip", "j1"]) == 0
     output = json.loads(capsys.readouterr().out)
-    assert output["cached"] == 1
+    assert output["roots"] == {str(repo): {"cached": 1}}
     assert output["skipped"] == []
 
 
@@ -140,6 +175,108 @@ def test_plan_rejects_an_unknown_skip_id(
 
     assert exit_code != 0
     assert "nonexistent" in capsys.readouterr().err
+
+
+def test_plan_merges_multiple_roots_into_one_docket(
+    repo: Path, second_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # The whole point of the multi-root plan: every named root's judgments in
+    # one payload, one root-free cli, jobs grouped by root -- so a bulk sweep
+    # costs the orchestrating agent no more pastes than a single-repo run.
+    exit_code = main(["--root", str(repo), "--root", str(second_repo), "plan"])
+
+    assert exit_code == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["roots"] == {
+        str(repo): {"cached": 0},
+        str(second_repo): {"cached": 0},
+    }
+    assert [(job["id"], job["root"]) for job in output["jobs"]] == [
+        ("j1", str(repo)),
+        ("j2", str(second_repo)),
+    ]
+    assert "--root" not in output["cli"]
+
+
+def test_plan_counts_the_cache_per_root(
+    repo: Path, second_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # The seen-set is shared across the machine, but the docket reports cache
+    # membership root by root -- that is what the caller relays per repo.
+    assert main(["--root", str(repo), "record", "j1"]) == 0
+    capsys.readouterr()  # drop record's confirmation line
+
+    assert main(["--root", str(repo), "--root", str(second_repo), "plan"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["roots"] == {
+        str(repo): {"cached": 1},
+        str(second_repo): {"cached": 0},
+    }
+    (job,) = output["jobs"]
+    assert (job["id"], job["root"]) == ("j2", str(second_repo))
+
+
+def test_plan_skip_sets_the_id_aside_in_every_root_that_has_it(
+    repo: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Two repos may declare the same id -- a worktree and its main checkout
+    # always do -- so a skipped id reports one {id, root} entry per set-aside
+    # judgment, never collapsing two into one.
+    twin = _write_repo(
+        tmp_path / "twin",
+        {
+            "pyproject.toml": CONFIG,
+            "judgments/a.yaml": ONE_JUDGMENT,
+            "docs/errors.md": "twin errors doc\n",
+            "src/exceptions.py": "class Kaboom(Exception): ...\n",
+        },
+    )
+
+    assert main(["--root", str(repo), "--root", str(twin), "plan", "--skip", "j1"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["jobs"] == []
+    assert output["skipped"] == [
+        {"id": "j1", "root": str(repo)},
+        {"id": "j1", "root": str(twin)},
+    ]
+
+
+def test_plan_rejects_a_skip_id_unknown_in_every_root(
+    repo: Path, second_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        ["--root", str(repo), "--root", str(second_repo), "plan", "--skip", "j3"]
+    )
+
+    assert exit_code != 0
+    assert "j3" in capsys.readouterr().err
+
+
+def test_render_rejects_multiple_roots(
+    repo: Path, second_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # render and record each operate on exactly one repo; several --root flags
+    # are a caller-side confusion, surfaced loudly rather than resolved by
+    # picking one.
+    exit_code = main(["--root", str(repo), "--root", str(second_repo), "render", "j1"])
+
+    assert exit_code == 2
+    assert "at most one --root" in capsys.readouterr().err
+
+
+def test_root_option_rejects_a_repo_without_judgments_config(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # A named root must itself bear judgments: a typo'd target fails loudly
+    # instead of quietly planning an empty repo.
+    unconfigured = tmp_path / "unconfigured"
+    unconfigured.mkdir()
+    (unconfigured / "pyproject.toml").write_text("[project]\nname = 'x'\n")
+
+    exit_code = main(["--root", str(unconfigured), "plan"])
+
+    assert exit_code == 1
+    assert "no [tool.judgments] table" in capsys.readouterr().err
 
 
 def test_plan_with_no_config_emits_an_empty_docket(
@@ -155,7 +292,7 @@ def test_plan_with_no_config_emits_an_empty_docket(
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
     assert output["schema"] == SCHEMA
-    assert output["cached"] == 0
+    assert output["roots"] == {str(bare): {"cached": 0}}
     assert output["jobs"] == []
 
 
@@ -185,7 +322,7 @@ def test_record_then_plan_reports_the_judgment_as_cached(
 
     assert main(["plan"]) == 0
     output = json.loads(capsys.readouterr().out)
-    assert output["cached"] == 1
+    assert output["roots"] == {str(repo): {"cached": 1}}
     assert output["jobs"] == []
 
 

@@ -21,10 +21,9 @@ requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
 # Workspace-wide tooling that resolves from the repo root reads this table.
-# The judgment gate collects every declaration in the judgments/*.yaml
-# claim-family files; each passes iff its exact content-key is already cached
-# (fill the cache with a run-judgments fleet run after editing a declaration or
-# a file it puts on trial).
+# Declarations live in the judgments/*.yaml claim-family files, each keyed by
+# content; a judgments-sweep run judges whatever an edit to a declaration or a
+# file it puts on trial has re-keyed out of the cache.
 [tool.judgments]
 paths = ["judgments/*.yaml"]
 

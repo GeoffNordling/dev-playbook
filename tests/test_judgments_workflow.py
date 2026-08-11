@@ -18,7 +18,12 @@ from pathlib import Path
 
 import pytest
 
-from dev_playbook.judgments.runner import ID_PLACEHOLDER, plan
+from dev_playbook.judgments.runner import (
+    CLI_PLACEHOLDER,
+    ID_PLACEHOLDER,
+    ROOT_PLACEHOLDER,
+    plan,
+)
 
 WORKFLOW = (
     Path(__file__).resolve().parents[1]
@@ -49,7 +54,7 @@ def _string_constant(name: str) -> str:
 def empty_plan(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
     """A plan over no declarations: the payload's shape, against a throwaway cache."""
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
-    return plan([], tmp_path)
+    return plan({tmp_path: []})
 
 
 def test_workflow_validates_exactly_the_keys_the_cli_emits(
@@ -60,22 +65,27 @@ def test_workflow_validates_exactly_the_keys_the_cli_emits(
     assert set(_string_array("PLAN_KEYS")) == set(empty_plan)
 
 
-def test_workflow_substitutes_the_placeholder_the_cli_leaves_behind(
+def test_workflow_substitutes_the_placeholders_the_cli_leaves_behind(
     empty_plan: dict[str, object],
 ) -> None:
-    # The judge prompt ships once, with a marker where each job's id goes. The
-    # marker is authored in Python and substituted in JavaScript.
+    # The judge prompt ships once, with markers where each job's invocation,
+    # root, and id go. The markers are authored in Python and substituted in
+    # JavaScript.
+    assert _string_constant("CLI_PLACEHOLDER") == CLI_PLACEHOLDER
+    assert _string_constant("ROOT_PLACEHOLDER") == ROOT_PLACEHOLDER
     assert _string_constant("ID_PLACEHOLDER") == ID_PLACEHOLDER
-    assert ID_PLACEHOLDER in str(empty_plan["judge_prompt"])
+    for placeholder in (CLI_PLACEHOLDER, ROOT_PLACEHOLDER, ID_PLACEHOLDER):
+        assert placeholder in str(empty_plan["judge_prompt"])
 
 
 def test_workflow_builds_every_command_from_the_plan() -> None:
-    # `cli` names an absolute interpreter and an explicit --root, so a command
-    # built from it runs without a PATH lookup, an activated virtualenv, or a
-    # particular working directory -- none of which a judge agent is guaranteed.
-    # `uv run` is the spelling that assumes all three; it is what the deleted
-    # planning agent used, and what sent it looking for a project to run under.
-    assert "${PLAN.cli} record " in SOURCE
+    # `cli` names an absolute interpreter, and every command built from it gets
+    # an explicit --root, so it runs without a PATH lookup, an activated
+    # virtualenv, or a particular working directory -- none of which a judge
+    # agent is guaranteed. `uv run` is the spelling that assumes all three; it
+    # is what the deleted planning agent used, and what sent it looking for a
+    # project to run under.
+    assert "${PLAN.cli} --root ${root} record " in SOURCE
     assert "uv run" not in SOURCE
 
 
