@@ -43,20 +43,18 @@ consult it when authoring docs, not for navigation.
 
 ### Always pin a subagent's model
 
-Never launch an agent without its model specified — the Agent tool, a Workflow
-`agent()` call, any of them. An omitted model inherits the session's, which on
-an expensive session silently spends expensive tokens on simpler scouting work.
-Pin it every time, and name the pick on screen in the same message — e.g.
+Pin the model on every agent launch — the Agent tool, a Workflow `agent()`
+call, any of them — and name the pick on screen in the same message — e.g.
 "three Sonnet scouts on the file inventory, one Opus on the coupling analysis."
 
-Choose by the character of the job, never by what the session is running on:
+Choose by the character of the job:
 
 - **Sonnet** — research and exploration, where nothing is decided: reading an
   API, extracting text verbatim, summarizing.
 - **Opus** — anything more complex than Sonnet handles: small decisions with
   low ambiguity, or construction of small artifacts — mapping territory,
   research spikes, building to a written brief.
-- **Fable** — never, unless the user asked for it by name.
+- **Fable** — only when the user asks for it by name.
 
 ### Never merge a pull request
 
