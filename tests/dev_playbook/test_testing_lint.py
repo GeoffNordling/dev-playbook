@@ -151,19 +151,52 @@ def test_test_file_at_its_module_mirror_is_clean(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_test_file_nested_under_a_scope_directory_is_flagged(tmp_path: Path) -> None:
-    """The mirror is the only accepted location; a ``tests/unit/`` prefix is not one."""
+def test_test_file_at_a_scoped_mirror_is_clean(tmp_path: Path) -> None:
+    """``unit`` and ``integration`` are recognized scope directories; the mirror
+    beneath each is an accepted location."""
     repo = make_repo(
         tmp_path,
         {
             "src/pkg/thing.py": "def public():\n    return 1\n",
+            "src/pkg/other.py": "def public():\n    return 1\n",
             "tests/unit/pkg/test_thing.py": "def test_it():\n    pass\n",
+            "tests/integration/pkg/test_other.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_test_file_under_an_unrecognized_scope_directory_is_flagged(
+    tmp_path: Path,
+) -> None:
+    """The scope set is fixed; any other directory in that position is a
+    misplacement, not a scope."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/helpers/pkg/test_thing.py": "def test_it():\n    pass\n",
         },
     )
     result = run(repo)
     assert result.returncode == 1
     assert "testing.mirror-layout" in result.stdout
-    assert "tests/unit/pkg/test_thing.py" in result.stdout
+    assert "tests/helpers/pkg/test_thing.py" in result.stdout
+
+
+def test_gate_test_under_agent_review_is_outside_the_rule(tmp_path: Path) -> None:
+    """``tests/agent_review/`` holds free-stem gate tests; one named after a src
+    module is never measured against it."""
+    repo = make_repo(
+        tmp_path,
+        {
+            "src/pkg/thing.py": "def public():\n    return 1\n",
+            "tests/agent_review/test_thing.py": "def test_it():\n    pass\n",
+        },
+    )
+    result = run(repo)
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_test_file_matching_no_module_is_outside_the_rule(tmp_path: Path) -> None:
