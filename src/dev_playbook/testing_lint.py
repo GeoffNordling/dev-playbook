@@ -10,10 +10,13 @@ and worktree-scoped) and applies three rules to the test files it finds:
     from python-lint, whose ``privacy.*`` family answered the testing standard's
     question, not Python's.
   - **mirror-layout** — a ``test_<stem>.py`` whose stem names an existing ``src``
-    module must sit at that module's literal mirror beneath ``tests/``
-    (``src/x/y.py`` -> ``tests/x/test_y.py``). Test files matching no module
-    (e2e suites, flattened names), ``conftest.py``, and non-``test_*`` helpers
-    are outside the rule's domain. Placement only, not coverage or naming.
+    module must sit at a mirror of that module: beneath ``tests/`` directly
+    (``src/x/y.py`` -> ``tests/x/test_y.py``) or beneath a recognized scope
+    directory (``tests/unit/x/test_y.py``, ``tests/integration/x/test_y.py``).
+    ``tests/agent_review/`` holds free-stem judgment gate tests and is outside
+    the rule's domain, as are test files matching no module (e2e suites,
+    flattened names), ``conftest.py``, and non-``test_*`` helpers. Placement
+    only, not coverage or naming.
   - **no-logic** — no ``if``/``else`` or ``try``/``except`` statement in the body
     of a ``test_*`` function; loops, ternary expressions, and comprehension
     filters stay legal; nested helpers and module level are exempt.
@@ -215,11 +218,27 @@ class _PrivacyVisitor(ast.NodeVisitor):
 
 # --- mirror-layout rule ---
 
+# The scope directories a suite may interpose between ``tests/`` and the
+# mirrored package path. ``unit`` and ``integration`` each mirror ``src/``
+# beneath them; ``agent_review`` holds free-stem judgment gate tests and is
+# outside the rule's domain entirely, so a gate test named after a src module
+# is never measured against it. The set is fixed: any other directory in that
+# position is a misplacement, not a scope.
+MIRROR_SCOPES = ("unit", "integration")
+GATE_SCOPE = "agent_review"
 
-def _mirror_of(src_rel: str) -> str:
-    """The test path that mirrors a src module: ``src/x/y.py`` -> ``tests/x/test_y.py``."""
+
+def _mirrors_of(src_rel: str) -> set[str]:
+    """The test paths that mirror a src module, flat and scoped.
+
+    ``src/x/y.py`` -> ``tests/x/test_y.py``, plus ``tests/<scope>/x/test_y.py``
+    for each recognized mirror scope.
+    """
     below_src = Path(src_rel).relative_to("src")
-    return str(Path("tests") / below_src.parent / f"test_{below_src.name}")
+    tail = below_src.parent / f"test_{below_src.name}"
+    return {str(Path("tests") / tail)} | {
+        str(Path("tests") / scope / tail) for scope in MIRROR_SCOPES
+    }
 
 
 def src_module_mirrors(files: list[Path], root: Path) -> dict[str, set[str]]:
@@ -235,19 +254,21 @@ def src_module_mirrors(files: list[Path], root: Path) -> dict[str, set[str]]:
         parts = Path(rel).parts
         if parts[0] != "src" or path.name == "__init__.py" or path.suffix != ".py":
             continue
-        mirrors.setdefault(path.stem, set()).add(_mirror_of(rel))
+        mirrors.setdefault(path.stem, set()).update(_mirrors_of(rel))
     return mirrors
 
 
 def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]:
-    """Flag a stem-matching test file that does not sit at its module's mirror.
+    """Flag a stem-matching test file that sits at none of its module's mirrors.
 
     The mirror relationship holds between the repo's top-level ``src/`` and
     ``tests/`` trees, so only files under ``tests/`` are in the rule's domain. A
     ``test_*.py`` living elsewhere -- e.g. a nested template scaffold's own test
-    tree -- is not matched against the top-level ``src/`` modules.
+    tree -- is not matched against the top-level ``src/`` modules, and neither
+    is anything under the free-stem gate-test scope (``tests/agent_review/``).
     """
-    if Path(rel).parts[0] != "tests":
+    parts = Path(rel).parts
+    if parts[0] != "tests" or (len(parts) > 1 and parts[1] == GATE_SCOPE):
         return []
     stem = Path(rel).name[len("test_") : -len(".py")]
     targets = mirrors.get(stem)
@@ -259,7 +280,7 @@ def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]
             rel,
             None,
             MIRROR_LAYOUT,
-            f"test file for a src module must sit at its mirror ({expected})",
+            f"test file for a src module must sit at one of its mirrors ({expected})",
         )
     ]
 
