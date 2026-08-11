@@ -1,12 +1,13 @@
 # Recording a pass without a judge
 
-You run the `record` command, but you never choose what goes in it — the workflow
-builds it from the ids its judges actually passed, and you copy it verbatim. There
-are exactly two exceptions where you name an id yourself, both of which require the
-user present in the loop, and both done with one command from the repo root:
+You run the `record` commands, but you never choose what goes in them — the
+workflow builds each from the ids its judges actually passed, and you copy them
+verbatim. There are exactly two exceptions where you name an id yourself, both of
+which require the user present in the loop, and both done with one command that
+runs from anywhere:
 
 ```
-uv run judgments-run record <id>
+uv run judgments-run --root <root> record <id>
 ```
 
 ## The two cases
