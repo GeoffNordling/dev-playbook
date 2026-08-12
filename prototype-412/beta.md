@@ -7,6 +7,6 @@ description: "Throwaway file-level-comment target for the #412 review-thread mec
 # Prototype 412 — fixture beta
 
 Throwaway file for wayfinder ticket #412. It is the target of a file-level
-review comment — a finding that has no single diff line to anchor to. It also
-gets edited in the second rework lap so a post-rebase delta exists for the
-final review cycle to read.
+review comment — a finding that has no single diff line to anchor to. FIXED
+in the cycle-1 rework lap: this sentence is the "fix" the file-level Blocking
+thread asked for.

@@ -10,8 +10,9 @@ Throwaway file for wayfinder ticket #412 (thread-model review mechanics).
 It exists so a GitHub review can anchor inline comment threads to specific
 lines. Nothing in it is real work; the whole branch is never merged.
 
-line 01: deliberately "wrong" — cycle 1 opens a Blocking thread here
+line 01: FIXED in the cycle-1 rework lap — the Blocking thread anchored here
 line 02: filler
+line 02b: deliberately "wrong", inserted by the fix commit — cycle 2 opens a Blocking thread here, and this insertion drifts the Suggestion thread below
 line 03: deliberately "improvable" — cycle 1 opens a Suggestion thread here
 line 04: filler
 line 05: filler
