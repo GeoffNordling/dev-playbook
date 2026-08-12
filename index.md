@@ -17,6 +17,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [dotfiles/](/dotfiles/index.md) — Claude Code configuration — skills, rules, settings, hooks — managed via GNU Stow, symlinked into home
 - [harness-recipes/](/harness-recipes/index.md) — Reusable harness orchestration patterns — prose descriptions of multi-agent workflows backed by code and skills
 - [instruments/](/instruments/index.md) — Purpose-built artifact formats and their tooling
+- [prototype-412/](/prototype-412/index.md) — Throwaway fixtures for the #412 review-thread mechanics prototype — this directory exists only on its prototype branch
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
 - [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its user checkpoints
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace
