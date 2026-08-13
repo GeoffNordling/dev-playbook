@@ -68,6 +68,21 @@ _Avoid_: WSL box (say **secondary machine** when the distinction from the primar
 **Machine-local state**
 Input a detector needs that lives on the host rather than in the repository — a sibling repo's clone, a populated cache. A detector whose machine-local state is absent reports the environment, not the code, which is why such a detector is skipped rather than allowed to fail.
 
+### Software factory
+
+The software factory's managing roles. The factory itself — regions, states,
+labels — is defined in
+[software-factory.md](/software-factory/software-factory.md); this fixes the
+words for who runs it.
+
+**Issue Manager**
+The top-level session that owns one issue's whole traverse through the factory — one per issue, launched by the user in Agent view, locked into the issue's worktree for the issue's life. It spawns the node subagents, writes every label, and stops only to escalate or to hand over the finished PR at the merge boundary.
+_Avoid_: issue overwatch, overwatch (retired).
+
+**Agent-View Manager**
+The user's fleet assistant in Agent view: reads the board across issues, recommends what to launch next, and hands the user paste-ready Issue Manager launch lines. It executes no node, owns no issue, and holds no git duties.
+_Avoid_: agent-view overwatch (retired).
+
 ### Tracking
 
 Where future work is recorded. A unit of work has exactly one home, decided by
@@ -89,6 +104,7 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 - A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
 - There is exactly one **Primary machine**; every other host is a **Secondary machine**.
 - A **Detector** is skipped on a machine iff the **Machine-local state** it needs is absent there; the **Primary machine** lacks none, so every detector runs there.
+- Exactly one **Issue Manager** per issue owns that issue's traverse; the **Agent-View Manager** watches the whole fleet and executes nothing.
 - A unit of future work has exactly one home: a **Candidate** in `CANDIDATES.md` while uncommitted, or a GitHub issue once committed — never both.
 - **Promotion** moves a unit of work from **Candidate** to issue, deleting the **Candidate** entry in the same change.
 - A **Candidate** carries no brief: choosing to write the brief is what makes work committed, and therefore an issue.
@@ -105,4 +121,5 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 - "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the check; an **Audit** is a run of one or more detectors.
 - "lint" and "audit" were blurred — "lint" survived in internals and prose with no defined status while every read-only detector was named an "audit" — resolved: a **Lint** is a Detector implemented as deterministic code, an **Audit** in the narrow sense is a Detector that is an LLM judge, and **Lint** ⊂ **Audit** (the umbrella read-only process). Deterministic scripts are `*-lint`; LLM judges keep "audit."
 - "backlog" floated with no definition as a name for both the register of uncommitted ideas and the queue of open issues — resolved: say **Candidate** for an uncommitted entry in `CANDIDATES.md`, and **issue** for committed work. "backlog" is retired.
+- "overwatch" named the managing role at both scopes — resolved: **Issue Manager** (one issue's traverse) and **Agent-View Manager** (the fleet). "overwatch" is retired.
 - "promotion" was used for two different moves — carrying an under-specified leaf to ready, and turning a Candidate into an issue — resolved: **Promotion** means Candidate → issue. The readiness interview is the **refinement step**.
