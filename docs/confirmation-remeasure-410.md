@@ -34,8 +34,9 @@ as NOT MEASURABLE FROM HERE, never guessed.*
 | **NOT RE-MEASURED** — calibration context, no ruling turns on it | 1 |
 | **DEFERRED to [#419](https://github.com/GeoffNordling/dev-playbook/issues/419)** | 6 |
 
-Of the 33 probed here: **27 CONFIRMED**, **3 PARTIALLY confirmed**,
-**2 REFUTED as stated**, **1 new fact** neither decision had considered.
+Of the 33 probed here: **27 CONFIRMED**, **2 PARTIALLY confirmed**,
+**2 REFUTED as stated**, **1 new fact** neither decision had considered, and
+**1 inconclusive** (A9 — the probe reached an existence check, not the fact).
 
 ### The headlines — what goes back
 
@@ -67,14 +68,16 @@ Both refutations are against
    prove a phantom empty `agent_type` never appears") in the negative, on
    thousands of rows.
 
-3. **NEW FACT — a parent agent cannot stop a hung child.** (A24) `TaskStop` on
-   this session's own hung child was refused: `Task <id> is owned by <id>; agent
-   <parent-id> cannot stop it.` #408's relaunch-fresh recovery ("a stalled or
-   dead issue manager is never resumed — the factory manager spawns a fresh one")
-   is sound as a policy about not resuming, but the stalled agent **cannot be
-   reaped by its parent**: a relaunch adds a second live issue manager rather
-   than replacing the first, and each stall permanently consumes a session-wide
-   concurrency slot.
+3. **NEW FACT — a parent agent cannot stop a stalled child, and a stalled child
+   may wake.** (A24) `TaskStop` on this session's own stalled child was refused:
+   `Task <id> is owned by <id>; agent <parent-id> cannot stop it.` The child was
+   abandoned and its work redone in a fresh agent — then it woke 9 hours 51
+   minutes later and completed normally. #408's relaunch-fresh recovery ("a
+   stalled or dead issue manager is never resumed — the factory manager spawns a
+   fresh one") is sound as a policy about not resuming, but the stalled agent
+   **cannot be reaped by its parent** and **may not be dead**: a relaunch adds a
+   second live issue manager rather than replacing the first, and the older one
+   can wake last and overwrite the newer one's work.
 
 Everything else the two decisions lean on is confirmed at 2.1.229 — including
 all four constraints that forced the unfenced-node relaxation, re-measured here
@@ -266,26 +269,35 @@ measures as inert.
 
 ### A9. `EnterWorktree`'s path (attach) form is closed to subagents
 
-**PROBED HERE — PARTIALLY confirmed; the failure mode is worse than recorded.**
-#415 verdict 3 recorded an immediate verbatim refusal ("the current working
-directory <MAIN> is the repository root, not an isolated worktree"). Here the
-same depth-2 subagent called
+**FRESH, not re-measured here — this session's probe missed the target, and its
+first reading of the result was wrong.** #415 verdict 3 recorded an immediate
+refusal naming the subagent's cwd ("the current working directory <MAIN> is the
+repository root, not an isolated worktree"). This session's probe passed a path
+that does not exist:
 
 ```
 EnterWorktree(path: "/home/geoff/workspace/dev-playbook/.claude/worktrees/does-not-exist-410")
+
+→ Cannot enter worktree: /home/geoff/workspace/dev-playbook/.claude/worktrees/does-not-exist-410:
+  ENOENT: no such file or directory, lstat
+  '/home/geoff/workspace/dev-playbook/.claude/worktrees/does-not-exist-410'
 ```
 
-— a path that does not exist. The call **returned nothing at all**: no result,
-no refusal, no error. The agent's transcript ends on the un-answered `tool_use`
-block; it was still pending 7+ minutes later and the agent had to be abandoned
-(A24 — it could not be stopped).
+That is an **existence** refusal, reached before any subagent-eligibility check,
+so it neither confirms nor refutes #415 verdict 3 — which stands as the fresh
+record, un-re-measured at 2.1.229. A probe wanting to re-measure it must pass the
+path of a worktree that really exists.
 
-**Verdict — the design consequence stands** (no subagent can attach; the ruled
-architecture contains no `EnterWorktree`), **but the delta is a fail-silent
-hazard**: with a non-existent path the call hangs instead of refusing loud. Not
-decision-critical for the ruled design, which never calls it; recorded because it
-is the first measured instance in this corpus of a harness tool hanging rather
-than refusing, and because it is what exposed A24.
+**Two things the probe did measure, both worth keeping.** First, the refusal is
+**loud** — correcting this record's own earlier reading, which was written while
+the call was still outstanding and called it fail-silent. Second, it was
+**extraordinarily slow**: issued at 23:03 on 2026-08-12, returned at 08:54 the
+following morning — 9 hours 51 minutes (the harness's own usage report puts the
+agent's total duration at 35,627,636 ms) for a failed `lstat`. Throughout those
+hours the call was indistinguishable from a hang; this session concluded it had
+hung, abandoned the agent, and re-ran the remaining steps in a fresh one. A
+factory manager watching a node behave that way would reach the same conclusion.
+That is A24's problem, and this is its measured basis.
 
 ### A10. No write fence binds any subagent in this shape
 
@@ -691,32 +703,35 @@ definition's restriction held and propagated to children). Treat "reviewer
 definitions carry `disallowed-tools`" as a claim to verify when the first
 definition is written, not as measured.
 
-### A24. A parent agent cannot stop a hung child
+### A24. A parent agent cannot stop a stalled child
 
 **PROBED HERE — NEW FACT**, unasked by either decision but load-bearing for
-#408's recovery ruling. When the A9 probe hung, this session tried to reap it:
+#408's recovery ruling. When the A9 probe stalled, this session tried to reap it:
 
 ```
 TaskStop(task_id: <child agent id>)
 → Task a8830…d7b is owned by a8830…d7b; agent af717…057 cannot stop it.
 ```
 
-The child's transcript stopped growing at 23:03 and was still un-answered at
-23:10+; the agent was abandoned, holding its slot.
+The reap was refused across the ownership boundary. The session abandoned the
+child and re-ran its remaining steps in a fresh agent — and the abandoned child
+**woke 9 hours 51 minutes later and completed normally**, reporting its full
+results long after that work had been redone elsewhere.
 
-**Verdict — #408's relaunch-fresh recovery is sound but incomplete.** "A stalled
-or dead issue manager is never resumed — the factory manager spawns a fresh one"
-is a policy about *not resuming*, and it stands. What is measured here is that
-the factory manager **cannot terminate** the stalled one: `TaskStop` refuses
-across the ownership boundary. A relaunch therefore adds a second live issue
-manager rather than replacing the first — two agents that may both write the same
-issue's labels and worktree, against the single-writer discipline — and each
-stall permanently consumes one of the session-wide concurrency slots (A3) until
-the whole session ends. The guardrail design
-([#416](https://github.com/GeoffNordling/dev-playbook/issues/416)) and the
-relaunch procedure need an answer: at minimum a stall detector that escalates to
-the user rather than silently double-dispatching, and the ledger's
-double-dispatch prevention (#408 §5) reading run state before spawning.
+**Verdict — #408's relaunch-fresh recovery is sound but incomplete, and the
+stall it must survive is real.** "A stalled or dead issue manager is never
+resumed — the factory manager spawns a fresh one" is a policy about not
+resuming, and it stands. Three measured facts complicate it: the factory manager
+**cannot terminate** the stalled one (`TaskStop` refuses across the ownership
+boundary); the stalled one may be **not dead but merely slow**, resuming and
+running to completion hours later; and each stall holds one of the session-wide
+concurrency slots (A3) meanwhile. A relaunch therefore risks two live issue
+managers writing the same issue's labels, worktree, and PR threads — against the
+single-writer discipline — with the older one waking last and overwriting. The
+guardrail design ([#416](https://github.com/GeoffNordling/dev-playbook/issues/416))
+and the relaunch procedure need an explicit answer: the ledger's double-dispatch
+prevention (#408 §5) read *and written* before any relaunch, and a woken-late
+node detecting that its run was superseded and exiting without writing.
 
 ### A25. The branches the resolution cites as prior art and design seed exist
 
@@ -1082,8 +1097,9 @@ grilling ticket:**
    [#411](https://github.com/GeoffNordling/dev-playbook/issues/411) and
    [#417](https://github.com/GeoffNordling/dev-playbook/issues/417).
 3. **A24** — a stalled issue manager cannot be reaped by the factory manager
-   (`TaskStop` refuses across the ownership boundary). Relaunch-fresh needs a
-   double-dispatch answer; feeds
+   (`TaskStop` refuses across the ownership boundary) and may wake hours later
+   and finish. Relaunch-fresh needs a double-dispatch answer and a
+   superseded-run check; feeds
    [#416](https://github.com/GeoffNordling/dev-playbook/issues/416).
 4. **A2 / A3** — pin `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` rather than ride a
    remotely-served default; size the parallel fast-follow against
@@ -1101,7 +1117,8 @@ nothing refuted. One text fix — **B14**: §1's binding-section list names
 `Artifacts`, which the brief-shape lint does not require; drop it from the
 Blocking-citeable list, or add it to the lint.
 
-**Still open, honestly:** A5 (workflow nesting — unreachable from a subagent,
+**Still open, honestly:** A9 (the path form's subagent-eligibility refusal —
+this session's probe hit an existence check instead; #415's record stands), A5 (workflow nesting — unreachable from a subagent,
 immaterial to the ruled design), A18 (worktree sweep eligibility — needs a
 multi-day observation), A19 (PAT workflow push — needs a mutating push), B7
 (post-rebase compare — needs another rebase), B12 (collapsed-thread rendering —
