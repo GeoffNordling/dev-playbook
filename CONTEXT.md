@@ -18,15 +18,6 @@ skill, along with the aliases it retires and the relationships among the
 terms. Invoke it before making a module suggestion and use its terms exactly;
 [Module Design](/standards/modules.md) is the card that governs the concern.
 
-### Factory
-
-The software factory's management vocabulary. The factory itself is defined in
-[software-factory.md](/standards/software-factory.md); this fixes the words.
-
-**Factory manager**
-The software factory's driving agent: one workspace-scoped session that carries issues through the factory across every repo. Exactly one exists.
-_Avoid_: workspace factory manager (the scope is part of the definition — say **factory manager**).
-
 ### Governance
 
 How a standard is checked against the repository and where nonconformance is
@@ -96,7 +87,6 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 - A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 - A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
-- There is exactly one **Factory manager**; it is workspace-scoped.
 - There is exactly one **Primary machine**; every other host is a **Secondary machine**.
 - A **Detector** is skipped on a machine iff the **Machine-local state** it needs is absent there; the **Primary machine** lacks none, so every detector runs there.
 - A unit of future work has exactly one home: a **Candidate** in `CANDIDATES.md` while uncommitted, or a GitHub issue once committed — never both.
