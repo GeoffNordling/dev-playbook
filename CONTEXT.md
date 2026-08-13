@@ -24,8 +24,8 @@ The software factory's management vocabulary. The factory itself is defined in
 [software-factory.md](/standards/software-factory.md); this fixes the words.
 
 **Factory manager**
-The software factory's driving agent: one workspace-scoped session that carries issues through the factory across every repo. Exactly one exists — there is no per-repo manager.
-_Avoid_: repo factory manager, repo-level factory manager (retired — the manager is workspace-scoped); workspace factory manager (say **factory manager**, adding "workspace-scoped" only when the contrast with a per-repo alternative is the point).
+The software factory's driving agent: one workspace-scoped session that carries issues through the factory across every repo. Exactly one exists.
+_Avoid_: workspace factory manager (the scope is part of the definition — say **factory manager**).
 
 ### Governance
 
@@ -96,7 +96,7 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 - A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
 - A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
-- There is exactly one **Factory manager** — workspace-scoped, never per-repo.
+- There is exactly one **Factory manager**; it is workspace-scoped.
 - There is exactly one **Primary machine**; every other host is a **Secondary machine**.
 - A **Detector** is skipped on a machine iff the **Machine-local state** it needs is absent there; the **Primary machine** lacks none, so every detector runs there.
 - A unit of future work has exactly one home: a **Candidate** in `CANDIDATES.md` while uncommitted, or a GitHub issue once committed — never both.
