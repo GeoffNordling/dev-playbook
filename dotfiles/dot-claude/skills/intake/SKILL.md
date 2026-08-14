@@ -82,10 +82,7 @@ On the nod, **bind `<phase>` before running either command below**. Work routed 
 ```bash
 gh issue create --title "..." \
   --label "<category>" --label "<mode>" --label "<tests>" --label "<phase>" \
-  --body "$(cat <<'EOF'
-...body...
-EOF
-)"
+  --body ...the brief...
 ```
 
 **Adopt** — set the four-tuple and overwrite the body on the existing issue:
@@ -93,10 +90,7 @@ EOF
 ```bash
 gh issue edit <issue> \
   --add-label "<category>" --add-label "<mode>" --add-label "<tests>" --add-label "<phase>" \
-  --body "$(cat <<'EOF'
-...body...
-EOF
-)"
+  --body ...the brief...
 ```
 
 For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.

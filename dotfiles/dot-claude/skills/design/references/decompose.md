@@ -22,10 +22,7 @@ never dispatches.
 ```bash
 gh issue edit <epic#> \
   --remove-label "<mode>" --remove-label "<tests>" --remove-label "phase:design" \
-  --body "$(cat <<'EOF'
-...outcome and decomposition rationale...
-EOF
-)"
+  --body ...outcome and decomposition rationale...
 ```
 
 ## 2. Slice
@@ -64,10 +61,7 @@ issue-review verdict, in its own session, is what moves it.
 ```bash
 gh issue create --title "..." \
   --label "<category>" --label "<mode>" --label "<tests>" --label "<phase>" \
-  --body "$(cat <<'EOF'
-...the seven build-leaf headings...
-EOF
-)"
+  --body ...the seven build-leaf headings...
 ```
 
 ## 4. Wire the relationships

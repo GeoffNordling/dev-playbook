@@ -64,9 +64,9 @@ Target **at least 4 findings**; cap at **8**, keeping the 8 most severe. If
 fewer genuine findings exist, post what you have — do not invent to hit the
 floor. A clean pass is a real outcome: say so plainly in the comment.
 
-Stage the comment body in `/tmp/bug-review-<issue>.md` (worktree writes are
-denied, `/tmp` is allowed), then post one PR comment with
-`gh pr comment --body-file <path>`.
+Stage the comment body in `/tmp/bug-review-<issue>.md`, then post it as one
+comment on the PR
+([the review contract](~/workspace/dev-playbook/software-factory/review-contract.md#the-findings-comment)).
 
 - **Head it `## Bug review — <sha>`**, using the short HEAD sha
   (`git rev-parse --short HEAD`) — that exact header, no other.

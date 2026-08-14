@@ -81,14 +81,9 @@ Nothing below this line is written to GitHub before the user approves.
 
 Re-author the issue's brief in place across the seven build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
 
-`gh issue edit --body` replaces the whole body, so write the complete brief back:
-
-```bash
-gh issue edit <issue> --body "$(cat <<'EOF'
-...the seven headings, re-authored...
-EOF
-)"
-```
+`gh issue edit --body` replaces the whole body
+([tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#the-issue-surface)),
+so write the complete brief back — all seven headings, re-authored.
 
 ### Decompose
 

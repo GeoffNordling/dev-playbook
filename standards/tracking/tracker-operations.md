@@ -16,19 +16,16 @@ this document's.
 
 ## The issue surface
 
-- **Create** — `gh issue create --title "..." --body "$(cat <<'EOF' … EOF)"`,
-  a quoted heredoc so a multi-line body reaches the tracker with its backticks
-  and `$` unexpanded.
+- **Create** — `gh issue create --title "..." --body ...`.
 - **Read** — `gh issue view <n>` renders the body alone; `--comments` renders
   the comments alone — each rendering omits the other's half. The whole issue
   in one call is `gh issue view <n> --json title,body,comments`.
 - **List** — `gh issue list --state open --json number,title,labels`, narrowed
   with `--label` and `--state` and shaped with `--jq`.
-- **Comment** — `gh issue comment <n> --body "..."`.
+- **Comment** — `gh issue comment <n> --body ...`.
 - **Body** — `gh issue edit <n> --body` replaces the **whole** body, so writing
-  one back is read–modify–write: the current body is fetched, edited, and
-  written back entire through the same quoted heredoc **Create** uses. A partial
-  write discards the rest.
+  one back is read–modify–write: fetch the current body, edit it, write it back
+  entire. A partial write discards the rest.
 - **Label** — `gh issue edit <n> --add-label "..."` / `--remove-label "..."`.
 - **Assign** — `gh issue edit <n> --add-assignee @me`.
 - **Close** — `gh issue close <n> --comment "..."`.

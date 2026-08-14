@@ -24,7 +24,7 @@ A citing review supplies three values and inherits everything below them:
 
 - **Review name** — the review's own name, `Code review` for instance. It heads
   the comment and it is what the cycle count counts.
-- **Staging filename** — the `/tmp` path the comment body is written to before
+- **Staging filename** — the path the comment body is written to before
   posting.
 - **What counts as Blocking** — one line, and it differs by review: a code
   review's Blocking is not a doc review's.
@@ -60,9 +60,8 @@ noticed incidentally is still reported.
 
 ## The findings comment
 
-The body is staged in the review's staging file — writes inside the worktree are
-denied, `/tmp` is allowed — and posted as one comment on the issue's PR with
-`gh pr comment --body-file <path>`.
+The body is staged in the review's staging file, then posted as one comment on
+the issue's PR.
 
 **The header carries the revision and the cycle.**
 `## <Review name> — <sha> · cycle <n>`, using the short HEAD sha
