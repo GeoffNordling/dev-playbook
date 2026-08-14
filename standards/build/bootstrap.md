@@ -36,8 +36,8 @@ From the new repo, in order:
    flag deliberately.
 2. `~/workspace/dev-playbook/scripts/bootstrap-labels` — mint the canonical
    label scheme.
-3. Set the merge settings by hand, per
-   [repo-settings.md](/standards/tracking/repo-settings.md) — they sit
+3. Set the merge settings and the default-branch protection ruleset by hand,
+   per [repo-settings.md](/standards/tracking/repo-settings.md) — both sit
    behind GitHub's Administration permission, so no script does this.
 
 ## Enrollment

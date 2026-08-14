@@ -350,7 +350,7 @@ def test_wrong_form_reported_even_when_target_missing(
     assert "0 broken" in result.stderr
 
 
-# --- rootless files: skills, rules use the Citation form ---
+# --- rootless files: skills, rules, agents use the Citation form ---
 
 
 def test_same_repo_citation_in_skill_is_ok(tmp_path: Path, workspace: Path) -> None:
@@ -378,6 +378,22 @@ def test_same_repo_citation_in_rules_is_ok(tmp_path: Path, workspace: Path) -> N
     result = run_ref_lint(repo, tmp_path)
 
     assert result.returncode == 0, result.stderr
+
+
+def test_same_repo_citation_in_agent_definition_is_ok(
+    tmp_path: Path, workspace: Path
+) -> None:
+    """An agent definition stows into ~/.claude/agents/, so it has no fixed
+    repo root and a same-repo Citation is legitimate."""
+    repo = workspace / "primary"
+    init_repo(repo)
+    write(repo / "standards" / "target.md", "x")
+    write(repo / "agents" / "build.md", "see ~/workspace/primary/standards/target.md\n")
+
+    result = run_ref_lint(repo, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert "all ok" in result.stderr
 
 
 def test_same_repo_citation_to_missing_file_in_rootless_file_is_broken(

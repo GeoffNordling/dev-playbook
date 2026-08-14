@@ -36,9 +36,9 @@ root** — a single repo it is always read from. Concept documents do, and so
 does a repo's own `CLAUDE.md` (Claude Code only loads it when the session
 is already inside that repo), so both use the Link form for same-repo
 targets. Files with **no fixed repo root** — skills and global `~/.claude/`
-config such as `rules/`, loaded across arbitrary repos — have no root for
-`/` to resolve against, so they use the Citation form even for a same-repo
-target (see [skill-conventions.md — Cross-references](/standards/claude-code/skill-conventions.md#cross-references)).
+config such as `rules/` and `agents/`, loaded across arbitrary repos — have
+no root for `/` to resolve against, so they use the Citation form even for a
+same-repo target (see [skill-conventions.md — Cross-references](/standards/claude-code/skill-conventions.md#cross-references)).
 That same-repo Citation is not a fixed jump to the main checkout: it
 resolves per [Same-repo resolution](/standards/docs/cross-references.md#same-repo-resolution)
 below, against the reader's own checkout.

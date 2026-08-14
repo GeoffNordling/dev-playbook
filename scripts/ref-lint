@@ -12,7 +12,8 @@ current worktree) and checks:
   - **Citation** — `~/workspace/<repo>/...`: cross-repo targets resolve at
     their absolute path; same-repo targets resolve against the invoking
     checkout. A same-repo Citation from a source with a fixed repo root is
-    a `wrong-form` finding; sources matching ROOTLESS_SEGMENTS are exempt.
+    a `wrong-form` finding; sources matching ROOTLESS_SEGMENTS (skills,
+    rules, agent definitions) are exempt.
   - `#fragment` anchors on .md targets must match a heading slug
     (`dev_playbook.md.github_slug`); fragments on directories or non-.md targets are
     out of scope and treated as ok.
@@ -87,9 +88,9 @@ class UnclassifiedRecordsFile(Exception):
         self.relpath = relpath
 
 
-# Path segments marking sources with no fixed repo root: skills and rules
-# ship into ~/.claude.
-ROOTLESS_SEGMENTS = {"skills", "rules"}
+# Path segments marking sources with no fixed repo root: skills, rules, and
+# agent definitions ship into ~/.claude.
+ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 
 
 def has_fixed_repo_root(relpath: str) -> bool:
