@@ -37,6 +37,15 @@ devices are **instruments**; each carries a prescriptive contract of its
 own, typed `Instrument-Spec`. The instrument concept is defined in
 [Instruments and Instrument Specs](/standards/instrument/format.md).
 
+## Where a standard lives
+
+A document typed `Standard` lives under `standards/`; nothing outside that tree
+claims the label. okf-lint's `knowledge-organization.type-location` checks it.
+
+This binds the type label, not membership — a card's define cell still points
+wherever the contract is, and prose that governs without being a conformance
+target takes another type.
+
 ## Scope
 
 Every standard has a **scope** — the population it governs — and there are
@@ -67,7 +76,7 @@ catches the collision at the consumer's commit gate.
 A standard's filename is kebab-case and names its topic as a noun: a plain
 noun (`conventions.md`, `records.md`, `distribution.md`), a noun compound
 (`cache-gate.md`, `context-content.md`), or a gerund compound
-(`issue-authoring.md`, `node-skill-authoring.md`) — never a bare verb
+(`issue-authoring.md`) — never a bare verb
 (`skill-write.md`). When a directory has an established family prefix
 (`skill-conventions.md`, `skill-management.md`), a new sibling on the same
 subject keeps it.

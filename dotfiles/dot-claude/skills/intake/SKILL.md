@@ -44,9 +44,11 @@ Report what both checks found and where you looked. On a hit — existing covera
 
 ### 3. Pick the four-tuple
 
-- `category:*` — pick one.
-- `mode:*` — `mode:direct` or `mode:spike`; those are the only two the scheme carries.
-- `tests:*` — for `mode:direct`, ask the user; `mode:spike` is always `tests:no`.
+The dimensions, their values, and what each means are
+[factory-labels.md](~/workspace/dev-playbook/standards/tracking/factory-labels.md) —
+pick the appropriate value in each.
+
+- `tests:*` — for `mode:direct`, ask the user.
 - `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it, or the user parks the beat and the issue holds here for the next session.
 
 Routing, given the mode:

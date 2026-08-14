@@ -60,10 +60,9 @@ from dev_playbook.findings import print_rules, render
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
 # Every rule id this detector can emit. Repo-settings drift, reachability, and
-# the live-repo tracking checks (label scheme, blocked labels, brief shape, epic
-# shape, wayfinder shape) answer the tracking card; four-tuple validity answers
-# the software-factory card; a stale dev-playbook pin answers the build card
-# (non-blocking).
+# the live-repo tracking checks (label scheme, blocked labels, four-tuple
+# validity, brief shape, epic shape, wayfinder shape) answer the tracking card;
+# a stale dev-playbook pin answers the build card (non-blocking).
 # Informational pin lines carry no rule id. Each id is a module-level constant so
 # every emission site references the constant, never a raw literal, and RULES
 # (what --list-rules prints) cannot drift from what the detector actually emits.
@@ -75,7 +74,7 @@ NO_BLOCKED_LABEL = "tracking.no-blocked-label"
 ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
 EPIC_SHAPE = "tracking.epic-shape"
 WAYFINDER_SHAPE = "tracking.wayfinder-shape"
-TUPLE_VALID = "software-factory.tuple-valid"
+TUPLE_VALID = "tracking.tuple-valid"
 PIN = "build.pin"
 
 RULES = (

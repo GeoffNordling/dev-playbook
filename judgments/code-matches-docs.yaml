@@ -73,14 +73,16 @@ judgments:
     claim: |
       src/dev_playbook/label_scheme.json's factory dimensions — category, mode,
       tests, and phase — mint exactly the labels
-      software-factory/software-factory.md states: the fixed-value dimensions
+      standards/tracking/factory-labels.md states: the fixed-value dimensions
       produce the labels of the doc's Valid labels table, and the phase
       dimension satisfies the doc's parity invariant — one value per work node
-      of the graph, with `_` mapped to `-`, plus the retained values the
-      invariant exempts and no others. Ignore any other dimension the scheme
-      declares — it is outside this claim.
+      of the graph in software-factory/software-factory.md, with `_` mapped to
+      `-`, plus the retained values the invariant exempts and no others. Ignore
+      any other dimension the scheme declares — it is outside this claim.
     evidence:  [src/dev_playbook/label_scheme.json]
-    reference: [software-factory/software-factory.md]
+    reference:
+      - standards/tracking/factory-labels.md
+      - software-factory/software-factory.md
     model: claude-sonnet-5
     effort: high
 

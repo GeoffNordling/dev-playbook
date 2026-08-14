@@ -190,6 +190,69 @@ def test_recipe_description_requires_resource(tmp_path: Path) -> None:
     assert "requires a 'resource'" in result.stdout
 
 
+def _root_index_listing(*extra: str) -> str:
+    """The base root index with ``extra`` bullets added before the Directories section."""
+    bullets = "".join(f"{line}\n" for line in extra)
+    return (
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        "- [Root](/README.md) — Root readme desc\n"
+        f"{bullets}\n"
+        "## Directories\n\n"
+        "- [standards/](/standards/index.md) — Cross-project standards\n"
+    )
+
+
+def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
+    doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    repo = make_bundle(
+        tmp_path,
+        {
+            "factory/ops.md": doc,
+            "index.md": _root_index_listing("- [Ops](/factory/ops.md) — How ops runs"),
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "knowledge-organization.type-location" in result.stdout
+    assert "factory/ops.md" in result.stdout
+    assert "'Standard' lives under standards/" in result.stdout
+
+
+def test_standard_nested_under_standards_dir_is_clean(tmp_path: Path) -> None:
+    doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Ops](/standards/factory/ops.md) — How ops runs\n"
+    )
+    repo = make_bundle(
+        tmp_path, {"standards/factory/ops.md": doc, "standards/index.md": index}
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_non_standard_type_outside_standards_dir_is_clean(tmp_path: Path) -> None:
+    """The rule binds the `Standard` label alone — every other type roams free."""
+    doc = "---\ntype: Guide\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    repo = make_bundle(
+        tmp_path,
+        {
+            "factory/ops.md": doc,
+            "index.md": _root_index_listing("- [Ops](/factory/ops.md) — How ops runs"),
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_index_omitting_a_concept_is_flagged(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"

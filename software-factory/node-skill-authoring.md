@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Guide
 title: Node-Skill Authoring
 description: Voice, content rules, and mechanics for authoring the software factory's node skills
 ---

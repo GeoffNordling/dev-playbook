@@ -30,22 +30,17 @@ Governs how an idea becomes a merged pull request.
 
 ## Audit
 
-- [workspace-lint](/scripts/workspace-lint) — four-tuple validity on every
-  open post-intake leaf (`software-factory.tuple-valid`), across repositories via
-  `gh api`
-- [judgments/code-matches-docs.yaml](/judgments/code-matches-docs.yaml) — the
-  LLM-judged `scheme-vs-graph` claim that the scheme's factory dimensions mint
-  exactly the labels this standard states, [the parity
-  invariant](/software-factory/software-factory.md#naming) between the graph's
-  work nodes and the `phase:*` values included
+- none: the graph and the contracts its regions run under are prose an agent
+  reads, with no deterministic check over them. What *is* checked is the label
+  half — the four-tuple on every leaf and the `phase:*` values' parity with this
+  graph's work nodes — and both answer the
+  [tracking](/standards/tracking.md) card, where the label contract
+  ([factory-labels.md](/standards/tracking/factory-labels.md)) lives
 
 ## Enforce
 
-- nothing blocks: `scheme-vs-graph` is sweep-only, so a label scheme that has
-  drifted from the graph surfaces at the next periodic judgments sweep.
-  GitHub itself sits outside every gate, so the state
-  machine stays the user dispatcher's to operate and workspace-lint reports
-  without blocking a skipped phase or a malformed tuple
+- nothing blocks: GitHub itself sits outside every gate, so the state machine
+  stays the user dispatcher's to operate — no gate stops a skipped phase
 
 ## Adopt
 

@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Guide
 title: Factory Operations
 description: The factory's operating contract — how a ready issue is dispatched, built, reviewed, and carried to the merge
 ---

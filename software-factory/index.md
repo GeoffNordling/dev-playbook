@@ -7,7 +7,7 @@ runs under. Start at
 Ordering: reading order.
 
 - [Software Factory](/software-factory/README.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its user checkpoints
-- [Software Factory](/software-factory/software-factory.md) — The path an issue takes from idea to merged software — its states, the moves between them, and the labels naming them
+- [Software Factory](/software-factory/software-factory.md) — The path an issue takes from idea to merged software — its two regions, its states, and the moves between them
 - [Factory Operations](/software-factory/factory-operations.md) — The factory's operating contract — how a ready issue is dispatched, built, reviewed, and carried to the merge
 - [User Checkpoints](/software-factory/user-checkpoints.md) — Every point where the factory stops for the user — the merge prohibition, escalation, the issue-review verdict, and the two review-stretch pauses
 - [Node-Skill Authoring](/software-factory/node-skill-authoring.md) — Voice, content rules, and mechanics for authoring the software factory's node skills

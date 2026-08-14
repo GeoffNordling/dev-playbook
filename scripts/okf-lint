@@ -2,12 +2,14 @@
 """Lint the repo's Open Knowledge Format (OKF) bundle.
 
 Three checks over one walk of the bundle, their rules namespaced by the card
-that owns them — `docs.*` for the first two (knowledge-organization),
+that owns them — `knowledge-organization.*` for the first two,
 `instrument.*` for the third (instruments):
 
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the type registry, plus `title` and `description`. `resource`
-    is optional in general and required on a `Recipe-Description`. The registry
+    is optional in general and required on a `Recipe-Description`, and a
+    document typed `Standard` lives under `standards/` — the tree reserved for
+    normative conformance targets (`knowledge-organization.type-location`). The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
     own `## Types` table (`REGISTRY_DOC`), read and shape-checked there as the
@@ -98,6 +100,7 @@ REGISTRY_ROW = "knowledge-organization.registry-row"
 DESCRIPTION_SHAPE = "knowledge-organization.description-shape"
 INDEX_ORDERING = "knowledge-organization.index-ordering"
 TYPE_SHADOWS_UPSTREAM = "knowledge-organization.type-shadows-upstream"
+TYPE_LOCATION = "knowledge-organization.type-location"
 EMPLOYED_BY = "instrument.employed-by"
 
 RULES = (
@@ -111,6 +114,7 @@ RULES = (
     DESCRIPTION_SHAPE,
     INDEX_ORDERING,
     TYPE_SHADOWS_UPSTREAM,
+    TYPE_LOCATION,
     EMPLOYED_BY,
 )
 
@@ -124,6 +128,11 @@ REGISTRY_DOC = "standards/docs/document-types.md"
 # dev-playbook mode on (see CANONICAL_CONFIG in src/dev_playbook/standards_lint.py).
 CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
+# The type reserved to one tree, and that tree. A normative conformance target
+# lives under standards/ and nothing else claims the label, so a Standard found
+# elsewhere is either misfiled or mistyped — see standards/standard/format.md.
+LOCATION_BOUND_TYPE = "Standard"
+STANDARDS_DIR = "standards/"
 # The type whose docs must carry an `## Employed by` section, and that section's
 # GitHub heading slug — the presence the instrument.employed-by check looks for.
 INSTRUMENT_SPEC_TYPE = "Instrument-Spec"
@@ -413,6 +422,14 @@ def check_types(
         if doctype in RESOURCE_REQUIRED_TYPES and not fm.get("resource"):
             findings.append(
                 Finding(rel, RESOURCE, f"'{doctype}' requires a 'resource'")
+            )
+        if doctype == LOCATION_BOUND_TYPE and not rel.startswith(STANDARDS_DIR):
+            findings.append(
+                Finding(
+                    rel,
+                    TYPE_LOCATION,
+                    f"'{LOCATION_BOUND_TYPE}' lives under {STANDARDS_DIR}",
+                )
             )
     return findings
 
