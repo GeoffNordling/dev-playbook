@@ -200,19 +200,17 @@ agentsview --server http://127.0.0.1:8080 session search 'x' --json --project p
 ### Probing headless operation
 
 `headless-probe` makes real inference calls, so it costs subscription usage and
-never belongs in the commit gate. `--guard-only` runs the billing guard alone
-and invokes nothing — free, offline, and the right thing to wire into anything
-that runs unattended.
+never belongs in the commit gate. `tests/dev_playbook/test_headless_probe.py`
+runs it under `make check`, which is where a regression in headless operation
+surfaces. `--guard-only` runs the billing guard alone and invokes nothing —
+free, offline, and the right thing to wire into anything that runs unattended.
 
 ```bash
-scripts/headless-probe --guard-only    # billing guard only, no inference
-scripts/headless-probe                 # guard + the harness-contract probes
-scripts/headless-probe --concurrency 3 # also race N processes (see below)
+scripts/headless-probe --guard-only  # billing guard only, no inference
+scripts/headless-probe               # guard + the harness-contract probes
 ```
 
-`--concurrency` is opt-in because it is the only probe that changes machine
-state rather than only reading it: every process shares one credential file, so
-a batch launching while that credential is due for renewal could in principle
-have its members renew over each other and force a re-login. Whether Claude
-Code renews eagerly, locks the file, or tolerates a reused refresh token is
-unverified — treat this as a guess about internals, not a measured failure.
+The full run is one `claude -p` invocation on the cheapest model, carrying
+nine assertions — everything the harness declares about a session plus the
+result envelope and a schema-validated body. It takes a few seconds, nearly all
+of it inference; the script's own startup is milliseconds.

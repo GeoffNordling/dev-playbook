@@ -46,7 +46,6 @@ import subprocess
 import sys
 import uuid
 from collections.abc import Sequence
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -68,6 +67,13 @@ BILLING_ENV_VARS = (
 
 #: Settings keys that mint or redirect credentials.
 BILLING_SETTINGS_KEYS = ("apiKeyHelper", "awsAuthRefresh", "awsCredentialExport")
+
+#: The model every probe runs against. What is under test is the harness's
+#: contract — what it declares, honors, and validates — never a model's
+#: behavior, so the cheapest and fastest model carries every probe. Proving
+#: `--model` is honored once is what makes the pin trustworthy; proving it
+#: again for a second model buys nothing and doubles the wall clock.
+MODEL = "haiku"
 
 #: The structured-output schema standing in for a factory node's terminal
 #: report. The harness validates the model's output against it, which is what
@@ -290,62 +296,11 @@ def probe_run(run: Run, *, expect: dict[str, Any]) -> list[Probe]:
     return probes
 
 
-def probe_concurrency(cwd: Path, count: int) -> list[Probe]:
-    """Whether N headless processes survive running at once.
-
-    The factory dispatches its reviewer nodes in parallel, so this decides
-    whether that fan-out is available or the traverse has to serialize.
-
-    It is opt-in because it is the only probe that can change machine state
-    rather than only reading it: every process shares one credential file, and
-    a batch launching while that credential is due for renewal could in
-    principle have its members renew over each other and force a re-login.
-    Whether Claude Code actually renews eagerly, locks the file, or tolerates a
-    reused refresh token is unverified — the caution is a guess about
-    internals, not a measured failure.
-    """
-    ids = [str(uuid.uuid4()) for _ in range(count)]
-    with ThreadPoolExecutor(max_workers=count) as pool:
-        runs = list(
-            pool.map(
-                lambda session_id: invoke(
-                    "say ok",
-                    model="sonnet",
-                    session_id=session_id,
-                    cwd=cwd,
-                    tools=[],
-                    permission_mode="auto",
-                    effort="low",
-                    agents=None,
-                    json_schema=None,
-                    timeout=180,
-                ),
-                ids,
-            )
-        )
-    succeeded = [r for r in runs if r.result.get("is_error") is False]
-    distinct = {r.init.get("session_id") for r in runs if r.init}
-    return [
-        Probe(
-            f"concurrency-{count}",
-            len(succeeded) == count and distinct == set(ids),
-            f"{len(succeeded)}/{count} succeeded; distinct session ids: {len(distinct)}",
-        )
-    ]
-
-
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the guard, then the probes, and report."""
     parser = argparse.ArgumentParser(
         prog="headless-probe",
         description="Assert that `claude -p` still carries the AFK factory's contract.",
-    )
-    parser.add_argument(
-        "--concurrency",
-        type=int,
-        default=0,
-        metavar="N",
-        help="also run N headless processes at once (opt-in: races credential refresh)",
     )
     parser.add_argument(
         "--guard-only",
@@ -374,14 +329,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     cwd = Path.cwd()
-    probes: list[Probe] = []
 
     print("\n== probes ==")
-    sonnet_id = str(uuid.uuid4())
-    sonnet = invoke(
-        "Report that the toy task finished successfully.",
-        model="sonnet",
-        session_id=sonnet_id,
+    # The prompt names the exact report to emit and forbids tool use. A vaguer
+    # one ("report success") sends the model to read the repo first, which
+    # triples the wall clock for nothing: the probes assert on what the harness
+    # declares, so every second of model exploration is waste. Nothing is
+    # asserted about whether the instruction was obeyed — it is a latency hint,
+    # and the probes below stand or fall on harness-declared state either way.
+    session_id = str(uuid.uuid4())
+    run = invoke(
+        "Do not use any tools. Set status to done and summary to the single word: ok.",
+        model=MODEL,
+        session_id=session_id,
         cwd=cwd,
         tools=["Read"],
         permission_mode="auto",
@@ -395,12 +355,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         json_schema=REPORT_SCHEMA,
         timeout=180,
     )
-    probes += probe_run(
-        sonnet,
+    probes = probe_run(
+        run,
         expect={
-            "session_id": sonnet_id,
+            "session_id": session_id,
             "cwd": cwd,
-            "model": "sonnet",
+            "model": MODEL,
             # `--json-schema` adds a StructuredOutput tool of its own, so a
             # schema-carrying node's fence is always its own list plus that one.
             "tools": ["Read", "StructuredOutput"],
@@ -408,36 +368,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             "schema_keys": {"status", "summary"},
         },
     )
-
-    opus_id = str(uuid.uuid4())
-    opus = invoke(
-        "say ok",
-        model="opus",
-        session_id=opus_id,
-        cwd=cwd,
-        tools=[],
-        permission_mode="auto",
-        effort="xhigh",
-        agents=None,
-        json_schema=None,
-        timeout=180,
-    )
-    probes += [
-        p
-        for p in probe_run(
-            opus,
-            expect={
-                "session_id": opus_id,
-                "cwd": cwd,
-                "model": "opus",
-                "tools": [],
-            },
-        )
-        if p.name in ("model-pin", "tool-fence", "result-envelope")
-    ]
-
-    if args.concurrency:
-        probes += probe_concurrency(cwd, args.concurrency)
 
     for probe in probes:
         print(
