@@ -9,6 +9,7 @@ standardize on, how their work is tracked and built, and how the agents that
 work them are configured. Start at [dev-playbook](/README.md).
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
+- [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories

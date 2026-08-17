@@ -24,6 +24,10 @@ permission system instead. With the user at the terminal that is fine — the
 permission prompts are the fence. With no user attached there are no prompts, so
 the file tools are unbounded.
 
+Settings cannot stand in for the prompts either: path-scoped permission rules
+are silently ignored headless, so a file tool is allowed everywhere or nowhere
+([headless.md](/docs/headless.md)).
+
 **A container** is therefore the fence for AFK work. The whole `claude` process
 runs inside it, so every tool — file tools included — sees only the directories
 we chose to put there. This is the direction. Nothing is built yet.
