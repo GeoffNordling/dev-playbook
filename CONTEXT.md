@@ -18,6 +18,21 @@ skill, along with the aliases it retires and the relationships among the
 terms. Invoke it before making a module suggestion and use its terms exactly;
 [Module Design](/standards/modules.md) is the card that governs the concern.
 
+### Engagement
+
+Whether the user is at the terminal for a piece of work. Exactly two values;
+which one each factory node takes is set by the dispatch table in
+[factory-operations.md](/software-factory/factory-operations.md), and this fixes
+the words.
+
+**AFK**
+Work the user is not intended to be involved in. No user is attached, so it runs to completion or escalates — it never waits. Independent of substrate: a delegated subagent and a headless `claude -p` process are both AFK.
+_Avoid_: unattended, hands-off, autonomous.
+
+**Inline**
+Work run with the user present in the terminal, free to interview, gate on the answers, and hand back mid-task.
+_Avoid_: interactive — overloaded, since it also names the Claude Code TUI as opposed to `claude -p`. Say **Inline** when engagement is the point.
+
 ### Governance
 
 How a standard is checked against the repository and where nonconformance is
@@ -98,6 +113,7 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 
 ## Relationships
 
+- Every piece of work is **AFK** or **Inline** — exactly two values, decided by whether the user is intended to be involved, never by which substrate runs it.
 - A **Detector** inspects the repository against one or more standards and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
 - A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
 - There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
@@ -116,6 +132,7 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 
 ## Flagged ambiguities
 
+- "AFK" named only a subagent delegated inside an interactive session, leaving work with no attached session unnamed — resolved: **AFK** is independent of substrate and means no user is attached, whether the work runs as a delegated subagent or a headless `claude -p` process.
 - "venue" was used informally for a blocking point — resolved: say **Gate**, or one of the three rung names (commit gate, push gate, CI gate). "venue" is retired.
 - "check" and "audit" were blurred — resolved: an **Audit** is read-only and never blocks; a **Gate** is what blocks. A check that blocks is a gate; a check that only reports is an audit.
 - "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the check; an **Audit** is a run of one or more detectors.

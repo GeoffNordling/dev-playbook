@@ -85,10 +85,11 @@ Canonical front-matter and syntax:
 
 ## Engagement
 
-Each node engages the user one of two ways:
+Each node engages the user one of two ways — the terms themselves are fixed in
+[the vocabulary](/CONTEXT.md):
 
-- **AFK** (away from keyboard) — the overwatch delegates the node to a subagent,
-  which does the work hands-off and reports. The user sees only the report.
+- **AFK** — the overwatch delegates the node to a subagent, which does the work
+  hands-off and reports. The user sees only the report.
 - **Inline** — the overwatch runs the node itself at its own main loop, with the
   user present in the terminal.
 

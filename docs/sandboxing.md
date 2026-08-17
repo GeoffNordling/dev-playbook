@@ -1,276 +1,73 @@
 ---
-type: Survey
+type: Guide
 title: Sandboxing Claude agents
-description: Comparing sandbox solutions for isolating a Claude agent's filesystem, network, and processes
+description: Which tools fence a Claude agent, and the container direction for work with no user attached
 ---
 
 # Sandboxing Claude agents
 
-What two tools — Anthropic's **native sandbox** (`/sandbox`) and Matt Pocock's
-**Sandcastle** — actually do to isolate a Claude agent's filesystem, network,
-and process, and which of those capabilities survive **interactive subscription
-billing**.
+Which tools we use to fence a Claude agent, and how we intend to fence AFK work
+once it moves to headless. The specific allow and deny settings live in the
+settings files, not here — they change, and a copy of them here would only go
+stale.
 
-Functional summary as of 2026-06-24, from Anthropic's
-[sandboxing](https://code.claude.com/docs/en/sandboxing) and
-[agent view](https://code.claude.com/docs/en/agent-view) docs and a read of the
-Sandcastle source.
+## The tools
 
-## The two asymmetries that matter
+**Anthropic's [native sandbox](https://code.claude.com/docs/en/sandboxing)
+(`/sandbox`)** is what we run for everyday Inline work. It fences the agent
+using features built into Linux itself rather than a container, so it costs
+nothing to start and nothing to maintain.
 
-- **Internet:** neither tool gives clean, *scoped* egress control on a
-  subscription daily driver. Native `/sandbox`'s `allowedDomains` is a
-  **prompt-skip list, not a deny** — non-listed domains fall back to the
-  permission flow, which auto-allows under bypass mode, so in practice it blocks
-  nothing. Real zero-egress exists only via `allowManagedDomainsOnly` in
-  root-owned **managed settings** — machine-wide, and it breaks everyday
-  `gh`/`git`/`uv`. Sandcastle ships no allowlist at all; its only lever is
-  all-or-nothing `--network none`, which also kills Claude's auth.
-- **Filesystem:** native `/sandbox` restricts **partially** — it bounds only
-  shell commands (and even then reads the whole disk by default), while the
-  agent's own file tools stay on the permission system. Sandcastle restricts
-  **completely** — the entire `claude` process runs in the container, so every
-  tool can see only the mounted paths.
+Its one structural limit decides everything downstream: **it bounds shell
+commands, not the agent's own file tools.** Read, Edit, and Write ride the
+permission system instead. With the user at the terminal that is fine — the
+permission prompts are the fence. With no user attached there are no prompts, so
+the file tools are unbounded.
 
-## The billing constraint (why interactive-only)
+**A container** is therefore the fence for AFK work. The whole `claude` process
+runs inside it, so every tool — file tools included — sees only the directories
+we chose to put there. This is the direction. Nothing is built yet.
 
-Subscription billing is durable **only for interactive (TUI) use**. Anthropic
-announced moving headless/programmatic usage (`claude -p`, Agent SDK) off
-subscription onto a separate credit, then **paused that change on 2026-06-15** —
-deferred, not cancelled. So any capability that depends on headless / AFK /
-programmatic operation is **not durable** on a subscription; only interactive
-sessions are. Availability below is judged against that line.
+**[Sandcastle](https://github.com/mattpocock/sandcastle) — declined.** Matt
+Pocock's framework is AFK *orchestration* that uses containers as a component.
+We want a sandbox, not a workflow engine: adopting it means adopting the loop
+our own factory already owns, and writing a TypeScript file per run to do it.
+Declined on that alone, not on its quality.
 
-## Native sandbox (`/sandbox`)
+## How we intend to operate
 
-**Scope: it sandboxes shell (Bash) commands and their subprocesses only.** The
-agent's Read / Edit / Write / WebFetch tools are governed by the permission
-system, not the sandbox. No container — it restricts the real host environment
-using OS primitives (Linux: `bubblewrap` + `socat`; macOS: Seatbelt; on Fedora,
-`sudo dnf install bubblewrap socat`). Opt-in, off by default; enable per-session
-with `/sandbox` or globally via `sandbox.enabled` in settings.
+- **Inline work keeps the native sandbox.** Always on, no per-run ceremony, and
+  the permission prompts cover what it doesn't.
+- **AFK work runs in a container.** A container starts empty: the only
+  directories from this machine that exist inside it are the ones we hand it.
+  That list is the fence — a worktree the agent may write to, plus whatever it
+  needs to read. Everything else on the disk is simply not there.
+- **We own the command that starts the container.** Whatever we build around
+  it, that command stays ours to write and change. A framework owning it is why
+  Sandcastle is declined.
+- **Limiting which sites the agent can reach comes later.** A container reaches
+  the whole internet by default. Narrowing that means running a second small
+  program beside the agent, with all its traffic passing through — every
+  destination checked against a list we maintain. Worth having eventually, so a
+  hijacked agent can't phone home. Deferred because a missing entry doesn't
+  announce itself: the agent stalls or reports something unrelated, and you
+  debug the wrong thing. A working container first.
 
-**Filesystem — partial control:**
+## Open
 
-- Default **write**: working directory + temp dir only.
-- Default **read**: the *entire disk*, including `~/.ssh` and
-  `~/.aws/credentials`. Not blocked unless you add them to a deny list.
-- Configurable allow/deny for read and write, OS-enforced down to child
-  processes — but only for shell commands.
-- Verified: a configured `denyRead` makes the path *vanish* inside the sandbox
-  (bubblewrap overlays an empty dir), so credentials are genuinely masked, not
-  just permission-denied; a write outside the allow-list fails as read-only. The
-  read-deny was confirmed in a background `claude agents` fleet terminal too, so
-  the fence is not foreground-only.
-
-**Network — weak control (the trap):**
-
-- Traffic *is* routed through a proxy, but `allowedDomains` in user/project
-  settings is a **prompt-skip list, not a deny**. Non-listed domains aren't
-  blocked — they fall back to the regular permission flow, and under
-  bypass / skip-prompt mode (how we run) that fallback auto-approves, so **every
-  domain passes**. Verified live: three non-listed hosts all returned 200.
-- Hard deny — blocking non-listed domains *without* a prompt — requires
-  `allowManagedDomainsOnly: true`, honored **only** in root-owned managed
-  settings (`/etc/claude-code/managed-settings.json`), never user/project/local.
-  That's machine-wide and blocks `gh`/`git`/`uv` too. There is no per-session or
-  user-settings zero-egress switch.
-- Claude's own model API is not a shell subprocess, so none of this affects auth.
-
-**Unix sockets — all-or-nothing (the keyring trap):**
-
-- A third dimension the docs barely mention. With the optional **seccomp helper**
-  installed (`@anthropic-ai/sandbox-runtime`), the sandbox blocks *every* AF_UNIX
-  socket: `socket(AF_UNIX, …)` returns `EPERM` inside it. That severs any tool that
-  reaches a local daemon over a Unix socket — D-Bus, and through it the **system
-  keyring** (libsecret / Secret Service), plus the podman/docker socket, PipeWire,
-  and the rest of `$XDG_RUNTIME_DIR`. The socket file is still *visible* in-sandbox;
-  it's the `socket()`/`connect()` syscall that's denied, so the failure looks like
-  a cryptic "Operation not permitted," not a missing file.
-- There is no per-socket allow on Linux. `allowUnixSockets` (a path list) is
-  **macOS only** — "Ignored on Linux (seccomp cannot filter by path)." The lone
-  Linux lever is `allowAllUnixSockets: true`, which lifts the block for *every*
-  socket at once, including `/run/user/<uid>/docker.sock` — which the docs flag as
-  a sandbox-escape vector (the Docker/Podman socket ≈ host access). So you either
-  block all local sockets or trust all of them.
-- Practical fallout: a CLI whose credentials live in the keyring (e.g. `gh` after
-  `gh auth login`) can't read them in-sandbox and fails as *unauthenticated* (a
-  401), even though plain HTTPS egress works fine. Fix it per-tool by excluding
-  that tool from the sandbox — see [Our setup](#our-setup-and-decisions).
-
-**Caveat:** because it covers only the shell, running unattended with
-permissions skipped leaves the file tools unbounded. The native sandbox is a
-boundary for shell commands and the network, not a safe jail for hands-off file
-editing.
-
-### Config-file protections and phantoms
-
-Enabling the sandbox adds a layer of **harness built-in** file protections that
-sit beneath the allow/deny rules we configure — and, unlike those rules, are
-**not user-overridable**. Anthropic's
-[sandbox docs](https://code.claude.com/docs/en/sandboxing) describe them:
-
-- **`settings.json` is write-denied at every scope** — user, project, local, and
-  the managed-settings directory — "so a sandboxed command cannot modify its own
-  policy."
-- **`.git/config` and `.git/hooks` writes are denied.** A linked git worktree
-  gets a carve-out — the sandbox allows writes to the main repo's shared `.git`
-  so `git commit` can update refs and the index — but "writes to `hooks/` and
-  `config` inside that directory remain denied."
-
-No `allowWrite` entry re-enables a `settings.json` or `.git/config` write: the
-harness applies these above the configurable layer. The rules we *can* set —
-`allowWrite`/`denyWrite`/`denyRead`/`allowRead`, `sandbox.credentials`,
-`excludedCommands`, `allowedDomains`/`deniedDomains` — only widen or narrow
-access *within* what the built-ins already deny.
-
-Their visible side-effect is a set of **phantoms**: with the sandbox on, guarded
-config paths — `.git/config`, `.mcp.json`, and home-style dotfiles like
-`.bashrc`/`.gitconfig` — read back empty and surface in `ls`/`git status` as
-`/dev/null` character devices owned by `nobody`, many of which don't exist on the
-host. They're a side-effect of enabling the sandbox, not of any allow/deny rule
-we wrote; the device-node overlay (as opposed to the documented write-denial) is
-itself undocumented — and distinct from a configured `denyRead`, which overlays
-an empty dir rather than a device node.
-
-For `git` this carried two costs: a plain `git status` listed the phantom config
-paths as untracked noise, and `git commit` failed with "could not lock config
-file" because the `.git/config.lock` it needs was masked. Since these protections
-aren't user-overridable, the fix is to run git on the host — `git` is in
-`excludedCommands` (see [Our setup](#our-setup-and-decisions)), so git sees the
-real working tree and its `.git/config` writes succeed.
-
-## Sandcastle
-
-An **AFK multi-agent orchestration framework** that uses containers for
-isolation — the container is a means, the orchestration is the product. Two
-modes: `interactive()` runs a single `claude` TUI session; `run()` runs headless
-fan-out. Sandbox backends: Docker, Podman, Vercel (remote), or none. It cannot
-wrap the native `claude agents` fleet — `interactive()` only ever launches one
-plain `claude` session.
-
-**Container — complete isolation:**
-
-- One container per session, built from a Dockerfile. The **whole `claude`
-  process runs inside it**, so *every* tool (file tools and shell alike) is
-  bounded by the container's mounts. This is what makes unattended,
-  permission-skipped runs safe inside it.
-- You can run several at once — one `interactive()` per terminal — each its own
-  container and worktree, but with no unified dashboard.
-
-**Filesystem — complete control:**
-
-- Mounted in by default: only the worktree and its git directory. Host config
-  dirs (`~/.ssh`, `~/.aws`, `~/.claude`) are **not** mounted, so they don't
-  exist inside the container. Add mounts to widen; the mount list *is* the
-  boundary.
-
-**Network — no control:**
-
-- Full outbound internet by default. No allowlist, proxy, or firewall ships.
-  The only option is turning networking off entirely, which also breaks Claude's
-  auth. Limiting egress means building it yourself around the container.
-
-**Operating it interactively — the per-session cost:**
-
-Launching the TUI on subscription billing works, but each session carries setup
-and recurring friction, because the container is ephemeral and starts bare:
-
-- **The token doesn't suppress login.** `CLAUDE_CODE_OAUTH_TOKEN` (from `claude
-  setup-token`) reaches the container, but the interactive TUI ignores it for
-  auth and runs its own browser sign-in. Inside a container there's no browser,
-  so you finish it by hand (open a URL on the host), and a fresh container
-  forgets it — so it re-prompts every launch.
-- **Persistence is manual.** To sign in once instead of every time, mount a
-  dedicated persistent dir as the container's `~/.claude` so credentials survive
-  teardown. It must be a *separate* dir — never the host's real `~/.claude`,
-  whose `.credentials.json` would then be exposed to the open-network sandbox.
-- **Your setup isn't there.** The container has none of your global skills,
-  rules, or settings (they live in the unmounted host `~/.claude`). You stage in
-  what you want, and must pin the theme to match your terminal — the default
-  auto-detect misrenders illegibly in a container TTY.
-
-Net: complete filesystem isolation, paid for with a container build plus a
-re-login-and-restage ritual around each session. Worth it to run genuinely
-untrusted code; heavy for everyday work.
-
-## What's achievable under interactive subscription billing
-
-| Capability | Native `/sandbox` | Sandcastle `interactive()` | Sandcastle `run()` (headless) |
-|---|---|---|---|
-| Durable on subscription | ✅ interactive | ✅ interactive (one session/terminal) | ❌ headless — not durable |
-| Filesystem control | ⚠️ partial — shell only; reads all by default | ✅ complete — every tool, mounts only | (headless) |
-| Network egress control | ⚠️ allowlist is prompt-skip only; hard deny needs root, machine-wide managed settings | ❌ none — full outbound | ❌ none |
-| Safe unattended (skip permissions) | ❌ file tools unbounded | ✅ container bounds all tools | ✅ (but headless) |
-| Multi-agent orchestration / AFK | ❌ | ❌ single session | ✅ — its purpose |
-| Remote/cloud execution | ❌ local only | ✅ | ✅ |
-| Isolation strength (untrusted code) | ⚠️ OS sandbox, weaker than a container | ✅ real container | ✅ |
-| Setup cost | low | high — image build + re-login/restage each launch | high |
-
-**For interactive subscription use:** Sandcastle's real strengths —
-orchestration, AFK fan-out, safe unattended runs — sit in the headless column
-that durability rules out. What's left splits into a filesystem story and a
-network story. For **filesystem** isolation, native `/sandbox` is the cheap,
-verified win — credentials masked, enforced across every session and agent. For
-**zero network egress**, neither tool is a clean fit on a subscription: native
-can only do it machine-wide via root managed settings (breaking everyday
-tooling), and Sandcastle can only do all-or-nothing that kills auth. So use
-native `/sandbox` for filesystem isolation everywhere, and treat genuine
-zero-egress as the *container* case for a specific untrusted run — not a global.
-
-## Our setup and decisions
-
-- **Native `/sandbox` is enabled globally** (`sandbox.enabled` in user
-  settings), and we treat it as applying to *every* agent — foreground TUI,
-  in-process subagents, and the background `claude agents` fleet alike.
-- **We use it for filesystem isolation only.** Writes are fenced to `~/workspace`
-  plus tool caches (`~/.cache`, `~/.local`, `~/.npm`); reads are denied on
-  `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.netrc`. Verified and OS-enforced — this is
-  the part that actually guards credentials. (It bounds *shell* commands; the
-  agent's own file tools still ride the permission system.)
-- **We do not configure network control.** The `allowedDomains` allowlist is a
-  prompt-skip list that collapses to allow-all under our bypass mode, and the
-  only real deny is machine-wide root managed settings that would break daily
-  tooling. We left it out rather than imply a protection we don't have.
-- **`gh` runs outside the sandbox** (`sandbox.excludedCommands: ["gh", "gh *"]`).
-  Our GitHub token lives in the system keyring, reached over D-Bus's Unix socket —
-  which the seccomp filter blocks — so in-sandbox `gh` falls back to unauthenticated
-  and 401s. We can't open just the keyring socket on Linux (it's all-or-nothing),
-  and `allowAllUnixSockets` would also expose the podman socket. Excluding `gh` runs
-  it on the host, where it reads the keyring normally and the **token stays encrypted
-  at rest**, while the sandbox's Unix-socket block stays intact for every other
-  command. `gh` only ever talks to GitHub over HTTPS with a scoped PAT, and the
-  auto-mode classifier still reviews each call, so the unsandboxed surface is narrow.
-  Rejected alternatives: `allowAllUnixSockets` (opens the podman socket too) and a
-  file-based token via `gh auth login --insecure-storage` (keeps `gh` sandboxed but
-  writes the PAT in plaintext).
-- **`git` runs outside the sandbox** (`sandbox.excludedCommands: ["git", "git *"]`),
-  mirroring `gh`. The harness denies sandboxed writes to `.git/config`/`.git/hooks`
-  and overlays guarded config paths as phantoms (see
-  [Config-file protections](#config-file-protections-and-phantoms)) — protections
-  that are not user-overridable. Sandboxed, `git` both polluted `git status` with
-  phantom entries and failed `git commit` with "could not lock config file" when
-  `.git/config.lock` was masked; on the host it sees the real working tree and its
-  `.git/config` writes succeed. **This is a real widening of the unsandboxed
-  surface, not a free pass like `gh`.** `gh` is a single-purpose GitHub client;
-  `git` is a known LOLBin (a trusted installed binary repurposable to run arbitrary
-  code) — `-c core.pager=…`, `-c core.editor=…`, `core.fsmonitor`, hooks, and
-  `protocol.ext` are all arbitrary-command vectors — so excluding it runs that
-  surface on the host. Mitigations: auto-mode's classifier still reviews every git
-  call, these are our own repos, and the agent already runs git constantly.
-  Accepted given the ongoing context-pollution and config-lock cost. Rejected
-  alternative: widening `allowWrite` to re-permit `.git/config`/`settings.json`
-  writes — the docs show these protections are not user-overridable, so
-  exclude-git is the available lever.
-- **Zero egress is a per-run container decision, never a global.** To run code
-  we don't trust with no network, we isolate that one run in a container.
-
-## Context: the native `claude agents` fleet
-
-`claude agents` runs many background `claude` sessions, each its own process with
-its own git worktree, on your subscription. Each reads settings from its
-directory the same as a fresh `claude`, so a global `sandbox` block applies to
-them too — **confirmed**: a fleet terminal could not read `~/.ssh` once the
-filesystem deny was set. We therefore treat the sandbox as covering every agent.
-The network gap reaches them too: with no hard deny available, fleet sessions
-have unrestricted egress just like the foreground.
+- **Docker or podman.** Two programs that do the same job. Docker is the
+  industry default — tutorials, prebuilt images, and Anthropic's own reference
+  setup all assume it, which is worth real money when something breaks at an
+  inconvenient hour. Podman is Fedora's own, and runs containers as an ordinary
+  user rather than as the machine's administrator: if an agent ever got out of
+  its container, it would land with our own permissions rather than full control
+  of the machine. Both read the same setup file, so the container itself is
+  identical and switching later is a few settings in one script — cheap to leave
+  undecided.
+- **What the container can read.** AFK agents need the workspace standards that
+  live in dev-playbook. Whether those arrive as a directory handed to the
+  container, a copy built into it, or something else is unsettled.
+- **Whether we ever restrict the agent's internet access**, and what would be on
+  the allowed list.
+- **Whether the native sandbox also runs inside the container.** Belt and
+  braces, or redundant ceremony.

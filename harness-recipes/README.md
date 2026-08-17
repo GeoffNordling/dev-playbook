@@ -19,8 +19,6 @@ Reusable patterns — recipes — for getting leverage out of the Claude Code ha
 
 ## Subscription billing constraint
 
-We recognize programatic, API-based workflows as a supremely-powerful pattern in agentic development. Alas, as a private individual with very limited funding, we're restricted to subscription billing. Anthropic limits that to "interactive" Claude Code sessions only.
-
-In June 2026, Anthropic announced moving Agent SDK and `claude -p` usage off the subscription pool, then [paused the change](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan). We treat the pause as temporary; Anthropic has a tendency to pull the rug out on customers.
+We recognize programatic, API-based workflows as a supremely-powerful pattern in agentic development. Alas, as a private individual with very limited funding, we're restricted to subscription billing.
 
 The recipes are listed in [`index.md`](/harness-recipes/index.md).

@@ -19,7 +19,7 @@ reference gate. `okf-lint` runs in CI — everything it checks is in-repo.
 ## Tests run locally, not in CI
 
 CI runs the hook suite and nothing else. Two hard reasons tests stay local:
-this workspace is local-first (no headless cloud agents, ever), and test
+this workspace is local-first (no cloud agents, ever), and test
 suites depend on dev-playbook as a local path dependency that does not exist
 on a cloud runner. The pre-push-stage hook does not fire under
 `pre-commit run`, so CI stays test-free automatically — nothing to
