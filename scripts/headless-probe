@@ -1,0 +1,28 @@
+#!/usr/bin/env -S uv run --script
+"""headless-probe — assert that `claude -p` still carries the AFK factory's contract.
+
+Thin shim over dev_playbook.headless_probe.main: it puts the checkout's ``src/``
+on ``sys.path`` and calls the module, which runs the billing guard and then a
+set of probes over headless invocations, printing one line per probe and
+exiting 0 (all passed) / 1 (a probe failed) / 2 (the guard tripped, or claude
+is not on PATH).
+
+Unlike the validators this is a utility script, run on demand and never from
+the commit gate: it makes real inference calls, which cost subscription usage
+and need the network. See dev_playbook.headless_probe for what each probe
+asserts and why.
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = []
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.headless_probe import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())

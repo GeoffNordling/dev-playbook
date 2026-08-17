@@ -138,6 +138,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `repo-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages, mirror the externally managed skills, generate `~/.claude/settings.json` for this machine; `--check` reports settings drift and is what the session-start hook runs |
+| `headless-probe` | Re-measure that `claude -p` still carries the AFK factory's contract — the billing guard first (no API key reachable), then probes over harness-declared state: subscription billing, model and tool pins, cwd placement, minted session ids, hooks firing, structured reports |
 
 Run any script with `--help`; each script's docstring documents its behavior in
 full.
@@ -195,3 +196,23 @@ the write lock the running one holds.
 ```bash
 agentsview --server http://127.0.0.1:8080 session search 'x' --json --project p
 ```
+
+### Probing headless operation
+
+`headless-probe` makes real inference calls, so it costs subscription usage and
+never belongs in the commit gate. `--guard-only` runs the billing guard alone
+and invokes nothing — free, offline, and the right thing to wire into anything
+that runs unattended.
+
+```bash
+scripts/headless-probe --guard-only    # billing guard only, no inference
+scripts/headless-probe                 # guard + the harness-contract probes
+scripts/headless-probe --concurrency 3 # also race N processes (see below)
+```
+
+`--concurrency` is opt-in because it is the only probe that changes machine
+state rather than only reading it: every process shares one credential file, so
+a batch launching while that credential is due for renewal could in principle
+have its members renew over each other and force a re-login. Whether Claude
+Code renews eagerly, locks the file, or tolerates a reused refresh token is
+unverified — treat this as a guess about internals, not a measured failure.
