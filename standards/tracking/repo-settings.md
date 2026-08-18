@@ -26,8 +26,8 @@ all-or-nothing **Administration** permission, too broad to grant for a one-time 
 
 ## Default branch: protected from destructive operations
 
-The default branch `SHALL` carry a **ruleset** — **Settings → Rules → Rulesets** —
-targeting it with enforcement **Active** and both destructive-operation rules on:
+The default branch `SHALL` carry a **ruleset** targeting it with enforcement
+**Active** and both destructive-operation rules on:
 
 | Rule | Denies |
 |---|---|
@@ -38,10 +38,31 @@ Together these make the branch's history append-only: every commit that reaches
 `main` stays reachable, so a mistaken push cannot erase reviewed work and no
 recovery depends on someone's local reflog.
 
-The ruleset's name, count, and ref pattern are the repo's own business. The
-requirement is on the branch, not on the arrangement: whatever rulesets a repo
-keeps, the rules **in force on the default branch** must include these two.
-Extra rules are free — this is a floor, not an exact set.
+### The canonical ruleset
+
+Create it at **Settings → Rules → Rulesets → New ruleset → New branch ruleset**.
+Rulesets sit behind the same all-or-nothing **Administration** permission as the
+merge settings, so this too is set by hand, not by token. Every field:
+
+| Field | Value |
+|---|---|
+| Ruleset Name | `protect-main` |
+| Enforcement status | Active |
+| Bypass list | empty |
+| Target branches | Include default branch |
+| Restrict deletions | checked |
+| Block force pushes | checked |
+
+Every other rule stays unchecked, and nothing is added to the bypass list — a
+bypass actor would return the two destructive operations to whoever holds it,
+which is the one thing this ruleset exists to deny.
+
+The audit measures the branch, not the arrangement: workspace-lint reads the
+rules **in force on the default branch**, so a repo that splits them across
+several rulesets, targets by pattern, or carries further rules still passes.
+Extra rules are free — the two above are a floor, not an exact set. The
+canonical ruleset is what **adoption** follows, so that bringing a repo up to
+this standard is a described act rather than an invented one.
 
 This is deliberately not [branch protection with required status
 checks](/standards/build/enforcement.md): nothing here makes CI a merge
