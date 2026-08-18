@@ -56,15 +56,25 @@ else:
     resource = segs[3] if len(segs) > 3 else "settings"
 
 # What a resource answers when a test says nothing about it. Protection defaults
-# to fully protected so that a test about merge settings or labels does not have
-# to restate the branch rules to stay clean.
+# to fully protected under the canonical ruleset, so that a test about merge
+# settings or labels does not have to restate the branch rules to stay clean.
+CANONICAL = {
+    "name": "protect-main",
+    "enforcement": "ACTIVE",
+    "bypassActors": {"nodes": []},
+}
 DEFAULTS = {
     "labels": [],
     "issues": [],
     "protection": {
         "defaultBranchRef": {
             "name": "main",
-            "rules": {"nodes": [{"type": "NON_FAST_FORWARD"}, {"type": "DELETION"}]},
+            "rules": {
+                "nodes": [
+                    {"type": "NON_FAST_FORWARD", "repositoryRuleset": CANONICAL},
+                    {"type": "DELETION", "repositoryRuleset": CANONICAL},
+                ]
+            },
         }
     },
 }
@@ -127,16 +137,36 @@ GOOD_SETTINGS = {
 }
 
 
-def protection(*types: str, branch: str = "main") -> dict:
+def protection(
+    *types: str,
+    branch: str = "main",
+    ruleset: str | None = "protect-main",
+    enforcement: str = "ACTIVE",
+    bypass: int = 0,
+) -> dict:
     """A default-branch rules payload as GraphQL serves it.
 
     No arguments is the unprotected repo — a default branch with an empty rule
-    list, which is what a repo carrying no ruleset answers.
+    list, which is what a repo carrying no ruleset answers. The ruleset keywords
+    describe the one ruleset behind every rule, defaulting to the canonical
+    arrangement so that a test about rule types alone need not restate it;
+    ``ruleset=None`` is the rule whose ruleset the read could not see.
     """
+    behind = (
+        None
+        if ruleset is None
+        else {
+            "name": ruleset,
+            "enforcement": enforcement,
+            "bypassActors": {"nodes": [{"bypassMode": "ALWAYS"}] * bypass},
+        }
+    )
     return {
         "defaultBranchRef": {
             "name": branch,
-            "rules": {"nodes": [{"type": t} for t in types]},
+            "rules": {
+                "nodes": [{"type": t, "repositoryRuleset": behind} for t in types]
+            },
         }
     }
 
@@ -706,6 +736,194 @@ def test_unreadable_rules_are_surfaced_not_read_as_unprotected(tmp_path: Path) -
         in result.stdout
     )
     assert "not protected against" not in result.stdout
+
+
+def test_bypass_actor_on_the_guarding_ruleset_is_a_finding(tmp_path: Path) -> None:
+    # The blind spot this closes: a bypass actor leaves both rules in force, so
+    # the branch reads protected while whoever holds the bypass can still erase
+    # it. Nothing about the rule types themselves shows the exemption.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection("NON_FAST_FORWARD", "DELETION", bypass=2),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        "alpha: tracking.branch-protection ruleset 'protect-main' grants bypass "
+        "to 2 actors (want none)" in result.stdout
+    )
+    assert "not protected against" not in result.stdout
+
+
+def test_one_bypass_actor_is_reported_in_the_singular(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection("NON_FAST_FORWARD", "DELETION", bypass=1),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "grants bypass to 1 actor (want none)" in result.stdout
+
+
+def test_protection_under_another_name_is_a_finding(tmp_path: Path) -> None:
+    # The branch is genuinely protected; what it is not is filed where the
+    # standard says to file it, so the finding names both.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection(
+                    "NON_FAST_FORWARD", "DELETION", ruleset="no-touchy"
+                ),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        "alpha: tracking.branch-protection main is protected by 'no-touchy', "
+        "not by the canonical 'protect-main'" in result.stdout
+    )
+    assert "not protected against" not in result.stdout
+
+
+def test_unprotected_branch_is_not_also_told_it_lacks_the_canonical_ruleset(
+    tmp_path: Path,
+) -> None:
+    # A repo carrying no ruleset at all owes the two rules, and hears that. The
+    # name finding would be a third line saying the same absence again.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {"me/alpha": {"settings": GOOD_SETTINGS, "protection": protection()}}
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert "canonical" not in result.stdout
+    assert len(result.stdout.strip().splitlines()) == 2
+
+
+def test_inactive_ruleset_enforcement_is_a_finding(tmp_path: Path) -> None:
+    # GitHub is documented to serve only active rulesets' rules here, so this
+    # asserts that documented behavior rather than trusting it.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection(
+                    "NON_FAST_FORWARD", "DELETION", enforcement="EVALUATE"
+                ),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        "ruleset 'protect-main' enforcement is 'EVALUATE' (want 'ACTIVE')"
+        in result.stdout
+    )
+
+
+def test_unreadable_ruleset_is_surfaced_not_read_as_bypassless(
+    tmp_path: Path,
+) -> None:
+    # A rule whose ruleset the read could not see is still in force, so the two
+    # rule findings stay quiet — but nothing is known about its bypass list, and
+    # silence there would be indistinguishable from an empty one.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path,
+        {
+            "me/alpha": {
+                "settings": GOOD_SETTINGS,
+                "protection": protection("NON_FAST_FORWARD", "DELETION", ruleset=None),
+            }
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        "alpha: tracking.branch-protection a ruleset protecting main could not "
+        "be read" in result.stdout
+    )
+    assert "not protected against" not in result.stdout
+
+
+def test_a_bypassed_ruleset_carrying_nothing_required_is_not_judged(
+    tmp_path: Path,
+) -> None:
+    # Only rulesets supplying a required rule can hand one back. A repo's other
+    # rulesets — a PR-review ruleset with an admin bypass, say — are its own
+    # business, so neither their name nor their bypass list is measured.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    canonical = protection("NON_FAST_FORWARD", "DELETION")
+    other = protection("PULL_REQUEST", ruleset="reviews", bypass=3)
+    canonical["defaultBranchRef"]["rules"]["nodes"] += other["defaultBranchRef"][
+        "rules"
+    ]["nodes"]
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {"me/alpha": {"settings": GOOD_SETTINGS, "protection": canonical}}
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_the_required_rules_may_be_split_across_rulesets(tmp_path: Path) -> None:
+    # The floor is measured on the branch, not on one ruleset: a repo that files
+    # the second rule elsewhere is still protected, and both rulesets are judged
+    # for bypass because either one could hand its rule back.
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    split = protection("NON_FAST_FORWARD")
+    extra = protection("DELETION", ruleset="no-delete", bypass=1)
+    split["defaultBranchRef"]["rules"]["nodes"] += extra["defaultBranchRef"]["rules"][
+        "nodes"
+    ]
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {"me/alpha": {"settings": GOOD_SETTINGS, "protection": split}}
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "not protected against" not in result.stdout
+    assert "canonical" not in result.stdout
+    assert "ruleset 'no-delete' grants bypass to 1 actor (want none)" in result.stdout
 
 
 def test_repo_without_origin_draws_one_finding_not_two(tmp_path: Path) -> None:

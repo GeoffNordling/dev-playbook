@@ -17,9 +17,12 @@ in, so governance is declared rather than inferred. For each governed repo:
     would read as six drifted settings on every repo. A repo the API cannot
     reach, or with no GitHub origin, is reported loudly.
   - **protection** — read the rules in force on the default branch and require
-    the two that deny destructive operations: no force-push, no deletion. The
-    read is of the branch's effective rules, not of the ruleset list, so how a
-    repo organizes its rulesets is its own business.
+    the two that deny destructive operations: no force-push, no deletion. Then
+    judge the arrangement behind them: every ruleset supplying one of those two
+    rules must be active and grant no bypass, and one of them must be the
+    canonical ``protect-main``. The read starts from the branch's effective
+    rules rather than from the ruleset list, so a ruleset that reaches the
+    branch carrying nothing required is never looked at.
   - **labels** — compare the repo's labels against the canonical scheme at full
     parity (a finding exactly when bootstrap-labels would repair), and flag any
     label naming a blocked state.
@@ -193,13 +196,23 @@ REQUIRED_RULES = {
     "DELETION": "deletion",
 }
 
+# The canonical ruleset of standards/tracking/repo-settings.md § The canonical
+# ruleset. Its name is audited so that the protection of every governed repo is
+# filed in one findable place: a repo whose branch is protected under some other
+# name is protected, but not the way the standard describes, and the finding is
+# how it gets told which.
+CANONICAL_RULESET = "protect-main"
+
 # Rules are read off the default branch rather than out of the ruleset list, so
-# the audit asks what protects the branch instead of how the protection is
-# organized. ``defaultBranchRef.rules`` is the effective view — every rule
-# reaching the branch from every ruleset, whatever those rulesets are named, how
-# many there are, or which ref patterns they match — so a repo may reorganize
-# its rulesets freely without moving this detector. The branch name comes back
-# with it, so nothing here assumes ``main``.
+# the audit starts from what protects the branch rather than from how the repo
+# files its rulesets. ``defaultBranchRef.rules`` is the effective view — every
+# rule reaching the branch from every ruleset, whatever ref pattern matched it —
+# which is what makes "targets the default branch" true by construction of the
+# read: a ruleset that does not reach this branch contributes nothing here, and
+# neither does one GitHub does not count as active. Each rule carries the
+# ruleset behind it, which is what lets the audit go on to judge that ruleset's
+# name, enforcement, and bypass list. The branch name comes back with it, so
+# nothing here assumes ``main``.
 PROTECTION_QUERY = """query($owner: String!, $name: String!) {
   repository(owner: $owner, name: $name) {
     defaultBranchRef {
@@ -207,6 +220,15 @@ PROTECTION_QUERY = """query($owner: String!, $name: String!) {
       rules(first: 100) {
         nodes {
           type
+          repositoryRuleset {
+            name
+            enforcement
+            bypassActors(first: 100) {
+              nodes {
+                bypassMode
+              }
+            }
+          }
         }
       }
     }
@@ -240,6 +262,29 @@ class Line:
         """The finding rendered as ``repo: card.rule message``."""
         assert self.rule is not None
         return render(self.repo, self.rule, self.message)
+
+
+@dataclass(frozen=True)
+class Ruleset:
+    """The ruleset behind a rule in force on the default branch."""
+
+    name: str
+    enforcement: str
+    bypass_actors: int
+
+
+@dataclass(frozen=True)
+class Rule:
+    """One rule in force on the default branch, and the ruleset supplying it.
+
+    ``ruleset`` is None when the response named no readable ruleset behind the
+    rule. The rule is in force either way — that is what appearing under
+    ``defaultBranchRef.rules`` means — but its arrangement cannot be judged, so
+    the caller reports the blind spot instead of passing it over.
+    """
+
+    type: str
+    ruleset: Ruleset | None
 
 
 def hook_repo_url() -> str:
@@ -451,8 +496,31 @@ def fetch_settings(slug: str) -> dict | None:
     return {rest: repository[field] for field, rest in SETTINGS_FIELDS.items()}
 
 
-def fetch_protection(slug: str) -> tuple[str, set[str]] | None:
-    """The default branch's name and the rule types in force on it, or None.
+def read_ruleset(node: object) -> Ruleset | None:
+    """One ``repositoryRuleset`` node as a Ruleset, or None if none was readable.
+
+    Any missing piece — the name, the enforcement status, the bypass list —
+    makes the whole ruleset unreadable rather than half-known. An absent bypass
+    list in particular must never read as an empty one: that is the difference
+    between "nobody may bypass" and "the audit could not tell".
+    """
+    if not isinstance(node, dict):
+        return None
+    name = node.get("name")
+    enforcement = node.get("enforcement")
+    actors = node.get("bypassActors")
+    nodes = actors.get("nodes") if isinstance(actors, dict) else None
+    if (
+        not isinstance(name, str)
+        or not isinstance(enforcement, str)
+        or not isinstance(nodes, list)
+    ):
+        return None
+    return Ruleset(name, enforcement, len(nodes))
+
+
+def fetch_protection(slug: str) -> tuple[str, tuple[Rule, ...]] | None:
+    """The default branch's name and the rules in force on it, or None.
 
     Its own round trip rather than extra fields on ``SETTINGS_QUERY``: the two
     reads then degrade independently, so a repo that answers one and not the
@@ -479,12 +547,11 @@ def fetch_protection(slug: str) -> tuple[str, set[str]] | None:
     nodes = rules.get("nodes") if isinstance(rules, dict) else None
     if not isinstance(nodes, list):
         return None
-    types = {
-        node["type"]
+    return ref["name"], tuple(
+        Rule(node["type"], read_ruleset(node.get("repositoryRuleset")))
         for node in nodes
         if isinstance(node, dict) and isinstance(node.get("type"), str)
-    }
-    return ref["name"], types
+    )
 
 
 def fetch_labels(slug: str) -> list | None:
@@ -536,6 +603,13 @@ def check_settings(repo: Path, slug: str | None) -> list[Line]:
 def check_protection(repo: Path, slug: str | None) -> list[Line]:
     """The default branch's protection against destructive operations.
 
+    Two questions in order: are both destructive operations denied on the
+    branch, and is the protection arranged the way the standard describes —
+    active, bypassed by nobody, filed under the canonical ruleset. Only the
+    rulesets supplying a required rule are judged, because only those can hand
+    an operation back: a bypass actor on some unrelated ruleset exempts nobody
+    from these two rules.
+
     A repo with no GitHub origin draws nothing here: ``check_settings`` already
     reports that once, and one missing origin should not print twice under two
     rule ids.
@@ -554,16 +628,64 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
             )
         ]
     branch, rules = found
-    return [
+    in_force = {rule.type for rule in rules}
+    lines = [
         Line(
             name,
             PROTECTION,
             f"{branch} is not protected against {operation}",
             blocking=True,
         )
-        for rule, operation in REQUIRED_RULES.items()
-        if rule not in rules
+        for required, operation in REQUIRED_RULES.items()
+        if required not in in_force
     ]
+    guards = [rule for rule in rules if rule.type in REQUIRED_RULES]
+    if any(rule.ruleset is None for rule in guards):
+        lines.append(
+            Line(
+                name,
+                PROTECTION,
+                f"a ruleset protecting {branch} could not be read",
+                blocking=True,
+            )
+        )
+    rulesets = {
+        rule.ruleset.name: rule.ruleset for rule in guards if rule.ruleset is not None
+    }
+    for ruleset in sorted(rulesets.values(), key=lambda found: found.name):
+        if ruleset.enforcement != "ACTIVE":
+            lines.append(
+                Line(
+                    name,
+                    PROTECTION,
+                    f"ruleset {ruleset.name!r} enforcement is "
+                    f"{ruleset.enforcement!r} (want 'ACTIVE')",
+                    blocking=True,
+                )
+            )
+        if ruleset.bypass_actors:
+            count = ruleset.bypass_actors
+            lines.append(
+                Line(
+                    name,
+                    PROTECTION,
+                    f"ruleset {ruleset.name!r} grants bypass to {count} "
+                    f"actor{'' if count == 1 else 's'} (want none)",
+                    blocking=True,
+                )
+            )
+    if rulesets and CANONICAL_RULESET not in rulesets:
+        filed = ", ".join(repr(found) for found in sorted(rulesets))
+        lines.append(
+            Line(
+                name,
+                PROTECTION,
+                f"{branch} is protected by {filed}, not by the canonical "
+                f"{CANONICAL_RULESET!r}",
+                blocking=True,
+            )
+        )
+    return lines
 
 
 def check_labels(name: str, labels: list) -> list[Line]:
