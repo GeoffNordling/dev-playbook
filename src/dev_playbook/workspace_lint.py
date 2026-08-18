@@ -146,6 +146,7 @@ GOVERNED = (
     "spec-tools",
     "mission-control",
     "fedora-playbook",
+    "voice-transcription",
 )
 
 # Expected GitHub settings, under the REST field names. The audit only reads;
