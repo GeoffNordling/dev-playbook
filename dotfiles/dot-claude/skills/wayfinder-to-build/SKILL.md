@@ -20,13 +20,10 @@ that decided it. `$ARGUMENTS` names the map.
 Before doing anything else:
 
 - Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
-  end-to-end — the epic body format, the readiness bar, the One-goal test, the
-  vertical-slice rules, and native relationships.
+  end-to-end.
 - Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
-  end-to-end — the two regions, the label scheme, and where the minted children
-  go next.
-- Invoke /codebase-design — deep modules, interfaces, the deletion test: the
-  qualities a good slice boundary preserves.
+  end-to-end.
+- Invoke /codebase-design: the qualities a good slice boundary preserves.
 
 Then report: `READ: issue-authoring.md, software-factory.md,
 codebase-design`. Proceed only after.
