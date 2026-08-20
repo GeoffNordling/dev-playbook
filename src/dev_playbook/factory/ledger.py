@@ -207,8 +207,8 @@ class LedgerError(Exception):
       one it kept.
     - A **stored row this module cannot use**, naming the row id: a payload
       that will not decode (chained from the decode error), a payload that
-      decodes into something other than a JSON object, a row with an empty
-      promoted column that no query can therefore match, or a `traverse-end`
+      decodes into something other than a JSON object, a promoted column that
+      is empty or holds a type the queries cannot address by, or a `traverse-end`
       candidate whose payload carries no `status` from the closed vocabulary
       at `STATUSES`. Only the first of these has an error to chain from; the
       rest are the store disagreeing with itself, not an operation failing.
@@ -462,14 +462,26 @@ def _select(
 # What a `COLUMNS` select yields, before the payload is parsed.
 StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
 
-# What a stored row must carry to be readable. `repo` and `issue` key every
-# supersession, window and closeout test in both queries, and a job row's
-# `node` and `session_id` key the rest -- so an empty one is unmatchable under
-# SQL's three-valued logic, and the row stands in every answer forever rather
-# than being superseded, reported or closed out of it. `received_at` is matched
-# on by nothing and is here because `LedgerRow` promises a string.
-KEY_COLUMNS = ("received_at", "repo", "issue")
-JOB_KEY_COLUMNS = ("node", "session_id")
+# What each promoted column must hold for a row to be readable. `repo` and
+# `issue` key every supersession, window and closeout test in both queries, and
+# a job row's `node` and `session_id` key the rest -- so a column holding
+# nothing is unmatchable under SQL's three-valued logic and the row stands in
+# every answer forever, while one holding the wrong type reaches a caller
+# inside a `LedgerRow` that lies about itself. `received_at` is matched on by
+# nothing and is here because `LedgerRow` promises a string.
+COLUMN_TYPES: dict[str, type] = {
+    "id": int,
+    "received_at": str,
+    "kind": str,
+    "repo": str,
+    "issue": int,
+}
+
+# The grain columns, by the kind that carries them. A traverse row's `None`s
+# are its shape rather than something it lacks, so they are stated as the type
+# they are instead of being left unchecked.
+JOB_GRAIN_TYPES: dict[str, type] = {"node": str, "session_id": str}
+TRAVERSE_GRAIN_TYPES: dict[str, type] = {"node": type(None), "session_id": type(None)}
 
 
 def _decode(stored: StoredRow) -> LedgerRow:
@@ -489,12 +501,14 @@ def _decode(stored: StoredRow) -> LedgerRow:
     later as a `TypeError` from whatever first treats one as a mapping. The
     sibling `measure-event` draws the same line for the same reason.
 
-    A **promoted column** fails one way, by being empty. The writers refuse
-    that at the door, so such a row got into the store some other way, and it
-    is the worse failure of the two: nothing raises anywhere, because a NULL
-    key simply never matches, so the row cannot be superseded, reported or
-    closed out and stands in every answer for good. It is refused here instead,
-    naming what it lacks, and an operator repairs the row the error names.
+    A **promoted column** fails the same two ways, being empty or holding the
+    wrong type, and both are worse than the payload's version: nothing raises
+    anywhere. A NULL key never matches, so the row cannot be superseded,
+    reported or closed out and stands in every answer for good; and SQLite's
+    column affinities convert only what already looks like the declared type,
+    so an issue number that arrived as a branch name is stored and handed back
+    as text. Each is refused here instead, naming the row and the column, and
+    an operator repairs what the error names.
 
     The columns are unpacked positionally rather than named one by one: adding
     a column to `COLUMNS` then breaks the constructor loudly, where eight
@@ -513,13 +527,16 @@ def _decode(stored: StoredRow) -> LedgerRow:
             f"but a {type(payload).__name__}"
         )
     row = LedgerRow(*stored[:-1], payload=payload)
-    required = KEY_COLUMNS + JOB_KEY_COLUMNS if row.kind in JOB_KINDS else KEY_COLUMNS
-    missing = [name for name in required if getattr(row, name) is None]
-    if missing:
+    grain = JOB_GRAIN_TYPES if row.kind in JOB_KINDS else TRAVERSE_GRAIN_TYPES
+    unusable = [
+        f"{name} holds {getattr(row, name)!r} where a {wanted.__name__} belongs"
+        for name, wanted in (COLUMN_TYPES | grain).items()
+        if not isinstance(getattr(row, name), wanted)
+    ]
+    if unusable:
         raise LedgerError(
-            f"run ledger row {row.id} is a {row.kind} carrying no "
-            f"{', '.join(missing)}, so no query can match it and it would stand "
-            f"in every answer until the row is repaired"
+            f"run ledger row {row.id} is a {row.kind} the queries cannot address: "
+            f"{'; '.join(unusable)}. Repair the row before reading again."
         )
     return row
 

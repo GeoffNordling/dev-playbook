@@ -8,6 +8,7 @@ from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 from types import MappingProxyType
+from typing import Any
 
 import pytest
 
@@ -66,6 +67,11 @@ COLLIDING_JOBS = [
     ("owner/one", 2, "build"),
     ("owner/one", 1, "doc-pr-review"),
 ]
+
+# A branch name where an issue number belongs -- the caller bug the module's
+# signatures forbid and SQLite's INTEGER affinity stores anyway. Typed loosely
+# so the deliberate misuse is the test's subject rather than a type error.
+NOT_AN_ISSUE_NUMBER: Any = "main"
 
 TraverseWriter = Callable[..., None]
 
@@ -386,6 +392,38 @@ def test_awaiting_merge_refuses_a_candidate_missing_a_key_column(
         ledger.awaiting_merge(db_path=db_path)
 
     assert column in str(raised.value)
+
+
+def test_live_jobs_refuses_a_stored_launch_whose_issue_is_not_a_number(
+    db_path: Path,
+) -> None:
+    ledger.job_launch(
+        "owner/repo", NOT_AN_ISSUE_NUMBER, "build", "sess-1", {}, db_path=db_path
+    )
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.live_jobs(db_path=db_path)
+
+    assert "issue" in str(raised.value)
+
+
+def test_awaiting_merge_refuses_a_candidate_whose_issue_is_not_a_number(
+    db_path: Path,
+) -> None:
+    """A column can hold the wrong type as well as nothing at all.
+
+    SQLite's INTEGER affinity converts what looks numeric and stores the rest
+    as it came, so a caller passing a branch name where an issue number belongs
+    writes a row that reads back as a `LedgerRow` lying about its own type.
+    """
+    ledger.traverse_end(
+        "owner/repo", NOT_AN_ISSUE_NUMBER, {"status": "pr-ready"}, db_path=db_path
+    )
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.awaiting_merge(db_path=db_path)
+
+    assert "issue" in str(raised.value)
 
 
 def test_a_stored_traverse_row_may_carry_no_node_or_session_id(
