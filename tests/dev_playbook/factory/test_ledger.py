@@ -47,10 +47,10 @@ WHERE l.kind = 'job-launch'
 # row it cannot use.
 NOT_JSON_OBJECTS = ["null", "123", "true", "[1, 2]", '"pr-ready"']
 
-# A `status` a candidate row can carry that the guard cannot judge. The module
-# never declares which status strings exist -- that vocabulary belongs to the
-# launcher slices -- but a status that is not a string at all is a row it
-# cannot read, whoever wrote it.
+# A `status` a candidate row can carry that is outside the module's closed
+# vocabulary because it is not a string at all. The unhashable two are the
+# reason the vocabulary is a tuple: a set would raise `TypeError` out of the
+# guard rather than judge them.
 NOT_STATUS_STRINGS = [1, None, True, ["pr-ready"], {"value": "pr-ready"}]
 
 TraverseWriter = Callable[..., None]
@@ -595,6 +595,17 @@ def test_awaiting_merge_reads_only_the_newest_traverse_end_of_an_issue(
     assert ledger.awaiting_merge(db_path=db_path) == []
 
 
+def test_awaiting_merge_refuses_a_candidate_whose_status_is_unrecognised(
+    db_path: Path,
+) -> None:
+    ledger.traverse_end("owner/repo", 438, {"status": "pr_ready"}, db_path=db_path)
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.awaiting_merge(db_path=db_path)
+
+    assert str(raised.value).endswith(": [1]")
+
+
 def test_awaiting_merge_raises_naming_a_newest_traverse_end_with_no_status(
     db_path: Path,
 ) -> None:
@@ -616,6 +627,15 @@ def test_awaiting_merge_refuses_a_candidate_whose_status_is_not_a_string(
         ledger.awaiting_merge(db_path=db_path)
 
     assert str(raised.value).endswith(": [1]")
+
+
+def test_awaiting_merge_ignores_a_superseded_unrecognised_status(
+    db_path: Path,
+) -> None:
+    ledger.traverse_end("owner/repo", 438, {"status": "pr_ready"}, db_path=db_path)
+    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
+
+    assert [row.issue for row in ledger.awaiting_merge(db_path=db_path)] == [438]
 
 
 def test_awaiting_merge_ignores_a_superseded_status_that_is_not_a_string(

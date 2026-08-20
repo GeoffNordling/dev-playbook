@@ -110,8 +110,21 @@ ORDER BY l.id
 
 # The one payload value this module reads. Everything else in a payload is the
 # launcher's business and passes through uninterpreted.
+#
+# The vocabulary is closed and this module owns it: a `traverse-end` carries the
+# status `traverse_issue` exited with, and those are the two terminal statuses
+# the graph has. A candidate carrying anything else -- a missing key, a value
+# that is not a string, a string nobody here recognises -- is a row this cannot
+# judge, and it says so rather than dropping it. Adding a terminal status is an
+# edit here, which is the point: the ledger is where a launcher's typo surfaces.
+#
+# A tuple, not a set: membership on a tuple compares rather than hashes, so an
+# unhashable stored status -- a list, an object -- is judged unrecognised
+# instead of raising `TypeError` out of the guard meant to catch it.
 STATUS = "status"
 PR_READY = "pr-ready"
+ESCALATED = "escalated"
+STATUSES = (PR_READY, ESCALATED)
 
 
 class LedgerRow(NamedTuple):
@@ -141,8 +154,8 @@ class LedgerError(Exception):
     - A **stored row this module cannot use**, naming the row id: a payload
       that will not decode (chained from the decode error), a payload that
       decodes into something other than a JSON object (unchained), or a
-      `traverse-end` candidate whose payload carries no usable `status`
-      (unchained, the row is simply unjudgeable).
+      `traverse-end` candidate whose payload carries no `status` from the
+      closed vocabulary at `STATUSES` (unchained, the row is unjudgeable).
 
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
@@ -440,32 +453,27 @@ def awaiting_merge(
     """Every issue whose traverse ended `pr-ready` and has not been closed out.
 
     The one place the module reads inside a payload, and it reads exactly one
-    key. A candidate whose `status` is missing, or is there but is not a
-    string, is a row this cannot judge either way, so it raises `LedgerError`
-    naming that row rather than dropping it.
-
-    A candidate carrying some *other* status string is a different matter: it
-    is judged, and the judgment is no. `pr-ready` is the only status this
-    module knows, and deliberately the only one it ever will — which statuses a
-    `traverse-end` may carry is the launcher slices' vocabulary, not this
-    module's, and a machine-global read that raised on every unfamiliar string
-    would let one slice's rename take `factory-status` down for every repo on
-    the machine. The cost is real and is stated here rather than hidden: a
-    launcher that writes `"PR-Ready"` or `"pr_ready"` will see that issue drop
-    out of this answer silently, and the guard above will not catch it.
+    key. That key's vocabulary is closed and stated at `STATUSES`: a candidate
+    carrying anything outside it — no `status` at all, a `status` that is not a
+    string, a string nobody here recognises — is a row this cannot judge, and
+    it raises `LedgerError` naming that row rather than dropping it. There is
+    no reading under which a launcher's `"PR-Ready"` or `"pr_ready"` quietly
+    means no.
 
     Only candidates are judged — the newest `traverse-end` per repo and issue,
     minus the closed-out. A superseded or spent end is dead history the query
-    never consults, so one malformed row cannot brick this read forever in a
-    table nothing can repair.
+    never consults, so a malformed row that is no longer in play cannot brick
+    this read; one that *is* in play stops the read until it is repaired, which
+    is a direct `UPDATE` on the row the error names. Append-only is this
+    module's writing discipline, not a limit on the operator.
     """
     candidates = _select(AWAITING_MERGE, {"repo": repo}, db_path)
     unjudgeable = [
-        row.id for row in candidates if not isinstance(row.payload.get(STATUS), str)
+        row.id for row in candidates if row.payload.get(STATUS) not in STATUSES
     ]
     if unjudgeable:
         raise LedgerError(
-            f"run ledger at {db_path} has traverse-end rows carrying no readable "
-            f"{STATUS!r} in their payload: {unjudgeable}"
+            f"run ledger at {db_path} has traverse-end rows whose payload "
+            f"{STATUS!r} is not one of {STATUSES}: {unjudgeable}"
         )
     return [row for row in candidates if row.payload[STATUS] == PR_READY]
