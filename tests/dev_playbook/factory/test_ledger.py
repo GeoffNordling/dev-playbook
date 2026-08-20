@@ -58,6 +58,23 @@ JOB_WRITERS: list[tuple[str, JobWriter]] = [
 ]
 
 
+@pytest.fixture(autouse=True)
+def never_the_real_store(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Repoint the module's default store into the temp tree, for every test.
+
+    `DB_PATH` is the default on all ten public functions, so one omitted
+    `db_path=` would otherwise append to the developer's real ledger. Autouse
+    makes "nothing touches the real store" enforced rather than remembered.
+    """
+    monkeypatch.setattr(ledger, "DB_PATH", tmp_path / "default" / "events.db")
+
+
+@pytest.fixture
+def db_path(tmp_path: Path) -> Path:
+    """The temp store a test writes to and reads back."""
+    return tmp_path / "events.db"
+
+
 def raw_rows(db_path: Path) -> list[tuple[object, ...]]:
     """Every ledger row as a raw tuple, oldest first, read outside the module."""
     with closing(sqlite3.connect(db_path)) as connection:
@@ -78,10 +95,8 @@ def test_traverse_start_appends_one_row(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
 def test_traverse_writers_stamp_their_kind_with_no_node_or_session(
-    kind: str, write: TraverseWriter, tmp_path: Path
+    kind: str, write: TraverseWriter, db_path: Path
 ) -> None:
-    db_path = tmp_path / "events.db"
-
     write("owner/repo", 438, {"note": kind}, db_path=db_path)
 
     (row,) = raw_rows(db_path)
@@ -98,10 +113,21 @@ def test_first_write_creates_the_store_in_wal_mode(tmp_path: Path) -> None:
     assert mode == "wal"
 
 
+def test_a_read_creates_the_store_it_finds_absent(tmp_path: Path) -> None:
+    db_path = tmp_path / "absent" / "events.db"
+
+    assert ledger.live_jobs(db_path=db_path) == []
+
+    with closing(sqlite3.connect(db_path)) as connection:
+        tables = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        ).fetchall()
+    assert ("ledger",) in tables
+
+
 def test_a_write_against_a_locked_store_waits_rather_than_failing(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
 
     with closing(sqlite3.connect(db_path)) as blocker, ThreadPoolExecutor(1) as pool:
@@ -110,15 +136,17 @@ def test_a_write_against_a_locked_store_waits_rather_than_failing(
             ledger.traverse_end, "owner/repo", 438, {}, db_path=db_path
         )
         time.sleep(LOCK_HOLD_SECONDS)
+        still_waiting = not contended.done()
         blocker.rollback()
         contended.result(timeout=ledger.BUSY_TIMEOUT_SECONDS)
 
-    assert [row[2] for row in raw_rows(db_path)] == ["traverse-start", "traverse-end"]
+    assert (still_waiting, [row[2] for row in raw_rows(db_path)]) == (
+        True,
+        ["traverse-start", "traverse-end"],
+    )
 
 
-def test_received_at_matches_the_events_timestamp_format(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
-
+def test_received_at_matches_the_events_timestamp_format(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
 
     (row,) = raw_rows(db_path)
@@ -131,10 +159,8 @@ def test_received_at_matches_the_events_timestamp_format(tmp_path: Path) -> None
 
 @pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
 def test_job_writers_carry_node_and_session(
-    kind: str, write: JobWriter, tmp_path: Path
+    kind: str, write: JobWriter, db_path: Path
 ) -> None:
-    db_path = tmp_path / "events.db"
-
     write("owner/repo", 438, "build", "sess-1", {"note": kind}, db_path=db_path)
 
     (row,) = raw_rows(db_path)
@@ -163,8 +189,7 @@ def test_a_write_to_an_unwritable_store_raises_ledger_error(tmp_path: Path) -> N
     assert isinstance(raised.value.__cause__, OSError)
 
 
-def test_a_read_of_a_corrupt_store_raises_ledger_error(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_a_read_of_a_corrupt_store_raises_ledger_error(db_path: Path) -> None:
     db_path.write_text("this is not a database")
 
     with pytest.raises(ledger.LedgerError) as raised:
@@ -174,10 +199,8 @@ def test_a_read_of_a_corrupt_store_raises_ledger_error(tmp_path: Path) -> None:
 
 
 def test_an_unserializable_payload_raises_before_anything_is_written(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
-
     with pytest.raises(TypeError):
         ledger.traverse_start("owner/repo", 438, {"opaque": object()}, db_path=db_path)
 
@@ -187,8 +210,7 @@ def test_an_unserializable_payload_raises_before_anything_is_written(
 # --- live_jobs ---
 
 
-def test_live_jobs_returns_a_launched_unreported_job(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_returns_a_launched_unreported_job(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch(
         "owner/repo", 438, "build", "sess-1", {"pid": 42}, db_path=db_path
@@ -201,8 +223,7 @@ def test_live_jobs_returns_a_launched_unreported_job(tmp_path: Path) -> None:
     ] == [("owner/repo", 438, "build", "sess-1", {"pid": 42})]
 
 
-def test_live_jobs_drops_a_reported_job(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_drops_a_reported_job(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
     ledger.job_report("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
@@ -210,10 +231,47 @@ def test_live_jobs_drops_a_reported_job(tmp_path: Path) -> None:
     assert ledger.live_jobs(db_path=db_path) == []
 
 
-def test_live_jobs_drops_a_job_superseded_by_a_later_launch_of_its_node(
-    tmp_path: Path,
+def test_live_jobs_keeps_every_node_launched_at_one_issue(db_path: Path) -> None:
+    ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
+    ledger.job_launch(
+        "owner/repo", 438, "bug-pr-review", "sess-bug", {}, db_path=db_path
+    )
+    ledger.job_launch(
+        "owner/repo", 438, "code-pr-review", "sess-code", {}, db_path=db_path
+    )
+    ledger.job_launch(
+        "owner/repo", 438, "doc-pr-review", "sess-doc", {}, db_path=db_path
+    )
+
+    live = ledger.live_jobs(db_path=db_path)
+
+    assert [row.node for row in live] == [
+        "bug-pr-review",
+        "code-pr-review",
+        "doc-pr-review",
+    ]
+
+
+def test_live_jobs_keeps_a_job_when_a_different_session_is_reported(
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
+    ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
+    ledger.job_launch(
+        "owner/repo", 438, "code-pr-review", "sess-code", {}, db_path=db_path
+    )
+    ledger.job_launch(
+        "owner/repo", 438, "doc-pr-review", "sess-doc", {}, db_path=db_path
+    )
+    ledger.job_report(
+        "owner/repo", 438, "code-pr-review", "sess-code", {}, db_path=db_path
+    )
+
+    assert [row.session_id for row in ledger.live_jobs(db_path=db_path)] == ["sess-doc"]
+
+
+def test_live_jobs_drops_a_job_superseded_by_a_later_launch_of_its_node(
+    db_path: Path,
+) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-2", {}, db_path=db_path)
@@ -221,8 +279,7 @@ def test_live_jobs_drops_a_job_superseded_by_a_later_launch_of_its_node(
     assert [row.session_id for row in ledger.live_jobs(db_path=db_path)] == ["sess-2"]
 
 
-def test_live_jobs_drops_a_job_once_its_traverse_ends(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_drops_a_job_once_its_traverse_ends(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
@@ -230,8 +287,7 @@ def test_live_jobs_drops_a_job_once_its_traverse_ends(tmp_path: Path) -> None:
     assert ledger.live_jobs(db_path=db_path) == []
 
 
-def test_live_jobs_drops_a_job_when_a_later_traverse_starts(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_drops_a_job_when_a_later_traverse_starts(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
@@ -239,8 +295,7 @@ def test_live_jobs_drops_a_job_when_a_later_traverse_starts(tmp_path: Path) -> N
     assert ledger.live_jobs(db_path=db_path) == []
 
 
-def test_live_jobs_keeps_a_job_through_a_traverse_escalation(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_keeps_a_job_through_a_traverse_escalation(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
     ledger.traverse_escalation("owner/repo", 438, {"why": "stuck"}, db_path=db_path)
@@ -249,9 +304,8 @@ def test_live_jobs_keeps_a_job_through_a_traverse_escalation(tmp_path: Path) -> 
 
 
 def test_live_jobs_keeps_a_job_when_another_issues_traverse_ends(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
     ledger.traverse_end("owner/repo", 999, {"status": "pr-ready"}, db_path=db_path)
@@ -269,8 +323,7 @@ def three_open_jobs(db_path: Path) -> None:
     ledger.job_launch("owner/two", 1, "build", "sess-two-1", {}, db_path=db_path)
 
 
-def test_live_jobs_without_a_filter_reads_the_whole_machine(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_without_a_filter_reads_the_whole_machine(db_path: Path) -> None:
     three_open_jobs(db_path)
 
     live = ledger.live_jobs(db_path=db_path)
@@ -282,8 +335,7 @@ def test_live_jobs_without_a_filter_reads_the_whole_machine(tmp_path: Path) -> N
     ]
 
 
-def test_live_jobs_filters_conjoin(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_filters_conjoin(db_path: Path) -> None:
     three_open_jobs(db_path)
 
     live = ledger.live_jobs(repo="owner/one", issue=2, db_path=db_path)
@@ -291,8 +343,7 @@ def test_live_jobs_filters_conjoin(tmp_path: Path) -> None:
     assert [row.session_id for row in live] == ["sess-one-2"]
 
 
-def test_live_jobs_filters_on_repo_alone(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_filters_on_repo_alone(db_path: Path) -> None:
     three_open_jobs(db_path)
 
     live = ledger.live_jobs(repo="owner/one", db_path=db_path)
@@ -300,8 +351,7 @@ def test_live_jobs_filters_on_repo_alone(tmp_path: Path) -> None:
     assert [row.session_id for row in live] == ["sess-one-1", "sess-one-2"]
 
 
-def test_live_jobs_filters_on_issue_alone(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_live_jobs_filters_on_issue_alone(db_path: Path) -> None:
     three_open_jobs(db_path)
 
     live = ledger.live_jobs(issue=1, db_path=db_path)
@@ -312,8 +362,7 @@ def test_live_jobs_filters_on_issue_alone(tmp_path: Path) -> None:
 # --- awaiting_merge ---
 
 
-def test_awaiting_merge_returns_a_pr_ready_traverse_end(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_awaiting_merge_returns_a_pr_ready_traverse_end(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
 
@@ -324,8 +373,7 @@ def test_awaiting_merge_returns_a_pr_ready_traverse_end(tmp_path: Path) -> None:
     ]
 
 
-def test_awaiting_merge_drops_an_issue_once_it_is_closed_out(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_awaiting_merge_drops_an_issue_once_it_is_closed_out(db_path: Path) -> None:
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
     ledger.closeout("owner/repo", 438, {"outcome": "merged"}, db_path=db_path)
 
@@ -333,18 +381,16 @@ def test_awaiting_merge_drops_an_issue_once_it_is_closed_out(tmp_path: Path) -> 
 
 
 def test_awaiting_merge_never_returns_a_traverse_end_that_is_not_pr_ready(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_end("owner/repo", 438, {"status": "escalated"}, db_path=db_path)
 
     assert ledger.awaiting_merge(db_path=db_path) == []
 
 
 def test_awaiting_merge_reads_only_the_newest_traverse_end_of_an_issue(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
     ledger.traverse_end("owner/repo", 438, {"status": "escalated"}, db_path=db_path)
 
@@ -352,21 +398,19 @@ def test_awaiting_merge_reads_only_the_newest_traverse_end_of_an_issue(
 
 
 def test_awaiting_merge_raises_naming_a_newest_traverse_end_with_no_status(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_end("owner/repo", 438, {"note": "no status here"}, db_path=db_path)
 
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.awaiting_merge(db_path=db_path)
 
-    assert "1" in str(raised.value)
+    assert str(raised.value).endswith(": [1]")
 
 
 def test_awaiting_merge_ignores_a_superseded_traverse_end_with_no_status(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_end("owner/repo", 438, {"note": "no status here"}, db_path=db_path)
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
 
@@ -374,17 +418,15 @@ def test_awaiting_merge_ignores_a_superseded_traverse_end_with_no_status(
 
 
 def test_awaiting_merge_ignores_a_closed_out_traverse_end_with_no_status(
-    tmp_path: Path,
+    db_path: Path,
 ) -> None:
-    db_path = tmp_path / "events.db"
     ledger.traverse_end("owner/repo", 438, {"note": "no status here"}, db_path=db_path)
     ledger.closeout("owner/repo", 438, {"outcome": "merged"}, db_path=db_path)
 
     assert ledger.awaiting_merge(db_path=db_path) == []
 
 
-def test_awaiting_merge_filters_on_repo(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_awaiting_merge_filters_on_repo(db_path: Path) -> None:
     ledger.traverse_end("owner/one", 1, {"status": "pr-ready"}, db_path=db_path)
     ledger.traverse_end("owner/two", 2, {"status": "pr-ready"}, db_path=db_path)
 
@@ -396,20 +438,7 @@ def test_awaiting_merge_filters_on_repo(tmp_path: Path) -> None:
 # --- the session-id spine ---
 
 
-def test_a_read_creates_the_store_it_finds_absent(tmp_path: Path) -> None:
-    db_path = tmp_path / "absent" / "events.db"
-
-    assert ledger.live_jobs(db_path=db_path) == []
-
-    with closing(sqlite3.connect(db_path)) as connection:
-        tables = connection.execute(
-            "SELECT name FROM sqlite_master WHERE type = 'table'"
-        ).fetchall()
-    assert ("ledger",) in tables
-
-
-def test_a_job_launch_joins_to_its_events_on_session_id(tmp_path: Path) -> None:
-    db_path = tmp_path / "events.db"
+def test_a_job_launch_joins_to_its_events_on_session_id(db_path: Path) -> None:
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
 
     with closing(sqlite3.connect(db_path)) as connection:
