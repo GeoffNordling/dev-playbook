@@ -516,7 +516,10 @@ def _supervise(
 
     The stream is read by a thread onto a queue rather than straight off the
     pipe, so the deadline still fires while the child says nothing at all: a
-    blocking `readline` on a silent child has no timeout to give.
+    blocking `readline` on a silent child has no timeout to give. That thread
+    owns the pipe and is the only one that closes it — closing a stream another
+    thread is blocked reading waits on the lock that read holds, so a close
+    from here would hang for as long as a grandchild held the write end open.
 
     The decoder is pinned to UTF-8 rather than left to the machine's locale,
     which is what `text=True` alone would use. Agent prose carries em-dashes
@@ -545,19 +548,10 @@ def _supervise(
     finally:
         # Cleanup, not absorption: an exception on the way out must not leave a
         # child running on the subscription with nobody watching it. Nothing is
-        # caught here, so every failure still leaves as itself.
-        #
-        # The wait is bounded, because this is reached exactly when a child has
-        # already proved it ignores what it is sent — an unbounded one would
-        # turn the module's loudest designed failure into a permanent hang with
-        # the `job-launch` row already standing.
-        #
-        # The pipe is the pump's to close, never this thread's. A grandchild
-        # can hold the write end open after the child is gone, and closing a
-        # stream another thread is blocked reading waits on the lock that read
-        # holds — so a close here would hang for as long as the stray process
-        # lived, which is the very failure ending the watch on child exit was
-        # meant to end.
+        # caught here, so every failure still leaves as itself. The wait is
+        # bounded because this is reached exactly when a child has proved it
+        # ignores what it is sent, where an unbounded one would turn the
+        # module's loudest designed failure into a permanent hang.
         if process.poll() is None:
             process.kill()
             process.wait(timeout=grace_s)
