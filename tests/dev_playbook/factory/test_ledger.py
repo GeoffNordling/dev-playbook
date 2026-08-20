@@ -112,9 +112,15 @@ def rot_the_stored_payload(db_path: Path, payload: str | None) -> None:
         connection.commit()
 
 
-def raw_rows(db_path: Path) -> list[tuple[object, ...]]:
-    """Every ledger row as a raw tuple, oldest first, read outside the module."""
+def raw_rows(db_path: Path) -> list[sqlite3.Row]:
+    """Every ledger row, oldest first, read outside the module.
+
+    Rows come back keyed by column name, so an assertion says `row["kind"]`
+    rather than `row[2]`, and a failure reports which column disagreed instead
+    of leaving the reader to count along `COLUMNS`.
+    """
     with closing(sqlite3.connect(db_path)) as connection:
+        connection.row_factory = sqlite3.Row
         return connection.execute(
             f"SELECT {COLUMNS} FROM ledger ORDER BY id"
         ).fetchall()
@@ -125,19 +131,20 @@ def test_traverse_start_appends_one_row(tmp_path: Path) -> None:
 
     ledger.traverse_start("owner/repo", 438, {"mode": "direct"}, db_path=db_path)
 
-    assert [row[2:] for row in raw_rows(db_path)] == [
+    assert [tuple(row)[2:] for row in raw_rows(db_path)] == [
         ("traverse-start", "owner/repo", 438, None, None, '{"mode": "direct"}')
     ]
 
 
 @pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
-def test_traverse_writers_stamp_their_kind_with_no_node_or_session(
+def test_a_traverse_writer_stores_its_kind_null_grain_and_payload(
     kind: str, write: TraverseWriter, db_path: Path
 ) -> None:
     write("owner/repo", 438, {"note": kind}, db_path=db_path)
 
     (row,) = raw_rows(db_path)
-    assert (row[2], row[5], row[6]) == (kind, None, None)
+    assert (row["kind"], row["node"], row["session_id"]) == (kind, None, None)
+    assert json.loads(row["payload"]) == {"note": kind}
 
 
 def test_first_write_creates_the_store_in_wal_mode(tmp_path: Path) -> None:
@@ -177,21 +184,20 @@ def test_a_write_against_a_locked_store_waits_rather_than_failing(
         blocker.rollback()
         contended.result(timeout=ledger.BUSY_TIMEOUT_SECONDS)
 
-    assert (still_waiting, [row[2] for row in raw_rows(db_path)]) == (
-        True,
-        ["traverse-start", "traverse-end"],
-    )
+    assert still_waiting
+    assert [row["kind"] for row in raw_rows(db_path)] == [
+        "traverse-start",
+        "traverse-end",
+    ]
 
 
 def test_received_at_matches_the_events_timestamp_format(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
 
     (row,) = raw_rows(db_path)
-    stamped = datetime.fromisoformat(str(row[1]))
-    assert (stamped.tzinfo, len(str(row[1]))) == (
-        UTC,
-        len("2026-08-19T12:34:56.123456+00:00"),
-    )
+    stamped = datetime.fromisoformat(row["received_at"])
+    assert stamped.tzinfo == UTC
+    assert len(row["received_at"]) == len("2026-08-19T12:34:56.123456+00:00")
 
 
 def test_a_writer_accepts_a_mapping_that_is_not_a_dict(db_path: Path) -> None:
@@ -200,24 +206,18 @@ def test_a_writer_accepts_a_mapping_that_is_not_a_dict(db_path: Path) -> None:
     )
 
     (row,) = raw_rows(db_path)
-    assert row[7] == '{"mode": "direct"}'
+    assert row["payload"] == '{"mode": "direct"}'
 
 
 @pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
-def test_job_writers_carry_node_and_session(
+def test_a_job_writer_stores_its_kind_both_grain_columns_and_payload(
     kind: str, write: JobWriter, db_path: Path
 ) -> None:
     write("owner/repo", 438, "build", "sess-1", {"note": kind}, db_path=db_path)
 
     (row,) = raw_rows(db_path)
-    assert row[2:] == (
-        kind,
-        "owner/repo",
-        438,
-        "build",
-        "sess-1",
-        f'{{"note": "{kind}"}}',
-    )
+    assert tuple(row)[2:7] == (kind, "owner/repo", 438, "build", "sess-1")
+    assert json.loads(row["payload"]) == {"note": kind}
 
 
 # --- failure discipline ---
@@ -282,10 +282,8 @@ def test_a_read_of_an_unparseable_stored_payload_names_the_row(
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.live_jobs(db_path=db_path)
 
-    assert (
-        isinstance(raised.value.__cause__, json.JSONDecodeError),
-        "row 1" in str(raised.value),
-    ) == (True, True)
+    assert isinstance(raised.value.__cause__, json.JSONDecodeError)
+    assert "row 1" in str(raised.value)
 
 
 def test_a_read_of_a_null_stored_payload_raises_ledger_error(
@@ -368,6 +366,38 @@ def test_live_jobs_returns_a_launched_unreported_job(db_path: Path) -> None:
     assert [
         (row.repo, row.issue, row.node, row.session_id, row.payload) for row in live
     ] == [("owner/repo", 438, "build", "sess-1", {"pid": 42})]
+
+
+def test_live_jobs_maps_every_stored_column_onto_its_own_field(
+    db_path: Path,
+) -> None:
+    """The job-grain half of the positional unpack `_decode` reads rows by.
+
+    Only two of the eight kinds are reachable through a public read —
+    `live_jobs` returns `job-launch` and `awaiting_merge` returns
+    `traverse-end`, and the brief adds no third read — so those two are where
+    the decode is pinned. The unpack itself is kind-blind, and what it can get
+    wrong is the column-to-field mapping: this asserts all eight fields against
+    the row as raw SQL sees it, so a slipped column fails here rather than
+    handing back a `node` holding a session id.
+    """
+    ledger.job_launch(
+        "owner/repo", 438, "build", "sess-1", {"pid": 42}, db_path=db_path
+    )
+
+    (row,) = ledger.live_jobs(db_path=db_path)
+
+    (stored,) = raw_rows(db_path)
+    assert row == ledger.LedgerRow(
+        id=stored["id"],
+        received_at=stored["received_at"],
+        kind="job-launch",
+        repo="owner/repo",
+        issue=438,
+        node="build",
+        session_id="sess-1",
+        payload={"pid": 42},
+    )
 
 
 def test_live_jobs_drops_a_reported_job(db_path: Path) -> None:
@@ -518,6 +548,27 @@ def test_awaiting_merge_returns_a_pr_ready_traverse_end(db_path: Path) -> None:
     assert [(row.repo, row.issue, row.payload) for row in waiting] == [
         ("owner/repo", 438, {"status": "pr-ready"})
     ]
+
+
+def test_awaiting_merge_maps_every_stored_column_onto_its_own_field(
+    db_path: Path,
+) -> None:
+    """The traverse-grain half, where both grain columns come back NULL."""
+    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
+
+    (row,) = ledger.awaiting_merge(db_path=db_path)
+
+    (stored,) = raw_rows(db_path)
+    assert row == ledger.LedgerRow(
+        id=stored["id"],
+        received_at=stored["received_at"],
+        kind="traverse-end",
+        repo="owner/repo",
+        issue=438,
+        node=None,
+        session_id=None,
+        payload={"status": "pr-ready"},
+    )
 
 
 def test_awaiting_merge_drops_an_issue_once_it_is_closed_out(db_path: Path) -> None:
