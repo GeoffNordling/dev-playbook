@@ -190,23 +190,20 @@ def _numbers(value: object) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
 
 
-# The whole addressing rule, in one place. Every public call passes its address
-# through `_gate` before anything else happens, so nothing below the gate
-# re-checks an address: past it, the address is trusted.
+# The whole addressing rule, in one place: `_gate` judges every address a
+# public call hands in, and nothing below it re-checks one.
 #
-# `repo`, `node` and `session_id` name things, and a name that is missing or
-# empty breaks its row two ways. A NULL is unmatchable under SQL's three-valued
-# logic, so the row can never be superseded, reported or closed out and stands
-# in every answer for good. An empty string is worse company: it *does* match,
-# so every caller that gets it wrong lands on one shared address and supersedes
-# work it has nothing to do with.
+# A name that is missing or empty breaks its row two ways. A NULL is unmatchable
+# under SQL's three-valued logic, so the row can never be superseded, reported
+# or closed out and stands in every answer for good. An empty string is worse
+# company: it *does* match, so every caller that gets it wrong lands on one
+# shared address and supersedes work it has nothing to do with.
 #
-# `issue` is what GitHub issues, and GitHub numbers issues from 1 -- so zero and
-# negatives are not issue numbers and never arrive from live data. Type is
-# checked as strictly as value, because SQLite's INTEGER affinity converts what
-# looks numeric and stores the rest as it came: `"0"` lands on the zero address,
-# `True` addresses issue #1 by subclassing `int`, and `"main"` sits in a column
-# `LedgerRow` promises is an `int`.
+# An issue number is judged as strictly on type as on value, because SQLite's
+# INTEGER affinity converts what looks numeric and stores the rest as it came:
+# `"0"` lands on the zero address, `True` addresses issue #1 by subclassing
+# `int`, and `"main"` sits in a column `LedgerRow` promises is an `int`. Zero
+# and negatives are barred because GitHub numbers issues from 1.
 ADDRESSES: dict[str, Callable[[object], bool]] = {
     "repo": _names,
     "issue": _numbers,
@@ -314,19 +311,14 @@ def _require_wal(connection: sqlite3.Connection, db_path: Path) -> None:
 def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
     """The store, open in one transaction, table present, WAL on, timeout set.
 
-    The `BEGIN` is what makes the block one snapshot, and one connection is not
-    that. `sqlite3` opens a transaction only ahead of DML, so consecutive
-    `SELECT`s here would otherwise be separate autocommit reads and a row
-    committed between them would be visible to the second — which is exactly
-    how a colliding `job-launch` slipped past `live_jobs`'s collision guard into
-    the answer that guard exists to hold back. Held from before the first read
-    until the connection closes, every statement in the block sees the store as
-    it stood when the block began.
-
-    Deferred, so it takes no lock of its own: a writer's `INSERT` still queues
-    on the busy timeout the way it did, and a reader still blocks nobody. It
-    opens after the DDL, which runs and commits in autocommit, so the table a
-    read finds absent is still created and still there when the read is over.
+    The `BEGIN` is what makes the block one snapshot; one connection is not.
+    `sqlite3` opens a transaction only ahead of DML, so consecutive `SELECT`s
+    here would otherwise be separate autocommit reads — which is how a colliding
+    `job-launch` slipped past `live_jobs`'s collision guard into the answer that
+    guard exists to hold back. It is deferred, so it takes no lock of its own
+    and a writer's `INSERT` still queues on the busy timeout, and it opens after
+    the DDL, which commits in autocommit, so a read still creates the store it
+    finds absent.
 
     Every storage failure in the block — the store unwritable, connect, the
     DDL, the caller's own INSERT or SELECT, a busy timeout expiring — arrives
