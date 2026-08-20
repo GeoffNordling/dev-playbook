@@ -33,11 +33,9 @@ Read what they said against the drafted brief and surface what collides, in one 
 - **Gap** — the intent leans on something the brief never covers.
 - **Drift** — the intent stresses what the brief treats as minor, or shrugs at what the brief makes central.
 
-The user is in an intuition headspace; the brief is literal. The distance between them is the finding, and it runs both ways: the intent may catch a brief that is wrong, and the brief may catch a user whose picture of the issue is off. Say so when what they described is wider, narrower, or simply other than what the issue will build — this beat is the last place that misreading surfaces before an agent builds against it.
+The user is in an intuition headspace; the brief is literal. The distance is the finding, and it may be the user who has the issue wrong. Say so when what they described is wider, narrower, or other than what the issue builds.
 
-The bar is absence of conflict, never usefulness. An intent that tips no future decision passes exactly as it stands: pressing the user to make it more useful would mean enumerating the ambiguities an implementer might hit, and any ambiguity worth enumerating belongs in the brief instead — so that pressure chases a value this beat cannot produce, and costs the user's patience to chase it.
-
-When nothing collides, say so plainly and go to step 3.
+Usefulness of intent is a bonus, not mandatory. As long as nothing collides, say so and go to step 3.
 
 ## 3. Marry the two
 
