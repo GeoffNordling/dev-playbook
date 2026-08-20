@@ -25,6 +25,24 @@ workspace-lint's `GOVERNED` roster, say so and stop: that repo's problem is
 pin drift or findings, which is /update-standards-pin territory, not
 adoption.
 
+Then, before touching a file, tell the user what their GitHub token will
+need. A fine-grained PAT carries neither permission by default, and both
+failures land late — one at the push, one at the CI check — so raising them
+now lets the user grant them while you work instead of being stopped twice:
+
+- **Workflows: Read and write** — the adoption diff creates
+  `.github/workflows/ci.yml`, and without this the push is rejected outright
+  (`refusing to allow a Personal Access Token to create or update workflow`).
+- **Actions: Read** — without it `gh pr checks` and the Actions API return
+  403, so you cannot confirm the CI gate went green before handing over the
+  PR.
+
+Both are granted per-token at `https://github.com/settings/personal-access-tokens`,
+and the token's repository selection must include the target. Do not offer
+`gh auth refresh -s workflow` — that is the OAuth path and does nothing for a
+fine-grained token. Say that the grant can be narrowed again once the repo is
+enrolled, so a temporary widening is not mistaken for a permanent one.
+
 ## 2. Wire and seed
 
 Follow bootstrap.md's adoption steps 1–4: read the layers, wire the pin at a
