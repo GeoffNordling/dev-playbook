@@ -237,8 +237,8 @@ def _gate_status(payload: Mapping[str, object]) -> None:
     This is the only writer of a `traverse-end`, and judging a status needs no
     sight of any other row -- so the judgment belongs here, where the caller who
     got it wrong is still on the stack. Made at the read instead it would arrive
-    as a stored row nobody can attribute and, the table being append-only,
-    nobody can repair. `awaiting_merge` reads the key with no guard of its own
+    as a stored row nobody can attribute, long after the caller that wrote it
+    has gone. `awaiting_merge` reads the key with no guard of its own
     because of this: a row that got past here carries a status it recognises.
     """
     if STATUS not in payload:
@@ -387,14 +387,17 @@ def _append(
     `_gate`, one level up.
 
     The payload is encoded before the store is touched, so a payload that will
-    not serialize raises with nothing written.
+    not serialize raises with nothing written. `allow_nan=False` puts a NaN or
+    an infinity in that class: `json.dumps` would otherwise write them as bare
+    tokens no JSON parser accepts, and SQLite's `json_valid` reads the row back
+    as invalid -- an unqueryable payload in the one column `_gate` cannot judge.
 
     `json.dumps` serializes `dict` alone, not the `Mapping` protocol, so the
     payload is copied into one first — otherwise the most natural immutable
     payloads, a `MappingProxyType` or a `ChainMap`, would be refused as
     unserializable despite being nothing of the sort.
     """
-    encoded = json.dumps(dict(payload))
+    encoded = json.dumps(dict(payload), allow_nan=False)
     received_at = datetime.now(UTC).isoformat(timespec="microseconds")
     with _ledger(db_path) as connection:
         connection.execute(
@@ -647,4 +650,4 @@ def awaiting_merge(
     _gate(**_given(repo=repo))
     with _ledger(db_path) as connection:
         candidates = _select(connection, AWAITING_MERGE, {"repo": repo})
-    return [row for row in candidates if row.payload.get(STATUS) == PR_READY]
+    return [row for row in candidates if row.payload[STATUS] == PR_READY]

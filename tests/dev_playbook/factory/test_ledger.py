@@ -215,8 +215,8 @@ def rot_the_stored_payload(db_path: Path, payload: str | None) -> None:
     """Damage the payload of the ledger's only row, behind the module's back.
 
     The module only ever INSERTs, so this stands in for a row that reached
-    the store intact and rotted there — the hazard an append-only table
-    cannot repair, and so must report rather than crash past.
+    the store intact and rotted there — the hazard the module must report
+    rather than crash past.
     """
     with closing(sqlite3.connect(db_path)) as connection:
         connection.execute("UPDATE ledger SET payload = ?", (payload,))
