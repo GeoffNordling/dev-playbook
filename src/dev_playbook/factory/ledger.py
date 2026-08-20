@@ -138,16 +138,18 @@ class LedgerError(Exception):
     - A **store that will not take WAL**, unchained: there is no underlying
       error, because SQLite reports a declined journal mode by returning the
       one it kept.
-    - A **stored row this module cannot use**, naming the row id: a
-      `traverse-end` candidate whose payload carries no `status` (unchained,
-      the row is simply unjudgeable), or a payload that will not decode
-      (chained from the decode error).
+    - A **stored row this module cannot use**, naming the row id: a payload
+      that will not decode (chained from the decode error), a payload that
+      decodes into something other than a JSON object (unchained), or a
+      `traverse-end` candidate whose payload carries no usable `status`
+      (unchained, the row is simply unjudgeable).
 
-    A caller's own bug is deliberately none of these. A payload that will not
-    serialize raises `TypeError` and a column argument SQLite cannot bind
-    raises `sqlite3.ProgrammingError` or `sqlite3.InterfaceError`, each
-    untouched and with nothing written — telling the operator their store is
-    unusable would send them to check a disk that is fine.
+    A caller's own bug is deliberately none of these — telling the operator
+    their store is unusable would send them to check a disk that is fine. Each
+    surfaces as itself, with nothing written: a payload that will not serialize
+    raises `TypeError`, a job-grain write missing its node or session id raises
+    `ValueError`, and a column argument SQLite cannot bind raises
+    `sqlite3.ProgrammingError` or `sqlite3.InterfaceError`.
     """
 
 
@@ -242,6 +244,38 @@ def _append_traverse(
     _append(kind, repo, issue, None, None, payload, db_path)
 
 
+def _append_job(
+    kind: str,
+    repo: str,
+    issue: int,
+    node: str,
+    session_id: str,
+    payload: Mapping[str, object],
+    db_path: Path,
+) -> None:
+    """Append one job-grain row, refusing one whose grain columns are missing.
+
+    Both job-grain columns are load-bearing for `live_jobs`, and a NULL in
+    either is worse than an error. SQL three-valued logic makes
+    `report.session_id = launch.session_id` neither true nor false when both
+    are NULL, so a launch written without a session id can never be closed --
+    not by its own report, not by anything -- and shows as running work
+    forever, with nothing raised anywhere. A launcher whose session-id minting
+    returns None on some path would strand every job it starts.
+
+    So the missing value is refused here, at the write, before it can reach a
+    store nothing can repair it in. This is a caller bug and surfaces as one:
+    `LedgerError` would send the operator to check a store that is perfectly
+    healthy.
+    """
+    if node is None or session_id is None:
+        raise ValueError(
+            f"a {kind} needs both a node and a session id, and was given "
+            f"node={node!r}, session_id={session_id!r}"
+        )
+    _append(kind, repo, issue, node, session_id, payload, db_path)
+
+
 # --- traverse-grain writers ---
 
 
@@ -305,7 +339,7 @@ def job_launch(
     db_path: Path = DB_PATH,
 ) -> None:
     """Append the pre-spawn record, right after the session id is minted."""
-    _append("job-launch", repo, issue, node, session_id, payload, db_path)
+    _append_job("job-launch", repo, issue, node, session_id, payload, db_path)
 
 
 def job_report(
@@ -318,7 +352,7 @@ def job_report(
     db_path: Path = DB_PATH,
 ) -> None:
     """Append the job's single terminal record, written as the child exits."""
-    _append("job-report", repo, issue, node, session_id, payload, db_path)
+    _append_job("job-report", repo, issue, node, session_id, payload, db_path)
 
 
 # --- reads ---
@@ -345,11 +379,19 @@ StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
 def _decode(row: StoredRow) -> LedgerRow:
     """One raw row as a `LedgerRow`, its payload text parsed back into a dict.
 
-    A payload that will not decode is a stored row this module cannot use, and
-    it leaves as `LedgerError` naming the row — the same shape as the
+    A payload this module cannot use is a stored row it cannot use, and it
+    leaves as `LedgerError` naming the row — the same shape as the
     `awaiting_merge` guard, and for the same reason. A caller who catches
     `LedgerError` to mean "the ledger is broken" would otherwise walk straight
     past a bare `json` error and take the traverse down with it.
+
+    Two things fail that way, and the second is not the first: text that will
+    not parse at all, and text that parses into something other than an object.
+    `null`, a number and a list are all valid JSON, so they clear the parse and
+    are still not the `dict` a payload is — left alone they ride out of here
+    inside a `LedgerRow` that lies about its own type, and surface much later
+    as a `TypeError` from whatever first treats one as a mapping. The sibling
+    `measure-event` draws the same line for the same reason.
 
     The columns are unpacked positionally rather than named one by one: adding
     a column to `COLUMNS` then breaks the constructor loudly, where eight
@@ -362,6 +404,11 @@ def _decode(row: StoredRow) -> LedgerRow:
         raise LedgerError(
             f"run ledger row {row[0]} has a payload that will not decode: {error}"
         ) from error
+    if not isinstance(payload, dict):
+        raise LedgerError(
+            f"run ledger row {row[0]} has a payload that is not a JSON object "
+            f"but a {type(payload).__name__}"
+        )
     return LedgerRow(*row[:-1], payload=payload)
 
 

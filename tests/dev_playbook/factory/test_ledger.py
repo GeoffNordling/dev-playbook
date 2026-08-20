@@ -42,6 +42,11 @@ JOIN events AS e ON l.session_id = e.session_id
 WHERE l.kind = 'job-launch'
 """
 
+# JSON a payload column can hold that is valid and still not a payload: the
+# module annotates `LedgerRow.payload` as a dict, so anything else is a stored
+# row it cannot use.
+NOT_JSON_OBJECTS = ["null", "123", "true", "[1, 2]", '"pr-ready"']
+
 TraverseWriter = Callable[..., None]
 
 TRAVERSE_WRITERS: list[tuple[str, TraverseWriter]] = [
@@ -287,6 +292,51 @@ def test_a_read_of_a_null_stored_payload_raises_ledger_error(
         ledger.live_jobs(db_path=db_path)
 
     assert isinstance(raised.value.__cause__, TypeError)
+
+
+@pytest.mark.parametrize("stored", NOT_JSON_OBJECTS)
+def test_a_read_of_a_payload_that_is_not_an_object_names_the_row(
+    stored: str, db_path: Path
+) -> None:
+    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
+    rot_the_stored_payload(db_path, stored)
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.live_jobs(db_path=db_path)
+
+    assert "row 1" in str(raised.value)
+
+
+def test_awaiting_merge_refuses_a_candidate_whose_payload_is_not_an_object(
+    db_path: Path,
+) -> None:
+    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
+    rot_the_stored_payload(db_path, "123")
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.awaiting_merge(db_path=db_path)
+
+    assert "row 1" in str(raised.value)
+
+
+@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
+def test_a_job_writer_refuses_a_missing_node(
+    kind: str, write: JobWriter, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write("owner/repo", 438, None, "sess-1", {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
+def test_a_job_writer_refuses_a_missing_session_id(
+    kind: str, write: JobWriter, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write("owner/repo", 438, "build", None, {}, db_path=db_path)
+
+    assert not db_path.exists()
 
 
 def test_an_unserializable_payload_raises_before_anything_is_written(
