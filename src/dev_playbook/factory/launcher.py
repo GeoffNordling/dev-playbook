@@ -151,6 +151,12 @@ def main_checkout(worktree: Path) -> Path:
     The answer comes back absolute from a linked worktree and relative from a
     main checkout, so it is joined onto the worktree either way — joining an
     absolute path discards the left side, which is exactly right here.
+
+    A path that is no git checkout at all leaves as git's own
+    `CalledProcessError` rather than as a `LauncherError`: the worktree is the
+    caller's to create and hand over, so a missing one is that caller's bug,
+    and dressing it as a launch failure would send an operator to check a
+    launch that was never the problem.
     """
     common = subprocess.run(
         ["git", "-C", str(worktree), "rev-parse", "--git-common-dir"],
