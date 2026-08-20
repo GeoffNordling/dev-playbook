@@ -15,7 +15,7 @@ from typing import IO
 
 import yaml
 
-from dev_playbook import gitrepo
+from dev_playbook import gitrepo, md
 from dev_playbook.factory import ledger
 
 # Environment variables that route inference somewhere other than subscription
@@ -45,10 +45,8 @@ MANAGED_SETTINGS_DIR = Path("/etc/claude-code/managed-settings.d")
 # The per-scope directory every settings file and agent definition sits under.
 CLAUDE_DIR = ".claude"
 
-# Where the factory's own definitions are stowed, and the fence line that opens
-# and closes the YAML frontmatter in one.
+# Where the factory's own definitions are stowed.
 AGENTS_DIR = Path("~/.claude/agents").expanduser()
-FRONTMATTER_FENCE = "---"
 
 # The six factory node names. The shadow check reads the whole roster whatever
 # node is being launched, because a repo-local copy of any of them silently
@@ -209,8 +207,8 @@ def preflight(worktree: Path, env: Mapping[str, str]) -> None:
     Raises `LaunchAborted` carrying every finding at once, so an operator fixes
     the whole configuration in one pass rather than one finding per run.
 
-    Presence is what condemns a billing name, here and in `_swept`, never
-    truthiness: `ANTHROPIC_API_KEY=""` is set, and a check guarding money must
+    Presence is what condemns a billing name, in the environment and in every
+    settings file alike, never truthiness: `ANTHROPIC_API_KEY=""` is set, and a check guarding money must
     not be the laxer of the two next to `CLAUDE_CODE_EFFORT_LEVEL`. An empty
     value that routes no billing is refused with the rest — a name nobody meant
     to export is a configuration an operator should see either way.
@@ -232,11 +230,11 @@ def _sweep_findings(
     findings = [f"environment: {var} is set" for var in BILLING_ENV_VARS if var in env]
     for path in _settings_roster(worktree, env, checkout):
         if path.exists():
-            findings += _swept(path)
+            findings += _settings_findings(path)
     return findings
 
 
-def _swept(path: Path) -> list[str]:
+def _settings_findings(path: Path) -> list[str]:
     """Findings from one settings file that is there.
 
     Two duties in one pass, because both need the file read. It must parse:
@@ -327,14 +325,27 @@ def _definition_findings(node: str, agents_dir: Path) -> list[str]:
     with no error, and an `effort` outside the vocabulary is swallowed — so a
     launch under either runs as something other than what was asked for, and
     nothing downstream would say so.
+
+    The frontmatter is split by `md.parse_frontmatter`, the one the doc linters
+    read every document in this repo with. A second spelling of one rule drifts
+    from the first: the two had already diverged over what closes a fence, so
+    the launcher would have refused a definition the linters read fine. Its
+    `None` covers every way a file can carry no usable mapping — no fence, a
+    fence never closed, a block that is not a mapping — and all three leave a
+    definition declaring neither field, which is the one finding they earn.
     """
     path = agents_dir / f"{node}.md"
     if not path.is_file():
         return [f"{path}: the launched node has no definition"]
     try:
-        frontmatter = _frontmatter(path)
-    except (ValueError, yaml.YAMLError) as error:
+        frontmatter, _ = md.parse_frontmatter(path.read_text())
+    except yaml.YAMLError as error:
         return [f"{path}: frontmatter will not parse ({error})"]
+    if frontmatter is None:
+        return [
+            f"{path}: carries no frontmatter mapping, so it declares neither a name "
+            f"nor an effort"
+        ]
     findings = []
     if frontmatter.get("name") != node:
         findings.append(
@@ -348,29 +359,6 @@ def _definition_findings(node: str, agents_dir: Path) -> list[str]:
             f"unrecognised effort is swallowed silently"
         )
     return findings
-
-
-def _frontmatter(path: Path) -> dict[str, object]:
-    """One agent definition's YAML frontmatter, as a mapping.
-
-    Raises `ValueError` for a file that carries no fenced block at all or whose
-    block is not a mapping, alongside the `yaml.YAMLError` malformed YAML
-    raises. The one caller reports all three the same way.
-    """
-    opening = f"{FRONTMATTER_FENCE}\n"
-    text = path.read_text()
-    if not text.startswith(opening):
-        raise ValueError("the file opens with no frontmatter fence")
-    _, _, rest = text.partition(opening)
-    block, fence, _ = rest.partition(f"\n{FRONTMATTER_FENCE}")
-    if not fence:
-        raise ValueError("the frontmatter fence is never closed")
-    frontmatter = yaml.safe_load(block)
-    if not isinstance(frontmatter, dict):
-        raise ValueError(
-            f"the frontmatter is a {type(frontmatter).__name__}, not a mapping"
-        )
-    return frontmatter
 
 
 def _shadow_findings(worktree: Path, checkout: Path) -> list[str]:

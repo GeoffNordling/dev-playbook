@@ -134,9 +134,13 @@ ORPHAN_SECONDS = 5.0
 ORPHANED_DEADLINE = 1.0
 
 # What the one real-spawn test needs of the machine it runs on, read at import
-# before any fixture redirects them. That test alone is swept against the real
-# settings and runs under the real home, because a billing key on this machine
-# must abort it rather than be hidden behind a temp directory nobody configured.
+# before any fixture redirects them. That test alone runs under the real home
+# and is swept against the machine's real settings roster, so a billing key
+# configured in any settings file here aborts it rather than being hidden
+# behind a temp directory nobody configured. Only the settings half of the
+# sweep is real: the autouse `child_env` fixture deletes the nine billing
+# variables from this process, and the child inherits that same cleaned
+# environment, so no real spawn can be metered by one of them either way.
 REAL_HOME = os.path.expanduser("~")
 REAL_MANAGED_SETTINGS = launcher.MANAGED_SETTINGS
 REAL_MANAGED_SETTINGS_DIR = launcher.MANAGED_SETTINGS_DIR
@@ -291,11 +295,16 @@ def child_env(home: Path, monkeypatch: pytest.MonkeyPatch) -> pytest.MonkeyPatch
 
 @pytest.fixture
 def real_machine(child_env: pytest.MonkeyPatch) -> None:
-    """Undo this module's hermetic redirections, for the one test that spawns claude.
+    """Undo this module's settings redirections, for the one test that spawns claude.
 
     The real spawn needs the machine's own home to find the subscription
     credential it runs on, and it has to be swept against the machine's real
-    settings for the sweep to mean anything at all.
+    settings for that half of the sweep to mean anything at all.
+
+    The environment stays as `child_env` left it, deliberately: restoring live
+    billing variables into this process is a worse trade than a narrower
+    claim. So this fixture proves the settings roster against the real machine
+    and nothing about the environment.
     """
     child_env.setenv("HOME", REAL_HOME)
     child_env.setattr(launcher, "MANAGED_SETTINGS", REAL_MANAGED_SETTINGS)
@@ -655,6 +664,42 @@ def test_launch_aborts_when_a_definitions_frontmatter_will_not_parse(
     launch: Callable[..., launcher.JobOutcome], agents_dir: Path, db: Path
 ) -> None:
     (agents_dir / f"{NODE}.md").write_text("---\nname: [build\n---\n\nBody.\n")
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launch()
+
+    assert f"{NODE}.md" in str(aborted.value)
+    assert ledger_rows(db) == []
+
+
+def test_launch_aborts_when_a_definition_carries_no_frontmatter_at_all(
+    launch: Callable[..., launcher.JobOutcome], agents_dir: Path, db: Path
+) -> None:
+    (agents_dir / f"{NODE}.md").write_text("Just a body, and no fence anywhere.\n")
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launch()
+
+    assert f"{NODE}.md" in str(aborted.value)
+    assert ledger_rows(db) == []
+
+
+def test_launch_aborts_when_a_definitions_frontmatter_fence_is_never_closed(
+    launch: Callable[..., launcher.JobOutcome], agents_dir: Path, db: Path
+) -> None:
+    (agents_dir / f"{NODE}.md").write_text("---\nname: build\neffort: high\n")
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launch()
+
+    assert f"{NODE}.md" in str(aborted.value)
+    assert ledger_rows(db) == []
+
+
+def test_launch_aborts_when_a_definitions_frontmatter_is_not_a_mapping(
+    launch: Callable[..., launcher.JobOutcome], agents_dir: Path, db: Path
+) -> None:
+    (agents_dir / f"{NODE}.md").write_text("---\n- build\n- high\n---\n\nBody.\n")
 
     with pytest.raises(launcher.LaunchAborted) as aborted:
         launch()
