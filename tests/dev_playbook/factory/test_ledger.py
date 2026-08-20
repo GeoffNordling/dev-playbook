@@ -49,11 +49,22 @@ WHERE l.kind = 'job-launch'
 # row it cannot use.
 NOT_JSON_OBJECTS = ["null", "123", "true", "[1, 2]", '"pr-ready"']
 
-# A `status` a candidate row can carry that is outside the module's closed
-# vocabulary because it is not a string at all. The unhashable two are the
-# reason the vocabulary is a tuple: a set would raise `TypeError` out of the
-# guard rather than judge them.
-NOT_STATUS_STRINGS = [1, None, True, ["pr-ready"], {"value": "pr-ready"}]
+# A `status` outside the module's closed vocabulary because it is not a string
+# at all. The unhashable two are the reason the vocabulary is a tuple: a set
+# would raise `TypeError` out of the gate meant to catch them.
+NOT_STATUS_STRINGS: list[Any] = [1, None, True, ["pr-ready"], {"value": "pr-ready"}]
+
+# What `traverse_end` refuses at the door: a payload with no `status` in it, one
+# whose `status` is not a string, and one whose `status` is a string the graph
+# never exits on -- the near-misses a launcher actually writes.
+REFUSED_TRAVERSE_END_PAYLOADS: list[dict[str, Any]] = [
+    {},
+    {"note": "no status here"},
+    *({"status": status} for status in NOT_STATUS_STRINGS),
+    {"status": "pr_ready"},
+    {"status": "PR-Ready"},
+    {"status": ""},
+]
 
 # The promoted columns a stored row of each grain has to carry. Every one is a
 # column a query matches on -- `received_at` excepted, which `LedgerRow` simply
@@ -308,11 +319,18 @@ def test_traverse_start_appends_one_row(tmp_path: Path) -> None:
 def test_a_traverse_writer_stores_its_kind_null_grain_and_payload(
     kind: str, write: TraverseWriter, db_path: Path
 ) -> None:
-    write("owner/repo", 438, {"note": kind}, db_path=db_path)
+    """The `status` rides along because `traverse_end` demands one at the door.
+
+    The other five writers interpret no payload key at all, so it passes
+    straight through them as any other value would.
+    """
+    payload = {"note": kind, "status": "pr-ready"}
+
+    write("owner/repo", 438, payload, db_path=db_path)
 
     (row,) = raw_rows(db_path)
     assert (row["kind"], row["node"], row["session_id"]) == (kind, None, None)
-    assert json.loads(row["payload"]) == {"note": kind}
+    assert json.loads(row["payload"]) == payload
 
 
 def store_by_positional_default(repo: str, db_path: Path = ledger.DB_PATH) -> Path:
@@ -383,7 +401,11 @@ def test_a_write_against_a_locked_store_waits_rather_than_failing(
     with closing(sqlite3.connect(db_path)) as blocker, ThreadPoolExecutor(1) as pool:
         blocker.execute("BEGIN EXCLUSIVE")
         contended = pool.submit(
-            ledger.traverse_end, "owner/repo", 438, {}, db_path=db_path
+            ledger.traverse_end,
+            "owner/repo",
+            438,
+            {"status": "pr-ready"},
+            db_path=db_path,
         )
         time.sleep(LOCK_HOLD_SECONDS)
         still_waiting = not contended.done()
@@ -614,6 +636,39 @@ def test_a_job_writer_refuses_an_address_the_gate_bars(
         write(*address, {}, db_path=db_path)
 
     assert not db_path.exists()
+
+
+@pytest.mark.parametrize("payload", REFUSED_TRAVERSE_END_PAYLOADS)
+def test_traverse_end_refuses_a_status_the_gate_bars(
+    payload: dict[str, Any], db_path: Path
+) -> None:
+    """A traverse ends on one of two statuses, and the writer is told so.
+
+    `traverse_end` is the sole writer of the one row `awaiting_merge` reads a
+    payload value out of, and judging a status needs no knowledge of any other
+    row -- so the judgment sits at the door, where the caller who got it wrong
+    is still on the stack, rather than at a read where it would be a row nobody
+    can attribute and nobody can repair.
+    """
+    with pytest.raises(ValueError):
+        ledger.traverse_end("owner/repo", 438, payload, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize("status", ledger.STATUSES)
+def test_traverse_end_accepts_either_terminal_status(
+    status: str, db_path: Path
+) -> None:
+    """Both ways out of `traverse_issue`, including the escalated one.
+
+    An escalated exit writes `traverse-end` too (epic standing ruling 4), so a
+    door that took only `pr-ready` would refuse half the traverses there are.
+    """
+    ledger.traverse_end("owner/repo", 438, {"status": status}, db_path=db_path)
+
+    (row,) = raw_rows(db_path)
+    assert json.loads(row["payload"]) == {"status": status}
 
 
 @pytest.mark.parametrize("filters", REFUSED_FILTERS)
@@ -964,76 +1019,6 @@ def test_awaiting_merge_reads_only_the_newest_traverse_end_of_an_issue(
 ) -> None:
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
     ledger.traverse_end("owner/repo", 438, {"status": "escalated"}, db_path=db_path)
-
-    assert ledger.awaiting_merge(db_path=db_path) == []
-
-
-def test_awaiting_merge_refuses_a_candidate_whose_status_is_unrecognised(
-    db_path: Path,
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"status": "pr_ready"}, db_path=db_path)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.awaiting_merge(db_path=db_path)
-
-    assert str(raised.value).endswith(": [1]")
-
-
-def test_awaiting_merge_raises_naming_a_newest_traverse_end_with_no_status(
-    db_path: Path,
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"note": "no status here"}, db_path=db_path)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.awaiting_merge(db_path=db_path)
-
-    assert str(raised.value).endswith(": [1]")
-
-
-@pytest.mark.parametrize("status", NOT_STATUS_STRINGS)
-def test_awaiting_merge_refuses_a_candidate_whose_status_is_not_a_string(
-    status: object, db_path: Path
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"status": status}, db_path=db_path)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.awaiting_merge(db_path=db_path)
-
-    assert str(raised.value).endswith(": [1]")
-
-
-def test_awaiting_merge_ignores_a_superseded_unrecognised_status(
-    db_path: Path,
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"status": "pr_ready"}, db_path=db_path)
-    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
-
-    assert [row.issue for row in ledger.awaiting_merge(db_path=db_path)] == [438]
-
-
-def test_awaiting_merge_ignores_a_superseded_status_that_is_not_a_string(
-    db_path: Path,
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"status": 7}, db_path=db_path)
-    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
-
-    assert [row.issue for row in ledger.awaiting_merge(db_path=db_path)] == [438]
-
-
-def test_awaiting_merge_ignores_a_superseded_traverse_end_with_no_status(
-    db_path: Path,
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"note": "no status here"}, db_path=db_path)
-    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
-
-    assert [row.issue for row in ledger.awaiting_merge(db_path=db_path)] == [438]
-
-
-def test_awaiting_merge_ignores_a_closed_out_traverse_end_with_no_status(
-    db_path: Path,
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"note": "no status here"}, db_path=db_path)
-    ledger.closeout("owner/repo", 438, {"outcome": "merged"}, db_path=db_path)
 
     assert ledger.awaiting_merge(db_path=db_path) == []
 

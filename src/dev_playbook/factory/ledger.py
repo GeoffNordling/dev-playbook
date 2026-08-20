@@ -128,8 +128,7 @@ ORDER BY l.id
 
 # The rows `awaiting_merge` is about to match: every `traverse-end` whose own
 # window is still open, by `WINDOW_CLOSERS`. What an end outside its window
-# said is dead history this never consults, so it can never brick the read
-# with a malformed payload.
+# said is dead history this never consults.
 AWAITING_MERGE = f"""
 SELECT {COLUMNS} FROM ledger AS l
 WHERE l.kind = '{TRAVERSE_END}'
@@ -166,14 +165,13 @@ ORDER BY l.session_id
 #
 # The vocabulary is closed and this module owns it: a `traverse-end` carries the
 # status `traverse_issue` exited with, and those are the two terminal statuses
-# the graph has. A candidate carrying anything else -- a missing key, a value
-# that is not a string, a string nobody here recognises -- is a row this cannot
-# judge, and it says so rather than dropping it. Adding a terminal status is an
-# edit here, which is the point: the ledger is where a launcher's typo surfaces.
+# the graph has. `traverse_end` refuses anything else at the door, so adding a
+# terminal status is an edit here -- which is the point: the ledger is where a
+# launcher's typo surfaces, and it surfaces at the write.
 #
 # A tuple, not a set: membership on a tuple compares rather than hashes, so an
-# unhashable stored status -- a list, an object -- is judged unrecognised
-# instead of raising `TypeError` out of the guard meant to catch it.
+# unhashable status -- a list, an object -- is judged unrecognised instead of
+# raising `TypeError` out of the gate meant to catch it.
 STATUS = "status"
 PR_READY = "pr-ready"
 ESCALATED = "escalated"
@@ -232,6 +230,34 @@ def _gate(**address: object) -> None:
         )
 
 
+def _gate_status(payload: Mapping[str, object]) -> None:
+    """Refuse a `traverse-end` carrying a status the graph never exits on.
+
+    Beside the address gate, and for the same reason: `traverse_issue` ends
+    `pr-ready` or `escalated` and nothing else, so a payload carrying anything
+    outside that is a launcher's typo. It is a caller bug, raised as
+    `ValueError` and before the store is touched, so nothing is written.
+
+    This is the only writer of a `traverse-end`, and judging a status needs no
+    sight of any other row -- so the judgment belongs here, where the caller who
+    got it wrong is still on the stack. Made at the read instead it would arrive
+    as a stored row nobody can attribute and, the table being append-only,
+    nobody can repair. `awaiting_merge` reads the key with no guard of its own
+    because of this: a row that got past here carries a status it recognises.
+    """
+    if STATUS not in payload:
+        raise ValueError(
+            f"the run ledger cannot record a {TRAVERSE_END} with no {STATUS!r} in "
+            f"its payload: a traverse ends on one of {STATUSES}"
+        )
+    status = payload[STATUS]
+    if status not in STATUSES:
+        raise ValueError(
+            f"the run ledger cannot record a {TRAVERSE_END} whose {STATUS} is "
+            f"{status!r}: a traverse ends on one of {STATUSES}"
+        )
+
+
 def _given(**address: object) -> dict[str, object]:
     """A read's filters, less the ones it left unset.
 
@@ -267,12 +293,10 @@ class LedgerError(Exception):
       error, because SQLite reports a declined journal mode by returning the
       one it kept.
     - A **stored row this module cannot use**, naming the row id: a payload
-      that will not decode (chained from the decode error), a payload that
-      decodes into something other than a JSON object, a promoted column that
-      is empty or holds a type the queries cannot address by, or a `traverse-end`
-      candidate whose payload carries no `status` from the closed vocabulary
-      at `STATUSES`. Only the first of these has an error to chain from; the
-      rest are the store disagreeing with itself, not an operation failing.
+      that will not decode (chained from the decode error), a promoted column
+      that is empty or holds a type the queries cannot address by. Only the
+      first of these has an error to chain from; the rest are the store
+      disagreeing with itself, not an operation failing.
     - **Stored rows this module cannot tell apart**, naming them: one session
       id held by more than one job, which no read can resolve because a session
       id is what a job is addressed and joined by.
@@ -280,9 +304,9 @@ class LedgerError(Exception):
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
     surfaces as itself, with nothing written: a payload that will not serialize
-    raises `TypeError`, an address `_gate` refuses raises `ValueError`, and a
-    column argument SQLite cannot bind raises `sqlite3.ProgrammingError` or
-    `sqlite3.InterfaceError`.
+    raises `TypeError`, an address or a `traverse-end` status the gates refuse
+    raises `ValueError`, and a column argument SQLite cannot bind raises
+    `sqlite3.ProgrammingError` or `sqlite3.InterfaceError`.
     """
 
 
@@ -392,8 +416,15 @@ def _append_traverse(
     Every traverse-grain writer goes through here, so the two job-grain columns
     are NULL by construction rather than by each writer remembering to pass
     nothing, and the gate is the first thing each of them reaches.
+
+    A `traverse-end` is gated on its payload as well, because it is the one kind
+    whose payload this module reads back. The address is judged first either
+    way, so a call that gets both wrong is told about the address it is filed
+    under before the status it carries.
     """
     _gate(repo=repo, issue=issue)
+    if kind == TRAVERSE_END:
+        _gate_status(payload)
     _append(kind, repo, issue, None, None, payload, db_path)
 
 
@@ -653,29 +684,12 @@ def awaiting_merge(
     is rewriting its branch.
 
     The one place the module reads inside a payload, and it reads exactly one
-    key. That key's vocabulary is closed and stated at `STATUSES`: a candidate
-    carrying anything outside it — no `status` at all, a `status` that is not a
-    string, a string nobody here recognises — is a row this cannot judge, and
-    it raises `LedgerError` naming that row rather than dropping it. There is
-    no reading under which a launcher's `"PR-Ready"` or `"pr_ready"` quietly
-    means no.
-
-    Only candidates are judged — the ends whose windows are still open. An end
-    that has been superseded, spent or reopened past is dead history the query
-    never consults, so a malformed row that is no longer in play cannot brick
-    this read; one that *is* in play stops the read until it is repaired, which
-    is a direct `UPDATE` on the row the error names. Append-only is this
-    module's writing discipline, not a limit on the operator.
+    key. It judges nothing: `traverse_end` is the sole writer of these rows and
+    demands a status from the closed vocabulary at `STATUSES` before it writes
+    one, so every row that reaches here already carries a status this
+    recognises. A launcher's `"PR-Ready"` or `"pr_ready"` never gets this far.
     """
     _gate(**_given(repo=repo))
     with _ledger(db_path) as connection:
         candidates = _select(connection, AWAITING_MERGE, {"repo": repo})
-    unjudgeable = [
-        row.id for row in candidates if row.payload.get(STATUS) not in STATUSES
-    ]
-    if unjudgeable:
-        raise LedgerError(
-            f"run ledger at {db_path} has {TRAVERSE_END} rows whose payload "
-            f"{STATUS!r} is not one of {STATUSES}: {unjudgeable}"
-        )
-    return [row for row in candidates if row.payload[STATUS] == PR_READY]
+    return [row for row in candidates if row.payload.get(STATUS) == PR_READY]
