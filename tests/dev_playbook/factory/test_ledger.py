@@ -182,6 +182,47 @@ def overwrite_the_stored_column(db_path: Path, column: str, value: Any) -> None:
         connection.commit()
 
 
+# A fragment of the `live_jobs` query and of nothing else, so a trace callback
+# can tell that statement from the collision guard that runs ahead of it.
+LIVE_JOBS_FRAGMENT = "relaunched"
+
+# A second job landing on `sess-1`, written as raw SQL because the gate refuses
+# to write one and the module's own writers are not the subject here.
+COLLIDING_LAUNCH = (
+    "INSERT INTO ledger (received_at, kind, repo, issue, node, session_id, payload) "
+    "VALUES ('2026-08-20T00:00:00.000000+00:00', 'job-launch', 'owner/two', 2, "
+    "'build', 'sess-1', '{}')"
+)
+
+
+def connect_colliding_between_the_guard_and_the_query(
+    db_path: Path,
+) -> Callable[..., sqlite3.Connection]:
+    """Real connections, one of which commits a colliding launch mid-read.
+
+    The commit lands just before the `live_jobs` query itself — after the
+    collision guard has run and passed — which is the window a held transaction
+    closes and a shared connection does not. A trace callback on the module's
+    own connection puts it there, with none of the timing a second thread and a
+    barrier would need.
+    """
+    connect: Callable[..., sqlite3.Connection] = sqlite3.connect
+    pending = [COLLIDING_LAUNCH]
+
+    def trace(statement: str) -> None:
+        if pending and LIVE_JOBS_FRAGMENT in statement:
+            with closing(connect(db_path)) as other:
+                other.execute(pending.pop())
+                other.commit()
+
+    def connecting(*args: Any, **kwargs: Any) -> sqlite3.Connection:
+        connection = connect(*args, **kwargs)
+        connection.set_trace_callback(trace)
+        return connection
+
+    return connecting
+
+
 def raw_rows(db_path: Path) -> list[sqlite3.Row]:
     """Every ledger row, oldest first, read outside the module.
 
@@ -620,6 +661,28 @@ def test_live_jobs_refuses_a_session_id_held_by_two_jobs(
         ledger.live_jobs(db_path=db_path)
 
     assert "sess-x" in str(raised.value)
+
+
+def test_live_jobs_answers_from_one_snapshot_of_the_store(
+    db_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A launch committed after the collision guard cannot slip into the answer.
+
+    The guard and the query are two statements, and the query matches a report
+    on its session id alone — so a colliding launch landing between them would
+    come back as live with nothing raised, which is the whole harm the guard
+    exists to stop. One connection is not one snapshot; a held transaction is.
+    """
+    ledger.job_launch("owner/one", 1, "build", "sess-1", {}, db_path=db_path)
+    monkeypatch.setattr(
+        ledger.sqlite3,
+        "connect",
+        connect_colliding_between_the_guard_and_the_query(db_path),
+    )
+
+    live = ledger.live_jobs(db_path=db_path)
+
+    assert [(row.repo, row.issue) for row in live] == [("owner/one", 1)]
 
 
 def test_live_jobs_reads_a_launch_and_its_own_report_sharing_a_session_id(

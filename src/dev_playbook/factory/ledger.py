@@ -312,7 +312,21 @@ def _require_wal(connection: sqlite3.Connection, db_path: Path) -> None:
 
 @contextmanager
 def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
-    """The store, open with the table present, WAL on, and the busy timeout set.
+    """The store, open in one transaction, table present, WAL on, timeout set.
+
+    The `BEGIN` is what makes the block one snapshot, and one connection is not
+    that. `sqlite3` opens a transaction only ahead of DML, so consecutive
+    `SELECT`s here would otherwise be separate autocommit reads and a row
+    committed between them would be visible to the second — which is exactly
+    how a colliding `job-launch` slipped past `live_jobs`'s collision guard into
+    the answer that guard exists to hold back. Held from before the first read
+    until the connection closes, every statement in the block sees the store as
+    it stood when the block began.
+
+    Deferred, so it takes no lock of its own: a writer's `INSERT` still queues
+    on the busy timeout the way it did, and a reader still blocks nobody. It
+    opens after the DDL, which runs and commits in autocommit, so the table a
+    read finds absent is still created and still there when the read is over.
 
     Every storage failure in the block — the store unwritable, connect, the
     DDL, the caller's own INSERT or SELECT, a busy timeout expiring — arrives
@@ -333,6 +347,7 @@ def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
         ) as connection:
             _require_wal(connection, db_path)
             connection.execute(SCHEMA)
+            connection.execute("BEGIN")
             yield connection
     # Two exception types, not one bound to a name: PEP 758, new in 3.14, which
     # this package requires. It reads character-for-character like Python 2's
@@ -495,9 +510,8 @@ def _select(
     """Run one named query on an open ledger and decode its rows.
 
     The connection is passed in rather than opened here so that a read and the
-    guards it runs alongside see one snapshot of the store: opened separately
-    they would not, and a write landing between them could slip past a guard
-    into the answer it was meant to hold back.
+    guards it runs alongside run inside the one transaction `_ledger` holds —
+    see there for why a shared connection alone would not have been enough.
 
     A filter left None matches everything, which each query spells out as
     `:name IS NULL OR column = :name` -- so the filters conjoin and passing
