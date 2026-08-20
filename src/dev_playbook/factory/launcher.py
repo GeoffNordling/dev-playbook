@@ -850,6 +850,24 @@ def _task_outcome(report: Mapping[str, object]) -> str:
     return str(report[OUTCOME])
 
 
+def _seconds(duration_ms: object) -> float:
+    """One duration the harness reported in milliseconds, as seconds.
+
+    A duration that is not a number is a broken promise, not a field to leave
+    off: `duration_ms` is one of the few measured guarantees the envelope
+    carries, and a type guard with no else branch would drop it from every row
+    from the day the harness changed shape, with a duration query returning
+    fewer rows than it should as the first anyone heard of it.
+    """
+    if not isinstance(duration_ms, int | float) or isinstance(duration_ms, bool):
+        raise HarnessContractViolation(
+            f"the result envelope reports {DURATION_MS} as a "
+            f"{type(duration_ms).__name__}, not the number it is measured to be: "
+            f"{duration_ms!r}"
+        )
+    return duration_ms / MILLISECONDS
+
+
 def _payload(
     run: _Run,
     process_outcome: str,
@@ -877,8 +895,8 @@ def _payload(
             if extract in run.result:
                 payload[extract] = run.result[extract]
         duration_ms = run.result.get(DURATION_MS)
-        if isinstance(duration_ms, int | float):
-            payload["duration_s"] = duration_ms / MILLISECONDS
+        if duration_ms is not None:
+            payload["duration_s"] = _seconds(duration_ms)
     if run.kill is not None:
         payload["kill"] = run.kill
     if run.alarm is not None:

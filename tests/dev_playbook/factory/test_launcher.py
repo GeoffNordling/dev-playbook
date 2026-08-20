@@ -1031,6 +1031,21 @@ def test_a_validated_report_with_no_outcome_violates_the_contract(
     assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
 
 
+def test_a_duration_the_harness_reports_as_a_string_violates_the_contract(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    envelope = {**result_line(REPORT), "duration_ms": "5432"}
+    claude_cmd = fake_claude([HOOK_LINE, init_line(), envelope])
+
+    with pytest.raises(launcher.HarnessContractViolation) as violated:
+        launch(claude_cmd=claude_cmd)
+
+    assert "duration_ms" in str(violated.value)
+
+
 @pytest.mark.skipif(
     os.environ.get(REAL_SPAWN_GATE) == "1",
     reason=f"{REAL_SPAWN_GATE}=1: this test launches actual claude",
