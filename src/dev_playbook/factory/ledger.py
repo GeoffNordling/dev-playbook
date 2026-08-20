@@ -153,9 +153,11 @@ class LedgerError(Exception):
       one it kept.
     - A **stored row this module cannot use**, naming the row id: a payload
       that will not decode (chained from the decode error), a payload that
-      decodes into something other than a JSON object (unchained), or a
-      `traverse-end` candidate whose payload carries no `status` from the
-      closed vocabulary at `STATUSES` (unchained, the row is unjudgeable).
+      decodes into something other than a JSON object, a row with an empty
+      promoted column that no query can therefore match, or a `traverse-end`
+      candidate whose payload carries no `status` from the closed vocabulary
+      at `STATUSES`. Only the first of these has an error to chain from; the
+      rest are the store disagreeing with itself, not an operation failing.
 
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
@@ -394,23 +396,43 @@ def _select(
 # What a `COLUMNS` select yields, before the payload is parsed.
 StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
 
+# The two job-grain kinds. Their rows carry a node and a session id; every
+# other kind is traverse-grain and carries neither.
+JOB_KINDS = frozenset({"job-launch", "job-report"})
 
-def _decode(row: StoredRow) -> LedgerRow:
+# What a stored row must carry to be readable. `repo` and `issue` key every
+# supersession, window and closeout test in both queries, and a job row's
+# `node` and `session_id` key the rest -- so an empty one is unmatchable under
+# SQL's three-valued logic, and the row stands in every answer forever rather
+# than being superseded, reported or closed out of it. `received_at` is matched
+# on by nothing and is here because `LedgerRow` promises a string.
+KEY_COLUMNS = ("received_at", "repo", "issue")
+JOB_KEY_COLUMNS = ("node", "session_id")
+
+
+def _decode(stored: StoredRow) -> LedgerRow:
     """One raw row as a `LedgerRow`, its payload text parsed back into a dict.
 
-    A payload this module cannot use is a stored row it cannot use, and it
-    leaves as `LedgerError` naming the row — the same shape as the
-    `awaiting_merge` guard, and for the same reason. A caller who catches
-    `LedgerError` to mean "the ledger is broken" would otherwise walk straight
-    past a bare `json` error and take the traverse down with it.
+    A stored row this module cannot use leaves as `LedgerError` naming the row
+    — the same shape as the `awaiting_merge` guard, and for the same reason. A
+    caller who catches `LedgerError` to mean "the ledger is broken" would
+    otherwise walk straight past a bare `json` error, or take a row that lies
+    about its own contents for a sound one.
 
-    Two things fail that way, and the second is not the first: text that will
-    not parse at all, and text that parses into something other than an object.
-    `null`, a number and a list are all valid JSON, so they clear the parse and
-    are still not the `dict` a payload is — left alone they ride out of here
-    inside a `LedgerRow` that lies about its own type, and surface much later
-    as a `TypeError` from whatever first treats one as a mapping. The sibling
-    `measure-event` draws the same line for the same reason.
+    A **payload** fails two ways, and the second is not the first: text that
+    will not parse at all, and text that parses into something other than an
+    object. `null`, a number and a list are all valid JSON, so they clear the
+    parse and are still not the `dict` a payload is — left alone they ride out
+    of here inside a `LedgerRow` that lies about its own type, and surface much
+    later as a `TypeError` from whatever first treats one as a mapping. The
+    sibling `measure-event` draws the same line for the same reason.
+
+    A **promoted column** fails one way, by being empty. The writers refuse
+    that at the door, so such a row got into the store some other way, and it
+    is the worse failure of the two: nothing raises anywhere, because a NULL
+    key simply never matches, so the row cannot be superseded, reported or
+    closed out and stands in every answer for good. It is refused here instead,
+    naming what it lacks, and an operator repairs the row the error names.
 
     The columns are unpacked positionally rather than named one by one: adding
     a column to `COLUMNS` then breaks the constructor loudly, where eight
@@ -418,17 +440,26 @@ def _decode(row: StoredRow) -> LedgerRow:
     session id.
     """
     try:
-        payload = json.loads(row[-1])
+        payload = json.loads(stored[-1])
     except (TypeError, ValueError) as error:
         raise LedgerError(
-            f"run ledger row {row[0]} has a payload that will not decode: {error}"
+            f"run ledger row {stored[0]} has a payload that will not decode: {error}"
         ) from error
     if not isinstance(payload, dict):
         raise LedgerError(
-            f"run ledger row {row[0]} has a payload that is not a JSON object "
+            f"run ledger row {stored[0]} has a payload that is not a JSON object "
             f"but a {type(payload).__name__}"
         )
-    return LedgerRow(*row[:-1], payload=payload)
+    row = LedgerRow(*stored[:-1], payload=payload)
+    required = KEY_COLUMNS + JOB_KEY_COLUMNS if row.kind in JOB_KINDS else KEY_COLUMNS
+    missing = [name for name in required if getattr(row, name) is None]
+    if missing:
+        raise LedgerError(
+            f"run ledger row {row.id} is a {row.kind} carrying no "
+            f"{', '.join(missing)}, so no query can match it and it would stand "
+            f"in every answer until the row is repaired"
+        )
+    return row
 
 
 def live_jobs(
