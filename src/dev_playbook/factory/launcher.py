@@ -74,6 +74,12 @@ DEADLINE_SECONDS = 3600.0
 GRACE_SECONDS = 30.0
 MILLISECONDS = 1000.0
 
+# How long the supervisor waits on a silent queue before looking at the child
+# itself. It is what lets supervision end when the child ends rather than when
+# the last writer closes the pipe, and it is a quiet period rather than a bare
+# poll so that a line already on its way is never cut off ahead of it.
+POLL_SECONDS = 0.05
+
 # The five process outcomes, named once. Every one is the launcher's own word
 # for how the process ended, and the graph branches on nothing else.
 CLEAN = "clean"
@@ -552,11 +558,21 @@ def _supervise(
         # Cleanup, not absorption: an exception on the way out must not leave a
         # child running on the subscription with nobody watching it. Nothing is
         # caught here, so every failure still leaves as itself.
+        #
+        # The wait is bounded, because this is reached exactly when a child has
+        # already proved it ignores what it is sent — an unbounded one would
+        # turn the module's loudest designed failure into a permanent hang with
+        # the `job-launch` row already standing.
+        #
+        # The pipe is the pump's to close, never this thread's. A grandchild
+        # can hold the write end open after the child is gone, and closing a
+        # stream another thread is blocked reading waits on the lock that read
+        # holds — so a close here would hang for as long as the stray process
+        # lived, which is the very failure ending the watch on child exit was
+        # meant to end.
         if process.poll() is None:
             process.kill()
-            process.wait()
-        pump.join(grace_s)
-        stream.close()
+            process.wait(timeout=grace_s)
 
 
 def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
@@ -568,11 +584,18 @@ def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
     as `timed-out`. What ended the read goes on the queue as itself — the
     exception object, not a flag — so `_watch` re-raises it and a decode
     failure or a closed pipe leaves as the failure it was.
+
+    This thread owns the pipe and is the only one that closes it, which is what
+    lets the supervisor leave the moment the child is gone. A grandchild that
+    inherited the write end can hold it open long afterwards, and this read
+    then blocks until that stray process lets go — so the fd goes back when the
+    read really ends, and nobody waits on it in the meantime.
     """
     ended: Exception | None = None
     try:
-        for line in stream:
-            lines.put(line)
+        with stream:
+            for line in stream:
+                lines.put(line)
     except Exception as error:
         ended = error
     finally:
@@ -596,6 +619,16 @@ def _watch(
     The stream is drained after a kill rather than abandoned, because a
     SIGTERM'd child still emits its result envelope, and the accounting on it
     belongs on the row.
+
+    Reading ends on the child exiting, not only on the pipe closing. `Popen`
+    hands the child fd 1, and everything the child spawns without redirecting
+    stdout inherits that same write end — so a node that leaves one background
+    process behind keeps the pipe open long after claude has exited 0 with a
+    full report. Waiting for an EOF that never comes would burn the rest of
+    the hour and then file that finished job as `timed-out`, throwing its
+    report away. A quiet queue plus an exited child is the second way out: the
+    quiet period is what makes it safe, because a pump with anything left to
+    hand over fills the queue far faster than that.
     """
     run = _Run()
     deadline = time.monotonic() + timeout_s
@@ -614,8 +647,10 @@ def _watch(
             deadline = time.monotonic() + grace_s
             continue
         try:
-            line = lines.get(timeout=remaining)
+            line = lines.get(timeout=min(remaining, POLL_SECONDS))
         except queue.Empty:
+            if process.poll() is not None:
+                break
             continue
         if line is None:
             break

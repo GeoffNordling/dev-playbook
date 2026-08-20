@@ -52,11 +52,14 @@ OVERTUNED_DEFINITION = {**DEFINITION, "effort": "turbo"}
 # in, so a test can emit a truthful `init` without knowing the path. A canned
 # line given as a string is printed verbatim, which is how a test emits a line
 # that is not JSON at all; `undecodable` opens the stream with bytes no
-# decoder accepts.
+# decoder accepts. `orphan_seconds` leaves a grandchild behind holding stdout
+# open after this process is gone, the way a background bash task or an stdio
+# MCP server does.
 FAKE_CLAUDE = """
 import json
 import os
 import signal
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -66,6 +69,10 @@ plan = json.loads((here / "plan.json").read_text())
 (here / "record.json").write_text(
     json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd()})
 )
+if plan["orphan_seconds"]:
+    subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(%s)" % plan["orphan_seconds"]]
+    )
 if plan["ignore_sigterm"]:
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
 if plan["undecodable"]:
@@ -117,6 +124,14 @@ LINGER_SECONDS = 30.0
 # The shrunk deadline and grace every supervision test runs under.
 BRIEF_DEADLINE = 0.3
 BRIEF_GRACE = 0.3
+
+# How long a grandchild holds the stdout pipe open after its parent is gone,
+# and the deadline the launcher watches that run under. The deadline is the
+# looser of the two on purpose: what is under test is that supervision ends
+# when the child exits, so the run must finish with the wall clock nowhere
+# near spent and the pipe still held open.
+ORPHAN_SECONDS = 5.0
+ORPHANED_DEADLINE = 1.0
 
 # What the one real-spawn test needs of the machine it runs on, read at import
 # before any fixture redirects them. That test alone is swept against the real
@@ -326,6 +341,7 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
         exit_code: int = 0,
         ignore_sigterm: bool = False,
         undecodable: bool = False,
+        orphan_seconds: float = 0.0,
     ) -> tuple[str, ...]:
         (here / "plan.json").write_text(
             json.dumps(
@@ -335,6 +351,7 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
                     "exit_code": exit_code,
                     "ignore_sigterm": ignore_sigterm,
                     "undecodable": undecodable,
+                    "orphan_seconds": orphan_seconds,
                 }
             )
         )
@@ -786,6 +803,26 @@ def test_a_child_still_running_at_the_deadline_is_timed_out(
     assert outcome.process_outcome == "timed-out"
     assert outcome.task_outcome is None
     assert ledger_rows(db)[1][2]["kill"] == "sigterm"
+
+
+def test_a_grandchild_holding_stdout_never_makes_a_finished_run_look_timed_out(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(), result_line(REPORT)], orphan_seconds=ORPHAN_SECONDS
+    )
+
+    outcome = launch(
+        claude_cmd=claude_cmd, timeout_s=ORPHANED_DEADLINE, grace_s=BRIEF_GRACE
+    )
+
+    assert outcome.process_outcome == "clean"
+    assert outcome.task_outcome == "done"
+    assert "kill" not in ledger_rows(db)[1][2]
 
 
 def test_a_run_placed_outside_its_worktree_is_killed_and_misconfigured(
