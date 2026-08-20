@@ -1,8 +1,9 @@
+import inspect
 import json
 import sqlite3
 import time
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from datetime import UTC, datetime
@@ -129,6 +130,49 @@ JOB_WRITERS: list[tuple[str, JobWriter]] = [
 ]
 
 
+def repoint_db_path_defaults(
+    monkeypatch: pytest.MonkeyPatch, namespace: Mapping[str, object], elsewhere: Path
+) -> None:
+    """Aim every bound `db_path` default in `namespace` at `elsewhere`.
+
+    By search rather than by list, so a public function added later is covered
+    without anyone remembering to come back here.
+
+    A bound default sits in one of two places depending on how the parameter
+    was spelled -- `__kwdefaults__` when it is keyword-only, `__defaults__`
+    when it is not -- and both are searched. Reading one dunder covers only the
+    spelling the module happens to use today, which is a net with a hole in it:
+    how a later function writes its own signature is not something this fixture
+    gets to decide.
+
+    `__defaults__` is a tuple with no names in it, so the parameters carrying a
+    default are read off the signature in the same order to find which slot
+    `db_path` occupies.
+    """
+    for entry in namespace.values():
+        keyword_only = getattr(entry, "__kwdefaults__", None)
+        if keyword_only and "db_path" in keyword_only:
+            monkeypatch.setitem(keyword_only, "db_path", elsewhere)
+        positional = getattr(entry, "__defaults__", None)
+        if not positional or not callable(entry):
+            continue
+        named = [
+            name
+            for name, parameter in inspect.signature(entry).parameters.items()
+            if parameter.default is not inspect.Parameter.empty
+            and parameter.kind is not inspect.Parameter.KEYWORD_ONLY
+        ]
+        if "db_path" in named:
+            monkeypatch.setattr(
+                entry,
+                "__defaults__",
+                tuple(
+                    elsewhere if name == "db_path" else default
+                    for name, default in zip(named, positional, strict=True)
+                ),
+            )
+
+
 @pytest.fixture(autouse=True)
 def never_the_real_store(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Repoint the module's default store into the temp tree, for every test.
@@ -140,15 +184,11 @@ def never_the_real_store(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
     A default is bound once, at import, so repointing the module attribute
     alone leaves every one of those functions still aimed at the real ledger —
     it reads as a safety net and catches nothing. The bound defaults are
-    repointed as well, and by search rather than by list, so a public function
-    added later is covered without anyone remembering to come back here.
+    repointed as well.
     """
     elsewhere = tmp_path / "default" / "events.db"
     monkeypatch.setattr(ledger, "DB_PATH", elsewhere)
-    for entry in vars(ledger).values():
-        bound = getattr(entry, "__kwdefaults__", None)
-        if bound and "db_path" in bound:
-            monkeypatch.setitem(bound, "db_path", elsewhere)
+    repoint_db_path_defaults(monkeypatch, vars(ledger), elsewhere)
 
 
 @pytest.fixture
@@ -267,6 +307,31 @@ def test_a_traverse_writer_stores_its_kind_null_grain_and_payload(
     (row,) = raw_rows(db_path)
     assert (row["kind"], row["node"], row["session_id"]) == (kind, None, None)
     assert json.loads(row["payload"]) == {"note": kind}
+
+
+def store_by_positional_default(repo: str, db_path: Path = ledger.DB_PATH) -> Path:
+    """A `db_path` default written without the `*` that makes it keyword-only.
+
+    Stands in for the public function nobody has written yet. All ten in the
+    module today are keyword-only, so nothing there exercises the other half of
+    the search -- and no rule in the module or the standards bars this
+    spelling, so the net has to hold the day one arrives.
+    """
+    return db_path
+
+
+def test_the_real_store_net_repoints_a_db_path_that_is_not_keyword_only(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    elsewhere = tmp_path / "elsewhere" / "events.db"
+
+    repoint_db_path_defaults(
+        monkeypatch,
+        {"store_by_positional_default": store_by_positional_default},
+        elsewhere,
+    )
+
+    assert store_by_positional_default("owner/repo") == elsewhere
 
 
 def test_a_call_that_omits_db_path_stays_out_of_the_real_store() -> None:
