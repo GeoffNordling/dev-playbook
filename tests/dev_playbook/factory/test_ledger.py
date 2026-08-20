@@ -248,7 +248,7 @@ COLLIDING_LAUNCH = (
 
 def connect_colliding_between_the_guard_and_the_query(
     db_path: Path,
-) -> Callable[..., sqlite3.Connection]:
+) -> tuple[Callable[..., sqlite3.Connection], list[str]]:
     """Real connections, one of which commits a colliding launch mid-read.
 
     The commit lands just before the `live_jobs` query itself — after the
@@ -256,6 +256,12 @@ def connect_colliding_between_the_guard_and_the_query(
     closes and a shared connection does not. A trace callback on the module's
     own connection puts it there, with none of the timing a second thread and a
     barrier would need.
+
+    The list of statements still waiting to fire is handed back with the
+    connections, because the trigger is a fragment of the query matched by
+    string: rename the alias it keys off and the callback stops firing, and a
+    test that only looked at the answer would go on passing over a collision
+    that never happened. Emptying that list is what says the window was hit.
     """
     connect: Callable[..., sqlite3.Connection] = sqlite3.connect
     pending = [COLLIDING_LAUNCH]
@@ -271,7 +277,7 @@ def connect_colliding_between_the_guard_and_the_query(
         connection.set_trace_callback(trace)
         return connection
 
-    return connecting
+    return connecting, pending
 
 
 def raw_rows(db_path: Path) -> list[sqlite3.Row]:
@@ -761,16 +767,20 @@ def test_live_jobs_answers_from_one_snapshot_of_the_store(
     on its session id alone — so a colliding launch landing between them would
     come back as live with nothing raised, which is the whole harm the guard
     exists to stop. One connection is not one snapshot; a held transaction is.
+
+    The collision is asserted before the answer is. It fires from a trace
+    callback keyed on a fragment of the query, so a later rewrite of that query
+    can stop the collision happening at all — and then the answer below is
+    right for the wrong reason and this test guards nothing. An empty `pending`
+    is what says the store really did change under the read.
     """
     ledger.job_launch("owner/one", 1, "build", "sess-1", {}, db_path=db_path)
-    monkeypatch.setattr(
-        ledger.sqlite3,
-        "connect",
-        connect_colliding_between_the_guard_and_the_query(db_path),
-    )
+    connecting, pending = connect_colliding_between_the_guard_and_the_query(db_path)
+    monkeypatch.setattr(ledger.sqlite3, "connect", connecting)
 
     live = ledger.live_jobs(db_path=db_path)
 
+    assert pending == []
     assert [(row.repo, row.issue) for row in live] == [("owner/one", 1)]
 
 
