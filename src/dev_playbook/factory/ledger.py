@@ -433,10 +433,20 @@ def awaiting_merge(
 ) -> list[LedgerRow]:
     """Every issue whose traverse ended `pr-ready` and has not been closed out.
 
-    The one place the module reads inside a payload. A candidate carrying no
-    `status` at all is a row this cannot judge, so it raises `LedgerError`
-    naming that row rather than dropping it: an issue waiting on a merge must
-    never go missing from the answer quietly.
+    The one place the module reads inside a payload, and it reads exactly one
+    key. A candidate whose `status` is missing, or is there but is not a
+    string, is a row this cannot judge either way, so it raises `LedgerError`
+    naming that row rather than dropping it.
+
+    A candidate carrying some *other* status string is a different matter: it
+    is judged, and the judgment is no. `pr-ready` is the only status this
+    module knows, and deliberately the only one it ever will — which statuses a
+    `traverse-end` may carry is the launcher slices' vocabulary, not this
+    module's, and a machine-global read that raised on every unfamiliar string
+    would let one slice's rename take `factory-status` down for every repo on
+    the machine. The cost is real and is stated here rather than hidden: a
+    launcher that writes `"PR-Ready"` or `"pr_ready"` will see that issue drop
+    out of this answer silently, and the guard above will not catch it.
 
     Only candidates are judged — the newest `traverse-end` per repo and issue,
     minus the closed-out. A superseded or spent end is dead history the query
@@ -444,10 +454,12 @@ def awaiting_merge(
     table nothing can repair.
     """
     candidates = _select(AWAITING_MERGE, {"repo": repo}, db_path)
-    unjudgeable = [row.id for row in candidates if STATUS not in row.payload]
+    unjudgeable = [
+        row.id for row in candidates if not isinstance(row.payload.get(STATUS), str)
+    ]
     if unjudgeable:
         raise LedgerError(
-            f"run ledger at {db_path} has traverse-end rows with no {STATUS!r} in "
-            f"their payload: {unjudgeable}"
+            f"run ledger at {db_path} has traverse-end rows carrying no readable "
+            f"{STATUS!r} in their payload: {unjudgeable}"
         )
     return [row for row in candidates if row.payload[STATUS] == PR_READY]
