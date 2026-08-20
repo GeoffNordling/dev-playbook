@@ -20,6 +20,7 @@ DB_PATH = Path("~/.local/share/claude-measure/events.db").expanduser()
 # writers coexist, and the busy timeout makes a collision queue rather than
 # fail.
 BUSY_TIMEOUT_SECONDS = 5.0
+WAL = "wal"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS ledger (
@@ -51,7 +52,8 @@ COLUMNS = "id, received_at, kind, repo, issue, node, session_id, payload"
 # and its traverse window still open. A window closes at `traverse-end` or at
 # the next `traverse-start` for the same repo and issue -- never at
 # `traverse-escalation`, which is followed by the `traverse-end` that does
-# close it (epic standing ruling 5).
+# close it. That holds because every `traverse_issue` exit, escalated exits
+# included, writes `traverse-end` as its last record (epic standing ruling 4).
 LIVE_JOBS = f"""
 SELECT {COLUMNS} FROM ledger AS l
 WHERE l.kind = 'job-launch'
@@ -126,13 +128,48 @@ class LedgerRow(NamedTuple):
 
 
 class LedgerError(Exception):
-    """A storage failure, chained from the `sqlite3.Error` or `OSError` beneath it.
+    """The ledger is broken — the one thing a caller catches, `sqlite3` unimported.
 
-    The one exception type the module raises for storage, so a caller catches
-    exactly "the ledger is broken" without importing `sqlite3`. A payload the
-    caller cannot serialize is not this: that is a caller bug, and its own
-    `TypeError` surfaces untouched.
+    Three kinds of trouble raise it:
+
+    - A **storage failure** — the store unwritable, connect, the DDL, an INSERT
+      or SELECT, a busy timeout expiring — chained from the `sqlite3.Error` or
+      `OSError` beneath it.
+    - A **store that will not take WAL**, unchained: there is no underlying
+      error, because SQLite reports a declined journal mode by returning the
+      one it kept.
+    - A **stored row this module cannot use**, naming the row id: a
+      `traverse-end` candidate whose payload carries no `status` (unchained,
+      the row is simply unjudgeable), or a payload that will not decode
+      (chained from the decode error).
+
+    A caller's own bug is deliberately none of these. A payload that will not
+    serialize raises `TypeError` and a column argument SQLite cannot bind
+    raises `sqlite3.ProgrammingError` or `sqlite3.InterfaceError`, each
+    untouched and with nothing written — telling the operator their store is
+    unusable would send them to check a disk that is fine.
     """
+
+
+def _require_wal(connection: sqlite3.Connection, db_path: Path) -> None:
+    """Put the store in WAL journal mode, and refuse it when it will not go.
+
+    `PRAGMA journal_mode=WAL` does not raise when the request is declined — it
+    returns the mode it kept instead, which is what a network filesystem or a
+    container overlay mount does. Carrying on would silently drop the
+    concurrency the factory's parallel traverses run on, and surface much later
+    as lock errors under exactly the load WAL exists to survive. So the refusal
+    is raised here, at the connection, rather than degraded past.
+
+    The pragma is persistent, so only the first connection of a database's life
+    changes anything; every later one reads back the mode already set.
+    """
+    (mode,) = connection.execute("PRAGMA journal_mode=WAL").fetchone()
+    if mode != WAL:
+        raise LedgerError(
+            f"run ledger at {db_path} would not take WAL journal mode and is in "
+            f"{mode!r} mode, so concurrent traverses would collide"
+        )
 
 
 @contextmanager
@@ -143,17 +180,24 @@ def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
     DDL, the caller's own INSERT or SELECT, a busy timeout expiring — arrives
     here and leaves as `LedgerError`. Nothing is caught, retried, or degraded:
     the factory must hear that its ledger is broken.
+
+    A caller's own bug is the one thing not converted. `sqlite3` raises
+    `ProgrammingError` and `InterfaceError` for API misuse — a column argument
+    it cannot bind, most likely — and telling the operator their store is
+    unusable would send them to check a disk that is fine. Those leave as
+    themselves, the same line `_append` draws one field over for a payload that
+    will not serialize.
     """
     try:
         db_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(
             sqlite3.connect(db_path, timeout=BUSY_TIMEOUT_SECONDS)
         ) as connection:
-            # Persistent, so only the first write of the database's life
-            # changes anything; the rest read back the mode they already have.
-            connection.execute("PRAGMA journal_mode=WAL")
+            _require_wal(connection, db_path)
             connection.execute(SCHEMA)
             yield connection
+    except sqlite3.ProgrammingError, sqlite3.InterfaceError:
+        raise
     except (sqlite3.Error, OSError) as error:
         raise LedgerError(f"run ledger at {db_path} is unusable: {error}") from error
 
@@ -171,8 +215,13 @@ def _append(
 
     The payload is encoded before the store is touched, so a payload that will
     not serialize is a caller bug that raises with nothing written.
+
+    `json.dumps` serializes `dict` alone, not the `Mapping` protocol, so the
+    payload is copied into one first — otherwise the most natural immutable
+    payloads, a `MappingProxyType` or a `ChainMap`, would be refused as
+    unserializable despite being nothing of the sort.
     """
-    encoded = json.dumps(payload)
+    encoded = json.dumps(dict(payload))
     received_at = datetime.now(UTC).isoformat(timespec="microseconds")
     with _ledger(db_path) as connection:
         connection.execute(
@@ -294,17 +343,26 @@ StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
 
 
 def _decode(row: StoredRow) -> LedgerRow:
-    """One raw row as a `LedgerRow`, its payload text parsed back into a dict."""
-    return LedgerRow(
-        id=row[0],
-        received_at=row[1],
-        kind=row[2],
-        repo=row[3],
-        issue=row[4],
-        node=row[5],
-        session_id=row[6],
-        payload=json.loads(row[7]),
-    )
+    """One raw row as a `LedgerRow`, its payload text parsed back into a dict.
+
+    A payload that will not decode is a stored row this module cannot use, and
+    it leaves as `LedgerError` naming the row — the same shape as the
+    `awaiting_merge` guard, and for the same reason. A caller who catches
+    `LedgerError` to mean "the ledger is broken" would otherwise walk straight
+    past a bare `json` error and take the traverse down with it.
+
+    The columns are unpacked positionally rather than named one by one: adding
+    a column to `COLUMNS` then breaks the constructor loudly, where eight
+    hand-written indices would quietly slide and hand back a `node` holding a
+    session id.
+    """
+    try:
+        payload = json.loads(row[-1])
+    except (TypeError, ValueError) as error:
+        raise LedgerError(
+            f"run ledger row {row[0]} has a payload that will not decode: {error}"
+        ) from error
+    return LedgerRow(*row[:-1], payload=payload)
 
 
 def live_jobs(
@@ -313,7 +371,13 @@ def live_jobs(
     issue: int | None = None,
     db_path: Path = DB_PATH,
 ) -> list[LedgerRow]:
-    """Every launched job with no terminal record, inside a traverse still open."""
+    """Every job still running, as the ledger's records and silences imply.
+
+    A launch counts as live until one of three things ends it: a `job-report`
+    for its session id, a later `job-launch` of the same node at the same repo
+    and issue superseding it, or its traverse window closing. Filters conjoin,
+    and passing none of them reads the whole machine.
+    """
     return _select(LIVE_JOBS, {"repo": repo, "issue": issue}, db_path)
 
 
@@ -323,9 +387,14 @@ def awaiting_merge(
     """Every issue whose traverse ended `pr-ready` and has not been closed out.
 
     The one place the module reads inside a payload. A candidate carrying no
-    `status` at all is a row this cannot judge, so it raises naming that row
-    rather than dropping it: an issue waiting on a merge must never go missing
-    from the answer quietly.
+    `status` at all is a row this cannot judge, so it raises `LedgerError`
+    naming that row rather than dropping it: an issue waiting on a merge must
+    never go missing from the answer quietly.
+
+    Only candidates are judged — the newest `traverse-end` per repo and issue,
+    minus the closed-out. A superseded or spent end is dead history the query
+    never consults, so one malformed row cannot brick this read forever in a
+    table nothing can repair.
     """
     candidates = _select(AWAITING_MERGE, {"repo": repo}, db_path)
     unjudgeable = [row.id for row in candidates if STATUS not in row.payload]

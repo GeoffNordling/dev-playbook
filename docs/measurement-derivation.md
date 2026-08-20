@@ -66,7 +66,7 @@ first violation:
 
 | Assertion | A violation means |
 |---|---|
-| Every row has a non-NULL `event`. | The hook received something it could not parse as a JSON object; the raw text is in `payload`. |
+| Every `events` row has a non-NULL `event`. | The hook received something it could not parse as a JSON object; the raw text is in `payload`. |
 | Every distinct `event` value appears in the hook wiring. | The captured set moved — a hook renamed upstream, or wiring changed — and rows exist that no rule here covers. |
 | Every row of a known event type carries the fields [Event semantics](/docs/measurement-derivation.md#event-semantics) names for that type. | A Claude Code release changed a payload shape, so a filter or formula reading that field is now reading nothing. |
 | `errors.log` is absent or empty. | Events were lost; every count is a lower bound of unknown depth. |

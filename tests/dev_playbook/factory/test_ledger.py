@@ -1,10 +1,13 @@
+import json
 import sqlite3
 import time
+import uuid
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -73,6 +76,29 @@ def never_the_real_store(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
 def db_path(tmp_path: Path) -> Path:
     """The temp store a test writes to and reads back."""
     return tmp_path / "events.db"
+
+
+def in_memory_store() -> sqlite3.Connection:
+    """A connection to a store that refuses WAL, as a network mount would.
+
+    SQLite keeps `memory` journal mode whatever `PRAGMA journal_mode=WAL`
+    asks for, which is the refusal the module has to notice. No temp
+    filesystem here reproduces it, so this stands in for the mount that
+    would.
+    """
+    return sqlite3.Connection(":memory:")
+
+
+def rot_the_stored_payload(db_path: Path, payload: str | None) -> None:
+    """Damage the payload of the ledger's only row, behind the module's back.
+
+    The module only ever INSERTs, so this stands in for a row that reached
+    the store intact and rotted there — the hazard an append-only table
+    cannot repair, and so must report rather than crash past.
+    """
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute("UPDATE ledger SET payload = ?", (payload,))
+        connection.commit()
 
 
 def raw_rows(db_path: Path) -> list[tuple[object, ...]]:
@@ -157,6 +183,15 @@ def test_received_at_matches_the_events_timestamp_format(db_path: Path) -> None:
     )
 
 
+def test_a_writer_accepts_a_mapping_that_is_not_a_dict(db_path: Path) -> None:
+    ledger.traverse_start(
+        "owner/repo", 438, MappingProxyType({"mode": "direct"}), db_path=db_path
+    )
+
+    (row,) = raw_rows(db_path)
+    assert row[7] == '{"mode": "direct"}'
+
+
 @pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
 def test_job_writers_carry_node_and_session(
     kind: str, write: JobWriter, db_path: Path
@@ -196,6 +231,62 @@ def test_a_read_of_a_corrupt_store_raises_ledger_error(db_path: Path) -> None:
         ledger.live_jobs(db_path=db_path)
 
     assert isinstance(raised.value.__cause__, sqlite3.Error)
+
+
+def test_an_unbindable_column_argument_is_not_reported_as_a_broken_store(
+    db_path: Path,
+) -> None:
+    with pytest.raises(sqlite3.ProgrammingError):
+        ledger.job_launch(
+            "owner/repo",
+            438,
+            "build",
+            uuid.UUID(int=1),  # type: ignore[arg-type]
+            {},
+            db_path=db_path,
+        )
+
+    assert raw_rows(db_path) == []
+
+
+def test_a_store_that_will_not_take_wal_raises_ledger_error(
+    db_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        ledger.sqlite3, "connect", lambda *_args, **_kwargs: in_memory_store()
+    )
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
+
+    assert "memory" in str(raised.value)
+
+
+def test_a_read_of_an_unparseable_stored_payload_names_the_row(
+    db_path: Path,
+) -> None:
+    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
+    rot_the_stored_payload(db_path, "{not json")
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.live_jobs(db_path=db_path)
+
+    assert (
+        isinstance(raised.value.__cause__, json.JSONDecodeError),
+        "row 1" in str(raised.value),
+    ) == (True, True)
+
+
+def test_a_read_of_a_null_stored_payload_raises_ledger_error(
+    db_path: Path,
+) -> None:
+    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
+    rot_the_stored_payload(db_path, None)
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.live_jobs(db_path=db_path)
+
+    assert isinstance(raised.value.__cause__, TypeError)
 
 
 def test_an_unserializable_payload_raises_before_anything_is_written(
