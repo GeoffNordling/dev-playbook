@@ -18,6 +18,18 @@ skill, along with the aliases it retires and the relationships among the
 terms. Invoke it before making a module suggestion and use its terms exactly;
 [Module Design](/standards/modules.md) is the card that governs the concern.
 
+### Definition region
+
+The interview beats that author an issue's brief before it crosses into the
+factory. Both run in `intake` and `design`; this fixes which is which.
+
+**General Interview**
+The ordinary interviewing that authors a brief — the areas in play, the approach, the tradeoffs, the probes. The agent asks, the user answers, and the agent writes the result in its own words. It authors every heading but `User intent`.
+_Avoid_: intent interview (retired).
+
+**User Intent Mini-Interview**
+The short beat that authors the `User intent` heading alone, run once the rest of the brief is drafted and before it lands. The user says their intent cold, the agent surfaces where it collides with the draft, and the reconciled text lands in the user's own words. Authored by the `/user-intent-mini-interview` skill.
+
 ### Engagement
 
 Whether the user is at the terminal for a piece of work. Exactly two values;
@@ -139,4 +151,5 @@ The step that turns a **Candidate** into committed work: an issue is authored fr
 - "lint" and "audit" were blurred — "lint" survived in internals and prose with no defined status while every read-only detector was named an "audit" — resolved: a **Lint** is a Detector implemented as deterministic code, an **Audit** in the narrow sense is a Detector that is an LLM judge, and **Lint** ⊂ **Audit** (the umbrella read-only process). Deterministic scripts are `*-lint`; LLM judges keep "audit."
 - "backlog" floated with no definition as a name for both the register of uncommitted ideas and the queue of open issues — resolved: say **Candidate** for an uncommitted entry in `CANDIDATES.md`, and **issue** for committed work. "backlog" is retired.
 - "overwatch" named the managing role at both scopes — resolved: **Issue Manager** (one issue's traverse) and **Agent-View Manager** (the fleet). "overwatch" is retired.
+- "intent interview" named the ordinary approach interviewing in `design` while sounding like it authored the `User intent` heading, which it never did — resolved: the ordinary beat is the **General Interview**, and the beat that authors `User intent` is the **User Intent Mini-Interview**.
 - "promotion" was used for two different moves — carrying an under-specified leaf to ready, and turning a Candidate into an issue — resolved: **Promotion** means Candidate → issue. The readiness interview is the **refinement step**.

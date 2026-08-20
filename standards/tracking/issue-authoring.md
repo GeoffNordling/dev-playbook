@@ -123,14 +123,16 @@ A build leaf carries **all seven** headings — none optional. `Key interfaces`
 states "none" when there are none, rather than being omitted.
 
 `User intent` answers why this issue exists and which way to lean when goods
-collide — the priority ordering, and which error direction is cheap. Its
-decisions come from above — the epic, or the design work behind it — already
-made and not re-asked: writing this section is distillation, not a new
-interview. But the *text* is written fresh for each leaf, because slices of
-one epic need different orderings; copy-pasting one epic-level block into
-every child is the defect this rule bans. The implementing agent consults it
-for micro-decisions and for choosing among permitted fixes; it is never
-grounds for whether a deviation is permitted. Build-leaf briefs only — spike
+collide — the priority ordering, and which error direction is cheap. Its text
+comes from the user, through the **User Intent Mini-Interview** that authors it
+(`/user-intent-mini-interview`): the user says their intent cold, the agent surfaces where it
+collides with the drafted brief, and the reconciled paragraph lands in the
+user's own words, repaired for grammar and never enriched. It is the one
+heading an agent does not compose. The text is written fresh for each leaf,
+because slices of one epic need different orderings; copy-pasting one
+epic-level block into every child is the defect this rule bans. The
+implementing agent consults it for micro-decisions and for choosing among
+permitted fixes; it is never grounds for whether a deviation is permitted. Build-leaf briefs only — spike
 briefs and epic bodies never carry it.
 
 ```markdown
@@ -138,7 +140,8 @@ briefs and epic bodies never carry it.
 
 **User intent:**
 Why this issue exists — the goal the acceptance criteria are a proxy for —
-and what wins when goods collide. Free prose, five lines at most.
+and what wins when goods collide. Free prose in the user's words, five lines
+at most; two or three sentences is typical.
 
 **Current behavior:**
 What happens now (or status quo for an enhancement).

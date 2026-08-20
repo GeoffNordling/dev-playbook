@@ -50,10 +50,12 @@ four-tuple and all seven build-leaf headings — the headings are required from
 minting, and a leaf missing one is a lint finding whatever its phase.
 
 Write into them what this session actually settled: the slice's outcome, its
-boundary, and the intent it inherits from the epic. The rest is a draft. A
-child's brief is not finished here and is not meant to be — its own design
-session re-authors it against the code as it stands by then, which is not the
-code this session is looking at.
+boundary, and the intent it inherits from the epic — that last one marked in the
+body, `_(Draft — inherited from the epic; replaced at this leaf's User Intent
+Mini-Interview.)_`, because `User intent` is the user's text and this session
+has not held the child's. The rest is a draft. A child's brief is not finished
+here and is not meant to be — its own design session re-authors it against the
+code as it stands by then, which is not the code this session is looking at.
 
 So every child is minted at `phase:design`, never `phase:build`. Its own
 issue-review verdict, in its own session, is what moves it.

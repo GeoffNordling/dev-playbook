@@ -67,6 +67,8 @@ Per the issue conventions: the build-leaf brief for `mode:direct`, the spike bri
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is settled at the issue-review verdict that releases the issue, not here.
 
+On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft six of the headings, then invoke /user-intent-mini-interview for the seventh, `User intent`, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
+
 ### 5. Confirm, then land
 
 Before writing anything to GitHub, reflect your read back to the user and land only on their **explicit nod**. This is a non-optional **hard gate**, not a courtesy: no label lands in the definition region on the agent's own authority, and **adopt** *overwrites* the existing body, so without the nod the rewrite lands silently. In one message, show:
