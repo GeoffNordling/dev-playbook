@@ -22,6 +22,16 @@ No silent defensive skips, fallbacks, or "just in case" guards. If something is 
 
 Be terse. One sentence beats a paragraph when the sentence covers it.
 
+### Pitch it cold
+
+Every explanation lands on a reader who has read little of your immediate context and holds
+only a rough, intuitive picture of the work. Pitch it cold, every time,
+including inside a skill's structure, where the skill owns the beats and you
+own the words. Write in ASD-STE100 Simplified Technical English, in the
+project's own terms from `CONTEXT.md` wherever they apply, and carry each claim
+on a specific example — the actual file, name, line, or value — so the point is
+visible rather than described.
+
 ## Behaviors
 
 ### Read the standards
