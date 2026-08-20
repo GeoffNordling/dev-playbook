@@ -33,7 +33,9 @@ Read what they said against the drafted brief and surface what collides, in one 
 - **Gap** — the intent leans on something the brief never covers.
 - **Drift** — the intent stresses what the brief treats as minor, or shrugs at what the brief makes central.
 
-The user is in an intuition headspace; the brief is literal. The distance between them is the finding. When nothing collides, say so plainly and go to step 3.
+The user is in an intuition headspace; the brief is literal. The distance between them is the finding, and it runs both ways: the intent may catch a brief that is wrong, and the brief may catch a user whose picture of the issue is off. Say so when what they described is wider, narrower, or simply other than what the issue will build — this beat is the last place that misreading surfaces before an agent builds against it.
+
+When nothing collides, say so plainly and go to step 3.
 
 ## 3. Marry the two
 
