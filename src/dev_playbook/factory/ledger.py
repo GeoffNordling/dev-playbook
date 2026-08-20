@@ -219,8 +219,9 @@ class LedgerError(Exception):
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
     surfaces as itself, with nothing written: a payload that will not serialize
-    raises `TypeError`, a write missing a column that addresses it — repo or
-    issue on any row, node or session id on a job row — raises `ValueError`,
+    raises `TypeError`, a write whose addressing columns are missing or empty —
+    repo and issue on any row, node and session id on a job row — raises
+    `ValueError`,
     and a column argument SQLite cannot bind raises `sqlite3.ProgrammingError`
     or `sqlite3.InterfaceError`.
     """
@@ -295,12 +296,18 @@ def _append(
     """Append one row of any kind, stamping `received_at` as it goes.
 
     Every row is addressed by repo and issue: both queries supersede, close and
-    filter on that pair, and a NULL in either is unmatchable under SQL's
-    three-valued logic — so a row written without one can never be superseded
-    or closed out, and stands in every answer for good. That is the hazard the
-    job grain's `node` and `session_id` carry too, one column over, and it is
-    refused the same way and for the same reason: before the store is touched,
-    as the caller bug it is rather than as a broken ledger.
+    filter on that pair, so an address that is missing or empty breaks the row
+    in one of two ways. A NULL is unmatchable under SQL's three-valued logic,
+    so the row can never be superseded or closed out and stands in every answer
+    for good. An empty string or a zero — an unset shell variable interpolated
+    into a repo slug, an issue number defaulted to nothing — is worse company
+    than that: it *does* match, so every caller that gets it wrong lands on one
+    shared address and supersedes work it has nothing to do with.
+
+    Both are refused before the store is touched, as the caller bug they are
+    rather than as a broken ledger. The job grain carries the same hazard one
+    column over in `node` and `session_id`, and `_append_job` refuses it the
+    same way.
 
     The payload is encoded before the store is touched as well, so a payload
     that will not serialize also raises with nothing written.
@@ -310,7 +317,7 @@ def _append(
     payloads, a `MappingProxyType` or a `ChainMap`, would be refused as
     unserializable despite being nothing of the sort.
     """
-    if repo is None or issue is None:
+    if not repo or not issue:
         raise ValueError(
             f"a {kind} needs both a repo and an issue, and was given "
             f"repo={repo!r}, issue={issue!r}"
@@ -345,17 +352,17 @@ def _append_job(
     payload: Mapping[str, object],
     db_path: Path,
 ) -> None:
-    """Append one job-grain row, refusing one whose grain columns are missing.
+    """Append one job-grain row, refusing one whose grain columns are unusable.
 
     These two are the job grain's half of the addressing rule `_append` states
-    for repo and issue, and they are refused for exactly that reason:
-    `report.session_id = launch.session_id` is neither true nor false when both
-    are NULL, so a launch written without a session id can never be closed --
-    not by its own report, not by anything -- and shows as running work
-    forever. A launcher whose session-id minting returns None on some path
-    would strand every job it starts.
+    for repo and issue, refused for exactly the reasons stated there. A missing
+    session id strands the job: `report.session_id = launch.session_id` is
+    neither true nor false when both are NULL, so the launch can never be
+    closed, not even by its own report, and shows as running work forever. An
+    empty one collides instead, and two jobs holding one session id is the
+    corruption `live_jobs` has to refuse a whole store over.
     """
-    if node is None or session_id is None:
+    if not node or not session_id:
         raise ValueError(
             f"a {kind} needs both a node and a session id, and was given "
             f"node={node!r}, session_id={session_id!r}"

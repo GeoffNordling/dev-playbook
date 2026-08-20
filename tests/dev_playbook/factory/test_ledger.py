@@ -73,6 +73,18 @@ COLLIDING_JOBS = [
 # so the deliberate misuse is the test's subject rather than a type error.
 NOT_AN_ISSUE_NUMBER: Any = "main"
 
+# Addresses that are present and empty -- an unset shell variable interpolated
+# into a repo slug, an issue number defaulted to nothing. Unlike a NULL these
+# match, so rather than stranding one row they put every caller that gets one
+# wrong at a single shared address.
+EMPTY_TRAVERSE_ADDRESSES = [("", 438), ("owner/repo", 0)]
+EMPTY_JOB_ADDRESSES = [
+    ("", 438, "build", "sess-1"),
+    ("owner/repo", 0, "build", "sess-1"),
+    ("owner/repo", 438, "", "sess-1"),
+    ("owner/repo", 438, "build", ""),
+]
+
 TraverseWriter = Callable[..., None]
 
 TRAVERSE_WRITERS: list[tuple[str, TraverseWriter]] = [
@@ -493,6 +505,28 @@ def test_a_job_writer_refuses_a_missing_session_id(
 ) -> None:
     with pytest.raises(ValueError):
         write("owner/repo", 438, "build", None, {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize("address", EMPTY_TRAVERSE_ADDRESSES)
+@pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
+def test_a_traverse_writer_refuses_an_empty_address(
+    kind: str, write: TraverseWriter, address: tuple[str, int], db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write(*address, {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize("address", EMPTY_JOB_ADDRESSES)
+@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
+def test_a_job_writer_refuses_an_empty_address(
+    kind: str, write: JobWriter, address: tuple[str, int, str, str], db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write(*address, {}, db_path=db_path)
 
     assert not db_path.exists()
 
