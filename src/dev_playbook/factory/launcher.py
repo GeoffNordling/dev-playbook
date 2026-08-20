@@ -2,12 +2,16 @@
 
 import json
 import os
+import queue
 import shutil
 import subprocess
+import threading
+import time
 import uuid
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import IO
 
 import yaml
 
@@ -68,6 +72,37 @@ EFFORT_LEVEL_VAR = "CLAUDE_CODE_EFFORT_LEVEL"
 # SIGTERM before SIGKILL. One hard rule, every node.
 DEADLINE_SECONDS = 3600.0
 GRACE_SECONDS = 30.0
+MILLISECONDS = 1000.0
+
+# The five process outcomes, named once. Every one is the launcher's own word
+# for how the process ended, and the graph branches on nothing else.
+CLEAN = "clean"
+SCHEMA_REFUSED = "schema-refused"
+DIED = "died"
+TIMED_OUT = "timed-out"
+MISCONFIGURED = "misconfigured"
+
+# How far the launcher had to go to stop a child, recorded on the row.
+SIGTERM = "sigterm"
+SIGKILL = "sigkill"
+
+# The two `init` fields that genuinely vary per run, and the value that means
+# the run is on subscription rather than metered. Every other field the harness
+# declares is recorded and never re-asserted.
+INIT_CWD = "cwd"
+INIT_API_KEY_SOURCE = "apiKeySource"
+SUBSCRIPTION = "none"
+
+# The report the harness validated, and the one key inside it the task layer
+# reads. Every node schema carries a required top-level `outcome`, so this one
+# key answers for node shapes no query has to know about.
+STRUCTURED_OUTPUT = "structured_output"
+OUTCOME = "outcome"
+
+# Accounting lifted off the result envelope onto the `job-report` row, plus the
+# duration field the row records in seconds.
+RESULT_EXTRACTS = ("subtype", "is_error", "num_turns", "usage", "permission_denials")
+DURATION_MS = "duration_ms"
 
 
 class LauncherError(Exception):
@@ -352,4 +387,355 @@ def launch_job(
         raise LaunchAborted(findings)
     session_id = str(uuid.uuid4())
     ledger.job_launch(repo, issue, node, session_id, launch_payload, db_path=db_path)
-    raise NotImplementedError
+    run = _supervise(
+        _argv(node, prompt, schema, session_id, claude_cmd),
+        worktree,
+        env,
+        timeout_s,
+        grace_s,
+    )
+    outcome, payload = _classify(run, session_id)
+    ledger.job_report(repo, issue, node, session_id, payload, db_path=db_path)
+    return outcome
+
+
+def _argv(
+    node: str,
+    prompt: str,
+    schema: Mapping[str, object],
+    session_id: str,
+    claude_cmd: Sequence[str],
+) -> list[str]:
+    """The fixed flag roster a launch spawns under — nothing added, nothing defaulted.
+
+    Never `--bare`, which skips the OAuth read outright and demands an API key,
+    and never `--model`, `--effort`, `--tools` or `--max-turns`: model, effort
+    and tool roster all bind from the definition's frontmatter, and a flag here
+    would outrank what the definition pins without saying so.
+
+    The session id goes down as a value because it is the ledger's join key and
+    the caller minted it; nothing reads it back out of the environment.
+    """
+    return [
+        *claude_cmd,
+        "--agent",
+        node,
+        "-p",
+        prompt,
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--session-id",
+        session_id,
+        "--json-schema",
+        json.dumps(dict(schema)),
+        "--permission-mode",
+        "bypassPermissions",
+    ]
+
+
+# --- live supervision ---
+
+
+@dataclass
+class _Run:
+    """Everything one supervised child declared, and how it came to an end."""
+
+    init: dict[str, object] | None = None
+    result: dict[str, object] | None = None
+    exit_code: int | None = None
+    kill: str | None = None
+    alarm: dict[str, object] | None = None
+    timed_out: bool = False
+
+
+def _supervise(
+    argv: list[str],
+    worktree: Path,
+    env: Mapping[str, str],
+    timeout_s: float,
+    grace_s: float,
+) -> _Run:
+    """Spawn the child and read its stream as it runs, killing it when it must be.
+
+    stdin comes from `/dev/null` so a child that waits on input dies at the
+    deadline rather than blocking for good, and the environment goes down
+    exactly as the sweep saw it — nothing is stripped, because the sweep is
+    what proved it clean.
+
+    The stream is read by a thread onto a queue rather than straight off the
+    pipe, so the deadline still fires while the child says nothing at all: a
+    blocking `readline` on a silent child has no timeout to give.
+    """
+    with open(os.devnull) as no_input:
+        process = subprocess.Popen(
+            argv,
+            cwd=worktree,
+            env=dict(env),
+            stdin=no_input,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+    stream = process.stdout
+    if stream is None:
+        raise LauncherError("the child was spawned without the stdout pipe to read")
+    lines: queue.Queue[str | None] = queue.Queue()
+    pump = threading.Thread(target=_pump, args=(stream, lines), daemon=True)
+    pump.start()
+    try:
+        return _watch(process, lines, worktree, timeout_s, grace_s)
+    finally:
+        # Cleanup, not absorption: an exception on the way out must not leave a
+        # child running on the subscription with nobody watching it. Nothing is
+        # caught here, so every failure still leaves as itself.
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+        pump.join(grace_s)
+        stream.close()
+
+
+def _pump(stream: IO[str], lines: queue.Queue[str | None]) -> None:
+    """Move the child's stdout onto the queue, closing it with a `None`."""
+    for line in stream:
+        lines.put(line)
+    lines.put(None)
+
+
+def _watch(
+    process: subprocess.Popen[str],
+    lines: queue.Queue[str | None],
+    worktree: Path,
+    timeout_s: float,
+    grace_s: float,
+) -> _Run:
+    """Read the stream to its end, taking the child down on an alarm or the deadline.
+
+    One deadline, moved rather than duplicated: it starts as the job's wall
+    clock and becomes the grace a killed child gets to honor its signal. That
+    is what makes the escalation ladder a loop — expiry means the next step
+    down, and there is no step past SIGKILL.
+
+    The stream is drained after a kill rather than abandoned, because a
+    SIGTERM'd child still emits its result envelope, and the accounting on it
+    belongs on the row.
+    """
+    run = _Run()
+    deadline = time.monotonic() + timeout_s
+    while True:
+        if deadline - time.monotonic() <= 0:
+            if run.kill == SIGKILL:
+                break
+            run.timed_out = run.timed_out or run.alarm is None
+            _escalate(process, run)
+            deadline = time.monotonic() + grace_s
+            continue
+        try:
+            line = lines.get(timeout=deadline - time.monotonic())
+        except queue.Empty:
+            continue
+        if line is None:
+            break
+        _read(line, run, worktree)
+        if run.alarm is not None and run.kill is None:
+            _escalate(process, run)
+            deadline = time.monotonic() + grace_s
+    run.exit_code = _final_exit(process, grace_s)
+    return run
+
+
+def _escalate(process: subprocess.Popen[str], run: _Run) -> None:
+    """Take the child down one step: SIGTERM first, SIGKILL once the grace is spent.
+
+    SIGTERM is measured safe — the child exits, the result envelope is still
+    emitted, and nothing is orphaned — so it is always the first step and
+    SIGKILL only ever the answer to a child that ignored it.
+    """
+    if run.kill is None:
+        process.terminate()
+        run.kill = SIGTERM
+    else:
+        process.kill()
+        run.kill = SIGKILL
+
+
+def _final_exit(process: subprocess.Popen[str], grace_s: float) -> int:
+    """The child's exit code, once there is nothing left to read."""
+    try:
+        return process.wait(timeout=grace_s)
+    except subprocess.TimeoutExpired as expired:
+        raise HarnessContractViolation(
+            f"the child outlived every signal sent to it and will not exit: {expired}"
+        ) from expired
+
+
+def _read(line: str, run: _Run, worktree: Path) -> None:
+    """Take one stream line into the run, raising the alarm an `init` fails."""
+    message = _parsed(line)
+    if message is None:
+        return
+    if message.get("type") == "system" and message.get("subtype") == "init":
+        run.init = message
+        run.alarm = _alarm(message, worktree)
+    elif message.get("type") == "result":
+        run.result = message
+
+
+def _parsed(line: str) -> dict[str, object] | None:
+    """One stream line as a message, or `None` for a line that is not one.
+
+    Everything other than `init` and `result` is read and dropped, and a line
+    that is not JSON at all is dropped with them — including the empty line a
+    stream ends on. Nothing is lost by it: a truncated `init` then reaches
+    `_classify` as a result envelope with no `init` ever seen, which is a
+    contract violation it refuses to classify rather than guess at.
+    """
+    try:
+        message = json.loads(line)
+    except ValueError:
+        return None
+    return message if isinstance(message, dict) else None
+
+
+def _alarm(init: dict[str, object], worktree: Path) -> dict[str, object] | None:
+    """The first of the two per-run facts this `init` got wrong, if either did.
+
+    Exactly two alarms, because these are the two that genuinely vary run to
+    run: where the process was placed, and what is paying for it. `cwd` is
+    compared through `resolve` so a worktree reached by a symlink is not read
+    as a misplacement, and the alarm records the path the harness actually
+    declared, which is what an operator needs to see.
+
+    An `init` missing either field is a contract violation, not an alarm: the
+    two checks the whole supervision rests on cannot be made at all.
+    """
+    for declared in (INIT_CWD, INIT_API_KEY_SOURCE):
+        if declared not in init:
+            raise HarnessContractViolation(
+                f"the init message declares no {declared!r}, so this run's placement "
+                f"and billing cannot be checked: {init}"
+            )
+    placed = Path(str(init[INIT_CWD])).resolve()
+    expected = worktree.resolve()
+    if placed != expected:
+        return {
+            "field": INIT_CWD,
+            "observed": init[INIT_CWD],
+            "expected": str(expected),
+        }
+    if init[INIT_API_KEY_SOURCE] != SUBSCRIPTION:
+        return {
+            "field": INIT_API_KEY_SOURCE,
+            "observed": init[INIT_API_KEY_SOURCE],
+            "expected": SUBSCRIPTION,
+        }
+    return None
+
+
+# --- classification ---
+
+
+def _classify(run: _Run, session_id: str) -> tuple[JobOutcome, dict[str, object]]:
+    """What the finished run was, and the payload its `job-report` row carries.
+
+    First match wins, and the impossible-by-contract states are refused before
+    the table rather than classified into it: a result envelope the harness
+    emitted without ever declaring an `init` leaves the run's placement and
+    billing unknown, and a stream that ended with neither an envelope nor an
+    exit leaves nothing to classify at all.
+    """
+    if run.result is not None and run.init is None:
+        raise HarnessContractViolation(
+            f"the harness emitted a result envelope having never emitted an init, so "
+            f"this run's placement and billing were never declared: {run.result}"
+        )
+    if run.result is None and run.exit_code is None:
+        raise HarnessContractViolation(
+            "the child's stream ended with neither a result envelope nor an exit"
+        )
+    report = None
+    if run.alarm is not None:
+        process_outcome, task_outcome = MISCONFIGURED, None
+    elif run.timed_out:
+        process_outcome, task_outcome = TIMED_OUT, None
+    elif run.exit_code != 0:
+        process_outcome, task_outcome = DIED, None
+    elif run.result is None:
+        raise HarnessContractViolation(
+            "the child exited cleanly having emitted no result envelope, so it "
+            "reported nothing at all"
+        )
+    else:
+        report = _report(run.result)
+        process_outcome = SCHEMA_REFUSED if report is None else CLEAN
+        task_outcome = None if report is None else _task_outcome(report)
+    return (
+        JobOutcome(process_outcome, task_outcome, report, session_id),
+        _payload(run, process_outcome, task_outcome, report),
+    )
+
+
+def _report(result: Mapping[str, object]) -> dict[str, object] | None:
+    """The validated report on a result envelope, or `None` where the node gave none.
+
+    A report that is present and is not an object is neither: the schema every
+    node is launched under describes an object, so the harness validating
+    something else against it is a promise broken.
+    """
+    report = result.get(STRUCTURED_OUTPUT)
+    if report is None:
+        return None
+    if not isinstance(report, dict):
+        raise HarnessContractViolation(
+            f"the validated report is a {type(report).__name__}, not the object every "
+            f"node schema describes: {report!r}"
+        )
+    return report
+
+
+def _task_outcome(report: Mapping[str, object]) -> str:
+    """The node's own word for how the work went, read from the report's `outcome`.
+
+    Exactly one key, by the epic's report-envelope convention: every node schema
+    carries a required top-level `outcome`, so a report the harness validated
+    and that still lacks one was validated against a schema this launch never
+    handed it.
+    """
+    if OUTCOME not in report:
+        raise HarnessContractViolation(
+            f"the validated report carries no {OUTCOME!r}, which every node schema "
+            f"requires of it: {dict(report)}"
+        )
+    return str(report[OUTCOME])
+
+
+def _payload(
+    run: _Run,
+    process_outcome: str,
+    task_outcome: str | None,
+    report: dict[str, object] | None,
+) -> dict[str, object]:
+    """The `job-report` row's payload, composed from everything the run left behind."""
+    payload: dict[str, object] = {
+        "process_outcome": process_outcome,
+        "task_outcome": task_outcome,
+        STRUCTURED_OUTPUT: report,
+    }
+    if run.result is not None:
+        # Accounting, recorded as the harness reported it and never re-asserted.
+        # A field the harness omits is left off the row rather than failing a
+        # job that already ran: nothing in the graph branches on a token count,
+        # and only `subtype`, `is_error`, `permission_denials` and
+        # `duration_ms` are measured promises to begin with.
+        payload["exit_code"] = run.exit_code
+        for extract in RESULT_EXTRACTS:
+            if extract in run.result:
+                payload[extract] = run.result[extract]
+        duration_ms = run.result.get(DURATION_MS)
+        if isinstance(duration_ms, int | float):
+            payload["duration_s"] = duration_ms / MILLISECONDS
+    if run.kill is not None:
+        payload["kill"] = run.kill
+    if run.alarm is not None:
+        payload["alarm"] = run.alarm
+    return payload

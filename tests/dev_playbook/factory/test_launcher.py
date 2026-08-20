@@ -45,6 +45,55 @@ MISNAMED_DEFINITION = {**DEFINITION, "name": "builder"}
 UNTUNED_DEFINITION = {"name": NODE, "description": "The build node.", "model": "opus"}
 OVERTUNED_DEFINITION = {**DEFINITION, "effort": "turbo"}
 
+# A stand-in for claude: it records the argv and placement it was spawned
+# with, then emits a canned stream-json stream line by line and exits the way
+# its plan says. `$CWD` in a canned line becomes the directory it really ran
+# in, so a test can emit a truthful `init` without knowing the path.
+FAKE_CLAUDE = """
+import json
+import os
+import signal
+import sys
+import time
+from pathlib import Path
+
+here = Path(__file__).parent
+plan = json.loads((here / "plan.json").read_text())
+(here / "record.json").write_text(
+    json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd()})
+)
+if plan["ignore_sigterm"]:
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+for line in plan["lines"]:
+    resolved = {k: (os.getcwd() if v == "$CWD" else v) for k, v in line.items()}
+    print(json.dumps(resolved), flush=True)
+time.sleep(plan["linger"])
+sys.exit(plan["exit_code"])
+"""
+
+# Hook events precede `init` in a real stream, so every canned stream opens
+# with one: the parser has to scan for `init` rather than read the first line.
+HOOK_LINE: dict[str, Any] = {
+    "type": "system",
+    "subtype": "hook_started",
+    "hook_event": "SessionStart",
+}
+
+# A line the launcher reads and drops, between `init` and the envelope.
+NOISE_LINE: dict[str, Any] = {"type": "rate_limit_event", "subtype": None}
+
+# The report a clean node returns, in the epic's envelope shape.
+REPORT: dict[str, Any] = {"outcome": "done", "gist": "The issue is built."}
+
+# How long a fake child lingers when the launcher is meant to be what ends it.
+# Long enough that a missed kill fails the test by timing out rather than by
+# passing for the wrong reason.
+LINGER_SECONDS = 30.0
+
+# The shrunk deadline and grace every supervision test runs under.
+BRIEF_DEADLINE = 0.3
+BRIEF_GRACE = 0.3
+
 # The six settings files a launch is swept against, named by scope. Every one
 # is a file `-p` merges, so a billing key in any of them meters the child.
 SETTINGS_SCOPES = (
@@ -187,6 +236,75 @@ def launch(
         )
 
     return run
+
+
+@pytest.fixture
+def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
+    """Write the stand-in claude for one test and return the command that runs it."""
+    here = tmp_path / "fake"
+    here.mkdir()
+    script = here / "claude.py"
+    script.write_text(FAKE_CLAUDE)
+
+    def plan(
+        lines: list[dict[str, Any]],
+        *,
+        linger: float = 0.0,
+        exit_code: int = 0,
+        ignore_sigterm: bool = False,
+    ) -> tuple[str, ...]:
+        (here / "plan.json").write_text(
+            json.dumps(
+                {
+                    "lines": lines,
+                    "linger": linger,
+                    "exit_code": exit_code,
+                    "ignore_sigterm": ignore_sigterm,
+                }
+            )
+        )
+        return (sys.executable, str(script))
+
+    return plan
+
+
+@pytest.fixture
+def spawn_record(tmp_path: Path) -> Callable[[], dict[str, Any]]:
+    """Read back the argv and placement the fake claude was spawned with."""
+
+    def read() -> dict[str, Any]:
+        record: dict[str, Any] = json.loads(
+            (tmp_path / "fake" / "record.json").read_text()
+        )
+        return record
+
+    return read
+
+
+def init_line(cwd: str = "$CWD", api_key_source: str = "none") -> dict[str, Any]:
+    """An `init` message declaring where the run was placed and what pays for it."""
+    return {
+        "type": "system",
+        "subtype": "init",
+        "cwd": cwd,
+        "apiKeySource": api_key_source,
+        "model": "claude-opus-4-5",
+        "permissionMode": "bypassPermissions",
+    }
+
+
+def result_line(report: dict[str, Any] | None = None) -> dict[str, Any]:
+    """A terminating `result` envelope carrying the accounting a job-report records."""
+    return {
+        "type": "result",
+        "subtype": "success",
+        "is_error": False,
+        "duration_ms": 5432,
+        "num_turns": 3,
+        "usage": {"input_tokens": 100, "output_tokens": 20},
+        "permission_denials": [],
+        "structured_output": report,
+    }
 
 
 def write_settings(path: Path, settings: dict[str, object]) -> None:
@@ -404,3 +522,252 @@ def test_launch_aborts_when_a_definitions_frontmatter_will_not_parse(
 
     assert f"{NODE}.md" in str(aborted.value)
     assert ledger_rows(db) == []
+
+
+def test_a_clean_run_lands_both_ledger_rows_on_the_minted_session_id(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line(), NOISE_LINE, result_line(REPORT)])
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    launched, reported = ledger_rows(db)
+    assert launched == ("job-launch", outcome.session_id, LAUNCH_PAYLOAD)
+    assert reported == (
+        "job-report",
+        outcome.session_id,
+        {
+            "process_outcome": "clean",
+            "task_outcome": "done",
+            "structured_output": REPORT,
+            "exit_code": 0,
+            "subtype": "success",
+            "is_error": False,
+            "duration_s": 5.432,
+            "num_turns": 3,
+            "usage": {"input_tokens": 100, "output_tokens": 20},
+            "permission_denials": [],
+        },
+    )
+
+
+def test_a_clean_run_returns_the_reports_own_outcome_as_the_task_outcome(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line(), result_line(REPORT)])
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    assert outcome.process_outcome == "clean"
+    assert outcome.task_outcome == "done"
+    assert outcome.structured_output == REPORT
+
+
+def test_the_spawn_carries_the_fixed_flag_roster_and_nothing_else(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    spawn_record: Callable[[], dict[str, Any]],
+    agents_dir: Path,
+    worktree: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line(), result_line(REPORT)])
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    record = spawn_record()
+    assert record["argv"] == [
+        "--agent",
+        NODE,
+        "-p",
+        PROMPT,
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--session-id",
+        outcome.session_id,
+        "--json-schema",
+        json.dumps(SCHEMA),
+        "--permission-mode",
+        "bypassPermissions",
+    ]
+    assert Path(record["cwd"]).resolve() == worktree.resolve()
+
+
+def test_a_run_whose_node_returned_no_report_is_schema_refused(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line(), result_line(None)])
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    assert outcome.process_outcome == "schema-refused"
+    assert outcome.task_outcome is None
+    assert outcome.structured_output is None
+    assert ledger_rows(db)[1][2]["process_outcome"] == "schema-refused"
+
+
+def test_a_child_that_exits_nonzero_on_its_own_died(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE], exit_code=3)
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    assert outcome.process_outcome == "died"
+    assert outcome.task_outcome is None
+    assert "kill" not in ledger_rows(db)[1][2]
+
+
+def test_a_child_still_running_at_the_deadline_is_timed_out(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line()], linger=LINGER_SECONDS)
+
+    outcome = launch(
+        claude_cmd=claude_cmd, timeout_s=BRIEF_DEADLINE, grace_s=BRIEF_GRACE
+    )
+
+    assert outcome.process_outcome == "timed-out"
+    assert outcome.task_outcome is None
+    assert ledger_rows(db)[1][2]["kill"] == "sigterm"
+
+
+def test_a_run_placed_outside_its_worktree_is_killed_and_misconfigured(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    worktree: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(cwd="/somewhere/else")], linger=LINGER_SECONDS
+    )
+
+    outcome = launch(
+        claude_cmd=claude_cmd, timeout_s=BRIEF_DEADLINE, grace_s=BRIEF_GRACE
+    )
+
+    assert outcome.process_outcome == "misconfigured"
+    assert outcome.task_outcome is None
+    payload = ledger_rows(db)[1][2]
+    assert payload["kill"] == "sigterm"
+    assert payload["alarm"] == {
+        "field": "cwd",
+        "observed": "/somewhere/else",
+        "expected": str(worktree.resolve()),
+    }
+
+
+def test_a_run_billed_to_anything_but_the_subscription_is_killed_and_misconfigured(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(api_key_source="ANTHROPIC_API_KEY")],
+        linger=LINGER_SECONDS,
+    )
+
+    outcome = launch(
+        claude_cmd=claude_cmd, timeout_s=BRIEF_DEADLINE, grace_s=BRIEF_GRACE
+    )
+
+    assert outcome.process_outcome == "misconfigured"
+    assert ledger_rows(db)[1][2]["alarm"] == {
+        "field": "apiKeySource",
+        "observed": "ANTHROPIC_API_KEY",
+        "expected": "none",
+    }
+
+
+def test_launch_runs_the_same_preflight_the_traverse_calls_standalone(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+    child_env: pytest.MonkeyPatch,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line(), result_line(REPORT)])
+    child_env.setenv("ANTHROPIC_API_KEY", "sk-metered")
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launch(claude_cmd=claude_cmd)
+
+    assert "ANTHROPIC_API_KEY" in str(aborted.value)
+    assert ledger_rows(db) == []
+
+
+def test_a_child_that_ignores_sigterm_is_killed_after_the_grace(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line()], linger=LINGER_SECONDS, ignore_sigterm=True
+    )
+
+    outcome = launch(
+        claude_cmd=claude_cmd, timeout_s=BRIEF_DEADLINE, grace_s=BRIEF_GRACE
+    )
+
+    assert outcome.process_outcome == "timed-out"
+    assert ledger_rows(db)[1][2]["kill"] == "sigkill"
+
+
+def test_a_result_envelope_with_no_init_before_it_violates_the_contract(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, result_line(REPORT)])
+
+    with pytest.raises(launcher.HarnessContractViolation):
+        launch(claude_cmd=claude_cmd)
+
+    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+
+
+def test_a_validated_report_with_no_outcome_violates_the_contract(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(), result_line({"gist": "The issue is built."})]
+    )
+
+    with pytest.raises(launcher.HarnessContractViolation) as violated:
+        launch(claude_cmd=claude_cmd)
+
+    assert "outcome" in str(violated.value)
+    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
