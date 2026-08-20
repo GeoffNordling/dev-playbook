@@ -133,6 +133,8 @@ SKILL_ROOTS = (".claude/skills", "dotfiles/dot-claude/skills")
 # The rule bodies' matching pair: a consumer repo carries its rules under
 # .claude/, dev-playbook authors them in the Stow source tree.
 RULE_ROOTS = (".claude/rules", "dotfiles/dot-claude/rules")
+# The typed agent definitions' matching pair, on the same split.
+AGENT_ROOTS = (".claude/agents", "dotfiles/dot-claude/agents")
 # The directory name any repo vendors third-party skills under — dev-playbook's
 # dotfiles/.agents, a consumer's own copy. Its contents are carried verbatim so
 # they can be re-synced from upstream, so authored-voice rules do not reach
@@ -654,17 +656,18 @@ def is_vendored(root: Path, path: Path) -> bool:
 
 def check_agent_facing_voice(root: Path) -> list[Finding]:
     """Agent-facing instruction text — every CLAUDE.md (root, nested, and the
-    dev-playbook global source) plus every first-party skill and rule body — is
-    written for the executing agent alone, so it never speaks in first person
-    (claude-content.md, conventions.md). Runs in
-    every repo, inspecting only that repo's own files; a consumer's skills and
-    rules sit under .claude/, dev-playbook's under the Stow source tree, and
-    vendored third-party skills are exempt wherever they surface. A skill's
-    frontmatter is in scope: its description is prose the agent reads to choose
-    the skill. Inline code, fenced blocks, and quoted speech are skipped so a
-    backticked example or a quoted utterance does not read as prose.
+    dev-playbook global source) plus every first-party agent definition, skill,
+    and rule body — is written for the executing agent alone, so it never
+    speaks in first person (claude-content.md, conventions.md). Runs in every
+    repo, inspecting only that repo's own files; a consumer's definitions,
+    skills, and rules sit under .claude/, dev-playbook's under the Stow source
+    tree, and vendored third-party skills are exempt wherever they surface. A
+    skill's frontmatter is in scope: its description is prose the agent reads
+    to choose the skill. Inline code, fenced blocks, and quoted speech are
+    skipped so a backticked example or a quoted utterance does not read as
+    prose.
     """
-    instruction_roots = tuple(f"{r}/" for r in SKILL_ROOTS + RULE_ROOTS)
+    instruction_roots = tuple(f"{r}/" for r in SKILL_ROOTS + RULE_ROOTS + AGENT_ROOTS)
     findings = []
     for path in md.find_md_files(root):
         rel = path.relative_to(root).as_posix()

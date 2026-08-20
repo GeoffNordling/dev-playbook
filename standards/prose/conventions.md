@@ -123,7 +123,7 @@ or `my` in the files listed above: they are commands addressed *to* the agent,
 so the only voices they carry are the imperative and `you`. A first-person
 sentence puts the document in the agent's mouth, which inverts who is
 instructing whom. `repo-lint` enforces this deterministically over the body of
-every first-party skill and rule as well as `CLAUDE.md`.
+every first-party agent definition, skill, and rule as well as `CLAUDE.md`.
 
 The ban governs the document's own voice, so quoting someone else's is
 untouched: a double-quoted utterance is exempt. Write the phrasing a user types

@@ -217,6 +217,22 @@ def test_same_repo_citation_from_skill_is_ok(tmp_path: Path) -> None:
     }
 
 
+def test_same_repo_citation_from_agent_definition_is_ok(tmp_path: Path) -> None:
+    """An agent definition stows into ~/.claude/agents/, so it has no fixed
+    repo root and a same-repo Citation is the correct form."""
+    repo = graph_repo(
+        tmp_path,
+        {
+            "agents/build.md": "see ~/workspace/repo/b.md",
+            "b.md": "target",
+        },
+    )
+
+    doc = graph.build_graph(repo)
+
+    assert edge(doc, "citation")["status"] == "ok"
+
+
 def test_cross_repo_citation_is_an_external_edge(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
