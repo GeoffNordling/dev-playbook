@@ -150,6 +150,7 @@ GOVERNED = (
     "mission-control",
     "fedora-playbook",
     "voice-transcription",
+    "sounds",
 )
 
 # Expected GitHub settings, under the REST field names. The audit only reads;
