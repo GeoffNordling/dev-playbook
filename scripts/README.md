@@ -96,9 +96,12 @@ them per script. The library is the installed `dev_playbook` package:
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
 loading/validation and the plan/render/record runner, behind `judgments-lint`
 and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
-model, classifier, and renderer behind `transcript-export`), and
+model, classifier, and renderer behind `transcript-export`),
 `dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
-already-recorded work).
+already-recorded work), and `dev_playbook.factory` (the software factory's
+append-only run ledger — the `ledger` table beside the hook-capture `events`
+table, its per-kind writers and its two read queries; no script consumes it
+yet).
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so

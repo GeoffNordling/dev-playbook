@@ -198,6 +198,12 @@ def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
             _require_wal(connection, db_path)
             connection.execute(SCHEMA)
             yield connection
+    # Two exception types, not one bound to a name: PEP 758, new in 3.14, which
+    # this package requires. It reads character-for-character like Python 2's
+    # `except X, name:` and is nothing of the sort. The parentheses that would
+    # settle it on sight cannot be written here — `ruff format` strips them from
+    # an unbound tuple and keeps them on the bound one below, which is the whole
+    # reason these two lines disagree.
     except sqlite3.ProgrammingError, sqlite3.InterfaceError:
         raise
     except (sqlite3.Error, OSError) as error:
