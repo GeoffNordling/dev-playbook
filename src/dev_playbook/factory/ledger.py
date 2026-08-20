@@ -162,9 +162,10 @@ class LedgerError(Exception):
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
     surfaces as itself, with nothing written: a payload that will not serialize
-    raises `TypeError`, a job-grain write missing its node or session id raises
-    `ValueError`, and a column argument SQLite cannot bind raises
-    `sqlite3.ProgrammingError` or `sqlite3.InterfaceError`.
+    raises `TypeError`, a write missing a column that addresses it — repo or
+    issue on any row, node or session id on a job row — raises `ValueError`,
+    and a column argument SQLite cannot bind raises `sqlite3.ProgrammingError`
+    or `sqlite3.InterfaceError`.
     """
 
 
@@ -236,14 +237,27 @@ def _append(
 ) -> None:
     """Append one row of any kind, stamping `received_at` as it goes.
 
-    The payload is encoded before the store is touched, so a payload that will
-    not serialize is a caller bug that raises with nothing written.
+    Every row is addressed by repo and issue: both queries supersede, close and
+    filter on that pair, and a NULL in either is unmatchable under SQL's
+    three-valued logic — so a row written without one can never be superseded
+    or closed out, and stands in every answer for good. That is the hazard the
+    job grain's `node` and `session_id` carry too, one column over, and it is
+    refused the same way and for the same reason: before the store is touched,
+    as the caller bug it is rather than as a broken ledger.
+
+    The payload is encoded before the store is touched as well, so a payload
+    that will not serialize also raises with nothing written.
 
     `json.dumps` serializes `dict` alone, not the `Mapping` protocol, so the
     payload is copied into one first — otherwise the most natural immutable
     payloads, a `MappingProxyType` or a `ChainMap`, would be refused as
     unserializable despite being nothing of the sort.
     """
+    if repo is None or issue is None:
+        raise ValueError(
+            f"a {kind} needs both a repo and an issue, and was given "
+            f"repo={repo!r}, issue={issue!r}"
+        )
     encoded = json.dumps(dict(payload))
     received_at = datetime.now(UTC).isoformat(timespec="microseconds")
     with _ledger(db_path) as connection:
@@ -276,18 +290,13 @@ def _append_job(
 ) -> None:
     """Append one job-grain row, refusing one whose grain columns are missing.
 
-    Both job-grain columns are load-bearing for `live_jobs`, and a NULL in
-    either is worse than an error. SQL three-valued logic makes
-    `report.session_id = launch.session_id` neither true nor false when both
+    These two are the job grain's half of the addressing rule `_append` states
+    for repo and issue, and they are refused for exactly that reason:
+    `report.session_id = launch.session_id` is neither true nor false when both
     are NULL, so a launch written without a session id can never be closed --
     not by its own report, not by anything -- and shows as running work
-    forever, with nothing raised anywhere. A launcher whose session-id minting
-    returns None on some path would strand every job it starts.
-
-    So the missing value is refused here, at the write, before it can reach a
-    store nothing can repair it in. This is a caller bug and surfaces as one:
-    `LedgerError` would send the operator to check a store that is perfectly
-    healthy.
+    forever. A launcher whose session-id minting returns None on some path
+    would strand every job it starts.
     """
     if node is None or session_id is None:
         raise ValueError(

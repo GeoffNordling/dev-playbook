@@ -391,6 +391,46 @@ def test_a_stored_traverse_row_may_carry_no_node_or_session_id(
     assert (row.node, row.session_id) == (None, None)
 
 
+@pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
+def test_a_traverse_writer_refuses_a_missing_repo(
+    kind: str, write: TraverseWriter, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write(None, 438, {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
+def test_a_traverse_writer_refuses_a_missing_issue(
+    kind: str, write: TraverseWriter, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write("owner/repo", None, {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
+def test_a_job_writer_refuses_a_missing_repo(
+    kind: str, write: JobWriter, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write(None, 438, "build", "sess-1", {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
+def test_a_job_writer_refuses_a_missing_issue(
+    kind: str, write: JobWriter, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        write("owner/repo", None, "build", "sess-1", {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
 @pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
 def test_a_job_writer_refuses_a_missing_node(
     kind: str, write: JobWriter, db_path: Path
