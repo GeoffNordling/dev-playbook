@@ -1,0 +1,337 @@
+"""The software factory's append-only run ledger.
+
+The `ledger` table sits beside the hook-capture `events` table in the same
+SQLite store, and this module is the only code that touches it. Rows are
+appended and never changed: state is derived by reading which records exist
+and which are absent.
+"""
+
+import json
+import sqlite3
+from collections.abc import Iterator, Mapping
+from contextlib import closing, contextmanager
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import NamedTuple
+
+DB_PATH = Path("~/.local/share/claude-measure/events.db").expanduser()
+
+# Concurrent traverses write to one database. WAL lets their readers and
+# writers coexist, and the busy timeout makes a collision queue rather than
+# fail.
+BUSY_TIMEOUT_SECONDS = 5.0
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS ledger (
+    id INTEGER PRIMARY KEY,
+    received_at TEXT,
+    kind TEXT,
+    repo TEXT,
+    issue INTEGER,
+    node TEXT,
+    session_id TEXT,
+    payload TEXT
+)
+"""
+
+INSERT = """
+INSERT INTO ledger (received_at, kind, repo, issue, node, session_id, payload)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+"""
+
+# Every read selects these, in this order; `_decode` reads a row back by that
+# order into a `LedgerRow`.
+COLUMNS = "id, received_at, kind, repo, issue, node, session_id, payload"
+
+# Sequencing is by `id` throughout: it is the only order the ledger guarantees.
+# `received_at` is there for wall-clock accounting and is never compared here.
+#
+# A job is live while it has been launched and nothing has since ended it: no
+# report for its session, no newer launch of the same node taking its place,
+# and its traverse window still open. A window closes at `traverse-end` or at
+# the next `traverse-start` for the same repo and issue -- never at
+# `traverse-escalation`, which is followed by the `traverse-end` that does
+# close it (epic standing ruling 5).
+LIVE_JOBS = f"""
+SELECT {COLUMNS} FROM ledger AS l
+WHERE l.kind = 'job-launch'
+  AND NOT EXISTS (
+      SELECT 1 FROM ledger AS reported
+      WHERE reported.kind = 'job-report'
+        AND reported.session_id = l.session_id
+        AND reported.id > l.id
+  )
+  AND NOT EXISTS (
+      SELECT 1 FROM ledger AS relaunched
+      WHERE relaunched.kind = 'job-launch'
+        AND relaunched.repo = l.repo
+        AND relaunched.issue = l.issue
+        AND relaunched.node = l.node
+        AND relaunched.id > l.id
+  )
+  AND NOT EXISTS (
+      SELECT 1 FROM ledger AS closer
+      WHERE closer.kind IN ('traverse-end', 'traverse-start')
+        AND closer.repo = l.repo
+        AND closer.issue = l.issue
+        AND closer.id > l.id
+  )
+  AND (:repo IS NULL OR l.repo = :repo)
+  AND (:issue IS NULL OR l.issue = :issue)
+ORDER BY l.id
+"""
+
+# The rows `awaiting_merge` is about to match: each repo and issue's newest
+# `traverse-end`, minus those an issue has since been closed out of. What a
+# superseded end said is dead history, and a closed-out issue's end is spent --
+# neither is consulted, so neither can brick the read with a malformed payload.
+AWAITING_MERGE = f"""
+SELECT {COLUMNS} FROM ledger AS l
+WHERE l.kind = 'traverse-end'
+  AND NOT EXISTS (
+      SELECT 1 FROM ledger AS newer
+      WHERE newer.kind = 'traverse-end'
+        AND newer.repo = l.repo
+        AND newer.issue = l.issue
+        AND newer.id > l.id
+  )
+  AND NOT EXISTS (
+      SELECT 1 FROM ledger AS closed
+      WHERE closed.kind = 'closeout'
+        AND closed.repo = l.repo
+        AND closed.issue = l.issue
+        AND closed.id > l.id
+  )
+  AND (:repo IS NULL OR l.repo = :repo)
+ORDER BY l.id
+"""
+
+# The one payload value this module reads. Everything else in a payload is the
+# launcher's business and passes through uninterpreted.
+STATUS = "status"
+PR_READY = "pr-ready"
+
+
+class LedgerRow(NamedTuple):
+    """One ledger row read back, with its payload decoded."""
+
+    id: int
+    received_at: str
+    kind: str
+    repo: str
+    issue: int
+    node: str | None
+    session_id: str | None
+    payload: dict[str, object]
+
+
+class LedgerError(Exception):
+    """A storage failure, chained from the `sqlite3.Error` or `OSError` beneath it.
+
+    The one exception type the module raises for storage, so a caller catches
+    exactly "the ledger is broken" without importing `sqlite3`. A payload the
+    caller cannot serialize is not this: that is a caller bug, and its own
+    `TypeError` surfaces untouched.
+    """
+
+
+@contextmanager
+def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
+    """The store, open with the table present, WAL on, and the busy timeout set.
+
+    Every storage failure in the block — the store unwritable, connect, the
+    DDL, the caller's own INSERT or SELECT, a busy timeout expiring — arrives
+    here and leaves as `LedgerError`. Nothing is caught, retried, or degraded:
+    the factory must hear that its ledger is broken.
+    """
+    try:
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        with closing(
+            sqlite3.connect(db_path, timeout=BUSY_TIMEOUT_SECONDS)
+        ) as connection:
+            # Persistent, so only the first write of the database's life
+            # changes anything; the rest read back the mode they already have.
+            connection.execute("PRAGMA journal_mode=WAL")
+            connection.execute(SCHEMA)
+            yield connection
+    except (sqlite3.Error, OSError) as error:
+        raise LedgerError(f"run ledger at {db_path} is unusable: {error}") from error
+
+
+def _append(
+    kind: str,
+    repo: str,
+    issue: int,
+    node: str | None,
+    session_id: str | None,
+    payload: Mapping[str, object],
+    db_path: Path,
+) -> None:
+    """Append one row of any kind, stamping `received_at` as it goes.
+
+    The payload is encoded before the store is touched, so a payload that will
+    not serialize is a caller bug that raises with nothing written.
+    """
+    encoded = json.dumps(payload)
+    received_at = datetime.now(UTC).isoformat(timespec="microseconds")
+    with _ledger(db_path) as connection:
+        connection.execute(
+            INSERT, (received_at, kind, repo, issue, node, session_id, encoded)
+        )
+        connection.commit()
+
+
+def _append_traverse(
+    kind: str, repo: str, issue: int, payload: Mapping[str, object], db_path: Path
+) -> None:
+    """Append one traverse-grain row, whose `node` and `session_id` are NULL.
+
+    Every traverse-grain writer goes through here, so the two job-grain columns
+    are NULL by construction rather than by each writer remembering to pass
+    nothing.
+    """
+    _append(kind, repo, issue, None, None, payload, db_path)
+
+
+# --- traverse-grain writers ---
+
+
+def traverse_start(
+    repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
+) -> None:
+    """Append the invocation's first record, at `traverse_issue` entry."""
+    _append_traverse("traverse-start", repo, issue, payload, db_path)
+
+
+def phase_transition(
+    repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
+) -> None:
+    """Append the record written beside a label move."""
+    _append_traverse("phase-transition", repo, issue, payload, db_path)
+
+
+def verdict(
+    repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
+) -> None:
+    """Append the record written at a review-loop verdict point."""
+    _append_traverse("verdict", repo, issue, payload, db_path)
+
+
+def traverse_escalation(
+    repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
+) -> None:
+    """Append the record written right before `traverse_issue` returns escalated."""
+    _append_traverse("traverse-escalation", repo, issue, payload, db_path)
+
+
+def traverse_end(
+    repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
+) -> None:
+    """Append every invocation's last record, escalated exits included.
+
+    A traverse window closes here or at the next `traverse-start` for the same
+    repo and issue — never at `traverse-escalation`, which is why an escalated
+    exit still writes this.
+    """
+    _append_traverse("traverse-end", repo, issue, payload, db_path)
+
+
+def closeout(
+    repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
+) -> None:
+    """Append the issue's terminal record, at `teardown_issue`."""
+    _append_traverse("closeout", repo, issue, payload, db_path)
+
+
+# --- job-grain writers ---
+
+
+def job_launch(
+    repo: str,
+    issue: int,
+    node: str,
+    session_id: str,
+    payload: Mapping[str, object],
+    *,
+    db_path: Path = DB_PATH,
+) -> None:
+    """Append the pre-spawn record, right after the session id is minted."""
+    _append("job-launch", repo, issue, node, session_id, payload, db_path)
+
+
+def job_report(
+    repo: str,
+    issue: int,
+    node: str,
+    session_id: str,
+    payload: Mapping[str, object],
+    *,
+    db_path: Path = DB_PATH,
+) -> None:
+    """Append the job's single terminal record, written as the child exits."""
+    _append("job-report", repo, issue, node, session_id, payload, db_path)
+
+
+# --- reads ---
+
+
+def _select(
+    query: str, filters: Mapping[str, object], db_path: Path
+) -> list[LedgerRow]:
+    """Run one named query and decode its rows.
+
+    A filter left None matches everything, which each query spells out as
+    `:name IS NULL OR column = :name` -- so the filters conjoin and passing
+    none of them reads the whole machine.
+    """
+    with _ledger(db_path) as connection:
+        rows = connection.execute(query, dict(filters)).fetchall()
+    return [_decode(row) for row in rows]
+
+
+# What a `COLUMNS` select yields, before the payload is parsed.
+StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
+
+
+def _decode(row: StoredRow) -> LedgerRow:
+    """One raw row as a `LedgerRow`, its payload text parsed back into a dict."""
+    return LedgerRow(
+        id=row[0],
+        received_at=row[1],
+        kind=row[2],
+        repo=row[3],
+        issue=row[4],
+        node=row[5],
+        session_id=row[6],
+        payload=json.loads(row[7]),
+    )
+
+
+def live_jobs(
+    *,
+    repo: str | None = None,
+    issue: int | None = None,
+    db_path: Path = DB_PATH,
+) -> list[LedgerRow]:
+    """Every launched job with no terminal record, inside a traverse still open."""
+    return _select(LIVE_JOBS, {"repo": repo, "issue": issue}, db_path)
+
+
+def awaiting_merge(
+    *, repo: str | None = None, db_path: Path = DB_PATH
+) -> list[LedgerRow]:
+    """Every issue whose traverse ended `pr-ready` and has not been closed out.
+
+    The one place the module reads inside a payload. A candidate carrying no
+    `status` at all is a row this cannot judge, so it raises naming that row
+    rather than dropping it: an issue waiting on a merge must never go missing
+    from the answer quietly.
+    """
+    candidates = _select(AWAITING_MERGE, {"repo": repo}, db_path)
+    unjudgeable = [row.id for row in candidates if STATUS not in row.payload]
+    if unjudgeable:
+        raise LedgerError(
+            f"run ledger at {db_path} has traverse-end rows with no {STATUS!r} in "
+            f"their payload: {unjudgeable}"
+        )
+    return [row for row in candidates if row.payload[STATUS] == PR_READY]

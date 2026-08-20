@@ -31,17 +31,19 @@ with the underlying defect raised as a bug against capture.
 ## The store
 
 The database is `~/.local/share/claude-measure/events.db` (SQLite, WAL), with
-one `events` table and one row per hook invocation: `received_at` (UTC
-ISO-8601, stamped when the hook received the event), `event`, `session_id`,
-`prompt_id`, `payload`. `event`, `session_id`, and `prompt_id` are promoted
-copies of the payload's `hook_event_name`, `session_id`, and `prompt_id`, kept
-as columns for querying convenience; `payload` holds the harness's JSON
-byte-verbatim — bar the single trim named under
-[Event semantics](/docs/measurement-derivation.md#event-semantics) (#255,
-ruling 23) — and is the authority for every field, promoted or not. A
+two tables. The `events` table holds one row per hook invocation:
+`received_at` (UTC ISO-8601, stamped when the hook received the event),
+`event`, `session_id`, `prompt_id`, `payload`. `event`, `session_id`, and
+`prompt_id` are promoted copies of the payload's `hook_event_name`,
+`session_id`, and `prompt_id`, kept as columns for querying convenience;
+`payload` holds the harness's JSON byte-verbatim — bar the single trim named
+under [Event semantics](/docs/measurement-derivation.md#event-semantics)
+(#255, ruling 23) — and is the authority for every field, promoted or not. A
 promoted column is NULL whenever its key was absent or arrived as something
 other than a string — including the whole-row case where stdin was not
-parseable JSON at all.
+parseable JSON at all. The sibling `ledger` table is the software factory's
+run ledger — written and read only by `dev_playbook.factory.ledger` — and is
+outside this document's scope.
 
 Which events reach the store is declared by the hook wiring in
 `/dotfiles/settings/fedora.json`, one [`measure-event`](/dotfiles/dot-claude/hooks/measure-event)
