@@ -453,17 +453,20 @@ def job_report(
 
 
 def _select(
-    query: str, filters: Mapping[str, object], db_path: Path
+    connection: sqlite3.Connection, query: str, filters: Mapping[str, object]
 ) -> list[LedgerRow]:
-    """Run one named query and decode its rows.
+    """Run one named query on an open ledger and decode its rows.
+
+    The connection is passed in rather than opened here so that a read and the
+    guards it runs alongside see one snapshot of the store: opened separately
+    they would not, and a write landing between them could slip past a guard
+    into the answer it was meant to hold back.
 
     A filter left None matches everything, which each query spells out as
     `:name IS NULL OR column = :name` -- so the filters conjoin and passing
     none of them reads the whole machine.
     """
-    with _ledger(db_path) as connection:
-        rows = connection.execute(query, dict(filters)).fetchall()
-    return [_decode(row) for row in rows]
+    return [_decode(row) for row in connection.execute(query, dict(filters))]
 
 
 # What a `COLUMNS` select yields, before the payload is parsed.
@@ -508,8 +511,8 @@ def _decode(stored: StoredRow) -> LedgerRow:
     later as a `TypeError` from whatever first treats one as a mapping. The
     sibling `measure-event` draws the same line for the same reason.
 
-    A **promoted column** fails the same two ways, being empty or holding the
-    wrong type, and both are worse than the payload's version: nothing raises
+    A **promoted column** fails two ways of its own, being empty or holding the
+    wrong type, and both are worse than the payload's pair: nothing raises
     anywhere. A NULL key never matches, so the row cannot be superseded,
     reported or closed out and stands in every answer for good; and SQLite's
     column affinities convert only what already looks like the declared type,
@@ -548,7 +551,7 @@ def _decode(stored: StoredRow) -> LedgerRow:
     return row
 
 
-def _refuse_colliding_sessions(db_path: Path) -> None:
+def _refuse_colliding_sessions(connection: sqlite3.Connection, db_path: Path) -> None:
     """Refuse a store where one session id stands for more than one job.
 
     Read whole rather than filtered: a session id is minted once and belongs to
@@ -559,8 +562,7 @@ def _refuse_colliding_sessions(db_path: Path) -> None:
     the factory can no longer tell apart, and finding that out late is worse
     than finding it out here.
     """
-    with _ledger(db_path) as connection:
-        collisions = connection.execute(COLLIDING_SESSIONS).fetchall()
+    collisions = connection.execute(COLLIDING_SESSIONS).fetchall()
     if collisions:
         held = ", ".join(f"{session!r} on rows {ids}" for session, ids in collisions)
         raise LedgerError(
@@ -590,8 +592,9 @@ def live_jobs(
     retiring a job it was never about, and the launcher's collision surfacing
     as work that finished without ever stopping.
     """
-    _refuse_colliding_sessions(db_path)
-    return _select(LIVE_JOBS, {"repo": repo, "issue": issue}, db_path)
+    with _ledger(db_path) as connection:
+        _refuse_colliding_sessions(connection, db_path)
+        return _select(connection, LIVE_JOBS, {"repo": repo, "issue": issue})
 
 
 def awaiting_merge(
@@ -620,13 +623,14 @@ def awaiting_merge(
     is a direct `UPDATE` on the row the error names. Append-only is this
     module's writing discipline, not a limit on the operator.
     """
-    candidates = _select(AWAITING_MERGE, {"repo": repo}, db_path)
+    with _ledger(db_path) as connection:
+        candidates = _select(connection, AWAITING_MERGE, {"repo": repo})
     unjudgeable = [
         row.id for row in candidates if row.payload.get(STATUS) not in STATUSES
     ]
     if unjudgeable:
         raise LedgerError(
-            f"run ledger at {db_path} has traverse-end rows whose payload "
+            f"run ledger at {db_path} has {TRAVERSE_END} rows whose payload "
             f"{STATUS!r} is not one of {STATUSES}: {unjudgeable}"
         )
     return [row for row in candidates if row.payload[STATUS] == PR_READY]
