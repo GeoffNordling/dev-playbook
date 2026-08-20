@@ -46,64 +46,95 @@ COLUMNS = "id, received_at, kind, repo, issue, node, session_id, payload"
 
 # Sequencing is by `id` throughout: it is the only order the ledger guarantees.
 # `received_at` is there for wall-clock accounting and is never compared here.
+
+# The eight kinds, named once. Every query matches on one and every writer
+# stamps one, so a bare literal on either side is a typo SQL answers with an
+# empty result rather than an error, and no test elsewhere would notice.
+TRAVERSE_START = "traverse-start"
+JOB_LAUNCH = "job-launch"
+JOB_REPORT = "job-report"
+PHASE_TRANSITION = "phase-transition"
+VERDICT = "verdict"
+TRAVERSE_ESCALATION = "traverse-escalation"
+TRAVERSE_END = "traverse-end"
+CLOSEOUT = "closeout"
+
+# The two job-grain kinds. Their rows carry a node and a session id; every
+# other kind is traverse-grain and carries neither.
+JOB_KINDS = frozenset({JOB_LAUNCH, JOB_REPORT})
+
+# A traverse window opens at `traverse-start` and closes at the first of these
+# to land for the same repo and issue: the `traverse-end` that every
+# `traverse_issue` exit writes as its last record, the next `traverse-start`
+# when a traverse died before writing one, or the `closeout` that makes the
+# issue terminal.
 #
+# `traverse-escalation` is deliberately not among them: an escalated exit still
+# writes `traverse-end` afterwards, and that is what closes the window (epic
+# standing ruling 4).
+WINDOW_CLOSERS = (TRAVERSE_END, TRAVERSE_START, CLOSEOUT)
+
+
+def _quoted(values: tuple[str, ...]) -> str:
+    """One of this module's vocabularies as a SQL literal list, for an `IN`."""
+    return ", ".join(f"'{value}'" for value in values)
+
+
+def _window_still_open(row: str) -> str:
+    """The condition that nothing has closed this row's window since it landed.
+
+    Both reads ask this of their own row and neither may answer it differently:
+    a job is live only inside an open window, and a `traverse-end` speaks for
+    its issue only until its own window shuts. So the rule is written once here
+    and interpolated into both queries rather than spelled out by hand in each.
+    Spelled twice it drifted, and the two reads then disagreed about one issue
+    at one instant -- `awaiting_merge` calling it ready to merge while
+    `live_jobs` showed a build rewriting its branch.
+    """
+    return f"""NOT EXISTS (
+      SELECT 1 FROM ledger AS closer
+      WHERE closer.kind IN ({_quoted(WINDOW_CLOSERS)})
+        AND closer.repo = {row}.repo
+        AND closer.issue = {row}.issue
+        AND closer.id > {row}.id
+  )"""
+
+
 # A job is live while it has been launched and nothing has since ended it: no
 # report for its session, no newer launch of the same node taking its place,
-# and its traverse window still open. A window closes at `traverse-end` or at
-# the next `traverse-start` for the same repo and issue -- never at
-# `traverse-escalation`, which is followed by the `traverse-end` that does
-# close it. That holds because every `traverse_issue` exit, escalated exits
-# included, writes `traverse-end` as its last record (epic standing ruling 4).
+# and its traverse window still open.
 LIVE_JOBS = f"""
 SELECT {COLUMNS} FROM ledger AS l
-WHERE l.kind = 'job-launch'
+WHERE l.kind = '{JOB_LAUNCH}'
   AND NOT EXISTS (
       SELECT 1 FROM ledger AS reported
-      WHERE reported.kind = 'job-report'
+      WHERE reported.kind = '{JOB_REPORT}'
         AND reported.session_id = l.session_id
         AND reported.id > l.id
   )
   AND NOT EXISTS (
       SELECT 1 FROM ledger AS relaunched
-      WHERE relaunched.kind = 'job-launch'
+      WHERE relaunched.kind = '{JOB_LAUNCH}'
         AND relaunched.repo = l.repo
         AND relaunched.issue = l.issue
         AND relaunched.node = l.node
         AND relaunched.id > l.id
   )
-  AND NOT EXISTS (
-      SELECT 1 FROM ledger AS closer
-      WHERE closer.kind IN ('traverse-end', 'traverse-start')
-        AND closer.repo = l.repo
-        AND closer.issue = l.issue
-        AND closer.id > l.id
-  )
+  AND {_window_still_open("l")}
   AND (:repo IS NULL OR l.repo = :repo)
   AND (:issue IS NULL OR l.issue = :issue)
 ORDER BY l.id
 """
 
-# The rows `awaiting_merge` is about to match: each repo and issue's newest
-# `traverse-end`, minus those an issue has since been closed out of. What a
-# superseded end said is dead history, and a closed-out issue's end is spent --
-# neither is consulted, so neither can brick the read with a malformed payload.
+# The rows `awaiting_merge` is about to match: every `traverse-end` whose own
+# window is still open. A newer end supersedes it, a later `traverse-start`
+# reopens the issue under it, and a `closeout` spends it -- one rule, not three
+# clauses. What a superseded, reopened or spent end said is dead history this
+# never consults, so it can never brick the read with a malformed payload.
 AWAITING_MERGE = f"""
 SELECT {COLUMNS} FROM ledger AS l
-WHERE l.kind = 'traverse-end'
-  AND NOT EXISTS (
-      SELECT 1 FROM ledger AS newer
-      WHERE newer.kind = 'traverse-end'
-        AND newer.repo = l.repo
-        AND newer.issue = l.issue
-        AND newer.id > l.id
-  )
-  AND NOT EXISTS (
-      SELECT 1 FROM ledger AS closed
-      WHERE closed.kind = 'closeout'
-        AND closed.repo = l.repo
-        AND closed.issue = l.issue
-        AND closed.id > l.id
-  )
+WHERE l.kind = '{TRAVERSE_END}'
+  AND {_window_still_open("l")}
   AND (:repo IS NULL OR l.repo = :repo)
 ORDER BY l.id
 """
@@ -313,28 +344,28 @@ def traverse_start(
     repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
 ) -> None:
     """Append the invocation's first record, at `traverse_issue` entry."""
-    _append_traverse("traverse-start", repo, issue, payload, db_path)
+    _append_traverse(TRAVERSE_START, repo, issue, payload, db_path)
 
 
 def phase_transition(
     repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
 ) -> None:
     """Append the record written beside a label move."""
-    _append_traverse("phase-transition", repo, issue, payload, db_path)
+    _append_traverse(PHASE_TRANSITION, repo, issue, payload, db_path)
 
 
 def verdict(
     repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
 ) -> None:
     """Append the record written at a review-loop verdict point."""
-    _append_traverse("verdict", repo, issue, payload, db_path)
+    _append_traverse(VERDICT, repo, issue, payload, db_path)
 
 
 def traverse_escalation(
     repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
 ) -> None:
     """Append the record written right before `traverse_issue` returns escalated."""
-    _append_traverse("traverse-escalation", repo, issue, payload, db_path)
+    _append_traverse(TRAVERSE_ESCALATION, repo, issue, payload, db_path)
 
 
 def traverse_end(
@@ -346,14 +377,14 @@ def traverse_end(
     repo and issue — never at `traverse-escalation`, which is why an escalated
     exit still writes this.
     """
-    _append_traverse("traverse-end", repo, issue, payload, db_path)
+    _append_traverse(TRAVERSE_END, repo, issue, payload, db_path)
 
 
 def closeout(
     repo: str, issue: int, payload: Mapping[str, object], *, db_path: Path = DB_PATH
 ) -> None:
     """Append the issue's terminal record, at `teardown_issue`."""
-    _append_traverse("closeout", repo, issue, payload, db_path)
+    _append_traverse(CLOSEOUT, repo, issue, payload, db_path)
 
 
 # --- job-grain writers ---
@@ -369,7 +400,7 @@ def job_launch(
     db_path: Path = DB_PATH,
 ) -> None:
     """Append the pre-spawn record, right after the session id is minted."""
-    _append_job("job-launch", repo, issue, node, session_id, payload, db_path)
+    _append_job(JOB_LAUNCH, repo, issue, node, session_id, payload, db_path)
 
 
 def job_report(
@@ -382,7 +413,7 @@ def job_report(
     db_path: Path = DB_PATH,
 ) -> None:
     """Append the job's single terminal record, written as the child exits."""
-    _append_job("job-report", repo, issue, node, session_id, payload, db_path)
+    _append_job(JOB_REPORT, repo, issue, node, session_id, payload, db_path)
 
 
 # --- reads ---
@@ -404,10 +435,6 @@ def _select(
 
 # What a `COLUMNS` select yields, before the payload is parsed.
 StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
-
-# The two job-grain kinds. Their rows carry a node and a session id; every
-# other kind is traverse-grain and carries neither.
-JOB_KINDS = frozenset({"job-launch", "job-report"})
 
 # What a stored row must carry to be readable. `repo` and `issue` key every
 # supersession, window and closeout test in both queries, and a job row's
@@ -481,8 +508,9 @@ def live_jobs(
 
     A launch counts as live until one of three things ends it: a `job-report`
     for its session id, a later `job-launch` of the same node at the same repo
-    and issue superseding it, or its traverse window closing. Filters conjoin,
-    and passing none of them reads the whole machine.
+    and issue superseding it, or its traverse window closing — at
+    `WINDOW_CLOSERS`, the one definition `awaiting_merge` reads by too. Filters
+    conjoin, and passing none of them reads the whole machine.
     """
     return _select(LIVE_JOBS, {"repo": repo, "issue": issue}, db_path)
 
@@ -490,7 +518,13 @@ def live_jobs(
 def awaiting_merge(
     *, repo: str | None = None, db_path: Path = DB_PATH
 ) -> list[LedgerRow]:
-    """Every issue whose traverse ended `pr-ready` and has not been closed out.
+    """Every issue whose traverse ended `pr-ready` and has not moved on since.
+
+    An end speaks for its issue only while its own window is open, by the one
+    definition at `WINDOW_CLOSERS` that `live_jobs` reads by too. A newer end
+    supersedes it, a `closeout` spends it, and a later `traverse-start` reopens
+    the issue underneath it — so an issue back in the factory for rework never
+    reads as ready to merge while a build is rewriting its branch.
 
     The one place the module reads inside a payload, and it reads exactly one
     key. That key's vocabulary is closed and stated at `STATUSES`: a candidate
@@ -500,8 +534,8 @@ def awaiting_merge(
     no reading under which a launcher's `"PR-Ready"` or `"pr_ready"` quietly
     means no.
 
-    Only candidates are judged — the newest `traverse-end` per repo and issue,
-    minus the closed-out. A superseded or spent end is dead history the query
+    Only candidates are judged — the ends whose windows are still open. An end
+    that has been superseded, spent or reopened past is dead history the query
     never consults, so a malformed row that is no longer in play cannot brick
     this read; one that *is* in play stops the read until it is repaired, which
     is a direct `UPDATE` on the row the error names. Append-only is this

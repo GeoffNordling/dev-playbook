@@ -580,6 +580,20 @@ def test_live_jobs_drops_a_job_when_a_later_traverse_starts(db_path: Path) -> No
     assert ledger.live_jobs(db_path=db_path) == []
 
 
+def test_live_jobs_drops_a_job_once_its_issue_is_closed_out(db_path: Path) -> None:
+    """A traverse killed before writing `traverse-end` still closes at closeout.
+
+    The issue is terminal once it is closed out, so no future `traverse-start`
+    will ever arrive to clear the launch — leaving it live would strand it in
+    every answer for good.
+    """
+    ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
+    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
+    ledger.closeout("owner/repo", 438, {"outcome": "abandoned"}, db_path=db_path)
+
+    assert ledger.live_jobs(db_path=db_path) == []
+
+
 def test_live_jobs_keeps_a_job_through_a_traverse_escalation(db_path: Path) -> None:
     ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
@@ -682,6 +696,16 @@ def test_awaiting_merge_maps_every_stored_column_onto_its_own_field(
 def test_awaiting_merge_drops_an_issue_once_it_is_closed_out(db_path: Path) -> None:
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
     ledger.closeout("owner/repo", 438, {"outcome": "merged"}, db_path=db_path)
+
+    assert ledger.awaiting_merge(db_path=db_path) == []
+
+
+def test_awaiting_merge_drops_an_issue_once_a_later_traverse_starts(
+    db_path: Path,
+) -> None:
+    ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
+    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
+    ledger.traverse_start("owner/repo", 438, {}, db_path=db_path)
 
     assert ledger.awaiting_merge(db_path=db_path) == []
 
