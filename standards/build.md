@@ -38,5 +38,9 @@ Governs how a repository is laid out, built, and checked.
 
 ## Adopt
 
-- [Bootstrap](/standards/build/bootstrap.md) — the fresh-repo procedure:
-  scaffold with `repo-init`, then the GitHub tail and roster enrollment
+- [Bootstrap](/standards/build/bootstrap.md) — how a repository joins the
+  workspace: scaffold a fresh repo with `repo-init` or adopt an existing one
+  to green, then the GitHub tail and roster enrollment
+- [enable-repo-governance](/dotfiles/dot-claude/skills/enable-repo-governance/SKILL.md)
+  — the adoption path's runbook: preflight, the findings loop, the hand-offs,
+  and the landing; invoke it as /enable-repo-governance

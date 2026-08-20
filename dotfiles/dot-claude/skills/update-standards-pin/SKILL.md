@@ -50,7 +50,7 @@ One line per consumer:
 | `needs work` | Real findings at the new pin. Work them. |
 | `skipped — uncommitted changes` / `not on main` | The repo is mid-work. Report it; never touch it. |
 | `skipped — already red at its current pin` | Pre-existing breakage, unrelated to this release. Surface it separately. |
-| `skipped — no dev-playbook pin` | Governed but unwired. An adoption question, not a bump. |
+| `skipped — no dev-playbook pin` | Governed but unwired. An adoption question — /enable-repo-governance — not a bump. |
 
 **An aborted run is an environment fault, not a finding.** If the script raises
 `the gate could not run`, pre-commit died before judging anything and that
