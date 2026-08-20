@@ -127,10 +127,9 @@ ORDER BY l.id
 """
 
 # The rows `awaiting_merge` is about to match: every `traverse-end` whose own
-# window is still open. A newer end supersedes it, a later `traverse-start`
-# reopens the issue under it, and a `closeout` spends it -- one rule, not three
-# clauses. What a superseded, reopened or spent end said is dead history this
-# never consults, so it can never brick the read with a malformed payload.
+# window is still open, by `WINDOW_CLOSERS`. What an end outside its window
+# said is dead history this never consults, so it can never brick the read
+# with a malformed payload.
 AWAITING_MERGE = f"""
 SELECT {COLUMNS} FROM ledger AS l
 WHERE l.kind = '{TRAVERSE_END}'
@@ -406,9 +405,8 @@ def traverse_end(
 ) -> None:
     """Append every invocation's last record, escalated exits included.
 
-    A traverse window closes here or at the next `traverse-start` for the same
-    repo and issue — never at `traverse-escalation`, which is why an escalated
-    exit still writes this.
+    This is one of `WINDOW_CLOSERS`, which is why an escalated exit still
+    writes it.
     """
     _append_traverse(TRAVERSE_END, repo, issue, payload, db_path)
 
@@ -603,10 +601,9 @@ def awaiting_merge(
     """Every issue whose traverse ended `pr-ready` and has not moved on since.
 
     An end speaks for its issue only while its own window is open, by the one
-    definition at `WINDOW_CLOSERS` that `live_jobs` reads by too. A newer end
-    supersedes it, a `closeout` spends it, and a later `traverse-start` reopens
-    the issue underneath it — so an issue back in the factory for rework never
-    reads as ready to merge while a build is rewriting its branch.
+    definition at `WINDOW_CLOSERS` that `live_jobs` reads by too — so an issue
+    back in the factory for rework never reads as ready to merge while a build
+    is rewriting its branch.
 
     The one place the module reads inside a payload, and it reads exactly one
     key. That key's vocabulary is closed and stated at `STATUSES`: a candidate
