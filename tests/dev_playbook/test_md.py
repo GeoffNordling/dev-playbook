@@ -181,6 +181,7 @@ class TestClassify:
             ("dotfiles/dot-claude/CLAUDE.md", "harness"),
             ("dotfiles/dot-claude/skills/commit/SKILL.md", "harness"),
             ("dotfiles/dot-claude/rules/bash-commands.md", "harness"),
+            ("dotfiles/dot-claude/agents/build.md", "harness"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
             ("tools/bin/ref-lint", "harness"),

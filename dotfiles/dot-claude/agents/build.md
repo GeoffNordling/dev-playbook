@@ -55,7 +55,7 @@ Declarations under `judgments/` are documentation: keep the ones your edits affe
 
 ## 5. Escalations
 
-When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt: post the contract's structured escalation comment to the PR if one exists, otherwise to the issue, then end the session per §6 with `outcome: escalated`. The comment is the durable record; the envelope only ends the run. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
+When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt: post the contract's structured escalation comment to the PR if one exists, otherwise to the issue, then end the session on the report envelope — structured output whose `outcome` is `"escalated"`, with the reason in `gist`. The comment is the durable record; the envelope only ends the run. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
 
 The user reads the comment, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries a further set of triggers of its own. In particular:
 
@@ -70,4 +70,4 @@ With every acceptance criterion satisfied:
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
 3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts. No deviations — record nothing here; the PR section states `No deviations.` explicitly.
-4. **End on the report envelope.** The session ends with structured output, never a message alone: `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed. An escalation ends the same way, with `outcome` `"escalated"` and the reason in `gist`.
+4. **End on the report envelope.** The session ends with structured output, never a message alone: `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed.

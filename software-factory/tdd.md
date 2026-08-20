@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Test-First Discipline
-description: How the work is carried out when an issue calls for tests — the chunk, the slice loop, and the whole-chunk refactor pass
+description: The test-first discipline `tests:yes` work runs under — the chunk, the slice loop, and the whole-chunk refactor pass
 ---
 
 # Test-First Discipline
@@ -34,10 +34,10 @@ failing test exercising it through the public surface. Run `make test`; confirm
 it fails for the expected reason.
 
 **Never modify a written test.** Once a test is written, make it pass by
-changing code; where you feel the need to change the test instead, escalate.
+changing code; changing the test instead is an escalation.
 
 **Stub on first contact.** When a test names a symbol with no stub yet, create
-the stub it needs — you design the signature here, since the brief pins
+the stub it needs — the signature is designed here, since the brief pins
 behavior, not interfaces. Body is `raise NotImplementedError` for functions and
 methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
@@ -63,9 +63,9 @@ These add to build's own escalation triggers, and end the session the same way �
 `outcome: escalated`, with the reason in `gist`:
 
 - **Stuck test.** A slice's test won't pass after two implementation attempts.
-- **A written test looks wrong.** You want to change a test you already wrote —
-  surface why; the user decides whether you mis-encoded it or the brief needs to
-  change.
+- **A written test looks wrong.** Changing an already-written test seems
+  necessary — surface why; the user decides whether the behavior was mis-encoded
+  or the brief needs to change.
 - **A refactor reaches past one module's seam.** Either pass surfaces a
-  structural problem wider than the module you're in — surface it rather than
-  widening the change on your own.
+  structural problem wider than the module in hand — surface it rather than
+  widening the change.

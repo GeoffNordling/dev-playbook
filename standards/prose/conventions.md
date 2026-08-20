@@ -90,7 +90,8 @@ One actor — the dispatcher, reviewer, and approver — carries one name
 everywhere: the `user`. Agent-facing instruction text uses it because that is
 what Claude Code calls the person (`AskUserQuestion`): `CLAUDE.md` at every
 level — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike —
-plus the skill and rule bodies under `dotfiles/dot-claude/skills/` and
+plus the agent-definition, skill, and rule bodies under
+`dotfiles/dot-claude/agents/`, `dotfiles/dot-claude/skills/`, and
 `dotfiles/dot-claude/rules/`. Declarative documentation uses the same word
 where it describes that actor in third person: `software-factory/`,
 `standards/`, `docs/`, and `README.md`.
