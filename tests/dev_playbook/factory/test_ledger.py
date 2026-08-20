@@ -59,6 +59,14 @@ NOT_STATUS_STRINGS = [1, None, True, ["pr-ready"], {"value": "pr-ready"}]
 LAUNCH_KEY_COLUMNS = ["received_at", "repo", "issue", "node", "session_id"]
 TRAVERSE_KEY_COLUMNS = ["received_at", "repo", "issue"]
 
+# A second job whose address differs from `("owner/one", 1, "build")` in one
+# column each -- the three ways a reused session id can span two jobs.
+COLLIDING_JOBS = [
+    ("owner/two", 1, "build"),
+    ("owner/one", 2, "build"),
+    ("owner/one", 1, "doc-pr-review"),
+]
+
 TraverseWriter = Callable[..., None]
 
 TRAVERSE_WRITERS: list[tuple[str, TraverseWriter]] = [
@@ -552,6 +560,36 @@ def test_live_jobs_keeps_a_job_when_a_different_session_is_reported(
     )
 
     assert [row.session_id for row in ledger.live_jobs(db_path=db_path)] == ["sess-doc"]
+
+
+@pytest.mark.parametrize("second", COLLIDING_JOBS)
+def test_live_jobs_refuses_a_session_id_held_by_two_jobs(
+    second: tuple[str, int, str], db_path: Path
+) -> None:
+    """A session id names one job, and it is what joins that job to its events.
+
+    Two jobs holding one is corrupt however a query is written: a report for
+    either retires both, the `events` join answers with the wrong issue, and no
+    later row can tell them apart again.
+    """
+    ledger.job_launch("owner/one", 1, "build", "sess-x", {}, db_path=db_path)
+    ledger.job_launch(*second, "sess-x", {}, db_path=db_path)
+
+    with pytest.raises(ledger.LedgerError) as raised:
+        ledger.live_jobs(db_path=db_path)
+
+    assert "sess-x" in str(raised.value)
+
+
+def test_live_jobs_reads_a_launch_and_its_own_report_sharing_a_session_id(
+    db_path: Path,
+) -> None:
+    """The one sharing that is not a collision: a job reporting on itself."""
+    ledger.traverse_start("owner/one", 1, {}, db_path=db_path)
+    ledger.job_launch("owner/one", 1, "build", "sess-x", {}, db_path=db_path)
+    ledger.job_report("owner/one", 1, "build", "sess-x", {}, db_path=db_path)
+
+    assert ledger.live_jobs(db_path=db_path) == []
 
 
 def test_live_jobs_drops_a_job_superseded_by_a_later_launch_of_its_node(

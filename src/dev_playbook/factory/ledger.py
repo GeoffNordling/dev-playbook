@@ -139,6 +139,29 @@ WHERE l.kind = '{TRAVERSE_END}'
 ORDER BY l.id
 """
 
+# The session ids more than one job holds. A session id is a job's identity --
+# it is what a report closes its own launch by, and what joins the job to its
+# rows in `events` -- so two jobs holding one is corrupt data no query can be
+# written around: a report for either would retire both, and the join would
+# answer with the wrong issue.
+#
+# `IS NOT` rather than `<>` so a NULL in an address column counts as different
+# rather than as unknown; SQL's three-valued logic would otherwise let the one
+# row a query can never match hide the collision as well.
+COLLIDING_SESSIONS = """
+SELECT l.session_id, group_concat(DISTINCT l.id)
+FROM ledger AS l
+JOIN ledger AS other ON other.session_id = l.session_id
+WHERE l.session_id IS NOT NULL
+  AND (
+      other.repo IS NOT l.repo
+      OR other.issue IS NOT l.issue
+      OR other.node IS NOT l.node
+  )
+GROUP BY l.session_id
+ORDER BY l.session_id
+"""
+
 # The one payload value this module reads. Everything else in a payload is the
 # launcher's business and passes through uninterpreted.
 #
@@ -174,7 +197,7 @@ class LedgerRow(NamedTuple):
 class LedgerError(Exception):
     """The ledger is broken — the one thing a caller catches, `sqlite3` unimported.
 
-    Three kinds of trouble raise it:
+    Four kinds of trouble raise it:
 
     - A **storage failure** — the store unwritable, connect, the DDL, an INSERT
       or SELECT, a busy timeout expiring — chained from the `sqlite3.Error` or
@@ -189,6 +212,9 @@ class LedgerError(Exception):
       candidate whose payload carries no `status` from the closed vocabulary
       at `STATUSES`. Only the first of these has an error to chain from; the
       rest are the store disagreeing with itself, not an operation failing.
+    - **Stored rows this module cannot tell apart**, naming them: one session
+      id held by more than one job, which no read can resolve because a session
+      id is what a job is addressed and joined by.
 
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
@@ -498,6 +524,27 @@ def _decode(stored: StoredRow) -> LedgerRow:
     return row
 
 
+def _refuse_colliding_sessions(db_path: Path) -> None:
+    """Refuse a store where one session id stands for more than one job.
+
+    Read whole rather than filtered: a session id is minted once and belongs to
+    one job for the life of the store, so a collision is never dead history the
+    way a superseded `traverse-end` is. It stops the read until an operator
+    repairs the rows the error names, which is the ordered behaviour -- a
+    launcher whose session-id minting collides or is retried is writing work
+    the factory can no longer tell apart, and finding that out late is worse
+    than finding it out here.
+    """
+    with _ledger(db_path) as connection:
+        collisions = connection.execute(COLLIDING_SESSIONS).fetchall()
+    if collisions:
+        held = ", ".join(f"{session!r} on rows {ids}" for session, ids in collisions)
+        raise LedgerError(
+            f"run ledger at {db_path} has session ids held by more than one job, "
+            f"so no read can tell those jobs apart: {held}"
+        )
+
+
 def live_jobs(
     *,
     repo: str | None = None,
@@ -511,7 +558,15 @@ def live_jobs(
     and issue superseding it, or its traverse window closing — at
     `WINDOW_CLOSERS`, the one definition `awaiting_merge` reads by too. Filters
     conjoin, and passing none of them reads the whole machine.
+
+    A report is matched by session id alone, which is sound only while a
+    session id names one job — so that is checked rather than assumed, and a
+    store where two jobs hold one raises `LedgerError` before any answer is
+    given. The alternative is the answer nobody can see is wrong: a report
+    retiring a job it was never about, and the launcher's collision surfacing
+    as work that finished without ever stopping.
     """
+    _refuse_colliding_sessions(db_path)
     return _select(LIVE_JOBS, {"repo": repo, "issue": issue}, db_path)
 
 
