@@ -20,7 +20,6 @@ DB_PATH = Path("~/.local/share/claude-measure/events.db").expanduser()
 # writers coexist, and the busy timeout makes a collision queue rather than
 # fail.
 BUSY_TIMEOUT_SECONDS = 5.0
-WAL = "wal"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS ledger (
@@ -316,10 +315,12 @@ def _require_wal(connection: sqlite3.Connection, db_path: Path) -> None:
     is raised here, at the connection, rather than degraded past.
 
     The pragma is persistent, so only the first connection of a database's life
-    changes anything; every later one reads back the mode already set.
+    changes anything; every later one reads back the mode already set. The mode
+    comes back lowercase whatever case the pragma asked in, which is the one
+    thing worth knowing about the comparison below.
     """
     (mode,) = connection.execute("PRAGMA journal_mode=WAL").fetchone()
-    if mode != WAL:
+    if mode != "wal":
         raise LedgerError(
             f"run ledger at {db_path} would not take WAL journal mode and is in "
             f"{mode!r} mode, so concurrent traverses would collide"
