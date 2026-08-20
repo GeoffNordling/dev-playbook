@@ -136,8 +136,19 @@ def never_the_real_store(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
     `DB_PATH` is the default on all ten public functions, so one omitted
     `db_path=` would otherwise append to the developer's real ledger. Autouse
     makes "nothing touches the real store" enforced rather than remembered.
+
+    A default is bound once, at import, so repointing the module attribute
+    alone leaves every one of those functions still aimed at the real ledger —
+    it reads as a safety net and catches nothing. The bound defaults are
+    repointed as well, and by search rather than by list, so a public function
+    added later is covered without anyone remembering to come back here.
     """
-    monkeypatch.setattr(ledger, "DB_PATH", tmp_path / "default" / "events.db")
+    elsewhere = tmp_path / "default" / "events.db"
+    monkeypatch.setattr(ledger, "DB_PATH", elsewhere)
+    for entry in vars(ledger).values():
+        bound = getattr(entry, "__kwdefaults__", None)
+        if bound and "db_path" in bound:
+            monkeypatch.setitem(bound, "db_path", elsewhere)
 
 
 @pytest.fixture
@@ -256,6 +267,19 @@ def test_a_traverse_writer_stores_its_kind_null_grain_and_payload(
     (row,) = raw_rows(db_path)
     assert (row["kind"], row["node"], row["session_id"]) == (kind, None, None)
     assert json.loads(row["payload"]) == {"note": kind}
+
+
+def test_a_call_that_omits_db_path_stays_out_of_the_real_store() -> None:
+    """The autouse fixture's guarantee, exercised the one way that proves it.
+
+    Every public function binds `DB_PATH` as its `db_path` default at import,
+    so repointing the module attribute alone leaves all ten still aimed at the
+    developer's own ledger. No test omits `db_path=` today; this is the day
+    someone does.
+    """
+    ledger.traverse_start("owner/repo", 438, {"mode": "direct"})
+
+    assert [row["kind"] for row in raw_rows(ledger.DB_PATH)] == ["traverse-start"]
 
 
 def test_first_write_creates_the_store_in_wal_mode(tmp_path: Path) -> None:
