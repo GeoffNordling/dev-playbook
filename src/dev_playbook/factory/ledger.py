@@ -8,7 +8,7 @@ and which are absent.
 
 import json
 import sqlite3
-from collections.abc import Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from contextlib import closing, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -180,6 +180,71 @@ ESCALATED = "escalated"
 STATUSES = (PR_READY, ESCALATED)
 
 
+def _names(value: object) -> bool:
+    """A repo slug, node or session id: a string with something in it."""
+    return isinstance(value, str) and value != ""
+
+
+def _numbers(value: object) -> bool:
+    """A GitHub issue number: a whole positive `int`, and `bool` is not one."""
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+# The whole addressing rule, in one place. Every public call passes its address
+# through `_gate` before anything else happens, so nothing below the gate
+# re-checks an address: past it, the address is trusted.
+#
+# `repo`, `node` and `session_id` name things, and a name that is missing or
+# empty breaks its row two ways. A NULL is unmatchable under SQL's three-valued
+# logic, so the row can never be superseded, reported or closed out and stands
+# in every answer for good. An empty string is worse company: it *does* match,
+# so every caller that gets it wrong lands on one shared address and supersedes
+# work it has nothing to do with.
+#
+# `issue` is what GitHub issues, and GitHub numbers issues from 1 -- so zero and
+# negatives are not issue numbers and never arrive from live data. Type is
+# checked as strictly as value, because SQLite's INTEGER affinity converts what
+# looks numeric and stores the rest as it came: `"0"` lands on the zero address,
+# `True` addresses issue #1 by subclassing `int`, and `"main"` sits in a column
+# `LedgerRow` promises is an `int`.
+ADDRESSES: dict[str, Callable[[object], bool]] = {
+    "repo": _names,
+    "issue": _numbers,
+    "node": _names,
+    "session_id": _names,
+}
+
+
+def _gate(**address: object) -> None:
+    """Refuse an address the ledger cannot use, before the store is touched.
+
+    A caller bug, raised as `ValueError` rather than `LedgerError`: the store is
+    fine, and telling the operator otherwise would send them to check a disk
+    that is not the problem.
+    """
+    unusable = [
+        f"{name}={value!r}"
+        for name, value in address.items()
+        if not ADDRESSES[name](value)
+    ]
+    if unusable:
+        raise ValueError(
+            f"the run ledger cannot be addressed by {', '.join(unusable)}: a repo, "
+            f"node and session id are each a non-empty string, and an issue is a "
+            f"positive whole number"
+        )
+
+
+def _given(**address: object) -> dict[str, object]:
+    """A read's filters, less the ones it left unset.
+
+    The one difference between a read's address and a write's: `None` here is
+    the caller declining to filter rather than a value, so it is what the gate
+    never sees. Everything it does see, it judges by the one rule above.
+    """
+    return {name: value for name, value in address.items() if value is not None}
+
+
 class LedgerRow(NamedTuple):
     """One ledger row read back, with its payload decoded."""
 
@@ -218,11 +283,9 @@ class LedgerError(Exception):
     A caller's own bug is deliberately none of these — telling the operator
     their store is unusable would send them to check a disk that is fine. Each
     surfaces as itself, with nothing written: a payload that will not serialize
-    raises `TypeError`, a write whose addressing columns are missing or empty —
-    repo and issue on any row, node and session id on a job row — raises
-    `ValueError`,
-    and a column argument SQLite cannot bind raises `sqlite3.ProgrammingError`
-    or `sqlite3.InterfaceError`.
+    raises `TypeError`, an address `_gate` refuses raises `ValueError`, and a
+    column argument SQLite cannot bind raises `sqlite3.ProgrammingError` or
+    `sqlite3.InterfaceError`.
     """
 
 
@@ -294,33 +357,17 @@ def _append(
 ) -> None:
     """Append one row of any kind, stamping `received_at` as it goes.
 
-    Every row is addressed by repo and issue: both queries supersede, close and
-    filter on that pair, so an address that is missing or empty breaks the row
-    in one of two ways. A NULL is unmatchable under SQL's three-valued logic,
-    so the row can never be superseded or closed out and stands in every answer
-    for good. An empty string or a zero — an unset shell variable interpolated
-    into a repo slug, an issue number defaulted to nothing — is worse company
-    than that: it *does* match, so every caller that gets it wrong lands on one
-    shared address and supersedes work it has nothing to do with.
+    Storage plumbing, and nothing else: the address arrives already judged by
+    `_gate`, one level up.
 
-    Both are refused before the store is touched, as the caller bug they are
-    rather than as a broken ledger. The job grain carries the same hazard one
-    column over in `node` and `session_id`, and `_append_job` refuses it the
-    same way.
-
-    The payload is encoded before the store is touched as well, so a payload
-    that will not serialize also raises with nothing written.
+    The payload is encoded before the store is touched, so a payload that will
+    not serialize raises with nothing written.
 
     `json.dumps` serializes `dict` alone, not the `Mapping` protocol, so the
     payload is copied into one first — otherwise the most natural immutable
     payloads, a `MappingProxyType` or a `ChainMap`, would be refused as
     unserializable despite being nothing of the sort.
     """
-    if not repo or not issue:
-        raise ValueError(
-            f"a {kind} needs both a repo and an issue, and was given "
-            f"repo={repo!r}, issue={issue!r}"
-        )
     encoded = json.dumps(dict(payload))
     received_at = datetime.now(UTC).isoformat(timespec="microseconds")
     with _ledger(db_path) as connection:
@@ -337,8 +384,9 @@ def _append_traverse(
 
     Every traverse-grain writer goes through here, so the two job-grain columns
     are NULL by construction rather than by each writer remembering to pass
-    nothing.
+    nothing, and the gate is the first thing each of them reaches.
     """
+    _gate(repo=repo, issue=issue)
     _append(kind, repo, issue, None, None, payload, db_path)
 
 
@@ -351,21 +399,12 @@ def _append_job(
     payload: Mapping[str, object],
     db_path: Path,
 ) -> None:
-    """Append one job-grain row, refusing one whose grain columns are unusable.
+    """Append one job-grain row, which carries all four address columns.
 
-    These two are the job grain's half of the addressing rule `_append` states
-    for repo and issue, refused for exactly the reasons stated there. A missing
-    session id strands the job: `report.session_id = launch.session_id` is
-    neither true nor false when both are NULL, so the launch can never be
-    closed, not even by its own report, and shows as running work forever. An
-    empty one collides instead, and two jobs holding one session id is the
-    corruption `live_jobs` has to refuse a whole store over.
+    Every job-grain writer goes through here, so the gate judges the whole
+    address — the two columns the traverse grain leaves NULL included.
     """
-    if not node or not session_id:
-        raise ValueError(
-            f"a {kind} needs both a node and a session id, and was given "
-            f"node={node!r}, session_id={session_id!r}"
-        )
+    _gate(repo=repo, issue=issue, node=node, session_id=session_id)
     _append(kind, repo, issue, node, session_id, payload, db_path)
 
 
@@ -581,7 +620,8 @@ def live_jobs(
     for its session id, a later `job-launch` of the same node at the same repo
     and issue superseding it, or its traverse window closing — at
     `WINDOW_CLOSERS`, the one definition `awaiting_merge` reads by too. Filters
-    conjoin, and passing none of them reads the whole machine.
+    conjoin, and passing none of them reads the whole machine; a filter that is
+    set is an address, judged by the gate the writers pass through.
 
     A report is matched by session id alone, which is sound only while a
     session id names one job — so that is checked rather than assumed, and a
@@ -590,6 +630,7 @@ def live_jobs(
     retiring a job it was never about, and the launcher's collision surfacing
     as work that finished without ever stopping.
     """
+    _gate(**_given(repo=repo, issue=issue))
     with _ledger(db_path) as connection:
         _refuse_colliding_sessions(connection, db_path)
         return _select(connection, LIVE_JOBS, {"repo": repo, "issue": issue})
@@ -620,6 +661,7 @@ def awaiting_merge(
     is a direct `UPDATE` on the row the error names. Append-only is this
     module's writing discipline, not a limit on the operator.
     """
+    _gate(**_given(repo=repo))
     with _ledger(db_path) as connection:
         candidates = _select(connection, AWAITING_MERGE, {"repo": repo})
     unjudgeable = [

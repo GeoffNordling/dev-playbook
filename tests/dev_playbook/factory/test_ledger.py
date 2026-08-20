@@ -68,21 +68,46 @@ COLLIDING_JOBS = [
     ("owner/one", 1, "doc-pr-review"),
 ]
 
-# A branch name where an issue number belongs -- the caller bug the module's
-# signatures forbid and SQLite's INTEGER affinity stores anyway. Typed loosely
-# so the deliberate misuse is the test's subject rather than a type error.
+# A branch name where an issue number belongs -- the caller bug the gate
+# refuses at the front door, and that an operator's own UPDATE can still put in
+# the store behind the module's back. Typed loosely so the deliberate misuse is
+# the test's subject rather than a type error.
 NOT_AN_ISSUE_NUMBER: Any = "main"
 
-# Addresses that are present and empty -- an unset shell variable interpolated
-# into a repo slug, an issue number defaulted to nothing. Unlike a NULL these
-# match, so rather than stranding one row they put every caller that gets one
-# wrong at a single shared address.
-EMPTY_TRAVERSE_ADDRESSES = [("", 438), ("owner/repo", 0)]
-EMPTY_JOB_ADDRESSES = [
-    ("", 438, "build", "sess-1"),
-    ("owner/repo", 0, "build", "sess-1"),
-    ("owner/repo", 438, "", "sess-1"),
-    ("owner/repo", 438, "build", ""),
+# What the gate refuses in a column that names something -- a repo slug, a node,
+# a session id. `None` strands the row it addresses, because a NULL matches
+# nothing under SQL's three-valued logic; `""` is worse company, because it
+# matches every other caller that got it equally wrong; and a value that is not
+# a string at all lands in a column the queries and `LedgerRow` read as text.
+REFUSED_FILTER_NAMES: list[Any] = ["", 438, uuid.UUID(int=1)]
+REFUSED_NAMES: list[Any] = [None, *REFUSED_FILTER_NAMES]
+
+# What it refuses in an issue number. GitHub numbers issues from 1, so 0 and
+# negatives never arrive from live data; `"0"` is truthy and SQLite's INTEGER
+# affinity then stores it on the zero address; `True` is an `int` subclass that
+# silently addresses issue #1; and a float or a branch name is not the `int`
+# `LedgerRow` promises.
+REFUSED_FILTER_ISSUES: list[Any] = [0, "0", -1, True, 1.5, NOT_AN_ISSUE_NUMBER]
+REFUSED_ISSUES: list[Any] = [None, *REFUSED_FILTER_ISSUES]
+
+REFUSED_TRAVERSE_ADDRESSES: list[tuple[Any, Any]] = [
+    *((repo, 438) for repo in REFUSED_NAMES),
+    *(("owner/repo", issue) for issue in REFUSED_ISSUES),
+]
+
+REFUSED_JOB_ADDRESSES: list[tuple[Any, Any, Any, Any]] = [
+    *((repo, 438, "build", "sess-1") for repo in REFUSED_NAMES),
+    *(("owner/repo", issue, "build", "sess-1") for issue in REFUSED_ISSUES),
+    *(("owner/repo", 438, node, "sess-1") for node in REFUSED_NAMES),
+    *(("owner/repo", 438, "build", session) for session in REFUSED_NAMES),
+]
+
+# What the reads refuse in a filter. `None` is absent from these two lists: on a
+# read it means "no filter" rather than an address, so it is the one value the
+# gate never judges.
+REFUSED_FILTERS: list[dict[str, Any]] = [
+    *({"repo": repo} for repo in REFUSED_FILTER_NAMES),
+    *({"issue": issue} for issue in REFUSED_FILTER_ISSUES),
 ]
 
 TraverseWriter = Callable[..., None]
@@ -144,15 +169,16 @@ def rot_the_stored_payload(db_path: Path, payload: str | None) -> None:
         connection.commit()
 
 
-def null_the_stored_column(db_path: Path, column: str) -> None:
-    """Empty one promoted column of the ledger's only row, behind the module's back.
+def overwrite_the_stored_column(db_path: Path, column: str, value: Any) -> None:
+    """Set one promoted column of the ledger's only row, behind the module's back.
 
-    The writers refuse to leave any of these empty, so this stands in for a row
-    that got into the store some other way — an older build, a hand-written
-    INSERT, an operator's repair that overshot.
+    The gate refuses every value below at the front door, so this stands in for
+    a row that got into the store some other way — an older build, a
+    hand-written INSERT, an operator's repair that overshot. Front door and
+    store integrity are two different jobs, and this exercises the second.
     """
     with closing(sqlite3.connect(db_path)) as connection:
-        connection.execute(f"UPDATE ledger SET {column} = NULL")
+        connection.execute(f"UPDATE ledger SET {column} = ?", (value,))
         connection.commit()
 
 
@@ -288,22 +314,6 @@ def test_a_read_of_a_corrupt_store_raises_ledger_error(db_path: Path) -> None:
     assert isinstance(raised.value.__cause__, sqlite3.Error)
 
 
-def test_an_unbindable_column_argument_is_not_reported_as_a_broken_store(
-    db_path: Path,
-) -> None:
-    with pytest.raises(sqlite3.ProgrammingError):
-        ledger.job_launch(
-            "owner/repo",
-            438,
-            "build",
-            uuid.UUID(int=1),  # type: ignore[arg-type]
-            {},
-            db_path=db_path,
-        )
-
-    assert raw_rows(db_path) == []
-
-
 def test_a_store_that_will_not_take_wal_raises_ledger_error(
     db_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -372,7 +382,7 @@ def test_live_jobs_refuses_a_stored_launch_with_no_session_id(
 ) -> None:
     """The row a report can never match, so it would stand as live forever."""
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
-    null_the_stored_column(db_path, "session_id")
+    overwrite_the_stored_column(db_path, "session_id", None)
 
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.live_jobs(db_path=db_path)
@@ -385,7 +395,7 @@ def test_live_jobs_refuses_a_stored_launch_missing_a_key_column(
     column: str, db_path: Path
 ) -> None:
     ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
-    null_the_stored_column(db_path, column)
+    overwrite_the_stored_column(db_path, column, None)
 
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.live_jobs(db_path=db_path)
@@ -398,7 +408,7 @@ def test_awaiting_merge_refuses_a_candidate_missing_a_key_column(
     column: str, db_path: Path
 ) -> None:
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
-    null_the_stored_column(db_path, column)
+    overwrite_the_stored_column(db_path, column, None)
 
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.awaiting_merge(db_path=db_path)
@@ -409,9 +419,8 @@ def test_awaiting_merge_refuses_a_candidate_missing_a_key_column(
 def test_live_jobs_refuses_a_stored_launch_whose_issue_is_not_a_number(
     db_path: Path,
 ) -> None:
-    ledger.job_launch(
-        "owner/repo", NOT_AN_ISSUE_NUMBER, "build", "sess-1", {}, db_path=db_path
-    )
+    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
+    overwrite_the_stored_column(db_path, "issue", NOT_AN_ISSUE_NUMBER)
 
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.live_jobs(db_path=db_path)
@@ -424,13 +433,13 @@ def test_awaiting_merge_refuses_a_candidate_whose_issue_is_not_a_number(
 ) -> None:
     """A column can hold the wrong type as well as nothing at all.
 
-    SQLite's INTEGER affinity converts what looks numeric and stores the rest
-    as it came, so a caller passing a branch name where an issue number belongs
-    writes a row that reads back as a `LedgerRow` lying about its own type.
+    The gate keeps a caller from writing one, but SQLite's INTEGER affinity
+    converts only what already looks numeric and stores the rest as it came --
+    so a row that reached the store any other way reads back as a `LedgerRow`
+    lying about its own type.
     """
-    ledger.traverse_end(
-        "owner/repo", NOT_AN_ISSUE_NUMBER, {"status": "pr-ready"}, db_path=db_path
-    )
+    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
+    overwrite_the_stored_column(db_path, "issue", NOT_AN_ISSUE_NUMBER)
 
     with pytest.raises(ledger.LedgerError) as raised:
         ledger.awaiting_merge(db_path=db_path)
@@ -449,70 +458,10 @@ def test_a_stored_traverse_row_may_carry_no_node_or_session_id(
     assert (row.node, row.session_id) == (None, None)
 
 
+@pytest.mark.parametrize("address", REFUSED_TRAVERSE_ADDRESSES)
 @pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
-def test_a_traverse_writer_refuses_a_missing_repo(
-    kind: str, write: TraverseWriter, db_path: Path
-) -> None:
-    with pytest.raises(ValueError):
-        write(None, 438, {}, db_path=db_path)
-
-    assert not db_path.exists()
-
-
-@pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
-def test_a_traverse_writer_refuses_a_missing_issue(
-    kind: str, write: TraverseWriter, db_path: Path
-) -> None:
-    with pytest.raises(ValueError):
-        write("owner/repo", None, {}, db_path=db_path)
-
-    assert not db_path.exists()
-
-
-@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
-def test_a_job_writer_refuses_a_missing_repo(
-    kind: str, write: JobWriter, db_path: Path
-) -> None:
-    with pytest.raises(ValueError):
-        write(None, 438, "build", "sess-1", {}, db_path=db_path)
-
-    assert not db_path.exists()
-
-
-@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
-def test_a_job_writer_refuses_a_missing_issue(
-    kind: str, write: JobWriter, db_path: Path
-) -> None:
-    with pytest.raises(ValueError):
-        write("owner/repo", None, "build", "sess-1", {}, db_path=db_path)
-
-    assert not db_path.exists()
-
-
-@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
-def test_a_job_writer_refuses_a_missing_node(
-    kind: str, write: JobWriter, db_path: Path
-) -> None:
-    with pytest.raises(ValueError):
-        write("owner/repo", 438, None, "sess-1", {}, db_path=db_path)
-
-    assert not db_path.exists()
-
-
-@pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
-def test_a_job_writer_refuses_a_missing_session_id(
-    kind: str, write: JobWriter, db_path: Path
-) -> None:
-    with pytest.raises(ValueError):
-        write("owner/repo", 438, "build", None, {}, db_path=db_path)
-
-    assert not db_path.exists()
-
-
-@pytest.mark.parametrize("address", EMPTY_TRAVERSE_ADDRESSES)
-@pytest.mark.parametrize(("kind", "write"), TRAVERSE_WRITERS)
-def test_a_traverse_writer_refuses_an_empty_address(
-    kind: str, write: TraverseWriter, address: tuple[str, int], db_path: Path
+def test_a_traverse_writer_refuses_an_address_the_gate_bars(
+    kind: str, write: TraverseWriter, address: tuple[Any, Any], db_path: Path
 ) -> None:
     with pytest.raises(ValueError):
         write(*address, {}, db_path=db_path)
@@ -520,13 +469,33 @@ def test_a_traverse_writer_refuses_an_empty_address(
     assert not db_path.exists()
 
 
-@pytest.mark.parametrize("address", EMPTY_JOB_ADDRESSES)
+@pytest.mark.parametrize("address", REFUSED_JOB_ADDRESSES)
 @pytest.mark.parametrize(("kind", "write"), JOB_WRITERS)
-def test_a_job_writer_refuses_an_empty_address(
-    kind: str, write: JobWriter, address: tuple[str, int, str, str], db_path: Path
+def test_a_job_writer_refuses_an_address_the_gate_bars(
+    kind: str, write: JobWriter, address: tuple[Any, Any, Any, Any], db_path: Path
 ) -> None:
     with pytest.raises(ValueError):
         write(*address, {}, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize("filters", REFUSED_FILTERS)
+def test_live_jobs_refuses_a_filter_the_gate_bars(
+    filters: dict[str, Any], db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        ledger.live_jobs(**filters, db_path=db_path)
+
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize("repo", REFUSED_FILTER_NAMES)
+def test_awaiting_merge_refuses_a_filter_the_gate_bars(
+    repo: Any, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        ledger.awaiting_merge(repo=repo, db_path=db_path)
 
     assert not db_path.exists()
 
