@@ -459,6 +459,18 @@ def test_preflight_aborts_on_a_roster_file_that_will_not_parse(
     assert str(unparseable) in str(aborted.value)
 
 
+def test_preflight_aborts_on_a_roster_file_that_exists_but_cannot_be_read(
+    roster: dict[str, Path], worktree: Path, env: dict[str, str]
+) -> None:
+    unreadable = roster["worktree-local"]
+    unreadable.mkdir(parents=True)
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launcher.preflight(worktree, env)
+
+    assert str(unreadable) in str(aborted.value)
+
+
 def test_preflight_faults_a_billing_variable_that_is_set_but_empty(
     worktree: Path, env: dict[str, str]
 ) -> None:
@@ -566,6 +578,23 @@ def test_launch_aborts_on_a_shadow_definition_of_any_factory_node(
         launch()
 
     assert f"{node}.md" in str(aborted.value)
+    assert ledger_rows(db) == []
+
+
+def test_launch_aborts_on_a_shadow_definition_that_is_there_but_not_a_regular_file(
+    launch: Callable[..., launcher.JobOutcome],
+    agents_dir: Path,
+    worktree: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    shadow = worktree / ".claude" / "agents" / f"{NODE}.md"
+    shadow.mkdir(parents=True)
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launch()
+
+    assert str(shadow) in str(aborted.value)
     assert ledger_rows(db) == []
 
 

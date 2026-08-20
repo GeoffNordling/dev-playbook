@@ -225,13 +225,13 @@ def _sweep_findings(
     """
     findings = [f"environment: {var} is set" for var in BILLING_ENV_VARS if var in env]
     for path in _settings_roster(worktree, env, checkout):
-        if path.is_file():
+        if path.exists():
             findings += _swept(path)
     return findings
 
 
 def _swept(path: Path) -> list[str]:
-    """Findings from one settings file that exists.
+    """Findings from one settings file that is there.
 
     Two duties in one pass, because both need the file read. It must parse:
     `-p` silently ignores a settings file it cannot read, so a launch under one
@@ -242,10 +242,19 @@ def _swept(path: Path) -> list[str]:
     A file that parses into something other than an object — a list, a bare
     number — fails the parse duty rather than the sweep: there is no place in
     it for the keys to be, so it cannot be reported clean.
+
+    The read is unconditional, and a file that is there but will not open is a
+    finding of its own rather than a skip. Absent and unreadable are two
+    different things, and the one check standing between the factory and
+    metered billing must not report them the same way. This is what surfaces a
+    roster file masked to `/dev/null` by a sandbox: `/dev/null` opens and reads
+    as empty, empty is not valid JSON, and the mask lands as a parse finding.
     """
     try:
         settings = json.loads(path.read_text())
-    except (OSError, ValueError) as error:
+    except OSError as error:
+        return [f"{path}: is there but will not open ({error})"]
+    except ValueError as error:
         return [f"{path}: will not parse as JSON ({error})"]
     if not isinstance(settings, dict):
         return [f"{path}: parses as {type(settings).__name__}, not a settings object"]
@@ -365,12 +374,18 @@ def _shadow_findings(worktree: Path, checkout: Path) -> list[str]:
     a project-scope `.claude/agents/<name>.md` silently beats the user-scope
     definition, so a stray copy left in a checkout quietly replaces a factory
     node with whatever that file says.
+
+    Anything at the path condemns it, not a regular file at the path. What is
+    being asked is whether something sits where the child will look, and a
+    check that answers "no" for a path it merely cannot read as a regular file
+    hides the very copy it exists to find — a `.claude/agents` masked by a
+    sandbox, most of all.
     """
     findings = []
     for tree in (worktree, checkout):
         for node in NODES:
             path = tree / CLAUDE_DIR / "agents" / f"{node}.md"
-            if path.is_file():
+            if path.exists():
                 findings.append(
                     f"{path}: a repo-local definition of {node!r} silently beats the "
                     f"user-scope one"
