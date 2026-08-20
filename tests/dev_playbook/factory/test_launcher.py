@@ -94,6 +94,34 @@ LINGER_SECONDS = 30.0
 BRIEF_DEADLINE = 0.3
 BRIEF_GRACE = 0.3
 
+# What the one real-spawn test needs of the machine it runs on, read at import
+# before any fixture redirects them. That test alone is swept against the real
+# settings and runs under the real home, because a billing key on this machine
+# must abort it rather than be hidden behind a temp directory nobody configured.
+REAL_HOME = os.path.expanduser("~")
+REAL_MANAGED_SETTINGS = launcher.MANAGED_SETTINGS
+REAL_MANAGED_SETTINGS_DIR = launcher.MANAGED_SETTINGS_DIR
+
+# The gate on the real spawn, mirroring `SKIP_JUDGMENTS`: exactly "1" skips
+# visibly, anything else -- a bare `pytest` included -- runs it.
+REAL_SPAWN_GATE = "SKIP_REAL_SPAWN"
+
+# The throwaway node the real spawn launches, and the definition it resolves
+# from project scope. Haiku because what is under test is the launcher, never a
+# model's judgment: the cheapest model proves the contract as well as any.
+HAIKU_NODE = "haiku-probe"
+HAIKU_DEFINITION: dict[str, Any] = {
+    "name": HAIKU_NODE,
+    "description": "A throwaway node that reports and stops.",
+    "model": "haiku",
+    "effort": "low",
+}
+HAIKU_PROMPT = "Do not use any tools. Set outcome to done and gist to the word: ok."
+
+# Generous enough for a real round trip, short enough that a wedged run fails
+# the suite rather than holding it.
+REAL_SPAWN_DEADLINE = 300.0
+
 # The six settings files a launch is swept against, named by scope. Every one
 # is a file `-p` merges, so a billing key in any of them meters the child.
 SETTINGS_SCOPES = (
@@ -212,6 +240,19 @@ def child_env(home: Path, monkeypatch: pytest.MonkeyPatch) -> pytest.MonkeyPatch
     for var in (*launcher.BILLING_ENV_VARS, launcher.EFFORT_LEVEL_VAR):
         monkeypatch.delenv(var, raising=False)
     return monkeypatch
+
+
+@pytest.fixture
+def real_machine(child_env: pytest.MonkeyPatch) -> None:
+    """Undo this module's hermetic redirections, for the one test that spawns claude.
+
+    The real spawn needs the machine's own home to find the subscription
+    credential it runs on, and it has to be swept against the machine's real
+    settings for the sweep to mean anything at all.
+    """
+    child_env.setenv("HOME", REAL_HOME)
+    child_env.setattr(launcher, "MANAGED_SETTINGS", REAL_MANAGED_SETTINGS)
+    child_env.setattr(launcher, "MANAGED_SETTINGS_DIR", REAL_MANAGED_SETTINGS_DIR)
 
 
 @pytest.fixture
@@ -771,3 +812,31 @@ def test_a_validated_report_with_no_outcome_violates_the_contract(
 
     assert "outcome" in str(violated.value)
     assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+
+
+@pytest.mark.skipif(
+    os.environ.get(REAL_SPAWN_GATE) == "1",
+    reason=f"{REAL_SPAWN_GATE}=1: this test launches actual claude",
+)
+def test_a_real_spawn_runs_the_whole_launcher_against_the_live_harness(
+    real_machine: None, worktree: Path, db: Path
+) -> None:
+    definitions = worktree / ".claude" / "agents"
+    write_definition(definitions, HAIKU_NODE, HAIKU_DEFINITION)
+
+    outcome = launcher.launch_job(
+        REPO,
+        ISSUE,
+        HAIKU_NODE,
+        worktree,
+        HAIKU_PROMPT,
+        SCHEMA,
+        LAUNCH_PAYLOAD,
+        db_path=db,
+        agents_dir=definitions,
+        timeout_s=REAL_SPAWN_DEADLINE,
+    )
+
+    assert outcome.process_outcome == "clean"
+    assert outcome.task_outcome == "done"
+    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch", "job-report"]
