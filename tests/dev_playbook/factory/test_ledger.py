@@ -66,12 +66,6 @@ REFUSED_TRAVERSE_END_PAYLOADS: list[dict[str, Any]] = [
     {"status": ""},
 ]
 
-# The promoted columns a stored row of each grain has to carry. Every one is a
-# column a query matches on -- `received_at` excepted, which `LedgerRow` simply
-# promises is a string.
-LAUNCH_KEY_COLUMNS = ["received_at", "repo", "issue", "node", "session_id"]
-TRAVERSE_KEY_COLUMNS = ["received_at", "repo", "issue"]
-
 # A second job whose address differs from `("owner/one", 1, "build")` in one
 # column each -- the three ways a reused session id can span two jobs.
 COLLIDING_JOBS = [
@@ -80,10 +74,8 @@ COLLIDING_JOBS = [
     ("owner/one", 1, "doc-pr-review"),
 ]
 
-# A branch name where an issue number belongs -- the caller bug the gate
-# refuses at the front door, and that an operator's own UPDATE can still put in
-# the store behind the module's back. Typed loosely so the deliberate misuse is
-# the test's subject rather than a type error.
+# A branch name where an issue number belongs. Typed loosely so the deliberate
+# misuse is the test's subject rather than a type error.
 NOT_AN_ISSUE_NUMBER: Any = "main"
 
 # What the gate refuses in a column that names something -- a repo slug, a node,
@@ -228,19 +220,6 @@ def rot_the_stored_payload(db_path: Path, payload: str | None) -> None:
     """
     with closing(sqlite3.connect(db_path)) as connection:
         connection.execute("UPDATE ledger SET payload = ?", (payload,))
-        connection.commit()
-
-
-def overwrite_the_stored_column(db_path: Path, column: str, value: Any) -> None:
-    """Set one promoted column of the ledger's only row, behind the module's back.
-
-    The gate refuses every value below at the front door, so this stands in for
-    a row that got into the store some other way — an older build, a
-    hand-written INSERT, an operator's repair that overshot. Front door and
-    store integrity are two different jobs, and this exercises the second.
-    """
-    with closing(sqlite3.connect(db_path)) as connection:
-        connection.execute(f"UPDATE ledger SET {column} = ?", (value,))
         connection.commit()
 
 
@@ -533,76 +512,6 @@ def test_awaiting_merge_refuses_a_candidate_whose_payload_is_not_an_object(
         ledger.awaiting_merge(db_path=db_path)
 
     assert "row 1" in str(raised.value)
-
-
-def test_live_jobs_refuses_a_stored_launch_with_no_session_id(
-    db_path: Path,
-) -> None:
-    """The row a report can never match, so it would stand as live forever."""
-    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
-    overwrite_the_stored_column(db_path, "session_id", None)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.live_jobs(db_path=db_path)
-
-    assert "row 1" in str(raised.value)
-
-
-@pytest.mark.parametrize("column", LAUNCH_KEY_COLUMNS)
-def test_live_jobs_refuses_a_stored_launch_missing_a_key_column(
-    column: str, db_path: Path
-) -> None:
-    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
-    overwrite_the_stored_column(db_path, column, None)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.live_jobs(db_path=db_path)
-
-    assert column in str(raised.value)
-
-
-@pytest.mark.parametrize("column", TRAVERSE_KEY_COLUMNS)
-def test_awaiting_merge_refuses_a_candidate_missing_a_key_column(
-    column: str, db_path: Path
-) -> None:
-    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
-    overwrite_the_stored_column(db_path, column, None)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.awaiting_merge(db_path=db_path)
-
-    assert column in str(raised.value)
-
-
-def test_live_jobs_refuses_a_stored_launch_whose_issue_is_not_a_number(
-    db_path: Path,
-) -> None:
-    ledger.job_launch("owner/repo", 438, "build", "sess-1", {}, db_path=db_path)
-    overwrite_the_stored_column(db_path, "issue", NOT_AN_ISSUE_NUMBER)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.live_jobs(db_path=db_path)
-
-    assert "issue" in str(raised.value)
-
-
-def test_awaiting_merge_refuses_a_candidate_whose_issue_is_not_a_number(
-    db_path: Path,
-) -> None:
-    """A column can hold the wrong type as well as nothing at all.
-
-    The gate keeps a caller from writing one, but SQLite's INTEGER affinity
-    converts only what already looks numeric and stores the rest as it came --
-    so a row that reached the store any other way reads back as a `LedgerRow`
-    lying about its own type.
-    """
-    ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
-    overwrite_the_stored_column(db_path, "issue", NOT_AN_ISSUE_NUMBER)
-
-    with pytest.raises(ledger.LedgerError) as raised:
-        ledger.awaiting_merge(db_path=db_path)
-
-    assert "issue" in str(raised.value)
 
 
 def test_a_stored_traverse_row_may_carry_no_node_or_session_id(

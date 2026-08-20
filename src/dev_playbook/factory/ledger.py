@@ -59,10 +59,6 @@ TRAVERSE_ESCALATION = "traverse-escalation"
 TRAVERSE_END = "traverse-end"
 CLOSEOUT = "closeout"
 
-# The two job-grain kinds. Their rows carry a node and a session id; every
-# other kind is traverse-grain and carries neither.
-JOB_KINDS = frozenset({JOB_LAUNCH, JOB_REPORT})
-
 # A traverse window opens at `traverse-start` and closes at the first of these
 # to land for the same repo and issue: the `traverse-end` that every
 # `traverse_issue` exit writes as its last record, the next `traverse-start`
@@ -292,11 +288,10 @@ class LedgerError(Exception):
     - A **store that will not take WAL**, unchained: there is no underlying
       error, because SQLite reports a declined journal mode by returning the
       one it kept.
-    - A **stored row this module cannot use**, naming the row id: a payload
-      that will not decode (chained from the decode error), a promoted column
-      that is empty or holds a type the queries cannot address by. Only the
-      first of these has an error to chain from; the rest are the store
-      disagreeing with itself, not an operation failing.
+    - A **stored payload this module cannot use**, naming the row id: text
+      that will not decode at all (chained from the decode error), and text
+      that decodes into something other than a JSON object (unchained — the
+      store disagreeing with itself, not an operation failing).
     - **Stored rows this module cannot tell apart**, naming them: one session
       id held by more than one job, which no read can resolve because a session
       id is what a job is addressed and joined by.
@@ -546,36 +541,9 @@ def _select(
 # What a `COLUMNS` select yields, before the payload is parsed.
 StoredRow = tuple[int, str, str, str, int, str | None, str | None, str]
 
-# What each promoted column must hold for a row to be readable. `repo` and
-# `issue` key every supersession, window and closeout test in both queries, and
-# a job row's `node` and `session_id` key the rest -- so a column holding
-# nothing is unmatchable under SQL's three-valued logic and the row stands in
-# every answer forever, while one holding the wrong type reaches a caller
-# inside a `LedgerRow` that lies about itself. `received_at` is matched on by
-# nothing and is here because `LedgerRow` promises a string.
-COLUMN_TYPES: dict[str, type] = {
-    "id": int,
-    "received_at": str,
-    "kind": str,
-    "repo": str,
-    "issue": int,
-}
-
-# The grain columns, by the kind that carries them. A traverse row's `None`s
-# are its shape rather than something it lacks, so they are stated as the type
-# they are instead of being left unchecked.
-JOB_GRAIN_TYPES: dict[str, type] = {"node": str, "session_id": str}
-TRAVERSE_GRAIN_TYPES: dict[str, type] = {"node": type(None), "session_id": type(None)}
-
 
 def _decode(stored: StoredRow) -> LedgerRow:
     """One raw row as a `LedgerRow`, its payload text parsed back into a dict.
-
-    A stored row this module cannot use leaves as `LedgerError` naming the row
-    — the same shape as the `awaiting_merge` guard, and for the same reason. A
-    caller who catches `LedgerError` to mean "the ledger is broken" would
-    otherwise walk straight past a bare `json` error, or take a row that lies
-    about its own contents for a sound one.
 
     A **payload** fails two ways, and the second is not the first: text that
     will not parse at all, and text that parses into something other than an
@@ -583,16 +551,15 @@ def _decode(stored: StoredRow) -> LedgerRow:
     parse and are still not the `dict` a payload is — left alone they ride out
     of here inside a `LedgerRow` that lies about its own type, and surface much
     later as a `TypeError` from whatever first treats one as a mapping. The
-    sibling `measure-event` draws the same line for the same reason.
+    sibling `measure-event` draws the same line for the same reason. Both leave
+    as `LedgerError` naming the row, so a caller who catches that to mean "the
+    ledger is broken" does not walk straight past a bare `json` error.
 
-    A **promoted column** fails two ways of its own, being empty or holding the
-    wrong type, and both are worse than the payload's pair: nothing raises
-    anywhere. A NULL key never matches, so the row cannot be superseded,
-    reported or closed out and stands in every answer for good; and SQLite's
-    column affinities convert only what already looks like the declared type,
-    so an issue number that arrived as a branch name is stored and handed back
-    as text. Each is refused here instead, naming the row and the column, and
-    an operator repairs what the error names.
+    The promoted columns are taken as they come. `_gate` judges every address
+    on the way in and no writer here can get past it, so a stored row with an
+    empty or wrong-typed `repo`, `issue`, `node` or `session_id` is not
+    something this module can produce -- and policing a store nothing else
+    writes to is a check that can only ever fire on a row placed by hand.
 
     The columns are unpacked positionally rather than named one by one: adding
     a column to `COLUMNS` then breaks the constructor loudly, where eight
@@ -610,19 +577,7 @@ def _decode(stored: StoredRow) -> LedgerRow:
             f"run ledger row {stored[0]} has a payload that is not a JSON object "
             f"but a {type(payload).__name__}"
         )
-    row = LedgerRow(*stored[:-1], payload=payload)
-    grain = JOB_GRAIN_TYPES if row.kind in JOB_KINDS else TRAVERSE_GRAIN_TYPES
-    unusable = [
-        f"{name} holds {getattr(row, name)!r} where a {wanted.__name__} belongs"
-        for name, wanted in (COLUMN_TYPES | grain).items()
-        if not isinstance(getattr(row, name), wanted)
-    ]
-    if unusable:
-        raise LedgerError(
-            f"run ledger row {row.id} is a {row.kind} the queries cannot address: "
-            f"{'; '.join(unusable)}. Repair the row before reading again."
-        )
-    return row
+    return LedgerRow(*stored[:-1], payload=payload)
 
 
 def _refuse_colliding_sessions(connection: sqlite3.Connection, db_path: Path) -> None:
