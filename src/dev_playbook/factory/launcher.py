@@ -139,7 +139,7 @@ class JobOutcome:
     session_id: str
 
 
-def main_checkout(worktree: Path) -> Path:
+def _main_checkout(worktree: Path) -> Path:
     """The main checkout a worktree is linked to, derived from the worktree alone.
 
     `git rev-parse --git-common-dir` names the main checkout's `.git`, whose
@@ -147,6 +147,11 @@ def main_checkout(worktree: Path) -> Path:
     worktree and nothing else: the sweep needs the main checkout's
     `settings.local.json`, which fires into a worktree-cwd'd child, and the
     shadow check needs both trees.
+
+    Resolved once per public entry point and passed down from there. Two calls
+    within one launch can disagree if the worktree is repointed between them,
+    and the sweep would then read one checkout's `settings.local.json` while
+    the shadow check scans another's.
 
     The answer comes back absolute from a linked worktree and relative from a
     main checkout, so it is joined onto the worktree either way — joining an
@@ -168,7 +173,9 @@ def main_checkout(worktree: Path) -> Path:
     return (worktree / common).resolve().parent
 
 
-def _settings_roster(worktree: Path, env: Mapping[str, str]) -> list[Path]:
+def _settings_roster(
+    worktree: Path, env: Mapping[str, str], checkout: Path
+) -> list[Path]:
     """Every settings file a launch from `worktree` under `env` would merge.
 
     The user scope resolves from the swept environment's own `HOME` rather than
@@ -180,7 +187,6 @@ def _settings_roster(worktree: Path, env: Mapping[str, str]) -> list[Path]:
     directory is unverified, and sweeping a file that never fires is harmless
     where missing one that does is the exact hole the sweep exists for.
     """
-    checkout = main_checkout(worktree)
     return [
         worktree / CLAUDE_DIR / "settings.json",
         worktree / CLAUDE_DIR / "settings.local.json",
@@ -196,15 +202,32 @@ def preflight(worktree: Path, env: Mapping[str, str]) -> None:
 
     Raises `LaunchAborted` carrying every finding at once, so an operator fixes
     the whole configuration in one pass rather than one finding per run.
+
+    Presence is what condemns a billing name, here and in `_swept`, never
+    truthiness: `ANTHROPIC_API_KEY=""` is set, and a check guarding money must
+    not be the laxer of the two next to `CLAUDE_CODE_EFFORT_LEVEL`. An empty
+    value that routes no billing is refused with the rest — a name nobody meant
+    to export is a configuration an operator should see either way.
     """
-    findings = [
-        f"environment: {var} is set" for var in BILLING_ENV_VARS if env.get(var)
-    ]
-    for path in _settings_roster(worktree, env):
-        if path.is_file():
-            findings += _swept(path)
+    findings = _sweep_findings(worktree, env, _main_checkout(worktree))
     if findings:
         raise LaunchAborted(findings)
+
+
+def _sweep_findings(
+    worktree: Path, env: Mapping[str, str], checkout: Path
+) -> list[str]:
+    """The sweep itself, given a checkout its caller has already resolved.
+
+    `preflight` and `launch_job` both run this and nothing else, so the launch
+    is swept by the very code the traverse calls standalone — the two can never
+    drift into disagreeing about what meters a run.
+    """
+    findings = [f"environment: {var} is set" for var in BILLING_ENV_VARS if var in env]
+    for path in _settings_roster(worktree, env, checkout):
+        if path.is_file():
+            findings += _swept(path)
+    return findings
 
 
 def _swept(path: Path) -> list[str]:
@@ -233,9 +256,9 @@ def _swept(path: Path) -> list[str]:
         *(
             f"{path}: {key} is configured"
             for key in BILLING_SETTINGS_KEYS
-            if settings.get(key)
+            if key in settings
         ),
-        *(f"{path}: env.{var} is set" for var in BILLING_ENV_VARS if exported.get(var)),
+        *(f"{path}: env.{var} is set" for var in BILLING_ENV_VARS if var in exported),
     ]
 
 
@@ -248,6 +271,7 @@ def _prespawn_findings(
     env: Mapping[str, str],
     agents_dir: Path,
     claude_cmd: Sequence[str],
+    checkout: Path,
 ) -> list[str]:
     """Everything about this launch that would make it spend money for nothing.
 
@@ -272,7 +296,7 @@ def _prespawn_findings(
     return [
         *findings,
         *_definition_findings(node, agents_dir),
-        *_shadow_findings(worktree),
+        *_shadow_findings(worktree, checkout),
     ]
 
 
@@ -334,7 +358,7 @@ def _frontmatter(path: Path) -> dict[str, object]:
     return frontmatter
 
 
-def _shadow_findings(worktree: Path) -> list[str]:
+def _shadow_findings(worktree: Path, checkout: Path) -> list[str]:
     """Findings for any repo-local copy of a factory node's definition.
 
     The whole six-name roster, in both trees, whatever node is being launched:
@@ -343,7 +367,7 @@ def _shadow_findings(worktree: Path) -> list[str]:
     node with whatever that file says.
     """
     findings = []
-    for tree in (worktree, main_checkout(worktree)):
+    for tree in (worktree, checkout):
         for node in NODES:
             path = tree / CLAUDE_DIR / "agents" / f"{node}.md"
             if path.is_file():
@@ -387,8 +411,15 @@ def launch_job(
     grain, and this never writes `traverse-escalation`.
     """
     env = dict(os.environ)
-    preflight(worktree, env)
-    findings = _prespawn_findings(node, worktree, env, agents_dir, claude_cmd)
+    # One checkout for the whole launch. The sweep reads its
+    # `settings.local.json` and the shadow check scans its `.claude/agents`, and
+    # resolving it twice lets those two read different trees if the worktree is
+    # repointed in between.
+    checkout = _main_checkout(worktree)
+    findings = _sweep_findings(worktree, env, checkout)
+    if findings:
+        raise LaunchAborted(findings)
+    findings = _prespawn_findings(node, worktree, env, agents_dir, claude_cmd, checkout)
     if findings:
         raise LaunchAborted(findings)
     session_id = str(uuid.uuid4())

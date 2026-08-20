@@ -184,7 +184,15 @@ def checkout(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def worktree(checkout: Path, tmp_path: Path) -> Path:
-    """A linked worktree of ``checkout`` — the placement every launch runs in."""
+    """A linked worktree of ``checkout`` — the placement every launch runs in.
+
+    A real ``git worktree add`` rather than a stand-in, because the launcher
+    derives the main checkout from the worktree's own git metadata and is never
+    handed it. Every test that reaches ``checkout`` while passing only this
+    path proves that derivation: the ``checkout-local`` settings scope, which
+    the sweep finds, and the ``checkout`` shadow scope, which the shadow check
+    scans.
+    """
     path = tmp_path / "worktree"
     subprocess.run(
         [
@@ -451,6 +459,30 @@ def test_preflight_aborts_on_a_roster_file_that_will_not_parse(
     assert str(unparseable) in str(aborted.value)
 
 
+def test_preflight_faults_a_billing_variable_that_is_set_but_empty(
+    worktree: Path, env: dict[str, str]
+) -> None:
+    env["ANTHROPIC_API_KEY"] = ""
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launcher.preflight(worktree, env)
+
+    assert "ANTHROPIC_API_KEY" in str(aborted.value)
+
+
+def test_preflight_faults_a_billing_name_present_but_empty_in_a_roster_file(
+    roster: dict[str, Path], worktree: Path, env: dict[str, str]
+) -> None:
+    write_settings(
+        roster["user"], {"apiKeyHelper": "", "env": {"ANTHROPIC_BASE_URL": ""}}
+    )
+
+    with pytest.raises(launcher.LaunchAborted) as aborted:
+        launcher.preflight(worktree, env)
+
+    assert len(aborted.value.findings) == 2
+
+
 def test_preflight_passes_a_clean_environment_with_no_roster_file_present(
     worktree: Path, env: dict[str, str]
 ) -> None:
@@ -475,12 +507,6 @@ def test_preflight_reports_every_finding_in_one_abort(
         launcher.preflight(worktree, env)
 
     assert len(aborted.value.findings) == 2
-
-
-def test_the_main_checkout_resolves_from_a_linked_worktree(
-    worktree: Path, checkout: Path
-) -> None:
-    assert launcher.main_checkout(worktree) == checkout.resolve()
 
 
 def test_launch_aborts_when_the_claude_binary_does_not_resolve(
