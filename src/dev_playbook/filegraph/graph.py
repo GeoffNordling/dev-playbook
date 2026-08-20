@@ -32,9 +32,9 @@ CONFIG_EXTENSIONS = {
     ".ini",
 }
 CONFIG_NAMES = {"Makefile"}
-# Mirrors scripts/ref-lint: sources with no fixed repo root (skills, rules)
-# legitimately use the Citation form for same-repo targets.
-ROOTLESS_SEGMENTS = {"skills", "rules"}
+# Mirrors scripts/ref-lint: sources with no fixed repo root (skills, rules, and
+# agent definitions) legitimately use the Citation form for same-repo targets.
+ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 FORMAL_FORMS = {"link", "citation", "resource"}
 CORE_BUCKETS = {"concept", "index"}
 # A path-shaped token in prose or code: a ~/workspace citation, a

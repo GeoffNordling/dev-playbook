@@ -1,7 +1,13 @@
+---
+type: Guide
+title: Test-First Discipline
+description: How the work is carried out when an issue calls for tests — the chunk, the slice loop, and the whole-chunk refactor pass
+---
+
 # Test-First Discipline
 
 How the work is carried out when the issue carries `tests:yes`. Read
-[testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md)
+[testing conventions](/standards/testing/conventions.md)
 end-to-end first — pytest structure, naming, fixtures, behavioral focus.
 
 Under this discipline a piece of the scope is a **chunk**: the slices covering
@@ -39,7 +45,7 @@ methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 
 **Refactor.** With the suite green, apply
-[the refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md)
+[the refactor catalogue](/software-factory/refactor-catalogue.md)
 **inside the module just touched** — its duplication, its shallow seams, its
 primitives. Run `make test` after each step.
 
@@ -53,7 +59,8 @@ several call sites exist, abstraction misalignments, primitive obsession. Run
 
 ## Escalations
 
-These add to build's own triggers and take its `ESCALATE:` line:
+These add to build's own escalation triggers, and end the session the same way —
+`outcome: escalated`, with the reason in `gist`:
 
 - **Stuck test.** A slice's test won't pass after two implementation attempts.
 - **A written test looks wrong.** You want to change a test you already wrote —

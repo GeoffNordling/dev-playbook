@@ -66,6 +66,7 @@ and only these:
 - **Terminal endpoints** — merged, closed. An issue leaves the graph there rather
   than occupying a state.
 
-A work node is usually served by a slash-command of the same name (`design` →
-`/design`), but the mapping is not guaranteed: a review diamond dispatches
-several skills, none named after the node.
+The factory's work nodes are served by typed agent definitions that the traverse
+script launches — several of them at a review diamond. A definition-region node
+is usually served by a slash-command of the same name (`design` → `/design`),
+but that mapping is not guaranteed.
