@@ -1,4 +1,5 @@
 import json
+import locale
 import os
 import sqlite3
 import subprocess
@@ -48,7 +49,10 @@ OVERTUNED_DEFINITION = {**DEFINITION, "effort": "turbo"}
 # A stand-in for claude: it records the argv and placement it was spawned
 # with, then emits a canned stream-json stream line by line and exits the way
 # its plan says. `$CWD` in a canned line becomes the directory it really ran
-# in, so a test can emit a truthful `init` without knowing the path.
+# in, so a test can emit a truthful `init` without knowing the path. A canned
+# line given as a string is printed verbatim, which is how a test emits a line
+# that is not JSON at all; `undecodable` opens the stream with bytes no
+# decoder accepts.
 FAKE_CLAUDE = """
 import json
 import os
@@ -64,7 +68,14 @@ plan = json.loads((here / "plan.json").read_text())
 )
 if plan["ignore_sigterm"]:
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
+if plan["undecodable"]:
+    sys.stdout.flush()
+    sys.stdout.buffer.write(b"\\xff\\xfe\\n")
+    sys.stdout.buffer.flush()
 for line in plan["lines"]:
+    if isinstance(line, str):
+        print(line, flush=True)
+        continue
     resolved = {k: (os.getcwd() if v == "$CWD" else v) for k, v in line.items()}
     print(json.dumps(resolved), flush=True)
 time.sleep(plan["linger"])
@@ -84,6 +95,14 @@ NOISE_LINE: dict[str, Any] = {"type": "rate_limit_event", "subtype": None}
 
 # The report a clean node returns, in the epic's envelope shape.
 REPORT: dict[str, Any] = {"outcome": "done", "gist": "The issue is built."}
+
+# The same report, its prose carrying the em-dash agent output is full of. It
+# goes down the stream as a verbatim line, because `json.dumps` escapes every
+# non-ASCII character by default and an all-ASCII stream would prove nothing.
+NON_ASCII_REPORT: dict[str, Any] = {
+    "outcome": "done",
+    "gist": "The issue is built — cleanly.",
+}
 
 # How long a fake child lingers when the launcher is meant to be what ends it.
 # Long enough that a missed kill fails the test by timing out rather than by
@@ -288,11 +307,12 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
     script.write_text(FAKE_CLAUDE)
 
     def plan(
-        lines: list[dict[str, Any]],
+        lines: list[dict[str, Any] | str],
         *,
         linger: float = 0.0,
         exit_code: int = 0,
         ignore_sigterm: bool = False,
+        undecodable: bool = False,
     ) -> tuple[str, ...]:
         (here / "plan.json").write_text(
             json.dumps(
@@ -301,6 +321,7 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
                     "linger": linger,
                     "exit_code": exit_code,
                     "ignore_sigterm": ignore_sigterm,
+                    "undecodable": undecodable,
                 }
             )
         )
@@ -744,6 +765,26 @@ def test_a_run_billed_to_anything_but_the_subscription_is_killed_and_misconfigur
     }
 
 
+def test_a_later_init_never_clears_an_alarm_already_standing(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(api_key_source="ANTHROPIC_API_KEY"), init_line()],
+        linger=LINGER_SECONDS,
+    )
+
+    outcome = launch(
+        claude_cmd=claude_cmd, timeout_s=BRIEF_DEADLINE, grace_s=BRIEF_GRACE
+    )
+
+    assert outcome.process_outcome == "misconfigured"
+    assert ledger_rows(db)[1][2]["alarm"]["field"] == "apiKeySource"
+
+
 def test_launch_runs_the_same_preflight_the_traverse_calls_standalone(
     launch: Callable[..., launcher.JobOutcome],
     fake_claude: Callable[..., tuple[str, ...]],
@@ -779,6 +820,41 @@ def test_a_child_that_ignores_sigterm_is_killed_after_the_grace(
 
     assert outcome.process_outcome == "timed-out"
     assert ledger_rows(db)[1][2]["kill"] == "sigkill"
+
+
+def test_a_stream_is_read_as_utf8_whatever_the_machines_locale_prefers(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    monkeypatch.setattr(locale, "getencoding", lambda: "ascii")
+    claude_cmd = fake_claude(
+        [
+            HOOK_LINE,
+            init_line(),
+            json.dumps(result_line(NON_ASCII_REPORT), ensure_ascii=False),
+        ]
+    )
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    assert outcome.structured_output == NON_ASCII_REPORT
+
+
+def test_a_stream_the_decoder_rejects_leaves_as_the_failure_it_was(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(), result_line(REPORT)], undecodable=True
+    )
+
+    with pytest.raises(UnicodeDecodeError):
+        launch(claude_cmd=claude_cmd, timeout_s=BRIEF_DEADLINE, grace_s=BRIEF_GRACE)
 
 
 def test_a_result_envelope_with_no_init_before_it_violates_the_contract(

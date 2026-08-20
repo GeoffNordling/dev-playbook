@@ -472,6 +472,12 @@ def _supervise(
     The stream is read by a thread onto a queue rather than straight off the
     pipe, so the deadline still fires while the child says nothing at all: a
     blocking `readline` on a silent child has no timeout to give.
+
+    The decoder is pinned to UTF-8 rather than left to the machine's locale,
+    which is what `text=True` alone would use. Agent prose carries em-dashes
+    and other non-ASCII constantly, and stream-json is UTF-8 whatever the
+    locale says, so a machine running under an ASCII locale would otherwise
+    turn ordinary output into a decode failure.
     """
     with open(os.devnull) as no_input:
         process = subprocess.Popen(
@@ -481,11 +487,12 @@ def _supervise(
             stdin=no_input,
             stdout=subprocess.PIPE,
             text=True,
+            encoding="utf-8",
         )
     stream = process.stdout
     if stream is None:
         raise LauncherError("the child was spawned without the stdout pipe to read")
-    lines: queue.Queue[str | None] = queue.Queue()
+    lines: queue.Queue[str | Exception | None] = queue.Queue()
     pump = threading.Thread(target=_pump, args=(stream, lines), daemon=True)
     pump.start()
     try:
@@ -501,16 +508,29 @@ def _supervise(
         stream.close()
 
 
-def _pump(stream: IO[str], lines: queue.Queue[str | None]) -> None:
-    """Move the child's stdout onto the queue, closing it with a `None`."""
-    for line in stream:
-        lines.put(line)
-    lines.put(None)
+def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
+    """Move the child's stdout onto the queue, closing it with what ended the read.
+
+    The close sits in a `finally` because a pump that dies without one leaves
+    `_watch` blocked on a queue nothing will fill again: it waits out the whole
+    deadline, SIGTERMs a child that finished long before, and files a clean run
+    as `timed-out`. What ended the read goes on the queue as itself — the
+    exception object, not a flag — so `_watch` re-raises it and a decode
+    failure or a closed pipe leaves as the failure it was.
+    """
+    ended: Exception | None = None
+    try:
+        for line in stream:
+            lines.put(line)
+    except Exception as error:
+        ended = error
+    finally:
+        lines.put(ended)
 
 
 def _watch(
     process: subprocess.Popen[str],
-    lines: queue.Queue[str | None],
+    lines: queue.Queue[str | Exception | None],
     worktree: Path,
     timeout_s: float,
     grace_s: float,
@@ -529,7 +549,13 @@ def _watch(
     run = _Run()
     deadline = time.monotonic() + timeout_s
     while True:
-        if deadline - time.monotonic() <= 0:
+        # One clock read a pass, clamped. Reading it twice lets the deadline
+        # fall between the guard and the `get`, and `Queue.get` refuses a
+        # negative timeout with a bare `ValueError` — which is no `LauncherError`,
+        # so it would escape a launch whose `job-launch` row is already written
+        # and leave that job reading as live for good.
+        remaining = max(0.0, deadline - time.monotonic())
+        if remaining <= 0:
             if run.kill == SIGKILL:
                 break
             run.timed_out = run.timed_out or run.alarm is None
@@ -537,11 +563,13 @@ def _watch(
             deadline = time.monotonic() + grace_s
             continue
         try:
-            line = lines.get(timeout=deadline - time.monotonic())
+            line = lines.get(timeout=remaining)
         except queue.Empty:
             continue
         if line is None:
             break
+        if isinstance(line, Exception):
+            raise line
         _read(line, run, worktree)
         if run.alarm is not None and run.kill is None:
             _escalate(process, run)
@@ -576,11 +604,22 @@ def _final_exit(process: subprocess.Popen[str], grace_s: float) -> int:
 
 
 def _read(line: str, run: _Run, worktree: Path) -> None:
-    """Take one stream line into the run, raising the alarm an `init` fails."""
+    """Take one stream line into the run, raising the alarm an `init` fails.
+
+    The first `init` is the one that counts, and a later one never displaces
+    it. The stream is drained after a kill by design, so a second `init` in
+    that tail would otherwise return a standing alarm to `None` — and the
+    metered, SIGTERM'd child the alarm exists to catch would be filed as an
+    ordinary death with no alarm on its row.
+    """
     message = _parsed(line)
     if message is None:
         return
-    if message.get("type") == "system" and message.get("subtype") == "init":
+    if (
+        message.get("type") == "system"
+        and message.get("subtype") == "init"
+        and run.init is None
+    ):
         run.init = message
         run.alarm = _alarm(message, worktree)
     elif message.get("type") == "result":
