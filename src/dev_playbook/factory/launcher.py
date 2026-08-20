@@ -453,6 +453,11 @@ class _Run:
     kill: str | None = None
     alarm: dict[str, object] | None = None
     timed_out: bool = False
+    # Whether any stream line was unreadable. A line that will not parse cannot
+    # be identified, so an `init` among them is unidentifiable too — and this
+    # is what lets `_classify` refuse a run whose placement and billing may
+    # never have been declared at all.
+    dropped: bool = False
 
 
 def _supervise(
@@ -612,8 +617,11 @@ def _read(line: str, run: _Run, worktree: Path) -> None:
     metered, SIGTERM'd child the alarm exists to catch would be filed as an
     ordinary death with no alarm on its row.
     """
+    if not line.strip():
+        return
     message = _parsed(line)
     if message is None:
+        run.dropped = True
         return
     if (
         message.get("type") == "system"
@@ -629,11 +637,11 @@ def _read(line: str, run: _Run, worktree: Path) -> None:
 def _parsed(line: str) -> dict[str, object] | None:
     """One stream line as a message, or `None` for a line that is not one.
 
-    Everything other than `init` and `result` is read and dropped, and a line
-    that is not JSON at all is dropped with them — including the empty line a
-    stream ends on. Nothing is lost by it: a truncated `init` then reaches
-    `_classify` as a result envelope with no `init` ever seen, which is a
-    contract violation it refuses to classify rather than guess at.
+    Everything other than `init` and `result` is read and dropped. A line that
+    is not JSON at all, or that is JSON but not an object, is unreadable rather
+    than uninteresting, and the caller records that one went by: what it said
+    is unrecoverable, so a run that never read an `init` can no longer be
+    assumed to have simply not been sent one.
     """
     try:
         message = json.loads(line)
@@ -683,20 +691,27 @@ def _alarm(init: dict[str, object], worktree: Path) -> dict[str, object] | None:
 def _classify(run: _Run, session_id: str) -> tuple[JobOutcome, dict[str, object]]:
     """What the finished run was, and the payload its `job-report` row carries.
 
-    First match wins, and the impossible-by-contract states are refused before
-    the table rather than classified into it: a result envelope the harness
-    emitted without ever declaring an `init` leaves the run's placement and
-    billing unknown, and a stream that ended with neither an envelope nor an
-    exit leaves nothing to classify at all.
+    First match wins, and the two states that leave a run's placement and
+    billing undeclared are refused before the table rather than classified into
+    it. Both come down to the same thing: the two alarms the whole supervision
+    rests on were never evaluated, so a run billed to a metered key would
+    otherwise be filed as an ordinary timeout or an ordinary crash.
+
+    The brief's third refusal — a stream ending with neither an envelope nor an
+    exit — is enforced in `_final_exit`, which raises when a child outlives
+    every signal sent to it. A run that reaches here therefore always has an
+    exit code, and a second guard for it here would be a defensive one standing
+    in for the real one.
     """
     if run.result is not None and run.init is None:
         raise HarnessContractViolation(
             f"the harness emitted a result envelope having never emitted an init, so "
             f"this run's placement and billing were never declared: {run.result}"
         )
-    if run.result is None and run.exit_code is None:
+    if run.init is None and run.dropped:
         raise HarnessContractViolation(
-            "the child's stream ended with neither a result envelope nor an exit"
+            "the child emitted a stream line that will not parse and never emitted a "
+            "readable init, so this run's placement and billing were never declared"
         )
     report = None
     if run.alarm is not None:
@@ -765,6 +780,11 @@ def _payload(
         "process_outcome": process_outcome,
         "task_outcome": task_outcome,
         STRUCTURED_OUTPUT: report,
+        # On every row, not just the ones carrying a result envelope: the exit
+        # code comes from `process.wait`, never off the envelope, and a `died`
+        # run has no envelope at all — so this is the one thing that separates
+        # exit 1 from a segfault from an OOM kill for whoever reads the row.
+        "exit_code": run.exit_code,
     }
     if run.result is not None:
         # Accounting, recorded as the harness reported it and never re-asserted.
@@ -772,7 +792,6 @@ def _payload(
         # job that already ran: nothing in the graph branches on a token count,
         # and only `subtype`, `is_error`, `permission_denials` and
         # `duration_ms` are measured promises to begin with.
-        payload["exit_code"] = run.exit_code
         for extract in RESULT_EXTRACTS:
             if extract in run.result:
                 payload[extract] = run.result[extract]

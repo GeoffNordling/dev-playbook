@@ -93,6 +93,11 @@ HOOK_LINE: dict[str, Any] = {
 # A line the launcher reads and drops, between `init` and the envelope.
 NOISE_LINE: dict[str, Any] = {"type": "rate_limit_event", "subtype": None}
 
+# An `init` cut off mid-write. Nothing can identify it as an `init`, which is
+# exactly why a run that drops a line and never reads an `init` is refused
+# rather than classified: its placement and billing were never declared.
+TRUNCATED_INIT = '{"type": "system", "subtype": "init", "cwd": "/wor'
+
 # The report a clean node returns, in the epic's envelope shape.
 REPORT: dict[str, Any] = {"outcome": "done", "gist": "The issue is built."}
 
@@ -696,6 +701,20 @@ def test_a_child_that_exits_nonzero_on_its_own_died(
     assert "kill" not in ledger_rows(db)[1][2]
 
 
+def test_a_died_run_records_the_exit_code_that_is_its_only_diagnostic(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE], exit_code=3)
+
+    launch(claude_cmd=claude_cmd)
+
+    assert ledger_rows(db)[1][2]["exit_code"] == 3
+
+
 def test_a_child_still_running_at_the_deadline_is_timed_out(
     launch: Callable[..., launcher.JobOutcome],
     fake_claude: Callable[..., tuple[str, ...]],
@@ -870,6 +889,36 @@ def test_a_result_envelope_with_no_init_before_it_violates_the_contract(
         launch(claude_cmd=claude_cmd)
 
     assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+
+
+def test_a_dropped_stream_line_with_no_init_ever_read_violates_the_contract(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, TRUNCATED_INIT], exit_code=1)
+
+    with pytest.raises(launcher.HarnessContractViolation):
+        launch(claude_cmd=claude_cmd)
+
+    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+
+
+def test_a_dropped_stream_line_after_a_readable_init_is_classified_as_usual(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(), TRUNCATED_INIT, result_line(REPORT)]
+    )
+
+    outcome = launch(claude_cmd=claude_cmd)
+
+    assert outcome.process_outcome == "clean"
 
 
 def test_a_validated_report_with_no_outcome_violates_the_contract(
