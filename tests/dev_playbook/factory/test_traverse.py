@@ -1,8 +1,10 @@
 import fcntl
 import json
+import signal
 import sqlite3
 import subprocess
 import sys
+import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -10,7 +12,7 @@ from typing import Any
 import pytest
 from conftest import commit_all, init_repo
 
-from dev_playbook.factory import launcher, traverse
+from dev_playbook.factory import launcher, ledger, traverse
 
 # The issue every test traverses unless it says otherwise, and the checkout the
 # slug resolves to inside the temp workspace.
@@ -105,7 +107,9 @@ if step["commit"]:
     branch = subprocess.run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True
     ).stdout.strip()
-    Path("built-by-%s.txt" % node).write_text("the node's work\\n")
+    # Named by session, so a second launch into a worktree a first already
+    # committed in still has something to commit.
+    Path("built-by-%s-%s.txt" % (node, session)).write_text("the node's work\\n")
     subprocess.run(["git", "add", "-A"], check=True)
     subprocess.run(
         ["git", "-c", "user.email=t@example.com", "-c", "user.name=test",
@@ -124,6 +128,49 @@ for line in step["lines"]:
 time.sleep(step["linger"])
 sys.exit(step["exit_code"])
 """
+
+# A traverse driven from a separate process, so a test can signal the traverse
+# itself rather than the child it supervises — and so the stdout and exit code
+# `main` produces are measured through the real entry point. The two module
+# paths the suite redirects are set here by hand: a monkeypatched attribute lives
+# in this process alone, and a child importing `launcher` fresh would otherwise
+# sweep the machine's real `/etc` managed settings.
+TRAVERSE_RUNNER = """
+import json
+import sys
+from pathlib import Path
+
+arguments = json.loads(Path(sys.argv[1]).read_text())
+sys.path.insert(0, arguments["src"])
+
+from dev_playbook.factory import launcher, traverse
+
+launcher.MANAGED_SETTINGS = Path(arguments["managed_settings"])
+launcher.MANAGED_SETTINGS_DIR = Path(arguments["managed_settings_dir"])
+
+raise SystemExit(
+    traverse.main(
+        arguments["argv"],
+        db_path=Path(arguments["db_path"]),
+        lock_dir=Path(arguments["lock_dir"]),
+        workspace_dir=Path(arguments["workspace_dir"]),
+        agents_dir=Path(arguments["agents_dir"]),
+        claude_cmd=tuple(arguments["claude_cmd"]),
+        gh_cmd=tuple(arguments["gh_cmd"]),
+        timeout_s=arguments["timeout_s"],
+        grace_s=arguments["grace_s"],
+    )
+)
+"""
+
+# How long a test waits for a traverse process to reach the state it is about to
+# act on, and for a signalled process and its child to be gone.
+PROCESS_BUDGET = 20.0
+PROCESS_POLL = 0.05
+
+# The deadline a traverse runs under when the test itself is what ends the job,
+# rather than the clock. Long enough that nothing times out first.
+PATIENT_DEADLINE = 60.0
 
 # Hook events precede `init` in a real stream, so every canned stream opens with
 # one: the parser scans for `init` rather than reading the first line.
@@ -225,6 +272,33 @@ DEFAULT_STEPS: dict[str, dict[str, Any]] = {
     "build": clean_build(),
     "open-pr": node_step(),
 }
+
+
+def process_state(pid: int) -> str | None:
+    """The single-letter process-table state of `pid`, or None once it is gone.
+
+    Read from ``/proc`` rather than asked with ``os.kill(pid, 0)``: a signal probe
+    answers "alive" for a zombie, and a child whose traverse was destroyed is
+    reparented, so it is a zombie until the reaper collects it. What is under test
+    is that it stopped running.
+    """
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_text()
+    except OSError:
+        return None
+    # The comm field is parenthesized and may hold spaces of its own, so the
+    # split starts after the last ')' rather than at the second field.
+    return stat.rpartition(")")[2].split()[0]
+
+
+def wait_until(ready: Callable[[], bool], budget: float = PROCESS_BUDGET) -> bool:
+    """Poll `ready` until it holds, within `budget` seconds."""
+    deadline = time.monotonic() + budget
+    while time.monotonic() < deadline:
+        if ready():
+            return True
+        time.sleep(PROCESS_POLL)
+    return False
 
 
 def add_worktree(checkout: Path, branch: str) -> Path:
@@ -477,6 +551,60 @@ def traverse_issue(
         )
 
     return run
+
+
+@pytest.fixture
+def traverse_process(
+    tmp_path: Path,
+    checkout: Path,
+    workspace: Path,
+    locks: Path,
+    db: Path,
+    agents_dir: Path,
+    managed_settings: tuple[Path, Path],
+    stub_gh: Callable[..., tuple[str, ...]],
+    fake_claude: Callable[..., tuple[str, ...]],
+) -> Callable[..., subprocess.Popen[str]]:
+    """Spawn a traverse in its own process, through the real `main`."""
+    runner = tmp_path / "runner.py"
+    runner.write_text(TRAVERSE_RUNNER)
+    managed, drop_in = managed_settings
+    spawned = 0
+
+    def start(**seams: Any) -> subprocess.Popen[str]:
+        nonlocal spawned
+        spawned += 1
+        arguments = tmp_path / f"traverse-{spawned}.json"
+        arguments.write_text(
+            json.dumps(
+                {
+                    "src": str(Path(traverse.__file__).parents[2]),
+                    "managed_settings": str(managed),
+                    "managed_settings_dir": str(drop_in),
+                    "argv": [
+                        seams.pop("repo", REPO),
+                        str(seams.pop("issue", ISSUE)),
+                        seams.pop("mode", "auto"),
+                    ],
+                    "db_path": str(db),
+                    "lock_dir": str(locks),
+                    "workspace_dir": str(workspace),
+                    "agents_dir": str(agents_dir),
+                    "claude_cmd": list(seams.pop("claude_cmd", None) or fake_claude()),
+                    "gh_cmd": list(seams.pop("gh_cmd", None) or stub_gh()),
+                    "timeout_s": seams.pop("timeout_s", BRIEF_DEADLINE),
+                    "grace_s": seams.pop("grace_s", BRIEF_GRACE),
+                }
+            )
+        )
+        return subprocess.Popen(
+            [sys.executable, str(runner), str(arguments)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+    return start
 
 
 # --- the entry gate, before any ledger write ---
@@ -869,3 +997,207 @@ def test_an_existing_worktree_is_reused_exactly_as_it_was_found(
     traverse_issue()
 
     assert carried_over.read_text() == "from the last lap\n"
+
+
+# --- the command line ---
+
+
+def test_a_finished_traverse_prints_one_json_line_and_exits_zero(
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    running = traverse_process()
+
+    stdout, stderr = running.communicate(timeout=PROCESS_BUDGET)
+
+    assert running.returncode == 0
+    assert json.loads(stdout) == {"status": "pr-ready", "pr_url": PR_URL}
+    assert stdout.count("\n") == 1
+    assert stderr != ""
+
+
+def test_an_escalated_traverse_prints_its_status_and_session_and_exits_zero(
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    """An escalation is a result the graph reached, not a failure of the script."""
+    running = traverse_process(gh_cmd=stub_gh(["phase:merged"]))
+
+    stdout, _ = running.communicate(timeout=PROCESS_BUDGET)
+
+    assert running.returncode == 0
+    assert json.loads(stdout) == {"status": "escalated", "session_id": None}
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [[], [REPO], [REPO, str(ISSUE)], [REPO, str(ISSUE), "auto", "extra"]],
+)
+def test_the_command_line_takes_exactly_three_arguments(argv: list[str]) -> None:
+    with pytest.raises(traverse.TraverseError):
+        traverse.main(argv)
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["owner/repo", "1", "spike"],
+        ["owner/repo", "1"],
+        ["owner/no-such-checkout-anywhere", "1", "auto"],
+    ],
+)
+def test_the_shim_refuses_a_call_it_cannot_run_and_exits_nonzero(
+    argv: list[str],
+) -> None:
+    """Run through the installed shim, on its own defaults.
+
+    Nothing here reaches the real ledger or the real lock directory, because
+    every one of these is refused before either is touched — which is the
+    property being measured as much as the exit code is.
+    """
+    shim = Path(traverse.__file__).parents[3] / "scripts" / "traverse-issue"
+
+    refused = subprocess.run(
+        [sys.executable, str(shim), *argv], capture_output=True, text=True
+    )
+
+    assert refused.returncode != 0
+    assert "TraverseError" in refused.stderr
+    assert refused.stdout == ""
+
+
+# --- one traverse per issue at a time ---
+
+
+def test_a_second_traverse_of_a_live_issue_fails_at_once_and_writes_nothing(
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    held = fake_claude(build=node_step([HOOK_LINE, init_line()], linger=LINGER_SECONDS))
+    first = traverse_process(claude_cmd=held, timeout_s=PATIENT_DEADLINE)
+    assert wait_until(lambda: len(launched()) == 1)
+    rows_while_running = len(ledger_rows(db))
+
+    second = traverse_process(claude_cmd=held)
+    _, stderr = second.communicate(timeout=PROCESS_BUDGET)
+    first.kill()
+    first.communicate(timeout=PROCESS_BUDGET)
+
+    assert second.returncode != 0
+    assert "is still running" in stderr
+    assert len(ledger_rows(db)) == rows_while_running
+    assert kinds(db).count("traverse-start") == 1
+
+
+def test_a_traverse_of_another_issue_runs_while_one_issue_is_locked(
+    fake_claude: Callable[..., tuple[str, ...]],
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    held = fake_claude(
+        build=node_step([HOOK_LINE, init_line()], linger=LINGER_SECONDS),
+        **{"open-pr": node_step()},
+    )
+    first = traverse_process(claude_cmd=held, timeout_s=PATIENT_DEADLINE)
+    assert wait_until(lambda: len(launched()) == 1)
+
+    other = traverse_process(issue=441, claude_cmd=fake_claude())
+    stdout, _ = other.communicate(timeout=PROCESS_BUDGET)
+    first.kill()
+    first.communicate(timeout=PROCESS_BUDGET)
+
+    assert other.returncode == 0
+    assert json.loads(stdout)["status"] == "pr-ready"
+
+
+# --- the kill cascade and the orphan sweep ---
+
+
+def test_a_traverse_sent_sigterm_kills_its_child_and_closes_its_own_window(
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    held = fake_claude(build=node_step([HOOK_LINE, init_line()], linger=LINGER_SECONDS))
+    running = traverse_process(claude_cmd=held, timeout_s=PATIENT_DEADLINE)
+    assert wait_until(lambda: len(launched()) == 1)
+    child = launched()[0]
+
+    running.send_signal(signal.SIGTERM)
+    stdout, _ = running.communicate(timeout=PROCESS_BUDGET)
+
+    assert running.returncode != 0
+    assert stdout == ""
+    assert wait_until(lambda: process_state(child["pid"]) in (None, "Z"))
+    report = payload_of(db, "job-report")
+    assert report["process_outcome"] == "died"
+    assert report["swept"] == "kill-cascade"
+    assert payload_of(db, "traverse-end") == {"status": "killed"}
+    assert ledger.live_jobs(db_path=db) == []
+    assert ledger.awaiting_merge(db_path=db) == []
+
+
+def test_a_traverse_destroyed_without_warning_takes_its_child_with_it(
+    fake_claude: Callable[..., tuple[str, ...]],
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    """`PR_SET_PDEATHSIG` is what covers the signal no trap can catch."""
+    held = fake_claude(build=node_step([HOOK_LINE, init_line()], linger=LINGER_SECONDS))
+    running = traverse_process(claude_cmd=held, timeout_s=PATIENT_DEADLINE)
+    assert wait_until(lambda: len(launched()) == 1)
+    child = launched()[0]
+
+    running.kill()
+    running.communicate(timeout=PROCESS_BUDGET)
+
+    assert wait_until(lambda: process_state(child["pid"]) in (None, "Z"))
+
+
+def test_the_next_traverse_finishes_the_books_a_destroyed_one_left_open(
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    ledger.job_launch("owner/other", 999, "build", "sess-elsewhere", {}, db_path=db)
+    held = fake_claude(build=node_step([HOOK_LINE, init_line()], linger=LINGER_SECONDS))
+    destroyed = traverse_process(claude_cmd=held, timeout_s=PATIENT_DEADLINE)
+    assert wait_until(lambda: len(launched()) == 1)
+    orphaned = launched()[0]["session"]
+    destroyed.kill()
+    destroyed.communicate(timeout=PROCESS_BUDGET)
+
+    traverse_issue()
+
+    swept = [
+        payload
+        for kind, _, payload in ledger_rows(db)
+        if kind == "job-report" and payload.get("swept") == "orphan-recovery"
+    ]
+    assert len(swept) == 1
+    assert swept[0]["process_outcome"] == "died"
+    assert orphaned not in [row.session_id for row in ledger.live_jobs(db_path=db)]
+    assert [row.session_id for row in ledger.live_jobs(db_path=db)] == [
+        "sess-elsewhere"
+    ]
+
+
+def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
+    db: Path, traverse_issue: Callable[..., Any]
+) -> None:
+    """Completing the books is the duty, whether or not anything is left to kill."""
+    ledger.job_launch(REPO, ISSUE, "build", "sess-long-gone", {}, db_path=db)
+
+    traverse_issue()
+
+    reports = [
+        (node, payload)
+        for kind, node, payload in ledger_rows(db)
+        if kind == "job-report" and payload.get("swept")
+    ]
+    assert reports[0][1]["process_outcome"] == "died"
+    assert reports[0][1]["kill"] is None

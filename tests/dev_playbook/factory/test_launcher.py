@@ -1185,7 +1185,7 @@ def test_a_child_dies_with_a_launcher_that_is_destroyed_without_warning(
     arguments.write_text(
         json.dumps(
             {
-                "src": str(Path(launcher.__file__).parents[3]),
+                "src": str(Path(launcher.__file__).parents[2]),
                 "managed_settings": str(managed),
                 "managed_settings_dir": str(drop_in),
                 "repo": REPO,
