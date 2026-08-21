@@ -333,6 +333,39 @@ REVIEWED_REPORT: dict[str, Any] = {
     "suggestion_count": 1,
 }
 
+# What the adjudicator returns — the envelope plus what it settled. `dispositions`
+# is the one thing the graph reads off a report rather than off GitHub: a fix-now
+# ruling is written nowhere durable, because the thread it names stays open and
+# unmarked for the next cycle's reviewer.
+ADJUDICATED_REPORT: dict[str, Any] = {
+    "outcome": "done",
+    "gist": "Three suggestions settled on PR #12.",
+    "dispositions": [
+        {
+            "thread": "PRRT_suggestion",
+            "outcome": "fix-now",
+            "fix": "name the constant as the review states",
+        },
+        {
+            "thread": "PRRT_deferred",
+            "outcome": "defer",
+            "reason": "needs-design",
+            "stub": 512,
+        },
+        {"thread": "PRRT_declined", "outcome": "decline", "reason": "no-consequence"},
+    ],
+    "callouts": [],
+}
+
+# What it reports when its docket settles to nothing the next lap has to carry —
+# the four fields all the same, because the envelope is read by its shape.
+NOTHING_SETTLED: dict[str, Any] = {
+    "outcome": "done",
+    "gist": "Nothing left open to settle on PR #12.",
+    "dispositions": [],
+    "callouts": [],
+}
+
 # What a review that could not be produced at all reports — no threads posted,
 # so both counts are zero, stated rather than left out.
 ESCALATED_REVIEW: dict[str, Any] = {
@@ -364,6 +397,12 @@ DEFINITIONS: dict[str, dict[str, Any]] = {
             "effort": "xhigh",
         }
         for node in REVIEW_NAMES
+    },
+    "adjudicator": {
+        "name": "adjudicator",
+        "description": "The adjudicator node.",
+        "model": "opus",
+        "effort": "xhigh",
     },
 }
 
@@ -482,11 +521,17 @@ def clean_review() -> dict[str, Any]:
     return node_step([HOOK_LINE, init_line(), result_line(REVIEWED_REPORT)])
 
 
+def clean_adjudication() -> dict[str, Any]:
+    """An adjudicator that settles its docket and reports what it settled."""
+    return node_step([HOOK_LINE, init_line(), result_line(ADJUDICATED_REPORT)])
+
+
 # The plan every fake claude starts from: every node clean, the build committing
 # and pushing the branch its verification then reads back off origin.
 DEFAULT_STEPS: dict[str, dict[str, Any]] = {
     "build": clean_build(),
     "open-pr": node_step(),
+    "adjudicator": clean_adjudication(),
     **{node: clean_review() for node in REVIEW_NAMES},
 }
 
@@ -1010,7 +1055,12 @@ def test_a_build_phase_issue_runs_its_nodes_then_the_loop_and_ends_pr_ready(
     launched: Callable[[], list[dict[str, Any]]],
     traverse_issue: Callable[..., Any],
 ) -> None:
-    """Build, open-pr, then one converging review cycle — the whole path."""
+    """Build, open-pr, one converging review cycle, then the adjudicator.
+
+    The whole path. The convergence run is not conditional — the pull request's
+    disposition sections are brought up to date on it whether or not this cycle
+    left anything open — so the last two rows are its launch and its report.
+    """
     outcome = traverse_issue()
 
     assert [launch["node"] for launch in launched()][:2] == ["build", "open-pr"]
@@ -1032,7 +1082,7 @@ def test_a_build_phase_issue_runs_its_nodes_then_the_loop_and_ends_pr_ready(
         "job-report",
         "job-report",
     ]
-    assert written[10:] == ["verdict", "traverse-end"]
+    assert written[10:] == ["verdict", "job-launch", "job-report", "traverse-end"]
     assert payload_of(db, "phase-transition") == {"from": "build", "to": "pr-review"}
     assert payload_of(db, "traverse-end") == {"status": "pr-ready", "pr_url": PR_URL}
     assert outcome == traverse.TraverseOutcome("pr-ready", pr_url=PR_URL)
@@ -1049,6 +1099,7 @@ def test_a_pr_review_phase_issue_skips_the_build_and_falls_into_the_loop(
     outcome = traverse_issue(gh_cmd=stub_gh(PR_REVIEW_LABELS))
 
     assert nodes_launched(launched) == [
+        "adjudicator",
         "bug-pr-review",
         "code-pr-review",
         "open-pr",
@@ -2046,6 +2097,35 @@ def test_the_rework_prompt_pastes_none_of_the_finding_text() -> None:
     assert "falls back silently" not in prompt
 
 
+def test_the_rework_prompt_carries_each_fix_now_item_and_the_fix_it_asks_for() -> None:
+    """A fix-now ruling is written nowhere else, so the prompt carries its text.
+
+    The address-not-content rule holds for every thread the node reads live; a
+    fix-now item is the deliberate exception, because the ruling exists only in
+    the report the adjudicator has just made.
+    """
+    prompt = traverse.rework_prompt(
+        ISSUE,
+        [thread(thread_id="PRRT_blocking")],
+        [
+            traverse.FixNow(
+                thread="PRRT_suggestion", fix="name the constant as the review states"
+            )
+        ],
+    )
+
+    assert "PRRT_blocking" in prompt
+    assert "PRRT_suggestion" in prompt
+    assert "name the constant as the review states" in prompt
+
+
+def test_a_rework_prompt_with_no_fix_now_item_offers_the_builder_none() -> None:
+    """A lap with no suggestion ruled fix-now is the prompt as it always was."""
+    prompt = traverse.rework_prompt(ISSUE, [thread()])
+
+    assert "fix now" not in prompt.lower()
+
+
 def test_the_rework_prompt_carries_the_resolution_rules() -> None:
     """Reply on what you fixed; the next cycle's reviewer resolves what it verifies."""
     prompt = traverse.rework_prompt(ISSUE, [thread()])
@@ -2085,15 +2165,16 @@ def test_a_first_cycle_with_no_blocking_thread_converges_and_ends_pr_ready(
     stub_gh: Callable[..., tuple[str, ...]],
     traverse_issue: Callable[..., Any],
 ) -> None:
-    """A converged pull request may still carry open Suggestion threads.
+    """Convergence is on Blocking alone, and the open Suggestion is then settled.
 
-    That is a real intermediate state rather than an oversight: dispositioning
-    a Suggestion belongs to the Adjudicator, and until it exists the thread
-    simply stays open.
+    The verdict is computed first and records the Suggestion as open, which is
+    what it was at that moment; the adjudicator runs on that verdict and
+    disposes of it, so the traverse ends with nothing left pending on it.
     """
     outcome = traverse_issue(gh_cmd=stub_gh(threads={1: [suggestion_thread()]}))
 
     assert nodes_launched(launched) == [
+        "adjudicator",
         "bug-pr-review",
         "build",
         "code-pr-review",
@@ -2331,8 +2412,223 @@ def test_a_documentation_only_diff_runs_the_doc_review_alone(
 ) -> None:
     outcome = traverse_issue(gh_cmd=stub_gh(files=[DOC_FILE]))
 
-    assert nodes_launched(launched) == ["build", "doc-pr-review", "open-pr"]
+    assert nodes_launched(launched) == [
+        "adjudicator",
+        "build",
+        "doc-pr-review",
+        "open-pr",
+    ]
     assert outcome.status == "pr-ready"
+
+
+# --- the adjudicator, launched at the loop's verdict points ---
+
+
+def decisions(db: Path) -> list[str]:
+    """Each verdict the loop reached and each node it launched on one, in order.
+
+    The cycle's reviews are left out. They fan out concurrently, so their launch
+    rows land in whichever order the pool finished them in, and what this is
+    measuring is the sequence the loop itself decides: the verdict is recorded,
+    and only then is anything launched on it.
+    """
+    order = []
+    for row in ledger_rows(db):
+        if row.kind == "verdict":
+            order.append(f"verdict:{row.payload['verdict']}")
+        elif row.kind == "job-launch" and row.payload["node"] not in REVIEW_NAMES:
+            order.append(str(row.payload["node"]))
+    return order
+
+
+def prompts_to(launched: Callable[[], list[dict[str, Any]]], node: str) -> list[str]:
+    """Every prompt one node was launched under, in launch order."""
+    return [launch["prompt"] for launch in launched() if launch["node"] == node]
+
+
+def test_a_converged_verdict_always_runs_the_adjudicator_before_the_traverse_ends(
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """Even with nothing open to settle: the convergence run is what makes the
+    pull request's two disposition sections complete at the merge read."""
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(threads={1: []}),
+        claude_cmd=fake_claude(
+            adjudicator=node_step(
+                [HOOK_LINE, init_line(), result_line(NOTHING_SETTLED)]
+            )
+        ),
+    )
+
+    assert decisions(db) == ["build", "open-pr", "verdict:converged", "adjudicator"]
+    assert prompts_to(launched, "adjudicator") == [f"{ISSUE} converged"]
+    assert payload_of(db, "traverse-end") == {"status": "pr-ready", "pr_url": PR_URL}
+    assert outcome == traverse.TraverseOutcome("pr-ready", pr_url=PR_URL)
+
+
+def test_a_rework_verdict_with_open_suggestions_adjudicates_before_the_next_build(
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The lap the Blocking threads already necessitate is what a fix now rides.
+
+    So the adjudicator runs between the verdict and the relaunch: its ruling has
+    to exist before the prompt that carries it is assembled.
+    """
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(
+            threads={1: [blocking_thread(), suggestion_thread()], 2: []},
+        )
+    )
+
+    assert decisions(db) == [
+        "build",
+        "open-pr",
+        "verdict:rework",
+        "adjudicator",
+        "build",
+        "verdict:converged",
+        "adjudicator",
+    ]
+    assert prompts_to(launched, "adjudicator")[0] == f"{ISSUE} rework"
+    relaunch = prompts_to(launched, "build")[1]
+    assert "PRRT_blocking" in relaunch
+    assert "PRRT_suggestion" in relaunch
+    assert "name the constant as the review states" in relaunch
+    assert outcome.status == "pr-ready"
+
+
+def test_a_rework_verdict_with_no_open_suggestion_launches_no_adjudicator(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """Nothing to settle is no job: the docket is the open Suggestion threads."""
+    traverse_issue(gh_cmd=stub_gh(threads={1: [blocking_thread()], 2: []}))
+
+    assert decisions(db) == [
+        "build",
+        "open-pr",
+        "verdict:rework",
+        "build",
+        "verdict:converged",
+        "adjudicator",
+    ]
+
+
+def test_a_cap_escalation_launches_no_adjudicator(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The traverse is ending, and nothing it settled now would be read."""
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(threads={1: [blocking_thread(), suggestion_thread()]})
+    )
+
+    assert decisions(db)[-1] == "verdict:cap-escalated"
+    assert decisions(db).count("adjudicator") == 3
+    assert outcome.status == "escalated"
+
+
+# Every way the adjudicator can come back other than clean and reporting done.
+# One job, no retry, and what it said rides the escalation.
+FAILING_ADJUDICATIONS: list[tuple[str, dict[str, Any], tuple[str, str | None]]] = [
+    (
+        "died",
+        node_step([HOOK_LINE, init_line()], exit_code=1),
+        ("died", None),
+    ),
+    (
+        "schema-refused",
+        node_step([HOOK_LINE, init_line(), result_line(None)]),
+        ("schema-refused", None),
+    ),
+    (
+        "task-escalated",
+        node_step([HOOK_LINE, init_line(), result_line(ESCALATED_REPORT)]),
+        ("clean", "escalated"),
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    ("step", "classification"),
+    [(step, classification) for _, step, classification in FAILING_ADJUDICATIONS],
+    ids=[name for name, _, _ in FAILING_ADJUDICATIONS],
+)
+def test_an_adjudication_that_does_not_come_back_clean_and_done_ends_the_traverse(
+    step: dict[str, Any],
+    classification: tuple[str, str | None],
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(threads={1: []}), claude_cmd=fake_claude(adjudicator=step)
+    )
+
+    assert outcome.status == "escalated"
+    assert [launch["node"] for launch in launched()].count("adjudicator") == 1
+    assert payload_of(db, "traverse-end") == {"status": "escalated"}
+    report = payloads_of(db, "job-report")[-1]
+    assert (report["process_outcome"], report["task_outcome"]) == classification
+    assert payload_of(db, "traverse-escalation")["node"] == "adjudicator"
+
+
+def test_a_fix_now_ruling_carrying_no_fix_ends_the_traverse_escalated(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The ruling is written nowhere else, so an empty one is a lost finding.
+
+    The builder would be handed a thread id it was told to fix and no statement
+    of what the fix is — and the thread's own text is a suggestion nobody ruled
+    on, which is what the ruling was there to replace.
+    """
+    silent = {
+        "outcome": "done",
+        "gist": "One suggestion settled on PR #12.",
+        "dispositions": [{"thread": "PRRT_suggestion", "outcome": "fix-now"}],
+        "callouts": [],
+    }
+
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(threads={1: [blocking_thread(), suggestion_thread()], 2: []}),
+        claude_cmd=fake_claude(
+            adjudicator=node_step([HOOK_LINE, init_line(), result_line(silent)])
+        ),
+    )
+
+    assert outcome.status == "escalated"
+    assert payload_of(db, "traverse-escalation")["node"] == "adjudicator"
+    assert payload_of(db, "traverse-end") == {"status": "escalated"}
+
+
+def test_a_graph_with_no_adjudicator_definition_is_refused_before_anything_spawns(
+    db: Path,
+    agents_dir: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The roster is checked whole, at the start, and the adjudicator is on it."""
+    (agents_dir / "adjudicator.md").unlink()
+
+    outcome = traverse_issue()
+
+    assert launched() == []
+    assert "adjudicator" in payload_of(db, "traverse-escalation")["reason"]
+    assert outcome.status == "escalated"
 
 
 def test_blocking_threads_that_survive_the_cap_end_the_traverse_escalated(

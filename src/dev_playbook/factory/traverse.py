@@ -57,6 +57,11 @@ BUILD = "build"
 OPEN_PR = "open-pr"
 PR_REVIEW = "pr-review"
 
+# The node that settles what a review suggested. It is not in the graph below:
+# it is launched from inside the review loop, at a verdict point, because which
+# verdict was reached is the whole of what decides whether it runs at all.
+ADJUDICATOR = "adjudicator"
+
 # The graph, declared rather than walked: the phase a traverse enters at, and the
 # nodes it runs from there. Entering at `pr-review` skips the build, which is
 # what a re-review of work already committed does.
@@ -77,7 +82,7 @@ REVIEW_NAMES = {
 
 # Every definition this graph can launch, so a missing one is found at traverse
 # start rather than halfway through a run that has already spent money.
-DEFINITIONS = (BUILD, OPEN_PR, *REVIEW_NAMES)
+DEFINITIONS = (BUILD, OPEN_PR, *REVIEW_NAMES, ADJUDICATOR)
 
 # The node's own word for work that finished. Anything else it reports — its own
 # `escalated` included — ends the traverse.
@@ -113,6 +118,56 @@ REVIEW_SCHEMA: dict[str, object] = {
         "suggestion_count": {"type": "integer"},
     },
     "required": ["outcome", "gist", "blocking_count", "suggestion_count"],
+    "additionalProperties": False,
+}
+
+# The keys of the adjudicator's report beyond the shared envelope, and the one
+# disposition outcome the loop acts on. `dispositions` is the single value this
+# graph takes on an agent's word: everything else it needs after a node is
+# durable in git or on GitHub and is read from there, but a fix-now ruling is
+# written nowhere — the thread it names is deliberately left open and unmarked
+# for the next cycle's reviewer — so the report is the only place it exists.
+DISPOSITIONS = "dispositions"
+DISPOSITION_OUTCOME = "outcome"
+THREAD = "thread"
+FIX = "fix"
+FIX_NOW = "fix-now"
+DEFER = "defer"
+DECLINE = "decline"
+CALLOUTS = "callouts"
+
+# What the adjudicator is launched under. The per-entry conditionals — `fix`
+# with a fix-now, `reason` with a defer or a decline, `stub` with a defer — are
+# the definition's to hold rather than the schema's, so the shape below requires
+# only what every entry carries. The loop reads fix-now strictly all the same:
+# a ruling with no fix in it stops the traverse rather than reaching a builder
+# as a bare thread id.
+ADJUDICATOR_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "outcome": {"type": "string", "enum": [DONE, "escalated"]},
+        "gist": {"type": "string"},
+        DISPOSITIONS: {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    THREAD: {"type": "string"},
+                    DISPOSITION_OUTCOME: {
+                        "type": "string",
+                        "enum": [FIX_NOW, DEFER, DECLINE],
+                    },
+                    FIX: {"type": "string"},
+                    "reason": {"type": "string"},
+                    "stub": {"type": "integer"},
+                },
+                "required": [THREAD, DISPOSITION_OUTCOME],
+                "additionalProperties": False,
+            },
+        },
+        CALLOUTS: {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["outcome", "gist", DISPOSITIONS, CALLOUTS],
     "additionalProperties": False,
 }
 
@@ -251,6 +306,20 @@ are your work list:
 Read each thread's content with `gh api` — none of it is repeated here. Reply
 `Fixed in <sha>` on each thread you fix, and never resolve a thread; the next
 cycle's reviewer resolves what it verifies. The order is yours."""
+
+# What a lap carrying fix-now items appends to the prompt above. These are the
+# one thing a prompt states rather than addresses: the ruling that a suggestion
+# rides this lap was made moments ago and written nowhere the node could read it,
+# so the line after each id is the whole of what the item asks for. The threads
+# themselves are still read live, exactly like the Blocking ones.
+FIX_NOW_PROMPT = """
+
+These Suggestion threads were ruled fix now, and each line is the whole of what
+its thread is being asked for:
+
+{items}
+
+Leave every one of them open, the same as the threads above."""
 
 
 class TraverseError(Exception):
@@ -406,6 +475,46 @@ def _thread(node: Mapping[str, Any]) -> ReviewThread:
     )
 
 
+def _fix_now(report: Mapping[str, object] | None) -> tuple[FixNow, ...]:
+    """The suggestions the adjudicator ruled the coming lap should carry.
+
+    Read strictly, and never salvaged. A fix-now entry is a whole instruction —
+    which thread, and what it is being asked for — and half of one cannot be
+    turned into a work item: the builder would be handed a thread id it was told
+    to fix and no statement of the fix, and the thread's own text is the
+    unruled suggestion the ruling was there to replace. So a malformed entry
+    ends the traverse in the node's own name rather than reaching a prompt with
+    the ruling quietly missing from it.
+    """
+    dispositions = (report or {}).get(DISPOSITIONS)
+    if not isinstance(dispositions, list):
+        raise _Escalated(
+            f"{ADJUDICATOR} reported {DONE} with {DISPOSITIONS} as "
+            f"{dispositions!r}, where the schema it was launched under requires "
+            f"the list of what it settled",
+            node=ADJUDICATOR,
+        )
+    ruled = []
+    for entry in dispositions:
+        if not isinstance(entry, Mapping):
+            raise _Escalated(
+                f"{ADJUDICATOR} reported a disposition that is not an object: "
+                f"{entry!r}",
+                node=ADJUDICATOR,
+            )
+        if entry.get(DISPOSITION_OUTCOME) != FIX_NOW:
+            continue
+        thread, fix = entry.get(THREAD), entry.get(FIX)
+        if not isinstance(thread, str) or not isinstance(fix, str) or not fix.strip():
+            raise _Escalated(
+                f"{ADJUDICATOR} ruled a suggestion {FIX_NOW} and left the rework "
+                f"lap no fix to carry: {dict(entry)!r}",
+                node=ADJUDICATOR,
+            )
+        ruled.append(FixNow(thread=thread, fix=fix))
+    return tuple(ruled)
+
+
 @dataclass(frozen=True)
 class TraverseOutcome:
     """How a traverse ended, in the two statuses a caller can be handed.
@@ -512,7 +621,25 @@ def elect_tracks(changed: Iterable[ChangedFile]) -> tuple[str, ...]:
     return tuple(tracks)
 
 
-def rework_prompt(issue: int, open_blocking: Iterable[ReviewThread]) -> str:
+@dataclass(frozen=True)
+class FixNow:
+    """One Suggestion the adjudicator ruled the coming rework lap should carry.
+
+    The thread it names stays open — the next cycle's reviewer is the one who
+    verifies and resolves it — so this pair is the whole record of the ruling
+    until that reviewer reads the fix. It is why the rework prompt carries the
+    `fix` text at all.
+    """
+
+    thread: str
+    fix: str
+
+
+def rework_prompt(
+    issue: int,
+    open_blocking: Iterable[ReviewThread],
+    fix_now: Iterable[FixNow] = (),
+) -> str:
     """The prompt a rework lap launches the build node under.
 
     Ids and locations, and not one word of what the findings said. The thread is
@@ -520,6 +647,11 @@ def rework_prompt(issue: int, open_blocking: Iterable[ReviewThread]) -> str:
     so a prompt carrying a copy of its text would be handing the builder a
     snapshot of a conversation that has gone on without it. It reads the live
     thread from GitHub instead.
+
+    The fix-now items are the one exception, and they are one because the rule
+    above does not reach them: a fix-now ruling was made at this verdict point
+    and left on no thread, so there is no live copy to read. Their threads are
+    still read live like every other.
 
     No ordering either. The prompt is a work list, and which finding to take
     first is a judgment about the code, which is the node's.
@@ -533,7 +665,11 @@ def rework_prompt(issue: int, open_blocking: Iterable[ReviewThread]) -> str:
     for thread in open_blocking:
         where = thread.path if thread.line is None else f"{thread.path}:{thread.line}"
         listed.append(f"- {thread.thread_id} — {where}")
-    return REWORK_PROMPT.format(issue=issue, threads="\n".join(listed))
+    prompt = REWORK_PROMPT.format(issue=issue, threads="\n".join(listed))
+    ruled = [f"- {item.thread} — {item.fix}" for item in fix_now]
+    if not ruled:
+        return prompt
+    return prompt + FIX_NOW_PROMPT.format(items="\n".join(ruled))
 
 
 def baseline_cycle(starts: Iterable[ledger.LedgerRow]) -> int:
@@ -604,10 +740,11 @@ def compute_verdict(
 ) -> CycleVerdict:
     """The cycle's verdict and its tallies, from thread state and the clock alone.
 
-    Convergence is on Blocking alone. Open Suggestion threads may outlive a
-    converged pull request — they are the Adjudicator's, and until it exists
-    they simply stay open, which is a real intermediate state rather than an
-    oversight.
+    Convergence is on Blocking alone, and an open Suggestion never holds it up.
+    The tally is taken before the adjudicator runs, so `suggestion_open` counts
+    what was open at this moment rather than what survives the verdict point —
+    and it is that count the launch rule reads, because a docket of zero is a
+    job with nothing in it.
 
     The cap is counted past the baseline rather than from zero, so a
     user-ordered lap restarts the clock behind it, and it is compared with `>=`
@@ -1004,6 +1141,7 @@ class _Traverse:
             verdict = compute_verdict(threads, cycle, baseline)
             self._record_verdict(pull, cycle, newest_sha(headers), verdict)
             if verdict.verdict == CONVERGED:
+                self._adjudicate(worktree, CONVERGED)
                 return self._pr_ready(pull)
             if verdict.verdict == CAP_ESCALATED:
                 raise _Escalated(
@@ -1013,7 +1151,12 @@ class _Traverse:
                     f"converging on its own",
                     payload={CYCLE: cycle, BASELINE: baseline},
                 )
-            self._run_build(worktree, rework_prompt(self.issue, verdict.open_blocking))
+            ruled = (
+                self._adjudicate(worktree, REWORK) if verdict.suggestion_open else ()
+            )
+            self._run_build(
+                worktree, rework_prompt(self.issue, verdict.open_blocking, ruled)
+            )
 
     def _elected(self, pull: _PullRequest, cycle: int) -> tuple[str, ...]:
         """The reviews this cycle runs, from the pull request's changed files.
@@ -1098,6 +1241,26 @@ class _Traverse:
         except launcher.LaunchAborted as aborted:
             return _Failure(_abort_reason(node, aborted), node)
         return _judge(node, outcome)
+
+    def _adjudicate(self, worktree: Path, verdict: str) -> tuple[FixNow, ...]:
+        """Settle the open Suggestion threads at one verdict point.
+
+        The launch rule is the verdict word and nothing else, which is what
+        makes it deterministic: a convergence always runs it, because that run
+        is what leaves the pull request's two disposition sections complete for
+        the merge read; a rework runs it only with Suggestion threads open,
+        because an empty docket is a job with nothing to do; and a cap
+        escalation never reaches here at all.
+
+        The prompt is the issue number and that word. Everything else the node
+        acts on — which threads are open, what each says, what the pull request
+        already records — it reads from GitHub itself, so two runs finding the
+        same pull request are given the same input.
+        """
+        outcome = self._launch(
+            ADJUDICATOR, worktree, ADJUDICATOR_SCHEMA, f"{self.issue} {verdict}"
+        )
+        return _fix_now(outcome.structured_output)
 
     def _pull_request(self) -> _PullRequest:
         """The open pull request on this issue's branch, refused when there is none.
@@ -1264,8 +1427,12 @@ class _Traverse:
 
     def _launch(
         self, node: str, worktree: Path, schema: Mapping[str, object], prompt: str
-    ) -> None:
+    ) -> launcher.JobOutcome:
         """Launch one node and refuse anything but a clean process reporting done.
+
+        The outcome is handed back for the one caller that needs the report on
+        it. Most ignore it, because what the graph does next is read from git
+        and GitHub rather than from what a node said.
 
         Zero retries live here. Every way a job can fail — the process
         classifications and the node's own `escalated` alike — ends the traverse,
@@ -1287,6 +1454,7 @@ class _Traverse:
             raise _Escalated(
                 failure.reason, node=failure.node, session_id=failure.session_id
             )
+        return outcome
 
     def _launch_job(
         self, node: str, worktree: Path, schema: Mapping[str, object], prompt: str
