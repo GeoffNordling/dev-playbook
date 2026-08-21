@@ -21,6 +21,14 @@ DB_PATH = Path("~/.local/share/claude-measure/events.db").expanduser()
 # every write. A traverse traps exactly these two and writes the books from the
 # trap -- `traverse.TRAPPED` is this tuple, so the pair cannot drift into a
 # signal that is trapped here and not deferred there.
+#
+# The invariant that makes holding them off work: **every thread any process
+# writing to this ledger starts must block these two.** Blocking them on the
+# writing thread alone is not enough -- CPython runs the C handler on whichever
+# thread the kernel picks and the main thread then runs the Python handler at
+# its next bytecode boundary regardless of its own mask, so one unblocked
+# thread anywhere is a route back into the write. `launcher._pump` is the one
+# thread this system starts, and it blocks them on entry.
 DEFERRED_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
 # Concurrent traverses write to one database. WAL lets their readers and

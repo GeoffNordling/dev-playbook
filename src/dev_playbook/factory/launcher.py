@@ -651,6 +651,17 @@ def _supervise(
 def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
     """Move the child's stdout onto the queue, closing it with what ended the read.
 
+    The first thing it does is block the ledger's deferred signals, under the
+    invariant every thread this process starts is held to: **a thread that does
+    not block `DEFERRED_SIGNALS` is a thread the kernel can hand one to.** A
+    Python handler runs on the main thread at its next bytecode boundary
+    whatever that thread's own mask says, so one unblocked thread anywhere puts
+    the traverse's trap right back inside the write `ledger._uninterrupted`
+    blocked it out of -- and the handler's own INSERT then queues behind a lock
+    only the frame it interrupted can release. The mask is set here rather than
+    before `start()` so the rule holds against whatever the starting thread
+    happened to be carrying.
+
     The close sits in a `finally` because a pump that dies without one leaves
     `_watch` blocked on a queue nothing will fill again: it waits out the whole
     deadline, SIGTERMs a child that finished long before, and files a clean run
@@ -664,6 +675,7 @@ def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
     then blocks until that stray process lets go — so the fd goes back when the
     read really ends, and nobody waits on it in the meantime.
     """
+    signal.pthread_sigmask(signal.SIG_BLOCK, ledger.DEFERRED_SIGNALS)
     ended: Exception | None = None
     try:
         with stream:

@@ -608,7 +608,8 @@ class _Traverse:
 
         Both signals are put back to the default first, so a second one while
         this is running kills outright rather than re-entering a handler already
-        part-way through the books.
+        part-way through the books. They are put back by walking `TRAPPED`, so a
+        signal added to the pair cannot be left trapped with no way out.
 
         `PR_SET_PDEATHSIG` on the children covers what no trap can: a launcher
         SIGKILLed or OOM-killed runs none of this, the children still die, and the
@@ -616,8 +617,8 @@ class _Traverse:
         """
 
         def die(number: int, frame: FrameType | None) -> None:
-            signal.signal(signal.SIGINT, signal.SIG_DFL)
-            signal.signal(signal.SIGTERM, signal.SIG_DFL)
+            for trapped in TRAPPED:
+                signal.signal(trapped, signal.SIG_DFL)
             _say(f"{self.repo}#{self.issue}: signal {number}, taking children down")
             self._sweep(KILL_CASCADE)
             ledger.traverse_end(
