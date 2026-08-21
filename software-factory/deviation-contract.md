@@ -21,7 +21,11 @@ Before self-servicing a fix, the **implementing agent itself** answers three
 yes/no questions:
 
 1. Does the fix change an acceptance criterion of the issue?
-2. Does the fix touch a surface the brief declared out of scope?
+2. Does the fix touch a surface the brief withheld — a path, module, or
+   interface named under `Prohibited surfaces`, or an idea the brief put
+   under `Out of scope`? The first half is mechanical: compare the file about
+   to be edited against the path list, and no judgment is owed
+   ([the two headings and the split between them](/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)).
 3. Does the fix contradict a decision recorded on the issue, PR, an epic's
    standing rulings, or a map?
 

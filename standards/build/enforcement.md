@@ -41,7 +41,7 @@ the path to main — they are references here, not rungs:
 | workspace-lint | on demand and via the periodic review | GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-lint`](/scripts/workspace-lint) | no — reports, never blocks |
 
 The re-run of `make check` at review start is the review node's **green gate**:
-the code-review skills run it before auditing and escalate if it is red, even
+the reviewers run it before auditing and escalate if it is red, even
 though the push gate already covered the pushed commits — stated explicitly so
 this belt-and-braces re-run is not mistaken for a fourth gate. GitHub sits
 outside every gate: it hosts the CI gate but is not itself one.

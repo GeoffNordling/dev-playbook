@@ -120,13 +120,13 @@ relationships; see [Relationships](#relationships).
 
 ### The build-leaf brief (`mode:direct`)
 
-A build leaf carries **all eight** headings — none optional. `Key interfaces`
-and `Prohibited surfaces` state "none" when there are none, rather than being
-omitted.
+A build leaf carries **every heading in the template below** — none optional.
+`Key interfaces` and `Prohibited surfaces` state "none" when there are none,
+rather than being omitted.
 
 `Prohibited surfaces` names the paths, modules, or interfaces the issue must
 not touch. It constrains codebase territory the way `Out of scope` constrains
-idea space, and it is what makes the second
+idea space, and it is what makes the codebase half of the second
 [deviation limiter](/software-factory/deviation-contract.md#the-three-deviation-limiters)
 mechanical: the implementing agent compares the file it is about to edit
 against a list rather than weighing intent. "none" is the expected value — a

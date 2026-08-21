@@ -6,7 +6,7 @@ settled on this exit — the single-leaf exit needs none of it.
 
 The children's intake happens here, in place, so none round-trips through
 `intake`. Minting carries a child only as far as a **starting brief** — a leaf
-with the four-tuple, the seven headings, and its relationships wired, but its
+with the four-tuple, the build-leaf headings, and its relationships wired, but its
 substance still provisional. Every child leaves this session incomplete. Each
 becomes **brief-complete** in its own `/design` session, which re-authors that
 brief, and **ready** at that session's issue-review verdict. The readiness bar is
@@ -46,8 +46,10 @@ a blocker that must already exist.
 ## 3. Mint each child with a starting brief
 
 One `gh issue create` per slice, in dependency order, each with a full
-four-tuple and all seven build-leaf headings — the headings are required from
-minting, and a leaf missing one is a lint finding whatever its phase.
+four-tuple and every build-leaf heading
+[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)
+requires — the headings are required from minting, and a leaf missing one is a
+lint finding whatever its phase.
 
 Write into them what this session actually settled: the slice's outcome, its
 boundary, and the intent it inherits from the epic — that last one marked in the
@@ -63,7 +65,7 @@ issue-review verdict, in its own session, is what moves it.
 ```bash
 gh issue create --title "..." \
   --label "<category>" --label "<mode>" --label "<tests>" --label "<phase>" \
-  --body ...the seven build-leaf headings...
+  --body ...the build-leaf headings...
 ```
 
 ## 4. Wire the relationships
