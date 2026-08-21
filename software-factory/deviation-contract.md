@@ -49,11 +49,11 @@ written to GitHub.
    already logged on this lap stay in the ledger; the run's stdout and its
    transcript are where they surface until `factory-status` exists.
 
-The user's reply is the ruling, given as a comment on the issue or the pull
-request. That mechanism is the user's and is unchanged: because the ruling
-lands there, limiter 3 automatically binds every later deviation to it —
-escalations feed the limiter system. The brief body itself is never the
-place — it is frozen, per
+The user's reply is the ruling, recorded as a comment on the issue or the
+pull request — typed there by the user, or said at the terminal and posted by
+the session that heard it. That comment is what limiter 3 reads, so every
+later deviation binds to it automatically: escalations feed the limiter
+system. The brief body itself is never the place — it is frozen, per
 [the brief freeze](/standards/tracking/issue-authoring.md#the-brief-freeze).
 
 ## The halt-commit-escalate lane

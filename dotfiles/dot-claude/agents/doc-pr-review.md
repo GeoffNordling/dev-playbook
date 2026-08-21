@@ -28,8 +28,8 @@ Before doing anything else, read end-to-end:
 
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
   — the stance, the green gate, the two severities, the thread model and its
-  `gh` mechanics, the cycle header, delta re-review, and the escalation
-  boundary.
+  `gh` mechanics, the cycle header, delta re-review, the report envelope, and
+  the escalation boundary.
 - [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) —
   every comment surface a pull request carries, and the command that reaches
   each.
@@ -67,8 +67,9 @@ read; below, `<issue>` is that number.
 5. **Take the scope** the contract's
    [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
    fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
-   the delta. An empty scope, or a scope with no documentation in it, is an
-   escalation (§5).
+   the delta. At cycle 1 an empty diff, or a diff with no documentation in it,
+   is an escalation (§5); from cycle 2 a delta that is empty or carries no
+   documentation is an ordinary cycle, with your open threads the work.
 
 ## 2. Read what the diff calls for
 
@@ -78,7 +79,7 @@ conventions. Read the ones it calls for, end-to-end, then report
 
 | The diff carries | Read |
 |---|---|
-| skills | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus /writing-for-agents for the craft every skill answers to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
+| skills | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/dotfiles/.agents/skills/writing-for-agents/SKILL.md) for the craft every skill answers to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
 | standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
 | structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/docs/index.md) |
 
@@ -151,22 +152,24 @@ verified, per
 
 ## 5. Close
 
-End on the report envelope — structured output, never a message alone:
-`outcome` `"done"`, `gist` naming the pull request and what the cycle found,
-and `blocking_count` and `suggestion_count` tallying the threads this run
-posted.
+End on the
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
+with `outcome` `"done"`.
 
 ## 6. Escalations
 
-Whenever you can't produce the review, end with `outcome` `"escalated"` and
-the reason in `gist`. Write nothing to GitHub. Your blocks:
+Whenever you can't produce the review, end on the same
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
+with `outcome` `"escalated"` and the reason in `gist`. Write nothing to
+GitHub. Your blocks:
 
 - **Green gate red.** The check gate fails — the pull request sits over a red
   tree. Surface it; don't review broken work.
-- **PR or diff missing.** There is no pull request to review, or the scope is
-  empty.
-- **No docs in the scope.** The scope carries no documentation — the doc track
-  was dispatched on work outside its jurisdiction.
+- **PR or diff missing.** There is no pull request to review, or cycle 1 finds
+  no diff at all.
+- **No docs at cycle 1.** The whole diff carries no documentation — the doc
+  track was dispatched on work outside its jurisdiction. From cycle 2 the open
+  threads are the work, so a delta without docs is not this block.
 
 [Findings are not escalations](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-not-escalations):
 a problem you can describe goes in a thread.

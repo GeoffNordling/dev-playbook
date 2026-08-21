@@ -25,8 +25,8 @@ Before doing anything else, read end-to-end:
 
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
   — the stance, the green gate, the two severities, the thread model and its
-  `gh` mechanics, the cycle header, delta re-review, and the escalation
-  boundary.
+  `gh` mechanics, the cycle header, delta re-review, the report envelope, and
+  the escalation boundary.
 
 Then report: `READ: review-contract.md`. Proceed only after.
 
@@ -55,10 +55,14 @@ read; below, `<issue>` is that number.
        gh pr view --json number,headRefOid
 
    No pull request is an escalation (§5).
-3. **Take the scope** the contract's
+3. **Read the pull request's existing threads and comments**, so you don't
+   re-flag what a prior bug-review cycle caught and so §4 has the threads it
+   resolves.
+4. **Take the scope** the contract's
    [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
    fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
-   the delta. An empty scope is an escalation (§5).
+   the delta. At cycle 1 an empty diff is an escalation (§5); from cycle 2 an
+   empty delta is an ordinary cycle, with your open threads the work.
 
 ## 2. Find candidates
 
@@ -91,7 +95,7 @@ real case.
 
 ### Angle C — cross-file tracer
 
-For each function the diff changes, find its callers (Grep for the symbol)
+For each function the diff changes, find its callers (grep for the symbol)
 and check whether the change breaks any call site: a new precondition, a
 changed return shape, a new exception, a timing/ordering dependency. Also
 check callees: does a parallel change in the same PR make a call unsafe?
@@ -100,7 +104,7 @@ check callees: does a parallel change in the same PR make a call unsafe?
 
 The angles above hunt for bugs; this one and the next two hunt for cleanup in
 the changed code. Flag new code that re-implements something the codebase
-already has — Grep shared/utility modules and files adjacent to the change,
+already has — grep shared/utility modules and files adjacent to the change,
 and name the existing helper to call instead.
 
 ### Angle E — simplification
@@ -177,20 +181,21 @@ verified, per
 
 ## 5. Close
 
-End on the report envelope — structured output, never a message alone:
-`outcome` `"done"`, `gist` naming the pull request and what the cycle found,
-and `blocking_count` and `suggestion_count` tallying the threads this run
-posted.
+End on the
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
+with `outcome` `"done"`.
 
 ## 6. Escalations
 
-Whenever you can't produce the review, end with `outcome` `"escalated"` and
-the reason in `gist`. Write nothing to GitHub. Your blocks:
+Whenever you can't produce the review, end on the same
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
+with `outcome` `"escalated"` and the reason in `gist`. Write nothing to
+GitHub. Your blocks:
 
 - **Green gate red.** The check gate fails: the build node opened a PR over a
   red tree. Surface it; don't review broken work.
-- **PR or diff missing.** There is no pull request to review, or the scope is
-  empty.
+- **PR or diff missing.** There is no pull request to review, or cycle 1 finds
+  no diff at all.
 
 [Findings are not escalations](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-not-escalations):
 a bug you can describe goes in a thread.

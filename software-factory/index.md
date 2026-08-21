@@ -15,4 +15,4 @@ Ordering: reading order.
 - [Deviation Contract](/software-factory/deviation-contract.md) — The contract a deviation runs under — the three limiters, the halt-commit-escalate lane, and the deviation ledger
 - [Test-First Discipline](/software-factory/tdd.md) — The test-first discipline `tests:yes` work runs under — the chunk, the slice loop, and the whole-chunk refactor pass
 - [Refactor Catalogue](/software-factory/refactor-catalogue.md) — The structural candidates — the cue and the move for each — and the step-size rule governing a refactor step
-- [Review Contract](/software-factory/review-contract.md) — The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, and the escalation boundary
+- [Review Contract](/software-factory/review-contract.md) — The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, the report envelope, and the escalation boundary

@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Review Contract
-description: The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, and the escalation boundary
+description: The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, the report envelope, and the escalation boundary
 ---
 
 # Review Contract
@@ -138,6 +138,16 @@ request's review headers, and the highest `n` is the cycle count while the
 newest header's sha is the last-reviewed sha. A comment carrying neither a
 cycle header nor an attribution line is the user's.
 
+**Where the writer gets `n`.** The review counts it, and counts its own name
+alone: the prior review bodies on the pull request whose header opens with
+this review's name, plus one, read from
+
+    gh api repos/<owner>/<repo>/pulls/<pr>/reviews
+
+That endpoint returns each body byte-identical and ordered by ascending `id`,
+so `n` is read rather than guessed — and a review that stands down for a cycle
+leaves its own count where it was.
+
 ## Delta re-review
 
 Cycle 1 reads the whole diff. From cycle 2 the review reads its own open
@@ -150,6 +160,11 @@ local `git diff <last-reviewed-sha>..HEAD` only. The REST compare endpoint uses
 merge-base semantics and reports a force-pushed branch as diverged across every
 file while the true content delta is empty (measured,
 [issue #412](https://github.com/GeoffNordling/dev-playbook/issues/412)).
+
+**Open threads are scope.** From cycle 2 an empty delta is an ordinary cycle,
+not a block: a lap that fixed nothing this review owns still leaves it threads
+to verify and resolve. Only cycle 1 finding no diff at all stops the review,
+because then there is nothing to read from either source.
 
 ## Resolution ownership
 
@@ -239,13 +254,30 @@ Every command above ran live on
 [issue #412](https://github.com/GeoffNordling/dev-playbook/issues/412)'s
 prototype.
 
+## The report envelope
+
+Every run ends on the report envelope — structured output, never a message
+alone — and all four of its fields are always present:
+
+| Field | Value |
+|---|---|
+| `outcome` | `"done"` when the review posted, `"escalated"` when it could not be produced |
+| `gist` | the pull request and what the cycle found, or the reason the review stopped |
+| `blocking_count` | the Blocking threads this run posted |
+| `suggestion_count` | the Suggestion threads this run posted |
+
+An escalation posts no threads, so it carries `0` for both counts — stated,
+never left out. The envelope is read by its shape, so a field omitted is a
+malformed report, and the escalation is the one report that must not go
+missing.
+
 ## Escalation
 
 Where the review cannot be produced at all, it surfaces the block and stops,
-ending on the report envelope with `outcome` `"escalated"` and the reason in
-`gist`. Two blocks recur — a red green gate, and a missing pull request or
-diff — and each review states its own full list. Nothing about an escalation is
-written to GitHub; the run's report is the record.
+ending on the envelope with `outcome` `"escalated"` and the reason in `gist`.
+Two blocks recur — a red green gate, and a missing pull request or diff — and
+each review states its own full list. Nothing about an escalation is written
+to GitHub; the run's report is the record.
 
 ### Findings are not escalations
 

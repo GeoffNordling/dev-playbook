@@ -26,8 +26,8 @@ Before doing anything else, read end-to-end:
 
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
   — the stance, the green gate, the two severities, the thread model and its
-  `gh` mechanics, the cycle header, delta re-review, and the escalation
-  boundary.
+  `gh` mechanics, the cycle header, delta re-review, the report envelope, and
+  the escalation boundary.
 - [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) —
   every comment surface a pull request carries, and the command that reaches
   each.
@@ -64,9 +64,10 @@ read; below, `<issue>` is that number.
 5. **Take the scope** the contract's
    [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
    fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
-   the delta. An empty scope is an escalation (§5). Where the change includes
-   code, read the tests under `tests/` and the code under `src/` too — the full
-   picture behind the diff.
+   the delta. At cycle 1 an empty diff is an escalation (§5); from cycle 2 an
+   empty delta is an ordinary cycle, with your open threads the work. Where the
+   change includes code, read the tests under `tests/` and the code under
+   `src/` too — the full picture behind the diff.
 
 ## 2. Read what the diff calls for
 
@@ -77,7 +78,7 @@ calls for, end-to-end, then report `READ: <what you read>`:
 |---|---|
 | tests | [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) |
 | source in any language | [refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md) — the structural candidates and their cues |
-| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md), plus /codebase-design invoked for the module-design contract |
+| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md), plus the [module-design contract](~/workspace/dev-playbook/dotfiles/.agents/skills/codebase-design/SKILL.md) |
 | shell scripts | [shell conventions](~/workspace/dev-playbook/standards/shell/conventions.md) |
 
 The implementer read at most the testing conventions, so enforcing all of
@@ -112,10 +113,10 @@ enumerates when they come back clean.
 - **Python style.** The code conforms to python-style.md — docstrings, the
   fail-loud rule (no silent fallbacks or defensive guards), the helpers bar (a
   helper earns its place or stays inline), annotation style.
-- **Module design.** The change conforms to /codebase-design — deep modules
-  behind small interfaces, no pass-throughs that fail the deletion test, seams
-  only where something varies — plus clear naming, no dead code or needless
-  duplication.
+- **Module design.** The change conforms to the module-design contract — deep
+  modules behind small interfaces, no pass-throughs that fail the deletion
+  test, seams only where something varies — plus clear naming, no dead code or
+  needless duplication.
 - **Structural smells.** The diff carries a candidate from the [refactor
   catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md)
   — name it and quote the hunk. Only the cues bind here; the step-size rule
@@ -142,20 +143,21 @@ verified, per
 
 ## 5. Close
 
-End on the report envelope — structured output, never a message alone:
-`outcome` `"done"`, `gist` naming the pull request and what the cycle found,
-and `blocking_count` and `suggestion_count` tallying the threads this run
-posted.
+End on the
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
+with `outcome` `"done"`.
 
 ## 6. Escalations
 
-Whenever you can't produce the review, end with `outcome` `"escalated"` and
-the reason in `gist`. Write nothing to GitHub. Your blocks:
+Whenever you can't produce the review, end on the same
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
+with `outcome` `"escalated"` and the reason in `gist`. Write nothing to
+GitHub. Your blocks:
 
 - **Green gate red.** The check gate fails: the build node opened a PR over a
   red tree. Surface it; don't review broken work.
-- **PR or diff missing.** There is no pull request to review, or the scope is
-  empty.
+- **PR or diff missing.** There is no pull request to review, or cycle 1 finds
+  no diff at all.
 
 [Findings are not escalations](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-not-escalations):
 a problem you can describe goes in a thread.
