@@ -206,7 +206,11 @@ SUBSTANTIVE_DOC_LINES = 10
 CHANGED_FILE_FIELDS = 4
 
 # The one read of the pull request's threads, stated in pr-feedback.md and
-# copied here field for field. `reviewThreads` caps at 100 a page and returns
+# copied here field for field — `isOutdated` and `subjectType` included, which
+# nothing below reads. The query is the documented one taken whole rather than
+# trimmed to today's callers; in particular `isOutdated` does not drive
+# `_thread`'s `line`/`originalLine` fallback, which keys on `line is None`
+# alone. `reviewThreads` caps at 100 a page and returns
 # them oldest first, so it is paged: the threads a long-running pull request
 # would drop are its newest, and a verdict that never sees an open Blocking
 # thread is a convergence declared falsely.

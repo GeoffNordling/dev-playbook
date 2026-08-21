@@ -325,7 +325,7 @@ The message is written twice from that one recipe, so the two cannot diverge:
 `/open-pr` authors it when it creates the PR — lifting the build session's
 recorded entries into `## Deviation ledger` per the
 [contract's hand-off](/software-factory/deviation-contract.md#the-deviation-ledger)
-— and the overwatch regenerates it at the approve verdict (`gh pr edit`).
+— and the overwatch regenerates it for the final review (`gh pr edit`).
 The regeneration synthesizes the entire PR record — the final diff,
 the comments, and the rulings — into an accurate squash-commit message for
 the whole issue, preserving the mandatory sections' content rather than
