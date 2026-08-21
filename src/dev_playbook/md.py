@@ -3,8 +3,8 @@
 This module is the single home for the markdown mechanics that more than one
 hook needs: fenced-code skipping, GitHub heading slugs, YAML frontmatter,
 link extraction, the OKF concept-doc/harness-owned path classification, and
-the rootless-source test behind the cross-reference grammar. ``ref-lint``,
-``okf-lint``, and the file graph consume it, so the slug rule, the bundle
+the rootless-source test behind the cross-reference grammar. Every workspace
+detector that reads markdown consumes it, so the slug rule, the bundle
 boundary, and the rootless roster are defined once here rather than drifting
 between scripts.
 
