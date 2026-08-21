@@ -71,11 +71,19 @@ remains for a fix to ride.
 
 Read every thread on the pull request. **Your docket is the open Suggestion
 threads** — a thread whose first comment opens on `Suggestion` and that nobody
-has resolved. Everything else you leave exactly as it is: a Blocking thread is
-the builder's and the next reviewer's, and a resolved thread is finished.
+has resolved. A Blocking thread you leave exactly as it is: it is the builder's
+and the next reviewer's.
 
-An empty docket is a real outcome. Say so and go on to §5 — at `converged`
-there is still the pull request's record to bring up to date.
+**One kind of resolved thread you still read.** A resolved Suggestion thread
+whose replies carry a builder's `Fixed in <sha>` and no reply signed
+`— adjudicator` was ruled fix now by an earlier run and has since been fixed and
+verified. You route none of these — they are settled — but §5 owes each one its
+line, and the thread is the only place that record survives. Collect them as you
+read. Every other resolved thread is finished.
+
+An empty docket is a real outcome, and it does not excuse §5: those fixed
+threads still need their lines, and at `converged` there is the whole of the
+pull request's record to bring up to date. Say so and go on to §5.
 
 ## 3. Route each one
 
@@ -146,13 +154,19 @@ your report, so a builder handed a thread id and a vague phrase has been handed
 nothing. If you cannot state the fix in one line, the routing has just told you
 it needs design — defer it.
 
+It gets no line in `## Suggestion dispositions` this run, because nothing has
+been fixed yet. Once it is, the run after that recovers it from the thread by
+the §2 read and gives it its line then.
+
 ## 5. Bring the pull request's record up to date
 
 Both sections are rewritten to match everything settled so far, this run and
 every earlier one, so neither is a diff of your own lap:
 
-- **`## Suggestion dispositions`** — one line per fixed and per declined
-  suggestion: its outcome, its vocabulary reason, and a link to its thread.
+- **`## Suggestion dispositions`** — one line per declined suggestion, carrying
+  its vocabulary reason and a link to its thread, and one line per fixed
+  suggestion — the threads §2 collected — carrying the commit it was fixed in
+  and a link to its thread. A fixed line has no vocabulary reason to carry.
 - **`## Deferred`** — every deferral's stub, linked.
 
 Read the current body, edit those two sections, leave every other section

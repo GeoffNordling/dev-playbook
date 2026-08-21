@@ -103,12 +103,21 @@ escalation instead, the same halt the limiters above produce:
 
 1. It contradicts no decision recorded on the issue, the pull request, an epic's
    standing rulings, or a map.
-2. Its whole effect is contained in the pull request, so declining the merge
-   undoes it.
+2. Its whole effect is contained in the pull request and the deferral stubs
+   this lane mints — nothing else moves.
 3. A confident recommendation exists.
 
 Three questions, like the limiters above and for the same reason: a node with
 more authority answers to the same discipline, not to less of it.
+
+**Why question 2 names the stubs.** Declining the merge undoes everything this
+lane wrote on the pull request, and that reversibility is what earns the lane
+its authority. A deferral stub is the one thing it leaves standing outside —
+a tracker entry that survives whether the pull request merges or not, and the
+whole point of deferring rather than declining. So the stub is written into the
+question as the sanctioned exception rather than left to contradict it: without
+it, no deferral could ever pass a test that every deferral is required to pass.
+Nothing else the lane touches gets that licence.
 
 An escalation out of this lane is written nowhere on GitHub, exactly as above.
 The call itself is always written somewhere a reader is already looking, and

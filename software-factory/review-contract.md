@@ -282,8 +282,23 @@ resolved by nobody here — it belongs to the next cycle's reviewer, under
 takes one line in the pull request's `## Suggestion dispositions` section, and
 every deferral's stub is linked under `## Deferred`
 ([the merge-message recipe](/software-factory/factory-operations.md#the-merge-message-recipe)).
-Both sections are brought up to date on every Adjudicator run, and the run at
-convergence always happens, so they are complete at the merge read.
+A declined line carries the vocabulary reason it was declined for; a fixed one
+carries none, because `fix now` is where the routing lands when no decline and
+no defer condition hit, and the vocabulary has no name for that. It names the
+commit the fix landed in instead. Both sections are brought up to date on every
+Adjudicator run, and the run at convergence always happens, so they are complete
+at the merge read.
+
+**A fixed suggestion is recovered from its own thread.** A decline and a
+deferral each leave the Adjudicator's reply standing on the thread, so their
+record outlives the run that made it. A fix-now ruling leaves none: the ruling
+is written only in a report nothing reads back, and by the time the fix lands
+the next cycle's reviewer has resolved the thread, which every later docket then
+passes over. The thread still holds the proof, so that is where a later run
+reads it: a **resolved** Suggestion thread whose replies carry a builder's
+`Fixed in <sha>` and no reply signed `— adjudicator` was ruled fix now and got
+fixed, and it takes its line from that. Without this read the one outcome the
+section could never record would be the one the loop worked hardest to reach.
 
 ## The `gh` mechanics
 
