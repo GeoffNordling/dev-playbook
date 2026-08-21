@@ -197,6 +197,51 @@ class TestClassify:
         assert md.classify(relpath) == kind
 
 
+class TestHasFixedRepoRoot:
+    def test_roster_is_exactly_the_three_rootless_segments(self) -> None:
+        expected = {"skills", "rules", "agents"}
+
+        assert expected == md.ROOTLESS_SEGMENTS
+
+    @pytest.mark.parametrize(
+        "relpath",
+        [
+            "README.md",
+            "standards/prose/conventions.md",
+            "src/dev_playbook/md.py",
+            "software-factory/factory-operations.md",
+        ],
+    )
+    def test_ordinary_source_has_a_fixed_repo_root(self, relpath: str) -> None:
+        assert md.has_fixed_repo_root(relpath) is True
+
+    @pytest.mark.parametrize(
+        "relpath",
+        [
+            "skills/demo/SKILL.md",
+            "rules/bash-commands.md",
+            "agents/build.md",
+        ],
+    )
+    def test_each_rootless_segment_has_no_fixed_repo_root(self, relpath: str) -> None:
+        assert md.has_fixed_repo_root(relpath) is False
+
+    @pytest.mark.parametrize(
+        "relpath",
+        [
+            "dotfiles/dot-claude/skills/commit/SKILL.md",
+            "dotfiles/dot-claude/rules/bash-commands.md",
+            "dotfiles/dot-claude/agents/open-pr.md",
+            ".claude/skills/demo/references/angles.md",
+        ],
+    )
+    def test_a_rootless_segment_is_matched_at_any_depth(self, relpath: str) -> None:
+        assert md.has_fixed_repo_root(relpath) is False
+
+    def test_a_segment_name_inside_a_filename_does_not_match(self) -> None:
+        assert md.has_fixed_repo_root("standards/skills.md") is True
+
+
 class TestHeadingSlugs:
     def test_collects_all_levels_skips_fenced(self, tmp_path: Path) -> None:
         f = tmp_path / "t.md"

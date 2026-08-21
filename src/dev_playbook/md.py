@@ -2,9 +2,10 @@
 
 This module is the single home for the markdown mechanics that more than one
 hook needs: fenced-code skipping, GitHub heading slugs, YAML frontmatter,
-link extraction, and the OKF concept-doc/harness-owned path classification.
-``ref-lint`` and ``okf-lint`` both consume it, so the slug rule and the bundle
-boundary are defined once here rather than drifting between scripts.
+link extraction, the OKF concept-doc/harness-owned path classification, and
+the rootless-source test behind the cross-reference grammar. The slug rule,
+the bundle boundary, and the rootless roster are defined once here rather than
+drifting between scripts.
 
 ``yaml`` is imported lazily inside :func:`parse_frontmatter` so importers that
 only need the pure-text helpers (``ref-lint`` runs under plain ``python3``) do
@@ -54,6 +55,13 @@ SLUG_STAR = re.compile(r"(\*{1,2})(.+?)\1")
 SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
 SLUG_DROP = re.compile(r"[^\w\s\-]", re.UNICODE)
 SLUG_WHITESPACE = re.compile(r"\s")
+
+# Path segments marking sources with no fixed repo root: skills, rules, and
+# agent definitions ship into ~/.claude, so a `/path` Link in one would resolve
+# against whatever repo the reading agent happens to stand in. They use the
+# Citation form even for same-repo targets, per the cross-reference standard.
+# classify() spells these names out again; add a fourth segment in both places.
+ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 
 
 class UnclosedFence(ValueError):
@@ -196,6 +204,20 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
     return front, body
 
 
+def has_fixed_repo_root(relpath: str) -> bool:
+    """True when a source file is always read from one repo, so ``/`` resolves.
+
+    The one home for the rootless test: ``ref-lint`` decides the ``wrong-form``
+    finding with it and the file graph stamps the matching edge status, so a new
+    rootless segment reaches both at once rather than drifting between them.
+
+    A segment matches at any depth, which is what lets
+    ``dotfiles/dot-claude/skills/...`` and a consumer's ``.claude/skills/...``
+    answer alike.
+    """
+    return not (ROOTLESS_SEGMENTS & set(PurePosixPath(relpath).parts))
+
+
 def classify(relpath: str) -> str:
     """Classify a repo-relative path within the OKF bundle taxonomy.
 
@@ -241,6 +263,8 @@ def classify(relpath: str) -> str:
         return "index"
     if name in {"CLAUDE.md", "SKILL.md"}:
         return "harness"
+    # ROOTLESS_SEGMENTS' names again, not read from the roster: `skills` differs
+    # here, where only the references/ and scripts/ subtrees are harness.
     if {"rules", "agents"} & set(dirparts):
         return "harness"
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):

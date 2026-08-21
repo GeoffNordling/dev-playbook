@@ -12,8 +12,9 @@ current worktree) and checks:
   - **Citation** — `~/workspace/<repo>/...`: cross-repo targets resolve at
     their absolute path; same-repo targets resolve against the invoking
     checkout. A same-repo Citation from a source with a fixed repo root is
-    a `wrong-form` finding; sources matching ROOTLESS_SEGMENTS (skills,
-    rules, agent definitions) are exempt.
+    a `wrong-form` finding; sources matching
+    `dev_playbook.md.ROOTLESS_SEGMENTS` — skills, rules, agent definitions —
+    are exempt.
   - `#fragment` anchors on .md targets must match a heading slug
     (`dev_playbook.md.github_slug`); fragments on directories or non-.md targets are
     out of scope and treated as ok.
@@ -88,20 +89,6 @@ class UnclassifiedRecordsFile(Exception):
         self.relpath = relpath
 
 
-# Path segments marking sources with no fixed repo root: skills, rules, and
-# agent definitions ship into ~/.claude.
-ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
-
-
-def has_fixed_repo_root(relpath: str) -> bool:
-    """True when a source file is always read from one repo, so `/` resolves.
-
-    Rootless files use the Citation form even for same-repo targets, per the
-    cross-reference standard.
-    """
-    return not (ROOTLESS_SEGMENTS & set(Path(relpath).parts))
-
-
 def workspace_root() -> Path:
     return Path.home() / "workspace"
 
@@ -168,8 +155,8 @@ def status_of(actual: Path, fragment: str) -> str:
 def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
     """Extract and classify every Link and Citation in one .md file."""
     results = []
-    source = str(filepath.relative_to(repo_root))
-    fixed_root = has_fixed_repo_root(source)
+    source = filepath.relative_to(repo_root).as_posix()
+    fixed_root = md.has_fixed_repo_root(source)
 
     def record(target_str: str, line_num: int, status: str) -> None:
         results.append(

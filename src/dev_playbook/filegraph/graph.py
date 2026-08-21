@@ -7,8 +7,9 @@ a typed, directed edge. :func:`build_graph` returns the spec's machine
 artifact as a dict; the ``file-graph`` script serializes it.
 
 Markdown mechanics (fence skipping, link extraction, frontmatter, the
-concept/harness classification) come from :mod:`dev_playbook.md`, so the
-graph's grammar cannot drift from ``ref-lint`` and ``okf-lint``.
+concept/harness classification, the rootless-source test) come from
+:mod:`dev_playbook.md`, so the graph's grammar cannot drift from ``ref-lint``
+and ``okf-lint``.
 """
 
 import re
@@ -32,9 +33,6 @@ CONFIG_EXTENSIONS = {
     ".ini",
 }
 CONFIG_NAMES = {"Makefile"}
-# Mirrors scripts/ref-lint: sources with no fixed repo root (skills, rules, and
-# agent definitions) legitimately use the Citation form for same-repo targets.
-ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 FORMAL_FORMS = {"link", "citation", "resource"}
 CORE_BUCKETS = {"concept", "index"}
 # A path-shaped token in prose or code: a ~/workspace citation, a
@@ -168,7 +166,7 @@ def markdown_edges(relpath: str, repo_root: Path, repo_name: str) -> list[dict]:
     ``ref-lint`` status semantics, plus off-grammar ``relative`` links.
     """
     text = (repo_root / relpath).read_text(encoding="utf-8", errors="replace")
-    fixed_root = not (ROOTLESS_SEGMENTS & set(PurePosixPath(relpath).parts))
+    fixed_root = md.has_fixed_repo_root(relpath)
     edges = []
 
     def add(raw: str, form: str, line: int) -> None:

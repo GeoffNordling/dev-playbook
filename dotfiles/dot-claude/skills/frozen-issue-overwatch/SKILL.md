@@ -88,8 +88,10 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/.claude/skills/frozen-issue-overwatch/references/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [pause 1](~/.claude/skills/frozen-issue-overwatch/references/user-checkpoints.md#pause-1-the-review-verdict), answer their questions, help them weigh, and act only on an explicit verdict.
 
-- **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then regenerate the merge message from the whole PR record (`gh pr edit`), per [the two owners](~/.claude/skills/frozen-issue-overwatch/references/factory-operations.md#the-two-owners), and carry the issue to the user's final read and merge.
-- **rework** — record the user's deciding reason where the findings live (`gh issue comment` / `gh pr comment`), then move the label back along the rework edge.
+Write every body you post here to `/tmp/<kind>-<N>.md` with the Write tool, and pass it with `--body-file`.
+
+- **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs (`gh pr comment --body-file`) — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then regenerate the merge message from the whole PR record, per [the two owners](~/.claude/skills/frozen-issue-overwatch/references/factory-operations.md#the-two-owners), and pass it with `gh pr edit --body-file`. Carry the issue to the user's final read and merge.
+- **rework** — record the user's deciding reason where the findings live (`gh issue comment --body-file` / `gh pr comment --body-file`), then move the label back along the rework edge.
 
 ## 6. Turn boundaries — the user's commands
 

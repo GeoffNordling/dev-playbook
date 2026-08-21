@@ -16,7 +16,7 @@ Your prompt is the issue number; below, `<issue>` is that number.
 1. **Skip if the PR already exists.** `gh pr list --head issue-<issue> --state all --json number,state`. If it lists one, this step already ran (a re-review) — leave it untouched and close (§Close) reporting that PR.
 2. **Create it, with an authored merge message.** Synthesize the title and body to the [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe), which defines the three mandatory sections. Your sources are the issue brief and its comments (`gh issue view <issue> --json title,body,comments`) — the `## Deviation ledger` entries are lifted from the issue comment of that name, recorded at build's close — and the diff the branch carries (`git diff origin/main...issue-<issue>`).
 
-   Then `gh pr create --head issue-<issue>` with that title and body, taking the default base branch.
+   Write the body to `/tmp/pr-body-<issue>.md` with the Write tool. Then `gh pr create --head issue-<issue>` with that title and `--body-file /tmp/pr-body-<issue>.md`, taking the default base branch.
 
 ## Close
 
