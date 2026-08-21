@@ -302,13 +302,20 @@ class _Traverse:
                 raise
 
     def _graph(self) -> TraverseOutcome:
-        """The nodes themselves, in the order this issue's phase calls for."""
+        """The nodes themselves, in the order this issue's phase calls for.
+
+        The tuple in `GRAPH` is walked rather than read for one name and then
+        second-guessed. Testing for one node and running the rest anyway would
+        make the other names in those tuples decorative, and the next phase
+        added to the graph would run nodes its own entry never declared.
+        """
         nodes = self._nodes()
         worktree = self._worktree()
         self._preflight(worktree)
-        if BUILD in nodes:
-            self._build(worktree)
-        return self._open_pr(worktree)
+        steps = {BUILD: self._build, OPEN_PR: self._open_pr}
+        for node in nodes:
+            steps[node](worktree)
+        return self._pr_ready()
 
     def _nodes(self) -> tuple[str, ...]:
         """The nodes this issue's labels call for — the phase label is the counter.
@@ -403,14 +410,17 @@ class _Traverse:
                 node=BUILD,
             )
 
-    def _open_pr(self, worktree: Path) -> TraverseOutcome:
-        """Run the open-pr node, then read the PR off GitHub rather than the report.
+    def _open_pr(self, worktree: Path) -> None:
+        """Run the open-pr node. What it left behind is read at the terminal step."""
+        self._launch(OPEN_PR, worktree, OPEN_PR_SCHEMA)
+
+    def _pr_ready(self) -> TraverseOutcome:
+        """Read the PR off GitHub rather than the report, and close the window.
 
         The URL is never lifted from what the agent said. A node that believes it
         opened a PR and did not would otherwise hand back a link to nothing, and
         the traverse would end `pr-ready` over an issue with no pull request.
         """
-        self._launch(OPEN_PR, worktree, OPEN_PR_SCHEMA)
         url = self._pr_url()
         if url is None:
             raise _Escalated(
@@ -666,24 +676,31 @@ class _Traverse:
         SIGTERMed; one that is already gone needs no signal. Either way its row is
         written, because completing the books is the whole duty here — a launch
         with no report reads as live for good.
+
+        The row it writes is shaped the way `launcher._payload` shapes one, down
+        to leaving `kill` out when nothing was signalled. `factory-status` reads
+        both writers, and a key one of them always writes and the other writes
+        only sometimes is a query that answers `"kill" in payload` with kills
+        that never happened.
         """
         for row in ledger.live_jobs(
             repo=self.repo, issue=self.issue, db_path=self.db_path
         ):
-            session_id = str(row.session_id)
+            session_id = _column(row, "session_id")
+            node = _column(row, "node")
             killed = _terminate(session_id)
-            _say(f"{self.repo}#{self.issue}: sweeping {row.node} {session_id} ({why})")
+            _say(f"{self.repo}#{self.issue}: sweeping {node} {session_id} ({why})")
             ledger.job_report(
                 self.repo,
                 self.issue,
-                str(row.node),
+                node,
                 session_id,
                 {
                     launcher.PROCESS_OUTCOME: launcher.DIED,
                     launcher.TASK_OUTCOME: None,
                     launcher.STRUCTURED_OUTPUT: None,
                     launcher.EXIT_CODE: None,
-                    launcher.KILL: launcher.SIGTERM if killed else None,
+                    **({launcher.KILL: launcher.SIGTERM} if killed else {}),
                     SWEPT: why,
                 },
                 db_path=self.db_path,
@@ -798,6 +815,27 @@ class _Traverse:
             ".[].url",
         )
         return listed.splitlines()[0] if listed else None
+
+
+def _column(row: ledger.LedgerRow, name: str) -> str:
+    """One grain column of a launch row the sweep cannot do without.
+
+    `LedgerRow` types both of them `str | None`, and coercing a missing one
+    with `str()` would hand `_terminate` the literal `"None"` to hunt the
+    process table for — a probe that looked for the wrong thing and then filed
+    a live job as dead, which is the outcome `_terminate` refuses to reach by
+    every other route. No writer in `ledger` produces such a row, so meeting
+    one means the store has gone wrong, and that is said rather than papered
+    over.
+    """
+    value = getattr(row, name)
+    if value is None:
+        raise TraverseError(
+            f"the {row.kind} row at id {row.id} has no {name}, so the job it "
+            f"records cannot be found in the process table or filed against a "
+            f"node — this store has gone wrong"
+        )
+    return str(value)
 
 
 def _terminate(session_id: str) -> bool:

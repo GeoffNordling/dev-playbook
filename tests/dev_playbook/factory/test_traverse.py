@@ -1,10 +1,12 @@
 import fcntl
 import json
 import signal
+import sqlite3
 import subprocess
 import sys
 import time
 from collections.abc import Callable
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -317,6 +319,18 @@ def push_branch(checkout: Path, branch: str) -> None:
         check=True,
         capture_output=True,
     )
+
+
+def blank_column(db: Path, column: str) -> None:
+    """Null one grain column of the store's only `job-launch` row.
+
+    Written with raw SQL because no writer in `ledger` will produce it: the
+    row this makes is a store that has gone wrong, which is the whole case
+    under test.
+    """
+    with closing(sqlite3.connect(db)) as connection:
+        connection.execute(f"UPDATE ledger SET {column} = NULL")
+        connection.commit()
 
 
 def kinds(db: Path) -> list[str]:
@@ -768,6 +782,26 @@ def test_a_pr_review_phase_issue_skips_the_build_and_launches_open_pr_alone(
     assert [launch["node"] for launch in launched()] == ["open-pr"]
     assert "phase-transition" not in kinds(db)
     assert not [call for call in gh_calls() if call[:2] == ["issue", "edit"]]
+    assert outcome.status == "pr-ready"
+
+
+def test_a_phase_launches_exactly_the_nodes_its_graph_entry_names(
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_issue: Callable[..., Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The tuples in `GRAPH` are the graph, not a note about it.
+
+    Left unwalked, an entry that names one node runs two, and the next author
+    to add a phase — one that only re-verifies, say — spends a job on a node
+    they declared out of it and reads the module's own word for the structure
+    as false.
+    """
+    monkeypatch.setattr(traverse, "GRAPH", {traverse.BUILD: (traverse.BUILD,)})
+
+    outcome = traverse_issue()
+
+    assert [run["node"] for run in launched()] == [traverse.BUILD]
     assert outcome.status == "pr-ready"
 
 
@@ -1326,6 +1360,27 @@ def test_a_process_probe_that_fails_for_any_reason_but_no_match_stops_the_sweep(
     assert kinds(db) == ["job-launch"]
 
 
+@pytest.mark.parametrize("missing", ["node", "session_id"])
+def test_a_launch_row_missing_a_column_the_sweep_needs_stops_the_traverse(
+    missing: str, db: Path, traverse_issue: Callable[..., Any]
+) -> None:
+    """Coerced to a string, a missing session id is a pattern the probe hunts for.
+
+    `str(None)` is the literal `"None"`, and `pgrep -f None` then answers about
+    whatever else on the machine carries that word — a probe that looked for
+    the wrong thing, filing a live job as dead. The launcher writes no such
+    row, so this is a store that has gone wrong, and a store that has gone
+    wrong is said out loud rather than worked around.
+    """
+    ledger.job_launch(REPO, ISSUE, "build", "sess-1", {}, db_path=db)
+    blank_column(db, missing)
+
+    with pytest.raises(traverse.TraverseError) as raised:
+        traverse_issue()
+
+    assert missing in str(raised.value)
+
+
 def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
     db: Path, traverse_issue: Callable[..., Any]
 ) -> None:
@@ -1341,4 +1396,4 @@ def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
     ]
     assert reports[0].node == "build"
     assert reports[0].payload["process_outcome"] == "died"
-    assert reports[0].payload["kill"] is None
+    assert "kill" not in reports[0].payload
