@@ -339,6 +339,22 @@ def test_rule_body_first_person_fails(tmp_path: Path) -> None:
     assert "'my'" in result.stdout
 
 
+def test_agent_definition_body_first_person_fails(tmp_path: Path) -> None:
+    files = base_files()
+    files["dotfiles/dot-claude/agents/demo.md"] = (
+        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
+        "# Demo\n\nI run my own checks.\n"
+    )
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert (
+        "dotfiles/dot-claude/agents/demo.md: claude-code.agent-facing-voice"
+        in result.stdout
+    )
+    assert "'I'" in result.stdout
+    assert "'my'" in result.stdout
+
+
 def test_rule_body_object_pronoun_fails(tmp_path: Path) -> None:
     files = base_files()
     files[".claude/rules/commands.md"] = "# Commands\n\nHand the command to me.\n"
