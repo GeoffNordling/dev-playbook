@@ -55,10 +55,10 @@ read; below, `<issue>` is that number.
        gh pr view --json number,headRefOid
 
    No pull request is an escalation (§5).
-3. **Take the scope.** On cycle 1 it is the whole diff (`gh pr diff`). From
-   cycle 2 it is your own open threads plus `git diff <last-reviewed-sha>..HEAD`
-   — and a rebase, or a delta that rewrites most of the diff, earns a full
-   re-read instead; that call is yours. An empty scope is an escalation (§5).
+3. **Take the scope** the contract's
+   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
+   fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
+   the delta. An empty scope is an escalation (§5).
 
 ## 2. Find candidates
 
@@ -167,13 +167,12 @@ fewer genuine findings exist, post what you have — do not invent to hit the
 floor. A clean pass is a real outcome: post the review body alone, saying so.
 
 Post one review per the
-[thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads)
-and its `gh` mechanics — the cycle header first in the body, each finding an
-inline comment opening its own thread, severity as the first word and the
-attribution line last. Rank the findings most-severe first.
+[thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),
+using the `gh` mechanics the contract carries. Rank the findings most-severe
+first.
 
 From cycle 2, resolve the threads your prior cycle opened whose fixes you have
-verified against the delta, per
+verified, per
 [resolution ownership](~/workspace/dev-playbook/software-factory/review-contract.md#resolution-ownership).
 
 ## 5. Close

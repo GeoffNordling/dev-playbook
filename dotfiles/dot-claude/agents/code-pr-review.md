@@ -61,12 +61,12 @@ read; below, `<issue>` is that number.
    re-flag what a prior cycle caught. The bug-hunting review runs in parallel
    with you; its threads for this cycle may not exist yet, so don't wait for
    them or dedup against them.
-5. **Take the scope.** On cycle 1 it is the whole diff (`gh pr diff`). From
-   cycle 2 it is your own open threads plus `git diff <last-reviewed-sha>..HEAD`
-   — and a rebase, or a delta that rewrites most of the diff, earns a full
-   re-read instead; that call is yours. An empty scope is an escalation (§5).
-   Where the change includes code, read the tests under `tests/` and the code
-   under `src/` too — the full picture behind the diff.
+5. **Take the scope** the contract's
+   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
+   fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
+   the delta. An empty scope is an escalation (§5). Where the change includes
+   code, read the tests under `tests/` and the code under `src/` too — the full
+   picture behind the diff.
 
 ## 2. Read what the diff calls for
 
@@ -132,13 +132,12 @@ enumerates when they come back clean.
 ## 4. Attach findings
 
 Post one review per the
-[thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads)
-and its `gh` mechanics — the cycle header first in the body, the clean
-dimensions bare beneath it, each finding an inline comment opening its own
-thread, severity as the first word and the attribution line last.
+[thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),
+using the `gh` mechanics the contract carries. The clean dimensions the review
+body enumerates are the ones §3 ran.
 
 From cycle 2, resolve the threads your prior cycle opened whose fixes you have
-verified against the delta, per
+verified, per
 [resolution ownership](~/workspace/dev-playbook/software-factory/review-contract.md#resolution-ownership).
 
 ## 5. Close

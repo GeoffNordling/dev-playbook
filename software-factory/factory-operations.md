@@ -218,7 +218,7 @@ the record the issue and its PR carry, never left as a placeholder.
 
 - **Title** — states the change: it is the commit subject `main`'s history will
   carry.
-- **Body** — three mandatory sections, each checkable by absence:
+- **Body** — four mandatory sections, each checkable by absence:
   - `## Summary` — what changed and why, drawn from the issue brief and the
     current diff, ending with the mandatory `Closes #<N>` line that closes
     the issue on merge. The claim that the acceptance criteria are met
@@ -233,6 +233,10 @@ the record the issue and its PR carry, never left as a placeholder.
     stub at `phase:intake`, named by issue link — never a Candidate
     ([the one-goal principle](/standards/tracking/issue-authoring.md#brief-principles)).
     `Nothing deferred.` explicitly when empty.
+  - `## Suggestion dispositions` — one line per Suggestion thread the review
+    loop settled, naming its outcome and the thread. It is the merge read's
+    one-place summary of what became of every suggestion. `None.` explicitly
+    when empty, which is what the node opening the pull request scaffolds.
 
 A missing section is a checkable defect: the code and doc reviews open with a
 mechanical presence check, and absence is an automatic Blocking finding.
