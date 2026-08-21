@@ -10,7 +10,7 @@ effort: xhigh
 
 <!-- Intentionally mirrors Anthropic's retired native /code-review (medium tier); keep the sections lifted from it verbatim. -->
 
-Hunt bugs in the PR diff through eight finder angles, dedup, and post the
+Hunt bugs in the PR diff through the finder angles below, dedup, and post the
 findings as threads on the pull request. The review is an audit only: you
 never modify the code under review, and the verdict on the findings is not
 yours to take — post them and stop.
@@ -47,26 +47,34 @@ another review's.
 Your prompt is the issue number, and from cycle 2 the sha the last review
 read; below, `<issue>` is that number.
 
-1. **Run the green gate** — red is an escalation (§5), never a finding.
-2. **Resolve the repository and the pull request**, and spell both into every
-   later command:
+1. **Run the green gate** — red is an escalation (§ Escalations), never a
+   finding.
+2. **Resolve the repository and the pull request**, in the order the
+   contract's
+   [`gh` mechanics](~/workspace/dev-playbook/software-factory/review-contract.md#the-gh-mechanics)
+   fix, and spell both into every later command:
 
        gh repo view --json nameWithOwner --jq .nameWithOwner
-       gh pr view --json number,headRefOid
+       gh pr list -R <owner>/<repo> --head "$(git rev-parse --abbrev-ref HEAD)" \
+         --json number,headRefOid
 
-   No pull request is an escalation (§5).
+   `gh pr list` opens the sequence because `-R` turns off branch inference and
+   so makes the number mandatory; from here the number and `-R` travel
+   together on every `gh pr` call, and `headRefOid` is the `commit_id` of every
+   call that posts. No pull request is an escalation (§ Escalations).
 3. **Read the pull request's existing threads and comments**, so you don't
-   re-flag what a prior bug-review cycle caught and so §4 has the threads it
-   resolves.
+   re-flag what a prior bug-review cycle caught and so
+   § Post the findings as threads has the threads it resolves.
 4. **Take the scope** the contract's
    [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
-   fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
-   the delta. At cycle 1 an empty diff is an escalation (§5); from cycle 2 an
-   empty delta is an ordinary cycle, with your open threads the work.
+   fixes: `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
+   `git diff <last-reviewed-sha>..HEAD` the delta. At cycle 1 an empty diff is
+   an escalation (§ Escalations); from cycle 2 an empty delta is an ordinary
+   cycle, with your open threads the work.
 
 ## 2. Find candidates
 
-Run the **eight finder angles** below in sequence, yourself, in THIS context;
+Run **every finder angle** below in sequence, yourself, in THIS context;
 do NOT spawn subagents for them. Each angle surfaces **up to 6 candidate
 findings** with `file`, `line`, a one-line `summary`, and a concrete
 `failure_scenario`. Do NOT let one angle's conclusions suppress another's — if

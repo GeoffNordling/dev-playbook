@@ -51,25 +51,34 @@ Your values for the contract's two parameters:
 Your prompt is the issue number, and from cycle 2 the sha the last review
 read; below, `<issue>` is that number.
 
-1. **Run the green gate** — red is an escalation (§5), never a finding.
-2. **Resolve the repository and the pull request**, and spell both into every
-   later command:
+1. **Run the green gate** — red is an escalation (§ Escalations), never a
+   finding.
+2. **Resolve the repository and the pull request**, in the order the
+   contract's
+   [`gh` mechanics](~/workspace/dev-playbook/software-factory/review-contract.md#the-gh-mechanics)
+   fix, and spell both into every later command:
 
        gh repo view --json nameWithOwner --jq .nameWithOwner
-       gh pr view --json number,headRefOid
+       gh pr list -R <owner>/<repo> --head "$(git rev-parse --abbrev-ref HEAD)" \
+         --json number,headRefOid
 
-   No pull request is an escalation (§5).
-3. **Read the brief** — `gh issue view <issue> --json title,body,comments`.
+   `gh pr list` opens the sequence because `-R` turns off branch inference and
+   so makes the number mandatory; from here the number and `-R` travel
+   together on every `gh pr` call, and `headRefOid` is the `commit_id` of every
+   call that posts. No pull request is an escalation (§ Escalations).
+3. **Read the brief** —
+   `gh issue view <issue> -R <owner>/<repo> --json title,body,comments`.
    The brief is the contract the work set out to satisfy, and its binding
    sections are what a Blocking fidelity finding cites.
 4. **Read the pull request's existing threads and comments**, so you don't
    re-flag what a prior doc-review cycle caught.
 5. **Take the scope** the contract's
    [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
-   fixes: `gh pr diff` gives the whole diff, `git diff <last-reviewed-sha>..HEAD`
-   the delta. At cycle 1 an empty diff, or a diff with no documentation in it,
-   is an escalation (§5); from cycle 2 a delta that is empty or carries no
-   documentation is an ordinary cycle, with your open threads the work.
+   fixes: `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
+   `git diff <last-reviewed-sha>..HEAD` the delta. At cycle 1 an empty diff, or
+   a diff with no documentation in it, is an escalation (§ Escalations); from
+   cycle 2 a delta that is empty or carries no documentation is an ordinary
+   cycle, with your open threads the work.
 
 ## 2. Read what the diff calls for
 
@@ -144,7 +153,7 @@ out-of-scope follow-up.
 Post one review per the
 [thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),
 using the `gh` mechanics the contract carries. The clean dimensions the review
-body enumerates are the ones §3 ran.
+body enumerates are the ones § Audit the change ran.
 
 From cycle 2, resolve the threads your prior cycle opened whose fixes you have
 verified, per
