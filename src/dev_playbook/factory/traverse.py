@@ -18,10 +18,12 @@ import signal
 import subprocess
 import sys
 from collections.abc import Iterable, Iterator, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from types import FrameType
+from typing import Any
 from urllib.parse import quote
 
 from dev_playbook import gitrepo
@@ -60,9 +62,22 @@ PR_REVIEW = "pr-review"
 # what a re-review of work already committed does.
 GRAPH = {BUILD: (BUILD, OPEN_PR), PR_REVIEW: (OPEN_PR,)}
 
+# The three reviewer definitions, the review name each opens its cycle header
+# with, and which track elects which. The header name is what a track's own
+# cycle and last-reviewed sha are looked up by, so the two spellings are held
+# together here rather than derived from each other.
+BUG_REVIEW = "bug-pr-review"
+CODE_REVIEW = "code-pr-review"
+DOC_REVIEW = "doc-pr-review"
+REVIEW_NAMES = {
+    BUG_REVIEW: "bug review",
+    CODE_REVIEW: "code review",
+    DOC_REVIEW: "doc review",
+}
+
 # Every definition this graph can launch, so a missing one is found at traverse
 # start rather than halfway through a run that has already spent money.
-DEFINITIONS = (BUILD, OPEN_PR)
+DEFINITIONS = (BUILD, OPEN_PR, *REVIEW_NAMES)
 
 # The node's own word for work that finished. Anything else it reports — its own
 # `escalated` included — ends the traverse.
@@ -83,9 +98,23 @@ REPORT_SCHEMA: dict[str, object] = {
 }
 
 # One per node, because a node's schema is the node's own and the two are free to
-# diverge as the graph grows. Today they are the one envelope above.
+# diverge as the graph grows. The two committing nodes are the one envelope
+# above; a review adds the two counts of what it posted, which are on its report
+# because the reviewer definitions put them there — the loop reads what it acts
+# on from the threads themselves.
 BUILD_SCHEMA = REPORT_SCHEMA
 OPEN_PR_SCHEMA = REPORT_SCHEMA
+REVIEW_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "outcome": {"type": "string", "enum": [DONE, "escalated"]},
+        "gist": {"type": "string"},
+        "blocking_count": {"type": "integer"},
+        "suggestion_count": {"type": "integer"},
+    },
+    "required": ["outcome", "gist", "blocking_count", "suggestion_count"],
+    "additionalProperties": False,
+}
 
 # Where an issue's worktree sits inside its checkout, and the branch it carries.
 WORKTREES = Path(".claude") / "worktrees"
@@ -164,11 +193,31 @@ DOC_TRACK = "doc"
 DOC_SUFFIX = ".md"
 IGNORED_SUFFIX = ".html"
 
+# Which reviews a track runs. The code track runs two — a bug hunt and a
+# fidelity-and-convention audit — because they read the same diff for different
+# things and neither covers the other.
+REVIEWS = {CODE_TRACK: (BUG_REVIEW, CODE_REVIEW), DOC_TRACK: (DOC_REVIEW,)}
+
 # What `pulls/{n}/files` calls a file this pull request creates, and how many
 # changed documentation lines make an edit substantive rather than the echo a
 # code change forces.
 ADDED = "added"
 SUBSTANTIVE_DOC_LINES = 10
+CHANGED_FILE_FIELDS = 4
+
+# The one read of the pull request's threads, stated in pr-feedback.md and
+# copied here field for field. `reviewThreads` caps at 100 a page and returns
+# them oldest first, so it is paged: the threads a long-running pull request
+# would drop are its newest, and a verdict that never sees an open Blocking
+# thread is a convergence declared falsely.
+THREADS_QUERY = """query {{ repository(owner:"{owner}", name:"{name}") {{
+  pullRequest(number:{number}) {{ reviewThreads(first:100, after:{after}) {{
+    pageInfo {{ hasNextPage endCursor }}
+    nodes {{
+      id isResolved isOutdated path line originalLine subjectType
+      comments(first:10) {{ nodes {{ databaseId body }} }}
+    }}
+  }} }} }} }}"""
 
 # The two severities a review writes, folded for comparison, and the decoration
 # a first word may be wrapped in. A severity is matched against these rather
@@ -215,13 +264,115 @@ class _Escalated(Exception):
     """
 
     def __init__(
-        self, reason: str, node: str | None = None, session_id: str | None = None
+        self,
+        reason: str,
+        node: str | None = None,
+        session_id: str | None = None,
+        payload: Mapping[str, object] | None = None,
     ) -> None:
-        """Hold what the escalation row names: why, and which job if any."""
+        """Hold what the escalation row names: why, which job if any, and its own.
+
+        `payload` is the keys one escalation carries that the others do not — the
+        cap records the cycle it stopped at and the baseline it counted from — and
+        it is merged into the row beside the three above.
+        """
         self.reason = reason
         self.node = node
         self.session_id = session_id
+        self.payload = dict(payload or {})
         super().__init__(reason)
+
+
+@dataclass(frozen=True)
+class _Failure:
+    """One way a fanned-out review did not come back clean and reporting done.
+
+    A fan-out cannot raise where the trouble is, the way the sequential path
+    does: an exception leaving one thread would abandon its siblings mid-flight
+    and leave their launches with no report, reading as live for good. So each
+    job's failure is carried back as a value and every one of them is relayed
+    once the whole fan-out has finished.
+    """
+
+    reason: str
+    node: str
+    session_id: str | None = None
+
+
+@dataclass(frozen=True)
+class _PullRequest:
+    """The one pull request an issue has, by the two names the loop addresses it by.
+
+    The number is what every `gh api` path and GraphQL argument needs; the URL is
+    what a person reading a ledger row needs. Read together off one call, so the
+    two can never come from different answers.
+    """
+
+    number: int
+    url: str
+
+
+def _judge(node: str, outcome: launcher.JobOutcome) -> _Failure | None:
+    """Whether a finished job came back clean and reporting done, and why not.
+
+    One rule for both paths. The sequential launch raises what this returns and
+    the fan-out carries it back as a value, and a second copy of the judgment
+    would let a review be accepted on terms a build is refused on.
+    """
+    if outcome.process_outcome != launcher.CLEAN:
+        return _Failure(
+            f"{node} ended {outcome.process_outcome}", node, outcome.session_id
+        )
+    if outcome.task_outcome != DONE:
+        return _Failure(
+            f"{node} reported {outcome.task_outcome!r}", node, outcome.session_id
+        )
+    return None
+
+
+def _relay(failures: Sequence[_Failure]) -> _Escalated:
+    """Every failure of one fan-out, as the escalation that ends the traverse.
+
+    Verbatim, and never summarized: what a node said about why it stopped is
+    what reaches the operator. The two grain columns are filled only where one
+    job answers for the escalation — with several failing they would have to name
+    one of them and read as though the others had not happened.
+    """
+    if len(failures) == 1:
+        return _Escalated(
+            failures[0].reason, node=failures[0].node, session_id=failures[0].session_id
+        )
+    return _Escalated("; ".join(failure.reason for failure in failures))
+
+
+def _defer_signals() -> None:
+    """Block the ledger's deferred signals on a fan-out thread, as it starts.
+
+    The invariant `launcher._pump` is held to, and for the same reason: a Python
+    handler runs on the main thread at its next bytecode boundary whatever any
+    other thread's mask says, so one unblocked thread anywhere is a route back
+    into the middle of a ledger write — and the traverse's own trap writes to
+    that ledger.
+    """
+    signal.pthread_sigmask(signal.SIG_BLOCK, TRAPPED)
+
+
+def _thread(node: Mapping[str, Any]) -> ReviewThread:
+    """One GraphQL thread node as the plain record the verdict is computed from.
+
+    The line falls back to `originalLine`. A fix that edits the anchored line
+    itself flips its thread outdated and takes the live line away — which is
+    exactly the thread a cycle is there to verify — so keying on the live line
+    alone would lose the location of every thread that was actually addressed.
+    """
+    comments = node["comments"]["nodes"]
+    return ReviewThread(
+        thread_id=str(node["id"]),
+        resolved=bool(node["isResolved"]),
+        path=str(node["path"]),
+        line=node["line"] if node["line"] is not None else node["originalLine"],
+        body=str(comments[0]["body"]) if comments else "",
+    )
 
 
 @dataclass(frozen=True)
@@ -500,6 +651,17 @@ def next_cycle(headers: Mapping[str, CycleHeader]) -> int:
     return max((header.cycle for header in headers.values()), default=0) + 1
 
 
+def newest_sha(headers: Mapping[str, CycleHeader]) -> str | None:
+    """The sha of the newest header on the pull request, across every track.
+
+    This is the cycle's own sha on the verdict record — what the cycle that just
+    ran actually read. The tracks of one cycle all review the same branch tip,
+    so which of them the newest header belongs to does not change the answer.
+    """
+    newest = max(headers.values(), key=lambda header: header.cycle, default=None)
+    return None if newest is None else newest.sha
+
+
 def _header(line: str) -> CycleHeader | None:
     """One line as a cycle header, or None where it is not one.
 
@@ -666,7 +828,7 @@ class _Traverse:
         steps = {BUILD: self._build, OPEN_PR: self._open_pr}
         for node in nodes:
             steps[node](worktree)
-        return self._pr_ready()
+        return self._review_loop(worktree)
 
     def _nodes(self) -> tuple[str, ...]:
         """The nodes this issue's labels call for — the phase label is the counter.
@@ -697,9 +859,14 @@ class _Traverse:
         return GRAPH[phases[0]]
 
     def _build(self, worktree: Path) -> None:
-        """Run the build node, verify what it left behind, and move the label."""
-        self._launch(BUILD, worktree, BUILD_SCHEMA)
-        self._verify_build(worktree)
+        """Run the build node, verify what it left behind, and move the label.
+
+        The label move belongs to the graph's own build, not to the loop's. A
+        rework lap runs the same node over the same worktree with the board
+        already at `pr-review`, and moving a label there would be moving it to
+        where it already is.
+        """
+        self._run_build(worktree, str(self.issue))
         self._gh(
             "issue",
             "edit",
@@ -715,6 +882,18 @@ class _Traverse:
             self.repo, self.issue, {FROM: BUILD, TO: PR_REVIEW}, db_path=self.db_path
         )
         _say(f"{self.repo}#{self.issue}: {BUILD} -> {PR_REVIEW}")
+
+    def _run_build(self, worktree: Path, prompt: str) -> None:
+        """Launch the build node under one prompt and verify what it left behind.
+
+        The whole of what the graph's build and a rework lap have in common. The
+        prompt is the only difference between them, and the verification is not
+        optional on either: a rework lap that edits and never pushes leaves the
+        next cycle reviewing the lap before it and reporting the same findings
+        against work that has already moved.
+        """
+        self._launch(BUILD, worktree, BUILD_SCHEMA, prompt)
+        self._verify_build(worktree)
 
     def _verify_build(self, worktree: Path) -> None:
         """Refuse to advance the board on anything but the facts the node left.
@@ -762,35 +941,293 @@ class _Traverse:
             )
 
     def _open_pr(self, worktree: Path) -> None:
-        """Run the open-pr node. What it left behind is read at the terminal step."""
-        self._launch(OPEN_PR, worktree, OPEN_PR_SCHEMA)
+        """Run the open-pr node. What it left behind is read by the loop below."""
+        self._launch(OPEN_PR, worktree, OPEN_PR_SCHEMA, str(self.issue))
 
-    def _pr_ready(self) -> TraverseOutcome:
-        """Read the PR off GitHub rather than the report, and close the window.
+    # --- the review loop ---
 
-        The URL is never lifted from what the agent said. A node that believes it
-        opened a PR and did not would otherwise hand back a link to nothing, and
-        the traverse would end `pr-ready` over an issue with no pull request.
+    def _review_loop(self, worktree: Path) -> TraverseOutcome:
+        """Review, judge, rework, and go round again until the loop leaves.
+
+        One uniform body, entered the same way every time. A traverse arriving
+        here for the first time and one relaunched after a crash run this
+        identical code: there is no resume branch, no state carried in the
+        process, and no label moved inside the loop. Everything the loop needs is
+        read from the pull request each lap, which is what lets a relaunch pick
+        up wherever the last one stopped. It costs a burned cycle number when a
+        traverse dies after its reviews posted, and that is accepted — the clock
+        the cap counts on is never turned back.
+
+        The headers are read twice a lap, and they are two different reads. The
+        one at the top says which cycle is about to run and what sha each track
+        last saw; the one after the fan-out is this cycle's own, and its sha is
+        what the verdict record names. The second is the next lap's first, so a
+        lap makes one read of its own.
         """
-        url = self._pr_url()
-        if url is None:
+        pull = self._pull_request()
+        baseline = baseline_cycle(
+            ledger.traverse_starts(
+                repo=self.repo, issue=self.issue, db_path=self.db_path
+            )
+        )
+        headers = self._cycle_headers(pull)
+        while True:
+            cycle = next_cycle(headers)
+            self._fan_out(self._elected(pull, cycle), headers, worktree)
+            headers = self._cycle_headers(pull)
+            verdict = compute_verdict(self._threads(pull), cycle, baseline)
+            self._record_verdict(pull, cycle, newest_sha(headers), verdict)
+            if verdict.verdict == CONVERGED:
+                return self._pr_ready(pull)
+            if verdict.verdict == CAP_ESCALATED:
+                raise _Escalated(
+                    f"{verdict.blocking_open} Blocking threads on {pull.url} are "
+                    f"still open at cycle {cycle}, {CYCLE_CAP} autonomous cycles "
+                    f"past baseline {baseline}, so this pull request is not "
+                    f"converging on its own",
+                    payload={CYCLE: cycle, BASELINE: baseline},
+                )
+            self._run_build(worktree, rework_prompt(self.issue, verdict.open_blocking))
+
+    def _elected(self, pull: _PullRequest, cycle: int) -> tuple[str, ...]:
+        """The reviews this cycle runs, from the pull request's changed files.
+
+        Recomputed every cycle rather than fixed at the first, because the diff
+        moves under it: a rework lap that adds a document earns the doc track it
+        did not earn before.
+
+        A diff that elects nothing stops the traverse. Every other verdict rests
+        on threads some review posted, so a cycle with no review at all would
+        find no Blocking thread, converge, and hand back a pull request nobody
+        read as though it had passed.
+        """
+        tracks = elect_tracks(self._changed_files(pull))
+        if not tracks:
+            raise _Escalated(
+                f"cycle {cycle} of {pull.url} elects no review track — every file "
+                f"it changes is one no review reads, so nothing would judge it"
+            )
+        elected = tuple(node for track in tracks for node in REVIEWS[track])
+        _say(f"{self.repo}#{self.issue}: cycle {cycle} runs {', '.join(elected)}")
+        return elected
+
+    def _fan_out(
+        self, nodes: Sequence[str], headers: Mapping[str, CycleHeader], worktree: Path
+    ) -> None:
+        """Run the cycle's reviews at once, and relay every one that did not land.
+
+        The books come first and the escalation second. An exception raised out
+        of one thread would leave its siblings running with nobody waiting for
+        them, and each of those launches has a `job-launch` row that only its own
+        report closes — so every job is waited out, whatever any of them did, and
+        only then is the failure relayed. Nothing is retried and nothing is
+        absorbed: a review that did not come back clean and reporting done ends
+        the traverse.
+
+        The pool's threads block the ledger's deferred signals on entry, under
+        the invariant every thread in a process that writes to that ledger is
+        held to — one unblocked thread anywhere is a route back into the middle
+        of a write the traverse's own trap would then deadlock against.
+
+        One thing is different here from the sequential path. A traverse killed
+        mid-fan-out files these jobs from its trap, and each worker's own
+        `launch_job` still returns and files a second report for the same
+        session: the `SystemExit` the trap raises reaches the main thread alone.
+        Both rows are true and neither hides the other — a launch with two
+        reports still reads as finished — so the duplicate is left rather than
+        papered over.
+        """
+        with ThreadPoolExecutor(
+            max_workers=len(nodes), initializer=_defer_signals
+        ) as pool:
+            running = [
+                pool.submit(self._review, node, headers, worktree) for node in nodes
+            ]
+        failures = [failure for job in running if (failure := job.result()) is not None]
+        if failures:
+            raise _relay(failures)
+
+    def _review(
+        self, node: str, headers: Mapping[str, CycleHeader], worktree: Path
+    ) -> _Failure | None:
+        """Launch one review, and hand back how it failed rather than raising.
+
+        The prompt carries the sha from this review's own newest header, and
+        never a sibling's. Election is recomputed every cycle, so a track really
+        can sit out one and come back — handed the newest sha on the pull
+        request it would start its delta at a commit it never read, and skip
+        every change between in silence. A review with no header yet is on its
+        first cycle and reads the whole diff, so it is given the issue number
+        alone.
+        """
+        header = headers.get(REVIEW_NAMES[node])
+        prompt = str(self.issue) if header is None else f"{self.issue} {header.sha}"
+        _say(f"{self.repo}#{self.issue}: launching {node}")
+        try:
+            outcome = self._launch_job(node, worktree, REVIEW_SCHEMA, prompt)
+        except launcher.LaunchAborted as aborted:
+            return _Failure(
+                f"{node} could not be launched: {'; '.join(aborted.findings)}", node
+            )
+        except Exception as failure:
+            # Every exception, not only the launcher's own. One leaving this
+            # thread would abandon the siblings, and what stopped this job is
+            # relayed either way — an unforeseen failure reaches the operator as
+            # its own type and message on the escalation row.
+            return _Failure(f"{node} failed: {type(failure).__name__}: {failure}", node)
+        return _judge(node, outcome)
+
+    def _pull_request(self) -> _PullRequest:
+        """The open pull request on this issue's branch, refused when there is none.
+
+        Read off GitHub rather than lifted from what a node said. A node that
+        believes it opened a pull request and did not would otherwise send the
+        loop reviewing a number that stands for nothing.
+        """
+        listed = self._gh_or_absent(
+            "pr",
+            "list",
+            "--repo",
+            self.repo,
+            "--head",
+            self._branch(),
+            "--json",
+            "number,url",
+            "--jq",
+            r'.[] | "\(.number) \(.url)"',
+        )
+        if listed is None:
             raise _Escalated(
                 f"{OPEN_PR} reported {DONE} but no pull request is open on "
                 f"{self._branch()}",
                 node=OPEN_PR,
             )
+        number, url = listed.splitlines()[0].split(" ", 1)
+        return _PullRequest(number=int(number), url=url)
+
+    def _cycle_headers(self, pull: _PullRequest) -> dict[str, CycleHeader]:
+        """Every review's newest cycle header, read off the pull request itself.
+
+        `--paginate` is not optional. The endpoint returns 30 reviews a page,
+        oldest first, so an unpaginated read drops the newest headers — exactly
+        the ones the cycle count and the shas depend on. A traverse busy enough
+        to approach the cap is the one whose count would silently reset.
+        """
+        return parse_cycle_headers(
+            self._gh(
+                "api",
+                "--paginate",
+                f"repos/{self.repo}/pulls/{pull.number}/reviews",
+                "--jq",
+                r'.[].body | split("\n")[0]',
+            ).splitlines()
+        )
+
+    def _changed_files(self, pull: _PullRequest) -> list[ChangedFile]:
+        """What the pull request changes, in the four fields the election weighs.
+
+        One line per file, and every line is parsed strictly. A line this cannot
+        read is a filter that has stopped returning what it used to, and a file
+        dropped from the answer is a track that quietly stops being elected.
+        """
+        changed = []
+        for line in self._gh(
+            "api",
+            "--paginate",
+            f"repos/{self.repo}/pulls/{pull.number}/files",
+            "--jq",
+            r".[] | [.filename, .status, (.additions|tostring), "
+            r"(.deletions|tostring)] | @tsv",
+        ).splitlines():
+            changed.append(self._changed_file(line, pull))
+        return changed
+
+    def _changed_file(self, line: str, pull: _PullRequest) -> ChangedFile:
+        """One tab-separated file line, refused rather than guessed at."""
+        fields = line.split("\t")
+        if len(fields) != CHANGED_FILE_FIELDS or not all(
+            count.isdecimal() for count in fields[2:]
+        ):
+            raise _Escalated(
+                f"the file list of {pull.url} carries a line this cannot read as "
+                f"a path, a status and two line counts: {line!r}"
+            )
+        path, status, additions, deletions = fields
+        return ChangedFile(
+            path=path,
+            status=status,
+            additions=int(additions),
+            deletions=int(deletions),
+        )
+
+    def _threads(self, pull: _PullRequest) -> list[ReviewThread]:
+        """Every review thread on the pull request, with its resolution state.
+
+        Paged to the end. `reviewThreads` caps at 100 and returns them oldest
+        first, so the threads a long-running pull request would drop are its
+        newest — and a verdict that never sees an open Blocking thread is a
+        convergence declared falsely.
+        """
+        owner, name = self.repo.split("/")
+        threads: list[ReviewThread] = []
+        after = "null"
+        while True:
+            page = self._threads_page(owner, name, pull.number, after)
+            threads.extend(_thread(node) for node in page["nodes"])
+            if not page["pageInfo"]["hasNextPage"]:
+                return threads
+            after = json.dumps(page["pageInfo"]["endCursor"])
+
+    def _threads_page(
+        self, owner: str, name: str, number: int, after: str
+    ) -> dict[str, Any]:
+        """One GraphQL page of review threads, decoded.
+
+        `gh api graphql` has no `-R` flag: the owner and the repository are
+        spelled into the query's own arguments, which is why they are formatted
+        in rather than passed as a repository option.
+        """
+        query = THREADS_QUERY.format(owner=owner, name=name, number=number, after=after)
+        answered = json.loads(self._gh("api", "graphql", "-f", f"query={query}"))
+        return answered["data"]["repository"]["pullRequest"]["reviewThreads"]  # type: ignore[no-any-return]
+
+    def _record_verdict(
+        self, pull: _PullRequest, cycle: int, sha: str | None, verdict: CycleVerdict
+    ) -> None:
+        """Write the cycle's verdict row — the one record of what a cycle decided."""
+        ledger.verdict(
+            self.repo,
+            self.issue,
+            {
+                PR: pull.url,
+                CYCLE: cycle,
+                SHA: sha,
+                BLOCKING_OPEN: verdict.blocking_open,
+                BLOCKING_RESOLVED: verdict.blocking_resolved,
+                SUGGESTION_OPEN: verdict.suggestion_open,
+                SUGGESTION_RESOLVED: verdict.suggestion_resolved,
+                VERDICT: verdict.verdict,
+            },
+            db_path=self.db_path,
+        )
+        _say(f"{self.repo}#{self.issue}: cycle {cycle} — {verdict.verdict}")
+
+    def _pr_ready(self, pull: _PullRequest) -> TraverseOutcome:
+        """Close the window over a pull request that has converged on Blocking."""
         ledger.traverse_end(
             self.repo,
             self.issue,
-            {ledger.STATUS: ledger.PR_READY, PR_URL: url},
+            {ledger.STATUS: ledger.PR_READY, PR_URL: pull.url},
             db_path=self.db_path,
         )
-        _say(f"{self.repo}#{self.issue}: pr-ready at {url}")
-        return TraverseOutcome(ledger.PR_READY, pr_url=url)
+        _say(f"{self.repo}#{self.issue}: pr-ready at {pull.url}")
+        return TraverseOutcome(ledger.PR_READY, pr_url=pull.url)
 
     # --- launching a node ---
 
-    def _launch(self, node: str, worktree: Path, schema: Mapping[str, object]) -> None:
+    def _launch(
+        self, node: str, worktree: Path, schema: Mapping[str, object], prompt: str
+    ) -> None:
         """Launch one node and refuse anything but a clean process reporting done.
 
         Zero retries live here. Every way a job can fail — the process
@@ -805,37 +1242,36 @@ class _Traverse:
         """
         _say(f"{self.repo}#{self.issue}: launching {node}")
         try:
-            outcome = launcher.launch_job(
-                self.repo,
-                self.issue,
-                node,
-                worktree,
-                str(self.issue),
-                schema,
-                {MODE: self.mode, NODE: node},
-                db_path=self.db_path,
-                agents_dir=self.agents_dir,
-                claude_cmd=self.claude_cmd,
-                timeout_s=self.timeout_s,
-                grace_s=self.grace_s,
-            )
+            outcome = self._launch_job(node, worktree, schema, prompt)
         except launcher.LaunchAborted as aborted:
             raise _Escalated(
                 f"{node} could not be launched: {'; '.join(aborted.findings)}",
                 node=node,
             ) from aborted
-        if outcome.process_outcome != launcher.CLEAN:
+        failure = _judge(node, outcome)
+        if failure is not None:
             raise _Escalated(
-                f"{node} ended {outcome.process_outcome}",
-                node=node,
-                session_id=outcome.session_id,
+                failure.reason, node=failure.node, session_id=failure.session_id
             )
-        if outcome.task_outcome != DONE:
-            raise _Escalated(
-                f"{node} reported {outcome.task_outcome!r}",
-                node=node,
-                session_id=outcome.session_id,
-            )
+
+    def _launch_job(
+        self, node: str, worktree: Path, schema: Mapping[str, object], prompt: str
+    ) -> launcher.JobOutcome:
+        """One `launch_job` call with this traverse's seams filled in."""
+        return launcher.launch_job(
+            self.repo,
+            self.issue,
+            node,
+            worktree,
+            prompt,
+            schema,
+            {MODE: self.mode, NODE: node},
+            db_path=self.db_path,
+            agents_dir=self.agents_dir,
+            claude_cmd=self.claude_cmd,
+            timeout_s=self.timeout_s,
+            grace_s=self.grace_s,
+        )
 
     def _preflight(self, worktree: Path) -> None:
         """Refuse a launch that would be metered, or a node with no definition.
@@ -1103,6 +1539,11 @@ class _Traverse:
         `traverse-end` follows the escalation row rather than replacing it: the
         escalation says why, and the end is what closes the window, so a traverse
         that wrote only the first would leave its issue open for good.
+
+        The escalation's own keys are merged last, so a payload that named one of
+        the three above would be the one written — a merge that dropped them
+        silently would leave a row whose extra keys are a lie about which
+        escalation it is.
         """
         _say(f"{self.repo}#{self.issue}: escalated — {escalated.reason}")
         ledger.traverse_escalation(
@@ -1112,6 +1553,7 @@ class _Traverse:
                 REASON: escalated.reason,
                 NODE: escalated.node,
                 SESSION_ID: escalated.session_id,
+                **escalated.payload,
             },
             db_path=self.db_path,
         )
@@ -1191,22 +1633,6 @@ class _Traverse:
         return self._gh_or_absent(
             "api", f"repos/{self.repo}/branches/{branch}", "--jq", ".commit.sha"
         )
-
-    def _pr_url(self) -> str | None:
-        """The URL of the open pull request on this issue's branch, if there is one."""
-        listed = self._gh_or_absent(
-            "pr",
-            "list",
-            "--repo",
-            self.repo,
-            "--head",
-            self._branch(),
-            "--json",
-            "url",
-            "--jq",
-            ".[].url",
-        )
-        return listed.splitlines()[0] if listed else None
 
 
 def _column(row: ledger.LedgerRow, name: str) -> str:
