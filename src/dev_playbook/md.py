@@ -3,10 +3,9 @@
 This module is the single home for the markdown mechanics that more than one
 hook needs: fenced-code skipping, GitHub heading slugs, YAML frontmatter,
 link extraction, the OKF concept-doc/harness-owned path classification, and
-the rootless-source test behind the cross-reference grammar. Every workspace
-detector that reads markdown consumes it, so the slug rule, the bundle
-boundary, and the rootless roster are defined once here rather than drifting
-between scripts.
+the rootless-source test behind the cross-reference grammar. The slug rule,
+the bundle boundary, and the rootless roster are defined once here rather than
+drifting between scripts.
 
 ``yaml`` is imported lazily inside :func:`parse_frontmatter` so importers that
 only need the pure-text helpers (``ref-lint`` runs under plain ``python3``) do
