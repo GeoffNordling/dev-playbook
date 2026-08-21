@@ -4,6 +4,7 @@ import os
 import sqlite3
 import subprocess
 import sys
+import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -46,6 +47,39 @@ MISNAMED_DEFINITION = {**DEFINITION, "name": "builder"}
 UNTUNED_DEFINITION = {"name": NODE, "description": "The build node.", "model": "opus"}
 OVERTUNED_DEFINITION = {**DEFINITION, "effort": "turbo"}
 
+# A launcher run driven from a separate process, so a test can kill the
+# launcher itself rather than the child it supervises. The two module paths the
+# suite redirects are set here by hand: a monkeypatched module attribute lives
+# in this process alone, and a child that imports `launcher` fresh would
+# otherwise sweep the machine's real `/etc` managed settings.
+LAUNCH_RUNNER = """
+import json
+import sys
+from pathlib import Path
+
+arguments = json.loads(Path(sys.argv[1]).read_text())
+sys.path.insert(0, arguments["src"])
+
+from dev_playbook.factory import launcher
+
+launcher.MANAGED_SETTINGS = Path(arguments["managed_settings"])
+launcher.MANAGED_SETTINGS_DIR = Path(arguments["managed_settings_dir"])
+
+launcher.launch_job(
+    arguments["repo"],
+    arguments["issue"],
+    arguments["node"],
+    Path(arguments["worktree"]),
+    arguments["prompt"],
+    arguments["schema"],
+    arguments["launch_payload"],
+    db_path=Path(arguments["db_path"]),
+    agents_dir=Path(arguments["agents_dir"]),
+    claude_cmd=tuple(arguments["claude_cmd"]),
+    timeout_s=arguments["timeout_s"],
+)
+"""
+
 # A stand-in for claude: it records the argv and placement it was spawned
 # with, then emits a canned stream-json stream line by line and exits the way
 # its plan says. `$CWD` in a canned line becomes the directory it really ran
@@ -67,7 +101,7 @@ from pathlib import Path
 here = Path(__file__).parent
 plan = json.loads((here / "plan.json").read_text())
 (here / "record.json").write_text(
-    json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd()})
+    json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd(), "pid": os.getpid()})
 )
 if plan["orphan_seconds"]:
     subprocess.Popen(
@@ -132,6 +166,13 @@ BRIEF_GRACE = 0.3
 # near spent and the pipe still held open.
 ORPHAN_SECONDS = 5.0
 ORPHANED_DEADLINE = 1.0
+
+# How long the pdeathsig test waits — for the child to declare itself, and then
+# for it to be gone after its launcher is destroyed. The budget is far shorter
+# than `LINGER_SECONDS`, so a child that outlives its launcher fails the test
+# rather than passing on a slow machine.
+PDEATHSIG_BUDGET = 10.0
+PDEATHSIG_POLL = 0.05
 
 # What the one real-spawn test needs of the machine it runs on, read at import
 # before any fixture redirects them. That test alone runs under the real home
@@ -421,6 +462,44 @@ def write_definition(directory: Path, stem: str, frontmatter: dict[str, Any]) ->
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"---\n{body}\n---\n\nThe node's instructions.\n")
     return path
+
+
+def process_state(pid: int) -> str | None:
+    """The single-letter process-table state of `pid`, or None once it is gone.
+
+    Read from ``/proc`` rather than asked with ``os.kill(pid, 0)``, because a
+    signal probe answers "alive" for a zombie — and a child whose launcher was
+    destroyed is reparented, so it is a zombie for however long it takes the
+    reaper to collect it. What is under test is that the child stopped running,
+    which the state letter says and the signal probe does not.
+    """
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_text()
+    except OSError:
+        return None
+    # The comm field is parenthesized and may itself hold spaces, so the split
+    # starts after the last ')' rather than at the second field.
+    return stat.rpartition(")")[2].split()[0]
+
+
+def wait_until_stopped(pid: int, budget: float) -> bool:
+    """Poll until `pid` is gone or a zombie, within `budget` seconds."""
+    deadline = time.monotonic() + budget
+    while time.monotonic() < deadline:
+        if process_state(pid) in (None, "Z"):
+            return True
+        time.sleep(PDEATHSIG_POLL)
+    return False
+
+
+def wait_for_file(path: Path, budget: float) -> bool:
+    """Poll until `path` exists, within `budget` seconds."""
+    deadline = time.monotonic() + budget
+    while time.monotonic() < deadline:
+        if path.exists():
+            return True
+        time.sleep(PDEATHSIG_POLL)
+    return False
 
 
 def ledger_rows(db: Path) -> list[tuple[str, str, dict[str, Any]]]:
@@ -1089,6 +1168,51 @@ def test_a_duration_the_harness_reports_as_a_string_violates_the_contract(
         launch(claude_cmd=claude_cmd)
 
     assert "duration_ms" in str(violated.value)
+
+
+def test_a_child_dies_with_a_launcher_that_is_destroyed_without_warning(
+    tmp_path: Path,
+    worktree: Path,
+    agents_dir: Path,
+    db: Path,
+    managed_settings: tuple[Path, Path],
+    fake_claude: Callable[..., tuple[str, ...]],
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line()], linger=LINGER_SECONDS)
+    managed, drop_in = managed_settings
+    arguments = tmp_path / "launch.json"
+    arguments.write_text(
+        json.dumps(
+            {
+                "src": str(Path(launcher.__file__).parents[3]),
+                "managed_settings": str(managed),
+                "managed_settings_dir": str(drop_in),
+                "repo": REPO,
+                "issue": ISSUE,
+                "node": NODE,
+                "worktree": str(worktree),
+                "prompt": PROMPT,
+                "schema": SCHEMA,
+                "launch_payload": LAUNCH_PAYLOAD,
+                "db_path": str(db),
+                "agents_dir": str(agents_dir),
+                "claude_cmd": list(claude_cmd),
+                "timeout_s": LINGER_SECONDS,
+            }
+        )
+    )
+    runner = tmp_path / "runner.py"
+    runner.write_text(LAUNCH_RUNNER)
+    launching = subprocess.Popen([sys.executable, str(runner), str(arguments)])
+    record = tmp_path / "fake" / "record.json"
+    assert wait_for_file(record, PDEATHSIG_BUDGET)
+    child = json.loads(record.read_text())["pid"]
+
+    launching.kill()
+    launching.wait(timeout=PDEATHSIG_BUDGET)
+
+    assert wait_until_stopped(child, PDEATHSIG_BUDGET)
 
 
 @pytest.mark.skipif(

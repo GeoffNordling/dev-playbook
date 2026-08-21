@@ -159,10 +159,17 @@ ORDER BY l.session_id
 # launcher's business and passes through uninterpreted.
 #
 # The vocabulary is closed and this module owns it: a `traverse-end` carries the
-# status `traverse_issue` exited with, and those are the two terminal statuses
-# the graph has. `traverse_end` refuses anything else at the door, so adding a
+# status the traverse exited with, and those are the three terminal statuses the
+# graph has. `traverse_end` refuses anything else at the door, so adding a
 # terminal status is an edit here -- which is the point: the ledger is where a
 # launcher's typo surfaces, and it surfaces at the write.
+#
+# `killed` is the one no `traverse_issue` return carries. It is written from the
+# kill trap, where the traverse is being taken down mid-flight and no value can
+# be returned to anyone -- and it has to be in the vocabulary, because a trap
+# whose last write raises leaves the window open and every job of that issue
+# reading as live for good. It closes a window like any other end and is never
+# `pr-ready`, so `awaiting_merge` passes over it without a clause of its own.
 #
 # A tuple, not a set: membership on a tuple compares rather than hashes, so an
 # unhashable status -- a list, an object -- is judged unrecognised instead of
@@ -170,7 +177,8 @@ ORDER BY l.session_id
 STATUS = "status"
 PR_READY = "pr-ready"
 ESCALATED = "escalated"
-STATUSES = (PR_READY, ESCALATED)
+KILLED = "killed"
+STATUSES = (PR_READY, ESCALATED, KILLED)
 
 
 def _names(value: object) -> bool:
@@ -228,10 +236,10 @@ def _gate(**address: object) -> None:
 def _gate_status(payload: Mapping[str, object]) -> None:
     """Refuse a `traverse-end` carrying a status the graph never exits on.
 
-    Beside the address gate, and for the same reason: `traverse_issue` ends
-    `pr-ready` or `escalated` and nothing else, so a payload carrying anything
-    outside that is a launcher's typo. It is a caller bug, raised as
-    `ValueError` and before the store is touched, so nothing is written.
+    Beside the address gate, and for the same reason: a traverse ends on one of
+    `STATUSES` and nothing else, so a payload carrying anything outside that is
+    a launcher's typo. It is a caller bug, raised as `ValueError` and before the
+    store is touched, so nothing is written.
 
     This is the only writer of a `traverse-end`, and judging a status needs no
     sight of any other row -- so the judgment belongs here, where the caller who

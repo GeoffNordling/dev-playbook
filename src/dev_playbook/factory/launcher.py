@@ -1,9 +1,11 @@
 """The job launcher — one factory node launch, preflight through spawn to a ledgered job."""
 
+import ctypes
 import json
 import os
 import queue
 import shutil
+import signal
 import subprocess
 import threading
 import time
@@ -71,6 +73,25 @@ EFFORT_LEVEL_VAR = "CLAUDE_CODE_EFFORT_LEVEL"
 DEADLINE_SECONDS = 3600.0
 GRACE_SECONDS = 30.0
 MILLISECONDS = 1000.0
+
+# `prctl`'s "signal me when my parent dies" operation, from <linux/prctl.h>.
+# Every child is spawned under it, so a launcher that dies untrappably — SIGKILL,
+# the OOM killer — still takes its child down with it rather than leaving a
+# claude session running on the subscription with nobody watching it. The trap
+# in the traverse covers the signals a process can catch; this covers the two it
+# cannot, and the next traverse's orphan sweep completes the books either way.
+PR_SET_PDEATHSIG = 1
+
+# The C library this process already has open, so `prctl` is resolved once at
+# import and the child does nothing but call it. `CDLL(None)` asks for the
+# running program's own symbols rather than naming a soname, which is what makes
+# this hold wherever the interpreter itself links its libc.
+#
+# Resolving it here rather than inside the child is the whole safety argument:
+# what runs between fork and exec must be async-signal-safe, and a symbol
+# lookup — which takes the dynamic loader's lock — is not. A parent thread
+# holding that lock at the moment of the fork would deadlock the child forever.
+LIBC = ctypes.CDLL(None, use_errno=True)
 
 # How long the supervisor waits on a silent queue before looking at the child
 # itself. It is what lets supervision end when the child ends rather than when
@@ -500,6 +521,38 @@ class _Run:
     dropped: bool = False
 
 
+def _die_with_parent() -> None:
+    """Ask the kernel to SIGTERM this process the moment its parent dies.
+
+    Runs in the child, between the fork and the exec, and does one syscall
+    through a function pointer the parent resolved at import — see `LIBC` for
+    why the lookup cannot happen here.
+
+    The flag survives the exec that follows, so it is claude itself the kernel
+    signals, and it is set unconditionally: a launcher that is SIGKILLed or
+    OOM-killed runs no cleanup of its own, and this is the only thing standing
+    between that and a claude session billed to the subscription with nobody
+    watching it.
+
+    A refused `prctl` raises rather than being logged and passed over. CPython
+    re-raises it in the parent, so the launch fails loudly with nothing spawned
+    — which is the right trade: the alternative is spawning a child the launcher
+    silently cannot guarantee it can take down.
+
+    A `preexec_fn` in a process that has threads is the documented hazard here,
+    and the traverse does launch a second node while the first launch's pump
+    thread can still be alive — a grandchild holding stdout open outlives the
+    `_watch` that stopped waiting for it. That thread is blocked in a read
+    syscall, holding no allocator lock, which is what makes the fork safe; the
+    lookup that would need one was done at import.
+    """
+    if LIBC.prctl(PR_SET_PDEATHSIG, signal.SIGTERM) != 0:
+        raise LauncherError(
+            f"the kernel refused PR_SET_PDEATHSIG for this child, so it could "
+            f"outlive its launcher: {os.strerror(ctypes.get_errno())}"
+        )
+
+
 def _supervise(
     argv: list[str],
     worktree: Path,
@@ -536,6 +589,10 @@ def _supervise(
             stdout=subprocess.PIPE,
             text=True,
             encoding="utf-8",
+            # Forces the fork-and-exec path, which is the point: `posix_spawn`
+            # has no hook to set the death signal in the child, and the child is
+            # the only place it can be set.
+            preexec_fn=_die_with_parent,
         )
     stream = process.stdout
     if stream is None:
