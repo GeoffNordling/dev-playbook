@@ -60,8 +60,7 @@ SLUG_WHITESPACE = re.compile(r"\s")
 # agent definitions ship into ~/.claude, so a `/path` Link in one would resolve
 # against whatever repo the reading agent happens to stand in. They use the
 # Citation form even for same-repo targets, per the cross-reference standard.
-# Read by has_fixed_repo_root; classify names the same segments separately, and
-# its comment there explains why the two rosters are not one.
+# classify() spells these names out again; add a fourth segment in both places.
 ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 
 
@@ -209,13 +208,10 @@ def has_fixed_repo_root(relpath: str) -> bool:
     """True when a source file is always read from one repo, so ``/`` resolves.
 
     The one home for the rootless test: ``ref-lint`` decides the ``wrong-form``
-    finding with it and the file graph stamps the matching edge status, so a
-    new rootless segment reaches both at once. The two drifted once already —
-    ``ref-lint`` gained ``agents`` and the graph did not — which is why the
-    roster lives here rather than being mirrored.
+    finding with it and the file graph stamps the matching edge status, so a new
+    rootless segment reaches both at once rather than drifting between them.
 
-    Relpaths are posix-form throughout, so the split normalizes on
-    :class:`PurePosixPath`. A segment matches at any depth, which is what lets
+    A segment matches at any depth, which is what lets
     ``dotfiles/dot-claude/skills/...`` and a consumer's ``.claude/skills/...``
     answer alike.
     """
@@ -267,11 +263,8 @@ def classify(relpath: str) -> str:
         return "index"
     if name in {"CLAUDE.md", "SKILL.md"}:
         return "harness"
-    # These are ROOTLESS_SEGMENTS' three names, deliberately spelled out again
-    # rather than read from the roster: both markers answer "does this file stow
-    # into ~/.claude", but the answers differ for `skills`, where only the
-    # references/ and scripts/ subtrees are harness and a bundle's own prose is
-    # not. A fourth rootless segment must be added in both places.
+    # ROOTLESS_SEGMENTS' names again, not read from the roster: `skills` differs
+    # here, where only the references/ and scripts/ subtrees are harness.
     if {"rules", "agents"} & set(dirparts):
         return "harness"
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):

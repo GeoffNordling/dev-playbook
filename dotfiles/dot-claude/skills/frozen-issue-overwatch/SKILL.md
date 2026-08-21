@@ -88,7 +88,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/.claude/skills/frozen-issue-overwatch/references/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [pause 1](~/.claude/skills/frozen-issue-overwatch/references/user-checkpoints.md#pause-1-the-review-verdict), answer their questions, help them weigh, and act only on an explicit verdict.
 
-Every body you post here — a deferral ruling, a deciding reason, the regenerated merge message — is staged at `/tmp/<kind>-<N>.md` with the Write tool, not a heredoc: the sandbox bounds shell commands, not the file tools, so Bash gets `Read-only file system` there and the Write tool doesn't. Pass each one with `--body-file`.
+Write every body you post here to `/tmp/<kind>-<N>.md` with the Write tool, and pass it with `--body-file`.
 
 - **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs (`gh pr comment --body-file`) — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then regenerate the merge message from the whole PR record, per [the two owners](~/.claude/skills/frozen-issue-overwatch/references/factory-operations.md#the-two-owners), and pass it with `gh pr edit --body-file`. Carry the issue to the user's final read and merge.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment --body-file` / `gh pr comment --body-file`), then move the label back along the rework edge.
