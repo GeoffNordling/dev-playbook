@@ -8,7 +8,7 @@ tooling, notes on the workspace's own machinery, and the Decision Records.
 - [Headless Operation](/docs/headless.md) — Running Claude Code headless on subscription
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
-- [Sandboxing Claude agents](/docs/sandboxing.md) — Which tools fence a Claude agent, and the container direction for work with no user attached
+- [Sandboxing Claude agents](/docs/sandboxing.md) — The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached is still ahead
 
 ## Directories
 

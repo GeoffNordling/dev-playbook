@@ -288,7 +288,7 @@ GLOBAL_VALID = (
     "## Behaviors\n\n"
     "### Read the standards\n\nRead the catalog first.\n\n"
     "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
-    "### Work in the sandbox\n\nYou run sandboxed.\n"
+    "### Teach unfamiliar terms\n\nExplain the unfamiliar term.\n"
 )
 
 

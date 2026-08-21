@@ -101,9 +101,7 @@ unruled, however clearly the surrounding discussion pointed at an answer.
 ## 6. Install on main
 
 The ruled installs land on the main checkout, before any branch exists, through
-the CLI that owns the lock file. **The user runs these** — they reach the
-network and npm, which a sandboxed session cannot. Hand over one line per
-skill and wait for the result:
+the CLI that owns the lock file. Run one line per skill:
 
 ```
 npx skills@latest add mattpocock/skills --skill <name> -g -y

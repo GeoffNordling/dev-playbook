@@ -188,17 +188,6 @@ the id the exporter wants. `--find` searches message and tool content; a pattern
 matching more than one session is ambiguous and fails loud rather than guess, so
 narrow it or pass `--limit N`.
 
-Two traps, both of which cost real time to rediscover:
-
-- **The script must be excluded from the Claude Code sandbox.** It reaches the
-  agentsview daemon on the host's loopback, which a sandboxed process cannot
-  see. `excludedCommands` in [`fedora.json`](/dotfiles/settings/fedora.json)
-  matches the *top-level* command, so excluding `agentsview` does nothing for a
-  script that merely spawns it — `transcript-export` itself carries the entry.
-  (The sandbox is a primary-machine feature; see [machines.md](/docs/machines.md).)
-- **A command excluded from the sandbox loses the sandbox's environment**, so
-  `$TMPDIR` is unset. Pass a real output directory, not `"$TMPDIR/out"`.
-
 When a filter `--find` does not expose is needed (`--project`, `--date-from`,
 `--regex`), query the daemon directly and pass the ids through. `agentsview`
 requires `--server`: without it the CLI auto-starts a rival daemon, which dies on
