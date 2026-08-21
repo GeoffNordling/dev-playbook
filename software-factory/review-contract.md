@@ -142,11 +142,16 @@ cycle header nor an attribution line is the user's.
 alone: the prior review bodies on the pull request whose header opens with
 this review's name, plus one, read from
 
-    gh api repos/<owner>/<repo>/pulls/<pr>/reviews
+    gh api --paginate repos/<owner>/<repo>/pulls/<pr>/reviews
 
 That endpoint returns each body byte-identical and ordered by ascending `id`,
 so `n` is read rather than guessed — and a review that stands down for a cycle
 leaves its own count where it was.
+
+`--paginate` is not optional. The endpoint returns 30 reviews per page,
+oldest first, so an unpaginated read drops the *newest* headers — exactly the
+ones the count depends on. A traverse busy enough to approach the cap is the
+one whose count would silently reset, leaving the cap unable to trip.
 
 ## Delta re-review
 
@@ -193,52 +198,95 @@ cap or declares convergence.
 ## The `gh` mechanics
 
 Every command names its repository outright, so none of them depends on the
-directory it runs in. The reviewer resolves the pair once:
+directory it runs in. The reviewer resolves the repository, then the pull
+request, in that order:
 
     gh repo view --json nameWithOwner --jq .nameWithOwner
+    gh pr list -R <owner>/<repo> --head "$(git rev-parse --abbrev-ref HEAD)" \
+      --json number,headRefOid
 
-`gh api` has no `-R` flag: owner and repo are spelled into the path
+**The number comes before `-R`, because `-R` is what makes it mandatory.**
+Naming the repository turns off branch inference, so a `gh pr` command that
+would otherwise find its own pull request no longer can — bare
+`gh pr view -R <owner>/<repo> --json number` exits on `argument required when
+using the --repo flag`. `gh pr list` is the one command in the family that
+takes a branch instead of a number, which is why it opens the sequence; every
+later `gh pr` call carries `-R <owner>/<repo>` **and** the number it returned,
+as in `gh pr diff -R <owner>/<repo> <pr>`. The branch comes from the local
+checkout, the same place the delta's `git diff` reads from.
+
+`gh api` has no `-R` flag at all: owner and repo are spelled into the path
 (`repos/<owner>/<repo>/…`) and into every GraphQL argument
-(`repository(owner:"<owner>", name:"<repo>")`). The `gh pr` family does take
-`-R <owner>/<repo>`, and carries it.
+(`repository(owner:"<owner>", name:"<repo>")`).
 
-**Post the cycle's review** — one call. The body goes in on standard input,
+**`headRefOid` is the `commit_id` for everything below.** It is the branch tip
+GitHub itself holds, and the posting endpoints reject a sha that is not on the
+pull request with HTTP 422. Local `HEAD` agrees with it only until it doesn't —
+an unpushed commit, or a push that landed after the reviewer read the tree —
+so the value resolved above is the one that is used, and local `HEAD` never is.
+
+**Never write the JSON by hand.** Findings quote code, and code contains `"`,
+`\`, and newlines. One quoted finding in a hand-written payload makes the whole
+body invalid, the `reviews` call fails, and the cycle posts nothing at all —
+which the loop then reads as the review never having run, because the cycle
+header is the only record it has. So each body is written to a plain text file
+and `jq` assembles the payload around it: escaping becomes the tool's job, and
+no finding's content can break the call that carries it.
+
+**Post the cycle's review** — one call. The payload goes in through `--input`,
 because a review's `comments[]` array cannot be expressed with `-f` field
 flags:
 
 ```bash
-gh api repos/<owner>/<repo>/pulls/<pr>/reviews --input - <<'JSON'
-{
-  "commit_id": "<git rev-parse HEAD>",
-  "event": "COMMENT",
-  "body": "<cycle header>\n\n<clean dimensions>",
-  "comments": [
-    {"path": "<file>", "line": 41, "side": "RIGHT",
-     "body": "Blocking — <problem, fix, and rule>\n\n— <node> · <session id>"}
-  ]
-}
-JSON
+# review-body.txt holds the cycle header and the clean dimensions;
+# finding-1.txt holds one finding, severity first and attribution last.
+jq -n \
+  --arg commit "<headRefOid>" \
+  --rawfile body review-body.txt \
+  --arg path1 '<file>' --argjson line1 41 --rawfile body1 finding-1.txt \
+  '{commit_id: $commit, event: "COMMENT", body: $body,
+    comments: [{path: $path1, line: $line1, side: "RIGHT", body: $body1}]}' \
+  > payload.json
+
+gh api repos/<owner>/<repo>/pulls/<pr>/reviews --input payload.json
 ```
+
+One `--arg`/`--argjson`/`--rawfile` trio and one `comments[]` entry per
+finding. `jq` fails loudly on a missing file, so a lost finding stops the call
+rather than posting a review that quietly omits it.
 
 **Post a file-level finding** — the standalone endpoint. A review's
 `comments[]` rejects `subject_type` with HTTP 422, so this finding cannot ride
 the call above; GitHub wraps it in an implicit review of its own, and the
-thread it opens is resolvable like any other:
+thread it opens is resolvable like any other. It is assembled the same way, for
+the same reason:
 
 ```bash
-gh api repos/<owner>/<repo>/pulls/<pr>/comments \
-  -f commit_id=<sha> -f path=<file> -f subject_type=file \
-  -f body='Blocking — <subject named first> …'
+jq -n --arg commit "<headRefOid>" --arg path '<file>' \
+      --rawfile body finding-file-level.txt \
+  '{commit_id: $commit, path: $path, subject_type: "file", body: $body}' \
+  > file-comment.json
+
+gh api repos/<owner>/<repo>/pulls/<pr>/comments --input file-comment.json
 ```
 
-**Read the threads** — the one query behind verification:
+**Read the threads** — the one query behind verification. `reviewThreads` caps
+at 100 per page and returns them oldest first, so it is paged for the same
+reason the reviews read is: the threads a long-running pull request drops are
+its newest, and an unresolved Blocking thread the review never sees is a
+convergence the verdict declares falsely. Ask for `pageInfo`, then repeat the
+query with `after:"<endCursor>"` until `hasNextPage` is `false`, accumulating
+`nodes` across the pages:
 
 ```bash
 gh api graphql -f query='query { repository(owner:"<owner>", name:"<repo>") {
-  pullRequest(number:<pr>) { reviewThreads(first:100) { nodes {
-    id isResolved isOutdated path line originalLine subjectType
-    comments(first:10) { nodes { databaseId body } }
-  } } } } }'
+  pullRequest(number:<pr>) { reviewThreads(first:100) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      id isResolved isOutdated path line originalLine subjectType
+      comments(first:10) { nodes { databaseId body } }
+    }
+  } } } }'
 ```
 
 **Resolve a verified thread** — GraphQL only; REST has no resolve, and the
@@ -250,9 +298,14 @@ gh api graphql -f query='mutation { resolveReviewThread(
   input:{threadId:"<PRRT_… id>"}) { thread { id isResolved } } }'
 ```
 
-Every command above ran live on
+Each endpoint above ran live on
 [issue #412](https://github.com/GeoffNordling/dev-playbook/issues/412)'s
-prototype.
+prototype, which is where the 422s and the GraphQL-only resolve were measured.
+The `jq` assembly, the `--paginate` flag, the thread paging, and the `-R`
+working order came later, on
+[issue #457](https://github.com/GeoffNordling/dev-playbook/issues/457): the
+`-R` failure and `jq`'s escaping of a finding carrying `"` and `\` were
+measured there, the pagination limits are GitHub's documented page sizes.
 
 ## The report envelope
 
