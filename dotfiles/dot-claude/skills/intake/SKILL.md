@@ -56,7 +56,7 @@ Routing, given the mode:
 | The work | Routes to | Why |
 |---|---|---|
 | `mode:spike` | `phase:spike` | A question is answered inside the definition region; it never enters the factory. |
-| `mode:direct`, specifiable on the spot | `phase:build`, set at §6's issue-review verdict — §5 writes `phase:intake` | The brief is complete and the approach settled, so nothing is left to design. The verdict is what releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
+| `mode:direct`, specifiable on the spot | `phase:build`, set at §6 on the user's approval — §5 writes `phase:intake` | The brief is complete and the approach settled, so nothing is left to design. Their approval releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
 | `mode:direct`, needing exploration, tradeoffs, or slicing | `phase:design` | The approach isn't settled, or the work is bigger than one build. Design re-authors the brief or decomposes. |
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.
@@ -65,7 +65,7 @@ Ask the user when the call isn't clear. Routing is a one-way handoff — nothing
 
 Per the issue conventions: the build-leaf brief for `mode:direct`, the spike brief for `mode:spike`. When **adopting**, rewriting the stub's body into the brief format is mandatory — every adopted issue leaves with an authored body. Structure what the user wrote, don't discard it.
 
-Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is settled at the issue-review verdict that releases the issue, not here.
+Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready, and that is the expected state — readiness is settled at the approval that releases the issue, not here.
 
 On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft six of the headings, then invoke /user-intent-mini-interview for the seventh, `User intent`, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
 
@@ -79,7 +79,7 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 
 Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment, not a ceremony — when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*; neither substitutes for the other. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
 
-On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6's verdict sets and nothing here does; the hold is momentary, since §6 runs next in this same session — unless the user parks the beat, and then it holds here for the next session.
+On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6 sets on the user's approval and nothing here does; the hold lasts until §6 ends, or into the next session if the user parks the beat.
 
 **Capture** — create the issue at that phase:
 
@@ -101,14 +101,15 @@ For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with
 
 ### 6. The issue-review beat — fast path only
 
-An issue routed to `phase:build` is released by the [issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict), never by the §5 nod alone. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
+The two lenses are **your tools, not the user's** — you dispatch them, you rule on what they return, you repair the brief. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
 
 1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
-2. **Synthesize the consolidated disposition list** — both lenses' findings merged and deduplicated, each disposition carrying a recommendation. The user rules on dispositions, never on raw findings one by one.
-3. **Take the verdict.** *Pass* — apply or demote per the ruled dispositions (the body is editable until launch), post the **verdict-record comment** — date, lenses run, findings count, disposition gist, verdict — then `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. *Back to design* — the brief needs more than the front door gives it: post the verdict-record comment, then route the issue there (`gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit, the verdict record its work order. Re-review is always a full fresh run of both lenses.
+2. **Dispose of every finding yourself.** Merge and deduplicate both lenses' findings, then apply or demote each on your own judgment, editing the body until the brief is one you would hand an autonomous builder. Never stop to have the user rule: a finding you cannot resolve is something step 3 reports, not an interruption.
+3. **Post the verdict-record comment** — date, lenses run, findings count, disposition gist — then hand the user the issue URL, what the lenses caught, what you changed, and anything left unresolved. This is where they first read it, so finish it before this line.
+4. **On their approval, and only then, move the phase:** `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit, the verdict record its work order — always a full fresh run of both lenses.
 
-The user may always skip the beat, cut it short, or advance anyway — the review binds the factory's autonomous path, never the user.
+No label crosses out of the definition region on your own authority. The user may always skip the beat, cut it short, or advance anyway.
 
 ## Output
 
-Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`. Where the user parked §6's beat, `routed to <phase>` reads `awaiting verdict` instead: the issue holds at `phase:intake`, and nothing is routed until the verdict comes.
+Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`. Where the user parked §6's beat, `routed to <phase>` reads `awaiting approval` instead: the issue holds at `phase:intake` until they give it.

@@ -88,8 +88,8 @@ only when all four hold:
 - **A brief-complete body**, meeting the brief standard below; an
   under-specified leaf is not yet ready.
 - **Released at an issue-review verdict** — the definition session dispatched
-  the two review lenses, the user ruled on the consolidated dispositions, and
-  the verdict-record comment on the issue evidences it
+  the two review lenses, disposed of their findings itself, and the user
+  approved the finished issue; the verdict-record comment evidences it
   ([user-checkpoints.md](/software-factory/user-checkpoints.md#the-issue-review-verdict)).
   Setting `phase:build` is that verdict's consequence, not a separate act. The
   user may always skip or override the beat; the release is theirs either way.
