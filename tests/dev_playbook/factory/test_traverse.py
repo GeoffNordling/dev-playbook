@@ -1292,6 +1292,36 @@ def test_a_traverse_sent_sigterm_kills_its_child_and_closes_its_own_window(
     assert ledger.awaiting_merge(db_path=db) == []
 
 
+def test_a_kill_cascade_that_cannot_file_a_job_still_closes_the_window_as_killed(
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_process: Callable[..., subprocess.Popen[str]],
+) -> None:
+    """The `killed` end is written ahead of the filing that can fail.
+
+    Filing the standing jobs has ways to raise that the trap cannot rule out —
+    a probe that will not compile, a store that refuses the write. A trap that
+    filed first and closed after would lose the `killed` end to any of them,
+    with both signals already back at the default and no second chance at the
+    books. So the end goes first and the filing follows it.
+
+    The `[` row is planted after the traverse's own orphan sweep has already
+    run, which is what leaves the kill cascade to be the thing that meets it.
+    """
+    held = fake_claude(build=node_step([HOOK_LINE, init_line()], linger=LINGER_SECONDS))
+    running = traverse_process(claude_cmd=held, timeout_s=PATIENT_DEADLINE)
+    assert wait_until(lambda: len(launched()) == 1)
+    ledger.job_launch(REPO, ISSUE, "build", "[", {}, db_path=db)
+
+    running.send_signal(signal.SIGTERM)
+    running.communicate(timeout=PROCESS_BUDGET)
+
+    assert running.returncode != 0
+    assert payload_of(db, "traverse-end") == {"status": "killed"}
+    assert "traverse-escalation" not in kinds(db)
+
+
 def test_a_traverse_destroyed_without_warning_takes_its_child_with_it(
     fake_claude: Callable[..., tuple[str, ...]],
     launched: Callable[[], list[dict[str, Any]]],

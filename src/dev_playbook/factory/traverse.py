@@ -17,7 +17,7 @@ import os
 import signal
 import subprocess
 import sys
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -628,15 +628,30 @@ class _Traverse:
         """Take every live child down with this process, on a signal it can catch.
 
         The trap completes the books itself rather than letting the unwind do it:
-        it kills what it launched, files each child's terminal row, and closes the
-        window with a `killed` end. Then it raises `SystemExit`, which is what
-        stops `launch_job` writing a second report for the job just filed — the
-        exception leaves through the supervision instead of returning into it.
+        it reads what is still standing, closes the window with a `killed` end,
+        then kills each child and files its terminal row. Then it raises
+        `SystemExit`, which is what stops `launch_job` writing a second report for
+        the job just filed — the exception leaves through the supervision instead
+        of returning into it.
 
         Both signals are put back to the default first, so a second one while
         this is running kills outright rather than re-entering a handler already
         part-way through the books. They are put back by walking `TRAPPED`, so a
         signal added to the pair cannot be left trapped with no way out.
+
+        The three steps run in that order for a reason. Filing has ways to fail
+        that nothing here can rule out — a session id the probe will not compile,
+        a store that refuses the write — and a handler that filed first would
+        lose the `killed` end to any of them, with both signals already back at
+        the default and no second chance at the books. So the end goes ahead of
+        the filing. It cannot go ahead of the *read*, though: `traverse-end` is
+        what closes the window, and `live_jobs` only answers while the window is
+        open, so an end written before the read would empty the cascade of
+        everything it exists to file. Read, close, then file.
+
+        A filing that fails after the end is chained onto the exit rather than
+        raised on its own, so the operator sees it and the supervision above
+        never gets the chance to write a second, contradicting end.
 
         `PR_SET_PDEATHSIG` on the children covers what no trap can: a launcher
         SIGKILLed or OOM-killed runs none of this, the children still die, and the
@@ -647,13 +662,17 @@ class _Traverse:
             for trapped in TRAPPED:
                 signal.signal(trapped, signal.SIG_DFL)
             _say(f"{self.repo}#{self.issue}: signal {number}, taking children down")
-            self._sweep(KILL_CASCADE)
+            standing = self._standing()
             ledger.traverse_end(
                 self.repo,
                 self.issue,
                 {ledger.STATUS: ledger.KILLED},
                 db_path=self.db_path,
             )
+            try:
+                self._file(standing, KILL_CASCADE)
+            except TraverseError as unfinished:
+                raise SystemExit(EXIT_KILLED) from unfinished
             raise SystemExit(EXIT_KILLED)
 
         restore = [(number, signal.signal(number, die)) for number in TRAPPED]
@@ -664,11 +683,32 @@ class _Traverse:
                 signal.signal(number, handler)
 
     def _sweep(self, why: str) -> None:
-        """Finish the books for every job of this issue that has no terminal row.
+        """Read this issue's unfinished jobs and finish their books.
+
+        The two halves are named apart because the kill cascade needs them apart:
+        it has to read before it closes its own window and file after. Nothing
+        else does, so every other caller takes them together here.
+        """
+        self._file(self._standing(), why)
+
+    def _standing(self) -> list[ledger.LedgerRow]:
+        """Every job of this issue whose launch has no terminal row yet.
 
         Scoped to this `(repo, issue)` and nothing wider. Other pairs' jobs belong
         to other traverses, which are running right now under their own locks, and
         a sweep that reached them would kill live work and file it as dead.
+
+        The rows are read into a list rather than left as a cursor, because the
+        one caller that separates the read from the filing writes the window's
+        terminal row between the two — and `live_jobs` answers only while the
+        window is open.
+        """
+        return list(
+            ledger.live_jobs(repo=self.repo, issue=self.issue, db_path=self.db_path)
+        )
+
+    def _file(self, standing: Iterable[ledger.LedgerRow], why: str) -> None:
+        """Take each standing job down and write it the terminal row it never got.
 
         A job is found in the process table by its session id, which rides the
         child's command line as `--session-id`, so the match is exact rather than
@@ -683,9 +723,7 @@ class _Traverse:
         only sometimes is a query that answers `"kill" in payload` with kills
         that never happened.
         """
-        for row in ledger.live_jobs(
-            repo=self.repo, issue=self.issue, db_path=self.db_path
-        ):
+        for row in standing:
             session_id = _column(row, "session_id")
             node = _column(row, "node")
             killed = _terminate(session_id)
