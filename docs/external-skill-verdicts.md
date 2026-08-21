@@ -58,7 +58,7 @@ installed skill has grown to cover it, never whether it should exist.
 | File | Why it stays authored |
 |---|---|
 | [testing/conventions.md](/standards/testing/conventions.md) | `tdd` is rejected, and the file is mostly workspace-original pytest material. |
-| [build/references/tdd.md](/dotfiles/dot-claude/skills/build/references/tdd.md) | The factory's own TDD procedure, wired to briefs and gates, with deliberate divergences from upstream's — autonomous seam forethought, in-loop refactor passes. |
+| [software-factory/tdd.md](/software-factory/tdd.md) | The factory's own TDD procedure, wired to briefs and gates, with deliberate divergences from upstream's — autonomous seam forethought, in-loop refactor passes. |
 | [design/references/design-it-twice.md](/dotfiles/dot-claude/skills/design/references/design-it-twice.md) | An adaptation wired into the `/design` node: Opus pinning, worktrees, the synthesis diet. |
 | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | The binding format layer, almost entirely workspace-original, and it wins where `/writing-for-agents` collides with it. |
 
@@ -101,7 +101,7 @@ pin from upstream. Ruling-record numbers are Decision Records in
 | research | engineering | **verbatim** | Installed unmodified from the pin | 0016 | Lock-tracked; byte-identical at this pin |
 | resolving-merge-conflicts | engineering | reject | Not necessary | 0016, 0020 | The 2026-07-31 reject carried no recorded rationale; 0020 records this one |
 | setup-matt-pocock-skills | engineering | reject | Its job is served by workspace standards | 0016 | `standards/tracking/tracker-operations.md` was seeded from its GitHub tracker file and delta-checks against this pin |
-| tdd | engineering | reject | Its mandatory user stop breaks the autonomous build node, its loop excludes refactoring, and `build/references/tdd.md` is already the workspace's TDD procedure | 0016, 0020 | Relabeled from the older adapt; 0020 records all three reasons |
+| tdd | engineering | reject | Its mandatory user stop breaks the autonomous build node, its loop excludes refactoring, and `software-factory/tdd.md` is already the workspace's TDD procedure | 0016, 0020 | Relabeled from the older adapt; 0020 records all three reasons |
 | to-spec | engineering | reject | Too complicated to land today, and it may conflict with `wayfinder` and the authored `wayfinder-to-build` | 0020 | **Reevaluate next sweep** |
 | to-tickets | engineering | reject | Too complicated to land today, and it may conflict with `wayfinder` and the authored `wayfinder-to-build` | 0020 | **Reevaluate next sweep** |
 | triage | engineering | reject | Its label and role vocabulary were hard-rejected at 0016 | 0016, 0020 | Relabeled from the older adapt; the redundancy check and verify-the-claim moves stay where 0016 landed them in `intake/SKILL.md` |

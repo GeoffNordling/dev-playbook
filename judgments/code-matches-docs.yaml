@@ -59,7 +59,8 @@ judgments:
       Every check scripts/repo-lint performs that emits a `claude-code.`
       rule corresponds to a requirement stated in the referenced standards:
       the agent-facing voice of every CLAUDE.md and of every first-party
-      skill and rule body, and the global file's two-section shape and
+      agent definition, skill, and rule body, and the global file's
+      two-section shape and
       required workspace-wide rules. The standards may state more than the
       tool checks; the tool must not check more than the standards state.
     evidence:  [scripts/repo-lint]

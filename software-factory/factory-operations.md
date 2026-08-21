@@ -170,7 +170,7 @@ out.
 A node skill does the node's work and reports; the issue overwatch launches it,
 sequences what follows, and writes the labels. This contract fixes structure; the
 authoring *style* behind the skills — voice, content, robustness, mechanics —
-lives in [node-skill-authoring.md](/software-factory/node-skill-authoring.md).
+lives in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md).
 
 - **Read first.** When a skill has required reading, it front-loads a
   `## Read first` section ending in a `READ: <files>` confirmation; when it has

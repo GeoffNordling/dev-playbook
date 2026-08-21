@@ -212,7 +212,8 @@ def classify(relpath: str) -> str:
       is subject to the type-lint.
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
-      ``references/``/``scripts/``, ``rules/``, every top-level ``tests/`` tree
+      ``references/``/``scripts/``, ``agents/``, ``rules/``, every top-level
+      ``tests/`` tree
       (parser fixtures — tool-consumed, often deliberately malformed; see the
       tests-tree boundary in standards/docs/bundle.md), and every non-``.md``
       file.
@@ -240,7 +241,7 @@ def classify(relpath: str) -> str:
         return "index"
     if name in {"CLAUDE.md", "SKILL.md"}:
         return "harness"
-    if "rules" in dirparts:
+    if {"rules", "agents"} & set(dirparts):
         return "harness"
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):
         return "harness"
