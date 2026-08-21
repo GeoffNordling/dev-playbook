@@ -270,24 +270,10 @@ jq -n --arg commit "<headRefOid>" --arg path '<file>' \
 gh api repos/<owner>/<repo>/pulls/<pr>/comments --input file-comment.json
 ```
 
-**Read the threads** — the one query behind verification. `reviewThreads` caps
-at 100 per page and returns them oldest first, so it is paged for the same
-reason the reviews read is: the threads a long-running pull request drops are
-its newest, and an unresolved Blocking thread the review never sees is a
-convergence the verdict declares falsely. Ask for `pageInfo`, then repeat the
-query with `after:"<endCursor>"` until `hasNextPage` is `false`, accumulating
-`nodes` across the pages:
-
-```bash
-gh api graphql -f query='query { repository(owner:"<owner>", name:"<repo>") {
-  pullRequest(number:<pr>) { reviewThreads(first:100) {
-    pageInfo { hasNextPage endCursor }
-    nodes {
-      id isResolved isOutdated path line originalLine subjectType
-      comments(first:10) { nodes { databaseId body } }
-    }
-  } } } }'
-```
+**Read the threads** — the one query behind verification, and the same read a
+committing node makes on a rework lap. It is stated once, in
+[PR feedback](/software-factory/pr-feedback.md#the-comment-surfaces), paging and
+all; read it there rather than from a second copy that drifts from it.
 
 **Resolve a verified thread** — GraphQL only; REST has no resolve, and the
 mutation takes the thread's `PRRT_…` node id, not the `databaseId` a reply

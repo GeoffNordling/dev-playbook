@@ -88,7 +88,7 @@ conventions. Read the ones it calls for, end-to-end, then report
 
 | The diff carries | Read |
 |---|---|
-| skills | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/dotfiles/.agents/skills/writing-for-agents/SKILL.md) for the craft every skill answers to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
+| skills or agent definitions | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/dotfiles/.agents/skills/writing-for-agents/SKILL.md) for the craft both forms answer to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
 | standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
 | structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/docs/index.md) |
 
