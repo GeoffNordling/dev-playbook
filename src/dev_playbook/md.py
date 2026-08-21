@@ -57,6 +57,14 @@ SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
 SLUG_DROP = re.compile(r"[^\w\s\-]", re.UNICODE)
 SLUG_WHITESPACE = re.compile(r"\s")
 
+# Path segments marking sources with no fixed repo root: skills, rules, and
+# agent definitions ship into ~/.claude, so a `/path` Link in one would resolve
+# against whatever repo the reading agent happens to stand in. They use the
+# Citation form even for same-repo targets, per the cross-reference standard.
+# Read by has_fixed_repo_root; classify names the same segments separately, and
+# its comment there explains why the two rosters are not one.
+ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
+
 
 class UnclosedFence(ValueError):
     """A fenced code block that nothing ever closes.
@@ -198,13 +206,6 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
     return front, body
 
 
-# Path segments marking sources with no fixed repo root: skills, rules, and
-# agent definitions ship into ~/.claude, so a `/path` Link in one would resolve
-# against whatever repo the reading agent happens to stand in. They use the
-# Citation form even for same-repo targets, per the cross-reference standard.
-ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
-
-
 def has_fixed_repo_root(relpath: str) -> bool:
     """True when a source file is always read from one repo, so ``/`` resolves.
 
@@ -267,6 +268,11 @@ def classify(relpath: str) -> str:
         return "index"
     if name in {"CLAUDE.md", "SKILL.md"}:
         return "harness"
+    # These are ROOTLESS_SEGMENTS' three names, deliberately spelled out again
+    # rather than read from the roster: both markers answer "does this file stow
+    # into ~/.claude", but the answers differ for `skills`, where only the
+    # references/ and scripts/ subtrees are harness and a bundle's own prose is
+    # not. A fourth rootless segment must be added in both places.
     if {"rules", "agents"} & set(dirparts):
         return "harness"
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):
