@@ -455,8 +455,7 @@ def check_auth() -> None:
         raise ToolError(
             "gh holds no usable credential, so every GitHub read would "
             "silently degrade to an anonymous request. Run `gh auth login`, or "
-            "re-run where the credential store is readable — a sandbox that "
-            f"hides it produces exactly this.\n{detail}"
+            f"re-run where the credential store is readable.\n{detail}"
         )
 
 

@@ -320,8 +320,8 @@ def _settings_findings(path: Path) -> list[str]:
     finding of its own rather than a skip. Absent and unreadable are two
     different things, and the one check standing between the factory and
     metered billing must not report them the same way. This is what surfaces a
-    roster file masked to `/dev/null` by a sandbox: `/dev/null` opens and reads
-    as empty, empty is not valid JSON, and the mask lands as a parse finding.
+    roster file masked to `/dev/null`: `/dev/null` opens and reads as empty,
+    empty is not valid JSON, and the mask lands as a parse finding.
     """
     try:
         settings = json.loads(path.read_text())
@@ -441,8 +441,8 @@ def _shadow_findings(worktree: Path, checkout: Path) -> list[str]:
     Anything at the path condemns it, not a regular file at the path. What is
     being asked is whether something sits where the child will look, and a
     check that answers "no" for a path it merely cannot read as a regular file
-    hides the very copy it exists to find — a `.claude/agents` masked by a
-    sandbox, most of all.
+    hides the very copy it exists to find — a masked `.claude/agents`, most of
+    all.
     """
     findings = []
     for tree in (worktree, checkout):

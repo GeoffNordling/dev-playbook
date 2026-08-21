@@ -46,7 +46,6 @@ Output:
 """
 
 import argparse
-import os
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -72,18 +71,6 @@ GATE_TIMEOUT = 900
 # must never be reported as findings.
 GATE_VERDICT_CODES = frozenset({0, 1})
 GATE_ERROR_BANNERS = ("An error has occurred:", "An unexpected error has occurred:")
-
-# Restores the proxy auth method under the spelling pre-commit preserves.
-# A sandboxed session reaches the network through an authenticating proxy and
-# configures git for it via GIT_CONFIG_PARAMETERS=http.proxyAuthMethod=basic.
-# pre-commit's no_git_env() drops every GIT_* variable outside a small
-# allowlist, and GIT_CONFIG_PARAMETERS is not on it — so the git pre-commit
-# spawns to clone a new rev falls back to `anyauth`, whose probe the proxy
-# rejects ("Proxy CONNECT aborted"). GIT_HTTP_PROXY_AUTHMETHOD is the older
-# spelling of the same setting and *is* on that allowlist, so it survives.
-# Outside a sandbox there is no proxy and git ignores it, so it is set
-# unconditionally rather than sniffed for.
-GATE_ENV = {"GIT_HTTP_PROXY_AUTHMETHOD": "basic"}
 
 CLEAN = "green"
 NEEDS_WORK = "needs work"
@@ -177,7 +164,6 @@ def run_gate(repo: Path) -> tuple[bool, str]:
             capture_output=True,
             text=True,
             timeout=GATE_TIMEOUT,
-            env={**os.environ, **GATE_ENV},
         )
     except FileNotFoundError as err:
         raise ToolError(f"{GATE[0]} not found on PATH") from err

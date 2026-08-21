@@ -1,36 +1,25 @@
 ---
 type: Guide
 title: Sandboxing Claude agents
-description: Which tools fence a Claude agent, and the container direction for work with no user attached
+description: The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached is still ahead
 ---
 
 # Sandboxing Claude agents
 
-Which tools we use to fence a Claude agent, and how we intend to fence AFK work
-once it moves to headless. The specific allow and deny settings live in the
-settings files, not here — they change, and a copy of them here would only go
-stale.
+**Anthropic's [native sandbox](https://code.claude.com/docs/en/sandboxing) is
+off.** [Decision Record 0024](/docs/decisions/0024-disable-native-sandbox.md)
+has the reasoning — months of false positives with no real catch to show for
+them — and #261 tracks redesigning a tighter, trustworthy surface and
+reintroducing it.
 
-## The tools
+## The container direction
 
-**Anthropic's [native sandbox](https://code.claude.com/docs/en/sandboxing)
-(`/sandbox`)** is what we run for everyday Inline work. It fences the agent
-using features built into Linux itself rather than a container, so it costs
-nothing to start and nothing to maintain.
-
-Its one structural limit decides everything downstream: **it bounds shell
-commands, not the agent's own file tools.** Read, Edit, and Write ride the
-permission system instead. With the user at the terminal that is fine — the
-permission prompts are the fence. With no user attached there are no prompts, so
-the file tools are unbounded.
-
-Settings cannot stand in for the prompts either: path-scoped permission rules
-are silently ignored headless, so a file tool is allowed everywhere or nowhere
-([headless.md](/docs/headless.md)).
-
-**A container** is therefore the fence for AFK work. The whole `claude` process
-runs inside it, so every tool — file tools included — sees only the directories
-we chose to put there. This is the direction. Nothing is built yet.
+AFK work — headless, no user attached — has no fence today, regardless of the
+native sandbox's on/off state: [headless.md](/docs/headless.md) covers why
+path-scoped permission rules don't help there. **A container** is the intended
+fence. The whole `claude` process would run inside it, so every tool — file
+tools included — sees only the directories we chose to put there. Nothing is
+built yet.
 
 **[Sandcastle](https://github.com/mattpocock/sandcastle) — declined.** Matt
 Pocock's framework is AFK *orchestration* that uses containers as a component.
@@ -40,8 +29,6 @@ Declined on that alone, not on its quality.
 
 ## How we intend to operate
 
-- **Inline work keeps the native sandbox.** Always on, no per-run ceremony, and
-  the permission prompts cover what it doesn't.
 - **AFK work runs in a container.** A container starts empty: the only
   directories from this machine that exist inside it are the ones we hand it.
   That list is the fence — a worktree the agent may write to, plus whatever it
@@ -73,5 +60,5 @@ Declined on that alone, not on its quality.
   container, a copy built into it, or something else is unsettled.
 - **Whether we ever restrict the agent's internet access**, and what would be on
   the allowed list.
-- **Whether the native sandbox also runs inside the container.** Belt and
-  braces, or redundant ceremony.
+- **Whether a reintroduced native sandbox also runs inside the container.** Belt
+  and braces, or redundant ceremony.

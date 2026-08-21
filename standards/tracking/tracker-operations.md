@@ -46,10 +46,7 @@ take the target issue's internal **database id** rather than its number:
 gh api repos/{owner}/{repo}/issues/<n> --jq .id
 ```
 
-That id is neither the `#number` nor the `node_id`; passing either fails. It
-comes off stdout: capturing it with `$(gh api …)` instead strips the call's
-sandbox exemption and fails auth
-([bash-commands.md § Keep sandbox-excluded commands leading and top-level](/dotfiles/dot-claude/rules/bash-commands.md#keep-sandbox-excluded-commands-leading-and-top-level)).
+That id is neither the `#number` nor the `node_id`; passing either fails.
 
 - **Sub-issue** —
   `gh api --method POST repos/{owner}/{repo}/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`

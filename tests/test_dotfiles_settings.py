@@ -83,9 +83,9 @@ def test_merge_dedupes_array_entries_that_are_objects() -> None:
 
 
 def test_merge_lets_the_fragment_win_when_the_types_disagree() -> None:
-    result = merge({"sandbox": {"enabled": True}}, {"sandbox": False})
+    result = merge({"autoMode": {"enabled": True}}, {"autoMode": False})
 
-    assert result["sandbox"] is False
+    assert result["autoMode"] is False
 
 
 def test_merge_leaves_the_base_untouched() -> None:
@@ -113,12 +113,12 @@ def test_settings_for_layers_the_named_fragment_over_the_base(tmp_path: Path) ->
 
 def test_settings_for_ignores_fragments_for_other_machines(tmp_path: Path) -> None:
     source = a_source_dir(
-        tmp_path, {"model": "opus"}, wsl={}, fedora={"sandbox": {"enabled": True}}
+        tmp_path, {"model": "opus"}, wsl={}, fedora={"autoMode": {"enabled": True}}
     )
 
     result = settings_for(source, "wsl")
 
-    assert "sandbox" not in result
+    assert "autoMode" not in result
 
 
 def test_settings_for_raises_when_the_fragment_is_missing(tmp_path: Path) -> None:
