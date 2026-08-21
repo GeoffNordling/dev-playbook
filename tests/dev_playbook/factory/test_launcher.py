@@ -130,6 +130,22 @@ time.sleep(plan["linger"])
 sys.exit(plan["exit_code"])
 """
 
+# An import of the launcher on a platform that is not Linux, run in its own
+# interpreter so the substituted `sys.platform` reaches the module's own guard.
+# The failure is printed rather than raised, so the test reads a result instead
+# of a traceback.
+PLATFORM_PROBE = """
+import sys
+
+sys.platform = "darwin"
+sys.path.insert(0, sys.argv[1])
+try:
+    from dev_playbook.factory import launcher
+except Exception as refusal:
+    print(type(refusal).__name__)
+    print(refusal)
+"""
+
 # Hook events precede `init` in a real stream, so every canned stream opens
 # with one: the parser has to scan for `init` rather than read the first line.
 HOOK_LINE: dict[str, Any] = {
@@ -1276,6 +1292,35 @@ def test_a_real_spawn_runs_the_whole_launcher_against_the_live_harness(
     assert outcome.process_outcome == "clean"
     assert outcome.task_outcome == "done"
     assert [row.kind for row in ledger_rows(db)] == ["job-launch", "job-report"]
+
+
+def test_importing_the_launcher_off_linux_names_the_platform_not_a_missing_symbol(
+    tmp_path: Path,
+) -> None:
+    """`prctl` is Linux's, and the binding that reaches it happens at import.
+
+    Left unguarded, a contributor on macOS gets `AttributeError: undefined
+    symbol: prctl` at collection for all three factory suites and from
+    `scripts/traverse-issue` before it can print its own usage — none of which
+    names the requirement it is failing.
+
+    The import runs in its own interpreter because that is the only place the
+    platform can be another one: reloading the module here would rebind every
+    class in it and leave the rest of the suite importing a different module
+    than it started with.
+    """
+    probe = tmp_path / "probe.py"
+    probe.write_text(PLATFORM_PROBE)
+
+    refused = subprocess.run(
+        [sys.executable, str(probe), str(Path(launcher.__file__).parents[2])],
+        capture_output=True,
+        text=True,
+    )
+
+    assert refused.stdout.splitlines()[0] == "LauncherError"
+    assert "darwin" in refused.stdout
+    assert "linux" in refused.stdout
 
 
 def test_the_death_signal_syscall_is_resolved_before_any_child_is_forked() -> None:

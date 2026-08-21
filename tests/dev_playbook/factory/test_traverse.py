@@ -1038,6 +1038,29 @@ def test_a_base_still_stale_after_the_fetch_escalates_before_any_worktree_exists
     assert "after a fetch" in payload_of(db, "traverse-escalation")["reason"]
 
 
+def test_a_branch_already_on_origin_with_no_worktree_left_is_never_recut(
+    checkout: Path,
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The branch missing locally is not the same as the work being missing.
+
+    `git worktree add -b issue-<N> origin/main` fails loudly on a local branch
+    that exists and succeeds silently on one that does not, so a checkout that
+    was re-cloned — or whose branch the user deleted before the merge landed —
+    would have every commit the last lap pushed reset to `main` underneath it,
+    with no build node running to put them back.
+    """
+    outcome = traverse_issue(gh_cmd=stub_gh(shas={BRANCH: "0" * 40}))
+
+    assert outcome.status == "escalated"
+    assert not (checkout / ".claude" / "worktrees" / BRANCH).exists()
+    assert launched() == []
+    assert "on origin" in payload_of(db, "traverse-escalation")["reason"]
+
+
 def test_an_existing_worktree_is_reused_exactly_as_it_was_found(
     checkout: Path, traverse_issue: Callable[..., Any]
 ) -> None:

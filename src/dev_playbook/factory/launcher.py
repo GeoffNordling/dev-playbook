@@ -1,4 +1,11 @@
-"""The job launcher — one factory node launch, preflight through spawn to a ledgered job."""
+"""The job launcher — one factory node launch, preflight through spawn to a ledgered job.
+
+Linux only, and at import: every child is spawned under `PR_SET_PDEATHSIG` so
+a launcher that dies untrappably cannot leave a claude session running on the
+subscription, and `prctl` is a Linux syscall with no portable equivalent. The
+module refuses to import anywhere else, by name, rather than failing later on a
+symbol nobody would connect to the requirement.
+"""
 
 import ctypes
 import json
@@ -7,6 +14,7 @@ import queue
 import shutil
 import signal
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -82,23 +90,11 @@ MILLISECONDS = 1000.0
 # cannot, and the next traverse's orphan sweep completes the books either way.
 PR_SET_PDEATHSIG = 1
 
-# The C library this process already has open, and the one function taken out of
-# it. `CDLL(None)` asks for the running program's own symbols rather than naming
-# a soname, which is what makes this hold wherever the interpreter itself links
-# its libc.
-#
-# The pointer is bound here, and that binding is the whole safety argument.
-# `CDLL(None)` opens a handle and resolves nothing; the symbol is looked up by
-# `CDLL.__getattr__`, which calls `dlsym` and takes the dynamic loader's lock.
-# What runs between fork and exec must be async-signal-safe and a lock is not, so
-# a parent thread holding that one at the moment of the fork would wedge the
-# child forever. Reaching for `LIBC.prctl` in the child would also repeat the
-# lookup on every single launch, never once: the attribute cache the lookup fills
-# is written on the child's copy, and the child execs straight after.
-LIBC = ctypes.CDLL(None, use_errno=True)
-PRCTL = LIBC.prctl
-PRCTL.argtypes = (ctypes.c_int, ctypes.c_ulong)
-PRCTL.restype = ctypes.c_int
+# What a child exits with when it finds its launcher already gone between the
+# fork and the `prctl`. Nobody reads it — the process that would have is the
+# one that died — so its whole job is to be a value no claude run produces, for
+# whoever finds it in a process accounting log.
+EXIT_ORPHANED = 124
 
 # How long the supervisor waits on a silent queue before looking at the child
 # itself. It is what lets supervision end when the child ends rather than when
@@ -164,6 +160,39 @@ class LaunchAborted(LauncherError):
 
 class HarnessContractViolation(LauncherError):
     """The harness broke a measured promise mid-flight, so no outcome can be read."""
+
+
+# The C library this process already has open, and the one function taken out of
+# it. `CDLL(None)` asks for the running program's own symbols rather than naming
+# a soname, which is what makes this hold wherever the interpreter itself links
+# its libc. It sits below the exceptions rather than with the other constants
+# because the platform it needs is checked here, and the refusal is one of them.
+#
+# `prctl` is Linux's alone. Unguarded, `dlsym` returns NULL anywhere else and
+# `CDLL.__getattr__` raises `AttributeError: undefined symbol: prctl` at import
+# — from all three factory suites at collection and from `scripts/traverse-issue`
+# before it can print its usage, none of it naming the real requirement.
+#
+# The pointer is bound here, and that binding is the whole safety argument.
+# `CDLL(None)` opens a handle and resolves nothing; the symbol is looked up by
+# `CDLL.__getattr__`, which calls `dlsym` and takes the dynamic loader's lock.
+# What runs between fork and exec must be async-signal-safe and a lock is not, so
+# a parent thread holding that one at the moment of the fork would wedge the
+# child forever. Reaching for `LIBC.prctl` in the child would also repeat the
+# lookup on every single launch, never once: the attribute cache the lookup fills
+# is written on the child's copy, and the child execs straight after. So the
+# binding cannot be deferred past import, and the platform is named instead.
+if sys.platform != "linux":
+    raise LauncherError(
+        f"the factory launcher runs on linux only and this is {sys.platform!r}: "
+        f"every child is spawned under PR_SET_PDEATHSIG, a prctl operation with "
+        f"no portable equivalent, so a child here could outlive its launcher"
+    )
+
+LIBC = ctypes.CDLL(None, use_errno=True)
+PRCTL = LIBC.prctl
+PRCTL.argtypes = (ctypes.c_int, ctypes.c_ulong)
+PRCTL.restype = ctypes.c_int
 
 
 @dataclass(frozen=True)
@@ -540,12 +569,21 @@ class _Run:
     dropped: bool = False
 
 
-def _die_with_parent() -> None:
+def _die_with_parent(launcher: int) -> None:
     """Ask the kernel to SIGTERM this process the moment its parent dies.
 
-    Runs in the child, between the fork and the exec, and does one syscall
-    through the function pointer bound at import — see `PRCTL` for why the
-    lookup cannot happen here.
+    Runs in the child, between the fork and the exec, and does two syscalls —
+    one through the function pointer bound at import (see `PRCTL` for why the
+    lookup cannot happen here), and one to close the race the first leaves.
+
+    The kernel fires the death signal only for a parent that dies *after* the
+    flag is set, so a launcher SIGKILLed or OOM-killed in the window between
+    the fork and the `prctl` leaves a child already reparented and never
+    signalled — a full hour of claude on the subscription with nobody watching
+    it, which is the one outcome this function exists to rule out. So the
+    parent is read back afterwards: a `getppid` that no longer names the
+    launcher means the death happened inside the window, and the child leaves
+    now rather than being the orphan the flag was meant to prevent.
 
     The flag survives the exec that follows, so it is claude itself the kernel
     signals, and it is set unconditionally: a launcher that is SIGKILLed or
@@ -585,6 +623,8 @@ def _die_with_parent() -> None:
         )
         os.write(2, f"{refusal}\n".encode())
         raise LauncherError(refusal)
+    if os.getppid() != launcher:
+        os._exit(EXIT_ORPHANED)
 
 
 def _supervise(
@@ -614,6 +654,7 @@ def _supervise(
     locale says, so a machine running under an ASCII locale would otherwise
     turn ordinary output into a decode failure.
     """
+    launcher = os.getpid()
     with open(os.devnull) as no_input:
         process = subprocess.Popen(
             argv,
@@ -626,7 +667,7 @@ def _supervise(
             # Forces the fork-and-exec path, which is the point: `posix_spawn`
             # has no hook to set the death signal in the child, and the child is
             # the only place it can be set.
-            preexec_fn=_die_with_parent,
+            preexec_fn=lambda: _die_with_parent(launcher),
         )
     stream = process.stdout
     if stream is None:

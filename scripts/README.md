@@ -104,7 +104,11 @@ hook-capture `events` table, its per-kind writers and its two read queries; the
 job launcher that sweeps a launch's credentials, spawns a factory node, watches
 its stream live, and writes its two job rows; and the build-region traverse that
 carries one issue from its phase label to an open pull request, behind
-`traverse-issue`.
+`traverse-issue`. The launcher and the traverse are **Linux only**, and say so
+at import: every node the launcher spawns is set to die with it through
+`PR_SET_PDEATHSIG`, a `prctl` operation with no portable equivalent, and a
+child that could outlive its launcher is an hour of claude billed with nobody
+watching it.
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so

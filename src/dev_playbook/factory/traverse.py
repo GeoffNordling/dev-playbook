@@ -514,12 +514,29 @@ class _Traverse:
         check, no rebase. Whether work in flight should be rebased onto a moved
         `main` is a judgment about the issue, not about this traverse, and it
         belongs to the manager above.
+
+        With no worktree there, origin is asked about the issue's own branch
+        before anything is cut. A branch on origin with no tree here means the
+        work is on GitHub and only the local side is gone — a re-cloned
+        checkout, or a `git branch -D` run before the merge landed — and
+        `git worktree add -b` would answer that by resetting the branch to
+        `main`, silently, because it refuses only a local branch that exists.
+        Every commit the last lap pushed would be off the branch with no node
+        running to put it back, and a `pr-review` entry skips the build and the
+        verification with it, so nothing downstream would notice either.
         """
         worktree = self.checkout / WORKTREES / self._branch()
         if worktree.exists():
             self._gate_reuse(worktree)
             _say(f"{self.repo}#{self.issue}: reusing {worktree}")
             return worktree
+        stranded = self._origin_sha(self._branch())
+        if stranded is not None:
+            raise _Escalated(
+                f"{self._branch()} is on origin at {stranded} with no worktree at "
+                f"{worktree}, so the issue's work is stranded — cutting the branch "
+                f"again here would reset it to main"
+            )
         self._git(self.checkout, "fetch", "origin", "main")
         local = self._git(self.checkout, "rev-parse", "origin/main")
         remote = self._origin_sha("main")
