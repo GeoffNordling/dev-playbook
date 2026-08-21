@@ -339,28 +339,9 @@ class _Traverse:
         return GRAPH[phases[0]]
 
     def _build(self, worktree: Path) -> None:
-        """Run the build node, verify what it left behind, and move the label.
-
-        The verification is the whole reason the label move is safe. A node
-        reporting `done` is a claim; that `issue-<N>` exists on origin at the sha
-        the worktree holds is the fact, and only the fact advances the board.
-        """
+        """Run the build node, verify what it left behind, and move the label."""
         self._launch(BUILD, worktree, BUILD_SCHEMA)
-        local = self._git(worktree, "rev-parse", self._branch())
-        pushed = self._origin_sha(self._branch())
-        if pushed is None:
-            raise _Escalated(
-                f"{BUILD} reported {DONE} but {self._branch()} is not on origin, so "
-                f"the work it committed is nowhere a review can read it",
-                node=BUILD,
-            )
-        if local != pushed:
-            raise _Escalated(
-                f"{BUILD} reported {DONE} but {self._branch()} is {local} in the "
-                f"worktree and {pushed} on origin, so the branch was never fully "
-                f"pushed",
-                node=BUILD,
-            )
+        self._verify_build(worktree)
         self._gh(
             "issue",
             "edit",
@@ -376,6 +357,51 @@ class _Traverse:
             self.repo, self.issue, {FROM: BUILD, TO: PR_REVIEW}, db_path=self.db_path
         )
         _say(f"{self.repo}#{self.issue}: {BUILD} -> {PR_REVIEW}")
+
+    def _verify_build(self, worktree: Path) -> None:
+        """Refuse to advance the board on anything but the facts the node left.
+
+        A node reporting `done` is a claim. That every edit it made is a commit,
+        that the commit is on `issue-<N>`, and that `issue-<N>` is on origin at
+        that same sha, are the facts, and only the facts move the label.
+
+        The tree is read before origin is, because the two ways work goes
+        missing without moving a sha are both local. A node that edits and never
+        commits leaves `issue-<N>` exactly where the lap before it did, and a
+        node that commits onto a detached HEAD leaves it there too — so a
+        comparison against origin alone agrees with itself and passes over work
+        the pull request will never show. Neither is hypothetical on a rework
+        lap, where the branch is already on origin when the node starts.
+        """
+        local = self._git(worktree, "rev-parse", self._branch())
+        head = self._git(worktree, "rev-parse", "HEAD")
+        if head != local:
+            raise _Escalated(
+                f"{BUILD} reported {DONE} but {worktree} is at {head} on a "
+                f"detached HEAD where {self._branch()} is at {local}, so the "
+                f"branch a review reads holds none of what it committed",
+                node=BUILD,
+            )
+        pending = self._git(worktree, "status", "--porcelain")
+        if pending:
+            raise _Escalated(
+                f"{BUILD} reported {DONE} but left {worktree} uncommitted:\n{pending}",
+                node=BUILD,
+            )
+        pushed = self._origin_sha(self._branch())
+        if pushed is None:
+            raise _Escalated(
+                f"{BUILD} reported {DONE} but {self._branch()} is not on origin, so "
+                f"the work it committed is nowhere a review can read it",
+                node=BUILD,
+            )
+        if local != pushed:
+            raise _Escalated(
+                f"{BUILD} reported {DONE} but {self._branch()} is {local} in the "
+                f"worktree and {pushed} on origin, so the branch was never fully "
+                f"pushed",
+                node=BUILD,
+            )
 
     def _open_pr(self, worktree: Path) -> TraverseOutcome:
         """Run the open-pr node, then read the PR off GitHub rather than the report.

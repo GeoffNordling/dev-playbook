@@ -108,10 +108,13 @@ with (here / "launched.jsonl").open("a") as log:
         )
         + "\\n"
     )
+branch = subprocess.run(
+    ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True
+).stdout.strip()
+# Read before the detach, which would leave it reading "HEAD".
+if step["detach"]:
+    subprocess.run(["git", "checkout", "-q", "--detach"], check=True)
 if step["commit"]:
-    branch = subprocess.run(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True
-    ).stdout.strip()
     # Named by session, so a second launch into a worktree a first already
     # committed in still has something to commit.
     Path("built-by-%s-%s.txt" % (node, session)).write_text("the node's work\\n")
@@ -125,6 +128,8 @@ if step["commit"]:
         subprocess.run(
             ["git", "push", "-q", "origin", "HEAD:refs/heads/" + branch], check=True
         )
+if step["dirty"]:
+    Path("left-by-%s.txt" % node).write_text("work that never reached a commit\\n")
 if step["ignore_sigterm"]:
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
 for line in step["lines"]:
@@ -249,6 +254,8 @@ def node_step(
     *,
     commit: bool = False,
     push: bool = False,
+    detach: bool = False,
+    dirty: bool = False,
     linger: float = 0.0,
     exit_code: int = 0,
     ignore_sigterm: bool = False,
@@ -260,6 +267,8 @@ def node_step(
         "lines": lines,
         "commit": commit,
         "push": push,
+        "detach": detach,
+        "dirty": dirty,
         "linger": linger,
         "exit_code": exit_code,
         "ignore_sigterm": ignore_sigterm,
@@ -299,6 +308,15 @@ def add_worktree(checkout: Path, branch: str) -> Path:
         capture_output=True,
     )
     return path
+
+
+def push_branch(checkout: Path, branch: str) -> None:
+    """Put a branch on origin, the way the lap before this one left it there."""
+    subprocess.run(
+        ["git", "-C", str(checkout), "push", "-q", "origin", branch],
+        check=True,
+        capture_output=True,
+    )
 
 
 def kinds(db: Path) -> list[str]:
@@ -932,6 +950,44 @@ def test_a_build_reporting_done_over_a_branch_stale_on_origin_escalates(
 
     assert outcome.status == "escalated"
     assert behind in payload_of(db, "traverse-escalation")["reason"]
+    assert not [call for call in gh_calls() if call[:2] == ["issue", "edit"]]
+
+
+def test_a_build_reporting_done_over_an_uncommitted_worktree_escalates(
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    gh_calls: Callable[[], list[list[str]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The node pushed what it committed and then went on editing, so the two
+    shas agree while the last of the work sits in a tree no review can read."""
+    step = node_step(commit=True, push=True, dirty=True)
+
+    outcome = traverse_issue(claude_cmd=fake_claude(build=step))
+
+    assert outcome.status == "escalated"
+    assert "uncommitted" in payload_of(db, "traverse-escalation")["reason"]
+    assert not [call for call in gh_calls() if call[:2] == ["issue", "edit"]]
+
+
+def test_a_build_reporting_done_from_a_detached_head_escalates(
+    checkout: Path,
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    gh_calls: Callable[[], list[list[str]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The commit went somewhere the branch does not point, so `issue-<N>` still
+    holds exactly what origin holds and the sha comparison agrees with itself."""
+    add_worktree(checkout, BRANCH)
+    push_branch(checkout, BRANCH)
+
+    outcome = traverse_issue(
+        claude_cmd=fake_claude(build=node_step(commit=True, detach=True))
+    )
+
+    assert outcome.status == "escalated"
+    assert "detached" in payload_of(db, "traverse-escalation")["reason"]
     assert not [call for call in gh_calls() if call[:2] == ["issue", "edit"]]
 
 
