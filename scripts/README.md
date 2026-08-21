@@ -98,12 +98,13 @@ loading/validation and the plan/render/record runner, behind `judgments-lint`
 and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`),
 `dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
-already-recorded work), and `dev_playbook.factory` (the software factory's
-append-only run ledger — the `ledger` table beside the hook-capture `events`
-table, its per-kind writers and its two read queries — the job launcher
-that sweeps a launch's credentials, spawns a factory node, watches its stream
-live, and writes its two job rows, and the build-region traverse that carries one
-issue from its phase label to an open pull request, behind `traverse-issue`).
+already-recorded work), and `dev_playbook.factory`, whose three pieces are
+the software factory's append-only run ledger — the `ledger` table beside the
+hook-capture `events` table, its per-kind writers and its two read queries; the
+job launcher that sweeps a launch's credentials, spawns a factory node, watches
+its stream live, and writes its two job rows; and the build-region traverse that
+carries one issue from its phase label to an open pull request, behind
+`traverse-issue`.
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so

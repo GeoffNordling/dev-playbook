@@ -36,7 +36,7 @@ and exits at once, writing nothing, when another traverse of that issue holds it
 Concurrency across issues is unbounded; concurrency within one is not.
 
 **Factory nodes only.** The factory region is all that is dispatched, by the
-script and by an overwatch alike. An issue whose phase sits in
+script and by a session alike. An issue whose phase sits in
 [definition](/software-factory/software-factory.md#the-definition-region) — or an
 unlabeled one — is refused outright, naming the skill the user should run
 instead. Definition is user-led by construction; a dispatcher that improvised its
@@ -174,11 +174,15 @@ working directory.
 - **Create or reuse (the traverse, before its first node).** A worktree already
   at the path is reused exactly as found — no freshness check and no rebase,
   because whether work in flight should move onto a newer `main` is a judgment
-  about the issue rather than about this run. Otherwise the traverse fetches
-  `origin/main`, compares the fetched ref against origin
-  (`git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main`),
-  escalates if the base is still stale, and branches `issue-<N>` from
-  `origin/main`.
+  about the issue rather than about this run. What is checked is that it is one:
+  `git worktree list --porcelain` must register it, on branch `issue-<N>`, and a
+  bare directory left behind by a refused removal escalates instead. Otherwise
+  the traverse fetches `origin/main`, compares the fetched ref against origin
+  (`git rev-parse origin/main` against
+  `gh api repos/<owner>/<name>/branches/main` — the slug written out, because gh
+  fills the `{owner}/{repo}` placeholders from the repo of the current directory
+  and the traverse runs from wherever it was launched), escalates if the base is
+  still stale, and branches `issue-<N>` from `origin/main`.
 - **Inherit (every node).** Each node is launched with the worktree as its cwd
   and does its work there.
 - **Remove (the user).** A merged issue's worktree and branch are removed by
@@ -201,9 +205,11 @@ and three clauses below say where the two differ. This contract fixes structure;
 the authoring *style* behind both — voice, content, robustness, mechanics — lives
 in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md).
 
-- **Read first.** When a node has required reading, it front-loads a
-  `## Read first` section ending in a `READ: <files>` confirmation; when it has
-  none, it omits the section entirely.
+- **Read first.** When a node has required reading, it front-loads that reading
+  and closes it with a `READ: <files>` confirmation before it edits anything;
+  when it has none, it carries neither. The confirmation is what binds — where
+  it sits is the node's own: a skill puts it under a `## Read first` heading, a
+  definition may fold it into a numbered step of its own.
 - **Worktree.** Every file-touching node does its work in the issue's worktree.
   A definition is placed there by `traverse-issue`, which owns the whole
   lifecycle per [the worktree contract](#the-worktree-contract) and never asks
