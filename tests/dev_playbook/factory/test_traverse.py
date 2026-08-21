@@ -2215,6 +2215,44 @@ def test_one_review_failing_lets_its_siblings_finish_before_the_traverse_ends(
     assert outcome.status == "escalated"
 
 
+def test_a_review_that_never_spawns_is_relayed_like_any_other_failure(
+    db: Path,
+    agents_dir: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """One reviewer aborts before spawning; its sibling still runs and reports.
+
+    An abort is raised rather than reported — nothing spawned, so there is no
+    stream to classify — and raising it out of a fan-out thread is exactly what
+    would abandon the sibling. It is carried back as that job's failure instead.
+
+    The definition here declares an effort the harness does not have, which the
+    launcher refuses per node: the whole-roster check at traverse start only asks
+    that each definition exists.
+    """
+    write_definition(
+        agents_dir,
+        "bug-pr-review",
+        {
+            "name": "bug-pr-review",
+            "description": "The bug-pr-review node.",
+            "model": "sonnet",
+            "effort": "turbo",
+        },
+    )
+
+    outcome = traverse_issue()
+
+    assert "code-pr-review" in [launch["node"] for launch in launched()]
+    assert "code-pr-review" in {
+        row.node for row in ledger_rows(db) if row.kind == "job-report"
+    }
+    reason = str(payload_of(db, "traverse-escalation")["reason"])
+    assert "bug-pr-review could not be launched" in reason
+    assert outcome.status == "escalated"
+
+
 def test_a_diff_no_review_reads_escalates_rather_than_converging(
     db: Path,
     launched: Callable[[], list[dict[str, Any]]],
