@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Deviation Contract
-description: The contract a deviation runs under — the three limiters, the halt-commit-escalate lane, and the deviation ledger
+description: The contract a deviation runs under — the three limiters, the halt-commit-escalate lane, the PR-callout lane, and the deviation ledger
 ---
 
 # Deviation Contract
@@ -73,14 +73,48 @@ The lane above stops the traverse. What puts a node in it differs by node:
 - **The traverse script** — **relay, never absorb**. A node's own report text
   rides its ledger row unedited; the script never overrides an escalation,
   retries it, or fixes it itself, so a limiter trip always reaches the user.
+- **The Adjudicator** — any judgment call that fails the routing test of
+  [the second lane](#the-pr-callout-lane) below.
 
 The three-no's fix is in neither lane: it is made, logged in the ledger, and
 the work goes on.
 
-A second lane runs beside this one — the PR-callout lane, where a decision is
-documented on the pull request and the traverse proceeds. It belongs to the
-Adjudicator alone and arrives with
-[issue #442](https://github.com/GeoffNordling/dev-playbook/issues/442).
+## The PR-callout lane
+
+A second lane runs beside the one above: the decision is documented on the pull
+request, and the traverse proceeds. It belongs to the **Adjudicator** alone —
+no other node may take a call and carry on.
+
+Four kinds of call ride it:
+
+- **A ruling on a surfaced-decision finding** — a review that named a decision
+  the user faces ("someone must decide whether this is safe") rather than a
+  defect.
+- **An overruling** — a finding judged wrong, or outside the jurisdiction of the
+  review that wrote it.
+- **A suggestion disposition** — every one of them
+  ([review-contract.md](/software-factory/review-contract.md#suggestion-dispositions)).
+- **Routing an out-of-scope real problem** — a genuine problem the pull request
+  is not the place to fix goes to `## Deferred` with a stub behind it.
+
+**The routing test.** A call rides this lane only when all three of these hold.
+Any one of them failing — or an answer that cannot be given cleanly — is an
+escalation instead, the same halt the limiters above produce:
+
+1. It contradicts no decision recorded on the issue, the pull request, an epic's
+   standing rulings, or a map.
+2. Its whole effect is contained in the pull request, so declining the merge
+   undoes it.
+3. A confident recommendation exists.
+
+Three questions, like the limiters above and for the same reason: a node with
+more authority answers to the same discipline, not to less of it.
+
+An escalation out of this lane is written nowhere on GitHub, exactly as above.
+What is written on GitHub is the callout itself — a pull request comment, ending
+in the attribution line every factory writer signs with — and the run's report
+repeats it, so the decision is on the record twice over and in one place a
+reader is already looking.
 
 ## The deviation ledger
 

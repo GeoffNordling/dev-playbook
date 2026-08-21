@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Review Contract
-description: The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, the report envelope, and the escalation boundary
+description: The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, suggestion dispositions, the report envelope, and the escalation boundary
 ---
 
 # Review Contract
@@ -20,10 +20,10 @@ Which reviews run at a cycle is
 how a pull request's existing feedback is read is
 [pr-feedback.md](/software-factory/pr-feedback.md).
 
-What happens to a Suggestion after it is posted is not here. The Adjudicator
-dispositions open Suggestion threads at each verdict point, and its rules —
-the routing, the reason vocabulary, the deferral stubs — arrive with
-[issue #442](https://github.com/GeoffNordling/dev-playbook/issues/442).
+What happens to a Suggestion after it is posted is
+[Suggestion dispositions](#suggestion-dispositions) below. It binds the
+Adjudicator rather than a review — a review posts a finding and stops — and it
+is stated here because it is what the Suggestion severity means.
 
 ## The stance
 
@@ -194,6 +194,96 @@ open Blocking threads is converged. Blocking threads still open after **four
 autonomous cycles past the newest baseline** end the traverse as an escalation.
 A review reports what it posted and stops — it never counts cycles toward the
 cap or declares convergence.
+
+## Suggestion dispositions
+
+A Suggestion does not sit on the pull request until someone gets to it. The
+**Adjudicator** — launched at each verdict point, once the cycle's reviews have
+reported — settles every open Suggestion thread into one of three outcomes:
+**fix now**, **defer**, or **decline**. No review dispositions a finding, its
+own included.
+
+Worth is not weighed here. The routing below is checkable questions, and whether
+a suggestion is worth doing is the user's — at the triage of a deferral stub, or
+at the merge read.
+
+### The disposition dimensions
+
+Each is checkable by inspection, save the one marked.
+
+- **Contradicts the record** — the suggestion conflicts with a named standard,
+  conflicts with a recorded ruling, or re-litigates a decision already taken
+  this traverse.
+- **No consequence** — it cannot name what gets worse if it is ignored: a
+  consequence for behavior, correctness, performance, security, or a named
+  convention. Pure preference fails this.
+- **Bad idea** — the Adjudicator is confident the change would make the work
+  worse, or its premise is false. This is the one judgment dimension, and not
+  checkable by inspection: the confidence is gated by
+  [the routing test](/software-factory/deviation-contract.md#the-pr-callout-lane),
+  and doubt still defers.
+- **Needs design decisions** — the stated fix leaves a significant design choice
+  open, so carrying it out would have an autonomous agent take a design
+  decision. It does not take them.
+- **Touches new files** — the stated fix would modify at least one file the pull
+  request's diff does not already modify (`gh pr diff --name-only`).
+- **Entangled or independent** — where the *problem* lives, as against where the
+  fix would land: entangled when the suggestion's subject — the code the finding
+  is about, not merely where its comment anchors — lies inside the diff;
+  independent otherwise.
+
+### The routing
+
+Ordered, first hit wins, and doubt defers.
+
+| Order | Condition | Outcome |
+|---|---|---|
+| 1 | Contradicts the record | **Decline** (`contradicts-standard` / `contradicts-ruling` / `re-litigates`) |
+| 2 | No consequence | **Decline** (`no-consequence`) |
+| 3 | Bad idea | **Decline** (`bad-idea`) |
+| 4 | Needs design decisions | **Defer** (`needs-design`) |
+| 5 | Touches new files | **Defer** (`outside-diff`) |
+| 6 | Entangled, fix fully specified, inside the diff's files | **Fix now** |
+| 7 | Independent — everything remaining | **Defer** (`independent`) |
+| — | Any answer in doubt | the doubted branch resolves toward **Defer** (`doubt-defers`) |
+
+**The reason vocabulary** is these ten names and no others:
+`contradicts-standard`, `contradicts-ruling`, `re-litigates`, `no-consequence`,
+`bad-idea`, `needs-design`, `outside-diff`, `independent`, `no-remaining-laps`,
+`doubt-defers`. Each is written verbatim wherever a disposition is mentioned —
+`Declined (no-consequence)`, `Deferred (needs-design) → #512` — so one query
+finds every disposition of a kind.
+
+### The three outcomes
+
+- **Fix now** — the item joins a rework lap that open Blocking threads already
+  necessitate. **Piggyback only**: a suggestion fix never causes a lap of its
+  own. Its thread stays open, and the next cycle's reviewer reads and resolves
+  it like any other fix. A fix now with no lap left to ride **downgrades to
+  defer**, reason `no-remaining-laps`, and is then reported exactly like every
+  other deferral — which is what a converged verdict does to every fix now, and
+  what the next verdict point does to a fix-now thread a reviewer left open on a
+  cycle that has since converged. It stays a Suggestion throughout: it never
+  gates convergence and it never escalates.
+- **Defer** — a real tracker stub at `phase:intake`, labeled `origin:deferral`
+  ([factory-labels.md](/standards/tracking/factory-labels.md#valid-labels)), so
+  every issue born of a factory deferral is one query away. Doubt lands here: a
+  stub is reversible, and information a decline drops is gone.
+- **Decline** — a one-line reply naming its reason from the vocabulary, and no
+  stub.
+
+**Reply, then resolve.** A declined thread and a deferred thread are both
+resolved by the Adjudicator, and never before its reply is on them: the reply is
+the record of why. No thread is ever resolved silently. A fix-now thread is
+resolved by nobody here — it belongs to the next cycle's reviewer, under
+[resolution ownership](#resolution-ownership).
+
+**Where a settled suggestion is listed.** Every fixed and declined suggestion
+takes one line in the pull request's `## Suggestion dispositions` section, and
+every deferral's stub is linked under `## Deferred`
+([the merge-message recipe](/software-factory/factory-operations.md#the-merge-message-recipe)).
+Both sections are brought up to date on every Adjudicator run, and the run at
+convergence always happens, so they are complete at the merge read.
 
 ## The `gh` mechanics
 
