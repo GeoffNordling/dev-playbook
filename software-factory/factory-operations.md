@@ -38,9 +38,11 @@ Concurrency across issues is unbounded; concurrency within one is not.
 **Factory nodes only.** The factory region is all that is dispatched, by the
 script and by a session alike. An issue whose phase sits in
 [definition](/software-factory/software-factory.md#the-definition-region) — or an
-unlabeled one — is refused outright, naming the skill the user should run
-instead. Definition is user-led by construction; a dispatcher that improvised its
-way through intake would be extracting intent with nobody to extract it from.
+unlabeled one — is refused outright by both, and each says what it can:
+`traverse-issue` escalates naming the phase the issue carries and the phases it
+runs, and a session names the skill the user should run instead. Definition is
+user-led by construction; a dispatcher that improvised its way through intake
+would be extracting intent with nobody to extract it from.
 
 **Single label writer.** One writer per issue moves its `phase:*` label. Across
 the build region that writer is `traverse-issue`, which moves the label only
@@ -55,10 +57,11 @@ whole bar is a definition-region obligation, carried across the crossing by the
 `phase:build` label the user's approval sets.
 
 `traverse-issue` re-derives none of it. The phase label is the program counter
-and the only thing read: `phase:build` runs build then open-pr, `phase:pr-review`
-runs open-pr alone, and anything else — including `mode:spike`, which opens no
-pull request — escalates. Asking again here would let a script overrule a
-decision that is the user's.
+and the only readiness signal read back: `phase:build` runs build then open-pr,
+`phase:pr-review` runs open-pr alone, and any other phase — or none, or more than
+one — escalates. `mode:spike` is read ahead of the phase and refused on sight,
+because a spike opens no pull request for this graph to reach. Asking anything
+further here would let a script overrule a decision that is the user's.
 
 ## Permissions
 
@@ -148,9 +151,13 @@ dispatched.
 **Escalation is terminal, and retries are the caller's.** A traverse runs no node
 twice. Any way a job comes back other than a clean process reporting `done` — the
 node's own `escalated`, a crash, the deadline, a refused report, a misconfigured
-run — ends the traverse on `traverse-escalation` then `traverse-end`, with the
-label unmoved. A retry is the caller invoking `traverse-issue` again from the
-top.
+run — ends the traverse on `traverse-escalation` then `traverse-end`. The
+escalating node's own label move is what does not happen; a move an earlier node
+in the same traverse already made stands. So a retry — the caller invoking
+`traverse-issue` again from the top — resumes at whatever phase the last node to
+finish left behind, not at the phase the traverse started on: a build that
+verified and then an `open-pr` that escalated leaves `phase:pr-review`, and the
+next invocation runs `open-pr` alone.
 
 ## Worktrees and branches
 
@@ -192,16 +199,20 @@ working directory.
 **The branch is pushed as it is committed.** A committing node pushes what it
 commits — the push is part of `/commit` — so the branch is on origin whenever
 the node ends, verified by the pre-push hook's full `make check` on the way out.
-The traverse then checks that for itself: it advances the phase label only once
-`issue-<N>` is on origin at the sha the worktree holds, so a node that reports
-success over an unpushed branch stops the traverse instead of moving the board.
+The traverse then checks that for itself, and all four checks precede the label
+move: the worktree is on `issue-<N>` rather than a detached HEAD, it has nothing
+uncommitted, and `issue-<N>` is on origin at the sha it holds. The last one alone
+would not do — neither sha moves when a node edits and never commits, so on a
+rework lap, where the branch is already on origin when the node starts, the
+comparison would agree with itself and pass over work the pull request will never
+show.
 
 ## The node-skill contract
 
 A node does the node's work and reports; what launched it sequences whatever
 follows and writes the labels. The contract binds both kinds of node — the typed
 agent definitions the traverse launches and the skills a session dispatches —
-and three clauses below say where the two differ. This contract fixes structure;
+and four clauses below say where the two differ. This contract fixes structure;
 the authoring *style* behind both — voice, content, robustness, mechanics — lives
 in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md).
 
