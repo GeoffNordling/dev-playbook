@@ -807,8 +807,11 @@ class _Traverse:
 
         Exactly two reads use this, and both are asking whether something exists
         on GitHub: a branch, and a pull request. A 404 and an unreachable network
-        are not told apart, and deliberately so — both end the traverse escalated
-        with the label unmoved, which is the safe direction to be wrong in.
+        are not told apart, and deliberately so — both end the traverse
+        escalated, which is the safe direction to be wrong in. Neither read moves
+        a label itself, but the pull request read runs after `_build` has already
+        moved one, so an escalation here does not leave the board where the
+        traverse found it.
         """
         done = subprocess.run(
             [*self.gh_cmd, *arguments], capture_output=True, text=True

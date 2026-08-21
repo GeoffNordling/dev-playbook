@@ -201,7 +201,8 @@ commits — the push is part of `/commit` — so the branch is on origin wheneve
 the node ends, verified by the pre-push hook's full `make check` on the way out.
 The traverse then checks that for itself, and all four checks precede the label
 move: the worktree is on `issue-<N>` rather than a detached HEAD, it has nothing
-uncommitted, and `issue-<N>` is on origin at the sha it holds. The last one alone
+uncommitted, `issue-<N>` is on origin at all, and it is there at the sha the
+worktree holds. The last one alone
 would not do — neither sha moves when a node edits and never commits, so on a
 rework lap, where the branch is already on origin when the node starts, the
 comparison would agree with itself and pass over work the pull request will never
