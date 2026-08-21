@@ -19,8 +19,8 @@ Governs how an idea becomes a merged pull request.
 - [software-factory/node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md) — the
   authoring style behind the node agent definitions and the node skills: voice,
   content, robustness, mechanics
-- [software-factory/review-contract.md](/software-factory/review-contract.md) — what the code
-  and doc reviews do once dispatched: gate, cycle, findings comment, escalation boundary
+- [software-factory/review-contract.md](/software-factory/review-contract.md) — what a review
+  does once launched: gate, severities, threads, cycle, escalation boundary
 - [software-factory/pr-feedback.md](/software-factory/pr-feedback.md) — the comment surfaces a
   PR carries, and how a committing node re-enters on a rework lap
 - [software-factory/tdd.md](/software-factory/tdd.md) — the test-first
@@ -29,8 +29,8 @@ Governs how an idea becomes a merged pull request.
 - [software-factory/refactor-catalogue.md](/software-factory/refactor-catalogue.md) — the
   structural candidates with their cues and moves, and the step-size rule governing them
 - [software-factory/deviation-contract.md](/software-factory/deviation-contract.md) — what a
-  build agent does when reality contradicts its brief: the three limiters, escalation,
-  the deviation ledger
+  build agent does when reality contradicts its brief: the three limiters, the
+  halt-commit-escalate lane, the deviation ledger
 
 ## Audit
 
@@ -50,5 +50,6 @@ Governs how an idea becomes a merged pull request.
 
 - the typed agent definitions in `dotfiles/dot-claude/agents/` and the skills in
   `dotfiles/dot-claude/skills/` — the intake and design skills carry an issue to
-  ready; the `build` and `open-pr` definitions, with the review skills, carry it
-  to merge ([delegation](/software-factory/factory-operations.md#engagement))
+  ready; the `build`, `open-pr`, `bug-pr-review`, `code-pr-review`, and
+  `doc-pr-review` definitions carry it to merge
+  ([delegation](/software-factory/factory-operations.md#engagement))

@@ -72,10 +72,10 @@ permissions. This is accepted deliberately; a later pass may tighten it.
 
 **The reviewer read-only guarantee is enforced, not asked for.** A reviewer
 reports findings and never rewrites the work under review, and the harness holds
-it to that: `code-pr-review`, `bug-pr-review`, and `doc-pr-review` each carry a
-`disallowed-tools` entry denying `Edit`, `MultiEdit`, `NotebookEdit`, and
-`Write`, so an attempted write is refused rather than merely discouraged by the
-prompt.
+it to that: `code-pr-review`, `bug-pr-review`, and `doc-pr-review` each pin
+`tools: Read, Grep, Glob, Bash`, so the file-writing tools are absent rather
+than merely discouraged by the prompt. The roster is accident-grade rather
+than containment — `Bash` sits on it because every GitHub write rides `gh`.
 
 From the first file-touching node on, the session is cwd-bound to the issue's
 worktree, which confines its file reach.
@@ -258,12 +258,12 @@ is authored against a diff still moving.
 whole stop. Which audits run is fixed by the [track rules](#track-rules) below,
 never by asking.
 
-- **Code track.** `/bug-pr-review` posts its bug findings; `/code-pr-review` adds
+- **Code track.** `bug-pr-review` posts its bug findings; `code-pr-review` adds
   the fidelity and convention findings it does not cover.
-- **Doc track.** `/doc-pr-review` audits the diff's documentation.
+- **Doc track.** `doc-pr-review` audits the diff's documentation.
 - **Lockdown re-review.** From the third cycle on, each live track runs its
-  fidelity-and-convention review alone — `/code-pr-review` on the code track,
-  `/doc-pr-review` on the doc track — and `/bug-pr-review` stands down: a
+  fidelity-and-convention review alone — `code-pr-review` on the code track,
+  `doc-pr-review` on the doc track — and `bug-pr-review` stands down: a
   lockdown verifies fixes and needs no fresh bug hunt. The track rules still
   elect the tracks, so a doc-only diff is re-reviewed by the doc track.
 

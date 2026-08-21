@@ -95,7 +95,7 @@ RULES = (
 
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issue-authoring.md states them — the doc and this rule
-# read one contract and cannot disagree. A build leaf carries all seven; a
+# read one contract and cannot disagree. A build leaf carries all eight; a
 # spike leaf carries the spike shape.
 BUILD_HEADINGS = (
     "Summary",
@@ -104,6 +104,7 @@ BUILD_HEADINGS = (
     "Desired behavior",
     "Key interfaces",
     "Acceptance criteria",
+    "Prohibited surfaces",
     "Out of scope",
 )
 SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
