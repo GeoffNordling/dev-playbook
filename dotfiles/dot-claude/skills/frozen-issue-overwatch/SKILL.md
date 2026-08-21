@@ -58,7 +58,7 @@ Repeat until the issue merges, closes, or a stop point (§6): place the issue at
 - **Inline** — run the node yourself, at your own main loop, with the user present.
 - **Review stop** — run /frozen-open-pr first (always), then select the tracks yourself per the [review stop](~/.claude/skills/frozen-issue-overwatch/references/factory-operations.md#the-review-stop). Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5).
 
-When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue.
+When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"`, with `<from>`/`<to>` written `_`-mapped-to-`-`: the graph's `pr_review` writes as the label `phase:pr-review`, not `phase:pr_review` — the repo carries no such label — and continue.
 
 **Readiness gates the first crossing only.** Before the traverse's first committing node, confirm the issue meets the [readiness bar](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness) — its first three conditions are the observable ones, and the release is taken as given, per [readiness at the crossing](~/.claude/skills/frozen-issue-overwatch/references/factory-operations.md#dispatch); escalate if one fails. A rework lap is not a crossing: the issue never left the factory, so nothing is re-checked.
 

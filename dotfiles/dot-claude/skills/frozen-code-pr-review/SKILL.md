@@ -5,7 +5,7 @@ disable-model-invocation: false
 model: opus
 effort: xhigh
 disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
-allowed-tools: Write(//tmp/**)
+allowed-tools: Write(/tmp/**)
 argument-hint: "<issue-number>"
 ---
 
