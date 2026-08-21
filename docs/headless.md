@@ -37,9 +37,9 @@ subscription credential, not a metered one.
 **`--bare` is the trapdoor.** It skips the keychain and the subscription login
 outright and demands an API key. It is never passed.
 
-[`headless-probe`](/scripts/headless-probe) checks all twelve sources before it
-makes any call and aborts the whole run on a single finding. It reads the
-environment and the settings files only — never the keyring.
+[`preflight`](/src/dev_playbook/factory/launcher.py) checks all twelve sources
+before every launch and refuses the whole run on a single finding. It reads
+the environment and the settings files only — never the keyring.
 
 ## How stable the policy is
 

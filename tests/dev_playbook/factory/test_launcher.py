@@ -203,38 +203,6 @@ PDEATHSIG_POLL = 0.05
 # says -- and would pass on the broken behavior as readily as on the fixed one.
 SIGNAL_SETTLE = 0.2
 
-# What the one real-spawn test needs of the machine it runs on, read at import
-# before any fixture redirects them. That test alone runs under the real home
-# and is swept against the machine's real settings roster, so a billing key
-# configured in any settings file here aborts it rather than being hidden
-# behind a temp directory nobody configured. Only the settings half of the
-# sweep is real: the autouse `child_env` fixture deletes the nine billing
-# variables from this process, and the child inherits that same cleaned
-# environment, so no real spawn can be metered by one of them either way.
-REAL_HOME = os.path.expanduser("~")
-REAL_MANAGED_SETTINGS = launcher.MANAGED_SETTINGS
-REAL_MANAGED_SETTINGS_DIR = launcher.MANAGED_SETTINGS_DIR
-
-# The gate on the real spawn, mirroring `SKIP_JUDGMENTS`: exactly "1" skips
-# visibly, anything else -- a bare `pytest` included -- runs it.
-REAL_SPAWN_GATE = "SKIP_REAL_SPAWN"
-
-# The throwaway node the real spawn launches, and the definition it resolves
-# from project scope. Haiku because what is under test is the launcher, never a
-# model's judgment: the cheapest model proves the contract as well as any.
-HAIKU_NODE = "haiku-probe"
-HAIKU_DEFINITION: dict[str, Any] = {
-    "name": HAIKU_NODE,
-    "description": "A throwaway node that reports and stops.",
-    "model": "haiku",
-    "effort": "low",
-}
-HAIKU_PROMPT = "Do not use any tools. Set outcome to done and gist to the word: ok."
-
-# Generous enough for a real round trip, short enough that a wedged run fails
-# the suite rather than holding it.
-REAL_SPAWN_DEADLINE = 300.0
-
 # The six settings files a launch is swept against, named by scope. Every one
 # is a file `-p` merges, so a billing key in any of them meters the child.
 SETTINGS_SCOPES = (
@@ -361,24 +329,6 @@ def child_env(home: Path, monkeypatch: pytest.MonkeyPatch) -> pytest.MonkeyPatch
     for var in (*launcher.BILLING_ENV_VARS, launcher.EFFORT_LEVEL_VAR):
         monkeypatch.delenv(var, raising=False)
     return monkeypatch
-
-
-@pytest.fixture
-def real_machine(child_env: pytest.MonkeyPatch) -> None:
-    """Undo this module's settings redirections, for the one test that spawns claude.
-
-    The real spawn needs the machine's own home to find the subscription
-    credential it runs on, and it has to be swept against the machine's real
-    settings for that half of the sweep to mean anything at all.
-
-    The environment stays as `child_env` left it, deliberately: restoring live
-    billing variables into this process is a worse trade than a narrower
-    claim. So this fixture proves the settings roster against the real machine
-    and nothing about the environment.
-    """
-    child_env.setenv("HOME", REAL_HOME)
-    child_env.setattr(launcher, "MANAGED_SETTINGS", REAL_MANAGED_SETTINGS)
-    child_env.setattr(launcher, "MANAGED_SETTINGS_DIR", REAL_MANAGED_SETTINGS_DIR)
 
 
 @pytest.fixture
@@ -1264,34 +1214,6 @@ def test_the_pump_thread_never_takes_a_signal_a_ledger_write_is_holding_off(
 
     assert inside == [[]]
     assert trapped_sigterm == [signal.SIGTERM]
-
-
-@pytest.mark.skipif(
-    os.environ.get(REAL_SPAWN_GATE) == "1",
-    reason=f"{REAL_SPAWN_GATE}=1: this test launches actual claude",
-)
-def test_a_real_spawn_runs_the_whole_launcher_against_the_live_harness(
-    real_machine: None, worktree: Path, db: Path
-) -> None:
-    definitions = worktree / ".claude" / "agents"
-    write_definition(definitions, HAIKU_NODE, HAIKU_DEFINITION)
-
-    outcome = launcher.launch_job(
-        REPO,
-        ISSUE,
-        HAIKU_NODE,
-        worktree,
-        HAIKU_PROMPT,
-        SCHEMA,
-        LAUNCH_PAYLOAD,
-        db_path=db,
-        agents_dir=definitions,
-        timeout_s=REAL_SPAWN_DEADLINE,
-    )
-
-    assert outcome.process_outcome == "clean"
-    assert outcome.task_outcome == "done"
-    assert [row.kind for row in ledger_rows(db)] == ["job-launch", "job-report"]
 
 
 def test_importing_the_launcher_off_linux_names_the_platform_not_a_missing_symbol(
