@@ -553,10 +553,23 @@ def _die_with_parent() -> None:
     between that and a claude session billed to the subscription with nobody
     watching it.
 
-    A refused `prctl` raises rather than being logged and passed over. CPython
-    re-raises it in the parent, so the launch fails loudly with nothing spawned
-    — which is the right trade: the alternative is spawning a child the launcher
-    silently cannot guarantee it can take down.
+    A refused `prctl` raises rather than being logged and passed over, and
+    nothing spawns — which is the right trade: the alternative is a child the
+    launcher silently cannot guarantee it can take down.
+
+    What the parent is told, though, is not this exception. `_posixsubprocess`
+    reports any `preexec_fn` failure over the error pipe as the fixed triple
+    `SubprocessError:0:Exception occurred in preexec_fn.`, so the type, the
+    message and the errno are all discarded before `Popen` reconstructs it —
+    an `OSError` raised here fares no better, because the errno the parent
+    would rebuild from is the one the pipe did not carry. The reason is
+    therefore written to fd 2 first, which `_spawn` leaves as the launcher's
+    own stderr, so the operator gets the errno even though the parent's
+    exception is a bare `SubprocessError`.
+
+    That write and the raise are on the failure path, where async-signal-safety
+    is already lost and the child is about to die either way. The success path —
+    the one every launch takes — is the single syscall above it.
 
     A `preexec_fn` in a process that has threads is the documented hazard here,
     and the traverse does launch a second node while the first launch's pump
@@ -566,10 +579,12 @@ def _die_with_parent() -> None:
     lookup that would need one was done at import.
     """
     if PRCTL(PR_SET_PDEATHSIG, signal.SIGTERM) != 0:
-        raise LauncherError(
+        refusal = (
             f"the kernel refused PR_SET_PDEATHSIG for this child, so it could "
             f"outlive its launcher: {os.strerror(ctypes.get_errno())}"
         )
+        os.write(2, f"{refusal}\n".encode())
+        raise LauncherError(refusal)
 
 
 def _supervise(
