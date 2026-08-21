@@ -44,16 +44,11 @@ Under auto mode the classifier must additionally pass each `gh` write, per
 
 ## The briefing rule
 
-**The user is in the terminal and nowhere else.** They are not reading the code,
-the diff, the PR, or its comments — that read comes once, at the end. So every
+**The user is primarily in the terminal.** They do not typically read the documents or the code. They read the PR once, at the veryy end of the process. So every
 question, verdict request, and escalation stands on its own: it assumes no prior
 knowledge, lays the background out plainly, quotes the specific finding, line, or
 command the decision turns on, and then asks. Whatever a decision turns on goes
 on screen.
-
-This is the rule the formats below specialize. It is also a ceiling: a brief
-carries what the decision needs and stops. Pasting a diff, a full audit comment,
-or a file the user did not ask for buries the call being made.
 
 ## Turn boundaries
 
