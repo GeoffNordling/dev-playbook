@@ -10,6 +10,8 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
+
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "repo-lint"
 CANONICAL = Path(__file__).resolve().parents[1] / "standards" / "build" / "canonical"
 
@@ -339,18 +341,19 @@ def test_rule_body_first_person_fails(tmp_path: Path) -> None:
     assert "'my'" in result.stdout
 
 
-def test_agent_definition_body_first_person_fails(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "relpath",
+    [".claude/agents/demo.md", "dotfiles/dot-claude/agents/demo.md"],
+)
+def test_agent_definition_body_first_person_fails(tmp_path: Path, relpath: str) -> None:
     files = base_files()
-    files["dotfiles/dot-claude/agents/demo.md"] = (
+    files[relpath] = (
         "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
         "# Demo\n\nI run my own checks.\n"
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert (
-        "dotfiles/dot-claude/agents/demo.md: claude-code.agent-facing-voice"
-        in result.stdout
-    )
+    assert f"{relpath}: claude-code.agent-facing-voice" in result.stdout
     assert "'I'" in result.stdout
     assert "'my'" in result.stdout
 
