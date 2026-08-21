@@ -1,7 +1,6 @@
 import json
 import locale
 import os
-import sqlite3
 import subprocess
 import sys
 import time
@@ -10,7 +9,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from conftest import commit_all, init_repo
+from conftest import (
+    commit_all,
+    init_repo,
+    ledger_rows,
+    process_state,
+    write_definition,
+)
 
 from dev_playbook.factory import launcher
 
@@ -455,33 +460,6 @@ def write_settings(path: Path, settings: dict[str, object]) -> None:
     path.write_text(json.dumps(settings))
 
 
-def write_definition(directory: Path, stem: str, frontmatter: dict[str, Any]) -> Path:
-    """Write one agent definition, its frontmatter rendered as YAML."""
-    body = "\n".join(f"{key}: {value}" for key, value in frontmatter.items())
-    path = directory / f"{stem}.md"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"---\n{body}\n---\n\nThe node's instructions.\n")
-    return path
-
-
-def process_state(pid: int) -> str | None:
-    """The single-letter process-table state of `pid`, or None once it is gone.
-
-    Read from ``/proc`` rather than asked with ``os.kill(pid, 0)``, because a
-    signal probe answers "alive" for a zombie — and a child whose launcher was
-    destroyed is reparented, so it is a zombie for however long it takes the
-    reaper to collect it. What is under test is that the child stopped running,
-    which the state letter says and the signal probe does not.
-    """
-    try:
-        stat = Path(f"/proc/{pid}/stat").read_text()
-    except OSError:
-        return None
-    # The comm field is parenthesized and may itself hold spaces, so the split
-    # starts after the last ')' rather than at the second field.
-    return stat.rpartition(")")[2].split()[0]
-
-
 def wait_until_stopped(pid: int, budget: float) -> bool:
     """Poll until `pid` is gone or a zombie, within `budget` seconds."""
     deadline = time.monotonic() + budget
@@ -500,19 +478,6 @@ def wait_for_file(path: Path, budget: float) -> bool:
             return True
         time.sleep(PDEATHSIG_POLL)
     return False
-
-
-def ledger_rows(db: Path) -> list[tuple[str, str, dict[str, Any]]]:
-    """Every ledger row in the store as (kind, session_id, payload), in write order."""
-    if not db.exists():
-        return []
-    with sqlite3.connect(db) as connection:
-        rows = connection.execute(
-            "SELECT kind, session_id, payload FROM ledger ORDER BY id"
-        ).fetchall()
-    return [
-        (kind, session_id, json.loads(payload)) for kind, session_id, payload in rows
-    ]
 
 
 def test_preflight_aborts_on_a_billing_variable_in_the_child_environment(
@@ -799,9 +764,10 @@ def test_a_clean_run_lands_both_ledger_rows_on_the_minted_session_id(
     outcome = launch(claude_cmd=claude_cmd)
 
     launched, reported = ledger_rows(db)
-    assert launched == ("job-launch", outcome.session_id, LAUNCH_PAYLOAD)
+    assert launched == ("job-launch", NODE, outcome.session_id, LAUNCH_PAYLOAD)
     assert reported == (
         "job-report",
+        NODE,
         outcome.session_id,
         {
             "process_outcome": "clean",
@@ -878,7 +844,7 @@ def test_a_run_whose_node_returned_no_report_is_schema_refused(
     assert outcome.process_outcome == "schema-refused"
     assert outcome.task_outcome is None
     assert outcome.structured_output is None
-    assert ledger_rows(db)[1][2]["process_outcome"] == "schema-refused"
+    assert ledger_rows(db)[1].payload["process_outcome"] == "schema-refused"
 
 
 def test_a_child_that_exits_nonzero_on_its_own_died(
@@ -894,7 +860,7 @@ def test_a_child_that_exits_nonzero_on_its_own_died(
 
     assert outcome.process_outcome == "died"
     assert outcome.task_outcome is None
-    assert "kill" not in ledger_rows(db)[1][2]
+    assert "kill" not in ledger_rows(db)[1].payload
 
 
 def test_a_died_run_records_the_exit_code_that_is_its_only_diagnostic(
@@ -908,7 +874,7 @@ def test_a_died_run_records_the_exit_code_that_is_its_only_diagnostic(
 
     launch(claude_cmd=claude_cmd)
 
-    assert ledger_rows(db)[1][2]["exit_code"] == 3
+    assert ledger_rows(db)[1].payload["exit_code"] == 3
 
 
 def test_a_child_still_running_at_the_deadline_is_timed_out(
@@ -926,7 +892,7 @@ def test_a_child_still_running_at_the_deadline_is_timed_out(
 
     assert outcome.process_outcome == "timed-out"
     assert outcome.task_outcome is None
-    assert ledger_rows(db)[1][2]["kill"] == "sigterm"
+    assert ledger_rows(db)[1].payload["kill"] == "sigterm"
 
 
 def test_a_grandchild_holding_stdout_never_makes_a_finished_run_look_timed_out(
@@ -946,7 +912,7 @@ def test_a_grandchild_holding_stdout_never_makes_a_finished_run_look_timed_out(
 
     assert outcome.process_outcome == "clean"
     assert outcome.task_outcome == "done"
-    assert "kill" not in ledger_rows(db)[1][2]
+    assert "kill" not in ledger_rows(db)[1].payload
 
 
 def test_a_run_placed_outside_its_worktree_is_killed_and_misconfigured(
@@ -967,7 +933,7 @@ def test_a_run_placed_outside_its_worktree_is_killed_and_misconfigured(
 
     assert outcome.process_outcome == "misconfigured"
     assert outcome.task_outcome is None
-    payload = ledger_rows(db)[1][2]
+    payload = ledger_rows(db)[1].payload
     assert payload["kill"] == "sigterm"
     assert payload["alarm"] == {
         "field": "cwd",
@@ -993,7 +959,7 @@ def test_a_run_billed_to_anything_but_the_subscription_is_killed_and_misconfigur
     )
 
     assert outcome.process_outcome == "misconfigured"
-    assert ledger_rows(db)[1][2]["alarm"] == {
+    assert ledger_rows(db)[1].payload["alarm"] == {
         "field": "apiKeySource",
         "observed": "ANTHROPIC_API_KEY",
         "expected": "none",
@@ -1017,7 +983,7 @@ def test_a_later_init_never_clears_an_alarm_already_standing(
     )
 
     assert outcome.process_outcome == "misconfigured"
-    assert ledger_rows(db)[1][2]["alarm"]["field"] == "apiKeySource"
+    assert ledger_rows(db)[1].payload["alarm"]["field"] == "apiKeySource"
 
 
 def test_launch_runs_the_same_preflight_the_traverse_calls_standalone(
@@ -1054,7 +1020,7 @@ def test_a_child_that_ignores_sigterm_is_killed_after_the_grace(
     )
 
     assert outcome.process_outcome == "timed-out"
-    assert ledger_rows(db)[1][2]["kill"] == "sigkill"
+    assert ledger_rows(db)[1].payload["kill"] == "sigkill"
 
 
 def test_a_stream_is_read_as_utf8_whatever_the_machines_locale_prefers(
@@ -1104,7 +1070,7 @@ def test_a_result_envelope_with_no_init_before_it_violates_the_contract(
     with pytest.raises(launcher.HarnessContractViolation):
         launch(claude_cmd=claude_cmd)
 
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch"]
 
 
 def test_a_dropped_stream_line_with_no_init_ever_read_violates_the_contract(
@@ -1119,7 +1085,7 @@ def test_a_dropped_stream_line_with_no_init_ever_read_violates_the_contract(
     with pytest.raises(launcher.HarnessContractViolation):
         launch(claude_cmd=claude_cmd)
 
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch"]
 
 
 def test_a_dropped_stream_line_after_a_readable_init_is_classified_as_usual(
@@ -1152,7 +1118,7 @@ def test_a_validated_report_with_no_outcome_violates_the_contract(
         launch(claude_cmd=claude_cmd)
 
     assert "outcome" in str(violated.value)
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch"]
 
 
 def test_a_duration_the_harness_reports_as_a_string_violates_the_contract(
@@ -1240,4 +1206,16 @@ def test_a_real_spawn_runs_the_whole_launcher_against_the_live_harness(
 
     assert outcome.process_outcome == "clean"
     assert outcome.task_outcome == "done"
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch", "job-report"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch", "job-report"]
+
+
+def test_the_death_signal_syscall_is_resolved_before_any_child_is_forked() -> None:
+    """The lookup between fork and exec is the deadlock this rules out.
+
+    `CDLL.__getattr__` runs `dlsym` on the first attribute access and caches the
+    result on the instance, so a cached entry with no launch yet in this process
+    is the proof the lookup happened at import — and a resolution that happened
+    at import cannot happen in the child, where taking the loader's lock could
+    wedge it forever.
+    """
+    assert "prctl" in launcher.LIBC.__dict__

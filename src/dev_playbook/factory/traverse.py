@@ -90,6 +90,13 @@ OPEN_PR_SCHEMA = REPORT_SCHEMA
 # Where an issue's worktree sits inside its checkout, and the branch it carries.
 WORKTREES = Path(".claude") / "worktrees"
 
+# The two line prefixes `git worktree list --porcelain` writes, and the namespace
+# a branch line names its ref in. The porcelain form rather than the one meant
+# for reading, because it is the form git undertakes not to change.
+WORKTREE_RECORD = "worktree "
+BRANCH_RECORD = "branch "
+HEADS = "refs/heads/"
+
 # The payload keys this module writes. Named once, because `factory-status` will
 # read them and a typo on either side is a query that answers with nothing.
 MODE = "mode"
@@ -101,13 +108,28 @@ TO = "to"
 PR_URL = "pr_url"
 
 # Why a job's terminal row was written by the sweep rather than by the launcher
-# that started it, recorded so the two are told apart on the row.
+# that started it, recorded so the two are told apart on the row. The key is this
+# module's own; the rest of that row's keys are the launcher's, and are taken
+# from it by name rather than typed out again here.
+SWEPT = "swept"
 ORPHAN_RECOVERY = "orphan-recovery"
 KILL_CASCADE = "kill-cascade"
 
 # The exit status a killed traverse leaves. Nonzero, because the traverse did not
 # finish — the JSON line on stdout belongs to the two statuses that did.
 EXIT_KILLED = 1
+
+# The signals a traverse takes its children down on. The ledger's own deferred
+# pair, not a second tuple beside it: the trap writes the books, so a signal
+# trapped here that the store did not hold off for the length of a write would
+# be one whose handler could deadlock against the write it interrupted. SIGKILL
+# is absent because it cannot be trapped — that is what `PR_SET_PDEATHSIG` in
+# the launcher is for.
+TRAPPED = ledger.DEFERRED_SIGNALS
+
+# The one `pgrep` exit that is an answer rather than a fault: it looked, and
+# nothing is running under that session id.
+PGREP_NO_MATCH = 1
 
 
 class TraverseError(Exception):
@@ -252,7 +274,11 @@ class _Traverse:
     # --- the sequence ---
 
     def run(self) -> TraverseOutcome:
-        """The whole traverse, from the orphan sweep to a terminal ledger row."""
+        """The whole traverse, from the orphan sweep to a terminal ledger row.
+
+        Every way out of the graph closes the window — the one the graph knows
+        about and the one it does not.
+        """
         self._sweep(ORPHAN_RECOVERY)
         ledger.traverse_start(
             self.repo, self.issue, {MODE: self.mode}, db_path=self.db_path
@@ -262,6 +288,18 @@ class _Traverse:
                 return self._graph()
             except _Escalated as escalated:
                 return self._record_escalation(escalated)
+            except Exception as failure:
+                # Not a way this graph knows a traverse can end: the harness
+                # breaking one of its promises, a git call that failed, the
+                # store itself. The books are completed all the same, because a
+                # window left open reads as a live traverse for good and every
+                # job of the issue reads as still running with it — and then the
+                # failure goes on rising, because nothing here understood it
+                # well enough to turn it into an outcome anyone could act on.
+                self._record_escalation(
+                    _Escalated(f"{type(failure).__name__}: {failure}")
+                )
+                raise
 
     def _graph(self) -> TraverseOutcome:
         """The nodes themselves, in the order this issue's phase calls for."""
@@ -453,6 +491,7 @@ class _Traverse:
         """
         worktree = self.checkout / WORKTREES / self._branch()
         if worktree.exists():
+            self._gate_reuse(worktree)
             _say(f"{self.repo}#{self.issue}: reusing {worktree}")
             return worktree
         self._git(self.checkout, "fetch", "origin", "main")
@@ -475,6 +514,59 @@ class _Traverse:
         )
         _say(f"{self.repo}#{self.issue}: created {worktree} off {local}")
         return worktree
+
+    def _gate_reuse(self, worktree: Path) -> None:
+        """Refuse a directory at the worktree path that git does not answer for.
+
+        A directory being there proves nothing. A `git worktree remove` refused
+        over untracked files leaves the tree standing, and a re-cloned checkout
+        leaves one whose link points nowhere — both of which an existence check
+        reuses happily, and both of which break the first git command a node
+        runs, deep inside a launch that has already been paid for. The registry
+        is asked instead, because it is what every git command in that tree will
+        answer from.
+
+        The branch is judged with it. A tree on some other branch would take the
+        node's commits, and the push and the verification would then read a
+        branch nothing was written to.
+        """
+        registered = self._registrations()
+        here = worktree.resolve()
+        if here not in registered:
+            raise _Escalated(
+                f"{worktree} is a directory {self.checkout} has no worktree "
+                f"registered at, so nothing launched into it would be working in "
+                f"a git tree at all"
+            )
+        branch = registered[here]
+        if branch != self._branch():
+            raise _Escalated(
+                f"{worktree} is checked out on {branch or 'a detached HEAD'} where "
+                f"this issue's work belongs on {self._branch()}"
+            )
+
+    def _registrations(self) -> dict[Path, str | None]:
+        """Every worktree this checkout holds, by path, and the branch each is on.
+
+        The porcelain form is parsed rather than the one meant for reading,
+        because it is the form git promises not to change: one `worktree <path>`
+        line opening each record, and a `branch <ref>` line only where that
+        record has one — a detached tree simply has none, which is what leaves
+        the branch None.
+        """
+        registrations: dict[Path, str | None] = {}
+        here: Path | None = None
+        for line in self._git(
+            self.checkout, "worktree", "list", "--porcelain"
+        ).splitlines():
+            if line.startswith(WORKTREE_RECORD):
+                here = Path(line.removeprefix(WORKTREE_RECORD)).resolve()
+                registrations[here] = None
+            elif line.startswith(BRANCH_RECORD) and here is not None:
+                registrations[here] = line.removeprefix(BRANCH_RECORD).removeprefix(
+                    HEADS
+                )
+        return registrations
 
     # --- the orphan sweep and the kill cascade ---
 
@@ -543,12 +635,12 @@ class _Traverse:
                 str(row.node),
                 session_id,
                 {
-                    "process_outcome": launcher.DIED,
-                    "task_outcome": None,
+                    launcher.PROCESS_OUTCOME: launcher.DIED,
+                    launcher.TASK_OUTCOME: None,
                     launcher.STRUCTURED_OUTPUT: None,
-                    "exit_code": None,
-                    "swept": why,
-                    "kill": launcher.SIGTERM if killed else None,
+                    launcher.EXIT_CODE: None,
+                    launcher.KILL: launcher.SIGTERM if killed else None,
+                    SWEPT: why,
                 },
                 db_path=self.db_path,
             )
@@ -664,21 +756,27 @@ class _Traverse:
         return listed.splitlines()[0] if listed else None
 
 
-# The signals a traverse takes its children down on. SIGKILL is absent because it
-# cannot be trapped — that is what `PR_SET_PDEATHSIG` in the launcher is for.
-TRAPPED = (signal.SIGINT, signal.SIGTERM)
-
-
 def _terminate(session_id: str) -> bool:
     """SIGTERM whatever process is running under `session_id`; say whether any was.
 
     The session id is on the child's command line, so `pgrep -f` matches that job
     and nothing else. `pgrep` exits 1 when it matches nothing, which is not a
     failure here: a job whose process is already gone still needs its row.
+
+    Every other nonzero exit is a probe that never got to look — a pattern it
+    would not compile, a fault in the tool itself — and it raises. Read as "no
+    such process" instead, it would file the job's terminal row while the
+    session is still running, and the one thing that would have taken it down
+    is the signal this decided not to send.
     """
     found = subprocess.run(["pgrep", "-f", session_id], capture_output=True, text=True)
-    if found.returncode != 0:
+    if found.returncode == PGREP_NO_MATCH:
         return False
+    if found.returncode != 0:
+        raise TraverseError(
+            f"pgrep could not say whether {session_id} is still running "
+            f"(exit {found.returncode}): {found.stderr.strip()}"
+        )
     pids = [int(line) for line in found.stdout.split()]
     for pid in pids:
         try:

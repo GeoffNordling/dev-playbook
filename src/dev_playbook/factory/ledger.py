@@ -7,6 +7,7 @@ and which are absent.
 """
 
 import json
+import signal
 import sqlite3
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import closing, contextmanager
@@ -15,6 +16,12 @@ from pathlib import Path
 from typing import NamedTuple
 
 DB_PATH = Path("~/.local/share/claude-measure/events.db").expanduser()
+
+# The signals whose handlers write to this ledger, held off for the length of
+# every write. A traverse traps exactly these two and writes the books from the
+# trap -- `traverse.TRAPPED` is this tuple, so the pair cannot drift into a
+# signal that is trapped here and not deferred there.
+DEFERRED_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
 # Concurrent traverses write to one database. WAL lets their readers and
 # writers coexist, and the busy timeout makes a collision queue rather than
@@ -336,6 +343,29 @@ def _require_wal(connection: sqlite3.Connection, db_path: Path) -> None:
 
 
 @contextmanager
+def _uninterrupted() -> Iterator[None]:
+    """Hold the deferred signals off for the length of the block.
+
+    Python runs a signal handler on the main thread at an arbitrary bytecode
+    boundary, so without this one can land in the middle of a write -- and a
+    traverse's handler writes to this ledger. Its own INSERT would then queue
+    behind a write lock only the thread it interrupted can release, wait out
+    `BUSY_TIMEOUT_SECONDS`, and leave as `LedgerError` from inside a handler:
+    the `killed` end never lands, and the window it exists to close stays open
+    for good.
+
+    The whole mask is restored rather than the two signals unblocked, so a
+    write reached from inside a block that already blocked them -- the trap's
+    own sweep is one -- leaves them blocked on the way out.
+    """
+    previous = signal.pthread_sigmask(signal.SIG_BLOCK, DEFERRED_SIGNALS)
+    try:
+        yield
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous)
+
+
+@contextmanager
 def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
     """The store, open in one transaction, table present, WAL on, timeout set.
 
@@ -395,6 +425,11 @@ def _append(
     Storage plumbing, and nothing else: the address arrives already judged by
     `_gate`, one level up.
 
+    The two deferred signals are held off for the length of the write, which is
+    what keeps a trap that writes the books out of the middle of one -- see
+    `_uninterrupted`. The encoding happens outside that hold, because it is not
+    the transaction and a signal is free to land there.
+
     The payload is encoded before the store is touched, so a payload that will
     not serialize raises with nothing written. `allow_nan=False` puts a NaN or
     an infinity in that class: `json.dumps` would otherwise write them as bare
@@ -408,7 +443,7 @@ def _append(
     """
     encoded = json.dumps(dict(payload), allow_nan=False)
     received_at = datetime.now(UTC).isoformat(timespec="microseconds")
-    with _ledger(db_path) as connection:
+    with _uninterrupted(), _ledger(db_path) as connection:
         connection.execute(
             INSERT, (received_at, kind, repo, issue, node, session_id, encoded)
         )

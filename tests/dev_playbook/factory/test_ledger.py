@@ -1,5 +1,6 @@
 import inspect
 import json
+import signal
 import sqlite3
 import time
 import uuid
@@ -425,6 +426,36 @@ def test_a_job_writer_stores_its_kind_both_grain_columns_and_payload(
     (row,) = raw_rows(db_path)
     assert tuple(row)[2:7] == (kind, "owner/repo", 438, "build", "sess-1")
     assert json.loads(row["payload"]) == {"note": kind}
+
+
+def test_a_write_holds_off_the_signals_a_trap_writes_its_books_from(
+    db_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A handler that landed inside a write would deadlock against it.
+
+    The trap runs on the thread it interrupted, so a handler reached mid-write
+    queues its own INSERT behind a write lock only that suspended thread can
+    release: it waits out the busy timeout and leaves as `LedgerError`, and the
+    `killed` end that closes the traverse's window never lands.
+
+    The mask is read at the moment the store is opened, which is inside the
+    write and the only place from which the answer means anything.
+    """
+    during: list[set[int]] = []
+    opening: Callable[..., sqlite3.Connection] = sqlite3.connect
+
+    def watched(*arguments: Any, **keywords: Any) -> sqlite3.Connection:
+        during.append(set(signal.pthread_sigmask(signal.SIG_BLOCK, [])))
+        return opening(*arguments, **keywords)
+
+    monkeypatch.setattr(sqlite3, "connect", watched)
+
+    ledger.traverse_start("owner/repo", 440, {"mode": "auto"}, db_path=db_path)
+
+    assert set(ledger.DEFERRED_SIGNALS) <= during[0]
+    assert not set(ledger.DEFERRED_SIGNALS) & signal.pthread_sigmask(
+        signal.SIG_BLOCK, []
+    )
 
 
 # --- failure discipline ---

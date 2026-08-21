@@ -1,7 +1,6 @@
 import fcntl
 import json
 import signal
-import sqlite3
 import subprocess
 import sys
 import time
@@ -10,7 +9,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from conftest import commit_all, init_repo
+from conftest import (
+    commit_all,
+    init_repo,
+    ledger_rows,
+    process_state,
+    write_definition,
+)
 
 from dev_playbook.factory import launcher, ledger, traverse
 
@@ -274,23 +279,6 @@ DEFAULT_STEPS: dict[str, dict[str, Any]] = {
 }
 
 
-def process_state(pid: int) -> str | None:
-    """The single-letter process-table state of `pid`, or None once it is gone.
-
-    Read from ``/proc`` rather than asked with ``os.kill(pid, 0)``: a signal probe
-    answers "alive" for a zombie, and a child whose traverse was destroyed is
-    reparented, so it is a zombie until the reaper collects it. What is under test
-    is that it stopped running.
-    """
-    try:
-        stat = Path(f"/proc/{pid}/stat").read_text()
-    except OSError:
-        return None
-    # The comm field is parenthesized and may hold spaces of its own, so the
-    # split starts after the last ')' rather than at the second field.
-    return stat.rpartition(")")[2].split()[0]
-
-
 def wait_until(ready: Callable[[], bool], budget: float = PROCESS_BUDGET) -> bool:
     """Poll `ready` until it holds, within `budget` seconds."""
     deadline = time.monotonic() + budget
@@ -313,35 +301,15 @@ def add_worktree(checkout: Path, branch: str) -> Path:
     return path
 
 
-def write_definition(directory: Path, stem: str, frontmatter: dict[str, Any]) -> Path:
-    """Write one agent definition, its frontmatter rendered as YAML."""
-    body = "\n".join(f"{key}: {value}" for key, value in frontmatter.items())
-    path = directory / f"{stem}.md"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"---\n{body}\n---\n\nThe node's instructions.\n")
-    return path
-
-
-def ledger_rows(db: Path) -> list[tuple[str, str | None, dict[str, Any]]]:
-    """Every ledger row as (kind, node, payload), in write order."""
-    if not db.exists():
-        return []
-    with sqlite3.connect(db) as connection:
-        rows = connection.execute(
-            "SELECT kind, node, payload FROM ledger ORDER BY id"
-        ).fetchall()
-    return [(kind, node, json.loads(payload)) for kind, node, payload in rows]
-
-
 def kinds(db: Path) -> list[str]:
     """The kinds the ledger holds, in write order."""
-    return [kind for kind, _, _ in ledger_rows(db)]
+    return [row.kind for row in ledger_rows(db)]
 
 
 def payload_of(db: Path, kind: str) -> dict[str, Any]:
     """The payload of the one row of `kind` the ledger holds."""
-    (row,) = [payload for stored, _, payload in ledger_rows(db) if stored == kind]
-    return row
+    (found,) = [row for row in ledger_rows(db) if row.kind == kind]
+    return found.payload
 
 
 @pytest.fixture
@@ -905,6 +873,34 @@ def test_an_escalation_after_a_launch_names_the_node_and_the_session_that_ran_it
     assert outcome.session_id == launched()[0]["session"]
 
 
+def test_a_failure_the_graph_never_foresaw_closes_the_books_and_still_raises(
+    db: Path,
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A window left open would read as a live traverse for good.
+
+    The harness breaking its own contract is not one of the ways a job comes
+    back, so nothing in the graph converts it into an escalation. It still has
+    to close the window on its way out — and it still has to reach the operator
+    as the traceback it is, because nothing about it is understood well enough
+    to be handled.
+    """
+    lawless = node_step([HOOK_LINE, result_line(DONE_REPORT)])
+
+    with pytest.raises(launcher.HarnessContractViolation):
+        traverse_issue(claude_cmd=fake_claude(build=lawless))
+
+    assert kinds(db) == [
+        "traverse-start",
+        "job-launch",
+        "traverse-escalation",
+        "traverse-end",
+    ]
+    assert payload_of(db, "traverse-end") == {"status": "escalated"}
+    assert ledger.live_jobs(db_path=db) == []
+
+
 # --- what the traverse verifies for itself ---
 
 
@@ -997,6 +993,50 @@ def test_an_existing_worktree_is_reused_exactly_as_it_was_found(
     traverse_issue()
 
     assert carried_over.read_text() == "from the last lap\n"
+
+
+def test_a_directory_git_has_no_worktree_registered_at_is_never_reused(
+    checkout: Path,
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A directory at the path is not proof of a worktree.
+
+    `git worktree remove` refused over untracked files leaves the tree standing,
+    and a re-cloned checkout leaves one whose link points nowhere. Reused, both
+    break the first git command a node runs — deep inside a launch already paid
+    for.
+    """
+    stray = checkout / ".claude" / "worktrees" / BRANCH
+    stray.mkdir(parents=True)
+
+    outcome = traverse_issue()
+
+    assert outcome.status == "escalated"
+    assert launched() == []
+    assert "no worktree" in payload_of(db, "traverse-escalation")["reason"]
+
+
+def test_a_worktree_found_on_another_branch_escalates_rather_than_being_worked_in(
+    checkout: Path,
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    path = checkout / ".claude" / "worktrees" / BRANCH
+    path.parent.mkdir(parents=True)
+    subprocess.run(
+        ["git", "-C", str(checkout), "worktree", "add", "-q", str(path), "-b", "other"],
+        check=True,
+        capture_output=True,
+    )
+
+    outcome = traverse_issue()
+
+    assert outcome.status == "escalated"
+    assert launched() == []
+    assert "other" in payload_of(db, "traverse-escalation")["reason"]
 
 
 # --- the command line ---
@@ -1174,9 +1214,9 @@ def test_the_next_traverse_finishes_the_books_a_destroyed_one_left_open(
     traverse_issue()
 
     swept = [
-        payload
-        for kind, _, payload in ledger_rows(db)
-        if kind == "job-report" and payload.get("swept") == "orphan-recovery"
+        row.payload
+        for row in ledger_rows(db)
+        if row.kind == "job-report" and row.payload.get("swept") == "orphan-recovery"
     ]
     assert len(swept) == 1
     assert swept[0]["process_outcome"] == "died"
@@ -1184,6 +1224,27 @@ def test_the_next_traverse_finishes_the_books_a_destroyed_one_left_open(
     assert [row.session_id for row in ledger.live_jobs(db_path=db)] == [
         "sess-elsewhere"
     ]
+
+
+def test_a_process_probe_that_fails_for_any_reason_but_no_match_stops_the_sweep(
+    db: Path, traverse_issue: Callable[..., Any]
+) -> None:
+    """Read as "already gone", a broken probe would file a live job as dead.
+
+    `pgrep` exits 1 when it matched nothing and 2 when it could not go looking
+    at all. Taking the second for the first files the job's terminal row while
+    its claude session runs on, billed to the subscription with nobody watching
+    it — so it stops the traverse instead.
+
+    A lone `[` is what makes the probe fail here: `pgrep` compiles its pattern
+    as a regular expression, and an unclosed bracket expression is not one.
+    """
+    ledger.job_launch(REPO, ISSUE, "build", "[", {}, db_path=db)
+
+    with pytest.raises(traverse.TraverseError):
+        traverse_issue()
+
+    assert kinds(db) == ["job-launch"]
 
 
 def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
@@ -1195,9 +1256,10 @@ def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
     traverse_issue()
 
     reports = [
-        (node, payload)
-        for kind, node, payload in ledger_rows(db)
-        if kind == "job-report" and payload.get("swept")
+        row
+        for row in ledger_rows(db)
+        if row.kind == "job-report" and row.payload.get("swept")
     ]
-    assert reports[0][1]["process_outcome"] == "died"
-    assert reports[0][1]["kill"] is None
+    assert reports[0].node == "build"
+    assert reports[0].payload["process_outcome"] == "died"
+    assert reports[0].payload["kill"] is None

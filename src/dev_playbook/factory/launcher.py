@@ -82,16 +82,23 @@ MILLISECONDS = 1000.0
 # cannot, and the next traverse's orphan sweep completes the books either way.
 PR_SET_PDEATHSIG = 1
 
-# The C library this process already has open, so `prctl` is resolved once at
-# import and the child does nothing but call it. `CDLL(None)` asks for the
-# running program's own symbols rather than naming a soname, which is what makes
-# this hold wherever the interpreter itself links its libc.
+# The C library this process already has open, and the one function taken out of
+# it. `CDLL(None)` asks for the running program's own symbols rather than naming
+# a soname, which is what makes this hold wherever the interpreter itself links
+# its libc.
 #
-# Resolving it here rather than inside the child is the whole safety argument:
-# what runs between fork and exec must be async-signal-safe, and a symbol
-# lookup — which takes the dynamic loader's lock — is not. A parent thread
-# holding that lock at the moment of the fork would deadlock the child forever.
+# The pointer is bound here, and that binding is the whole safety argument.
+# `CDLL(None)` opens a handle and resolves nothing; the symbol is looked up by
+# `CDLL.__getattr__`, which calls `dlsym` and takes the dynamic loader's lock.
+# What runs between fork and exec must be async-signal-safe and a lock is not, so
+# a parent thread holding that one at the moment of the fork would wedge the
+# child forever. Reaching for `LIBC.prctl` in the child would also repeat the
+# lookup on every single launch, never once: the attribute cache the lookup fills
+# is written on the child's copy, and the child execs straight after.
 LIBC = ctypes.CDLL(None, use_errno=True)
+PRCTL = LIBC.prctl
+PRCTL.argtypes = (ctypes.c_int, ctypes.c_ulong)
+PRCTL.restype = ctypes.c_int
 
 # How long the supervisor waits on a silent queue before looking at the child
 # itself. It is what lets supervision end when the child ends rather than when
@@ -118,10 +125,22 @@ INIT_CWD = "cwd"
 INIT_API_KEY_SOURCE = "apiKeySource"
 SUBSCRIPTION = "none"
 
-# The report the harness validated, and the one key inside it the task layer
-# reads. Every node schema carries a required top-level `outcome`, so this one
-# key answers for node shapes no query has to know about.
+# The keys a `job-report` payload is written under, named here rather than typed
+# into each writer. The launcher is not the only one: the traverse's sweep files
+# this row for a job whose launcher is gone, and a key spelled differently on
+# either side is a row `factory-status` reads as missing what it plainly holds.
+#
+# `STRUCTURED_OUTPUT` doubles as the key in the harness's own result envelope
+# that the report is lifted from, and `OUTCOME` is the one key inside that
+# report the task layer reads — every node schema carries a required top-level
+# `outcome`, so it answers for node shapes no query has to know about. `KILL`
+# names the key; its values are the two `SIGTERM`/`SIGKILL` words above.
+PROCESS_OUTCOME = "process_outcome"
+TASK_OUTCOME = "task_outcome"
 STRUCTURED_OUTPUT = "structured_output"
+EXIT_CODE = "exit_code"
+KILL = "kill"
+ALARM = "alarm"
 OUTCOME = "outcome"
 
 # Accounting lifted off the result envelope onto the `job-report` row, plus the
@@ -525,8 +544,8 @@ def _die_with_parent() -> None:
     """Ask the kernel to SIGTERM this process the moment its parent dies.
 
     Runs in the child, between the fork and the exec, and does one syscall
-    through a function pointer the parent resolved at import — see `LIBC` for
-    why the lookup cannot happen here.
+    through the function pointer bound at import — see `PRCTL` for why the
+    lookup cannot happen here.
 
     The flag survives the exec that follows, so it is claude itself the kernel
     signals, and it is set unconditionally: a launcher that is SIGKILLed or
@@ -546,7 +565,7 @@ def _die_with_parent() -> None:
     syscall, holding no allocator lock, which is what makes the fork safe; the
     lookup that would need one was done at import.
     """
-    if LIBC.prctl(PR_SET_PDEATHSIG, signal.SIGTERM) != 0:
+    if PRCTL(PR_SET_PDEATHSIG, signal.SIGTERM) != 0:
         raise LauncherError(
             f"the kernel refused PR_SET_PDEATHSIG for this child, so it could "
             f"outlive its launcher: {os.strerror(ctypes.get_errno())}"
@@ -915,14 +934,14 @@ def _payload(
 ) -> dict[str, object]:
     """The `job-report` row's payload, composed from everything the run left behind."""
     payload: dict[str, object] = {
-        "process_outcome": process_outcome,
-        "task_outcome": task_outcome,
+        PROCESS_OUTCOME: process_outcome,
+        TASK_OUTCOME: task_outcome,
         STRUCTURED_OUTPUT: report,
         # On every row, not just the ones carrying a result envelope: the exit
         # code comes from `process.wait`, never off the envelope, and a `died`
         # run has no envelope at all — so this is the one thing that separates
         # exit 1 from a segfault from an OOM kill for whoever reads the row.
-        "exit_code": run.exit_code,
+        EXIT_CODE: run.exit_code,
     }
     if run.result is not None:
         # Accounting, recorded as the harness reported it and never re-asserted.
@@ -937,7 +956,7 @@ def _payload(
         if duration_ms is not None:
             payload["duration_s"] = _seconds(duration_ms)
     if run.kill is not None:
-        payload["kill"] = run.kill
+        payload[KILL] = run.kill
     if run.alarm is not None:
-        payload["alarm"] = run.alarm
+        payload[ALARM] = run.alarm
     return payload
