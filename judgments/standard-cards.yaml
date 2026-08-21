@@ -199,6 +199,7 @@ judgments:
       - software-factory/tdd.md
       - software-factory/refactor-catalogue.md
       - software-factory/deviation-contract.md
+      - scripts/traverse-issue
       - scripts/workspace-lint
       - src/dev_playbook/workspace_lint.py
     model: claude-sonnet-5

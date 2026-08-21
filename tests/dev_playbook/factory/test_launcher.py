@@ -1,17 +1,25 @@
 import json
 import locale
 import os
+import signal
 import sqlite3
 import subprocess
 import sys
-from collections.abc import Callable
+import time
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Any
 
 import pytest
-from conftest import commit_all, init_repo
+from conftest import (
+    commit_all,
+    init_repo,
+    ledger_rows,
+    process_state,
+    write_definition,
+)
 
-from dev_playbook.factory import launcher
+from dev_playbook.factory import launcher, ledger
 
 # The job every test launches unless it says otherwise.
 REPO = "owner/repo"
@@ -46,6 +54,39 @@ MISNAMED_DEFINITION = {**DEFINITION, "name": "builder"}
 UNTUNED_DEFINITION = {"name": NODE, "description": "The build node.", "model": "opus"}
 OVERTUNED_DEFINITION = {**DEFINITION, "effort": "turbo"}
 
+# A launcher run driven from a separate process, so a test can kill the
+# launcher itself rather than the child it supervises. The two module paths the
+# suite redirects are set here by hand: a monkeypatched module attribute lives
+# in this process alone, and a child that imports `launcher` fresh would
+# otherwise sweep the machine's real `/etc` managed settings.
+LAUNCH_RUNNER = """
+import json
+import sys
+from pathlib import Path
+
+arguments = json.loads(Path(sys.argv[1]).read_text())
+sys.path.insert(0, arguments["src"])
+
+from dev_playbook.factory import launcher
+
+launcher.MANAGED_SETTINGS = Path(arguments["managed_settings"])
+launcher.MANAGED_SETTINGS_DIR = Path(arguments["managed_settings_dir"])
+
+launcher.launch_job(
+    arguments["repo"],
+    arguments["issue"],
+    arguments["node"],
+    Path(arguments["worktree"]),
+    arguments["prompt"],
+    arguments["schema"],
+    arguments["launch_payload"],
+    db_path=Path(arguments["db_path"]),
+    agents_dir=Path(arguments["agents_dir"]),
+    claude_cmd=tuple(arguments["claude_cmd"]),
+    timeout_s=arguments["timeout_s"],
+)
+"""
+
 # A stand-in for claude: it records the argv and placement it was spawned
 # with, then emits a canned stream-json stream line by line and exits the way
 # its plan says. `$CWD` in a canned line becomes the directory it really ran
@@ -67,7 +108,7 @@ from pathlib import Path
 here = Path(__file__).parent
 plan = json.loads((here / "plan.json").read_text())
 (here / "record.json").write_text(
-    json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd()})
+    json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd(), "pid": os.getpid()})
 )
 if plan["orphan_seconds"]:
     subprocess.Popen(
@@ -87,6 +128,22 @@ for line in plan["lines"]:
     print(json.dumps(resolved), flush=True)
 time.sleep(plan["linger"])
 sys.exit(plan["exit_code"])
+"""
+
+# An import of the launcher on a platform that is not Linux, run in its own
+# interpreter so the substituted `sys.platform` reaches the module's own guard.
+# The failure is printed rather than raised, so the test reads a result instead
+# of a traceback.
+PLATFORM_PROBE = """
+import sys
+
+sys.platform = "darwin"
+sys.path.insert(0, sys.argv[1])
+try:
+    from dev_playbook.factory import launcher
+except Exception as refusal:
+    print(type(refusal).__name__)
+    print(refusal)
 """
 
 # Hook events precede `init` in a real stream, so every canned stream opens
@@ -132,6 +189,19 @@ BRIEF_GRACE = 0.3
 # near spent and the pipe still held open.
 ORPHAN_SECONDS = 5.0
 ORPHANED_DEADLINE = 1.0
+
+# How long the pdeathsig test waits — for the child to declare itself, and then
+# for it to be gone after its launcher is destroyed. The budget is far shorter
+# than `LINGER_SECONDS`, so a child that outlives its launcher fails the test
+# rather than passing on a slow machine.
+PDEATHSIG_BUDGET = 10.0
+PDEATHSIG_POLL = 0.05
+
+# How long a signal sent to this process is given to arrive. Delivery is a
+# kernel round trip rather than a call, so a test that reads the record the
+# instant after `os.kill` returns would find an empty one whatever the mask
+# says -- and would pass on the broken behavior as readily as on the fixed one.
+SIGNAL_SETTLE = 0.2
 
 # What the one real-spawn test needs of the machine it runs on, read at import
 # before any fixture redirects them. That test alone runs under the real home
@@ -370,6 +440,23 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
 
 
 @pytest.fixture
+def trapped_sigterm() -> Iterator[list[int]]:
+    """Catch SIGTERM for one test, recording each delivery, and restore after.
+
+    A test that signals itself needs somewhere for the signal to land: the
+    default action would kill the run. The record is what a test reads to see
+    whether the Python-level handler ran, which is the whole question when a
+    write is meant to be holding the signal off.
+    """
+    fired: list[int] = []
+    previous = signal.signal(signal.SIGTERM, lambda number, frame: fired.append(number))
+    try:
+        yield fired
+    finally:
+        signal.signal(signal.SIGTERM, previous)
+
+
+@pytest.fixture
 def spawn_record(tmp_path: Path) -> Callable[[], dict[str, Any]]:
     """Read back the argv and placement the fake claude was spawned with."""
 
@@ -414,26 +501,24 @@ def write_settings(path: Path, settings: dict[str, object]) -> None:
     path.write_text(json.dumps(settings))
 
 
-def write_definition(directory: Path, stem: str, frontmatter: dict[str, Any]) -> Path:
-    """Write one agent definition, its frontmatter rendered as YAML."""
-    body = "\n".join(f"{key}: {value}" for key, value in frontmatter.items())
-    path = directory / f"{stem}.md"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"---\n{body}\n---\n\nThe node's instructions.\n")
-    return path
+def wait_until_stopped(pid: int, budget: float) -> bool:
+    """Poll until `pid` is gone or a zombie, within `budget` seconds."""
+    deadline = time.monotonic() + budget
+    while time.monotonic() < deadline:
+        if process_state(pid) in (None, "Z"):
+            return True
+        time.sleep(PDEATHSIG_POLL)
+    return False
 
 
-def ledger_rows(db: Path) -> list[tuple[str, str, dict[str, Any]]]:
-    """Every ledger row in the store as (kind, session_id, payload), in write order."""
-    if not db.exists():
-        return []
-    with sqlite3.connect(db) as connection:
-        rows = connection.execute(
-            "SELECT kind, session_id, payload FROM ledger ORDER BY id"
-        ).fetchall()
-    return [
-        (kind, session_id, json.loads(payload)) for kind, session_id, payload in rows
-    ]
+def wait_for_file(path: Path, budget: float) -> bool:
+    """Poll until `path` exists, within `budget` seconds."""
+    deadline = time.monotonic() + budget
+    while time.monotonic() < deadline:
+        if path.exists():
+            return True
+        time.sleep(PDEATHSIG_POLL)
+    return False
 
 
 def test_preflight_aborts_on_a_billing_variable_in_the_child_environment(
@@ -720,9 +805,10 @@ def test_a_clean_run_lands_both_ledger_rows_on_the_minted_session_id(
     outcome = launch(claude_cmd=claude_cmd)
 
     launched, reported = ledger_rows(db)
-    assert launched == ("job-launch", outcome.session_id, LAUNCH_PAYLOAD)
+    assert launched == ("job-launch", NODE, outcome.session_id, LAUNCH_PAYLOAD)
     assert reported == (
         "job-report",
+        NODE,
         outcome.session_id,
         {
             "process_outcome": "clean",
@@ -799,7 +885,7 @@ def test_a_run_whose_node_returned_no_report_is_schema_refused(
     assert outcome.process_outcome == "schema-refused"
     assert outcome.task_outcome is None
     assert outcome.structured_output is None
-    assert ledger_rows(db)[1][2]["process_outcome"] == "schema-refused"
+    assert ledger_rows(db)[1].payload["process_outcome"] == "schema-refused"
 
 
 def test_a_child_that_exits_nonzero_on_its_own_died(
@@ -815,7 +901,7 @@ def test_a_child_that_exits_nonzero_on_its_own_died(
 
     assert outcome.process_outcome == "died"
     assert outcome.task_outcome is None
-    assert "kill" not in ledger_rows(db)[1][2]
+    assert "kill" not in ledger_rows(db)[1].payload
 
 
 def test_a_died_run_records_the_exit_code_that_is_its_only_diagnostic(
@@ -829,7 +915,7 @@ def test_a_died_run_records_the_exit_code_that_is_its_only_diagnostic(
 
     launch(claude_cmd=claude_cmd)
 
-    assert ledger_rows(db)[1][2]["exit_code"] == 3
+    assert ledger_rows(db)[1].payload["exit_code"] == 3
 
 
 def test_a_child_still_running_at_the_deadline_is_timed_out(
@@ -847,7 +933,7 @@ def test_a_child_still_running_at_the_deadline_is_timed_out(
 
     assert outcome.process_outcome == "timed-out"
     assert outcome.task_outcome is None
-    assert ledger_rows(db)[1][2]["kill"] == "sigterm"
+    assert ledger_rows(db)[1].payload["kill"] == "sigterm"
 
 
 def test_a_grandchild_holding_stdout_never_makes_a_finished_run_look_timed_out(
@@ -867,7 +953,7 @@ def test_a_grandchild_holding_stdout_never_makes_a_finished_run_look_timed_out(
 
     assert outcome.process_outcome == "clean"
     assert outcome.task_outcome == "done"
-    assert "kill" not in ledger_rows(db)[1][2]
+    assert "kill" not in ledger_rows(db)[1].payload
 
 
 def test_a_run_placed_outside_its_worktree_is_killed_and_misconfigured(
@@ -888,7 +974,7 @@ def test_a_run_placed_outside_its_worktree_is_killed_and_misconfigured(
 
     assert outcome.process_outcome == "misconfigured"
     assert outcome.task_outcome is None
-    payload = ledger_rows(db)[1][2]
+    payload = ledger_rows(db)[1].payload
     assert payload["kill"] == "sigterm"
     assert payload["alarm"] == {
         "field": "cwd",
@@ -914,7 +1000,7 @@ def test_a_run_billed_to_anything_but_the_subscription_is_killed_and_misconfigur
     )
 
     assert outcome.process_outcome == "misconfigured"
-    assert ledger_rows(db)[1][2]["alarm"] == {
+    assert ledger_rows(db)[1].payload["alarm"] == {
         "field": "apiKeySource",
         "observed": "ANTHROPIC_API_KEY",
         "expected": "none",
@@ -938,7 +1024,7 @@ def test_a_later_init_never_clears_an_alarm_already_standing(
     )
 
     assert outcome.process_outcome == "misconfigured"
-    assert ledger_rows(db)[1][2]["alarm"]["field"] == "apiKeySource"
+    assert ledger_rows(db)[1].payload["alarm"]["field"] == "apiKeySource"
 
 
 def test_launch_runs_the_same_preflight_the_traverse_calls_standalone(
@@ -975,7 +1061,7 @@ def test_a_child_that_ignores_sigterm_is_killed_after_the_grace(
     )
 
     assert outcome.process_outcome == "timed-out"
-    assert ledger_rows(db)[1][2]["kill"] == "sigkill"
+    assert ledger_rows(db)[1].payload["kill"] == "sigkill"
 
 
 def test_a_stream_is_read_as_utf8_whatever_the_machines_locale_prefers(
@@ -1025,7 +1111,7 @@ def test_a_result_envelope_with_no_init_before_it_violates_the_contract(
     with pytest.raises(launcher.HarnessContractViolation):
         launch(claude_cmd=claude_cmd)
 
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch"]
 
 
 def test_a_dropped_stream_line_with_no_init_ever_read_violates_the_contract(
@@ -1040,7 +1126,7 @@ def test_a_dropped_stream_line_with_no_init_ever_read_violates_the_contract(
     with pytest.raises(launcher.HarnessContractViolation):
         launch(claude_cmd=claude_cmd)
 
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch"]
 
 
 def test_a_dropped_stream_line_after_a_readable_init_is_classified_as_usual(
@@ -1073,7 +1159,7 @@ def test_a_validated_report_with_no_outcome_violates_the_contract(
         launch(claude_cmd=claude_cmd)
 
     assert "outcome" in str(violated.value)
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch"]
 
 
 def test_a_duration_the_harness_reports_as_a_string_violates_the_contract(
@@ -1089,6 +1175,95 @@ def test_a_duration_the_harness_reports_as_a_string_violates_the_contract(
         launch(claude_cmd=claude_cmd)
 
     assert "duration_ms" in str(violated.value)
+
+
+def test_a_child_dies_with_a_launcher_that_is_destroyed_without_warning(
+    tmp_path: Path,
+    worktree: Path,
+    agents_dir: Path,
+    db: Path,
+    managed_settings: tuple[Path, Path],
+    fake_claude: Callable[..., tuple[str, ...]],
+) -> None:
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude([HOOK_LINE, init_line()], linger=LINGER_SECONDS)
+    managed, drop_in = managed_settings
+    arguments = tmp_path / "launch.json"
+    arguments.write_text(
+        json.dumps(
+            {
+                "src": str(Path(launcher.__file__).parents[2]),
+                "managed_settings": str(managed),
+                "managed_settings_dir": str(drop_in),
+                "repo": REPO,
+                "issue": ISSUE,
+                "node": NODE,
+                "worktree": str(worktree),
+                "prompt": PROMPT,
+                "schema": SCHEMA,
+                "launch_payload": LAUNCH_PAYLOAD,
+                "db_path": str(db),
+                "agents_dir": str(agents_dir),
+                "claude_cmd": list(claude_cmd),
+                "timeout_s": LINGER_SECONDS,
+            }
+        )
+    )
+    runner = tmp_path / "runner.py"
+    runner.write_text(LAUNCH_RUNNER)
+    launching = subprocess.Popen([sys.executable, str(runner), str(arguments)])
+    record = tmp_path / "fake" / "record.json"
+    assert wait_for_file(record, PDEATHSIG_BUDGET)
+    child = json.loads(record.read_text())["pid"]
+
+    launching.kill()
+    launching.wait(timeout=PDEATHSIG_BUDGET)
+
+    assert wait_until_stopped(child, PDEATHSIG_BUDGET)
+
+
+def test_the_pump_thread_never_takes_a_signal_a_ledger_write_is_holding_off(
+    launch: Callable[..., launcher.JobOutcome],
+    fake_claude: Callable[..., tuple[str, ...]],
+    agents_dir: Path,
+    db: Path,
+    trapped_sigterm: list[int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A signal any thread can take is a signal that lands inside the write.
+
+    CPython runs the C-level handler on whichever thread the kernel picks, and
+    the main thread then runs the Python handler at its next bytecode boundary
+    whatever its own mask says. So a blocked main thread is not enough: one
+    unblocked thread anywhere in the process puts the traverse's trap back
+    inside the transaction it was blocked out of, where its own INSERT queues
+    behind a write lock only the suspended frame can release.
+
+    The grandchild here is what keeps the pump thread alive past the run it
+    belongs to -- the same case `_die_with_parent` names, where the traverse
+    launches its second node while the first launch's pump still holds the pipe.
+    """
+    write_definition(agents_dir, NODE, DEFINITION)
+    claude_cmd = fake_claude(
+        [HOOK_LINE, init_line(), result_line(REPORT)], orphan_seconds=ORPHAN_SECONDS
+    )
+    launch(claude_cmd=claude_cmd, timeout_s=ORPHANED_DEADLINE, grace_s=BRIEF_GRACE)
+    inside: list[list[int]] = []
+    opening: Callable[..., sqlite3.Connection] = sqlite3.connect
+
+    def watched(*arguments: Any, **keywords: Any) -> sqlite3.Connection:
+        os.kill(os.getpid(), signal.SIGTERM)
+        time.sleep(SIGNAL_SETTLE)
+        inside.append(list(trapped_sigterm))
+        return opening(*arguments, **keywords)
+
+    monkeypatch.setattr(sqlite3, "connect", watched)
+
+    ledger.traverse_end(REPO, ISSUE, {"status": "killed"}, db_path=db)
+    time.sleep(SIGNAL_SETTLE)
+
+    assert inside == [[]]
+    assert trapped_sigterm == [signal.SIGTERM]
 
 
 @pytest.mark.skipif(
@@ -1116,4 +1291,45 @@ def test_a_real_spawn_runs_the_whole_launcher_against_the_live_harness(
 
     assert outcome.process_outcome == "clean"
     assert outcome.task_outcome == "done"
-    assert [kind for kind, _, _ in ledger_rows(db)] == ["job-launch", "job-report"]
+    assert [row.kind for row in ledger_rows(db)] == ["job-launch", "job-report"]
+
+
+def test_importing_the_launcher_off_linux_names_the_platform_not_a_missing_symbol(
+    tmp_path: Path,
+) -> None:
+    """`prctl` is Linux's, and the binding that reaches it happens at import.
+
+    Left unguarded, a contributor on macOS gets `AttributeError: undefined
+    symbol: prctl` at collection for all three factory suites and from
+    `scripts/traverse-issue` before it can print its own usage — none of which
+    names the requirement it is failing.
+
+    The import runs in its own interpreter because that is the only place the
+    platform can be another one: reloading the module here would rebind every
+    class in it and leave the rest of the suite importing a different module
+    than it started with.
+    """
+    probe = tmp_path / "probe.py"
+    probe.write_text(PLATFORM_PROBE)
+
+    refused = subprocess.run(
+        [sys.executable, str(probe), str(Path(launcher.__file__).parents[2])],
+        capture_output=True,
+        text=True,
+    )
+
+    assert refused.stdout.splitlines()[0] == "LauncherError"
+    assert "darwin" in refused.stdout
+    assert "linux" in refused.stdout
+
+
+def test_the_death_signal_syscall_is_resolved_before_any_child_is_forked() -> None:
+    """The lookup between fork and exec is the deadlock this rules out.
+
+    `CDLL.__getattr__` runs `dlsym` on the first attribute access and caches the
+    result on the instance, so a cached entry with no launch yet in this process
+    is the proof the lookup happened at import — and a resolution that happened
+    at import cannot happen in the child, where taking the loader's lock could
+    wedge it forever.
+    """
+    assert "prctl" in launcher.LIBC.__dict__

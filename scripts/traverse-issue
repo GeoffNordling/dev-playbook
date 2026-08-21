@@ -1,0 +1,36 @@
+#!/usr/bin/env -S uv run --script
+"""traverse-issue — carry one factory issue from its phase label to an open PR.
+
+Thin shim over dev_playbook.factory.traverse.main: it puts the checkout's
+``src/`` on ``sys.path`` and calls the module, which takes the issue's lock,
+runs the build-region graph, and writes every traverse-grain ledger row.
+
+    traverse-issue <owner/name> <issue> <auto|user-rework>
+
+One JSON line on stdout names the terminal status — ``pr-ready`` with the pull
+request's URL, or ``escalated`` with the session that stopped it — and the exit
+is 0 for both, because an escalation is a result the graph reached. Progress
+goes to stderr, so stdout stays parseable. The exit is nonzero when the traverse
+never started (a bad argument, a repo with no checkout, another traverse of the
+issue already running) and when a signal takes this one down mid-flight.
+
+Every node runs as a headless ``claude -p`` on the subscription, so this is a
+utility script and never part of the commit gate. See dev_playbook.factory.traverse
+for the graph it executes and what each step verifies.
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = [
+#     "pyyaml>=6.0",
+# ]
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.factory.traverse import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())
