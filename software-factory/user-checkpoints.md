@@ -40,7 +40,10 @@ Under auto mode the classifier must additionally pass each `gh` write, per
 | merge the PR (in the GitHub UI) | yes | **no — never** | user |
 | `git push` (rides every commit) / `git pull` (keep local `main` current) | yes | yes | skills |
 | `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | yes | yes | skills |
-| commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | yes | yes | skills |
+| commit (rides every node that changes files) | yes | yes | skills |
+| create a factory issue's worktree and branch | yes | yes | `traverse-issue` |
+| `git worktree remove` / `git branch -D` after a merge | yes | yes | user |
+| `EnterWorktree`/`ExitWorktree`, `git branch -m` (definition-region trees) | yes | yes | skills |
 
 ## The briefing rule
 
