@@ -125,13 +125,13 @@ The table is factory-only. The definition region's skills — `/intake`,
 and the `spike` node has no runner at all.
 
 **Headless launch.** `build`, `open-pr`, the three reviewers and the
-`adjudicator` are typed agent definitions in `dotfiles/dot-claude/agents/`, and `traverse-issue` launches each
-as its own headless `claude -p` process under `--agent <name>`. Model, effort,
-and tool roster all bind from the definition's frontmatter — the launch adds no
-flag that would outrank them. The process is given the issue's worktree as its
-cwd and one hour on the wall clock, and its stream is watched live: a run placed
-outside its worktree, or billed to anything but the subscription, is killed
-rather than allowed to finish.
+`adjudicator` are typed agent definitions in `dotfiles/dot-claude/agents/`, and
+`traverse-issue` launches each as its own headless `claude -p` process under
+`--agent <name>`. Model, effort, and tool roster all bind from the definition's
+frontmatter — the launch adds no flag that would outrank them. The process is
+given the issue's worktree as its cwd and one hour on the wall clock, and its
+stream is watched live: a run placed outside its worktree, or billed to anything
+but the subscription, is killed rather than allowed to finish.
 
 **The prompt is fully determined by durable state.** Nothing carries over from
 whatever launched a node: every value in a prompt is read from the pull request

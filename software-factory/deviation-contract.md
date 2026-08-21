@@ -111,10 +111,14 @@ Three questions, like the limiters above and for the same reason: a node with
 more authority answers to the same discipline, not to less of it.
 
 An escalation out of this lane is written nowhere on GitHub, exactly as above.
-What is written on GitHub is the callout itself — a pull request comment, ending
-in the attribution line every factory writer signs with — and the run's report
-repeats it, so the decision is on the record twice over and in one place a
-reader is already looking.
+The call itself is always written somewhere a reader is already looking, and
+which place that is depends on the kind. A ruling and an overruling have no
+other home, so each is written as a pull request comment and repeated in the
+run's report — on the record twice over. A disposition and an out-of-scope
+routing already have one: the suggestion's own thread carries the reply, and the
+pull request body's `## Suggestion dispositions` and `## Deferred` sections carry
+the line and the stub. Neither is repeated as a comment. Every one of them ends
+in the attribution line every factory writer signs with.
 
 ## The deviation ledger
 
