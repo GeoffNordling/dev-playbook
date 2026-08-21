@@ -90,7 +90,8 @@ One actor — the dispatcher, reviewer, and approver — carries one name
 everywhere: the `user`. Agent-facing instruction text uses it because that is
 what Claude Code calls the person (`AskUserQuestion`): `CLAUDE.md` at every
 level — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike —
-plus the skill and rule bodies under `dotfiles/dot-claude/skills/` and
+plus the agent-definition, skill, and rule bodies under
+`dotfiles/dot-claude/agents/`, `dotfiles/dot-claude/skills/`, and
 `dotfiles/dot-claude/rules/`. Declarative documentation uses the same word
 where it describes that actor in third person: `software-factory/`,
 `standards/`, `docs/`, and `README.md`.
@@ -122,7 +123,7 @@ or `my` in the files listed above: they are commands addressed *to* the agent,
 so the only voices they carry are the imperative and `you`. A first-person
 sentence puts the document in the agent's mouth, which inverts who is
 instructing whom. `repo-lint` enforces this deterministically over the body of
-every first-party skill and rule as well as `CLAUDE.md`.
+every first-party agent definition, skill, and rule as well as `CLAUDE.md`.
 
 The ban governs the document's own voice, so quoting someone else's is
 untouched: a double-quoted utterance is exempt. Write the phrasing a user types

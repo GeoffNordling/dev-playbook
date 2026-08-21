@@ -16,6 +16,7 @@ One machine runs one configuration, and the machines differ — see [machines.md
 
 ```
 dot-claude/          -> ~/.claude/
+  agents/      Typed agent definitions the software factory launches
   skills/      Claude Code skills (software factory nodes, commit, tool wrappers, etc.)
   rules/       Global rules applied to every conversation
   hooks/       Claude Code hook scripts

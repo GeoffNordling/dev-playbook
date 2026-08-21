@@ -193,9 +193,10 @@ judgments:
       - software-factory/software-factory.md
       - software-factory/factory-operations.md
       - software-factory/user-checkpoints.md
-      - software-factory/node-skill-authoring.md
+      - software-factory/node-agent-and-skill-authoring.md
       - software-factory/review-contract.md
       - software-factory/pr-feedback.md
+      - software-factory/tdd.md
       - software-factory/refactor-catalogue.md
       - software-factory/deviation-contract.md
       - scripts/workspace-lint
