@@ -118,14 +118,14 @@ The factory's nodes, what runs each, and how each engages the user:
 | Node | Run by | Engagement |
 |---|---|---|
 | `build` | the `build` agent definition, launched by `traverse-issue` | AFK. |
-| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [elected](#the-review-stop) reviewer definitions, launched together each cycle | AFK throughout — the verdict on the stop is the script's, computed from thread state, and the user is not asked. |
+| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [elected](#the-review-stop) reviewer definitions, launched together each cycle; then the `adjudicator` definition, at the verdict points its [launch rule](#the-review-stop) names | AFK throughout — the verdict on the stop is the script's, computed from thread state, and the user is not asked. |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the user and never dispatched,
 and the `spike` node has no runner at all.
 
-**Headless launch.** `build`, `open-pr` and the three reviewers are typed agent
-definitions in `dotfiles/dot-claude/agents/`, and `traverse-issue` launches each
+**Headless launch.** `build`, `open-pr`, the three reviewers and the
+`adjudicator` are typed agent definitions in `dotfiles/dot-claude/agents/`, and `traverse-issue` launches each
 as its own headless `claude -p` process under `--agent <name>`. Model, effort,
 and tool roster all bind from the definition's frontmatter — the launch adds no
 flag that would outrank them. The process is given the issue's worktree as its
@@ -147,6 +147,15 @@ and both carry an address rather than content:
   unresolved Blocking thread. Not one word of what the findings said: the thread
   is the record and it keeps moving, so the node reads each one live from GitHub.
   The order is the node's own.
+
+  It also carries each **fix-now item** the verdict point ruled — its thread id
+  and the one line of fix text the ruling states
+  ([suggestion dispositions](/software-factory/review-contract.md#suggestion-dispositions)).
+  That text is the one deliberate exception to the rule above, and it is one
+  because the rule does not reach it: the ruling was made moments earlier and
+  written onto no thread, so there is no live copy to read. The rule still holds
+  for every thread id in the prompt, fix-now threads included — the node reads
+  each of those from GitHub, exactly as before.
 
 **The report envelope.** A launched node ends on structured output, never a
 message alone: a required top-level `outcome` of `"done"` or `"escalated"`, and a
@@ -325,7 +334,7 @@ The message is written twice from that one recipe, so the two cannot diverge:
 `/open-pr` authors it when it creates the PR — lifting the build session's
 recorded entries into `## Deviation ledger` per the
 [contract's hand-off](/software-factory/deviation-contract.md#the-deviation-ledger)
-— and the overwatch regenerates it for the final review (`gh pr edit`).
+— and the `adjudicator` regenerates it at convergence (`gh pr edit`).
 The regeneration synthesizes the entire PR record — the final diff,
 the comments, and the rulings — into an accurate squash-commit message for
 the whole issue, preserving the mandatory sections' content rather than
@@ -346,15 +355,23 @@ converges, escalates, or is killed:
 3. **Read the threads and compute the verdict** — the arithmetic is
    [the verdict and the cap](/software-factory/review-contract.md#the-verdict-and-the-cap),
    and the counts it reached are recorded on a `verdict` ledger row.
-4. **Act on it.** `converged` ends the traverse `pr-ready`. `rework` relaunches
-   `build` against the open Blocking threads and goes round again.
-   `cap-escalated` ends the traverse escalated.
+4. **Act on it.** Both live verdicts run the `adjudicator` over the open
+   Suggestion threads first, on a rule the verdict word alone decides:
+   `converged` always runs it, and `rework` runs it only when Suggestion
+   threads are open, since an empty docket is a job with nothing in it.
+   `converged` then ends the traverse `pr-ready`. `rework` relaunches `build`
+   against the open Blocking threads, plus each fix-now item the adjudicator
+   ruled, and goes round again. `cap-escalated` runs nothing and ends the
+   traverse escalated — it is already ending, and nothing settled now would be
+   read.
 
 **`pr-ready` means converged on Blocking alone.** Only Blocking threads are
-weighed, so a pull request can end the loop `pr-ready` with Suggestion threads
-still open on it. That is a real state rather than an oversight — a Suggestion is
-dispositioned at the merge boundary, and until the user gets there it stays open
-and no cycle counts it against convergence.
+weighed for convergence, and no cycle counts a Suggestion against it. That does
+not leave the Suggestions pending: the adjudicator settles every open one at
+each verdict point, and the run at convergence always happens, so a traverse
+ends `pr-ready` with its suggestions settled. The verdict is computed before
+that run, so a Suggestion counted open in a `verdict` row is the ordinary case
+rather than a leftover.
 
 - **Code track.** `bug-pr-review` posts its bug findings; `code-pr-review` adds
   the fidelity and convention findings it does not cover.
