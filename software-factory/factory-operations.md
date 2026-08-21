@@ -14,22 +14,23 @@ where it stops for the user is
 
 ## Dispatch
 
-The unit of dispatch is the **issue**, and the build region is dispatched by a
-program rather than by a session. `traverse-issue <owner/name> <issue> <mode>`
-carries an issue from its phase label to an open pull request: it takes the
-issue's lock, creates or reuses the worktree, launches `build` and `open-pr`, and
-ends `pr-ready` or `escalated`. Every branch in that sequence is conditional
-logic in the script; judgment happens only inside the agents it launches. From
-the review stop on, the **issue overwatch** — one session per issue, launched by
-the user in **Agent view**, the official name of the `claude agents` dashboard —
-still sequences the traverse and stops where the user must act.
+The unit of dispatch is the **issue**, and the factory is dispatched by a program
+rather than by a session. `traverse-issue <owner/name> <issue> <mode>` carries an
+issue from its phase label to a reviewed pull request: it takes the issue's lock,
+creates or reuses the worktree, launches `build` and `open-pr`, then runs the
+[review stop](#the-review-stop) — reviews, verdict, and rework laps — and ends
+`pr-ready` or `escalated`. Every branch in that sequence is conditional logic in
+the script; judgment happens only inside the agents it launches. From the merge
+boundary on, the **issue overwatch** — one session per issue, launched by the
+user in **Agent view**, the official name of the `claude agents` dashboard —
+sequences what is left and stops where the user must act.
 
 Two overwatch scopes, two screens:
 
 - **Agent-view overwatch** — fleet scope: reads the board and recommends what to
   launch next.
-- **Issue overwatch** — issue scope, one per issue: sequences the review stop
-  onward and surfaces the commands the user must run.
+- **Issue overwatch** — issue scope, one per issue: sequences the merge boundary
+  and surfaces the commands the user must run.
 
 **One traverse per issue.** `traverse-issue` takes a non-blocking per-issue lock
 and exits at once, writing nothing, when another traverse of that issue holds it.
@@ -45,9 +46,11 @@ user-led by construction; a dispatcher that improvised its way through intake
 would be extracting intent with nobody to extract it from.
 
 **Single label writer.** One writer per issue moves its `phase:*` label. Across
-the build region that writer is `traverse-issue`, which moves the label only
-after verifying for itself what the node claims to have done; from the review
-stop on it is the sequencing session. A launched agent never writes a label, so
+the factory that writer is `traverse-issue`, which moves the label only after
+verifying for itself what the node claims to have done; from the merge boundary
+on it is the sequencing session. The review stop moves no label at all — a
+rework lap runs the build node over an issue already at `phase:pr-review`, and
+there is nowhere for the label to go. A launched agent never writes a label, so
 nothing can advance the board out from under whatever is sequencing it.
 
 **Readiness at the crossing.** An issue must meet the readiness bar — a leaf,
@@ -105,8 +108,8 @@ Each node engages the user one of two ways — the terms themselves are fixed in
 - **Inline** — a session runs the node at its own main loop, with the user
   present in the terminal.
 
-A review node (a diamond) is several AFK runs followed by the sequencing
-session's own verdict interview, within the one node.
+A review node (a diamond) is several AFK runs followed by a verdict the script
+computes from what they left on the pull request, within the one node.
 
 ### The dispatch table
 
@@ -115,52 +118,75 @@ The factory's nodes, what runs each, and how each engages the user:
 | Node | Run by | Engagement |
 |---|---|---|
 | `build` | the `build` agent definition, launched by `traverse-issue` | AFK. |
-| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [track](#track-rules) reviewer definitions | AFK per node, then the user's verdict on the whole stop ([pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict)). |
+| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [elected](#the-review-stop) reviewer definitions, launched together each cycle | AFK throughout — the verdict on the stop is the script's, computed from thread state, and the user is not asked. |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the user and never dispatched,
 and the `spike` node has no runner at all.
 
-**Headless launch.** `build` and `open-pr` are typed agent definitions in
-`dotfiles/dot-claude/agents/`, and `traverse-issue` launches each as its own
-headless `claude -p` process under `--agent <name>`. Model, effort, and tool
-roster all bind from the definition's frontmatter — the launch adds no flag that
-would outrank them. The process is given the issue's worktree as its cwd and one
-hour on the wall clock, and its stream is watched live: a run placed outside its
-worktree, or billed to anything but the subscription, is killed rather than
-allowed to finish.
+**Headless launch.** `build`, `open-pr` and the three reviewers are typed agent
+definitions in `dotfiles/dot-claude/agents/`, and `traverse-issue` launches each
+as its own headless `claude -p` process under `--agent <name>`. Model, effort,
+and tool roster all bind from the definition's frontmatter — the launch adds no
+flag that would outrank them. The process is given the issue's worktree as its
+cwd and one hour on the wall clock, and its stream is watched live: a run placed
+outside its worktree, or billed to anything but the subscription, is killed
+rather than allowed to finish.
 
-**The fixed prompt.** The prompt is the issue number and nothing else. Everything
-a node needs it reloads for itself — the brief from `gh issue view <N>`, the work
-so far from the worktree — so nothing carries over from whatever launched it, and
-two launches of one node at one issue are given identical input.
+**The prompt is fully determined by durable state.** Nothing carries over from
+whatever launched a node: every value in a prompt is read from the pull request
+or the issue at launch time, so two launches that find the same durable state are
+given identical input. Most prompts are the issue number alone. Two carry more,
+and both carry an address rather than content:
+
+- A **review** prompt carries the issue number and, from its own second cycle,
+  the sha its own last cycle header names — which is where its delta starts. Per
+  review, never across: election is recomputed every cycle, so a track that sat
+  one out and handed a sibling's sha would start at a commit it never read.
+- A **rework** prompt carries the issue number and the id and location of every
+  unresolved Blocking thread. Not one word of what the findings said: the thread
+  is the record and it keeps moving, so the node reads each one live from GitHub.
+  The order is the node's own.
 
 **The report envelope.** A launched node ends on structured output, never a
 message alone: a required top-level `outcome` of `"done"` or `"escalated"`, and a
-`gist` in prose. The launch is refused a report that does not validate. Nothing
-else is read from it — what the traverse needs next is durable in git and on
-GitHub, and it reads it from there rather than taking the agent's word, so a
-node's claim never advances the board on its own.
+`gist` in prose. A review's envelope adds the two counts of what it posted
+([the report envelope](/software-factory/review-contract.md#the-report-envelope)).
+The launch is refused a report that does not validate. Nothing else is read from
+it — what the traverse needs next is durable in git and on GitHub, and it reads
+it from there rather than taking the agent's word, so a node's claim never
+advances the board on its own.
 
-**The terminal report contract.** A subagent delegated by a session — the track
-reviews — MUST begin its final message at character one with exactly
-`DONE: <one-line outcome>` or `ESCALATE: <one-line reason>`; detail follows
-below. Any non-matching final message is treated as ESCALATE — malformed fails
-safe, toward the user. What a session does with an escalation is
-[user-checkpoints.md](/software-factory/user-checkpoints.md#escalation). A helper
-invoked inside a node (`/commit`, `/grill-with-docs`) is not a node and is never
-dispatched.
+**The terminal report contract.** A subagent delegated by a session MUST begin
+its final message at character one with exactly `DONE: <one-line outcome>` or
+`ESCALATE: <one-line reason>`; detail follows below. Any non-matching final
+message is treated as ESCALATE — malformed fails safe, toward the user. What a
+session does with an escalation is
+[user-checkpoints.md](/software-factory/user-checkpoints.md#escalation).
 
-**Escalation is terminal, and retries are the caller's.** A traverse runs no node
-twice. Any way a job comes back other than a clean process reporting `done` — the
-node's own `escalated`, a crash, the deadline, a refused report, a misconfigured
-run — ends the traverse on `traverse-escalation` then `traverse-end`. The
+It binds no factory node. Every node the traverse launches — the reviews
+included — is a headless process ending on the report envelope above, which is
+parsed rather than read, so a line of prose could not carry its outcome even if
+it wrote one. A helper invoked inside a node (`/commit`, `/grill-with-docs`) is
+not a node and is never dispatched.
+
+**Escalation is terminal, and retries are the caller's.** A traverse never runs a
+job again after it has failed. Any way a job comes back other than a clean
+process reporting `done` — the node's own `escalated`, a crash, the deadline, a
+refused report, a misconfigured run — ends the traverse on `traverse-escalation`
+then `traverse-end`. A failure inside the review loop's fan-out waits for its
+siblings first, so their books land before the traverse ends, and then every
+failure is relayed onto the escalation row in the node's own words. The
 escalating node's own label move is what does not happen; a move an earlier node
 in the same traverse already made stands. So a retry — the caller invoking
 `traverse-issue` again from the top — resumes at whatever phase the last node to
 finish left behind, not at the phase the traverse started on: a build that
 verified and then an `open-pr` that escalated leaves `phase:pr-review`, and the
-next invocation runs `open-pr` alone.
+next invocation runs `open-pr` and falls into the review loop behind it.
+
+A rework lap is not a retry. It is the loop's ordinary next step over a job that
+finished cleanly, launching `build` again against findings that did not exist
+when the last one ran.
 
 ## Worktrees and branches
 
@@ -299,7 +325,7 @@ The message is written twice from that one recipe, so the two cannot diverge:
 `/open-pr` authors it when it creates the PR — lifting the build session's
 recorded entries into `## Deviation ledger` per the
 [contract's hand-off](/software-factory/deviation-contract.md#the-deviation-ledger)
-— and the overwatch regenerates it at the approve verdict (`gh pr edit`).
+— and the overwatch regenerates it for the final review (`gh pr edit`).
 The regeneration synthesizes the entire PR record — the final diff,
 the comments, and the rulings — into an accurate squash-commit message for
 the whole issue, preserving the mandatory sections' content rather than
@@ -310,42 +336,64 @@ is authored against a diff still moving.
 
 ## The review stop
 
-`pr_review` is a diamond: audits run, then the user gives one verdict on the
-whole stop. Which audits run is fixed by the [track rules](#track-rules) below,
-never by asking.
+`pr_review` is a loop `traverse-issue` runs, and the user is not in it. Each
+**cycle** is one pass of the same four steps, and the loop stops only when it
+converges, escalates, or is killed:
+
+1. **Elect the tracks** from the pull request's changed files
+   ([track rules](#track-rules) below), recomputed every cycle.
+2. **Run every elected review at once**, as concurrent headless launches.
+3. **Read the threads and compute the verdict** — the arithmetic is
+   [the verdict and the cap](/software-factory/review-contract.md#the-verdict-and-the-cap),
+   and the counts it reached are recorded on a `verdict` ledger row.
+4. **Act on it.** `converged` ends the traverse `pr-ready`. `rework` relaunches
+   `build` against the open Blocking threads and goes round again.
+   `cap-escalated` ends the traverse escalated.
+
+**`pr-ready` means converged on Blocking alone.** Only Blocking threads are
+weighed, so a pull request can end the loop `pr-ready` with Suggestion threads
+still open on it. That is a real state rather than an oversight — a Suggestion is
+dispositioned at the merge boundary, and until the user gets there it stays open
+and no cycle counts it against convergence.
 
 - **Code track.** `bug-pr-review` posts its bug findings; `code-pr-review` adds
   the fidelity and convention findings it does not cover.
 - **Doc track.** `doc-pr-review` audits the diff's documentation.
-- **Lockdown re-review.** From the third cycle on, each live track runs its
-  fidelity-and-convention review alone — `code-pr-review` on the code track,
-  `doc-pr-review` on the doc track — and `bug-pr-review` stands down: a
-  lockdown verifies fixes and needs no fresh bug hunt. The track rules still
-  elect the tracks, so a doc-only diff is re-reviewed by the doc track.
 
-There is exactly one verdict per stop, and it is the user's — the first of the
-two pauses, briefed per
-[pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict). A
-**reject** returns the issue to `build`, with the deciding reason recorded where
-the findings live so the rework carries it. An **approve** advances it to the
-user's final read and merge.
+**Every elected track runs every cycle.** No review stands down, at any cycle,
+for any reason — the election takes the changed files and nothing else. A
+stand-down would deadlock the loop rather than save a run: only the next cycle's
+reviewer may resolve a thread
+([resolution ownership](/software-factory/review-contract.md#resolution-ownership)),
+so a stood-down track's fixed threads would have nobody left to resolve them, the
+open Blocking count would never reach zero, and a pull request that had actually
+converged would cap out. A stand-down reintroduced later has to move resolution
+ownership with it.
+
+**The loop keeps no state of its own.** Everything it needs is on the pull
+request: the cycle headers give the cycle number and each track's last-reviewed
+sha, and the threads give the verdict. So a traverse relaunched after a crash
+runs the identical code path — there is no resume branch and no label moves
+inside the loop. It costs one burned cycle number when a traverse dies after its
+reviews have posted, and the cap's clock is never turned back to pay for it.
+
+**A diff no review reads escalates.** Every verdict rests on threads some review
+posted, so a cycle that elects nothing would find no Blocking thread, declare
+convergence, and hand back a pull request nobody had read.
 
 ### Track rules
 
-Content kind picks the track, not file format — by hard rule, announced, never
-asked:
+Content kind picks the track, and the kinds are told apart mechanically, by
+suffix: `.md` is documentation, `.html` is rendered output no review reads as
+source, and everything else is code — `.py`, `.sh`, extensionless scripts and
+hooks, `Makefile*`, config.
 
-- **Code track — default on.** Launch whenever the diff touches executable or
-  machine-consumed content: source, scripts, tests, build or config files. Skip
-  only when the diff has none.
-- **Doc track — earned, never defaulted.** Launch only when documentation is a
-  substantive deliverable of the diff: a new document, a new or restructured
-  section, or the issue's brief names docs as a deliverable. Skip when the doc
-  changes are incidental to a code deliverable — mechanical echoes such as
-  renames, links, and wording the code change forces, or small edits (roughly
-  under 10 changed doc lines). Always skip when the user already wrote or
-  approved those doc changes inline this traverse: a review there re-litigates an
-  approval.
-- **Doubt skips.** A skipped track is one retroactive command away; an
-  over-launched audit spends a review on content nobody questioned and posts
-  noise to the PR.
+- **Code track — whenever any code file changed.** It is the diff's default
+  reader, and it is skipped only when the diff has no code file in it.
+- **Doc track — earned, never defaulted, while there is code beside it.** It
+  runs when the diff adds a document, or changes 10 or more documentation lines.
+  Below that the doc change is the echo a code change forces — a rename, a link,
+  a reworded sentence — and reviewing it spends a run on content nobody
+  questioned.
+- **A documentation-only diff always earns the doc track**, however small. With
+  no code track there is nothing else to read the diff at all.

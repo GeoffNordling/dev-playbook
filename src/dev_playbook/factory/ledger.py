@@ -147,6 +147,19 @@ WHERE l.kind = '{TRAVERSE_END}'
 ORDER BY l.id
 """
 
+# Every invocation one issue has ever had, oldest first. The only read here with
+# no window clause: a `traverse-start` is itself a window closer, so at most one
+# of these is ever inside an open window, and a reader after the whole history --
+# the review loop's cycle cap, counting from the newest baseline any of them
+# recorded -- would be answered with that one row alone.
+TRAVERSE_STARTS = f"""
+SELECT {COLUMNS} FROM ledger AS l
+WHERE l.kind = '{TRAVERSE_START}'
+  AND l.repo = :repo
+  AND l.issue = :issue
+ORDER BY l.id
+"""
+
 # The session ids more than one job holds. A session id is a job's identity --
 # it is what a report closes its own launch by, and what joins the job to its
 # rows in `events` -- so two jobs holding one is corrupt data no query can be
@@ -703,3 +716,23 @@ def awaiting_merge(
     with _ledger(db_path) as connection:
         candidates = _select(connection, AWAITING_MERGE, {"repo": repo})
     return [row for row in candidates if row.payload[STATUS] == PR_READY]
+
+
+def traverse_starts(
+    *, repo: str, issue: int, db_path: Path = DB_PATH
+) -> list[LedgerRow]:
+    """Every invocation one issue has ever had, oldest first, payloads intact.
+
+    Both addresses are required, unlike the two readers above. A start is scoped
+    to one issue by construction — it is the record of one invocation of one
+    issue — and a sweep of every start on the machine answers no question the
+    factory asks, so the filter is the address rather than an option.
+
+    The payload is handed back untouched. What a caller wants from these rows is
+    the caller's: the review loop reads the newest `baseline_cycle` a
+    user-ordered lap recorded, which is a key this module never writes and
+    therefore never judges.
+    """
+    _gate(repo=repo, issue=issue)
+    with _ledger(db_path) as connection:
+        return _select(connection, TRAVERSE_STARTS, {"repo": repo, "issue": issue})

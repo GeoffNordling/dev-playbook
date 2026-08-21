@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: User Checkpoints
-description: Every point where the factory stops for the user — the merge prohibition, escalation, the issue-review verdict, and the two review-stretch pauses
+description: Every point where the factory stops for the user — the merge prohibition, escalation, the issue-review verdict, and the final-review pause
 ---
 
 # User Checkpoints
@@ -11,8 +11,8 @@ where it stops and the user acts, and there are only two reasons for one:
 
 - **Prohibition** — the agent *can* do it and *must not*. Merging a PR is the
   only one ([The merge prohibition](#the-merge-prohibition)).
-- **Decision** — the call is *not the agent's*. A verdict on reviewed work, an
-  ambiguous fix, the final read before merge.
+- **Decision** — the call is *not the agent's*. An ambiguous fix, the final read
+  before merge.
 
 This document collects both, and fixes what the factory owes the user at each.
 The nodes these checkpoints interrupt are
@@ -80,45 +80,24 @@ all. The mechanics of the report itself — the `DONE:`/`ESCALATE:` line a subag
 must emit — are
 [the terminal report contract](/software-factory/factory-operations.md#engagement).
 
-## The two pauses
+## The pause
 
-Everything above interrupts the factory wherever it happens. The two **pauses**
-are different: they are scheduled, they all sit after implementation, and
-together they are the whole of the user's decision-making inside the factory.
-Until the first of them, the factory asks the user for nothing.
+Everything above interrupts the factory wherever it happens. The **pause** is
+different: it is scheduled, it sits after implementation and after review, and it
+is the whole of the user's decision-making inside the factory. Until it, the
+factory asks the user for nothing.
 
-### Pause 1: the review verdict
-
-At the review stop, the audits have posted their findings and the user has read
-none of them. The overwatch reads every comment surface on the PR itself, then
-briefs — one brief per call it needs, not one per finding — in four parts:
-
-1. **Current state** — what is true in the code or docs today, stated plainly
-   enough to follow without opening them.
-2. **Goal** — what this issue is trying to achieve, so the finding can be weighed
-   against it.
-3. **Proposed new state** — what the finding asks to change, and what the work
-   looks like afterward.
-4. **Specific example** — one concrete instance: the finding's own words, the
-   line, the snippet. The example is what makes the first three parts checkable.
-
-Then it answers questions, helps the user weigh, and acts only on an explicit
-verdict — **reject** back to `build`, or **approve** onward. Rework is
-Blocking-driven by default: suggestions alone do not call for a rework lap. The
-overwatch never touches the work under review; a fix is the author's, routed
-through rework.
-
-### Pause 2: the final review
+### The final review
 
 The last checkpoint, and the only one where the user reads the diff. It is
 reached only when the issue is **100% done**: the merge message regenerated
 from the whole PR record, every commit on origin, and a closing brief on what
-shipped and what changed since the approve verdict.
+shipped and what the review loop settled on the way.
 
-Nothing is outstanding at pause 2 but the read and the merge. Anything still
+Nothing is outstanding at the pause but the read and the merge. Anything still
 pending — a red gate, an unrefreshed message, an unpushed commit, an open
-question — means the issue has not reached pause 2 yet, and presenting it as
-though it had spends the user's one full read on work that is still moving.
+question — means the issue has not reached it yet, and presenting it as though
+it had spends the user's one full read on work that is still moving.
 
 ## The issue-review verdict
 
@@ -146,11 +125,14 @@ skip the beat, cut it short, or advance anyway.
 
 The factory decides these itself, announcing rather than asking:
 
-- **Which review tracks run.** Selected by hard rule and announced on screen;
-  dispatch is immediate, with no confirmation wait. A skipped audit is one
-  retroactive command away.
-- **Doc changes the user already wrote or approved inline this traverse** — a
-  review there re-litigates an approval.
+- **Which review tracks run.** Elected from the pull request's changed files by
+  [hard rule](/software-factory/factory-operations.md#track-rules), recomputed
+  every cycle, and never asked.
+- **The verdict on a review cycle.** Computed by the traverse script from thread
+  state: any open Blocking thread is a rework lap, none is convergence. It is
+  arithmetic over what the reviews posted, so there is no judgment in it for the
+  user to make — and the findings themselves reach the user at the final review,
+  on the pull request where they live.
 - **Anything the graph already answers.** Where a node goes next is read from the
   graph, not asked; a node whose next edge is unclear is an escalation, not a
   question for the user to route by hand.

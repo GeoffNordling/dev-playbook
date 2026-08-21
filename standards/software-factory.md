@@ -48,7 +48,7 @@ Governs how an idea becomes a merged pull request.
 
 ## Adopt
 
-- `scripts/traverse-issue`, the build region's entry point, plus the typed agent
+- `scripts/traverse-issue`, the factory's entry point, plus the typed agent
   definitions in `dotfiles/dot-claude/agents/` and the skills in
   `dotfiles/dot-claude/skills/` — the intake and design skills carry an issue to
   ready; the traverse launches the `build` and `open-pr` definitions, and the

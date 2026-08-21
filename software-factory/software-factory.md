@@ -46,8 +46,9 @@ flowchart LR
 
     subgraph factory[Factory — autonomous]
         build[build] -->|pushed| pr_review{pr_review}
-        pr_review -->|reject: rework| build
-        pr_review -->|approve, merge msg refreshed| done([merged])
+        pr_review -->|rework: Blocking open| build
+        pr_review -->|cap: 4 cycles, still Blocking| stuck([escalated])
+        pr_review -->|converged, then approve, merge msg refreshed| done([merged])
     end
 
     intake -->|simple| build
@@ -117,9 +118,23 @@ defined once in
 
 ## The factory
 
-`build` implements, and `pr_review` audits and takes the user's verdict before
-the user's final read and merge. A rejected review returns to `build`; nothing
-else re-enters. What each node does, who runs it, and under what contract is
+`build` implements, and `pr_review` audits in cycles. The graph draws `pr_review`
+as one node because it is one state an issue occupies; the loop inside it is
+here. Each cycle runs the reviews the diff elects, all at once, and the verdict
+on what they posted is the traverse script's rather than anyone's judgment: it is
+computed from the pull request's thread state.
+
+Open Blocking threads send the issue back to `build` for another lap. None open
+is `pr-ready`, and the user's final read and merge follow. Blocking threads still
+open after four autonomous cycles end the traverse escalated — a pull request
+that is not converging on its own reaches the user rather than looping on.
+Nothing else re-enters.
+
+`pr-ready` means converged on Blocking alone. Open Suggestion threads may still
+be on the pull request, and that is a real state rather than an oversight: a
+Suggestion is dispositioned at the merge boundary, so until the user gets there
+it simply stays open and no cycle counts it against convergence. What each node
+does, who runs it, and under what contract is
 [factory-operations.md](/software-factory/factory-operations.md).
 
 ## Labels

@@ -71,7 +71,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 ## 5. Verdicts at the review stop
 
-The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [pause 1](~/workspace/dev-playbook/software-factory/user-checkpoints.md#pause-1-the-review-verdict), answer their questions, help them weigh, and act only on an explicit verdict.
+The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [the briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule), answer their questions, help them weigh, and act only on an explicit verdict.
 
 Write every body you post here to `/tmp/<kind>-<N>.md` with the Write tool, and pass it with `--body-file`.
 

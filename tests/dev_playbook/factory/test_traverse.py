@@ -34,13 +34,26 @@ PR_REVIEW_LABELS = ["mode:direct", "tests:yes", "phase:pr-review"]
 
 # The PR the stub gh reports once open-pr has run.
 PR_URL = "https://github.com/owner/repo/pull/12"
+PR_NUMBER = 12
 
-# A stand-in for gh, answering the four calls the traverse makes off a real bare
+# The review names the three reviewer definitions open their cycle headers with.
+REVIEW_NAMES = {
+    "bug-pr-review": "bug review",
+    "code-pr-review": "code review",
+    "doc-pr-review": "doc review",
+}
+
+# A stand-in for gh, answering every call the traverse makes off a real bare
 # origin repo, so a sha it reports is the sha origin genuinely holds. Every
 # invocation is appended to `calls.jsonl`, which is how a test sees the single
 # label move. A branch named in the plan's `shas` overrides the mirror — that is
 # how a test makes `origin/main` stale after the fetch, or makes the issue
 # branch missing on origin, without touching the repos themselves.
+#
+# The review loop's three reads are served out of the world directory the fake
+# claude writes into, so a cycle really does advance because a reviewer posted:
+# the cycle headers are whatever reviewers have written, and the thread state a
+# cycle sees is the plan's entry for the highest cycle those headers reach.
 STUB_GH = """
 import json
 import subprocess
@@ -49,6 +62,7 @@ from pathlib import Path
 
 here = Path(__file__).parent
 plan = json.loads((here / "plan.json").read_text())
+world = Path(plan["world"])
 argv = sys.argv[1:]
 with (here / "calls.jsonl").open("a") as log:
     log.write(json.dumps(argv) + "\\n")
@@ -65,20 +79,74 @@ def origin_sha(branch):
     return done.stdout.strip() if done.returncode == 0 else None
 
 
+def review_lines():
+    posted = [
+        json.loads(path.read_text()) for path in (world / "reviews").glob("*.json")
+    ]
+    posted.sort(key=lambda entry: entry["seq"])
+    return [entry["line"] for entry in posted]
+
+
+def cycle_now():
+    highest = 0
+    for line in review_lines():
+        fields = line.split(" \\u00b7 ")
+        if len(fields) == 4 and fields[2].startswith("cycle "):
+            highest = max(highest, int(fields[2][len("cycle "):]))
+    return highest
+
+
+def threads_now():
+    defined = {int(at): threads for at, threads in plan["threads"].items()}
+    reached = [at for at in sorted(defined) if at <= cycle_now()]
+    return defined[reached[-1]] if reached else []
+
+
+def thread_node(thread):
+    line = thread.get("line", 1)
+    body = thread.get("body")
+    opened = [] if body is None else [{"databaseId": 1, "body": body}]
+    return {
+        "id": thread["id"],
+        "isResolved": thread.get("isResolved", False),
+        "isOutdated": thread.get("isOutdated", False),
+        "path": thread.get("path", "src/dev_playbook/factory/traverse.py"),
+        "line": line,
+        "originalLine": thread.get("originalLine", line),
+        "subjectType": "LINE",
+        "comments": {"nodes": opened},
+    }
+
+
 if argv[:2] == ["issue", "view"]:
     print("\\n".join(plan["labels"]))
 elif argv[:2] == ["issue", "edit"]:
     pass
 elif argv[:1] == ["api"]:
-    branch = argv[1].rsplit("/branches/", 1)[1]
-    sha = origin_sha(branch)
-    if sha is None:
-        sys.stderr.write("gh: Not Found (HTTP 404)\\n")
-        raise SystemExit(1)
-    print(sha)
+    endpoint = [word for word in argv[1:] if not word.startswith("-")][0]
+    if endpoint == "graphql":
+        print(json.dumps({"data": {"repository": {"pullRequest": {"reviewThreads": {
+            "pageInfo": {"hasNextPage": False, "endCursor": None},
+            "nodes": [thread_node(thread) for thread in threads_now()],
+        }}}}}))
+    elif endpoint.endswith("/reviews"):
+        for line in review_lines():
+            print(line)
+    elif endpoint.endswith("/files"):
+        for changed in plan["files"]:
+            print("\\t".join(str(field) for field in changed))
+    elif "/branches/" in endpoint:
+        sha = origin_sha(endpoint.rsplit("/branches/", 1)[1])
+        if sha is None:
+            sys.stderr.write("gh: Not Found (HTTP 404)\\n")
+            raise SystemExit(1)
+        print(sha)
+    else:
+        sys.stderr.write("stub gh: unhandled api call %r\\n" % (argv,))
+        raise SystemExit(64)
 elif argv[:2] == ["pr", "list"]:
     if plan["pr_url"]:
-        print(plan["pr_url"])
+        print("%d %s" % (plan["pr_number"], plan["pr_url"]))
 else:
     sys.stderr.write("stub gh: unhandled call %r\\n" % (argv,))
     raise SystemExit(64)
@@ -97,19 +165,76 @@ import sys
 import time
 from pathlib import Path
 
+PEER_BUDGET = 10.0
+
 here = Path(__file__).parent
 plan = json.loads((here / "plan.json").read_text())
+world = Path(plan["world"])
+reviews = plan["review_names"]
 argv = sys.argv[1:]
 node = argv[argv.index("--agent") + 1]
 session = argv[argv.index("--session-id") + 1]
+prompt = argv[argv.index("-p") + 1]
 step = plan[node]
 with (here / "launched.jsonl").open("a") as log:
     log.write(
         json.dumps(
-            {"node": node, "session": session, "cwd": os.getcwd(), "pid": os.getpid()}
+            {
+                "node": node,
+                "session": session,
+                "cwd": os.getcwd(),
+                "pid": os.getpid(),
+                "prompt": prompt,
+            }
         )
         + "\\n"
     )
+# A reviewer posts its cycle header before anything else, the way a real one
+# posts its review: the header is the loop's durable state, and the count is
+# this review name's own headers plus one.
+if node in reviews:
+    posted = world / "reviews"
+    posted.mkdir(parents=True, exist_ok=True)
+    name = reviews[node]
+    mine = sum(
+        1
+        for path in posted.glob("*.json")
+        if json.loads(path.read_text())["review"] == name
+    )
+    short = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True
+    ).stdout.strip()
+    landing = posted / (session + ".json")
+    staged = posted / (session + ".staging")
+    staged.write_text(
+        json.dumps(
+            {
+                "review": name,
+                "seq": time.time_ns(),
+                "line": "%s \\u00b7 %s \\u00b7 cycle %d \\u00b7 %s"
+                % (name, short, mine + 1, session),
+            }
+        )
+    )
+    # Renamed into place, so a sibling reading the directory never reads a file
+    # that is still being written.
+    staged.rename(landing)
+# A rendezvous, so a test can prove the fan-out really is one: this run refuses
+# to finish until the log holds as many launches as it was told to wait for, and
+# a launcher that ran its nodes one after another can never reach that count.
+if step["await_peers"]:
+    met = False
+    give_up = time.time() + PEER_BUDGET
+    while time.time() < give_up:
+        if len((here / "launched.jsonl").read_text().splitlines()) >= step[
+            "await_peers"
+        ]:
+            met = True
+            break
+        time.sleep(0.02)
+    if not met:
+        sys.stderr.write("fake claude: %s never met its peers\\n" % node)
+        raise SystemExit(70)
 branch = subprocess.run(
     ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True
 ).stdout.strip()
@@ -199,6 +324,24 @@ ESCALATED_REPORT: dict[str, Any] = {
     "gist": "The brief contradicts the code.",
 }
 
+# What a review returns instead — the same two fields plus the counts of what it
+# posted, which is the envelope the reviewer definitions end on.
+REVIEWED_REPORT: dict[str, Any] = {
+    "outcome": "done",
+    "gist": "Two Blocking findings on PR #12.",
+    "blocking_count": 2,
+    "suggestion_count": 1,
+}
+
+# What a review that could not be produced at all reports — no threads posted,
+# so both counts are zero, stated rather than left out.
+ESCALATED_REVIEW: dict[str, Any] = {
+    "outcome": "escalated",
+    "gist": "The green gate is red on this branch.",
+    "blocking_count": 0,
+    "suggestion_count": 0,
+}
+
 # A well-formed definition for each node this graph launches.
 DEFINITIONS: dict[str, dict[str, Any]] = {
     "build": {
@@ -213,7 +356,57 @@ DEFINITIONS: dict[str, dict[str, Any]] = {
         "model": "sonnet",
         "effort": "low",
     },
+    **{
+        node: {
+            "name": node,
+            "description": f"The {node} node.",
+            "model": "sonnet",
+            "effort": "xhigh",
+        }
+        for node in REVIEW_NAMES
+    },
 }
+
+# The changed file a traverse's pull request carries unless a test says
+# otherwise: one code file, which elects the code track and nothing else.
+CODE_FILE = ["src/dev_playbook/factory/traverse.py", "modified", 12, 3]
+DOC_FILE = ["software-factory/factory-operations.md", "modified", 40, 20]
+
+
+# A Blocking and a Suggestion thread, as the GraphQL read hands them over.
+def blocking_thread(
+    thread_id: str = "PRRT_blocking", *, resolved: bool = False
+) -> dict[str, Any]:
+    """One open Blocking thread, which is what drives a rework lap."""
+    return {
+        "id": thread_id,
+        "isResolved": resolved,
+        "path": "src/dev_playbook/factory/traverse.py",
+        "line": 41,
+        "body": "Blocking — the verdict is never written.\n\n— code review · sess-x",
+    }
+
+
+def suggestion_thread(thread_id: str = "PRRT_suggestion") -> dict[str, Any]:
+    """One open Suggestion thread, which a converged pull request may keep."""
+    return {
+        "id": thread_id,
+        "isResolved": False,
+        "path": "src/dev_playbook/factory/traverse.py",
+        "line": 9,
+        "body": "Suggestion — name this constant.\n\n— code review · sess-x",
+    }
+
+
+def commentless_thread(thread_id: str = "PRRT_silent") -> dict[str, Any]:
+    """A thread the read hands back with no comment on it — a shape nobody grades."""
+    return {
+        "id": thread_id,
+        "isResolved": False,
+        "path": "src/dev_playbook/factory/traverse.py",
+        "line": 41,
+    }
+
 
 # The shrunk clocks every supervision runs under, so a `timed-out` classification
 # is reached in test time rather than in the job's real hour.
@@ -261,6 +454,7 @@ def node_step(
     linger: float = 0.0,
     exit_code: int = 0,
     ignore_sigterm: bool = False,
+    await_peers: int = 0,
 ) -> dict[str, Any]:
     """One node's plan for the fake claude — what it does, says, and exits with."""
     if lines is None:
@@ -274,6 +468,7 @@ def node_step(
         "linger": linger,
         "exit_code": exit_code,
         "ignore_sigterm": ignore_sigterm,
+        "await_peers": await_peers,
     }
 
 
@@ -282,11 +477,17 @@ def clean_build() -> dict[str, Any]:
     return node_step(commit=True, push=True)
 
 
-# The plan every fake claude starts from: both nodes clean, the build committing
+def clean_review() -> dict[str, Any]:
+    """A review that posts its cycle header and reports on the full envelope."""
+    return node_step([HOOK_LINE, init_line(), result_line(REVIEWED_REPORT)])
+
+
+# The plan every fake claude starts from: every node clean, the build committing
 # and pushing the branch its verification then reads back off origin.
 DEFAULT_STEPS: dict[str, dict[str, Any]] = {
     "build": clean_build(),
     "open-pr": node_step(),
+    **{node: clean_review() for node in REVIEW_NAMES},
 }
 
 
@@ -342,6 +543,31 @@ def payload_of(db: Path, kind: str) -> dict[str, Any]:
     """The payload of the one row of `kind` the ledger holds."""
     (found,) = [row for row in ledger_rows(db) if row.kind == kind]
     return found.payload
+
+
+def payloads_of(db: Path, kind: str) -> list[dict[str, Any]]:
+    """Every payload of `kind` the ledger holds, in write order."""
+    return [row.payload for row in ledger_rows(db) if row.kind == kind]
+
+
+def seed_review(world: Path, name: str, *, cycle: int, sha: str) -> None:
+    """Leave one review's cycle header behind, the way a finished cycle does.
+
+    This is the whole of what a crashed traverse leaves for the next one to pick
+    up: the loop keeps no state of its own, so a header on the pull request is
+    the state.
+    """
+    posted = world / "reviews"
+    posted.mkdir(parents=True, exist_ok=True)
+    (posted / f"{name.replace(' ', '-')}-{cycle}.json").write_text(
+        json.dumps(
+            {
+                "review": name,
+                "seq": cycle,
+                "line": f"{name} · {sha} · cycle {cycle} · sess-{name[0]}{cycle}",
+            }
+        )
+    )
 
 
 @pytest.fixture
@@ -446,7 +672,22 @@ def agents_dir(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def stub_gh(tmp_path: Path, origin: Path) -> Callable[..., tuple[str, ...]]:
+def world(tmp_path: Path) -> Path:
+    """Where the reviewers post their cycle headers and the stub gh reads them.
+
+    One directory shared by the two stand-ins, which is what makes a cycle
+    advance for the reason it advances in production: a review ran and left a
+    header behind.
+    """
+    path = tmp_path / "world"
+    path.mkdir()
+    return path
+
+
+@pytest.fixture
+def stub_gh(
+    tmp_path: Path, origin: Path, world: Path
+) -> Callable[..., tuple[str, ...]]:
     """Write the stub gh for one test and return the command that runs it."""
     here = tmp_path / "gh"
     here.mkdir()
@@ -458,14 +699,21 @@ def stub_gh(tmp_path: Path, origin: Path) -> Callable[..., tuple[str, ...]]:
         *,
         shas: dict[str, str | None] | None = None,
         pr_url: str | None = PR_URL,
+        pr_number: int = PR_NUMBER,
+        files: list[list[Any]] | None = None,
+        threads: dict[int, list[dict[str, Any]]] | None = None,
     ) -> tuple[str, ...]:
         (here / "plan.json").write_text(
             json.dumps(
                 {
                     "origin": str(origin),
+                    "world": str(world),
                     "labels": BUILD_LABELS if labels is None else labels,
                     "shas": shas or {},
                     "pr_url": pr_url,
+                    "pr_number": pr_number,
+                    "files": [CODE_FILE] if files is None else files,
+                    "threads": threads or {},
                 }
             )
         )
@@ -488,7 +736,7 @@ def gh_calls(tmp_path: Path) -> Callable[[], list[list[str]]]:
 
 
 @pytest.fixture
-def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
+def fake_claude(tmp_path: Path, world: Path) -> Callable[..., tuple[str, ...]]:
     """Write the stand-in claude for one test and return the command that runs it."""
     here = tmp_path / "fake"
     here.mkdir()
@@ -496,7 +744,16 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
     script.write_text(FAKE_CLAUDE)
 
     def plan(**steps: dict[str, Any]) -> tuple[str, ...]:
-        (here / "plan.json").write_text(json.dumps({**DEFAULT_STEPS, **steps}))
+        (here / "plan.json").write_text(
+            json.dumps(
+                {
+                    **DEFAULT_STEPS,
+                    **steps,
+                    "world": str(world),
+                    "review_names": REVIEW_NAMES,
+                }
+            )
+        )
         return (sys.executable, str(script))
 
     return plan
@@ -748,38 +1005,54 @@ def test_the_traverse_start_records_the_mode_it_was_launched_in(
 # --- the graph ---
 
 
-def test_a_build_phase_issue_runs_both_nodes_and_ends_pr_ready(
+def test_a_build_phase_issue_runs_its_nodes_then_the_loop_and_ends_pr_ready(
     db: Path,
     launched: Callable[[], list[dict[str, Any]]],
     traverse_issue: Callable[..., Any],
 ) -> None:
+    """Build, open-pr, then one converging review cycle — the whole path."""
     outcome = traverse_issue()
 
-    assert [launch["node"] for launch in launched()] == ["build", "open-pr"]
-    assert kinds(db) == [
+    assert [launch["node"] for launch in launched()][:2] == ["build", "open-pr"]
+    written = kinds(db)
+    assert written[:6] == [
         "traverse-start",
         "job-launch",
         "job-report",
         "phase-transition",
         "job-launch",
         "job-report",
-        "traverse-end",
     ]
+    # The fan-out's four rows are unordered among themselves by construction —
+    # two jobs racing each other is the whole point — so the cycle is judged on
+    # which rows it wrote rather than on which of them won.
+    assert sorted(written[6:10]) == [
+        "job-launch",
+        "job-launch",
+        "job-report",
+        "job-report",
+    ]
+    assert written[10:] == ["verdict", "traverse-end"]
     assert payload_of(db, "phase-transition") == {"from": "build", "to": "pr-review"}
     assert payload_of(db, "traverse-end") == {"status": "pr-ready", "pr_url": PR_URL}
     assert outcome == traverse.TraverseOutcome("pr-ready", pr_url=PR_URL)
 
 
-def test_a_pr_review_phase_issue_skips_the_build_and_launches_open_pr_alone(
+def test_a_pr_review_phase_issue_skips_the_build_and_falls_into_the_loop(
     db: Path,
     stub_gh: Callable[..., tuple[str, ...]],
     launched: Callable[[], list[dict[str, Any]]],
     gh_calls: Callable[[], list[list[str]]],
     traverse_issue: Callable[..., Any],
 ) -> None:
+    """Re-entry runs open-pr, which is idempotent, and then reviews as usual."""
     outcome = traverse_issue(gh_cmd=stub_gh(PR_REVIEW_LABELS))
 
-    assert [launch["node"] for launch in launched()] == ["open-pr"]
+    assert nodes_launched(launched) == [
+        "bug-pr-review",
+        "code-pr-review",
+        "open-pr",
+    ]
     assert "phase-transition" not in kinds(db)
     assert not [call for call in gh_calls() if call[:2] == ["issue", "edit"]]
     assert outcome.status == "pr-ready"
@@ -795,13 +1068,15 @@ def test_a_phase_launches_exactly_the_nodes_its_graph_entry_names(
     Left unwalked, an entry that names one node runs two, and the next author
     to add a phase — one that only re-verifies, say — spends a job on a node
     they declared out of it and reads the module's own word for the structure
-    as false.
+    as false. What the entry governs is the run up to the review loop; the loop
+    itself follows every entry.
     """
     monkeypatch.setattr(traverse, "GRAPH", {traverse.BUILD: (traverse.BUILD,)})
 
     outcome = traverse_issue()
 
-    assert [run["node"] for run in launched()] == [traverse.BUILD]
+    assert [run["node"] for run in launched()][0] == traverse.BUILD
+    assert traverse.OPEN_PR not in nodes_launched(launched)
     assert outcome.status == "pr-ready"
 
 
@@ -1427,3 +1702,654 @@ def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
     assert reports[0].node == "build"
     assert reports[0].payload["process_outcome"] == "died"
     assert "kill" not in reports[0].payload
+
+
+# --- the cycle headers, the loop's durable state ---
+
+
+def test_a_cycle_header_is_parsed_into_the_four_fields_it_carries() -> None:
+    """The header a review posts, read back exactly as the probe measured it."""
+    headers = traverse.parse_cycle_headers(
+        ["bug review · 4b43af9 · cycle 1 · 0198a1b2-7c3d-4e5f-8a9b-c0d1e2f3a4b5"]
+    )
+
+    assert headers == {
+        "bug review": traverse.CycleHeader(
+            review="bug review",
+            sha="4b43af9",
+            cycle=1,
+            session_id="0198a1b2-7c3d-4e5f-8a9b-c0d1e2f3a4b5",
+        )
+    }
+
+
+def test_a_track_that_sat_out_a_cycle_keeps_its_own_last_reviewed_sha() -> None:
+    """Two tracks at different cycles, each answered for out of its own headers.
+
+    The doc track sat out cycle 2, so the newest header on the pull request is
+    the code track's. Handed that one it would start its delta at `bbbbbbb` — a
+    commit it never read — and everything between `aaaaaaa` and there would go
+    unreviewed with nobody saying so.
+    """
+    headers = traverse.parse_cycle_headers(
+        [
+            "code review · aaaaaaa · cycle 1 · sess-code-1",
+            "doc review · aaaaaaa · cycle 1 · sess-doc-1",
+            "code review · bbbbbbb · cycle 2 · sess-code-2",
+        ]
+    )
+
+    assert headers["doc review"].sha == "aaaaaaa"
+    assert headers["doc review"].cycle == 1
+    assert headers["code review"].sha == "bbbbbbb"
+    assert headers["code review"].cycle == 2
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "",
+        "Looks good to me.",
+        "bug review · 4b43af9 · cycle one · sess-1",
+        "bug review · 4b43af9 · cycle 1",
+        "bug review · 4b43af9 · round 1 · sess-1",
+    ],
+)
+def test_a_line_that_is_not_a_cycle_header_is_passed_over(line: str) -> None:
+    """A comment carrying no header is the user's, and the user writes anything."""
+    assert traverse.parse_cycle_headers([line]) == {}
+
+
+def test_a_pull_request_with_no_headers_yet_is_about_to_run_cycle_one() -> None:
+    assert traverse.next_cycle({}) == 1
+
+
+def test_the_next_cycle_is_one_past_the_highest_header_on_the_pull_request() -> None:
+    """The loop's own count, across every track — not any one track's.
+
+    The doc track is a cycle behind here, and a count taken from it would run
+    cycle 2 a second time and give the cap a clock that never advances.
+    """
+    headers = traverse.parse_cycle_headers(
+        [
+            "doc review · aaaaaaa · cycle 1 · sess-doc-1",
+            "code review · bbbbbbb · cycle 2 · sess-code-2",
+        ]
+    )
+
+    assert traverse.next_cycle(headers) == 3
+
+
+# --- electing the tracks from the changed files ---
+
+
+def changed(
+    path: str, *, status: str = "modified", additions: int = 1, deletions: int = 1
+) -> Any:
+    """One entry of the pull request's file list, as the election reads it."""
+    return traverse.ChangedFile(
+        path=path, status=status, additions=additions, deletions=deletions
+    )
+
+
+def test_a_diff_touching_code_elects_the_code_track() -> None:
+    assert traverse.elect_tracks([changed("src/dev_playbook/factory/traverse.py")]) == (
+        traverse.CODE_TRACK,
+    )
+
+
+@pytest.mark.parametrize(
+    "path", ["scripts/hook", "Makefile", "run.sh", "pyproject.toml"]
+)
+def test_a_file_that_is_neither_markdown_nor_html_is_code(path: str) -> None:
+    """Extensionless scripts, hooks, `Makefile*` and config all count as code."""
+    assert traverse.elect_tracks([changed(path)]) == (traverse.CODE_TRACK,)
+
+
+def test_a_documentation_only_diff_elects_the_doc_track() -> None:
+    """Small, modified, incidental by every other rule — and still reviewed.
+
+    A doc-only diff has no code track to carry it, so nothing else would read
+    it at all.
+    """
+    assert traverse.elect_tracks(
+        [changed("software-factory/factory-operations.md", additions=1, deletions=1)]
+    ) == (traverse.DOC_TRACK,)
+
+
+def test_a_new_document_beside_code_elects_the_doc_track() -> None:
+    assert traverse.elect_tracks(
+        [
+            changed("src/dev_playbook/factory/traverse.py"),
+            changed("software-factory/review-loop.md", status="added", additions=4),
+        ]
+    ) == (traverse.CODE_TRACK, traverse.DOC_TRACK)
+
+
+def test_ten_changed_documentation_lines_beside_code_elect_the_doc_track() -> None:
+    assert traverse.elect_tracks(
+        [
+            changed("src/dev_playbook/factory/traverse.py"),
+            changed("software-factory/software-factory.md", additions=6, deletions=4),
+        ]
+    ) == (traverse.CODE_TRACK, traverse.DOC_TRACK)
+
+
+def test_incidental_documentation_beside_code_leaves_the_doc_track_out() -> None:
+    """Nine changed lines in an existing document is the echo a code change forces."""
+    assert traverse.elect_tracks(
+        [
+            changed("src/dev_playbook/factory/traverse.py"),
+            changed("software-factory/software-factory.md", additions=5, deletions=4),
+        ]
+    ) == (traverse.CODE_TRACK,)
+
+
+def test_a_diff_of_ignored_files_alone_elects_no_track() -> None:
+    """The caller escalates on this: the loop never converges on an unread PR."""
+    assert traverse.elect_tracks([changed("dotfiles/report.html")]) == ()
+
+
+def test_an_empty_diff_elects_no_track() -> None:
+    assert traverse.elect_tracks([]) == ()
+
+
+# --- the verdict, computed from thread state ---
+
+
+def thread(
+    severity: str = "Blocking",
+    *,
+    resolved: bool = False,
+    thread_id: str = "PRRT_kwDO1",
+    path: str = "src/dev_playbook/factory/traverse.py",
+    line: int | None = 41,
+) -> Any:
+    """One review thread, shaped the way the GraphQL read hands it over."""
+    return traverse.ReviewThread(
+        thread_id=thread_id,
+        resolved=resolved,
+        path=path,
+        line=line,
+        body=f"{severity} — the scheme read falls back silently.\n\n"
+        f"— code review · 0198a1b2-7c3d-4e5f-8a9b-0c1d2e3f4a5b",
+    )
+
+
+def test_an_open_blocking_thread_makes_the_cycle_a_rework_lap() -> None:
+    verdict = traverse.compute_verdict([thread("Blocking")], cycle=1, baseline=0)
+
+    assert verdict.verdict == traverse.REWORK
+    assert verdict.open_blocking == (thread("Blocking"),)
+
+
+def test_a_cycle_with_no_open_blocking_thread_has_converged() -> None:
+    """Open Suggestions stay open — convergence is on Blocking alone."""
+    verdict = traverse.compute_verdict(
+        [thread("Blocking", resolved=True), thread("Suggestion")], cycle=2, baseline=0
+    )
+
+    assert verdict.verdict == traverse.CONVERGED
+    assert verdict.open_blocking == ()
+
+
+def test_the_verdict_tallies_both_severities_open_and_resolved() -> None:
+    verdict = traverse.compute_verdict(
+        [
+            thread("Blocking", thread_id="PRRT_1"),
+            thread("Blocking", thread_id="PRRT_2", resolved=True),
+            thread("Blocking", thread_id="PRRT_3", resolved=True),
+            thread("Suggestion", thread_id="PRRT_4"),
+            thread("Suggestion", thread_id="PRRT_5"),
+            thread("Suggestion", thread_id="PRRT_6", resolved=True),
+        ],
+        cycle=1,
+        baseline=0,
+    )
+
+    assert verdict.blocking_open == 1
+    assert verdict.blocking_resolved == 2
+    assert verdict.suggestion_open == 2
+    assert verdict.suggestion_resolved == 1
+
+
+def test_a_thread_opening_on_neither_severity_is_tallied_as_neither() -> None:
+    """A comment carrying no severity and no attribution is the user's own."""
+    verdict = traverse.compute_verdict(
+        [
+            traverse.ReviewThread(
+                thread_id="PRRT_user",
+                resolved=False,
+                path="README.md",
+                line=1,
+                body="Why is this here?",
+            )
+        ],
+        cycle=1,
+        baseline=0,
+    )
+
+    assert verdict.verdict == traverse.CONVERGED
+    assert (verdict.blocking_open, verdict.suggestion_open) == (0, 0)
+
+
+@pytest.mark.parametrize("written", ["Blocking", "blocking", "**Blocking**"])
+def test_the_severity_is_the_first_word_however_it_is_decorated(written: str) -> None:
+    """Missing a Blocking thread declares a convergence that never happened."""
+    verdict = traverse.compute_verdict([thread(written)], cycle=1, baseline=0)
+
+    assert verdict.blocking_open == 1
+
+
+def test_the_third_autonomous_cycle_past_the_baseline_still_reworks() -> None:
+    verdict = traverse.compute_verdict([thread("Blocking")], cycle=3, baseline=0)
+
+    assert verdict.verdict == traverse.REWORK
+
+
+def test_the_fourth_autonomous_cycle_past_the_baseline_caps_out() -> None:
+    verdict = traverse.compute_verdict([thread("Blocking")], cycle=4, baseline=0)
+
+    assert verdict.verdict == traverse.CAP_ESCALATED
+
+
+def test_the_cap_counts_from_the_baseline_rather_than_from_cycle_zero() -> None:
+    """A user-ordered lap moves the baseline, and the clock restarts behind it."""
+    assert (
+        traverse.compute_verdict([thread("Blocking")], cycle=5, baseline=2).verdict
+        == traverse.REWORK
+    )
+    assert (
+        traverse.compute_verdict([thread("Blocking")], cycle=6, baseline=2).verdict
+        == traverse.CAP_ESCALATED
+    )
+
+
+def test_a_cycle_past_the_cap_with_nothing_blocking_still_converges() -> None:
+    """The cap ends a traverse that cannot clear its findings, not one that did."""
+    verdict = traverse.compute_verdict([thread("Suggestion")], cycle=9, baseline=0)
+
+    assert verdict.verdict == traverse.CONVERGED
+
+
+# --- the baseline the cap counts from ---
+
+
+def starts(db: Path) -> Any:
+    """This issue's `traverse-start` rows, through the reader the loop uses."""
+    return ledger.traverse_starts(repo=REPO, issue=ISSUE, db_path=db)
+
+
+def test_an_issue_with_no_recorded_baseline_counts_from_zero(db: Path) -> None:
+    ledger.traverse_start(REPO, ISSUE, {"mode": "auto"}, db_path=db)
+
+    assert traverse.baseline_cycle(starts(db)) == 0
+
+
+def test_an_issue_that_never_started_counts_from_zero(db: Path) -> None:
+    assert traverse.baseline_cycle(starts(db)) == 0
+
+
+def test_the_baseline_is_the_highest_one_any_start_recorded(db: Path) -> None:
+    """The newest baseline, whichever start carries it — the clock never resets."""
+    ledger.traverse_start(REPO, ISSUE, {"mode": "auto"}, db_path=db)
+    ledger.traverse_start(
+        REPO, ISSUE, {"mode": "user-rework", "baseline_cycle": 5}, db_path=db
+    )
+    ledger.traverse_start(
+        REPO, ISSUE, {"mode": "auto", "baseline_cycle": 2}, db_path=db
+    )
+
+    assert traverse.baseline_cycle(starts(db)) == 5
+
+
+def test_a_baseline_that_is_not_a_whole_number_stops_the_traverse(db: Path) -> None:
+    """Read past, it would give the cap a clock nobody can reason about."""
+    ledger.traverse_start(REPO, ISSUE, {"baseline_cycle": "3"}, db_path=db)
+
+    with pytest.raises(traverse.TraverseError):
+        traverse.baseline_cycle(starts(db))
+
+
+# --- the rework prompt ---
+
+
+def test_the_rework_prompt_names_the_issue_and_every_thread_and_where_it_sits() -> None:
+    prompt = traverse.rework_prompt(
+        ISSUE,
+        [
+            thread(thread_id="PRRT_one", path="src/a.py", line=41),
+            thread(thread_id="PRRT_two", path="docs/b.md", line=7),
+        ],
+    )
+
+    assert prompt.splitlines()[0] == str(ISSUE)
+    assert "PRRT_one" in prompt
+    assert "src/a.py:41" in prompt
+    assert "PRRT_two" in prompt
+    assert "docs/b.md:7" in prompt
+
+
+def test_the_rework_prompt_locates_an_outdated_thread_by_its_file() -> None:
+    """A fix that edits the anchored line leaves the thread with no live line."""
+    prompt = traverse.rework_prompt(
+        ISSUE, [thread(thread_id="PRRT_gone", path="src/a.py", line=None)]
+    )
+
+    assert "src/a.py" in prompt
+
+
+def test_the_rework_prompt_pastes_none_of_the_finding_text() -> None:
+    """The thread is read from GitHub; a paste is a second copy that goes stale."""
+    prompt = traverse.rework_prompt(ISSUE, [thread()])
+
+    assert "falls back silently" not in prompt
+
+
+def test_the_rework_prompt_carries_the_resolution_rules() -> None:
+    """Reply on what you fixed; the next cycle's reviewer resolves what it verifies."""
+    prompt = traverse.rework_prompt(ISSUE, [thread()])
+
+    assert "gh api" in prompt
+    assert "Fixed in <sha>" in prompt
+    assert "resolve" in prompt
+
+
+# --- the review loop, through the fake claude and the stub gh ---
+
+
+def head_sha(checkout: Path) -> str:
+    """The short sha the issue's worktree is on — what a review headers with."""
+    return subprocess.run(
+        ["git", "-C", str(worktree_of(checkout)), "rev-parse", "--short", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+
+def worktree_of(checkout: Path) -> Path:
+    """Where this issue's worktree sits inside its checkout."""
+    return checkout / ".claude" / "worktrees" / BRANCH
+
+
+def nodes_launched(launched: Callable[[], list[dict[str, Any]]]) -> list[str]:
+    """Every node the traverse launched, sorted — a fan-out has no fixed order."""
+    return sorted(launch["node"] for launch in launched())
+
+
+def test_a_first_cycle_with_no_blocking_thread_converges_and_ends_pr_ready(
+    db: Path,
+    checkout: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A converged pull request may still carry open Suggestion threads.
+
+    That is a real intermediate state rather than an oversight: dispositioning
+    a Suggestion belongs to the Adjudicator, and until it exists the thread
+    simply stays open.
+    """
+    outcome = traverse_issue(gh_cmd=stub_gh(threads={1: [suggestion_thread()]}))
+
+    assert nodes_launched(launched) == [
+        "bug-pr-review",
+        "build",
+        "code-pr-review",
+        "open-pr",
+    ]
+    assert payload_of(db, "verdict") == {
+        "pr": PR_URL,
+        "cycle": 1,
+        "sha": head_sha(checkout),
+        "blocking_open": 0,
+        "blocking_resolved": 0,
+        "suggestion_open": 1,
+        "suggestion_resolved": 0,
+        "verdict": "converged",
+    }
+    assert outcome == traverse.TraverseOutcome("pr-ready", pr_url=PR_URL)
+
+
+def test_an_open_blocking_thread_reworks_and_the_loop_goes_round_again(
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    gh_calls: Callable[[], list[list[str]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """Cycle 1 finds a Blocking thread; the lap that follows clears it.
+
+    The board never moves inside the loop: the one label write in the whole
+    traverse is the graph's own `build -> pr-review`.
+    """
+    outcome = traverse_issue(gh_cmd=stub_gh(threads={1: [blocking_thread()], 2: []}))
+
+    builds = [launch for launch in launched() if launch["node"] == "build"]
+    assert len(builds) == 2
+    assert "PRRT_blocking" in builds[1]["prompt"]
+    assert [payload["verdict"] for payload in payloads_of(db, "verdict")] == [
+        "rework",
+        "converged",
+    ]
+    assert [payload["cycle"] for payload in payloads_of(db, "verdict")] == [1, 2]
+    assert len([call for call in gh_calls() if call[:2] == ["issue", "edit"]]) == 1
+    assert outcome.status == "pr-ready"
+
+
+def test_a_returning_track_is_prompted_with_its_own_sha_not_a_siblings(
+    checkout: Path,
+    world: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The code review has read this branch once; the bug review never has.
+
+    So one of them is given a sha to take its delta from and the other is given
+    the issue number alone. Handed the newest header on the pull request, the
+    bug review would start at a commit it never read.
+    """
+    add_worktree(checkout, BRANCH)
+    push_branch(checkout, BRANCH)
+    seed_review(world, "code review", cycle=1, sha="deadbee")
+
+    traverse_issue(gh_cmd=stub_gh(PR_REVIEW_LABELS))
+
+    prompts = {launch["node"]: launch["prompt"] for launch in launched()}
+    assert prompts["code-pr-review"] == f"{ISSUE} deadbee"
+    assert prompts["bug-pr-review"] == str(ISSUE)
+
+
+def test_a_traverse_relaunched_mid_loop_runs_the_next_cycle_through_one_path(
+    db: Path,
+    checkout: Path,
+    world: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A store and a pull request left at cycle 2 relaunch into cycle 3.
+
+    No resume branch reads any of this: the cycle is one past the highest header
+    the pull request carries, and the verdict is computed from live thread state.
+    The cycle a crashed traverse was part-way through is burned, which is the
+    accepted cost of a loop that keeps no state of its own.
+    """
+    add_worktree(checkout, BRANCH)
+    push_branch(checkout, BRANCH)
+    for cycle in (1, 2):
+        seed_review(world, "bug review", cycle=cycle, sha="deadbee")
+        seed_review(world, "code review", cycle=cycle, sha="deadbee")
+
+    outcome = traverse_issue(gh_cmd=stub_gh(PR_REVIEW_LABELS))
+
+    assert [payload["cycle"] for payload in payloads_of(db, "verdict")] == [3]
+    assert outcome.status == "pr-ready"
+
+
+def test_one_review_failing_lets_its_siblings_finish_before_the_traverse_ends(
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """The books come first, the escalation second, and nothing is retried.
+
+    Each launch has a `job-launch` row that only its own report closes, so a
+    sibling the traverse walked away from would read as live for good. Every job
+    is waited out before any failure is relayed.
+    """
+    outcome = traverse_issue(
+        claude_cmd=fake_claude(
+            **{
+                "bug-pr-review": node_step(
+                    [HOOK_LINE, init_line(), result_line(ESCALATED_REVIEW)]
+                )
+            }
+        )
+    )
+
+    reported = [row for row in ledger_rows(db) if row.kind == "job-report"]
+    assert {row.node for row in reported} == {
+        "build",
+        "open-pr",
+        "bug-pr-review",
+        "code-pr-review",
+    }
+    written = kinds(db)
+    assert written.index("traverse-escalation") > max(
+        at for at, kind in enumerate(written) if kind == "job-report"
+    )
+    assert "bug-pr-review" in str(payload_of(db, "traverse-escalation")["reason"])
+    assert len([launch for launch in launched() if launch["node"] == "build"]) == 1
+    assert outcome.status == "escalated"
+
+
+def test_a_review_that_never_spawns_is_relayed_like_any_other_failure(
+    db: Path,
+    agents_dir: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """One reviewer aborts before spawning; its sibling still runs and reports.
+
+    An abort is raised rather than reported — nothing spawned, so there is no
+    stream to classify — and it is the one exception a fanned-out review catches,
+    exactly as the sequential path catches it. It comes back as that job's
+    failure and is relayed beside anything else the cycle turned up.
+
+    The definition here declares an effort the harness does not have, which the
+    launcher refuses per node: the whole-roster check at traverse start only asks
+    that each definition exists.
+    """
+    write_definition(
+        agents_dir,
+        "bug-pr-review",
+        {
+            "name": "bug-pr-review",
+            "description": "The bug-pr-review node.",
+            "model": "sonnet",
+            "effort": "turbo",
+        },
+    )
+
+    outcome = traverse_issue()
+
+    assert "code-pr-review" in [launch["node"] for launch in launched()]
+    assert "code-pr-review" in {
+        row.node for row in ledger_rows(db) if row.kind == "job-report"
+    }
+    reason = str(payload_of(db, "traverse-escalation")["reason"])
+    assert "bug-pr-review could not be launched" in reason
+    assert outcome.status == "escalated"
+
+
+def test_a_diff_no_review_reads_escalates_rather_than_converging(
+    db: Path,
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """Converging here would hand back a pull request nobody had read."""
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(files=[["dotfiles/report.html", "modified", 4, 2]])
+    )
+
+    assert nodes_launched(launched) == ["build", "open-pr"]
+    assert "verdict" not in kinds(db)
+    assert "no review track" in str(payload_of(db, "traverse-escalation")["reason"])
+    assert outcome.status == "escalated"
+
+
+def test_a_thread_carrying_no_comment_stops_the_traverse(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A thread with nothing to read a severity from is refused, never graded.
+
+    Every severity comes from the first word of a thread's first comment, so a
+    thread that arrives with no comment has no severity at all. Passed over it
+    would count as neither Blocking nor Suggestion and drop out of the tally in
+    silence — a convergence declared over a finding nobody read.
+    """
+    outcome = traverse_issue(gh_cmd=stub_gh(threads={1: [commentless_thread()]}))
+
+    reason = str(payload_of(db, "traverse-escalation")["reason"])
+    assert "PRRT_silent" in reason
+    assert "verdict" not in kinds(db)
+    assert outcome.status == "escalated"
+
+
+def test_the_cycles_reviews_really_do_run_at_the_same_time(
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """Each review refuses to finish until it can see the other one running.
+
+    A launcher that ran them one after another could never satisfy both: the
+    first would wait out its whole budget for a peer that has not been spawned
+    yet, exit unmet, and end the traverse escalated.
+    """
+    both = {
+        node: node_step(
+            [HOOK_LINE, init_line(), result_line(REVIEWED_REPORT)], await_peers=4
+        )
+        for node in ("bug-pr-review", "code-pr-review")
+    }
+
+    outcome = traverse_issue(claude_cmd=fake_claude(**both), timeout_s=PATIENT_DEADLINE)
+
+    assert outcome.status == "pr-ready"
+
+
+def test_a_documentation_only_diff_runs_the_doc_review_alone(
+    launched: Callable[[], list[dict[str, Any]]],
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    outcome = traverse_issue(gh_cmd=stub_gh(files=[DOC_FILE]))
+
+    assert nodes_launched(launched) == ["build", "doc-pr-review", "open-pr"]
+    assert outcome.status == "pr-ready"
+
+
+def test_blocking_threads_that_survive_the_cap_end_the_traverse_escalated(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """Four autonomous cycles past the baseline, and the finding is still open."""
+    outcome = traverse_issue(gh_cmd=stub_gh(threads={1: [blocking_thread()]}))
+
+    assert [payload["verdict"] for payload in payloads_of(db, "verdict")] == [
+        "rework",
+        "rework",
+        "rework",
+        "cap-escalated",
+    ]
+    escalation = payload_of(db, "traverse-escalation")
+    assert (escalation["cycle"], escalation["baseline"]) == (4, 0)
+    assert payload_of(db, "traverse-end") == {"status": "escalated"}
+    assert outcome.status == "escalated"

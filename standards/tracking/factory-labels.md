@@ -63,8 +63,10 @@ and only these:
 
 - **Pre-issue states** — `CANDIDATES.md` and the idea funnel. No issue exists, so
   there is nothing to label.
-- **Terminal endpoints** — merged, closed. An issue leaves the graph there rather
-  than occupying a state.
+- **Terminal endpoints** — merged, closed, escalated. An issue leaves the graph
+  there rather than occupying a state. Escalated is where a review loop that
+  cannot converge puts the pull request down for the user; the issue keeps
+  whatever phase it was in, so no label answers to it.
 
 The factory region's work nodes are served by typed agent definitions that the
 traverse script launches — several of them at a review diamond. A
