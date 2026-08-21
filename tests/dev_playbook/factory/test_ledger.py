@@ -986,6 +986,64 @@ def test_awaiting_merge_filters_on_repo(db_path: Path) -> None:
     assert [(row.repo, row.issue) for row in waiting] == [("owner/two", 2)]
 
 
+# --- traverse_starts ---
+
+
+def test_traverse_starts_returns_one_issues_starts_in_write_order(
+    db_path: Path,
+) -> None:
+    """Every start the issue ever had, however many windows have closed since.
+
+    The review loop's cycle cap counts from the newest baseline a start
+    recorded, so these rows are read whole rather than through an open window:
+    a start is what *closes* a window, so the only one inside any open window is
+    the current traverse's own.
+    """
+    ledger.traverse_start("owner/repo", 441, {"mode": "auto"}, db_path=db_path)
+    ledger.traverse_end("owner/repo", 441, {"status": "escalated"}, db_path=db_path)
+    ledger.traverse_start(
+        "owner/repo", 441, {"mode": "user-rework", "baseline_cycle": 3}, db_path=db_path
+    )
+
+    starts = ledger.traverse_starts(repo="owner/repo", issue=441, db_path=db_path)
+
+    assert [row.payload for row in starts] == [
+        {"mode": "auto"},
+        {"mode": "user-rework", "baseline_cycle": 3},
+    ]
+
+
+def test_traverse_starts_reads_no_other_issue_and_no_other_kind(
+    db_path: Path,
+) -> None:
+    ledger.traverse_start("owner/repo", 441, {"mode": "auto"}, db_path=db_path)
+    ledger.traverse_start("owner/repo", 442, {"mode": "auto"}, db_path=db_path)
+    ledger.traverse_start("other/repo", 441, {"mode": "auto"}, db_path=db_path)
+    ledger.phase_transition("owner/repo", 441, {"to": "pr-review"}, db_path=db_path)
+
+    starts = ledger.traverse_starts(repo="owner/repo", issue=441, db_path=db_path)
+
+    assert [(row.kind, row.repo, row.issue) for row in starts] == [
+        ("traverse-start", "owner/repo", 441)
+    ]
+
+
+def test_traverse_starts_answers_an_issue_that_never_started_with_nothing(
+    db_path: Path,
+) -> None:
+    assert ledger.traverse_starts(repo="owner/repo", issue=441, db_path=db_path) == []
+
+
+@pytest.mark.parametrize(
+    ("repo", "issue"), [("", 441), ("owner/repo", 0), ("owner/repo", "441")]
+)
+def test_traverse_starts_refuses_an_address_the_ledger_cannot_use(
+    repo: Any, issue: Any, db_path: Path
+) -> None:
+    with pytest.raises(ValueError):
+        ledger.traverse_starts(repo=repo, issue=issue, db_path=db_path)
+
+
 # --- the session-id spine ---
 
 

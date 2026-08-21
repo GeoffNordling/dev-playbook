@@ -1427,3 +1427,354 @@ def test_a_sweep_writes_a_report_for_a_job_whose_process_is_already_gone(
     assert reports[0].node == "build"
     assert reports[0].payload["process_outcome"] == "died"
     assert "kill" not in reports[0].payload
+
+
+# --- the cycle headers, the loop's durable state ---
+
+
+def test_a_cycle_header_is_parsed_into_the_four_fields_it_carries() -> None:
+    """The header a review posts, read back exactly as the probe measured it."""
+    headers = traverse.parse_cycle_headers(
+        ["bug review · 4b43af9 · cycle 1 · 0198a1b2-7c3d-4e5f-8a9b-c0d1e2f3a4b5"]
+    )
+
+    assert headers == {
+        "bug review": traverse.CycleHeader(
+            review="bug review",
+            sha="4b43af9",
+            cycle=1,
+            session_id="0198a1b2-7c3d-4e5f-8a9b-c0d1e2f3a4b5",
+        )
+    }
+
+
+def test_a_track_that_sat_out_a_cycle_keeps_its_own_last_reviewed_sha() -> None:
+    """Two tracks at different cycles, each answered for out of its own headers.
+
+    The doc track sat out cycle 2, so the newest header on the pull request is
+    the code track's. Handed that one it would start its delta at `bbbbbbb` — a
+    commit it never read — and everything between `aaaaaaa` and there would go
+    unreviewed with nobody saying so.
+    """
+    headers = traverse.parse_cycle_headers(
+        [
+            "code review · aaaaaaa · cycle 1 · sess-code-1",
+            "doc review · aaaaaaa · cycle 1 · sess-doc-1",
+            "code review · bbbbbbb · cycle 2 · sess-code-2",
+        ]
+    )
+
+    assert headers["doc review"].sha == "aaaaaaa"
+    assert headers["doc review"].cycle == 1
+    assert headers["code review"].sha == "bbbbbbb"
+    assert headers["code review"].cycle == 2
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "",
+        "Looks good to me.",
+        "bug review · 4b43af9 · cycle one · sess-1",
+        "bug review · 4b43af9 · cycle 1",
+        "bug review · 4b43af9 · round 1 · sess-1",
+    ],
+)
+def test_a_line_that_is_not_a_cycle_header_is_passed_over(line: str) -> None:
+    """A comment carrying no header is the user's, and the user writes anything."""
+    assert traverse.parse_cycle_headers([line]) == {}
+
+
+def test_a_pull_request_with_no_headers_yet_is_about_to_run_cycle_one() -> None:
+    assert traverse.next_cycle({}) == 1
+
+
+def test_the_next_cycle_is_one_past_the_highest_header_on_the_pull_request() -> None:
+    """The loop's own count, across every track — not any one track's.
+
+    The doc track is a cycle behind here, and a count taken from it would run
+    cycle 2 a second time and give the cap a clock that never advances.
+    """
+    headers = traverse.parse_cycle_headers(
+        [
+            "doc review · aaaaaaa · cycle 1 · sess-doc-1",
+            "code review · bbbbbbb · cycle 2 · sess-code-2",
+        ]
+    )
+
+    assert traverse.next_cycle(headers) == 3
+
+
+# --- electing the tracks from the changed files ---
+
+
+def changed(
+    path: str, *, status: str = "modified", additions: int = 1, deletions: int = 1
+) -> Any:
+    """One entry of the pull request's file list, as the election reads it."""
+    return traverse.ChangedFile(
+        path=path, status=status, additions=additions, deletions=deletions
+    )
+
+
+def test_a_diff_touching_code_elects_the_code_track() -> None:
+    assert traverse.elect_tracks([changed("src/dev_playbook/factory/traverse.py")]) == (
+        traverse.CODE_TRACK,
+    )
+
+
+@pytest.mark.parametrize(
+    "path", ["scripts/hook", "Makefile", "run.sh", "pyproject.toml"]
+)
+def test_a_file_that_is_neither_markdown_nor_html_is_code(path: str) -> None:
+    """Extensionless scripts, hooks, `Makefile*` and config all count as code."""
+    assert traverse.elect_tracks([changed(path)]) == (traverse.CODE_TRACK,)
+
+
+def test_a_documentation_only_diff_elects_the_doc_track() -> None:
+    """Small, modified, incidental by every other rule — and still reviewed.
+
+    A doc-only diff has no code track to carry it, so nothing else would read
+    it at all.
+    """
+    assert traverse.elect_tracks(
+        [changed("software-factory/factory-operations.md", additions=1, deletions=1)]
+    ) == (traverse.DOC_TRACK,)
+
+
+def test_a_new_document_beside_code_elects_the_doc_track() -> None:
+    assert traverse.elect_tracks(
+        [
+            changed("src/dev_playbook/factory/traverse.py"),
+            changed("software-factory/review-loop.md", status="added", additions=4),
+        ]
+    ) == (traverse.CODE_TRACK, traverse.DOC_TRACK)
+
+
+def test_ten_changed_documentation_lines_beside_code_elect_the_doc_track() -> None:
+    assert traverse.elect_tracks(
+        [
+            changed("src/dev_playbook/factory/traverse.py"),
+            changed("software-factory/software-factory.md", additions=6, deletions=4),
+        ]
+    ) == (traverse.CODE_TRACK, traverse.DOC_TRACK)
+
+
+def test_incidental_documentation_beside_code_leaves_the_doc_track_out() -> None:
+    """Nine changed lines in an existing document is the echo a code change forces."""
+    assert traverse.elect_tracks(
+        [
+            changed("src/dev_playbook/factory/traverse.py"),
+            changed("software-factory/software-factory.md", additions=5, deletions=4),
+        ]
+    ) == (traverse.CODE_TRACK,)
+
+
+def test_a_diff_of_ignored_files_alone_elects_no_track() -> None:
+    """The caller escalates on this: the loop never converges on an unread PR."""
+    assert traverse.elect_tracks([changed("dotfiles/report.html")]) == ()
+
+
+def test_an_empty_diff_elects_no_track() -> None:
+    assert traverse.elect_tracks([]) == ()
+
+
+# --- the verdict, computed from thread state ---
+
+
+def thread(
+    severity: str = "Blocking",
+    *,
+    resolved: bool = False,
+    thread_id: str = "PRRT_kwDO1",
+    path: str = "src/dev_playbook/factory/traverse.py",
+    line: int | None = 41,
+) -> Any:
+    """One review thread, shaped the way the GraphQL read hands it over."""
+    return traverse.ReviewThread(
+        thread_id=thread_id,
+        resolved=resolved,
+        path=path,
+        line=line,
+        body=f"{severity} — the scheme read falls back silently.\n\n"
+        f"— code review · 0198a1b2-7c3d-4e5f-8a9b-0c1d2e3f4a5b",
+    )
+
+
+def test_an_open_blocking_thread_makes_the_cycle_a_rework_lap() -> None:
+    verdict = traverse.compute_verdict([thread("Blocking")], cycle=1, baseline=0)
+
+    assert verdict.verdict == traverse.REWORK
+    assert verdict.open_blocking == (thread("Blocking"),)
+
+
+def test_a_cycle_with_no_open_blocking_thread_has_converged() -> None:
+    """Open Suggestions stay open — convergence is on Blocking alone."""
+    verdict = traverse.compute_verdict(
+        [thread("Blocking", resolved=True), thread("Suggestion")], cycle=2, baseline=0
+    )
+
+    assert verdict.verdict == traverse.CONVERGED
+    assert verdict.open_blocking == ()
+
+
+def test_the_verdict_tallies_both_severities_open_and_resolved() -> None:
+    verdict = traverse.compute_verdict(
+        [
+            thread("Blocking", thread_id="PRRT_1"),
+            thread("Blocking", thread_id="PRRT_2", resolved=True),
+            thread("Blocking", thread_id="PRRT_3", resolved=True),
+            thread("Suggestion", thread_id="PRRT_4"),
+            thread("Suggestion", thread_id="PRRT_5"),
+            thread("Suggestion", thread_id="PRRT_6", resolved=True),
+        ],
+        cycle=1,
+        baseline=0,
+    )
+
+    assert verdict.blocking_open == 1
+    assert verdict.blocking_resolved == 2
+    assert verdict.suggestion_open == 2
+    assert verdict.suggestion_resolved == 1
+
+
+def test_a_thread_opening_on_neither_severity_is_tallied_as_neither() -> None:
+    """A comment carrying no severity and no attribution is the user's own."""
+    verdict = traverse.compute_verdict(
+        [
+            traverse.ReviewThread(
+                thread_id="PRRT_user",
+                resolved=False,
+                path="README.md",
+                line=1,
+                body="Why is this here?",
+            )
+        ],
+        cycle=1,
+        baseline=0,
+    )
+
+    assert verdict.verdict == traverse.CONVERGED
+    assert (verdict.blocking_open, verdict.suggestion_open) == (0, 0)
+
+
+@pytest.mark.parametrize("written", ["Blocking", "blocking", "**Blocking**"])
+def test_the_severity_is_the_first_word_however_it_is_decorated(written: str) -> None:
+    """Missing a Blocking thread declares a convergence that never happened."""
+    verdict = traverse.compute_verdict([thread(written)], cycle=1, baseline=0)
+
+    assert verdict.blocking_open == 1
+
+
+def test_the_third_autonomous_cycle_past_the_baseline_still_reworks() -> None:
+    verdict = traverse.compute_verdict([thread("Blocking")], cycle=3, baseline=0)
+
+    assert verdict.verdict == traverse.REWORK
+
+
+def test_the_fourth_autonomous_cycle_past_the_baseline_caps_out() -> None:
+    verdict = traverse.compute_verdict([thread("Blocking")], cycle=4, baseline=0)
+
+    assert verdict.verdict == traverse.CAP_ESCALATED
+
+
+def test_the_cap_counts_from_the_baseline_rather_than_from_cycle_zero() -> None:
+    """A user-ordered lap moves the baseline, and the clock restarts behind it."""
+    assert (
+        traverse.compute_verdict([thread("Blocking")], cycle=5, baseline=2).verdict
+        == traverse.REWORK
+    )
+    assert (
+        traverse.compute_verdict([thread("Blocking")], cycle=6, baseline=2).verdict
+        == traverse.CAP_ESCALATED
+    )
+
+
+def test_a_cycle_past_the_cap_with_nothing_blocking_still_converges() -> None:
+    """The cap ends a traverse that cannot clear its findings, not one that did."""
+    verdict = traverse.compute_verdict([thread("Suggestion")], cycle=9, baseline=0)
+
+    assert verdict.verdict == traverse.CONVERGED
+
+
+# --- the baseline the cap counts from ---
+
+
+def starts(db: Path) -> Any:
+    """This issue's `traverse-start` rows, through the reader the loop uses."""
+    return ledger.traverse_starts(repo=REPO, issue=ISSUE, db_path=db)
+
+
+def test_an_issue_with_no_recorded_baseline_counts_from_zero(db: Path) -> None:
+    ledger.traverse_start(REPO, ISSUE, {"mode": "auto"}, db_path=db)
+
+    assert traverse.baseline_cycle(starts(db)) == 0
+
+
+def test_an_issue_that_never_started_counts_from_zero(db: Path) -> None:
+    assert traverse.baseline_cycle(starts(db)) == 0
+
+
+def test_the_baseline_is_the_highest_one_any_start_recorded(db: Path) -> None:
+    """The newest baseline, whichever start carries it — the clock never resets."""
+    ledger.traverse_start(REPO, ISSUE, {"mode": "auto"}, db_path=db)
+    ledger.traverse_start(
+        REPO, ISSUE, {"mode": "user-rework", "baseline_cycle": 5}, db_path=db
+    )
+    ledger.traverse_start(
+        REPO, ISSUE, {"mode": "auto", "baseline_cycle": 2}, db_path=db
+    )
+
+    assert traverse.baseline_cycle(starts(db)) == 5
+
+
+def test_a_baseline_that_is_not_a_whole_number_stops_the_traverse(db: Path) -> None:
+    """Read past, it would give the cap a clock nobody can reason about."""
+    ledger.traverse_start(REPO, ISSUE, {"baseline_cycle": "3"}, db_path=db)
+
+    with pytest.raises(traverse.TraverseError):
+        traverse.baseline_cycle(starts(db))
+
+
+# --- the rework prompt ---
+
+
+def test_the_rework_prompt_names_the_issue_and_every_thread_and_where_it_sits() -> None:
+    prompt = traverse.rework_prompt(
+        ISSUE,
+        [
+            thread(thread_id="PRRT_one", path="src/a.py", line=41),
+            thread(thread_id="PRRT_two", path="docs/b.md", line=7),
+        ],
+    )
+
+    assert prompt.splitlines()[0] == str(ISSUE)
+    assert "PRRT_one" in prompt
+    assert "src/a.py:41" in prompt
+    assert "PRRT_two" in prompt
+    assert "docs/b.md:7" in prompt
+
+
+def test_the_rework_prompt_locates_an_outdated_thread_by_its_file() -> None:
+    """A fix that edits the anchored line leaves the thread with no live line."""
+    prompt = traverse.rework_prompt(
+        ISSUE, [thread(thread_id="PRRT_gone", path="src/a.py", line=None)]
+    )
+
+    assert "src/a.py" in prompt
+
+
+def test_the_rework_prompt_pastes_none_of_the_finding_text() -> None:
+    """The thread is read from GitHub; a paste is a second copy that goes stale."""
+    prompt = traverse.rework_prompt(ISSUE, [thread()])
+
+    assert "falls back silently" not in prompt
+
+
+def test_the_rework_prompt_carries_the_resolution_rules() -> None:
+    """Reply on what you fixed; the next cycle's reviewer resolves what it verifies."""
+    prompt = traverse.rework_prompt(ISSUE, [thread()])
+
+    assert "gh api" in prompt
+    assert "Fixed in <sha>" in prompt
+    assert "resolve" in prompt
