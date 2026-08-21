@@ -73,9 +73,12 @@ permissions. This is accepted deliberately; a later pass may tighten it.
 **The reviewer read-only guarantee is enforced, not asked for.** A reviewer
 reports findings and never rewrites the work under review, and the harness holds
 it to that: `code-pr-review`, `bug-pr-review`, and `doc-pr-review` each pin
-`tools: Read, Grep, Glob, Bash`, so the file-writing tools are absent rather
-than merely discouraged by the prompt. The roster is accident-grade rather
-than containment — `Bash` sits on it because every GitHub write rides `gh`.
+`tools: Read, Bash`, so the file-writing tools are absent rather than merely
+discouraged by the prompt. The roster is accident-grade rather than
+containment — `Bash` sits on it because every GitHub write rides `gh`, and
+searching rides it too, this harness having no separate search tool. A pin
+naming a tool the harness does not have is discarded in silence, so a roster
+states only names the harness reports.
 
 From the first file-touching node on, the session is cwd-bound to the issue's
 worktree, which confines its file reach.

@@ -1,7 +1,7 @@
 ---
 name: bug-pr-review
 description: Runs a bug-hunting review over an issue's PR diff and posts its findings as threads on the PR, never editing code. Use when the software factory dispatches the code track at a review cycle.
-tools: Read, Grep, Glob, Bash
+tools: Read, Bash
 model: opus
 effort: xhigh
 ---

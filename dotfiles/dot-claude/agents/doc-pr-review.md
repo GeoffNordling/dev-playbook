@@ -1,7 +1,7 @@
 ---
 name: doc-pr-review
 description: Audits the documentation in an issue's PR against its brief, the doc standards, and the adjacent docs it must agree with, and attaches its findings as threads on the PR. Use when the software factory dispatches the doc track at a review cycle.
-tools: Read, Grep, Glob, Bash
+tools: Read, Bash
 model: opus
 effort: xhigh
 ---
