@@ -2,7 +2,7 @@
 name: issue-review-claims
 description: Audits a factory-bound issue brief's empirical claims — provenance grades, quoted passages, prototype citations — against the real repo, findings only. Use when a definition session dispatches the claims-audit lens of the issue-review beat before a leaf's verdict.
 disable-model-invocation: false
-model: opus
+model: sonnet
 effort: xhigh
 disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 argument-hint: "<issue-number>"
