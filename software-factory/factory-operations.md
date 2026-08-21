@@ -350,6 +350,12 @@ converges, escalates, or is killed:
    `build` against the open Blocking threads and goes round again.
    `cap-escalated` ends the traverse escalated.
 
+**`pr-ready` means converged on Blocking alone.** Only Blocking threads are
+weighed, so a pull request can end the loop `pr-ready` with Suggestion threads
+still open on it. That is a real state rather than an oversight — a Suggestion is
+dispositioned at the merge boundary, and until the user gets there it stays open
+and no cycle counts it against convergence.
+
 - **Code track.** `bug-pr-review` posts its bug findings; `code-pr-review` adds
   the fidelity and convention findings it does not cover.
 - **Doc track.** `doc-pr-review` audits the diff's documentation.
@@ -371,9 +377,9 @@ runs the identical code path — there is no resume branch and no label moves
 inside the loop. It costs one burned cycle number when a traverse dies after its
 reviews have posted, and the cap's clock is never turned back to pay for it.
 
-**A diff no review reads stops the traverse.** Every verdict rests on threads
-some review posted, so a cycle that elects nothing would find no Blocking thread,
-declare convergence, and hand back a pull request nobody had read.
+**A diff no review reads escalates.** Every verdict rests on threads some review
+posted, so a cycle that elects nothing would find no Blocking thread, declare
+convergence, and hand back a pull request nobody had read.
 
 ### Track rules
 
