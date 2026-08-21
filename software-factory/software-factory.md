@@ -45,9 +45,12 @@ flowchart LR
     end
 
     subgraph factory[Factory — autonomous]
-        build[build] -->|pushed| pr_review{pr_review}
-        pr_review -->|reject: rework| build
-        pr_review -->|approve, merge msg refreshed| done([merged])
+        build[build] -->|pushed| reviews[elected reviews, in parallel]
+        reviews -->|threads posted| verdict{verdict}
+        verdict -->|rework: Blocking open| build
+        verdict -->|cap: 4 cycles, still Blocking| stuck([escalated])
+        verdict -->|converged: no Blocking| ready[pr-ready]
+        ready -->|approve, merge msg refreshed| done([merged])
     end
 
     intake -->|simple| build
@@ -117,9 +120,15 @@ defined once in
 
 ## The factory
 
-`build` implements, and `pr_review` audits and takes the user's verdict before
-the user's final read and merge. A rejected review returns to `build`; nothing
-else re-enters. What each node does, who runs it, and under what contract is
+`build` implements, and `pr_review` audits in cycles. Each cycle runs the reviews
+the diff elects, all at once, and the verdict on what they posted is the
+traverse script's rather than anyone's judgment: it is computed from the pull
+request's thread state. Open Blocking threads send the issue back to `build` for
+another lap. None open is `pr-ready`, and the user's final read and merge follow.
+Blocking threads still open after four autonomous cycles end the traverse
+escalated — a pull request that is not converging on its own reaches the user
+rather than looping on. Nothing else re-enters. What each node does, who runs it,
+and under what contract is
 [factory-operations.md](/software-factory/factory-operations.md).
 
 ## Labels
