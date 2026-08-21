@@ -19,8 +19,7 @@ session in your final message.
 ## Read first
 
 - The issue under audit: `gh issue view $ARGUMENTS --json title,body,comments`.
-  The body is the brief; comments may carry probe records, rulings, and
-  verdict records.
+  The body is the brief; comments may carry probe records and rulings.
 - Its parent epic, if it has one — `gh issue view $ARGUMENTS --json parent`
   names it, since the body-and-comments read does not surface it: the epic's
   standing rulings bind the brief and calibrate this review.
@@ -61,8 +60,8 @@ and move on.
 - Installability audits stop at the approved words: placement, heading
   levels, and stitching into surrounding text are the builder's judgment —
   flag placement only where it would cause a wrong install.
-- Rulings already recorded on the issue or its epic — verdict records,
-  ruling comments, standing rulings — are settled; do not re-litigate them.
+- Rulings already recorded on the issue or its epic — ruling comments and
+  standing rulings — are settled; do not re-litigate them.
 - Zero findings is a valid and expected outcome. Do not manufacture
   findings and do not pad; a sweep that found nothing is one line.
 

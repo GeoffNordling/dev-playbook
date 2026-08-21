@@ -101,12 +101,12 @@ For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with
 
 ### 6. The issue-review beat — fast path only
 
-The two lenses are **your tools, not the user's** — you dispatch them, you rule on what they return, you repair the brief. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
+The two lenses are **your tools, not the user's** — latent instruments you run to sharpen your own brief before anyone reads it. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
 
 1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
-2. **Dispose of every finding yourself.** Merge and deduplicate both lenses' findings, then apply or demote each on your own judgment, editing the body until the brief is one you would hand an autonomous builder. Never stop to have the user rule: a finding you cannot resolve is something step 3 reports, not an interruption.
-3. **Post the verdict-record comment** — date, lenses run, findings count, disposition gist — then hand the user the issue URL, what the lenses caught, what you changed, and anything left unresolved. This is where they first read it, so finish it before this line.
-4. **On their approval, and only then, move the phase:** `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit, the verdict record its work order — always a full fresh run of both lenses.
+2. **Edit the brief in place.** Merge and deduplicate both lenses' findings, then apply or demote each on your own judgment, rewriting the body until it is a brief you would hand an autonomous builder. Never stop to have the user rule, and record nothing about the run on the issue — the repaired brief is the whole output.
+3. **Present the finished issue** — the URL, what you changed and why, and anything you could not resolve. This is where the user first reads it, so finish it before this line.
+4. **On their approval, and only then, move the phase:** `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit — always a full fresh run of both lenses.
 
 No label crosses out of the definition region on your own authority. The user may always skip the beat, cut it short, or advance anyway.
 

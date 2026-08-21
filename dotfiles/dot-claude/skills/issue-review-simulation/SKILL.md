@@ -19,8 +19,7 @@ dispatching session in your final message.
 ## Read first
 
 - The issue under audit: `gh issue view $ARGUMENTS --json title,body,comments`.
-  The body is the brief; comments may carry probe records, rulings, and
-  verdict records.
+  The body is the brief; comments may carry probe records and rulings.
 - Its parent epic, if it has one — `gh issue view $ARGUMENTS --json parent`
   names it, since the body-and-comments read does not surface it: the epic's
   standing rulings bind the brief and calibrate this review.
@@ -39,8 +38,8 @@ under the
 [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md)'s
 escalation rule. Resolvable ambiguity is not a finding. Do not audit
 installability to the letter. Rulings already recorded on the issue or its
-epic — verdict records, ruling comments, standing rulings — are settled; do
-not re-litigate them. Zero findings is a valid and expected outcome; do not
+epic — ruling comments and standing rulings — are settled; do not
+re-litigate them. Zero findings is a valid and expected outcome; do not
 manufacture findings to appear thorough.
 
 ## The question set

@@ -88,11 +88,12 @@ only when all four hold:
 - **A brief-complete body**, meeting the brief standard below; an
   under-specified leaf is not yet ready.
 - **Released at an issue-review verdict** — the definition session dispatched
-  the two review lenses, disposed of their findings itself, and the user
-  approved the finished issue; the verdict-record comment evidences it
+  the two review lenses, edited the brief from what they returned, and the user
+  approved the finished issue
   ([user-checkpoints.md](/software-factory/user-checkpoints.md#the-issue-review-verdict)).
-  Setting `phase:build` is that verdict's consequence, not a separate act. The
-  user may always skip or override the beat; the release is theirs either way.
+  `phase:build` is that verdict's consequence and its only evidence, not a
+  separate act. The user may always skip or override the beat; the release is
+  theirs either way.
   Factory-bound leaves only: a spike's deliverable is an answer, not a build,
   so a spike is ready on the first three conditions.
 

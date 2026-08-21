@@ -48,8 +48,9 @@ verdict — defined once in the
 
 What the crossing checks is the first three: each is observable on the issue,
 and an overwatch escalates when one fails. The release is a definition-region
-obligation — evidenced by the verdict-record comment, and overridable by the
-user — so the crossing takes it as given rather than re-deriving it. A rework
+obligation — carried by the `phase:build` label the user's approval sets, and
+overridable by them — so the crossing takes it as given rather than re-deriving
+it. A rework
 lap is not a crossing: the issue never left the factory, so nothing is
 re-checked.
 

@@ -123,22 +123,20 @@ though it had spends the user's one full read on work that is still moving.
 One decision checkpoint sits before the factory rather than inside it: the
 **issue-review verdict**, at the end of a factory-bound leaf's definition beat.
 The two fresh-context review lenses — **claims audit** and **implementation
-simulation** — are the session's tools, not the user's. The session dispatches
-both, merges and deduplicates their findings, and disposes of each on its own
-judgment, repairing the brief until an autonomous builder could be handed it. It
-never pauses for the user to rule on a finding. It then posts one
-**verdict-record comment** on the issue — date, lenses run, findings count,
-disposition gist — and only then brings the user a finished issue. The verdict
-is the user's:
+simulation** — are the session's tools, not the user's: latent instruments it
+runs to sharpen its own brief. The session dispatches both, merges and
+deduplicates their findings, and disposes of each on its own judgment, editing
+the brief in place until an autonomous builder could be handed it. It never
+pauses for the user to rule, and it records nothing about the run on the issue —
+the repaired brief is the whole output. It then brings the user a finished
+issue. The verdict is the user's:
 
-- **Ready** — the leaf moves to `phase:build`. No label crosses out of the
-  definition region before this.
+- **Ready** — the leaf moves to `phase:build`. That label is the release, and no
+  label crosses out of the definition region before it.
 - **Not ready** — asked-for changes are applied and the issue re-presented; a
   leaf sent back for re-authoring moves to `phase:design`, or stays there if it
   is a design-exit leaf. Re-review is a full fresh run of both lenses.
 
-The verdict record is the evidence behind the readiness bar's "released at an
-issue-review verdict" and, on a back-to-design, the next session's work order.
 The review binds the factory's autonomous path, never the user, who may always
 skip the beat, cut it short, or advance anyway.
 
