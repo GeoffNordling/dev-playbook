@@ -175,7 +175,6 @@ argv = sys.argv[1:]
 node = argv[argv.index("--agent") + 1]
 session = argv[argv.index("--session-id") + 1]
 prompt = argv[argv.index("-p") + 1]
-step = plan[node]
 with (here / "launched.jsonl").open("a") as log:
     log.write(
         json.dumps(
@@ -189,6 +188,19 @@ with (here / "launched.jsonl").open("a") as log:
         )
         + "\\n"
     )
+# This node's plan, read after its launch is in the log so a list can be
+# indexed by it: a plan given as a list runs its steps in launch order with the
+# last one repeating, which is how a node the loop launches more than once
+# answers differently the second time. Sequential nodes only — the reviews race
+# each other, so there is no launch order of theirs to plan against.
+step = plan[node]
+if isinstance(step, list):
+    mine = sum(
+        1
+        for line in (here / "launched.jsonl").read_text().splitlines()
+        if json.loads(line)["node"] == node
+    )
+    step = step[min(mine, len(step)) - 1]
 # A reviewer posts its cycle header before anything else, the way a real one
 # posts its review: the header is the loop's durable state, and the count is
 # this review name's own headers plus one.
@@ -333,19 +345,14 @@ REVIEWED_REPORT: dict[str, Any] = {
     "suggestion_count": 1,
 }
 
-# What the adjudicator returns — the envelope plus what it settled. `dispositions`
-# is the one thing the graph reads off a report rather than off GitHub: a fix-now
-# ruling is written nowhere durable, because the thread it names stays open and
-# unmarked for the next cycle's reviewer.
+# What the adjudicator returns on the run that leaves nothing behind it — the
+# envelope plus the suggestions it settled where they stood. A convergence can
+# report only this shape, because a fix-now there is a ruling with no lap left
+# to act on it.
 ADJUDICATED_REPORT: dict[str, Any] = {
     "outcome": "done",
-    "gist": "Three suggestions settled on PR #12.",
+    "gist": "Two suggestions settled on PR #12.",
     "dispositions": [
-        {
-            "thread": "PRRT_suggestion",
-            "outcome": "fix-now",
-            "fix": "name the constant as the review states",
-        },
         {
             "thread": "PRRT_deferred",
             "outcome": "defer",
@@ -353,6 +360,25 @@ ADJUDICATED_REPORT: dict[str, Any] = {
             "stub": 512,
         },
         {"thread": "PRRT_declined", "outcome": "decline", "reason": "no-consequence"},
+    ],
+    "callouts": [],
+}
+
+# What it reports when one suggestion is to ride the lap the Blocking threads
+# already necessitate. A fix-now ruling is the one thing the graph reads off a
+# report rather than off GitHub: it is written nowhere durable, because the
+# thread it names stays open and unmarked for the next cycle's reviewer. Only a
+# rework verdict can be answered with it — at a convergence there is no lap left
+# to carry the ruling.
+RULED_FIX_NOW: dict[str, Any] = {
+    "outcome": "done",
+    "gist": "One suggestion rides the coming lap on PR #12.",
+    "dispositions": [
+        {
+            "thread": "PRRT_suggestion",
+            "outcome": "fix-now",
+            "fix": "name the constant as the review states",
+        }
     ],
     "callouts": [],
 }
@@ -524,6 +550,11 @@ def clean_review() -> dict[str, Any]:
 def clean_adjudication() -> dict[str, Any]:
     """An adjudicator that settles its docket and reports what it settled."""
     return node_step([HOOK_LINE, init_line(), result_line(ADJUDICATED_REPORT)])
+
+
+def ruled_fix_now() -> dict[str, Any]:
+    """An adjudicator that rules one suggestion onto the coming rework lap."""
+    return node_step([HOOK_LINE, init_line(), result_line(RULED_FIX_NOW)])
 
 
 # The plan every fake claude starts from: every node clean, the build committing
@@ -788,7 +819,9 @@ def fake_claude(tmp_path: Path, world: Path) -> Callable[..., tuple[str, ...]]:
     script = here / "claude.py"
     script.write_text(FAKE_CLAUDE)
 
-    def plan(**steps: dict[str, Any]) -> tuple[str, ...]:
+    def plan(
+        **steps: dict[str, Any] | list[dict[str, Any]],
+    ) -> tuple[str, ...]:
         (here / "plan.json").write_text(
             json.dumps(
                 {
@@ -2119,6 +2152,22 @@ def test_the_rework_prompt_carries_each_fix_now_item_and_the_fix_it_asks_for() -
     assert "name the constant as the review states" in prompt
 
 
+def test_the_rework_prompt_asks_for_a_fix_marker_on_a_fix_now_thread_too() -> None:
+    """A fix-now thread has to show it was worked, the same as a Blocking one.
+
+    The reply instruction is stated once for the Blocking list and again for the
+    fix-now list, so a builder reading the second list on its own still leaves
+    the marker the next cycle's reviewer looks for.
+    """
+    prompt = traverse.rework_prompt(
+        ISSUE,
+        [thread(thread_id="PRRT_blocking")],
+        [traverse.FixNow(thread="PRRT_suggestion", fix="name the constant")],
+    )
+
+    assert prompt.count("Fixed in <sha>") == 2
+
+
 def test_a_rework_prompt_with_no_fix_now_item_offers_the_builder_none() -> None:
     """A lap with no suggestion ruled fix-now is the prompt as it always was."""
     prompt = traverse.rework_prompt(ISSUE, [thread()])
@@ -2474,17 +2523,21 @@ def test_a_rework_verdict_with_open_suggestions_adjudicates_before_the_next_buil
     db: Path,
     launched: Callable[[], list[dict[str, Any]]],
     stub_gh: Callable[..., tuple[str, ...]],
+    fake_claude: Callable[..., tuple[str, ...]],
     traverse_issue: Callable[..., Any],
 ) -> None:
     """The lap the Blocking threads already necessitate is what a fix now rides.
 
     So the adjudicator runs between the verdict and the relaunch: its ruling has
-    to exist before the prompt that carries it is assembled.
+    to exist before the prompt that carries it is assembled. It runs twice here,
+    and only the first run can rule a fix now — the second is the convergence,
+    which has no lap after it.
     """
     outcome = traverse_issue(
         gh_cmd=stub_gh(
             threads={1: [blocking_thread(), suggestion_thread()], 2: []},
-        )
+        ),
+        claude_cmd=fake_claude(adjudicator=[ruled_fix_now(), clean_adjudication()]),
     )
 
     assert decisions(db) == [
@@ -2612,6 +2665,33 @@ def test_a_fix_now_ruling_carrying_no_fix_ends_the_traverse_escalated(
 
     assert outcome.status == "escalated"
     assert payload_of(db, "traverse-escalation")["node"] == "adjudicator"
+    assert payload_of(db, "traverse-end") == {"status": "escalated"}
+
+
+def test_a_fix_now_ruling_at_convergence_ends_the_traverse_escalated(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    fake_claude: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A convergence has no lap left to carry a fix now, so the ruling stops it.
+
+    The definition downgrades a fix-now to a deferral once no lap remains, and a
+    run reporting one anyway has made a ruling this graph cannot act on: the
+    thread it names is deliberately left open, the fix text exists nowhere but
+    that report, and a traverse ending `pr-ready` would be saying a suggestion
+    is settled that nobody settled.
+    """
+    outcome = traverse_issue(
+        gh_cmd=stub_gh(threads={1: [suggestion_thread()]}),
+        claude_cmd=fake_claude(adjudicator=ruled_fix_now()),
+    )
+
+    assert outcome.status == "escalated"
+    escalation = payload_of(db, "traverse-escalation")
+    assert escalation["node"] == "adjudicator"
+    assert "converged" in escalation["reason"]
+    assert "rework lap" not in escalation["reason"]
     assert payload_of(db, "traverse-end") == {"status": "escalated"}
 
 

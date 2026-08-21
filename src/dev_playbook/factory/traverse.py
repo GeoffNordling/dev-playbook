@@ -132,8 +132,6 @@ DISPOSITION_OUTCOME = "outcome"
 THREAD = "thread"
 FIX = "fix"
 FIX_NOW = "fix-now"
-DEFER = "defer"
-DECLINE = "decline"
 CALLOUTS = "callouts"
 
 # What the adjudicator is launched under. The per-entry conditionals — `fix`
@@ -155,7 +153,7 @@ ADJUDICATOR_SCHEMA: dict[str, object] = {
                     THREAD: {"type": "string"},
                     DISPOSITION_OUTCOME: {
                         "type": "string",
-                        "enum": [FIX_NOW, DEFER, DECLINE],
+                        "enum": [FIX_NOW, "defer", "decline"],
                     },
                     FIX: {"type": "string"},
                     "reason": {"type": "string"},
@@ -319,7 +317,8 @@ its thread is being asked for:
 
 {items}
 
-Leave every one of them open, the same as the threads above."""
+Reply `Fixed in <sha>` on each one you fix, and leave every one of them open,
+the same as the threads above."""
 
 
 class TraverseError(Exception):
@@ -475,7 +474,7 @@ def _thread(node: Mapping[str, Any]) -> ReviewThread:
     )
 
 
-def _fix_now(report: Mapping[str, object] | None) -> tuple[FixNow, ...]:
+def _fix_now(report: Mapping[str, object] | None, verdict: str) -> tuple[FixNow, ...]:
     """The suggestions the adjudicator ruled the coming lap should carry.
 
     Read strictly, and never salvaged. A fix-now entry is a whole instruction —
@@ -485,6 +484,14 @@ def _fix_now(report: Mapping[str, object] | None) -> tuple[FixNow, ...]:
     unruled suggestion the ruling was there to replace. So a malformed entry
     ends the traverse in the node's own name rather than reaching a prompt with
     the ruling quietly missing from it.
+
+    The verdict the run was launched under is read as strictly. A fix-now is
+    work for the lap that follows, and a convergence has no lap that follows —
+    the definition downgrades the item to a deferral there. A ruling that
+    arrives anyway can be neither carried nor dropped: the thread it names is
+    left open by design, and the fix text is written on no thread, so a traverse
+    that read past it would end `pr-ready` saying a suggestion is settled that
+    nobody settled.
     """
     dispositions = (report or {}).get(DISPOSITIONS)
     if not isinstance(dispositions, list):
@@ -504,6 +511,12 @@ def _fix_now(report: Mapping[str, object] | None) -> tuple[FixNow, ...]:
             )
         if entry.get(DISPOSITION_OUTCOME) != FIX_NOW:
             continue
+        if verdict != REWORK:
+            raise _Escalated(
+                f"{ADJUDICATOR} ruled a suggestion {FIX_NOW} on a {verdict} "
+                f"run, where no lap remains to carry it: {dict(entry)!r}",
+                node=ADJUDICATOR,
+            )
         thread, fix = entry.get(THREAD), entry.get(FIX)
         if not isinstance(thread, str) or not isinstance(fix, str) or not fix.strip():
             raise _Escalated(
@@ -1260,7 +1273,7 @@ class _Traverse:
         outcome = self._launch(
             ADJUDICATOR, worktree, ADJUDICATOR_SCHEMA, f"{self.issue} {verdict}"
         )
-        return _fix_now(outcome.structured_output)
+        return _fix_now(outcome.structured_output, verdict)
 
     def _pull_request(self) -> _PullRequest:
         """The open pull request on this issue's branch, refused when there is none.
