@@ -2,7 +2,7 @@
 name: frozen-code-pr-review
 description: Audits the code in a direct-mode issue's PR against its issue brief and the project conventions — the copy frozen for the factory rebuild. Use when the frozen issue overwatch dispatches the code track at the `pr_review` stop.
 disable-model-invocation: false
-model: opus
+model: sonnet
 effort: xhigh
 disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(/tmp/**)

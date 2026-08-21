@@ -2,7 +2,7 @@
 name: frozen-bug-pr-review
 description: Runs a bug-hunting review over an issue's PR diff and posts its findings to the PR — the copy frozen for the factory rebuild. Use when the frozen issue overwatch dispatches the code track at a review stop.
 disable-model-invocation: false
-model: opus
+model: sonnet
 effort: xhigh
 disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(/tmp/**)

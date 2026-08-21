@@ -2,7 +2,7 @@
 name: code-pr-review
 description: Audits the code in a direct-mode issue's PR against its issue brief and the project conventions, and attaches its findings as threads on the PR. Use when the software factory dispatches the code track at a review cycle.
 tools: Read, Bash
-model: opus
+model: sonnet
 effort: xhigh
 ---
 

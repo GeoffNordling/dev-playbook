@@ -2,7 +2,7 @@
 name: frozen-doc-pr-review
 description: Audits the documentation in an issue's PR against its brief and the doc standards — the copy frozen for the factory rebuild. Use when the frozen issue overwatch dispatches the doc track at a review stop.
 disable-model-invocation: false
-model: opus
+model: sonnet
 effort: xhigh
 disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
 allowed-tools: Write(/tmp/**)
