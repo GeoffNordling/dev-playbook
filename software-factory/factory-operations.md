@@ -14,45 +14,54 @@ where it stops for the user is
 
 ## Dispatch
 
-The unit of dispatch is the **issue**. The user launches one **issue overwatch**
-per issue in **Agent view** — the official name of the `claude agents` dashboard
-— and that overwatch owns the issue's whole traverse: it reads the graph and
-executes it, delegating each node and stopping where the user must act. The node
-sequence is never hard-coded into any skill — the graph is the single source.
+The unit of dispatch is the **issue**, and the build region is dispatched by a
+program rather than by a session. `traverse-issue <owner/name> <issue> <mode>`
+carries an issue from its phase label to an open pull request: it takes the
+issue's lock, creates or reuses the worktree, launches `build` and `open-pr`, and
+ends `pr-ready` or `escalated`. Every branch in that sequence is conditional
+logic in the script; judgment happens only inside the agents it launches. From
+the review stop on, the **issue overwatch** — one session per issue, launched by
+the user in **Agent view**, the official name of the `claude agents` dashboard —
+still sequences the traverse and stops where the user must act.
 
 Two overwatch scopes, two screens:
 
-- **Agent-view overwatch** — fleet scope: reads the board,
-  recommends what to launch next, tears down worktrees after confirmed merges.
-- **Issue overwatch** — issue scope, one per issue: executes that
-  issue's traverse and surfaces the git commands the user must run.
+- **Agent-view overwatch** — fleet scope: reads the board and recommends what to
+  launch next.
+- **Issue overwatch** — issue scope, one per issue: sequences the review stop
+  onward and surfaces the commands the user must run.
 
-**Factory nodes only.** An issue overwatch executes the factory region and
-nothing else. Launched on an issue whose phase sits in
-[definition](/software-factory/software-factory.md#the-definition-region) — or on
-an unlabeled one — it refuses outright and names the skill the user should run
-instead. Definition is user-led by construction; an overwatch that improvised
-its way through intake would be extracting intent with nobody to extract it from.
+**One traverse per issue.** `traverse-issue` takes a non-blocking per-issue lock
+and exits at once, writing nothing, when another traverse of that issue holds it.
+Concurrency across issues is unbounded; concurrency within one is not.
 
-**Single label writer.** One writing session per issue — the session sequencing
-it. A subagent never writes a label; a skill run inline in the sequencing session
-writes as that session. Every label move is the overwatch's, made as a node
-finishes, so no subagent can advance the board out from under the session
-sequencing it.
+**Factory nodes only.** The factory region is all that is dispatched, by the
+script and by a session alike. An issue whose phase sits in
+[definition](/software-factory/software-factory.md#the-definition-region) — or an
+unlabeled one — is refused outright by both, and each says what it can:
+`traverse-issue` escalates naming the phase the issue carries and the phases it
+runs, and a session names the skill the user should run instead. Definition is
+user-led by construction; a dispatcher that improvised its way through intake
+would be extracting intent with nobody to extract it from.
 
-**Readiness at the crossing.** Two things gate a launch. The issue's phase must
-sit in the factory region, per the refusal above; and the issue must meet the
-readiness bar — a leaf, unblocked, brief-complete, released at an issue-review
-verdict — defined once in the
-[tracking standard](/standards/tracking/issue-authoring.md#readiness).
+**Single label writer.** One writer per issue moves its `phase:*` label. Across
+the build region that writer is `traverse-issue`, which moves the label only
+after verifying for itself what the node claims to have done; from the review
+stop on it is the sequencing session. A launched agent never writes a label, so
+nothing can advance the board out from under whatever is sequencing it.
 
-What the crossing checks is the first three: each is observable on the issue,
-and an overwatch escalates when one fails. The release is a definition-region
-obligation — carried by the `phase:build` label the user's approval sets, and
-overridable by them — so the crossing takes it as given rather than re-deriving
-it. A rework
-lap is not a crossing: the issue never left the factory, so nothing is
-re-checked.
+**Readiness at the crossing.** An issue must meet the readiness bar — a leaf,
+unblocked, brief-complete, released at an issue-review verdict — defined once in
+the [tracking standard](/standards/tracking/issue-authoring.md#readiness). The
+whole bar is a definition-region obligation, carried across the crossing by the
+`phase:build` label the user's approval sets.
+
+`traverse-issue` re-derives none of it. The phase label is the program counter
+and the only readiness signal read back: `phase:build` runs build then open-pr,
+`phase:pr-review` runs open-pr alone, and any other phase — or none, or more than
+one — escalates. `mode:spike` is read ahead of the phase and refused on sight,
+because a spike opens no pull request for this graph to reach. Asking anything
+further here would let a script overrule a decision that is the user's.
 
 ## Permissions
 
@@ -92,118 +101,158 @@ Canonical front-matter and syntax:
 Each node engages the user one of two ways — the terms themselves are fixed in
 [the vocabulary](/CONTEXT.md):
 
-- **AFK** — the overwatch delegates the node to a subagent, which does the work
-  hands-off and reports. The user sees only the report.
-- **Inline** — the overwatch runs the node itself at its own main loop, with the
-  user present in the terminal.
+- **AFK** — the node runs hands-off and reports. The user sees only the report.
+- **Inline** — a session runs the node at its own main loop, with the user
+  present in the terminal.
 
-A review node (a diamond) is several AFK delegations followed by the overwatch's
-own verdict interview, sequenced within the one node.
+A review node (a diamond) is several AFK runs followed by the sequencing
+session's own verdict interview, within the one node.
 
 ### The dispatch table
 
 The factory's nodes, what runs each, and how each engages the user:
 
-| Node | Skill | Engagement |
+| Node | Run by | Engagement |
 |---|---|---|
-| `build` | `/build` | AFK. |
-| `pr_review` | `/open-pr` first, always, then the [track](#track-rules) skills | AFK per skill, then the user's verdict on the whole stop ([pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict)). |
+| `build` | the `build` agent definition, launched by `traverse-issue` | AFK. |
+| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [track](#track-rules) reviewer definitions | AFK per node, then the user's verdict on the whole stop ([pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict)). |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the user and never dispatched,
-and the `spike` node has no skill at all.
+and the `spike` node has no runner at all.
 
-**Delegation.** An AFK node is delegated to a subagent whose prompt is the launch
-line `run /<skill> <N>` and nothing more — nodes stay skills. The subagent gets a
-fresh context window and inherits the issue's worktree as cwd; it reloads what it
-needs from the issue (`gh issue view <N>`) and the worktree, does the work, and
-ends with a terminal report. Nothing carries over from the overwatch's context.
-A helper a skill invokes itself (`/commit`,
-`/grill-with-docs`) is not a node and is never dispatched.
+**Headless launch.** `build` and `open-pr` are typed agent definitions in
+`dotfiles/dot-claude/agents/`, and `traverse-issue` launches each as its own
+headless `claude -p` process under `--agent <name>`. Model, effort, and tool
+roster all bind from the definition's frontmatter — the launch adds no flag that
+would outrank them. The process is given the issue's worktree as its cwd and one
+hour on the wall clock, and its stream is watched live: a run placed outside its
+worktree, or billed to anything but the subscription, is killed rather than
+allowed to finish.
 
-**The terminal report contract.** A subagent's final message MUST begin at
-character one with exactly `DONE: <one-line outcome>` or
-`ESCALATE: <one-line reason>`; detail follows below. Any non-matching final
-message is treated as ESCALATE — malformed fails safe, toward the user. What the
-overwatch does with an escalation is
-[user-checkpoints.md](/software-factory/user-checkpoints.md#escalation).
+**The fixed prompt.** The prompt is the issue number and nothing else. Everything
+a node needs it reloads for itself — the brief from `gh issue view <N>`, the work
+so far from the worktree — so nothing carries over from whatever launched it, and
+two launches of one node at one issue are given identical input.
+
+**The report envelope.** A launched node ends on structured output, never a
+message alone: a required top-level `outcome` of `"done"` or `"escalated"`, and a
+`gist` in prose. The launch is refused a report that does not validate. Nothing
+else is read from it — what the traverse needs next is durable in git and on
+GitHub, and it reads it from there rather than taking the agent's word, so a
+node's claim never advances the board on its own.
+
+**The terminal report contract.** A subagent delegated by a session — the track
+reviews — MUST begin its final message at character one with exactly
+`DONE: <one-line outcome>` or `ESCALATE: <one-line reason>`; detail follows
+below. Any non-matching final message is treated as ESCALATE — malformed fails
+safe, toward the user. What a session does with an escalation is
+[user-checkpoints.md](/software-factory/user-checkpoints.md#escalation). A helper
+invoked inside a node (`/commit`, `/grill-with-docs`) is not a node and is never
+dispatched.
+
+**Escalation is terminal, and retries are the caller's.** A traverse runs no node
+twice. Any way a job comes back other than a clean process reporting `done` — the
+node's own `escalated`, a crash, the deadline, a refused report, a misconfigured
+run — ends the traverse on `traverse-escalation` then `traverse-end`. The
+escalating node's own label move is what does not happen; a move an earlier node
+in the same traverse already made stands. So a retry — the caller invoking
+`traverse-issue` again from the top — resumes at whatever phase the last node to
+finish left behind, not at the phase the traverse started on: a build that
+verified and then an `open-pr` that escalated leaves `phase:pr-review`, and the
+next invocation runs `open-pr` alone.
 
 ## Worktrees and branches
 
-An issue runs under one issue overwatch that builds a continuous line of work
-across its nodes. Isolation — from other issues and from the main checkout —
-comes from giving each issue its own **git worktree**, opened once and kept for
-the issue's life.
+An issue's work is isolated — from other issues and from the main checkout — by
+giving each issue its own **git worktree**, created once and kept for the issue's
+life.
 
 - **One worktree, one branch, one PR per issue,** at
   `<repo>/.claude/worktrees/issue-<N>` on branch `issue-<N>` (`N` is the issue
   number).
-- **Opened once, then persisted.** cwd and worktree survive a `/clear`, so an
-  overwatch re-invoked after one inherits them with no re-entry.
+- **Created once, then persisted.** The worktree outlives every session that
+  works in it, so each node arrives at a tree the last one left.
 
 ### The worktree contract
 
-Every file-touching node sits in the issue's worktree:
+The worktree's whole lifecycle belongs to `traverse-issue`, not to anything
+running inside it. A node never creates, enters, or removes one: the script
+creates the tree before the first launch and hands it to every node as its
+working directory.
 
-- **Open (first file-touching node).** The issue overwatch opens it, gated on a
-  check that the local `origin/main` ref matches origin
-  (`git rev-parse origin/main` against `gh api …/branches/main`); on a stale
-  base the overwatch pulls the main checkout current and re-checks. Open with
-  `EnterWorktree(name=issue-<N>)`, which branches from `origin/main` because
-  `worktree.baseRef` is pinned to `fresh` in user `settings.json` — so the base is
-  `origin/main` whatever branch the main checkout sits on. Then rename the branch
-  to the bare `issue-<N>`: Agent view's cleanup keys on the `worktree-` prefix, so
-  dropping it lets the worktree outlive a torn-down session.
-- **Inherit (everything after).** AFK subagents inherit the worktree as their
-  cwd; the overwatch keeps it across `/clear`. Every later node confirms the
-  worktree is present — escalating if it's gone, since the issue's work would be
-  lost.
-- **Tear down (Agent-view overwatch, post-merge).** When the issue lands, the
-  Agent-view overwatch removes the local side —
-  `git worktree remove .claude/worktrees/issue-<N>` and
-  `git branch -D issue-<N>` — only after the user confirms the merge happened. A
-  spike's worktree goes the same way when its issue closes.
+- **Create or reuse (the traverse, before its first node).** A worktree already
+  at the path is reused exactly as found — no freshness check and no rebase,
+  because whether work in flight should move onto a newer `main` is a judgment
+  about the issue rather than about this run. What is checked is that it is one:
+  `git worktree list --porcelain` must register it, on branch `issue-<N>`, and a
+  bare directory left behind by a refused removal escalates instead. Otherwise
+  the traverse fetches `origin/main`, compares the fetched ref against origin
+  (`git rev-parse origin/main` against
+  `gh api repos/<owner>/<name>/branches/main` — the slug written out, because gh
+  fills the `{owner}/{repo}` placeholders from the repo of the current directory
+  and the traverse runs from wherever it was launched), escalates if the base is
+  still stale, and branches `issue-<N>` from `origin/main`.
+- **Inherit (every node).** Each node is launched with the worktree as its cwd
+  and does its work there.
+- **Remove (the user).** A merged issue's worktree and branch are removed by
+  hand — `git worktree remove .claude/worktrees/issue-<N>` and
+  `git branch -D issue-<N>`.
 
 **The branch is pushed as it is committed.** A committing node pushes what it
 commits — the push is part of `/commit` — so the branch is on origin whenever
-the node ends, verified by the pre-push hook's full `make check` on the way
-out.
+the node ends, verified by the pre-push hook's full `make check` on the way out.
+The traverse then checks that for itself, and all four checks precede the label
+move: the worktree is on `issue-<N>` rather than a detached HEAD, it has nothing
+uncommitted, `issue-<N>` is on origin at all, and it is there at the sha the
+worktree holds. The last one alone
+would not do — neither sha moves when a node edits and never commits, so on a
+rework lap, where the branch is already on origin when the node starts, the
+comparison would agree with itself and pass over work the pull request will never
+show.
 
 ## The node-skill contract
 
-A node skill does the node's work and reports; the issue overwatch launches it,
-sequences what follows, and writes the labels. This contract fixes structure; the
-authoring *style* behind the skills — voice, content, robustness, mechanics —
-lives in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md).
+A node does the node's work and reports; what launched it sequences whatever
+follows and writes the labels. The contract binds both kinds of node — the typed
+agent definitions the traverse launches and the skills a session dispatches —
+and four clauses below say where the two differ. This contract fixes structure;
+the authoring *style* behind both — voice, content, robustness, mechanics — lives
+in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md).
 
-- **Read first.** When a skill has required reading, it front-loads a
-  `## Read first` section ending in a `READ: <files>` confirmation; when it has
-  none, it omits the section entirely.
-- **Worktree.** Every file-touching node sits in the issue's worktree before
-  doing anything else, per [the worktree contract](#the-worktree-contract), and
-  escalates when it is missing.
-- **AFK** — the skill runs hands-off and terminates per
-  [the terminal report contract](#engagement): `DONE:` on success, `ESCALATE:`
-  when stuck. Each skill states its own escalation triggers in its body.
+- **Read first.** When a node has required reading, it front-loads that reading
+  and closes it with a `READ: <files>` confirmation before it edits anything;
+  when it has none, it carries neither. The confirmation is what binds — where
+  it sits is the node's own: a skill puts it under a `## Read first` heading, a
+  definition may fold it into a numbered step of its own.
+- **Worktree.** Every file-touching node does its work in the issue's worktree.
+  A definition is placed there by `traverse-issue`, which owns the whole
+  lifecycle per [the worktree contract](#the-worktree-contract) and never asks
+  the node to create or enter one; a skill dispatched by a session inherits it as
+  cwd.
+- **AFK** — the node runs hands-off. A definition terminates on
+  [the report envelope](#engagement); a skill terminates per
+  [the terminal report contract](#engagement), `DONE:` on success and
+  `ESCALATE:` when stuck. Each states its own escalation triggers in its body.
 - **Inline** — a skill the user invokes directly, as the definition region's
   are, may gate on interviews and approvals, asked in prose at the terminal.
-- **The report line.** Every node closes on one ` · `-delimited line: the handle
+- **The report line.** A skill closes on one ` · `-delimited line: the handle
   `<repo>#<N>` · `phase: <node>`. A committing node appends
   `commit <sha> · check green · pushed`; a node whose real output landed on
   GitHub appends a pointer only (`findings on PR #<n>`, `brief in issue`), never
   a re-paste — the line points, GitHub holds the detail. An AFK skill carries it
-  on the `DONE:`/`ESCALATE:` line per
-  [the terminal report contract](#engagement); an inline skill omits the token
-  and closes with the line alone.
+  on the `DONE:`/`ESCALATE:` line; an inline skill omits the token and closes
+  with the line alone. A definition carries the same content as the envelope's
+  `gist` instead, because nothing parses its prose.
 - **Gate.** A committing node runs `make check` — the full gate, not just the
   commit hooks — before finishing its phase; a phase never closes over a red
   tree. The rule is per-phase, not per-commit: individual commits are already
   covered by the commit gate's hook suite, and the full gate is the phase-close
   ritual.
-- **Judgments sit outside every node skill.** `make check` leaves the semantic
-  [cache gate](/standards/judgments/cache-gate.md) skipped, and no node skill
-  arms it or runs a judge — judgments are settled by the periodic sweep, outside
-  the factory. For a **review** skill the exclusion is total: the
+- **Judgments sit outside every node.** `make check` leaves the semantic
+  [cache gate](/standards/judgments/cache-gate.md) skipped, and no node arms it
+  or runs a judge — judgments are settled by the periodic sweep, outside the
+  factory. For a **review** skill the exclusion is total: the
   `judgments/*.yaml` declarations are outside its jurisdiction
   whether or not the diff changes them, and a judgment — its content, its
   verdict, or its cache state — appears nowhere in its findings. A stale or red

@@ -48,8 +48,9 @@ Governs how an idea becomes a merged pull request.
 
 ## Adopt
 
-- the typed agent definitions in `dotfiles/dot-claude/agents/` and the skills in
+- `scripts/traverse-issue`, the build region's entry point, plus the typed agent
+  definitions in `dotfiles/dot-claude/agents/` and the skills in
   `dotfiles/dot-claude/skills/` — the intake and design skills carry an issue to
-  ready; the `build`, `open-pr`, `bug-pr-review`, `code-pr-review`, and
-  `doc-pr-review` definitions carry it to merge
-  ([delegation](/software-factory/factory-operations.md#engagement))
+  ready; the traverse launches the `build` and `open-pr` definitions, and the
+  `bug-pr-review`, `code-pr-review`, and `doc-pr-review` definitions carry it to
+  merge ([headless launch](/software-factory/factory-operations.md#engagement))

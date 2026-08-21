@@ -7,6 +7,7 @@ and which are absent.
 """
 
 import json
+import signal
 import sqlite3
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import closing, contextmanager
@@ -15,6 +16,20 @@ from pathlib import Path
 from typing import NamedTuple
 
 DB_PATH = Path("~/.local/share/claude-measure/events.db").expanduser()
+
+# The signals whose handlers write to this ledger, held off for the length of
+# every write. A traverse traps exactly these two and writes the books from the
+# trap -- `traverse.TRAPPED` is this tuple, so the pair cannot drift into a
+# signal that is trapped here and not deferred there.
+#
+# The invariant that makes holding them off work: **every thread any process
+# writing to this ledger starts must block these two.** Blocking them on the
+# writing thread alone is not enough -- CPython runs the C handler on whichever
+# thread the kernel picks and the main thread then runs the Python handler at
+# its next bytecode boundary regardless of its own mask, so one unblocked
+# thread anywhere is a route back into the write. `launcher._pump` is the one
+# thread this system starts, and it blocks them on entry.
+DEFERRED_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
 # Concurrent traverses write to one database. WAL lets their readers and
 # writers coexist, and the busy timeout makes a collision queue rather than
@@ -159,10 +174,17 @@ ORDER BY l.session_id
 # launcher's business and passes through uninterpreted.
 #
 # The vocabulary is closed and this module owns it: a `traverse-end` carries the
-# status `traverse_issue` exited with, and those are the two terminal statuses
-# the graph has. `traverse_end` refuses anything else at the door, so adding a
+# status the traverse exited with, and those are the three terminal statuses the
+# graph has. `traverse_end` refuses anything else at the door, so adding a
 # terminal status is an edit here -- which is the point: the ledger is where a
 # launcher's typo surfaces, and it surfaces at the write.
+#
+# `killed` is the one no `traverse_issue` return carries. It is written from the
+# kill trap, where the traverse is being taken down mid-flight and no value can
+# be returned to anyone -- and it has to be in the vocabulary, because a trap
+# whose last write raises leaves the window open and every job of that issue
+# reading as live for good. It closes a window like any other end and is never
+# `pr-ready`, so `awaiting_merge` passes over it without a clause of its own.
 #
 # A tuple, not a set: membership on a tuple compares rather than hashes, so an
 # unhashable status -- a list, an object -- is judged unrecognised instead of
@@ -170,7 +192,8 @@ ORDER BY l.session_id
 STATUS = "status"
 PR_READY = "pr-ready"
 ESCALATED = "escalated"
-STATUSES = (PR_READY, ESCALATED)
+KILLED = "killed"
+STATUSES = (PR_READY, ESCALATED, KILLED)
 
 
 def _names(value: object) -> bool:
@@ -228,10 +251,10 @@ def _gate(**address: object) -> None:
 def _gate_status(payload: Mapping[str, object]) -> None:
     """Refuse a `traverse-end` carrying a status the graph never exits on.
 
-    Beside the address gate, and for the same reason: `traverse_issue` ends
-    `pr-ready` or `escalated` and nothing else, so a payload carrying anything
-    outside that is a launcher's typo. It is a caller bug, raised as
-    `ValueError` and before the store is touched, so nothing is written.
+    Beside the address gate, and for the same reason: a traverse ends on one of
+    `STATUSES` and nothing else, so a payload carrying anything outside that is
+    a launcher's typo. It is a caller bug, raised as `ValueError` and before the
+    store is touched, so nothing is written.
 
     This is the only writer of a `traverse-end`, and judging a status needs no
     sight of any other row -- so the judgment belongs here, where the caller who
@@ -328,6 +351,29 @@ def _require_wal(connection: sqlite3.Connection, db_path: Path) -> None:
 
 
 @contextmanager
+def _uninterrupted() -> Iterator[None]:
+    """Hold the deferred signals off for the length of the block.
+
+    Python runs a signal handler on the main thread at an arbitrary bytecode
+    boundary, so without this one can land in the middle of a write -- and a
+    traverse's handler writes to this ledger. Its own INSERT would then queue
+    behind a write lock only the thread it interrupted can release, wait out
+    `BUSY_TIMEOUT_SECONDS`, and leave as `LedgerError` from inside a handler:
+    the `killed` end never lands, and the window it exists to close stays open
+    for good.
+
+    The whole mask is restored rather than the two signals unblocked, so a
+    write reached from inside a block that already blocked them -- the trap's
+    own sweep is one -- leaves them blocked on the way out.
+    """
+    previous = signal.pthread_sigmask(signal.SIG_BLOCK, DEFERRED_SIGNALS)
+    try:
+        yield
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous)
+
+
+@contextmanager
 def _ledger(db_path: Path) -> Iterator[sqlite3.Connection]:
     """The store, open in one transaction, table present, WAL on, timeout set.
 
@@ -387,6 +433,11 @@ def _append(
     Storage plumbing, and nothing else: the address arrives already judged by
     `_gate`, one level up.
 
+    The two deferred signals are held off for the length of the write, which is
+    what keeps a trap that writes the books out of the middle of one -- see
+    `_uninterrupted`. The encoding happens outside that hold, because it is not
+    the transaction and a signal is free to land there.
+
     The payload is encoded before the store is touched, so a payload that will
     not serialize raises with nothing written. `allow_nan=False` puts a NaN or
     an infinity in that class: `json.dumps` would otherwise write them as bare
@@ -400,7 +451,7 @@ def _append(
     """
     encoded = json.dumps(dict(payload), allow_nan=False)
     received_at = datetime.now(UTC).isoformat(timespec="microseconds")
-    with _ledger(db_path) as connection:
+    with _uninterrupted(), _ledger(db_path) as connection:
         connection.execute(
             INSERT, (received_at, kind, repo, issue, node, session_id, encoded)
         )

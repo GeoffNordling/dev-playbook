@@ -1,10 +1,20 @@
-"""The job launcher — one factory node launch, preflight through spawn to a ledgered job."""
+"""The job launcher — one factory node launch, preflight through spawn to a ledgered job.
 
+Linux only, and at import: every child is spawned under `PR_SET_PDEATHSIG` so
+a launcher that dies untrappably cannot leave a claude session running on the
+subscription, and `prctl` is a Linux syscall with no portable equivalent. The
+module refuses to import anywhere else, by name, rather than failing later on a
+symbol nobody would connect to the requirement.
+"""
+
+import ctypes
 import json
 import os
 import queue
 import shutil
+import signal
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -72,6 +82,20 @@ DEADLINE_SECONDS = 3600.0
 GRACE_SECONDS = 30.0
 MILLISECONDS = 1000.0
 
+# `prctl`'s "signal me when my parent dies" operation, from <linux/prctl.h>.
+# Every child is spawned under it, so a launcher that dies untrappably — SIGKILL,
+# the OOM killer — still takes its child down with it rather than leaving a
+# claude session running on the subscription with nobody watching it. The trap
+# in the traverse covers the signals a process can catch; this covers the two it
+# cannot, and the next traverse's orphan sweep completes the books either way.
+PR_SET_PDEATHSIG = 1
+
+# What a child exits with when it finds its launcher already gone between the
+# fork and the `prctl`. Nobody reads it — the process that would have is the
+# one that died — so its whole job is to be a value no claude run produces, for
+# whoever finds it in a process accounting log.
+EXIT_ORPHANED = 124
+
 # How long the supervisor waits on a silent queue before looking at the child
 # itself. It is what lets supervision end when the child ends rather than when
 # the last writer closes the pipe, and it is a quiet period rather than a bare
@@ -97,10 +121,22 @@ INIT_CWD = "cwd"
 INIT_API_KEY_SOURCE = "apiKeySource"
 SUBSCRIPTION = "none"
 
-# The report the harness validated, and the one key inside it the task layer
-# reads. Every node schema carries a required top-level `outcome`, so this one
-# key answers for node shapes no query has to know about.
+# The keys a `job-report` payload is written under, named here rather than typed
+# into each writer. The launcher is not the only one: the traverse's sweep files
+# this row for a job whose launcher is gone, and a key spelled differently on
+# either side is a row `factory-status` reads as missing what it plainly holds.
+#
+# `STRUCTURED_OUTPUT` doubles as the key in the harness's own result envelope
+# that the report is lifted from, and `OUTCOME` is the one key inside that
+# report the task layer reads — every node schema carries a required top-level
+# `outcome`, so it answers for node shapes no query has to know about. `KILL`
+# names the key; its values are the two `SIGTERM`/`SIGKILL` words above.
+PROCESS_OUTCOME = "process_outcome"
+TASK_OUTCOME = "task_outcome"
 STRUCTURED_OUTPUT = "structured_output"
+EXIT_CODE = "exit_code"
+KILL = "kill"
+ALARM = "alarm"
 OUTCOME = "outcome"
 
 # Accounting lifted off the result envelope onto the `job-report` row, plus the
@@ -124,6 +160,39 @@ class LaunchAborted(LauncherError):
 
 class HarnessContractViolation(LauncherError):
     """The harness broke a measured promise mid-flight, so no outcome can be read."""
+
+
+# The C library this process already has open, and the one function taken out of
+# it. `CDLL(None)` asks for the running program's own symbols rather than naming
+# a soname, which is what makes this hold wherever the interpreter itself links
+# its libc. It sits below the exceptions rather than with the other constants
+# because the platform it needs is checked here, and the refusal is one of them.
+#
+# `prctl` is Linux's alone. Unguarded, `dlsym` returns NULL anywhere else and
+# `CDLL.__getattr__` raises `AttributeError: undefined symbol: prctl` at import
+# — from all three factory suites at collection and from `scripts/traverse-issue`
+# before it can print its usage, none of it naming the real requirement.
+#
+# The pointer is bound here, and that binding is the whole safety argument.
+# `CDLL(None)` opens a handle and resolves nothing; the symbol is looked up by
+# `CDLL.__getattr__`, which calls `dlsym` and takes the dynamic loader's lock.
+# What runs between fork and exec must be async-signal-safe and a lock is not, so
+# a parent thread holding that one at the moment of the fork would wedge the
+# child forever. Reaching for `LIBC.prctl` in the child would also repeat the
+# lookup on every single launch, never once: the attribute cache the lookup fills
+# is written on the child's copy, and the child execs straight after. So the
+# binding cannot be deferred past import, and the platform is named instead.
+if sys.platform != "linux":
+    raise LauncherError(
+        f"the factory launcher runs on linux only and this is {sys.platform!r}: "
+        f"every child is spawned under PR_SET_PDEATHSIG, a prctl operation with "
+        f"no portable equivalent, so a child here could outlive its launcher"
+    )
+
+LIBC = ctypes.CDLL(None, use_errno=True)
+PRCTL = LIBC.prctl
+PRCTL.argtypes = (ctypes.c_int, ctypes.c_ulong)
+PRCTL.restype = ctypes.c_int
 
 
 @dataclass(frozen=True)
@@ -500,6 +569,64 @@ class _Run:
     dropped: bool = False
 
 
+def _die_with_parent(launcher: int) -> None:
+    """Ask the kernel to SIGTERM this process the moment its parent dies.
+
+    Runs in the child, between the fork and the exec, and does two syscalls —
+    one through the function pointer bound at import (see `PRCTL` for why the
+    lookup cannot happen here), and one to close the race the first leaves.
+
+    The kernel fires the death signal only for a parent that dies *after* the
+    flag is set, so a launcher SIGKILLed or OOM-killed in the window between
+    the fork and the `prctl` leaves a child already reparented and never
+    signalled — a full hour of claude on the subscription with nobody watching
+    it, which is the one outcome this function exists to rule out. So the
+    parent is read back afterwards: a `getppid` that no longer names the
+    launcher means the death happened inside the window, and the child leaves
+    now rather than being the orphan the flag was meant to prevent.
+
+    The flag survives the exec that follows, so it is claude itself the kernel
+    signals, and it is set unconditionally: a launcher that is SIGKILLed or
+    OOM-killed runs no cleanup of its own, and this is the only thing standing
+    between that and a claude session billed to the subscription with nobody
+    watching it.
+
+    A refused `prctl` raises rather than being logged and passed over, and
+    nothing spawns — which is the right trade: the alternative is a child the
+    launcher silently cannot guarantee it can take down.
+
+    What the parent is told, though, is not this exception. `_posixsubprocess`
+    reports any `preexec_fn` failure over the error pipe as the fixed triple
+    `SubprocessError:0:Exception occurred in preexec_fn.`, so the type, the
+    message and the errno are all discarded before `Popen` reconstructs it —
+    an `OSError` raised here fares no better, because the errno the parent
+    would rebuild from is the one the pipe did not carry. The reason is
+    therefore written to fd 2 first, which `_spawn` leaves as the launcher's
+    own stderr, so the operator gets the errno even though the parent's
+    exception is a bare `SubprocessError`.
+
+    That write and the raise are on the failure path, where async-signal-safety
+    is already lost and the child is about to die either way. The success path —
+    the one every launch takes — is the single syscall above it.
+
+    A `preexec_fn` in a process that has threads is the documented hazard here,
+    and the traverse does launch a second node while the first launch's pump
+    thread can still be alive — a grandchild holding stdout open outlives the
+    `_watch` that stopped waiting for it. That thread is blocked in a read
+    syscall, holding no allocator lock, which is what makes the fork safe; the
+    lookup that would need one was done at import.
+    """
+    if PRCTL(PR_SET_PDEATHSIG, signal.SIGTERM) != 0:
+        refusal = (
+            f"the kernel refused PR_SET_PDEATHSIG for this child, so it could "
+            f"outlive its launcher: {os.strerror(ctypes.get_errno())}"
+        )
+        os.write(2, f"{refusal}\n".encode())
+        raise LauncherError(refusal)
+    if os.getppid() != launcher:
+        os._exit(EXIT_ORPHANED)
+
+
 def _supervise(
     argv: list[str],
     worktree: Path,
@@ -527,6 +654,7 @@ def _supervise(
     locale says, so a machine running under an ASCII locale would otherwise
     turn ordinary output into a decode failure.
     """
+    launcher = os.getpid()
     with open(os.devnull) as no_input:
         process = subprocess.Popen(
             argv,
@@ -536,6 +664,10 @@ def _supervise(
             stdout=subprocess.PIPE,
             text=True,
             encoding="utf-8",
+            # Forces the fork-and-exec path, which is the point: `posix_spawn`
+            # has no hook to set the death signal in the child, and the child is
+            # the only place it can be set.
+            preexec_fn=lambda: _die_with_parent(launcher),
         )
     stream = process.stdout
     if stream is None:
@@ -560,6 +692,17 @@ def _supervise(
 def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
     """Move the child's stdout onto the queue, closing it with what ended the read.
 
+    The first thing it does is block the ledger's deferred signals, under the
+    invariant every thread this process starts is held to: **a thread that does
+    not block `DEFERRED_SIGNALS` is a thread the kernel can hand one to.** A
+    Python handler runs on the main thread at its next bytecode boundary
+    whatever that thread's own mask says, so one unblocked thread anywhere puts
+    the traverse's trap right back inside the write `ledger._uninterrupted`
+    blocked it out of -- and the handler's own INSERT then queues behind a lock
+    only the frame it interrupted can release. The mask is set here rather than
+    before `start()` so the rule holds against whatever the starting thread
+    happened to be carrying.
+
     The close sits in a `finally` because a pump that dies without one leaves
     `_watch` blocked on a queue nothing will fill again: it waits out the whole
     deadline, SIGTERMs a child that finished long before, and files a clean run
@@ -573,6 +716,7 @@ def _pump(stream: IO[str], lines: queue.Queue[str | Exception | None]) -> None:
     then blocks until that stray process lets go — so the fd goes back when the
     read really ends, and nobody waits on it in the meantime.
     """
+    signal.pthread_sigmask(signal.SIG_BLOCK, ledger.DEFERRED_SIGNALS)
     ended: Exception | None = None
     try:
         with stream:
@@ -858,14 +1002,14 @@ def _payload(
 ) -> dict[str, object]:
     """The `job-report` row's payload, composed from everything the run left behind."""
     payload: dict[str, object] = {
-        "process_outcome": process_outcome,
-        "task_outcome": task_outcome,
+        PROCESS_OUTCOME: process_outcome,
+        TASK_OUTCOME: task_outcome,
         STRUCTURED_OUTPUT: report,
         # On every row, not just the ones carrying a result envelope: the exit
         # code comes from `process.wait`, never off the envelope, and a `died`
         # run has no envelope at all — so this is the one thing that separates
         # exit 1 from a segfault from an OOM kill for whoever reads the row.
-        "exit_code": run.exit_code,
+        EXIT_CODE: run.exit_code,
     }
     if run.result is not None:
         # Accounting, recorded as the harness reported it and never re-asserted.
@@ -880,7 +1024,7 @@ def _payload(
         if duration_ms is not None:
             payload["duration_s"] = _seconds(duration_ms)
     if run.kill is not None:
-        payload["kill"] = run.kill
+        payload[KILL] = run.kill
     if run.alarm is not None:
-        payload["alarm"] = run.alarm
+        payload[ALARM] = run.alarm
     return payload

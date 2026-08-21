@@ -1,5 +1,6 @@
 import inspect
 import json
+import signal
 import sqlite3
 import time
 import uuid
@@ -427,6 +428,36 @@ def test_a_job_writer_stores_its_kind_both_grain_columns_and_payload(
     assert json.loads(row["payload"]) == {"note": kind}
 
 
+def test_a_write_holds_off_the_signals_a_trap_writes_its_books_from(
+    db_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A handler that landed inside a write would deadlock against it.
+
+    The trap runs on the thread it interrupted, so a handler reached mid-write
+    queues its own INSERT behind a write lock only that suspended thread can
+    release: it waits out the busy timeout and leaves as `LedgerError`, and the
+    `killed` end that closes the traverse's window never lands.
+
+    The mask is read at the moment the store is opened, which is inside the
+    write and the only place from which the answer means anything.
+    """
+    during: list[set[int]] = []
+    opening: Callable[..., sqlite3.Connection] = sqlite3.connect
+
+    def watched(*arguments: Any, **keywords: Any) -> sqlite3.Connection:
+        during.append(set(signal.pthread_sigmask(signal.SIG_BLOCK, [])))
+        return opening(*arguments, **keywords)
+
+    monkeypatch.setattr(sqlite3, "connect", watched)
+
+    ledger.traverse_start("owner/repo", 440, {"mode": "auto"}, db_path=db_path)
+
+    assert set(ledger.DEFERRED_SIGNALS) <= during[0]
+    assert not set(ledger.DEFERRED_SIGNALS) & signal.pthread_sigmask(
+        signal.SIG_BLOCK, []
+    )
+
+
 # --- failure discipline ---
 
 
@@ -551,7 +582,7 @@ def test_a_job_writer_refuses_an_address_the_gate_bars(
 def test_traverse_end_refuses_a_status_the_gate_bars(
     payload: dict[str, Any], db_path: Path
 ) -> None:
-    """A traverse ends on one of two statuses, and the writer is told so.
+    """A traverse ends on one of `STATUSES`, and the writer is told so.
 
     `traverse_end` is the sole writer of the one row `awaiting_merge` reads a
     payload value out of, and judging a status needs no knowledge of any other
@@ -566,13 +597,12 @@ def test_traverse_end_refuses_a_status_the_gate_bars(
 
 
 @pytest.mark.parametrize("status", ledger.STATUSES)
-def test_traverse_end_accepts_either_terminal_status(
-    status: str, db_path: Path
-) -> None:
-    """Both ways out of `traverse_issue`, including the escalated one.
+def test_traverse_end_accepts_every_terminal_status(status: str, db_path: Path) -> None:
+    """Every way a traverse ends, the escalated and killed ones included.
 
-    An escalated exit writes `traverse-end` too (epic standing ruling 4), so a
-    door that took only `pr-ready` would refuse half the traverses there are.
+    An escalated exit writes `traverse-end` too (epic standing ruling 4), and so
+    does the kill trap, so a door that took only `pr-ready` would refuse most of
+    the traverses there are.
     """
     ledger.traverse_end("owner/repo", 438, {"status": status}, db_path=db_path)
 
@@ -928,6 +958,21 @@ def test_awaiting_merge_reads_only_the_newest_traverse_end_of_an_issue(
 ) -> None:
     ledger.traverse_end("owner/repo", 438, {"status": "pr-ready"}, db_path=db_path)
     ledger.traverse_end("owner/repo", 438, {"status": "escalated"}, db_path=db_path)
+
+    assert ledger.awaiting_merge(db_path=db_path) == []
+
+
+def test_awaiting_merge_neither_raises_nor_lists_an_issue_whose_traverse_was_killed(
+    db_path: Path,
+) -> None:
+    """The third terminal status closes a window without ever awaiting a merge.
+
+    A traverse that dies in its kill trap ends `killed`, and the gate has to
+    take that status or the trap's last write raises inside the handler and the
+    window never closes at all.
+    """
+    ledger.traverse_start("owner/repo", 440, {"mode": "auto"}, db_path=db_path)
+    ledger.traverse_end("owner/repo", 440, {"status": "killed"}, db_path=db_path)
 
     assert ledger.awaiting_merge(db_path=db_path) == []
 

@@ -40,11 +40,14 @@ Under auto mode the classifier must additionally pass each `gh` write, per
 | merge the PR (in the GitHub UI) | yes | **no — never** | user |
 | `git push` (rides every commit) / `git pull` (keep local `main` current) | yes | yes | skills |
 | `gh pr create` / `gh api` / `gh issue` / `gh pr diff` | yes | yes | skills |
-| commit, `EnterWorktree`/`ExitWorktree`, `git branch -m`, `git worktree remove` | yes | yes | skills |
+| commit (rides every node that changes files) | yes | yes | skills |
+| create a factory issue's worktree and branch | yes | yes | `traverse-issue` |
+| remove a factory issue's worktree and branch after a merge | yes | **no — the user's** | user |
+| `EnterWorktree`/`ExitWorktree`, `git branch -m` (definition-region trees) | yes | yes | skills |
 
 ## The briefing rule
 
-**The user is primarily in the terminal.** They do not typically read the documents or the code. They read the PR once, at the veryy end of the process. So every
+**The user is primarily in the terminal.** They do not typically read the documents or the code. They read the PR once, at the very end of the process. So every
 question, verdict request, and escalation stands on its own: it assumes no prior
 knowledge, lays the background out plainly, quotes the specific finding, line, or
 command the decision turns on, and then asks. Whatever a decision turns on goes

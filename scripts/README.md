@@ -98,11 +98,17 @@ loading/validation and the plan/render/record runner, behind `judgments-lint`
 and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`),
 `dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
-already-recorded work), and `dev_playbook.factory` (the software factory's
-append-only run ledger — the `ledger` table beside the hook-capture `events`
-table, its per-kind writers and its two read queries — and the job launcher
-that sweeps a launch's credentials, spawns a factory node, watches its stream
-live, and writes its two job rows; no script consumes it yet).
+already-recorded work), and `dev_playbook.factory`, whose three pieces are
+the software factory's append-only run ledger — the `ledger` table beside the
+hook-capture `events` table, its per-kind writers and its two read queries; the
+job launcher that sweeps a launch's credentials, spawns a factory node, watches
+its stream live, and writes its two job rows; and the build-region traverse that
+carries one issue from its phase label to an open pull request, behind
+`traverse-issue`. The launcher and the traverse are **Linux only**, and say so
+at import: every node the launcher spawns is set to die with it through
+`PR_SET_PDEATHSIG`, a `prctl` operation with no portable equivalent, and a
+child that could outlive its launcher is an hour of claude billed with nobody
+watching it.
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so
@@ -142,6 +148,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `repo-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages, mirror the externally managed skills, generate `~/.claude/settings.json` for this machine; `--check` reports settings drift and is what the session-start hook runs |
+| `traverse-issue` | Carry one factory issue from its phase label to an open PR: `traverse-issue <owner/name> <issue> <auto\|user-rework>` — per-issue lock, worktree create-or-reuse, the `build` and `open-pr` nodes launched headless, one JSON line on stdout naming the terminal status |
 | `headless-probe` | Re-measure that `claude -p` still carries the AFK factory's contract — the billing guard first (no API key reachable), then probes over harness-declared state: subscription billing, model and tool pins, cwd placement, minted session ids, hooks firing, structured reports |
 
 Run any script with `--help`; each script's docstring documents its behavior in
