@@ -287,10 +287,10 @@ class _Escalated(Exception):
 class _Failure:
     """One way a fanned-out review did not come back clean and reporting done.
 
-    A fan-out cannot raise where the trouble is, the way the sequential path
-    does: an exception leaving one thread would abandon its siblings mid-flight
-    and leave their launches with no report, reading as live for good. So each
-    job's failure is carried back as a value and every one of them is relayed
+    A fan-out does not raise where the trouble is, the way the sequential path
+    does, because several jobs can fail at once: an exception would surface
+    whichever one was read from first and lose what the rest said. So each job's
+    failure is carried back as a value and every one of them is relayed together
     once the whole fan-out has finished.
     """
 
@@ -345,16 +345,31 @@ def _relay(failures: Sequence[_Failure]) -> _Escalated:
     return _Escalated("; ".join(failure.reason for failure in failures))
 
 
-def _defer_signals() -> None:
-    """Block the ledger's deferred signals on a fan-out thread, as it starts.
+def _abort_reason(node: str, aborted: launcher.LaunchAborted) -> str:
+    """Why a node never spawned, worded once for both paths that report it.
+
+    The fan-out carries an abort back as a value and the sequential path raises
+    it, but an operator reads the same sentence either way — and a message built
+    twice is a message the two copies drift apart on.
+    """
+    return f"{node} could not be launched: {'; '.join(aborted.findings)}"
+
+
+def _pool(workers: int) -> ThreadPoolExecutor:
+    """A pool whose threads block the ledger's deferred signals before their first job.
 
     The invariant `launcher._pump` is held to, and for the same reason: a Python
     handler runs on the main thread at its next bytecode boundary whatever any
     other thread's mask says, so one unblocked thread anywhere is a route back
     into the middle of a ledger write — and the traverse's own trap writes to
-    that ledger.
+    that ledger. `initializer` runs inside each worker thread as it starts, which
+    is exactly where the mask has to be set.
     """
-    signal.pthread_sigmask(signal.SIG_BLOCK, TRAPPED)
+    return ThreadPoolExecutor(
+        max_workers=workers,
+        initializer=signal.pthread_sigmask,
+        initargs=(signal.SIG_BLOCK, TRAPPED),
+    )
 
 
 def _thread(node: Mapping[str, Any]) -> ReviewThread:
@@ -364,14 +379,26 @@ def _thread(node: Mapping[str, Any]) -> ReviewThread:
     itself flips its thread outdated and takes the live line away — which is
     exactly the thread a cycle is there to verify — so keying on the live line
     alone would lose the location of every thread that was actually addressed.
+
+    A thread carrying no comment is refused rather than stood in for. Every
+    severity is the first word of a thread's first comment, so such a thread has
+    none to read: passed over with an empty body it counts as neither Blocking
+    nor Suggestion and leaves the tally in silence, which is a convergence
+    declared over a finding nobody read.
     """
     comments = node["comments"]["nodes"]
+    if not comments:
+        raise _Escalated(
+            f"the review thread {node['id']} carries no comment to read a "
+            f"severity from, and a thread the verdict cannot grade is a finding "
+            f"it would drop without saying so"
+        )
     return ReviewThread(
         thread_id=str(node["id"]),
         resolved=bool(node["isResolved"]),
         path=str(node["path"]),
         line=node["line"] if node["line"] is not None else node["originalLine"],
-        body=str(comments[0]["body"]) if comments else "",
+        body=str(comments[0]["body"]),
     )
 
 
@@ -492,22 +519,17 @@ def rework_prompt(issue: int, open_blocking: Iterable[ReviewThread]) -> str:
 
     No ordering either. The prompt is a work list, and which finding to take
     first is a judgment about the code, which is the node's.
+
+    A thread with no line left is located by its file alone. A fix that edits
+    the anchored line itself flips the thread outdated and takes its live line
+    away — which is exactly the thread a rework lap is most likely to be looking
+    at — so the path stands rather than the location reading `path:None`.
     """
-    listed = "\n".join(
-        f"- {thread.thread_id} — {_where(thread)}" for thread in open_blocking
-    )
-    return REWORK_PROMPT.format(issue=issue, threads=listed)
-
-
-def _where(thread: ReviewThread) -> str:
-    """Where a thread sits, by path and line where it still has one.
-
-    A fix that edits the anchored line itself flips the thread outdated and
-    takes its live line away — which is exactly the thread a rework lap is most
-    likely to be looking at — so the path stands alone rather than the location
-    reading `path:None`.
-    """
-    return thread.path if thread.line is None else f"{thread.path}:{thread.line}"
+    listed = []
+    for thread in open_blocking:
+        where = thread.path if thread.line is None else f"{thread.path}:{thread.line}"
+        listed.append(f"- {thread.thread_id} — {where}")
+    return REWORK_PROMPT.format(issue=issue, threads="\n".join(listed))
 
 
 def baseline_cycle(starts: Iterable[ledger.LedgerRow]) -> int:
@@ -974,8 +996,8 @@ class _Traverse:
         while True:
             cycle = next_cycle(headers)
             self._fan_out(self._elected(pull, cycle), headers, worktree)
-            headers = self._cycle_headers(pull)
-            verdict = compute_verdict(self._threads(pull), cycle, baseline)
+            headers, threads = self._headers_and_threads(pull)
+            verdict = compute_verdict(threads, cycle, baseline)
             self._record_verdict(pull, cycle, newest_sha(headers), verdict)
             if verdict.verdict == CONVERGED:
                 return self._pr_ready(pull)
@@ -1016,18 +1038,17 @@ class _Traverse:
     ) -> None:
         """Run the cycle's reviews at once, and relay every one that did not land.
 
-        The books come first and the escalation second. An exception raised out
-        of one thread would leave its siblings running with nobody waiting for
-        them, and each of those launches has a `job-launch` row that only its own
-        report closes — so every job is waited out, whatever any of them did, and
-        only then is the failure relayed. Nothing is retried and nothing is
+        The books come first and the escalation second. The `with` block joins
+        every worker before a single result is read, so whatever any one of them
+        did, the siblings run to the end and their `job-report` rows land — and
+        only then is a failure relayed. Nothing is retried and nothing is
         absorbed: a review that did not come back clean and reporting done ends
         the traverse.
 
-        The pool's threads block the ledger's deferred signals on entry, under
-        the invariant every thread in a process that writes to that ledger is
-        held to — one unblocked thread anywhere is a route back into the middle
-        of a write the traverse's own trap would then deadlock against.
+        Failures come back as values rather than exceptions so that all of them
+        are relayed. Raising would surface whichever job the results were read
+        from first and lose what the others said, and what a node reported about
+        why it stopped is the whole of what reaches the operator.
 
         One thing is different here from the sequential path. A traverse killed
         mid-fan-out files these jobs from its trap, and each worker's own
@@ -1037,9 +1058,7 @@ class _Traverse:
         reports still reads as finished — so the duplicate is left rather than
         papered over.
         """
-        with ThreadPoolExecutor(
-            max_workers=len(nodes), initializer=_defer_signals
-        ) as pool:
+        with _pool(len(nodes)) as pool:
             running = [
                 pool.submit(self._review, node, headers, worktree) for node in nodes
             ]
@@ -1059,6 +1078,13 @@ class _Traverse:
         every change between in silence. A review with no header yet is on its
         first cycle and reads the whole diff, so it is given the issue number
         alone.
+
+        `LaunchAborted` is the one exception caught, exactly as the sequential
+        path catches it and for the same reason: nothing spawned and nothing was
+        spent. Anything else is the harness breaking a promise mid-flight, and a
+        reviewer answers for that the way a builder does — it leaves as itself,
+        rises through the traverse, and ends the run red rather than being folded
+        into an ordinary escalation nobody would look at twice.
         """
         header = headers.get(REVIEW_NAMES[node])
         prompt = str(self.issue) if header is None else f"{self.issue} {header.sha}"
@@ -1066,15 +1092,7 @@ class _Traverse:
         try:
             outcome = self._launch_job(node, worktree, REVIEW_SCHEMA, prompt)
         except launcher.LaunchAborted as aborted:
-            return _Failure(
-                f"{node} could not be launched: {'; '.join(aborted.findings)}", node
-            )
-        except Exception as failure:
-            # Every exception, not only the launcher's own. One leaving this
-            # thread would abandon the siblings, and what stopped this job is
-            # relayed either way — an unforeseen failure reaches the operator as
-            # its own type and message on the escalation row.
-            return _Failure(f"{node} failed: {type(failure).__name__}: {failure}", node)
+            return _Failure(_abort_reason(node, aborted), node)
         return _judge(node, outcome)
 
     def _pull_request(self) -> _PullRequest:
@@ -1104,6 +1122,21 @@ class _Traverse:
             )
         number, url = listed.splitlines()[0].split(" ", 1)
         return _PullRequest(number=int(number), url=url)
+
+    def _headers_and_threads(
+        self, pull: _PullRequest
+    ) -> tuple[dict[str, CycleHeader], list[ReviewThread]]:
+        """The two reads a verdict rests on, run at once.
+
+        They are independent — different endpoints, and neither answer shapes
+        the other's request — so run one after the other a cycle would pay both
+        round trips end to end, every cycle, up to `CYCLE_CAP` of them a
+        traverse.
+        """
+        with _pool(2) as pool:
+            posted = pool.submit(self._cycle_headers, pull)
+            threads = pool.submit(self._threads, pull)
+        return posted.result(), threads.result()
 
     def _cycle_headers(self, pull: _PullRequest) -> dict[str, CycleHeader]:
         """Every review's newest cycle header, read off the pull request itself.
@@ -1244,10 +1277,7 @@ class _Traverse:
         try:
             outcome = self._launch_job(node, worktree, schema, prompt)
         except launcher.LaunchAborted as aborted:
-            raise _Escalated(
-                f"{node} could not be launched: {'; '.join(aborted.findings)}",
-                node=node,
-            ) from aborted
+            raise _Escalated(_abort_reason(node, aborted), node=node) from aborted
         failure = _judge(node, outcome)
         if failure is not None:
             raise _Escalated(

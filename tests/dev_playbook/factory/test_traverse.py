@@ -104,6 +104,8 @@ def threads_now():
 
 def thread_node(thread):
     line = thread.get("line", 1)
+    body = thread.get("body")
+    opened = [] if body is None else [{"databaseId": 1, "body": body}]
     return {
         "id": thread["id"],
         "isResolved": thread.get("isResolved", False),
@@ -112,7 +114,7 @@ def thread_node(thread):
         "line": line,
         "originalLine": thread.get("originalLine", line),
         "subjectType": "LINE",
-        "comments": {"nodes": [{"databaseId": 1, "body": thread["body"]}]},
+        "comments": {"nodes": opened},
     }
 
 
@@ -393,6 +395,16 @@ def suggestion_thread(thread_id: str = "PRRT_suggestion") -> dict[str, Any]:
         "path": "src/dev_playbook/factory/traverse.py",
         "line": 9,
         "body": "Suggestion — name this constant.\n\n— code review · sess-x",
+    }
+
+
+def commentless_thread(thread_id: str = "PRRT_silent") -> dict[str, Any]:
+    """A thread the read hands back with no comment on it — a shape nobody grades."""
+    return {
+        "id": thread_id,
+        "isResolved": False,
+        "path": "src/dev_playbook/factory/traverse.py",
+        "line": 41,
     }
 
 
@@ -2184,10 +2196,9 @@ def test_one_review_failing_lets_its_siblings_finish_before_the_traverse_ends(
 ) -> None:
     """The books come first, the escalation second, and nothing is retried.
 
-    An exception out of one fan-out thread would leave its siblings running with
-    nobody waiting for them, and each of those launches has a `job-launch` row
-    that only its own report closes — so a sibling abandoned mid-flight reads as
-    live for good.
+    Each launch has a `job-launch` row that only its own report closes, so a
+    sibling the traverse walked away from would read as live for good. Every job
+    is waited out before any failure is relayed.
     """
     outcome = traverse_issue(
         claude_cmd=fake_claude(
@@ -2224,8 +2235,9 @@ def test_a_review_that_never_spawns_is_relayed_like_any_other_failure(
     """One reviewer aborts before spawning; its sibling still runs and reports.
 
     An abort is raised rather than reported — nothing spawned, so there is no
-    stream to classify — and raising it out of a fan-out thread is exactly what
-    would abandon the sibling. It is carried back as that job's failure instead.
+    stream to classify — and it is the one exception a fanned-out review catches,
+    exactly as the sequential path catches it. It comes back as that job's
+    failure and is relayed beside anything else the cycle turned up.
 
     The definition here declares an effort the harness does not have, which the
     launcher refuses per node: the whole-roster check at traverse start only asks
@@ -2267,6 +2279,26 @@ def test_a_diff_no_review_reads_escalates_rather_than_converging(
     assert nodes_launched(launched) == ["build", "open-pr"]
     assert "verdict" not in kinds(db)
     assert "no review track" in str(payload_of(db, "traverse-escalation")["reason"])
+    assert outcome.status == "escalated"
+
+
+def test_a_thread_carrying_no_comment_stops_the_traverse(
+    db: Path,
+    stub_gh: Callable[..., tuple[str, ...]],
+    traverse_issue: Callable[..., Any],
+) -> None:
+    """A thread with nothing to read a severity from is refused, never graded.
+
+    Every severity comes from the first word of a thread's first comment, so a
+    thread that arrives with no comment has no severity at all. Passed over it
+    would count as neither Blocking nor Suggestion and drop out of the tally in
+    silence — a convergence declared over a finding nobody read.
+    """
+    outcome = traverse_issue(gh_cmd=stub_gh(threads={1: [commentless_thread()]}))
+
+    reason = str(payload_of(db, "traverse-escalation")["reason"])
+    assert "PRRT_silent" in reason
+    assert "verdict" not in kinds(db)
     assert outcome.status == "escalated"
 
 
