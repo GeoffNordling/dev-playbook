@@ -2,9 +2,11 @@
 
 This module is the single home for the markdown mechanics that more than one
 hook needs: fenced-code skipping, GitHub heading slugs, YAML frontmatter,
-link extraction, and the OKF concept-doc/harness-owned path classification.
-``ref-lint`` and ``okf-lint`` both consume it, so the slug rule and the bundle
-boundary are defined once here rather than drifting between scripts.
+link extraction, the OKF concept-doc/harness-owned path classification, and
+the rootless-source test behind the cross-reference grammar. ``ref-lint``,
+``okf-lint``, and the file graph consume it, so the slug rule, the bundle
+boundary, and the rootless roster are defined once here rather than drifting
+between scripts.
 
 ``yaml`` is imported lazily inside :func:`parse_frontmatter` so importers that
 only need the pure-text helpers (``ref-lint`` runs under plain ``python3``) do
@@ -194,6 +196,30 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
     if not isinstance(front, dict):
         return None, body
     return front, body
+
+
+# Path segments marking sources with no fixed repo root: skills, rules, and
+# agent definitions ship into ~/.claude, so a `/path` Link in one would resolve
+# against whatever repo the reading agent happens to stand in. They use the
+# Citation form even for same-repo targets, per the cross-reference standard.
+ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
+
+
+def has_fixed_repo_root(relpath: str) -> bool:
+    """True when a source file is always read from one repo, so ``/`` resolves.
+
+    The one home for the rootless test: ``ref-lint`` decides the ``wrong-form``
+    finding with it and the file graph stamps the matching edge status, so a
+    new rootless segment reaches both at once. The two drifted once already —
+    ``ref-lint`` gained ``agents`` and the graph did not — which is why the
+    roster lives here rather than being mirrored.
+
+    Relpaths are posix-form throughout, so the split normalizes on
+    :class:`PurePosixPath`. A segment matches at any depth, which is what lets
+    ``dotfiles/dot-claude/skills/...`` and a consumer's ``.claude/skills/...``
+    answer alike.
+    """
+    return not (ROOTLESS_SEGMENTS & set(PurePosixPath(relpath).parts))
 
 
 def classify(relpath: str) -> str:
