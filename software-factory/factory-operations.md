@@ -81,10 +81,13 @@ permissions. This is accepted deliberately; a later pass may tighten it.
 
 **The reviewer read-only guarantee is enforced, not asked for.** A reviewer
 reports findings and never rewrites the work under review, and the harness holds
-it to that: `code-pr-review`, `bug-pr-review`, and `doc-pr-review` each carry a
-`disallowed-tools` entry denying `Edit`, `MultiEdit`, `NotebookEdit`, and
-`Write`, so an attempted write is refused rather than merely discouraged by the
-prompt.
+it to that: `code-pr-review`, `bug-pr-review`, and `doc-pr-review` each pin
+`tools: Read, Bash`, so the file-writing tools are absent rather than merely
+discouraged by the prompt. The roster is accident-grade rather than
+containment — `Bash` sits on it because every GitHub write rides `gh`, and
+searching rides it too, this harness having no separate search tool. A pin
+naming a tool the harness does not have is discarded in silence, so a roster
+states only names the harness reports.
 
 From the first file-touching node on, the session is cwd-bound to the issue's
 worktree, which confines its file reach.
@@ -112,7 +115,7 @@ The factory's nodes, what runs each, and how each engages the user:
 | Node | Run by | Engagement |
 |---|---|---|
 | `build` | the `build` agent definition, launched by `traverse-issue` | AFK. |
-| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [track](#track-rules) skills | AFK per node, then the user's verdict on the whole stop ([pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict)). |
+| `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [track](#track-rules) reviewer definitions | AFK per node, then the user's verdict on the whole stop ([pause 1](/software-factory/user-checkpoints.md#pause-1-the-review-verdict)). |
 
 The table is factory-only. The definition region's skills — `/intake`,
 `/design`, `/candidate-promote` — are invoked by the user and never dispatched,
@@ -267,7 +270,7 @@ the record the issue and its PR carry, never left as a placeholder.
 
 - **Title** — states the change: it is the commit subject `main`'s history will
   carry.
-- **Body** — three mandatory sections, each checkable by absence:
+- **Body** — four mandatory sections, each checkable by absence:
   - `## Summary` — what changed and why, drawn from the issue brief and the
     current diff, ending with the mandatory `Closes #<N>` line that closes
     the issue on merge. The claim that the acceptance criteria are met
@@ -282,6 +285,10 @@ the record the issue and its PR carry, never left as a placeholder.
     stub at `phase:intake`, named by issue link — never a Candidate
     ([the one-goal principle](/standards/tracking/issue-authoring.md#brief-principles)).
     `Nothing deferred.` explicitly when empty.
+  - `## Suggestion dispositions` — one line per Suggestion thread the review
+    loop settled, naming its outcome and the thread. It is the merge read's
+    one-place summary of what became of every suggestion. `None.` explicitly
+    when empty, which is what the node opening the pull request scaffolds.
 
 A missing section is a checkable defect: the code and doc reviews open with a
 mechanical presence check, and absence is an automatic Blocking finding.
@@ -307,12 +314,12 @@ is authored against a diff still moving.
 whole stop. Which audits run is fixed by the [track rules](#track-rules) below,
 never by asking.
 
-- **Code track.** `/bug-pr-review` posts its bug findings; `/code-pr-review` adds
+- **Code track.** `bug-pr-review` posts its bug findings; `code-pr-review` adds
   the fidelity and convention findings it does not cover.
-- **Doc track.** `/doc-pr-review` audits the diff's documentation.
+- **Doc track.** `doc-pr-review` audits the diff's documentation.
 - **Lockdown re-review.** From the third cycle on, each live track runs its
-  fidelity-and-convention review alone — `/code-pr-review` on the code track,
-  `/doc-pr-review` on the doc track — and `/bug-pr-review` stands down: a
+  fidelity-and-convention review alone — `code-pr-review` on the code track,
+  `doc-pr-review` on the doc track — and `bug-pr-review` stands down: a
   lockdown verifies fixes and needs no fresh bug hunt. The track rules still
   elect the tracks, so a doc-only diff is re-reviewed by the doc track.
 

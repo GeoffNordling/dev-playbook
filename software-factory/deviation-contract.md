@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Deviation Contract
-description: The contract a deviation runs under — the three limiters, escalation, and the deviation ledger
+description: The contract a deviation runs under — the three limiters, the halt-commit-escalate lane, and the deviation ledger
 ---
 
 # Deviation Contract
@@ -21,7 +21,11 @@ Before self-servicing a fix, the **implementing agent itself** answers three
 yes/no questions:
 
 1. Does the fix change an acceptance criterion of the issue?
-2. Does the fix touch a surface the brief declared out of scope?
+2. Does the fix touch a surface the brief withheld — a path, module, or
+   interface named under `Prohibited surfaces`, or an idea the brief put
+   under `Out of scope`? The first half is mechanical: compare the file about
+   to be edited against the path list, and no judgment is owed
+   ([the two headings and the split between them](/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)).
 3. Does the fix contradict a decision recorded on the issue, PR, an epic's
    standing rulings, or a map?
 
@@ -33,18 +37,50 @@ call becomes a review finding rather than a mid-flight stall.
 
 ## Escalation
 
-On any yes: stop work, commit what is done so the branch holds it, and post
-**one structured comment** — the deviation (brief said / reality is), which
-limiter tripped, two or three fix options with a recommendation, and any
-ledger entries already logged on this lap — to the PR if one exists,
-otherwise to the issue — always the most current of the two. The user's
-reply is the ruling: given as a comment, or spoken in the terminal and
-transcribed onto the issue or PR by the session that received the
-escalation, so it is always recorded. The brief body itself is never the
-place — it is frozen, per
+On any yes: **halt, commit, escalate.** Nothing about an escalation is
+written to GitHub.
+
+1. **Halt.** Stop work where it stands.
+2. **Commit and push**, so the branch holds what is done. A halt reaches its
+   commit even when the gates refuse it: the agent commits and pushes with
+   `--no-verify`, and says on its terminal report that it did so. One
+   server-side exception is accepted — a push touching `.github/workflows/`
+   is refused by the token at the server, which `--no-verify` cannot bypass,
+   so that halt's commit lands in the worktree only and the report says so.
+3. **Escalate on the report envelope.** The deviation detail — brief said /
+   reality is / two or three fix options with a recommendation — rides the
+   envelope's `gist`, together with which limiter tripped. Ledger entries
+   already logged on this lap stay in the ledger; the run's stdout and its
+   transcript are where they surface until `factory-status` exists.
+
+The user's reply is the ruling, recorded as a comment on the issue or the
+pull request — typed there by the user, or said at the terminal and posted by
+the session that heard it. That comment is what limiter 3 reads, so every
+later deviation binds to it automatically: escalations feed the limiter
+system. The brief body itself is never the place — it is frozen, per
 [the brief freeze](/standards/tracking/issue-authoring.md#the-brief-freeze).
-Because the ruling lands on the issue or PR, limiter 3 automatically binds
-every later deviation to it — escalations feed the limiter system.
+
+## The halt-commit-escalate lane
+
+The lane above stops the traverse. What puts a node in it differs by node:
+
+- **The build node** — any limiter yes, or an answer it cannot give cleanly,
+  plus the general stuck bucket: anything that leaves it genuinely unable to
+  proceed. There is no taxonomy of stuck reasons to match against.
+- **A review node** — operational failures only. A problem a review can
+  describe is a finding, never an escalation
+  ([review contract](/software-factory/review-contract.md#findings-are-not-escalations)).
+- **The traverse script** — **relay, never absorb**. A node's own report text
+  rides its ledger row unedited; the script never overrides an escalation,
+  retries it, or fixes it itself, so a limiter trip always reaches the user.
+
+The three-no's fix is in neither lane: it is made, logged in the ledger, and
+the work goes on.
+
+A second lane runs beside this one — the PR-callout lane, where a decision is
+documented on the pull request and the traverse proceeds. It belongs to the
+Adjudicator alone and arrives with
+[issue #442](https://github.com/GeoffNordling/dev-playbook/issues/442).
 
 ## The deviation ledger
 
@@ -59,4 +95,4 @@ them. On the lap that precedes the PR it records them on the issue at close;
 the node that authors the PR description lifts them into the section. On a
 rework lap, with the PR live, the builder appends to the section directly. A
 lap that halts on an escalation never reaches its close, so its entries ride
-the escalation comment instead.
+the escalating run's `gist` and stay in the ledger.

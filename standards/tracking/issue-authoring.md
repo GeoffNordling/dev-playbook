@@ -120,8 +120,18 @@ relationships; see [Relationships](#relationships).
 
 ### The build-leaf brief (`mode:direct`)
 
-A build leaf carries **all seven** headings — none optional. `Key interfaces`
-states "none" when there are none, rather than being omitted.
+A build leaf carries **every heading in the template below** — none optional.
+`Key interfaces` and `Prohibited surfaces` state "none" when there are none,
+rather than being omitted.
+
+`Prohibited surfaces` names the paths, modules, or interfaces the issue must
+not touch. It constrains codebase territory the way `Out of scope` constrains
+idea space, and it is what makes the codebase half of the second
+[deviation limiter](/software-factory/deviation-contract.md#the-three-deviation-limiters)
+mechanical: the implementing agent compares the file it is about to edit
+against a list rather than weighing intent. "none" is the expected value — a
+brief names a surface only where touching it would be a real hazard, and never
+strains to fill the heading with a laundry list.
 
 `User intent` answers why this issue exists and which way to lean when goods
 collide — the priority ordering, and which error direction is cheap. Its text
@@ -159,6 +169,9 @@ What should happen after the work is complete. Be specific about edge cases and 
 - [ ] Specific, testable criterion 1
 - [ ] Specific, testable criterion 2
 
+**Prohibited surfaces:**
+- `path/or/module` — why this issue must not touch it
+
 **Out of scope:**
 - Things that should NOT be changed
 - Adjacent features that are separate
@@ -187,6 +200,12 @@ deviation. Approval of the text is part of the issue-review verdict. If
 artifacts push the body toward GitHub's size limit, they overflow to issue
 comments — stated loudly in the section, never silently. Mechanical edits
 need no artifact.
+
+The section **binds when present**. The heading is optional and the lint never
+demands it, so a brief without one is well-shaped; a brief that carries one has
+made its approved words part of the contract, and a review may cite them for a
+Blocking finding exactly as it cites a required section
+([the citeability rule](/software-factory/review-contract.md#the-two-severities)).
 
 ### The spike brief (`mode:spike`)
 

@@ -70,8 +70,7 @@ user: the issue overwatch adds its own context — which node, what it dispatche
 what the report says — and stops. It never overrides, retries, or self-fixes a
 node's escalation; the user's call routes the issue onward. A node whose skill
 doesn't exist is an escalation, not an improvisation. For a deviation escalation
-the call is also recorded: spoken in the terminal, it is transcribed onto the
-issue or PR by the overwatch, per the
+the call is also recorded as a comment on the issue or PR, per the
 [deviation contract](/software-factory/deviation-contract.md#escalation) —
 limiter 3 binds later deviations only to what is written there.
 

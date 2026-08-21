@@ -79,13 +79,13 @@ Nothing below this line is written to GitHub before the user approves.
 
 ### Single leaf
 
-Re-author the issue's brief in place across the seven build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)). A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
+Re-author the issue's brief in place across the build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)), which is where the required set is fixed. A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief, not a brief plus a commentary on it.
 
-Draft six of the headings, then invoke /user-intent-mini-interview for the seventh, `User intent`: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
+Draft every heading except `User intent`, then invoke /user-intent-mini-interview for that one: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
 
 `gh issue edit --body` replaces the whole body
 ([tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#the-issue-surface)),
-so write the complete brief back — all seven headings, re-authored.
+so write the complete brief back — every required heading, re-authored.
 
 ### Decompose
 

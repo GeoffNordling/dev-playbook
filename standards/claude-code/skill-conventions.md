@@ -67,7 +67,7 @@ Every skill must have all five of these:
 | Field | When to include |
 |-------|-----------------|
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
-| `disallowed-tools` | Denies tools outright. Same format as `allowed-tools`. The mechanism behind the reviewer read-only guarantee — the pr-review skills carry `Edit MultiEdit NotebookEdit Write(/**)`, so a write is refused, not merely discouraged. Don't restate a workspace-wide denial from the settings. |
+| `disallowed-tools` | Denies tools outright. Same format as `allowed-tools`. Use it where a read-only stance must be enforced rather than asked for — `issue-review-claims` and `issue-review-simulation` carry `Edit MultiEdit NotebookEdit Write(/**)`, so a write is refused, not merely discouraged. Don't restate a workspace-wide denial from the settings. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
 
 ### The vocabulary is closed

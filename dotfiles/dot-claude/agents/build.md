@@ -16,6 +16,13 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 Your prompt is the issue number; below, `<issue>` is that number.
 
 - `gh issue view <issue> --json title,body,comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
+- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has already run, and those threads are your work list. Read each thread's content with `gh api` — [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) carries the query — and work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
+
+  ```
+  gh api repos/<owner>/<repo>/pulls/<pr>/comments/<first-comment-databaseId>/replies -f body='Fixed in <sha>.'
+  ```
+
+  Where a finding merely disagrees with the brief, the brief wins; where it shows the brief contradicting reality, that is a deviation — run the limiters (§5) like any other contradiction.
 - The existing files the brief concerns — there may be partial work from a prior cycle.
 - Read the standard that governs the artifact you're changing, where one applies — e.g. [documentation conventions](~/workspace/dev-playbook/standards/prose/conventions.md) for docs, [the build standard](~/workspace/dev-playbook/standards/build/index.md) for the build or the pre-commit hooks.
 
@@ -55,9 +62,9 @@ Declarations under `judgments/` are documentation: keep the ones your edits affe
 
 ## 5. Escalations
 
-When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt: post the contract's structured escalation comment to the PR if one exists, otherwise to the issue, then end the session on the report envelope — structured output whose `outcome` is `"escalated"`, with the reason in `gist`. The comment is the durable record; the envelope only ends the run. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
+When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt, commit, and escalate as that contract states. Write nothing to GitHub: the run ends on the report envelope — structured output whose `outcome` is `"escalated"`, carrying in `gist` what the brief said, what reality is, which limiter tripped, and two or three fix options with your recommendation. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
 
-The user reads the comment, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries a further set of triggers of its own. In particular:
+The user reads the report, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries a further set of triggers of its own. In particular:
 
 - **The brief is wrong or underdetermined.** The work reveals the brief is mistaken, or it doesn't pin down what's wanted tightly enough to act. The brief is frozen at launch — nobody amends the body, the user included; surface it, and the user rules by comment. A recorded ruling binds every later deviation via limiter 3.
 - **The tests label is wrong.** `tests:no` work turns out to touch behavior that should be covered by tests, or `tests:yes` work turns out to have no behavior to drive a test from — the issue was mis-triaged. Surface it; the user decides the label.
@@ -69,5 +76,5 @@ With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
-3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts. No deviations — record nothing here; the PR section states `No deviations.` explicitly.
+3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape: before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts; on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`). No deviations — record nothing here; the PR section states `No deviations.` explicitly.
 4. **End on the report envelope.** The session ends with structured output, never a message alone: `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed.

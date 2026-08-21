@@ -1137,7 +1137,8 @@ def test_wrong_shape_response_is_surfaced_not_crash(tmp_path: Path) -> None:
 BUILD_BODY = (
     "**Summary:** s\n\n**User intent:** i\n\n"
     "**Current behavior:** c\n\n**Desired behavior:** d\n\n"
-    "**Key interfaces:** none\n\n**Acceptance criteria:** a\n\n**Out of scope:** o\n"
+    "**Key interfaces:** none\n\n**Acceptance criteria:** a\n\n"
+    "**Prohibited surfaces:** none\n\n**Out of scope:** o\n"
 )
 SPIKE_BODY = "**Summary:** s\n\n**Question:** q\n\n**Deliverable:** d\n"
 VALID_DIRECT = ["category:extension", "mode:direct", "tests:no", "phase:build"]
@@ -1420,6 +1421,16 @@ def test_build_leaf_missing_user_intent_is_a_finding(tmp_path: Path) -> None:
     assert "User intent" in result.stdout
 
 
+def test_build_leaf_missing_prohibited_surfaces_is_a_finding(tmp_path: Path) -> None:
+    # Prohibited surfaces is a required build-leaf heading: it names the
+    # codebase territory the issue must not touch, which is what makes the
+    # second deviation limiter mechanical rather than a judgment call.
+    body = BUILD_BODY.replace("**Prohibited surfaces:** none\n\n", "")
+    result = run_with_issue(tmp_path, issue(37, VALID_DIRECT, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "Prohibited surfaces" in result.stdout
+
+
 def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:no", "phase:spike"]
     body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
@@ -1434,7 +1445,8 @@ def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
     body = (
         "**Summary**: s\n\n**User intent**: i\n\n"
         "**Current behavior**: c\n\n**Desired behavior**: d\n\n"
-        "**Key interfaces**: none\n\n**Acceptance criteria**: a\n\n**Out of scope**: o\n"
+        "**Key interfaces**: none\n\n**Acceptance criteria**: a\n\n"
+        "**Prohibited surfaces**: none\n\n**Out of scope**: o\n"
     )
     result = run_with_issue(tmp_path, issue(31, VALID_DIRECT, body=body))
     assert "tracking.issue-brief-shape" not in result.stdout
