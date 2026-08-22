@@ -66,10 +66,9 @@ appears as an abstract insider word where a plain description fits. State the
 reason, then state what follows from it.
 
 - **Before** "**The adoption test.** A tool earns its place if it fails a build
-  with a one-line message." → **After** "These tools exist to hide complexity
-  behind deterministic code and give me a simple interface onto it. So the ones
-  worth adopting fail the build with a one-line message, the way ruff names a
-  file, a line, and a rule id."
+  with a one-line message." → **After** "These tools hide complexity behind
+  deterministic code, so the ones worth adopting fail the build with a one-line
+  message."
 - **Before** "Two kinds of force" (a section heading; neither thing in the
   section is a force) → **After** "Stochastic functions and deterministic
   backpressure"
@@ -85,18 +84,16 @@ A dramatic word or image where an ordinary one carries the same meaning.
 - **Before** "...and the leaks are where the architecture hides:" → **After**
   "The two disagree here:"
 - **Before** "No interactive zoomable viewer — that is the heavy-HTML mistake
-  in a new costume." → **After** deleted.
+  in a new costume." → **After** deleted; the user never said that.
 
-### Lopsided examples
+### Unnecessary examples
 
-Examples supplied on one side of a contrast only. Give one of each, or none.
+Instances piled onto a claim the reader already understood. Each one has to be
+read before the point can be picked up again.
 
 - **Before** "Report-shaped tools rot: a call-graph HTML nobody opens or a
-  metrics dashboard is one more artifact I will not read." (two examples of the
-  bad kind, none of the good) → **After** "...the ones worth adopting fail the
-  build with a one-line message, the way ruff names a file, a line, and a rule
-  id. A tool that produces something to look at instead, such as a call-graph
-  HTML page, needs me to read it."
+  metrics dashboard is one more artifact I will not read." → **After**
+  "Report-shaped tools take effort to read."
 
 ### Closing cadence
 
@@ -131,10 +128,12 @@ attributed to the user.
 ### Changelog residue
 
 Traces of an earlier draft or of the path to the knowledge, left in a document
-whose job is to say what is true now. Git holds the history. It happens most
-when we rewrite in place: told to move a tool from Adopt to Reject, Claude
-writes "we previously adopted this, then decided against it" instead of moving
-the line.
+whose job is to say what is true now. Git holds the history.
+
+It accumulates. A document edited across many sessions collects a layer each
+time: told to move a tool from Adopt to Reject, Claude writes "we previously
+adopted this, then decided against it" instead of moving the line. The
+most-rewritten documents carry the most residue.
 
 - **Before** "Docstring enforcement is already deterministic, and I had
   forgotten." → **After** deleted; the section states the enforcement as it
