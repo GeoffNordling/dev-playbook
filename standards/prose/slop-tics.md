@@ -1,10 +1,10 @@
 ---
-type: Guide
-title: Writing
-description: The named tics in Claude's writing
+type: Standard
+title: Slop Tics
+description: The named tics in Claude's slop writing — the patterns to remove from any workspace document
 ---
 
-# Writing
+# Slop Tics
 
 Specific examples of tics in Claude's slop writing and how to avoid them.
 
@@ -93,6 +93,8 @@ proposed, in either order: assertion then denial, or denial then assertion.
   terror." → **After** "...a pleasure to read."
 - **Before** "What good writing looks like here, and the named tics that keep it
   from happening." → **After** "The named tics in Claude's writing."
+- **Before** "X is hand-maintained — there is no generator." → **After** "X is
+  the source of truth."
 
 ## Closing cadence
 
@@ -244,7 +246,8 @@ stronger writing and are usually false. The words are "everything", "never",
 **Definition.** Writing aimed at a reader who is about to misunderstand, rather
 than the one actually reading. This is unnecessary bloat.
 
-**Action.** Write for the reader in front of you.
+**Action.** Write for the reader in front of you — someone careful enough to
+follow a single sentence.
 
 **Examples.**
 

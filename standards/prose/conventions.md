@@ -7,15 +7,14 @@ description: How Markdown docs are written — voice, structure, brevity, curren
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Applies to every doc
-in the repo documentation hierarchy.
+in the repo documentation hierarchy. The named failure patterns to remove are
+cataloged in [Slop Tics](/standards/prose/slop-tics.md).
 
 ## Current state and next steps only
 
 Describe what exists and what's planned next. Don't reference removed things,
 past state, or rejected alternatives.
-
-Don't: "X is hand-maintained — there is no generator."
-Do: "X is the source of truth."
+[Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
 
 Decision Records are the exception. A Decision Record in `docs/decisions/` is a
 dated record of a past decision — the choice made, the alternatives rejected,
@@ -166,10 +165,6 @@ recur:
 When a real file IS the standard, the doc directs the reader to it.
 The build standard's `canonical.md` names each canonical artifact and points
 at the file instead of restating its contents.
-
-## Trust the reader
-
-Write for someone careful enough to follow a single sentence.
 
 ## Brevity
 

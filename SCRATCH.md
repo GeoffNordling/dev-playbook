@@ -195,4 +195,5 @@ Candidates for `CONTEXT.md`:
 - **Gray module**
 - **Slop**
 
-Writing standards and the named tics are in [WRITING.md](WRITING.md).
+Writing standards and the named tics are in
+[slop-tics.md](/standards/prose/slop-tics.md).
