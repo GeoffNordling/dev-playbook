@@ -7,7 +7,8 @@
 # the edit at the next sync. Neither is visible without a check.
 #
 # Informational, not blocking — by the time this runs the session has already
-# loaded the stale settings, so the useful act is telling the user to resync.
+# loaded the stale settings, so the useful act is resyncing them for the next
+# one. The check writes the instruction; this hook only carries it through.
 # Silent on success, and every path exits 0: a non-zero exit would mean "the
 # hook broke", never "the check failed".
 set -euo pipefail
@@ -35,4 +36,4 @@ if drift=$("$checker" --check 2>&1); then
 fi
 
 note "DRIFT"
-printf 'Tell the user their Claude Code settings need resyncing:\n%s\n' "$drift"
+printf '%s\n' "$drift"

@@ -240,7 +240,11 @@ def sync(repo: Path, home: Path) -> list[str]:
 
 
 def drift_report(repo: Path, home: Path) -> str | None:
-    """What to tell the user about stale settings, or None when they are current."""
+    """What the session must do about stale settings, or None when current.
+
+    Addressed to the agent rather than to the user: the fix is one command the
+    agent can run itself, and making the user its courier wastes a turn.
+    """
     settings_dir = repo / "dotfiles" / "settings"
     target = home / ".claude" / "settings.json"
     machine = detect_machine()
@@ -250,9 +254,11 @@ def drift_report(repo: Path, home: Path) -> str | None:
         f"Claude Code settings are out of date for this machine ({machine}).\n"
         f"  installed: {target}\n"
         f"  source:    {settings_dir}/base.json + {machine}.json\n"
-        f"Run {repo}/scripts/sync-dotfiles to reinstall. If you edited the\n"
-        "installed file directly, move the change into the source instead --\n"
-        "the installed copy is generated and the edit will be overwritten."
+        f"Run `{repo}/scripts/sync-dotfiles` yourself now, then tell the user you\n"
+        "resynced their settings and that the new file loads at their next\n"
+        "session -- this one has already read the stale copy. If the user has\n"
+        "edited the installed file directly, the sync overwrites that edit: it\n"
+        "is generated, and the change belongs in the source."
     )
 
 
