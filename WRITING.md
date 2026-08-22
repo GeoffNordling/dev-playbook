@@ -14,16 +14,25 @@ of them do not contain the word "not" next to a comma. A deterministic linter ca
 catch a first-pass subset and nothing more. The rest stays with the reader and
 with review agents.
 
+Every example below is a real edit from this repository's documents. "Before" is
+what Claude wrote; "after" is what survived review.
+
 ## What good looks like
 
 **Grammatical parallelism in section headings.** Headings within a document take
 the same grammatical shape. In `SCRATCH.md` they are noun phrases: "The problem",
 "The code toolbox", "Two testing tiers", "Gray modules".
 
+- Before: "Tests in two tiers" — After: "Two testing tiers"
+- Before: "Not yet examined: documentation" — After: "The documentation toolbox"
+
+**State the reason, then say the thing plainly.** The alternative is inventing a
+term to carry the point (see Minted term).
+
 ## The hypothetical misreader
 
-The root of several artifacts below. Claude writes for a reader who is about to
-misunderstand, rather than for the reader who is actually there. The defense
+The root of the first three tics below. Claude writes for a reader who is about
+to misunderstand, rather than for the reader who is actually there. The defense
 against that imagined misreading is what bloats the prose.
 
 ## Tics
@@ -31,14 +40,21 @@ against that imagined misreading is what bloats the prose.
 ### Contrast pair
 
 An assertion paired with a denial of something the reader never proposed. Either
-order.
+order: assertion then denial, or denial then assertion. Keep the assertion,
+delete the denial.
 
-> A record of decisions, not a specification.
-
-> The failure was not reading tests. It was having one undifferentiated tier.
-
-In the first, the sentence finishes at "decisions". In the second, only the
-second sentence is needed. Keep the assertion and delete the denial.
+- Before: "A record of decisions, not a specification."
+  After: "What I decided on the day I stopped digging, and why."
+- Before: "The failure was not reading tests. It was having one undifferentiated
+  tier."
+  After: "The failure was having one undifferentiated tier."
+- Before: "Collapse a call graph up to module level and you get roughly the
+  import graph. Roughly, not exactly, and the leaks are where the architecture
+  hides:"
+  After: "Collapse a call graph up to module level and you get roughly the
+  import graph. The two disagree here:"
+- Before: "...so that the documentation is a pleasure to read and not a terror."
+  After: "...a pleasure to read."
 
 *First-pass detection:* a clause-final "not X" appended to a complete assertion,
 or a sentence of the form "It was not X" followed by "It was Y". Catches the
@@ -46,89 +62,170 @@ obvious cases only.
 
 ### Unasked disclaimer
 
-A whole sentence defending against a misreading nobody was going to make.
+A whole sentence defending against a misreading nobody was going to make. Delete
+the sentence.
 
-> Nothing here describes software to build yet.
-
-Delete the sentence.
+- Before: "Nothing here describes software to build yet."
+  After: deleted.
 
 *First-pass detection:* weak. The giveaway is that the sentence carries no
 information the reader lacked, which no regex sees.
 
 ### Reassurance
 
-Comfort offered to a reader who might feel bad about a choice they made.
+Comfort offered to a reader who might feel bad about a choice they made. Same
+root as the two above, but the tell is emotional rather than logical: the
+sentence is managing feelings instead of carrying information.
 
-> Sometimes stochastic functions are required — that is the power of AI, and it
-> is not a failure to use them.
-
-Cut from the comma. Same root as the others, but the tell is emotional rather
-than logical: the sentence is managing feelings instead of carrying information.
-Lower priority than the contrast pair and the unasked disclaimer.
+- Before: "Sometimes stochastic functions are required — that is the power of
+  AI, and it is not a failure to use them."
+  After: "Sometimes stochastic functions are required — that is the power of
+  AI."
+- Before: "This is the orthodox test pyramid, and acceptance tests as executable
+  specification are an established paradigm."
+  After: "This is the orthodox test pyramid."
 
 *First-pass detection:* none.
 
 ### Minted term
 
-A term invented on the spot and then used as though it were established.
+A term invented on the spot and then used as though it were established — bold
+type and a definite article lend it an authority it has not earned. It also
+appears as an unnecessarily abstract insider word where a plain description
+fits. The fix is to state the reason, then state what follows from it.
 
-> **The adoption test.** A tool earns its place if...
-
-Nobody has heard of the adoption test. It was invented one sentence earlier and
-given bold type and a definite article, which lends it an authority it has not
-earned. The plain alternative is to state the reason and then state what follows
-from it.
+- Before: "**The adoption test.** A tool earns its place if it fails a build
+  with a one-line message."
+  After: "These tools exist to hide complexity behind deterministic code and
+  give me a simple interface onto it. So the ones worth adopting fail the build
+  with a one-line message, the way ruff names a file, a line, and a rule id."
+- Before: "Two kinds of force" (a section heading; neither thing in the section
+  is a force)
+  After: "Stochastic functions and deterministic backpressure"
+- Before: "`import-linter` is the gate."
+  After: "Only `import-linter` fails the build, and it checks the import graph
+  against rules I write."
 
 ### Flourish
 
-A dramatic word where an ordinary one carries the same meaning.
+A dramatic word or image where an ordinary one carries the same meaning. Reports
+do not rot; they go unread.
 
-> Report-shaped tools **rot**.
-
-Reports do not rot. They go unread.
+- Before: "Report-shaped tools rot."
+  After: deleted; the paragraph already said reports depend on being read.
+- Before: "...and the leaks are where the architecture hides:"
+  After: "The two disagree here:"
+- Before: "No interactive zoomable viewer — that is the heavy-HTML mistake in a
+  new costume."
+  After: deleted.
 
 ### Lopsided examples
 
-Examples supplied on one side of a contrast only.
+Examples supplied on one side of a contrast only. Give one of each, or none.
 
-> ...a call-graph HTML nobody opens or a metrics dashboard...
-
-Two examples of the bad kind, none of the good kind. Either give one of each or
-give neither.
+- Before: "Report-shaped tools rot: a call-graph HTML nobody opens or a metrics
+  dashboard is one more artifact I will not read." (two examples of the bad
+  kind, none of the good)
+  After: "...the ones worth adopting fail the build with a one-line message, the
+  way ruff names a file, a line, and a rule id. A tool that produces something
+  to look at instead, such as a call-graph HTML page, needs me to read it."
 
 ### Closing cadence
 
-A pair of short parallel sentences at the end of a paragraph, there for rhythm.
+A short punchy sentence or pair of sentences at the end of a paragraph, there
+for rhythm. The paragraph already made the point; the cadence adds sound, not
+meaning.
 
-> Gates compound. Reports rot.
-
-The paragraph already made both points. The cadence adds sound, not meaning.
+- Before: "Gates compound. Reports rot."
+  After: deleted.
+- Before: "...and I cannot read a thousand tests. Nobody can."
+  After: "...and I cannot read a thousand tests."
 
 ### Overclaim
 
-A position you stated with qualifications, restated as an absolute.
+A qualified position restated as an absolute. Absolutes read as stronger writing
+and are usually false.
 
-> ...depends on me reading it, and I will not read it.
+- Before: "...depends on me reading it, and I will not read it."
+  After: "I will read one when I need to, but it is much more work than a
+  one-line message and much less useful to the AI."
+- Before: "Everything I have done for the last six months has been slop."
+  After: "Six months of building this way has produced a lot of slop."
+- Before: "I never look at the code."
+  After: "I rarely look at the code."
+- Before: "I am fundamentally incapable of reading Claude's slop-filled style..."
+  After: "I am incapable of reading Claude's slop-filled style..."
 
-You said reports are more work and less useful to the AI. The rewrite turned
-that into a refusal you never made. The same tic produced "everything I have done
-for the last six months has been slop" from a milder original.
-
-Absolutes read as stronger writing and are usually false. Watch for "everything",
-"never", "always", "nothing", and for any flat refusal attributed to you.
+Watch for "everything", "never", "always", "nothing", and for any flat refusal
+attributed to the user.
 
 ### Changelog residue
 
-Traces of an earlier draft, left in a document whose job is to say what is true
-now.
-
-> Docstring enforcement is already deterministic, and I had forgotten.
-
-It happens most when we rewrite in place. Told to move a tool from Adopt to
-Reject, Claude writes "we previously adopted this, then decided against it"
-instead of simply moving the line.
+Traces of an earlier draft or of the path to the knowledge, left in a document
+whose job is to say what is true now. It happens most when we rewrite in place:
+told to move a tool from Adopt to Reject, Claude writes "we previously adopted
+this, then decided against it" instead of simply moving the line.
 
 The document says what is true now. Git holds the history.
 
-Watch for "already", "previously", "it turns out", "no longer", "used to", "I had
-assumed", and for any sentence whose subject is the act of changing our minds.
+- Before: "Docstring enforcement is already deterministic, and I had forgotten."
+  After: deleted; the section states the enforcement as it stands.
+- Before: "Docstrings — already settled" (a section heading)
+  After: "Docstrings"
+
+Watch for "already", "previously", "it turns out", "no longer", "used to", "I
+had assumed", and for any sentence whose subject is the act of changing our
+minds.
+
+### Restatement
+
+A point made in plain words, then made again — with terminology attached so it
+reads as a conclusion, or in a second clause that repeats the first. Say each
+thing once; attach a term to the plain statement instead of repeating the
+statement to carry it.
+
+- Before: "Four to a few dozen nodes. I can hold it in my head, and rules can be
+  written against it. This is at the CLOA, and it is what `import-linter`
+  enforces."
+  After: "Four to a few dozen nodes. This is at the CLOA: I can hold it in my
+  head, and `import-linter` can enforce rules against it."
+- Before: "The format may be wrong — a heavy HTML file is possibly the wrong way
+  to go."
+  After: "A heavy HTML file may be the wrong format."
+- Before: "The challenge is imposing quality standards that keep it from being
+  sloppified. I am fundamentally incapable of reading Claude's slop-filled
+  documentation style. Something must be imposed so that the documentation is a
+  pleasure to read and not a terror."
+  After: "I am incapable of reading Claude's slop-filled style, so something has
+  to keep the documentation a pleasure to read."
+
+### Obvious qualifier
+
+A qualifier — sometimes a whole sentence — that carries nothing, because no
+alternative exists or because it restates the document's own premise. Delete it;
+keep a qualifier only where the alternative is real and someone might have
+expected it.
+
+- Before: "Both graphs are understanding tools, generated on demand." (tools run
+  when they are run)
+  After: the qualifier deleted, and then the whole sentence — the document is
+  about understanding.
+- Before: "Raw material, carried forward without analysis. We have not earned
+  conclusions here." (under a heading that already said "not yet examined")
+  After: "Not yet examined. Raw material only."
+- Before: "New terms introduced here" (a section heading)
+  After: "New terms"
+- Before: "Candidates for `CONTEXT.md`, not yet added there:"
+  After: "Candidates for `CONTEXT.md`:"
+
+### Unnecessary enumeration
+
+A count of the items in a list that follows, written into the prose above it.
+The list already says how many. The count only has to be maintained, and it goes
+wrong the moment a fourth item is added — worse across files, where nobody sees
+the count when they edit the list.
+
+- Before: "The two disagree in three places:"
+  After: "The two disagree here:"
+
+Watch for "three places", "the following two", "both of which", "all four".
