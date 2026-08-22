@@ -83,8 +83,8 @@ What must stay small is how much we commit to before reality answers back.
   line.
 - **Rendered API surface** — `mkdocstrings` or `pdoc`, both built on `griffe`.
   Public signatures plus docstrings, which is the read-a-module-at-a-glance view.
-- **Import graphs and call graphs** (`pydeps`, `code2flow`) — generated on
-  demand, side by side. See "Import graph and call graph" below.
+- **Import graphs and call graphs** (`pydeps`, `code2flow`) — read side by side.
+  See "Import graph and call graph" below.
 - **ruff `D` rules** — already in place. See "Docstrings" below.
 - **`tests/acceptance/`** — see "Tests in two tiers" below.
 
@@ -145,14 +145,14 @@ rules, or a rule that every public module has at least one.
 ## Import graph and call graph
 
 - **Import graph.** Nodes are modules, edges are `import` statements. Four to a
-  few dozen nodes. I can hold it in my head, and rules can be written against it.
-  This is at the CLOA, and it is what `import-linter` enforces.
+  few dozen nodes. This is at the CLOA: I can hold it in my head, and
+  `import-linter` can enforce rules against it.
 - **Call graph.** Nodes are functions, edges are calls. Hundreds of nodes. Below
   the CLOA, so it is for tracing one operation rather than for holding the whole
   codebase in mind.
 
 Collapse a call graph up to module level and you get roughly the import graph.
-Roughly, not exactly, and the leaks are where the architecture hides:
+The two disagree here:
 
 - **Imports with no calls** — `from .types import Config` for a type annotation,
   a constant, or an exception class.
@@ -161,19 +161,16 @@ Roughly, not exactly, and the leaks are where the architecture hides:
 - **Re-exports** — `__init__.py` importing everything to expose it creates a hub
   the call graph knows nothing about.
 
-Both graphs are understanding tools, generated on demand. `import-linter` is the
-gate. No interactive zoomable viewer — that is the heavy-HTML mistake in a new
-costume.
+Only `import-linter` fails the build, and it checks the import graph against
+rules I write.
 
-## Not yet examined: documentation
+## The documentation toolbox
 
-Raw material, carried forward without analysis. We have not earned conclusions
-here.
+Not yet examined. Raw material only.
 
-- `CONTEXT.md` discipline, as described above.
-- **OKF graphs.** One is implemented but has not been used in a while and may need
-  updating. The format may be wrong — a heavy HTML file is possibly the wrong way
-  to go.
+- `CONTEXT.md` discipline, as described in the CLOA section.
+- **OKF graphs.** One is implemented but has not been used in a while and may
+  need updating. A heavy HTML file may be the wrong format.
 - **OKF traces.** If we have an OKF graph, then an operation can be expressed as
   markdown instructions that trace a path through it.
 - **Markdown complexity detectors.** No specifics yet on how to measure the
@@ -185,18 +182,15 @@ here.
 - **The core problem.** Documentation needs far more reading by the user than code
   does. Code is deterministic and can be pinned down by the tools above.
   Documentation can only be taken so far by deterministic tools; a lot of the
-  time it just has to be read. The challenge is imposing quality standards that
-  keep it from being sloppified. I am fundamentally incapable of reading Claude's
-  slop-filled documentation style. Something must be imposed so that the
-  documentation is a pleasure to read and not a terror.
+  time it just has to be read. I am incapable of reading Claude's slop-filled
+  style, so something has to keep the documentation a pleasure to read.
 
-## New terms introduced here
+## New terms
 
-Candidates for `CONTEXT.md`, not yet added there:
+Candidates for `CONTEXT.md`:
 
 - **CLOA** (Correct Level of Abstraction)
 - **Deterministic backpressure** and **stochastic function**
-- **Gate** versus **report**
 - **Unread tier** and **acceptance tier**
 - **Gray module**
 - **Slop**
