@@ -151,11 +151,6 @@ reads as a conclusion, or in a second clause that repeats the first. Say each
 thing once; attach a term to the plain statement instead of repeating the
 statement to carry it.
 
-- **Before** "Four to a few dozen nodes. I can hold it in my head, and rules
-  can be written against it. This is at the CLOA, and it is what
-  `import-linter` enforces." → **After** "Four to a few dozen nodes. This is at
-  the CLOA: I can hold it in my head, and `import-linter` can enforce rules
-  against it."
 - **Before** "The format may be wrong — a heavy HTML file is possibly the wrong
   way to go." → **After** "A heavy HTML file may be the wrong format."
 - **Before** "The challenge is imposing quality standards that keep it from
@@ -177,16 +172,13 @@ twice; this makes it once, slowly.
 ### Obvious qualifier
 
 A qualifier — sometimes a whole sentence — that carries nothing, because no
-alternative exists or because it restates the document's own premise. Delete it;
-keep a qualifier only where the alternative is real and someone might have
-expected it.
+alternative exists or because it restates the document's own premise. Delete it.
 
-- **Before** "Both graphs are understanding tools, generated on demand." (tools
-  run when they are run) → **After** the qualifier deleted, and then the whole
-  sentence — the document is about understanding.
+- **Before** "Both tool outputs are generated on demand." → **After** deleted;
+  tools run when they are run.
 - **Before** "Raw material, carried forward without analysis. We have not
   earned conclusions here." (under a heading that already said "not yet
-  examined") → **After** "Not yet examined. Raw material only."
+  examined") → **After** "Raw material only."
 - **Before** "New terms introduced here" (a section heading) → **After** "New
   terms"
 - **Before** "Not yet examined: documentation" (a section heading) → **After**
@@ -202,9 +194,9 @@ wrong the moment a fourth item is added — worse across files, where nobody see
 the count when they edit the list.
 
 - **Before** "The two disagree in three places:" → **After** "The two disagree
-  here:"
+  like so:"
 
-Watch for "three places", "the following two", "both of which", "all four".
+Watch for "three places", "the following two", "both of which", "all four", etc.
 
 ### Prepositional padding
 
