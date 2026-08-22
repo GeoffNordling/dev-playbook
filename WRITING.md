@@ -15,14 +15,24 @@ what survived review.
 
 ### The hypothetical misreader
 
-Writing aimed at a reader who is about to misunderstand, rather than the one
-actually reading. This is unnecessary bloat.
+**Definition.** Writing aimed at a reader who is about to misunderstand, rather
+than the one actually reading. This is unnecessary bloat.
+
+**Action.** Write for the reader in front of you.
+
+**Examples.**
+
+- **Before** "Run `make check`, the check target in the Makefile, before
+  pushing." → **After** "Run `make check` before pushing."
 
 ### Contrast pair
 
-An assertion paired with a denial of something the reader never proposed. Either
-order: assertion then denial, or denial then assertion. Keep the assertion,
-delete the denial.
+**Definition.** An assertion paired with a denial of something the reader never
+proposed, in either order: assertion then denial, or denial then assertion.
+
+**Action.** Delete the denial. The assertion stands on its own.
+
+**Examples.**
 
 - **Before** "A record of decisions, not a specification." → **After** "A record
   of decisions."
@@ -40,16 +50,25 @@ delete the denial.
 
 ### Unasked disclaimer
 
-A whole sentence defending against a misreading nobody was going to make. Delete
-the sentence.
+**Definition.** A whole sentence defending against a misreading nobody was going
+to make.
+
+**Action.** Delete the sentence.
+
+**Examples.**
 
 - **Before** "Nothing here describes software to build yet." → **After**
   deleted.
 
 ### Reassurance
 
-Comfort offered to a reader who might feel bad about a choice they made. The
-tell is emotional rather than logical: the sentence manages feelings.
+**Definition.** Comfort offered to a reader who might feel bad about a choice
+they made. The tell is emotional rather than logical: the sentence manages
+feelings.
+
+**Action.** Delete the comfort. Leave the fact it was wrapped around.
+
+**Examples.**
 
 - **Before** "Sometimes stochastic functions are required — that is the power
   of AI, and it is not a failure to use them." → **After** "Sometimes
@@ -60,10 +79,14 @@ tell is emotional rather than logical: the sentence manages feelings.
 
 ### Minted term
 
-A term invented on the spot and then used as though it were established — bold
-type and a definite article lend it an authority it has not earned. It also
-appears as an abstract insider word where a plain description fits. State the
-reason, then state what follows from it.
+**Definition.** A term invented on the spot and then used as though it were
+established — bold type and a definite article lend it an authority it has not
+earned. It also appears as an abstract insider word where a plain description
+fits.
+
+**Action.** State the reason, then state what follows from it.
+
+**Examples.**
 
 - **Before** "**The adoption test.** A tool earns its place if it fails a build
   with a one-line message." → **After** "These tools hide complexity behind
@@ -77,7 +100,13 @@ reason, then state what follows from it.
 
 ### Flourish
 
-A dramatic word or image where an ordinary one carries the same meaning.
+**Definition.** A dramatic word or image where an ordinary one carries the same
+meaning.
+
+**Action.** Write the ordinary word. Where the drama was the whole sentence,
+delete the sentence.
+
+**Examples.**
 
 - **Before** "Report-shaped tools rot." → **After** deleted; the paragraph
   already said reports depend on being read.
@@ -88,8 +117,12 @@ A dramatic word or image where an ordinary one carries the same meaning.
 
 ### Unnecessary examples
 
-Instances piled onto a claim the reader already understood. Each one has to be
-read before the point can be picked up again.
+**Definition.** Instances piled onto a claim the reader already understood. Each
+one has to be read before the point can be picked up again.
+
+**Action.** Delete the instances. Keep the claim.
+
+**Examples.**
 
 - **Before** "Report-shaped tools rot: a call-graph HTML nobody opens or a
   metrics dashboard is one more artifact I will not read." → **After**
@@ -97,8 +130,13 @@ read before the point can be picked up again.
 
 ### Closing cadence
 
-A short punchy sentence or pair of sentences at the end of a paragraph, there
-for rhythm. The paragraph already made the point; the cadence adds sound.
+**Definition.** A short punchy sentence or pair of sentences at the end of a
+paragraph, there for rhythm. The paragraph already made the point; the cadence
+adds sound.
+
+**Action.** Delete the closing sentence. End on the point.
+
+**Examples.**
 
 - **Before** "Gates compound. Reports rot." → **After** deleted.
 - **Before** "...and I cannot read a thousand tests. Nobody can." → **After**
@@ -108,8 +146,13 @@ for rhythm. The paragraph already made the point; the cadence adds sound.
 
 ### Overclaim
 
-A qualified position restated as an absolute. Absolutes read as stronger writing
-and are usually false.
+**Definition.** A qualified position restated as an absolute. Absolutes read as
+stronger writing and are usually false. The words are "everything", "never",
+"always", "nothing", and any flat refusal attributed to the user.
+
+**Action.** Write what is actually true, qualifier included.
+
+**Examples.**
 
 - **Before** "...depends on me reading it, and I will not read it." → **After**
   "I will read one when I need to, but it is much more work than a one-line
@@ -122,18 +165,21 @@ and are usually false.
   style..." → **After** "I am incapable of reading Claude's slop-filled
   style..."
 
-Watch for "everything", "never", "always", "nothing", and for any flat refusal
-attributed to the user.
-
 ### Changelog residue
 
-Traces of an earlier draft or of the path to the knowledge, left in a document
-whose job is to say what is true now. Git holds the history.
+**Definition.** Traces of an earlier draft or of the path to the knowledge, left
+in a document whose job is to say what is true now. Git holds the history. The
+words are "already", "previously", "it turns out", "no longer", "used to", "I
+had assumed", and any sentence whose subject is a change of mind.
 
 It accumulates. A document edited across many sessions collects a layer each
 time: told to move a tool from Adopt to Reject, Claude writes "we previously
 adopted this, then decided against it" instead of moving the line. The
 most-rewritten documents carry the most residue.
+
+**Action.** Make the edit and say only what is true now.
+
+**Examples.**
 
 - **Before** "Docstring enforcement is already deterministic, and I had
   forgotten." → **After** deleted; the section states the enforcement as it
@@ -141,15 +187,16 @@ most-rewritten documents carry the most residue.
 - **Before** "Docstrings — already settled" (a section heading) → **After**
   "Docstrings"
 
-Watch for "already", "previously", "it turns out", "no longer", "used to", "I
-had assumed", and for any sentence whose subject is a change of mind.
-
 ### Restatement
 
-A point made in plain words, then made again — with terminology attached so it
-reads as a conclusion, or in a second clause that repeats the first. Say each
-thing once; attach a term to the plain statement instead of repeating the
-statement to carry it.
+**Definition.** A point made in plain words, then made again — with terminology
+attached so it reads as a conclusion, or in a second clause that repeats the
+first.
+
+**Action.** Say each thing once. Attach the term to the plain statement instead
+of repeating the statement to carry it.
+
+**Examples.**
 
 - **Before** "The format may be wrong — a heavy HTML file is possibly the wrong
   way to go." → **After** "A heavy HTML file may be the wrong format."
@@ -162,17 +209,25 @@ statement to carry it.
 
 ### Bloated phrasing
 
-The same point in far more words than it needs. The short form was available and
-the sentence took a longer route to the same place. Restatement makes the point
-twice; this makes it once, slowly.
+**Definition.** The same point in far more words than it needs. The short form
+was available and the sentence took a longer route to the same place.
+Restatement makes the point twice; this makes it once, slowly.
+
+**Action.** Write the short form.
+
+**Examples.**
 
 - **Before** "The defense against that imagined misreading is what bloats the
   prose." → **After** "This is unnecessary bloat."
 
 ### Obvious qualifier
 
-A qualifier — sometimes a whole sentence — that carries nothing, because no
-alternative exists or because it restates the document's own premise. Delete it.
+**Definition.** A qualifier — sometimes a whole sentence — that carries nothing,
+because no alternative exists or because it restates the document's own premise.
+
+**Action.** Delete it.
+
+**Examples.**
 
 - **Before** "Both tool outputs are generated on demand." → **After** deleted;
   tools run when they are run.
@@ -188,20 +243,27 @@ alternative exists or because it restates the document's own premise. Delete it.
 
 ### Unnecessary enumeration
 
-A count of the items in a list that follows, written into the prose above it.
-The list already says how many. The count only has to be maintained, and it goes
-wrong the moment a fourth item is added — worse across files, where nobody sees
-the count when they edit the list.
+**Definition.** A count of the items in a list that follows, written into the
+prose above it. The list already says how many. The count only has to be
+maintained, and it goes wrong the moment a fourth item is added — worse across
+files, where nobody sees the count when they edit the list. The words are "three
+places", "the following two", "both of which", "all four", etc.
+
+**Action.** Delete the count.
+
+**Examples.**
 
 - **Before** "The two disagree in three places:" → **After** "The two disagree
   like so:"
 
-Watch for "three places", "the following two", "both of which", "all four", etc.
-
 ### Prepositional padding
 
-A phrase that spends a preposition to say what a compound says in fewer words.
-Common in headings, where the subject ends up buried behind the preposition
-instead of leading.
+**Definition.** A phrase that spends a preposition to say what a compound says in
+fewer words. Common in headings, where the subject ends up buried behind the
+preposition instead of leading.
+
+**Action.** Write the compound.
+
+**Examples.**
 
 - **Before** "Tests in two tiers" → **After** "Two testing tiers"
