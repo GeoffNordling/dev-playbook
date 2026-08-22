@@ -6,10 +6,7 @@ description: The named tics in Claude's writing
 
 # Writing
 
-The named tics in Claude's writing.
-
-Every example below is a real edit. "Before" is what Claude wrote; "after" is
-what survived review.
+Specific examples of Claude slop writing and how to avoid them.
 
 ## Tics
 
