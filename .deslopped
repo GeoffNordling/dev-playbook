@@ -1,0 +1,10 @@
+# Markdown files deslopped against standards/prose/slop-tics.md.
+#
+# One entry per line: <blob-sha> <path>. The sha is `git hash-object <path>`
+# at the time the file passed its faithful-reader check, so a path whose
+# current sha no longer matches has been edited since and is due again.
+#
+# Absence means never deslopped. There is no false value.
+
+bf7290e1b51768f8e41255373bd833a21a9c1313 software-factory/factory-operations.md
+b8429d67b4b24358eef7eee57c714005d21f2bb0 standards/prose/conventions.md

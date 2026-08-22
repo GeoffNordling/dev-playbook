@@ -58,5 +58,12 @@ directory, the target path, and
 [slop-tics.md](/standards/prose/slop-tics.md) as the standard the rewrite
 followed.
 
-Report its verdict line and any findings to the user, then stop. The user
-decides what to accept.
+It replies with a verdict line. Findings follow it only where it stalled.
+
+## Hand off the diff
+
+Report the target path, its `git diff --stat` line, and the verdict. Where the
+verdict is `I STALLED`, the findings follow.
+
+The change stays uncommitted so the user reads the diff in their IDE. They
+decide what to accept. Stop there.

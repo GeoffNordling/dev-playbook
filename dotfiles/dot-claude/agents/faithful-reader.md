@@ -2,7 +2,7 @@
 name: faithful-reader
 description: Reads a rewritten Markdown document, then checks whether the rewrite cost a reader anything they need. Use after a style-only rewrite, to judge what the deletions cost.
 tools: Read, Bash
-model: opus
+model: sonnet
 effort: xhigh
 ---
 
@@ -64,13 +64,15 @@ on it in step 1, it did not hamper you.
 
 ## The report
 
-Report each finding as: what you were trying to do, where you stopped or went
-wrong, the removed text that would have carried you through, and what the
-document says in its place.
+Open your reply with one line: `I CAN CARRY THIS OUT`, or
+`I STALLED (n places)`.
+
+On `I CAN CARRY THIS OUT`, that line is the entire reply. Write nothing after
+it.
+
+On `I STALLED`, one entry follows per finding: what you were trying to do,
+where you stopped or went wrong, the removed text that would have carried you
+through, and what the document says in its place.
 
 Most of what was removed was removed on purpose. Getting through the whole
-document is the expected outcome, and saying so is the right answer when it is
-true.
-
-Begin your reply with one line: `I CAN CARRY THIS OUT`, or
-`I STALLED (n places)`.
+document is the expected outcome.
