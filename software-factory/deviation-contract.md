@@ -117,7 +117,7 @@ a tracker entry that survives whether the pull request merges or not, and the
 whole point of deferring rather than declining. So the stub is written into the
 question as the sanctioned exception rather than left to contradict it: without
 it, no deferral could ever pass a test that every deferral is required to pass.
-Nothing else the lane touches gets that licence.
+Nothing else the lane touches gets that license.
 
 An escalation out of this lane is written nowhere on GitHub, exactly as above.
 The call itself is always written somewhere a reader is already looking, and
