@@ -52,6 +52,13 @@ H1 uses Title Case. H2 and below use sentence case.
 Proper nouns and code identifiers keep their native case at every level:
 `# CLAUDE.md Content`, `## pyproject.toml`, `### Ask in prose, never AskUserQuestion`.
 
+## Grammatical parallelism
+
+Items that sit together take the same grammatical shape: the headings of a
+document, the bullets of a list, the clauses of a sentence. One form holds
+throughout, so a break in the pattern marks a break in meaning rather than an
+accident of drafting.
+
 ## Open with purpose
 
 State what the document is for and what a reader should be able to do after
