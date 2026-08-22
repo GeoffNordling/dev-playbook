@@ -92,10 +92,14 @@ judgments:
       src/dev_playbook/label_scheme.json's wayfinder dimension mints exactly the
       labels standards/tracking/tracker-operations.md states in its Wayfinding
       operations section: the map label and the ticket types, and nothing else.
-      The scheme declares no dimension beyond wayfinder and the factory's —
-      category, mode, tests, and phase; one that is neither violates this claim.
+      The scheme declares no dimension beyond wayfinder, the factory's four —
+      category, mode, tests, and phase — and origin, which is governed by
+      standards/tracking/factory-labels.md's Valid labels section; one that is
+      none of those violates this claim.
     evidence:  [src/dev_playbook/label_scheme.json]
-    reference: [standards/tracking/tracker-operations.md]
+    reference:
+      - standards/tracking/tracker-operations.md
+      - standards/tracking/factory-labels.md
     model: claude-sonnet-5
     effort: high
 

@@ -44,9 +44,17 @@ defined — `wayfinder` by
 | Mode | `mode:spike` | A question; the answer closes the issue, no PR. Always `tests:no` — a spike merges nothing. |
 | Tests | `tests:yes` | The work writes or modifies tests, so `build` runs it test-first. |
 | Tests | `tests:no` | The work touches no tests, so `build` implements directly. |
+| Origin | `origin:deferral` | The issue was opened by the factory itself, to hold work a review suggested and the run deferred. |
 
 Every mode either fixes `tests:*` or splits on it, so the four-tuple is complete
 on every leaf. Category is required metadata and affects no routing.
+
+`origin:*` is outside the four-tuple. It records where an issue came from rather
+than what it is or where it stands, so it rides no leaf's tuple and no leaf is
+required to carry one; an issue opened by hand carries none. A deferral stub is
+the whole of the dimension today —
+[the suggestion dispositions](/software-factory/review-contract.md#suggestion-dispositions)
+mint it, at `phase:intake` like any other fresh issue.
 
 ## Naming
 

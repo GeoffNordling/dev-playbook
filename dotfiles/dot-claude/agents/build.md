@@ -18,6 +18,8 @@ Your prompt is the issue number; below, `<issue>` is that number.
 - `gh issue view <issue> --json title,body,comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
 - **Rework re-entry.** A prompt naming thread ids is a rework lap: review has already run, and those threads are your work list. Read each thread's content with `gh api` — [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) carries the query — and work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
 
+  **One exception, where the prompt does carry content.** A Suggestion thread listed as ruled fix now comes with a line of its own, and that line is the Adjudicator's ruling — the whole of what the thread is being asked for. It replaces the thread's posted text, which is the unruled suggestion the ruling settled: read the thread for context, then do what the prompt's line says, not what the suggestion said. Every other thread id in the prompt is an address and nothing more.
+
   ```
   gh api repos/<owner>/<repo>/pulls/<pr>/comments/<first-comment-databaseId>/replies -f body='Fixed in <sha>.'
   ```

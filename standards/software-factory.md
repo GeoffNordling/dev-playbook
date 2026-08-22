@@ -51,6 +51,5 @@ Governs how an idea becomes a merged pull request.
 - `scripts/traverse-issue`, the factory's entry point, plus the typed agent
   definitions in `dotfiles/dot-claude/agents/` and the skills in
   `dotfiles/dot-claude/skills/` — the intake and design skills carry an issue to
-  ready; the traverse launches the `build` and `open-pr` definitions, and the
-  `bug-pr-review`, `code-pr-review`, and `doc-pr-review` definitions carry it to
-  merge ([headless launch](/software-factory/factory-operations.md#engagement))
+  ready, and the traverse launches the definitions that carry it to merge
+  ([headless launch](/software-factory/factory-operations.md#engagement))

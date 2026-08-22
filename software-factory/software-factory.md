@@ -130,10 +130,11 @@ open after four autonomous cycles end the traverse escalated — a pull request
 that is not converging on its own reaches the user rather than looping on.
 Nothing else re-enters.
 
-`pr-ready` means converged on Blocking alone. Open Suggestion threads may still
-be on the pull request, and that is a real state rather than an oversight: a
-Suggestion is dispositioned at the merge boundary, so until the user gets there
-it simply stays open and no cycle counts it against convergence. What each node
+`pr-ready` means converged on Blocking alone: only Blocking threads are weighed,
+and no cycle counts a Suggestion against convergence. The Suggestions are not
+left pending for it. The Adjudicator settles every open one at each verdict
+point, and always at convergence, so a traverse ends `pr-ready` with its
+suggestions fixed, deferred to a stub, or declined. What each node
 does, who runs it, and under what contract is
 [factory-operations.md](/software-factory/factory-operations.md).
 
