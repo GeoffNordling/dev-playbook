@@ -12,7 +12,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
 - [Scratch](/SCRATCH.md) — Where the slop reduction stands — the CLOA, the code toolbox, and the open documentation work
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
-- [Writing](/WRITING.md) — What good writing looks like here, and the named tics that keep it from happening
+- [Writing](/WRITING.md) — The named tics in Claude's writing
 
 ## Directories
 

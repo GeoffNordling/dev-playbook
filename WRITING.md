@@ -1,39 +1,34 @@
 ---
 type: Guide
 title: Writing
-description: What good writing looks like here, and the named tics that keep it from happening
+description: The named tics in Claude's writing
 ---
 
 # Writing
 
-What good writing looks like here, and the named tics that keep it from
-happening.
+The named tics in Claude's writing.
 
-Detection is approximate. There are many ways to write a contrast pair, and most
-of them do not contain the word "not" next to a comma. A deterministic linter can
-catch a first-pass subset and nothing more. The rest stays with the reader and
-with review agents.
-
-Every example below is a real edit from this repository's documents. "Before" is
-what Claude wrote; "after" is what survived review.
+Every example below is a real edit. "Before" is what Claude wrote; "after" is
+what survived review.
 
 ## What good looks like
 
-**Grammatical parallelism in section headings.** Headings within a document take
-the same grammatical shape. In `SCRATCH.md` they are noun phrases: "The problem",
-"The code toolbox", "Two testing tiers", "Gray modules".
+**Grammatical parallelism in section headings.** In `SCRATCH.md` every heading is
+a noun phrase: "The problem", "The code toolbox", "Two testing tiers", "Gray
+modules".
 
-- Before: "Tests in two tiers" — After: "Two testing tiers"
-- Before: "Not yet examined: documentation" — After: "The documentation toolbox"
+- Before: "Tests in two tiers"
+  After: "Two testing tiers"
+- Before: "Not yet examined: documentation"
+  After: "The documentation toolbox"
 
-**State the reason, then say the thing plainly.** The alternative is inventing a
-term to carry the point (see Minted term).
+**State the reason, then say the thing plainly.** See Minted term.
 
 ## The hypothetical misreader
 
 The root of the first three tics below. Claude writes for a reader who is about
-to misunderstand, rather than for the reader who is actually there. The defense
-against that imagined misreading is what bloats the prose.
+to misunderstand. The defense against that imagined misreading is what bloats
+the prose.
 
 ## Tics
 
@@ -55,10 +50,9 @@ delete the denial.
   import graph. The two disagree here:"
 - Before: "...so that the documentation is a pleasure to read and not a terror."
   After: "...a pleasure to read."
-
-*First-pass detection:* a clause-final "not X" appended to a complete assertion,
-or a sentence of the form "It was not X" followed by "It was Y". Catches the
-obvious cases only.
+- Before: "What good writing looks like here, and the named tics that keep it
+  from happening."
+  After: "The named tics in Claude's writing."
 
 ### Unasked disclaimer
 
@@ -68,14 +62,10 @@ the sentence.
 - Before: "Nothing here describes software to build yet."
   After: deleted.
 
-*First-pass detection:* weak. The giveaway is that the sentence carries no
-information the reader lacked, which no regex sees.
-
 ### Reassurance
 
-Comfort offered to a reader who might feel bad about a choice they made. Same
-root as the two above, but the tell is emotional rather than logical: the
-sentence is managing feelings instead of carrying information.
+Comfort offered to a reader who might feel bad about a choice they made. The
+tell is emotional rather than logical: the sentence manages feelings.
 
 - Before: "Sometimes stochastic functions are required — that is the power of
   AI, and it is not a failure to use them."
@@ -85,14 +75,12 @@ sentence is managing feelings instead of carrying information.
   specification are an established paradigm."
   After: "This is the orthodox test pyramid."
 
-*First-pass detection:* none.
-
 ### Minted term
 
 A term invented on the spot and then used as though it were established — bold
 type and a definite article lend it an authority it has not earned. It also
-appears as an unnecessarily abstract insider word where a plain description
-fits. The fix is to state the reason, then state what follows from it.
+appears as an abstract insider word where a plain description fits. State the
+reason, then state what follows from it.
 
 - Before: "**The adoption test.** A tool earns its place if it fails a build
   with a one-line message."
@@ -108,8 +96,7 @@ fits. The fix is to state the reason, then state what follows from it.
 
 ### Flourish
 
-A dramatic word or image where an ordinary one carries the same meaning. Reports
-do not rot; they go unread.
+A dramatic word or image where an ordinary one carries the same meaning.
 
 - Before: "Report-shaped tools rot."
   After: deleted; the paragraph already said reports depend on being read.
@@ -133,13 +120,14 @@ Examples supplied on one side of a contrast only. Give one of each, or none.
 ### Closing cadence
 
 A short punchy sentence or pair of sentences at the end of a paragraph, there
-for rhythm. The paragraph already made the point; the cadence adds sound, not
-meaning.
+for rhythm. The paragraph already made the point; the cadence adds sound.
 
 - Before: "Gates compound. Reports rot."
   After: deleted.
 - Before: "...and I cannot read a thousand tests. Nobody can."
   After: "...and I cannot read a thousand tests."
+- Before: "The document says what is true now. Git holds the history."
+  After: folded into the definition above it.
 
 ### Overclaim
 
@@ -162,11 +150,10 @@ attributed to the user.
 ### Changelog residue
 
 Traces of an earlier draft or of the path to the knowledge, left in a document
-whose job is to say what is true now. It happens most when we rewrite in place:
-told to move a tool from Adopt to Reject, Claude writes "we previously adopted
-this, then decided against it" instead of simply moving the line.
-
-The document says what is true now. Git holds the history.
+whose job is to say what is true now. Git holds the history. It happens most
+when we rewrite in place: told to move a tool from Adopt to Reject, Claude
+writes "we previously adopted this, then decided against it" instead of moving
+the line.
 
 - Before: "Docstring enforcement is already deterministic, and I had forgotten."
   After: deleted; the section states the enforcement as it stands.
@@ -174,8 +161,7 @@ The document says what is true now. Git holds the history.
   After: "Docstrings"
 
 Watch for "already", "previously", "it turns out", "no longer", "used to", "I
-had assumed", and for any sentence whose subject is the act of changing our
-minds.
+had assumed", and for any sentence whose subject is a change of mind.
 
 ### Restatement
 
@@ -198,6 +184,10 @@ statement to carry it.
   pleasure to read and not a terror."
   After: "I am incapable of reading Claude's slop-filled style, so something has
   to keep the documentation a pleasure to read."
+- Before: "**Grammatical parallelism in section headings.** Headings within a
+  document take the same grammatical shape."
+  After: "**Grammatical parallelism in section headings.** In `SCRATCH.md` every
+  heading is a noun phrase."
 
 ### Obvious qualifier
 
