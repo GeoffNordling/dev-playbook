@@ -1,0 +1,17 @@
+# Paths the document-deslop skill never runs on.
+#
+# One repo-relative path, directory, or glob per line; a directory covers its
+# whole subtree; `**` matches any number of directories, including
+# none; `#` opens a comment line. Every entry carries a comment
+# saying why. Unlike .deslopped, an entry here records no sha: exemption is
+# permanent and does not lapse when the file changes.
+
+# The catalog the skill reads to do its job. Every `**Before** "..."` in it is
+# a deliberate specimen of a tic, so an agent applying the standard to this
+# file would destroy the examples that define it.
+standards/prose/slop-tics.md
+
+# Indexes. Each entry restates the frontmatter `description` of the file it
+# links, and okf-lint fails the commit when the two drift. The description is
+# the target file's to change, so an index is never rewritten on its own.
+**/index.md

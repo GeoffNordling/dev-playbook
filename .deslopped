@@ -1,10 +1,35 @@
-# Markdown files deslopped against standards/prose/slop-tics.md.
+# Markdown files that no longer need the document-deslop skill run on them.
 #
-# One entry per line: <blob-sha> <path>. The sha is `git hash-object <path>`
-# at the time the file passed its faithful-reader check, so a path whose
+# One entry per line: <status> <blob-sha> <path>.
+#
+#   checked   the skill ran, the faithful-reader check passed, and the diff
+#             was reviewed by the user.
+#   accepted  the user read the file and judged it clean. The skill never ran.
+#
+# The sha is `git hash-object <path>` as of that decision, so a path whose
 # current sha no longer matches has been edited since and is due again.
 #
-# Absence means never deslopped. There is no false value.
+# Absence means never deslopped. There is no false value. Files the skill
+# must never run on are listed in .deslop-exempt instead.
 
-bf7290e1b51768f8e41255373bd833a21a9c1313 software-factory/factory-operations.md
-b8429d67b4b24358eef7eee57c714005d21f2bb0 standards/prose/conventions.md
+checked  bf7290e1b51768f8e41255373bd833a21a9c1313 software-factory/factory-operations.md
+checked  b8429d67b4b24358eef7eee57c714005d21f2bb0 standards/prose/conventions.md
+
+# The standard cards. Each is four pointer cells over a couple of lines of
+# prose — too small to carry a tic, and high enough leverage that a bad
+# rewrite would propagate. Read and judged clean on 2026-08-22.
+accepted ea67c2f89bc70292d855660c9f6a2e39c8d1582c standards/build.md
+accepted f1f1abb32d86f6383e96bcdc195535ca7525c0ec standards/claude-code.md
+accepted e4b451d7001eefd3ff94e008f04066d7f6545dc7 standards/decisions.md
+accepted 67b076197aa14337ad1751f13d0aded98b8ea1d7 standards/instrument.md
+accepted 83a7cb8de51755fd856fcb4518ef200e20cf9ff0 standards/knowledge-organization.md
+accepted 71ffd82684dbedc68330ab0854591cc82748fad1 standards/legibility.md
+accepted 8040f7e03dfdb5e5316c7700dae4dd9467d98409 standards/modules.md
+accepted 1ee7d843e8e4887cb24910e83a31f8dc55fb2783 standards/prose.md
+accepted 1a9b1b9db25ae1e6a3a93dd154a6f842407e474d standards/python.md
+accepted 309496b37420d85c02fb2de592492ccb85859780 standards/semantic-validation.md
+accepted 2d38d96ff2baa547b107fca0f46633089c24909d standards/shell.md
+accepted 64c34502abc7ed0d198ff89584c30c6249101b01 standards/software-factory.md
+accepted 5c8c6bd4d9d4e245c4e783f76bdfe2816164700a standards/standard.md
+accepted 7966b9eea82f4d663d6a6aa8e36489839c61f69b standards/testing.md
+accepted f493b5675ebb3080ef21681d4b6ba85beeadb431 standards/tracking.md
