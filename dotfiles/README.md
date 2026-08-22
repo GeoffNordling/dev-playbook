@@ -36,7 +36,7 @@ scatter them one level too high — `scripts/sync-dotfiles` holds the mapping.
 
 ## Settings are generated, not symlinked
 
-`~/.claude/settings.json` is the one managed file that is not a symlink. Claude Code reads a single user-scope settings file and offers no local override layer, so the machine-specific remainder cannot be layered on top of a shared checked-in file — the sync merges `settings/base.json` with `settings/<machine>.json` and installs the result. Editing the installed copy loses the edit at the next sync; a session-start hook reports the drift rather than letting it pass silently.
+`~/.claude/settings.json` is the one managed file that is not a symlink. Claude Code reads a single user-scope settings file and offers no local override layer, so the machine-specific remainder cannot be layered on top of a shared checked-in file — the sync merges `settings/base.json` with `settings/<machine>.json` and installs the result. Editing the installed copy loses the edit at the next sync; a session-start hook catches the drift and tells the session to run the sync itself.
 
 ## Workflow
 
