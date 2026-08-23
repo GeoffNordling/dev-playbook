@@ -110,9 +110,7 @@ scripts, or the judges.
 
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
-  `/document-deslop` skill: Claude cannot be trusted to write a document
-  without slop, so, invoke the skill following every new document creation
-  or large document edit.
+  `/document-deslop` skill, which the user invokes manually.
 
 **Decided, awaiting a standard**
 

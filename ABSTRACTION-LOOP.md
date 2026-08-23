@@ -88,28 +88,59 @@ significant investment, never a whim two weeks later. The CLOA change
 discipline from the branch plan guards everyday operations against that
 jitter; the bootstrap run, before anything is adopted, stays freeform.
 
-## Candidates
+## Abstractions so far
 
-- **Standard** — define, audit, enforce, adopt. Established and live.
-  Bottom-level unreadability is its open problem: the top level (Define, Audit, Enforce, Adopt),
-  is elegant and simple, but the bottom level is a messy collection of non-user readable
-  documents and scripts.
-- **Agent** — a collection of documentation plus a permission set. Verb
-  perhaps **do**; unearned.
-- **Skill** — not an agent: a skill carries no permission set of its own.
-  It is documentation a session loads and executes with the session's
-  permissions. Verb set unearned.
+| Noun            | Verbs                         | Is                                                |
+| --------------- | ----------------------------- | ------------------------------------------------- |
+| Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
+| Agent           | do                            | Documentation that runs on its own permission set |
+| Skill           | do                            | Documentation that runs on the session's permissions |
+| Reference chain | —                             | A doc unit's references, declared, edge-labeled   |
 
-## First target
+- **Standard** is established and live. Its open problem: the top level is
+  elegant and simple; the bottom level is a messy collection of
+  non-user-readable documents and scripts.
+- **Agent and Skill** get one verb, **do**, and no more, ever. Specificity
+  comes from the verb being done, which a Standard defines — the deslopper
+  does not "enforce," it does slop-tics.enforce. The two differ only in
+  permission binding: an agent brings its own set, a skill runs on the
+  session's. The steps inside a skill are that skill's program, file-level
+  detail below the CLOA, never an interface.
+- **Reference chain** carries its verbs on its edges: **does** (a
+  Standard's verb, possibly via an agent) and **reads** (consulted, not
+  done). The declaration is lintable against the actual links. Absorbs
+  skills as signatures, OKF traces, and the OKF graph — one object seen
+  from three angles.
 
-One skill chain. The user's stated want: look up a skill and see every
-skill and document it references, as a chain. This absorbs raw ideas
-from the branch plan — skills as signatures, OKF traces, and the OKF
-graph — which are one object seen from three angles: a doc unit's
-reference chain, declared rather than discovered, so a lint can verify the
-declaration against the actual links.
+## Targets
 
-The software factory is the graduation exercise, not the first target: the
+Three chosen, in order: `document-deslop` (minimal, known cold — the
+calibration run), `grill-with-docs` (mid-size — five skills and a
+standard), `design` (the hub — eight skills and four docs, the chain least
+likely to fit in the user's head).
+
+The software factory is the graduation exercise, not a target yet: the
 abandoned attempt to understand it whole failed because the factory is
 only a collection of abstractions, and none of them had been constructed
 yet.
+
+### Run 1: document-deslop — zero residual
+
+The chain, declared:
+
+    document-deslop (Skill)  — does: slop-tics.enforce, via ↓
+    └─ deslopper (Agent: Read, Write)
+       ├─ does:  slop-tics.enforce
+       ├─ reads: conventions.md
+       └─ reads (conditional): writing-for-agents
+
+One sentence carries the target: document-deslop is the enforce arm of the
+Slop Tics Standard — a Skill that resolves a hint to files and dispatches
+the deslopper Agent once per file. Everything else in the two files — the
+one-pass write rule, the DONE protocol, the rewrite rules — is internals
+below the CLOA, the pandas method body, and is not residual.
+
+What the run bought: the **do**-only verb rule for Agent and Skill, and the
+two edge labels. The enforce/consult distinction that first appeared as
+residual dissolved into them — enforce is *does* the Standard's verb,
+consult is merely *reads*.
