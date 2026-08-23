@@ -32,9 +32,14 @@ uncommitted changes, say so and stop.
 
 ## Transform
 
-Read [slop-tics.md](/standards/prose/slop-tics.md) and
-[conventions.md](/standards/prose/conventions.md) first, then the target in
-full. Rewrite the target in place.
+Read three files and nothing else:
+[slop-tics.md](/standards/prose/slop-tics.md),
+[conventions.md](/standards/prose/conventions.md), and the target in full.
+
+**One pass, one write.** Write the whole rewritten document in a single
+`Write` call. Do not build it up through `Edit` calls, and do not inspect the
+file while the rewrite is in progress. Then read the finished document back
+in full and check it against the rules below.
 
 The rules, in order of importance:
 
