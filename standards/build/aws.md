@@ -6,8 +6,7 @@ description: The AWS layer — one CDK codebase under src/, per-Lambda dependenc
 
 # The AWS Layer
 
-An AWS repo is one Python codebase, not a collection of per-function
-mini-projects:
+An AWS repo is one Python codebase:
 
 - `cdk.json` declares `"app": "uv run python -m <package>.app"`.
 - Stacks and Lambda handlers live under `src/<package>/` as ordinary

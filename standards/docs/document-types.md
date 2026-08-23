@@ -28,7 +28,7 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 |------|------------|
 | `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [tracking/candidates.md](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
-| `General-Sheet` | A deliberately-broad genre for a working loop document whose precise genre is not yet settled — e.g. a live record read on a cadence (a board of declared metrics, a register of selected items). Used when no crisper genre fits and the document's shape may still change. |
+| `General-Sheet` | A deliberately-broad genre for a working loop document whose type is not yet settled — e.g. a live record read on a cadence (a board of declared metrics, a register of selected items). |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
 | `Instrument-Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
@@ -37,7 +37,7 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
 | `Spec-Item` | One item of a machine-validated specification tree — a functional requirement or design node with typed edges, operated on by tooling rather than only read. |
 | `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work; lives under `standards/`, the one tree reserved for it (see [standard/format.md](/standards/standard/format.md#where-a-standard-lives)). |
-| `Standard-Card` | The thin catalog record for one standard — four pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
+| `Standard-Card` | The thin catalog record for one standard — pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
@@ -83,8 +83,7 @@ Extension is **additive and downhill only**:
   because it never edits this file.
 - **Downhill only.** A local type is legal only in the repo that declares it (and
   any repo downstream of it); it is invisible uphill to dev-playbook and sideways
-  to sibling consumers. A type is exactly as local as the population that carries
-  it — a vocabulary word lives where its documents live.
+  to sibling consumers.
 - **Name and description only.** A local type carries just its name and its
   `## Types` cell. The per-type constraints upstream types may impose (a
   `resource` on `Recipe-Description`, an `## Employed by` section on
@@ -93,7 +92,7 @@ Extension is **additive and downhill only**:
 - **Broken extension degrades, never aborts.** A malformed or empty extension
   table yields findings on that file (`knowledge-organization.registry-row`,
   `knowledge-organization.index-ordering`) while the rest of the repo is still
-  fully checked — never a whole-repo scan abort.
+  fully checked.
 
 Authoring a local extension is one step of the
 [repo-scoped standard recipe](/standards/standard/consuming.md); it is itself a

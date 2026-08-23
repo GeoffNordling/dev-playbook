@@ -6,20 +6,19 @@ description: The CONTEXT.md vocabulary center — structure, authoring rules, an
 
 # CONTEXT.md Content
 
-CONTEXT.md is the repo's vocabulary disambiguation center. It is not confined
-to a single domain glossary: as ambiguity surfaces it may accrete several
-term clusters — an architecture vocabulary, a governance vocabulary — grouped
-under `## Language` subheadings. The point is constant: when several words
-compete for one concept, pick one and retire the rest.
+CONTEXT.md is the repo's vocabulary disambiguation center: when several
+words compete for one concept, pick one and retire the rest. As ambiguity
+surfaces it may accrete several term clusters — an architecture vocabulary,
+a governance vocabulary — grouped under `## Language` subheadings.
 
 ## Structure
 
 Frontmatter (`type: Vocabulary`, `title`, `description`), an H1 with a
-short purpose statement, then four sections: `## Language`,
+short purpose statement, then these sections: `## Language`,
 `## Relationships`, `## Example dialogue`, `## Flagged ambiguities`. When
-the file carries more than one term cluster, group `## Language` (and, where
-it helps, `## Relationships`) under `###` subheadings, one per cluster. A
-`## Rejected framings` section is optional, for framings deliberately turned
+the file carries more than one term cluster, group `## Language` (and,
+where it helps, `## Relationships`) under `###` subheadings, one per
+cluster. A `## Rejected framings` section is optional, for framings turned
 down. A brief worked example:
 
 ```markdown
@@ -63,22 +62,19 @@ _Avoid_: Bill, payment request
   the best one and list the others as aliases to avoid.
 - **Flag conflicts explicitly.** If a term is used ambiguously, call it out
   in "Flagged ambiguities" with a clear resolution.
-- **Keep definitions tight.** One sentence max. Define what it IS, not what
-  it does.
+- **Keep definitions tight.** One sentence max. Define what it is.
 - **Show relationships.** Use bold term names and express cardinality where
   obvious.
 - **Only include terms specific to this project's context.** General
   programming concepts (timeouts, error types, utility patterns) don't
-  belong even if the project uses them extensively. Before adding a term,
-  ask: is this a concept unique to this context, or a general programming
-  concept? Only the former belongs.
+  belong even if the project uses them extensively.
 - **Group terms under subheadings** when natural clusters emerge. If all
   terms belong to a single cohesive area, a flat list is fine.
 - **Write an example dialogue.** A conversation between a dev and a domain
-  expert that demonstrates how the terms interact naturally and clarifies
-  boundaries between related concepts.
+  expert that demonstrates how the terms interact and clarifies boundaries
+  between related concepts.
 
 ## Location
 
 One `CONTEXT.md` at the repo root, created lazily as terminology ambiguity
-surfaces — never pre-populated.
+surfaces.

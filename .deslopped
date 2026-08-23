@@ -22,6 +22,16 @@ checked  049f6445bdc69fb95a42ec371407ae8e438a4b1e software-factory/review-contra
 checked  5a7e09fe1c0380498b58639e32a8642a7cc2c2de software-factory/software-factory.md
 checked  2a6d7d130479cb9dd052d62e2ba9b2be85e98263 software-factory/tdd.md
 checked  3e5a9be359dde5d85b92d8af4769d7d7051582bd software-factory/user-checkpoints.md
+checked  4f4cf8c624e2c079694f38d00d9ee93b927e96da docs/machines.md
+checked  d844acf7b8e6fb355cfbb02277cc0f72982b8c7a dotfiles/dot-claude/agents/open-pr.md
+checked  074c2999086e86852625660205a7da880fbc8ddc dotfiles/dot-claude/skills/idea/SKILL.md
+checked  2f425d81e888d6be003e1ca58cf490e065eacb6e dotfiles/dot-claude/skills/intake/SKILL.md
+checked  4def81a5dc554d7a51bd617898f40686d4e50ada standards/build/aws.md
+checked  b9a452594d878c17b6955c904379ccaf0452ff82 standards/build/distribution.md
+checked  ce2d7a34a1a4f02a4580db59b1ada4f7e0e2e5bb standards/docs/context-content.md
+checked  fca349ca6d9ec84fd25f4d8c40d918ff52b0b878 standards/docs/document-types.md
+checked  af37334acd9aad8ab2fb6689b6758f3daf1b68d1 standards/tracking/repo-settings.md
+checked  d5ab045bd74ba6617ce534d9bc91057d5346bebb standards/tracking/tracker-operations.md
 
 # The standard cards. Each is four pointer cells over a couple of lines of
 # prose — too small to carry a tic, and high enough leverage that a bad
