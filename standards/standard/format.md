@@ -178,7 +178,7 @@ contract.
 - **Two citation kinds in an Audit cell.** A cell cites a **lint** via a
   `/scripts/` link — a deterministic detector, held to the rule-matrix
   `--list-rules` contract — or an **audit** (an LLM judge) via a judgment link
-  (`/standards/judgments/…` or `/judgments/*.yaml`), which carries no script
+  (`/standards/semantic-validation/…` or `/judgments/*.yaml`), which carries no script
   contract. The rule-matrix check scopes its citation collection to `/scripts/`
   links, so audit-kind citations are exempt by construction, not by exception.
   The [Semantic Validation](/standards/semantic-validation.md) card shows both:
@@ -212,7 +212,7 @@ Standards drift, each grain with its own detector:
 
 1. **Fine grain** — a specific document or passage must keep meaning what
    it meant when validated.
-   [Judgments](/standards/judgments/index.md) cover this: the
+   [Judgments](/standards/semantic-validation/index.md) cover this: the
    content-addressed cache expires a verdict the moment the underlying
    bytes change.
 2. **Contract grain** — a change to a define cell obligates rework across the

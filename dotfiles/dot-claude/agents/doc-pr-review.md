@@ -19,7 +19,7 @@ code files to the code track, which reviews in parallel with you; both are
 reference material: read them where the docs describe them, and post no
 findings on them. Judgment declarations under `judgments/` are ordinary docs
 here — a review may flag one as stale against the artifacts it names
-([Maintenance](~/workspace/dev-playbook/standards/judgments/declarations.md#maintenance));
+([Maintenance](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#maintenance));
 cache state is never a finding.
 
 ## Read first
@@ -90,7 +90,7 @@ conventions. Read the ones it calls for, end-to-end, then report
 |---|---|
 | skills or agent definitions | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/dotfiles/.agents/skills/writing-for-agents/SKILL.md) for the craft both forms answer to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
 | standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
-| structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/docs/index.md) |
+| structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/knowledge-organization/index.md) |
 
 A rule you did not read cannot carry a Blocking finding.
 

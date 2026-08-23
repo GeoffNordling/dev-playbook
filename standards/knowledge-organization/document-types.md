@@ -15,7 +15,7 @@ This governs **concept documents** — the prose `.md` files an agent crawls and
 loads to understand something. Harness-owned files are in the bundle too, but a
 tool consumes them as configuration or runs them as code rather than reading
 them as prose, so they are not concept documents and carry no OKF frontmatter.
-The boundary rule lives in [bundle.md](/standards/docs/bundle.md); the
+The boundary rule lives in [bundle.md](/standards/knowledge-organization/bundle.md); the
 Claude Code file set is enumerated in
 [the harness-files registry](/standards/claude-code/files.md).
 
@@ -64,7 +64,7 @@ Not used: `tags`, `timestamp`.
 The registry is hierarchical, exactly two levels deep. **This file, in
 dev-playbook, is the global registry** — the upstream vocabulary every repo
 inherits. A consumer repo that carries a document type no other repo shares
-declares it in a **local extension**: its own `standards/docs/document-types.md`,
+declares it in a **local extension**: its own `standards/knowledge-organization/document-types.md`,
 a `## Types` table of the same shape. okf-lint resolves a document's `type`
 against **upstream ∪ local** — the global registry plus the audited repo's
 extension, defaulting to upstream alone when the repo carries no extension.

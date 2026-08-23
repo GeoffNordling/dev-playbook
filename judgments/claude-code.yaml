@@ -7,7 +7,7 @@
 # disallowed actor noun (prose-lint), but only a reader can tell whether the prose
 # is actually agent-facing or merely token-clean declarative third person — that
 # semantic gap is what this family guards.
-# See standards/judgments/.
+# See standards/semantic-validation/.
 judgments:
   - id: claude-md-agent-facing-voice
     claim: |

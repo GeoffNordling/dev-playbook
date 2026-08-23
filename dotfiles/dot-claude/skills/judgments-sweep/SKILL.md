@@ -13,7 +13,7 @@ A **judgment** is a specific yes/no question about specific files, ruled on by a
 LLM judge, declared as YAML and keyed by content: editing a claim or a file it
 puts on trial re-keys it, and a machine-shared cache remembers what has been
 judged-and-passed. A sweep judges whatever has drifted out of that cache.
-See the [declaration format](~/workspace/dev-playbook/standards/judgments/declarations.md).
+See the [declaration format](~/workspace/dev-playbook/standards/semantic-validation/declarations.md).
 
 Steps 1–3 below are mechanical: run a command, pass its output on untouched, run
 the commands you get back. **Copy, never compose** — each hand-off is one opaque

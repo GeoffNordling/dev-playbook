@@ -237,7 +237,7 @@ def classify(relpath: str) -> str:
       ``references/``/``scripts/``, ``agents/``, ``rules/``, every top-level
       ``tests/`` tree
       (parser fixtures — tool-consumed, often deliberately malformed; see the
-      tests-tree boundary in standards/docs/bundle.md), and every non-``.md``
+      tests-tree boundary in standards/knowledge-organization/bundle.md), and every non-``.md``
       file.
 
     The concept/harness split mirrors the bundle boundary in the docs

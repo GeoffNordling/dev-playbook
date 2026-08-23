@@ -521,21 +521,17 @@ def test_global_claude_absent_gates_the_check(tmp_path: Path) -> None:
     assert "global-claude" not in result.stdout
 
 
-def test_context_md_with_all_sections_passes(tmp_path: Path) -> None:
+def test_context_md_with_language_passes(tmp_path: Path) -> None:
     files = base_files()
-    files["CONTEXT.md"] = (
-        "# Domain\n\n## Language\n\n## Relationships\n\n"
-        "## Example dialogue\n\n## Flagged ambiguities\n"
-    )
+    files["CONTEXT.md"] = "# Domain\n\n## Language\n\n**Order**:\nA request.\n"
     assert run(make_repo(tmp_path, files)).returncode == 0
 
 
-def test_context_md_missing_section_fails(tmp_path: Path) -> None:
+def test_context_md_missing_language_fails(tmp_path: Path) -> None:
     files = base_files()
-    files["CONTEXT.md"] = "# Domain\n\n## Language\n\n## Relationships\n"
+    files["CONTEXT.md"] = "# Domain\n\nTerms for the domain.\n"
     result = run(make_repo(tmp_path, files))
-    assert "missing section '## Example dialogue'" in result.stdout
-    assert "missing section '## Flagged ambiguities'" in result.stdout
+    assert "missing section '## Language'" in result.stdout
 
 
 def test_nested_context_md_forbidden(tmp_path: Path) -> None:

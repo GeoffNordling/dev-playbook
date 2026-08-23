@@ -21,21 +21,21 @@ copies two opaque strings and is left with only the refutations to weigh.
 
 ## Define
 
-- [standards/judgments/](/standards/judgments/index.md) — the contract, one
+- [standards/semantic-validation/](/standards/semantic-validation/index.md) — the contract, one
   concern per document; start at Judgment Declarations
 
 ## Audit
 
 - [judgments-lint](/scripts/judgments-lint) — checks declaration shape,
   deterministically
-- [the LLM judgments](/standards/judgments/declarations.md) — an LLM judge
+- [the LLM judgments](/standards/semantic-validation/declarations.md) — an LLM judge
   rules on each declared claim against its evidence, dispatched by the
   periodic `judgments-sweep` — for an ungated judgment, the only checker
   there is; the audit-kind detector no deterministic lint can stand in for
 
 ## Enforce
 
-- the pytest cache gate ([The Cache Gate](/standards/judgments/cache-gate.md))
+- the pytest cache gate ([The Cache Gate](/standards/semantic-validation/cache-gate.md))
   — the **push gate** for gated judgments: a pytest naming a judgment's id
   reds `make check-judgments-cache` until that exact content is
   judged-and-passed; a repo gates all, some, or none of its judgments
@@ -46,5 +46,5 @@ copies two opaque strings and is left with only the refutations to weigh.
 
 ## Adopt
 
-- [Consuming Judgments](/standards/judgments/consuming.md) — the
+- [Consuming Judgments](/standards/semantic-validation/consuming.md) — the
   consumer-repo recipe: dependency, declarations, gate, cache fill

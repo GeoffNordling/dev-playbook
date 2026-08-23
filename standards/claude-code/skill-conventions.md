@@ -35,7 +35,7 @@ The directory name must match the `name` field in the front matter.
 A skill bundle is harness-owned — Claude Code loads `SKILL.md` as configuration,
 not as prose to learn from — so it is not an OKF concept document. Its front
 matter is the Claude Code skill schema below, **not** the OKF `type`/`title`/`description`
-profile. See [the OKF bundle boundary](/standards/docs/bundle.md).
+profile. See [the OKF bundle boundary](/standards/knowledge-organization/bundle.md).
 
 ```yaml
 ---
@@ -113,9 +113,9 @@ After the front matter, the body is Markdown.
 
 ## Cross-references
 
-Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) are harness-owned, not concept documents, and they follow a **target-based** rule instead of the bundle Link/Citation split ([cross-references.md](/standards/docs/cross-references.md)). The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
+Skill bundles (`SKILL.md` and any reference files under `.claude/skills/<name>/` or `.agents/skills/<name>/`) are harness-owned, not concept documents, and they follow a **target-based** rule instead of the bundle Link/Citation split ([cross-references.md](/standards/knowledge-organization/cross-references.md)). The wrapper records intent: an inline link means "go open this"; inline code means "this file exists conceptually."
 
-A skill has **no fixed repo root**. The same skill can be invoked from a session in any repo's checkout, so there is no stable bundle root for a `/`-absolute Link to resolve against. A skill therefore cites a workspace document by its full `~/workspace/<repo>/…` path even when that document lives in the same repo as the skill bundle. When that document is in the same repo, the citation resolves per [same-repo resolution](/standards/docs/cross-references.md#same-repo-resolution) — against the reader's own checkout, worktree included, not the main checkout.
+A skill has **no fixed repo root**. The same skill can be invoked from a session in any repo's checkout, so there is no stable bundle root for a `/`-absolute Link to resolve against. A skill therefore cites a workspace document by its full `~/workspace/<repo>/…` path even when that document lives in the same repo as the skill bundle. When that document is in the same repo, the citation resolves per [same-repo resolution](/standards/knowledge-organization/cross-references.md#same-repo-resolution) — against the reader's own checkout, worktree included, not the main checkout.
 
 | Target | Style | Example |
 |---|---|---|
@@ -125,7 +125,7 @@ A skill has **no fixed repo root**. The same skill can be invoked from a session
 | Directory | Inline code | `` `docs/decisions/` `` |
 | Slash-skill invocation | Bare — no markup | `/commit` |
 
-When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/docs/cross-references.md#fragment-anchors)).
+When citing a section of a referenced document, prefer a stable named anchor over a positional `§x.x` / heading-number — name the concept and drop the number where the source exposes no stable anchor (see [Fragment anchors](/standards/knowledge-organization/cross-references.md#fragment-anchors)).
 
 ## References directory
 

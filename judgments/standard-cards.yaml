@@ -6,7 +6,7 @@
 # misrepresents what its targets do. Evidence is the card under trial; reference
 # is standards/standard/format.md (the card contract) plus the artifacts the
 # card points at. One judgment per card -- semantic honesty the deterministic
-# standards-lint cannot check. See standards/judgments/.
+# standards-lint cannot check. See standards/semantic-validation/.
 judgments:
   - id: standard-card-build
     claim: |
@@ -75,7 +75,7 @@ judgments:
     evidence:  [standards/knowledge-organization.md]
     reference:
       - standards/standard/format.md
-      - standards/docs/index.md
+      - standards/knowledge-organization/index.md
       - scripts/okf-lint
       - scripts/ref-lint
       - scripts/repo-lint
@@ -92,9 +92,9 @@ judgments:
     evidence:  [standards/semantic-validation.md]
     reference:
       - standards/standard/format.md
-      - standards/judgments/index.md
-      - standards/judgments/cache-gate.md
-      - standards/judgments/consuming.md
+      - standards/semantic-validation/index.md
+      - standards/semantic-validation/cache-gate.md
+      - standards/semantic-validation/consuming.md
       - scripts/judgments-lint
       - scripts/judgments-run
       - standards/build/canonical/.pre-commit-config.yaml

@@ -25,7 +25,7 @@ Readmit both, framed as generic workspace vocabulary rather than SDD support:
   accepts a module's mirror flat (`tests/x/test_y.py`) or beneath the
   recognized scope directories `unit` and `integration`; `tests/agent_review/`
   holds free-stem judgment gate tests
-  ([cache-gate.md](/standards/judgments/cache-gate.md)) and sits outside the
+  ([cache-gate.md](/standards/semantic-validation/cache-gate.md)) and sits outside the
   rule. 0017 dropped the scopes because their names were semantic input to SDD
   traceability; they return with no such semantics attached — `unit` and
   `integration` are plain pytest vocabulary, and `agent_review` is workspace

@@ -18,9 +18,9 @@ def test_errors_exhaustive():
 ```
 
 `assert_judgment_cached(id)` resolves the root
-([declarations.md — Config and root resolution](/standards/judgments/declarations.md#config-and-root-resolution)),
+([declarations.md — Config and root resolution](/standards/semantic-validation/declarations.md#config-and-root-resolution)),
 keys the named judgment
-([declarations.md — What a judgment is](/standards/judgments/declarations.md#what-a-judgment-is)),
+([declarations.md — What a judgment is](/standards/semantic-validation/declarations.md#what-a-judgment-is)),
 and asks the seen-set whether that exact content has been
 judged-and-passed:
 

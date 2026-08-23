@@ -58,7 +58,7 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 3. Commit the piece with /commit.
 4. Move to the next piece, or to §6 once the issue's scope is fully carried out.
 
-Declarations under `judgments/` are documentation: keep the ones your edits affect accurate as you edit; add new ones rarely — see [The bar](~/workspace/dev-playbook/standards/judgments/declarations.md#the-bar).
+Declarations under `judgments/` are documentation: keep the ones your edits affect accurate as you edit; add new ones rarely — see [The bar](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#the-bar).
 
 ## 5. Escalations
 

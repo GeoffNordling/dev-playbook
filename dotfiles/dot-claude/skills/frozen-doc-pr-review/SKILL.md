@@ -19,7 +19,7 @@ presence, their absence, or their contents.
 
 Review the documentation in an issue's PR diff against its issue brief, the doc standards, and the documents around it, and attach your findings to the PR.
 
-**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec markdown and prose artifacts, and on the PR body, for the presence check alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them. Judgment declarations under `judgments/` are ordinary docs here — a review may flag one as stale against the artifacts it names ([Maintenance](~/workspace/dev-playbook/standards/judgments/declarations.md#maintenance)); cache state is never a finding.
+**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec markdown and prose artifacts, and on the PR body, for the presence check alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and code files to the code track, which reviews in parallel with you; both are reference material: read them where the docs describe them, and post no findings on them. Judgment declarations under `judgments/` are ordinary docs here — a review may flag one as stale against the artifacts it names ([Maintenance](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#maintenance)); cache state is never a finding.
 
 ## Read first
 
@@ -57,7 +57,7 @@ The diff's content picks the standards that bind this review on top of the doc c
 |---|---|
 | skills | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus /writing-for-agents for the craft every skill answers to; and for a `phase:*` skill, [node-skill authoring](~/.claude/skills/frozen-issue-overwatch/references/node-skill-authoring.md) on top |
 | standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
-| structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/docs/index.md) |
+| structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/knowledge-organization/index.md) |
 
 ## 3. Audit the change
 

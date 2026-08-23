@@ -48,7 +48,7 @@ an `index.md` listing each file with a one-line description, and child
 directories are reached through their own `index.md`. Walk the descriptions
 to the one file the task needs, confirming relevance from a doc's YAML
 frontmatter (`type`, `description`) before reading its body. The format
-(OKF) is defined at `~/workspace/dev-playbook/standards/docs/index.md`;
+(OKF) is defined at `~/workspace/dev-playbook/standards/knowledge-organization/index.md`;
 consult it when authoring docs, not for navigation.
 
 ### Always pin a subagent's model
@@ -96,6 +96,6 @@ GitHub renders Markdown before LaTeX, so:
 
 ### Resolve same-repo paths
 
-<!-- verbatim from standards/docs/cross-references.md — keep in sync -->
+<!-- verbatim from standards/knowledge-organization/cross-references.md — keep in sync -->
 
 **Same-repo resolution:** a `~/workspace/<repo>/…` path whose `<repo>` is the repo your session is working in — its main checkout or any of its worktrees — resolves inside your own checkout: substitute your checkout root for `~/workspace/<repo>/`. A path into a different repo resolves as written, to that repo's main checkout. Touching your repo's main checkout from a worktree is legitimate only as a deliberate comparison against published state — say so when you do it.

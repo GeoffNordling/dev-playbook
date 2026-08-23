@@ -275,7 +275,7 @@ in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-au
   tree. The rule is per-phase, not per-commit: individual commits are already
   covered by the commit gate's hook suite.
 - **Judgments sit outside every node.** `make check` leaves the semantic
-  [cache gate](/standards/judgments/cache-gate.md) skipped, and no node arms it
+  [cache gate](/standards/semantic-validation/cache-gate.md) skipped, and no node arms it
   or runs a judge — judgments are settled by the periodic sweep, outside the
   factory. For a **review** skill the exclusion is total: the
   `judgments/*.yaml` declarations are outside its jurisdiction

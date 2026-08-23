@@ -3,7 +3,7 @@
 # artifact conforms to what the doc states. Evidence is the artifact under trial;
 # reference is the governing document. This is the mirror of docs-match-code --
 # there a doc is on trial against the code it describes; here the code is on
-# trial against the doc that governs it. See standards/judgments/.
+# trial against the doc that governs it. See standards/semantic-validation/.
 #
 # Subset claim template. The subset judgments below share one shape: X does or
 # contains only what Y states; Y may state more than X does; X must not exceed
@@ -43,14 +43,14 @@ judgments:
     claim: |
       Every check scripts/repo-lint performs that emits the
       `knowledge-organization.doc-shape` rule corresponds to a requirement
-      stated in the standards/docs/ documents:
+      stated in the standards/knowledge-organization/ documents:
       the README H1 and the CONTEXT.md sections it checks for are shape
       requirements those documents state. The standard may state more than
       the tool checks; the tool must not check more than the standard states.
     evidence:  [scripts/repo-lint]
     reference:
-      - standards/docs/readme-content.md
-      - standards/docs/context-content.md
+      - standards/knowledge-organization/readme-content.md
+      - standards/knowledge-organization/context-content.md
     model: claude-sonnet-5
     effort: high
 

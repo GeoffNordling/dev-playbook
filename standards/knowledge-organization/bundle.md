@@ -18,7 +18,7 @@ A repo's agent-navigated documentation is one
 bundle, per the [OKF SPEC](/standards/references/okf-spec.md). The bundle is
 the whole repository: an agent triages a document by its frontmatter and
 navigates between documents by the per-directory `index.md` listings
-([indexes.md](/standards/docs/indexes.md)), loading full bodies only when a
+([indexes.md](/standards/knowledge-organization/indexes.md)), loading full bodies only when a
 document is relevant.
 
 ## Concept documents and harness-owned files
@@ -28,7 +28,7 @@ Not every file in the repo is a concept document. The bundle divides:
 - **Concept documents** — prose knowledge a reader loads to *understand*
   something: standards, guides, surveys, Decision Records, READMEs, the
   vocabulary. Each carries OKF frontmatter (`type` + `title` +
-  `description`, per [document-types.md](/standards/docs/document-types.md)) and
+  `description`, per [document-types.md](/standards/knowledge-organization/document-types.md)) and
   is subject to the type-lint.
 - **Harness-owned files** — files a tool *consumes as configuration or runs
   as code*: every non-`.md` file, every `.md` under a top-level `tests/`

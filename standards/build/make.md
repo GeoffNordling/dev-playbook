@@ -11,7 +11,7 @@ universal target and means the same thing everywhere: **green `check` =
 every deterministic check whose remedy is in the repo's own hands passes.**
 Its recipe is identical in every repo — run the full hook suite — and
 layers add prerequisites. `check-judgments-cache` is `check` plus the
-semantic [cache gate](/standards/judgments/cache-gate.md) armed; it is what
+semantic [cache gate](/standards/semantic-validation/cache-gate.md) armed; it is what
 the pre-push hook runs, because that gate's only remedy is a
 [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
 run:
@@ -35,7 +35,7 @@ guarantees a green cloud run.
 
 The `test` target carries whatever judgment cache tripwires the repo has
 wired via pytest — deterministic checks, no LLM
-([cache-gate.md](/standards/judgments/cache-gate.md)) — but `make test`
+([cache-gate.md](/standards/semantic-validation/cache-gate.md)) — but `make test`
 and `make check` **skip** them by default (they export `SKIP_JUDGMENTS=1`), so
 a subagent never hits a miss it cannot fill. `make check-judgments-cache` arms
 them and is the pre-push hook's entry — a repo with none wired passes it

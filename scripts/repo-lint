@@ -143,12 +143,7 @@ AGENT_ROOTS = (".claude/agents", "dotfiles/dot-claude/agents")
 VENDORED_DIR = ".agents"
 UV_SHEBANG = "#!/usr/bin/env -S uv run --script"
 PEP723_OPEN = "# /// script"
-CONTEXT_SECTIONS = (
-    "## Language",
-    "## Relationships",
-    "## Example dialogue",
-    "## Flagged ambiguities",
-)
+CONTEXT_SECTIONS = ("## Language",)
 
 # The words agent-facing instruction text may not speak in live in
 # dev_playbook.voice, which repo-init reads too — a fresh repo's name becomes

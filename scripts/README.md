@@ -62,11 +62,11 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
 | `python-lint` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
 | `testing-lint` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
-| `ref-lint` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
-| `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
+| `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
+| `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
-| `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
+| `judgments-lint` | [declarations.md](/standards/semantic-validation/declarations.md) | Judgment declaration validity |
 | `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, and the banned actor noun over every tracked file of any type, less the vendored `.agents/` trees and verbatim `type: Reference` mirrors |
 | `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 

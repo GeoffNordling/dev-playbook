@@ -42,7 +42,7 @@ The caller supplies the repository root. Optionally:
 
 | Bucket | Test |
 |---|---|
-| `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([bundle.md](/standards/docs/bundle.md)) |
+| `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([bundle.md](/standards/knowledge-organization/bundle.md)) |
 | `index` | an `index.md` directory listing |
 | `harness-session` | markdown injected into agent context at session start: `CLAUDE.md` at any level, `rules/*.md` |
 | `harness-skill-authored` | a first-party skill bundle member — `SKILL.md` plus everything in its skill directory |
@@ -58,7 +58,7 @@ injected every session, versus loaded on skill invocation from first-party
 or third-party trees.
 
 The bucket tests follow the concept/harness boundary
-([bundle.md](/standards/docs/bundle.md)) and the harness-file registry
+([bundle.md](/standards/knowledge-organization/bundle.md)) and the harness-file registry
 ([files.md](/standards/claude-code/files.md)); the reference encoding is
 `classify()` in [md.py](/src/dev_playbook/md.py).
 
@@ -71,9 +71,9 @@ not edges.
 
 | Form | Detection |
 |---|---|
-| `link` | root-absolute markdown link, per [cross-references.md](/standards/docs/cross-references.md) |
+| `link` | root-absolute markdown link, per [cross-references.md](/standards/knowledge-organization/cross-references.md) |
 | `citation` | `~/workspace/…` reference, in-link or bare |
-| `resource` | frontmatter `resource:` pointer ([document-types.md](/standards/docs/document-types.md)) |
+| `resource` | frontmatter `resource:` pointer ([document-types.md](/standards/knowledge-organization/document-types.md)) |
 | `relative` | relative markdown link — outside the reference grammar, still an edge |
 | `prose-path` | a path-shaped token in markdown that the grammar treats as prose — inline code spans, fenced blocks — resolving to an in-scope file |
 | `code-ref` | a path-shaped token in a non-markdown file that resolves to an in-scope file |

@@ -1196,12 +1196,14 @@ def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
 
 
 def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
-    files = ordered_repo_files({"standards/docs/index.md": "# docs\n"})
+    files = ordered_repo_files(
+        {"standards/knowledge-organization/index.md": "# docs\n"}
+    )
     files["standards/index.md"] = catalog(
         [
             bullet("standards/README.md", "Standards"),
             bullet("standards/standard.md", "Meta-Standard"),
-            bullet("standards/docs/index.md", "docs/"),
+            bullet("standards/knowledge-organization/index.md", "docs/"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
             bullet("standards/standard/format.md", "Standards and Standard Cards"),

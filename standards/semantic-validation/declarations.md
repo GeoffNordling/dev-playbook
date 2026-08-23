@@ -14,7 +14,7 @@ judged-and-passed**; the periodic
 [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
 skill fills that
 cache by running the judge on whatever drifted out; and the
-deterministic [cache gate](/standards/judgments/cache-gate.md) — where a
+deterministic [cache gate](/standards/semantic-validation/cache-gate.md) — where a
 repo wires one — turns a miss into a failing pytest.
 
 ## What a judgment is

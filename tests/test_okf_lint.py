@@ -33,7 +33,7 @@ BASE_BUNDLE: dict[str, str] = {
         "---\ntype: README\ntitle: Standards\ndescription: Standards desc\n---\n\n"
         "# Standards\n"
     ),
-    "standards/docs/document-types.md": (
+    "standards/knowledge-organization/document-types.md": (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
@@ -44,7 +44,7 @@ BASE_BUNDLE: dict[str, str] = {
     "standards/index.md": (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
     ),
 }
 
@@ -87,7 +87,7 @@ UPSTREAM_REGISTRY = (
 def make_upstream(tmp_path: Path) -> Path:
     """Write the synthetic upstream registry into a tree and return its root."""
     root = tmp_path / "upstream"
-    doc = root / "standards" / "docs" / "document-types.md"
+    doc = root / "standards" / "knowledge-organization" / "document-types.md"
     doc.parent.mkdir(parents=True, exist_ok=True)
     doc.write_text(UPSTREAM_REGISTRY)
     return root
@@ -177,7 +177,7 @@ def test_recipe_description_requires_resource(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
         "- [Ralph](/standards/ralph.md) — A loop\n"
     )
     repo = make_bundle(
@@ -225,7 +225,7 @@ def test_standard_nested_under_standards_dir_is_clean(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
         "- [Ops](/standards/factory/ops.md) — How ops runs\n"
     )
     repo = make_bundle(
@@ -263,7 +263,10 @@ def test_index_omitting_a_concept_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "omits concept doc standards/docs/document-types.md" in result.stdout
+    assert (
+        "omits concept doc standards/knowledge-organization/document-types.md"
+        in result.stdout
+    )
 
 
 def test_index_listing_missing_file_is_flagged(tmp_path: Path) -> None:
@@ -281,7 +284,7 @@ def test_index_description_drift_is_flagged(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — WRONG description\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
@@ -346,7 +349,7 @@ def test_index_listing_non_concept_target_is_flagged(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
         "- [Rules](/standards/rules/naming.md) — not a concept doc\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
@@ -365,7 +368,7 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Dupe](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
@@ -388,7 +391,7 @@ def test_bullet_inside_a_four_backtick_artifact_fence_is_not_read_as_an_entry(
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) — The document type registry\n\n"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n\n"
         "An index entry is written like this:\n\n"
         "````markdown\n"
         "```\n"
@@ -431,7 +434,7 @@ def test_repo_self_scan_is_clean() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-# --- consumer mode: no standards/docs/document-types.md in the audited repo ---
+# --- consumer mode: no standards/knowledge-organization/document-types.md in the audited repo ---
 
 # A minimal bundle with no registry doc at all (no standards/ directory), so
 # okf-lint must resolve consumer mode and validate types against the upstream
@@ -456,7 +459,7 @@ def make_consumer_bundle(tmp_path: Path, overrides: dict[str, str | None]) -> Pa
 
 
 def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
-    """A repo with no standards/docs/document-types.md is still linted — its
+    """A repo with no standards/knowledge-organization/document-types.md is still linted — its
     types are validated against the upstream registry, never treated as
     'cannot run'."""
     repo = make_consumer_bundle(tmp_path, {})
@@ -501,8 +504,10 @@ def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> Non
         "| `Landmark` | a bespoke upstream-only type |\n| `README` | landing |\n"
     )
     upstream = tmp_path / "upstream"
-    (upstream / "standards" / "docs").mkdir(parents=True)
-    (upstream / "standards" / "docs" / "document-types.md").write_text(upstream_doc)
+    (upstream / "standards" / "knowledge-organization").mkdir(parents=True)
+    (
+        upstream / "standards" / "knowledge-organization" / "document-types.md"
+    ).write_text(upstream_doc)
     landmark = (
         "---\ntype: Landmark\ntitle: A Landmark\n"
         "description: A landmark doc\n---\n\n# A Landmark\n"
@@ -521,7 +526,7 @@ def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> Non
 
 # --- consumer mode: the local type extension (union, degradation, shadow) ---
 
-# A conformant consumer bundle that carries its OWN standards/docs/document-types.md
+# A conformant consumer bundle that carries its OWN standards/knowledge-organization/document-types.md
 # as a LOCAL EXTENSION. It ships no canonical consumer template, so okf-lint stays
 # in consumer mode: it resolves the upstream registry (the pinned synthetic one)
 # and unions the extension's valid types on top. The local names (Doohickey,
@@ -551,9 +556,9 @@ CONSUMER_EXT_BUNDLE: dict[str, str] = {
     "standards/index.md": (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
     ),
-    "standards/docs/document-types.md": EXTENSION_DOC,
+    "standards/knowledge-organization/document-types.md": EXTENSION_DOC,
 }
 
 
@@ -586,7 +591,7 @@ def test_consumer_extension_local_type_doc_is_accepted(tmp_path: Path) -> None:
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [A Gizmo](/standards/gizmo.md) — A gizmo doc\n"
-        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
     )
     repo = make_consumer_ext_bundle(
         tmp_path, {"standards/gizmo.md": gizmo, "standards/index.md": index}
@@ -607,7 +612,7 @@ def test_consumer_extension_bogus_type_still_flagged(tmp_path: Path) -> None:
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [A Bogus](/standards/bogus.md) — A bogus doc\n"
-        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
     )
     repo = make_consumer_ext_bundle(
         tmp_path, {"standards/bogus.md": bogus, "standards/index.md": index}
@@ -639,12 +644,12 @@ def test_consumer_extension_malformed_row_is_flagged_and_walk_continues(
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [A Nope](/standards/nope.md) — A nope doc\n"
-        "- [Local Types](/standards/docs/document-types.md) — The local type extension\n"
+        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
     )
     repo = make_consumer_ext_bundle(
         tmp_path,
         {
-            "standards/docs/document-types.md": ext,
+            "standards/knowledge-organization/document-types.md": ext,
             "standards/nope.md": nope,
             "standards/index.md": index,
         },
@@ -654,7 +659,7 @@ def test_consumer_extension_malformed_row_is_flagged_and_walk_continues(
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/docs/document-types\.md:\d+: knowledge-organization\.registry-row",
+        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.registry-row",
         result.stdout,
     ), result.stdout
     # The malformed extension did not abort the scan (exit 2): the sibling bogus
@@ -675,7 +680,9 @@ def test_consumer_extension_with_zero_valid_rows_degrades_to_a_finding(
         "| Type | What it is |\n|------|------------|\n"
         "| no ticks here | nonsense |\n"
     )
-    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": ext}
+    )
 
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
@@ -683,7 +690,7 @@ def test_consumer_extension_with_zero_valid_rows_degrades_to_a_finding(
     # The finding is file-level (no `:line` after the path) and the run is exit 1,
     # not the exit 2 of a scan abort.
     assert (
-        "standards/docs/document-types.md: knowledge-organization.registry-row"
+        "standards/knowledge-organization/document-types.md: knowledge-organization.registry-row"
         in result.stdout
     )
 
@@ -700,13 +707,15 @@ def test_consumer_extension_table_out_of_alphabetical_order_is_flagged(
         "| Type | What it is |\n|------|------------|\n"
         "| `Gizmo` | a local gizmo |\n| `Doohickey` | a local doohickey |\n"
     )
-    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": ext}
+    )
 
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
     assert (
-        "standards/docs/document-types.md: knowledge-organization.index-ordering"
+        "standards/knowledge-organization/document-types.md: knowledge-organization.index-ordering"
         in result.stdout
     )
 
@@ -724,7 +733,9 @@ def test_consumer_extension_shadowing_upstream_yields_one_shadow_finding(
         "| Type | What it is |\n|------|------------|\n"
         "| `Readme` | a case variant of upstream README |\n"
     )
-    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": ext}
+    )
 
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
@@ -753,7 +764,9 @@ def test_consumer_extension_intra_extension_case_alias_yields_one_shadow_finding
         "| Type | What it is |\n|------|------------|\n"
         "| `Api` | a local api |\n| `API` | a case variant of Api |\n"
     )
-    repo = make_consumer_ext_bundle(tmp_path, {"standards/docs/document-types.md": ext})
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": ext}
+    )
 
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
@@ -781,7 +794,10 @@ def test_consumer_extension_file_unlisted_in_index_is_flagged_by_index_rule(
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 1
-    assert "omits concept doc standards/docs/document-types.md" in result.stdout
+    assert (
+        "omits concept doc standards/knowledge-organization/document-types.md"
+        in result.stdout
+    )
 
 
 def test_list_rules_includes_type_shadows_upstream(tmp_path: Path) -> None:
@@ -815,7 +831,7 @@ INSTRUMENT_REGISTRY = (
 INSTRUMENT_INDEX = (
     "# standards/ — index\n\n"
     "- [Standards](/standards/README.md) — Standards desc\n"
-    "- [Document Types](/standards/docs/document-types.md) — The document type registry\n"
+    "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
     "- [Widget](/standards/widget.md) — The widget instrument\n"
 )
 WIDGET_SPEC = (
@@ -829,7 +845,7 @@ def make_instrument_bundle(tmp_path: Path, spec_body: str) -> Path:
     return make_bundle(
         tmp_path,
         {
-            "standards/docs/document-types.md": INSTRUMENT_REGISTRY,
+            "standards/knowledge-organization/document-types.md": INSTRUMENT_REGISTRY,
             "standards/index.md": INSTRUMENT_INDEX,
             "standards/widget.md": WIDGET_SPEC.format(body=spec_body),
         },
@@ -895,13 +911,15 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
         "| `Guide` | teaching |\n| `Recipe-Description` | describes code |\n"
         "| Bogus row without ticks | nonsense |\n"
     )
-    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+    repo = make_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": doc}
+    )
 
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/docs/document-types\.md:\d+: knowledge-organization\.registry-row",
+        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.registry-row",
         result.stdout,
     ), result.stdout
 
@@ -919,13 +937,15 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
         "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
         "| `bogus name` | nonsense |\n"
     )
-    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+    repo = make_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": doc}
+    )
 
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/docs/document-types\.md:\d+: knowledge-organization\.registry-row",
+        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.registry-row",
         result.stdout,
     ), result.stdout
 
@@ -940,7 +960,7 @@ def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> No
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Apple](/standards/apple.md) — apple guide\n"
-        "- [Document Types](/standards/docs/document-types.md) —"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
         " The document type registry\n\n"
         "Ordering: by significance, not alphabetical.\n"
     )
@@ -971,7 +991,7 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
             "standards/index.md": (
                 "# standards/ — index\n\n"
                 "- [Standards](/standards/README.md) — Standards desc.\n"
-                "- [Document Types](/standards/docs/document-types.md) —"
+                "- [Document Types](/standards/knowledge-organization/document-types.md) —"
                 " The document type registry\n"
             ),
         },
@@ -989,7 +1009,7 @@ def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
     """The README.md entry must head an index; here it trails a concept doc."""
     index = (
         "# standards/ — index\n\n"
-        "- [Document Types](/standards/docs/document-types.md) —"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
         " The document type registry\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
     )
@@ -1012,7 +1032,7 @@ def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Apple](/standards/apple.md) — apple guide\n"
-        "- [Document Types](/standards/docs/document-types.md) —"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
         " The document type registry\n"
     )
     repo = make_bundle(
@@ -1036,7 +1056,7 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
     index = (
         "# standards/ — index\n\n"
         "Ordering: by significance, not alphabetical.\n\n"
-        "- [Document Types](/standards/docs/document-types.md) —"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
         " The document type registry\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
     )
@@ -1056,7 +1076,7 @@ def test_concept_entries_out_of_alphabetical_order_are_flagged(
     index = (
         "# standards/ — index\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/docs/document-types.md) —"
+        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
         " The document type registry\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Apple](/standards/apple.md) — apple guide\n"
@@ -1087,13 +1107,15 @@ def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> Non
         "| `README` | landing |\n| `Standard` | rules |\n"
         "| `Guide` | teaching |\n| `Recipe-Description` | describes code |\n"
     )
-    repo = make_bundle(tmp_path, {"standards/docs/document-types.md": doc})
+    repo = make_bundle(
+        tmp_path, {"standards/knowledge-organization/document-types.md": doc}
+    )
 
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
     assert (
-        "standards/docs/document-types.md: knowledge-organization.index-ordering"
+        "standards/knowledge-organization/document-types.md: knowledge-organization.index-ordering"
         in result.stdout
     )
 

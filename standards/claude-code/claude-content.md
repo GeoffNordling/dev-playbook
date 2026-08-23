@@ -50,7 +50,7 @@ catalog at session start, and **Navigate docs by index**, which states how
 to walk OKF indexes without loading whole trees. Their workspace paths are
 backticked prose rather than live citations, since a citation would be
 `wrong-form` inside dev-playbook itself
-([cross-references.md](/standards/docs/cross-references.md)).
+([cross-references.md](/standards/knowledge-organization/cross-references.md)).
 
 The section shape and the two required rules are checked deterministically,
 but only in dev-playbook, where the source file lives — other repos have no

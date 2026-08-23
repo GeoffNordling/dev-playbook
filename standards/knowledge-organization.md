@@ -11,7 +11,7 @@ types, indexes, and cross-references.
 
 ## Define
 
-- [standards/docs/](/standards/docs/index.md) — the contract, one concern
+- [standards/knowledge-organization/](/standards/knowledge-organization/index.md) — the contract, one concern
   per document; start at The OKF Bundle
 
 ## Audit

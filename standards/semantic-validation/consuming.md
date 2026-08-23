@@ -13,8 +13,8 @@ the `judgments-run` / `judgments-lint` console scripts. Any repo on the
 same machine consumes it as a **local path dependency** — no network, no
 PyPI, no published index. The recipe below is
 end-to-end; the field rules, config, and gate it points at are defined in
-[declarations.md](/standards/judgments/declarations.md) and
-[cache-gate.md](/standards/judgments/cache-gate.md).
+[declarations.md](/standards/semantic-validation/declarations.md) and
+[cache-gate.md](/standards/semantic-validation/cache-gate.md).
 
 ## 1. Add the package as an editable path dependency
 
@@ -52,10 +52,10 @@ PATH.
 ## 2. Declare the repo's judgments
 
 Opt in exactly as
-[declarations.md — Config and root resolution](/standards/judgments/declarations.md#config-and-root-resolution)
+[declarations.md — Config and root resolution](/standards/semantic-validation/declarations.md#config-and-root-resolution)
 defines: a `[tool.judgments]` table in the consumer's own `pyproject.toml`
 and one or more declaration YAML files in
-[the YAML declaration format](/standards/judgments/declarations.md#the-yaml-declaration-format).
+[the YAML declaration format](/standards/semantic-validation/declarations.md#the-yaml-declaration-format).
 
 ```toml
 [tool.judgments]
@@ -69,7 +69,7 @@ against it.
 ## 3. Choose the repo's position on the gate spectrum
 
 Gating is per-judgment and optional
-([cache-gate.md](/standards/judgments/cache-gate.md)): a judgment is
+([cache-gate.md](/standards/semantic-validation/cache-gate.md)): a judgment is
 gate-enforced iff some pytest in the consumer's suite calls
 `assert_judgment_cached` with its id. Choose a position by what the suite
 wires:
@@ -98,7 +98,7 @@ seen-set the judgments sweep fills, so it needs no LLM and no API key
 on CI.
 
 The gate is two-tier, keyed off one environment variable `SKIP_JUDGMENTS` that
-`assert_judgment_cached` reads ([cache-gate.md](/standards/judgments/cache-gate.md)):
+`assert_judgment_cached` reads ([cache-gate.md](/standards/semantic-validation/cache-gate.md)):
 exactly `1` skips the check with a visible pytest skip, any other value or
 unset arms it. The canonical [Makefile](/standards/build/make.md) defaults it
 to `1` and exports it, so `make check` and `make test` **skip** the gate — a

@@ -197,7 +197,7 @@ lives in [node-skill-authoring.md](~/.claude/skills/frozen-issue-overwatch/refer
   covered by the commit gate's hook suite, and the full gate is the phase-close
   ritual.
 - **Judgments sit outside every node skill.** `make check` leaves the semantic
-  [cache gate](/standards/judgments/cache-gate.md) skipped, and no node skill
+  [cache gate](/standards/semantic-validation/cache-gate.md) skipped, and no node skill
   arms it or runs a judge — judgments are settled by the periodic sweep, outside
   the factory. For a **review** skill the exclusion is total: the
   `judgments/*.yaml` declarations are outside its jurisdiction

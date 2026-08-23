@@ -122,34 +122,3 @@ _Avoid_: backlog item, todo, roadmap item.
 
 **Promotion**
 The step that turns a **Candidate** into committed work: an issue is authored from the entry, and the entry is deleted in the same change. Deciding to write the brief is the act of committing — a Candidate may already be specifiable and stay a Candidate until that decision is made.
-
-## Relationships
-
-- Every piece of work is **AFK** or **Inline** — exactly two values, decided by whether the user is intended to be involved, never by which substrate runs it.
-- A **Detector** inspects the repository against one or more standards and emits **Findings**; an **Audit** is a run of one or more **Detectors**; stationed at a **Gate**, that audit becomes **Enforcement**.
-- A **Detector** is a **Lint** (deterministic code) or an **Audit** in the narrow sense (an LLM judge); **Lint** ⊂ **Audit** — every lint is part of the audit process, never the reverse.
-- There are exactly three **Gates** on the path to main: commit gate, push gate, CI gate.
-- A standard has exactly one **Scope**: workspace-scoped (declared in dev-playbook, governing every repo) or repo-scoped (declared in one **Consumer**, governing that repo alone).
-- There is exactly one **Primary machine**; every other host is a **Secondary machine**.
-- A **Detector** is skipped on a machine iff the **Machine-local state** it needs is absent there; the **Primary machine** lacks none, so every detector runs there.
-- Exactly one **Issue Manager** per issue owns that issue's traverse; the **Agent-View Manager** watches the whole fleet and executes nothing.
-- A unit of future work has exactly one home: a **Candidate** in `CANDIDATES.md` while uncommitted, or a GitHub issue once committed — never both.
-- **Promotion** moves a unit of work from **Candidate** to issue, deleting the **Candidate** entry in the same change.
-- A **Candidate** carries no brief: choosing to write the brief is what makes work committed, and therefore an issue.
-
-## Example dialogue
-
-> **Dev:** "repo-lint reported a **Finding**. Does that block my commit?"
-> **Reviewer:** "Only because it runs at the **commit gate**. The audit itself is read-only — it just emits **Findings**. It's the **Gate** it's stationed at that blocks; run by hand, it isn't **Enforcement** at all."
-
-## Flagged ambiguities
-
-- "AFK" named only a subagent delegated inside an interactive session, leaving work with no attached session unnamed — resolved: **AFK** is independent of substrate and means no user is attached, whether the work runs as a delegated subagent or a headless `claude -p` process.
-- "venue" was used informally for a blocking point — resolved: say **Gate**, or one of the three rung names (commit gate, push gate, CI gate). "venue" is retired.
-- "check" and "audit" were blurred — resolved: an **Audit** is read-only and never blocks; a **Gate** is what blocks. A check that blocks is a gate; a check that only reports is an audit.
-- "audit" and "detector" were blurred — the same read-only, gate-stationed role was defined with near-identical language in two files — resolved: a **Detector** is the check; an **Audit** is a run of one or more detectors.
-- "lint" and "audit" were blurred — "lint" survived in internals and prose with no defined status while every read-only detector was named an "audit" — resolved: a **Lint** is a Detector implemented as deterministic code, an **Audit** in the narrow sense is a Detector that is an LLM judge, and **Lint** ⊂ **Audit** (the umbrella read-only process). Deterministic scripts are `*-lint`; LLM judges keep "audit."
-- "backlog" floated with no definition as a name for both the register of uncommitted ideas and the queue of open issues — resolved: say **Candidate** for an uncommitted entry in `CANDIDATES.md`, and **issue** for committed work. "backlog" is retired.
-- "overwatch" named the managing role at both scopes — resolved: **Issue Manager** (one issue's traverse) and **Agent-View Manager** (the fleet). "overwatch" is retired.
-- "intent interview" named the ordinary approach interviewing in `design` while sounding like it authored the `User intent` heading, which it never did — resolved: the ordinary beat is the **General Interview**, and the beat that authors `User intent` is the **User Intent Mini-Interview**.
-- "promotion" was used for two different moves — carrying an under-specified leaf to ready, and turning a Candidate into an issue — resolved: **Promotion** means Candidate → issue. The readiness interview is the **refinement step**.
