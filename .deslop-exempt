@@ -24,3 +24,14 @@ standards/prose/slop-tics.md
 # Except this one, which has outgrown the landing-doc shape at 197 lines and
 # carries real prose.
 !scripts/README.md
+
+# Vendored skills. Everything under an `.agents/` path is a third-party skill
+# carried unmodified so it can be re-synced from upstream; its voice is its
+# author's to set, per standards/prose/conventions.md.
+dotfiles/.agents/**
+
+# Decision Records. A Decision Record is a dated account of a past decision —
+# the alternatives rejected, the context that forced it — and is never
+# rewritten to match later state. Removing changelog residue from one would
+# destroy the point of the document.
+docs/decisions/**

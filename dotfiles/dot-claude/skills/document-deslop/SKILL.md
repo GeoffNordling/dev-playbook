@@ -32,9 +32,16 @@ uncommitted changes, say so and stop.
 
 ## Transform
 
-Read three files and nothing else:
+Read these first, and nothing else:
 [slop-tics.md](/standards/prose/slop-tics.md),
 [conventions.md](/standards/prose/conventions.md), and the target in full.
+
+Where the target is an agent-facing instruction file — a skill, an agent
+definition, a rule, or a `CLAUDE.md` — read
+[writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) as
+well. Read it to learn what the file is doing, so the rewrite does not break
+it. It is not a standard to bring the target into line with: leave a
+conformance gap where you find one. The job is the slop-tics and nothing else.
 
 **One pass, one write.** Write the whole rewritten document in a single
 `Write` call. Do not build it up through `Edit` calls, and do not inspect the
