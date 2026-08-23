@@ -113,4 +113,3 @@ The software factory is the graduation exercise, not the first target: the
 abandoned attempt to understand it whole failed because the factory is
 only a collection of abstractions, and none of them had been constructed
 yet.
-</content>
