@@ -111,19 +111,9 @@ scripts, or the judges.
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill, which the user invokes manually.
-- **Documentation defines behaviors; skills and agents never define one.**
-  Written into the knowledge-organization standard as
-  [file-roles.md](/standards/knowledge-organization/file-roles.md), the
-  renamed and rebuilt `bundle.md`. Two axes — role (concept document /
-  harness-owned file) and content (behavior / procedure) — and the rule is
-  the grid's one empty cell: a rule of the system is never written only in
-  a skill body or an agent definition.
-
-  Nothing checks it. No detector can, and the card carries no judgment for
-  it, so conformance across the existing skills and agents is unmeasured.
-  Two violations are confirmed by reading: `commit` and `doc-format` both
-  define behaviors that have no document to point at, so each needs a
-  document written before the skill can shrink.
+- **Documents hold behavior; skills and agents hold procedure.**
+  Standardized in
+  [file-roles.md](/standards/knowledge-organization/file-roles.md).
 
 **Raw ideas, none designed**
 
