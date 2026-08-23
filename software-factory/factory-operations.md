@@ -240,7 +240,7 @@ work the pull request will never show.
 ## The node-skill contract
 
 A node does the node's work and reports; what launched it sequences whatever
-follows and writes the labels. The contract binds both kinds of node — the typed
+follows and writes the labels. The contract binds every node — the typed
 agent definitions the traverse launches and the skills a session dispatches —
 and the clauses below say where the two differ. This contract fixes structure;
 the authoring *style* behind both — voice, content, robustness, mechanics — lives
@@ -363,9 +363,9 @@ so a Suggestion counted open in a `verdict` row is the ordinary case.
   the fidelity and convention findings it does not cover.
 - **Doc track.** `doc-pr-review` audits the diff's documentation.
 
-**Every elected track runs every cycle.** No review stands down, at any cycle,
-for any reason — the election takes the changed files and nothing else. A
-stand-down would deadlock the loop: only the next cycle's reviewer may resolve a
+**Every elected track runs every cycle.** No review stands down — the election
+takes the changed files and nothing else. A stand-down would deadlock the loop:
+only the next cycle's reviewer may resolve a
 thread
 ([resolution ownership](/software-factory/review-contract.md#resolution-ownership)),
 so a stood-down track's fixed threads would have nobody left to resolve them, the

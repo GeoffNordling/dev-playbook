@@ -12,8 +12,16 @@
 # Absence means never deslopped. There is no false value. Files the skill
 # must never run on are listed in .deslop-exempt instead.
 
-checked  bf7290e1b51768f8e41255373bd833a21a9c1313 software-factory/factory-operations.md
+checked  9fbd875b23ef847eb33e16e8459db24ac9382419 software-factory/factory-operations.md
 checked  b8429d67b4b24358eef7eee57c714005d21f2bb0 standards/prose/conventions.md
+checked  fe6edfaa0bf8df0228f824ef2dc15915c470427b software-factory/deviation-contract.md
+checked  77edb036f07a67495aaccb581d9fed352c2d8eee software-factory/node-agent-and-skill-authoring.md
+checked  ee1930b208cbcce4c7ebafaa3604a1629b6246d1 software-factory/pr-feedback.md
+checked  12f9a1f793945f5177583b150f07a5fb2bcb050d software-factory/refactor-catalogue.md
+checked  049f6445bdc69fb95a42ec371407ae8e438a4b1e software-factory/review-contract.md
+checked  5a7e09fe1c0380498b58639e32a8642a7cc2c2de software-factory/software-factory.md
+checked  2a6d7d130479cb9dd052d62e2ba9b2be85e98263 software-factory/tdd.md
+checked  3e5a9be359dde5d85b92d8af4769d7d7051582bd software-factory/user-checkpoints.md
 
 # The standard cards. Each is four pointer cells over a couple of lines of
 # prose — too small to carry a tic, and high enough leverage that a bad
