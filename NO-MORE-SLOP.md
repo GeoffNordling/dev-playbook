@@ -132,6 +132,12 @@ scripts, or the judges.
 - **Deslop regression gate.** Something must keep a rewritten document from
   sliding back into slop. Deterministic rules cannot judge prose quality;
   the judgments machinery may fit here.
+- **Vocabulary change discipline.** A process that forces a conscientious
+  decision on every term added to or removed from `CONTEXT.md`. Without one,
+  terms accrete unexamined.
+- **CLOA change discipline.** A process that forces a conscientious
+  decision on every term used within a CLOA communication. Without one,
+  vocabulary changes willy-nilly.
 - **Skills as signatures.** A skill today is all docstring — freeform
   English that can be anything. Give it a signature: a few declared,
   machine-checkable claims — the scope it may touch, the gates it runs,

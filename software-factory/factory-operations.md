@@ -100,12 +100,15 @@ Canonical front-matter and syntax:
 
 ## Engagement
 
-A node engages the user in one of these ways — the terms are fixed in
-[the vocabulary](/CONTEXT.md):
+A node engages the user in one of two ways:
 
-- **AFK** — the node runs hands-off and reports. The user sees only the report.
+- **AFK** — the node runs hands-off and reports; the user sees only the
+  report. No user is attached, so the node runs to completion or escalates —
+  it never waits. Substrate does not decide it: a delegated subagent and a
+  headless `claude -p` process are both AFK.
 - **Inline** — a session runs the node at its own main loop, with the user
-  present in the terminal.
+  present in the terminal, free to interview, gate on the answers, and hand
+  back mid-task.
 
 A review node (a diamond) is several AFK runs followed by a verdict the script
 computes from what they left on the pull request, within the one node.

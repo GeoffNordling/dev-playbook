@@ -8,7 +8,7 @@ description: The gate ladder — the three rungs where checks block the path to 
 
 **Enforcement** is an audit stationed at a **gate** — an automatic, unmanned
 blocking point on the path to main. The gates are named by their fixed rung
-names. The governance vocabulary (Audit, Detector, Gate, Enforcement, Finding)
+names. The governance vocabulary (Audit, Lint, Detector, Gate, Enforcement)
 is defined in [CONTEXT.md](/CONTEXT.md); this file is where the three rungs
 are defined once, and every card's Enforce cell cites them by these names.
 
