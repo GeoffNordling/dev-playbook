@@ -35,3 +35,8 @@ dotfiles/.agents/**
 # rewritten to match later state. Removing changelog residue from one would
 # destroy the point of the document.
 docs/decisions/**
+
+# Frozen skills. A `frozen-` skill is a point-in-time copy held for the factory
+# rebuild, and its references/ mirror docs whose live originals are deslopped
+# separately. A style pass would break the freeze.
+dotfiles/dot-claude/skills/frozen-*/**
