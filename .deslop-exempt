@@ -40,3 +40,15 @@ docs/decisions/**
 # rebuild, and its references/ mirror docs whose live originals are deslopped
 # separately. A style pass would break the freeze.
 dotfiles/dot-claude/skills/frozen-*/**
+
+# References. A `type: Reference` document is a verbatim mirror of an external
+# document, vendored so it can be read without the network. Rewriting one stops
+# it being a mirror. standards/references/ is where they live; the type carries
+# the exemption wherever else one appears.
+standards/references/**
+
+# The slop-reduction working notes and the candidate list. Both are transient by
+# design — rewritten as the work moves — so a style pass goes stale within days.
+NO-MORE-SLOP.md
+SCRATCH.md
+CANDIDATES.md

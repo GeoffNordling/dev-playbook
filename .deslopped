@@ -45,6 +45,12 @@ checked  a0dfae8db85636945c5945cc013050992261eadf standards/docs/readme-content.
 applied  b19193f5d572452f5575ade530da440a5a0060ba standards/judgments/cache-gate.md
 checked  ad7845cbd2a4c13735815f65ae940d05ce090502 standards/python/style.md
 
+# Reviewed by hand rather than by the skill — high-leverage files kept out
+# of the random batches. 2026-08-23.
+applied  402693d770d19293bd6019340b89e7d37b0c2881 dotfiles/dot-claude/CLAUDE.md
+applied  76c54e48c251770f00b9361931feedefdbc1b65f dotfiles/dot-claude/skills/document-deslop/SKILL.md
+accepted 77ba9dd3804f58b1c582110e784c186424981a46 CLAUDE.md   # read and judged clean; no edit needed
+
 # The standard cards. Each is four pointer cells over a couple of lines of
 # prose — too small to carry a tic, and high enough leverage that a bad
 # rewrite would propagate. Read and judged clean on 2026-08-22.
