@@ -111,8 +111,20 @@ scripts, or the judges.
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill: Claude cannot be trusted to write a document
-  without slop, so a single rework pass follows every significant document
-  write.
+  without slop, so, invoke the skill following every new document creation
+  or large document edit.
+
+**Decided, awaiting a standard**
+
+- **Documentation defines behaviors; skills and agents never define one** —
+  they sequence and condition on what the documentation defines. No
+  standard states this as a general rule today; fragments exist without
+  it — "source the what and when from the read itself"
+  ([node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md)),
+  the Read-first clause
+  ([factory-operations.md](/software-factory/factory-operations.md#the-node-skill-contract)),
+  and the meta-standard's rule that a card never restates its targets. To
+  do, not now: find the standard this belongs in and write it there.
 
 **Raw ideas, none designed**
 
@@ -122,13 +134,10 @@ scripts, or the judges.
 - **Doc linters, re-aimed.** The existing linters are pedantic — they check
   that certain headings are present. Decide what is actually worth linting
   for and design toward that.
-- **OKF graph.** The [File Graph](/instruments/file-graph.md) instrument is
-  implemented but unused for a while; a heavy HTML file may be the wrong
-  format. Evaluate it against the current repo before designing anything
-  new.
-- **OKF traces.** An agent operation expressed as a readable sequence of
-  the files it touches — understood at a medium or high level without
-  reading them all. Possibly a query over the file graph.
+- **Reference chains.** Skills as signatures, OKF traces, and the OKF
+  graph converged into one object — a doc unit's reference chain, declared
+  rather than discovered, lintable. Moved to
+  [the abstraction loop](/ABSTRACTION-LOOP.md) as its first target.
 - **Deslop regression gate.** Something must keep a rewritten document from
   sliding back into slop. Deterministic rules cannot judge prose quality;
   the judgments machinery may fit here.
@@ -138,12 +147,6 @@ scripts, or the judges.
 - **CLOA change discipline.** A process that forces a conscientious
   decision on every term used within a CLOA communication. Without one,
   vocabulary changes willy-nilly.
-- **Skills as signatures.** A skill today is all docstring — freeform
-  English that can be anything. Give it a signature: a few declared,
-  machine-checkable claims — the scope it may touch, the gates it runs,
-  the stops where it waits — verified by code, with the prose staying
-  prose.
-
 The core problem of this track: documentation needs far more reading by the
 user than code does. Code is deterministic and can be pinned down by tools;
 documentation can only be taken so far by them, so something has to keep it
@@ -203,23 +206,20 @@ a pleasure to read.
 
 ## New terms
 
-Candidates for `CONTEXT.md`:
+Candidates to document somewhere:
 
 - CLOA (Correct Level of Abstraction)
-- deterministic backpressure, stochastic function
 - unread tier, acceptance tier
 - gray module
 - slop
 - constrain to optimize understanding
-- vocabulary API
 - the pandas standard
-- forcing function
 
 ## Now
 
-Envision the end state through manufactured examples: prototype specific
-examples of what good looks like, align on the end state from them, then
-plan the implementation toward it.
+Run [the abstraction loop](/ABSTRACTION-LOOP.md) — the offshoot where the
+CLOA abstractions are constructed one change at a time. First target: one
+skill chain. Its results merge back here or the offshoot terminates.
 
 ## Done
 
