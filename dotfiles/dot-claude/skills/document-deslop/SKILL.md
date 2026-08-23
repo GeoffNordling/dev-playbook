@@ -33,11 +33,16 @@ path in the prompt. Launch one subagent per file; for more than one target,
 send all the launches in a single message so they run in parallel — each
 file's rewrite is independent of the others.
 
-This skill never commits, and it runs no check on the result: the user reads
-each diff and decides what to keep.
+This skill never commits.
 
-## Hand off the diff
+## Review, then stay silent
 
-For each target, report its path, `git diff --stat` line, and the tics the
-subagent named as most recurrent. The user reads the diff in their IDE and
-decides what to accept.
+The subagent edits the file in place and replies either `DONE` or, on a
+problem, free text describing it.
+
+- **It escalated.** Relay the problem to the user.
+- **It replied `DONE`.** Read its diff yourself — you own the document's
+  content, so check the edit the way you'd check your own work.
+  - **Looks right.** Say nothing and go on with whatever you were doing.
+  - **Changed something you didn't want.** Tell the user what changed and
+    why you disagree, the same as any other edit you'd push back on.

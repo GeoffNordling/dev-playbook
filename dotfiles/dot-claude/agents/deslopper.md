@@ -45,10 +45,10 @@ The rules, in order of importance:
    command, or name appears; keep that one.
 3. **Keep the frontmatter, the heading structure, and the document's Markdown
    conventions.** Heading text itself is rewritable.
-4. **Match the file's existing wrap width.**
 
 Leave the change uncommitted — you never commit.
 
 ## Report back
 
-Return one line naming the tics that recurred most in this file.
+On success, reply with exactly `DONE` — nothing else. If you hit a problem,
+reply in free text describing it instead.
