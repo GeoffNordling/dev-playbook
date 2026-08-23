@@ -10,7 +10,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
-- [Scratch](/SCRATCH.md) — Where the slop reduction stands — the CLOA, the code toolbox, and the open documentation work
+- [No More Slop](/NO-MORE-SLOP.md) — The branch plan — goal, principles, the two tracks, and the current step
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories

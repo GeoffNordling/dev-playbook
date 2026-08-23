@@ -24,10 +24,10 @@ root (the repo root).
 A root-absolute link resolves against the reader's *own* checkout root —
 the current working directory's repo — so it points at the copy of the
 file that matches the checkout the reader is already in, whether that's
-the main checkout or a per-issue worktree. A same-repo reference `SHALL
-NOT` be written as `~/workspace/<this-repo>/…` — from inside a worktree
-that absolute path silently jumps to the main checkout, yielding a
-different (possibly stale) copy than the one the reader is working in.
+the main checkout or a per-issue worktree. A same-repo reference
+`SHALL NOT` be written as `~/workspace/<this-repo>/…` — from inside a
+worktree that absolute path silently jumps to the main checkout, yielding
+a different (possibly stale) copy than the one the reader is working in.
 `ref-lint` enforces this: a same-repo citation in a fixed-root file fails
 as `wrong-form`, whether or not the target exists.
 
