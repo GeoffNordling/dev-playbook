@@ -42,7 +42,7 @@ The caller supplies the repository root. Optionally:
 
 | Bucket | Test |
 |---|---|
-| `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([bundle.md](/standards/knowledge-organization/bundle.md)) |
+| `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([file-roles.md](/standards/knowledge-organization/file-roles.md)) |
 | `index` | an `index.md` directory listing |
 | `harness-session` | markdown injected into agent context at session start: `CLAUDE.md` at any level, `rules/*.md` |
 | `harness-skill-authored` | a first-party skill bundle member — `SKILL.md` plus everything in its skill directory |
@@ -58,7 +58,7 @@ injected every session, versus loaded on skill invocation from first-party
 or third-party trees.
 
 The bucket tests follow the concept/harness boundary
-([bundle.md](/standards/knowledge-organization/bundle.md)) and the harness-file registry
+([file-roles.md](/standards/knowledge-organization/file-roles.md)) and the harness-file registry
 ([files.md](/standards/claude-code/files.md)); the reference encoding is
 `classify()` in [md.py](/src/dev_playbook/md.py).
 

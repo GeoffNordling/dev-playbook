@@ -35,7 +35,7 @@ The directory name must match the `name` field in the front matter.
 A skill bundle is harness-owned — Claude Code loads `SKILL.md` as configuration,
 not as prose to learn from — so it is not an OKF concept document. Its front
 matter is the Claude Code skill schema below, **not** the OKF `type`/`title`/`description`
-profile. See [the OKF bundle boundary](/standards/knowledge-organization/bundle.md).
+profile. See [the two file roles](/standards/knowledge-organization/file-roles.md).
 
 ```yaml
 ---

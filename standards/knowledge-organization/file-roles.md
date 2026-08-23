@@ -1,0 +1,60 @@
+---
+type: Standard
+title: File Roles
+description: The role a repository file plays and the content it may hold — behavior and procedure across concept documents and harness-owned files
+---
+
+# File Roles
+
+Every file in a workspace repository plays one of two roles, and the role
+bounds what the file may hold — so a rule of the system has one place it can
+be written, and a reader knows where to look. Which files must exist is
+declared once, in the build standard's
+[file skeleton](/standards/build/skeleton.md); what goes inside each is
+governed by that file's content standard, linked from the skeleton.
+
+## Roles and content
+
+Two axes. **Role** is who consumes the file; **content** is what the file
+holds.
+
+**Concept document** — prose a reader loads to *understand* something. It
+carries OKF frontmatter (`type` + `title` + `description`, per
+[document-types.md](/standards/knowledge-organization/document-types.md))
+and is subject to the type-lint.
+
+**Harness-owned file** — a file a tool *consumes as configuration or runs as
+code / instructions*: every non-`.md` file, plus the Claude Code file set enumerated in
+[the harness-files registry](/standards/claude-code/files.md). It carries no
+OKF frontmatter, is not type-linted, and keeps whatever format its consumer
+requires.
+
+**Behavior** — a rule of the system: a contract, a state and the moves out
+of it, a format, what one part owes another. It binds every actor who
+touches the thing, whatever job that actor is doing.
+
+**Procedure** — the steps of one job: what triggers it, what it targets, the
+order of the steps, the conditions it branches on, the commands it issues,
+when it stops, what it reports. It binds one actor for the length of one
+run.
+
+## What each role may hold
+
+The axes are independent, and three of the four cells are populated:
+
+| | Concept document | Harness-owned file |
+|---|---|---|
+| **Behavior** | Its one home — a Standard, a Decision Record, the vocabulary. | **Forbidden.** |
+| **Procedure** | A recipe a reader follows — an adoption walkthrough, a migration. | A program the harness runs — a skill body, an agent definition. |
+
+The empty cell is the rule. A skill body or an agent definition is a program
+over the world the concept documents describe: it sequences, conditions, and
+commands, and where it needs a behavior it names the document that defines
+it. A procedure's own steps are not behavior, so a harness file that invents
+no behavior needs no reference at all. What the rule forbids is a rule of
+the system stated only in a harness file, which a reader would have to read
+every skill to find. Where a harness file needs a behavior no document
+defines, the document comes first.
+
+One behavior is restated rather than cited: a prohibition, in one sentence,
+wherever an agent must not miss it.

@@ -29,7 +29,7 @@ Run `ls` at the repo root to see the top-level file and directory structure.
 
 ## Step 2 — discover what documentation exists
 
-Read the Files table in the [documentation bundle standard](~/workspace/dev-playbook/standards/knowledge-organization/bundle.md).
+Read the table in the [file skeleton](~/workspace/dev-playbook/standards/build/skeleton.md).
 
 Check existence with one `ls` call that always exits 0:
 

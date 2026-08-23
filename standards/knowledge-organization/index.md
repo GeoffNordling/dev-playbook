@@ -1,11 +1,11 @@
 # standards/knowledge-organization/ — index
 
 The documentation-content standard, one concern per document. Start at
-[The OKF Bundle](/standards/knowledge-organization/bundle.md).
+[File Roles](/standards/knowledge-organization/file-roles.md).
 
 Ordering: reading order.
 
-- [The OKF Bundle](/standards/knowledge-organization/bundle.md) — The documentation bundle — its purpose, principles, and the concept/harness boundary
+- [File Roles](/standards/knowledge-organization/file-roles.md) — The role a repository file plays and the content it may hold — behavior and procedure across concept documents and harness-owned files
 - [Document Types](/standards/knowledge-organization/document-types.md) — The OKF document-type registry and the frontmatter profile every concept doc carries
 - [Indexes](/standards/knowledge-organization/indexes.md) — The index.md file — its required introduction, per-directory listing rules, child-index delegation, authored not generated
 - [README Content](/standards/knowledge-organization/readme-content.md) — The README content floor — OKF frontmatter, an H1, and a one-line purpose; depth grows with the project

@@ -8,12 +8,9 @@ description: The README content floor — OKF frontmatter, an H1, and a one-line
 
 A README's floor is its OKF frontmatter — `type: README`, `title`,
 `description`, per [document-types.md](/standards/knowledge-organization/document-types.md) —
-followed by an H1 and a one-line purpose. Depth varies by project ("Scope
-is standardized; depth is not" —
-[bundle.md](/standards/knowledge-organization/bundle.md#principles)), and a README `MAY` add
-prerequisites, quick-start, architecture overview, or examples as the
-project earns them. It `SHALL NOT` contain agent instructions or
-architecture decisions — those live in `CLAUDE.md` and `docs/decisions/`.
+followed by an H1 and a one-line purpose. A README `MAY` add prerequisites,
+quick-start, architecture overview, or examples as the project earns them.
+It `SHALL NOT` contain agent instructions or architecture decisions — those live in `CLAUDE.md` and `docs/decisions/`.
 
 It `SHALL NOT` enumerate the repo's skills or any other harness-injected
 files: Claude Code already puts each one's name and description into every

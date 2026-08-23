@@ -6,13 +6,13 @@ description: Card for the knowledge-organization standard — how knowledge is o
 
 # Knowledge Organization
 
-Governs how knowledge is organized in markdown — the bundle, document
+Governs how knowledge is organized in markdown — file roles, document
 types, indexes, and cross-references.
 
 ## Define
 
 - [standards/knowledge-organization/](/standards/knowledge-organization/index.md) — the contract, one concern
-  per document; start at The OKF Bundle
+  per document; start at File Roles
 
 ## Audit
 

@@ -6,6 +6,13 @@ description: The index.md file — its required introduction, per-directory list
 
 # Indexes
 
+A repo's agent-navigated documentation is one
+[Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog)
+bundle, per the [OKF SPEC](/standards/references/okf-spec.md). The bundle is
+the whole repository: an agent triages a document by its frontmatter and
+navigates between documents by the per-directory `index.md` listings, loading
+full bodies only when a document is relevant.
+
 An `index.md` is a navigational listing that lets an agent see what a
 directory contains — and read each document's one-line `description` —
 without opening every file. `index.md` is **typeless**: it carries no OKF

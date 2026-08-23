@@ -235,12 +235,10 @@ def classify(relpath: str) -> str:
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
       ``references/``/``scripts/``, ``agents/``, ``rules/``, every top-level
-      ``tests/`` tree
-      (parser fixtures — tool-consumed, often deliberately malformed; see the
-      tests-tree boundary in standards/knowledge-organization/bundle.md), and every non-``.md``
-      file.
+      ``tests/`` tree (fixture data a test consumes, held to no doc
+      standard), and every non-``.md`` file.
 
-    The concept/harness split mirrors the bundle boundary in the docs
+    The concept/harness split mirrors the file roles in the docs
     standard and the Claude Code file registry
     (standards/claude-code/files.md); keep them in step.
     """
