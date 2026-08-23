@@ -9,8 +9,8 @@ effort: low
 # Commit Off
 
 The user wants to review every diff before it is committed. From now until
-the user turns committing back on, finish each unit of work and stop with
-the changes left uncommitted in the working tree — run no `git commit`.
+the user turns committing back on, finish each unit of work and run no
+`git commit`, leaving the changes in the working tree.
 
 Acknowledge activation with exactly:
 
@@ -19,8 +19,8 @@ Acknowledge activation with exactly:
 ## Turning committing back on
 
 Any plain-language signal from the user counts — "commits back on",
-"resume committing", "you can commit again" — no fixed phrase required.
-When it comes, acknowledge with exactly:
+"resume committing", "you can commit again". When it comes, acknowledge
+with exactly:
 
 > Natural committing is back on.
 

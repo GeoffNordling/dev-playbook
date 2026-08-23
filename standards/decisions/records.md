@@ -8,7 +8,7 @@ description: When to write a Decision Record, its template, sequential numbering
 
 Decision Records live in `docs/decisions/` and use sequential 4-digit numbering: `0001-slug.md`, `0002-slug.md`, etc. Create the `docs/decisions/` directory lazily — only when the first record is needed.
 
-> An **ADR** (Architecture Decision Record) is the industry term for the architectural subset of this kind. A Decision Record is the same artifact generalized past architecture to any hard-to-reverse decision; where a decision is architectural, "ADR" and "Decision Record" name the same thing.
+> An **ADR** (Architecture Decision Record) is the industry term for the architectural subset of this kind. A Decision Record generalizes the same artifact past architecture to any hard-to-reverse decision.
 
 ## Scope
 
@@ -18,11 +18,11 @@ A decision lives with the thing it governs: a decision about one repo is recorde
 
 The record listing lives in `docs/decisions/index.md` — one line per record, carrying the record's `description` — so a reader or skill can find the relevant records without opening every file. It follows the [indexes.md](/standards/docs/indexes.md) rules, and the staleness checker fails any commit that adds, renames, or removes a record without updating the index in the same change. Create it lazily alongside the first record.
 
-`docs/decisions/README.md` is a short narrative orientation for the directory, not the listing.
+`docs/decisions/README.md` is a short narrative orientation for the directory.
 
 ## When to offer a Decision Record
 
-All three must be true:
+Each of the following must be true:
 
 1. **Hard to reverse** — changing course later carries meaningful cost.
 2. **Surprising without context** — a future reader will look at the code and wonder "why on earth did they do it this way?"
@@ -56,9 +56,9 @@ date: {YYYY-MM-DD}
 {1-3 sentences: what's the context, what did we decide, and why.}
 ```
 
-That's it. A Decision Record can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
+A Decision Record can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
-A Decision Record is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/docs/document-types.md)). The `description` is the record's triage line and feeds `docs/decisions/index.md`; on a one-sentence record it will echo the body — that's fine, the description is the triage surface and the body is the record.
+A Decision Record is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/docs/document-types.md)). The `description` is the record's triage line and feeds `docs/decisions/index.md`; on a one-sentence record it echoes the body, since the description serves triage and the body is the record.
 
 ## Date
 

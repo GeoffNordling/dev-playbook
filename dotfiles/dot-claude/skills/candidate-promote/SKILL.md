@@ -16,8 +16,8 @@ both homes. The contract is
 [candidate conventions](~/workspace/dev-playbook/standards/tracking/candidates.md).
 
 This skill owns the lookup and the delete. Authoring the brief and the
-four-tuple is /intake's job — it already accepts a free-form idea as text, so
-nothing is passed but the entry.
+four-tuple is /intake's job — it accepts a free-form idea as text, so nothing
+is passed but the entry.
 
 ## Candidate: $ARGUMENTS
 
@@ -38,9 +38,9 @@ nothing is passed but the entry.
 
 4. **Invoke /intake**, passing the entry's name and prose — plus the children's
    text when promoting a subtree — as the free-form idea. A one-line entry is
-   the expected input, not a problem to solve first: intake grills the idea,
-   authors the brief and four-tuple, and lands the issue on its own confirmation
-   gate, routing a subtree to `phase:design`.
+   the expected input: intake grills the idea, authors the brief and
+   four-tuple, and lands the issue on its own confirmation gate, routing a
+   subtree to `phase:design`.
 
 5. **Delete the promoted entries** from `CANDIDATES.md` once intake reports the
    issue number. Remove the whole subtree when the subtree was promoted — the
@@ -54,10 +54,10 @@ nothing is passed but the entry.
 
 ## Boundaries
 
-- **Never delete an entry before intake lands the issue.** A failed or abandoned
-  intake leaves `CANDIDATES.md` untouched — losing the entry loses the work.
-- **Promotion moves a record between homes.** The work itself is then dispatched
-  through the software factory like any other issue; the building happens there.
-- **Repo-scoped Candidates only.** This skill moves entries already recorded as
-  serious, repo-scoped Candidates; random, unfiltered, or cross-repo ideas go to
-  mission-control via /idea.
+- **Never delete an entry before intake lands the issue.** A failed or
+  abandoned intake leaves `CANDIDATES.md` untouched.
+- **Promotion moves a record between homes.** The work itself is then
+  dispatched through the software factory like any other issue.
+- **Repo-scoped Candidates only.** This skill moves entries recorded as
+  serious, repo-scoped Candidates; random, unfiltered, or cross-repo ideas go
+  to mission-control via /idea.

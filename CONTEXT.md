@@ -6,7 +6,7 @@ description: The workspace's established vocabulary — the canonical terms to u
 
 # Vocabulary
 
-The workspace's established vocabulary — the canonical terms every doc uses exactly, so shared language stays consistent instead of each doc reinventing it. Extensible: terms are added here as they're pinned down. Consistent language is the whole point.
+The workspace's established vocabulary — the canonical terms every doc uses exactly, so shared language stays consistent. Extensible: terms are added here as they're pinned down.
 
 ## Language
 
@@ -52,11 +52,11 @@ blocked. The gate rungs are defined once in
 [enforcement.md](/standards/build/enforcement.md); this fixes the words.
 
 **Audit**
-The umbrella term for the Standard's read-only checking process: a run of one or more detectors; read-only — it never mutates the repository and never blocks by itself. A Detector is a **lint** if it is deterministic code, an **audit** in the narrow sense if it is an LLM judge — two kinds of the one read-only process.
+The umbrella term for the Standard's read-only checking process: a run of one or more detectors; read-only — it never mutates the repository and never blocks by itself. A Detector is a **lint** if it is deterministic code, an **audit** in the narrow sense if it is an LLM judge.
 _Avoid_: check (too broad — a check may block; an audit never does).
 
 **Lint**
-A Detector implemented as deterministic code — the `*-lint` scripts under `scripts/`. Every lint is part of the audit process (lint ⊂ audit), never the reverse: a lint is one kind of audit, but an audit in the narrow sense (an LLM judge) is not a lint.
+A Detector implemented as deterministic code — the `*-lint` scripts under `scripts/`. Every lint is part of the audit process (lint ⊂ audit), never the reverse — an audit in the narrow sense (an LLM judge) is not a lint.
 _Avoid_: audit, for a deterministic detector — that detector is a lint.
 
 **Detector**
@@ -67,13 +67,13 @@ An automatic, unmanned blocking point on the path to main. There are exactly thr
 _Avoid_: venue (retired — say **gate**, or a rung name).
 
 **Enforcement**
-An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect; a one-time code review by the user is not enforcement.
+An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect.
 
 **Finding**
 One output line from a detector, in GNU format: `file:line: card.rule message` — a colon after the location, single spaces, a repo-relative path. The `:line` is omitted for a file-level finding (e.g. `README.md: knowledge-organization.doc-shape missing an H1 title`). The rule id is namespaced by the card whose question it answers.
 
 **Consumer**
-A repository that consumes what dev-playbook defines — standards, published hooks, judgments machinery, methods. Consuming dev-playbook is the point of dev-playbook: every other workspace repo is a consumer.
+A repository that consumes what dev-playbook defines — standards, published hooks, judgments machinery, methods. Every other workspace repo is a consumer.
 
 **Scope**
 The population a standard governs. **Workspace-scoped**: declared in dev-playbook, governing every repo in `~/workspace`. **Repo-scoped**: declared in one consumer, governing that repo alone. Exactly two values.

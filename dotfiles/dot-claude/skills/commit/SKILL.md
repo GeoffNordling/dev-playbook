@@ -22,7 +22,7 @@ Space-separated, any order. Recognized keywords:
 - `amend` — commit verb: use `git commit --amend --no-edit` instead of a fresh commit. Keeps the prior message (including its existing Co-Authored-By line) exactly as it stands.
   - **Pre-flight: skip the amend if HEAD has been pushed.** Run `git branch -r --contains HEAD`. If it lists any remote branches, amending would rewrite pushed history and produce a diverged-remote error on the next push. Make a fresh commit instead (still apply the rest of the skill, including the `Co-Authored-By` line). After committing, tell the user: amend was downgraded to a fresh commit because HEAD was already on `<remote/branch>`.
 
-`fast amend` is valid — fast governs staging, amend governs the commit verb. They compose.
+`fast amend` is valid — fast governs staging, amend governs the commit verb.
 
 ### Without `fast` (default staging)
 

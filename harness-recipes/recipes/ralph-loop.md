@@ -38,8 +38,7 @@ Each iteration is one fresh `agent()` that:
 6. commits via the `/commit` skill,
 7. reports whether the plan is complete.
 
-The runtime repeats this until an agent reports done. No agent remembers the
-last — continuity lives entirely on disk.
+The runtime repeats this until an agent reports done.
 
 ## Running it
 
@@ -49,7 +48,7 @@ skill interviews you and writes them — then call the workflow by name:
 
     Workflow({ name: "ralph-loop", args: { model: "haiku", maxIters: 6, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
 
-All five args are required — no defaults: `model` (worker model), `maxIters`
+All args are required — no defaults: `model` (worker model), `maxIters`
 (safety rail), `planFile` (the plan: a task list), `progressFile` (the running
 log), `checkCmd` (the check gate run at the start and end of each iteration — a
 shell command meaning "green", e.g. `make check` or `make -C tools check`; pass

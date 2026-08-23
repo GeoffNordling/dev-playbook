@@ -28,19 +28,18 @@ dispatching session in your final message.
 
 ## Calibration — read before auditing
 
-Briefs aim at acceptable ambiguity, never completeness: the builder is a
-capable agent operating under the brief's User intent, with judgment over
-everything except approved artifact words — fitting those in (placement,
-heading levels, stitching) is explicitly the builder's call, and a placement
-note is guidance, not a script. A finding requires that the implementer
-would either confidently do the **wrong** thing or be forced to **halt**
-under the
+Briefs aim at acceptable ambiguity: the builder is a capable agent operating
+under the brief's User intent, with judgment over everything except approved
+artifact words — fitting those in (placement, heading levels, stitching) is
+the builder's call, and a placement note is guidance. A finding requires
+that the implementer would either confidently do the **wrong** thing or be
+forced to **halt** under the
 [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md)'s
 escalation rule. Resolvable ambiguity is not a finding. Do not audit
-installability to the letter. Rulings already recorded on the issue or its
-epic — ruling comments and standing rulings — are settled; do not
-re-litigate them. Zero findings is a valid and expected outcome; do not
-manufacture findings to appear thorough.
+installability to the letter. Rulings recorded on the issue or its epic —
+ruling comments and standing rulings — are settled; do not re-litigate them.
+Zero findings is an expected outcome; do not manufacture findings to appear
+thorough.
 
 ## The question set
 
@@ -56,15 +55,15 @@ Each hit is a finding.
   pull the builder into it?
 - **Q6 — One goal + size.** Exactly one goal? Anything deferrable without
   blocking the goal is a finding. The size check — buildable in one session
-  within context budget — is asked here, but its output is a **suggestion**,
-  a proposed seam, never a decision.
+  within context budget — is asked here, but its output is a suggested
+  seam.
 - **Q7 — Intent sufficiency.** Taking the edges found in Q3: does User
   intent give the implementer enough principle and cost model to handle
   them within the deviation limiters?
 
 ## Return
 
-Your final message is data for the dispatching session, not a user-facing
-report. Return, raw: findings grouped Q3–Q7, each concrete — the file or
-section, the defect, why it meets the wrong-or-halt bar — with one line per
-question that came back empty. If clean overall, say so plainly.
+Your final message is data for the dispatching session. Return, raw:
+findings grouped Q3–Q7, each concrete — the file or section, the defect,
+why it meets the wrong-or-halt bar — with one line per question that came
+back empty. If clean overall, say so plainly.

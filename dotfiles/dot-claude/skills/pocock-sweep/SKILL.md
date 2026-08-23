@@ -47,8 +47,8 @@ gh api repos/mattpocock/skills/releases/latest --jq .tag_name
 The tag the ledger already names means there is nothing to sweep. Say so and
 stop.
 
-Otherwise resolve two commits and compare them — the second decides how step 6
-installs:
+Otherwise resolve the commits and compare them — the second decides how step
+6 installs:
 
 ```
 gh api repos/mattpocock/skills/commits/<tag> --jq .sha
@@ -92,8 +92,8 @@ or standing — and the tally matches the package's own tier counts.
 
 ## 5. Rule the docket with the user
 
-The user rules every item, one item at a time. What you bring is a lead, never
-a ruling: the recommendation, the evidence, and what it costs either way.
+The user rules every item, one item at a time. What you bring is a lead: the
+recommendation, the evidence, and what it costs either way.
 
 A recap clause is not a docket. An item the user has not ruled on by itself is
 unruled, however clearly the surrounding discussion pointed at an answer.
@@ -176,7 +176,7 @@ and no revision, so the tag and its commit are named in the ledger or nowhere.
 The Decision Record beside it is **thin and delta-only**: what moved and why,
 the positions declined so a later sweep does not re-find them, and any
 correction to a claim the sweep made along the way. Where a skill stands today
-is the ledger's question, not the record's.
+is the ledger's question.
 
 ## 10. Open the PR
 

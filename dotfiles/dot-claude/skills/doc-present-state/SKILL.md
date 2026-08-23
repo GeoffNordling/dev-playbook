@@ -8,6 +8,6 @@ effort: xhigh
 
 # Present-State Documentation
 
-Write the doc as a map of now: current state and next steps, the minimum an agent needs to act. A future agent reads it to act on the decisions that hold today, never to reconstruct the trajectory that produced them. History earns a sentence only when the present is unintelligible without it — a constraint that still binds, a decision that still governs.
+Write the doc as a map of now: current state and next steps, the minimum an agent needs to act. A future agent reads it to act on the decisions that hold today. History earns a sentence only when the present is unintelligible without it — a constraint that still binds, a decision that still governs.
 
-This applies in both directions: forward to every doc written from here on, and backward to the writing just done — revisit it now and rewrite it to match.
+This applies forward to every doc written from here on, and backward to the writing just done — revisit it now and rewrite it to match.

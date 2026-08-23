@@ -90,16 +90,15 @@ For Python files in `scripts/`:
 
 ## Entry points
 
-When the project exposes a CLI, declare it:
+Declare an entry point only when the project has a CLI:
 
 ```toml
 [project.scripts]
 <command> = "<package>.cli:main"
 ```
 
-Lazy — present only when a CLI actually exists.
-
 ## Initial setup
 
 `uv init --package <repo>` generates the uv_build src layout; overwrite the
 generated `pyproject.toml` with the canonical shape.
+</content>

@@ -2,20 +2,19 @@
 
 You run the `record` commands, but you never choose what goes in them — the
 workflow builds each from the ids its judges actually passed, and you copy them
-verbatim. There are exactly two exceptions where you name an id yourself, both of
-which require the user present in the loop, and both done with one command that
-runs from anywhere:
+verbatim. Exceptions where you name an id yourself require the user present in
+the loop and use one command that runs from anywhere:
 
 ```
 uv run judgments-run --root <root> record <id>
 ```
 
-## The two cases
+## Naming an id yourself
 
 - **A false positive the user concurs is wrong.** The artifact is correct, the judge
   tripped anyway, and the user agrees. Record the pass on the unchanged content
-  rather than re-running a judge that will trip again. This is the deliberate
-  "no need to rerun the judge" path.
+  rather than re-running a judge that will trip again — the deliberate "no need
+  to rerun the judge" path.
 - **A small edit the user watched you make.** They asked for it, or they saw the
   wording and agreed. A second opinion on a clause the user just approved buys
   nothing they have not already supplied, and the round trip costs a full judge run.

@@ -29,7 +29,7 @@ session in your final message.
   observed output cited) or `assumed`, and a `measured` claim without
   checkable evidence is demoted to `assumed`.
 
-## The two questions
+## Audit questions
 
 Each hit is a finding.
 
@@ -60,14 +60,14 @@ and move on.
 - Installability audits stop at the approved words: placement, heading
   levels, and stitching into surrounding text are the builder's judgment —
   flag placement only where it would cause a wrong install.
-- Rulings already recorded on the issue or its epic — ruling comments and
-  standing rulings — are settled; do not re-litigate them.
-- Zero findings is a valid and expected outcome. Do not manufacture
-  findings and do not pad; a sweep that found nothing is one line.
+- Rulings recorded on the issue or its epic — ruling comments and standing
+  rulings — are settled; do not re-litigate them.
+- Zero findings is an expected outcome. Do not manufacture findings and do
+  not pad; a sweep that found nothing is one line.
 
 ## Return
 
-Your final message is data for the dispatching session, not a user-facing
-report. Return, raw: a numbered list of findings — each states the claim or
-quote at issue, what reality shows, and why it meets the wrong-or-halt bar —
-then one line per sweep performed that came back clean.
+Your final message is data for the dispatching session. Return, raw: a
+numbered list of findings — each states the claim or quote at issue, what
+reality shows, and why it meets the wrong-or-halt bar — then one line per
+sweep performed that came back clean.

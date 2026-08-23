@@ -21,9 +21,9 @@ Open with the ask and present nothing else:
 
 > What's your User intent for this issue?
 
-Then stop. The user answers from memory, and that memory is the whole signal — the vibe that has been driving the session, uncontaminated by the wording the brief settled on. A recap of the draft first hands them the agent's framing to echo back, and step 2 then finds nothing, because both sides came from the same place. Cold is what makes the check real.
+Then stop. The user answers from memory, and that memory is the whole signal — the vibe that has been driving the session, uncontaminated by the wording the brief settled on. A recap of the draft first hands them the agent's framing to echo back, and step 2 then finds nothing, because both sides came from the same place.
 
-Expect voice-dictation or fast typing: fragments, run-ons, trailing thoughts. That is the input this beat is built for.
+Expect voice-dictation or fast typing: fragments, run-ons, trailing thoughts.
 
 ## 2. Scrutinise
 
@@ -35,13 +35,13 @@ Read what they said against the drafted brief and surface what collides, in one 
 
 The user is in an intuition headspace; the brief is literal. The distance is the finding, and it may be the user who has the issue wrong. Say so when what they described is wider, narrower, or other than what the issue builds.
 
-Usefulness of intent is a bonus, not mandatory. As long as nothing collides, say so and go to step 3.
+As long as nothing collides, say so and go to step 3.
 
 ## 3. Marry the two
 
 Either side may give, the user's call, one collision at a time. The brief is still a draft in this session and nothing has landed on GitHub, so amending an acceptance criterion costs nothing at this moment — and half the value here is the vibe catching a spec the agent got subtly wrong, so treat the brief as a live suspect, never only the intent.
 
-The two do not have to match perfectly. They have to stop obviously fighting.
+They have to stop obviously fighting.
 
 This is a conversation, and it runs until the user ends it.
 

@@ -17,9 +17,9 @@ sections render blank, never as errors.
 ## The owner
 
 Every visible sentence must be meaningful and useful to a reader who will
-*never* open the code — not "hasn't yet," never. This reader is the **owner**:
-an experienced engineer who delegates all coding to agents and collaborates on
-design. The owner reads a datasheet to answer two questions:
+never open the code — not one who simply hasn't gotten to it yet. This reader
+is the **owner**: an experienced engineer who delegates all coding to agents
+and collaborates on design. The owner reads a datasheet to answer:
 
 - **Trust** — what does this system do, what does it touch, what is verified,
   and what should I worry about?
@@ -28,9 +28,9 @@ design. The owner reads a datasheet to answer two questions:
 
 ## Scope and identity
 
-The caller chooses the scope: an explicit manifest of paths and globs. The datasheet never decides
-its own scope. The **subject** names the datasheet and its file; the caller supplies it, or the
-generator proposes one and the caller confirms. 
+The caller chooses the scope: an explicit manifest of paths and globs. The
+**subject** names the datasheet and its file; the caller supplies it, or the
+generator proposes one and the caller confirms.
 
 - Home: `readings/datasheet/<subject>.html` in the covered repository.
 - One datasheet per subject. Regenerating an existing subject overwrites the
@@ -39,47 +39,47 @@ generator proposes one and the caller confirms.
   stamp comment alone — never by reading a full sheet. If the new manifest
   overlaps an existing one, stop and surface the overlap to the caller instead
   of writing a near-duplicate.
-- Datasheets are regenerated manually, on demand — never hand-edited, never
-  auto-synced; a sheet may lag its subject until someone regenerates it.
+- Datasheets are regenerated manually, on demand, never hand-edited; a sheet
+  may lag its subject until someone regenerates it.
 
 ## Document form
 
 One self-contained HTML file: inline CSS, no scripts required to read, no
 external requests. It renders complete from `file://` in any browser.
 
-The document has two layers:
+The document's layers:
 
 - **Visible layer** — everything rendered by default. It stands alone: reading
   only the visible layer yields the complete mid-level understanding. Hard
   budget: **1,000 words**, counted as every visible word except the stamp
   block. Diagram and exhibit text counts.
 - **Collapsed layer** — `<details>` elements holding optional depth. Hard
-  budget: **1,000 additional words**. Collapsed content deepens the story; it
-  never completes it — nothing in the visible layer may depend on it.
+  budget: **1,000 additional words**. Collapsed content deepens the story —
+  nothing in the visible layer may depend on it.
 
 The visual form is fixed, and the [example](#example) is its normative
 embodiment: a sheet copies the example's stylesheet and card markup verbatim
 and varies only the content. The layout is a fact rail beside a main grid:
 the rail (narrow, sticky) holds identity, Concepts, Touch surface, and Tests
 for constant-position lookup; the main grid pairs Purpose and Behavior side by
-side, then gives API, Data flow, and Assessment each a full-width band; on narrow
-windows the main grid collapses to one column. Color is semantics, never
-decoration — green marks the verified, amber marks opinion and coverage
+side, then gives API, Data flow, and Assessment each a full-width band; on
+narrow windows the main grid collapses to one column. Color is semantics,
+never decoration — green marks the verified, amber marks opinion and coverage
 gaps, indigo chips mark concepts, slate is neutral.
 
 The ceiling is independent of scope: a whole-repository datasheet and a
 single-tool datasheet share the same maximum, and a larger scope raises the
 altitude of description rather than the word count. The ceiling is not a
-target — a small subject yields a short sheet. Depth comes from narrowing
-scope, never from lengthening the document.
+target: a small subject yields a short sheet, and depth comes from narrowing
+scope, not lengthening the document.
 
 ## Language
 
 The subject of every visible sentence is a behavior or a concept — what the
 system does, decides, produces, touches, or refuses. Code identifiers
 (variables, functions, env vars, filenames) appear only as parenthetical
-anchors or in the collapsed layer, never as what a sentence is about. State
-the consequence first; the mechanism supports it.
+anchors or in the collapsed layer. State the consequence first; the mechanism
+supports it.
 
 Banned:
 
@@ -100,7 +100,7 @@ demonstrates, a judgment's consequence.
 
 ## Content classes
 
-Every section is one of two classes, and the accuracy standard differs:
+Every section carries a content class, and the accuracy standard differs:
 
 - **Extractive [E]** — statements derivable from the files. A false extractive
   sentence is a defect, as a failing test is a defect in code. Every
@@ -116,8 +116,8 @@ Every section is one of two classes, and the accuracy standard differs:
 Every section always appears, in a fixed place. The fact rail holds the
 lookup sections under the identity header; the main grid holds the narrative
 sections. The markup follows the same order — rail, then main. A section
-whose subject is absent states that plainly ("None.") — presence with an
-affirmative blank is the signal, silence is a violation.
+whose subject is absent states that plainly ("None."); silence is a
+violation.
 
 | Section | Place | Class | Contents |
 |---|---|---|---|
@@ -133,25 +133,25 @@ affirmative blank is the signal, silence is a violation.
 
 ### Stamp
 
-The stamp exists in two forms carrying the same fields: a YAML block inside an
-HTML comment that opens the file — the first thing in it, before the doctype —
-so a datasheet's identity is readable from its opening lines alone; and the
-identity card that opens the fact rail. The [example](#example) shows both.
+The stamp exists as a YAML block inside an HTML comment that opens the file —
+the first thing in it, before the doctype — so a datasheet's identity is
+readable from its opening lines alone, and as the identity card that opens
+the fact rail, both carrying the same fields. The [example](#example) shows
+both.
 
 ### Concepts
 
-Concepts are the owner's vocabulary, not the code's. Each chip names
-something the owner needs in order to direct future work or to read the rest
-of this sheet; the defining phrase is one clause. Terms come from the files:
-when the files name the thing — an identifier, a docstring phrase, an
-emitted element — the chip uses that name, anchored to its defining site. A
-term the files don't supply is the generator's coinage and wears a dashed
-border (`chip coined`) — the coinage still anchors to where the concept lives
-in the code; the dashed border marks that the *name* is the generator's, not
-that the concept is ungrounded. A concept earns its place
-only when another part of the sheet leans on it — the exhibit, a diagram
-node, an Assessment item. A concept nothing else references is a souvenir of
-reading the code; cut it.
+Concepts are the owner's vocabulary. Each chip names something the owner
+needs in order to direct future work or to read the rest of this sheet; the
+defining phrase is one clause. Terms come from the files: when the files name
+the thing — an identifier, a docstring phrase, an emitted element — the chip
+uses that name, anchored to its defining site. A term the files don't supply
+is the generator's coinage and wears a dashed border (`chip coined`) — the
+coinage still anchors to where the concept lives in the code; the dashed
+border marks that the *name* is the generator's, not that the concept is
+ungrounded. A concept earns its place only when another part of the sheet
+leans on it — the exhibit, a diagram node, an Assessment item. A concept
+nothing else references serves no purpose; cut it.
 
 ### Touch surface
 
@@ -162,24 +162,24 @@ explicitly.
 
 ### Tests
 
-Rows, not paragraphs. Each row is a count or mark plus what that
-verification covers — the suite's shape, never its file list. Verified
-coverage is green; gated, skipped, or absent coverage is amber.
+Rows. Each row is a count or mark plus what that verification covers — the
+suite's shape, never its file list. Verified coverage is green; gated,
+skipped, or absent coverage is amber.
 
 ### Behavior
 
 The exhibit is the smallest input/output pair that demonstrates the system's
 primary transformation — any element that could be deleted without weakening
-the demonstration is cut. Two labels, both mandatory:
+the demonstration is cut. Labels are mandatory:
 
 - **verified:** `run` — the invocation was executed during generation — or
-  `not-run`, with one sentence saying why (e.g. unsafe, private information, not runnable, needs
-  credentials).
-- **exhibit:** `captured` — a real scenario really run: genuine input and the
-  output it actually produced, elisions marked honestly ("showing 14 of 3,400
-  lines") — or `constructed` — a synthetic illustration, which may be informed
-  by a real run. Fabricating the input makes an exhibit `constructed`, never
-  `captured`, even when the command really executed.
+  `not-run`, with one sentence saying why (e.g. unsafe, private information,
+  not runnable, needs credentials).
+- **exhibit:** `captured` — a real scenario, actually run: genuine input and
+  the output it produced, elisions marked honestly ("showing 14 of 3,400
+  lines") — or `constructed` — a synthetic illustration, which may be
+  informed by a real run. Fabricating the input makes an exhibit
+  `constructed`, never `captured`, even when the command executed.
 
 The input is a real, recognizable artifact of the owner's world — when the
 system operates on something outside its own scope (a package, a repo, a
@@ -192,8 +192,8 @@ run live for verification and construct a small, faithful exhibit
 ### API
 
 The public call surface, and only what a consumer is meant to invoke — never
-internal helpers or private names (a leading underscore is private). It takes
-one of two forms, or both:
+internal helpers or private names (a leading underscore is private). It
+takes these forms, or both:
 
 - **A command grammar** renders as a **railroad diagram** — the syntax-diagram
   convention (SQLite, JSON.org, EBNF): a left-to-right track with required
@@ -208,10 +208,10 @@ one of two forms, or both:
   from `griffe-outline`, the same tool the exhibit runs, so no new extraction is
   needed.
 
-A tool that is a CLI over a library shows both. When only one form applies, the
-absent one is named with its reason in a single sentence — "No importable
-surface: these are standalone scripts, not a library" — never left as silence;
-the affirmative-blank rule governs each half, not only the whole section. A
+A tool that is a CLI over a library shows both. When only one form applies,
+the absent one is named with its reason in a single sentence — "No
+importable surface: these are standalone scripts, not a library" — the
+affirmative-blank rule governs each half, not only the whole section. A
 system that exposes nothing to call states "None." A railroad that fails to
 render is a generation failure, exactly as with the dataflow diagram.
 
@@ -220,24 +220,22 @@ render is a generation failure, exactly as with the dataflow diagram.
 This is a **dataflow diagram** and only that: how does the primary input move
 through the system's parts to become the primary output? Not module
 dependencies, not call graphs, not API interaction — the API has its own
-section. Fixing the lens keeps the diagram out of the infinite space of what it
-could otherwise depict.
+section.
 
-Every node is a **real, named part** the sheet already discusses — a command, a
-module, a store. Aggregate or category nodes the reader cannot point to in the
-code ("workflow tools", "shared logic") are banned; if the flow cannot be drawn
-without inventing a hub to join everything, the scope is a grab-bag, and the
-diagram must show that rather than fake a unity. Edges are the data in motion,
-each labeled with what crosses it.
+Every node is a **real, named part** the sheet already discusses — a command,
+a module, a store. Aggregate or category nodes the reader cannot point to in
+the code ("workflow tools", "shared logic") are banned; if the flow cannot be
+drawn without inventing a hub to join everything, the scope is a grab-bag,
+and the diagram must show that rather than fake a unity. Edges are the data
+in motion, each labeled with what crosses it.
 
 Color is fixed, and a **legend in the card states it**: the input endpoint is
-tinted blue, the terminal output(s) green, internal parts slate — the reader
-never guesses what a color means.
+tinted blue, the terminal output(s) green, internal parts slate.
 
 When the scope is several independent tools rather than one pipeline, each is
-drawn as its **own disconnected track** — separate blue→…→green chains, no hub
-joining them. The disconnection is honest information: it tells the owner the
-scope is N independent things, not one system.
+drawn as its **own disconnected track** — separate blue→…→green chains, no
+hub joining them. The disconnection is honest information: it tells the
+owner the scope is N independent things.
 
 The medium is Graphviz: DOT rendered to SVG, inlined, with the DOT source in an
 adjacent HTML comment. Node and edge labels count against the visible budget. A
@@ -247,10 +245,10 @@ roster, a schema — goes in a collapsed block at the card's foot.
 
 ### Assessment
 
-The one section allowed opinion, fenced five ways:
+The one section allowed opinion, fenced as follows:
 
-1. Every judgment rests on facts already stated in the extractive sections and
-   points to them. Assessment interprets the sheet; it introduces no new facts.
+1. Every judgment rests on facts already stated in the extractive sections
+   and points to them; it introduces no new facts.
 2. Flag, don't prescribe. "Nothing verifies the output shape — consumers are
    trusting string templates" flags; "add schema validation" prescribes and is
    banned.
@@ -275,5 +273,4 @@ size: a real system may spend the full budget.
 [System Legibility](/standards/legibility.md) — the standard whose Define cell
 claims the datasheet as its answer to how a system's owner earns trust and
 direction without reading the code. Datasheets are regenerated on demand;
-System Legibility sets no cadence, and nothing binds this instrument to a
-schedule.
+System Legibility sets no cadence.

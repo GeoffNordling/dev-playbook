@@ -8,6 +8,6 @@ effort: xhigh
 
 # Grill with Docs
 
-Run a /grilling session, using the /domain-modeling skill throughout. Everything both skills say applies as written.
+Run a /grilling session, using the /domain-modeling skill throughout. Everything else applies as written.
 
 Where /domain-modeling says `docs/adr/` and "ADR", this workspace writes **Decision Records** to `docs/decisions/`, in the form given by [Decision Record conventions](~/workspace/dev-playbook/standards/decisions/records.md). Where it gives a format for `CONTEXT.md`, the workspace form is [context-content.md](~/workspace/dev-playbook/standards/docs/context-content.md).

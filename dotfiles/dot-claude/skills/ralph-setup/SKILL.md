@@ -11,8 +11,6 @@ argument-hint: "[goal description]"
 
 The Ralph loop boots a fresh, memoryless agent each iteration; its only inputs are a plan file, a progress file, and a green check gate (or none). This skill produces those — above all a plan **chunked** so each fresh agent can do the next task without re-deriving the whole.
 
-A vague plan makes a loop that thrashes; a well-ordered one grinds to done.
-
 ## Read first
 
 Before doing anything else, read end-to-end:
@@ -37,7 +35,7 @@ Synthesize the finished product as explicit, checkable success criteria — conc
 
 ## 4. Chunk the plan
 
-The heart. Break the work into an ordered task list where each task:
+Break the work into an ordered task list where each task:
 
 - is small enough to finish cleanly in one fresh-context iteration,
 - is independently committable,
@@ -45,16 +43,16 @@ The heart. Break the work into an ordered task list where each task:
 - depends only on tasks above it — sequential, no forward references,
 - is self-contained: executable from the plan and progress log alone, without re-deriving the higher-level plan.
 
-Order so prerequisites come first. Present the chunked plan for explicit approval — a hard gate. Nothing is written until the user approves.
+Order so prerequisites come first. Present the chunked plan for explicit approval — a hard gate: nothing is written until the user approves.
 
 ## 5. Determine the check gate and verify loop-ready
 
-The loop runs a **check gate** at the start and end of every iteration, and raises on a red entry. The gate is loop config passed as the `checkCmd` arg — decided once here, with the user, because the memoryless iteration agents execute it, they do not re-decide it.
+The loop runs a **check gate** at the start and end of every iteration, and raises on a red entry. The gate is loop config passed as the `checkCmd` arg — decided once here, with the user, because the memoryless iteration agents execute it.
 
 Settle it now, before writing anything:
 
-- Decide the single shell command that means "green" for this repo: a root `make check`, a sub-project `make -C tools check`, an `&&`-chain across several, or none. Per the workspace build standard, a repo may legitimately have no check (e.g. docs-only); that is allowed — the gate is then the empty string `""`.
-- Run the chosen gate and confirm it passes green (or confirm there is genuinely no gate to run).
+- Decide the single shell command that means "green" for this repo: a root `make check`, a sub-project `make -C tools check`, an `&&`-chain across several, or none. Per the workspace build standard, a repo may have no check (e.g. docs-only) — the gate is then the empty string `""`.
+- Run the chosen gate and confirm it passes green (or confirm there is no gate to run).
 - Confirm the git tree is clean and committed.
 
 If the chosen gate is red, surface it and stop — scaffolding waits on a green tree.

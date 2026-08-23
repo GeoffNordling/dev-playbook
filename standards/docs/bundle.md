@@ -23,7 +23,7 @@ document is relevant.
 
 ## Concept documents and harness-owned files
 
-Not every file in the repo is a concept document. The bundle divides in two:
+Not every file in the repo is a concept document. The bundle divides:
 
 - **Concept documents** — prose knowledge a reader loads to *understand*
   something: standards, guides, surveys, Decision Records, READMEs, the
@@ -31,31 +31,29 @@ Not every file in the repo is a concept document. The bundle divides in two:
   `description`, per [document-types.md](/standards/docs/document-types.md)) and
   is subject to the type-lint.
 - **Harness-owned files** — files a tool *consumes as configuration or runs
-  as code*, not prose a reader loads to learn: every non-`.md` file, every
-  `.md` under a top-level `tests/` tree, plus the Claude Code file set
-  enumerated in [the harness-files registry](/standards/claude-code/files.md).
-  These carry no OKF frontmatter and are not type-linted. They keep whatever
-  format their consumer requires — a `SKILL.md` keeps its Claude Code
-  frontmatter (`name`, `model`, …), not OKF frontmatter; a `tests/` markdown
-  file is parser fixture data, often deliberately malformed, so it is never
-  measured against OKF format at all.
+  as code*: every non-`.md` file, every `.md` under a top-level `tests/`
+  tree, plus the Claude Code file set enumerated in
+  [the harness-files registry](/standards/claude-code/files.md). These carry
+  no OKF frontmatter and are not type-linted. They keep whatever format
+  their consumer requires — a `SKILL.md` keeps its Claude Code frontmatter
+  (`name`, `model`, …), not OKF frontmatter; a `tests/` markdown file is
+  parser fixture data, often deliberately malformed, so it is never measured
+  against OKF format.
 
-The test is *how the file is used*, not where it sits: everything is in the
-repo, hence in the bundle; harness-owned files are simply in-bundle
-non-concept-documents. `CLAUDE.md` is the worked example — it is prose a
-user could read, but Claude Code loads it as operating configuration, so
-it is harness-owned and carries no OKF frontmatter.
+The test is how the file is used: everything is in the repo, hence in the
+bundle; harness-owned files are in-bundle non-concept-documents. `CLAUDE.md`
+is the worked example — it is prose a user could read, but Claude Code loads
+it as operating configuration, so it is harness-owned and carries no OKF
+frontmatter.
 
 ## Principles
 
-**Scope is standardized; depth is not.** Every file has a defined scope
-(what goes in it), but depth varies by project. A CLI tool's README may be
-10 lines. A simulation's may be 100. Both are conformant if the content
+**Scope is standardized; depth is not.** A CLI tool's README may be 10
+lines; a simulation's may be 100 — both conformant as long as the content
 stays within scope.
 
-**Presence is the status signal.** There are no explicit status fields. The
-presence or absence of optional files signals the project's stage. A missing
-`CONTEXT.md` means no vocabulary has needed pinning yet; a populated
+**Presence is the status signal.** There is no explicit status field — a
+missing `CONTEXT.md` means no vocabulary has needed pinning yet; a populated
 `specs/` directory means the project is complex enough to warrant formal
 requirements.
 

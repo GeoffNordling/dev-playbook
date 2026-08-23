@@ -15,20 +15,20 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 ## Organization
 
 - **Mirror source structure.** Test files mirror the source directory layout: `src/auth/login.py` -> `tests/auth/test_login.py`. This scales naturally and avoids naming collisions. The mirror — flat, or beneath a recognized scope directory — is the one accepted location; the package path is always required.
-- **Scope directories.** A suite may interpose one recognized scope directory between `tests/` and the mirror: `unit` and `integration` each mirror `src/` beneath them (`tests/unit/auth/test_login.py`). A third, `tests/agent_review/`, holds judgment gate tests ([cache-gate.md](/standards/judgments/cache-gate.md)); their free-form stems are never measured against source modules. The set is fixed — any other directory in that position is a misplacement, not a scope.
+- **Scope directories.** A suite may interpose one recognized scope directory between `tests/` and the mirror: `unit` and `integration` each mirror `src/` beneath them (`tests/unit/auth/test_login.py`). A third, `tests/agent_review/`, holds judgment gate tests ([cache-gate.md](/standards/judgments/cache-gate.md)); their free-form stems are never measured against source modules. The set is fixed — any other directory in that position is a misplacement.
 - **Conftest hierarchy.** Place `conftest.py` at each directory level for fixtures relevant to that scope. Root `conftest.py` holds shared fixtures; subdirectory `conftest.py` files hold domain-specific fixtures.
 
 ## Test structure
 
-- **Arrange-Act-Assert.** Every test has three clear sections: set up the conditions, perform the action, verify the result. Separate them with blank lines for readability.
+- **Arrange-Act-Assert.** Every test has clear sections: set up the conditions, perform the action, verify the result. Separate them with blank lines for readability.
 - **One concept per test.** Each test verifies one behavior or scenario. Multiple assertions are fine when they all verify aspects of the same concept.
 - **Descriptive names.** Test names read like behavior descriptions: `test_login_rejects_expired_token`, not `test_login_2`. The name alone conveys what the test verifies.
-- **No logic in tests.** No if/else, no try/except in test bodies. Tests are boring and linear.
+- **No logic in tests.** No if/else, no try/except in test bodies.
 - **Expected values come from outside the code.** A known-good literal, a worked example, or the spec supplies the expected value. A *tautological* test recomputes it the way the code under test computes it, so it passes by construction and can never disagree with the code.
 
 ## Behavioral focus
 
-Tests verify **what** the system does, not **how** it does it. This is the single most important principle in this document.
+Tests verify **what** the system does, not **how** it does it.
 
 - **Access only public names.** Tests exercise identifiers without a leading underscore. Private helpers (`_foo`, `_Tokenizer`) are reached through the public interfaces that call them. Python dunder protocol methods (`__init__`, `__iter__`, etc.) count as public.
 - **Assert on observable outputs.** Return values, state changes (records stored, files written), raised exceptions. Never assert on internal state, private attributes, or implementation details.
@@ -55,7 +55,7 @@ Choose the lightest test double that verifies the behavior under test: a real ob
 
 ### Real objects (integration tests)
 
-Use the real implementation when it is cheap and deterministic. A real database in a temp directory, an in-process HTTP server, and real parsers operating on fixture files are all examples. Integration tests that exercise the real dependency give the highest confidence but are slower and harder to isolate.
+Use the real implementation when it is cheap and deterministic: a real database in a temp directory, an in-process HTTP server, real parsers operating on fixture files. Integration tests that exercise the real dependency give the highest confidence but are slower and harder to isolate.
 
 ### Fakes (the default for dependencies with state or logic)
 
@@ -88,4 +88,3 @@ A service you own but call over the network — an internal API, a queue consume
 - **Use fixtures for setup and teardown.** Standardize construction and cleanup through pytest fixtures rather than ad-hoc setup code in test bodies.
 - **Narrowest scope.** Use the narrowest fixture scope that works: function (default) > class > module > session. Shared state between tests causes flaky failures.
 - **Fixtures define the contract.** When writing tests before implementation, fixtures that construct objects (including fakes) serve as the interface contract for the green agent. Keep them minimal; only the parameters the spec implies.
-

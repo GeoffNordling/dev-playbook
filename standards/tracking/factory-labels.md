@@ -8,22 +8,21 @@ description: The four-tuple every leaf carries — the factory's fixed-value lab
 
 The state of an issue is written on the issue, as labels. This document is the
 label contract: which labels exist, what a leaf must carry, and how a phase
-label is derived from the node it names. The states themselves — the graph these
-labels are read against — are
+label is derived from the node it names. The states themselves — the graph
+these labels are read against — are
 [the software factory](/software-factory/software-factory.md).
 
 ## The four-tuple
 
-Every **leaf** — the unit of work — carries the full four-tuple `(category:*,
-mode:*, tests:*, phase:*)`, with `phase:*` naming its current node. An **epic**
-is not a leaf: it never dispatches and carries `category:*` alone; its children
-carry the work. Roles are derived, never labeled
+Every **leaf** — the unit of work — carries the four-tuple `(category:*,
+mode:*, tests:*, phase:*)`, with `phase:*` naming its current node. An
+**epic** is not a leaf: it never dispatches and carries `category:*` alone;
+its children carry the work. Roles are derived, never labeled
 ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 
-An untriaged issue may carry `phase:intake` or no labels at all — either way it
-is untriaged, with `phase:intake` the implied default. Issue **relationships** —
-hierarchy and blocked-by — are native GitHub relationships, tracked outside this
-tuple.
+An issue is untriaged whether it carries `phase:intake` or no labels at all;
+`phase:intake` is the implied default. Issue **relationships** — hierarchy and
+blocked-by — are native to GitHub, tracked outside this tuple.
 
 ## Valid labels
 
@@ -31,8 +30,8 @@ The factory's labels are exactly these: the fixed-value labels in the table
 below, plus one `phase:*` label per work node, derived per [Naming](#naming).
 [bootstrap-labels](/scripts/bootstrap-labels) mints them.
 
-The scheme carries dimensions beyond the factory's. Each is governed where it is
-defined — `wayfinder` by
+The scheme carries dimensions beyond the factory's. Each is governed where it
+is defined — `wayfinder` by
 [Wayfinding operations](/standards/tracking/tracker-operations.md#wayfinding-operations)
 — and this doc restates none of their values.
 
@@ -66,8 +65,7 @@ A phase label is its node id with `_` mapped to `-`, `phase:`-prefixed: node
 rectangles and diamonds — mapped that way must equal the scheme's `phase:*`
 values exactly. The inventory: `intake, design, spike, build, pr-review`. A
 scheme value no node answers to, or a node no scheme value names, is the
-violation; the `scheme-vs-graph` judgment enforces it. Two things are exempt,
-and only these:
+violation; the `scheme-vs-graph` judgment enforces it. Exempt, and only these:
 
 - **Pre-issue states** — `CANDIDATES.md` and the idea funnel. No issue exists, so
   there is nothing to label.

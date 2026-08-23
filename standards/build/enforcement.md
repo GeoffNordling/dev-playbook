@@ -7,11 +7,10 @@ description: The gate ladder — the three rungs where checks block the path to 
 # Enforcement
 
 **Enforcement** is an audit stationed at a **gate** — an automatic, unmanned
-blocking point on the path to main. There are exactly three gates, named by
-their fixed rung names. The governance vocabulary (Audit, Detector, Gate,
-Enforcement, Finding) is defined in [CONTEXT.md](/CONTEXT.md); this file is
-where the three rungs are defined once, and every card's Enforce cell cites
-them by these names.
+blocking point on the path to main. The gates are named by their fixed rung
+names. The governance vocabulary (Audit, Detector, Gate, Enforcement, Finding)
+is defined in [CONTEXT.md](/CONTEXT.md); this file is where the three rungs
+are defined once, and every card's Enforce cell cites them by these names.
 
 ## The three gates
 
@@ -26,24 +25,24 @@ them — hooks that live in `.git/`, so `uvx pre-commit install` has to run in
 every clone. The CI gate has no branch protection behind it —
 [repo-settings.md](/standards/tracking/repo-settings.md) configures no required
 status checks — so its block executes through the user's standing rule: **a
-red CI run is never merged**. That rule is nondiscretionary — no judgment is
-exercised — which is what keeps the CI gate a gate rather than a review; the
-block sits at the merge button, not in branch-protection settings.
+red CI run is never merged**. That rule is nondiscretionary, which is what
+keeps the CI gate a gate rather than a review; the block sits at the merge
+button.
 
-## Outside the gates
+## Non-gate checks
 
 Not every place a check runs is a gate. These run checks but block nothing on
-the path to main — they are references here, not rungs:
+the path to main — they are references here:
 
 | Non-gate | When | What runs | Blocks |
 |---|---|---|---|
-| agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline, not a gate; the normative rule lives in [the node-skill contract](/software-factory/factory-operations.md#the-node-skill-contract) |
-| workspace-lint | on demand and via the periodic review | GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-lint`](/scripts/workspace-lint) | no — reports, never blocks |
+| agent ritual | before finishing every committing phase | `make check` | no — a node-skill discipline; the normative rule lives in [the node-skill contract](/software-factory/factory-operations.md#the-node-skill-contract) |
+| workspace-lint | on demand and via the periodic review | GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label/issue/epic tracking conformance, four-tuple validity, and stale dev-playbook pins, via [`workspace-lint`](/scripts/workspace-lint) | no — reports |
 
 The re-run of `make check` at review start is the review node's **green gate**:
 the reviewers run it before auditing and escalate if it is red, even
 though the push gate already covered the pushed commits — stated explicitly so
-this belt-and-braces re-run is not mistaken for a fourth gate. GitHub sits
+this redundant re-run is not mistaken for a fourth gate. GitHub sits
 outside every gate: it hosts the CI gate but is not itself one.
 
 ## Map

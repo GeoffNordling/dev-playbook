@@ -27,11 +27,9 @@ The third one is the point of this step. Be honest and complete about it. A
 place you half-understood counts, and so does one where you would have picked
 the likely meaning and moved on — settle on what you would have picked.
 
-This only means something because you worked it out from the document alone.
-
 ## Step 2 — Now find out what changed
 
-This document was rewritten for style. Load two things:
+This document was rewritten for style. Load:
 
 - The change itself: `git diff -- <target>`. For anything you need in full
   context, the prior version is `git show HEAD:<target>`.
@@ -59,8 +57,7 @@ Report a removal when, and only when:
   following it faithfully would produce the wrong result.
 
 Do not report a removal because the text is gone, because a reason is now
-unstated, or because the older wording was more explicit. If you did not stall
-on it in step 1, it did not hamper you.
+unstated, or because the older wording was more explicit.
 
 ## The report
 

@@ -98,12 +98,12 @@ A rule you did not read cannot carry a Blocking finding.
 
 Read the changed docs whole, not as hunks — the brief and the docs together —
 against the standards they answer to. Pin each finding to its file and line
-and the rule or criterion it breaches. All six dimensions are audited — the
+and the rule or criterion it breaches. All dimensions are audited — the
 presence check against the PR body, the rest against the docs — and they are
 also the dimensions the review body enumerates when they come back clean.
 
 - **The presence check**, first and mechanical. The PR body carries the
-  four mandatory sections of the
+  mandatory sections of the
   [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)
   — `## Summary`, `## Deviation ledger`, `## Deferred`,
   `## Suggestion dispositions` — with the explicit empty markers
@@ -125,12 +125,12 @@ also the dimensions the review body enumerates when they come back clean.
 - **Cross-document coherence.** After the change, the repo's docs must still
   read as one consistent body — editing one document knocks on to its semantic
   neighbors, and a missed knock-on update is as Blocking as a contradiction
-  inside the diff. The deterministic linters already prove references resolve
-  and indexes match frontmatter; your subject is meaning — whether what the
+  inside the diff. The deterministic linters prove references resolve and
+  indexes match frontmatter; your subject is meaning — whether what the
   neighbors say is still true.
 
 **The coherence frontier.** The diff picks what you read beyond itself, one
-hop, three derivations — then you stop:
+hop — then you stop:
 
 1. **Inbound** — docs that reference the changed docs (grep the changed paths
    repo-wide): each may now misdescribe what it points at.
@@ -142,11 +142,10 @@ hop, three derivations — then you stop:
 
 Read the frontier docs and check agreement with the diff. The frontier is one
 hop: a neighbor's own neighbors are out of bounds — a problem you suspect
-beyond it goes in a thread as a question or risk naming the doc, not another
-expansion. Generated and derived artifacts are off the frontier: anything
-under `readings/`, `*.html` datasheets, and the like are regenerated from
-source rather than hand-maintained — never flag them, not even as an
-out-of-scope follow-up.
+beyond it goes in a thread as a question or risk naming the doc. Generated and
+derived artifacts are off the frontier: anything under `readings/`,
+`*.html` datasheets, and the like are regenerated from source rather than
+hand-maintained — never flag them, not even as an out-of-scope follow-up.
 
 ## 4. Attach findings
 
