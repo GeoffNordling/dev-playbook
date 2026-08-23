@@ -110,24 +110,21 @@ pre-push hook: a miss blocks the push until the cache is filled, and a repo
 with nothing gated passes vacuously. A bare `uv run pytest` arms it too
 (fail-safe).
 
-**Same-commit adoption.** A repo taking the new Makefile fragment `MUST`
-repoint its pre-push hook to `make check-judgments-cache` in the
-**same commit**. Otherwise its `make check` stops running the gate while
-nothing at the push enforces it — a window with zero mechanical enforcement.
+A repo taking the new Makefile fragment `MUST` repoint its pre-push hook to
+`make check-judgments-cache` in the same commit — otherwise its `make check`
+stops running the gate while nothing at the push enforces it.
 
 ## 4. Lint the declarations on commit
 
 `judgments-lint` fails malformed or stale declarations fast at the commit
-gate. There is nothing to wire: it is in the roster of dev-playbook's
-published `playbook-lint` hook, which the canonical
-`.pre-commit-config.yaml` already pins
+gate. It runs as part of dev-playbook's published `playbook-lint` hook,
+which the canonical `.pre-commit-config.yaml` pins
 ([distribution.md](/standards/build/distribution.md)) — any repo on the
 canonical config runs it on every commit.
 
 The hook runs from pre-commit's own clone of dev-playbook at the pinned
-`rev` and self-bootstraps its imports, so it needs neither the installed
-package nor a checkout path — it is independent of the editable dependency
-in step 1.
+`rev` and self-bootstraps its imports, needing neither the installed
+package nor the checkout path from step 1's editable dependency.
 
 ## 5. Let the periodic sweep fill the cache
 

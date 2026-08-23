@@ -9,10 +9,9 @@ description: What a standard is and the standard-card format — four pointer ce
 Returning to a topic months later should not require re-deriving shared
 understanding over several turns of conversation. Each standard therefore
 gets a **standard card**: a small fixed-format record that tells a user or
-agent where to look. The card does not define the standard — the files it
-points at do that. It aggregates pointers so a thought that originates at
-the abstract level ("how do we do X here?") resolves to concrete files in
-one hop.
+agent where to look. The files it points at define the standard; the card
+aggregates pointers so a thought that originates at the abstract level
+("how do we do X here?") resolves to concrete files in one hop.
 
 ## What a standard is
 
@@ -31,10 +30,10 @@ standard.
 ## What a standard is not
 
 Not everything normative is a standard. A device built to serve a purpose
-— an artifact format, a tool, a template — is an answer, not a governed
-question, and so belongs inside a cell rather than in the catalog. Such
-devices are **instruments**; each carries a prescriptive contract of its
-own, typed `Instrument-Spec`. The instrument concept is defined in
+— an artifact format, a tool, a template — is an answer, so it belongs
+inside a cell rather than in the catalog. Such devices are **instruments**;
+each carries a prescriptive contract of its own, typed `Instrument-Spec`.
+The instrument concept is defined in
 [Instruments and Instrument Specs](/standards/instrument/format.md).
 
 ## Where a standard lives
@@ -48,8 +47,7 @@ target takes another type.
 
 ## Scope
 
-Every standard has a **scope** — the population it governs — and there are
-exactly two values:
+Every standard has a **scope** — the population it governs:
 
 - **Workspace-scoped** — declared in dev-playbook, governing every repo in
   `~/workspace`. The bulk of the catalog is workspace-scoped: the
@@ -67,9 +65,9 @@ never an intermediate group. Deeper nesting is deliberately unsupported
 
 **No shadowing.** A repo-scoped card may not reuse a workspace-scoped card's
 name. A consumer's `standards/<name>.md` may not collide with a card stem
-dev-playbook already publishes, because that would silently override the
-upstream standard of that name; the rule `standard.card-shadows-upstream`
-catches the collision at the consumer's commit gate.
+dev-playbook publishes, because that would silently override the upstream
+standard of that name; the rule `standard.card-shadows-upstream` catches the
+collision at the consumer's commit gate.
 
 ## Naming
 
@@ -101,52 +99,50 @@ restate the content of their targets.
   wiring lives (pre-commit hooks → the commit gate; tools that run only inside
   `make check` / `make check-judgments-cache` → the push gate); the hook pattern in enforcement.md's Map
   implies the echoes at the other rungs. Enforcement is automatic and
-  continuously in effect; a code review is a one-time checkpoint, not
-  enforcement, and never an Enforce pointer.
+  continuously in effect; a code review is a one-time checkpoint, never an
+  Enforce pointer.
 - **Adopt** — anything that helps bring a repository into conformance,
   such as templates or migration procedures. Often "none": the generic
   path is an agent reading the define cell and fixing the repository.
 
-The living exemplars are the cards themselves: [Build](/standards/build.md)
-and [Meta-Standard](/standards/standard.md) — the latter is this standard's own
+The cards themselves are the examples: [Build](/standards/build.md) and
+[Meta-Standard](/standards/standard.md) — the latter is this standard's own
 card, since the meta-standard is an instance of the format it defines.
 
 ## The catalog
 
 Each repo that carries cards has its own catalog at `standards/index.md`; in
 dev-playbook that is [standards/index.md](/standards/index.md). okf-lint's
-index rule already forces a catalog to list every card with a matching
-description, so catalog completeness is enforced by the existing hook suite
-rather than by new tooling.
+index rule forces a catalog to list every card with a matching description.
 
 ## Detectors
 
 A **detector** is the read-only check behind an Audit cell — it inspects the
 repository against one or more standards and emits findings, never mutating the
 repository and never blocking by itself (its runs at a gate are the audit
-stationed there — that is Enforcement). This is the normative home of the
-detector contract.
+stationed there — that is Enforcement). This document defines the detector
+contract.
 
-- **Read-only means mutating nothing git tracks.** A detector reports without
-  changing the repository. Reaching outside the working tree does not disqualify
-  it: workspace-lint queries GitHub over `gh api`, writing findings to stdout
-  and a summary to stderr — reading remote state and mutating nothing git
-  tracks — so it is read-only and belongs in an Audit cell.
-- **Wired throughout its scope; applicability lives inside the detector.** Every
-  detector is wired throughout its scope — a workspace-scoped detector runs in
-  every repo, a repo-scoped one throughout its host repo; the population it
-  governs runs the full menu, never a subset. A detector whose surface is
-  optional (skills, or a `standards/` tree) exits 0 silently when the surface is
-  absent; every other detector asserts unconditionally and fails loud. A gap is
-  never resolved by making a detector opt-in.
+- **Read-only means mutating nothing git tracks.** Reaching outside the
+  working tree does not disqualify it: workspace-lint queries GitHub over
+  `gh api`, writing findings to stdout and a summary to stderr — reading
+  remote state and mutating nothing git tracks — so it is read-only and
+  belongs in an Audit cell.
+- **Wired throughout its scope; applicability lives inside the detector.** A
+  workspace-scoped detector runs in every repo, a repo-scoped one throughout
+  its host repo; the population it governs runs the full menu, never a
+  subset. A detector whose surface is optional (skills, or a `standards/`
+  tree) exits 0 silently when the surface is absent; every other detector
+  asserts unconditionally and fails loud. A gap is never resolved by making
+  a detector opt-in.
 - **A card may have more than one detector.** Cards are organized by the
   question they govern; detectors by the mechanism they run. Question and
-  mechanism cross-cut, so the relation is one-to-many, not one-to-one: one
-  question can need several mechanisms (a card cited by more than one
-  detector), and one mechanism can serve several questions (a detector cited by
-  more than one card). The one-to-one invariant lives a level down, at the rule
-  — every `card.rule` id belongs to exactly one card. A card may still honestly
-  audit `none` when no automatic check exists.
+  mechanism cross-cut, so the relation is one-to-many: one question can need
+  several mechanisms (a card cited by more than one detector), and one
+  mechanism can serve several questions (a detector cited by more than one
+  card). The one-to-one invariant lives a level down, at the rule — every
+  `card.rule` id belongs to exactly one card. A card may still audit `none`
+  when no automatic check exists.
 - **Thin shims.** A detector script stays a thin shim over the host repo's
   reusable modules (in dev-playbook, `src/dev_playbook`); the logic lives in the
   module, the script wires argument parsing and output to it.
@@ -170,9 +166,9 @@ detector contract.
   `tests/conftest.py`).
 - **The hosting pattern.** A repo's detectors live at `scripts/<name>`, are
   published in that repo's own `.pre-commit-hooks.yaml`, and are mirrored in its
-  `repo: local` block — dev-playbook is the topmost instance of this pattern, not
-  a special case. A repo that ships a manifest must run what it ships from its
-  own local block; that dogfooding invariant is stated once in
+  `repo: local` block — dev-playbook is the topmost instance of this pattern. A
+  repo that ships a manifest must run what it ships from its own local block;
+  that dogfooding invariant is stated once in
   [distribution.md](/standards/build/distribution.md) and not restated here.
 - **Card-namespaced rule ids.** Every finding carries a rule id of the form
   `card.rule`, namespaced by the card whose question it answers and named
@@ -212,7 +208,7 @@ undocumented per-detector skip list, not the acknowledged mirror.
 
 ## Drift
 
-Standards drift at two grains, each with its own detector:
+Standards drift, each grain with its own detector:
 
 1. **Fine grain** — a specific document or passage must keep meaning what
    it meant when validated.

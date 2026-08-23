@@ -7,7 +7,7 @@ description: Every point where the factory stops for the user — the merge proh
 # User Checkpoints
 
 The factory runs unattended between checkpoints. A **checkpoint** is a point
-where it stops and the user acts, and there are only two reasons for one:
+where it stops and the user acts. The reasons:
 
 - **Prohibition** — the agent *can* do it and *must not*. Merging a PR is the
   only one ([The merge prohibition](#the-merge-prohibition)).
@@ -47,11 +47,11 @@ Under auto mode the classifier must additionally pass each `gh` write, per
 
 ## The briefing rule
 
-**The user is primarily in the terminal.** They do not typically read the documents or the code. They read the PR once, at the very end of the process. So every
-question, verdict request, and escalation stands on its own: it assumes no prior
-knowledge, lays the background out plainly, quotes the specific finding, line, or
-command the decision turns on, and then asks. Whatever a decision turns on goes
-on screen.
+**The user is primarily in the terminal.** They do not typically read the
+documents or the code. They read the PR once, at the very end of the process.
+So every question, verdict request, and escalation stands on its own: it
+assumes no prior knowledge, lays the background out plainly, quotes the
+specific finding, line, or command the decision turns on, and then asks.
 
 ## Turn boundaries
 
@@ -69,15 +69,14 @@ An escalation is a node reporting that it cannot proceed. It always reaches the
 user: the issue overwatch adds its own context — which node, what it dispatched,
 what the report says — and stops. It never overrides, retries, or self-fixes a
 node's escalation; the user's call routes the issue onward. A node whose skill
-doesn't exist is an escalation, not an improvisation. For a deviation escalation
-the call is also recorded as a comment on the issue or PR, per the
+doesn't exist is an escalation. For a deviation escalation the call is also
+recorded as a comment on the issue or PR, per the
 [deviation contract](/software-factory/deviation-contract.md#escalation) —
 limiter 3 binds later deviations only to what is written there.
 
-An escalation is not a finding. A problem a review node can describe belongs in
-its findings; it escalates only when something stops it producing the review at
-all. The mechanics of the report itself — the `DONE:`/`ESCALATE:` line a subagent
-must emit — are
+A problem a review node can describe belongs in its findings; it escalates only
+when something stops it producing the review at all. The mechanics of the
+report itself — the `DONE:`/`ESCALATE:` line a subagent must emit — are
 [the terminal report contract](/software-factory/factory-operations.md#engagement).
 
 ## The pause
@@ -104,13 +103,12 @@ it had spends the user's one full read on work that is still moving.
 One decision checkpoint sits before the factory rather than inside it: the
 **issue-review verdict**, at the end of a factory-bound leaf's definition beat.
 The two fresh-context review lenses — **claims audit** and **implementation
-simulation** — are the session's tools, not the user's: latent instruments it
-runs to sharpen its own brief. The session dispatches both, merges and
-deduplicates their findings, and disposes of each on its own judgment, editing
-the brief in place until an autonomous builder could be handed it. It never
-pauses for the user to rule, and it records nothing about the run on the issue —
-the repaired brief is the whole output. It then brings the user a finished
-issue. The verdict is the user's:
+simulation** — are the session's tools, run to sharpen its own brief. The
+session dispatches both, merges and deduplicates their findings, and disposes
+of each on its own judgment, editing the brief in place until an autonomous
+builder could be handed it. It never pauses for the user to rule, and it
+records nothing about the run on the issue — the repaired brief is the whole
+output. It then brings the user a finished issue. The verdict is the user's:
 
 - **Ready** — the leaf moves to `phase:build`. That label is the release, and no
   label crosses out of the definition region before it.
@@ -118,8 +116,8 @@ issue. The verdict is the user's:
   leaf sent back for re-authoring moves to `phase:design`, or stays there if it
   is a design-exit leaf. Re-review is a full fresh run of both lenses.
 
-The review binds the factory's autonomous path, never the user, who may always
-skip the beat, cut it short, or advance anyway.
+The review binds the factory's autonomous path; the user may always skip the
+beat, cut it short, or advance anyway.
 
 ## What is not a checkpoint
 
@@ -127,12 +125,11 @@ The factory decides these itself, announcing rather than asking:
 
 - **Which review tracks run.** Elected from the pull request's changed files by
   [hard rule](/software-factory/factory-operations.md#track-rules), recomputed
-  every cycle, and never asked.
+  every cycle.
 - **The verdict on a review cycle.** Computed by the traverse script from thread
   state: any open Blocking thread is a rework lap, none is convergence. It is
   arithmetic over what the reviews posted, so there is no judgment in it for the
   user to make — and the findings themselves reach the user at the final review,
   on the pull request where they live.
-- **Anything the graph already answers.** Where a node goes next is read from the
-  graph, not asked; a node whose next edge is unclear is an escalation, not a
-  question for the user to route by hand.
+- **Anything the graph already answers.** Where a node goes next is read from
+  the graph; a node whose next edge is unclear is an escalation.

@@ -38,14 +38,14 @@ repo's own reusable modules. It obeys the detector contract in
 GNU format (`file:line: card.rule message`) with card-namespaced rule ids,
 answering `--list-rules`, exit 0 clean / 1 findings / 2 tool error.
 
-One contract clause is invisible until a hook runs and is easy to miss: the
-explicit-root rule — a git-shelling detector scrubs the repository-locating
-variables `git rev-parse --local-env-vars` names from its subprocess
-environment, and its test suite clears the same set per test. The commit gate is
-a git hook, and a hook inherits an absolute `GIT_DIR` whenever discovery would
-otherwise find the wrong repository — always from a linked worktree, so anyone
-working the way this workspace does meets it immediately, even though a plain
-clone's hook exports no absolute `GIT_DIR`.
+One contract clause is invisible until a hook runs: the explicit-root rule —
+a git-shelling detector scrubs the repository-locating variables `git
+rev-parse --local-env-vars` names from its subprocess environment, and its
+test suite clears the same set per test. The commit gate is a git hook, and a
+hook inherits an absolute `GIT_DIR` whenever discovery would otherwise find
+the wrong repository — always from a linked worktree, so anyone working the
+way this workspace does meets it immediately, even though a plain clone's
+hook exports no absolute `GIT_DIR`.
 
 ## 3. Publish it in the repo's own manifest
 
@@ -75,7 +75,7 @@ hook. Pin-bumping to a dev-playbook `rev` that carries it wires it over the
 consumer's `standards/` tree in consumer mode: from that rev it runs the
 consumer-mode `standards-lint` rules over the tree (`standards-lint
 --list-rules` is the registry). Until the pin moves, the tree is unpoliced by
-the meta-standard; the bump is what turns policing on.
+the meta-standard.
 
 ## 7. Register a local document type (only if the standard needs one)
 
@@ -84,8 +84,8 @@ OKF registry does not carry. If it does, declare that type in a **local
 extension**: the repo's own `standards/docs/document-types.md`, a `## Types`
 table of the same shape as the [global registry](/standards/docs/document-types.md),
 listing only the repo's local types. okf-lint unions its valid names onto the
-upstream registry (upstream ∪ local); it never replaces the global set. The
-hierarchy law — additive, downhill only, no shadowing — is defined in the
+upstream registry (upstream ∪ local). The hierarchy law — additive, downhill
+only, no shadowing — is defined in the
 [registry doc](/standards/docs/document-types.md#local-extensions).
 
 The extension file is itself a **concept document**, so it obeys the same rules

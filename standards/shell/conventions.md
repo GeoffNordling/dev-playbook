@@ -6,18 +6,18 @@ description: How shell is written — glue-only boundary, strict mode, declared 
 
 # Shell Conventions
 
-Shell here is glue, not a language to build in. These four rules say where
-shell is allowed, how an executable script opens, which dialect it speaks, and
-the one bar every shell file clears. shellcheck and shfmt enforce the
-mechanical parts at the commit gate; rules 1–3 are prose by choice — a
-reviewer's call, not a detector's.
+Shell here is glue. These rules say where shell is allowed, how an executable
+script opens, which dialect it speaks, and the one requirement every shell
+file meets. shellcheck and shfmt enforce the mechanical parts at the commit
+gate; rules 1–3 are prose by choice — a reviewer's call.
 
-**Shell inside an externally-managed tree is exempt from all four.** A vendored
-third-party skill bundle is an external dependency, carried byte-identical to
-its upstream pin so it can be re-synced; the scripts it ships are its author's
-to write, and holding them to a boundary their author never agreed to would only
-force a fork. The commit gate skips those trees for the same reason, and the
-roots are declared once in `src/dev_playbook/external.py` — see
+**Shell inside an externally-managed tree is exempt from all of them.** A
+vendored third-party skill bundle is an external dependency, carried
+byte-identical to its upstream pin so it can be re-synced; the scripts it
+ships are its author's to write, and holding them to a boundary their author
+never agreed to would only force a fork. The commit gate skips those trees
+for the same reason, and the roots are declared once in
+`src/dev_playbook/external.py` — see
 [externally-managed and verbatim content](/standards/standard/format.md#externally-managed-and-verbatim-content).
 
 ## Boundary — shell is glue only
@@ -35,7 +35,7 @@ shell moves to Python too.
 
 ## Strict mode — every executable script opens the same way
 
-Every executable script starts with these two lines:
+Every executable script starts the same way:
 
 ```bash
 #!/usr/bin/env bash

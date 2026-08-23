@@ -39,12 +39,11 @@ answer only because something asks the question; the section records who
 asks, so an orphaned instrument — one no live consumer names — reads as
 orphaned rather than indistinguishable from a working device.
 
-Reading cadence belongs to the consumer, never to this standard. On demand is
-the device's contract — an instrument is regenerated when someone asks for a
-fresh reading (see Readings below), and no instrument is bound to the weekly
-loop by this standard. A ritual that wants its readings refreshed on a
-schedule states that cadence in the ritual's own doc, and the Employed-by
-section points at that ritual; the cadence lives there, not here.
+Reading cadence belongs to the consumer, not this standard: an instrument
+is regenerated on demand, when someone asks for a fresh reading (see
+Readings below), and no instrument is bound to the weekly loop by default.
+A ritual that wants its readings refreshed on a schedule states that
+cadence in its own doc, and the Employed-by section points at that ritual.
 
 ## Executors
 
@@ -57,14 +56,13 @@ executor needs: inputs, scope, and where the artifact lands.
 
 An instrument's artifacts land under `readings/<instrument>/<subject>.<ext>`
 — one subdirectory per instrument, named for its spec (`instruments/<X>.md`
-⇒ `readings/<X>/`). Readings are regenerated **manually, on demand** — by
-re-running the instrument when someone wants a fresh one, never by
-hand-editing the output and never on an automatic sync. A committed reading
+⇒ `readings/<X>/`). Readings are regenerated **manually, on demand**: a
+user asks for a fresh reading and the instrument is re-run — never by
+hand-editing the output, never on an automatic sync. A committed reading
 may lag the code or repository it describes until it is next regenerated;
-that staleness is expected, not a defect to chase. On demand means a user
-asks for a fresh reading. A change that stales a committed reading — moved
-files, renamed paths, refactors — is not a demand: exclude `readings/`
-from reference sweeps and leave the reading lagging. Readings carry no OKF
-frontmatter (they are outputs, not concept docs). A repository that consumes
-an instrument grows only a `readings/` directory; the spec and its tooling
-stay in dev-playbook.
+that staleness is expected, not a defect to chase. A change that stales a
+committed reading — moved files, renamed paths, refactors — is not a
+demand: exclude `readings/` from reference sweeps and leave the reading
+lagging. Readings carry no OKF frontmatter (they are outputs, not concept
+docs). A repository that consumes an instrument grows only a `readings/`
+directory; the spec and its tooling stay in dev-playbook.

@@ -6,9 +6,9 @@ description: The machines the workspace runs on — one Fedora primary and two W
 
 # Machines
 
-The workspace runs on three machines under one user. Nearly all work happens on
-the primary; the secondaries exist so the workspace is reachable from the
-Windows side of the same hardware.
+The workspace runs on the machines below, under one user. Nearly all work
+happens on the primary; the secondaries exist so the workspace is reachable
+from the Windows side of the same hardware.
 
 | Machine | Role | Notes |
 |---|---|---|
@@ -16,13 +16,13 @@ Windows side of the same hardware.
 | Windows 11 desktop | secondary | Ubuntu WSL guest. |
 | Windows 11 framework laptop | secondary | Ubuntu WSL guest; the other half of the primary's hardware. |
 
-The two secondaries are kept identical and share one configuration, so
+The secondaries are kept identical and share one configuration, so
 everything below treats them as a single machine key, `wsl`. Fedora's key is
 `fedora`.
 
 ## What differs
 
-Machine differences are held in exactly two places, both named by machine key:
+Machine differences are held in these places, named by machine key:
 
 - `dotfiles/settings/<machine>.json` — the Claude Code settings that cannot be
   shared. `~/.claude/settings.json` is generated from `base.json` plus this
@@ -36,9 +36,10 @@ bug.
 
 ## What does not run on a secondary
 
-Two checks depend on state that is local to a machine rather than present in
-the repository, so on a secondary they would report the environment as a defect
-in the code. Both are skipped there, and both announce the skip on every run.
+Checks that depend on state local to a machine, rather than present in the
+repository, would report the environment as a defect in the code when run on
+a secondary. They are skipped there, and each announces the skip on every
+run.
 
 - **Judgments.** The seen-set lives in `~/.cache/skipcache`, filled by
   [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
@@ -51,7 +52,6 @@ in the code. Both are skipped there, and both announce the skip on every run.
   cloned, and a secondary deliberately carries only some of the workspace's
   repos. `SKIP=ref-lint` stands the detector down.
 
-The primary carries every repo and runs both, so nothing goes permanently
-unchecked — it is checked on the machine that can check it. Which gates this
-affects is recorded in
+The primary carries every repo and runs every check, so nothing goes
+permanently unchecked. Which gates this affects is recorded in
 [enforcement.md](/standards/build/enforcement.md).

@@ -8,8 +8,8 @@ description: The contract the three reviews run under — the two severities, th
 
 What a review does once it is launched: the gate it runs before reading
 anything, the threads it leaves behind, and the line between a finding and an
-escalation. Every clause binds all three reviews — bug, code, and doc alike.
-Each review supplies two values and inherits everything else:
+escalation. Every clause binds every review — bug, code, and doc alike.
+Each review supplies its own values and inherits everything else:
 
 - **Review name** — `code review`, for instance. It opens the cycle header and
   it is what the cycle count counts.
@@ -22,17 +22,17 @@ how a pull request's existing feedback is read is
 
 What happens to a Suggestion after it is posted is
 [Suggestion dispositions](#suggestion-dispositions) below. It binds the
-Adjudicator rather than a review — a review posts a finding and stops — and it
-is stated here because it is what the Suggestion severity means.
+Adjudicator rather than a review, and it is stated here because it is what
+the Suggestion severity means.
 
 ## The stance
 
-A review is an **audit only**. It never modifies the work under review, and the
-verdict on its findings is not its to take — it posts them and stops. Defects
-route back to the authoring node through the script-computed verdict, never
-through the reviewer's hand.
+A review is an **audit only**, hands-off: it never modifies the work under
+review, and the verdict on its findings is not its to take — it posts them
+and stops. Defects route back to the authoring node through the
+script-computed verdict.
 
-The audit runs hands-off: finding problems is its output, not a reason to stop.
+Finding problems is its output, not a reason to stop.
 
 ## The green gate
 
@@ -53,7 +53,7 @@ run on their own. Where there is no `make check` to run, the audit proceeds.
   never drives a lap by itself.
 
 **The citeability rule.** A finding is Blocking only when it names a breach of
-one of three sources. Everything else is a Suggestion at most:
+one of these sources. Everything else is a Suggestion at most:
 
 1. **A binding section of the issue brief** — `Acceptance criteria`,
    `Desired behavior`, `Out of scope`, `Prohibited surfaces`, and `Artifacts`
@@ -73,11 +73,10 @@ one of three sources. Everything else is a Suggestion at most:
 
 ## Findings are threads
 
-A finding is a resolvable thread on the pull request, never a paragraph in an
-essay. One run posts **one GitHub review, verdict `COMMENT`** — the only
-verdict a single account may give its own pull request. The review body carries
-the cycle header and the clean dimensions, bare; the inline comments are the
-findings.
+A finding is a resolvable thread on the pull request. One run posts **one
+GitHub review, verdict `COMMENT`** — the only verdict a single account may
+give its own pull request. The review body carries the cycle header and the
+clean dimensions, bare; the inline comments are the findings.
 
 - **The first word is the severity** — `Blocking` or `Suggestion` — and the
   last line is the attribution `— <node> · <session id>`, which is what joins
@@ -116,8 +115,7 @@ the missing file — python style's fail-loud rule forbids the defensive guard.
 
 The same observation, malformed. It opens on no severity, hedges instead of
 asserting, names no action, cites no rule, and spends its last sentence
-explaining that a clean thing is clean — so a reader can do nothing with it but
-read it again.
+explaining that a clean thing is clean.
 
 ```markdown
 The missing-file handling looks a bit defensive here, might be worth a look at
@@ -126,7 +124,7 @@ some point. Otherwise this file is clean and well-organized.
 
 ## The cycle header
 
-The first line of every review body, four fields:
+The first line of every review body:
 
 ```
 <review name> · <short sha> · cycle <n> · <session id>
@@ -199,7 +197,7 @@ cap or declares convergence.
 
 A Suggestion does not sit on the pull request until someone gets to it. The
 **Adjudicator** — launched at each verdict point, once the cycle's reviews have
-reported — settles every open Suggestion thread into one of three outcomes:
+reported — settles every open Suggestion thread into one of these outcomes:
 **fix now**, **defer**, or **decline**. No review dispositions a finding, its
 own included.
 
@@ -247,19 +245,19 @@ Ordered, first hit wins, and doubt defers.
 | 7 | Independent — everything remaining | **Defer** (`independent`) |
 | — | Any answer in doubt | the doubted branch resolves toward **Defer** (`doubt-defers`) |
 
-**The reason vocabulary** is these ten names and no others:
+**The reason vocabulary** is these names and no others:
 `contradicts-standard`, `contradicts-ruling`, `re-litigates`, `no-consequence`,
 `bad-idea`, `needs-design`, `outside-diff`, `independent`, `no-remaining-laps`,
 `doubt-defers`. Each is written verbatim wherever a disposition is mentioned —
 `Declined (no-consequence)`, `Deferred (needs-design) → #512` — so one query
 finds every disposition of a kind.
 
-### The three outcomes
+### The outcomes
 
 - **Fix now** — the item joins a rework lap that open Blocking threads already
-  necessitate. **Piggyback only**: a suggestion fix never causes a lap of its
-  own. Its thread stays open, and the next cycle's reviewer reads and resolves
-  it like any other fix. A fix now with no lap left to ride **downgrades to
+  necessitate; a suggestion fix never causes a lap of its own. Its thread
+  stays open, and the next cycle's reviewer reads and resolves it like any
+  other fix. A fix now with no lap left to ride **downgrades to
   defer**, reason `no-remaining-laps`, and is then reported exactly like every
   other deferral — which is what a converged verdict does to every fix now, and
   what the next verdict point does to a fix-now thread a reviewer left open on a
@@ -273,9 +271,9 @@ finds every disposition of a kind.
   stub.
 
 **Reply, then resolve.** A declined thread and a deferred thread are both
-resolved by the Adjudicator, and never before its reply is on them: the reply is
-the record of why. No thread is ever resolved silently. A fix-now thread is
-resolved by nobody here — it belongs to the next cycle's reviewer, under
+resolved by the Adjudicator, and never before its reply is on them: the reply
+is the record of why. A fix-now thread is resolved by nobody here — it
+belongs to the next cycle's reviewer, under
 [resolution ownership](#resolution-ownership).
 
 **Where a settled suggestion is listed.** Every fixed and declined suggestion
@@ -297,8 +295,7 @@ the next cycle's reviewer has resolved the thread, which every later docket then
 passes over. The thread still holds the proof, so that is where a later run
 reads it: a **resolved** Suggestion thread whose replies carry a builder's
 `Fixed in <sha>` and no reply signed `— adjudicator` was ruled fix now and got
-fixed, and it takes its line from that. Without this read the one outcome the
-section could never record would be the one the loop worked hardest to reach.
+fixed, and it takes its line from that.
 
 ## The `gh` mechanics
 
@@ -401,7 +398,7 @@ measured there, the pagination limits are GitHub's documented page sizes.
 ## The report envelope
 
 Every run ends on the report envelope — structured output, never a message
-alone — and all four of its fields are always present:
+alone — and every field is always present:
 
 | Field | Value |
 |---|---|
@@ -412,16 +409,15 @@ alone — and all four of its fields are always present:
 
 An escalation posts no threads, so it carries `0` for both counts — stated,
 never left out. The envelope is read by its shape, so a field omitted is a
-malformed report, and the escalation is the one report that must not go
-missing.
+malformed report.
 
 ## Escalation
 
 Where the review cannot be produced at all, it surfaces the block and stops,
 ending on the envelope with `outcome` `"escalated"` and the reason in `gist`.
-Two blocks recur — a red green gate, and a missing pull request or diff — and
-each review states its own full list. Nothing about an escalation is written
-to GitHub; the run's report is the record.
+The blocks that recur are a red green gate and a missing pull request or
+diff; each review states its own full list. Nothing about an escalation is
+written to GitHub; the run's report is the record.
 
 ### Findings are not escalations
 

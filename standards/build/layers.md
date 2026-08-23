@@ -21,20 +21,19 @@ the authority ([enforcement.md](/standards/build/enforcement.md)).
 | python · aws | `cdk.json` exists | the CDK shape and deploy targets — [aws.md](/standards/build/aws.md); requires src |
 | js | `package.json` exists | a committed lockfile alongside `package.json`; nothing more yet |
 
-`tests/` is not a layer: it is required the moment `src/` exists or `scripts/`
-holds Python.
+`tests/` is not a layer: it is required the moment `src/` exists or
+`scripts/` holds Python.
 
 Each layer's concrete file requirements are the
 [skeleton tables](/standards/build/skeleton.md).
 
 ## Additions are free; conflicts are not
 
-A repo `MAY` contain anything beyond its layers' requirements — extra
-directories, extra Make targets, extra hooks — provided required files stay
-present and canonical, and forbidden files stay absent. A deviation from a
-requirement is an amendment to this standard in dev-playbook.
+A repo `MAY` contain anything beyond its layers' requirements, provided
+required files stay present and canonical, and forbidden files stay absent.
+A deviation from a requirement is an amendment to this standard in
+dev-playbook.
 
 ## Deferred
 
-Licensing: the standard takes no position on `LICENSE` files yet —
-deliberately unaddressed.
+Licensing: the standard takes no position on `LICENSE` files.

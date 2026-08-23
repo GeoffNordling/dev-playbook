@@ -12,11 +12,9 @@ allowed to be.
 ## Step size
 
 **Make each step as small as it can be.** A refactoring step is one
-behavior-preserving move — extract this function, rename this symbol, move this
-method to where its data lives — and `make test` runs green after it. Prefer the
-smallest move that changes the shape at all: the smaller the step, the shorter
-the window in which the program is not demonstrably working, and the cheaper the
-revert when a step turns out wrong.
+behavior-preserving move, and `make test` runs green after it. The smaller
+the step, the shorter the window in which the program is not demonstrably
+working, and the cheaper the revert when a step turns out wrong.
 
 Where a change lands cleanly but leaves an older seam, name, or duplication
 visibly wrong in a way it was not before, that fix is its own step, separate
@@ -34,8 +32,8 @@ and the move it calls for.
 - **Long method → break into private helpers.** *Cue:* the body needs a comment
   per section, or a reader has to hold several unrelated things at once to
   follow it. *Move:* lift each section into a named private helper, leaving the
-  method as the sequence of its steps. Tests stay on the public interface — the
-  helpers are an internal detail, not a new surface to cover.
+  method as the sequence of its steps. Tests stay on the public interface —
+  the helpers are an internal detail.
 - **Shallow module → combine or deepen.** *Cue:* the interface is nearly as wide
   as the implementation behind it, so a caller learns as much by reading the
   module as by using it. *Move:* push work behind the interface until the module
@@ -51,11 +49,11 @@ and the move it calls for.
   every use. *Move:* give it a type that enforces the rule at construction, so
   the checks collapse to one.
 - **Mysterious name → rename it.** *Cue:* a function, variable, or type whose
-  name does not reveal what it does or holds. *Move:* rename it; where no honest
-  name comes, the murk is in the design, not the label.
+  name does not reveal what it does or holds. *Move:* rename it; where no
+  honest name comes, the murk is in the design.
 - **Data clumps → bundle them into a type.** *Cue:* the same few fields or
-  parameters keep travelling together. *Move:* give the group one type and pass
-  that — a type wanting to be born.
+  parameters keep travelling together. *Move:* give the group one type and
+  pass that.
 - **Repeated switches → replace with polymorphism.** *Cue:* the same `if`- or
   `match`-cascade on the same type recurs in more than one place. *Move:*
   dispatch on the type itself, or collapse the cascades to one map both sites

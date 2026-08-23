@@ -15,8 +15,7 @@ configuration around it.
 
 The graph is **total**: pointed at any repository, it accounts for every
 file, throwaway included. Totality is the invariant that makes absence
-meaningful — a file missing from every connected view is a finding, not a
-gap in the instrument.
+meaningful — a file missing from every connected view is a finding.
 
 ## Inputs
 
@@ -34,12 +33,9 @@ The caller supplies the repository root. Optionally:
 
 ## Node accounting
 
-Two grains:
-
 - **Ignored files** — everything `.gitignore` excludes — are accounted in
   aggregate: a count per ignore pattern, no individual nodes. They are
-  throwaway by declaration; the graph proves they were seen, not what they
-  contain.
+  throwaway by declaration: the graph proves they were seen.
 - **In-scope files** — everything `git ls-files --cached --others
   --exclude-standard` returns — are individual nodes, each assigned one
   bucket by the first matching test:
@@ -85,10 +81,10 @@ not edges.
 
 Formal forms (`link`, `citation`, `resource`) follow the workspace
 reference grammar exactly — fenced code blocks and inline code spans are
-not scanned for them. `prose-path` and `code-ref` are heuristic by nature;
-the spec requires only that a reported edge resolve to a real in-scope
-file. `prose-path` exists because a reading agent follows a backticked
-path as readily as a link — reachability without it misses real routes.
+not scanned for them. `prose-path` and `code-ref` are heuristic; the spec
+requires only that a reported edge resolve to a real in-scope file.
+`prose-path` exists because a reading agent follows a backticked path as
+readily as a link — reachability without it misses real routes.
 
 ## Queries
 

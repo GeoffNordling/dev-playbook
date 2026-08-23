@@ -19,10 +19,9 @@ explore agents, no deep code searches.
 $ARGUMENTS
 
 If the line above is empty, run the default top-level orientation. If it holds a
-hint, still complete every step below at the top level, but spend extra time on
-the docs, directories, and code the hint points to — read those files more
-closely and weight your summary toward them. The documentation hierarchy bounds
-the reading either way.
+hint, still complete every step below at the top level, but read the docs,
+directories, and code it points to more closely and weight your summary toward
+them. The documentation hierarchy bounds the reading either way.
 
 ## Step 1 — see the shape of the repo
 
@@ -48,4 +47,4 @@ Then report: `READ: {list of files you read}`. Proceed only after.
 
 ## Step 4 — summarize
 
-Give the user a concise summary of what you learned. Include whether you noticed any obvious duplicate, redundant, or inaccurate documentation. If a focus was given, lead with what you found on it.
+Summarize what you learned for the user. Include whether you noticed any obvious duplicate, redundant, or inaccurate documentation. If a focus was given, lead with what you found on it.

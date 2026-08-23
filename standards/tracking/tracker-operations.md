@@ -10,16 +10,15 @@ How the tracker is driven. Every operation on an issue — create, read, label,
 link, close — goes through the `gh` CLI, which infers the repo from the clone it
 runs inside. What goes *into* an issue body is
 [issue-authoring.md](/standards/tracking/issue-authoring.md); this document
-covers the commands that move issues around. Pull requests are the
-[software factory](/software-factory/factory-operations.md#pull-requests)'s, not
-this document's.
+covers the commands that move issues around. Pull requests belong to the
+[software factory](/software-factory/factory-operations.md#pull-requests).
 
 ## The issue surface
 
 - **Create** — `gh issue create --title "..." --body ...`.
 - **Read** — `gh issue view <n>` renders the body alone; `--comments` renders
-  the comments alone — each rendering omits the other's half. The whole issue
-  in one call is `gh issue view <n> --json title,body,comments`.
+  the comments alone. The whole issue in one call is
+  `gh issue view <n> --json title,body,comments`.
 - **List** — `gh issue list --state open --json number,title,labels`, narrowed
   with `--label` and `--state` and shaped with `--jq`.
 - **Comment** — `gh issue comment <n> --body ...`.
@@ -58,16 +57,16 @@ That id is neither the `#number` nor the `node_id`; passing either fails.
   the read that gates a dispatch.
 
 GitHub reports live blockers as `issue_dependencies_summary.blocked_by`, which
-counts open blockers only. That count is what makes *blocked* a derived state
-readable from the tracker rather than a label anyone has to maintain.
+counts open blockers only. That count is what makes *blocked* a derived state,
+readable from the tracker.
 
 ## Wayfinding operations
 
 The `/wayfinder` skill drives a **wayfinder map** — a planning epic whose
 children are decision tickets
 ([issue-authoring.md § Two species of epic](/standards/tracking/issue-authoring.md#two-species-of-epic))
-— across this same surface. The skill owns the method; the moves it makes on the
-tracker are these.
+— across this same surface. The skill owns the method; the moves it makes on
+the tracker are these.
 
 - **Map** — one issue labelled `wayfinder:map`, created with
   `gh issue create --label wayfinder:map`.

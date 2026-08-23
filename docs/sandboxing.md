@@ -23,16 +23,15 @@ built yet.
 
 **[Sandcastle](https://github.com/mattpocock/sandcastle) — declined.** Matt
 Pocock's framework is AFK *orchestration* that uses containers as a component.
-We want a sandbox, not a workflow engine: adopting it means adopting the loop
-our own factory already owns, and writing a TypeScript file per run to do it.
-Declined on that alone, not on its quality.
+We want a sandbox: adopting it means adopting the loop our own factory owns,
+and writing a TypeScript file per run to do it. Declined on that alone.
 
 ## How we intend to operate
 
 - **AFK work runs in a container.** A container starts empty: the only
   directories from this machine that exist inside it are the ones we hand it.
   That list is the fence — a worktree the agent may write to, plus whatever it
-  needs to read. Everything else on the disk is simply not there.
+  needs to read. Everything else on the disk is not there.
 - **We own the command that starts the container.** Whatever we build around
   it, that command stays ours to write and change. A framework owning it is why
   Sandcastle is declined.
@@ -42,7 +41,7 @@ Declined on that alone, not on its quality.
   destination checked against a list we maintain. Worth having eventually, so a
   hijacked agent can't phone home. Deferred because a missing entry doesn't
   announce itself: the agent stalls or reports something unrelated, and you
-  debug the wrong thing. A working container first.
+  debug the wrong thing.
 
 ## Open
 

@@ -15,13 +15,12 @@ findings as threads on the pull request. The review is an audit only: you
 never modify the code under review, and the verdict on the findings is not
 yours to take — post them and stop.
 
-Review for **correctness bugs**: surface every plausible bug. Catching real
-bugs matters more than avoiding false positives — err on the side of
-surfacing.
+Review for **correctness bugs**, erring toward surfacing every plausible one:
+catching a real bug matters more than avoiding a false positive.
 
 ## Read first
 
-Before doing anything else, read end-to-end:
+Read end-to-end:
 
 - [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
   — the stance, the green gate, the two severities, the thread model and its
@@ -37,18 +36,16 @@ Your values for the contract's two parameters:
 | Review name | `bug review` |
 | Blocking | a bug you can show failing — a specific input or state the code reaches, and the wrong output, crash, or data loss it produces |
 
-**Jurisdiction: the diff's code, and the functions it touches.** The diff is
-the whole review scope; a bug in an unchanged line of a function the diff
-edits is in scope, because the change re-exposes it. Everything past that is
-another review's.
+The review's scope is the diff and the functions it touches: a bug in an
+unchanged line of a touched function is in scope because the change
+re-exposes it. Everything past that is another review's.
 
 ## 1. Load context
 
 Your prompt is the issue number, and from cycle 2 the sha the last review
 read; below, `<issue>` is that number.
 
-1. **Run the green gate** — red is an escalation (§ Escalations), never a
-   finding.
+1. **Run the green gate** — red is an escalation (§ Escalations).
 2. **Resolve the repository and the pull request**, in the order the
    contract's
    [`gh` mechanics](~/workspace/dev-playbook/software-factory/review-contract.md#the-gh-mechanics)
@@ -110,10 +107,10 @@ check callees: does a parallel change in the same PR make a call unsafe?
 
 ### Angle D — reuse
 
-The angles above hunt for bugs; this one and the next two hunt for cleanup in
-the changed code. Flag new code that re-implements something the codebase
-already has — grep shared/utility modules and files adjacent to the change,
-and name the existing helper to call instead.
+The angles above hunt for bugs; this one, Angle E, and Angle F hunt for
+cleanup in the changed code. Flag new code that re-implements something the
+codebase already has — grep shared/utility modules and files adjacent to the
+change, and name the existing helper to call instead.
 
 ### Angle E — simplification
 
@@ -133,10 +130,9 @@ alternative.
 
 ### Angle G — altitude
 
-Check that each change is implemented at the right depth, not as a fragile
-bandaid. Special cases layered on shared infrastructure are a sign the fix
-isn't deep enough — prefer generalizing the underlying mechanism over adding
-special cases.
+Check that each change is implemented at the right depth. Special cases
+layered on shared infrastructure are a sign the fix isn't deep enough —
+prefer generalizing the underlying mechanism over adding special cases.
 
 ### Angle H — conventions (CLAUDE.md)
 
@@ -176,7 +172,7 @@ conventions findings when the output cap forces a cut.
 
 Target **at least 4 findings**; cap at **8**, keeping the 8 most severe. If
 fewer genuine findings exist, post what you have — do not invent to hit the
-floor. A clean pass is a real outcome: post the review body alone, saying so.
+floor. On a clean pass, post the review body alone, saying so.
 
 Post one review per the
 [thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),

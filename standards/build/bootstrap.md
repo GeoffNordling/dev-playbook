@@ -6,8 +6,8 @@ description: How a repository joins the workspace — repo-init scaffolds a fres
 
 # Bootstrap
 
-How a repository joins the workspace conforming. Two entry paths — a
-**fresh** repo is scaffolded, an **existing** repo is adopted — converging
+How a repository joins the workspace conforming. Entry paths — a
+**fresh** repo is scaffolded, an **existing** repo is adopted — converge
 on the same GitHub tail and roster enrollment.
 
 ## The fresh path: scaffold
@@ -44,8 +44,8 @@ standard, in this order:
    installs the pin by fetching it, so a local-only sha is uninstallable.
 3. **Seed the canonicals.** Copy each missing byte-identical artifact
    (`ci.yml`, `.python-version`); merge the canonical blocks into files the
-   repo already has (`Makefile`, `pyproject.toml`, `.gitignore`), never
-   clobbering repo-specific content beyond them.
+   repo already has (`Makefile`, `pyproject.toml`, `.gitignore`), preserving
+   repo-specific content beyond them.
 4. **Install the gate.** `uvx pre-commit install` — the canonical config
    declares both stages.
 5. **Lint to green.** Run dev-playbook's [`repo-lint`](/scripts/repo-lint)
@@ -53,7 +53,7 @@ standard, in this order:
    is the fix's authority. Forbidden files get explicit dispositions —
    `ROADMAP.md` and kin become `CANDIDATES.md` entries or issues
    ([tracking/candidates.md](/standards/tracking/candidates.md)),
-   `requirements.txt` moves into `pyproject.toml` — never silent deletion.
+   `requirements.txt` moves into `pyproject.toml`.
 
 The adoption lands as one reviewable unit — a small diff as a single
 commit straight to main, a large one as a branch and PR; either way the

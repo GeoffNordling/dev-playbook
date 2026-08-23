@@ -9,9 +9,9 @@ argument-hint: "[doc-hint]"
 
 # Doc Format
 
-Make the formatting and style of a Markdown document consistent throughout. The
-content stays exactly as it is: this is a **formatting-only pass**, bounded by
-the rules at the bottom.
+Make the formatting and style of a Markdown document consistent throughout
+without changing its content — a **formatting-only pass**, bounded by the
+rules at the bottom.
 
 ## Target
 
@@ -64,7 +64,7 @@ per dimension and apply it everywhere.
 ## Rules
 
 - **The words survive the pass.** Wording, content, section order, and heading
-  text all come through unchanged; a heading's level or casing may move for
-  consistency, its text and meaning stay put.
+  text all come through unchanged; only a heading's level or casing may move,
+  for consistency.
 - If a section's content genuinely requires a different structure (e.g., a
   table vs. a list), leave it; consistency applies within comparable sections.

@@ -7,13 +7,12 @@ description: The Make contract — the universal check target plus per-layer tar
 # Make
 
 Make is the task runner; every repo has a `Makefile`. `check` is the
-universal target and means the same thing everywhere: **green `check` = the
-repo passes everything it can settle locally on its own** — every
-deterministic check whose remedy is in the repo's own hands. Its recipe is
-identical in every repo — run the full hook suite — and layers add
-prerequisites. `check-judgments-cache` is `check` plus the semantic
-[cache gate](/standards/judgments/cache-gate.md) armed; it is what the
-pre-push hook runs, because that gate's only remedy is a
+universal target and means the same thing everywhere: **green `check` =
+every deterministic check whose remedy is in the repo's own hands passes.**
+Its recipe is identical in every repo — run the full hook suite — and
+layers add prerequisites. `check-judgments-cache` is `check` plus the
+semantic [cache gate](/standards/judgments/cache-gate.md) armed; it is what
+the pre-push hook runs, because that gate's only remedy is a
 [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
 run:
 

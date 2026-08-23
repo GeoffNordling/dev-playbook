@@ -20,10 +20,9 @@ the commits.
 The target is the repo the session is standing in —
 `git rev-parse --show-toplevel` names it. Refuse to start unless its working
 tree is clean and on `main` — the adoption diff must carry adoption and
-nothing else. If the repo is already in
-workspace-lint's `GOVERNED` roster, say so and stop: that repo's problem is
-pin drift or findings, which is /update-standards-pin territory, not
-adoption.
+nothing else. If the repo is already in workspace-lint's `GOVERNED` roster,
+say so and stop: that repo's problem is pin drift or findings, which is
+/update-standards-pin territory.
 
 Then, before touching a file, tell the user what their GitHub token will
 need. A fine-grained PAT carries neither permission by default, and both
@@ -48,16 +47,15 @@ enrolled, so a temporary widening is not mistaken for a permanent one.
 Follow bootstrap.md's adoption steps 1–4: read the layers, wire the pin at a
 **pushed** dev-playbook sha, seed and merge the canonical artifacts, install
 the hook stages. The canonical artifacts live in
-`~/workspace/dev-playbook/standards/build/canonical/`. Where a canonical
-block must merge into a file the repo already has, show the user the merged
-result before moving on when anything beyond mechanical insertion was
-involved.
+`~/workspace/dev-playbook/standards/build/canonical/`. When a canonical block
+merges into a file the repo already has and the merge is more than mechanical
+insertion, show the user the merged result before moving on.
 
 ## 3. Lint to green
 
 Run `~/workspace/dev-playbook/scripts/repo-lint`. The findings are the
 worklist; work it to empty, taking each fix's authority from the rule's
-define doc, reached through the card catalog at
+define doc, reached through
 [standards/index.md](~/workspace/dev-playbook/standards/index.md).
 
 Escalate rather than decide when a finding needs a call only the user can
@@ -77,8 +75,8 @@ and wait for their confirmation before calling the tail done.
 
 ## 5. Land the target
 
-The size of the diff picks the vehicle — judge it as soon as the worklist
-makes the size clear:
+The size of the diff decides how the work lands — judge it as soon as the
+worklist makes the size clear:
 
 - **Five or fewer changed files**: one commit carrying the pin wiring and
   every fix together, straight to `main` — /commit runs the gate at the new
@@ -96,5 +94,4 @@ clean, and commit that dev-playbook edit separately. On the PR path this
 waits for the user's merge — a repo enrolled while its pin sits on an
 unmerged branch reports a `build.pin` finding against `main`.
 
-Report per-repo results — a failure in one never blocks the other's
-report.
+Report per-repo results — a failure in one never blocks the other's report.

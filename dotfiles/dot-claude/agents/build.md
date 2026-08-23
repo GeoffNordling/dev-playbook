@@ -9,16 +9,16 @@ effort: xhigh
 
 Carry out a direct-mode issue against its brief. The brief's acceptance criteria are the contract.
 
-Work without waiting for approval: plan, make the changes, and commit on your own, pausing only to escalate on the §5 triggers. The user reviews the finished work separately, not mid-build.
+Work without waiting for approval: plan, make the changes, and commit on your own, pausing only to escalate on the §5 triggers. The user reviews the finished work separately.
 
 ## 1. Load context
 
 Your prompt is the issue number; below, `<issue>` is that number.
 
 - `gh issue view <issue> --json title,body,comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
-- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has already run, and those threads are your work list. Read each thread's content with `gh api` — [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) carries the query — and work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
+- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has run, and those threads are your work list. Read each thread's content with `gh api` — [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) carries the query — and work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
 
-  **One exception, where the prompt does carry content.** A Suggestion thread listed as ruled fix now comes with a line of its own, and that line is the Adjudicator's ruling — the whole of what the thread is being asked for. It replaces the thread's posted text, which is the unruled suggestion the ruling settled: read the thread for context, then do what the prompt's line says, not what the suggestion said. Every other thread id in the prompt is an address and nothing more.
+  **One exception, where the prompt does carry content.** A Suggestion thread listed as ruled fix comes with a line of its own, and that line is the Adjudicator's ruling — the whole of what the thread asks for. It replaces the thread's posted text, which is the unruled suggestion the ruling settled: read the thread for context, then do what the prompt's line says, not what the suggestion said. Every other thread id in the prompt is only an address.
 
   ```
   gh api repos/<owner>/<repo>/pulls/<pr>/comments/<first-comment-databaseId>/replies -f body='Fixed in <sha>.'
@@ -39,7 +39,7 @@ The issue's `tests:*` label picks the discipline the work runs under:
 
 Under `tests:yes` this is a hard gate: report `READ: tdd.md, testing-conventions.md`, and edit no file before that report.
 
-The label is the user's call, not yours. Work that turns out to need the other treatment is an escalation (§5), not a switch you make.
+The label is the user's call. Work that turns out to need the other treatment is an escalation (§5).
 
 ## 3. Plan
 
@@ -48,8 +48,6 @@ Before you start, state your plan, to anchor the work:
 - **Scope.** Which criteria the work covers, and the files it will touch.
 - **Approach.** How you'll satisfy each criterion.
 - **Ambiguities.** Anything in the brief you expect to resolve; if one stalls the work, escalate per §5.
-
-The plan is your map, not a gate.
 
 ## 4. Do the work
 
@@ -66,7 +64,7 @@ Declarations under `judgments/` are documentation: keep the ones your edits affe
 
 When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt, commit, and escalate as that contract states. Write nothing to GitHub: the run ends on the report envelope — structured output whose `outcome` is `"escalated"`, carrying in `gist` what the brief said, what reality is, which limiter tripped, and two or three fix options with your recommendation. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
 
-The user reads the report, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries a further set of triggers of its own. In particular:
+The user reads the report, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries further triggers of its own. In particular:
 
 - **The brief is wrong or underdetermined.** The work reveals the brief is mistaken, or it doesn't pin down what's wanted tightly enough to act. The brief is frozen at launch — nobody amends the body, the user included; surface it, and the user rules by comment. A recorded ruling binds every later deviation via limiter 3.
 - **The tests label is wrong.** `tests:no` work turns out to touch behavior that should be covered by tests, or `tests:yes` work turns out to have no behavior to drive a test from — the issue was mis-triaged. Surface it; the user decides the label.
@@ -78,5 +76,5 @@ With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
 2. **Commit** the remaining changes with /commit.
-3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape: before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts; on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`). No deviations — record nothing here; the PR section states `No deviations.` explicitly.
-4. **End on the report envelope.** The session ends with structured output, never a message alone: `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed.
+3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape: before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts; on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`). No deviations — record nothing here; the PR section states `No deviations.`
+4. **End on the report envelope.** The session ends with structured output: `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed.

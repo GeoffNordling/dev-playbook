@@ -18,7 +18,7 @@ All interpretation happens at report time. Capture appends rows and does
 nothing else beyond one mechanical trim (issue #255, rulings 16 and 23), which
 is what makes a metric change a query change rather than lost data — and what
 makes every rule below a query's obligation rather than a guarantee the store
-already meets.
+meets.
 
 ## Standing and amendment
 
@@ -30,15 +30,15 @@ with the underlying defect raised as a bug against capture.
 
 ## The store
 
-The database is `~/.local/share/claude-measure/events.db` (SQLite, WAL), with
-two tables. The `events` table holds one row per hook invocation:
-`received_at` (UTC ISO-8601, stamped when the hook received the event),
-`event`, `session_id`, `prompt_id`, `payload`. `event`, `session_id`, and
-`prompt_id` are promoted copies of the payload's `hook_event_name`,
-`session_id`, and `prompt_id`, kept as columns for querying convenience;
-`payload` holds the harness's JSON byte-verbatim — bar the single trim named
-under [Event semantics](/docs/measurement-derivation.md#event-semantics)
-(#255, ruling 23) — and is the authority for every field, promoted or not. A
+The database is `~/.local/share/claude-measure/events.db` (SQLite, WAL). The
+`events` table holds one row per hook invocation: `received_at` (UTC ISO-8601,
+stamped when the hook received the event), `event`, `session_id`, `prompt_id`,
+`payload`. `event`, `session_id`, and `prompt_id` are promoted copies of the
+payload's `hook_event_name`, `session_id`, and `prompt_id`, kept as columns
+for querying convenience; `payload` holds the harness's JSON byte-verbatim —
+bar the single trim named under
+[Event semantics](/docs/measurement-derivation.md#event-semantics) (#255,
+ruling 23) — and is the authority for every field, promoted or not. A
 promoted column is NULL whenever its key was absent or arrived as something
 other than a string — including the whole-row case where stdin was not
 parseable JSON at all. The sibling `ledger` table is the software factory's
@@ -59,7 +59,7 @@ it.
 
 A report opens the database read-only.
 
-## Assertions that run before any metric
+## Assertions before any metric
 
 A report asserts the store's shape before computing anything, and stops on the
 first violation:
@@ -116,7 +116,7 @@ assertion checks.
 | `PostCompact` | A compaction — the context-pressure signal | — |
 | `Notification` | A harness notification, including the permission-request and waiting-on-user moments the bell announces | Unverified: capture of this event begins with the wiring that added it (#255, ruling 23), so no field is named here — and none asserted — until real payloads are read. |
 
-Two identity facts constrain all of the above. A subagent's own tool events
+Identity facts constrain all of the above. A subagent's own tool events
 carry the **parent** session's `session_id` and `transcript_path` (#258) —
 but also their own `agent_id` and `agent_type`, so a subagent's tool work is
 directly attributable to it by `agent_id` (#270). And `agent_type` on a
@@ -126,7 +126,7 @@ parent's own work (#270, overriding #258's agent-view reading).
 
 ## Filters
 
-Four exclusions apply to conforming rows before any metric is computed:
+Exclusions apply to conforming rows before any metric is computed:
 
 | Filter | Rule | Why |
 |---|---|---|
@@ -138,16 +138,16 @@ Four exclusions apply to conforming rows before any metric is computed:
 **Known blind spots.** UI slash builtins such as `/model`, `/compact`, and
 `/exit` fire neither `UserPromptSubmit` nor `UserPromptExpansion`, and ESC
 interrupts fire nothing at all. Together they are roughly a fifth of user
-actions, and all of it is low-signal — UI commands plus interrupts (#258).
-Skill commands and the prose inside their arguments are fully captured. A
-report states this blind spot rather than presenting counts as complete;
-interrupts are the one intervention signal with no capture path.
+actions, all of it low-signal (#258). Skill commands and the prose inside
+their arguments are fully captured. A report states this blind spot rather
+than presenting counts as complete; interrupts are the one intervention
+signal with no capture path.
 
 **The hook stream outranks the transcript.** Resubmitting an edited prompt
 creates a sibling branch that the transcript's live path hides, so a
 transcript walk undercounts submissions by around 8 % against the hook stream.
-The user really did submit twice — two interventions, two attention windows —
-so the hook stream is the accurate source and is never reconciled toward the
+The user submitted twice — two interventions, two attention windows — so the
+hook stream is the accurate source and is never reconciled toward the
 transcript (#266).
 
 ## Metrics
@@ -170,14 +170,14 @@ boundary_before(s) = the latest Stop or SessionStart event of the same session,
 A user submission is one deduplicated row from the filters above, so a skill
 invocation counts once.
 
-The cap is the whole instrument. Uncapped, the metric spans 34× between its
-10th and 90th percentile across sessions; at 180 s it spans 2.7×, and no
-amount of overnight idling, resumption, or weekend can inflate it. The value
-180 s is not chosen for looks: it is Claude Code's own away threshold, the
-modal lag of 876 measured `away_summary` firings. The metric charges the user
-for no agent time, needs only hook events, and degrades gracefully — a missing
-`Stop` after an interrupt, or a late timestamp on a queued prompt, costs at
-most one 180 s window instead of corrupting the session.
+Uncapped, the metric spans 34× between its 10th and 90th percentile across
+sessions; at 180 s it spans 2.7×, and no amount of overnight idling,
+resumption, or weekend can inflate it. The value 180 s is Claude Code's own
+away threshold, the modal lag of 876 measured `away_summary` firings. The
+metric charges the user for no agent time, needs only hook events, and
+degrades gracefully — a missing `Stop` after an interrupt, or a late
+timestamp on a queued prompt, costs at most one 180 s window instead of
+corrupting the session.
 
 Published beside it as a sanity check: submissions × 1.7 min. A divergence
 beyond about 2× on one work item means something is odd about that item, and
@@ -188,12 +188,11 @@ about 35 % and loosens stability (CV 0.32 → 0.39); 120 s is the most stable
 but collapses toward a plain submission count; 600 s leaks away-time back in
 and is rejected.
 
-One measurement caveat is accepted rather than researched: a queued prompt's
-`UserPromptSubmit` may fire at dequeue rather than at the moment enter was
-pressed, which lets its window absorb some agent working time. Queued prompts
-are rare, the cap bounds the error to one window, and no correction would be
-possible even with the timing known — so the bias is documented here and
-deliberately not investigated (#255, ruling 21).
+A queued prompt's `UserPromptSubmit` may fire at dequeue rather than at the
+moment enter was pressed, which lets its window absorb some agent working
+time. Queued prompts are rare, the cap bounds the error to one window, and no
+correction would be possible even with the timing known — so the bias is
+documented here and deliberately not investigated (#255, ruling 21).
 
 ### Waiting-on-user latency
 
@@ -231,11 +230,11 @@ command is deterministic evidence that a phase moved for issue `<N>` in that
 session (#255, ruling 2). A command that never ran records nothing, and
 GitHub's own issue timeline stays the corroborating record.
 
-The session tree is the spine of attribution: subagent sessions attach to
-their parent through `SubagentStart`/`SubagentStop` in the hook stream and
-through `parent_session_id` in agentsview. `cwd` and git branch corroborate
-and never decide (#255, ruling 5) — the traverse that motivated this rule ran
-its overwatch from the main checkout on `main` while its nodes worked in
+The session tree carries attribution: subagent sessions attach to their
+parent through `SubagentStart`/`SubagentStop` in the hook stream and through
+`parent_session_id` in agentsview. `cwd` and git branch corroborate and never
+decide (#255, ruling 5) — the traverse that motivated this rule ran its
+overwatch from the main checkout on `main` while its nodes worked in
 worktrees.
 
 Sessions and work items are different units, so binding resolves per event.

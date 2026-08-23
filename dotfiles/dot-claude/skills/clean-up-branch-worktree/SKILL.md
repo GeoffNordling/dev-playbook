@@ -21,7 +21,7 @@ refuses, and `ExitWorktree` refuses with `Worktree has N commits on
 <branch>`.
 
 None of that is evidence of a problem. Prove the work landed by
-comparing **trees**, not history, then remove without hesitating.
+comparing **trees**, not history, then remove.
 
 ## 1. Check for uncommitted work
 
@@ -50,11 +50,10 @@ git diff --stat origin/main HEAD
 ```
 
 **Empty output is the green light.** The branch's tree and main's tree
-are byte-identical, so removing the branch cannot lose anything. This is
-the check that survives squash merge.
+are byte-identical, so removing the branch cannot lose anything.
 
 If it prints anything, main has moved on since the merge — or the work
-never landed. Get the exact answer instead of guessing:
+never landed. Get the exact answer:
 
 ```
 gh pr list --head <branch> --state merged --json number,headRefOid
@@ -72,8 +71,8 @@ ExitWorktree({action: "remove", discard_changes: true})
 ```
 
 Pass `discard_changes: true` on the **first** call. Step 3 already is
-the confirmation the tool asks for, so calling without it only earns the
-refusal you know is coming.
+the confirmation the tool asks for, so calling without it only earns a
+refusal.
 
 This deletes the branch too — but only under the name `EnterWorktree`
 created it with, `worktree-<name>`. Never rename a worktree branch

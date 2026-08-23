@@ -7,20 +7,18 @@ description: How Markdown docs are written — voice, structure, brevity, curren
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Applies to every doc
-in the repo documentation hierarchy.
+in the repo documentation hierarchy. Named tics to remove are cataloged in
+[Slop Tics](/standards/prose/slop-tics.md).
 
 ## Current state and next steps only
 
 Describe what exists and what's planned next. Don't reference removed things,
 past state, or rejected alternatives.
-
-Don't: "X is hand-maintained — there is no generator."
-Do: "X is the source of truth."
+[Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
 
 Decision Records are the exception. A Decision Record in `docs/decisions/` is a
 dated record of a past decision — the choice made, the alternatives rejected,
-the context that forced it — and is never rewritten to match later state. This
-rule binds every other doc.
+the context that forced it — and is never rewritten to match later state.
 
 ## Voice
 
@@ -42,7 +40,7 @@ House spelling is American English. Write `judgment`, not `judgement` — and
 because the British form slips back in through habit and voice dictation. Naming
 the forbidden form in prose stays legible as long as it sits in backticks: the
 detector checks only text outside code spans, so this section names it without
-tripping itself.
+tripping the detector.
 
 ## Heading casing
 
@@ -52,10 +50,16 @@ H1 uses Title Case. H2 and below use sentence case.
 Proper nouns and code identifiers keep their native case at every level:
 `# CLAUDE.md Content`, `## pyproject.toml`, `### Ask in prose, never AskUserQuestion`.
 
+## Grammatical parallelism
+
+Items that sit together take the same grammatical shape: the headings of a
+document, the bullets of a list, the clauses of a sentence. One form holds
+throughout, so a break in the pattern marks a break in meaning.
+
 ## Open with purpose
 
 State what the document is for and what a reader should be able to do after
-reading. Write for a cold-start reader who has no prior conversation context.
+reading. Write for a reader with no prior conversation context.
 
 ## One rule, one place
 
@@ -70,7 +74,7 @@ A document covers one concern. When a file accumulates several — distinct
 questions a reader might arrive with — it splits into a directory of
 single-concern documents with an `index.md`, per the
 [OKF SPEC](/standards/references/okf-spec.md). A reader crawling for one
-answer loads one small file, not a monolith that covers everything.
+answer loads one small file.
 
 ## Lead with the edge case when reach is surprising
 
@@ -103,7 +107,7 @@ translate it: "readable", not "readable by a person". Translate instead only
 where the qualifier carries a distinction the reader needs — the system pauses
 at many points and `software-factory/user-checkpoints.md` covers the subset
 that are the user's, so dropping the word there would name the wrong set. The
-test is whether removing it loses a distinction, not whether it reads well.
+test is whether removing it loses a distinction.
 
 **Exemption is declared per repo in `.prose-lint-exempt`.** Text the rule does
 not govern — captured external documents, prose authored for an outside
@@ -112,11 +116,10 @@ process it — is exempted by listing its path in a tracked `.prose-lint-exempt`
 at the repo root: one repo-relative file or directory per line, a directory
 covering its whole subtree, `#` opening a comment line. Any file is listable,
 an `index.md` included — an index description that must carry the word exempts
-its index the same way. This file is the one suppression surface, so every
-exemption is a reviewable line, ideally under a comment saying why. Two
-structural exemptions stand alongside it: skills vendored under an `.agents/`
-path, and Markdown verbatim mirrors carrying `type: Reference` frontmatter,
-which follows the document wherever it lives.
+its index the same way. Every exemption is a reviewable line in it, ideally
+under a comment saying why. Structural exemptions stand alongside it: skills
+vendored under an `.agents/` path, and Markdown verbatim mirrors carrying
+`type: Reference` frontmatter, which follows the document wherever it lives.
 
 **Agent-facing instruction text never speaks in the first person.** No `I`, `me`,
 or `my` in the files listed above: they are commands addressed *to* the agent,
@@ -125,13 +128,12 @@ sentence puts the document in the agent's mouth, which inverts who is
 instructing whom. `repo-lint` enforces this deterministically over the body of
 every first-party agent definition, skill, and rule as well as `CLAUDE.md`.
 
-The ban governs the document's own voice, so quoting someone else's is
-untouched: a double-quoted utterance is exempt. Write the phrasing a user types
-to trigger a skill, or the reaction a prototype exists to provoke, in their
-words — `"Show me a few options before I commit."` — and reserve the
-surrounding prose for the imperative. A skill's frontmatter is not exempt: its
-`description` is prose the agent reads to choose the skill, so it answers to the
-same voice as the body.
+The ban governs the document's own voice: a double-quoted utterance is exempt.
+Write the phrasing a user types to trigger a skill, or the reaction a
+prototype exists to provoke, in their words — `"Show me a few options before
+I commit."` — and reserve the surrounding prose for the imperative. A skill's
+frontmatter is not exempt: its `description` is prose the agent reads to
+choose the skill, so it answers to the same voice as the body.
 
 **Skills vendored verbatim are exempt.** A third-party skill under an `.agents/`
 path is an external dependency, carried unmodified so it can be re-synced from
@@ -160,11 +162,6 @@ When a real file IS the standard, the doc directs the reader to it.
 The build standard's `canonical.md` names each canonical artifact and points
 at the file instead of restating its contents.
 
-## Trust the reader
-
-Write for someone careful enough to follow a single sentence.
-
 ## Brevity
 
-Choose brevity over completeness. A doc that's read beats a doc that's
-complete. Trim further than instinct says.
+Choose brevity over completeness. Trim further than instinct says.

@@ -74,9 +74,8 @@ read; below, `<issue>` is that number.
    fixes: `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
    `git diff <last-reviewed-sha>..HEAD` the delta. At cycle 1 an empty diff is
    an escalation (§ Escalations); from cycle 2 an empty delta is an ordinary
-   cycle, with your open threads the work. Where the change includes code, read
-   the tests under `tests/` and the code under `src/` too — the full picture
-   behind the diff.
+   cycle, with your open threads the work. Where the change includes code,
+   read the tests under `tests/` and the code under `src/` too.
 
 ## 2. Read what the diff calls for
 
@@ -97,13 +96,11 @@ these is yours alone. A rule you did not read cannot carry a Blocking finding.
 
 Read the change as a whole — the brief and the change together — against the
 standards it answers to; pin each finding to its file and line and the rule or
-criterion it breaches. The presence check always runs — its subject is the PR
-body, not the diff — and every other dimension below whose content the diff
-carries is audited; the dimensions that ran are also the ones the review body
-enumerates when they come back clean.
+criterion it breaches. The presence check always runs, and every other
+dimension below whose content the diff carries is audited.
 
 - **The presence check**, first and mechanical. The PR body carries the
-  four mandatory sections of the
+  mandatory sections of the
   [merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)
   — `## Summary`, `## Deviation ledger`, `## Deferred`,
   `## Suggestion dispositions` — with the explicit empty markers

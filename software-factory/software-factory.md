@@ -24,7 +24,7 @@ The system has two **regions**, divided by what kind of work each does:
   where it stops is
   [user-checkpoints.md](/software-factory/user-checkpoints.md).
 
-This document is the map both regions share: the states and the moves between
+This document covers the states both regions share and the moves between
 them.
 
 ## The graph
@@ -56,22 +56,20 @@ flowchart LR
     epic -.->|each child| build
 ```
 
-Three edges leave the definition subgraph, and they are the only entries to the
-factory: intake's release and design's single leaf, both state moves, plus an
-epic's children — dotted because the epic itself never crosses; each child enters
-`build` as a leaf of its own.
+The only entries to the factory leave the definition subgraph: intake's release
+and design's single leaf, both state moves, plus an epic's children — dotted
+because the epic itself never crosses; each child enters `build` as a leaf of
+its own.
 
 ## The definition region
 
-Work enters as an idea and leaves as an issue a factory node can pick up. Every
-state below is user-led; the skills serving them are invoked by the user, never
-dispatched by the factory.
+Work enters as an idea and leaves as an issue a factory node can pick up.
 
 **Before the issue.** The idea funnel feeds `CANDIDATES.md`, a repo's register of
 work described but not yet committed to
 ([candidates.md](/standards/tracking/candidates.md)). A Candidate is pre-issue:
-no issue exists, so no label does either. `/candidate-promote` is the elevator —
-it finds the entry, opens intake on it, and deletes the entry as the issue lands.
+no issue exists, so no label does either. `/candidate-promote` finds the entry,
+opens intake on it, and deletes the entry as the issue lands.
 
 **`intake` — accounting and routing.** Every issue passes through, whether minted
 fresh, adopted as a rushed stub, or promoted from a Candidate. Intake grills for
@@ -86,8 +84,7 @@ research, prototypes, tradeoffs. Prototyping happens in a disposable worktree
 that is deleted on exit; the `prototype/<issue>` branch pushed from it survives
 as the citable artifact
 ([issue-authoring.md](/standards/tracking/issue-authoring.md#brief-principles)).
-Nothing merges out of definition — a prototype branch never merges, and pushing
-a dead-end branch is not merging. A design session exits one of two ways:
+Nothing merges out of definition. A design session exits:
 
 - **A single leaf.** The chosen approach is written back into the issue by
   re-authoring its brief, and the issue-review verdict releases the issue to the
@@ -96,15 +93,15 @@ a dead-end branch is not merging. A design session exits one of two ways:
 - **Decomposition.** When the work is too big for one leaf, the issue becomes an
   **epic** and never builds itself; its children carry the work. Children are
   minted here rather than at the intake node, carrying a starting brief and
-  unreleased — a child is incomplete when it leaves the decomposing session.
-  Each returns to `design` in a session of its own, which re-authors its brief
-  and crosses it into the factory on its issue-review verdict. The epic body carries
-  the outcome and the decomposition rationale
+  unreleased — incomplete when the decomposing session ends. Each returns to
+  `design` in a session of its own, which re-authors its brief and crosses it
+  into the factory on its issue-review verdict. The epic body carries the
+  outcome and the decomposition rationale
   ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
 
-**`spike` — a question, not a change.** A spike is an issue whose deliverable is
-an answer. Everything it produces lands on the issue itself: the findings in its
-closing comment, plus a
+**`spike` — a question.** A spike is an issue whose deliverable is an answer.
+Everything it produces lands on the issue itself: the findings in its closing
+comment, plus a
 [Decision Record](/standards/decisions/records.md) if a one-way door was crossed.
 No PR opens and nothing persists in git — the branch and worktree are disposable.
 A spike may stand alone or serve a design effort, where its answer shapes how an
@@ -124,15 +121,14 @@ here. Each cycle runs the reviews the diff elects, all at once, and the verdict
 on what they posted is the traverse script's rather than anyone's judgment: it is
 computed from the pull request's thread state.
 
-Open Blocking threads send the issue back to `build` for another lap. None open
+Open Blocking threads send the issue back to `build` for another cycle. None open
 is `pr-ready`, and the user's final read and merge follow. Blocking threads still
 open after four autonomous cycles end the traverse escalated — a pull request
 that is not converging on its own reaches the user rather than looping on.
 Nothing else re-enters.
 
-`pr-ready` means converged on Blocking alone: only Blocking threads are weighed,
-and no cycle counts a Suggestion against convergence. The Suggestions are not
-left pending for it. The Adjudicator settles every open one at each verdict
+`pr-ready` means converged on Blocking alone — no cycle counts a Suggestion
+against convergence. The Adjudicator settles every open one at each verdict
 point, and always at convergence, so a traverse ends `pr-ready` with its
 suggestions fixed, deferred to a stub, or declined. What each node
 does, who runs it, and under what contract is

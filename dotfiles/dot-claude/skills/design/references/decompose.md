@@ -6,18 +6,17 @@ settled on this exit — the single-leaf exit needs none of it.
 
 The children's intake happens here, in place, so none round-trips through
 `intake`. Minting carries a child only as far as a **starting brief** — a leaf
-with the four-tuple, the build-leaf headings, and its relationships wired, but its
-substance still provisional. Every child leaves this session incomplete. Each
-becomes **brief-complete** in its own `/design` session, which re-authors that
-brief, and **ready** at that session's issue-review verdict. The readiness bar is
+with the four-tuple, the build-leaf headings, and its relationships wired, but
+its substance still provisional. Each becomes **brief-complete** in its own
+`/design` session, which re-authors that brief, and **ready** at that
+session's issue-review verdict. The readiness bar is
 [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness).
 
 ## 1. Rewrite the issue as the epic
 
-Its body becomes the outcome plus the decomposition rationale — never a
-restatement of the sub-issue list GitHub already shows. Its labels become
-`category:*` alone: strip `mode:*`, `tests:*`, and `phase:design`, since an epic
-never dispatches.
+Its body becomes the outcome plus the decomposition rationale — GitHub already
+shows the sub-issue list elsewhere. Its labels become `category:*` alone:
+strip `mode:*`, `tests:*`, and `phase:design`, since an epic never dispatches.
 
 ```bash
 gh issue edit <epic#> \
@@ -48,16 +47,17 @@ a blocker that must already exist.
 One `gh issue create` per slice, in dependency order, each with a full
 four-tuple and every build-leaf heading
 [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)
-requires — the headings are required from minting, and a leaf missing one is a
-lint finding whatever its phase.
+requires from minting on — a leaf missing one is a lint finding whatever its
+phase.
 
 Write into them what this session actually settled: the slice's outcome, its
 boundary, and the intent it inherits from the epic — that last one marked in the
 body, `_(Draft — inherited from the epic; replaced at this leaf's User Intent
 Mini-Interview.)_`, because `User intent` is the user's text and this session
-has not held the child's. The rest is a draft. A child's brief is not finished
-here and is not meant to be — its own design session re-authors it against the
-code as it stands by then, which is not the code this session is looking at.
+has not held the child's. The rest is a draft.
+
+A child's brief is not finished here — its own design session re-authors it
+against the code as it stands by then, later than what this session sees.
 
 So every child is minted at `phase:design`, never `phase:build`. Its own
 issue-review verdict, in its own session, is what moves it.
@@ -70,7 +70,7 @@ gh issue create --title "..." \
 
 ## 4. Wire the relationships
 
-Two independent native relationships, per
+Independent native relationships, per
 [Relationships](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#relationships):
 each ordered slice **blocked-by** its predecessor, and every slice a
 **sub-issue** of the epic. Neither is a body field and neither is a label.

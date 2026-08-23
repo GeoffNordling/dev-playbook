@@ -4,13 +4,12 @@ title: Candidate Conventions
 description: The CANDIDATES.md register of uncommitted future work — entry shape, grouping and nesting, and promotion to an issue
 ---
 
-# Candidate Conventions
+# Candidates
 
 A repo records the future work it has not committed to in one root file,
 `CANDIDATES.md`. Committed work lives in GitHub issues
 ([issue-authoring.md](/standards/tracking/issue-authoring.md)); a **Candidate**
-is work described but not yet decided. A unit of work has exactly one home —
-never both.
+is work described but not yet decided. A unit of work has exactly one home.
 
 ## The commitment test
 
@@ -20,17 +19,17 @@ committing, and the work then belongs in an issue at whatever size fits — an
 epic, an ordinary issue, or a one-line bug.
 
 So a Candidate is not merely work too vague to specify. An entry may be
-perfectly specifiable and stay a Candidate for as long as the decision to build
-it has not been made; writing its brief is what ends that.
+perfectly specifiable and stay a Candidate for as long as the decision to
+build it has not been made; writing its brief is what ends that.
 
 The author makes this call. No detector checks it.
 
 ## What a Candidate is
 
 A Candidate is serious and repo-scoped: work this repo would genuinely
-implement if the decision were made. It is not a passing thought — unfiltered
-and cross-repo ideas belong in mission-control's capture path instead. A
-Candidate is also work: material that is not work at all has no entry here.
+implement once the decision is made, not the unfiltered, cross-repo ideas
+that belong in mission-control's capture path. It excludes material that is
+not work at all.
 
 ## Presence
 
@@ -60,7 +59,7 @@ therefore that the work belongs in an issue.
 
 ## Structure
 
-Two kinds of structure, with distinct meanings:
+Structure carries distinct meanings:
 
 - **`##` headings group.** Navigational only, free to invent, no semantics.
 - **Nesting decomposes.** A parent is an outcome; its children are the work

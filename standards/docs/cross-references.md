@@ -22,14 +22,14 @@ root (the repo root).
 ```
 
 A root-absolute link resolves against the reader's *own* checkout root —
-the current working directory's repo — so it is **worktree-safe**: it
-points at the copy of the file that matches the checkout the reader is
-already in, whether that's the main checkout or a per-issue worktree. A
-same-repo reference `SHALL NOT` be written as `~/workspace/<this-repo>/…` —
-from inside a worktree that absolute path silently jumps to the main
-checkout, yielding a different (possibly stale) copy than the one the
-reader is working in. `ref-lint` enforces this: a same-repo citation in a
-fixed-root file fails as `wrong-form`, whether or not the target exists.
+the current working directory's repo — so it points at the copy of the
+file that matches the checkout the reader is already in, whether that's
+the main checkout or a per-issue worktree. A same-repo reference
+`SHALL NOT` be written as `~/workspace/<this-repo>/…` — from inside a
+worktree that absolute path silently jumps to the main checkout, yielding
+a different (possibly stale) copy than the one the reader is working in.
+`ref-lint` enforces this: a same-repo citation in a fixed-root file fails
+as `wrong-form`, whether or not the target exists.
 
 The deciding factor is whether the referencing file has a **fixed repo
 root** — a single repo it is always read from. Concept documents do, and so
@@ -39,8 +39,8 @@ targets. Files with **no fixed repo root** — skills and global `~/.claude/`
 config such as `rules/` and `agents/`, loaded across arbitrary repos — have
 no root for `/` to resolve against, so they use the Citation form even for a
 same-repo target (see [skill-conventions.md — Cross-references](/standards/claude-code/skill-conventions.md#cross-references)).
-That same-repo Citation is not a fixed jump to the main checkout: it
-resolves per [Same-repo resolution](/standards/docs/cross-references.md#same-repo-resolution)
+That same-repo Citation resolves per
+[Same-repo resolution](/standards/docs/cross-references.md#same-repo-resolution)
 below, against the reader's own checkout.
 
 ## Citation — another repo
@@ -53,8 +53,7 @@ path**, beginning with `~/workspace/`:
 ```
 
 A cross-repo citation always resolves to that repo's canonical main
-checkout, which is the intended behavior — it references another repo's
-published state, not whatever worktree is currently open.
+checkout — it references another repo's published state.
 `~/workspace/<repo>` is self-describing: the repo name is in the path, so
 no external convention is needed to interpret it.
 
@@ -78,7 +77,16 @@ declarative third person — so the copies stay identical.
 
 **Same-repo resolution:** a `~/workspace/<repo>/…` path whose `<repo>` is the repo your session is working in — its main checkout or any of its worktrees — resolves inside your own checkout: substitute your checkout root for `~/workspace/<repo>/`. A path into a different repo resolves as written, to that repo's main checkout. Touching your repo's main checkout from a worktree is legitimate only as a deliberate comparison against published state — say so when you do it.
 
-The written form is kept because no static path can encode this: the same `~/workspace/<repo>/…` citation must resolve to a different checkout depending on where the reader stands — a globally-loaded skill resolves a dev-playbook citation to dev-playbook's main checkout from another repo's worktree, but to the worktree when run inside a dev-playbook worktree — so the meaning has to be a reader-side rule, not a rewritten path. `ref-lint` already resolves same-repo citations this way, against the invoking checkout, so this rule states at read time what the linter has enforced at commit time all along; the [same-repo-resolution Decision Record](/docs/decisions/0009-same-repo-resolution.md) records why the alternatives were rejected.
+The written form is kept because no static path can encode this: the same
+`~/workspace/<repo>/…` citation must resolve to a different checkout
+depending on where the reader stands — a globally-loaded skill resolves a
+dev-playbook citation to dev-playbook's main checkout from another repo's
+worktree, but to the worktree when run inside a dev-playbook worktree — so
+the meaning has to be a reader-side rule. `ref-lint` already resolves
+same-repo citations this way, against the invoking checkout, so this rule
+states at read time what the linter has enforced at commit time all along;
+the [same-repo-resolution Decision Record](/docs/decisions/0009-same-repo-resolution.md)
+records why the alternatives were rejected.
 
 ## Fenced code blocks
 

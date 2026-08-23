@@ -32,8 +32,6 @@ into one. So:
 - **If it genuinely must be multiple lines** (independent commands where a
   mid-way failure should not stop the rest, or a heredoc), number them and say
   "run these N separately, in order."
-- One `&&`-chained line beats a stack of lines the user selects and pastes one
-  at a time — prefer it even for multi-step setup.
 
 This is about commands the **user** runs; it does not relax the `cd` rule below,
 which governs **your own** Bash tool calls.
@@ -67,8 +65,7 @@ Right:
     # call 2
     git status
 
-If you catch yourself typing `cd … && …`, stop and split it. No
-exceptions for "just a quick check."
+If you catch yourself typing `cd … && …`, stop and split it.
 
 ## Quote regex patterns with single quotes
 
@@ -80,4 +77,4 @@ any pattern argument:
     grep -n "^`" file       # wrong — bash waits for closing backtick
 
 When a `&&`-chained or parallel `Bash` call fails this way, siblings get
-cancelled too. Prefer single quotes by default for regex/pattern data.
+cancelled too.

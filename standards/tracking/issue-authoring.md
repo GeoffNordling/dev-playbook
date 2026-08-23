@@ -36,8 +36,7 @@ two roles. The role is **derived**, never a label — the same principle as
   directly**: no branch, no PR, no dispatch. It carries a **category label
   only** — no phase, mode, or tests label — and its epic role is derived purely
   from having sub-issues, so there is no `epic` label to mint. Its body is the
-  epic body (below): the outcome and the decomposition rationale, never a
-  restatement of the native sub-issue list GitHub already shows.
+  epic body (below): the outcome and the decomposition rationale.
 
 **A design session produces an epic.** The common way an epic is born is the
 `design` node concluding the work is too big for one leaf: the session
@@ -77,9 +76,8 @@ skill's own statement of it rather than a restatement here.
 
 ## Readiness
 
-Readiness is a **lifecycle position, not a kind of issue** — the industry's
-*Definition of Ready*. Four things make an issue ready, and work is dispatched
-only when all four hold:
+Readiness is a **lifecycle position** — the industry's *Definition of Ready*.
+Work is dispatched only once every one of these holds:
 
 - **A leaf** — an epic is decomposed, never built
   ([Roles](#roles-epic-and-leaf)).
@@ -91,16 +89,15 @@ only when all four hold:
   the two review lenses, edited the brief from what they returned, and the user
   approved the finished issue
   ([user-checkpoints.md](/software-factory/user-checkpoints.md#the-issue-review-verdict)).
-  `phase:build` is that verdict's consequence and its only evidence, not a
-  separate act. The user may always skip or override the beat; the release is
-  theirs either way.
-  Factory-bound leaves only: a spike's deliverable is an answer, not a build,
-  so a spike is ready on the first three conditions.
+  `phase:build` is that verdict's consequence and its only evidence. The user
+  may always skip or override the beat; the release is theirs either way.
+  Factory-bound leaves only: a spike's deliverable is an answer, so a spike is
+  ready on the first three conditions.
 
-The bar governs the **one crossing out of definition**, not every occurrence of
-`phase:build`. An issue the review stop sends back to `build` is already inside
-the factory and does not re-cross: the rework lap carries the original release,
-and no fresh issue review is owed.
+The bar governs the **one crossing out of definition**. An issue the review
+stop sends back to `build` is already inside the factory and does not
+re-cross: the rework lap carries the original release, and no fresh issue
+review is owed.
 
 The refinement interview — intake, or the `design` node — is the **refinement
 step** that carries a leaf to ready by authoring its brief; the issue-review
@@ -115,8 +112,8 @@ role-and-mode. Each format's required headings are stated explicitly below, and
 are exactly the lists the [`tracking.issue-brief-shape` audit](/scripts/workspace-lint)
 checks on live leaves — so this document and the rule cannot disagree.
 
-Dependencies and hierarchy are **not** body fields — they are native GitHub
-relationships; see [Relationships](#relationships).
+Dependencies and hierarchy are native GitHub relationships; see
+[Relationships](#relationships).
 
 ### The build-leaf brief (`mode:direct`)
 
@@ -194,12 +191,11 @@ criteria cite the section ("install the artifacts as their subsections
 state").
 The approved words are not the builder's to edit — but everything about
 fitting them in is: placement, heading levels, stitching into surrounding
-text are ordinary build judgment under the brief's intent, and a placement
-note is guidance, not a script. Trouble with the words themselves is a
-deviation. Approval of the text is part of the issue-review verdict. If
-artifacts push the body toward GitHub's size limit, they overflow to issue
-comments — stated loudly in the section, never silently. Mechanical edits
-need no artifact.
+text are ordinary build judgment under the brief's intent. Trouble with the
+words themselves is a deviation. Approval of the text is part of the
+issue-review verdict. If artifacts push the body toward GitHub's size limit,
+they overflow to issue comments — stated loudly in the section, never
+silently. Mechanical edits need no artifact.
 
 The section **binds when present**. The heading is optional and the lint never
 demands it, so a brief without one is well-shaped; a brief that carries one has
@@ -242,7 +238,7 @@ that shaped the slices.
 
 #### Optional sections
 
-A long-running epic accumulates two things the required sections have no home
+A long-running epic accumulates things the required sections have no home
 for: a boundary that keeps getting re-asked, and a ruling made after the
 decomposition that binds more than one child. Each gets an **optional** section,
 added when — and only when — the epic actually accrues one. A fresh epic carries
@@ -265,10 +261,10 @@ to a sibling; an epic's rules out work no sibling will pick up.
 
 **Standing rulings** holds decisions taken after the epic was written that
 constrain children not yet built. Governing unbuilt work is what earns a ruling
-its place — this is not an index of closed children, nor a changelog. Numbered,
-appended to, never renumbered: the number is how a child cites a ruling. A
-decision binding one child belongs in that child's brief; one meeting the
-Decision Record bar gets a record under `docs/decisions/`
+its place — this is not an index of closed children, nor a changelog.
+Numbered, appended to, never renumbered: the number is how a child cites a
+ruling. A decision binding one child belongs in that child's brief; one
+meeting the Decision Record bar gets a record under `docs/decisions/`
 ([records.md](/standards/decisions/records.md)).
 
 ## Brief principles
@@ -277,7 +273,7 @@ Decision Record bar gets a record under `docs/decisions/`
 - **Behavioural, not procedural.** Describe what the system should do, not how to implement it. The agent will explore and decide.
 - **Testable acceptance criteria.** Each criterion is independently verifiable.
 - **Explicit out-of-scope.** Prevents gold-plating.
-- **One goal.** A brief serves one master. Test any doubtful part with two
+- **One goal.** A brief serves one master. Test any doubtful part with these
   questions: would the outcome still stand if this part slipped
   indefinitely, and could it ship later as its own issue without reopening
   this one? Both yes — it must be deferred: mint a real tracker stub at
@@ -339,7 +335,7 @@ Create slices in dependency order, then wire the native relationships (see [Rela
 
 Two independent relationships connect issues. Both are **native GitHub relationships** — not body fields, not labels — wired when the work is decomposed, at the `design` node. They are orthogonal: a parent says nothing about order, and a blocker says nothing about parentage.
 
-- **Dependency — blocked-by.** The "must finish first" relationship, and the workhorse for sequencing slices. An issue is *blocked* while any issue it is blocked-by is still open, and *ready* once they all close. Blocked is a derived state, never a label — don't mint one.
+- **Dependency — blocked-by.** The "must finish first" relationship, and the workhorse for sequencing slices. An issue is *blocked* while any issue it is blocked-by is still open, and *ready* once they all close. Blocked is a derived state, never a label.
 - **Hierarchy — sub-issues.** The "part of" relationship: a parent issue and its children. Use it to group the slices of a large feature under a tracking **epic** — which is exactly what derives the epic role (see [Roles](#roles-epic-and-leaf)). Decomposition only — it implies no ordering, and a sub-issue is not blocked by its siblings unless a blocked-by edge says so.
 
 Example — epic "User CSV export" (#10) sliced into schema (#11), API (#12), UI (#13), docs (#14):

@@ -8,10 +8,9 @@ description: The registry of repo files the Claude Code harness consumes — eac
 
 The files in a workspace repo that exist for the Claude Code harness —
 injected into agent context, read as configuration, or run as code. They
-are not concept documents: no OKF frontmatter, exempt from the type-lint.
-The concept/harness boundary rule is
-[bundle.md](/standards/docs/bundle.md); its code encoding is `classify()`
-in [md.py](/src/dev_playbook/md.py).
+carry no OKF frontmatter and sit outside the type-lint. The
+concept/harness boundary rule is [bundle.md](/standards/docs/bundle.md);
+its code encoding is `classify()` in [md.py](/src/dev_playbook/md.py).
 
 Claude Code is named deliberately: a different harness would consume a
 different file set and would get its own standard.

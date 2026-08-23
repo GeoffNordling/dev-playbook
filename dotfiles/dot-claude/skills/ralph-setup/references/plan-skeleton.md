@@ -21,10 +21,10 @@ every task below is checked and these all hold. -->
 ## Working notes
 
 <!-- Durable facts a future memoryless iteration needs: where things live,
-gotchas, conventions, decisions already settled. Distinct from the progress
-log, which is the chronological one-line-per-iteration record — this is the
-curated, current knowledge base. Seed any facts known from setup; the loop
-keeps it tight and current as it learns. -->
+gotchas, conventions, settled decisions. The progress log is the chronological
+one-line-per-iteration record; this is the curated, current knowledge base.
+Seed any facts known from setup; the loop keeps it tight and current as it
+learns. -->
 
 - <fact a later iteration would otherwise have to rediscover, or empty at setup>
 

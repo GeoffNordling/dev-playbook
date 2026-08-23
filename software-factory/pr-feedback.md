@@ -19,9 +19,9 @@ pull request.
 
 **Threads are the primary surface.** Every review finding is a resolvable
 inline thread, and a thread carries its own state — open or resolved — which no
-other surface does. One GraphQL read returns all of them with that state. It is
-stated here once, and every node that reads threads — a committing node on a
-rework lap, a review verifying its prior cycle — reads it from here:
+other surface does. One GraphQL read returns all of them with that state.
+Every node that reads threads — a committing node on a rework lap, a review
+verifying its prior cycle — reads it from here:
 
 ```bash
 gh api graphql -f query='query { repository(owner:"<owner>", name:"<repo>") {
@@ -56,7 +56,7 @@ and no review body — so a read that stops there sees no finding at all.
 
 A committing node checks for an existing PR with `gh pr view`:
 
-- **A PR exists** — review has already run, and the work list is the
+- **A PR exists** — review has run, and the work list is the
   **unresolved Blocking threads**, plus any fix-now items the relaunch prompt
   names. The prompt names each item by thread id; the thread's own content is
   read from GitHub, never pasted into the prompt.
