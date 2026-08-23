@@ -18,8 +18,8 @@ For build/task-runner conventions (Makefile targets, `make check`), see
 
 Imports, re-exports, `__all__` declarations, and any other code live in named
 modules, not in `__init__.py`. Callers import from the specific submodule
-(`from pkg.sub import thing`), not from the package root. The module docstring
-rule below is no exception — an `__init__.py` carries no docstring either; a
+(`from pkg.sub import thing`), not from the package root. The module
+docstring rule applies here too: an `__init__.py` carries no docstring; a
 package's overview belongs in its primary named module or a README.
 
 Rationale: a blank `__init__.py` has no import-time side effects, surfaces the
@@ -89,9 +89,9 @@ A module's top-level statements appear in this order:
    A derived constant goes immediately after the things it derives from,
    in a labeled section.
 
-Don't define a constant next to its first user mid-file. Single-use
-constants still go at the top (or, for derived ones, in their grouped
-section near their dependencies) — never floating above one function.
+Single-use constants go at the top too (or, for derived ones, in their
+grouped section near their dependencies), not next to their one user
+mid-file.
 
 Rationale: a reader scanning a new module wants to find its dependencies and
 its tunable values without searching. Mixing constants into the body of the
@@ -106,7 +106,7 @@ slips past review because nobody saw it.
 
 ## Helpers
 
-A helper function earns its place by doing one of these:
+A helper function is justified by one of these:
 
 - **Multi-use**: called from two or more sites. De-duplication is the
   clearest justification.
@@ -121,7 +121,7 @@ A helper function earns its place by doing one of these:
   or strategy map. These look "single-use" by static call count but are
   pluggable by design.
 
-A helper does **not** earn its place from:
+A helper is **not** justified by:
 
 - "Symmetry with siblings" alone — three functions of the same shape, where
   one is single-use and trivial, is not a reason to keep the trivial one.
@@ -131,14 +131,14 @@ A helper does **not** earn its place from:
 - Speculative reuse — extract when the second caller appears, not in
   anticipation of one.
 
-When a helper does earn its place, put it directly under the function that
-uses it (or, for helpers shared by several functions, in a clearly labeled
-section). Group related helpers into sections with a `# ---` banner so a
-reader can navigate by concern, not by call graph.
+When a helper is justified, put it directly under the function that uses it
+(or, for helpers shared by several functions, in a clearly labeled section).
+Group related helpers into sections with a `# ---` banner so a reader can
+navigate by concern, not by call graph.
 
 Rationale: every helper costs the reader a jump. Helpers that genuinely
 encapsulate a concept pay that cost back; helpers that just relocate a few
-lines don't. Pinning the "earns its place" criteria explicitly keeps
-review consistent — without them, "should this be extracted?" becomes a
-matter of taste, and codebases drift toward over-factored or
-under-factored extremes depending on who reviewed last.
+lines don't. Pinning these criteria explicitly keeps review consistent —
+without them, "should this be extracted?" becomes a matter of taste, and
+codebases drift toward over-factored or under-factored extremes depending
+on who reviewed last.

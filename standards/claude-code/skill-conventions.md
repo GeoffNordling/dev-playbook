@@ -52,14 +52,14 @@ argument-hint: "<hint>"             # optional
 
 ### Required fields
 
-Every skill must have all five of these:
+Every skill must have:
 
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case. Must match the directory name. |
 | `description` | Plain text, max 1024 chars, third person. **A model-invoked skill's description is exactly two sentences.** The first states what the skill does; the second `SHALL` begin with the literal words `Use when` and name the trigger keywords, contexts, or file types verbatim — it is the auto-invocation match surface, so be specific. Keep the wording minimal; nothing checks length. Sentences are counted dumbly: `.`, `!`, or `?` ends one when whitespace or the string's end follows, so `CANDIDATES.md` is safe mid-sentence but `e.g.` ends a sentence early. **Under `disable-model-invocation: true` it is exactly one sentence** — no model loads the description, so it is the one-line summary the user reads in the slash-command list, trigger list dropped. |
 | `disable-model-invocation` | `false` is the standard — per the [dispatch model](/software-factory/factory-operations.md#dispatch), the dispatcher's slash commands arrive as agent text input and count as model invocation. Use `true` only for skills meant for direct user invocation outside the dispatcher. Always explicit — never rely on the default. |
-| `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory — always present, never omitted. **The user decides `model` and `effort` explicitly**, never an agent and never a machinery default; `inherit` is a choice like any other. This governs the values persisted here, not a session's runtime pick of a subagent's model. One mechanical fact bears on the choice: **a pinned model only governs the turn that loads the skill** and reverts to the session model on the next prompt, so a pin binds a single-turn/batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
+| `model` | The model the skill runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory. **The user decides `model` and `effort` explicitly**, never an agent and never a machinery default; `inherit` is a choice like any other. This governs the values persisted here, not a session's runtime pick of a subagent's model. One mechanical fact bears on the choice: **a pinned model only governs the turn that loads the skill** and reverts to the session model on the next prompt, so a pin binds a single-turn/batch skill but not an interactive, multi-turn one — for the latter, only `inherit` reflects what the interaction actually runs on. |
 | `effort` | `low`, `medium`, `high`, or `xhigh`. No default — the user's decision, same as `model`. |
 
 ### Optional fields
@@ -160,8 +160,7 @@ A skill-bundle `scripts/` directory is not the same as a project-root
 `.claude/skills/<skill-name>/scripts/` and holds skill-internal helpers
 the agent invokes while running the skill. A repo's project-root
 `scripts/`, where it exists, holds project-level workspace scripts and
-is governed elsewhere. The two may coexist in the same repo without
-conflict; they are different paths and different concerns.
+is governed elsewhere.
 
 ## Naming conventions
 
@@ -184,7 +183,7 @@ conflict; they are different paths and different concerns.
 Before shipping a new skill:
 
 - [ ] Directory name matches `name` field
-- [ ] All five required front matter fields present
+- [ ] All required front matter fields present
 - [ ] Description is exactly two sentences, the second beginning `Use when …`
       — or, under `disable-model-invocation: true`, exactly one sentence
 - [ ] Body starts with an `# H1` title

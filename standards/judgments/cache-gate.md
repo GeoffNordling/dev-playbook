@@ -24,17 +24,16 @@ keys the named judgment
 and asks the seen-set whether that exact content has been
 judged-and-passed:
 
-- **cache hit → the test passes.** The judgment's content has already been
-  ruled true by the judge.
+- **cache hit → the test passes.** The judge has ruled the content true.
 - **cache miss → the test fails** with `judgment '<id>': cache miss`. The
   content is new or changed, and no judge has ruled on it yet.
 - an unknown `id`, or an unreadable evidence file, surfaces as a loud test
   error, never a silent pass — a test naming a deleted or renamed judgment
-  fails rather than rotting.
+  fails instead of lingering unnoticed.
 
 So the gate is fast and deterministic: green means every judgment it names
-is already cached as passing. Filling the cache — running the judge on the
-misses and recording the passes — is the job of the
+is cached as passing. Filling the cache — running the judge on the misses
+and recording the passes — is the job of the
 [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
 skill, the only place an LLM ever runs. A judgment whose judge returns
 *false* is never recorded, so it stays a permanent miss (a permanent
@@ -50,7 +49,7 @@ declarations, CLI, cache, and build files. An ungated judgment is checked
 by no test and no hook; the periodic `judgments-sweep` is its only checker,
 and the sweep always considers every declaration regardless of gating.
 
-Two test shapes cover the whole spectrum:
+Test shapes cover the whole spectrum:
 
 - **Explicit, per judgment** — one test naming one id, as above. Opt-in: a
   new declaration is not gated until someone writes its test.
@@ -75,15 +74,15 @@ judges them, and a stochastic judge's false positive never blocks a push
 mid-work.
 
 The sweep pre-fills the shared cache for gated judgments too, so gates are
-usually already green; when a push still blocks, the remedy is running
+usually green; when a push still blocks, the remedy is running
 `judgments-sweep` ad hoc.
 
 ## Two tiers: when the gate is armed
 
 A cache miss is only remediable by a judgments sweep, but subagents are
 told to run `make check` regularly. So the gate is two-tier, keyed off one
-environment variable, `SKIP_JUDGMENTS`, read inside
-`assert_judgment_cached` itself:
+environment variable, `SKIP_JUDGMENTS`, read inside `assert_judgment_cached`
+itself:
 
 | Invocation | `SKIP_JUDGMENTS` | The gate |
 |---|---|---|
@@ -100,5 +99,4 @@ markers**. `make check-judgments-cache` is the
 it asserts the cache for whatever judgments the repo has tripwired via
 pytest, so in a gated repo a miss blocks the push until a sweep fills it,
 and a repo with nothing tripwired passes it vacuously — a valid position on
-the spectrum. A subagent running plain `make check` never meets an
-unresolvable red.
+the spectrum.

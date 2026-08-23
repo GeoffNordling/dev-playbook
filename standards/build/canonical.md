@@ -7,12 +7,11 @@ description: The canonical artifacts — the single-source files under standards
 # Canonical Artifacts
 
 The standard's machine-checkable content lives **once**, as files in
-dev-playbook under `standards/build/canonical/`,
-shipped inside every hook clone
-([distribution.md](/standards/build/distribution.md)). Prose points at them
-and does not restate their contents — the files are the standard. Each
-repo's working copies exist because the consuming tools demand real files in
-place, and `repo-lint` enforces them equal to the canonical source:
+dev-playbook under `standards/build/canonical/`, shipped inside every hook
+clone ([distribution.md](/standards/build/distribution.md)). Prose points at
+them — the files are the standard. Each repo's working copies exist because
+the consuming tools demand real files in place, and `repo-lint` enforces them
+equal to the canonical source:
 
 | Artifact | Compared how |
 |---|---|
@@ -23,10 +22,10 @@ place, and `repo-lint` enforces them equal to the canonical source:
 | [pyproject.toml](/standards/build/canonical/pyproject.toml) | pinned values match, parsed from TOML; additions are free |
 | [.gitignore](/standards/build/canonical/.gitignore) | baseline lines present |
 
-`standards/build/canonical/` is quoted material: hooks and tree rules skip it —
-its `pyproject.toml` is a template, not a second project. Every file in the
-directory is compared against by `repo-lint`; a file that no tool checks
-does not belong there.
+`standards/build/canonical/` is quoted material: hooks and tree rules skip
+it — its `pyproject.toml` is a template. Every file in the directory is
+compared against by `repo-lint`; a file that no tool checks does not belong
+there.
 
 ## One config serves every repo
 
@@ -37,8 +36,7 @@ ruff, shellcheck, and shfmt hooks at canonical revs, and the pre-push
 `make check-judgments-cache` hook, installing both the commit and push stages.
 It serves every repo unchanged: a hook with no matching files skips itself, and
 detectors like `judgments-lint` and `skill-lint` pass trivially where a repo
-has no `[tool.judgments]` table and no authored skills — which is why the
-roster can run everywhere without per-repo opt-ins. dev-playbook
+has no `[tool.judgments]` table and no authored skills. dev-playbook
 replaces the published block with its dogfood block
 ([distribution.md](/standards/build/distribution.md#dogfooding)).
 

@@ -45,10 +45,8 @@ An `index.md` lists, for its own directory:
 - each concept document, as a markdown link carrying the document's
   frontmatter `description`.
 
-For child directories, it links the child's own `index.md` rather than
-reaching into it. A subdirectory is recursed into inline **only when it has
-no `index.md` of its own** — otherwise the listing delegates to that child
-index.
+For child directories, it links the child's own `index.md`. A subdirectory
+is recursed into inline only when it has no `index.md` of its own.
 
 The repository root `index.md` additionally declares the bundle's OKF
 version in frontmatter (its only frontmatter key), per the
@@ -68,11 +66,11 @@ case-insensitive. `README.md` always comes first.
 
 An index may deviate from alphabetical **only when an intro line beginning
 `Ordering:` declares the meaningful order** — for example
-`Ordering: in Decision Record number order` or `Ordering: by level of abstraction`. The
-marker is structured, not prose: the detector checks only that an intro line
-(one before the first listed entry) begins `Ordering:`, and never parses what
-the declaration says. An undeclared deviation from alphabetical is a defect —
-a reader cannot distinguish unstated meaning from entropy.
+`Ordering: in Decision Record number order` or
+`Ordering: by level of abstraction`. The marker is structured: the detector
+checks only that an intro line (one before the first listed entry) begins
+`Ordering:`. An undeclared deviation from alphabetical is a defect — a
+reader cannot distinguish unstated meaning from randomness.
 
 ## Authored, not generated
 
@@ -80,5 +78,4 @@ a reader cannot distinguish unstated meaning from entropy.
 staleness checker (a pre-commit hook, alongside `ref-lint` and the
 type-lint) fails the commit when an index omits a concept document in its
 directory, lists one that no longer exists, or gives a description that no
-longer matches the child's frontmatter. The check keeps hand-authored
-indexes honest without a generator owning the file.
+longer matches the child's frontmatter.

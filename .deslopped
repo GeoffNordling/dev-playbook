@@ -5,6 +5,8 @@
 #   checked   the skill ran, the faithful-reader check passed, and the diff
 #             was reviewed by the user.
 #   accepted  the user read the file and judged it clean. The skill never ran.
+#   applied   the skill ran and the user reviewed the diff, but the file was
+#             outside that batch's faithful-reader sample. No check ran on it.
 #
 # The sha is `git hash-object <path>` as of that decision, so a path whose
 # current sha no longer matches has been edited since and is due again.
@@ -32,6 +34,16 @@ checked  ce2d7a34a1a4f02a4580db59b1ada4f7e0e2e5bb standards/docs/context-content
 checked  fca349ca6d9ec84fd25f4d8c40d918ff52b0b878 standards/docs/document-types.md
 checked  af37334acd9aad8ab2fb6689b6758f3daf1b68d1 standards/tracking/repo-settings.md
 checked  d5ab045bd74ba6617ce534d9bc91057d5346bebb standards/tracking/tracker-operations.md
+checked  1e5d9d42fd3aa72cca016075630568ffafee6192 docs/sandboxing.md
+applied  c9c76ae9307d909cd91906ff0de4292f2e046888 dotfiles/dot-claude/rules/bash-commands.md
+applied  b33d193ff7ebccb95511c1a68f53d2b5a0a318e4 dotfiles/dot-claude/skills/doc-rewrite/SKILL.md
+applied  7161ccf9d4bb2e8a87f0fc5d65a239f36830f772 dotfiles/dot-claude/skills/rewind-compact/SKILL.md
+applied  3859ee95b0e572cfa26ad73b041dd187a3235616 standards/build/canonical.md
+applied  d9885d09defa720f9f42109a963d8ec87de1f434 standards/claude-code/skill-conventions.md
+applied  fa5eda681066ba3baa4c3f6eaf26d24230be2bd1 standards/docs/indexes.md
+checked  a0dfae8db85636945c5945cc013050992261eadf standards/docs/readme-content.md
+applied  b19193f5d572452f5575ade530da440a5a0060ba standards/judgments/cache-gate.md
+checked  ad7845cbd2a4c13735815f65ae940d05ce090502 standards/python/style.md
 
 # The standard cards. Each is four pointer cells over a couple of lines of
 # prose — too small to carry a tic, and high enough leverage that a bad
