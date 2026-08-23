@@ -9,7 +9,7 @@ argument-hint: "<issue-number>"
 
 # Issue Overwatch
 
-You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node — nothing launches itself — and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
+You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node, and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
 
 One hard limit: you never merge. That is the user's.
 
@@ -17,8 +17,7 @@ One hard limit: you never merge. That is the user's.
 
 ## Read first
 
-Before doing anything else, read end-to-end — the software factory is your
-subject, so know it cold:
+Before doing anything else, read end-to-end:
 
 - [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
 - [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — delegation, the worktree contract, the terminal report contract, readiness, and the review stop.
@@ -69,7 +68,7 @@ You open it, once, before the issue's first file-touching node, per the worktree
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
 
-## 5. Verdicts at the review stop
+## 5. Review-stop verdicts
 
 The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [the briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule), answer their questions, help them weigh, and act only on an explicit verdict.
 

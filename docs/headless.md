@@ -21,21 +21,21 @@ sits at the bottom of it. Anthropic's [IAM
 documentation](https://code.claude.com/docs/en/iam) states that in
 non-interactive mode a configured key is always used when present — so a stray
 `ANTHROPIC_API_KEY` moves the workspace to per-token billing with no prompt and
-no warning. Nine environment variables outrank the login:
+no warning. Environment variables outrank the login:
 
 `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_BASE_URL`,
 `CLAUDE_CODE_USE_BEDROCK`, `CLAUDE_CODE_USE_VERTEX`, `CLAUDE_CODE_USE_FOUNDRY`,
 `ANTHROPIC_PROFILE`, `ANTHROPIC_FEDERATION_RULE_ID`,
 `ANTHROPIC_ORGANIZATION_ID`.
 
-Three settings keys mint or redirect a credential the same way: `apiKeyHelper`,
+Settings keys mint or redirect a credential the same way: `apiKeyHelper`,
 `awsAuthRefresh`, `awsCredentialExport`.
 
 `CLAUDE_CODE_OAUTH_TOKEN` also outranks the login, and is safe: it is a
 subscription credential, not a metered one.
 
-**`--bare` is the trapdoor.** It skips the keychain and the subscription login
-outright and demands an API key. It is never passed.
+`--bare` skips the keychain and the subscription login outright and demands
+an API key, and it is never passed.
 
 [`preflight`](/src/dev_playbook/factory/launcher.py) checks all twelve sources
 before every launch and refuses the whole run on a single finding. It reads
@@ -63,10 +63,10 @@ emits is an `init` reporting the session's own configuration back:
 `agents`. The terminating `result` message carries `is_error`, `subtype`,
 `permission_denials`, `duration_ms`, and the model's final text.
 
-This is what makes the substrate testable: **every guardrail is asserted
-against state the harness declares, with no agent behavior in the verdict.** A
-node that complied once proves nothing about the next run; an `init` message
-reporting `tools: ['Read']` is a fact about the process.
+**A run is testable because every guardrail is asserted against state the
+harness declares, with no agent behavior in the verdict.** A node that
+complied once proves nothing about the next run; an `init` message reporting
+`tools: ['Read']` is a fact about the process.
 
 `apiKeySource` appears only in the stream — the plain `--output-format json`
 envelope does not carry it.

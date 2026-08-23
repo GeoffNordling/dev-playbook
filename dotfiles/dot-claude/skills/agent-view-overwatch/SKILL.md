@@ -15,8 +15,7 @@ Refer to each issue by a fixed handle — `<repo>#<N>`, the full repo name and i
 
 ## Read first
 
-Before doing anything else, read end-to-end — the software factory is your
-subject, so know it cold:
+Before doing anything else, read end-to-end — the software factory is your subject:
 
 - [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the node graph and the states an issue moves through.
 - [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — the two overwatch scopes, readiness, and the worktree contract whose teardown step is yours.
@@ -25,21 +24,21 @@ Then report: `READ: software-factory.md, factory-operations.md`. Proceed only af
 
 ## Navigate
 
-Provide commands under **state once, then trust**. When you hand the user a launch command, state it once, clearly, in paste-safe single-line form, then assume it ran and move the board forward. Don't track whether a launch executed, don't re-surface it on a later turn, and don't ask "did you run it?" The trust is bounded: a merge stays open until the user says it merged; teardown waits for the user's word.
+When you hand the user a launch command, state it once, clearly, in paste-safe single-line form, then assume it ran and move the board forward. Don't track whether a launch executed, don't re-surface it on a later turn, and don't ask "did you run it?" The trust is bounded: a merge stays open until the user says it merged; teardown waits for the user's word.
 
-1. **Read state.** Labels for the phase: `gh issue view <N> --json labels --jq '.labels[].name'`. Track position, not content — don't read the body. Then look up the issue's PR for the board's PR column, keyed on the fleet's `issue-<N>` branch convention: `gh pr list --head issue-<N> --state open --json number --jq '.[0].number // empty'` — a number if a PR is open, blank if none. With several issues in flight, check each with its own `gh` call, run in parallel — never a `for`-loop over the issues. Think of each as a row `<repo>#<N> · <phase>`.
+1. **Read state.** Labels for the phase: `gh issue view <N> --json labels --jq '.labels[].name'`. Track position — don't read the body. Then look up the issue's PR for the board's PR column, keyed on the fleet's `issue-<N>` branch convention: `gh pr list --head issue-<N> --state open --json number --jq '.[0].number // empty'` — a number if a PR is open, blank if none. With several issues in flight, check each with its own `gh` call, run in parallel — never a `for`-loop over the issues. Think of each as a row `<repo>#<N> · <phase>`.
 
    **Only run this on an explicit ask.** These `gh` calls fire on first contact with an issue, or when the user explicitly asks you to look something up (check labels, check the PR, refresh state). A bare "show the board" mid-session is not that ask — it means render from what you already know: prior lookups this conversation, plus whatever the user has told you directly (an issue closed, opened, blocked, unblocked). The user tracks issue state and reports it to you; do not go re-query the API to second-guess them.
 2. **Recommend the next launch.** An issue is launchable when it is unblocked per factory-operations.md's readiness rule **and** its `phase:*` sits in the factory region — a definition-phase issue is not launchable, per the [factory-nodes-only rule](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch); it waits on the user running its definition skill. Among the launchable, recommend what to launch next and say why — dependency order, a verdict waiting, work going stale.
 3. **Emit the launch command.** One issue overwatch per issue, launched in the issue's repo: `/issue-overwatch <N>`. Hand over the literal command — the user launches it. Never auto-launch, never advance a label yourself: every label move belongs to the issue's own overwatch.
-4. **Tear down after a confirmed merge.** Worktree teardown is yours, and only after the user *tells you* the merge happened — never on inference, and with no API verification step. Then run the cheap local cleanup: `git -C ~/workspace/<repo> worktree remove .claude/worktrees/issue-<N>` and `git -C ~/workspace/<repo> branch -D issue-<N>`. A closed spike's worktree goes the same way.
+4. **Tear down after a confirmed merge.** Worktree teardown is yours, only after the user *tells you* the merge happened, with no API verification step. Then run the cheap local cleanup: `git -C ~/workspace/<repo> worktree remove .claude/worktrees/issue-<N>` and `git -C ~/workspace/<repo> branch -D issue-<N>`. A closed spike's worktree goes the same way.
 5. **Show the board.** Close every turn with the board, built to the spec under **The board** below — the turn is finished once the table is rendered with a row for every in-flight issue.
 
 ## The board
 
-The board is a **glance**, not a report — and there is a lot of information here, so the failure mode is packing too much into it. Render an actual Markdown table (header row, `---` separator, one issue per line); never a stack of paragraphs split by `---` rules. Keep every cell to a few words — if a cell wants a sentence, it's too much: compress it or lift it out. The reasoning, the recommendation, and the launch commands live in prose around the table, not inside its cells.
+The board is a **glance** — there is a lot of information here, so the failure mode is packing too much into it. Render a Markdown table (header row, `---` separator, one issue per line); never a stack of paragraphs split by `---` rules. Keep every cell to a few words — if a cell wants a sentence, it's too much: compress it or lift it out. The reasoning, the recommendation, and the launch commands live in prose around the table.
 
-It leads with the issue's **state** — two **orthogonal** dimensions, **Activity** (is a session working the issue, as far as you've been told?) and **Status** (where the issue stands, health-wise), rendered as two glyphs side by side with no space between them, Activity first then Status (e.g. `✈️💚`). They stay orthogonal — read each glyph on its own, and never let one stand in for the other — they just share one column to spare the table's width.
+It leads with the issue's **state** — **orthogonal** dimensions, **Activity** (is a session working the issue, as far as you've been told?) and **Status** (where the issue stands, health-wise), rendered as two glyphs side by side with no space between them, Activity first then Status (e.g. `✈️💚`). Read each glyph on its own — never let one stand in for the other — they just share one column to spare the table's width.
 
 | Column | Contents |
 |---|---|
@@ -54,7 +53,7 @@ It leads with the issue's **state** — two **orthogonal** dimensions, **Activit
 
 **Status** (health): 💚 **healthy** — in progress or ready to advance; nothing wrong. ❌ **blocked** — cannot proceed; a dependency is unmet. ⏸️ **paused** — deliberately tabled. ❗ **escalated** — an overwatch stopped and is waiting for the user's attention.
 
-Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A merge or verdict pending at an issue's own overwatch is not its own glyph — it reads as 💤💚 with the action named in **Notes**; the command itself is that overwatch's to surface, not yours.
+Combos, for reference: ✈️💚 running fine · 💤💚 grounded and ready for the user · 💤❌ blocked · 💤⏸️ paused · 💤❗ needs attention. A merge or verdict pending at an issue's own overwatch is not its own glyph — it reads as 💤💚 with the action named in **Notes**; the command itself is that overwatch's to surface.
 
 ```
 | ⚑ | Handle | PR | Purpose | Node | Notes |

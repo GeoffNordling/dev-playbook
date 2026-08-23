@@ -9,4 +9,4 @@ allowed-tools: Bash(bash *usage-report/scripts/report.sh)
 
 # Usage Report
 
-Run [report.sh](scripts/report.sh) from this skill's base directory. Nothing else.
+Run [report.sh](scripts/report.sh) from this skill's base directory.

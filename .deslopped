@@ -69,3 +69,26 @@ accepted 64c34502abc7ed0d198ff89584c30c6249101b01 standards/software-factory.md
 accepted 5c8c6bd4d9d4e245c4e783f76bdfe2816164700a standards/standard.md
 accepted 7966b9eea82f4d663d6a6aa8e36489839c61f69b standards/testing.md
 accepted f493b5675ebb3080ef21681d4b6ba85beeadb431 standards/tracking.md
+
+# Batch 4 — transform only, no faithful-reader check on any file
+# (sampling was dropped for this one batch by explicit instruction).
+applied  d1bb47ccc76a608feb23c906b7739ef7531c221e docs/external-skill-verdicts.md
+applied  6f23047dcdd6fbbb37251ec73665eed000fef972 docs/headless.md
+applied  9fa290b055e478b0bb5f41dff312f8350e35f65d dotfiles/dot-claude/agents/build.md
+applied  8ff4edbc9a912cf4ef78bd4dc82ad15214464cdf dotfiles/dot-claude/agents/code-pr-review.md
+applied  be3d825cb7df7ba5097ba7a85cadde03f32f7928 dotfiles/dot-claude/skills/agent-view-overwatch/SKILL.md
+applied  a4fd581fcb07f7f1962fd99c1be0fd5e977dd304 dotfiles/dot-claude/skills/clean-up-branch-worktree/SKILL.md
+applied  d0d9a509c259b8a770b70f56d48ecc80d70d921e dotfiles/dot-claude/skills/compact-prep/SKILL.md
+applied  569f0f8ef05068c92e98acbf06fbbada6f150fbd dotfiles/dot-claude/skills/design/references/design-it-twice.md
+applied  dcec7a78bb7ecc3941fa5c79f75cb40185185ff2 dotfiles/dot-claude/skills/issue-overwatch/SKILL.md
+applied  00fa5e7b8d93a16904a0cf66010503b0c38371b5 dotfiles/dot-claude/skills/orient/SKILL.md
+applied  9d06ab06aea14c24103570b2c723679979bc1e91 dotfiles/dot-claude/skills/skill-creator/SKILL.md
+applied  0cd34e887e6285ef4e2f68f8c71b59ace8418baa dotfiles/dot-claude/skills/usage-report/SKILL.md
+applied  6f4c045865846d39aeb56ebf78a0c7826b0e25cb harness-recipes/recipes/scatter-gather.md
+applied  6e3619edb3e4e3ad88b4efc0432bf9e069cdccc1 instruments/file-graph.md
+applied  fdb85c3640f88a79ea1baf4c26ab704dad2d54e3 scripts/README.md
+applied  ba1753451e8ced0b7b6fd4289bc528abb12b3ed8 standards/build/ci.md
+applied  5eacf8c88ee068a448b104c0a26e2e818caf4278 standards/claude-code/claude-content.md
+applied  095a0ef2f15726b173f2018f705dd2c769f4b074 standards/docs/cross-references.md
+applied  fdc748b8cb3777874702408443e9902b5998033e standards/tracking/candidates.md
+applied  591a9acc5d155f8dac7df3a52e85b8ff0c87e33f standards/tracking/issue-authoring.md

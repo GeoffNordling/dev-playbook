@@ -14,7 +14,7 @@ it.
 
 The steps run in order. Step 2 ends by putting its questions to the user and
 waiting for the answers, and those answers are the inputs to steps 3–5 — so
-the first line of `SKILL.md` gets written at step 5, with the answers in hand.
+the first line of `SKILL.md` gets written at step 5.
 
 ## 1. Read the standards
 
@@ -29,8 +29,8 @@ binding, craft is the skill.
   it behaves predictably. Its `SKILL-MECHANICS.md` carries the skill-specific
   half.
 
-This skill is the workflow over those two; the rules live there, not here.
-Where they collide, skill-conventions.md wins.
+This skill is the workflow over those two; the rules live there. Where they
+collide, skill-conventions.md wins.
 
 ## 2. Gather requirements
 
@@ -50,13 +50,11 @@ Ask the user the questions the standards leave to choice:
   carries no triggers.
 - **Model** — ask the user which model the skill runs under (`haiku` /
   `sonnet` / `opus` / `fable`, or `inherit` to follow the session model); it's
-  their call, not a default you set. The one mechanic to surface when they
-  decide: a pin only governs the turn that loads the skill, so for an
-  interactive, multi-turn skill `inherit` is what honestly reflects the rest of
-  the interaction.
+  their call. The one mechanic to surface when they decide: a pin only governs
+  the turn that loads the skill, so for an interactive, multi-turn skill
+  `inherit` is what reflects the rest of the interaction.
 - **Effort** — ask the user which effort the skill runs at (`low` / `medium` /
-  `high` / `xhigh`); there is no default, and it is their call, not one you
-  set.
+  `high` / `xhigh`); there is no default, and it is their call.
 - **Arguments** — none, single free-form (`$ARGUMENTS`), or positional
   (`$0`/`$1`/...)?
 - **References** — does the body need supporting files under `references/`?

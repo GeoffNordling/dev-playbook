@@ -7,8 +7,8 @@ description: The executable surface of published hook entry points and local dev
 # Scripts
 
 The repo's executable surface: the published pre-commit hook entry points and
-the local dev CLIs. Each file here is a thin shim — a program you run, not a
-module you import — over the library code in `src/dev_playbook/`.
+the local dev CLIs. Each file here is a thin shim over the library code in
+`src/dev_playbook/`.
 
 > *"The perfect race car crosses the finish line in first place and then falls to pieces."*  
 > — Ferdinand Porsche
@@ -81,8 +81,8 @@ full.
 
 ## Shared libraries (`src/dev_playbook/`)
 
-The scripts share their markdown and Python primitives rather than redefining
-them per script. The library is the installed `dev_playbook` package:
+The scripts share their markdown and Python primitives through the library —
+the installed `dev_playbook` package:
 
 - `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-lint` and `okf-lint`.
 - `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint`, `testing-lint`, and `repo-lint`.
@@ -98,8 +98,8 @@ loading/validation and the plan/render/record runner, behind `judgments-lint`
 and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
 model, classifier, and renderer behind `transcript-export`),
 `dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
-already-recorded work), and `dev_playbook.factory`, whose three pieces are
-the software factory's append-only run ledger — the `ledger` table beside the
+already-recorded work), and `dev_playbook.factory`, whose pieces are the
+software factory's append-only run ledger — the `ledger` table beside the
 hook-capture `events` table, its per-kind writers and its two read queries; the
 job launcher that sweeps a launch's credentials, spawns a factory node, watches
 its stream live, and writes its two job rows; and the build-region traverse that
@@ -173,8 +173,9 @@ built.
 
 ### Exporting a session transcript
 
-Naming the session is the only hard step, so `transcript-export` takes it three
-ways and never asks the caller to reach past it to the `agentsview` CLI:
+Naming the session is the only hard step, so `transcript-export` takes it
+several ways and never asks the caller to reach past it to the `agentsview`
+CLI:
 
 ```bash
 scripts/transcript-export out/ "$CLAUDE_CODE_SESSION_ID"   # the running session

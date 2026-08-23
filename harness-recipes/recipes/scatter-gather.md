@@ -16,8 +16,8 @@ jobs. The fan-out runs in the Workflow runtime, outside any context window.
 
 For many jobs that do not depend on each other and whose results you want
 collected in one shot — judging a set of candidates, classifying a list, or
-answering the same question against different inputs. Each job is its own isolated
-`agent()`; none can see another's work.
+answering the same question against different inputs. Each job is its own
+isolated `agent()`.
 
 This is the parallel-independent counterpart to the [Ralph loop](/harness-recipes/recipes/ralph-loop.md).
 Ralph is one large task split into sequential, dependent steps, where disk carries
@@ -63,8 +63,8 @@ Build the batch and call the workflow by name, passing the batch as `args`:
 
 Note the asymmetry between that call and the script: the caller passes an **object**,
 but the script parses a **JSON string** and rejects an object outright. Both are
-correct, because the Workflow runtime serializes every `args` value on the way in —
-a passed object reaches the script as JSON text, and an omitted one as `undefined`.
-It never arrives as a live object, contrary to the runtime's own documentation. Every
-workflow here is written to that contract. Source:
+correct: the Workflow runtime serializes every `args` value on the way in, so a
+passed object reaches the script as JSON text and an omitted one as `undefined` —
+contrary to the runtime's own documentation. Every workflow here is written to that
+contract. Source:
 [`scatter-gather.js`](/dotfiles/dot-claude/workflows/scatter-gather.js).
