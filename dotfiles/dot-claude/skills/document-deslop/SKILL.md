@@ -3,7 +3,7 @@ name: document-deslop
 description: Rewrite a Markdown document to remove the named slop tics, changing style but never content. Use when a document reads as slop, when asked to deslop or clean up the writing in a doc, or after generating a long document that has not been style-checked.
 disable-model-invocation: false
 model: sonnet
-effort: xhigh
+effort: high
 argument-hint: "[doc-hint]"
 ---
 

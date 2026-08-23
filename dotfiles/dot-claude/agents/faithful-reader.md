@@ -3,7 +3,7 @@ name: faithful-reader
 description: Reads a rewritten Markdown document, then checks whether the rewrite cost a reader anything they need. Use after a style-only rewrite, to judge what the deletions cost.
 tools: Read, Bash
 model: sonnet
-effort: xhigh
+effort: high
 ---
 
 # Faithful Reader
