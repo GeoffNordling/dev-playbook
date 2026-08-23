@@ -91,11 +91,11 @@ jitter; the bootstrap run, before anything is adopted, stays freeform.
 ## Abstractions so far
 
 | Noun            | Verbs                         | Is                                                |
-| --------------- | ----------------------------- | ------------------------------------------------- |
+| --------------- | ------------------------------ | ------------------------------------------------- |
 | Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
 | Agent           | do                            | Documentation that runs on its own permission set |
 | Skill           | do                            | Documentation that runs on the session's permissions |
-| Reference chain | —                             | A doc unit's references, declared, edge-labeled   |
+| Reference chain | —                              | A doc unit's references, declared, edge-labeled   |
 
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
@@ -114,7 +114,7 @@ jitter; the bootstrap run, before anything is adopted, stays freeform.
 
 ## Targets
 
-Three chosen, in order: `document-deslop` (minimal, known cold — the
+Chosen, in order: `document-deslop` (minimal, known cold — the
 calibration run), `grill-with-docs` (mid-size — five skills and a
 standard), `design` (the hub — eight skills and four docs, the chain least
 likely to fit in the user's head).
