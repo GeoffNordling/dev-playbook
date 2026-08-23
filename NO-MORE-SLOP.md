@@ -111,18 +111,19 @@ scripts, or the judges.
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill, which the user invokes manually.
+- **Documentation defines behaviors; skills and agents never define one.**
+  Written into the knowledge-organization standard as
+  [file-roles.md](/standards/knowledge-organization/file-roles.md), the
+  renamed and rebuilt `bundle.md`. Two axes — role (concept document /
+  harness-owned file) and content (behavior / procedure) — and the rule is
+  the grid's one empty cell: a rule of the system is never written only in
+  a skill body or an agent definition.
 
-**Decided, awaiting a standard**
-
-- **Documentation defines behaviors; skills and agents never define one** —
-  they sequence and condition on what the documentation defines. No
-  standard states this as a general rule today; fragments exist without
-  it — "source the what and when from the read itself"
-  ([node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-authoring.md)),
-  the Read-first clause
-  ([factory-operations.md](/software-factory/factory-operations.md#the-node-skill-contract)),
-  and the meta-standard's rule that a card never restates its targets. To
-  do, not now: find the standard this belongs in and write it there.
+  Nothing checks it. No detector can, and the card carries no judgment for
+  it, so conformance across the existing skills and agents is unmeasured.
+  Two violations are confirmed by reading: `commit` and `doc-format` both
+  define behaviors that have no document to point at, so each needs a
+  document written before the skill can shrink.
 
 **Raw ideas, none designed**
 
@@ -218,7 +219,3 @@ Candidates to document somewhere:
 Run [the abstraction loop](/ABSTRACTION-LOOP.md) — the offshoot where the
 CLOA abstractions are constructed one change at a time. First target: one
 skill chain. Its results merge back here or the offshoot terminates.
-
-## Done
-
-- Deslop rewrite of every prose document — see the documentation track.
