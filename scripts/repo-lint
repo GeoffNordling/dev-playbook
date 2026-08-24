@@ -210,9 +210,10 @@ class Layers:
 
 
 def infer_layers(root: Path, python_files: list[Path]) -> Layers:
+    python = (root / "pyproject.toml").is_file()
     return Layers(
-        python=(root / "pyproject.toml").is_file(),
-        src=(root / "src").is_dir(),
+        python=python,
+        src=python and (root / "src").is_dir(),
         scripts_python=any(
             p.relative_to(root).parts[:1] == ("scripts",) for p in python_files
         ),

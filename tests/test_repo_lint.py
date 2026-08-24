@@ -856,6 +856,16 @@ def test_package_json_requires_committed_lockfile(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_js_src_is_not_the_python_src_layer(tmp_path: Path) -> None:
+    files = base_files()
+    files["package.json"] = '{"name": "sample"}\n'
+    files["package-lock.json"] = "{}\n"
+    files["src/pages/index.astro"] = "<h1>hello</h1>\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "layers: base, js" in result.stderr
+
+
 # --- hook-repo self-audit ---
 
 

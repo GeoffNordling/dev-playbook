@@ -16,13 +16,18 @@ the authority ([enforcement.md](/standards/build/enforcement.md)).
 |---|---|---|
 | base | always | the docs skeleton, `Makefile`, pre-commit, thin CI |
 | python | `pyproject.toml` exists | the root Python project — [python.md](/standards/build/python.md) |
-| python · src | `src/` exists | the importable package |
+| python · src | `pyproject.toml` and `src/` both exist | the importable package |
 | python · scripts | `scripts/` holds Python | tested, runnable Python scripts |
 | python · aws | `cdk.json` exists | the CDK shape and deploy targets — [aws.md](/standards/build/aws.md); requires src |
 | js | `package.json` exists | a committed lockfile alongside `package.json`; nothing more yet |
 
-`tests/` is not a layer: it is required the moment `src/` exists or
-`scripts/` holds Python.
+`tests/` is not a layer: it is required the moment a repo is in
+`python · src` or `python · scripts`.
+
+`src/` is the default source root of most JavaScript build tools as well, so
+the `python · src` trigger is a conjunction: a repo without `pyproject.toml`
+is not in the python layer, and therefore not in `python · src`, whatever it
+keeps in `src/`.
 
 Each layer's concrete file requirements are the
 [skeleton tables](/standards/build/skeleton.md).
