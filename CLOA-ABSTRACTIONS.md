@@ -1,15 +1,17 @@
 ---
 type: General-Sheet
-title: The Abstraction Loop
-description: Offshoot of the branch plan — constructing the noun-and-verb abstractions that make documentation understandable at the CLOA
+title: CLOA Abstractions
+description: The noun-and-verb abstractions that make documentation understandable at the CLOA, and the loop that generates them
 ---
 
-# The Abstraction Loop
+# CLOA Abstractions
 
-An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md), deleted when its results
-merge back into that plan or the branch of ideas terminates. The same
-speculative voice applies: a guess is written as a guess, and a sentence is
-settled only when it says so.
+The abstractions the user and the AI share at the CLOA — each a noun with
+a small fixed verb set — and, as a detail of method, the loop that
+generates them. An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md),
+deleted when its results merge back into that plan or the branch of ideas
+terminates. The same speculative voice applies: a guess is written as a
+guess, and a sentence is settled only when it says so.
 
 ## Goal
 

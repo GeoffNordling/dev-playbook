@@ -60,17 +60,20 @@ These apply to both tracks.
 
 - **The CLOA** (Correct Level of Abstraction) — the level of abstraction
   where the AI and the user communicate in the exact same terminology.
-  `CONTEXT.md` is the anchor: the user understands it 100%, the AI uses
-  its terms in all communication, and a missing term is added on the spot
-  and approved by the user. Zero vibe coding in that file. The terms form
-  a **vocabulary API** — an API between the user and the AI, designed the
-  way a library designs its public surface, with the internals below it
-  AI-owned. Escalation discipline is its behavioral half: the AI raises
-  questions in vocabulary terms, proposing a new term when one is
-  missing. A default, toggleable — some modes of talk need to leave the
-  vocabulary. The bets per track: `CONTEXT.md` carries the CLOA for
-  documentation and communication, and the acceptance tier (code track)
-  carries it for code.
+  Its shared definitions are the primitives in
+  [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) — each a noun with a small
+  fixed verb set — from which the user predicts behavior without reading
+  bodies. The bets per track: the primitives carry the CLOA for
+  documentation, and the acceptance tier (code track) carries it for
+  code.
+- **The vocabulary API** — `CONTEXT.md` holds the canonical terms for
+  communication: the user understands it 100%, the AI uses its terms, and
+  a missing term is added on the spot and approved by the user. Zero vibe
+  coding in that file. It is designed the way a library designs its
+  public surface, with the internals below it AI-owned. Escalation
+  discipline is its behavioral half: the AI raises questions in
+  vocabulary terms, proposing a new term when one is missing. A default,
+  toggleable — some modes of talk need to leave the vocabulary.
 - **Deterministic backpressure preferred over stochastic functions.**
   Stochastic functions — prompts, models, agents — are powerful but
   expensive. Deterministic backpressure — detectors, linters, gates, and
@@ -108,6 +111,15 @@ scripts, or the judges.
 
 **Completed**
 
+- **CLOA primitives.** Three loop runs in
+  [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) constructed a converged
+  primitive set — Standard, Agent, Skill, Reference chain — that
+  describes what documentation does at the CLOA: the user understands the
+  whole surface and keeps enough control to guide the system, the
+  implementation below the CLOA is delegated to the agent, and deep
+  dives stay auditable by opening actual files. That files are still too
+  hard to read is a separate open work stream (the Levels section's
+  first level).
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill, which the user invokes manually.
@@ -123,10 +135,11 @@ scripts, or the judges.
 - **Doc linters, re-aimed.** The existing linters are pedantic — they check
   that certain headings are present. Decide what is actually worth linting
   for and design toward that.
-- **Reference chains.** Skills as signatures, OKF traces, and the OKF
-  graph converged into one object — a doc unit's reference chain, declared
-  rather than discovered, lintable. Moved to
-  [the abstraction loop](/ABSTRACTION-LOOP.md) as its first target.
+- **Reference chains.** Constructed in
+  [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) as the Reference chain
+  primitive — edges does, reads, overrides, writes. Still raw: the
+  in-file declaration format and the lint that fails when the declared
+  chain and reality disagree.
 - **Deslop regression gate.** Something must keep a rewritten document from
   sliding back into slop. Deterministic rules cannot judge prose quality;
   the judgments machinery may fit here.
@@ -206,6 +219,8 @@ Candidates to document somewhere:
 
 ## Now
 
-Run [the abstraction loop](/ABSTRACTION-LOOP.md) — the offshoot where the
-CLOA abstractions are constructed one change at a time. First target: one
-skill chain. Its results merge back here or the offshoot terminates.
+[CLOA Abstractions](/CLOA-ABSTRACTIONS.md) has checked back in: the loop
+ran three targets, the primitive set converged, and the loop stays live
+for re-entry when a new corner of the repo produces a real residual. The
+branch is choosing its next work stream. Candidate: declare and lint the
+reference chain — the primitives' first deterministic backpressure.
