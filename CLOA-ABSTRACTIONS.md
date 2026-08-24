@@ -6,9 +6,9 @@ description: The noun-and-verb abstractions that make documentation understandab
 
 # CLOA Abstractions
 
-The abstractions the user and the AI share at the CLOA — each a noun with
-a small fixed verb set — and, as a detail of method, the loop that
-generates them. An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md),
+The **CLOA primitives ontology**: the abstractions the user and the AI
+share at the CLOA — each a noun with a small fixed verb set — and, as a
+detail of method, the loop that generates them. An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md),
 deleted when its results merge back into that plan or the branch of ideas
 terminates. The same speculative voice applies: a guess is written as a
 guess, and a sentence is settled only when it says so.
@@ -55,6 +55,12 @@ An expectation-maximization shape over a chosen target artifact:
 Residuals are tracked, not zeroed. The loop's job is awareness of what
 the abstractions fail to carry; the primitive set is refactored only when
 the reduction is worth the change cost.
+
+The first move on a repo is the **registry pass**: enumerate every
+document type from its two registries — OKF concept types and
+harness-owned kinds — and rule each one important or not to the CLOA
+primitives ontology. Unimportant types are declared so and ignored;
+targets come from the important ones.
 
 The bootstrap run is freeform — a discussion, with several branching
 possibilities live in the same context window. Rigidity applies later, to
@@ -196,6 +202,14 @@ between the two is encoded as `classify()` in `src/dev_playbook/md.py`.
 This repo's census, per `classify()`: 107 concept docs, 48 harness `.md`
 files, 16 indexes, 47 excluded (the vendored `dotfiles/.agents` tree and
 scratch).
+
+The registry pass ruled on every registered type. Two matter to the
+ontology: **Standard** — with Standard-Card as its catalog surface, the
+same object — and **Guide**, the software factory's documentation, unmet
+by the loop so far. **Vocabulary** is important but separate: the
+vocabulary API, not a primitive. Everything else is declared unimportant
+and ignored — Decision-Records included, which take no actions and exist
+as greppable history.
 
 Chosen, in order: `document-deslop` (minimal, known cold — the
 calibration run), `grill-with-docs` (mid-size — five skills and a

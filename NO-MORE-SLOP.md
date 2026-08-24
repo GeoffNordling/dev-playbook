@@ -219,8 +219,9 @@ Candidates to document somewhere:
 
 ## Now
 
-[CLOA Abstractions](/CLOA-ABSTRACTIONS.md) has checked back in: the loop
-ran three targets, the primitive set converged, and the loop stays live
-for re-entry when a new corner of the repo produces a real residual. The
-branch is choosing its next work stream. Candidate: declare and lint the
-reference chain — the primitives' first deterministic backpressure.
+The pre-factory sequence runs in
+[CLOA Abstractions](/CLOA-ABSTRACTIONS.md). The registry pass is done —
+Standard and Guide are the ontology-important types. Next: close out
+skills and agents empirically (all of them, not three samples), then a
+prose lint plan for the deterministic structure. Then the software
+factory.
