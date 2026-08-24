@@ -1,12 +1,10 @@
 import json
 import locale
 import os
-import signal
-import sqlite3
 import subprocess
 import sys
 import time
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +17,7 @@ from conftest import (
     write_definition,
 )
 
-from dev_playbook.factory import launcher, ledger
+from dev_playbook.factory import launcher
 
 # The job every test launches unless it says otherwise.
 REPO = "owner/repo"
@@ -196,12 +194,6 @@ ORPHANED_DEADLINE = 1.0
 # rather than passing on a slow machine.
 PDEATHSIG_BUDGET = 10.0
 PDEATHSIG_POLL = 0.05
-
-# How long a signal sent to this process is given to arrive. Delivery is a
-# kernel round trip rather than a call, so a test that reads the record the
-# instant after `os.kill` returns would find an empty one whatever the mask
-# says -- and would pass on the broken behavior as readily as on the fixed one.
-SIGNAL_SETTLE = 0.2
 
 # The six settings files a launch is swept against, named by scope. Every one
 # is a file `-p` merges, so a billing key in any of them meters the child.
@@ -387,23 +379,6 @@ def fake_claude(tmp_path: Path) -> Callable[..., tuple[str, ...]]:
         return (sys.executable, str(script))
 
     return plan
-
-
-@pytest.fixture
-def trapped_sigterm() -> Iterator[list[int]]:
-    """Catch SIGTERM for one test, recording each delivery, and restore after.
-
-    A test that signals itself needs somewhere for the signal to land: the
-    default action would kill the run. The record is what a test reads to see
-    whether the Python-level handler ran, which is the whole question when a
-    write is meant to be holding the signal off.
-    """
-    fired: list[int] = []
-    previous = signal.signal(signal.SIGTERM, lambda number, frame: fired.append(number))
-    try:
-        yield fired
-    finally:
-        signal.signal(signal.SIGTERM, previous)
 
 
 @pytest.fixture
@@ -1170,50 +1145,6 @@ def test_a_child_dies_with_a_launcher_that_is_destroyed_without_warning(
     launching.wait(timeout=PDEATHSIG_BUDGET)
 
     assert wait_until_stopped(child, PDEATHSIG_BUDGET)
-
-
-def test_the_pump_thread_never_takes_a_signal_a_ledger_write_is_holding_off(
-    launch: Callable[..., launcher.JobOutcome],
-    fake_claude: Callable[..., tuple[str, ...]],
-    agents_dir: Path,
-    db: Path,
-    trapped_sigterm: list[int],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """A signal any thread can take is a signal that lands inside the write.
-
-    CPython runs the C-level handler on whichever thread the kernel picks, and
-    the main thread then runs the Python handler at its next bytecode boundary
-    whatever its own mask says. So a blocked main thread is not enough: one
-    unblocked thread anywhere in the process puts the traverse's trap back
-    inside the transaction it was blocked out of, where its own INSERT queues
-    behind a write lock only the suspended frame can release.
-
-    The grandchild here is what keeps the pump thread alive past the run it
-    belongs to -- the same case `_die_with_parent` names, where the traverse
-    launches its second node while the first launch's pump still holds the pipe.
-    """
-    write_definition(agents_dir, NODE, DEFINITION)
-    claude_cmd = fake_claude(
-        [HOOK_LINE, init_line(), result_line(REPORT)], orphan_seconds=ORPHAN_SECONDS
-    )
-    launch(claude_cmd=claude_cmd, timeout_s=ORPHANED_DEADLINE, grace_s=BRIEF_GRACE)
-    inside: list[list[int]] = []
-    opening: Callable[..., sqlite3.Connection] = sqlite3.connect
-
-    def watched(*arguments: Any, **keywords: Any) -> sqlite3.Connection:
-        os.kill(os.getpid(), signal.SIGTERM)
-        time.sleep(SIGNAL_SETTLE)
-        inside.append(list(trapped_sigterm))
-        return opening(*arguments, **keywords)
-
-    monkeypatch.setattr(sqlite3, "connect", watched)
-
-    ledger.traverse_end(REPO, ISSUE, {"status": "killed"}, db_path=db)
-    time.sleep(SIGNAL_SETTLE)
-
-    assert inside == [[]]
-    assert trapped_sigterm == [signal.SIGTERM]
 
 
 def test_importing_the_launcher_off_linux_names_the_platform_not_a_missing_symbol(

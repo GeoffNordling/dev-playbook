@@ -29,6 +29,11 @@ paths = ["judgments/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The suite is mostly waiting -- on fixture `git` subprocesses and the factory
+# tests' real sleeps -- so it shards well across cores. It sits here rather than
+# in the Makefile because repo-lint holds `test:` verbatim; `uv run pytest -n0`
+# turns it off for a pdb run.
+addopts = ["-n", "auto"]
 # src/ exposes the dev_playbook package; tests/ carries a bare-imported
 # transcript_fakes helper two suites pull in.
 pythonpath = ["src", "tests"]
@@ -37,6 +42,7 @@ pythonpath = ["src", "tests"]
 dev = [
     "mypy>=2.0",
     "pytest>=9.0",
+    "pytest-xdist>=3.8",
     "ruff>=0.15.20",
 ]
 
