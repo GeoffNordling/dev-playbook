@@ -67,7 +67,7 @@ Thus, functionality may be expressed as code, constrained by the primitives
 that were defined by the language in advance.
 
 When we seek to express existing documentation as code, we have a problem: documentation
-expresses free-form, infinite possibilities. No constrained programming language
+has free-form, infinite possibilities. No constrained programming language
 exists apriori: indeed the language we have is the English Language!
 
 We solve this with a backwards operation combining AI proposals with user intuition.
