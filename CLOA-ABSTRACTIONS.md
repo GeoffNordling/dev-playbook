@@ -119,6 +119,15 @@ in the abstract.
 - **User eyes.** The artifacts the loop produces must be easy for the
   user to read — everything before this point optimized for agent
   readers. An application of constrain to optimize understanding.
+- **Zero verbatim third-party dependencies.** Deterministic linting and
+  declared in-file structure (return declarations, write typing) must
+  reach every unit, vendored ones included — so no unit can stay
+  verbatim upstream text. Adopting a third-party unit means owning its
+  file and restructuring it to the workspace's form. Accepted cost,
+  ruled deliberately. Open note: the overrides edge is justified today
+  as "substitute a clause in a unit that cannot be edited"; once every
+  vendored file is owned and editable, that justification needs
+  restating or the edge needs re-grounding.
 - **Types respected.** The loop keeps the stochastic/deterministic
   distinction and the document-type distinctions explicit.
 - **General and hierarchical across repos.** The abstractions and the loop run on any
@@ -126,6 +135,13 @@ in the abstract.
   (upstream ∪ local) for concept docs, harness files for executors.
   Nothing here may depend on this repo's internals. Primitives will also
   cascade hierarchically across designated repositories the same way the Standards object does today.
+- **The procedure generalizes; the nouns cascade.** The procedure —
+  registry pass, EM loop, change discipline — runs on any repo. The
+  nouns generated here are not repo-local output: dev-playbook is the
+  root of the hierarchy, and every repo runs skills, so its primitives —
+  Reference chain included — cascade to consumer repos the way
+  Standards do today. A consumer repo's loop adds special-case nouns on
+  top of the inherited set; it never re-derives the root.
 
 ## Abstractions so far
 
@@ -275,6 +291,14 @@ but deliberately outside the ontology until a ruling is reversed.
 - **Vendored platform manifests** — the `agents/openai.yaml` display
   card every vendored bundle ships for another agent platform; bundle
   furniture, referenced by nothing, never an edge.
+- **Presentation gestures** — opening an already-written artifact for
+  the user (improve-codebase-architecture's `xdg-open` on its report);
+  part of returning the value, never an edge; ruled not accounted.
+- **Phase gates** — a step-scoped prohibition inside a unit's own
+  program, lifted by a later step (improve-codebase-architecture's "Do
+  NOT propose interfaces yet"); internal sequencing below the CLOA,
+  already covered by the steps-are-the-program rule; ruled not
+  accounted.
 
 ## Targets
 

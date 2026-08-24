@@ -281,3 +281,70 @@ One sentence carries the target: diagnosing-bugs is all guards — its
 lasting writes are one regression test and one commit carrying the
 confirmed hypothesis; everything else it writes, it reverts. Its
 secret-redaction rule is a ledgered behavior-mode setting, not an edge.
+
+### writing-for-agents
+
+    [writing-for-agents] Skill
+      (no edges)
+
+One sentence carries the target: writing-for-agents is pure craft
+guidance — its whole behavior is being active in the calling context;
+its only read is its own bundled reference, collapsed by the zoom rule,
+and other units do it (skill-creator) and override it where a Standard
+collides.
+
+### codebase-design
+
+    {codebase-design} Skill
+      ├ ╌ reads ╌ ╌ ► CONTEXT.md                          composing the sub-agent
+      │                                                    briefs
+      ├ ╌ does ╌ ╌ ► design agents ×3–4                   design-it-twice — parallel,
+      │               (unnamed, fresh context)             one design constraint each
+      ├ ╌ returns ╌ ╌ ► problem_space_explanation: str    before the fan-out
+      └ ╌ returns ╌ ╌ ► comparison_and_recommendation: str    after the compare
+
+One sentence carries the target: codebase-design is mostly vocabulary —
+its one active move is the design-it-twice fan-out, three to four fresh
+agents each pinned to a different design constraint, compared and
+returned; the exact-term discipline it installs is a ledgered
+behavior-mode setting.
+
+### prototype
+
+    {prototype} Skill
+      ├─writes──► local file(demo)                logic HTML, or UI variants
+      │                                            with a ?variant= switcher
+      ├ ╌ writes ╌ ╌ ► scratch                    persistence is in question —
+      │                                            named "PROTOTYPE — wipe me"
+      ├ ╌ writes ╌ ╌ ► local file(real module)    the validated decision folds
+      │                                            in; losing variants deleted
+      ├─writes──► git(branch, commit)             the prototype lives out of main
+      ├─writes──► GitHub(issue)                   context pointer to the branch,
+      │                                            plus the settled verdict —
+      │                                            there or in a commit
+      └─returns─► demo: str    the file path or the variant URL
+
+One sentence carries the target: prototype builds a throwaway demo,
+hands the user its path or URL, and once the question is answered folds
+the decision into real code — the demo itself always exits main on a
+throwaway branch, pointered from the issue.
+
+### improve-codebase-architecture
+
+    [improve-codebase-architecture] Skill
+      ├─reads───► CONTEXT.md                  the domain glossary
+      ├─reads───► docs/adr/*                  decisions not to re-litigate
+      ├─does────► {codebase-design} Skill     in-context — the vocabulary lens,
+      │                                        loaded first
+      ├─does────► exploration agent           walks the codebase for shallow
+      │            (unnamed, fresh context)    modules and friction
+      ├─writes──► scratch                     the HTML architecture report
+      ├─returns─► report_path: str            told to the user and opened
+      ├ ╌ does ╌ ╌ ► {grilling} Skill             the user picks a candidate
+      └ ╌ does ╌ ╌ ► {domain-modeling} Skill      a new term needs the glossary,
+                                                   or a rejection deserves an ADR
+
+One sentence carries the target: improve-codebase-architecture is a
+hub — the vocabulary lens loads first, a fresh explorer walks the code,
+findings land as a scratch HTML report whose path is the return, and
+every downstream edge waits on the user picking something up.
