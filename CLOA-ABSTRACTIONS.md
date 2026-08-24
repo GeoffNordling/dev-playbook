@@ -100,9 +100,10 @@ The bootstrap run is freeform — a discussion, with several branching
 possibilities live in the same context window. Rigidity applies later, to
 adopted abstractions: see the change-cost note under the code heuristic.
 
-Candidate generation may run outside this context window — an agent reads
-the target and returns candidates for filtering here — or inline; which
-fits is not yet known.
+Candidate generation settled during the close-out: parallel reader
+agents extract each unit's chain against a shared brief, outside this
+context window; rulings happen inline, between batches, and the brief
+is re-synced to the ontology before each launch.
 
 Before looping on a target, interview the user on what they want to
 understand about it. The CLOA is relative to the repository's purpose and
@@ -215,8 +216,8 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   type-hint form, `arg_name: arg_type` — log-friction declares
   `friction: str`. Never lands in state, dies with the call.
 - **returns** — hand a value back to the caller, user and agent alike:
-  ralph-setup returns a launch command to the user, build returns its
-  report envelope to the orchestrator. Unlike a write, a return never
+  ralph-setup returns a launch command to the user, bump-pins returns
+  its status enum to update-standards-pin. Unlike a write, a return never
   lands in state — it dies with the call. Returns mirror args: named
   and typed as `return_name: return_type` — commit returns
   `outcome: str` — and an enumerable status is preferred, its values
@@ -317,9 +318,10 @@ for concept docs and the
 files — so "every unit accounted for" is a checkable claim, and each
 registered type gets a disposition into the ontology. The boundary
 between the two is encoded as `classify()` in `src/dev_playbook/md.py`.
-This repo's census, per `classify()`: 107 concept docs, 48 harness `.md`
-files, 16 indexes, 47 excluded (the vendored `dotfiles/.agents` tree and
-scratch).
+This repo's census, taken at the registry pass, per `classify()`:
+107 concept docs, 48 harness `.md` files, 16 indexes, 47 excluded (the
+vendored `dotfiles/.agents` tree and scratch). Orient and pymc-modeling
+were deleted after the count.
 
 The registry pass ruled on every registered type:
 
@@ -338,15 +340,19 @@ The registry pass ruled on every registered type:
 | Reference | 1 | No | Vendored mirror |
 | Survey / Log / Spec-Item | 0 | No | No population here |
 
-Chosen, in order: `document-deslop` (minimal, known cold — the
-calibration run), `grill-with-docs` (mid-size — five skills and a
-standard), `design` (the hub — eight skills and four docs, the chain least
-likely to fit in the user's head).
+The bootstrap targets, run in order and all recorded in the ledger:
+`document-deslop` (minimal, known cold — the calibration run),
+`grill-with-docs` (mid-size — five skills and a standard), `design`
+(the hub — the chain least likely to fit in the user's head).
 
-The software factory is the graduation exercise, not a target yet: the
-abandoned attempt to understand it whole failed because the factory is
-only a collection of abstractions, and none of them had been constructed
-yet.
+The software factory is next — the graduation exercise. It brings the
+Guide type (9 docs, all `software-factory/`) and the 13 parked units,
+and may leave large residuals: a Guide describes how a fleet of units
+operates together — protocol, not one unit's behavior — which no
+current noun carries. Per the remembered rule, Guide earns a noun only
+if it demonstrates a verb interface, the way Standard did; otherwise
+its content lands in chains, written-artifact semantics, and the
+ledger.
 
 ### The chains ledger
 
@@ -354,3 +360,10 @@ Every finalized chain is recorded in [CLOA Chains](/CLOA-CHAINS.md) as it
 is ruled — the three bootstrap runs and each close-out unit — so the
 close-out ends in a written ledger, not in compacted memory. This file
 keeps the ontology and the rulings; that file keeps the chains.
+
+The empirical close-out ended by ruling with 23 chains recorded: batches had
+stopped producing ontology changes, and the thirteen units still
+unread were ruled expressible with the existing primitives. The
+recorded chains are proof of concept, not final artifacts — the final
+traces will be generated deterministically by scripts operating on
+structure embedded in the unit files, designed with the lint plan.

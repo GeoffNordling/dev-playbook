@@ -12,12 +12,26 @@ in a written ledger rather than compacted memory. An entry is the chain
 plus its one-sentence carrier; the rulings that shaped it live in the
 abstractions file.
 
+These chains are not the final versions. They exist as proof of
+concept — each one written to test that the primitive set could
+express that unit's operations, and the set held. The final traces
+will be generated deterministically, by scripts operating on structure
+embedded in the unit files themselves; the format of that structure is
+designed with the lint plan. The close-out ended by ruling with 23
+chains recorded: batches had stopped producing ontology changes, and
+the thirteen units still unread were ruled expressible with the
+existing primitives.
+
 Excluded units record no chain: `datasheet` (Instruments exclusion) and
 `judgments-sweep` (Judgments exclusion). Deleted units record no chain:
 `orient` and `pymc-modeling`, removed from the workspace during the
 close-out.
 
 ## Bootstrap runs
+
+Bootstrap entries keep the notation of their era — written before
+write typing and args/returns existed. Guard dashes were retrofitted;
+the rest was not. The close-out entries onward use the final notation.
 
 ### Run 1: document-deslop — zero residual
 

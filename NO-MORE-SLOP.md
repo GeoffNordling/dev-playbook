@@ -111,15 +111,19 @@ scripts, or the judges.
 
 **Completed**
 
-- **CLOA primitives.** Three loop runs in
-  [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) constructed a converged
-  primitive set — Standard, Agent, Skill, Reference chain — that
-  describes what documentation does at the CLOA: the user understands the
-  whole surface and keeps enough control to guide the system, the
-  implementation below the CLOA is delegated to the agent, and deep
-  dives stay auditable by opening actual files. That files are still too
-  hard to read is a separate open work stream (the Levels section's
-  first level).
+- **CLOA primitives.** Three bootstrap runs plus an empirical
+  close-out in [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) constructed
+  a converged primitive set — Standard, Agent, Skill, Workflow,
+  Script, Reference chain — that describes what documentation does at
+  the CLOA: the user understands the whole surface and keeps enough
+  control to guide the system, the implementation below the CLOA is
+  delegated to the agent, and deep dives stay auditable by opening
+  actual files. The close-out proved the set on 23 units — chains
+  recorded in [CLOA Chains](/CLOA-CHAINS.md) as proof of concept, the
+  final traces to be generated deterministically once the in-file
+  structure exists — and ended by ruling when batches stopped
+  producing ontology changes. That files are still too hard to read is
+  a separate open work stream (the Levels section's first level).
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill, which the user invokes manually.
@@ -137,9 +141,11 @@ scripts, or the judges.
   for and design toward that.
 - **Reference chains.** Constructed in
   [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) as the Reference chain
-  primitive — edges does, reads, overrides, writes. Still raw: the
-  in-file declaration format and the lint that fails when the declared
-  chain and reality disagree.
+  primitive — edges does, reads, overrides, writes, args, returns —
+  and proven on 23 units in [CLOA Chains](/CLOA-CHAINS.md). Still raw:
+  the in-file declaration format, the deterministic generation of
+  traces from it, and the lint that fails when the declared chain and
+  reality disagree.
 - **Deslop regression gate.** Something must keep a rewritten document from
   sliding back into slop. Deterministic rules cannot judge prose quality;
   the judgments machinery may fit here.
