@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Machines
 description: The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 ---

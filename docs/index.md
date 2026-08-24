@@ -1,7 +1,7 @@
 # docs/ — index
 
-What the repo has decided and what it has observed — surveys of outside
-tooling, notes on the workspace's own machinery, and the Decision Records.
+The repo's working papers — a mixture of notes, unenforced policies,
+intentions, and explorations — and the Decision Records.
 
 - [External Skill Verdicts](/docs/external-skill-verdicts.md) — The standing verdict on every skill in each external upstream skill package, one row per skill, with the record that ruled it
 - [Headless Operation](/docs/headless.md) — Running Claude Code headless on subscription

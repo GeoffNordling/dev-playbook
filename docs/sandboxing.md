@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Sandboxing Claude agents
 description: The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached is still ahead
 ---
