@@ -81,6 +81,11 @@ in the abstract.
   readers. An application of constrain to optimize understanding.
 - **Types respected.** The loop keeps the stochastic/deterministic
   distinction and the document-type distinctions explicit.
+- **General and hierarchical across repos.** The abstractions and the loop run on any
+  workspace repo, anchored on that repo's registries — document types
+  (upstream ∪ local) for concept docs, harness files for executors.
+  Nothing here may depend on this repo's internals. Primitives will also
+  cascade hierarchically across designated repositories the same way the Standards object does today.
 
 ## Heuristic: pivot to code
 
@@ -179,6 +184,18 @@ Remembered, not primitives:
   verb interface, the way Standard did.
 
 ## Targets
+
+The population a repo's loop must account for is enumerated by its two
+registries — the
+[document-type registry](/standards/knowledge-organization/document-types.md)
+for concept docs and the
+[Claude Code file registry](/standards/claude-code/files.md) for harness
+files — so "every unit accounted for" is a checkable claim, and each
+registered type gets a disposition into the ontology. The boundary
+between the two is encoded as `classify()` in `src/dev_playbook/md.py`.
+This repo's census, per `classify()`: 107 concept docs, 48 harness `.md`
+files, 16 indexes, 47 excluded (the vendored `dotfiles/.agents` tree and
+scratch).
 
 Chosen, in order: `document-deslop` (minimal, known cold — the
 calibration run), `grill-with-docs` (mid-size — five skills and a
