@@ -50,6 +50,10 @@ An expectation-maximization shape over a chosen target artifact:
   behavior without reading its bodies, and the abstraction count is
   minimal. Good abstractions are a codebook the corpus gets short in.
 
+Residuals are tracked, not zeroed. The loop's job is awareness of what
+the abstractions fail to carry; the primitive set is refactored only when
+the reduction is worth the change cost.
+
 The bootstrap run is freeform — a discussion, with several branching
 possibilities live in the same context window. Rigidity applies later, to
 adopted abstractions: see the change-cost note under the code heuristic.
@@ -78,11 +82,14 @@ in the abstract.
 
 ## Heuristic: pivot to code
 
-Documentation is a fuzzy, stochastic version of code. When the
-documentation form of a problem is stuck, translate it to the code form,
-solve it there, and port the analogy back.
+Documentation is a fuzzy, stochastic version of code — treat it as a
+special case of code, and unify the two theories wherever the parallel is
+real, never by force. When the documentation form of a problem is stuck,
+translate it to the code form, solve it there, and port the analogy back.
+Ports so far: change cost (below), the definition-site rule, and the
+import-linter parallel (both under the reference chain).
 
-One port is made: change cost. An adopted abstraction changes the
+**Change cost.** An adopted abstraction changes the
 way a codebase does — renaming or replacing one is a refactor, a
 significant investment, never a whim two weeks later. The CLOA change
 discipline from the branch plan guards everyday operations against that
@@ -95,22 +102,54 @@ jitter; the bootstrap run, before anything is adopted, stays freeform.
 | Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
 | Agent           | do                            | Documentation that runs on its own permission set |
 | Skill           | do                            | Documentation that runs on the session's permissions |
-| Reference chain | —                              | A doc unit's references, declared, edge-labeled   |
+| Reference chain | edges: does, reads, overrides  | The declared tree of everything a unit does, reads, and overrides |
 
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
   non-user-readable documents and scripts.
 - **Agent and Skill** get one verb, **do**, and no more, ever. Specificity
-  comes from the verb being done, which a Standard defines — the deslopper
-  does not "enforce," it does slop-tics.enforce. The two differ only in
-  permission binding: an agent brings its own set, a skill runs on the
-  session's. The steps inside a skill are that skill's program, file-level
-  detail below the CLOA, never an interface.
-- **Reference chain** carries its verbs on its edges: **does** (a
-  Standard's verb, possibly via an agent) and **reads** (consulted, not
-  done). The declaration is lintable against the actual links. Absorbs
-  skills as signatures, OKF traces, and the OKF graph — one object seen
-  from three angles.
+  comes from the behavior being done, which documentation defines — a
+  Standard's verb where one exists (the deslopper does slop-tics.enforce),
+  the whole unit where the doc is the definition (grill-with-docs does
+  grilling). The two differ only in permission binding: an agent brings
+  its own set, a skill runs on the session's. The steps inside a skill are
+  that skill's program, file-level detail below the CLOA, never an
+  interface.
+
+### Reference chain
+
+A **unit** is one documentation file, or an abstract object that functions
+like one, the way a skill functions like its SKILL.md. Every chain node is
+a unit; the nouns in the table are its types.
+
+Notation: `[x]` self-owned, `{x}` vendored. The edges:
+
+- **does** — run a behavior some documentation defines: a Standard's verb
+  where one exists, the whole unit where the doc is the definition.
+- **reads** — consulted, not run.
+- **overrides … with …** — substitute a clause in a unit that cannot be
+  edited.
+- **writes** — candidate, used in run 2, not yet ruled on.
+
+Its rules:
+
+- **Nodes are typed** by kind (Standard, Agent, Skill) and by ownership —
+  self-owned or vendored. Ownership is a color, not an edge.
+- **Edges live at the definition site.** An edge belongs to the document
+  whose text contains the instruction — greppable, so the assignment is
+  lintable. A root's effects are the union of edges reachable along its
+  does-path — the same rule as code, where a write belongs to the frame
+  whose source contains the statement.
+- **Tree, then graph.** Each unit declares its own tree; the union across
+  roots is the repo graph, where in-degree, hubs, and orphans appear. The
+  code parallel is import-linter: a declared dependency contract that
+  fails when reality disagrees. A lint-design candidate to evaluate when
+  the checker is built: the ontology-guardrails idea
+  (`~/workspace/mission-control/ideas/ontology-guardrails.md`) — declared
+  rules enforced by a solver.
+
+The chain absorbs skills as signatures, OKF traces, and the OKF graph —
+one object seen from three angles.
 
 ## Targets
 
@@ -128,11 +167,11 @@ yet.
 
 The chain, declared:
 
-    document-deslop (Skill)  — does: slop-tics.enforce, via ↓
-    └─ deslopper (Agent: Read, Write)
-       ├─ does:  slop-tics.enforce
-       ├─ reads: conventions.md
-       └─ reads (conditional): writing-for-agents
+    [document-deslop] Skill
+      └─does──► [deslopper] Agent (Read, Write)
+                  ├─does──►  [slop-tics] Standard — .enforce
+                  ├─reads──► [conventions] Standard
+                  └─reads──► [writing-for-agents] Skill  (only agent-facing targets)
 
 One sentence carries the target: document-deslop is the enforce arm of the
 Slop Tics Standard — a Skill that resolves a hint to files and dispatches
@@ -141,6 +180,27 @@ one-pass write rule, the DONE protocol, the rewrite rules — is internals
 below the CLOA, the pandas method body, and is not residual.
 
 What the run bought: the **do**-only verb rule for Agent and Skill, and the
-two edge labels. The enforce/consult distinction that first appeared as
-residual dissolved into them — enforce is *does* the Standard's verb,
+first two edge labels. The enforce/consult distinction that first appeared
+as residual dissolved into them — enforce is *does* the Standard's verb,
 consult is merely *reads*.
+
+### Run 2: grill-with-docs — the wrapped interview
+
+The chain, declared:
+
+    [grill-with-docs] Skill
+      ├─does──► {grilling} Skill                the interview
+      ├─does──► {domain-modeling} Skill         active throughout
+      │           ├─reads──►  {CONTEXT-FORMAT} {ADR-FORMAT}
+      │           └─writes──► CONTEXT.md, docs/decisions/*
+      └─overrides {domain-modeling}'s ADR clause
+          with──► [records] Standard
+
+One sentence carries the target: grill-with-docs does grilling with
+domain-modeling active throughout, overriding its decision-record clause
+with the workspace's Decision Record Standard.
+
+What the run bought: the generalized **does** edge, the **overrides**
+edge, the ownership node type — the wrapper exists only because its
+dependencies are vendored — and the definition-site rule for edge
+assignment. Open: the **writes** edge.
