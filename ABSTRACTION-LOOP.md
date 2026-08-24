@@ -100,9 +100,9 @@ jitter; the bootstrap run, before anything is adopted, stays freeform.
 | Noun            | Verbs                         | Is                                                |
 | --------------- | ------------------------------ | ------------------------------------------------- |
 | Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
-| Agent           | do                            | Documentation that runs on its own permission set |
-| Skill           | do                            | Documentation that runs on the session's permissions |
-| Reference chain | edges: does, reads, overrides  | The declared tree of everything a unit does, reads, and overrides |
+| Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
+| Skill           | do                            | Documentation that runs in the calling context, on its permissions |
+| Reference chain | edges: does, reads, overrides, writes | The declared tree of everything a unit does, reads, overrides, and writes |
 
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
@@ -111,10 +111,16 @@ jitter; the bootstrap run, before anything is adopted, stays freeform.
   comes from the behavior being done, which documentation defines — a
   Standard's verb where one exists (the deslopper does slop-tics.enforce),
   the whole unit where the doc is the definition (grill-with-docs does
-  grilling). The two differ only in permission binding: an agent brings
-  its own set, a skill runs on the session's. The steps inside a skill are
-  that skill's program, file-level detail below the CLOA, never an
-  interface.
+  grilling). The two differ in context binding: an agent runs in a fresh
+  context window, a skill in the calling one — an in-process call versus a
+  subprocess. A fresh context starts from configuration (the preset
+  preload, whose contents are not modeled, the way a call graph does not
+  model env vars); a skill starts from here. Permissions ride on the node:
+  an agent carries its own set, a skill the calling context's, minus any
+  clamp its frontmatter declares. Declared permissions are assumed to take
+  effect; harness enforcement fidelity is out of scope. The steps inside a
+  skill are that skill's program, file-level detail below the CLOA, never
+  an interface.
 
 ### Reference chain
 
@@ -129,12 +135,22 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
 - **reads** — consulted, not run.
 - **overrides … with …** — substitute a clause in a unit that cannot be
   edited.
-- **writes** — candidate, used in run 2, not yet ruled on.
+- **writes** — produce or mutate state outside the chain. Write targets
+  are typed as state — a GitHub issue, a local markdown file, a git
+  branch — and may re-enter the graph as read sources: design writes the
+  brief that build later reads.
+
+Any edge may carry a **guard** — the condition under which it fires — as
+a prose annotation on the edge ("only agent-facing targets", "only when
+reading can't settle it"). A call inside an `if` is still a call edge;
+the condition never changes the edge's type.
 
 Its rules:
 
 - **Nodes are typed** by kind (Standard, Agent, Skill) and by ownership —
-  self-owned or vendored. Ownership is a color, not an edge.
+  self-owned or vendored. Ownership is a color, not an edge. A node may
+  also carry its permission expression — an agent's set, a skill's
+  clamp — as node data.
 - **Edges live at the definition site.** An edge belongs to the document
   whose text contains the instruction — greppable, so the assignment is
   lintable. A root's effects are the union of edges reachable along its
@@ -150,6 +166,15 @@ Its rules:
 
 The chain absorbs skills as signatures, OKF traces, and the OKF graph —
 one object seen from three angles.
+
+Remembered, not primitives:
+
+- **Zoom.** A unit collapses its internal files (containment is derivable
+  from paths — `design/references/` sits under `design/`); zoomed in, they
+  appear as nodes inside the unit boundary with ordinary edges.
+- **Doc type.** A read target's frontmatter type (Guide, General-Sheet)
+  is noted informally; a type earns a noun only when it demonstrates a
+  verb interface, the way Standard did.
 
 ## Targets
 
@@ -203,4 +228,44 @@ with the workspace's Decision Record Standard.
 What the run bought: the generalized **does** edge, the **overrides**
 edge, the ownership node type — the wrapper exists only because its
 dependencies are vendored — and the definition-site rule for edge
-assignment. Open: the **writes** edge.
+assignment. Open: the **writes** edge (adopted in run 3).
+
+### Run 3: design — the hub
+
+The chain, declared (grill-with-docs's subtree is run 2's, reused by
+reference):
+
+    [design] Skill
+      ├─reads──► [software-factory] [user-checkpoints]        Guides
+      ├─reads──► [issue-authoring] [tracker-operations]       Standards
+      ├─does──► {codebase-design} Skill              the lens, invoked first
+      ├─does──► [grill-with-docs] Skill              subtree per run 2
+      ├─does──► {prototype} Skill                    only when reading can't settle it
+      ├─does──► [user-intent-mini-interview] Skill   every single-leaf write
+      ├─does──► [issue-review-claims] Skill (no Write)      fresh-context subagent
+      ├─does──► [issue-review-simulation] Skill (no Write)  fresh-context subagent
+      └─writes─► issue brief, phase labels, probe-record comment, prototype/<issue> branch
+
+One sentence carries the target: design turns an issue's rough brief into
+a factory-ready one — or an epic with children — by grilling the approach
+through the codebase-design lens, prototyping only what reading can't
+settle, and writing the brief back audited by the two issue-review
+lenses.
+
+The chain absorbed two things cleanly. `references/design-it-twice.md`
+and `references/decompose.md` are inside the unit — the skill is its
+directory, so they are private functions, not chain nodes. And the old
+mention-grep survey said design references eight skills; the declared
+chain has six does edges — `intake` appears only in when-to-use prose,
+and "research" is a word, not the skill. The gap between grep and
+declaration is exactly what the import-linter parallel exists to close.
+
+What the run bought: **writes** adopted, with targets typed as state; the
+**guard** annotation blessed; permission expressions as node data; and
+the context-binding correction to Agent and Skill — fresh context versus
+calling context, not permission set alone.
+
+Residuals tracked, unmodeled: the user as **soft guardian** — design
+waits for "approved" before anything lands on GitHub, a wait, not a
+permission boundary; and doc types held informal (see "Remembered, not
+primitives").
