@@ -126,12 +126,6 @@ def lines_outside_fences(text: str) -> Iterator[tuple[int, str]]:
     opened_at = 0
     for line_num, line in enumerate(text.splitlines(keepends=True), start=1):
         fence = FENCE_PATTERN.match(line)
-        if fence and fence.group(1)[0] == "`" and "`" in fence.group(2):
-            # CommonMark forbids a backtick in a backtick fence's info string,
-            # precisely so a one-line code span cannot be read as a fence. A
-            # line that is nothing but ```a.b``` is inline code, and treating
-            # it as an opener strands every later line inside a phantom block.
-            fence = None
         if marker is None:
             if fence:
                 marker = fence.group(1)

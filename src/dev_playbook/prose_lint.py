@@ -214,15 +214,7 @@ def audit(root: Path) -> list[Finding]:
             if is_verbatim_doc(frontmatter):
                 continue
             offset = text.count("\n", 0, len(text) - len(body))
-            try:
-                findings.extend(scan_text(rel, body, offset))
-            except md.UnclosedFence as unclosed:
-                # Re-raised naming the file, as content_lines does for the
-                # path-taking scanners: a bare line number has no home in a
-                # checkout-wide run.
-                raise md.UnclosedFence(
-                    unclosed.marker, unclosed.line + offset, rel
-                ) from None
+            findings.extend(scan_text(rel, body, offset))
         findings.extend(scan_banned(rel, text))
     return findings
 
