@@ -66,7 +66,7 @@ In code, the programming language comes first and the functionality second.
 Thus, functionality may be expressed as code, constrained by the primitives
 that were defined by the language in advance.
 
-When we seek to express documentation as code, we have a problem: documentation
+When we seek to express existing documentation as code, we have a problem: documentation
 expresses free-form, infinite possibilities. No constrained programming language
 exists apriori: indeed the language we have is the English Language!
 
