@@ -26,6 +26,28 @@ is a collection of documentation plus a permission set. So a documentation
 unit has an operational meaning — what reads it, when it fires, what
 changes as a result — and an abstraction names that meaning at the CLOA.
 
+## Documentation as code
+
+The vision: think of documentation the way code is thought of — modules,
+typing, signatures, rules. Everything here is just wrapping deterministic
+structure around written documentation. Keep the structure simple,
+enforceable, and deterministic, and account for what it cannot carry in
+the residuals ruled important.
+
+The working heuristic: documentation is a fuzzy, stochastic version of
+code — treat it as a special case of code, and unify the two theories
+wherever the parallel is real, never by force. When the documentation
+form of a problem is stuck, translate it to the code form, solve it
+there, and port the analogy back.
+Ports so far: change cost (below), the definition-site rule, and the
+import-linter parallel (both under the reference chain).
+
+**Change cost.** An adopted abstraction changes the
+way a codebase does — renaming or replacing one is a refactor, a
+significant investment, never a whim two weeks later. The CLOA change
+discipline from the branch plan guards everyday operations against that
+jitter; the bootstrap run, before anything is adopted, stays freeform.
+
 ## Abstraction shape
 
 One noun carrying a small fixed verb set — an interface. Nouns describe;
@@ -39,6 +61,18 @@ opening one standard lands in a sprawl of markdown files and scripts. The
 loop owes an answer at both levels.
 
 ## The loop
+
+In code, the programming language comes first and the functionality secoond.
+Thus, functionality may be expressed as code, constrained by the primitives
+that were defined by the language in advance.
+
+When we seek to express documentation as code, we have a problem: documentation
+expresses free-form, infinite possibilities. No constrained programming language
+exists apriori: indeed the language we have is the English Language!
+
+We solve this with a backwards operation combining AI proposals with user intuition.
+This generates programmable primitives from the documentation in a way that aligns
+with both user intuition and AI evaluation. The user vibes, the AI validates.
 
 An expectation-maximization shape over a chosen target artifact:
 
@@ -92,21 +126,6 @@ in the abstract.
   (upstream ∪ local) for concept docs, harness files for executors.
   Nothing here may depend on this repo's internals. Primitives will also
   cascade hierarchically across designated repositories the same way the Standards object does today.
-
-## Heuristic: pivot to code
-
-Documentation is a fuzzy, stochastic version of code — treat it as a
-special case of code, and unify the two theories wherever the parallel is
-real, never by force. When the documentation form of a problem is stuck,
-translate it to the code form, solve it there, and port the analogy back.
-Ports so far: change cost (below), the definition-site rule, and the
-import-linter parallel (both under the reference chain).
-
-**Change cost.** An adopted abstraction changes the
-way a codebase does — renaming or replacing one is a refactor, a
-significant investment, never a whim two weeks later. The CLOA change
-discipline from the branch plan guards everyday operations against that
-jitter; the bootstrap run, before anything is adopted, stays freeform.
 
 ## Abstractions so far
 
