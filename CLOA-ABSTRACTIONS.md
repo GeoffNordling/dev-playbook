@@ -134,6 +134,7 @@ in the abstract.
 | Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
 | Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
 | Skill           | do                            | Documentation that runs in the calling context, on its permissions |
+| Workflow        | do                            | Deterministic orchestration code in its own runtime — not an LLM |
 | Reference chain | edges: does, reads, overrides, writes, returns | The declared tree of everything a unit does, reads, overrides, writes, and returns |
 
 - **Standard** is established and live. Its open problem: the top level is
@@ -168,13 +169,17 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
 - **overrides … with …** — substitute a clause in a unit that cannot be
   edited.
 - **writes** — produce or mutate state outside the chain. Write targets
-  are typed as state — a GitHub issue, a local markdown file, a git
-  branch — and may re-enter the graph as read sources: design writes the
-  brief that build later reads.
+  are typed as state in coarse buckets — git state, GitHub state, local
+  file, local cache — and may re-enter
+  the graph as read sources: design writes the brief that build later
+  reads. Writes to a scratch location collapse to one abstract scratch
+  target, no filenames.
 - **returns** — hand a value back to the caller, user and agent alike:
   ralph-setup returns a launch command to the user, build returns its
   report envelope to the orchestrator. Unlike a write, a return never
-  lands in state — it dies with the call.
+  lands in state — it dies with the call. Returns are typed too; prefer
+  an enumerable status — commit returns its outcome as one of a small
+  set of values.
 
 Any edge may carry a **guard** — the condition under which it fires — as
 a prose annotation on the edge ("only agent-facing targets", "only when
@@ -183,10 +188,10 @@ the condition never changes the edge's type.
 
 Its rules:
 
-- **Nodes are typed** by kind (Standard, Agent, Skill) and by ownership —
-  self-owned or vendored. Ownership is a color, not an edge. A node may
-  also carry its permission expression — an agent's set, a skill's
-  clamp — as node data.
+- **Nodes are typed** by kind (Standard, Agent, Skill, Workflow) and by
+  ownership — self-owned or vendored. Ownership is a color, not an edge.
+  A node may also carry its permission expression — an agent's set, a
+  skill's clamp — and its model pin (`model`, `effort`) as node data.
 - **Edges live at the definition site.** An edge belongs to the document
   whose text contains the instruction — greppable, so the assignment is
   lintable. A root's effects are the union of edges reachable along its
@@ -224,6 +229,10 @@ but deliberately outside the ontology until a ruling is reversed.
 - **Attestation checkpoints** — "report `READ: x`, proceed only after."
   A prompt device that raises the probability the read happens; ruled
   not accounted.
+- **Agent-held ephemeral state** — counts and set-aside lists a unit
+  tracks only in its own working memory, persisted nowhere
+  (judgments-sweep's fix-attempt cap and skip list); ruled not
+  accounted.
 
 ## Targets
 
@@ -239,13 +248,22 @@ This repo's census, per `classify()`: 107 concept docs, 48 harness `.md`
 files, 16 indexes, 47 excluded (the vendored `dotfiles/.agents` tree and
 scratch).
 
-The registry pass ruled on every registered type. Two matter to the
-ontology: **Standard** — with Standard-Card as its catalog surface, the
-same object — and **Guide**, the software factory's documentation, unmet
-by the loop so far. **Vocabulary** is important but separate: the
-vocabulary API, not a primitive. Everything else is declared unimportant
-and ignored — Decision-Records included, which take no actions and exist
-as greppable history.
+The registry pass ruled on every registered type:
+
+| Type | Pop. | Important? | Ruling |
+|---|---|---|---|
+| Standard | 37 | **Yes** | The Standard noun — define, audit, enforce, adopt |
+| Standard-Card | 15 | **Yes** | Same object as Standard — its catalog surface |
+| Guide | 9 | **Yes** | All `software-factory/` — deferred to the factory phase |
+| Vocabulary | 1 | Separate | The vocabulary API, not a primitive |
+| Decision-Record | 25 | No | Takes no actions; greppable history |
+| README | 7 | No | Navigation |
+| General-Sheet | 7 | No | Parking lot for unsettled types |
+| Recipe-Description | 3 | No | Describes backing code |
+| Instrument-Spec | 2 | No — actively excluded | Instruments face possible deletion |
+| Candidate-List | 1 | No | Tracker state |
+| Reference | 1 | No | Vendored mirror |
+| Survey / Log / Spec-Item | 0 | No | No population here |
 
 Chosen, in order: `document-deslop` (minimal, known cold — the
 calibration run), `grill-with-docs` (mid-size — five skills and a
