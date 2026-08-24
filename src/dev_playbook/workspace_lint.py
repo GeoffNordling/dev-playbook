@@ -150,7 +150,6 @@ GOVERNED = (
     "spec-tools",
     "mission-control",
     "fedora-playbook",
-    "voice-transcription",
     "sounds",
 )
 
