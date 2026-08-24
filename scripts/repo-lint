@@ -32,7 +32,6 @@ Usage:
 # ///
 
 import argparse
-import json
 import os
 import re
 import sys
@@ -53,7 +52,6 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
 REQUIRED_FILE = "build.required-file"
-LAYER_SHAPE = "build.layer-shape"
 FORBIDDEN = "build.forbidden"
 CANONICAL_BYTES = "build.canonical-bytes"
 CANONICAL_BLOCK = "build.canonical-block"
@@ -74,7 +72,6 @@ ROGUE_FUTURE_WORK_NAMES = frozenset({"ROADMAP.md", "TODO.md", "BACKLOG.md", "IDE
 
 RULES = (
     REQUIRED_FILE,
-    LAYER_SHAPE,
     FORBIDDEN,
     CANONICAL_BYTES,
     CANONICAL_BLOCK,
@@ -103,7 +100,6 @@ CANONICAL_MANIFEST = frozenset(
         "pyproject.toml",
         "Makefile.base",
         "Makefile.python",
-        "Makefile.aws",
         ".gitignore",
     }
 )
@@ -195,7 +191,6 @@ class Layers:
     python: bool
     src: bool
     scripts_python: bool
-    aws: bool
     js: bool
 
     def names(self) -> list[str]:
@@ -203,7 +198,6 @@ class Layers:
             ("python", self.python),
             ("src", self.src),
             ("scripts", self.scripts_python),
-            ("aws", self.aws),
             ("js", self.js),
         ]
         return ["base"] + [name for name, on in flags if on]
@@ -217,7 +211,6 @@ def infer_layers(root: Path, python_files: list[Path]) -> Layers:
         scripts_python=any(
             p.relative_to(root).parts[:1] == ("scripts",) for p in python_files
         ),
-        aws=(root / "cdk.json").is_file(),
         js=(root / "package.json").is_file(),
     )
 
@@ -321,8 +314,6 @@ def check_makefile(
         return []
     consumer = path.read_text(encoding="utf-8").splitlines()
     fragments = ["Makefile.python" if layers.python else "Makefile.base"]
-    if layers.aws:
-        fragments.append("Makefile.aws")
     findings = []
     for name in fragments:
         text = canonical_text(name)
@@ -383,8 +374,6 @@ def check_presence(
                 "a committed lockfile must sit alongside package.json",
             )
         )
-    if layers.aws and not layers.src:
-        findings.append(Finding("cdk.json", LAYER_SHAPE, "the aws layer requires src/"))
     return findings
 
 
@@ -428,21 +417,6 @@ def check_forbidden(
         elif base == "CANDIDATES.md" and rel != "CANDIDATES.md":
             findings.append(
                 Finding(rel, FORBIDDEN, "CANDIDATES.md lives at the repo root only")
-            )
-    if layers.aws:
-        if (root / "app.py").is_file():
-            findings.append(
-                Finding(
-                    "app.py",
-                    FORBIDDEN,
-                    "the CDK entry is src/<package>/app.py, not a root app.py",
-                )
-            )
-        if any(rel.startswith("cdk.out/") for rel in tracked):
-            findings.append(
-                Finding(
-                    "cdk.out/", FORBIDDEN, "synth output is gitignored, never committed"
-                )
             )
     return findings
 
@@ -569,7 +543,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
     return findings
 
 
-# --- name mapping, cdk, docs, scripts, skills ---
+# --- name mapping, docs, scripts, skills ---
 
 
 def check_src_package(
@@ -600,29 +574,7 @@ def check_src_package(
                 f"src/ holds exactly one package, named '{pkg}'",
             )
         )
-    if layers.aws and not (root / "src" / pkg / "app.py").is_file():
-        findings.append(
-            Finding(f"src/{pkg}/app.py", REQUIRED_FILE, "the aws layer's CDK entry")
-        )
     return findings
-
-
-def check_cdk(root: Path, layers: Layers, repo_name: str) -> list[Finding]:
-    if not layers.aws:
-        return []
-    expected = f"uv run python -m {package_name(repo_name)}.app"
-    try:
-        data = json.loads((root / "cdk.json").read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as err:
-        return [Finding("cdk.json", CANONICAL_VALUE, f"does not parse: {err}")]
-    actual = data.get("app")
-    if actual != expected:
-        return [
-            Finding(
-                "cdk.json", CANONICAL_VALUE, f"app must be {expected!r}, got {actual!r}"
-            )
-        ]
-    return []
 
 
 def body_lines(path: Path) -> list[str]:
@@ -903,7 +855,6 @@ def audit(root: Path, repo_name: str) -> tuple[list[Finding], Layers]:
         *check_makefile(root, layers, python_files),
         *check_pyproject(root, layers, repo_name),
         *check_src_package(root, layers, files, repo_name),
-        *check_cdk(root, layers, repo_name),
         *check_agent_facing_voice(root),
         *check_global_claude(root),
         *check_doc_shapes(root),

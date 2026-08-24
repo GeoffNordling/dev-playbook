@@ -1,7 +1,0 @@
-.PHONY: synth diff deploy
-synth:
-	npx cdk synth
-diff:
-	npx cdk diff
-deploy:
-	npx cdk deploy

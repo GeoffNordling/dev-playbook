@@ -32,7 +32,6 @@ judgments:
       - standards/build/make.md
       - standards/build/python.md
       - standards/build/ci.md
-      - standards/build/aws.md
       - standards/build/canonical.md
       - standards/build/distribution.md
       - standards/build/enforcement.md

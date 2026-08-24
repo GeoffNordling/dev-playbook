@@ -72,14 +72,12 @@ judgments:
       - standards/build/make.md
       - standards/build/python.md
       - standards/build/ci.md
-      - standards/build/aws.md
       - standards/build/canonical.md
       - standards/build/distribution.md
       - standards/build/enforcement.md
     reference:
       - standards/build/canonical/Makefile.base
       - standards/build/canonical/Makefile.python
-      - standards/build/canonical/Makefile.aws
       - standards/build/canonical/ci.yml
       - standards/build/canonical/pyproject.toml
       - standards/build/canonical/.pre-commit-config.yaml

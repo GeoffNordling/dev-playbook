@@ -106,21 +106,6 @@ def scripts_only_files() -> dict[str, str]:
     return files
 
 
-def aws_files() -> dict[str, str]:
-    files = python_files()
-    files.update(
-        {
-            "cdk.json": '{"app": "uv run python -m sample_repo.app"}\n',
-            "src/sample_repo/app.py": "app = None\n",
-            "Makefile": canonical("Makefile.python").replace(
-                "<code-roots>", "src tests"
-            )
-            + canonical("Makefile.aws"),
-        }
-    )
-    return files
-
-
 # --- exit codes and base layer ---
 
 
@@ -790,55 +775,6 @@ def test_non_executable_helper_module_not_checked(tmp_path: Path) -> None:
     files["scripts/helper.py"] = "X = 1\n"
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 0, result.stdout + result.stderr
-
-
-# --- aws layer ---
-
-
-def test_conforming_aws_repo_is_clean(tmp_path: Path) -> None:
-    result = run(make_repo(tmp_path, aws_files()))
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "layers: base, python, src, aws" in result.stderr
-
-
-def test_cdk_app_command_enforced(tmp_path: Path) -> None:
-    files = aws_files()
-    files["cdk.json"] = '{"app": "python3 app.py"}\n'
-    result = run(make_repo(tmp_path, files))
-    assert "cdk.json: build.canonical-value" in result.stdout
-    assert "uv run python -m sample_repo.app" in result.stdout
-
-
-def test_root_app_py_forbidden_and_entry_required(tmp_path: Path) -> None:
-    files = aws_files()
-    del files["src/sample_repo/app.py"]
-    files["app.py"] = "app = None\n"
-    result = run(make_repo(tmp_path, files))
-    assert "app.py: build.forbidden" in result.stdout
-    assert "src/sample_repo/app.py: build.required-file" in result.stdout
-
-
-def test_aws_without_src_flagged(tmp_path: Path) -> None:
-    files = base_files()
-    files["cdk.json"] = '{"app": "uv run python -m sample_repo.app"}\n'
-    result = run(make_repo(tmp_path, files))
-    assert "cdk.json: build.layer-shape" in result.stdout
-
-
-def test_tracked_cdk_out_forbidden(tmp_path: Path) -> None:
-    files = aws_files()
-    files["cdk.out/manifest.json"] = "{}\n"
-    result = run(make_repo(tmp_path, files))
-    assert "cdk.out/: build.forbidden" in result.stdout
-
-
-def test_makefile_missing_aws_targets_fails(tmp_path: Path) -> None:
-    files = aws_files()
-    files["Makefile"] = canonical("Makefile.python").replace(
-        "<code-roots>", "src tests"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert "Makefile.aws" in result.stdout
 
 
 # --- js layer ---

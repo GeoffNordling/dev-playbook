@@ -51,15 +51,6 @@ forbids.
 |---|---|---|
 | `scripts/*.py` | — | executable, tested; shape per [Scripts](/standards/build/python.md#scripts) |
 
-## python · aws
-
-| Entry | Presence | Rule |
-|---|---|---|
-| `cdk.json` | Required | at the root; `src/` must exist |
-| `src/<package>/app.py` | Required | the CDK entry; a root `app.py` is forbidden |
-| `synth`, `diff`, `deploy` | Required | Make targets |
-| `cdk.out/` | Forbidden in git | gitignored |
-
 ## Worked trees
 
 Base only:
@@ -77,7 +68,7 @@ Base only:
 └── scripts/            # optional — shell here, gated by shellcheck and shfmt
 ```
 
-Full stack (python · src · scripts · aws):
+Full stack (python · src · scripts):
 
 ```
 <repo>/
@@ -90,14 +81,12 @@ Full stack (python · src · scripts · aws):
 ├── CONTEXT.md          # optional
 ├── Makefile
 ├── README.md
-├── cdk.json
 ├── docs/decisions/     # optional
 ├── index.md
 ├── pyproject.toml
 ├── uv.lock
 ├── scripts/
 ├── src/<package>/
-│   ├── __init__.py     # empty
-│   └── app.py          # CDK entry
+│   └── __init__.py     # empty
 └── tests/
 ```
