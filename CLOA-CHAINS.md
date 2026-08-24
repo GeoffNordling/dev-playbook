@@ -46,7 +46,7 @@ The chain, declared:
       ├─does──► {grilling} Skill                the interview
       ├─does──► {domain-modeling} Skill         active throughout
       │           ├─reads──►  {CONTEXT-FORMAT} {ADR-FORMAT}
-      │           └─writes──► CONTEXT.md, docs/decisions/*
+      │           └─writes──► CONTEXT.md, docs/adr/*
       └─overrides {domain-modeling}'s ADR clause
           with──► [records] Standard
 
@@ -170,9 +170,9 @@ cross-repo document — and reports that the push landed.
       ├─returns─► stage_plan: str          for confirmation before authoring
       └─returns─► run_instructions: str    at handoff
 
-One sentence carries the target: wizard authors a Workflow — deterministic
+One sentence carries the target: wizard authors a Script — deterministic
 bash the user runs later; the script's own future writes (.env, GitHub
-secrets) belong to that Workflow's chain, and this skill never runs it.
+secrets) belong to that Script's chain, and this skill never runs it.
 
 ### skill-creator
 
@@ -187,3 +187,97 @@ One sentence carries the target: skill-creator writes a new node of this
 very graph — a skill bundle authored against the conventions Standard,
 with writing-for-agents active and overridden where the Standard
 collides. No returns.
+
+### candidate-promote
+
+    [candidate-promote] Skill · model: inherit, effort: xhigh
+      ├─args────► candidate: str    the entry name, via $ARGUMENTS —
+      │                              asks if absent or ambiguous
+      ├─reads───► CANDIDATES.md                   the parking lot, repo root
+      ├─reads───► [candidates] Standard           the conventions contract
+      ├─does────► [intake] Skill    in-context    the located entry as the
+      │                                            free-form idea
+      ├ ╌ writes ╌ ╌ ► local file(CANDIDATES.md)    intake reports the issue
+      │                                              number — the entry is
+      │                                              deleted, never before
+      └─returns─► issue_number: int, removed_entries: list[str]
+
+One sentence carries the target: candidate-promote owns the lookup and
+the delete — authoring the issue is intake's job, and the entry leaves
+CANDIDATES.md only after intake lands the issue. First recorded edge
+into a parked factory unit; intake's own chain waits for the factory
+phase.
+
+### usage-report
+
+    [usage-report] Skill · allowed-tools: Bash(bash *usage-report/scripts/report.sh), model: sonnet, effort: low
+      └─does────► [report.sh] Script    in-bundle
+                    └ ╌ reads ╌ ╌ ► ~/.cache/claude-code/usage.json    exits with a
+                                                                        diagnosis rather
+                                                                        than a guess
+
+One sentence carries the target: usage-report is a thin shim around a
+deterministic Script — the allowed-tools clamp permits exactly one
+command, and the Script reads the usage cache and exits with a
+diagnosis rather than report a number it cannot stand behind. No
+writes anywhere.
+
+### research
+
+    [research] Skill
+      └─does────► research agent (unnamed, fresh context)
+                    ├ ╌ reads ╌ ╌ ► primary sources — docs, source code,
+                    │                specs    as needed
+                    └─writes──► local file(findings .md)    where the repo
+                                                             already keeps
+                                                             such notes
+
+One sentence carries the target: research spins one background agent
+whose entire spec is this document — it reads primary sources, writes
+one findings file into the repo, and hands nothing back to the caller.
+
+### domain-modeling
+
+    {domain-modeling} Skill
+      ├ ╌ reads ╌ ╌ ► CONTEXT.md          challenging a term against the glossary
+      ├ ╌ reads ╌ ╌ ► CONTEXT-MAP.md      it exists at repo root
+      ├ ╌ reads ╌ ╌ ► source code         the user states how something works
+      ├ ╌ reads ╌ ╌ ► {CONTEXT-FORMAT}    a term resolves
+      ├ ╌ reads ╌ ╌ ► {ADR-FORMAT}        an ADR is offered
+      ├ ╌ writes ╌ ╌ ► local file(CONTEXT.md)              a term is resolved
+      └ ╌ writes ╌ ╌ ► local file(docs/adr/NNNN-slug.md)   all three ADR
+                                                            criteria hold
+
+One sentence carries the target: vanilla domain-modeling is fully
+conditional — every edge guarded, no does-edges, its two writes the
+glossary and an ADR; grill-with-docs vendors it and overrides the ADR
+clause.
+
+### diagnosing-bugs
+
+    [diagnosing-bugs] Skill
+      ├ ╌ reads ╌ ╌ ► CONTEXT.md                          it exists
+      ├ ╌ reads ╌ ╌ ► docs/adr/*                          touching that area
+      ├ ╌ writes ╌ ╌ ► local file(hitl loop script)       a user-run repro
+      │                                                    step is the last
+      │                                                    resort
+      ├ ╌ does ╌ ╌ ► [hitl loop script] Script            same condition — the
+      │                                                    user runs it, output
+      │                                                    feeds the loop
+      ├ ╌ writes ╌ ╌ ► local file(DEBUG instrumentation)  Phase 4 — reverted
+      │                                                    in cleanup
+      ├ ╌ writes ╌ ╌ ► local file(regression test)        a correct test seam
+      │                                                    exists
+      ├ ╌ writes ╌ ╌ ► scratch                            throwaway harnesses —
+      │                                                    deleted in cleanup
+      ├ ╌ writes ╌ ╌ ► git(commit)                        the confirmed
+      │                                                    hypothesis lands in
+      │                                                    the message
+      └ ╌ does ╌ ╌ ► [improve-codebase-architecture] Skill   the root cause was
+                                                             architectural — only
+                                                             after the fix lands
+
+One sentence carries the target: diagnosing-bugs is all guards — its
+lasting writes are one regression test and one commit carrying the
+confirmed hypothesis; everything else it writes, it reverts. Its
+secret-redaction rule is a ledgered behavior-mode setting, not an edge.

@@ -135,6 +135,7 @@ in the abstract.
 | Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
 | Skill           | do                            | Documentation that runs in the calling context, on its permissions |
 | Workflow        | do                            | Deterministic orchestration code in its own runtime — not an LLM |
+| Script          | do                            | Deterministic code run via the shell — not a direct LLM call, not the Workflow runtime |
 | Reference chain | edges: does, reads, overrides, writes, args, returns | The declared tree of a unit's behavior and its call signature — args in, returns out |
 
 - **Standard** is established and live. Its open problem: the top level is
@@ -154,6 +155,16 @@ in the abstract.
   effect; harness enforcement fidelity is out of scope. The steps inside a
   skill are that skill's program, file-level detail below the CLOA, never
   an interface.
+- **Workflow and Script** are deliberately two nouns for the same
+  function — deterministic code, done with the one verb **do** — split
+  by runtime: a Workflow runs in Claude Code's dynamic-workflow runtime
+  (ralph-loop), a Script runs via the shell (usage-report's bundled
+  `report.sh`, the repro loop diagnosing-bugs copies from its template).
+  Different words in the same spot; the node name says which runtime
+  executes. Running a script is a does-edge to a Script node — marked
+  in-bundle when it ships inside the skill's directory — and the
+  script's own reads and writes hang under that node. The zoom rule
+  collapses in-bundle documents, never an executed script.
 
 ### Reference chain
 
@@ -205,7 +216,7 @@ condition never changes the edge's type.
 
 Its rules:
 
-- **Nodes are typed** by kind (Standard, Agent, Skill, Workflow) and by
+- **Nodes are typed** by kind (Standard, Agent, Skill, Workflow, Script) and by
   ownership — self-owned or vendored. Ownership is a color, not an edge.
   A node may also carry its permission expression and model pin as node
   data, quoted verbatim in the harness's own syntax —
