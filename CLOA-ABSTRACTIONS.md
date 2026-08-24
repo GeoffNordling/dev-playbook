@@ -169,11 +169,12 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
 - **overrides … with …** — substitute a clause in a unit that cannot be
   edited.
 - **writes** — produce or mutate state outside the chain. Write targets
-  are typed as state in coarse buckets — git state, GitHub state, local
-  file, local cache — and may re-enter
-  the graph as read sources: design writes the brief that build later
-  reads. Writes to a scratch location collapse to one abstract scratch
-  target, no filenames.
+  are typed `bucket(refinement)`: a fixed coarse bucket — git, GitHub,
+  local file, local cache, scratch — plus an optional free refinement,
+  as in `git(branch)` or `local cache(SQLite)`. The bucket list stays
+  fixed and lintable; the refinement is a memory aid, never a new type.
+  Targets may re-enter the graph as read sources: design writes the
+  brief that build later reads. Scratch writes carry no filenames.
 - **returns** — hand a value back to the caller, user and agent alike:
   ralph-setup returns a launch command to the user, build returns its
   report envelope to the orchestrator. Unlike a write, a return never
@@ -190,8 +191,10 @@ Its rules:
 
 - **Nodes are typed** by kind (Standard, Agent, Skill, Workflow) and by
   ownership — self-owned or vendored. Ownership is a color, not an edge.
-  A node may also carry its permission expression — an agent's set, a
-  skill's clamp — and its model pin (`model`, `effort`) as node data.
+  A node may also carry its permission expression and model pin as node
+  data, quoted verbatim in the harness's own syntax —
+  `allowed-tools: Bash(git *)`, `model: sonnet`, `effort: low` — never
+  paraphrased into prose.
 - **Edges live at the definition site.** An edge belongs to the document
   whose text contains the instruction — greppable, so the assignment is
   lintable. A root's effects are the union of edges reachable along its
