@@ -13,7 +13,9 @@ plus its one-sentence carrier; the rulings that shaped it live in the
 abstractions file.
 
 Excluded units record no chain: `datasheet` (Instruments exclusion) and
-`judgments-sweep` (Judgments exclusion).
+`judgments-sweep` (Judgments exclusion). Deleted units record no chain:
+`orient` and `pymc-modeling`, removed from the workspace during the
+close-out.
 
 ## Bootstrap runs
 
@@ -348,3 +350,109 @@ One sentence carries the target: improve-codebase-architecture is a
 hub — the vocabulary lens loads first, a fresh explorer walks the code,
 findings land as a scratch HTML report whose path is the return, and
 every downstream edge waits on the user picking something up.
+
+### handoff
+
+    [handoff] Skill · model: opus, effort: medium
+      ├─args────► focus: str    optional — the next session's focus,
+      │                          via $ARGUMENTS
+      ├─writes──► scratch                    the handoff document in OS temp —
+      │                                       secrets redacted before writing
+      ├─returns─► absolute_path: str
+      └─returns─► resume_line: str    "Read /tmp/handoff-<name>.md and continue."
+
+One sentence carries the target: handoff writes one scratch document
+carrying the session's state and returns its path with a paste-ready
+resume line; everything it cites is already in context, so it reads
+nothing.
+
+### doc-rewrite
+
+    [doc-rewrite] Skill · model: opus, effort: xhigh
+      ├─args────► doc_hint: str    resolves to one .md file — asks when
+      │                             it cannot
+      ├─reads───► the target document
+      ├─reads───► [conventions] Standard    the prose conventions, always
+      ├─writes──► local file(the target document)    restructured — no fact
+      │                                               cut without approval
+      └─returns─► report: str    purpose, changes, approved cuts,
+                   flagged leftovers
+
+One sentence carries the target: doc-rewrite reads one document and
+writes the same document back restructured against the conventions
+Standard; its sources are clamped to the document and the interview —
+a ledgered behavior-mode line.
+
+### update-standards-pin
+
+    [update-standards-pin] Skill · model: opus, effort: xhigh
+      ├─reads───► [distribution] Standard            the bump is the release
+      ├─reads───► workspace_lint.py                  the GOVERNED roster
+      ├─does────► [bump-pins] Script                 dry-run first, then
+      │             │                                 mutating — shared
+      │             │                                 scripts/, not in-bundle
+      │             ├─reads───► consumer/.pre-commit-config.yaml    the pinned rev
+      │             ├─writes──► local file(consumer: .pre-commit-config.yaml)
+      │             └─returns─► status: str    enum: green / needs work /
+      │                          already current / would bump /
+      │                          skipped (four reasons)
+      ├ ╌ does ╌ ╌ ► [enable-repo-governance] Skill    a repo has no pin
+      ├ ╌ writes ╌ ╌ ► git(commit, push)               the finding is a defect
+      │                                                 in the release itself
+      ├ ╌ writes ╌ ╌ ► local file(consumer: edits, deletions)    adaptations
+      │                                                           and retired
+      │                                                           content
+      ├─writes──► git(consumer: commit, push)          one commit per consumer —
+      │                                                 pin move plus adaptation
+      └─returns─► per_repo_report: str    plus escalation, skip, and
+                   fault reports
+
+One sentence carries the target: update-standards-pin walks the
+GOVERNED roster doing the bump-pins Script per consumer and landing
+one commit per repo — the first unit whose writes are mostly
+consumer-prefixed, `consumer:` standing for whichever roster member is
+in hand.
+
+### wayfinder
+
+    {wayfinder} Skill
+      ├─args────► idea: str      charting a new map, via $ARGUMENTS
+      ├─args────► map: str       working a map — URL or issue number
+      ├─args────► ticket: str    optional — else wayfinder picks from
+      │                           the frontier
+      ├─reads───► [tracker-operations] Standard    the Wayfinding
+      │                                             operations section
+      ├─reads───► the map issue and its frontier   the open, unblocked,
+      │                                             unclaimed children;
+      │                                             ticket bodies on zoom
+      ├ ╌ does ╌ ╌ ► setup-matt-pocock-skills      no tracker provided —
+      │                                             dead reference; stays,
+      │                                             the unit is verbatim
+      ├ ╌ does ╌ ╌ ► {grilling} Skill              naming the destination,
+      │                                             mapping the frontier,
+      │                                             whenever in doubt
+      ├ ╌ does ╌ ╌ ► {domain-modeling} Skill       alongside grilling,
+      │                                             throughout
+      ├ ╌ does ╌ ╌ ► [research] Skill              one per research ticket —
+      │                                             fresh context, in parallel
+      ├ ╌ does ╌ ╌ ► {prototype} Skill             a prototype ticket calls
+      │                                             for code
+      ├ ╌ does ╌ ╌ ► skills the map's Notes name   resolved at runtime from
+      │                                             the map body
+      ├─writes──► GitHub(issue, label, sub-issue, dependency,
+      │            assignee, comment, close)        the map and its tickets —
+      │                                              created, claimed,
+      │                                              resolved, closed, the
+      │                                              body sections kept current
+      ├ ╌ writes ╌ ╌ ► git(branch)                 research findings on
+      │                                             research/<name>
+      ├ ╌ writes ╌ ╌ ► local file(markdown tracker)    no tracker provided
+      └ ╌ returns ╌ ╌ ► no_map_needed: str         the grill surfaces no fog
+
+One sentence carries the target: wayfinder is a GitHub-state machine —
+the map, tickets, claims, fog, and decision log are all issue state
+under one writes edge, its callees are the interview pair plus
+research and prototype, and its "plan, don't do" default with the
+map-Notes escape is a ledgered behavior-mode. The map body's own
+contract — fog lifecycle, HITL/AFK axis, claim-by-assignment — is
+ledgered written-artifact semantics.

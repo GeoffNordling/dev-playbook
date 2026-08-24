@@ -119,15 +119,17 @@ in the abstract.
 - **User eyes.** The artifacts the loop produces must be easy for the
   user to read — everything before this point optimized for agent
   readers. An application of constrain to optimize understanding.
-- **Zero verbatim third-party dependencies.** Deterministic linting and
-  declared in-file structure (return declarations, write typing) must
-  reach every unit, vendored ones included — so no unit can stay
-  verbatim upstream text. Adopting a third-party unit means owning its
-  file and restructuring it to the workspace's form. Accepted cost,
-  ruled deliberately. Open note: the overrides edge is justified today
-  as "substitute a clause in a unit that cannot be edited"; once every
-  vendored file is owned and editable, that justification needs
-  restating or the edge needs re-grounding.
+- **Verbatim dependencies cannot participate.** The goal is to
+  generate every reference chain with deterministic code, after
+  structuring each unit to make that generation possible. A verbatim
+  third-party file carries none of that structure, so it cannot
+  participate. Two dispositions, undecided until the lint plan: own
+  and restructure every vendored file (zero verbatim dependencies), or
+  keep some verbatim and accept that their chains stay model-generated,
+  outside the deterministic system. Related open note: overrides is
+  grounded today in "a unit that cannot be edited"; if vendored files
+  become owned, it likely re-grounds as superseding an instruction in
+  effect at runtime, self-owned units included.
 - **Types respected.** The loop keeps the stochastic/deterministic
   distinction and the document-type distinctions explicit.
 - **General and hierarchical across repos.** The abstractions and the loop run on any
@@ -299,6 +301,11 @@ but deliberately outside the ontology until a ruling is reversed.
   NOT propose interfaces yet"); internal sequencing below the CLOA,
   already covered by the steps-are-the-program rule; ruled not
   accounted.
+- **Written-artifact semantics** — the schema and state rules of a
+  document a unit writes and later re-reads: wayfinder's map-body
+  sections, fog lifecycle, HITL/AFK axis, claim-by-assignment, ticket
+  sizing. The artifact's contract lives in the artifact; the chain
+  records only the writes and reads that touch it.
 
 ## Targets
 
