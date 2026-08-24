@@ -135,7 +135,7 @@ in the abstract.
 | Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
 | Skill           | do                            | Documentation that runs in the calling context, on its permissions |
 | Workflow        | do                            | Deterministic orchestration code in its own runtime — not an LLM |
-| Reference chain | edges: does, reads, overrides, writes, returns | The declared tree of everything a unit does, reads, overrides, writes, and returns |
+| Reference chain | edges: does, reads, overrides, writes, args, returns | The declared tree of a unit's behavior and its call signature — args in, returns out |
 
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
@@ -175,17 +175,33 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   fixed and lintable; the refinement is a memory aid, never a new type.
   Targets may re-enter the graph as read sources: design writes the
   brief that build later reads. Scratch writes carry no filenames.
+  The refinement stays machine-readable: a comma-separated sequence of
+  operations — `git(commit, push)` — never prose and never `+`. A
+  target in another repo carries that repo's name as the refinement's
+  head — `git(mission-control: commit, push)` — and the same repo
+  prefix marks a cross-repo read target (`mission-control/friction
+  log`); crossing a repo boundary is always visible.
+- **args** — the value the caller hands in at invocation, carried by
+  the harness's `$ARGUMENTS` substitution. Declared in Python
+  type-hint form, `arg_name: arg_type` — log-friction declares
+  `friction: str`. Never lands in state, dies with the call.
 - **returns** — hand a value back to the caller, user and agent alike:
   ralph-setup returns a launch command to the user, build returns its
   report envelope to the orchestrator. Unlike a write, a return never
-  lands in state — it dies with the call. Returns are typed too; prefer
-  an enumerable status — commit returns its outcome as one of a small
-  set of values.
+  lands in state — it dies with the call. Returns mirror args: named
+  and typed as `return_name: return_type` — commit returns
+  `outcome: str` — and an enumerable status is preferred, its values
+  listed as a small enum. A returning unit will declare its return in
+  its own file, so the primitive view renders the declaration instead
+  of a model regenerating it; the declaration format is designed
+  later, with the lint plan.
 
-Any edge may carry a **guard** — the condition under which it fires — as
-a prose annotation on the edge ("only agent-facing targets", "only when
-reading can't settle it"). A call inside an `if` is still a call edge;
-the condition never changes the edge's type.
+Any edge may carry a **guard** — the condition under which it fires.
+A guarded edge is drawn dashed with the dashes spaced out so the break
+is visible on screen (`├ ╌ does ╌ ╌ ►`), and its trailing text is the
+condition; a solid edge (`├─does──►`) is unconditional, and its
+trailing text is mere annotation. A call inside an `if` is still a call edge; the
+condition never changes the edge's type.
 
 Its rules:
 
@@ -236,6 +252,18 @@ but deliberately outside the ontology until a ruling is reversed.
   tracks only in its own working memory, persisted nowhere
   (judgments-sweep's fix-attempt cap and skip list); ruled not
   accounted.
+- **User interview loops** — a mid-run, multi-round dialogue with the
+  user (skill-creator's "iterate until the user is satisfied";
+  grilling's whole body). Conversing is what running in the calling
+  context means; ruled not accounted.
+- **Behavior-mode setting** — a unit whose body installs standing
+  behavior in the session's ephemeral context and fires no edge at
+  invocation (orchestrate: "everything below you is a subagent").
+  Ruled residual; admitting it later requires a lintable,
+  deterministic form.
+- **Vendored platform manifests** — the `agents/openai.yaml` display
+  card every vendored bundle ships for another agent platform; bundle
+  furniture, referenced by nothing, never an edge.
 
 ## Targets
 
@@ -278,84 +306,9 @@ abandoned attempt to understand it whole failed because the factory is
 only a collection of abstractions, and none of them had been constructed
 yet.
 
-### Run 1: document-deslop — zero residual
+### The chains ledger
 
-The chain, declared:
-
-    [document-deslop] Skill
-      └─does──► [deslopper] Agent (Read, Write)
-                  ├─does──►  [slop-tics] Standard — .enforce
-                  ├─reads──► [conventions] Standard
-                  └─reads──► [writing-for-agents] Skill  (only agent-facing targets)
-
-One sentence carries the target: document-deslop is the enforce arm of the
-Slop Tics Standard — a Skill that resolves a hint to files and dispatches
-the deslopper Agent once per file. Everything else in the two files — the
-one-pass write rule, the DONE protocol, the rewrite rules — is internals
-below the CLOA, the pandas method body, and is not residual.
-
-What the run bought: the **do**-only verb rule for Agent and Skill, and the
-first two edge labels. The enforce/consult distinction that first appeared
-as residual dissolved into them — enforce is *does* the Standard's verb,
-consult is merely *reads*.
-
-### Run 2: grill-with-docs — the wrapped interview
-
-The chain, declared:
-
-    [grill-with-docs] Skill
-      ├─does──► {grilling} Skill                the interview
-      ├─does──► {domain-modeling} Skill         active throughout
-      │           ├─reads──►  {CONTEXT-FORMAT} {ADR-FORMAT}
-      │           └─writes──► CONTEXT.md, docs/decisions/*
-      └─overrides {domain-modeling}'s ADR clause
-          with──► [records] Standard
-
-One sentence carries the target: grill-with-docs does grilling with
-domain-modeling active throughout, overriding its decision-record clause
-with the workspace's Decision Record Standard.
-
-What the run bought: the generalized **does** edge, the **overrides**
-edge, the ownership node type — the wrapper exists only because its
-dependencies are vendored — and the definition-site rule for edge
-assignment. Open: the **writes** edge (adopted in run 3).
-
-### Run 3: design — the hub
-
-The chain, declared (grill-with-docs's subtree is run 2's, reused by
-reference):
-
-    [design] Skill
-      ├─reads──► [software-factory] [user-checkpoints]        Guides
-      ├─reads──► [issue-authoring] [tracker-operations]       Standards
-      ├─does──► {codebase-design} Skill              the lens, invoked first
-      ├─does──► [grill-with-docs] Skill              subtree per run 2
-      ├─does──► {prototype} Skill                    only when reading can't settle it
-      ├─does──► [user-intent-mini-interview] Skill   every single-leaf write
-      ├─does──► [issue-review-claims] Skill (no Write)      fresh-context subagent
-      ├─does──► [issue-review-simulation] Skill (no Write)  fresh-context subagent
-      └─writes─► issue brief, phase labels, probe-record comment, prototype/<issue> branch
-
-One sentence carries the target: design turns an issue's rough brief into
-a factory-ready one — or an epic with children — by grilling the approach
-through the codebase-design lens, prototyping only what reading can't
-settle, and writing the brief back audited by the two issue-review
-lenses.
-
-The chain absorbed two things cleanly. `references/design-it-twice.md`
-and `references/decompose.md` are inside the unit — the skill is its
-directory, so they are private functions, not chain nodes. And the old
-mention-grep survey said design references eight skills; the declared
-chain has six does edges — `intake` appears only in when-to-use prose,
-and "research" is a word, not the skill. The gap between grep and
-declaration is exactly what the import-linter parallel exists to close.
-
-What the run bought: **writes** adopted, with targets typed as state; the
-**guard** annotation blessed; permission expressions as node data; and
-the context-binding correction to Agent and Skill — fresh context versus
-calling context, not permission set alone.
-
-Residuals tracked, unmodeled: the user as **soft guardian** — design
-waits for "approved" before anything lands on GitHub, a wait, not a
-permission boundary; and doc types held informal (see "Remembered, not
-primitives").
+Every finalized chain is recorded in [CLOA Chains](/CLOA-CHAINS.md) as it
+is ruled — the three bootstrap runs and each close-out unit — so the
+close-out ends in a written ledger, not in compacted memory. This file
+keeps the ontology and the rulings; that file keeps the chains.
