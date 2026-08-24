@@ -62,7 +62,7 @@ loop owes an answer at both levels.
 
 ## The loop
 
-In code, the programming language comes first and the functionality secoond.
+In code, the programming language comes first and the functionality second.
 Thus, functionality may be expressed as code, constrained by the primitives
 that were defined by the language in advance.
 
@@ -134,7 +134,7 @@ in the abstract.
 | Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
 | Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
 | Skill           | do                            | Documentation that runs in the calling context, on its permissions |
-| Reference chain | edges: does, reads, overrides, writes | The declared tree of everything a unit does, reads, overrides, and writes |
+| Reference chain | edges: does, reads, overrides, writes, returns | The declared tree of everything a unit does, reads, overrides, writes, and returns |
 
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
@@ -171,6 +171,10 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   are typed as state — a GitHub issue, a local markdown file, a git
   branch — and may re-enter the graph as read sources: design writes the
   brief that build later reads.
+- **returns** — hand a value back to the caller, user and agent alike:
+  ralph-setup returns a launch command to the user, build returns its
+  report envelope to the orchestrator. Unlike a write, a return never
+  lands in state — it dies with the call.
 
 Any edge may carry a **guard** — the condition under which it fires — as
 a prose annotation on the edge ("only agent-facing targets", "only when
@@ -207,6 +211,19 @@ Remembered, not primitives:
 - **Doc type.** A read target's frontmatter type (Guide, General-Sheet)
   is noted informally; a type earns a noun only when it demonstrates a
   verb interface, the way Standard did.
+
+### Accepted residuals
+
+The ledger of residuals ruled on and accepted as-is, one line each, so
+no run raises the same question twice. A construct listed here is real
+but deliberately outside the ontology until a ruling is reversed.
+
+- **Reality probes** — direct shell contact with repo state ("run the
+  gate", "confirm the git tree is clean"). A real operation; ruled not
+  accounted.
+- **Attestation checkpoints** — "report `READ: x`, proceed only after."
+  A prompt device that raises the probability the read happens; ruled
+  not accounted.
 
 ## Targets
 
