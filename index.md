@@ -12,6 +12,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
 - [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) — The noun-and-verb abstractions that make documentation understandable at the CLOA, and the loop that generates them
 - [CLOA Chains](/CLOA-CHAINS.md) — The ledger of finalized reference chains — one recorded entry per unit, written down as it is ruled
+- [Factory Survey](/FACTORY-SURVEY.md) — One session's full read of the software factory — a classification of its files, the intent they carry, and sketches for a possible native rewrite
 - [No More Slop](/NO-MORE-SLOP.md) — The branch plan — goal, principles, the two tracks, and the current step
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 

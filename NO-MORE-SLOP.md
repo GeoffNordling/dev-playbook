@@ -231,3 +231,7 @@ Standard and Guide are the ontology-important types. Next: close out
 skills and agents empirically (all of them, not three samples), then a
 prose lint plan for the deterministic structure. Then the software
 factory.
+
+The factory phase is parked: one session read all its files and left the
+classification, the intent, and unbound rewrite sketches in
+[Factory Survey](/FACTORY-SURVEY.md). Start there when it unparks.
