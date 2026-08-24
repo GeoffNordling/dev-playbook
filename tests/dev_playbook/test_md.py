@@ -90,6 +90,22 @@ class TestLinesOutsideFences:
         got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
         assert got == ["a", "    ```", "b"]
 
+    def test_a_one_line_code_span_is_not_an_opening_fence(self) -> None:
+        # CommonMark forbids a backtick inside a backtick fence's info string,
+        # precisely so ```IdeaTree.tree``` reads as an inline code span rather
+        # than an opener. Reading it as a fence strands every later line in a
+        # block nothing closes, and the scan dies on a valid document.
+        text = "intro\n```IdeaTree.tree```\nafter\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["intro", "```IdeaTree.tree```", "after"]
+
+    def test_a_tilde_fence_may_carry_a_backtick_info_string(self) -> None:
+        # The info-string ban is backtick-fence-only; a tilde fence opens
+        # normally, so the carve-out must not leak across the marker kinds.
+        text = "intro\n~~~a`b\ncode\n~~~\nafter\n"
+        got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
+        assert got == ["intro", "after"]
+
     def test_a_block_left_open_at_the_end_is_reported(self) -> None:
         # A closer carrying an info string does not close, so this block runs
         # to the end of the text and every line after it drops out of the
