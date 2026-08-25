@@ -14,7 +14,10 @@ file's prose answers to the [prose standard](/standards/prose.md); members
 typically carry `type: General-Sheet`, the registry's genre for a working
 document whose type is not yet settled.
 
-The `/working-doc-set-audit` skill audits a set against this standard.
+The `/working-doc-set-audit` skill audits a set against this standard and
+reports what it finds; the `/working-doc-set-deslop` skill sends a set
+through an agent that audits and then fixes it, leaving every edit
+uncommitted for the user's diff review.
 
 ## Shape
 
@@ -73,10 +76,3 @@ root's terms bucket with a one-line definition. The bucket is
 exploratory-grade — the settled subset is promoted to `CONTEXT.md` when the
 work completes, per
 [CONTEXT.md Content](/standards/knowledge-organization/context-content.md).
-
-## Conservation
-
-Information leaves a set only with the user's approval. A cleanup flags cut
-candidates in two categories — **stale** (records a decision no longer
-relevant to current state) and **ancillary** (detail a tighter set does not
-need) — and cuts nothing until the user rules on the batch.

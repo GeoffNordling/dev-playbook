@@ -12,8 +12,8 @@ argument-hint: "[set-hint]"
 
 Audit one working documentation set against
 [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)
-and report findings. Edit nothing and commit nothing — the report is the
-whole product.
+and report findings. Edit nothing, commit nothing, and ask no questions —
+the report is the whole product.
 
 ## Target
 
@@ -21,9 +21,9 @@ whole product.
 a description such as "the no-more-slop working files."
 
 - **Empty.** Operate on the set most clearly in focus in the current
-  conversation. Where none is, ask which.
+  conversation. Where none is, report that no set is in focus and stop.
 - **Non-empty.** Resolve the hint to a root file. Where it matches nothing,
-  ask.
+  report the failed hint and stop.
 
 The set is the root plus every working file it links, plus any sibling
 working file the root fails to link — an unlinked sibling is itself a
@@ -47,5 +47,15 @@ conventions the set itself declares. The finding categories:
   terms bucket, used inconsistently, or resolvable nowhere in the set.
 - **Misfiled or unfiled** — material sitting outside the bucket that owns
   its type, with no Unfiled entry declaring it.
-- **Cut candidates** — content flagged stale or ancillary under the
-  standard's conservation rule, listed for the user's ruling, never cut.
+- **Cut candidates** — **stale** content, recording a decision no longer
+  bearing on current state, or **ancillary** content, detail the set does
+  not need.
+
+## Report
+
+The report is the hand-off to whoever fixes the set — the user, or the
+agent `/working-doc-set-deslop` launches. Findings ranked by how much each
+would mislead a fresh session reading the set cold. Every finding cites
+`file:line`, quotes the offending text, and names its category; a
+duplication or conflict finding also says where the surviving copy
+belongs. When the set is clean, say so plainly.
