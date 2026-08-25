@@ -216,8 +216,8 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   `outcome: str` — and an enumerable status is preferred, its values
   listed as a small enum. A returning unit will declare its return in
   its own file, so the primitive view renders the declaration instead
-  of a model regenerating it; the declaration format is designed
-  later, with the lint plan.
+  of a model regenerating it; the declaration format is under design in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
 
 Any edge may carry a **guard** — the condition under which it fires.
 A guarded edge is drawn dashed with the dashes spaced out so the break
@@ -359,4 +359,6 @@ stopped producing ontology changes, and the thirteen units still
 unread were ruled expressible with the existing primitives. The
 recorded chains are proof of concept, not final artifacts — the final
 traces will be generated deterministically by scripts operating on
-structure embedded in the unit files, designed with the lint plan.
+structure embedded in the unit files. That structure is under design
+in [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md),
+this file's lower level.
