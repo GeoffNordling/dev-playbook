@@ -6,15 +6,44 @@ description: The dispatch prompt for porting one skill or agent to the edge enco
 
 # Port Prompt
 
-The prompt sent to each port agent. Fill `<PATH>` with the file to port
-(a `dotfiles/dot-claude/skills/*/SKILL.md` or
-`dotfiles/dot-claude/agents/*.md` path) and send the body below verbatim.
+The instructions each port agent works from. The dispatch message is two
+lines: tell the agent to read this file and follow it, and name the file
+to port (a `dotfiles/dot-claude/skills/*/SKILL.md` or
+`dotfiles/dot-claude/agents/*.md` path). Everywhere below, `<PATH>`
+means the file your dispatch message named.
+
+## Dispatch procedure
+
+The session that launches port agents runs this loop; the agents run
+the body below the rule.
+
+1. Pick a batch of unported first-party units from the
+   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster)
+   — never a (3P) unit before the plan's adoption-policy stage. Launch
+   one Sonnet agent per unit, in parallel, each with the two-line
+   dispatch message above. Do not regenerate this file's body into the
+   prompt.
+2. Do not read the ported files or their diffs — that spends the
+   context the subagents exist to save. The agent's report is the
+   content review; the user reviews the diffs in the IDE.
+3. When the batch lands, verify mechanically only:
+   `python3 no-more-slop-branch-working-files/parser/chaingen.py`
+   then `--check`, and grep
+   `no-more-slop-branch-working-files/RESIDUAL-LEDGER.md` for one
+   `## <name>` header per batch unit. Parallel agents race on the
+   ledger; restore a lost section verbatim from its agent's
+   transcript, never by rewriting it.
+4. Tick the batch's roster checkboxes, then report the round tally:
+   completed vs. open, first-party vs. third-party.
+5. Commit only on the user's /commit, with `SKIP=playbook-lint`
+   (pushes add `SKIP=make-check`) until the plan's pre-commit stage
+   lands.
 
 ---
 
 You are working in the dev-playbook repository. Your job is to rewrite
 one file, `<PATH>`, and record what would not fit. Everything you need
-is in this prompt and the files it names.
+is in this file and the files it names.
 
 ## What this is for
 

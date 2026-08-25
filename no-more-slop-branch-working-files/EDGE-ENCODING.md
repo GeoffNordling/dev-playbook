@@ -43,10 +43,12 @@ enforced by our lint.
 Every higher-level primitive maps one-to-one to a lower-level
 expression — `reports` in the chain is `{Report …}` in the prose, and
 nothing else is. A skill is then rewritten using only the map, and
-whatever prose refuses to fit is a residual, tracked in the
-[Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
-A valuable residual amends the shared primitive structure; a
-worthless one is reworded away. This is
+whatever prose refuses to fit is a residual, recorded at the moment of
+porting in the
+[Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md)
+— a record, not a queue for rulings. During the design phase, residuals
+drove the map: a valuable one amended the shared primitive structure, a
+worthless one was reworded away. This is
 [the EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#the-loop)
 run at a lower level — still generating primitives in partnership with
 the user to minimize residuals, with the skill file as the target
@@ -327,20 +329,20 @@ Skills:
 - [x] log-friction
 - [x] usage-report
 - [ ] agent-view-overwatch
-- [ ] candidate-promote
-- [ ] clean-up-branch-worktree
+- [x] candidate-promote
+- [x] clean-up-branch-worktree
 - [ ] codebase-design (3P)
 - [x] commit — the `{Commit}` span itself skipped: `git_detail()` requires `-C`, this skill targets the ambient repo (ledgered)
 - [ ] commit-off
 - [ ] compact-prep
-- [ ] datasheet
+- [x] datasheet
 - [ ] design
 - [ ] diagnosing-bugs (3P)
 - [ ] domain-modeling (3P)
 - [ ] enable-repo-governance
 - [ ] grilling (3P)
 - [x] handoff
-- [ ] idea
+- [x] idea
 - [ ] improve-codebase-architecture (3P)
 - [ ] intake
 - [ ] issue-overwatch
@@ -354,7 +356,7 @@ Skills:
 - [ ] prototype (3P)
 - [x] ralph-setup
 - [ ] research (3P)
-- [ ] rewind-compact
+- [x] rewind-compact
 - [ ] skill-creator
 - [ ] update-standards-pin
 - [ ] user-intent-mini-interview

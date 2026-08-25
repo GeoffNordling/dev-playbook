@@ -24,8 +24,16 @@
 [agent-view-overwatch] Skill · model: sonnet, effort: xhigh, allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
 
 [candidate-promote] Skill · model: inherit, effort: xhigh
+  ├─args────► candidate
+  ├─reads───► [candidates] Standard    as the contract
+  ├─does────► [intake] Skill    with the entry's name and prose as the free-form idea — the children's text too, when promoting a subtree
+  ├ ╌ writes ╌ ► local file    the promoted entries out of `CANDIDATES.md`    if intake reports the issue number
+  └─reports─► outcome: str    the issue number and which entries were removed
 
 [clean-up-branch-worktree] Skill · model: sonnet, effort: low
+  ├ ╌ reports ╌ ► outcome: str    the output    if it prints anything
+  ├ ╌ reports ╌ ► outcome: str    both outputs    if the SHAs differ, or the PR list is empty
+  └─reports─► outcome: str    one line: worktree and branch removed, main at that commit
 
 {codebase-design} Skill
 
@@ -40,6 +48,17 @@
 [compact-prep] Skill · model: inherit, effort: xhigh
 
 [datasheet] Skill · model: opus, effort: xhigh
+  ├─args────► subject
+  ├─args────► scope
+  ├─reads───► datasheet.md    end-to-end, before anything else
+  ├─reads───► datasheet-example.html    end-to-end, before anything else
+  ├ ╌ reports ╌ ► outcome: str    exactly what is needed    if either is missing or ambiguous
+  ├ ╌ reports ╌ ► outcome: str    the overlap    if the new manifest overlaps another subject's manifest
+  ├ ╌ does ╌ ► griffe-outline    over each package in scope, appending its outline to the scratch directory    if the scope holds a Python package
+  ├─writes──► local file    the sheet to `readings/datasheet/<subject>.html`
+  ├─does────► [check_datasheet.py] Script    against the sheet, from this skill's base directory
+  ├ ╌ reports ╌ ► outcome: str    why the sheet is nonconformant    if a contract rule cannot be satisfied
+  └─reports─► outcome: str    the sheet path, the checker's one-line summary, and the Behavior labels used
 
 [design] Skill · model: inherit, effort: xhigh
 
@@ -66,6 +85,8 @@
   └─reports─► outcome: str    a ready-to-paste resume line for the user to carry into the new session
 
 [idea] Skill · model: sonnet, effort: xhigh
+  ├─args────► material
+  └─does────► [idea] Skill    verbatim
 
 {improve-codebase-architecture} Skill
 
@@ -107,6 +128,10 @@
 {research} Skill
 
 [rewind-compact] Skill · model: opus, effort: medium
+  ├─args────► target
+  ├─does────► [commit] Skill
+  ├─reports─► outcome: str    the Tangential compaction summary
+  └─reports─► outcome: str    the verbatim text of the rewind target
 
 [skill-creator] Skill · model: opus, effort: xhigh
 

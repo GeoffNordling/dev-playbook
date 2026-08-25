@@ -4,7 +4,7 @@ description: Promote a Candidate from the current repo's CANDIDATES.md into a co
 disable-model-invocation: false
 model: inherit
 effort: xhigh
-argument-hint: "[candidate name]"
+arguments: [candidate]
 ---
 
 # Promote a Candidate
@@ -12,22 +12,20 @@ argument-hint: "[candidate name]"
 Turn a Candidate into committed work. A Candidate is uncommitted future work
 recorded in the repo's root `CANDIDATES.md`; promotion authors a GitHub issue
 from it and **deletes the entry in the same change**, so the work never sits in
-both homes. The contract is
-[candidate conventions](~/workspace/dev-playbook/standards/tracking/candidates.md).
+both homes. {Read [candidate conventions](~/workspace/dev-playbook/standards/tracking/candidates.md)
+as the contract}.
 
 This skill owns the lookup and the delete. Authoring the brief and the
 four-tuple is /intake's job — it accepts a free-form idea as text, so nothing
 is passed but the entry.
-
-## Candidate: $ARGUMENTS
 
 ## Steps
 
 1. **Read `CANDIDATES.md`** at the repo root. If the file is absent, say so and
    stop — there is nothing to promote.
 
-2. **Locate the entry.** Match `$ARGUMENTS` against the bolded entry names. If
-   no argument was given, or the match is ambiguous, list the candidate names
+2. **Locate the entry.** Match `candidate` against the bolded entry names. If
+   none was given, or the match is ambiguous, list the candidate names
    and ask which one. Never guess between two plausible entries.
 
 3. **Decide the scope with the user.** An entry with nested children is a
@@ -36,20 +34,21 @@ is passed but the entry.
    skill lands **one** issue — intake does not slice and never mints an epic, so
    a subtree promotes whole and its decomposition waits for the `design` node.
 
-4. **Invoke /intake**, passing the entry's name and prose — plus the children's
-   text when promoting a subtree — as the free-form idea. A one-line entry is
-   the expected input: intake grills the idea, authors the brief and
-   four-tuple, and lands the issue on its own confirmation gate, routing a
-   subtree to `phase:design`.
+4. {Run [/intake](~/.claude/skills/intake/SKILL.md) with the entry's name and
+   prose as the free-form idea — the children's text too, when promoting a
+   subtree}. A one-line entry is the expected input: intake grills the idea,
+   authors the brief and four-tuple, and lands the issue on its own
+   confirmation gate, routing a subtree to `phase:design`.
 
-5. **Delete the promoted entries** from `CANDIDATES.md` once intake reports the
-   issue number. Remove the whole subtree when the subtree was promoted — the
-   work is committed to that one issue now, wherever design later splits it;
-   when only one child was promoted, remove that child and leave the parent. If
-   removing the last child of a parent leaves it childless, keep the parent —
-   an outcome with no remaining decomposition is still a Candidate.
+5. {If intake reports the issue number, {Write the promoted entries out of
+   `CANDIDATES.md`; remove the whole subtree when the subtree was promoted —
+   the work is committed to that one issue now, wherever design later splits
+   it; when only one child was promoted, remove that child and leave the
+   parent. If removing the last child of a parent leaves it childless, keep
+   the parent — an outcome with no remaining decomposition is still a
+   Candidate}}.
 
-6. **Report** the issue number and which entries were removed. Leave the
+6. {Report the issue number and which entries were removed}. Leave the
    change uncommitted for the user's review unless they ask otherwise.
 
 ## Boundaries

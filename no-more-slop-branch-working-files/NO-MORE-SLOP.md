@@ -299,6 +299,13 @@ and a port is nothing but an edit:
    finds.
 3. **Port the converted skills.** The former (3P) thirteen, now owned,
    go through the same port as stage 1.
+4. **Fix the failing pre-commit checks.** Every port commit currently
+   rides `SKIP=playbook-lint` (and pushes `SKIP=make-check` too):
+   `skill-lint`'s closed frontmatter vocabulary rejects the `arguments`
+   key the encoding introduces. Teach the lints the ported format —
+   part of the standard scrub in the Edge Encoding to-do — so the gate
+   runs green with no `SKIP` anywhere. The skips are deliberate and
+   temporary; the branch does not merge while any remain.
 
 The factory phase is parked: one session read all its files and left the
 classification, the intent, and unbound rewrite sketches in

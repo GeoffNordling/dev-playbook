@@ -4,7 +4,7 @@ description: Produce or refresh a datasheet for a chosen subject and file scope.
 disable-model-invocation: false
 model: opus
 effort: xhigh
-argument-hint: "[subject and/or scope paths]"
+arguments: [subject, scope]
 ---
 
 # Datasheet
@@ -14,24 +14,22 @@ Produces one datasheet conformant to the
 fixed-section, budgeted HTML report at `readings/datasheet/<subject>.html` that
 gives the system's owner trust and direction without reading the code.
 
-`$ARGUMENTS` names the subject and/or scope paths.
-
 ## Read first
 
-Read end-to-end:
+{Read [datasheet.md](~/workspace/dev-playbook/instruments/datasheet.md)
+end-to-end, before anything else; it states the contract the sheet must
+satisfy}. {Read
+[datasheet-example.html](~/workspace/dev-playbook/instruments/datasheet-example.html)
+end-to-end, before anything else; it shows the structure to match}.
 
-- [Datasheet Standard](~/workspace/dev-playbook/instruments/datasheet.md) — the
-  contract the sheet must satisfy.
-- [datasheet-example.html](~/workspace/dev-playbook/instruments/datasheet-example.html)
-  — the structure to match.
-
-Then report: `READ: datasheet.md, datasheet-example.html`. Proceed only after.
+Then say `READ: datasheet.md, datasheet-example.html`, and proceed only
+after.
 
 ## Resolve subject and scope
 
-The scope is an explicit manifest of paths and globs; the subject names the
-sheet. Take both from `$ARGUMENTS`. If either is missing or ambiguous, stop
-and report exactly what is needed.
+`scope` is an explicit manifest of paths and globs; `subject` names the
+sheet. {If either is missing or ambiguous, {report exactly what is
+needed} and stop}.
 
 ## Check existing sheets
 
@@ -41,25 +39,27 @@ Read stamps only:
 grep -A12 '^<!--datasheet-stamp' readings/datasheet/*.html 2>/dev/null; true
 ```
 
-- Same subject already exists → this run regenerates it in place.
-- The new manifest overlaps another subject's manifest → stop and surface
-  the overlap to the user.
+If the same subject already exists, this run regenerates it in place.
+{If the new manifest overlaps another subject's manifest, {report the
+overlap} and stop}.
 
 ## Inventory
 
-Create a self-ignoring scratch directory, then inventory each Python package
-in scope:
+Create a self-ignoring scratch directory. {If the scope holds a Python
+package, {Run
+[griffe-outline](~/workspace/dev-playbook/scripts/griffe-outline) over
+each package in scope, appending its outline to the scratch
+directory}}:
 
 ```
 mkdir -p .datasheet && printf '*\n' > .datasheet/.gitignore
 ~/workspace/dev-playbook/scripts/griffe-outline <package-path> >> .datasheet/outline.txt
 ```
 
-If the scope holds no Python package, skip this step.
-
 ## Generate
 
-Write the sheet to `readings/datasheet/<subject>.html` under these rules:
+{Write the sheet to `readings/datasheet/<subject>.html`}, under these
+rules:
 
 - **Structure from the inventory.** The inventory is authoritative for what
   exists — modules, classes, functions, signatures. Read source freely for
@@ -78,14 +78,15 @@ Write the sheet to `readings/datasheet/<subject>.html` under these rules:
 
 ## Verify and report
 
-Run the checker:
+{Run [check_datasheet.py](scripts/check_datasheet.py) against the sheet,
+from this skill's base directory}:
 
 ```
 python3 <skill-dir>/scripts/check_datasheet.py readings/datasheet/<subject>.html
 ```
 
-Findings mean the sheet is nonconformant — fix by regenerating and re-run
-until clean. If a contract rule cannot be satisfied, delete the output and
-report why instead of shipping the sheet. Then give the user the sheet path,
-the checker's one-line summary, and the Behavior labels used. Committing is
-the user's call.
+Findings mean the sheet is nonconformant — fix by regenerating and
+re-run until clean. {If a contract rule cannot be satisfied, {report why
+the sheet is nonconformant} and delete the output instead of shipping
+it}. {Report the sheet path, the checker's one-line summary, and the
+Behavior labels used}. Committing is the user's call.
