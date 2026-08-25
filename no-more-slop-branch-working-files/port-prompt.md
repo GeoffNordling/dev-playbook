@@ -120,10 +120,13 @@ allow and record the leftover honestly.
    with a large, honest ledger entry is a finished port, not a
    failure.
 5. Add a `## <file's name>` section to
-   `no-more-slop-branch-working-files/RESIDUAL-LEDGER.md`, in the same
-   style as the existing sections: what converged, and each leftover
-   the rules could not express. Large leftovers are fine — record them
-   plainly; someone else rules on them later.
+   `no-more-slop-branch-working-files/RESIDUAL-LEDGER.md`. A couple of
+   sentences, hard limit: name each specific action you could not
+   express and why the rules cannot say it — nothing else. Do not
+   narrate what converged, do not restate the rules, do not compare
+   with other entries or name residual families. Many leftovers is a
+   fine outcome; a long entry is not — every agent who ports after you
+   reads this whole file, and your words are their context budget.
 
 ## Do not
 
@@ -131,6 +134,11 @@ allow and record the leftover honestly.
 - Do not edit any file other than `<PATH>` and `RESIDUAL-LEDGER.md`.
 - Do not change the parser, the encoding rules, or any other skill or
   agent.
+- Never run `git stash` in any form. This worktree is shared with
+  other agents working in parallel; a stash sweeps up and can destroy
+  their uncommitted edits. If the corpus-wide parser run fails on a
+  file that is not yours, that is a sibling agent mid-edit — verify
+  your own file's chain and move on.
 
 ## Report
 

@@ -138,8 +138,8 @@ exemplar, worked as the abstraction shape in
   [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md)
   and proven by `parser/chaingen.py`, which deterministically
   regenerates every covered unit's chain into `parser/chains.txt` and
-  fails on drift via `--check`. Remaining work rides that file's
-  to-do.
+  fails on drift via `--check`. Remaining work rides the Now section
+  below.
 
 **Raw ideas, none designed**
 
@@ -271,22 +271,34 @@ works the term holds the detail. Every one is a tentative promotion to
 ## Now
 
 Edge encoding is the live work: the design and its parser sit in
-[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md), and
-that file's to-do carries the next steps in order. The ontology above it is
-settled in
+[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
+This section is the one to-do list for the branch. The ontology above
+the encoding is settled in
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md),
 with every proven chain in
 [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md).
 
-The corpus port runs in three stages, because thirteen skills in the
+The corpus port runs in stages, because thirteen skills in the
 roster are third-party verbatim — vendored bytes under
 `dotfiles/.agents/skills/`, which the current policy forbids editing,
 and a port is nothing but an edit:
 
 1. **First-party first.** Port every unit we author ourselves — all
    nine agents and the unmarked skills in the
-   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster).
-2. **Retire verbatim adoption.** A Decision Record changes the policy:
+   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster),
+   by the dispatch procedure in
+   [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md).
+2. **The standard, and the gate goes green.** The grammar's standard
+   card and the skill-standards scrub are likely one job: the new
+   standard replaces what the old docs teach (the `## Name: $ARGUMENTS`
+   heading, `argument-hint`), and `scripts/skill-lint` and friends stop
+   expecting the old forms and start enforcing the map — which is also
+   what fixes the failing pre-commit checks. Today every port commit
+   rides `SKIP=playbook-lint` (pushes add `SKIP=make-check`) because
+   skill-lint's closed frontmatter vocabulary rejects the `arguments`
+   key. The skips are deliberate and temporary; the branch does not
+   merge while any remain.
+3. **Retire verbatim adoption.** A Decision Record changes the policy:
    external skills are no longer adopted verbatim — the corpus requires
    every unit to carry the edge encoding, and vendored bytes cannot be
    edited, so verbatim adoption is rejected for that reason. The
@@ -297,15 +309,12 @@ and a port is nothing but an edit:
    stance — `pocock-sweep`, the external-skill-verdicts ledger, the
    skill-management standard, and whatever else the sweep of those docs
    finds.
-3. **Port the converted skills.** The former (3P) thirteen, now owned,
+4. **Port the converted skills.** The former (3P) thirteen, now owned,
    go through the same port as stage 1.
-4. **Fix the failing pre-commit checks.** Every port commit currently
-   rides `SKIP=playbook-lint` (and pushes `SKIP=make-check` too):
-   `skill-lint`'s closed frontmatter vocabulary rejects the `arguments`
-   key the encoding introduces. Teach the lints the ported format —
-   part of the standard scrub in the Edge Encoding to-do — so the gate
-   runs green with no `SKIP` anywhere. The skips are deliberate and
-   temporary; the branch does not merge while any remain.
+5. **Final Quality Pass.** Go through the final skills and look for residual
+opportunities. We deemphasized residuals tracking during the conversion
+sweeps so we'll need a fresh eye to see if we're happy with the final result
+or if we need new expressions.
 
 The factory phase is parked: one session read all its files and left the
 classification, the intent, and unbound rewrite sketches in

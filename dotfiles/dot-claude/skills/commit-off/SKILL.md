@@ -8,9 +8,8 @@ effort: low
 
 # Commit Off
 
-The user wants to review every diff before it is committed. From now until
-the user turns committing back on, finish each unit of work and run no
-`git commit`, leaving the changes in the working tree.
+Until the user turns committing back on, finish each unit of work and run no
+`git commit` — leave the changes in the working tree for review.
 
 Acknowledge activation with exactly:
 

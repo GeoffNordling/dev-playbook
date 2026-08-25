@@ -4,13 +4,13 @@ description: Author a new Claude Code skill bundle against the workspace's skill
 disable-model-invocation: false
 model: opus
 effort: xhigh
+arguments: [idea]
 ---
 
 # Skill Creator
 
-Create a new Claude Code skill. `$ARGUMENTS` carries whatever the user has
-already said about it; the interview in step 2 starts from that and confirms
-it.
+Create a new Claude Code skill. `idea` carries whatever the user has already
+said about it; the interview in step 2 starts from that and confirms it.
 
 The steps run in order. Step 2 ends by putting its questions to the user and
 waiting for the answers, and those answers are the inputs to steps 3–5 — so
@@ -21,16 +21,14 @@ the first line of `SKILL.md` gets written at step 5.
 Do both before going further. They split along one seam: conventions is
 binding, craft is the skill.
 
-- Read
-  [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md)
-  — the format `scripts/skill-lint` enforces at the commit gate: front matter,
+- {Read [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) plus its checklist, walked before done}.
+  The format `scripts/skill-lint` enforces at the commit gate: front matter,
   file structure, length, naming, references, checklist.
-- Invoke /writing-for-agents — how a document an agent consumes is written so
-  it behaves predictably. Its `SKILL-MECHANICS.md` carries the skill-specific
-  half.
+- {Run [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) in context} —
+  how a document an agent consumes is written so it behaves predictably. Its
+  `SKILL-MECHANICS.md` carries the skill-specific half.
 
-This skill is the workflow over those two; the rules live there. Where they
-collide, skill-conventions.md wins.
+This skill is the workflow over those two; the rules live there. {Override [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) on craft guidance with [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md); they collide}.
 
 ## 2. Gather requirements
 
@@ -89,7 +87,8 @@ in the dotfiles repo's `dotfiles/dot-claude/skills/` for cross-project skills.
 
 ## 5. Draft
 
-Write `SKILL.md` and any reference files against the answers from step 2.
+{Write the new skill bundle, project-local or cross-project home}: `SKILL.md`
+and any reference files against the answers from step 2.
 
 - Include a concrete example wherever a rule earns one.
 - Mirror the siblings: where the workspace's skills already share a shape

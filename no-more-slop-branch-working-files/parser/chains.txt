@@ -16,6 +16,10 @@
 [doc-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
 
 [open-pr] Agent · model: sonnet, effort: low
+  ├ ╌ reports ╌ ► outcome: str    that PR    if it lists one
+  ├─reads───► factory-operations.md
+  ├─reports─► outcome: str    the PR's number and whether you created it or found it already open
+  └ ╌ reports ╌ ► outcome: str    the reason instead, as escalated    if the PR cannot be created at all
 
 [set-auditor] Agent · tools: Read, Grep, Glob, model: opus, effort: xhigh
 
@@ -91,6 +95,14 @@
 {improve-codebase-architecture} Skill
 
 [intake] Skill · model: inherit, effort: xhigh
+  ├─reads───► software factory standard
+  ├─reads───► [issue-authoring] Standard
+  ├─does────► [grill-with-docs] Skill    once to sharpen the raw idea
+  ├─reads───► [factory-labels] Standard
+  ├─does────► [user-intent-mini-interview] Skill    for that one
+  ├─does────► [issue-review-claims] Skill    `<issue>`
+  ├─does────► [issue-review-simulation] Skill    `<issue>`
+  └─reports─► outcome: str    the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`
 
 [issue-overwatch] Skill · model: inherit, effort: xhigh
 
@@ -112,6 +124,8 @@
 {marimo-notebook} Skill
 
 [orchestrate] Skill · model: inherit, effort: xhigh
+  ├─reports─► outcome: str    a single line confirming Fable orchestration mode is on
+  └ ╌ reports ╌ ► outcome: str    that immediately    if you are not Fable
 
 [pocock-sweep] Skill · model: inherit, effort: xhigh
 
@@ -134,6 +148,11 @@
   └─reports─► outcome: str    the verbatim text of the rewind target
 
 [skill-creator] Skill · model: opus, effort: xhigh
+  ├─args────► idea
+  ├─reads───► [skill-conventions] Standard    plus its checklist, walked before done
+  ├─does────► {writing-for-agents} Skill    in context
+  ├─overrides─► {writing-for-agents} Skill    on craft guidance    with [skill-conventions] Standard
+  └─writes──► local file    the new skill bundle, project-local or cross-project home
 
 [update-standards-pin] Skill · model: opus, effort: xhigh
 

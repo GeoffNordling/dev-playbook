@@ -12,99 +12,119 @@ what the full rewrite could not express in it, recognized and written
 down at the moment of porting. That is all an entry is — a record, not
 a question awaiting a verdict.
 
-Entries are parsimonious: a few lines naming each leftover, nothing
-more. No "accounted" inventories, no history, no restating the map's
-own rules. A recurrence cites its family by name and moves on; the
-first sighting carries whatever one-line context the verdict needs.
+An entry is a couple of sentences, hard limit: name each specific
+action the file could not express and why the map cannot say it —
+nothing else. No inventories of what fit, no family taxonomies, no
+cross-references to other entries, no history, no restating the map's
+rules.
 
 ## log-friction
 
-Behavior-mode block ("fire-and-forget, ask nothing") — recurs
-corpus-wide, strongest primitive candidate. Control-flow "and stop" —
-early exit has no primitive. Rationale prose — why-text has no
-primitive.
+Could not express the fire-and-forget behavior mode, the early exit
+("and stop"), or the why-text calibrating judgment — no primitive for
+any of the three.
 
 ## document-deslop
 
-Partially ported; the Review section waits on a conditional-report
-round. Negated edge ("This skill never commits"). Conditional report —
-one branch deliberately reports nothing; likely encodable as guarded
-reports.
+Partially ported; the Review section still waits. Could not express
+"this skill never commits" (no primitive for a forbidden action) or a
+report that one branch deliberately withholds.
 
 ## grill-with-docs
 
-Override-scope prose — statements of what is *not* overridden
-(negated-edge family).
+Could not express what is *not* overridden ("Everything else applies
+as written") — no primitive asserts an edge's absence.
 
 ## usage-report
 
-Script subtree — a script has no frontmatter or spans, so its own
-reads can't generate; the does edge ends at the file.
+Could not express the script's own read of `usage.json` — a script has
+no frontmatter or spans, so the does edge ends at the file.
 
 ## deslopper
 
-Enforce relationship flattened to a plain read — nothing says this
-unit is a Standard's enforce arm. Agent inputs — agents have no
-`arguments` frontmatter, so inputs ride as prose. Negated edge and
-rationale prose recur.
+Could not express being a Standard's enforce arm (flattened to a plain
+read) or an agent's inputs — agents have no `arguments` frontmatter.
 
 ## handoff
 
-Scratch write — the OS temp-directory write is the open
-writes—GitHub/scratch hole; stays prose. Multiple unnamed reports —
-two facts, both rendering the constant `outcome: str`.
+Could not express the OS temp-directory write (the writes—scratch
+hole) or telling the two reports apart — both render `outcome: str`.
 
 ## ralph-setup
 
-Named report — `launch_command: str` collapses to `outcome: str`; the
-name rides in annotation only. Mid-run acknowledgment reworded
-"report"→"say". Guards deliberately restate the prose approval gates.
+Could not express the report's name (`launch_command` rides only in
+annotation) or the mid-run `READ:` acknowledgment, which targets the
+conversation, not the invoker.
 
 ## commit
 
-Ambient-repo git write — `git_detail()` demands `-C`, but this skill
-commits the repo it stands in, so the write stays prose; filling the
-hole means treating a `-C`-less line as the ambient repo. Guard's
-condition restated in the unbraced lead sentence (control flow has no
-primitive, only its report does).
+Could not express committing the ambient repo — `git_detail()` demands
+a `-C <repo>` no honest same-repo command carries — or the
+skip-the-amend decision itself; only its report has a primitive.
 
 ## datasheet
 
-Split argument — one free-text hint declared as
-`arguments: [subject, scope]`, read off the datasheet standard's own
-field names. Scratch write recurs (`.datasheet/`). Extensionless
-script target — `griffe-outline` misses `classify()`'s
-`\.(sh|py|bash)$` heuristic, so the edge renders bare link text, not
-`Script`. Negated edge and rationale prose recur.
+Could not express the `.datasheet/` scratch write (writes—scratch
+hole) or `griffe-outline` as a Script — `classify()` types scripts by
+`.sh`/`.py`/`.bash` extension and it has none.
 
 ## clean-up-branch-worktree
 
-Ambient-repo git writes recur (`git fetch`, `git merge --ff-only`).
-Bare harness tool call — `ExitWorktree` is the central action but the
-does row only covers file-linked Agent/Skill/Script. Ephemeral
-data-gathering commands, unbraced control-flow `if`, and rationale
-prose recur.
+Could not express the ambient-repo `git fetch`/`git merge`, the
+`ExitWorktree` tool call (does covers only file-linked units), or the
+state-reading `git`/`gh` commands.
 
 ## idea
 
-Cross-repo does-edge — the Run target
-(`~/workspace/mission-control/.claude/skills/idea/SKILL.md`)
-classifies cleanly but lives outside the scanned corpus, so no chain
-exists to stitch into. Override-scope prose recurs as a
-parameter-binding variant: the Overrides section binds fixed values
-onto the delegated skill, not one linked unit for another. Unbraced
-conditional recurs.
+Could not express the delegation target's own behavior — the Run edge
+resolves to mission-control's skill, outside the scanned corpus, so no
+chain exists to stitch into — or the Overrides section, which binds
+fixed values, not one linked unit for another.
 
 ## rewind-compact
 
-Doubled unnamed report recurs (summary + verbatim rewind target, both
-`outcome: str`). Narrative intro reworded away — rationale cut, the
-definitional half folded into step 1. Unbraced conditional recurs.
+Could not express telling the two reports apart (both `outcome: str`).
+
+## commit-off
+
+Could not express forbidding an action ("run no `git commit`") or the
+two exact-text mid-session acknowledgments — no primitive for either.
+The chain is the bare node header.
 
 ## candidate-promote
 
-Ambient-repo read — `CANDIDATES.md` resolves per invocation, but
-`{Read}` demands one on-disk link; the read-side first sighting of
-commit's ambient-repo family. Named/typed report recurs
-(`issue_number: int, removed_entries: list[str]` → `outcome: str`).
-Guard-condition restated and conditional negated edge recur.
+Could not express reading the invoking repo's `CANDIDATES.md` —
+`{Read}` needs one fixed on-disk link and the target changes per
+invocation — or the typed report (`issue_number: int`) — reports
+render only `outcome: str`.
+
+## orchestrate
+
+Could not express launching runtime-chosen subagents — `{Launch}`
+needs a link to one agent file and none exists — or the persistent
+session posture, which no primitive covers.
+
+## intake
+
+Could not express the GitHub issue writes (`gh issue create`/`edit`,
+comments) — the writes—GitHub hole — the `gh issue view` read (no
+on-disk link), or the mode→phase routing table (a table has no
+sentence for the grammar to span). `software-factory.md` renders as
+bare link text: `classify()` has no type for docs outside
+`standards/`.
+
+## skill-creator
+
+Could not express the interview loop of steps 2 and 6 (no primitive
+for a question-and-answer round), the `scripts/skill-lint` run (bare
+command, no link for a does edge), or the step-completion gates (no
+control-flow primitive).
+
+## open-pr
+
+Could not express the anchored read — `{Read}` fails on `#fragment`
+links, so the recipe link dropped its anchor — the `gh issue view` and
+branch-diff reads (no on-disk link), the PR-body scratch write and
+`gh pr create` (writes—GitHub/scratch hole), or the issue-number input
+(agents have no `arguments` frontmatter). Three alternate reports all
+collapse to `outcome: str`.

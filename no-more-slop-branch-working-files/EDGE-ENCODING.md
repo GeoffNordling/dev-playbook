@@ -318,13 +318,13 @@ Agents:
 - [ ] build
 - [ ] code-pr-review
 - [ ] doc-pr-review
-- [ ] open-pr
+- [x] open-pr
 - [ ] set-auditor
 - [ ] set-deslopper
 
 Skills:
 
-- [x] document-deslop — Review section still unencoded (To-do 2)
+- [x] document-deslop — Review section still unencoded (rides stage 1 of the branch plan)
 - [x] grill-with-docs
 - [x] log-friction
 - [x] usage-report
@@ -333,7 +333,7 @@ Skills:
 - [x] clean-up-branch-worktree
 - [ ] codebase-design (3P)
 - [x] commit — the `{Commit}` span itself skipped: `git_detail()` requires `-C`, this skill targets the ambient repo (ledgered)
-- [ ] commit-off
+- [x] commit-off
 - [ ] compact-prep
 - [x] datasheet
 - [ ] design
@@ -344,20 +344,20 @@ Skills:
 - [x] handoff
 - [x] idea
 - [ ] improve-codebase-architecture (3P)
-- [ ] intake
+- [x] intake
 - [ ] issue-overwatch
 - [ ] issue-review-claims
 - [ ] issue-review-simulation
 - [ ] judgments-sweep
 - [ ] marimo-batch (3P)
 - [ ] marimo-notebook (3P)
-- [ ] orchestrate
+- [x] orchestrate
 - [ ] pocock-sweep
 - [ ] prototype (3P)
 - [x] ralph-setup
 - [ ] research (3P)
 - [x] rewind-compact
-- [ ] skill-creator
+- [x] skill-creator
 - [ ] update-standards-pin
 - [ ] user-intent-mini-interview
 - [ ] wait-what (3P)
@@ -369,35 +369,6 @@ Skills:
 
 ## To-do
 
-In order:
-
-1. **Fill the map hole.** writes — GitHub / scratch, ruled when the
-   port surfaces each bucket's sentence. The units that write either
-   bucket are the ones whose chains carry a scratch or GitHub write in
-   [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md);
-   read the roster off the ledger rather than a copy of it. No unit
-   writes a cache — usage-report's script only reads one — and no unit
-   fires does → Workflow: the Workflow noun does not appear in
-   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).
-2. **Finish document-deslop.** Its Review section is the covering
-   set's one unencoded piece. The shape it waits on has landed: the
-   deslopper rewrite encodes two guarded reports through
-   guard-contained `{Report …}` spans. What remains is applying it.
-3. **The corpus port.** Bring every unchecked Port roster unit online,
-   one at a time: generate the target chain from the unit itself and
-   its prior recorded chain in
-   [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md),
-   encode the file in map language so the prose reads naturally and
-   parses to that target, run `chaingen.py`, and certify the result in
-   `parser/chains.txt`. Escalate immediately on a new primitive, a
-   rule change, or an ambiguous sentence.
-4. **The standard.** The grammar's standard card and the
-   skill-standards scrub are likely one job: the new standard replaces
-   what the old docs teach (the `## Name: $ARGUMENTS` heading,
-   `argument-hint`), and `scripts/skill-lint` and friends stop
-   expecting the old forms and start enforcing the map. Decide whether
-   card and scrub are one standard when the writing starts.
-5. Parked: whether an unmarked link to a known unit should require a
-   waiver. The live case: document-deslop links slop-tics.md in plain
-   prose — correctly edge-free there, but the same pattern could be a
-   forgotten encoding.
+The plan lives in one place: the
+[branch plan's Now section](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#now).
+This file carries no step list of its own.
