@@ -90,9 +90,16 @@ The ruled rows, in detail:
   the argument text appended to the rendered content as
   `ARGUMENTS: <input>`, so nothing is dropped; `$name` placeholders are
   positional with shell-style splitting — on unquoted free text they
-  grab one word — so free-text skills must not use them. Verification
-  step before porting to live skills: one live test that the append
-  fallback fires unchanged when `arguments:` is declared. Ripple: the
+  grab one word — so free-text skills must not use them. Verified live
+  (2026-08-25, probe skill, headless and subagent contexts, byte-identical
+  results): the invented `arguments:` key is inert to the harness; the
+  `ARGUMENTS: <input>` append fires unchanged with it declared; and
+  frontmatter is stripped from rendered content — the executing agent
+  never sees the argument name, which therefore carries meaning for
+  the user and the chain only. Side findings: the skills directory
+  rescans live (no session restart needed), and
+  `disable-model-invocation: true` blocks the Skill tool itself, not
+  just spontaneous invocation. Ripple: the
   skill standards' `## Name: $ARGUMENTS` heading convention and
   `argument-hint` guidance retire when this merges.
 - **guard** — `{If <condition>, {edge span} …}`: the guard nests the
@@ -344,11 +351,7 @@ In order:
    `argument-hint`), and `scripts/skill-lint` and friends stop
    expecting the old forms and start enforcing the map. Decide whether
    card and scrub are one standard when the writing starts.
-4. **Live args test.** One run confirming the harness ignores the
-   invented `arguments:` frontmatter key and still appends
-   `ARGUMENTS: <input>` when the body has no placeholder — the
-   undocumented assumption the args ruling stands on.
-5. Parked: whether an unmarked link to a known unit should require a
+4. Parked: whether an unmarked link to a known unit should require a
    waiver. The live case: document-deslop links slop-tics.md in plain
    prose — correctly edge-free there, but the same pattern could be a
    forgotten encoding.
