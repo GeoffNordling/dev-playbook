@@ -1,6 +1,6 @@
 ---
 name: set-auditor
-description: Audits one working documentation set against the working-documentation-sets standard, reporting findings without editing. Use when the working-doc-set-audit skill or the set-deslopper agent dispatches a target set.
+description: Audits one working documentation set against the working-documentation-sets standard, reporting findings without editing. Use when the set-deslopper agent dispatches a target set.
 tools: Read, Grep, Glob
 model: opus
 effort: xhigh
@@ -42,8 +42,7 @@ conventions the set itself declares. The finding categories:
 
 ## Report back
 
-The report is the hand-off to whoever fixes the set — the user behind the
-working-doc-set-audit skill, or the set-deslopper agent. Findings ranked
+The report is the hand-off to the set-deslopper agent. Findings ranked
 by how much each would mislead a fresh session reading the set cold.
 Every finding cites `file:line`, quotes the offending text, and names its
 category; a duplication or conflict finding also says where the surviving

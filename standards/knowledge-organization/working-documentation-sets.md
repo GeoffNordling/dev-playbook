@@ -14,10 +14,9 @@ file's prose answers to the [prose standard](/standards/prose.md); members
 typically carry `type: General-Sheet`, the registry's genre for a working
 document whose type is not yet settled.
 
-The `/working-doc-set-audit` skill audits a set against this standard and
-reports what it finds; the `/working-doc-set-deslop` skill sends a set
-through an agent that audits and then fixes it, leaving every edit
-uncommitted for the user's diff review.
+The `/working-doc-set-deslop` skill sends a set through an agent that
+audits it against this standard and then fixes what the audit finds,
+leaving every edit uncommitted for the user's diff review.
 
 ## Shape
 
