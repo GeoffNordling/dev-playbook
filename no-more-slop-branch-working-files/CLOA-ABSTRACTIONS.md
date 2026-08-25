@@ -27,16 +27,17 @@ changes as a result — and an abstraction names that meaning at the CLOA.
 
 ## Documentation as code
 
-The vision: think of documentation like code — modules,
-typing, signatures, rules. We will wrap deterministic
-structure around written documentation. Keep the structure simple,
-enforceable, deterministic, and high leverage.
+The vision: documentation is stochastic, extremely high-dimensional
+code. The move is to add parsimonious structure — the minimum that
+deterministic code can parse — and let that structure carry a
+high-level abstraction capturing most of what the user cares about
+in the document. Keep the structure simple, enforceable,
+deterministic, and high leverage.
 
-The working heuristic: documentation is a fuzzy, stochastic version of
-code — treat it as a special case of code, and unify the two theories
-when the parallel is real. When the documentation form of a problem is
-stuck, translate it to the code form, solve it there, and port the
-analogy back.
+The working heuristic follows: treat documentation as a special case
+of code, and unify the two theories when the parallel is real. When
+the documentation form of a problem is stuck, translate it to the
+code form, solve it there, and port the analogy back.
 
 **Change cost.** Adopted abstractions change the
 way a codebase does — refactors are significant investments.
@@ -78,7 +79,8 @@ An expectation-maximization shape over a chosen target artifact:
   model validates every accepted candidate against the corpus.
 - **Convergence** is the pandas standard: the user predicts the target's
   behavior without reading its bodies, and the abstraction count is
-  minimal — good abstractions are a codebook the corpus gets short in.
+  minimal — good abstractions are a codebook the corpus gets short in,
+  so functionality per character runs high.
 
 Residuals are tracked. The loop's job is awareness of what
 the abstractions fail to carry; the primitive set is refactored only when
@@ -147,6 +149,13 @@ down the levels.
   effect at runtime, self-owned units included.
 - **Types respected.** The loop keeps the stochastic/deterministic
   distinction and the document-type distinctions explicit.
+- **Every documentation family is its own beast.** The Reference chain
+  is the skills-family solution — skills are commands, so a
+  command-shaped abstraction fits — not the universal one. Each family
+  earns its own abstractions and its own deterministic parsing: a
+  freedom and a burden both. The registry pass's per-type dispositions
+  and the rule that a type earns a noun only by demonstrating a verb
+  interface are this constraint applied.
 - **General and hierarchical across repos.** The abstractions and the loop run on any
   workspace repo, anchored on that repo's registries — document types
   (upstream ∪ local) for concept docs, harness files for executors.
@@ -204,6 +213,14 @@ down the levels.
 A **unit** is one documentation file, or an abstract object that functions
 like one, the way a skill functions like its SKILL.md. Every chain node is
 a unit; the nouns in the table are its types.
+
+The chain's origin: a skill is a command — invoked by name, args in,
+reports out, effects on state — and a command's caller is owed a
+signature. The Reference chain is that signature written down; an
+agent differs only in context binding, so it shares the shape. The
+chain carries the order the unit fires its operations in — not with
+full fidelity, because the chain is a collapse of the unit's program,
+and the fine-grained sequencing it drops stays below the CLOA.
 
 Notation: `[x]` self-owned, `{x}` vendored. The edges:
 
