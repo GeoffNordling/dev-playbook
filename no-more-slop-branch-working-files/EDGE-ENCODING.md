@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Edge Encoding
-description: The inline grammar that makes skill prose machine-parseable — the rules ruled so far and the roster of edges still to encode
+description: The one-to-one primitive map from Reference chain to skill prose — the ruled encodings, the holes, and the residual ledger
 ---
 
 # Edge Encoding
@@ -37,13 +37,69 @@ never embed notation). STE is loose style inspiration, unenforced. What we
 adopt 100% is our own small grammar below, to be specified as a standard
 card and enforced by our lint.
 
-## The grammar — ruled so far
+## The theory
+
+Every higher-level primitive maps one-to-one to exactly one lower-level
+expression — `reports` in the chain is `{Report …}` in the prose, and
+nothing else is. A skill is then rewritten using only the map, and
+whatever prose refuses to fit is a **residual**, tracked in the ledger
+below. A valuable residual amends the shared primitive structure; a
+worthless one is reworded away. This is the same loop the higher level
+ran — model, track residuals, let residuals force the ontology — pushed
+down one level. The earlier sentence-by-sentence retrofit ran the loop
+backwards, and every retrofit surfaced a fresh complexity; the map runs
+it forwards.
+
+## The primitive map
+
+| Higher primitive | Lower expression | Status |
+|---|---|---|
+| node type + ownership | file path | **Ruled** (derived) |
+| node data (`model`, `effort`, `allowed-tools`) | frontmatter, verbatim | **Ruled** (derived) |
+| unit summary | frontmatter `description` | **Ruled** (derived) |
+| args | `## <Name>: $ARGUMENTS` heading | Proposed, unruled |
+| reads | `{Read <one link>}` | **Ruled** |
+| writes — git bucket | `{Commit …}` + fenced command | **Ruled** |
+| writes — other buckets | — | **Hole** |
+| reports | `{Report <payload>}` | **Ruled** |
+| guard | `{If <condition>, {…}}` containment | **Ruled** |
+| does → Agent / Skill / Script / Workflow | — | **Hole** |
+| overrides … with … | — | **Hole** |
+
+The ruled rows, in detail:
+
+- **guard** — `{If <condition>, {edge span} …}`: the guard nests the
+  span(s) it guards, so binding is containment, never sentence
+  adjacency. The text between the keyword `if` and the first nested
+  span is the condition, lifted verbatim (trailing comma dropped);
+  every nested span fires under that condition and draws dashed; prose
+  in the body ("and stop") stays uncoded. This spends the two-deep
+  nesting cap — guard at depth one, edges at depth two, never deeper.
+  A span nested nowhere is unconditional (solid). Unbraced `if` stays
+  plain prose and fires nothing. (Supersedes `{only where …}` and the
+  same-sentence adjacency rule: the distinctive phrase and the
+  heuristic are both jobs the braces already do.)
+- **reads** — `{Read <payload containing exactly one link>}`. The one
+  markdown link or citation in the span is the edge target; other words in
+  the span are annotation. Two reads means two spans; zero or two links in
+  one span fails the lint.
+- **writes, git bucket** — `{Commit …}` declares the edge; the fenced
+  command block in the same step supplies the machine detail — repo from
+  `-C`, operations from the git subcommands. The lint requires the block
+  and fails span/block disagreement.
+- **reports** — `{Report <payload>}`. The name is the constant default
+  `outcome`, the type the constant `str` (a skill's report to its caller
+  is prose); the annotation is the payload after the keyword, verbatim.
+  Named or non-str reports (candidate-promote's `issue_number: int`) and
+  multiple reports (handoff) are outside the covering set, unruled.
+
+## Grammar mechanics
 
 - **Braced span.** `{keyword payload}` — the one inline form. Every span
   opens with a fixed keyword from the grammar's lexicon; the keyword types
   the span and the remainder is payload. Keywords match case-insensitively
   so sentence-initial `{Read …}` stays natural. Flat by default; nesting is
-  reserved and capped at two deep.
+  reserved and capped at two deep — the guard spends it.
 - **Delimiter.** `{…}` won on merit: the skill corpus is nearly free of
   braces outside code spans, angle brackets are the workspace's placeholder
   convention (`<issue>`, `<repo>`), and a space-free `<tag>` vanishes in
@@ -60,35 +116,6 @@ card and enforced by our lint.
   chain's edge labels (`reads`, `writes`, `reports`) as the third-party
   observer. The higher level renamed `returns` to `reports` so this
   translation is always the bare `+s`, never a word swap.
-
-Ruled encodings, one per edge:
-
-- **guard** — `{If <condition>, {edge span} …}`: the guard nests the
-  span(s) it guards, so binding is containment, never sentence
-  adjacency. The text between the keyword `if` and the first nested
-  span is the condition, lifted verbatim (trailing comma dropped);
-  every nested span fires under that condition and draws dashed; prose
-  in the body ("and stop") stays uncoded. This spends the two-deep
-  nesting cap — guard at depth one, edges at depth two, never deeper.
-  A span nested nowhere is unconditional (solid). Unbraced `if` stays
-  plain prose and fires nothing. (Supersedes `{only where …}` and the
-  same-sentence adjacency rule: the distinctive phrase and the
-  heuristic are both jobs the braces already do.)
-- **reads** — `{read <payload containing exactly one link>}`. The one
-  markdown link or citation in the span is the edge target; other words in
-  the span are annotation. Two reads means two spans; zero or two links in
-  one span fails the lint.
-- **writes, git bucket** — `{commit …}` declares the edge; the fenced
-  command block in the same step supplies the machine detail — repo from
-  `-C`, operations from the git subcommands. The lint requires the block
-  and fails span/block disagreement. Other write buckets (local file,
-  GitHub, scratch, cache) are unruled; each gets its keyword when its
-  exemplar sentence comes up.
-- **reports** — `{Report <payload>}`. The name is the constant default
-  `outcome`, the type the constant `str` (a skill's report to its caller
-  is prose); the annotation is the payload after the keyword, verbatim.
-  Named or non-str reports (candidate-promote's `issue_number: int`) and
-  multiple reports (handoff) are outside the covering set, unruled.
 
 ## Proposal procedure
 
@@ -107,6 +134,35 @@ ruling approves the three together:
    certifies that deterministic code parsing the after-prose reconstructs
    the target fragment exactly; the trace is the contract the future
    parser implements.
+
+## Residual ledger
+
+Per exemplar: what the full rewrite could not express in the map. Each
+entry awaits a verdict — valuable (amends the shared structure) or not
+(reworded away).
+
+### log-friction
+
+The rewrite converges: every sentence is a primitive, an accounted
+internal, or one of these three residuals.
+
+1. **Behavior-mode block** — "Run to completion without asking the user
+   anything … fire-and-forget …". The higher level already ledgers this
+   category (orchestrate's whole body, diagnosing-bugs' secret-redaction
+   rule) as remembered-not-primitive. It recurs; strongest candidate for
+   a future primitive.
+2. **Control flow** — "and stop" in the nothing-to-record bullet. Early
+   exit has no primitive; it rides as uncoded payload words the agent
+   obeys.
+3. **Rationale prose** — "An imperfect entry is cheap: the log is
+   append-only prose …". Not an instruction — why-text calibrating the
+   agent's judgment. No primitive expresses justification.
+
+Accounted, not residual: the three unbraced `If` bullets (the deliberate
+uncoded-conditional tier); step 2's entry-writing and step 3's staging
+detail (internal program below the CLOA); the working-tree edit itself
+(subsumed by the git commit edge, exactly as the ledger's chain models
+it).
 
 ## Principles ruled this session
 
@@ -130,25 +186,22 @@ ruling approves the three together:
   test-suite hook is skipped (`SKIP=make-check` on push).
 - **Acronyms defined once**, at the top of anything we write.
 
-## The roster
+## Holes in the map
 
-Every edge CLOA-ABSTRACTIONS.md defines, its exemplar sentence, and where
-it stands. The minimal covering set is four skills plus one agent file —
-no skill fires both a does→Agent and a does→Script edge.
+Each hole has its exemplar waiting in the covering set — four skills
+plus one agent file; no skill fires both a does→Agent and a does→Script
+edge.
 
-| # | Edge | Exemplar | Status |
-|---|---|---|---|
-| 1 | guard | log-friction step 3 | **Ruled**, committed |
-| 2 | reads | log-friction step 1 | **Ruled**, committed |
-| 3 | writes (git bucket) | log-friction step 3 + fenced block | **Ruled**, committed |
-| 4 | args | log-friction `## Friction: $ARGUMENTS` | Open — likely derived from the heading form |
-| 5 | reports | log-friction step 4 + the nothing-to-record bullet | **Ruled**, committed |
-| 6 | does → Agent | document-deslop ("launch the `deslopper` subagent") | Open |
-| 7 | does → Skill | grill-with-docs ("Run a /grilling session") | Open |
-| 8 | does → Script | usage-report (its `report.sh` run) | Open |
-| 9 | overrides | grill-with-docs ("Where /domain-modeling says …") | Open |
+| Hole | Exemplar |
+|---|---|
+| args (proposed, unruled) | log-friction `## Friction: $ARGUMENTS` |
+| does → Agent | document-deslop ("launch the `deslopper` subagent") |
+| does → Skill | grill-with-docs ("Run a /grilling session") |
+| does → Script | usage-report (its `report.sh` run) |
+| overrides … with … | grill-with-docs ("Where /domain-modeling says …") |
+| writes — other buckets | local file, GitHub, scratch, cache — each when its sentence comes up |
 
-Also open, beyond the roster: the remaining write buckets; where the
-grammar's standard card lives; the lint and parser themselves; and the
-old two-sided question — whether an unmarked link to a known unit should
-require a waiver — parked, not dropped.
+Also open, beyond the map: where the grammar's standard card lives; the
+lint and parser themselves; and the old two-sided question — whether an
+unmarked link to a known unit should require a waiver — parked, not
+dropped.
