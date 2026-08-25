@@ -212,6 +212,31 @@ The ruled rows, in detail:
   observer. The higher level renamed `returns` to `reports` so this
   translation is always the bare `+s`, never a word swap.
 
+## Chain rendering
+
+The display conventions the generator implements — pinned by
+`parser/chaingen.py`, which reproduces every certified emission
+byte-for-byte:
+
+- An edge line is arrow, target, annotation, condition, separated by
+  four spaces; empty segments are dropped.
+- A solid arrow pads its label to eight columns (`├─reads───►`); a
+  guarded edge draws dashed (`├ ╌ reads ╌ ►`) and carries
+  `if <condition>` as the rightmost segment.
+- Targets render: a unit as `[name] Type` or `{name} Type`, the name
+  from the resolved path (a SKILL.md's directory, an agent's or
+  standard's basename, a script's filename); a non-unit read target as
+  the link text verbatim (`friction/log.md`); a report as
+  `outcome: str`; a local-file write as `local file`; a git write as
+  `git(<repo>: <subcommands>)` — repo from `-C`, subcommands in command
+  order, deduplicated.
+- The node header is `[name] Type · <node data>`: the recognized
+  frontmatter keys (`tools`, `model`, `effort`, `allowed-tools`)
+  verbatim, in frontmatter order. args edges lead; body edges follow in
+  document order.
+- Whitespace inside a slice collapses to single spaces — spans wrap
+  across source lines.
+
 ## Proposal procedure
 
 Every encoding proposal is presented on screen in parts, approved together
@@ -228,11 +253,15 @@ by one ruling:
    token on the left, the rule that fires on it, and the chain element
    it emits on the right — step by step until the whole fragment is
    rebuilt and nothing in it is unexplained. Approval certifies the
-   transform; it is the contract the future parser implements. Every
-   chain drawn on screen is a perfect simulacrum of the generator's
-   output — byte-faithful, no abbreviation, no truncation, no
-   prettifying. A chain too noisy to read that way is a design defect
-   to fix in the rules or the prose, never in the drawing.
+   transform; it is the contract the parser implements. Chains are
+   never hand-drawn and never pasted into the terminal: the generator
+   writes them all to `parser/chains.txt`, and the user reads them
+   there. A chain too noisy to read is a design defect to fix in the
+   rules or the prose, never in the output. Prose is written with the
+   generator in mind: phrase each span so the text left after excising
+   the link reads clean on the edge — no orphaned `'s`,
+   `a … session`, or leading punctuation — and demote elaboration
+   behind a semicolon so it stays file-only.
 
 ## Residual ledger
 
@@ -343,7 +372,10 @@ In order:
 1. **The parser prototype.** Deterministic code that reconstructs the
    high-level chains from the encoded `edge-examples/` files. This
    proves the concept: its output must reproduce the certified
-   transforms exactly.
+   transforms exactly. Built: `parser/chaingen.py`, stdlib Python;
+   running it writes every unit's chain, blank-line separated, to
+   `parser/chains.txt` — the one file the user reads chains in — and
+   `--check` regenerates in memory and fails on drift.
 2. **Fill the map holes.** writes — GitHub / scratch / cache, and
    does → Workflow. Neither has a sentence in the covering set (no
    file in it fires a Workflow; the GitHub bucket lives in skills like

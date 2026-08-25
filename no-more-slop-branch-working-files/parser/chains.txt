@@ -1,0 +1,25 @@
+[deslopper] Agent · tools: Read, Write, Edit, model: sonnet, effort: high
+  ├─reads───► [slop-tics] Standard
+  ├─writes──► local file    the target document in place
+  ├ ╌ reads ╌ ► {writing-for-agents} Skill    if the target is an agent-facing instruction file
+  ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
+  └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
+
+[document-deslop] Skill · model: sonnet, effort: high
+  ├─args────► doc-hint
+  └─does────► [deslopper] Agent    the subagent, `model: sonnet`
+
+[grill-with-docs] Skill · model: inherit, effort: xhigh
+  ├─does────► {grilling} Skill
+  ├─does────► {domain-modeling} Skill    throughout
+  └─overrides─► {domain-modeling} Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
+
+[log-friction] Skill · model: sonnet, effort: xhigh
+  ├─args────► friction
+  ├ ╌ reports ╌ ► outcome: str    that there is nothing to record    if there is genuinely nothing to record
+  ├─reads───► friction/log.md
+  ├ ╌ writes ╌ ► git(~/workspace/mission-control: add, commit, push)    and push    if there is something to record
+  └─reports─► outcome: str    one line with the entry's short name, and that the push landed
+
+[usage-report] Skill · model: sonnet, effort: low, allowed-tools: Bash(bash *usage-report/scripts/report.sh)
+  └─does────► [report.sh] Script    from this skill's base directory
