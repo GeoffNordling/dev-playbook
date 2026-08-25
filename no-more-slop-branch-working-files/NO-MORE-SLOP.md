@@ -65,7 +65,7 @@ These apply to both tracks.
 - **The CLOA** (Correct Level of Abstraction) — the level of abstraction
   where the AI and the user communicate in the exact same terminology.
   Its shared definitions are the primitives in
-  [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) — each a noun with a small
+  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) — each a noun with a small
   fixed verb set — from which the user predicts behavior without reading
   bodies. The bets per track: the primitives carry the CLOA for
   documentation, and the acceptance tier (code track) carries it for
@@ -116,14 +116,14 @@ scripts, or the judges.
 **Completed**
 
 - **CLOA primitives.** Three bootstrap runs plus an empirical
-  close-out in [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) constructed
+  close-out in [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) constructed
   a converged primitive set — Standard, Agent, Skill, Workflow,
   Script, Reference chain — that describes what documentation does at
   the CLOA: the user understands the whole surface and keeps enough
   control to guide the system, the implementation below the CLOA is
   delegated to the agent, and deep dives stay auditable by opening
   actual files. The close-out proved the set on 23 units — chains
-  recorded in [CLOA Chains](/CLOA-CHAINS.md) as proof of concept, the
+  recorded in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as proof of concept, the
   final traces to be generated deterministically once the in-file
   structure exists — and ended by ruling when batches stopped
   producing ontology changes. That files are still too hard to read is
@@ -144,9 +144,9 @@ scripts, or the judges.
   that certain headings are present. Decide what is actually worth linting
   for and design toward that.
 - **Reference chains.** Constructed in
-  [CLOA Abstractions](/CLOA-ABSTRACTIONS.md) as the Reference chain
+  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) as the Reference chain
   primitive — edges does, reads, overrides, writes, args, returns —
-  and proven on 23 units in [CLOA Chains](/CLOA-CHAINS.md). Still raw:
+  and proven on 23 units in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md). Still raw:
   the in-file declaration format, the deterministic generation of
   traces from it, and the lint that fails when the declared chain and
   reality disagree.
@@ -231,7 +231,7 @@ Candidates to document somewhere:
 ## Now
 
 The pre-factory sequence runs in
-[CLOA Abstractions](/CLOA-ABSTRACTIONS.md). The registry pass is done —
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md). The registry pass is done —
 Standard and Guide are the ontology-important types. Next: close out
 skills and agents empirically (all of them, not three samples), then a
 prose lint plan for the deterministic structure. Then the software
@@ -239,4 +239,4 @@ factory.
 
 The factory phase is parked: one session read all its files and left the
 classification, the intent, and unbound rewrite sketches in
-[Factory Survey](/FACTORY-SURVEY.md). Start there when it unparks.
+[Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md). Start there when it unparks.

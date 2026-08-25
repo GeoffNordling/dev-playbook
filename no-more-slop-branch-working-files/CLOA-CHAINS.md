@@ -7,7 +7,7 @@ description: The ledger of finalized reference chains — one recorded entry per
 # CLOA Chains
 
 Every finalized Reference chain, recorded at ruling time in the notation
-[CLOA Abstractions](/CLOA-ABSTRACTIONS.md) defines, so the close-out ends
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) defines, so the close-out ends
 in a written ledger rather than compacted memory. An entry is the chain
 plus its one-sentence carrier; the rulings that shaped it live in the
 abstractions file.

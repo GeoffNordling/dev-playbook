@@ -8,7 +8,7 @@ description: The noun-and-verb abstractions that make documentation understandab
 
 The **CLOA primitives ontology**: the abstractions the user and the AI
 share at the CLOA — each a noun with a small fixed verb set — and, as a
-detail of method, the loop that generates them. An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md).
+detail of method, the loop that generates them. An offshoot of [NO-MORE-SLOP.md](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
 The same speculative voice applies: a guess is written as a
 guess, and a sentence is settled only when it says so.
 
@@ -349,7 +349,7 @@ ledger.
 
 ### The chains ledger
 
-Every finalized chain is recorded in [CLOA Chains](/CLOA-CHAINS.md) as it
+Every finalized chain is recorded in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as it
 is ruled — the three bootstrap runs and each close-out unit — so the
 close-out ends in a written ledger, not in compacted memory. This file
 keeps the ontology and the rulings; that file keeps the chains.
