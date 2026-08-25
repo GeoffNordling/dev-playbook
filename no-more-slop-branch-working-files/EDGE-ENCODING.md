@@ -68,7 +68,8 @@ surfaced a fresh complexity; the map runs it forwards.
 | writes — other buckets | — | **Hole** |
 | reports | `{Report <payload>}` | **Ruled** |
 | guard | `{If <condition>, {…}}` containment | **Ruled** |
-| does → Agent / Skill / Script / Workflow | — | **Hole** |
+| does → Agent | `{Launch <one link>}` | **Ruled** |
+| does → Skill / Script / Workflow | — | **Hole** |
 | overrides … with … | — | **Hole** |
 
 The ruled rows, in detail:
@@ -110,6 +111,17 @@ The ruled rows, in detail:
   command block in the same step supplies the machine detail — repo from
   `-C`, operations from the git subcommands. The lint requires the block
   and fails span/block disagreement.
+- **does → Agent** — `{Launch <payload containing exactly one link>}`.
+  The link is the agent definition file at its live harness path
+  (document-deslop links `~/.claude/agents/deslopper.md`); the target's
+  node type derives from the path's `agents/` segment, and its node data
+  (model, effort, tools) comes from that file's own frontmatter, stitched
+  by following the edge — the skill restates none of it. The lexicon
+  gains Launch → does. Non-link payload words are annotation, same as
+  reads; document-deslop's `model: sonnet` pin rides there as a
+  launch-time instruction. Supersedes the
+  `(Agent tool, subagent_type: …)` parenthetical: the keyword carries
+  the mechanism, the link carries the target.
 - **reports** — `{Report <payload>}`. The name is the constant default
   `outcome`, the type the constant `str` (a skill's report to its caller
   is prose); the annotation is the payload after the keyword, verbatim.
@@ -187,6 +199,17 @@ detail (internal program below the CLOA); the working-tree edit itself
 (subsumed by the git commit edge, exactly as the ledger's chain models
 it).
 
+### document-deslop
+
+Partially rewritten: args and does→Agent are encoded; the Review
+section waits on a conditional-report round. Candidates so far:
+
+1. **Negated edge** — "This skill never commits." No primitive
+   expresses the absence of an edge.
+2. **Conditional report** — "Relay the problem to the user" versus
+   "Say nothing and go on": the report to the caller depends on the
+   subagent's reply, and one branch deliberately reports nothing.
+
 ## Principles ruled this session
 
 - **Skills are programs.** No narrative intro; the body is instructions,
@@ -211,13 +234,10 @@ it).
 
 ## Holes in the map
 
-Each hole has its exemplar waiting in the covering set — four skills
-plus one agent file; no skill fires both a does→Agent and a does→Script
-edge.
+Each hole has its exemplar waiting in the covering set.
 
 | Hole | Exemplar |
 |---|---|
-| does → Agent | document-deslop ("launch the `deslopper` subagent") |
 | does → Skill | grill-with-docs ("Run a /grilling session") |
 | does → Script | usage-report (its `report.sh` run) |
 | overrides … with … | grill-with-docs ("Where /domain-modeling says …") |

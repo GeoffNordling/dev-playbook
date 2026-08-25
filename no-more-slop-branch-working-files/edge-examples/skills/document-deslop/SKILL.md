@@ -4,7 +4,7 @@ description: Send a Markdown document through an isolated subagent that strips t
 disable-model-invocation: false
 model: sonnet
 effort: high
-argument-hint: "[doc-hint]"
+arguments: [doc-hint]
 ---
 
 # Document Deslop
@@ -15,7 +15,7 @@ in [slop-tics.md](/standards/prose/slop-tics.md).
 
 ## Target
 
-`$ARGUMENTS` is a hint identifying which document or documents to operate on.
+`doc-hint` identifies which document or documents to operate on.
 A path, a partial path, a filename fragment, or a description such as "the
 auth setup doc" all resolve.
 
@@ -27,12 +27,12 @@ auth setup doc" all resolve.
 
 ## Dispatch
 
-For each resolved target, launch the `deslopper` subagent (Agent tool,
-`subagent_type: deslopper`, `model: sonnet`), naming the working
-directory and the target path in the prompt. Launch one subagent per
-file; for more than one target, send all the launches in a single
-message so they run in parallel — each file's rewrite is independent of
-the others.
+For each resolved target, {Launch the
+[deslopper](~/.claude/agents/deslopper.md) subagent, `model: sonnet`},
+naming the working directory and the target path in the prompt. Launch
+one subagent per file; for more than one target, send all the launches
+in a single message so they run in parallel — each file's rewrite is
+independent of the others.
 
 This skill never commits.
 
