@@ -66,13 +66,12 @@ surfaced a fresh complexity; the map runs it forwards.
 | reads | `{Read <one link>}` | **Ruled** |
 | writes — git bucket | `{Commit …}` + fenced command | **Ruled** |
 | writes — local file | `{Write <payload>}` | **Ruled** |
-| writes — GitHub / scratch / cache | — | **Hole** |
+| writes — GitHub / scratch | — | **Hole** |
 | reports | `{Report <payload>}` | **Ruled** |
 | guard | `{If <condition>, {…}}` containment | **Ruled** |
 | does → Agent | `{Launch <one link>}` | **Ruled** |
 | does → Skill | `{Run <one link>}` | **Ruled** |
 | does → Script | `{Run <one link>}` | **Ruled** |
-| does → Workflow | — | **Hole** |
 | overrides … with … | `{Override <link> with <link>}` | **Ruled** |
 
 The ruled rows, in detail:
@@ -369,10 +368,15 @@ guarded reports all land in the map. Candidates:
 
 In order:
 
-1. **Fill the map holes.** writes — GitHub / scratch / cache, and
-   does → Workflow. Neither has a sentence in the covering set (no
-   file in it fires a Workflow; the GitHub bucket lives in skills like
-   design); each gets ruled when the port surfaces its sentence.
+1. **Fill the map hole.** writes — GitHub / scratch, ruled when the
+   port surfaces each bucket's sentence. In the 23 closed-out chains,
+   scratch is written by wizard, prototype,
+   improve-codebase-architecture, codebase-design, and handoff;
+   GitHub by wayfinder and candidate-promote. Two former holes were
+   struck 2026-08-25 as vacuous in the corpus: no unit writes a
+   cache (usage-report's script only reads one), and no unit fires
+   does → Workflow — the Workflow noun itself was dropped from
+   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).
 2. **The standard.** The grammar's standard card and the
    skill-standards scrub are likely one job: the new standard replaces
    what the old docs teach (the `## Name: $ARGUMENTS` heading,
