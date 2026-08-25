@@ -329,9 +329,11 @@ def render_unit(path):
     with open(path) as f:
         text = f.read()
     meta, body = split_frontmatter(text, path)
-    ntype = "Agent" if "/agents/" in os.path.abspath(path) else "Skill"
+    real = os.path.realpath(path)
+    ntype = "Agent" if "/agents/" in real else "Skill"
+    braces = "{{{}}}" if "/.agents/" in real else "[{}]"
     data = ", ".join(f"{k}: {meta[k]}" for k in meta if k in NODE_DATA_KEYS)
-    header = f"[{meta['name']}] {ntype}" + (f" · {data}" if data else "")
+    header = f"{braces.format(meta['name'])} {ntype}" + (f" · {data}" if data else "")
     edges = [Edge("args", a) for a in parse_arguments(meta)]
     edges += edges_of(body, os.path.abspath(path))
     lines = [header]

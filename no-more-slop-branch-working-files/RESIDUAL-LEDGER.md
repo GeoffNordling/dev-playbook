@@ -83,6 +83,38 @@ guarded reports all land in the map. Candidates:
    and "Conformance to the standard is the goal …" (rationale prose,
    second sighting).
 
+## handoff
+
+The rewrite converges — args and two `{Report …}` spans land in the map.
+Both candidates were already anticipated by the map's own ruled-row
+detail bullets, not discovered fresh here:
+
+1. **Scratch write, unruled** — the document is written to the OS
+   temporary directory, "not the workspace," and reported by path
+   rather than committed. This is exactly the map's open "writes —
+   GitHub / scratch" hole: `{Write …}` only renders `local file`, which
+   would misstate a temp-directory write that nothing in the workspace
+   or a repo ever sees. The write stays plain, unmarked prose — the
+   redaction rule ("Sensitive material is redacted: API keys,
+   passwords, personally identifiable information") rides on it
+   uncoded, the same tier as log-friction's rationale prose.
+2. **Multiple reports, unruled** — the run always reports two facts
+   together: the absolute path and a ready-to-paste resume line.
+   Nothing in the grammar stops two unconditional `{Report …}` spans
+   (unlike deslopper's guarded pair, both fire every time here), and
+   `chaingen.py` renders them cleanly as two `reports─►` edges — but
+   both collapse to the constant `outcome: str`, so the chain cannot
+   distinguish "the path" from "the resume line" by name; only the
+   annotation text tells them apart. Same shape as ralph-setup's
+   *Named reports* residual, doubled: one skill, one report call, two
+   facts, one generic label repeated twice in the chain.
+
+Accounted: the `focus` arg (frontmatter `arguments: [focus]`,
+`$ARGUMENTS` reworded to the bare name in prose, `argument-hint`
+dropped); the suggested-skills section and citation-not-restatement
+rule (internal detail of what the unencodable scratch write contains,
+below the CLOA, same tier as log-friction's entry-writing step).
+
 ## ralph-setup
 
 The first corpus-port unit; the rewrite converges — read, does, two
@@ -103,3 +135,44 @@ guarded local-file writes, one report. Candidates:
    the two Write spans restates those conditions at the write site.
    The duplication is deliberate: the prose stops the agent, the guard
    draws the dashes.
+
+## commit
+
+The rewrite converges to a thin chain — args and two `{Report …}`
+spans; the skill's central action, the git write itself, stays
+unmarked prose. Candidates:
+
+1. **Same-repo git write, unruled** — `git_detail()` requires a `-C
+   <repo>` on the matched command line and raises "git command block
+   without -C" when none is found. Every other corpus unit that
+   commits (log-friction, idea) writes to a *different* repo than its
+   cwd and genuinely needs `-C` to say so; commit writes to the
+   ambient repo — the whole premise of the skill is that the agent is
+   already standing in it — and no git command anywhere else in the
+   corpus qualifies a same-repo call with `-C .` or the like. Forcing
+   one in just to satisfy `git_detail()` would misrepresent the actual
+   invocation to the skill's first two readers for the sole benefit of
+   the third, so the commit and push stay plain prose. The hand-drawn
+   chain's own `git(commit, push)` — no repo segment at all — is the
+   target shape once the hole is filled: `git_detail()` would need to
+   treat a `-C`-less line as the ambient repo rather than erroring.
+2. **Guard's trailing prose repeats the condition** — the guard around
+   the amend-downgrade report reads `{If it lists any remote branches,
+   {report …} — amending would rewrite pushed history, so make a fresh
+   commit instead …}`; the lead sentence, "Pre-flight: skip the amend
+   if HEAD has been pushed," states the same condition again, unbraced,
+   because the skip-the-amend decision itself has no primitive — only
+   the report of it does. Same shape as log-friction's Control-flow
+   residual.
+
+Accounted: the `fast`/`amend` frontmatter `arguments` list (each name
+is the literal keyword the user types, so the map's derived-args rule
+applies with no adornment; `argument-hint` dropped, no `$ARGUMENTS`
+placeholder in the body); `git status` / `git diff --stat` / `git log
+--oneline -3` (ephemeral Bash-tool data-gathering, not doc reads —
+internal program below the CLOA, the same tier as log-friction's
+`date +%F`); the file-selection judgment in "Without `fast`" (which
+files count as "the work you did in this conversation" is a runtime
+call, not an edge); the "Always stage settings.json" / "Never commit
+.env" housekeeping rules (guardrails on the unmarked write, not
+primitives themselves).

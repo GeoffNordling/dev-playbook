@@ -232,8 +232,11 @@ byte-for-byte:
   order, deduplicated.
 - The node header is `[name] Type · <node data>`: the recognized
   frontmatter keys (`tools`, `model`, `effort`, `allowed-tools`)
-  verbatim, in frontmatter order. args edges lead; body edges follow in
-  document order.
+  verbatim, in frontmatter order. The header's braces follow the same
+  ownership rule as targets — a unit whose realpath resolves into
+  `.agents/` renders `{name}`, so `{grilling}` heads its own chain the
+  same way it appears on grill-with-docs's does edge. args edges lead;
+  body edges follow in document order.
 - Whitespace inside a slice collapses to single spaces — spans wrap
   across source lines.
 
@@ -298,6 +301,13 @@ Every unit in the live corpus (`dotfiles/dot-claude/agents/*.md` and
 `skills/*/SKILL.md` — the tree `chaingen.py` scans). Checked means ported:
 encoded in map language and its chain certified in `parser/chains.txt`.
 
+A **(3P)** mark means third-party verbatim: the skill directory is a
+symlink into `dotfiles/.agents/skills/`, whose bytes belong to upstream
+(`.skill-lock.json` names the source — mattpocock/skills or
+marimo-team/skills). These port last, after the adoption-policy Decision
+Record converts them to first-class owned copies — see the port plan in
+[No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
+
 Agents:
 
 - [x] deslopper
@@ -319,41 +329,41 @@ Skills:
 - [ ] agent-view-overwatch
 - [ ] candidate-promote
 - [ ] clean-up-branch-worktree
-- [ ] codebase-design
-- [ ] commit
+- [ ] codebase-design (3P)
+- [x] commit — the `{Commit}` span itself skipped: `git_detail()` requires `-C`, this skill targets the ambient repo (ledgered)
 - [ ] commit-off
 - [ ] compact-prep
 - [ ] datasheet
 - [ ] design
-- [ ] diagnosing-bugs
-- [ ] domain-modeling
+- [ ] diagnosing-bugs (3P)
+- [ ] domain-modeling (3P)
 - [ ] enable-repo-governance
-- [ ] grilling
-- [ ] handoff
+- [ ] grilling (3P)
+- [x] handoff
 - [ ] idea
-- [ ] improve-codebase-architecture
+- [ ] improve-codebase-architecture (3P)
 - [ ] intake
 - [ ] issue-overwatch
 - [ ] issue-review-claims
 - [ ] issue-review-simulation
 - [ ] judgments-sweep
-- [ ] marimo-batch
-- [ ] marimo-notebook
+- [ ] marimo-batch (3P)
+- [ ] marimo-notebook (3P)
 - [ ] orchestrate
 - [ ] pocock-sweep
-- [ ] prototype
+- [ ] prototype (3P)
 - [x] ralph-setup
-- [ ] research
+- [ ] research (3P)
 - [ ] rewind-compact
 - [ ] skill-creator
 - [ ] update-standards-pin
 - [ ] user-intent-mini-interview
-- [ ] wait-what
-- [ ] wayfinder
+- [ ] wait-what (3P)
+- [ ] wayfinder (3P)
 - [ ] wayfinder-to-build
-- [ ] wizard
+- [ ] wizard (3P)
 - [ ] working-doc-set-deslop
-- [ ] writing-for-agents
+- [ ] writing-for-agents (3P)
 
 ## To-do
 

@@ -278,6 +278,28 @@ settled in
 with every proven chain in
 [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md).
 
+The corpus port runs in three stages, because thirteen skills in the
+roster are third-party verbatim — vendored bytes under
+`dotfiles/.agents/skills/`, which the current policy forbids editing,
+and a port is nothing but an edit:
+
+1. **First-party first.** Port every unit we author ourselves — all
+   nine agents and the unmarked skills in the
+   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster).
+2. **Retire verbatim adoption.** A Decision Record changes the policy:
+   external skills are no longer adopted verbatim — the corpus requires
+   every unit to carry the edge encoding, and vendored bytes cannot be
+   edited, so verbatim adoption is rejected for that reason. The
+   thirteen (3P) skills convert to first-class owned copies: copied
+   directly into our tree, ours from then on (verbatim at the moment of
+   copy, upstream credited, no symlink, no lock entry). Every document
+   that evaluates or adopts other people's skills updates to the new
+   stance — `pocock-sweep`, the external-skill-verdicts ledger, the
+   skill-management standard, and whatever else the sweep of those docs
+   finds.
+3. **Port the converted skills.** The former (3P) thirteen, now owned,
+   go through the same port as stage 1.
+
 The factory phase is parked: one session read all its files and left the
 classification, the intent, and unbound rewrite sketches in
 [Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md). Start there when it unparks.

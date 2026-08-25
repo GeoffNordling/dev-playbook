@@ -27,11 +27,15 @@
 
 [clean-up-branch-worktree] Skill · model: sonnet, effort: low
 
-[codebase-design] Skill
+{codebase-design} Skill
 
 [commit-off] Skill · model: inherit, effort: low
 
 [commit] Skill · model: sonnet, effort: low, allowed-tools: Bash(git *)
+  ├─args────► fast
+  ├─args────► amend
+  ├ ╌ reports ╌ ► outcome: str    that amend was downgraded to a fresh commit because HEAD was already on `<remote/branch>`    if it lists any remote branches
+  └─reports─► outcome: str    tree clean or which files remain uncommitted, and that the push landed
 
 [compact-prep] Skill · model: inherit, effort: xhigh
 
@@ -39,13 +43,13 @@
 
 [design] Skill · model: inherit, effort: xhigh
 
-[diagnosing-bugs] Skill
+{diagnosing-bugs} Skill
 
 [document-deslop] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
   └─does────► [deslopper] Agent    the subagent, `model: sonnet`
 
-[domain-modeling] Skill
+{domain-modeling} Skill
 
 [enable-repo-governance] Skill · model: opus, effort: xhigh
 
@@ -54,13 +58,16 @@
   ├─does────► {domain-modeling} Skill    throughout
   └─overrides─► {domain-modeling} Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
 
-[grilling] Skill
+{grilling} Skill
 
 [handoff] Skill · model: opus, effort: medium
+  ├─args────► focus
+  ├─reports─► outcome: str    the absolute path of the handoff document
+  └─reports─► outcome: str    a ready-to-paste resume line for the user to carry into the new session
 
 [idea] Skill · model: sonnet, effort: xhigh
 
-[improve-codebase-architecture] Skill
+{improve-codebase-architecture} Skill
 
 [intake] Skill · model: inherit, effort: xhigh
 
@@ -79,15 +86,15 @@
   ├ ╌ writes ╌ ► git(~/workspace/mission-control: add, commit, push)    and push    if there is something to record
   └─reports─► outcome: str    one line with the entry's short name, and that the push landed
 
-[marimo-batch] Skill
+{marimo-batch} Skill
 
-[marimo-notebook] Skill
+{marimo-notebook} Skill
 
 [orchestrate] Skill · model: inherit, effort: xhigh
 
 [pocock-sweep] Skill · model: inherit, effort: xhigh
 
-[prototype] Skill
+{prototype} Skill
 
 [ralph-setup] Skill · model: inherit, effort: xhigh
   ├─args────► goal
@@ -97,7 +104,7 @@
   ├ ╌ writes ╌ ► local file    the progress file    if the user approved the criteria and the plan, and the gate is green
   └─reports─► outcome: str    the full launch command for the user to run
 
-[research] Skill
+{research} Skill
 
 [rewind-compact] Skill · model: opus, effort: medium
 
@@ -110,14 +117,14 @@
 
 [user-intent-mini-interview] Skill · model: inherit, effort: xhigh
 
-[wait-what] Skill
+{wait-what} Skill
 
 [wayfinder-to-build] Skill · model: inherit, effort: xhigh
 
-[wayfinder] Skill
+{wayfinder} Skill
 
-[wizard] Skill
+{wizard} Skill
 
 [working-doc-set-deslop] Skill · model: sonnet, effort: high
 
-[writing-for-agents] Skill
+{writing-for-agents} Skill
