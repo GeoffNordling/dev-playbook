@@ -99,7 +99,10 @@ The ruled rows, in detail:
   the user and the chain only. Side findings: the skills directory
   rescans live (no session restart needed), and
   `disable-model-invocation: true` blocks the Skill tool itself, not
-  just spontaneous invocation. Ripple: the
+  just spontaneous invocation. Input reaches the agent appended after
+  the whole body as `ARGUMENTS: <text>`; a future complicated skill
+  could reintroduce a `$ARGUMENTS` placeholder for mid-body injection
+  — noted, out of scope. Ripple: the
   skill standards' `## Name: $ARGUMENTS` heading convention and
   `argument-hint` guidance retire when this merges.
 - **guard** — `{If <condition>, {edge span} …}`: the guard nests the
