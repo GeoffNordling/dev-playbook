@@ -24,8 +24,7 @@ unread were ruled expressible with the existing primitives.
 Excluded units record no chain: `datasheet` (Instruments exclusion) and
 `judgments-sweep` (Judgments exclusion). Deleted units record no chain:
 `orient` and `pymc-modeling`, removed from the workspace during the
-close-out, and `doc-format`, `doc-present-state`, and `doc-rewrite`,
-retired into the prose and knowledge-organization standards.
+close-out.
 
 ## Bootstrap runs
 
