@@ -148,7 +148,7 @@ in the abstract.
 | Skill           | do                            | Documentation that runs in the calling context, on its permissions |
 | Workflow        | do                            | Deterministic orchestration code in its own runtime — not an LLM |
 | Script          | do                            | Deterministic code run via the shell — not a direct LLM call, not the Workflow runtime |
-| Reference chain | edges: does, reads, overrides, writes, args, returns | The declared tree of a unit's behavior and its call signature — args in, returns out |
+| Reference chain | edges: does, reads, overrides, writes, args, reports | The declared tree of a unit's behavior and its call signature — args in, reports out |
 
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
@@ -208,16 +208,19 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   the harness's `$ARGUMENTS` substitution. Declared in Python
   type-hint form, `arg_name: arg_type` — log-friction declares
   `friction: str`. Never lands in state, dies with the call.
-- **returns** — hand a value back to the caller, user and agent alike:
-  ralph-setup returns a launch command to the user, bump-pins returns
-  its status enum to update-standards-pin. Unlike a write, a return never
-  lands in state — it dies with the call. Returns mirror args: named
-  and typed as `return_name: return_type` — commit returns
+- **reports** — hand a value back to the caller, user and agent alike:
+  ralph-setup reports a launch command to the user, bump-pins reports
+  its status enum to update-standards-pin. Unlike a write, a report never
+  lands in state — it dies with the call. Reports mirror args: named
+  and typed as `report_name: report_type` — commit reports
   `outcome: str` — and an enumerable status is preferred, its values
-  listed as a small enum. A returning unit will declare its return in
+  listed as a small enum. A reporting unit will declare its report in
   its own file, so the primitive view renders the declaration instead
   of a model regenerating it; the declaration format is under design in
   [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
+  Renamed from `returns`: the label is now the bare third-person form
+  of the skill-prose keyword `Report`, so translation adds an `s` and
+  never swaps a word.
 
 Any edge may carry a **guard** — the condition under which it fires.
 A guarded edge is drawn dashed with the dashes spaced out so the break
@@ -289,7 +292,7 @@ but deliberately outside the ontology until a ruling is reversed.
   furniture, referenced by nothing, never an edge.
 - **Presentation gestures** — opening an already-written artifact for
   the user (improve-codebase-architecture's `xdg-open` on its report);
-  part of returning the value, never an edge; ruled not accounted.
+  part of reporting the value, never an edge; ruled not accounted.
 - **Phase gates** — a step-scoped prohibition inside a unit's own
   program, lifted by a later step (improve-codebase-architecture's "Do
   NOT propose interfaces yet"); internal sequencing below the CLOA,

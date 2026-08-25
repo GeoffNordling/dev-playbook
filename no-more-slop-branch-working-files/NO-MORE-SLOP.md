@@ -145,7 +145,7 @@ scripts, or the judges.
   for and design toward that.
 - **Reference chains.** Constructed in
   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) as the Reference chain
-  primitive — edges does, reads, overrides, writes, args, returns —
+  primitive — edges does, reads, overrides, writes, args, reports —
   and proven on 23 units in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md). Still raw:
   the in-file declaration format, the deterministic generation of
   traces from it, and the lint that fails when the declared chain and

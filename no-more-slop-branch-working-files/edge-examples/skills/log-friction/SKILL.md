@@ -15,14 +15,15 @@ Run to completion without asking the user anything. This skill is
 fire-and-forget: the user typed one line and moved on, so a
 clarifying question stalls the work unanswered.
 
-- Where the input is long, rambling, or vents several complaints at
+- If the input is long, rambling, or vents several complaints at
   once, distil it to the log's entry format without losing the
   owner's actual point.
-- Where several distinct frictions arrived in one message, write one
+- If several distinct frictions arrived in one message, write one
   entry each.
-- Where no description was given, infer the friction from recent
+- If no description was given, infer the friction from recent
   session context and write it.
-- Where there is genuinely nothing to record, say so and stop.
+- {If there is genuinely nothing to record, {report that there is
+  nothing to record} and stop}.
 
 An imperfect entry is cheap: the log is append-only prose, curation
 reads it later, and the owner can correct it in seconds.
@@ -36,8 +37,8 @@ reads it later, and the owner can correct it in seconds.
    rather than opening a new one.
 2. Write the entry in the owner's register — one or two plain lines,
    dated from `date +%F`, stating what happened and where, and
-   carrying a proposed fix only where the user gave one.
-3. {Commit and push}, {only where there is something to record}. Stage
+   carrying a proposed fix if the user gave one.
+3. {If there is something to record, {commit and push}}. Stage
    **only** `friction/log.md` — the repo may
    hold unrelated work; leave it alone. One line, `git` leading so it
    keeps its credential access, and `-C` throughout because the
@@ -45,5 +46,5 @@ reads it later, and the owner can correct it in seconds.
 
        git -C ~/workspace/mission-control add friction/log.md && git -C ~/workspace/mission-control commit -m "<subject>" -m "Co-Authored-By: Claude <noreply@anthropic.com>" && git -C ~/workspace/mission-control push
 
-4. Report in one line: the entry's short name, and that the push
-   landed.
+4. {Report one line with the entry's short name, and that the push
+   landed}.

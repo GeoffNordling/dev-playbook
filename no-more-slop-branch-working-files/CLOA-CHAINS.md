@@ -30,7 +30,7 @@ close-out.
 ## Bootstrap runs
 
 Bootstrap entries keep the notation of their era — written before
-write typing and args/returns existed. Guard dashes were retrofitted;
+write typing and args/reports existed. Guard dashes were retrofitted;
 the rest was not. The close-out entries onward use the final notation.
 
 ### Run 1: document-deslop — zero residual
@@ -124,28 +124,28 @@ primitives").
       ├─does────► [grill-with-docs] Skill             subtree per run 2
       ├ ╌ writes ╌ ╌ ► local file(PLAN.md, PROGRESS.md)    the user approved twice
       │                                                     and the gate is green
-      └─returns─► launch_command: str    the ralph-loop Workflow launch — never runs it
+      └─reports─► launch_command: str    the ralph-loop Workflow launch — never runs it
 
 One sentence carries the target: ralph-setup grills the plan into shape,
 writes PLAN.md and PROGRESS.md from its bundled skeletons once approved
-and the gate is green, then returns the Workflow launch command without
+and the gate is green, then reports the Workflow launch command without
 starting the loop.
 
 ### commit
 
     [commit] Skill · allowed-tools: Bash(git *), model: sonnet, effort: low
       ├─writes──► git(commit, push)
-      └─returns─► outcome: str    enum: clean / files remain / push landed
+      └─reports─► outcome: str    enum: clean / files remain / push landed
 
 One sentence carries the target: commit is a leaf — it stages this
-conversation's work, commits, pushes, and returns a status.
+conversation's work, commits, pushes, and reports a status.
 
 ### grilling
 
     {grilling} Skill
       ├ ╌ does ╌ ╌ ► sub-agent (unnamed, fresh context)   a question needs a
       │                                                    fact from the environment
-      └─returns─► questions: str    each with a recommendation —
+      └─reports─► questions: str    each with a recommendation —
                    loops until the frontier is empty
 
 One sentence carries the target: grilling is a pure conversation loop —
@@ -155,7 +155,7 @@ working memory (ledgered ephemeral state).
 ### orchestrate
 
     [orchestrate] Skill · model: inherit, effort: xhigh
-      └─returns─► confirmation: str    orchestration mode is on
+      └─reports─► confirmation: str    orchestration mode is on
 
 One sentence carries the target: orchestrate fires no other edge at
 invocation — its whole body installs standing behavior ("everything
@@ -169,7 +169,7 @@ ledgered behavior-mode residual.
       ├─reads───► mission-control/friction log          the entry format and
       │                                                  its repeat-bites rule
       ├ ╌ writes ╌ ╌ ► git(mission-control: commit, push)    something to record
-      └─returns─► outcome: str    entry name + push landed | "nothing to record"
+      └─reports─► outcome: str    entry name + push landed | "nothing to record"
 
 One sentence carries the target: log-friction appends one entry to
 mission-control's friction log — the read and the write are the same
@@ -183,8 +183,8 @@ cross-repo document — and reports that the push landed.
       ├─writes──► scratch                            the generated wizard script (default)
       ├ ╌ writes ╌ ╌ ► local file(script, README)    the user wants it repeatable
       ├ ╌ writes ╌ ╌ ► git(commit)                   the user wants it repeatable
-      ├─returns─► stage_plan: str          for confirmation before authoring
-      └─returns─► run_instructions: str    at handoff
+      ├─reports─► stage_plan: str          for confirmation before authoring
+      └─reports─► run_instructions: str    at handoff
 
 One sentence carries the target: wizard authors a Script — deterministic
 bash the user runs later; the script's own future writes (.env, GitHub
@@ -202,7 +202,7 @@ secrets) belong to that Script's chain, and this skill never runs it.
 One sentence carries the target: skill-creator writes a new node of this
 very graph — a skill bundle authored against the conventions Standard,
 with writing-for-agents active and overridden where the Standard
-collides. No returns.
+collides. No reports.
 
 ### candidate-promote
 
@@ -216,7 +216,7 @@ collides. No returns.
       ├ ╌ writes ╌ ╌ ► local file(CANDIDATES.md)    intake reports the issue
       │                                              number — the entry is
       │                                              deleted, never before
-      └─returns─► issue_number: int, removed_entries: list[str]
+      └─reports─► issue_number: int, removed_entries: list[str]
 
 One sentence carries the target: candidate-promote owns the lookup and
 the delete — authoring the issue is intake's job, and the entry leaves
@@ -316,13 +316,13 @@ collides.
       │                                                    briefs
       ├ ╌ does ╌ ╌ ► design agents ×3–4                   design-it-twice — parallel,
       │               (unnamed, fresh context)             one design constraint each
-      ├ ╌ returns ╌ ╌ ► problem_space_explanation: str    before the fan-out
-      └ ╌ returns ╌ ╌ ► comparison_and_recommendation: str    after the compare
+      ├ ╌ reports ╌ ╌ ► problem_space_explanation: str    before the fan-out
+      └ ╌ reports ╌ ╌ ► comparison_and_recommendation: str    after the compare
 
 One sentence carries the target: codebase-design is mostly vocabulary —
 its one active move is the design-it-twice fan-out, three to four fresh
 agents each pinned to a different design constraint, compared and
-returned; the exact-term discipline it installs is a ledgered
+reported; the exact-term discipline it installs is a ledgered
 behavior-mode setting.
 
 ### prototype
@@ -338,7 +338,7 @@ behavior-mode setting.
       ├─writes──► GitHub(issue)                   context pointer to the branch,
       │                                            plus the settled verdict —
       │                                            there or in a commit
-      └─returns─► demo: str    the file path or the variant URL
+      └─reports─► demo: str    the file path or the variant URL
 
 One sentence carries the target: prototype builds a throwaway demo,
 hands the user its path or URL, and once the question is answered folds
@@ -355,14 +355,15 @@ throwaway branch, pointered from the issue.
       ├─does────► exploration agent           walks the codebase for shallow
       │            (unnamed, fresh context)    modules and friction
       ├─writes──► scratch                     the HTML architecture report
-      ├─returns─► report_path: str            told to the user and opened
+      ├─reports─► report_path: str            told to the user and opened
       ├ ╌ does ╌ ╌ ► {grilling} Skill             the user picks a candidate
       └ ╌ does ╌ ╌ ► {domain-modeling} Skill      a new term needs the glossary,
                                                    or a rejection deserves an ADR
 
 One sentence carries the target: improve-codebase-architecture is a
 hub — the vocabulary lens loads first, a fresh explorer walks the code,
-findings land as a scratch HTML report whose path is the return, and
+findings land as a scratch HTML report whose path is the reported
+value, and
 every downstream edge waits on the user picking something up.
 
 ### handoff
@@ -372,11 +373,11 @@ every downstream edge waits on the user picking something up.
       │                          via $ARGUMENTS
       ├─writes──► scratch                    the handoff document in OS temp —
       │                                       secrets redacted before writing
-      ├─returns─► absolute_path: str
-      └─returns─► resume_line: str    "Read /tmp/handoff-<name>.md and continue."
+      ├─reports─► absolute_path: str
+      └─reports─► resume_line: str    "Read /tmp/handoff-<name>.md and continue."
 
 One sentence carries the target: handoff writes one scratch document
-carrying the session's state and returns its path with a paste-ready
+carrying the session's state and reports its path with a paste-ready
 resume line; everything it cites is already in context, so it reads
 nothing.
 
@@ -389,7 +390,7 @@ nothing.
       ├─reads───► [conventions] Standard    the prose conventions, always
       ├─writes──► local file(the target document)    restructured — no fact
       │                                               cut without approval
-      └─returns─► report: str    purpose, changes, approved cuts,
+      └─reports─► report: str    purpose, changes, approved cuts,
                    flagged leftovers
 
 One sentence carries the target: doc-rewrite reads one document and
@@ -407,7 +408,7 @@ a ledgered behavior-mode line.
       │             │                                 scripts/, not in-bundle
       │             ├─reads───► consumer/.pre-commit-config.yaml    the pinned rev
       │             ├─writes──► local file(consumer: .pre-commit-config.yaml)
-      │             └─returns─► status: str    enum: green / needs work /
+      │             └─reports─► status: str    enum: green / needs work /
       │                          already current / would bump /
       │                          skipped (four reasons)
       ├ ╌ does ╌ ╌ ► [enable-repo-governance] Skill    a repo has no pin
@@ -418,7 +419,7 @@ a ledgered behavior-mode line.
       │                                                           content
       ├─writes──► git(consumer: commit, push)          one commit per consumer —
       │                                                 pin move plus adaptation
-      └─returns─► per_repo_report: str    plus escalation, skip, and
+      └─reports─► per_repo_report: str    plus escalation, skip, and
                    fault reports
 
 One sentence carries the target: update-standards-pin walks the
@@ -461,7 +462,7 @@ in hand.
       ├ ╌ writes ╌ ╌ ► git(branch)                 research findings on
       │                                             research/<name>
       ├ ╌ writes ╌ ╌ ► local file(markdown tracker)    no tracker provided
-      └ ╌ returns ╌ ╌ ► no_map_needed: str         the grill surfaces no fog
+      └ ╌ reports ╌ ╌ ► no_map_needed: str         the grill surfaces no fog
 
 One sentence carries the target: wayfinder is a GitHub-state machine —
 the map, tickets, claims, fog, and decision log are all issue state

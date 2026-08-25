@@ -52,18 +52,28 @@ card and enforced by our lint.
 - **Code contexts are inert.** Spans are interpreted only outside code
   spans and fenced blocks.
 - **Unmarked prose is never an edge.** The marker declares; the parser
-  infers nothing. log-friction's "carrying a proposed fix only where the
-  user gave one" fires no edge and needs no special rule.
+  infers nothing. log-friction's "carrying a proposed fix if the user
+  gave one" fires no edge and needs no special rule — unbraced `if` is
+  the deliberate tier for conditional logic left out of the chain.
 - **Imperative in, third-person out.** Keywords are agent-facing commands
-  (`Read`, `Commit`); deterministic code translates to the chain's edge
-  labels (`reads`, `writes`) as the third-party observer.
+  (`Read`, `Commit`, `Report`); deterministic code translates to the
+  chain's edge labels (`reads`, `writes`, `reports`) as the third-party
+  observer. The higher level renamed `returns` to `reports` so this
+  translation is always the bare `+s`, never a word swap.
 
 Ruled encodings, one per edge:
 
-- **guard** — `{only where <condition>}`, a trailing clause of the
-  edge-firing sentence. At most one per sentence; the condition is the
-  payload after the fixed keyword `only where`, lifted verbatim; absence
-  means the edge is unconditional (solid, not dashed).
+- **guard** — `{If <condition>, {edge span} …}`: the guard nests the
+  span(s) it guards, so binding is containment, never sentence
+  adjacency. The text between the keyword `if` and the first nested
+  span is the condition, lifted verbatim (trailing comma dropped);
+  every nested span fires under that condition and draws dashed; prose
+  in the body ("and stop") stays uncoded. This spends the two-deep
+  nesting cap — guard at depth one, edges at depth two, never deeper.
+  A span nested nowhere is unconditional (solid). Unbraced `if` stays
+  plain prose and fires nothing. (Supersedes `{only where …}` and the
+  same-sentence adjacency rule: the distinctive phrase and the
+  heuristic are both jobs the braces already do.)
 - **reads** — `{read <payload containing exactly one link>}`. The one
   markdown link or citation in the span is the edge target; other words in
   the span are annotation. Two reads means two spans; zero or two links in
@@ -74,6 +84,11 @@ Ruled encodings, one per edge:
   and fails span/block disagreement. Other write buckets (local file,
   GitHub, scratch, cache) are unruled; each gets its keyword when its
   exemplar sentence comes up.
+- **reports** — `{Report <payload>}`. The name is the constant default
+  `outcome`, the type the constant `str` (a skill's report to its caller
+  is prose); the annotation is the payload after the keyword, verbatim.
+  Named or non-str reports (candidate-promote's `issue_number: int`) and
+  multiple reports (handoff) are outside the covering set, unruled.
 
 ## Proposal procedure
 
@@ -104,7 +119,7 @@ ruling approves the three together:
 - **Declared versus derived.** Node type and ownership derive from path;
   node data (`model`, `effort`, `allowed-tools`) from frontmatter; the
   summary from `description`; args mostly from the existing
-  `## Name: $ARGUMENTS` heading form. Edges, guards, and returns are
+  `## Name: $ARGUMENTS` heading form. Edges, guards, and reports are
   declared inline. No file describes another file's behavior — subtrees
   are stitched by following does-edges into the target file's own
   declarations.
@@ -127,7 +142,7 @@ no skill fires both a does→Agent and a does→Script edge.
 | 2 | reads | log-friction step 1 | **Ruled**, committed |
 | 3 | writes (git bucket) | log-friction step 3 + fenced block | **Ruled**, committed |
 | 4 | args | log-friction `## Friction: $ARGUMENTS` | Open — likely derived from the heading form |
-| 5 | returns | log-friction step 4 ("Report in one line …") | Open — name/type unexpressed in prose |
+| 5 | reports | log-friction step 4 + the nothing-to-record bullet | **Ruled**, committed |
 | 6 | does → Agent | document-deslop ("launch the `deslopper` subagent") | Open |
 | 7 | does → Skill | grill-with-docs ("Run a /grilling session") | Open |
 | 8 | does → Script | usage-report (its `report.sh` run) | Open |
