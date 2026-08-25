@@ -326,25 +326,29 @@ guarded reports all land in the map. Candidates:
   on push).
 - **Acronyms defined once**, at the top of anything we write.
 
-## Holes in the map
+## To-do
 
-Each hole has its exemplar waiting in the covering set.
+In order:
 
-| Hole | Exemplar |
-|---|---|
-| writes — GitHub / scratch / cache | each when its sentence comes up |
-| does → Workflow | no exemplar in the covering set |
-
-Also open, beyond the map:
-
-- **Scrub the skill standards.** The rulings here invalidate parts of
-  the published skill-authoring surface: the describing markdown
-  documents (the skill-conventions Standard and anything teaching the
-  `## Name: $ARGUMENTS` heading or `argument-hint`), the linting
-  scripts (`scripts/skill-lint` and friends must stop expecting the
-  old forms and start enforcing the map), and the live skills
-  themselves. A full scrub when the design ports.
-- Where the grammar's standard card lives.
-- The lint and parser themselves.
-- The old two-sided question — whether an unmarked link to a known
-  unit should require a waiver — parked.
+1. **The parser prototype.** Deterministic code that reconstructs the
+   high-level chains from the encoded `edge-examples/` files. This
+   proves the concept: its output must reproduce the certified
+   transforms exactly.
+2. **Fill the map holes.** writes — GitHub / scratch / cache, and
+   does → Workflow. Neither has a sentence in the covering set (no
+   file in it fires a Workflow; the GitHub bucket lives in skills like
+   design); each gets ruled when the port surfaces its sentence.
+3. **The standard.** The grammar's standard card and the
+   skill-standards scrub are likely one job: the new standard replaces
+   what the old docs teach (the `## Name: $ARGUMENTS` heading,
+   `argument-hint`), and `scripts/skill-lint` and friends stop
+   expecting the old forms and start enforcing the map. Decide whether
+   card and scrub are one standard when the writing starts.
+4. **Live args test.** One run confirming the harness ignores the
+   invented `arguments:` frontmatter key and still appends
+   `ARGUMENTS: <input>` when the body has no placeholder — the
+   undocumented assumption the args ruling stands on.
+5. Parked: whether an unmarked link to a known unit should require a
+   waiver. The live case: document-deslop links slop-tics.md in plain
+   prose — correctly edge-free there, but the same pattern could be a
+   forgotten encoding.
