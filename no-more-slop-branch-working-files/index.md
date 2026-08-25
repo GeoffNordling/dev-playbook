@@ -14,8 +14,9 @@ locations as it settles.
 - [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) — The branch plan — goal, principles, the two tracks, and the current step
 
 The `edge-examples/` subtree holds the exemplar skills and agents for the
-edge-encoding design, twice: `original/` is the verbatim snapshot, never
-edited, and `edited/` is the working copy that accumulates the encoding as
-each edge is settled. Both mirror the `skills/` and `agents/` source layout
-so the lints treat the copies exactly as they treat the sources. The live
-skill files are untouched until the design settles.
+edge-encoding design. The committed state is the verbatim snapshot; the
+encoding under design lives as uncommitted edits on top, so the IDE diff
+against HEAD shows exactly what the encoding changes. A settled edge's
+edit is committed once ruled. The tree mirrors the `skills/` and `agents/`
+source layout so the lints treat the copies exactly as they treat the
+sources. The live skill files are untouched until the design settles.
