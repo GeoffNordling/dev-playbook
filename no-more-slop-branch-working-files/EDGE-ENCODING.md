@@ -69,8 +69,9 @@ surfaced a fresh complexity; the map runs it forwards.
 | reports | `{Report <payload>}` | **Ruled** |
 | guard | `{If <condition>, {…}}` containment | **Ruled** |
 | does → Agent | `{Launch <one link>}` | **Ruled** |
-| does → Skill / Script / Workflow | — | **Hole** |
-| overrides … with … | — | **Hole** |
+| does → Skill | `{Run <one link>}` | **Ruled** |
+| does → Script / Workflow | — | **Hole** |
+| overrides … with … | `{Override <link> with <link>}` | **Ruled** |
 
 The ruled rows, in detail:
 
@@ -122,6 +123,22 @@ The ruled rows, in detail:
   launch-time instruction. Supersedes the
   `(Agent tool, subagent_type: …)` parenthetical: the keyword carries
   the mechanism, the link carries the target.
+- **does → Skill** — `{Run <payload containing exactly one link>}`.
+  Same shape as does → Agent with the verb natural to skills; the
+  lexicon gains Run → does. The link is the live harness path
+  (`~/.claude/skills/grilling/SKILL.md`); node type from the path's
+  `skills/` segment; ownership from the *resolved* path — a vendored
+  skill's harness symlink resolves into `.agents/skills/`, drawing the
+  chain's curly braces, while an owned skill resolves into the dotfiles
+  `dot-claude` tree. One span per edge: grill-with-docs fires two, the
+  /grilling session and /domain-modeling active throughout.
+- **overrides** — `{Override <one link + clause words> with
+  <one link + detail words>}`. The literal word `with` splits the
+  payload, the way the guard's comma-after-condition does: the link
+  before `with` is the overridden unit and the words around it name the
+  clause; the link after `with` is the replacement, and the words after
+  it carry the operative detail. Exactly two links, one per side, or
+  the lint fails.
 - **reports** — `{Report <payload>}`. The name is the constant default
   `outcome`, the type the constant `str` (a skill's report to its caller
   is prose); the annotation is the payload after the keyword, verbatim.
@@ -140,6 +157,16 @@ The ruled rows, in detail:
   convention (`<issue>`, `<repo>`), and a space-free `<tag>` vanishes in
   rendered HTML. Greenfield mindset stands — a collision alone never vetoes
   a choice.
+- **The parser slices, never interprets.** Inside a span, deterministic
+  code touches only fixed cut points: the keyword, the markdown
+  link(s), the `with` splitter, and nested braces. Every word between
+  cut points is an opaque verbatim string — annotation, carried for
+  display or dropped, never parsed and never load-bearing. In
+  `{Run a [/grilling](…) session}`, "a" and "session" are glue for the
+  executing agent; "throughout" in the sibling span is a real
+  instruction to that agent — and the code reads none of them. The
+  guard's condition follows the same rule: lifted verbatim between two
+  cut points, sliced, not understood.
 - **Code contexts are inert.** Spans are interpreted only outside code
   spans and fenced blocks.
 - **Unmarked prose is never an edge.** The marker declares; the parser
@@ -163,12 +190,12 @@ by one ruling:
    forward.
 2. **The prose.** The exemplar's before and after — the diff that would
    land.
-3. **The certification.** A trace from every element of the target
-   fragment to the exact source token that yields it — a span keyword, a
-   link, a fenced command, a frontmatter field, a path segment. Approval
-   certifies that deterministic code parsing the after-prose reconstructs
-   the target fragment exactly; the trace is the contract the future
-   parser implements.
+3. **The transform.** The planned deterministic rules, walked as a
+   literal map from the after-prose to the target fragment: each source
+   token on the left, the rule that fires on it, and the chain element
+   it emits on the right — step by step until the whole fragment is
+   rebuilt and nothing in it is unexplained. Approval certifies the
+   transform; it is the contract the future parser implements.
 
 ## Residual ledger
 
@@ -210,6 +237,15 @@ section waits on a conditional-report round. Candidates so far:
    "Say nothing and go on": the report to the caller depends on the
    subagent's reply, and one branch deliberately reports nothing.
 
+### grill-with-docs
+
+The rewrite converges; one candidate:
+
+1. **Override-scope prose** — "Everything else applies as written" and
+   "Its `CONTEXT.md` format applies as written": statements of what is
+   *not* overridden. Same family as document-deslop's negated edge —
+   prose asserting an edge's absence.
+
 ## Principles ruled this session
 
 - **Skills are programs.** No narrative intro; the body is instructions,
@@ -226,10 +262,12 @@ section waits on a conditional-report round. Candidates so far:
   are stitched by following does-edges into the target file's own
   declarations.
 - **Workflow.** `edge-examples/` is committed at verbatim original
-  content; the encoding under design rides as uncommitted edits so the
-  diff against HEAD shows exactly what the encoding changes; a ruled
-  edge's edit is committed. Commits run the document linters; the
-  test-suite hook is skipped (`SKIP=make-check` on push).
+  content. A proposal turn lands its full diff uncommitted — the
+  exemplar's encoding, the map's new rows and detail bullets, and the
+  ledger's new entries — so the diff against HEAD is the whole
+  proposal; one ruling approves and commits it all. Commits run the
+  document linters; the test-suite hook is skipped (`SKIP=make-check`
+  on push).
 - **Acronyms defined once**, at the top of anything we write.
 
 ## Holes in the map
@@ -238,9 +276,7 @@ Each hole has its exemplar waiting in the covering set.
 
 | Hole | Exemplar |
 |---|---|
-| does → Skill | grill-with-docs ("Run a /grilling session") |
 | does → Script | usage-report (its `report.sh` run) |
-| overrides … with … | grill-with-docs ("Where /domain-modeling says …") |
 | writes — other buckets | local file, GitHub, scratch, cache — each when its sentence comes up |
 
 Also open, beyond the map:
