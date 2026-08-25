@@ -363,13 +363,12 @@ def main(argv):
     here = os.path.dirname(os.path.abspath(__file__))
     chains_path = os.path.join(here, "chains.txt")
     units = all_units(os.path.join(here, "..", "..", "dotfiles", "dot-claude"))
-    rendered, errors = [], 0
+    rendered = []
     for p in units:
         try:
             rendered.append(render_unit(p))
         except LintError as e:
-            rendered.append(f"[{unit_name(p)}] ERROR: {e}\n")
-            errors += 1
+            raise LintError(f"{unit_name(p)}: {e}") from None
     text = "\n".join(rendered)
     if argv == ["--check"]:
         if not os.path.exists(chains_path):
@@ -396,9 +395,6 @@ def main(argv):
     with open(chains_path, "w") as f:
         f.write(text)
     print(f"wrote {len(units)} chains to {chains_path}")
-    if errors:
-        print(f"{errors} units failed to parse — see ERROR lines", file=sys.stderr)
-        return 1
     return 0
 
 

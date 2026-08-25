@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Edge Encoding
-description: The one-to-one primitive map from Reference chain to skill prose — the ruled encodings, the holes, and the residual ledger
+description: The one-to-one primitive map from Reference chain to skill prose — the ruled encodings, the holes, and the port roster
 ---
 
 # Edge Encoding
@@ -43,8 +43,9 @@ enforced by our lint.
 Every higher-level primitive maps one-to-one to exactly one lower-level
 expression — `reports` in the chain is `{Report …}` in the prose, and
 nothing else is. A skill is then rewritten using only the map, and
-whatever prose refuses to fit is a residual, tracked in the ledger
-below. A valuable residual amends the shared primitive structure; a
+whatever prose refuses to fit is a residual, tracked in the
+[Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
+A valuable residual amends the shared primitive structure; a
 worthless one is reworded away. This is
 [the EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#the-loop)
 run at a lower level — still generating primitives in partnership with
@@ -265,81 +266,9 @@ by one ruling:
 
 ## Residual ledger
 
-Per exemplar: what the full rewrite could not express in the map. Each
-entry awaits a verdict — valuable (amends the shared structure) or not
-(reworded away).
-
-### log-friction
-
-The rewrite converges: every sentence is a primitive, an accounted
-internal, or one of these residuals.
-
-1. **Behavior-mode block** — "Run to completion without asking the user
-   anything … fire-and-forget …". The higher level already ledgers this
-   category (orchestrate's whole body, diagnosing-bugs' secret-redaction
-   rule) as remembered-not-primitive. It recurs; strongest candidate for
-   a future primitive.
-2. **Control flow** — "and stop" in the nothing-to-record bullet. Early
-   exit has no primitive; it rides as uncoded payload words the agent
-   obeys.
-3. **Rationale prose** — "An imperfect entry is cheap: the log is
-   append-only prose …". Not an instruction — why-text calibrating the
-   agent's judgment. No primitive expresses justification.
-
-Accounted: the three unbraced `If` bullets (the deliberate
-uncoded-conditional tier); step 2's entry-writing and step 3's staging
-detail (internal program below the CLOA); the working-tree edit itself
-(subsumed by the git commit edge, exactly as the ledger's chain models
-it).
-
-### document-deslop
-
-Partially rewritten: args and does→Agent are encoded; the Review
-section waits on a conditional-report round. Candidates so far:
-
-1. **Negated edge** — "This skill never commits." No primitive
-   expresses the absence of an edge.
-2. **Conditional report** — "Relay the problem to the user" versus
-   "Say nothing and go on": the report to the caller depends on the
-   subagent's reply, and one branch deliberately reports nothing.
-   Likely resolvable without a new primitive: deslopper's Report back
-   encodes the same shape as guard-contained `{Report …}` spans.
-
-### grill-with-docs
-
-The rewrite converges; one candidate:
-
-1. **Override-scope prose** — "Everything else applies as written" and
-   "Its `CONTEXT.md` format applies as written": statements of what is
-   *not* overridden. Same family as document-deslop's negated edge —
-   prose asserting an edge's absence.
-
-### usage-report
-
-The rewrite converges — the body is one span. One candidate:
-
-1. **Script subtree** — the ledger's chain draws a reads edge under
-   `report.sh` (`~/.cache/claude-code/usage.json`). A shell script has
-   no frontmatter and no spans, so nothing in the map can generate a
-   Script's sub-edges; the does edge ends at the file.
-
-### deslopper
-
-The rewrite converges — reads, guarded read, local-file write, and two
-guarded reports all land in the map. Candidates:
-
-1. **The enforce relationship** — Run 1's chain drew
-   `does → [slop-tics] Standard — .enforce`. The map expresses the
-   relationship as `{Read [slop-tics.md]}`: honest (the agent must read
-   the tics) but flat — no expression says this unit is the *enforce
-   arm* of a Standard.
-2. **Agent inputs** — "The launching prompt names the working directory
-   and the target document." A skill's args derive from frontmatter
-   `arguments`; an agent has no such field, so its inputs ride as
-   prose.
-3. **Recurrences** — "you never commit" (negated edge, third sighting)
-   and "Conformance to the standard is the goal …" (rationale prose,
-   second sighting).
+Per unit, what its full rewrite could not express in the map — each
+entry awaiting a verdict. Lives in its own file:
+[Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
 
 ## Principles ruled this session
 
@@ -417,7 +346,7 @@ Skills:
 - [ ] orchestrate
 - [ ] pocock-sweep
 - [ ] prototype
-- [ ] ralph-setup — trips the scanner today (stray `{name: …}` brace); its chain is an ERROR line
+- [x] ralph-setup
 - [ ] research
 - [ ] rewind-compact
 - [ ] skill-creator

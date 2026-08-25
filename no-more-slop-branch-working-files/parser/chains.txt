@@ -89,7 +89,13 @@
 
 [prototype] Skill
 
-[ralph-setup] ERROR: unknown keyword 'name:' in span at offset 3698
+[ralph-setup] Skill · model: inherit, effort: xhigh
+  ├─args────► goal
+  ├─reads───► ralph-loop.md    end-to-end, before anything else
+  ├─does────► [grill-with-docs] Skill
+  ├ ╌ writes ╌ ► local file    the plan file    if the user approved the criteria and the plan, and the gate is green
+  ├ ╌ writes ╌ ► local file    the progress file    if the user approved the criteria and the plan, and the gate is green
+  └─reports─► outcome: str    the full launch command for the user to run
 
 [research] Skill
 
