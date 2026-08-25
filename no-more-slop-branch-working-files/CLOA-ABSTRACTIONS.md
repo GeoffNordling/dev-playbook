@@ -77,7 +77,7 @@ An expectation-maximization shape over a chosen target artifact:
   model's job is to challenge the filter. The burden of proof sits with
   the model: the user's accept or reject needs no justification, and the
   model validates every accepted candidate against the corpus.
-- **Convergence** is the pandas test: the user predicts the target's
+- **Convergence** is the pandas standard: the user predicts the target's
   behavior without reading its bodies, and the abstraction count is
   minimal — good abstractions are a codebook the corpus gets short in.
 
@@ -171,9 +171,8 @@ down the levels.
 | Script          | do                            | Deterministic code run via the shell — not a direct LLM call |
 | Reference chain | edges: does, reads, overrides, writes, args, reports | The declared tree of a unit's behavior and its call signature — args in, reports out |
 
-- **Standard** is established and live. Its open problem: the top level is
-  elegant and simple; the bottom level is a messy collection of
-  non-user-readable documents and scripts.
+- **Standard** is established and live; its open problem is the two-level
+  split under [Abstraction shape](#abstraction-shape).
 - **Agent and Skill** get one verb, **do**, and no more. Specificity
   comes from the behavior being done, which documentation defines — a
   Standard's verb where one exists (the deslopper does slop-tics.enforce),
@@ -196,7 +195,8 @@ down the levels.
   node. The zoom rule collapses in-bundle documents, never an executed
   script. A sibling **Workflow** noun (deterministic orchestration in
   Claude Code's dynamic-workflow runtime) was dropped 2026-08-25 as
-  empirically vacuous: no unit among the 23 closed-out chains fires a
+  empirically vacuous: no unit in
+  [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) fires a
   does-edge into one — ralph-setup, the closest, reports the
   ralph-loop launch command as a string and never runs it. The noun
   returns if a unit ever does a workflow.
@@ -223,19 +223,17 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   brief that build later reads. Scratch writes carry no filenames.
   The refinement stays machine-readable: a comma-separated sequence of
   operations — `git(commit, push)` — never prose and never `+`. A
-  target in another repo carries that repo's name as the refinement's
-  head — `git(mission-control: commit, push)` — and the same repo
-  prefix marks a cross-repo read target (`mission-control/friction
-  log`); crossing a repo boundary is always visible.
-- **args** — the value the caller hands in at invocation, carried by
-  the harness's argument substitution. Declared by name alone, in the
-  harness-native frontmatter field `arguments` — log-friction declares
-  `arguments: [friction]`. No type is written: the substitution is
-  text, so every arg is a string by harness mechanics, and a type that
-  applies all the time distinguishes nothing — remembered, not
-  encoded. Never lands in state, dies with the call. The lower-level
-  detail lives in
-  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
+  target in another repo carries that repo as the refinement's head, so
+  crossing a repo boundary is always visible in a write. How the
+  generator draws it is in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md#chain-rendering).
+- **args** — the value the caller hands in at invocation. Declared by
+  name alone: the harness substitutes text, so every arg is a string,
+  and a type that applies all the time distinguishes nothing —
+  remembered, not encoded. Never lands in state, dies with the call.
+  Where the name is declared, and what the harness does and does not
+  do with it, is ruled in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md#the-primitive-map).
 - **reports** — hand a value back to the caller, user and agent alike:
   ralph-setup reports a launch command to the user, bump-pins reports
   its status enum to update-standards-pin. Unlike a write, a report never
@@ -243,19 +241,19 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   typed as well as named, `report_name: report_type` — a report's type
   varies, so it carries information — commit reports
   `outcome: str` — and an enumerable status is preferred, its values
-  listed as a small enum. A reporting unit will declare its report in
-  its own file, so the primitive view renders the declaration instead
-  of a model regenerating it; the declaration format is under design in
-  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
+  listed as a small enum. A reporting unit declares its report in its
+  own file, so the primitive view renders the declaration instead of a
+  model regenerating it; the declaration format is ruled in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md#the-primitive-map).
   The label is the bare third-person form of the skill-prose keyword
   `Report`, so translation adds an `s` and never swaps a word.
 
-Any edge may carry a **guard** — the condition under which it fires.
-A guarded edge is drawn dashed with the dashes spaced out so the break
-is visible on screen (`├ ╌ does ╌ ╌ ►`), and its trailing text is the
-condition; a solid edge (`├─does──►`) is unconditional, and its
-trailing text is mere annotation. A call inside an `if` is still a call edge; the
-condition never changes the edge's type.
+Any edge may carry a **guard** — the condition under which it fires. A
+guarded edge draws dashed and carries its condition; an unguarded edge
+draws solid, and its trailing text is mere annotation. A call inside an
+`if` is still a call edge; the condition never changes the edge's type.
+The drawn form is in
+[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md#chain-rendering).
 
 Its rules:
 
@@ -368,8 +366,10 @@ The bootstrap targets, run in order and all recorded in the ledger:
 `grill-with-docs` (mid-size — five skills and a standard), `design`
 (the hub — the chain least likely to fit in the user's head).
 
-The software factory is next — the graduation exercise. It brings the
-Guide type (9 docs, all `software-factory/`) and the 13 parked units,
+The software factory is the graduation exercise, parked for now — see
+[Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md). It
+brings the Guide type (9 docs, all `software-factory/`) and the 13 parked
+units,
 and may leave large residuals: a Guide describes how a fleet of units
 operates together — protocol, not one unit's behavior — which no
 current noun carries. Per the remembered rule, Guide earns a noun only
@@ -379,16 +379,12 @@ ledger.
 
 ### The chains ledger
 
-Every finalized chain is recorded in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as it
-is ruled — the three bootstrap runs and each close-out unit — so the
-close-out ends in a written ledger, not in compacted memory. This file
-keeps the ontology and the rulings; that file keeps the chains.
-
-The empirical close-out ended by ruling with 23 chains recorded: batches had
-stopped producing ontology changes, and the thirteen units still
-unread were ruled expressible with the existing primitives. The
-recorded chains are proof of concept — the final traces will be
-generated deterministically by scripts operating on structure embedded
-in the unit files. That structure is under design
-in [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md),
-this file's lower level.
+Every finalized chain is recorded in
+[CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as it is
+ruled — the three bootstrap runs and each close-out unit — so the close-out
+ends in a written ledger, not in compacted memory. This file keeps the
+ontology and the rulings; that file keeps the chains, their count, and the
+ruling that closed the run. The in-file structure those chains are now
+generated from is
+[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md), this
+file's lower level.

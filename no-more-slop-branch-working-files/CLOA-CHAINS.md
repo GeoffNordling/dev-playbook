@@ -14,10 +14,12 @@ abstractions file.
 
 These chains exist as proof of concept — each one written to test
 that the primitive set could express that unit's operations, and the
-set held. The final traces will be generated deterministically, by
-scripts operating on structure embedded in the unit files themselves;
-the format of that structure is designed with the lint plan. The
-close-out ended by ruling with 23 chains recorded: batches had
+set held. The final traces are generated instead, from structure
+embedded in the unit files themselves: that structure is ruled in
+[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md), and
+`parser/chaingen.py` emits `parser/chains.txt` — the five covering-set
+units so far, log-friction's entry below among them. The
+close-out ended by ruling with 22 chains recorded: batches had
 stopped producing ontology changes, and the thirteen units still
 unread were ruled expressible with the existing primitives.
 
@@ -165,10 +167,10 @@ ledgered behavior-mode residual.
 
     [log-friction] Skill · model: sonnet, effort: xhigh
       ├─args────► friction
-      ├─reads───► mission-control/friction log          the entry format and
-      │                                                  its repeat-bites rule
-      ├ ╌ writes ╌ ╌ ► git(mission-control: commit, push)    something to record
-      └─reports─► outcome: str    entry name + push landed | "nothing to record"
+      ├ ╌ reports ╌ ► outcome: str    that there is nothing to record    if there is genuinely nothing to record
+      ├─reads───► friction/log.md
+      ├ ╌ writes ╌ ► git(mission-control: add, commit, push)    and push    if there is something to record
+      └─reports─► outcome: str    one line with the entry's short name, and that the push landed
 
 One sentence carries the target: log-friction appends one entry to
 mission-control's friction log — the read and the write are the same

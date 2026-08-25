@@ -8,10 +8,10 @@ description: One session's full read of the software factory — a classificatio
 
 Notes from a single session that read every software-factory file once,
 written down before a deliberate pause. The factory phase of the
-`no-more-slop` branch is parked. The doc conventions' declarative voice does
-not apply: every disposition and candidate here is a guess, and nothing binds
-until a ruling elsewhere says it does. Like `NO-MORE-SLOP.md`, this file is
-temporary — it drains into permanent homes or gets discarded.
+`no-more-slop` branch is parked. Same working-file conventions as
+[the branch plan](/no-more-slop-branch-working-files/NO-MORE-SLOP.md): every
+disposition and candidate here is a guess, and nothing binds until a ruling
+elsewhere says it does.
 
 Why parked: an outside source on software-factory patterns is expected
 imminently, and the user intends to rewrite the factory anyway — so mapping
@@ -19,10 +19,6 @@ the CLOA primitives onto its *current* files looked like wasted effort. The
 sketch that felt most promising when we stopped: distill the factory's
 intent, design any new primitives against that intent, then re-author the
 factory natively in them. That sequencing is a suggestion.
-
-One working note from the pause: launching reader agents over the current
-factory files for chain extraction seemed like the clearest waste — the
-files' intent matters, their present shape probably doesn't.
 
 ## The census
 
@@ -93,15 +89,17 @@ A rewrite would presumably preserve most of this:
   halt-commit-escalate), suggestion dispositions (ordered routing, a fixed
   reason vocabulary), and user checkpoints (the merge prohibition above
   all).
-- **Typed returns.** Every headless node ends on a report envelope —
-  `outcome: done|escalated`, a `gist`, counts. The existing `returns`
-  primitive carries this as-is.
+- **Typed reports.** Every headless node ends on a report envelope —
+  `outcome: done|escalated`, a `gist`, counts. The
+  [reports edge](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#reference-chain)
+  carries this as-is.
 
 ## Primitive candidates the intent hints at
 
-Ideas only. None has been proposed for a ruling, and the ontology's
-elbow-point discipline (new nouns must be load-bearing and lintable) still
-applies to every one:
+Ideas only. None has been proposed for a ruling, and the ontology's rule
+still applies to every one — a type earns a noun only when it demonstrates a
+verb interface, the way Standard did
+([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#reference-chain)):
 
 - **A declared graph.** The fleet's state machine — regions, nodes, edges,
   dispatch table — today lives in prose+mermaid and is executed twice: once
@@ -116,8 +114,9 @@ applies to every one:
 - **Generated units.** The three reviewers share most of their text;
   `review-contract.md` even names its "two parameters" (review name, what
   counts as Blocking) that each supplies. A template plus parameter blocks,
-  deterministically expanded, would resemble the step-4 plan of generating
-  traces from in-file structure.
+  deterministically expanded, would resemble
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md)'s
+  plan of generating traces from in-file structure.
 - **Scripts for mechanics.** The `jq`/GraphQL recipes agents currently
   re-type each run (posting a review, reading threads, resolving one)
   could become bundled scripts with `does → Script` edges. No new
@@ -141,13 +140,8 @@ as two entangled efforts — sequence them instead:
 3. **Native re-authoring.** Express the factory in whatever primitives
    survive. Chains would then be born with the units rather than extracted
    after the fact.
-4. **Close-out.** Residuals to the ledger, `CLOA-ABSTRACTIONS.md` and
-   `NO-MORE-SLOP.md` updated, then the lint plan — which by then would
-   have real declared structure to lint.
-
-The pool skills' pipeline (map → prove → embed → generate) is unaffected
-either way.
-
-## Inbox
-
-Takeaways from the software-factory-patterns episode land here.
+4. **Close-out.** Residuals to the ledger,
+   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)
+   and [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md)
+   updated, then the lint plan — which by then would have real declared
+   structure to lint.

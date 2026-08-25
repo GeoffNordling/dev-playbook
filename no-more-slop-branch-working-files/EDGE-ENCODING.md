@@ -10,15 +10,16 @@ The lower-level design under
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md):
 machine-parseable structure inside skill and agent prose, so deterministic
 code can generate the Reference chains that file defines. Same working-file
-conventions as its siblings: speculative voice, deleted when the results
-merge. The exemplar files being edited live in `edge-examples/`; the live
-skills stay untouched until the design settles.
+conventions as
+[the branch plan](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) sets
+out.
 
-Acronyms used here, defined once: CLOA — Correct Level of Abstraction.
-CNL — Controlled Natural Language, an engineered subset of a natural
-language with restricted vocabulary and grammar so machines can parse what
-a reader reads. STE — ASD-STE100 Simplified Technical English, one
-specific CNL from aerospace, aimed at readers rather than machines.
+Acronyms used here, defined once: CNL — Controlled Natural Language, an
+engineered subset of a natural language with restricted vocabulary and
+grammar so machines can parse what a reader reads. STE — ASD-STE100
+Simplified Technical English, one specific CNL from aerospace, aimed at
+readers rather than machines. CLOA is in the branch plan's
+[terms](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#terms).
 
 ## Three readers
 
@@ -42,7 +43,7 @@ enforced by our lint.
 Every higher-level primitive maps one-to-one to exactly one lower-level
 expression — `reports` in the chain is `{Report …}` in the prose, and
 nothing else is. A skill is then rewritten using only the map, and
-whatever prose refuses to fit is a **residual**, tracked in the ledger
+whatever prose refuses to fit is a residual, tracked in the ledger
 below. A valuable residual amends the shared primitive structure; a
 worthless one is reworded away. This is
 [the EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#the-loop)
@@ -76,9 +77,9 @@ surfaced a fresh complexity; the map runs it forwards.
 
 The ruled rows, in detail:
 
-- **args** — fully derived from the harness-native frontmatter field:
-  `arguments: [friction]` declares the edge and the name; the chain
-  shows the name alone. No type (`$ARGUMENTS` is text substitution, so
+- **args** — fully derived from a frontmatter field this design
+  declares: `arguments: [friction]` names the edge and its argument;
+  the chain shows the name alone. No type (`$ARGUMENTS` is text substitution, so
   every arg is a string — remembered, not encoded), no annotation (the
   name must carry the meaning, same rule as code), no `argument-hint`
   (its only harness function is the `/` autocomplete popup), no
@@ -355,8 +356,9 @@ guarded reports all land in the map. Candidates:
   declared inline. No file describes another file's behavior — subtrees
   are stitched by following does-edges into the target file's own
   declarations.
-- **Workflow.** `edge-examples/` is committed at verbatim original
-  content. A proposal turn lands its full diff uncommitted — the
+- **One diff per proposal.** `edge-examples/` is committed at verbatim
+  original content, and the live skills stay untouched until the design
+  settles. A proposal turn lands its full diff uncommitted — the
   exemplar's encoding, the map's new rows and detail bullets, and the
   ledger's new entries — so the diff against HEAD is the whole
   proposal; one ruling approves and commits it all. Commits run the
@@ -369,21 +371,26 @@ guarded reports all land in the map. Candidates:
 In order:
 
 1. **Fill the map hole.** writes — GitHub / scratch, ruled when the
-   port surfaces each bucket's sentence. In the 23 closed-out chains,
-   scratch is written by wizard, prototype,
-   improve-codebase-architecture, codebase-design, and handoff;
-   GitHub by wayfinder and candidate-promote. Two former holes were
-   struck 2026-08-25 as vacuous in the corpus: no unit writes a
-   cache (usage-report's script only reads one), and no unit fires
-   does → Workflow — the Workflow noun itself was dropped from
+   port surfaces each bucket's sentence. The units that write either
+   bucket are the ones whose chains carry a scratch or GitHub write in
+   [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md);
+   read the roster off the ledger rather than a copy of it. Two former
+   holes were struck 2026-08-25 as vacuous in the corpus: no unit
+   writes a cache (usage-report's script only reads one), and no unit
+   fires does → Workflow — the Workflow noun itself was dropped from
    [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).
-2. **The standard.** The grammar's standard card and the
+2. **Finish document-deslop.** Its Review section is the covering
+   set's one unencoded piece. The shape it waits on is already
+   landed — the deslopper rewrite encodes two guarded reports through
+   guard-contained `{Report …}` spans — so what remains is applying
+   it, not deciding it.
+3. **The standard.** The grammar's standard card and the
    skill-standards scrub are likely one job: the new standard replaces
    what the old docs teach (the `## Name: $ARGUMENTS` heading,
    `argument-hint`), and `scripts/skill-lint` and friends stop
    expecting the old forms and start enforcing the map. Decide whether
    card and scrub are one standard when the writing starts.
-3. Parked: whether an unmarked link to a known unit should require a
+4. Parked: whether an unmarked link to a known unit should require a
    waiver. The live case: document-deslop links slop-tics.md in plain
    prose — correctly edge-free there, but the same pattern could be a
    forgotten encoding.

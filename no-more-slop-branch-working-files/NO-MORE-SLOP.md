@@ -107,27 +107,25 @@ fluency came from being the caller: the user learned pandas, git, and the
 software factory by operating them daily.
 
 The [Standard](/standards/standard/format.md) card system is the in-repo
-exemplar: the user holds primitives — define, audit, enforce, adopt — and
-predicts every card's behavior without having memorized the rule prose, the
-scripts, or the judges.
+exemplar, worked as the abstraction shape in
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#abstraction-shape).
 
 ## Documentation track — active
 
 **Completed**
 
 - **CLOA primitives.** Three bootstrap runs plus an empirical
-  close-out in [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) constructed
-  a converged primitive set — Standard, Agent, Skill, Workflow,
-  Script, Reference chain — that describes what documentation does at
-  the CLOA: the user understands the whole surface and keeps enough
-  control to guide the system, the implementation below the CLOA is
-  delegated to the agent, and deep dives stay auditable by opening
-  actual files. The close-out proved the set on 23 units — chains
-  recorded in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as proof of concept, the
-  final traces to be generated deterministically once the in-file
-  structure exists — and ended by ruling when batches stopped
-  producing ontology changes. That files are still too hard to read is
-  a separate open work stream (the Levels section's first level).
+  close-out in
+  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)
+  constructed a converged primitive set — that file's table is the
+  roster — describing what documentation does at the CLOA: the user
+  understands the whole surface and keeps enough control to guide the
+  system, the implementation below the CLOA is delegated to the agent,
+  and deep dives stay auditable by opening actual files. Every chain
+  the close-out proved, and the ruling that closed it, are in
+  [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md). That
+  files are still too hard to read is a separate open work stream (the
+  Levels section's first level).
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill, which the user invokes manually.
@@ -136,13 +134,13 @@ scripts, or the judges.
   [file-roles.md](/standards/knowledge-organization/file-roles.md).
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format — braced spans over a fixed keyword lexicon,
-  sliced at fixed cut points but never interpreted — designed and
-  certified on a five-unit covering set in
-  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md),
+  sliced at fixed cut points but never interpreted — designed on a
+  five-unit covering set in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md)
   and proven by `parser/chaingen.py`, which deterministically
-  regenerates every unit's chain into `parser/chains.txt` and fails
-  on drift via `--check`. Remaining work rides that file's to-do: the
-  map's two holes, the standard, and the corpus port.
+  regenerates every covered unit's chain into `parser/chains.txt` and
+  fails on drift via `--check`. Remaining work rides that file's
+  to-do.
 
 **Raw ideas, none designed**
 
@@ -165,6 +163,7 @@ scripts, or the judges.
 - **CLOA change discipline.** A process that forces a conscientious
   decision on every term used within a CLOA communication. Without one,
   vocabulary changes willy-nilly.
+
 The core problem of this track: documentation needs far more reading by the
 user than code does. Code is deterministic and can be pinned down by tools;
 documentation can only be taken so far by them, so something has to keep it
@@ -222,27 +221,63 @@ a pleasure to read.
   only; docstring quality stays stochastic with the review agents, which is
   the right assignment.
 
-## New terms
+## Terms
 
-Candidates to document somewhere:
+The terms this branch coined. Each line is the definition; the file that
+works the term holds the detail. Every one is a tentative promotion to
+`CONTEXT.md`: none is promoted until the user approves it.
 
-- CLOA (Correct Level of Abstraction)
-- intent alignment debt
-- unread tier, acceptance tier
-- gray module
-- slop
-- constrain to optimize understanding
-- the pandas standard
-- layer invariance
+- **acceptance tier** — the small, capped, fully read test suite in
+  `tests/acceptance/`, one test per behavior the user could state in a
+  sentence. Its opposite is the unread tier.
+- **CLOA (Correct Level of Abstraction)** — the level of abstraction where
+  the AI and the user communicate in the exact same terminology.
+- **constrain to optimize understanding** — the principle that a constraint
+  on form pays for itself in amortized reading, meaningful location, and a
+  lintable rule.
+- **covering set** — the smallest group of exemplar units that exercises
+  every row of a design under test; edge encoding's is five units.
+- **gray module** — a module the user understands approximately, because the
+  user understands its tests and the tests pass.
+- **intent alignment debt** — divergence from the user's intent accrued over
+  time; the mirror of tech debt.
+- **layer invariance** — the loop is the same algorithm at any level, with
+  adjacent runs joined by a map
+  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance)).
+- **the loop** — the expectation-maximization procedure that generates
+  primitives from a target artifact
+  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#the-loop)).
+- **the pandas standard** — the target state: fluency with an interface —
+  which objects exist, which methods fit which task — without ever reading
+  inside it.
+- **Reference chain** — the declared tree of one unit's behavior and its
+  call signature
+  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#reference-chain)).
+- **registry pass** — the loop's first move on a repo: rule every registered
+  document type important to the primitives ontology or not.
+- **residual** — whatever the current abstractions cannot express; tracked,
+  never forced.
+- **slop** — output that diverges from the user's intent (low quality) or
+  that the user cannot read (not understood); the Goal section splits the
+  two.
+- **slop trench** — nominal ownership of a system whose details have
+  outpaced inspection.
+- **unit** — one documentation file, or an abstract object that functions
+  like one, the way a skill functions like its `SKILL.md`.
+- **unread tier** — the existing thousand-odd machine-written unit tests,
+  judged only by passing.
+- **the vocabulary API** — `CONTEXT.md` designed the way a library designs
+  its public surface, plus the escalation discipline that keeps it current.
 
 ## Now
 
-The pre-factory sequence runs in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md). The registry pass is done —
-Standard and Guide are the ontology-important types. Next: close out
-skills and agents empirically (all of them, not three samples), then a
-prose lint plan for the deterministic structure. Then the software
-factory.
+Edge encoding is the live work: the design and its parser sit in
+[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md), and
+that file's to-do carries the next steps in order. The ontology above it is
+settled in
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md),
+with every proven chain in
+[CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md).
 
 The factory phase is parked: one session read all its files and left the
 classification, the intent, and unbound rewrite sketches in
