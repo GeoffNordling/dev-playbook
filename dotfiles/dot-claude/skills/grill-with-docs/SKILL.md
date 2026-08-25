@@ -8,6 +8,6 @@ effort: xhigh
 
 # Grill with Docs
 
-Run a /grilling session, using the /domain-modeling skill throughout. Everything else applies as written.
+{Run [/grilling](~/.claude/skills/grilling/SKILL.md)}, then {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) throughout}. Everything else applies as written.
 
-Where /domain-modeling says `docs/adr/` and "ADR", this workspace writes **Decision Records** to `docs/decisions/`, in the form given by [Decision Record conventions](~/workspace/dev-playbook/standards/decisions/records.md). Its `CONTEXT.md` format applies as written.
+{Override [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) on its `docs/adr/` and "ADR" clause with [Decision Record conventions](~/workspace/dev-playbook/standards/decisions/records.md); this workspace writes **Decision Records** to `docs/decisions/`}. Its `CONTEXT.md` format applies as written.

@@ -1,3 +1,11 @@
+[adjudicator] Agent · tools: Read, Bash, model: opus, effort: xhigh
+
+[bug-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+
+[build] Agent · model: opus, effort: xhigh
+
+[code-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+
 [deslopper] Agent · tools: Read, Write, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
   ├─writes──► local file    the target document in place
@@ -5,14 +13,64 @@
   ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
 
+[doc-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+
+[open-pr] Agent · model: sonnet, effort: low
+
+[set-auditor] Agent · tools: Read, Grep, Glob, model: opus, effort: xhigh
+
+[set-deslopper] Agent · tools: Read, Write, Edit, Grep, Glob, Agent, model: opus, effort: xhigh
+
+[agent-view-overwatch] Skill · model: sonnet, effort: xhigh, allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
+
+[candidate-promote] Skill · model: inherit, effort: xhigh
+
+[clean-up-branch-worktree] Skill · model: sonnet, effort: low
+
+[codebase-design] Skill
+
+[commit-off] Skill · model: inherit, effort: low
+
+[commit] Skill · model: sonnet, effort: low, allowed-tools: Bash(git *)
+
+[compact-prep] Skill · model: inherit, effort: xhigh
+
+[datasheet] Skill · model: opus, effort: xhigh
+
+[design] Skill · model: inherit, effort: xhigh
+
+[diagnosing-bugs] Skill
+
 [document-deslop] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
   └─does────► [deslopper] Agent    the subagent, `model: sonnet`
+
+[domain-modeling] Skill
+
+[enable-repo-governance] Skill · model: opus, effort: xhigh
 
 [grill-with-docs] Skill · model: inherit, effort: xhigh
   ├─does────► {grilling} Skill
   ├─does────► {domain-modeling} Skill    throughout
   └─overrides─► {domain-modeling} Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
+
+[grilling] Skill
+
+[handoff] Skill · model: opus, effort: medium
+
+[idea] Skill · model: sonnet, effort: xhigh
+
+[improve-codebase-architecture] Skill
+
+[intake] Skill · model: inherit, effort: xhigh
+
+[issue-overwatch] Skill · model: inherit, effort: xhigh
+
+[issue-review-claims] Skill · model: sonnet, effort: xhigh
+
+[issue-review-simulation] Skill · model: sonnet, effort: xhigh
+
+[judgments-sweep] Skill · model: opus, effort: xhigh
 
 [log-friction] Skill · model: sonnet, effort: xhigh
   ├─args────► friction
@@ -21,5 +79,39 @@
   ├ ╌ writes ╌ ► git(~/workspace/mission-control: add, commit, push)    and push    if there is something to record
   └─reports─► outcome: str    one line with the entry's short name, and that the push landed
 
+[marimo-batch] Skill
+
+[marimo-notebook] Skill
+
+[orchestrate] Skill · model: inherit, effort: xhigh
+
+[pocock-sweep] Skill · model: inherit, effort: xhigh
+
+[prototype] Skill
+
+[ralph-setup] ERROR: unknown keyword 'name:' in span at offset 3698
+
+[research] Skill
+
+[rewind-compact] Skill · model: opus, effort: medium
+
+[skill-creator] Skill · model: opus, effort: xhigh
+
+[update-standards-pin] Skill · model: opus, effort: xhigh
+
 [usage-report] Skill · model: sonnet, effort: low, allowed-tools: Bash(bash *usage-report/scripts/report.sh)
   └─does────► [report.sh] Script    from this skill's base directory
+
+[user-intent-mini-interview] Skill · model: inherit, effort: xhigh
+
+[wait-what] Skill
+
+[wayfinder-to-build] Skill · model: inherit, effort: xhigh
+
+[wayfinder] Skill
+
+[wizard] Skill
+
+[working-doc-set-deslop] Skill · model: sonnet, effort: high
+
+[writing-for-agents] Skill

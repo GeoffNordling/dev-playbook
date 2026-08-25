@@ -13,13 +13,12 @@ it is the branch plan, and it holds the goal, the principles, the terms, and
 the next steps for the work as a whole. The other four files are its
 children.
 
-Two subdirectories carry no index of their own, and
+One subdirectory carries no index of its own, and
 [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md) owns
-what both hold: `edge-examples/`, the exemplar skills and agents the
-encoding is designed on, mirroring the `skills/` and `agents/` source layout
-so the lints treat the copies exactly as they treat the sources; and
-`parser/`, holding `chaingen.py`, the chain generator, beside `chains.txt`,
-its output.
+what it holds: `parser/`, holding `chaingen.py`, the chain generator,
+beside `chains.txt`, its output over the whole live corpus. The
+`edge-examples/` copies the encoding was designed on retired into the
+live `dotfiles/dot-claude` sources on 2026-08-25.
 
 - [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) — The noun-and-verb abstractions that make documentation understandable at the CLOA, and the loop that generates them
 - [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) — The ledger of finalized reference chains — one recorded entry per unit, written down as it is ruled

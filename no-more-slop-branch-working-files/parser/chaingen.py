@@ -7,13 +7,15 @@ link(s), the `with` splitter, nested braces, and the first semicolon.
 Everything between cut points is opaque verbatim text.
 
 Usage:
-    chaingen.py            regenerate chains.txt — every unit in
-                           ../edge-examples, blank-line separated
+    chaingen.py            regenerate chains.txt — every unit in the
+                           corpus (dotfiles/dot-claude agents and
+                           skills), blank-line separated
     chaingen.py --check    regenerate in memory and diff against
                            chains.txt; exit 1 on drift
 """
 
 import difflib
+import glob
 import os
 import re
 import sys
@@ -341,22 +343,34 @@ def render_unit(path):
 # ── entry ────────────────────────────────────────────────────────────────
 
 
-def all_units(examples_dir):
-    """Every .md unit under `examples_dir`, in walk order."""
-    units = []
-    for dirpath, _dirs, files in sorted(os.walk(examples_dir)):
-        for name in sorted(files):
-            if name.endswith(".md"):
-                units.append(os.path.join(dirpath, name))
+def all_units(claude_dir):
+    """Every unit in the corpus: agents/*.md, then skills/*/SKILL.md."""
+    units = sorted(glob.glob(os.path.join(claude_dir, "agents", "*.md")))
+    units += sorted(glob.glob(os.path.join(claude_dir, "skills", "*", "SKILL.md")))
     return units
+
+
+def unit_name(path):
+    """A unit's display name: the skill's directory or the agent's basename."""
+    base = os.path.basename(path)
+    if base == "SKILL.md":
+        return os.path.basename(os.path.dirname(path))
+    return base[: -len(".md")]
 
 
 def main(argv):
     """Write chains.txt, or with --check diff against it."""
     here = os.path.dirname(os.path.abspath(__file__))
     chains_path = os.path.join(here, "chains.txt")
-    units = all_units(os.path.join(here, "..", "edge-examples"))
-    text = "\n".join(render_unit(p) for p in units)
+    units = all_units(os.path.join(here, "..", "..", "dotfiles", "dot-claude"))
+    rendered, errors = [], 0
+    for p in units:
+        try:
+            rendered.append(render_unit(p))
+        except LintError as e:
+            rendered.append(f"[{unit_name(p)}] ERROR: {e}\n")
+            errors += 1
+    text = "\n".join(rendered)
     if argv == ["--check"]:
         if not os.path.exists(chains_path):
             print("DRIFT: chains.txt does not exist")
@@ -382,6 +396,9 @@ def main(argv):
     with open(chains_path, "w") as f:
         f.write(text)
     print(f"wrote {len(units)} chains to {chains_path}")
+    if errors:
+        print(f"{errors} units failed to parse — see ERROR lines", file=sys.stderr)
+        return 1
     return 0
 
 

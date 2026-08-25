@@ -356,15 +356,79 @@ guarded reports all land in the map. Candidates:
   declared inline. No file describes another file's behavior — subtrees
   are stitched by following does-edges into the target file's own
   declarations.
-- **One diff per proposal.** `edge-examples/` is committed at verbatim
-  original content, and the live skills stay untouched until the design
-  settles. A proposal turn lands its full diff uncommitted — the
-  exemplar's encoding, the map's new rows and detail bullets, and the
-  ledger's new entries — so the diff against HEAD is the whole
-  proposal; one ruling approves and commits it all. Commits run the
-  document linters; the test-suite hook is skipped (`SKIP=make-check`
-  on push).
+- **One diff per proposal.** A proposal turn lands its full diff
+  uncommitted — the unit's encoding, the map's new rows and detail
+  bullets, and the ledger's new entries — so the diff against HEAD is
+  the whole proposal; one ruling approves and commits it all. Commits
+  run the document linters; the test-suite hook is skipped
+  (`SKIP=make-check` on push). (The design settled on `edge-examples/`
+  copies, which retired into the live `dotfiles/dot-claude` sources on
+  2026-08-25; proposals now edit the live files directly.)
 - **Acronyms defined once**, at the top of anything we write.
+
+## Port roster
+
+Every unit in the live corpus (`dotfiles/dot-claude/agents/*.md` and
+`skills/*/SKILL.md` — the tree `chaingen.py` scans since the
+edge-examples retired into it). Checked means ported: encoded in map
+language and its chain certified in `parser/chains.txt`.
+
+Agents:
+
+- [x] deslopper
+- [ ] adjudicator
+- [ ] bug-pr-review
+- [ ] build
+- [ ] code-pr-review
+- [ ] doc-pr-review
+- [ ] open-pr
+- [ ] set-auditor
+- [ ] set-deslopper
+
+Skills:
+
+- [x] document-deslop — Review section still unencoded (To-do 2)
+- [x] grill-with-docs
+- [x] log-friction
+- [x] usage-report
+- [ ] agent-view-overwatch
+- [ ] candidate-promote
+- [ ] clean-up-branch-worktree
+- [ ] codebase-design
+- [ ] commit
+- [ ] commit-off
+- [ ] compact-prep
+- [ ] datasheet
+- [ ] design
+- [ ] diagnosing-bugs
+- [ ] domain-modeling
+- [ ] enable-repo-governance
+- [ ] grilling
+- [ ] handoff
+- [ ] idea
+- [ ] improve-codebase-architecture
+- [ ] intake
+- [ ] issue-overwatch
+- [ ] issue-review-claims
+- [ ] issue-review-simulation
+- [ ] judgments-sweep
+- [ ] marimo-batch
+- [ ] marimo-notebook
+- [ ] orchestrate
+- [ ] pocock-sweep
+- [ ] prototype
+- [ ] ralph-setup — trips the scanner today (stray `{name: …}` brace); its chain is an ERROR line
+- [ ] research
+- [ ] rewind-compact
+- [ ] skill-creator
+- [ ] update-standards-pin
+- [ ] user-intent-mini-interview
+- [ ] wait-what
+- [ ] wayfinder
+- [ ] wayfinder-to-build
+- [ ] wizard
+- [ ] working-doc-set-deslop
+- [ ] writing-for-agents
 
 ## To-do
 
@@ -384,13 +448,21 @@ In order:
    landed — the deslopper rewrite encodes two guarded reports through
    guard-contained `{Report …}` spans — so what remains is applying
    it, not deciding it.
-3. **The standard.** The grammar's standard card and the
+3. **The corpus port.** Bring every unchecked Port roster unit online,
+   one at a time: generate the target chain from the unit itself and
+   its prior recorded chain in
+   [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md),
+   encode the file in map language so the prose reads naturally and
+   parses to that target, run `chaingen.py`, and certify the result in
+   `parser/chains.txt`. Escalate immediately on a new primitive, a
+   rule change, or an ambiguous sentence.
+4. **The standard.** The grammar's standard card and the
    skill-standards scrub are likely one job: the new standard replaces
    what the old docs teach (the `## Name: $ARGUMENTS` heading,
    `argument-hint`), and `scripts/skill-lint` and friends stop
    expecting the old forms and start enforcing the map. Decide whether
    card and scrub are one standard when the writing starts.
-4. Parked: whether an unmarked link to a known unit should require a
+5. Parked: whether an unmarked link to a known unit should require a
    waiver. The live case: document-deslop links slop-tics.md in plain
    prose — correctly edge-free there, but the same pattern could be a
    forgotten encoding.
