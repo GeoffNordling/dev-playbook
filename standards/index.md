@@ -35,8 +35,8 @@ alphabetical; directories last.
 
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement, bootstrap
 - [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard, one concern per document — the member registry, CLAUDE.md content, skill conventions, skill management
-- [docs/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references
-- [judgments/](/standards/semantic-validation/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
+- [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, working documentation sets
 - [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — doc conventions and the named slop tics
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
+- [semantic-validation/](/standards/semantic-validation/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [tracking/](/standards/tracking/index.md) — The tracking standard's contract, one concern per document — candidate conventions, issue authoring, repository settings, tracker operations

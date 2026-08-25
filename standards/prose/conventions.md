@@ -15,6 +15,8 @@ in the repo documentation hierarchy. Named tics to remove are cataloged in
 Describe what exists and what's planned next. Don't reference removed things,
 past state, or rejected alternatives.
 [Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
+History earns a sentence only when the present is unintelligible without
+it — a constraint that still binds, a decision that still governs.
 
 Decision Records are the exception. A Decision Record in `docs/decisions/` is a
 dated record of a past decision — the choice made, the alternatives rejected,

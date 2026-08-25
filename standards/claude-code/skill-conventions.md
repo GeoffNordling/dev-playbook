@@ -167,7 +167,7 @@ is governed elsewhere.
 - **Skill names**: kebab-case, concise, verb-noun or noun when obvious.
   Good: `commit`, `ref-lint`. Bad: `do-the-commit-thing`.
 - **Skill families**: prefix related skills with a shared namespace.
-  Example: `doc-format`, `doc-present-state`, `doc-rewrite`.
+  Example: `issue-review-claims`, `issue-review-simulation`.
 - **Descriptions**: see the [Required Fields](#required-fields) row for the
   rule. Good: `Write the failing tests for a change before any implementation
   lands. Use when starting the red phase of TDD, when a build leaf carries
