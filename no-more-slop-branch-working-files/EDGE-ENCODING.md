@@ -65,12 +65,14 @@ surfaced a fresh complexity; the map runs it forwards.
 | args | frontmatter `arguments` list — name only | **Ruled** (derived) |
 | reads | `{Read <one link>}` | **Ruled** |
 | writes — git bucket | `{Commit …}` + fenced command | **Ruled** |
-| writes — other buckets | — | **Hole** |
+| writes — local file | `{Write <payload>}` | **Ruled** |
+| writes — GitHub / scratch / cache | — | **Hole** |
 | reports | `{Report <payload>}` | **Ruled** |
 | guard | `{If <condition>, {…}}` containment | **Ruled** |
 | does → Agent | `{Launch <one link>}` | **Ruled** |
 | does → Skill | `{Run <one link>}` | **Ruled** |
-| does → Script / Workflow | — | **Hole** |
+| does → Script | `{Run <one link>}` | **Ruled** |
+| does → Workflow | — | **Hole** |
 | overrides … with … | `{Override <link> with <link>}` | **Ruled** |
 
 The ruled rows, in detail:
@@ -112,6 +114,13 @@ The ruled rows, in detail:
   command block in the same step supplies the machine detail — repo from
   `-C`, operations from the git subcommands. The lint requires the block
   and fails span/block disagreement.
+- **writes, local file** — `{Write <payload>}`. The keyword picks the
+  bucket: Commit → git, Write → local file. The payload is wholly
+  opaque — the write target is usually runtime-bound (deslopper's
+  arrives in the launching prompt), so no link is required and none is
+  interpreted; the chain draws `local file` with the payload verbatim
+  as annotation. The hand-drawn parenthetical contents
+  (`local file(PLAN.md, PROGRESS.md)`) are not generatable.
 - **does → Agent** — `{Launch <payload containing exactly one link>}`.
   The link is the agent definition file at its live harness path
   (document-deslop links `~/.claude/agents/deslopper.md`); the target's
@@ -132,6 +141,12 @@ The ruled rows, in detail:
   chain's curly braces, while an owned skill resolves into the dotfiles
   `dot-claude` tree. One span per edge: grill-with-docs fires two, the
   /grilling session and /domain-modeling active throughout.
+- **does → Script** — `{Run <payload containing exactly one link>}`,
+  the same expression as does → Skill: the verb never carries the
+  target type, the linked path does. A link to a `SKILL.md` is a Skill;
+  a link to a script file (usage-report's `scripts/report.sh`) is a
+  Script, named by its filename, in-bundle when the link is relative to
+  the skill's own directory.
 - **overrides** — `{Override <one link + clause words> with
   <one link + detail words>}`. The literal word `with` splits the
   payload, the way the guard's comma-after-condition does: the link
@@ -159,14 +174,22 @@ The ruled rows, in detail:
   a choice.
 - **The parser slices, never interprets.** Inside a span, deterministic
   code touches only fixed cut points: the keyword, the markdown
-  link(s), the `with` splitter, and nested braces. Every word between
-  cut points is an opaque verbatim string — annotation, carried for
-  display or dropped, never parsed and never load-bearing. In
+  link(s), the `with` splitter, nested braces, and the first semicolon.
+  Every word between cut points is an opaque verbatim string —
+  annotation, carried for display or dropped, never parsed and never
+  load-bearing. In
   `{Run a [/grilling](…) session}`, "a" and "session" are glue for the
   executing agent; "throughout" in the sibling span is a real
   instruction to that agent — and the code reads none of them. The
   guard's condition follows the same rule: lifted verbatim between two
   cut points, sliced, not understood.
+- **The first semicolon ends the chain's view.** In any sliced payload —
+  a span's annotation or a guard's condition — text after the first `;`
+  is file-only elaboration; the kernel before it travels to the chain.
+  Writers keep chains readable by fronting the kernel: deslopper's
+  `{Write the target document in place; it must say the same things …}`
+  puts "the target document in place" on the edge and the rest in the
+  file only. No semicolon means the whole slice travels.
 - **Code contexts are inert.** Spans are interpreted only outside code
   spans and fenced blocks.
 - **Unmarked prose is never an edge.** The marker declares; the parser
@@ -195,7 +218,11 @@ by one ruling:
    token on the left, the rule that fires on it, and the chain element
    it emits on the right — step by step until the whole fragment is
    rebuilt and nothing in it is unexplained. Approval certifies the
-   transform; it is the contract the future parser implements.
+   transform; it is the contract the future parser implements. Every
+   chain drawn on screen is a perfect simulacrum of the generator's
+   output — byte-faithful, no abbreviation, no truncation, no
+   prettifying. A chain too noisy to read that way is a design defect
+   to fix in the rules or the prose, never in the drawing.
 
 ## Residual ledger
 
@@ -236,6 +263,8 @@ section waits on a conditional-report round. Candidates so far:
 2. **Conditional report** — "Relay the problem to the user" versus
    "Say nothing and go on": the report to the caller depends on the
    subagent's reply, and one branch deliberately reports nothing.
+   Likely resolvable without a new primitive: deslopper's Report back
+   encodes the same shape as guard-contained `{Report …}` spans.
 
 ### grill-with-docs
 
@@ -245,6 +274,33 @@ The rewrite converges; one candidate:
    "Its `CONTEXT.md` format applies as written": statements of what is
    *not* overridden. Same family as document-deslop's negated edge —
    prose asserting an edge's absence.
+
+### usage-report
+
+The rewrite converges — the body is one span. One candidate:
+
+1. **Script subtree** — the ledger's chain draws a reads edge under
+   `report.sh` (`~/.cache/claude-code/usage.json`). A shell script has
+   no frontmatter and no spans, so nothing in the map can generate a
+   Script's sub-edges; the does edge ends at the file.
+
+### deslopper
+
+The rewrite converges — reads, guarded read, local-file write, and two
+guarded reports all land in the map. Candidates:
+
+1. **The enforce relationship** — Run 1's chain drew
+   `does → [slop-tics] Standard — .enforce`. The map expresses the
+   relationship as `{Read [slop-tics.md]}`: honest (the agent must read
+   the tics) but flat — no expression says this unit is the *enforce
+   arm* of a Standard.
+2. **Agent inputs** — "The launching prompt names the working directory
+   and the target document." A skill's args derive from frontmatter
+   `arguments`; an agent has no such field, so its inputs ride as
+   prose.
+3. **Recurrences** — "you never commit" (negated edge, third sighting)
+   and "Conformance to the standard is the goal …" (rationale prose,
+   second sighting).
 
 ## Principles ruled this session
 
@@ -276,8 +332,8 @@ Each hole has its exemplar waiting in the covering set.
 
 | Hole | Exemplar |
 |---|---|
-| does → Script | usage-report (its `report.sh` run) |
-| writes — other buckets | local file, GitHub, scratch, cache — each when its sentence comes up |
+| writes — GitHub / scratch / cache | each when its sentence comes up |
+| does → Workflow | no exemplar in the covering set |
 
 Also open, beyond the map:
 
