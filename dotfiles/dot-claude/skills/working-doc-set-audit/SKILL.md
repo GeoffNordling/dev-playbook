@@ -49,14 +49,3 @@ conventions the set itself declares. The finding categories:
   its type, with no Unfiled entry declaring it.
 - **Cut candidates** — content flagged stale or ancillary under the
   standard's conservation rule, listed for the user's ruling, never cut.
-
-Where a member's prose carries file-level slop tics, name the file and
-recommend /document-deslop for it rather than itemizing tics here.
-
-## Report
-
-Findings ranked by how much each would mislead a fresh session reading the
-set cold. Every finding cites `file:line`, quotes the offending text, and
-names its category; a duplication or conflict finding also says where the
-surviving copy belongs. Close with the cut-candidate batch as questions for
-the user. When the set is clean, say so plainly.
