@@ -32,6 +32,10 @@ What slop is precisely is still being worked out. So far, it breaks into:
   not include critical information below the CLOA; the user never needs to
   understand every line of code, for example.
 
+Today's stock of slop is mostly **intent alignment debt** — divergence
+from the user's intent accrued over time: the mirror of tech debt. Going
+forward, maintaining user understanding keeps new debt from accruing.
+
 ## Levels
 
 Understanding happens at multiple levels, for code and documentation alike:
@@ -217,6 +221,7 @@ a pleasure to read.
 Candidates to document somewhere:
 
 - CLOA (Correct Level of Abstraction)
+- intent alignment debt
 - unread tier, acceptance tier
 - gray module
 - slop

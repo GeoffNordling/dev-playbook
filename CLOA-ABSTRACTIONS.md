@@ -8,9 +8,8 @@ description: The noun-and-verb abstractions that make documentation understandab
 
 The **CLOA primitives ontology**: the abstractions the user and the AI
 share at the CLOA — each a noun with a small fixed verb set — and, as a
-detail of method, the loop that generates them. An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md),
-deleted when its results merge back into that plan or the branch of ideas
-terminates. The same speculative voice applies: a guess is written as a
+detail of method, the loop that generates them. An offshoot of [NO-MORE-SLOP.md](/NO-MORE-SLOP.md).
+The same speculative voice applies: a guess is written as a
 guess, and a sentence is settled only when it says so.
 
 ## Goal
@@ -28,31 +27,25 @@ changes as a result — and an abstraction names that meaning at the CLOA.
 
 ## Documentation as code
 
-The vision: think of documentation the way code is thought of — modules,
-typing, signatures, rules. Everything here is just wrapping deterministic
+The vision: think of documentation like code — modules,
+typing, signatures, rules. We will wrap deterministic
 structure around written documentation. Keep the structure simple,
-enforceable, and deterministic, and account for what it cannot carry in
-the residuals ruled important.
+enforceable, deterministic, and high leverage.
 
 The working heuristic: documentation is a fuzzy, stochastic version of
 code — treat it as a special case of code, and unify the two theories
-wherever the parallel is real, never by force. When the documentation
+when the parallel is real, not by force. When the documentation
 form of a problem is stuck, translate it to the code form, solve it
 there, and port the analogy back.
-Ports so far: change cost (below), the definition-site rule, and the
-import-linter parallel (both under the reference chain).
 
-**Change cost.** An adopted abstraction changes the
-way a codebase does — renaming or replacing one is a refactor, a
-significant investment, never a whim two weeks later. The CLOA change
-discipline from the branch plan guards everyday operations against that
-jitter; the bootstrap run, before anything is adopted, stays freeform.
+**Change cost.** Adopted abstractions change the
+way a codebase does — refactors are significant investments.
 
 ## Abstraction shape
 
 One noun carrying a small fixed verb set — an interface. Nouns describe;
-verbs predict. Tentatively accepted rule: the operations are always verbs,
-which is deterministic structure at the level of ideas.
+verbs predict. This is just naming nouns and giving them verbs:
+is deterministic structure at the level of ideas.
 
 The exemplar is the **Standard**: define, audit, enforce, adopt. Its top
 level works — the user predicts every card's behavior from four verbs
