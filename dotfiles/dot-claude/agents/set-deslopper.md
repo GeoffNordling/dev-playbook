@@ -14,11 +14,9 @@ The launching prompt names the working directory and the set's root file.
 
 Two moves:
 
-1. **Audit.** Launch one subagent (Agent tool,
-   `subagent_type: general-purpose`, `model: opus`) whose prompt names
-   the working directory and the root file and tells it to invoke the
-   `working-doc-set-audit` skill on that root and return the skill's
-   report verbatim.
+1. **Audit.** Launch the `set-auditor` subagent (Agent tool,
+   `subagent_type: set-auditor`, `model: opus`), naming the working
+   directory and the set's root file in the prompt.
 2. **Fix.** Read every member, then work the report finding by finding:
    move each duplicated fact to its single home, resolve conflicts,
    repair shape and term drift, file the misfiled, and cut what the

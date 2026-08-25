@@ -2,60 +2,35 @@
 name: working-doc-set-audit
 description: Audit a working documentation set — the in-process Markdown files of one work stream — against the working-documentation-sets standard, reporting findings without editing. Use when working docs have drifted, or when asked to audit a set of planning files for duplication, staleness, conflicts, or term drift.
 disable-model-invocation: false
-model: opus
-effort: xhigh
-disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
+model: sonnet
+effort: high
 argument-hint: "[set-hint]"
 ---
 
 # Working Doc Set Audit
 
-Audit one working documentation set against
+Send one working documentation set to the `set-auditor` subagent, which
+audits it against
 [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)
-and report findings. Edit nothing, commit nothing, and ask no questions —
-the report is the whole product.
+and reports findings without editing.
 
 ## Target
 
-`$ARGUMENTS` is a hint identifying the set: its root file, its directory, or
-a description such as "the no-more-slop working files."
+The invocation may carry a hint identifying the set: its root file, its
+directory, or a description such as "the no-more-slop working files."
 
-- **Empty.** Operate on the set most clearly in focus in the current
-  conversation. Where none is, report that no set is in focus and stop.
-- **Non-empty.** Resolve the hint to a root file. Where it matches nothing,
-  report the failed hint and stop.
+- **No hint.** Operate on the set most clearly in focus in the current
+  conversation. Where none is, ask which.
+- **Hint.** Resolve it to a root file. Where it matches nothing, ask.
 
-The set is the root plus every working file it links, plus any sibling
-working file the root fails to link — an unlinked sibling is itself a
-finding, never a reason to skip the file.
+## Dispatch
 
-## Audit
+Launch the `set-auditor` subagent (Agent tool,
+`subagent_type: set-auditor`, `model: opus`), naming the working
+directory and the set's root file in the prompt.
 
-Read the standard, then every member in full, before judging anything.
-Check the set against each rule of the standard, using the bucket names and
-conventions the set itself declares. The finding categories:
+This skill edits nothing and commits nothing.
 
-- **Stale next steps** — plan prose, in the root or a child's own to-dos,
-  contradicted by the set's own ledgers or by later members.
-- **Duplicated fact** — one fact in two or more homes; name the single home
-  it should keep.
-- **Conflict** — two members (or a definition and its usage) that disagree;
-  quote both sides.
-- **Broken shape** — an orphan member, a dead link, a child restating a
-  parent, a root summary that no longer matches its child.
-- **Term drift** — a coined term used across members but missing from the
-  terms bucket, used inconsistently, or resolvable nowhere in the set.
-- **Misfiled or unfiled** — material sitting outside the bucket that owns
-  its type, with no Unfiled entry declaring it.
-- **Cut candidates** — **stale** content, recording a decision no longer
-  bearing on current state, or **ancillary** content, detail the set does
-  not need.
+## Relay
 
-## Report
-
-The report is the hand-off to whoever fixes the set — the user, or the
-agent `/working-doc-set-deslop` launches. Findings ranked by how much each
-would mislead a fresh session reading the set cold. Every finding cites
-`file:line`, quotes the offending text, and names its category; a
-duplication or conflict finding also says where the surviving copy
-belongs. When the set is clean, say so plainly.
+Deliver the agent's report to the user unchanged.

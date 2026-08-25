@@ -17,13 +17,12 @@ nothing.
 
 ## Target
 
-`$ARGUMENTS` is a hint identifying the set: its root file, its directory,
-or a description such as "the no-more-slop working files."
+The invocation may carry a hint identifying the set: its root file, its
+directory, or a description such as "the no-more-slop working files."
 
-- **Empty.** Operate on the set most clearly in focus in the current
+- **No hint.** Operate on the set most clearly in focus in the current
   conversation. Where none is, ask which.
-- **Non-empty.** Resolve the hint to a root file. Where it matches
-  nothing, ask.
+- **Hint.** Resolve it to a root file. Where it matches nothing, ask.
 
 ## Pre-flight
 

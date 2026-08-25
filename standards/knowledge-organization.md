@@ -21,8 +21,6 @@ types, indexes, and cross-references.
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
 - [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)
-- /working-doc-set-audit — report drift on a targeted working
-  documentation set
 - /working-doc-set-deslop — audit and then fix a working documentation
   set, the edits left uncommitted for diff review
 
