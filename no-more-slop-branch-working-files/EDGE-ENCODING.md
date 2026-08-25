@@ -48,7 +48,10 @@ worthless one is reworded away. This is
 [the EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#the-loop)
 run at a lower level — still generating primitives in partnership with
 the user to minimize residuals, with the skill file as the target
-artifact and the map as the current abstraction set. The earlier
+artifact and the map as the current abstraction set. The general rule —
+the loop is the same algorithm at any layer, joined by a map written to
+a stateful location — is stated in
+[Layer invariance](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance). The earlier
 sentence-by-sentence retrofit ran the loop backwards, and every retrofit
 surfaced a fresh complexity; the map runs it forwards.
 

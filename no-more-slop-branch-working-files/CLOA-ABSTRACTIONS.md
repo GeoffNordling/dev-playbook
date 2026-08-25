@@ -105,6 +105,25 @@ understand about it. The CLOA is relative to the repository's purpose and
 the user's wants, so without the interview the loop optimizes explanation
 in the abstract.
 
+### Layer invariance
+
+The loop is layer-invariant. It ran once at the ontology level — target:
+the documentation corpus; output: the primitives table below — and again
+one level down in
+[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md),
+where the target is skill prose and the output is a grammar. Two adjacent
+runs connect through a map between the lower level's generated primitives
+and the higher level's existing ones, written to a stateful location
+(Edge Encoding's primitive map). One-to-one is the ideal — each higher
+primitive with exactly one lower expression — but may not always be
+possible; the map is what matters, because it lets the next run start
+from structure instead of from conversation. The alternative is the
+linear mode — correcting one instance per turn, no primitive ever
+extracted — which is how a session lands back in the slop trench. The
+Constraints bullet "The procedure generalizes; the nouns cascade" claims
+the same invariance along the repo axis; this is the orthogonal axis,
+down the levels.
+
 ## Constraints
 
 - **Deterministic backpressure where it reaches.** A claim stated in an

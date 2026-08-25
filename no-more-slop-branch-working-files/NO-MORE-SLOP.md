@@ -227,6 +227,7 @@ Candidates to document somewhere:
 - slop
 - constrain to optimize understanding
 - the pandas standard
+- layer invariance
 
 ## Now
 
