@@ -9,12 +9,6 @@ argument-hint: "[what bit, one line]"
 
 # Log Friction
 
-Append one entry to the friction log —
-[friction/log.md](~/workspace/mission-control/friction/log.md) —
-and commit it. The log feeds curation: twice-felt friction becomes a
-curation item mapped onto the idea archive, and only Selection scopes
-it into a Cycle.
-
 ## Friction: $ARGUMENTS
 
 Run to completion without asking the user anything. This skill is
@@ -43,7 +37,7 @@ reads it later, and the owner can correct it in seconds.
 2. Write the entry in the owner's register — one or two plain lines,
    dated from `date +%F`, stating what happened and where, and
    carrying a proposed fix only where the user gave one.
-3. Commit and push, {only where there is something to record}. Stage
+3. {Commit and push}, {only where there is something to record}. Stage
    **only** `friction/log.md` — the repo may
    hold unrelated work; leave it alone. One line, `git` leading so it
    keeps its credential access, and `-C` throughout because the
