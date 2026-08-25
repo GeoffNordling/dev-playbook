@@ -28,10 +28,11 @@ auth setup doc" all resolve.
 ## Dispatch
 
 For each resolved target, launch the `deslopper` subagent (Agent tool,
-`subagent_type: deslopper`), naming the working directory and the target
-path in the prompt. Launch one subagent per file; for more than one target,
-send all the launches in a single message so they run in parallel — each
-file's rewrite is independent of the others.
+`subagent_type: deslopper`, `model: sonnet`), naming the working
+directory and the target path in the prompt. Launch one subagent per
+file; for more than one target, send all the launches in a single
+message so they run in parallel — each file's rewrite is independent of
+the others.
 
 This skill never commits.
 
