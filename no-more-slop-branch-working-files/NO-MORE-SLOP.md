@@ -134,6 +134,15 @@ scripts, or the judges.
 - **Documents hold behavior; skills and agents hold procedure.**
   Standardized in
   [file-roles.md](/standards/knowledge-organization/file-roles.md).
+- **Edge encoding and its parser.** The Reference chain's in-file
+  declaration format — braced spans over a fixed keyword lexicon,
+  sliced at fixed cut points but never interpreted — designed and
+  certified on a five-unit covering set in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md),
+  and proven by `parser/chaingen.py`, which deterministically
+  regenerates every unit's chain into `parser/chains.txt` and fails
+  on drift via `--check`. Remaining work rides that file's to-do: the
+  map's two holes, the standard, and the corpus port.
 
 **Raw ideas, none designed**
 
@@ -143,13 +152,10 @@ scripts, or the judges.
 - **Doc linters, re-aimed.** The existing linters are pedantic — they check
   that certain headings are present. Decide what is actually worth linting
   for and design toward that.
-- **Reference chains.** Constructed in
-  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) as the Reference chain
-  primitive — edges does, reads, overrides, writes, args, reports —
-  and proven on 23 units in [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md). Still raw:
-  the in-file declaration format, the deterministic generation of
-  traces from it, and the lint that fails when the declared chain and
-  reality disagree.
+- **Reference chains, the lint.** The primitive was constructed in
+  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) and its declaration format
+  and deterministic generation are now Completed above. Still raw:
+  the lint that fails when the declared chain and reality disagree.
 - **Deslop regression gate.** Something must keep a rewritten document from
   sliding back into slop. Deterministic rules cannot judge prose quality;
   the judgments machinery may fit here.

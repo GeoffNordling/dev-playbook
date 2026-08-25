@@ -369,24 +369,17 @@ guarded reports all land in the map. Candidates:
 
 In order:
 
-1. **The parser prototype — done.** Deterministic code that
-   reconstructs the high-level chains from the encoded
-   `edge-examples/` files, proving the concept: `parser/chaingen.py`,
-   stdlib Python. Running it writes every unit's chain, blank-line
-   separated, to `parser/chains.txt` — the one file the user reads
-   chains in — and `--check` regenerates in memory and fails on
-   drift. All five generations approved 2026-08-25.
-2. **Fill the map holes.** writes — GitHub / scratch / cache, and
+1. **Fill the map holes.** writes — GitHub / scratch / cache, and
    does → Workflow. Neither has a sentence in the covering set (no
    file in it fires a Workflow; the GitHub bucket lives in skills like
    design); each gets ruled when the port surfaces its sentence.
-3. **The standard.** The grammar's standard card and the
+2. **The standard.** The grammar's standard card and the
    skill-standards scrub are likely one job: the new standard replaces
    what the old docs teach (the `## Name: $ARGUMENTS` heading,
    `argument-hint`), and `scripts/skill-lint` and friends stop
    expecting the old forms and start enforcing the map. Decide whether
    card and scrub are one standard when the writing starts.
-4. Parked: whether an unmarked link to a known unit should require a
+3. Parked: whether an unmarked link to a known unit should require a
    waiver. The live case: document-deslop links slop-tics.md in plain
    prose — correctly edge-free there, but the same pattern could be a
    forgotten encoding.
