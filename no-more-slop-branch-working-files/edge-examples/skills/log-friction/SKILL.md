@@ -35,7 +35,7 @@ reads it later, and the owner can correct it in seconds.
 
 ## Steps
 
-1. Read [friction/log.md](~/workspace/mission-control/friction/log.md).
+1. {Read [friction/log.md](~/workspace/mission-control/friction/log.md)}.
    Follow the entry format defined there — the log file owns the
    format. That includes its rule for repeat bites: where the
    friction already has an entry, add a `Felt:` line to that entry
