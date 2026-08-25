@@ -74,6 +74,12 @@ Ruled encodings, one per edge:
   and fails span/block disagreement. Other write buckets (local file,
   GitHub, scratch, cache) are unruled; each gets its keyword when its
   exemplar sentence comes up.
+- **args** — derived, no inline marker. A heading of the form
+  `## <Name>: $ARGUMENTS` declares one argument: the name is the heading
+  text lowercased, the type is `str` because the harness's `$ARGUMENTS`
+  substitution is always a string. The frontmatter `argument-hint` stays
+  display text, not the declaration. The multi-argument form (wayfinder's
+  `idea`/`map`/`ticket`) is outside the covering set and stays unruled.
 
 ## Proposal procedure
 
@@ -126,7 +132,7 @@ no skill fires both a does→Agent and a does→Script edge.
 | 1 | guard | log-friction step 3 | **Ruled**, committed |
 | 2 | reads | log-friction step 1 | **Ruled**, committed |
 | 3 | writes (git bucket) | log-friction step 3 + fenced block | **Ruled**, committed |
-| 4 | args | log-friction `## Friction: $ARGUMENTS` | Open — likely derived from the heading form |
+| 4 | args | log-friction `## Friction: $ARGUMENTS` | **Ruled**, derived — no diff to commit |
 | 5 | returns | log-friction step 4 ("Report in one line …") | Open — name/type unexpressed in prose |
 | 6 | does → Agent | document-deslop ("launch the `deslopper` subagent") | Open |
 | 7 | does → Skill | grill-with-docs ("Run a /grilling session") | Open |
