@@ -51,12 +51,11 @@ Understanding happens at multiple levels, for code and documentation alike:
 Across the levels runs an abstraction/detail axis with a latent optimal
 point neither party knows a priori. Too low — too much detail — and the
 user wastes time or stops paying attention; too high and the user is
-fooled into thinking they understand, but really doesn't; both ends
-produce slop. Pre-AI interfaces
-were forcing functions: pandas and git impose their abstractions, and a
-wrong mental model does not survive contact with them. Natural language
-imposes no level at all and never pushes back, so the operating point
-drifts unless the CLOA is engineered deliberately.
+fooled into thinking they understand; both ends produce slop. Pre-AI
+interfaces were forcing functions: pandas and git impose their
+abstractions, and a wrong mental model does not survive contact with them.
+Natural language imposes no level at all and never pushes back, so the
+operating point drifts unless the CLOA is engineered deliberately.
 
 ## Principles
 
@@ -82,9 +81,9 @@ These apply to both tracks.
   Stochastic functions — prompts, models, agents — are powerful but
   expensive. Deterministic backpressure — detectors, linters, gates, and
   plain contact with reality — is inviolable and efficient. Prefer it
-  wherever it can reach, but admit that it can't do everything. Keep
-  agentic backpressure tools simple and loop friendly: simple status codes
-  can be better than detailed reports.
+  wherever it can reach, but it can't do everything. Keep agentic
+  backpressure tools simple and loop friendly: simple status codes can be
+  better than detailed reports.
 - **Move slowly in decision space.** Past failures were planning too much
   and leaping too far. Small iterative steps, with backpressure from
   reality at each one; what stays small is how much is committed before
@@ -144,12 +143,12 @@ exemplar, worked as the abstraction shape in
 
 **Raw ideas, none designed**
 
-- **Markdown complexity detectors.** No specifics yet on how to measure the
-  complexity of a document, but surely something is measurable — the goal
-  is a file the user can read without checking out on opening.
+- **Markdown complexity detectors.** No specifics yet on how to measure a
+  document's complexity — the goal is a file the user can read without
+  checking out on opening.
 - **Doc linters, re-aimed.** The existing linters are pedantic — they check
-  that certain headings are present. Decide what is actually worth linting
-  for and design toward that.
+  that certain headings are present. Decide what is worth linting for and
+  design toward that.
 - **Reference chains, the lint.** The primitive was constructed in
   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) and its declaration format
   and deterministic generation are now Completed above. Still raw:
@@ -162,7 +161,7 @@ exemplar, worked as the abstraction shape in
   terms accrete unexamined.
 - **CLOA change discipline.** A process that forces a conscientious
   decision on every term used within a CLOA communication. Without one,
-  vocabulary changes willy-nilly.
+  vocabulary changes unchecked.
 
 The core problem of this track: documentation needs far more reading by the
 user than code does. Code is deterministic and can be pinned down by tools;
@@ -191,8 +190,8 @@ a pleasure to read.
   remembering, not worth shoehorning in.
 - **Mermaid sequence diagrams** — cheap to generate when tracing one
   operation.
-- **coverage.py** — as a detector, not a percentage: uncovered code is code
-  nothing forces to be correct.
+- **coverage.py** — as a detector, not a percentage: uncovered code is
+  code nothing forces to be correct.
 
 **Rejected**
 

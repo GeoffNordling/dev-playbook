@@ -34,9 +34,9 @@ enforceable, deterministic, and high leverage.
 
 The working heuristic: documentation is a fuzzy, stochastic version of
 code — treat it as a special case of code, and unify the two theories
-when the parallel is real, not by force. When the documentation
-form of a problem is stuck, translate it to the code form, solve it
-there, and port the analogy back.
+when the parallel is real. When the documentation form of a problem is
+stuck, translate it to the code form, solve it there, and port the
+analogy back.
 
 **Change cost.** Adopted abstractions change the
 way a codebase does — refactors are significant investments.
@@ -59,13 +59,12 @@ In code, the programming language comes first and the functionality second.
 Thus, functionality may be expressed as code, constrained by the primitives
 that were defined by the language in advance.
 
-When we seek to express existing documentation as code, we have a problem: documentation
+Expressing existing documentation as code hits a problem: documentation
 has free-form, infinite possibilities. No constrained programming language
 exists apriori: the language we have is English.
 
-This is solved by a backwards operation combining AI proposals with user intuition:
-it generates programmable primitives from the documentation, aligned with both
-user intuition and AI evaluation.
+This is solved by a backwards operation combining AI proposals with user
+intuition: it generates programmable primitives from the documentation.
 
 An expectation-maximization shape over a chosen target artifact:
 
@@ -139,7 +138,7 @@ down the levels.
   generate every reference chain with deterministic code, after
   structuring each unit to make that generation possible. A verbatim
   third-party file carries none of that structure, so it cannot
-  participate. Two dispositions, undecided until the lint plan: own
+  participate. Disposition is undecided until the lint plan: own
   and restructure every vendored file (zero verbatim dependencies), or
   keep some verbatim and accept that their chains stay model-generated,
   outside the deterministic system. Related open note: overrides is
@@ -151,8 +150,7 @@ down the levels.
 - **General and hierarchical across repos.** The abstractions and the loop run on any
   workspace repo, anchored on that repo's registries — document types
   (upstream ∪ local) for concept docs, harness files for executors.
-  Nothing here may depend on this repo's internals. Primitives will also
-  cascade hierarchically across designated repositories the same way the Standards object does today.
+  Nothing here may depend on this repo's internals.
 - **The procedure generalizes; the nouns cascade.** The procedure —
   registry pass, EM loop, change discipline — runs on any repo. The
   nouns generated here are not repo-local output: dev-playbook is the
@@ -277,7 +275,7 @@ Its rules:
   rules enforced by a solver.
 
 The chain absorbs skills as signatures, OKF traces, and the OKF graph —
-one object seen from three angles.
+one object, several angles.
 
 Remembered, not primitives:
 
@@ -371,7 +369,7 @@ The software factory is the graduation exercise, parked for now — see
 brings the Guide type (9 docs, all `software-factory/`) and the 13 parked
 units,
 and may leave large residuals: a Guide describes how a fleet of units
-operates together — protocol, not one unit's behavior — which no
+operates together — a protocol above single-unit behavior — which no
 current noun carries. Per the remembered rule, Guide earns a noun only
 if it demonstrates a verb interface, the way Standard did; otherwise
 its content lands in chains, written-artifact semantics, and the

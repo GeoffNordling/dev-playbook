@@ -23,7 +23,7 @@ readers rather than machines. CLOA is in the branch plan's
 
 ## Three readers
 
-Every encoding decision must serve three readers, in priority order:
+Every encoding decision must serve the readers below, in priority order:
 
 1. **The executing agent** — the primary customer. Skill prose commands the
    agent in natural imperative English; nothing may clutter that.
@@ -40,7 +40,7 @@ enforced by our lint.
 
 ## The theory
 
-Every higher-level primitive maps one-to-one to exactly one lower-level
+Every higher-level primitive maps one-to-one to a lower-level
 expression — `reports` in the chain is `{Report …}` in the prose, and
 nothing else is. A skill is then rewritten using only the map, and
 whatever prose refuses to fit is a residual, tracked in the
@@ -53,9 +53,9 @@ the user to minimize residuals, with the skill file as the target
 artifact and the map as the current abstraction set. The general rule —
 the loop is the same algorithm at any layer, joined by a map written to
 a stateful location — is stated in
-[Layer invariance](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance). The earlier
-sentence-by-sentence retrofit ran the loop backwards, and every retrofit
-surfaced a fresh complexity; the map runs it forwards.
+[Layer invariance](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance).
+The earlier sentence-by-sentence retrofit ran the loop backwards, and
+every retrofit surfaced a fresh complexity; the map runs it forwards.
 
 ## The primitive map
 
@@ -116,7 +116,7 @@ The ruled rows, in detail:
   A span nested nowhere is unconditional (solid). Unbraced `if` stays
   plain prose and fires nothing. (Supersedes `{only where …}` and the
   same-sentence adjacency rule: the distinctive phrase and the
-  heuristic are both jobs the braces already do.)
+  heuristic are both jobs the braces do.)
 - **reads** — `{Read <payload containing exactly one link>}`. The one
   markdown link or citation in the span is the edge target; other words in
   the span are annotation. Two reads means two spans; zero or two links in
@@ -178,11 +178,10 @@ The ruled rows, in detail:
   the span and the remainder is payload. Keywords match case-insensitively
   so sentence-initial `{Read …}` stays natural. Flat by default; nesting is
   reserved and capped at two deep — the guard spends it.
-- **Delimiter.** `{…}` won on merit: the skill corpus is nearly free of
+- **Delimiter.** `{…}` is the delimiter: the skill corpus is nearly free of
   braces outside code spans, angle brackets are the workspace's placeholder
   convention (`<issue>`, `<repo>`), and a space-free `<tag>` vanishes in
-  rendered HTML. Greenfield mindset stands — a collision alone never vetoes
-  a choice.
+  rendered HTML. A collision alone never vetoes a choice.
 - **The parser slices, never interprets.** Inside a span, deterministic
   code touches only fixed cut points: the keyword, the markdown
   link(s), the `with` splitter, nested braces, and the first semicolon.
@@ -270,7 +269,7 @@ Per unit, what its full rewrite could not express in the map — each
 entry awaiting a verdict. Lives in its own file:
 [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
 
-## Principles ruled this session
+## Principles
 
 - **Skills are programs.** No narrative intro; the body is instructions,
   as if it were a program. The one-sentence summary lives in the
@@ -290,17 +289,14 @@ entry awaiting a verdict. Lives in its own file:
   bullets, and the ledger's new entries — so the diff against HEAD is
   the whole proposal; one ruling approves and commits it all. Commits
   run the document linters; the test-suite hook is skipped
-  (`SKIP=make-check` on push). (The design settled on `edge-examples/`
-  copies, which retired into the live `dotfiles/dot-claude` sources on
-  2026-08-25; proposals now edit the live files directly.)
+  (`SKIP=make-check` on push). Proposals edit the live files directly.
 - **Acronyms defined once**, at the top of anything we write.
 
 ## Port roster
 
 Every unit in the live corpus (`dotfiles/dot-claude/agents/*.md` and
-`skills/*/SKILL.md` — the tree `chaingen.py` scans since the
-edge-examples retired into it). Checked means ported: encoded in map
-language and its chain certified in `parser/chains.txt`.
+`skills/*/SKILL.md` — the tree `chaingen.py` scans). Checked means ported:
+encoded in map language and its chain certified in `parser/chains.txt`.
 
 Agents:
 
@@ -367,16 +363,14 @@ In order:
    port surfaces each bucket's sentence. The units that write either
    bucket are the ones whose chains carry a scratch or GitHub write in
    [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md);
-   read the roster off the ledger rather than a copy of it. Two former
-   holes were struck 2026-08-25 as vacuous in the corpus: no unit
-   writes a cache (usage-report's script only reads one), and no unit
-   fires does → Workflow — the Workflow noun itself was dropped from
+   read the roster off the ledger rather than a copy of it. No unit
+   writes a cache — usage-report's script only reads one — and no unit
+   fires does → Workflow: the Workflow noun does not appear in
    [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).
 2. **Finish document-deslop.** Its Review section is the covering
-   set's one unencoded piece. The shape it waits on is already
-   landed — the deslopper rewrite encodes two guarded reports through
-   guard-contained `{Report …}` spans — so what remains is applying
-   it, not deciding it.
+   set's one unencoded piece. The shape it waits on has landed: the
+   deslopper rewrite encodes two guarded reports through
+   guard-contained `{Report …}` spans. What remains is applying it.
 3. **The corpus port.** Bring every unchecked Port roster unit online,
    one at a time: generate the target chain from the unit itself and
    its prior recorded chain in
