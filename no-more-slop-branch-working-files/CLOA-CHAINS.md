@@ -24,7 +24,8 @@ unread were ruled expressible with the existing primitives.
 Excluded units record no chain: `datasheet` (Instruments exclusion) and
 `judgments-sweep` (Judgments exclusion). Deleted units record no chain:
 `orient` and `pymc-modeling`, removed from the workspace during the
-close-out.
+close-out, and `doc-format`, `doc-present-state`, and `doc-rewrite`,
+retired into the prose and knowledge-organization standards.
 
 ## Bootstrap runs
 
@@ -378,23 +379,6 @@ One sentence carries the target: handoff writes one scratch document
 carrying the session's state and reports its path with a paste-ready
 resume line; everything it cites is already in context, so it reads
 nothing.
-
-### doc-rewrite
-
-    [doc-rewrite] Skill · model: opus, effort: xhigh
-      ├─args────► doc_hint    resolves to one .md file — asks when
-      │                             it cannot
-      ├─reads───► the target document
-      ├─reads───► [conventions] Standard    the prose conventions, always
-      ├─writes──► local file(the target document)    restructured — no fact
-      │                                               cut without approval
-      └─reports─► report: str    purpose, changes, approved cuts,
-                   flagged leftovers
-
-One sentence carries the target: doc-rewrite reads one document and
-writes the same document back restructured against the conventions
-Standard; its sources are clamped to the document and the interview —
-a ledgered behavior-mode line.
 
 ### update-standards-pin
 
