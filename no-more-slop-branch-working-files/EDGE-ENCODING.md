@@ -20,7 +20,7 @@ language with restricted vocabulary and grammar so machines can parse what
 a reader reads. STE — ASD-STE100 Simplified Technical English, one
 specific CNL from aerospace, aimed at readers rather than machines.
 
-## The trifecta
+## Three readers
 
 Every encoding decision must serve three readers, in priority order:
 
@@ -31,11 +31,11 @@ Every encoding decision must serve three readers, in priority order:
    that enforces the grammar. Served by subtle helpers, never by machine
    notation embedded in prose.
 
-Inspirations, inspiration only: doctest (fenced blocks inside prose are
-legitimate deterministic parse targets) and CNL (constrain the sentence,
-never embed notation). STE is loose style inspiration, unenforced. What we
-adopt 100% is our own small grammar below, to be specified as a standard
-card and enforced by our lint.
+Inspiration only: doctest (fenced blocks inside prose are legitimate
+deterministic parse targets) and CNL (constrain the sentence, never embed
+notation). STE is loose style inspiration, unenforced. What we adopt 100%
+is our own small grammar below, to be specified as a standard card and
+enforced by our lint.
 
 ## The theory
 
@@ -59,7 +59,7 @@ surfaced a fresh complexity; the map runs it forwards.
 | node type + ownership | file path | **Ruled** (derived) |
 | node data (`model`, `effort`, `allowed-tools`) | frontmatter, verbatim | **Ruled** (derived) |
 | unit summary | frontmatter `description` | **Ruled** (derived) |
-| args | `## <Name>: $ARGUMENTS` heading | Proposed, unruled |
+| args | frontmatter `arguments` list — name only | **Ruled** (derived) |
 | reads | `{Read <one link>}` | **Ruled** |
 | writes — git bucket | `{Commit …}` + fenced command | **Ruled** |
 | writes — other buckets | — | **Hole** |
@@ -70,6 +70,24 @@ surfaced a fresh complexity; the map runs it forwards.
 
 The ruled rows, in detail:
 
+- **args** — fully derived from the harness-native frontmatter field:
+  `arguments: [friction]` declares the edge and the name; the chain
+  shows the name alone. No type (`$ARGUMENTS` is text substitution, so
+  every arg is a string — remembered, not encoded), no annotation (the
+  name must carry the meaning, same rule as code), no `argument-hint`
+  (its only harness function is the `/` autocomplete popup), no
+  `## Name: $ARGUMENTS` heading, no placeholder in the body. Multi-arg
+  comes free: wayfinder declares `arguments: [idea, map, ticket]`.
+  Harness facts behind the ruling (official skills docs): `$ARGUMENTS`
+  substitution is harness-implemented; a file with no placeholder gets
+  the argument text appended to the rendered content as
+  `ARGUMENTS: <input>`, so nothing is dropped; `$name` placeholders are
+  positional with shell-style splitting — on unquoted free text they
+  grab one word — so free-text skills must not use them. Verification
+  step before porting to live skills: one live test that the append
+  fallback fires unchanged when `arguments:` is declared. Ripple: the
+  skill standards' `## Name: $ARGUMENTS` heading convention and
+  `argument-hint` guidance retire when this merges.
 - **guard** — `{If <condition>, {edge span} …}`: the guard nests the
   span(s) it guards, so binding is containment, never sentence
   adjacency. The text between the keyword `if` and the first nested
@@ -121,8 +139,8 @@ The ruled rows, in detail:
 
 ## Proposal procedure
 
-Every encoding proposal is presented on screen in three parts, and one
-ruling approves the three together:
+Every encoding proposal is presented on screen in parts, approved together
+by one ruling:
 
 1. **The target.** The Reference chain fragment being encoded, drawn in
    [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)
@@ -146,7 +164,7 @@ entry awaits a verdict — valuable (amends the shared structure) or not
 ### log-friction
 
 The rewrite converges: every sentence is a primitive, an accounted
-internal, or one of these three residuals.
+internal, or one of these residuals.
 
 1. **Behavior-mode block** — "Run to completion without asking the user
    anything … fire-and-forget …". The higher level already ledgers this
@@ -160,7 +178,7 @@ internal, or one of these three residuals.
    append-only prose …". Not an instruction — why-text calibrating the
    agent's judgment. No primitive expresses justification.
 
-Accounted, not residual: the three unbraced `If` bullets (the deliberate
+Accounted: the three unbraced `If` bullets (the deliberate
 uncoded-conditional tier); step 2's entry-writing and step 3's staging
 detail (internal program below the CLOA); the working-tree edit itself
 (subsumed by the git commit edge, exactly as the ledger's chain models
@@ -176,8 +194,8 @@ it).
   ("Append one entry … and commit it") was the ruling case.
 - **Declared versus derived.** Node type and ownership derive from path;
   node data (`model`, `effort`, `allowed-tools`) from frontmatter; the
-  summary from `description`; args mostly from the existing
-  `## Name: $ARGUMENTS` heading form. Edges, guards, and reports are
+  summary from `description`; args from the frontmatter `arguments`
+  list. Edges, guards, and reports are
   declared inline. No file describes another file's behavior — subtrees
   are stitched by following does-edges into the target file's own
   declarations.
@@ -196,14 +214,22 @@ edge.
 
 | Hole | Exemplar |
 |---|---|
-| args (proposed, unruled) | log-friction `## Friction: $ARGUMENTS` |
 | does → Agent | document-deslop ("launch the `deslopper` subagent") |
 | does → Skill | grill-with-docs ("Run a /grilling session") |
 | does → Script | usage-report (its `report.sh` run) |
 | overrides … with … | grill-with-docs ("Where /domain-modeling says …") |
 | writes — other buckets | local file, GitHub, scratch, cache — each when its sentence comes up |
 
-Also open, beyond the map: where the grammar's standard card lives; the
-lint and parser themselves; and the old two-sided question — whether an
-unmarked link to a known unit should require a waiver — parked, not
-dropped.
+Also open, beyond the map:
+
+- **Scrub the skill standards.** The rulings here invalidate parts of
+  the published skill-authoring surface: the describing markdown
+  documents (the skill-conventions Standard and anything teaching the
+  `## Name: $ARGUMENTS` heading or `argument-hint`), the linting
+  scripts (`scripts/skill-lint` and friends must stop expecting the
+  old forms and start enforcing the map), and the live skills
+  themselves. A full scrub when the design ports.
+- Where the grammar's standard card lives.
+- The lint and parser themselves.
+- The old two-sided question — whether an unmarked link to a known
+  unit should require a waiver — parked.

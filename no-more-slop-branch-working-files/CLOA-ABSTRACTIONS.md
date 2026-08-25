@@ -44,11 +44,11 @@ way a codebase does — refactors are significant investments.
 ## Abstraction shape
 
 One noun carrying a small fixed verb set — an interface. Nouns describe;
-verbs predict. This is just naming nouns and giving them verbs:
-is deterministic structure at the level of ideas.
+verbs predict. Naming nouns and giving them verbs is deterministic
+structure at the level of ideas.
 
 The exemplar is the **Standard**: define, audit, enforce, adopt. Its top
-level works — the user predicts every card's behavior from four verbs
+level works — the user predicts every card's behavior from those verbs
 without reading the rule prose or the scripts. Its bottom level does not —
 opening one standard lands in a sprawl of markdown files and scripts. The
 loop owes an answer at both levels.
@@ -61,11 +61,11 @@ that were defined by the language in advance.
 
 When we seek to express existing documentation as code, we have a problem: documentation
 has free-form, infinite possibilities. No constrained programming language
-exists apriori: indeed the language we have is the English Language!
+exists apriori: the language we have is English.
 
-We solve this with a backwards operation combining AI proposals with user intuition.
-This generates programmable primitives from the documentation in a way that aligns
-with both user intuition and AI evaluation. The user vibes, the AI validates.
+This is solved by a backwards operation combining AI proposals with user intuition:
+it generates programmable primitives from the documentation, aligned with both
+user intuition and AI evaluation.
 
 An expectation-maximization shape over a chosen target artifact:
 
@@ -74,12 +74,14 @@ An expectation-maximization shape over a chosen target artifact:
   residual.
 - **M-step.** Propose abstraction changes — add, merge, rename, delete —
   that shrink the residual. The user filters candidates on intuition; the
-  model's job is to challenge the filter.
+  model's job is to challenge the filter. The burden of proof sits with
+  the model: the user's accept or reject needs no justification, and the
+  model validates every accepted candidate against the corpus.
 - **Convergence** is the pandas test: the user predicts the target's
   behavior without reading its bodies, and the abstraction count is
-  minimal. Good abstractions are a codebook the corpus gets short in.
+  minimal — good abstractions are a codebook the corpus gets short in.
 
-Residuals are tracked, not zeroed. The loop's job is awareness of what
+Residuals are tracked. The loop's job is awareness of what
 the abstractions fail to carry; the primitive set is refactored only when
 the reduction is worth the change cost.
 
@@ -111,8 +113,9 @@ in the abstract.
   prefer lintable claims wherever a lint can reach, and accept that much
   of what the abstractions say will never be lintable.
 - **User eyes.** The artifacts the loop produces must be easy for the
-  user to read — everything before this point optimized for agent
-  readers. An application of constrain to optimize understanding.
+  user to read — documentation up to this point has generally optimized
+  for agent readers. This applies the branch principle
+  [Constrain to optimize understanding](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
 - **Verbatim dependencies cannot participate.** The goal is to
   generate every reference chain with deterministic code, after
   structuring each unit to make that generation possible. A verbatim
@@ -153,7 +156,7 @@ in the abstract.
 - **Standard** is established and live. Its open problem: the top level is
   elegant and simple; the bottom level is a messy collection of
   non-user-readable documents and scripts.
-- **Agent and Skill** get one verb, **do**, and no more, ever. Specificity
+- **Agent and Skill** get one verb, **do**, and no more. Specificity
   comes from the behavior being done, which documentation defines — a
   Standard's verb where one exists (the deslopper does slop-tics.enforce),
   the whole unit where the doc is the definition (grill-with-docs does
@@ -205,22 +208,27 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   prefix marks a cross-repo read target (`mission-control/friction
   log`); crossing a repo boundary is always visible.
 - **args** — the value the caller hands in at invocation, carried by
-  the harness's `$ARGUMENTS` substitution. Declared in Python
-  type-hint form, `arg_name: arg_type` — log-friction declares
-  `friction: str`. Never lands in state, dies with the call.
+  the harness's argument substitution. Declared by name alone, in the
+  harness-native frontmatter field `arguments` — log-friction declares
+  `arguments: [friction]`. No type is written: the substitution is
+  text, so every arg is a string by harness mechanics, and a type that
+  applies all the time distinguishes nothing — remembered, not
+  encoded. Never lands in state, dies with the call. The lower-level
+  detail lives in
+  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
 - **reports** — hand a value back to the caller, user and agent alike:
   ralph-setup reports a launch command to the user, bump-pins reports
   its status enum to update-standards-pin. Unlike a write, a report never
-  lands in state — it dies with the call. Reports mirror args: named
-  and typed as `report_name: report_type` — commit reports
+  lands in state — it dies with the call. Unlike args, reports are
+  typed as well as named, `report_name: report_type` — a report's type
+  varies, so it carries information — commit reports
   `outcome: str` — and an enumerable status is preferred, its values
   listed as a small enum. A reporting unit will declare its report in
   its own file, so the primitive view renders the declaration instead
   of a model regenerating it; the declaration format is under design in
   [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
-  Renamed from `returns`: the label is now the bare third-person form
-  of the skill-prose keyword `Report`, so translation adds an `s` and
-  never swaps a word.
+  The label is the bare third-person form of the skill-prose keyword
+  `Report`, so translation adds an `s` and never swaps a word.
 
 Any edge may carry a **guard** — the condition under which it fires.
 A guarded edge is drawn dashed with the dashes spaced out so the break
@@ -316,8 +324,7 @@ registered type gets a disposition into the ontology. The boundary
 between the two is encoded as `classify()` in `src/dev_playbook/md.py`.
 This repo's census, taken at the registry pass, per `classify()`:
 107 concept docs, 48 harness `.md` files, 16 indexes, 47 excluded (the
-vendored `dotfiles/.agents` tree and scratch). Orient and pymc-modeling
-were deleted after the count.
+vendored `dotfiles/.agents` tree and scratch).
 
 The registry pass ruled on every registered type:
 
@@ -360,8 +367,8 @@ keeps the ontology and the rulings; that file keeps the chains.
 The empirical close-out ended by ruling with 23 chains recorded: batches had
 stopped producing ontology changes, and the thirteen units still
 unread were ruled expressible with the existing primitives. The
-recorded chains are proof of concept, not final artifacts — the final
-traces will be generated deterministically by scripts operating on
-structure embedded in the unit files. That structure is under design
+recorded chains are proof of concept — the final traces will be
+generated deterministically by scripts operating on structure embedded
+in the unit files. That structure is under design
 in [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md),
 this file's lower level.

@@ -4,12 +4,10 @@ description: Record a friction entry — pain felt, time lost, a manual interven
 disable-model-invocation: false
 model: sonnet
 effort: xhigh
-argument-hint: "[what bit, one line]"
+arguments: [friction]
 ---
 
 # Log Friction
-
-## Friction: $ARGUMENTS
 
 Run to completion without asking the user anything. This skill is
 fire-and-forget: the user typed one line and moved on, so a

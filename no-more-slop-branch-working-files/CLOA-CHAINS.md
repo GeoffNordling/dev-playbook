@@ -12,15 +12,14 @@ in a written ledger rather than compacted memory. An entry is the chain
 plus its one-sentence carrier; the rulings that shaped it live in the
 abstractions file.
 
-These chains are not the final versions. They exist as proof of
-concept — each one written to test that the primitive set could
-express that unit's operations, and the set held. The final traces
-will be generated deterministically, by scripts operating on structure
-embedded in the unit files themselves; the format of that structure is
-designed with the lint plan. The close-out ended by ruling with 23
-chains recorded: batches had stopped producing ontology changes, and
-the thirteen units still unread were ruled expressible with the
-existing primitives.
+These chains exist as proof of concept — each one written to test
+that the primitive set could express that unit's operations, and the
+set held. The final traces will be generated deterministically, by
+scripts operating on structure embedded in the unit files themselves;
+the format of that structure is designed with the lint plan. The
+close-out ended by ruling with 23 chains recorded: batches had
+stopped producing ontology changes, and the thirteen units still
+unread were ruled expressible with the existing primitives.
 
 Excluded units record no chain: `datasheet` (Instruments exclusion) and
 `judgments-sweep` (Judgments exclusion). Deleted units record no chain:
@@ -165,7 +164,7 @@ ledgered behavior-mode residual.
 ### log-friction
 
     [log-friction] Skill · model: sonnet, effort: xhigh
-      ├─args────► friction: str    the description, via $ARGUMENTS
+      ├─args────► friction
       ├─reads───► mission-control/friction log          the entry format and
       │                                                  its repeat-bites rule
       ├ ╌ writes ╌ ╌ ► git(mission-control: commit, push)    something to record
@@ -207,7 +206,7 @@ collides. No reports.
 ### candidate-promote
 
     [candidate-promote] Skill · model: inherit, effort: xhigh
-      ├─args────► candidate: str    the entry name, via $ARGUMENTS —
+      ├─args────► candidate    the entry name, via $ARGUMENTS —
       │                              asks if absent or ambiguous
       ├─reads───► CANDIDATES.md                   the parking lot, repo root
       ├─reads───► [candidates] Standard           the conventions contract
@@ -235,8 +234,8 @@ phase.
 One sentence carries the target: usage-report is a thin shim around a
 deterministic Script — the allowed-tools clamp permits exactly one
 command, and the Script reads the usage cache and exits with a
-diagnosis rather than report a number it cannot stand behind. No
-writes anywhere.
+diagnosis rather than a number it cannot stand behind. No writes
+anywhere.
 
 ### research
 
@@ -363,13 +362,12 @@ throwaway branch, pointered from the issue.
 One sentence carries the target: improve-codebase-architecture is a
 hub — the vocabulary lens loads first, a fresh explorer walks the code,
 findings land as a scratch HTML report whose path is the reported
-value, and
-every downstream edge waits on the user picking something up.
+value, and every downstream edge waits on the user picking something up.
 
 ### handoff
 
     [handoff] Skill · model: opus, effort: medium
-      ├─args────► focus: str    optional — the next session's focus,
+      ├─args────► focus    optional — the next session's focus,
       │                          via $ARGUMENTS
       ├─writes──► scratch                    the handoff document in OS temp —
       │                                       secrets redacted before writing
@@ -384,7 +382,7 @@ nothing.
 ### doc-rewrite
 
     [doc-rewrite] Skill · model: opus, effort: xhigh
-      ├─args────► doc_hint: str    resolves to one .md file — asks when
+      ├─args────► doc_hint    resolves to one .md file — asks when
       │                             it cannot
       ├─reads───► the target document
       ├─reads───► [conventions] Standard    the prose conventions, always
@@ -431,9 +429,9 @@ in hand.
 ### wayfinder
 
     {wayfinder} Skill
-      ├─args────► idea: str      charting a new map, via $ARGUMENTS
-      ├─args────► map: str       working a map — URL or issue number
-      ├─args────► ticket: str    optional — else wayfinder picks from
+      ├─args────► idea      charting a new map, via $ARGUMENTS
+      ├─args────► map       working a map — URL or issue number
+      ├─args────► ticket    optional — else wayfinder picks from
       │                           the frontier
       ├─reads───► [tracker-operations] Standard    the Wayfinding
       │                                             operations section
