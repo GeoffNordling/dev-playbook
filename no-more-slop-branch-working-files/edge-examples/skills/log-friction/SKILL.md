@@ -43,7 +43,8 @@ reads it later, and the owner can correct it in seconds.
 2. Write the entry in the owner's register — one or two plain lines,
    dated from `date +%F`, stating what happened and where, and
    carrying a proposed fix only where the user gave one.
-3. Commit and push. Stage **only** `friction/log.md` — the repo may
+3. Commit and push, {only where there is something to record}. Stage
+   **only** `friction/log.md` — the repo may
    hold unrelated work; leave it alone. One line, `git` leading so it
    keeps its credential access, and `-C` throughout because the
    session's cwd is some other repo:
