@@ -68,12 +68,30 @@ Ruled encodings, one per edge:
   markdown link or citation in the span is the edge target; other words in
   the span are annotation. Two reads means two spans; zero or two links in
   one span fails the lint.
-- **writes, git bucket** — proposed, awaiting verdict on the diff in view.
-  `{commit …}` declares the edge; the fenced command block in the same
-  step supplies the machine detail — repo from `-C`, operations from the
-  git subcommands. The lint requires the block and fails span/block
-  disagreement. Other write buckets (local file, GitHub, scratch, cache)
-  are unruled; each gets its keyword when its exemplar sentence comes up.
+- **writes, git bucket** — `{commit …}` declares the edge; the fenced
+  command block in the same step supplies the machine detail — repo from
+  `-C`, operations from the git subcommands. The lint requires the block
+  and fails span/block disagreement. Other write buckets (local file,
+  GitHub, scratch, cache) are unruled; each gets its keyword when its
+  exemplar sentence comes up.
+
+## Proposal procedure
+
+Every encoding proposal is presented on screen in three parts, and one
+ruling approves the three together:
+
+1. **The target.** The Reference chain fragment being encoded, drawn in
+   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)
+   notation — only the edges this proposal covers, nothing projected
+   forward.
+2. **The prose.** The exemplar's before and after — the diff that would
+   land.
+3. **The certification.** A trace from every element of the target
+   fragment to the exact source token that yields it — a span keyword, a
+   link, a fenced command, a frontmatter field, a path segment. Approval
+   certifies that deterministic code parsing the after-prose reconstructs
+   the target fragment exactly; the trace is the contract the future
+   parser implements.
 
 ## Principles ruled this session
 
@@ -107,7 +125,7 @@ no skill fires both a does→Agent and a does→Script edge.
 |---|---|---|---|
 | 1 | guard | log-friction step 3 | **Ruled**, committed |
 | 2 | reads | log-friction step 1 | **Ruled**, committed |
-| 3 | writes (git bucket) | log-friction step 3 + fenced block | Proposed — diff in view |
+| 3 | writes (git bucket) | log-friction step 3 + fenced block | **Ruled**, committed |
 | 4 | args | log-friction `## Friction: $ARGUMENTS` | Open — likely derived from the heading form |
 | 5 | returns | log-friction step 4 ("Report in one line …") | Open — name/type unexpressed in prose |
 | 6 | does → Agent | document-deslop ("launch the `deslopper` subagent") | Open |
