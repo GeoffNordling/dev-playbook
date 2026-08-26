@@ -150,6 +150,13 @@ exemplar, worked as the abstraction shape in
 
 **Raw ideas, none designed**
 
+- **Each new document is a giant pile of slop.** Each new major document Claude
+  writes is a pile of slop that I have to wade through and iterate with Claude
+  to brint to acceptable condition. Every time I do this is an opportunity to
+  codify general rules, procedures, and algorithms for writing documents
+  correctly. I need to use each linear slop trench session to spin the flywheel
+  and climb out of the trench. Right now there is no flywheel and I haven't
+  even started climbing out.
 - **Markdown complexity detectors.** No specifics yet on how to measure a
   document's complexity — the goal is a file the user can read without
   checking out on opening.

@@ -59,7 +59,7 @@ installed skill has grown to cover it, never whether it should exist.
 | [testing/conventions.md](/standards/testing/conventions.md) | `tdd` is rejected, and the file is mostly workspace-original pytest material. |
 | [software-factory/tdd.md](/software-factory/tdd.md) | The factory's own TDD procedure, wired to briefs and gates, with deliberate divergences from upstream's — autonomous seam forethought, in-loop refactor passes. |
 | [design/references/design-it-twice.md](/dotfiles/dot-claude/skills/design/references/design-it-twice.md) | An adaptation wired into the `/design` node: Opus pinning, worktrees, the synthesis diet. |
-| [skill-conventions.md](/standards/harness/skill-conventions.md) | The binding format layer, almost entirely workspace-original, and it wins where `/writing-for-agents` collides with it. |
+| [runbook-conventions.md](/standards/harness/runbook-conventions.md) | The binding format layer, almost entirely workspace-original, and it wins where `/writing-for-agents` collides with it. |
 
 ## Tier policy
 
@@ -120,7 +120,7 @@ pin from upstream. Ruling-record numbers are Decision Records in
 | teach | productivity | reject | Personal productivity, outside the factory's domain | 0016 | — |
 | to-questionnaire | productivity | reject | A solo developer has no third party to send a questionnaire to | 0016, 0020 | Its tier reject was voided by promotion out of in-progress; the row reopened and was re-rejected on its merits |
 | wait-what | productivity | **verbatim** | A three-line corrective: re-pitch the last message in Simplified Technical English, using `CONTEXT.md` vocabulary | 0020 | New upstream skill. User-invoked, so it costs no context load; its first-person voice is covered by the prose standard's vendored exemption |
-| writing-for-agents | productivity | **verbatim** | The craft layer for any document an agent consumes | 0020 | Renamed from `writing-great-skills`, reversing 0016's adapt. Supersedes the two workspace files seeded from it. Model-invoked; `skill-conventions.md` wins where the two collide |
+| writing-for-agents | productivity | **verbatim** | The craft layer for any document an agent consumes | 0020 | Renamed from `writing-great-skills`, reversing 0016's adapt. Supersedes the two workspace files seeded from it. Model-invoked; `runbook-conventions.md` wins where the two collide |
 
 Rows retired at this pin — their skills no longer exist upstream:
 `design-an-interface`, `qa`, `request-refactor-plan`, `ubiquitous-language`,

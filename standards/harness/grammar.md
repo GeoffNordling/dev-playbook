@@ -68,7 +68,7 @@ own declarations — no file describes another file's behavior.
 - **args** — the values the caller hands in at invocation; each is a
   string, and each dies with the call. A skill declares them by name in
   its frontmatter, per
-  [Skill Conventions](/standards/harness/skill-conventions.md); an
+  [Runbook Conventions](/standards/harness/runbook-conventions.md); an
   agent declares none — its input arrives in the launching prompt.
 - **reports** — the value handed back to the caller; unlike a write, a
   report never lands in state. A report is `outcome: str` — a runbook's

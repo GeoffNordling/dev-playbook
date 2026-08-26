@@ -1,8 +1,8 @@
 #!/usr/bin/env -S uv run --script
-"""Audit internal SKILL.md files for skill-conventions.md conformance.
+"""Audit internal SKILL.md files for runbook-conventions.md conformance.
 
 Scans skill bundles authored in this repo against the conventions in
-dev-playbook's standards/harness/skill-conventions.md. Two skill roots are checked
+dev-playbook's standards/harness/runbook-conventions.md. Two skill roots are checked
 when present in the target directory:
 
   - .claude/skills/                (project-level skills, any repo)
@@ -92,7 +92,7 @@ RULES = (
 REQUIRED_FIELDS = ("name", "description", "disable-model-invocation", "model", "effort")
 OPTIONAL_FIELDS = ("allowed-tools", "disallowed-tools", "argument-hint")
 # The front matter vocabulary is closed: these eight fields and nothing else.
-# Adopting a new one starts with an edit to skill-conventions.md, before its
+# Adopting a new one starts with an edit to runbook-conventions.md, before its
 # first use in a bundle.
 KNOWN_FIELDS = REQUIRED_FIELDS + OPTIONAL_FIELDS
 BANNED_FIELDS = ("user-invocable",)

@@ -21,14 +21,14 @@ the first line of `SKILL.md` gets written at step 5.
 Do both before going further. They split along one seam: conventions is
 binding, craft is the skill.
 
-- {Read [skill-conventions.md](~/workspace/dev-playbook/standards/harness/skill-conventions.md) plus its checklist, walked before done}.
+- {Read [runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md)}.
   The format `scripts/harness-files-lint` enforces at the commit gate: front matter,
-  file structure, length, naming, references, checklist.
+  file structure, length, naming, references.
 - {Run [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) in context} —
   how a document an agent consumes is written so it behaves predictably. Its
   `SKILL-MECHANICS.md` carries the skill-specific half.
 
-This skill is the workflow over those two; the rules live there. {Override [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) on craft guidance with [skill-conventions.md](~/workspace/dev-playbook/standards/harness/skill-conventions.md); they collide}.
+This skill is the workflow over those two; the rules live there. {Override [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) on craft guidance with [runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md); they collide}.
 
 ## 2. Gather requirements
 
@@ -121,11 +121,11 @@ Show the draft. Ask:
 
 Revise based on feedback. Iterate until the user is satisfied.
 
-## 7. Walk the checklist
+## 7. Recheck against the standard
 
-Walk the checklist in
-[skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/harness/skill-conventions.md#checklist)
-and confirm each item passes. Fix any failures before considering the skill
+Reread
+[runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md)
+and confirm every rule passes. Fix any failures before considering the skill
 done.
 
 Then run dev-playbook's `scripts/harness-files-lint` over the **repo root** of the

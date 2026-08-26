@@ -18,8 +18,8 @@ only harness currently in use.
   registry and the CLAUDE.md content standard; start at Files
 - [Instruction Grammar](/standards/harness/grammar.md) — the braced-span
   grammar that makes skill and agent bodies machine-readable
-- [Skill Conventions](/standards/harness/skill-conventions.md) — the skill-bundle
-  format
+- [Runbook Conventions](/standards/harness/runbook-conventions.md) — the runbook
+  format: skill bundles and agent definitions
 - [Skill Management](/standards/harness/skill-management.md) — where skills live
   and the authored/installed mirror rule
 - [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —

@@ -24,8 +24,8 @@ Every member has a **class**, naming what the harness does with it:
 | Member | Class | Role | Content standard |
 |---|---|---|---|
 | `CLAUDE.md`, `<dir>/CLAUDE.md` | context | injected into every session at or below its directory | [claude-content.md](/standards/harness/claude-content.md) |
-| skill bundles — `SKILL.md` + `references/`, `scripts/` | runbook | loaded when a skill is invoked | [skill-conventions.md](/standards/harness/skill-conventions.md); placement per [skill-management.md](/standards/harness/skill-management.md) |
-| `agents/*.md` | runbook | loaded when a typed agent is launched | none yet |
+| skill bundles — `SKILL.md` + `references/`, `scripts/` | runbook | loaded when a skill is invoked | [runbook-conventions.md](/standards/harness/runbook-conventions.md); placement per [skill-management.md](/standards/harness/skill-management.md) |
+| `agents/*.md` | runbook | loaded when a typed agent is launched | [runbook-conventions.md](/standards/harness/runbook-conventions.md) |
 | `rules/*.md` | context | injected into every session | none yet |
 | `settings.json`, `settings.local.json` | configuration | read as configuration | none yet |
 | `hooks/` | code | run as code around harness events | none yet |
