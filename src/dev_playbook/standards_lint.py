@@ -72,8 +72,16 @@ CATALOG_ORDER = "standard.catalog-order"
 RULE_MATRIX = "standard.rule-matrix"
 HOOK_SURFACES = "standard.hook-surfaces"
 CARD_SHADOWS = "standard.card-shadows-upstream"
+CARD_QUESTION = "standard.card-question"
 
-RULES = (CARD_LAYOUT, CATALOG_ORDER, RULE_MATRIX, HOOK_SURFACES, CARD_SHADOWS)
+RULES = (
+    CARD_LAYOUT,
+    CATALOG_ORDER,
+    RULE_MATRIX,
+    HOOK_SURFACES,
+    CARD_SHADOWS,
+    CARD_QUESTION,
+)
 
 CARD_TYPE = "Standard-Card"
 CATALOG = "standards/index.md"
@@ -84,6 +92,13 @@ CELLS = ("Define", "Audit", "Enforce", "Adopt")
 
 # A ``## Heading`` (exactly level two): three ``#`` would fail the ``\s`` after.
 _H2 = re.compile(r"^##\s+(.+?)\s*#*\s*$")
+# Any ATX heading, used to bound the opening paragraph of a card.
+_HEADING = re.compile(r"^#{1,6}\s")
+# A sentence terminator: a period at end of line or before a space. Requiring the
+# boundary keeps ``CLAUDE.md`` and ``index.md`` from ending a sentence mid-word.
+_SENTENCE_END = re.compile(r"\.(?=\s|$)")
+# The opening every card's question sentence must use.
+QUESTION_LEAD = "Governs how"
 # An index bullet: ``- [title](/root-absolute)``; the target's ``#`` anchor and
 # any trailing description are dropped.
 _BULLET = re.compile(r"^\s*[-*]\s+\[([^\]]*)\]\((/[^)\s#]+)")
@@ -233,6 +248,83 @@ def check_card_layout(root: Path) -> list[Finding]:
                     None,
                     CARD_LAYOUT,
                     f"card cells are out of order (want {', '.join(CELLS)})",
+                )
+            )
+    return findings
+
+
+# --- standard.card-question -------------------------------------------------
+
+
+def _opening_sentence(path: Path) -> tuple[int, str] | None:
+    """The ``(line, text)`` of the first sentence after a card's H1.
+
+    The sentence is the run up to the first period at a word boundary, taken from
+    the paragraph following the H1 with its line breaks flattened to spaces.
+    Returns None when the card has no H1 or nothing follows it, which
+    ``check_card_question`` reports rather than crashing on.
+    """
+    lines = list(md.content_lines(path))
+    start = next((i for i, (_, ln) in enumerate(lines) if ln.startswith("# ")), None)
+    if start is None:
+        return None
+    paragraph: list[str] = []
+    number: int | None = None
+    for num, line in lines[start + 1 :]:
+        if not line.strip():
+            if paragraph:
+                break
+            continue
+        if _HEADING.match(line):
+            break
+        if number is None:
+            number = num
+        paragraph.append(line.strip())
+    if number is None:
+        return None
+    text = " ".join(paragraph)
+    end = _SENTENCE_END.search(text)
+    return number, text[: end.start()] if end else text
+
+
+def check_card_question(root: Path) -> list[Finding]:
+    """Flag a card whose question sentence and description have come apart.
+
+    format.md binds the two: the sentence after the H1 opens ``Governs how`` and
+    names the governed question, and the frontmatter description repeats it
+    verbatim less the period, so the catalog row and the card state one remit.
+    """
+    findings: list[Finding] = []
+    for rel in _card_paths(root):
+        path = root / rel
+        front = _frontmatter(path)
+        if not front or front.get("type") != CARD_TYPE:
+            continue  # card-layout owns a mistyped slot.
+        opening = _opening_sentence(path)
+        if opening is None:
+            findings.append(
+                Finding(rel, None, CARD_QUESTION, "card states no question sentence")
+            )
+            continue
+        line, sentence = opening
+        if not sentence.startswith(QUESTION_LEAD):
+            findings.append(
+                Finding(
+                    rel,
+                    line,
+                    CARD_QUESTION,
+                    f"question sentence must open '{QUESTION_LEAD}'",
+                )
+            )
+        description = front.get("description")
+        if not isinstance(description, str) or description.strip() != sentence:
+            findings.append(
+                Finding(
+                    rel,
+                    line,
+                    CARD_QUESTION,
+                    "description must repeat the question sentence verbatim, "
+                    f"less its period: {sentence!r}",
                 )
             )
     return findings
@@ -692,6 +784,7 @@ def audit(
     dev_playbook_mode = _dev_playbook_mode(root)
     findings: list[Finding] = []
     findings.extend(check_card_layout(root))
+    findings.extend(check_card_question(root))
     findings.extend(check_catalog_order(root, dev_playbook_mode))
     findings.extend(check_rule_matrix(root, list_rules))
     findings.extend(check_hook_surfaces(root, dev_playbook_mode, roster, ungated))
