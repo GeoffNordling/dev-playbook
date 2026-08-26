@@ -120,6 +120,59 @@ for a question-and-answer round), the `scripts/skill-lint` run (bare
 command, no link for a does edge), or the step-completion gates (no
 control-flow primitive).
 
+## working-doc-set-deslop
+
+Could not express the pre-flight `git status` check (no on-disk link, so
+no `{Read}`), forbidding commits (no primitive for a forbidden action),
+or the closing human verdict — accept-and-commit versus
+reject-and-restore-to-`HEAD` — which no primitive covers.
+
+## doc-pr-review
+
+Could not express the anchored reads (review-contract.md's gh-mechanics,
+delta-re-review, findings-are-threads, resolution-ownership, and
+findings-are-not-escalations sections; declarations.md's maintenance
+section; factory-operations.md's merge-message recipe) — `{Read}` fails
+on `#fragment` links. Could not express the diff-conditional standards
+table in § Read what the diff calls for — a table has no sentence for
+the grammar to span — or the `gh` state reads (PR threads, the diff
+itself, the issue brief) — no on-disk link. The escalation bullets in
+§ 6 restate the guard's condition rather than firing their own edges,
+since the map has no primitive for enumerating alternative trigger
+conditions under one guard.
+
+## build
+
+Could not express the `gh issue view` read (no on-disk link), the `gh api`
+reply and the deviation-ledger's `gh issue create`/`gh pr edit` writes (the
+writes—GitHub hole), the issue-number input (agents have no `arguments`
+frontmatter), the open-ended "read the standard that governs the artifact"
+instruction (an example-led rule, not an enumerable branch), telling the
+escalation and completion reports apart (both render `outcome: str`), or
+the gate runs (`make check`, §4 and §6) — a bare command in the ambient
+repo, with no on-disk link for a does edge.
+
+## design
+
+Could not express the phase-label move (§8's `gh issue edit`,
+`phase:design` → `phase:build`) or the other `gh issue`
+reads/writes (no on-disk link, writes—GitHub hole), the
+`EnterWorktree`/`ExitWorktree` tool calls and worktree/branch git
+commands (does covers only file-linked units, and none carries a fenced
+`-C` block for `{Commit}`), the approval gate spanning §6 into §7
+(guard containment can't cross sections), the area-discovery and
+probe-picking interviews (no primitive for a question-and-answer round
+with the user), or the `READ:` acknowledgment (targets the
+conversation, not the invoker).
+
+## judgments-sweep
+
+Could not express dispatching the judge fan-out — `Workflow({ name: "judgments", … })`
+is neither an Agent nor a Skill/Script link, so does has no primitive for a
+Workflow call. `judgments-run` renders as bare link text, not a `Script` node:
+`classify()` types scripts by `.sh`/`.py`/`.bash` extension and this one has
+none.
+
 ## open-pr
 
 Could not express the anchored read — `{Read}` fails on `#fragment`

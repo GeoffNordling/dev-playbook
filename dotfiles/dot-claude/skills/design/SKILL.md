@@ -4,7 +4,7 @@ description: Works out how a direct-mode issue should be built, then leaves it f
 disable-model-invocation: false
 model: inherit
 effort: xhigh
-argument-hint: "<issue-number>"
+arguments: [issue]
 ---
 
 # Design
@@ -17,14 +17,14 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 
 Before doing anything else:
 
-- Invoke /codebase-design — small interface, deep implementation; accept dependencies, return results; keep the surface small. The lens for weighing a solution's shape.
-- Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end — the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on.
+- {Run [/codebase-design](~/.claude/skills/codebase-design/SKILL.md); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
+- {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end; the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on}.
 
 Then report: `READ: codebase-design, issue-authoring.md`. Proceed only after.
 
 ## 1. Load context
 
-`$ARGUMENTS` is the issue number; below, `<issue>` is that number.
+Below, `<issue>` is the issue number given as input.
 
 - `gh issue view <issue> --json title,body,comments` — the brief is what you re-author or decompose. Comments may carry context the body doesn't.
 - **Brownfield reconnaissance.** Read the existing code the issue touches — the modules in play, their public surfaces, the seams a solution would use.
@@ -46,19 +46,19 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 ## 3. General Interview
 
-Invoke /grill-with-docs to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended.
+{Run [/grill-with-docs](~/.claude/skills/grill-with-docs/SKILL.md) to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize}. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended.
 
 Claims about existing reality accumulate through this interview — what a module does today, what a config holds, what a rule enforces. Collect the ones the approach stands on into a **proposed-probe list** and put it to the user; they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)). Run the picked probes immediately, in-context, as ordinary tool calls, and post the **probe-record comment** on the issue — each probe's command and its observed output, appended to on later runs. The §7 brief's `measured` claims cite it; peripheral claims ride as `assumed` freely.
 
 ## 4. Design it twice — only for a load-bearing surface
 
-When §2 settled that the public surface is load-bearing, read [design-it-twice.md](references/design-it-twice.md) and work through it: three or four subagents in parallel proposing the surface along different axes, compared on depth, locality, and seam placement.
+{If §2 settled that the public surface is load-bearing, {Read [design-it-twice.md](references/design-it-twice.md)} and work through it}: three or four subagents in parallel proposing the surface along different axes, compared on depth, locality, and seam placement.
 
 An ordinary surface — internal, one caller, cheap to change — skips it, and skips that file.
 
 ## 5. Prototype — only where reading can't settle it
 
-When a question survives the interview and the code can't answer it, invoke /prototype. Everything it says applies, with one thing fixed here: the prototype lives in its own disposable tree, because nothing merges out of definition.
+{If a question survives the interview and the code can't answer it, {Run [/prototype](~/.claude/skills/prototype/SKILL.md)}}. Everything it says applies, with one thing fixed here: the prototype lives in its own disposable tree, because nothing merges out of definition.
 
 Open it with `EnterWorktree(name=design-<issue>)`, then rename the branch the tool minted — `git branch -m worktree-design-<issue> prototype/<issue>` — because automated worktree cleanup keys on the `worktree-` prefix, and this branch must outlive the session. `prototype/<issue>` is this node's prototype branch name, suffixed when one issue carries several (`prototype/<issue>-<slug>`). If the tool refuses because this session already holds a worktree, make the tree by hand — `git worktree add .claude/worktrees/design-<issue> -b prototype/<issue>` — and enter it with `EnterWorktree(path: …)`; no rename needed, and §8's exit is the same either way. Commit on that branch whatever the outcome, and commit everything the standard's prototype paragraph requires, so review can audit the artifact without re-running it. The answer comes back on the issue; the tree goes at §8; the branch survives as the prototype's primary source, and the re-authored brief cites branch + path.
 
@@ -81,7 +81,7 @@ Nothing below this line is written to GitHub before the user approves.
 
 Re-author the issue's brief in place across the build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)), which is where the required set is fixed. A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief.
 
-Draft every heading except `User intent`, then invoke /user-intent-mini-interview for that one: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
+Draft every heading except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md)} for that one: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
 
 `gh issue edit --body` replaces the whole body
 ([tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#the-issue-surface)),
@@ -89,16 +89,16 @@ so write the complete brief back — every required heading, re-authored.
 
 ### Decompose
 
-When the work is bigger than one build, the issue becomes an **epic** and never builds itself, and its children are minted here rather than round-tripping through `intake` — each carrying a starting brief only. A child is completed and released later, in its own design session. Read [decompose.md](references/decompose.md) and work through it — the epic rewrite, the slicing, the children, and the relationship wiring.
+When the work is bigger than one build, the issue becomes an **epic** and never builds itself, and its children are minted here rather than round-tripping through `intake` — each carrying a starting brief only. A child is completed and released later, in its own design session. {Read [decompose.md](references/decompose.md)} and work through it — the epic rewrite, the slicing, the children, and the relationship wiring.
 
 ## 8. Close the phase
 
 Only once the user has explicitly agreed design is done. No label moves in this region on the agent's own authority.
 
-1. **Run the issue-review beat** — for the leaf this session designed, fresh or decomposition-minted. The two lenses are **your tools** — latent instruments that sharpen your brief. Dispatch both in one message, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names, reading only the issue and the repo. Merge and deduplicate their findings, then apply or demote each on your judgment, rewriting until it is a brief you would hand an autonomous builder. Never stop to have the user rule, and record nothing on the issue. Then present the finished issue: the URL, what you changed, and anything unresolved ([the issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)). They may always skip or cut short the beat.
+1. **Run the issue-review beat** — for the leaf this session designed, fresh or decomposition-minted. The two lenses are **your tools** — latent instruments that sharpen your brief. Dispatch both in one message, as fresh-context subagents: one {Run [/issue-review-claims](~/.claude/skills/issue-review-claims/SKILL.md)} on `<issue>`, the other {Run [/issue-review-simulation](~/.claude/skills/issue-review-simulation/SKILL.md)} on `<issue>`, each pinned to the model its skill file names, reading only the issue and the repo. Merge and deduplicate their findings, then apply or demote each on your judgment, rewriting until it is a brief you would hand an autonomous builder. Never stop to have the user rule, and record nothing on the issue. Then present the finished issue: the URL, what you changed, and anything unresolved ([the issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)). They may always skip or cut short the beat.
 2. **Move the phase** — single leaf only, on their approval alone: `gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"`. Asked for changes, apply and re-present. Judged not ready, it stays at `phase:design` for a session that re-authors it; only this move is skipped — the rest run either way. A decomposed issue shed its phase at §7 and stays an epic; each child crosses on its own approval.
 3. **Keep the branch, drop the tree**, if §5 opened one. The prototype is already committed on `prototype/<issue>` (§5). Exit with `ExitWorktree(action: "keep")` — never `"remove"`, which deletes the branch too — then `git worktree remove .claude/worktrees/design-<issue>`, and leave the pointer /prototype asks for: `gh issue comment <issue> --body "Prototype preserved on branch prototype/<issue> at <dir>."`, where `<dir>` is the prototype's directory **inside that branch** — not the tree the previous command just deleted. Then push the branch — `git push -u origin prototype/<issue>` — so the citable artifact is on origin. It survives there until everything citing it has merged; after that it is deletable, with no purge duty.
-4. Report and stop:
+4. {Report the phase result and next state; format below} and stop:
    ```
    <repo>#<issue> · phase: design · <released to build | epic + N children, M released | awaiting verdict> · brief in issue
    ```

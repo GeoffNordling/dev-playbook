@@ -315,9 +315,9 @@ Agents:
 - [x] deslopper
 - [ ] adjudicator
 - [ ] bug-pr-review
-- [ ] build
+- [x] build
 - [ ] code-pr-review
-- [ ] doc-pr-review
+- [x] doc-pr-review
 - [x] open-pr
 - [ ] set-auditor
 - [ ] set-deslopper
@@ -336,7 +336,7 @@ Skills:
 - [x] commit-off
 - [ ] compact-prep
 - [x] datasheet
-- [ ] design
+- [x] design
 - [ ] diagnosing-bugs (3P)
 - [ ] domain-modeling (3P)
 - [ ] enable-repo-governance
@@ -348,7 +348,7 @@ Skills:
 - [ ] issue-overwatch
 - [ ] issue-review-claims
 - [ ] issue-review-simulation
-- [ ] judgments-sweep
+- [x] judgments-sweep
 - [ ] marimo-batch (3P)
 - [ ] marimo-notebook (3P)
 - [x] orchestrate
@@ -364,7 +364,7 @@ Skills:
 - [ ] wayfinder (3P)
 - [ ] wayfinder-to-build
 - [ ] wizard (3P)
-- [ ] working-doc-set-deslop
+- [x] working-doc-set-deslop
 - [ ] writing-for-agents (3P)
 
 ## To-do

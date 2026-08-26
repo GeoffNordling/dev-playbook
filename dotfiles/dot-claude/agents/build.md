@@ -16,7 +16,7 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 Your prompt is the issue number; below, `<issue>` is that number.
 
 - `gh issue view <issue> --json title,body,comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
-- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has run, and those threads are your work list. Read each thread's content with `gh api` — [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) carries the query — and work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
+- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has run, and those threads are your work list. {Read [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md); it carries the query for reading each thread's content with `gh api`}. Work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
 
   **One exception, where the prompt does carry content.** A Suggestion thread listed as ruled fix comes with a line of its own, and that line is the Adjudicator's ruling — the whole of what the thread asks for. It replaces the thread's posted text, which is the unruled suggestion the ruling settled: read the thread for context, then do what the prompt's line says, not what the suggestion said. Every other thread id in the prompt is only an address.
 
@@ -30,12 +30,7 @@ Your prompt is the issue number; below, `<issue>` is that number.
 
 ## 2. Read what the issue calls for
 
-The issue's `tests:*` label picks the discipline the work runs under:
-
-| The issue carries | Read |
-|---|---|
-| `tests:yes` | [tdd.md](~/workspace/dev-playbook/software-factory/tdd.md) and the testing conventions it opens with, end-to-end — the work then runs test-first |
-| `tests:no` | nothing further — the work touches no tests, so carry the brief out directly |
+The issue's `tests:*` label picks the discipline the work runs under. {If the issue carries `tests:yes`, {Read [tdd.md](~/workspace/dev-playbook/software-factory/tdd.md) and the testing conventions it opens with, end-to-end; the work then runs test-first}}. `tests:no` work touches no tests, so carry the brief out directly.
 
 Under `tests:yes` this is a hard gate: report `READ: tdd.md, testing-conventions.md`, and edit no file before that report.
 
@@ -55,14 +50,14 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 
 1. Make the changes for a coherent piece of the scope. Under `tests:yes` that piece is a chunk, driven by the loops in [tdd.md](~/workspace/dev-playbook/software-factory/tdd.md).
 2. Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root — and resolve failures.
-3. Commit the piece with /commit.
+3. {Run [/commit](~/.claude/skills/commit/SKILL.md)} on the piece.
 4. Move to the next piece, or to §6 once the issue's scope is fully carried out.
 
 Declarations under `judgments/` are documentation: keep the ones your edits affect accurate as you edit; add new ones rarely — see [The bar](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#the-bar).
 
 ## 5. Escalations
 
-When reality contradicts the brief, run the three limiters of the [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md). Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt, commit, and escalate as that contract states. Write nothing to GitHub: the run ends on the report envelope — structured output whose `outcome` is `"escalated"`, carrying in `gist` what the brief said, what reality is, which limiter tripped, and two or three fix options with your recommendation. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
+When reality contradicts the brief, {Read [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md); run its three limiters}. Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt, commit, and escalate as that contract states. Write nothing to GitHub: {Report the escalation envelope; `outcome` is `"escalated"`, carrying in `gist` what the brief said, what reality is, which limiter tripped, and two or three fix options with your recommendation}. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
 
 The user reads the report, decides, and relaunches; you don't push past the obstacle on your own. Under `tests:yes`, tdd.md carries further triggers of its own. In particular:
 
@@ -75,6 +70,6 @@ The user reads the report, decides, and relaunches; you don't push past the obst
 With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
-2. **Commit** the remaining changes with /commit.
+2. **Commit** the remaining changes with {Run [/commit](~/.claude/skills/commit/SKILL.md)}.
 3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape: before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts; on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`). No deviations — record nothing here; the PR section states `No deviations.`
-4. **End on the report envelope.** The session ends with structured output: `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed.
+4. {Report the completion envelope; `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed}.

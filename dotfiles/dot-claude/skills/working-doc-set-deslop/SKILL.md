@@ -4,25 +4,24 @@ description: Send a working documentation set through an agent that audits it ag
 disable-model-invocation: false
 model: sonnet
 effort: high
-argument-hint: "[set-hint]"
+arguments: [set-hint]
 ---
 
 # Working Doc Set Deslop
 
-Send one working documentation set through the `set-deslopper` subagent,
-which audits the set against
+Audit one working documentation set against
 [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)
-and then fixes what the audit finds, editing in place and committing
-nothing.
+and fix what the audit finds, editing in place and committing nothing.
 
 ## Target
 
-The invocation may carry a hint identifying the set: its root file, its
-directory, or a description such as "the no-more-slop working files."
+`set-hint` may name the set: its root file, its directory, or a
+description such as "the no-more-slop working files."
 
-- **No hint.** Operate on the set most clearly in focus in the current
-  conversation. Where none is, ask which.
-- **Hint.** Resolve it to a root file. Where it matches nothing, ask.
+- If `set-hint` is absent, operate on the set most clearly in focus in
+  the current conversation. Where none is, ask which.
+- If `set-hint` is present, resolve it to a root file. Where it
+  matches nothing, ask.
 
 ## Pre-flight
 
@@ -33,9 +32,9 @@ clean baseline.
 
 ## Dispatch
 
-Launch the `set-deslopper` subagent (Agent tool,
-`subagent_type: set-deslopper`, `model: opus`), naming the working
-directory and the set's root file in the prompt.
+{Launch the [set-deslopper](~/.claude/agents/set-deslopper.md) subagent,
+`model: opus`}, naming the working directory and the set's root file in
+the prompt.
 
 This skill never commits.
 

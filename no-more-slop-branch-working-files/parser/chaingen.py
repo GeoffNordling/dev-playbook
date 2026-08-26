@@ -185,6 +185,24 @@ def classify(link_text, link_target, source_file):
     """Render a link target as a node, or as the link text for a non-unit."""
     if link_target.startswith("~"):
         path = os.path.expanduser(link_target)
+        # Same-repo resolution: a ~/workspace/<repo>/… path naming the repo
+        # the source file lives in resolves inside that file's own checkout
+        # (main or worktree), not the literal main checkout.
+        m = re.match(r"~/workspace/([^/]+)/(.*)", link_target)
+        if m:
+            main = os.path.expanduser(f"~/workspace/{m.group(1)}")
+            root = repo_root(os.path.dirname(source_file))
+            if root == main or root.startswith(main + os.sep):
+                path = os.path.join(root, m.group(2))
+        # ~/.claude/ is this meta-repo's dotfiles/dot-claude tree, stowed;
+        # from inside the repo it resolves to the checkout's own tree.
+        m = re.match(r"~/\.claude/(.*)", link_target)
+        if m:
+            stowed = os.path.join(
+                repo_root(os.path.dirname(source_file)), "dotfiles", "dot-claude"
+            )
+            if os.path.isdir(stowed):
+                path = os.path.join(stowed, m.group(1))
     elif link_target.startswith("/"):
         path = os.path.join(
             repo_root(os.path.dirname(source_file)), link_target.lstrip("/")

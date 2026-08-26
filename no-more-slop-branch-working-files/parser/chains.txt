@@ -3,6 +3,13 @@
 [bug-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
 
 [build] Agent · model: opus, effort: xhigh
+  ├─reads───► PR feedback
+  ├ ╌ reads ╌ ► tdd.md    and the testing conventions it opens with, end-to-end    if the issue carries `tests:yes`
+  ├─does────► [commit] Skill
+  ├─reads───► deviation contract
+  ├─reports─► outcome: str    the escalation envelope
+  ├─does────► [commit] Skill
+  └─reports─► outcome: str    the completion envelope
 
 [code-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
 
@@ -14,6 +21,11 @@
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
 
 [doc-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+  ├─reads───► review contract
+  ├─reads───► PR feedback
+  ├─reads───► [conventions] Standard
+  ├─reports─► outcome: str    `outcome` `"done"`
+  └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
 
 [open-pr] Agent · model: sonnet, effort: low
   ├ ╌ reports ╌ ► outcome: str    that PR    if it lists one
@@ -65,6 +77,17 @@
   └─reports─► outcome: str    the sheet path, the checker's one-line summary, and the Behavior labels used
 
 [design] Skill · model: inherit, effort: xhigh
+  ├─args────► issue
+  ├─does────► {codebase-design} Skill
+  ├─reads───► [issue-authoring] Standard    end-to-end
+  ├─does────► [grill-with-docs] Skill    to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize
+  ├ ╌ reads ╌ ► design-it-twice.md    if §2 settled that the public surface is load-bearing
+  ├ ╌ does ╌ ► {prototype} Skill    if a question survives the interview and the code can't answer it
+  ├─does────► [user-intent-mini-interview] Skill
+  ├─reads───► decompose.md
+  ├─does────► [issue-review-claims] Skill
+  ├─does────► [issue-review-simulation] Skill
+  └─reports─► outcome: str    the phase result and next state
 
 {diagnosing-bugs} Skill
 
@@ -111,6 +134,12 @@
 [issue-review-simulation] Skill · model: sonnet, effort: xhigh
 
 [judgments-sweep] Skill · model: opus, effort: xhigh
+  ├─args────► roots
+  ├─reads───► [declarations] Standard
+  ├─does────► judgments-run    in `plan` mode
+  ├─writes──► local file    the judgment cache
+  ├─does────► judgments-run    again, with a `--skip` per set-aside id
+  └─reports─► outcome: str    per root: already cached, judged, passed, fixed-then-passed (each id + the edit made), set aside (each id + its `opinion` or crash history + why), crashed-and-recovered
 
 [log-friction] Skill · model: sonnet, effort: xhigh
   ├─args────► friction
@@ -170,5 +199,7 @@
 {wizard} Skill
 
 [working-doc-set-deslop] Skill · model: sonnet, effort: high
+  ├─args────► set-hint
+  └─does────► [set-deslopper] Agent    the subagent, `model: opus`
 
 {writing-for-agents} Skill
