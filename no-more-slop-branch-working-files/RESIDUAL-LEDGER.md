@@ -248,6 +248,55 @@ so they render as bare `does` targets. Could not express the size-conditional
 landing choice in § 5 (a decision, not a fixed condition to guard) or the
 GitHub-token permission preflight, which has no primitive.
 
+## user-intent-mini-interview
+
+Could not express the anchored read of issue-authoring.md's build-leaf-brief
+section — `{Read}` fails on `#fragment` links — or the `gh issue view` read
+of the draft when `issue` is given (no on-disk link). Could not express the
+ask/scrutinize/marry interview loop of steps 1–3 (no primitive for a
+question-and-answer round) or the closing "writes nothing to GitHub"
+assertion (no primitive for an edge's absence).
+
+## issue-review-claims
+
+Could not express the `gh issue view` reads of the issue body and its parent
+epic (no on-disk link) or the forbidden actions — never edit files or the
+issue, post nothing to GitHub (no primitive for a forbidden action). The
+`disallowed-tools` frontmatter key sits outside the node-data set the header
+renders (`tools`, `model`, `effort`, `allowed-tools`), so its edit/write ban
+is silently absent from the chain.
+
+## issue-overwatch
+
+Could not express the anchored reads throughout (the briefing rule, the dispatch
+table, readiness, the terminal report contract, the escalation rule, comment
+surfaces, the two owners, turn boundaries — all `#fragment` links), the `gh`
+state and write calls (issue view, blocked-by check, label moves, PR/issue
+comments, stub creation — no on-disk link, the writes—GitHub hole), or the
+`EnterWorktree` calls and worktree-only git commands (does covers only
+file-linked units). The AFK/Inline/Review-stop engagement switch, including
+the fixed `/open-pr` launch inside the Review-stop branch, has no primitive
+for a multi-way enumeration — encoding just that one branch would misstate it
+as unconditional. The runtime-chosen `Run /<skill> <N>` delegation has no
+fixed link for `{Launch}`.
+
+## pocock-sweep
+
+Could not express the `gh api` state reads (release tag, commit SHAs) or the
+`gh pr create` write that opens the PR — no on-disk link for either, the
+writes—GitHub hole. Could not express the scratch writes — the tag clone, the
+optional cross-window plan file, and the hand-install route's bundle,
+symlink, and lock-entry copies — all writes—scratch hole, nor the
+`npx skills@latest`/`scripts/sync-dotfiles` calls, bare commands with no link
+for a does edge. Could not express the commit-SHA branch that decides step
+6's install route, or the branch-tip-versus-hand-install alternation itself —
+both would guard a later section, and guard containment can't cross sections.
+Could not express opening the worktree branch (no primitive for the
+EnterWorktree tool call), the docket-ruling round with the user (no
+primitive for a question-and-answer round), or the main-checkout commit that
+lands the installs (no fenced git block to satisfy `{Commit}`'s block
+requirement, since the staged files vary per sweep).
+
 ## open-pr
 
 Could not express the anchored read — `{Read}` fails on `#fragment`
@@ -256,3 +305,36 @@ branch-diff reads (no on-disk link), the PR-body scratch write and
 `gh pr create` (writes—GitHub/scratch hole), or the issue-number input
 (agents have no `arguments` frontmatter). Three alternate reports all
 collapse to `outcome: str`.
+
+## update-standards-pin
+
+Could not express the `git rev-parse`/`gh api` state read confirming the
+release is pushed, or the report-format table in § Read the report (a table
+has no sentence for the grammar to span, so its `/enable-repo-governance`
+mention stays unencoded too). Could not express the ambient dev-playbook
+commit for a release-defect fix or the per-consumer commit/push — the
+writes—git bucket needs a fenced command with a fixed `-C`, and neither the
+ambient nor the runtime-chosen consumer repo carries an honest one — or the
+`pre-commit gc` cleanup, a bare command with no on-disk link for a does
+edge.
+
+## issue-review-simulation
+
+Could not express the `gh issue view` state reads (title/body/comments,
+the parent-epic lookup) or the read of whatever files the brief names —
+`{Read}` needs one fixed on-disk link and all three are runtime-bound.
+Could not express forbidding edits or GitHub writes (no primitive for a
+forbidden action), or the `disallowed-tools` permission as node data —
+only `tools`/`model`/`effort`/`allowed-tools` render in the header.
+
+## wayfinder-to-build
+
+Could not express the anchored reads (tracker-operations.md's wayfinding
+section, issue-authoring.md's vertical-slice-rules and epic-body sections,
+user-checkpoints.md's issue-review-verdict section) — `{Read}` fails on
+`#fragment` links. Could not express reading the map issue and its child
+tickets via `gh issue view` (no on-disk link), minting the build epic and
+child stubs, or wiring sub-issue/blocked-by relationships (`gh` writes, the
+writes—GitHub hole). Could not express the mid-run `READ:` acknowledgment
+(targets the conversation, not the invoker) or the per-step "Done when"
+completion gates (no control-flow primitive).

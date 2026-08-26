@@ -4,7 +4,7 @@ description: Executes one issue's traverse through the software factory, stoppin
 disable-model-invocation: true
 model: inherit
 effort: xhigh
-argument-hint: "<issue-number>"
+arguments: [issue-number]
 ---
 
 # Issue Overwatch
@@ -19,15 +19,15 @@ One hard limit: you never merge. That is the user's.
 
 Before doing anything else, read end-to-end:
 
-- [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
-- [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — delegation, the worktree contract, the terminal report contract, readiness, and the review stop.
-- [user-checkpoints.md](~/workspace/dev-playbook/software-factory/user-checkpoints.md) — every point you stop at, and what you owe the user there.
+- {Read [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md)} — the graph you execute, the states, and the labels naming them. Navigate by what you read: the node sequence is never hard-coded, here or in any skill — the graph is the single source.
+- {Read [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md)} — delegation, the worktree contract, the terminal report contract, readiness, and the review stop.
+- {Read [user-checkpoints.md](~/workspace/dev-playbook/software-factory/user-checkpoints.md)} — every point you stop at, and what you owe the user there.
 
 Then report: `READ: software-factory.md, factory-operations.md, user-checkpoints.md`. Proceed only after.
 
 ## 1. Orient
 
-`$ARGUMENTS` is the issue number; below, `<N>` is that number.
+The input is the issue number; below, `<N>` is that number.
 
 - `gh issue view <N> --json title,labels,body` — the `phase:*` label places the issue on the graph; the `mode`/`tests` labels pick the outgoing edges.
 - **You execute the factory region only.** An issue carrying no labels, or whose `phase:*` sits in the definition region, is not yours — refuse it, name the skill the user runs instead, and stop, per the [factory-nodes-only rule](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch).
@@ -72,7 +72,7 @@ When `git worktree list` shows the worktree already exists, enter it instead: `E
 
 The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [the briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule), answer their questions, help them weigh, and act only on an explicit verdict.
 
-Write every body you post here to `/tmp/<kind>-<N>.md` with the Write tool, and pass it with `--body-file`.
+{Write every body you post here; save it to `/tmp/<kind>-<N>.md` and pass it with `--body-file`}.
 
 - **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs (`gh pr comment --body-file`) — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then regenerate the merge message from the whole PR record, per [the two owners](~/workspace/dev-playbook/software-factory/factory-operations.md#the-two-owners), and pass it with `gh pr edit --body-file`. Carry the issue to the user's final read and merge.
 - **rework** — record the user's deciding reason where the findings live (`gh issue comment --body-file` / `gh pr comment --body-file`), then move the label back along the rework edge.
@@ -87,4 +87,4 @@ When the user returns, pick the traverse back up from the labels.
 
 ## Report
 
-Close each turn with the issue's state, one line: `<repo>#<N> · phase: <node> · <what's pending and whose it is>`.
+{Report the issue's state at the close of each turn; one line: `<repo>#<N> · phase: <node> · <what's pending and whose it is>`}.

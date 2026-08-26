@@ -26,14 +26,12 @@ and delete it before the PR.
 
 ## 1. Read first
 
-Before doing anything else, read end-to-end:
+Before doing anything else, {Read [external-skill-verdicts.md](~/workspace/dev-playbook/docs/external-skill-verdicts.md)
+end-to-end; the standing verdict on every skill, and the rules that bind this
+sweep} and {Read [skill-management.md](~/workspace/dev-playbook/standards/claude-code/skill-management.md)
+end-to-end; where installed skills live, the lock file, and the mirror rule}.
 
-- [the ledger](~/workspace/dev-playbook/docs/external-skill-verdicts.md) — the
-  standing verdict on every skill, and the rules that bind this sweep.
-- [skill-management.md](~/workspace/dev-playbook/standards/claude-code/skill-management.md)
-  — where installed skills live, the lock file, and the mirror rule.
-
-Then report: `READ: external-skill-verdicts.md, skill-management.md`. Proceed
+Then say `READ: external-skill-verdicts.md, skill-management.md` and proceed
 only after.
 
 ## 2. Resolve the release
@@ -44,8 +42,8 @@ Sweeps evaluate release tags, never `main`.
 gh api repos/mattpocock/skills/releases/latest --jq .tag_name
 ```
 
-The tag the ledger already names means there is nothing to sweep. Say so and
-stop.
+{If the ledger already names this tag, {report that there is nothing to
+sweep} and stop}.
 
 Otherwise resolve the commits and compare them — the second decides how step
 6 installs:
@@ -58,8 +56,8 @@ gh api repos/mattpocock/skills/commits/main --jq .sha
 Equal, and the release is the tip of his branch: the `skills` CLI fetches his
 default branch, so what it installs is exactly the tag. Unequal, and he has
 merged unreleased work since cutting the release, so step 6 installs by hand
-at the tag instead. Report which one you got — the hand route is slower, and
-the user should know why before it starts.
+at the tag instead. {Report which route it resolved to; the hand route is
+slower, and the user should know why before it starts}.
 
 ## 3. Clone the tag
 
@@ -168,15 +166,15 @@ An adversarial pass over the sweep's own work, before the records are written:
 
 ## 9. Write the records
 
-The ledger is rewritten to the new pin — every row current, retired rows folded
-into a closing note, the general rules updated where a ruling changed one. It
+{Write the ledger to the new pin; every row current, retired rows folded into
+a closing note, the general rules updated where a ruling changed one}. It
 is also where the pin's provenance lives: the lock file records a folder hash
 and no revision, so the tag and its commit are named in the ledger or nowhere.
 
-The Decision Record beside it is **thin and delta-only**: what moved and why,
-the positions declined so a later sweep does not re-find them, and any
-correction to a claim the sweep made along the way. Where a skill stands today
-is the ledger's question.
+{Write the Decision Record beside it; **thin and delta-only** — what moved
+and why, the positions declined so a later sweep does not re-find them, and
+any correction to a claim the sweep made along the way}. Where a skill stands
+today is the ledger's question.
 
 ## 10. Open the PR
 

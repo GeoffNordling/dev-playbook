@@ -10,12 +10,13 @@ effort: xhigh
 
 A consumer repo runs the standards as of the dev-playbook `rev` it pins, and
 nothing else: a detector added upstream, a rule tightened, a canonical artifact
-changed — none of it reaches that repo until the pin moves. The bump *is* the
-release ([distribution.md](~/workspace/dev-playbook/standards/build/distribution.md)).
+changed — none of it reaches that repo until the pin moves. {Read
+[distribution.md](~/workspace/dev-playbook/standards/build/distribution.md);
+the bump *is* the release}.
 
-[bump-pins](~/workspace/dev-playbook/scripts/bump-pins) owns the mechanical
-half. This skill owns the half it deliberately stops short of: deciding what
-each finding means, and getting the result committed.
+`bump-pins` owns the mechanical half; this skill owns the half it
+deliberately stops short of — deciding what each finding means, and getting
+the result committed.
 
 ## 1. Confirm the release is on the remote
 
@@ -28,17 +29,19 @@ git rev-parse main
 gh api repos/{owner}/{repo}/branches/main --jq .commit.sha
 ```
 
-Unequal means the release is unpushed — escalate and stop. Commits push as
-they land, so an unpushed main means something upstream went wrong; surface
-it rather than pushing someone else's unreviewed work.
+{If the two values are unequal, {report that the release is unpushed} and
+stop} — commits push as they land, so an unpushed main means something
+upstream went wrong; surface it rather than pushing someone else's
+unreviewed work.
 
 ## 2. Run it
 
-From the dev-playbook checkout, `scripts/bump-pins --dry-run` to see what would
-move, then `scripts/bump-pins` to move it. The population is the `GOVERNED`
-roster in
-[workspace_lint.py](~/workspace/dev-playbook/src/dev_playbook/workspace_lint.py);
-a repo absent from it is not governed and is neither audited nor bumped.
+{Read [workspace_lint.py](~/workspace/dev-playbook/src/dev_playbook/workspace_lint.py)
+for the `GOVERNED` roster}: the population this skill audits and bumps; a
+repo absent from it is not governed and is neither audited nor bumped. From
+the dev-playbook checkout, {Run
+[bump-pins](~/workspace/dev-playbook/scripts/bump-pins) `--dry-run` first to
+see what would move, then run it again for real}.
 
 ## 3. Read the report
 
@@ -52,9 +55,9 @@ One line per consumer:
 | `skipped — already red at its current pin` | Pre-existing breakage, unrelated to this release. Surface it separately. |
 | `skipped — no dev-playbook pin` | Governed but unwired. An adoption question — /enable-repo-governance. |
 
-**An aborted run is an environment fault.** If the script raises
-`the gate could not run`, pre-commit died before judging anything and that
-repo's pin is already restored — report it as the fault it is.
+**An aborted run is an environment fault**: pre-commit died before judging
+anything and that repo's pin is already restored. {If the script raises
+`the gate could not run`, {report the abort as the fault it is}}.
 
 ## 4. Work the findings, one repo at a time
 
@@ -71,16 +74,18 @@ re-running, or the sweep silently skips it.
 ## 5. Trim retired content only after the bump is green
 
 A requirement retired upstream is still enforced by the check that ships
-**inside the pinned clone**. Delete what it demands before the pin moves and
-the repo goes red against its own old pin. So: bump, verify green, then trim,
-then commit both together.
+**inside the pinned clone**, so a repo left untrimmed goes red against its
+own old pin the moment the bump lands. {If the bump already reports green,
+{Write the retired requirement's adaptation and deletions out of the
+consumer repo}} — carry both into the same commit.
 
 ## 6. Commit and push, one repo at a time
 
 One commit per consumer carries the pin move and any adaptation together;
 the commit gate runs at the new pin, so a green commit is a second
 verification. Push each repo as its commit lands — they are independent, so
-one failure never blocks the rest; report per-repo results.
+one failure never blocks the rest. {Report per-repo results — bumped, needs
+work, skipped, or faulted}.
 
 ## 7. Collect the garbage
 

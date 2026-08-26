@@ -161,10 +161,23 @@
   └─reports─► outcome: str    the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`
 
 [issue-overwatch] Skill · model: inherit, effort: xhigh
+  ├─args────► issue-number
+  ├─reads───► software-factory.md
+  ├─reads───► factory-operations.md
+  ├─reads───► user-checkpoints.md
+  ├─writes──► local file    every body you post here
+  └─reports─► outcome: str    the issue's state at the close of each turn
 
 [issue-review-claims] Skill · model: sonnet, effort: xhigh
+  ├─args────► issue
+  ├─reads───► [issue-authoring] Standard    for claim provenance
+  ├─reads───► deviation contract
+  └─reports─► outcome: str    raw: a numbered list of findings — each states the claim or quote at issue, what reality shows, and why it meets the wrong-or-halt bar — then one line per sweep performed that came back clean
 
 [issue-review-simulation] Skill · model: sonnet, effort: xhigh
+  ├─args────► issue
+  ├─reads───► deviation contract
+  └─reports─► outcome: str    findings grouped Q3–Q7
 
 [judgments-sweep] Skill · model: opus, effort: xhigh
   ├─args────► roots
@@ -190,6 +203,12 @@
   └ ╌ reports ╌ ► outcome: str    that immediately    if you are not Fable
 
 [pocock-sweep] Skill · model: inherit, effort: xhigh
+  ├─reads───► external-skill-verdicts.md    end-to-end
+  ├─reads───► [skill-management] Standard    end-to-end
+  ├ ╌ reports ╌ ► outcome: str    that there is nothing to sweep    if the ledger already names this tag
+  ├─reports─► outcome: str    which route it resolved to
+  ├─writes──► local file    the ledger to the new pin
+  └─writes──► local file    the Decision Record beside it
 
 {prototype} Skill
 
@@ -217,15 +236,33 @@
   └─writes──► local file    the new skill bundle, project-local or cross-project home
 
 [update-standards-pin] Skill · model: opus, effort: xhigh
+  ├─reads───► [distribution] Standard
+  ├ ╌ reports ╌ ► outcome: str    that the release is unpushed    if the two values are unequal
+  ├─reads───► [workspace_lint.py] Script    for the `GOVERNED` roster
+  ├─does────► bump-pins    `--dry-run` first to see what would move, then run it again for real
+  ├ ╌ reports ╌ ► outcome: str    the abort as the fault it is    if the script raises `the gate could not run`
+  ├ ╌ writes ╌ ► local file    the retired requirement's adaptation and deletions out of the consumer repo    if the bump already reports green
+  └─reports─► outcome: str    per-repo results — bumped, needs work, skipped, or faulted
 
 [usage-report] Skill · model: sonnet, effort: low, allowed-tools: Bash(bash *usage-report/scripts/report.sh)
   └─does────► [report.sh] Script    from this skill's base directory
 
 [user-intent-mini-interview] Skill · model: inherit, effort: xhigh
+  ├─args────► issue
+  └─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
 
 {wait-what} Skill
 
 [wayfinder-to-build] Skill · model: inherit, effort: xhigh
+  ├─args────► map
+  ├─reads───► [issue-authoring] Standard    end-to-end
+  ├─reads───► software factory    end-to-end
+  ├─does────► {codebase-design} Skill
+  ├ ╌ reports ╌ ► outcome: str    exactly what is open    if anything is still open — a ticket, a fog patch
+  ├─does────► {grilling} Skill    and work these branches as its design tree
+  ├─reads───► the decompose exit
+  ├─reads───► [tracker-operations] Standard    for the commands that wire the native relationships
+  └─reports─► outcome: str    the whole hand-off on screen
 
 {wayfinder} Skill
 

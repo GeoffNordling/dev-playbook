@@ -345,24 +345,24 @@ Skills:
 - [x] idea
 - [ ] improve-codebase-architecture (3P)
 - [x] intake
-- [ ] issue-overwatch
-- [ ] issue-review-claims
-- [ ] issue-review-simulation
+- [x] issue-overwatch
+- [x] issue-review-claims
+- [x] issue-review-simulation
 - [x] judgments-sweep
 - [ ] marimo-batch (3P)
 - [ ] marimo-notebook (3P)
 - [x] orchestrate
-- [ ] pocock-sweep
+- [x] pocock-sweep
 - [ ] prototype (3P)
 - [x] ralph-setup
 - [ ] research (3P)
 - [x] rewind-compact
 - [x] skill-creator
-- [ ] update-standards-pin
-- [ ] user-intent-mini-interview
+- [x] update-standards-pin
+- [x] user-intent-mini-interview
 - [ ] wait-what (3P)
 - [ ] wayfinder (3P)
-- [ ] wayfinder-to-build
+- [x] wayfinder-to-build
 - [ ] wizard (3P)
 - [x] working-doc-set-deslop
 - [ ] writing-for-agents (3P)
