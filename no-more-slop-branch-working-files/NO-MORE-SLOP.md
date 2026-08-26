@@ -18,9 +18,14 @@ inline next to its topic, and a sentence is settled only when it says so.
 
 The user can understand this repository without reading all of it. Today
 they cannot: the repo sits in the slop trench — nominal ownership of a
-system whose details have outpaced inspection. The
-[System Legibility](/standards/legibility.md) card states the goal. This
-branch works the documentation track; the code track waits.
+system whose details have outpaced inspection. This branch works the
+documentation track; the code track waits.
+
+Open question: no standard states this goal. A System Legibility card used
+to, pointing at the datasheet and file-graph instruments, but both went
+stale and the card was deleted. Whether the goal earns a card of its own is
+a question for the end of this branch, once the work has shown what would
+actually be governed.
 
 What slop is precisely is still being worked out. So far, it breaks into:
 

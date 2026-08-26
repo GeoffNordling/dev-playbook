@@ -1,7 +1,7 @@
 ---
 type: Standard-Card
 title: Module Design
-description: Card for the module-design standard — how modules are designed
+description: Governs how modules are designed — interfaces, depth, and seams
 ---
 
 # Module Design

@@ -1,12 +1,13 @@
 ---
 type: Standard-Card
 title: Software Factory
-description: Card for the software factory standard — how an idea becomes a merged pull request
+description: Governs how an idea becomes a merged pull request — the state graph, the node contracts, review, and the user's checkpoints
 ---
 
 # Software Factory
 
-Governs how an idea becomes a merged pull request.
+Governs how an idea becomes a merged pull request — the state graph, the
+node contracts, review, and the user's checkpoints.
 
 ## Define
 

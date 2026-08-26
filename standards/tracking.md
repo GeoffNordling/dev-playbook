@@ -1,13 +1,13 @@
 ---
 type: Standard-Card
 title: Tracking
-description: Card for the tracking standard — how committed and uncommitted work is tracked through issue authoring, tracker operations, candidates, and repository settings
+description: Governs how work is tracked — candidates, issue authoring, factory labels, tracker operations, and repository settings
 ---
 
 # Tracking
 
-Governs how work is tracked — committed work as issues, uncommitted work as
-candidates, and repository settings. This card owns the **shapes** — what an
+Governs how work is tracked — candidates, issue authoring, factory labels,
+tracker operations, and repository settings. This card owns the **shapes** — what an
 issue, a candidate, and a brief must look like — the **labels** an issue carries
 to name its state, and the **tracker surface** they live on: the `gh` commands
 that create, link, and close an issue. The **lifecycle** those labels name — the

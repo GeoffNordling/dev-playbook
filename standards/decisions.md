@@ -1,12 +1,14 @@
 ---
 type: Standard-Card
 title: Decision Records
-description: Card for the decision-records standard — how hard-to-reverse decisions are recorded
+description: Governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, immutability, and status vocabulary
 ---
 
 # Decision Records
 
-Governs how hard-to-reverse or surprising decisions are recorded.
+Governs how hard-to-reverse or surprising decisions are recorded — the
+Decision Record's warrant, template, numbering, immutability, and status
+vocabulary.
 
 ## Define
 

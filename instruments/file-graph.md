@@ -123,7 +123,6 @@ repository until someone rebuilds them.
 
 ## Employed by
 
-[System Legibility](/standards/legibility.md) — the standard whose Define cell
-claims the file graph as its answer to how a reader sees the connectivity of a
-repository without crawling it in full. File graphs are rebuilt on demand;
-System Legibility sets no cadence.
+No standard. The file graph answers how a reader sees the connectivity of a
+repository without crawling it in full, but no card claims it today. File
+graphs are rebuilt on demand, on no cadence.

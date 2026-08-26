@@ -1,13 +1,13 @@
 ---
 type: Standard-Card
 title: Meta-Standard
-description: Card for the meta-standard — how standards are declared as cards, cataloged, and kept honest
+description: Governs how the workspace's standards themselves are declared, found, and kept honest — the card format, the catalog, and drift
 ---
 
 # Meta-Standard
 
 Governs how the workspace's standards themselves are declared, found, and
-kept honest.
+kept honest — the card format, the catalog, and drift.
 
 ## Define
 

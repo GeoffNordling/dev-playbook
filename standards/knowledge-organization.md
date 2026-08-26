@@ -1,13 +1,13 @@
 ---
 type: Standard-Card
 title: Knowledge Organization
-description: Card for the knowledge-organization standard — how knowledge is organized in markdown
+description: Governs how knowledge is organized in markdown — file roles, document types, indexes, cross-references, and working documentation sets
 ---
 
 # Knowledge Organization
 
 Governs how knowledge is organized in markdown — file roles, document
-types, indexes, and cross-references.
+types, indexes, cross-references, and working documentation sets.
 
 ## Define
 

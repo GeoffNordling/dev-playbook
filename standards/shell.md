@@ -1,12 +1,13 @@
 ---
 type: Standard-Card
 title: Shell
-description: Card for the shell standard — how shell is written
+description: Governs how shell is written — the glue-only boundary, strict mode, declared bash, and shellcheck-clean
 ---
 
 # Shell
 
-Governs how shell is written.
+Governs how shell is written — the glue-only boundary, strict mode,
+declared bash, and shellcheck-clean.
 
 ## Define
 

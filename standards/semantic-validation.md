@@ -1,7 +1,7 @@
 ---
 type: Standard-Card
 title: Semantic Validation
-description: Card for the semantic-validation standard — how claims only language can check are validated and kept from drifting
+description: Governs how claims only language can check — accuracy, honesty, scope — are validated and kept from drifting as the underlying files change
 ---
 
 # Semantic Validation

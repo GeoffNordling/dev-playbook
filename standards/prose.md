@@ -1,13 +1,13 @@
 ---
 type: Standard-Card
 title: Prose
-description: Card for the prose standard — how workspace prose is written
+description: Governs how prose is written in every workspace document — voice, structure, brevity, and the named slop tics
 ---
 
 # Prose
 
-Governs how prose is written — voice, structure, and brevity in every
-workspace document.
+Governs how prose is written in every workspace document — voice,
+structure, brevity, and the named slop tics.
 
 ## Define
 
