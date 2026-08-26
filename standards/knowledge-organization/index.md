@@ -10,5 +10,5 @@ Ordering: reading order.
 - [Indexes](/standards/knowledge-organization/indexes.md) — The index.md file — its required introduction, per-directory listing rules, child-index delegation, authored not generated
 - [README Content](/standards/knowledge-organization/readme-content.md) — The README content floor — OKF frontmatter, an H1, and a one-line purpose; depth grows with the project
 - [CONTEXT.md Content](/standards/knowledge-organization/context-content.md) — The CONTEXT.md vocabulary center — the installed format, plus the two workspace differences
-- [Cross-References](/standards/knowledge-organization/cross-references.md) — The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, fragment anchors
+- [Cross-References](/standards/knowledge-organization/cross-references.md) — The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the runbook target rule, fragment anchors
 - [Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md) — How the in-process Markdown files of one work stream are organized as a set — root plan, child edges, single-home facts, ledgers, and local terms

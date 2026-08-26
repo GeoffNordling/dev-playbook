@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Cross-References
-description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, fragment anchors
+description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the runbook target rule, fragment anchors
 ---
 
 # Cross-References
@@ -38,7 +38,7 @@ is already inside that repo), so both use the Link form for same-repo
 targets. Files with **no fixed repo root** — skills and global `~/.claude/`
 config such as `rules/` and `agents/`, loaded across arbitrary repos — have
 no root for `/` to resolve against, so they use the Citation form even for a
-same-repo target (see [runbook-conventions.md — Cross-references](/standards/harness/runbook-conventions.md#cross-references)).
+same-repo target (see [Runbooks](#runbooks) below).
 That same-repo Citation resolves per
 [Same-repo resolution](/standards/knowledge-organization/cross-references.md#same-repo-resolution)
 below, against the reader's own checkout.
@@ -65,6 +65,30 @@ Accepted — agents are the primary audience, and both forms are what the
 `ref-lint` linter (`/scripts/ref-lint`) validates. Anything else —
 backticked filenames like `` `conftest.py` ``, slash-skill invocations like
 `/commit` — is treated as prose by `ref-lint`.
+
+## Runbooks
+
+A [runbook](/standards/harness/runbook-conventions.md) — a skill bundle
+or agent definition — has **no fixed repo root**: the same skill or
+agent can run from a session in any repo's checkout, so there is no
+stable root for a `/`-absolute Link to resolve against. A runbook
+therefore cites a workspace document by its full `~/workspace/<repo>/…`
+path even when that document lives in the same repo, and that same-repo
+citation resolves per [Same-repo resolution](#same-repo-resolution)
+below — against the reader's own checkout, worktree included, not the
+main checkout.
+
+Runbook references are **target-based** rather than bundle-based. The
+wrapper records intent: an inline link means "go open this"; inline code
+means "this file exists conceptually."
+
+| Target | Style | Example |
+|---|---|---|
+| File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
+| File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[<doc>](~/workspace/<repo>/<path>/<doc>.md)` |
+| File in the user's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
+| Directory | Inline code | `` `docs/decisions/` `` |
+| Slash-skill invocation | Bare — no markup | `/<skill-name>` |
 
 ## Same-repo resolution
 
