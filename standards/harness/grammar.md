@@ -6,27 +6,35 @@ description: The braced-span grammar and its ontology — the node kinds, the ed
 
 # Instruction Grammar
 
-Governs the bodies of the two files that define **runbooks**: skill bodies
-(`SKILL.md`) and agent definitions (`agents/*.md`). No other file in
-[the harness-file registry](/standards/harness/files.md) carries this
-grammar — `CLAUDE.md`, rules, settings, and hooks are context and
-configuration, not runbooks, and a braced span in them means nothing.
+Governs the body of every **runbook**. Which files those are is
+[the harness-file registry](/standards/harness/files.md)'s call — it
+classifies every harness file, and no class but the runbook carries
+this grammar.
 
-A **runbook** is documentation that acts: invoked by name, arguments in, a
-report out, effects on state. Its body stays natural imperative English
-for the executing agent; the grammar adds the minimum structure that
-deterministic code can parse, so tooling reconstructs the runbook's
-**Reference chain** — the declared tree of what it does, reads, and
-writes, plus its call signature — without a model in the loop.
+Two representations of one object stand as peers at different levels.
+The **runbook** is the written level: documentation that acts — invoked
+by name, arguments in, a report out, effects on state — whose body stays
+natural imperative English for the executing agent. The **Reference
+chain** is the abstract level, constructed from the runbook: the
+declared tree of what it does, reads, and writes, plus its call
+signature — the same behavior re-expressed so compactly that the user
+takes in the whole runbook at a glance. The grammar is the one-to-one
+join between them: each chain element has exactly one written
+expression, so deterministic code constructs the chain from the runbook
+without a model in the loop. This document defines the chain's
+vocabulary first, then the written form that declares it.
 
 The grammar serves three readers, in priority order: the executing agent
 (the prose commands it; nothing may clutter that), the user (who reads
 the file as plain English), and deterministic code (served by the
 braces, never by machine notation embedded in prose).
 
-## Node kinds
+## The Reference chain
 
-Every chain node is typed by kind:
+The abstract level: nodes typed by kind, connected by a fixed edge
+vocabulary.
+
+### Node kinds
 
 | Kind | Is |
 |---|---|
@@ -42,7 +50,7 @@ also carries its **node data** — `model`, `effort`, `tools`,
 `allowed-tools` — quoted verbatim from its own frontmatter, never
 paraphrased into prose.
 
-## Edges
+### Edges
 
 A runbook declares its behavior as edges. **Edges live at the definition
 site**: an edge belongs to the file whose text contains the instruction,
@@ -50,16 +58,18 @@ and a chain is stitched by following does-edges into each target file's
 own declarations — no file describes another file's behavior.
 
 - **does** — run a behavior some documentation defines: a Standard's
-  verb where one exists (the deslopper agent does the prose standard's
-  enforcement), the whole runbook where the doc is the definition
-  (grill-with-docs does grilling).
+  verb where one exists, the whole runbook where the doc is the
+  definition.
 - **reads** — consulted, not run.
 - **writes** — produce or mutate state outside the chain, typed by
   bucket: `git` or `local file`.
 - **overrides … with …** — substitute a clause of another runbook's
   instructions at runtime, leaving its file untouched.
 - **args** — the values the caller hands in at invocation; each is a
-  string, and each dies with the call.
+  string, and each dies with the call. A skill declares them by name in
+  its frontmatter, per
+  [Skill Conventions](/standards/harness/skill-conventions.md); an
+  agent declares none — its input arrives in the launching prompt.
 - **reports** — the value handed back to the caller; unlike a write, a
   report never lands in state. A report is `outcome: str` — a runbook's
   report to its caller is prose.
@@ -68,7 +78,11 @@ Any edge may carry a **condition**: the circumstance under which it
 fires. A conditional edge is still the same edge — the condition changes
 when it fires, never what it is.
 
-## The braced span
+## The runbook
+
+The written level: how a body declares the chain's edges.
+
+### The braced span
 
 `{keyword payload}` is the one inline form. A span opens with a keyword
 from the lexicon; the keyword types the span and the remainder is
@@ -86,102 +100,48 @@ payload. Keywords match case-insensitively, so a sentence-initial
 | `Override` | overrides | `{Override <one link + clause words> with <one link + detail words>}` |
 | `If` | condition | `{If <condition>, {edge span} …}` |
 
+This vocabulary is closed: the eight keywords are the whole lexicon, and
+these forms are the whole grammar. A new keyword, write bucket, or span
+form requires an edit here before its first use.
+
 Keywords are imperative commands to the executing agent; the chain's
 edge labels are their third-person forms. Per keyword:
 
-- **Read.** The one link in the payload is the edge target; every other
-  word is annotation. Two reads means two spans; zero or two links in
-  one span is an error.
-- **Write.** The local-file bucket. The payload is wholly opaque — the
-  target is usually runtime-bound (the deslopper's arrives in its
-  launching prompt) — so no link is required and none is interpreted.
-- **Commit.** The git bucket. The span declares the edge; the fenced
-  command block in the same step supplies the machine detail — the repo
-  from `-C`, the operations from the git subcommands. A span without its
-  block, or a block that disagrees with its span, is an error.
-- **Report.** The payload is the report's content, verbatim —
-  log-friction ends with `{Report one line with the entry's short name,
-  and that the push landed}`.
-- **Launch.** The link is the agent definition at its live harness
-  path — document-deslop launches
-  `[deslopper](~/.claude/agents/deslopper.md)`. The target's model,
-  effort, and tools come from that file's own frontmatter; the launching
-  runbook restates none of them. Non-link words are annotation and ride the
-  edge — document-deslop's `model: sonnet` pin travels there as a
-  launch-time instruction.
-- **Run.** The same shape, with the verb natural to skills and scripts.
-  The link, never the verb, decides the target's kind: a `SKILL.md` is a
-  Skill, a script file is a Script — usage-report runs its bundled
-  `scripts/report.sh`.
-- **Override.** The literal word `with` splits the payload: the link
-  before it is the overridden runbook and the words around it name the
-  clause; the link after it is the replacement, and the words after it
-  carry the operative detail. Exactly one link per side. grill-with-docs
-  overrides /domain-modeling's "ADR" clause with the workspace's
-  Decision Record conventions.
-- **If.** The condition, and the only span that nests. The text between
-  the keyword and the first nested span is the condition, lifted
-  verbatim (a trailing comma is dropped); every nested span fires only
-  under it — log-friction's `{If there is something to record, {commit
-  and push}}`. Nesting is capped at two deep, and the condition spends
-  it: condition at depth one, edges at depth two, never deeper.
+- **Read.** The one link is the target; exactly one per span.
+- **Write.** Local-file bucket. The payload is opaque; no link is
+  interpreted.
+- **Commit.** Git bucket. A fenced command block in the same step
+  carries the detail — repo from `-C`, operations from the
+  subcommands — and must agree with the span.
+- **Report.** The payload is the report's content, verbatim.
+- **Launch.** The link is the agent definition; its model, effort, and
+  tools stay in that file, never restated.
+- **Run.** The link decides the kind: a `SKILL.md` is a Skill, a script
+  file is a Script.
+- **Override.** The word `with` splits the payload — overridden runbook
+  before, replacement after; one link per side.
+- **If.** The only span that nests. The text before the first nested
+  span is the condition, verbatim; each nested span fires only under
+  it. Two deep, never deeper.
 
-## Slicing, never interpreting
+### Slicing, never interpreting
 
 Deterministic code touches only fixed cut points: the keyword, the
 markdown link(s), the `with` splitter, nested braces, and the first
 semicolon. Every word between cut points is opaque annotation — a real
 instruction to the executing agent, carried verbatim for display, never
-parsed and never load-bearing to code. In
-`{Run a [/grilling](~/.claude/skills/grilling/SKILL.md) session}`, "a"
-and "session" are glue the code does not read.
+parsed and never load-bearing to code. The words that make a span read
+as a natural sentence — an article before the link, a noun after it —
+are glue for the executing agent; code reads none of them.
 
 - **The first semicolon ends the chain's view.** In any sliced payload,
   text after the first `;` is file-only elaboration; the kernel before
-  it travels to the chain. Front the kernel: the deslopper's
-  `{Write the target document in place; it must say the same things …}`
-  puts "the target document in place" on the edge and the rest in the
-  file only.
+  it travels to the chain. Front the kernel: open the span with the
+  words that belong on the edge, and demote the rest behind the
+  semicolon.
 - **Code contexts are inert.** Spans count only outside code spans and
   fenced blocks.
 - **Unmarked prose is never an edge.** The brace declares; the parser
-  infers nothing. An unbraced "if" is the deliberate tier for
-  conditional logic left off the chain — log-friction's "carrying a
-  proposed fix if the user gave one" fires nothing.
-
-## Declared and derived
-
-No fact is stated twice. Everything the chain shows either derives from
-structure the file already has or is declared exactly once:
-
-| Fact | Source |
-|---|---|
-| Node kind | the file's path |
-| Node data | frontmatter `model`, `effort`, `tools`, `allowed-tools`, verbatim |
-| Runbook summary | frontmatter `description` |
-| args | frontmatter `arguments` list |
-| Edges, conditions, reports | braced spans in the body |
-
-## The `arguments` key
-
-A runbook that takes input declares each argument by name in its
-frontmatter:
-
-```yaml
-arguments: [friction]
-```
-
-Names only, kebab-case, and the name must carry the meaning — invocation
-input is text substitution, so every argument is a string and a type
-would distinguish nothing. The body carries no placeholder
-(`$ARGUMENTS`, `$0`): the harness appends the invocation input after the
-body as `ARGUMENTS: <text>`, whole and unsplit, and the executing agent
-never sees the argument's name — the name carries meaning for the user
-and the chain. A multi-argument runbook lists more names:
-`arguments: [idea, map, ticket]`.
-
-## The vocabulary is closed
-
-The eight keywords are the whole lexicon, and the forms above are the
-whole grammar. A new keyword, write bucket, or span form requires an
-edit here before its first use.
+  infers nothing. Anything left unbraced — a condition, a read, a whole
+  step — still binds the executing agent; leaving it unbraced is the
+  author's choice to keep it out of the chain.

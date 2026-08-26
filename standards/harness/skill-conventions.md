@@ -47,6 +47,7 @@ effort: <low|medium|high|xhigh>
 allowed-tools: <tool spec>          # optional
 disallowed-tools: <tool spec>       # optional
 argument-hint: "<hint>"             # optional
+arguments: [<name>, ...]            # optional
 ---
 ```
 
@@ -69,10 +70,11 @@ Every skill must have:
 | `allowed-tools` | Restricts which tools the skill can use without prompting. Use for focused, mechanical skills. Format: space-separated tool specs, e.g., `Bash(git *) Bash(gh *)`. |
 | `disallowed-tools` | Denies tools outright. Same format as `allowed-tools`. Use it where a read-only stance must be enforced rather than asked for — `issue-review-claims` and `issue-review-simulation` carry `Edit MultiEdit NotebookEdit Write(/**)`, so a write is refused, not merely discouraged. Don't restate a workspace-wide denial from the settings. |
 | `argument-hint` | Short string shown during autocomplete. Brackets for optional args: `"[fast]"`, `"[issue-number-or-url]"`. |
+| `arguments` | The skill takes input — one kebab-case name per input. See [Arguments](#arguments). |
 
 ### The vocabulary is closed
 
-These eight fields are the whole vocabulary; a new one requires an edit here
+These nine fields are the whole vocabulary; a new one requires an edit here
 before its first use.
 
 - **`user-invocable`** — do not include this field. To make a skill
@@ -82,17 +84,15 @@ before its first use.
 
 ## Arguments
 
-Skills receive user input via `$ARGUMENTS` (the full string) or `$0`, `$1`,
-etc. (positional access). `$N` is shorthand for `$ARGUMENTS[N]`.
-
-- Use `$ARGUMENTS` when the skill takes a single free-form input.
-- Use `$0`, `$1`, etc. when the skill takes distinct positional arguments.
-
-Reference the variable in the body where the skill consumes it:
-
-```markdown
-## Feedback: $ARGUMENTS
-```
+A skill that takes input declares each argument by name in the
+`arguments` frontmatter list — `arguments: [subject]`, one kebab-case
+name per input. Names only: invocation input is text substitution, so
+every argument is a string and a type would distinguish nothing — the
+name must carry the meaning. The body carries no placeholder
+(`$ARGUMENTS`, `$0`): the harness appends the invocation input after
+the body as `ARGUMENTS: <text>`, whole and unsplit, and the executing
+agent never sees the argument's name — the name carries meaning for the
+user and the [Reference chain](/standards/harness/grammar.md).
 
 ## Body format
 
@@ -189,7 +189,8 @@ Before shipping a new skill:
 - [ ] Body starts with an `# H1` title
 - [ ] SKILL.md under ~500 lines (or content beyond that lives in `references/`)
 - [ ] References are one level deep
-- [ ] Arguments use `$ARGUMENTS` or `$0`/`$1` per the conventions above
+- [ ] Inputs are declared in the `arguments` list, names only, no body
+      placeholders
 - [ ] No time-sensitive content (versions, dates, release paths)
 - [ ] Concrete examples included where the rule benefits from one
 - [ ] Terminology consistent throughout the bundle

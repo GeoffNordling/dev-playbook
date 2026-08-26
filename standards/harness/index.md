@@ -3,7 +3,7 @@
 The harness-files standard, one concern per document. Start at
 [Files](/standards/harness/files.md).
 
-- [Claude Code Files](/standards/harness/files.md) — The registry of repo files the Claude Code harness consumes — each member's role and its content standard
+- [Claude Code Files](/standards/harness/files.md) — The registry of repo files the Claude Code harness consumes — each member's class, role, and content standard
 - [CLAUDE.md Content](/standards/harness/claude-content.md) — The CLAUDE.md content standard — operational scope, the global and repo files, the nested-file hierarchy
 - [Instruction Grammar](/standards/harness/grammar.md) — The braced-span grammar and its ontology — the node kinds, the edge vocabulary, and the closed keyword lexicon that make skill and agent bodies machine-readable
 - [Skill Conventions](/standards/harness/skill-conventions.md) — Skill-bundle format — frontmatter fields, SKILL.md structure, and directory organization
