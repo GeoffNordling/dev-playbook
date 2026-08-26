@@ -324,7 +324,7 @@ Agents:
 
 Skills:
 
-- [x] document-deslop — Review section still unencoded (rides stage 1 of the branch plan)
+- [x] document-deslop — Review section still unencoded (rides the branch plan's Final Quality Pass)
 - [x] grill-with-docs
 - [x] log-friction
 - [x] usage-report

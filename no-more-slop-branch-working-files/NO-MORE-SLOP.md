@@ -140,6 +140,13 @@ exemplar, worked as the abstraction shape in
   regenerates every covered unit's chain into `parser/chains.txt` and
   fails on drift via `--check`. Remaining work rides the Now section
   below.
+- **First-party port.** Every unit we author ourselves — all twelve
+  agents and the unmarked skills in the
+  [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster),
+  38 units — ported to the edge encoding by the dispatch procedure in
+  [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md), each
+  with its leftovers recorded in the
+  [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
 
 **Raw ideas, none designed**
 
@@ -283,12 +290,7 @@ roster are third-party verbatim — vendored bytes under
 `dotfiles/.agents/skills/`, which the current policy forbids editing,
 and a port is nothing but an edit:
 
-1. **First-party first.** Port every unit we author ourselves — all
-   nine agents and the unmarked skills in the
-   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster),
-   by the dispatch procedure in
-   [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md).
-2. **The standard, and the gate goes green.** The grammar's standard
+1. **The standard, and the gate goes green.** The grammar's standard
    card and the skill-standards scrub are likely one job: the new
    standard replaces what the old docs teach (the `## Name: $ARGUMENTS`
    heading, `argument-hint`), and `scripts/skill-lint` and friends stop
@@ -298,7 +300,7 @@ and a port is nothing but an edit:
    skill-lint's closed frontmatter vocabulary rejects the `arguments`
    key. The skips are deliberate and temporary; the branch does not
    merge while any remain.
-3. **Retire verbatim adoption.** A Decision Record changes the policy:
+2. **Retire verbatim adoption.** A Decision Record changes the policy:
    external skills are no longer adopted verbatim — the corpus requires
    every unit to carry the edge encoding, and vendored bytes cannot be
    edited, so verbatim adoption is rejected for that reason. The
@@ -309,9 +311,9 @@ and a port is nothing but an edit:
    stance — `pocock-sweep`, the external-skill-verdicts ledger, the
    skill-management standard, and whatever else the sweep of those docs
    finds.
-4. **Port the converted skills.** The former (3P) thirteen, now owned,
-   go through the same port as stage 1.
-5. **Final Quality Pass.** Go through the final skills and look for residual
+3. **Port the converted skills.** The former (3P) thirteen, now owned,
+   go through the same port as the first-party units.
+4. **Final Quality Pass.** Go through the final skills and look for residual
 opportunities. We deemphasized residuals tracking during the conversion
 sweeps so we'll need a fresh eye to see if we're happy with the final result
 or if we need new expressions. Basically scan skills and look for important things
