@@ -25,7 +25,7 @@
   ├─reports─► outcome: str    `outcome` `"done"`
   └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
 
-[deslopper] Agent · tools: Read, Write, Edit, model: sonnet, effort: high
+[deslopper] Agent · tools: Read, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
   ├─writes──► local file    the target document in place
   ├ ╌ reads ╌ ► {writing-for-agents} Skill    if the target is an agent-facing instruction file

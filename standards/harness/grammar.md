@@ -16,7 +16,7 @@ The **runbook** is the written level: documentation that acts — invoked
 by name, arguments in, a report out, effects on state — whose body stays
 natural imperative English for the executing agent. The **Reference
 chain** is the abstract level, constructed from the runbook: the
-declared tree of what it does, reads, and writes, plus its call
+declared tree of which verbs it executes plus its call
 signature — the same behavior re-expressed so compactly that the user
 takes in the whole runbook at a glance. The grammar is the one-to-one
 join between them: each chain element has exactly one written
@@ -24,7 +24,7 @@ expression, so deterministic code constructs the chain from the runbook
 without a model in the loop. This document defines the chain's
 vocabulary first, then the written form that declares it.
 
-The grammar serves three readers, in priority order: the executing agent
+The grammar serves readers in priority order: the executing agent
 (the prose commands it; nothing may clutter that), the user (who reads
 the file as plain English), and deterministic code (served by the
 braces, never by machine notation embedded in prose).
@@ -100,7 +100,7 @@ payload. Keywords match case-insensitively, so a sentence-initial
 | `Override` | overrides | `{Override <one link + clause words> with <one link + detail words>}` |
 | `If` | condition | `{If <condition>, {edge span} …}` |
 
-This vocabulary is closed: the eight keywords are the whole lexicon, and
+This vocabulary is closed: the keywords above are the whole lexicon, and
 these forms are the whole grammar. A new keyword, write bucket, or span
 form requires an edit here before its first use.
 
@@ -122,7 +122,7 @@ edge labels are their third-person forms. Per keyword:
   before, replacement after; one link per side.
 - **If.** The only span that nests. The text before the first nested
   span is the condition, verbatim; each nested span fires only under
-  it. Two deep, never deeper.
+  it. Two deep.
 
 ### Slicing, never interpreting
 
