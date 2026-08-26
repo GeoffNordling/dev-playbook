@@ -14,15 +14,15 @@ The launching prompt names the working directory and the set's root file.
 
 Two moves:
 
-1. **Audit.** Launch the `set-auditor` subagent (Agent tool,
-   `subagent_type: set-auditor`, `model: opus`), naming the working
-   directory and the set's root file in the prompt.
+1. **Audit.** {Launch [set-auditor](~/.claude/agents/set-auditor.md)},
+   naming the working directory and the set's root file in the prompt.
 2. **Fix.** Read every member, then work the report finding by finding:
-   move each duplicated fact to its single home, resolve conflicts,
-   repair shape and term drift, file the misfiled, and cut what the
-   audit flags stale or ancillary. The placement decisions are yours;
-   the user reviews the working-tree diff afterward, where every
-   deletion is visible.
+   {Write the fix for each finding into the set's members; move each
+   duplicated fact to its single home, resolve conflicts, repair shape
+   and term drift, file the misfiled, and cut what the audit flags
+   stale or ancillary}. The placement decisions are yours; the user
+   reviews the working-tree diff afterward, where every deletion is
+   visible.
 
 The rules:
 
@@ -33,6 +33,6 @@ The rules:
 
 ## Report back
 
-Reply with a minimal report: one line per member changed, and one line
-per finding left unfixed with the reason. The skill relays it to the
+{Report a minimal report: one line per member changed, and one line
+per finding left unfixed with the reason}. The skill relays it to the
 user.

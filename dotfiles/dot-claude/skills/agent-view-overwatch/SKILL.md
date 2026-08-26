@@ -15,10 +15,11 @@ Refer to each issue by a fixed handle — `<repo>#<N>`, the full repo name and i
 
 ## Read first
 
-Before doing anything else, read end-to-end — the software factory is your subject:
+Before doing anything else, the software factory is your subject:
 
-- [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the node graph and the states an issue moves through.
-- [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — the two overwatch scopes, readiness, and the worktree contract whose teardown step is yours.
+{Read [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md); the node graph and the states an issue moves through}.
+
+{Read [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md); the two overwatch scopes, readiness, and the worktree contract whose teardown step is yours}.
 
 Then report: `READ: software-factory.md, factory-operations.md`. Proceed only after.
 

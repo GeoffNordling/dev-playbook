@@ -4,7 +4,7 @@ description: Commit outstanding work and get the session ready before the user r
 disable-model-invocation: true
 model: inherit
 effort: xhigh
-argument-hint: "[what the user considers important]"
+arguments: [important]
 ---
 
 # Compact Prep
@@ -14,10 +14,10 @@ check.
 
 ## Procedure
 
-1. **Commit everything.** Use /commit. Split unrelated changes into separate
-   commits.
+1. {Run [/commit](~/.claude/skills/commit/SKILL.md); split unrelated
+   changes into separate commits}.
 
-2. **Mention anything important at risk — only if something stands out.**
+2. Mention anything important at risk — only if something stands out.
    Compaction aims to preserve the conversation and is usually good enough,
    so saying nothing here is normal. Work from what is in front of you
    rather than searching the session for candidates: if one thing is
@@ -26,11 +26,7 @@ check.
    a line. Skip anything recoverable from the committed files, the issue, or
    `git log`.
 
-3. **Report and stop.** State what you committed, add the one thing from
-   step 2 if there was one, and give a plain ready verdict. Persisting it is
-   the user's call.
-
-## Argument
-
-$ARGUMENTS, when given, is what the user believes matters. Confirm
-specifically that it is committed or flagged, and say which.
+3. {Report what was committed, the one at-risk item from step 2 if there
+   was one, and a plain ready verdict; persisting it is the user's call}.
+   `important`, when given, is what the user believes matters — confirm
+   specifically that it is committed or flagged, and say which.

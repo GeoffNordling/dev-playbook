@@ -133,13 +133,27 @@ Could not express the anchored reads (review-contract.md's gh-mechanics,
 delta-re-review, findings-are-threads, resolution-ownership, and
 findings-are-not-escalations sections; declarations.md's maintenance
 section; factory-operations.md's merge-message recipe) — `{Read}` fails
-on `#fragment` links. Could not express the diff-conditional standards
+on `#fragment` links. Could not express the review's central act —
+auditing the docs in the diff and posting the findings as threads on
+the PR, and resolving verified prior-cycle threads (`gh` writes, the
+writes—GitHub hole). Could not express the diff-conditional standards
 table in § Read what the diff calls for — a table has no sentence for
 the grammar to span — or the `gh` state reads (PR threads, the diff
 itself, the issue brief) — no on-disk link. The escalation bullets in
 § 6 restate the guard's condition rather than firing their own edges,
 since the map has no primitive for enumerating alternative trigger
 conditions under one guard.
+
+## adjudicator
+
+Could not express the `gh` state reads (issue, PR, threads, comments) or the
+`gh api`/`gh issue create`/`gh pr edit`/`gh pr comment` writes — no on-disk
+link for either hole. Could not express the routing test and its dispositions
+(§3–§4), the ordered-first-hit routing, or the callout distinction — no
+control-flow or enumeration primitive for any of them. Could not express the
+prompt's issue-number and verdict-word input — agents have no `arguments`
+frontmatter — or the `READ:` acknowledgment, which targets the conversation,
+not the invoker.
 
 ## build
 
@@ -172,6 +186,67 @@ is neither an Agent nor a Skill/Script link, so does has no primitive for a
 Workflow call. `judgments-run` renders as bare link text, not a `Script` node:
 `classify()` types scripts by `.sh`/`.py`/`.bash` extension and this one has
 none.
+
+## code-pr-review
+
+Could not express the review itself — auditing the diff and posting the
+findings as threads on the PR, and resolving verified prior-cycle
+threads (`gh api` writes, the writes—GitHub hole; no primitive for the
+audit act). Could not express the `gh` state reads (repo, PR list, brief,
+threads, diff) — no on-disk link — the diff-conditional standards table
+in § Read what the diff calls for, or the presence-check and
+audit-dimension tables — a table has no sentence for the grammar to
+span. The green-gate and PR/diff-missing
+escalation bullets restate the guard's condition rather than firing their
+own edges, since the map has no primitive for enumerating alternative
+trigger conditions under one guard.
+
+## compact-prep
+
+Could not express step 2's "only if something stands out" condition —
+the guard primitive gates a whole span, not a report's own contents.
+
+## set-auditor
+
+Could not express the set-member reads — the root and its linked working
+files are runtime-bound (named in the launching prompt), so `{Read}`'s one
+fixed on-disk link cannot cover them; they stay plain prose. No primitive
+covers forbidding an action ("edit nothing, commit nothing, ask no
+questions").
+
+## agent-view-overwatch
+
+Could not express the `gh issue view`/`gh pr list` state reads (no
+on-disk link), the launch command handed to the user (no primitive for
+an instruction the agent itself never runs), the teardown's
+`git worktree remove`/`git branch -D` (writes—git bucket is scoped to
+commits, not arbitrary git subcommands), or the board table (no
+primitive for a rendered report's shape).
+
+## bug-pr-review
+
+Could not express the anchored reads inside review-contract.md (gh-mechanics,
+delta-re-review, findings-are-threads, resolution-ownership,
+findings-are-not-escalations) — `{Read}` fails on `#fragment` links — or the
+`gh` state reads (PR threads, the diff itself) — no on-disk link. Could
+not express the review's central act — posting the findings as threads
+on the PR and resolving prior-cycle threads (`gh` writes, the
+writes—GitHub hole). The eight finder angles and their dedup/tag steps
+are procedure, not edges, so the map has nothing to encode there.
+
+## set-deslopper
+
+Could not express reading every set member — `{Read}` needs one fixed
+on-disk link, and set membership is runtime-determined — or forbidding
+the commit action itself (no primitive for a forbidden action).
+
+## enable-repo-governance
+
+Could not type `repo-lint`, `bootstrap-labels`, and `workspace-lint` as
+Script nodes — `classify()` types scripts by extension and these have none,
+so they render as bare `does` targets. Could not express the size-conditional
+landing choice in § 5 (a decision, not a fixed condition to guard) or the
+GitHub-token permission preflight, which has no primitive.
 
 ## open-pr
 

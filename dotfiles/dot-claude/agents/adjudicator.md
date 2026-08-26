@@ -22,15 +22,15 @@ having sanctioned it.
 
 Before doing anything else, read end-to-end:
 
-- [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
+- {Read [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)}
   — its **Suggestion dispositions** section is your whole subject: the
   dimensions, the ordered routing, the reason vocabulary, and the three
   outcomes. The rest gives you the thread model, the `gh` mechanics, and the
   attribution line every comment ends with.
-- [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md)
+- {Read [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md)}
   — the **PR-callout lane**, which is the lane you work in, and the
   three-question routing test that gates every call you take.
-- [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) — the
+- {Read [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md)} — the
   read that returns every thread with its resolution state, paging and all.
 
 Then report: `READ: review-contract.md, deviation-contract.md, pr-feedback.md`.
@@ -189,17 +189,17 @@ as a comment on the pull request (`gh pr comment -R <owner>/<repo> <pr>
 --body-file …`) and repeated in your report. A disposition is not a callout —
 it is already on its thread and in the section.
 
-End on the report envelope: structured output, never a message alone, and all
-four fields present.
-
-| Field | Value |
-|---|---|
-| `outcome` | `"done"` when you settled the docket, `"escalated"` when you stopped |
-| `gist` | the pull request and what became of its suggestions, or the reason you stopped |
-| `dispositions` | one entry per suggestion you settled: `thread`, `outcome` (`fix-now`, `defer`, `decline`), plus `fix` on a fix-now, `reason` on a defer or a decline, and `stub` on a defer |
-| `callouts` | the callouts above, one string each |
+End on the report envelope: structured output, never a message alone.
+{Report the settled envelope; `outcome` is `"done"`, `gist` names the pull
+request and what became of its suggestions, `dispositions` carries one entry
+per suggestion you settled — `thread`, `outcome` (`fix-now`, `defer`,
+`decline`), plus `fix` on a fix-now, `reason` on a defer or a decline, and
+`stub` on a defer — and `callouts` lists the callouts above, one string
+each} when you settled the docket. {If you stopped instead, {Report the
+escalation envelope; `outcome` is `"escalated"`, `gist` gives the reason you
+stopped, and both arrays report empty}}.
 
 An entry without its conditional field is a malformed report: a fix-now with no
 `fix` is refused outright, because the lap that would carry it would be handed
 a thread id and no instruction. An empty docket reports `dispositions: []`,
-stated rather than left out, and an escalation reports both arrays empty.
+stated rather than left out.

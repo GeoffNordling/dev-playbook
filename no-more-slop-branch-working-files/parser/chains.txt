@@ -1,6 +1,14 @@
 [adjudicator] Agent · tools: Read, Bash, model: opus, effort: xhigh
+  ├─reads───► review contract
+  ├─reads───► deviation contract
+  ├─reads───► PR feedback
+  ├─reports─► outcome: str    the settled envelope
+  └ ╌ reports ╌ ► outcome: str    the escalation envelope    if you stopped instead
 
 [bug-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+  ├─reads───► review contract
+  ├─reports─► outcome: str    `outcome` `"done"`
+  └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
 
 [build] Agent · model: opus, effort: xhigh
   ├─reads───► PR feedback
@@ -12,6 +20,10 @@
   └─reports─► outcome: str    the completion envelope
 
 [code-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+  ├─reads───► review contract
+  ├─reads───► PR feedback
+  ├─reports─► outcome: str    `outcome` `"done"`
+  └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
 
 [deslopper] Agent · tools: Read, Write, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
@@ -34,10 +46,17 @@
   └ ╌ reports ╌ ► outcome: str    the reason instead, as escalated    if the PR cannot be created at all
 
 [set-auditor] Agent · tools: Read, Grep, Glob, model: opus, effort: xhigh
+  ├─reads───► [working-documentation-sets] Standard
+  └─reports─► outcome: str    findings ranked by how much each would mislead a fresh session reading the set cold, as the hand-off to the set-deslopper agent
 
 [set-deslopper] Agent · tools: Read, Write, Edit, Grep, Glob, Agent, model: opus, effort: xhigh
+  ├─does────► [set-auditor] Agent
+  ├─writes──► local file    the fix for each finding into the set's members
+  └─reports─► outcome: str    a minimal report: one line per member changed, and one line per finding left unfixed with the reason
 
 [agent-view-overwatch] Skill · model: sonnet, effort: xhigh, allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
+  ├─reads───► software-factory.md
+  └─reads───► factory-operations.md
 
 [candidate-promote] Skill · model: inherit, effort: xhigh
   ├─args────► candidate
@@ -62,6 +81,9 @@
   └─reports─► outcome: str    tree clean or which files remain uncommitted, and that the push landed
 
 [compact-prep] Skill · model: inherit, effort: xhigh
+  ├─args────► important
+  ├─does────► [commit] Skill
+  └─reports─► outcome: str    what was committed, the one at-risk item from step 2 if there was one, and a plain ready verdict
 
 [datasheet] Skill · model: opus, effort: xhigh
   ├─args────► subject
@@ -98,6 +120,17 @@
 {domain-modeling} Skill
 
 [enable-repo-governance] Skill · model: opus, effort: xhigh
+  ├─reads───► [bootstrap] Standard
+  ├ ╌ reports ╌ ► outcome: str    that the tree is not clean    if its working tree is not clean and on `main`
+  ├ ╌ reports ╌ ► outcome: str    that it is already governed    if the repo is already in workspace-lint's `GOVERNED` roster
+  ├─does────► repo-lint
+  ├─reads───► [index] Standard
+  ├─does────► bootstrap-labels
+  ├─reads───► [repo-settings] Standard
+  ├─writes──► local file    the target's name into the `GOVERNED` roster
+  ├─does────► workspace-lint
+  ├─writes──► git(~/workspace/dev-playbook: add, commit)    that dev-playbook edit separately, one line
+  └─reports─► outcome: str    per-repo results
 
 [grill-with-docs] Skill · model: inherit, effort: xhigh
   ├─does────► {grilling} Skill

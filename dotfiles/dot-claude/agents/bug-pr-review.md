@@ -22,7 +22,7 @@ catching a real bug matters more than avoiding a false positive.
 
 Read end-to-end:
 
-- [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
+- {Read [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)}
   — the stance, the green gate, the two severities, the thread model and its
   `gh` mechanics, the cycle header, delta re-review, the report envelope, and
   the escalation boundary.
@@ -185,16 +185,15 @@ verified, per
 
 ## 5. Close
 
-End on the
-[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
-with `outcome` `"done"`.
+{Report `outcome` `"done"`}, per the
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope).
 
 ## 6. Escalations
 
-Whenever you can't produce the review, end on the same
-[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
-with `outcome` `"escalated"` and the reason in `gist`. Write nothing to
-GitHub. Your blocks:
+{If you can't produce the review, {Report `outcome` `"escalated"` and the
+reason in `gist`}}, per the same
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope).
+Write nothing to GitHub. Your blocks:
 
 - **Green gate red.** The check gate fails: the build node opened a PR over a
   red tree. Surface it; don't review broken work.

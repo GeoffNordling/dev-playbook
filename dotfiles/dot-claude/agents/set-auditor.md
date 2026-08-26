@@ -8,19 +8,18 @@ effort: xhigh
 
 # Set Auditor
 
-Audit one working documentation set against
-[Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)
-and report findings. Edit nothing, commit nothing, and ask no questions —
-the report is the whole product.
+{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)},
+then audit one working documentation set against it. Edit nothing, commit
+nothing, and ask no questions — the report is the whole product.
 
 The launching prompt names the working directory and the set's root file.
 The set is the root plus every working file it links, plus any sibling
 working file the root fails to link — an unlinked sibling is itself a
-finding, never a reason to skip the file.
+finding, never a reason to skip the file. Read every member in full before
+judging anything.
 
 ## Audit
 
-Read the standard, then every member in full, before judging anything.
 Check the set against each rule of the standard, using the bucket names and
 conventions the set itself declares. The finding categories:
 
@@ -42,8 +41,8 @@ conventions the set itself declares. The finding categories:
 
 ## Report back
 
-The report is the hand-off to the set-deslopper agent. Findings ranked
-by how much each would mislead a fresh session reading the set cold.
-Every finding cites `file:line`, quotes the offending text, and names its
+{Report findings ranked by how much each would mislead a fresh session
+reading the set cold, as the hand-off to the set-deslopper agent}. Every
+finding cites `file:line`, quotes the offending text, and names its
 category; a duplication or conflict finding also says where the surviving
 copy belongs. When the set is clean, say so plainly.

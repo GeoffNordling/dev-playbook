@@ -313,14 +313,14 @@ Record converts them to first-class owned copies — see the port plan in
 Agents:
 
 - [x] deslopper
-- [ ] adjudicator
-- [ ] bug-pr-review
+- [x] adjudicator
+- [x] bug-pr-review
 - [x] build
-- [ ] code-pr-review
+- [x] code-pr-review
 - [x] doc-pr-review
 - [x] open-pr
-- [ ] set-auditor
-- [ ] set-deslopper
+- [x] set-auditor
+- [x] set-deslopper
 
 Skills:
 
@@ -328,18 +328,18 @@ Skills:
 - [x] grill-with-docs
 - [x] log-friction
 - [x] usage-report
-- [ ] agent-view-overwatch
+- [x] agent-view-overwatch
 - [x] candidate-promote
 - [x] clean-up-branch-worktree
 - [ ] codebase-design (3P)
 - [x] commit — the `{Commit}` span itself skipped: `git_detail()` requires `-C`, this skill targets the ambient repo (ledgered)
 - [x] commit-off
-- [ ] compact-prep
+- [x] compact-prep
 - [x] datasheet
 - [x] design
 - [ ] diagnosing-bugs (3P)
 - [ ] domain-modeling (3P)
-- [ ] enable-repo-governance
+- [x] enable-repo-governance
 - [ ] grilling (3P)
 - [x] handoff
 - [x] idea
