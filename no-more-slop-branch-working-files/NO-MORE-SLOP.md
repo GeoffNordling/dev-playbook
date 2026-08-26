@@ -307,6 +307,10 @@ and a port is nothing but an edit:
    harness-files-lint's closed frontmatter vocabulary rejects the `arguments`
    key. The skips are deliberate and temporary; the branch does not
    merge while any remain.
+
+   **Structured process for document writing.** I struck off a tangent from
+   Step 1 because runbook-conventions.md was total slop. NO MORE SLOP!
+   Improve this, then come back and finish Step 1.
 2. **Retire verbatim adoption.** A Decision Record changes the policy:
    external skills are no longer adopted verbatim — the corpus requires
    every runbook to carry the edge encoding, and vendored bytes cannot be
