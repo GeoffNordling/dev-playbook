@@ -65,7 +65,7 @@ every retrofit surfaced a fresh complexity; the map runs it forwards.
 |---|---|---|
 | node type + ownership | file path | **Ruled** (derived) |
 | node data (`model`, `effort`, `allowed-tools`) | frontmatter, verbatim | **Ruled** (derived) |
-| unit summary | frontmatter `description` | **Ruled** (derived) |
+| runbook summary | frontmatter `description` | **Ruled** (derived) |
 | args | frontmatter `arguments` list — name only | **Ruled** (derived) |
 | reads | `{Read <one link>}` | **Ruled** |
 | writes — git bucket | `{Commit …}` + fenced command | **Ruled** |
@@ -163,7 +163,7 @@ The ruled rows, in detail:
 - **overrides** — `{Override <one link + clause words> with
   <one link + detail words>}`. The literal word `with` splits the
   payload, the way the guard's comma-after-condition does: the link
-  before `with` is the overridden unit and the words around it name the
+  before `with` is the overridden runbook and the words around it name the
   clause; the link after `with` is the replacement, and the words after
   it carry the operative detail. Exactly two links, one per side, or
   the lint fails.
@@ -225,9 +225,9 @@ byte-for-byte:
 - A solid arrow pads its label to eight columns (`├─reads───►`); a
   guarded edge draws dashed (`├ ╌ reads ╌ ►`) and carries
   `if <condition>` as the rightmost segment.
-- Targets render: a unit as `[name] Type` or `{name} Type`, the name
+- Targets render: a runbook as `[name] Type` or `{name} Type`, the name
   from the resolved path (a SKILL.md's directory, an agent's or
-  standard's basename, a script's filename); a non-unit read target as
+  standard's basename, a script's filename); a non-runbook read target as
   the link text verbatim (`friction/log.md`); a report as
   `outcome: str`; a local-file write as `local file`; a git write as
   `git(<repo>: <subcommands>)` — repo from `-C`, subcommands in command
@@ -235,7 +235,7 @@ byte-for-byte:
 - The node header is `[name] Type · <node data>`: the recognized
   frontmatter keys (`tools`, `model`, `effort`, `allowed-tools`)
   verbatim, in frontmatter order. The header's braces follow the same
-  ownership rule as targets — a unit whose realpath resolves into
+  ownership rule as targets — a runbook whose realpath resolves into
   `.agents/` renders `{name}`, so `{grilling}` heads its own chain the
   same way it appears on grill-with-docs's does edge. args edges lead;
   body edges follow in document order.
@@ -270,7 +270,7 @@ by one ruling:
 
 ## Residual ledger
 
-Per unit, what its full rewrite could not express in the map — each
+Per runbook, what its full rewrite could not express in the map — each
 entry awaiting a verdict. Lives in its own file:
 [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
 
@@ -290,7 +290,7 @@ entry awaiting a verdict. Lives in its own file:
   are stitched by following does-edges into the target file's own
   declarations.
 - **One diff per proposal.** A proposal turn lands its full diff
-  uncommitted — the unit's encoding, the map's new rows and detail
+  uncommitted — the runbook's encoding, the map's new rows and detail
   bullets, and the ledger's new entries — so the diff against HEAD is
   the whole proposal; one ruling approves and commits it all. Commits
   run the document linters; the test-suite hook is skipped
@@ -299,7 +299,7 @@ entry awaiting a verdict. Lives in its own file:
 
 ## Port roster
 
-Every unit in the live corpus (`dotfiles/dot-claude/agents/*.md` and
+Every runbook in the live corpus (`dotfiles/dot-claude/agents/*.md` and
 `skills/*/SKILL.md` — the tree `chaingen.py` scans). Checked means ported:
 encoded in map language and its chain certified in `parser/chains.txt`.
 

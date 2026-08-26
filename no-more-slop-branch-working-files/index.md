@@ -21,9 +21,9 @@ beside `chains.txt`, its output over the whole live corpus. The
 live `dotfiles/dot-claude` sources on 2026-08-25.
 
 - [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) — The noun-and-verb abstractions that make documentation understandable at the CLOA, and the loop that generates them
-- [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) — The ledger of finalized reference chains — one recorded entry per unit, written down as it is ruled
+- [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) — The ledger of finalized reference chains — one recorded entry per runbook, written down as it is ruled
 - [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md) — The one-to-one primitive map from Reference chain to skill prose — the ruled encodings, the holes, and the port roster
 - [Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md) — One session's full read of the software factory — a classification of its files, the intent they carry, and sketches for a possible native rewrite
 - [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) — The branch plan — goal, principles, the two tracks, and the current step
 - [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md) — The dispatch prompt for porting one skill or agent to the edge encoding — fill the <PATH> slot and send
-- [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md) — Per unit, what its full rewrite could not express in the edge-encoding map — recorded at the moment of porting
+- [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md) — Per runbook, what its full rewrite could not express in the edge-encoding map — recorded at the moment of porting

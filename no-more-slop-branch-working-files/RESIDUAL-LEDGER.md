@@ -1,12 +1,12 @@
 ---
 type: General-Sheet
 title: Residual Ledger
-description: Per unit, what its full rewrite could not express in the edge-encoding map — recorded at the moment of porting
+description: Per runbook, what its full rewrite could not express in the edge-encoding map — recorded at the moment of porting
 ---
 
 # Residual Ledger
 
-Per unit ported to the
+Per runbook ported to the
 [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md) map:
 what the full rewrite could not express in it, recognized and written
 down at the moment of porting. That is all an entry is — a record, not
@@ -71,7 +71,7 @@ hole) or `griffe-outline` as a Script — `classify()` types scripts by
 ## clean-up-branch-worktree
 
 Could not express the ambient-repo `git fetch`/`git merge`, the
-`ExitWorktree` tool call (does covers only file-linked units), or the
+`ExitWorktree` tool call (does covers only file-linked runbooks), or the
 state-reading `git`/`gh` commands.
 
 ## idea
@@ -79,7 +79,7 @@ state-reading `git`/`gh` commands.
 Could not express the delegation target's own behavior — the Run edge
 resolves to mission-control's skill, outside the scanned corpus, so no
 chain exists to stitch into — or the Overrides section, which binds
-fixed values, not one linked unit for another.
+fixed values, not one linked runbook for another.
 
 ## rewind-compact
 
@@ -172,7 +172,7 @@ Could not express the phase-label move (§8's `gh issue edit`,
 `phase:design` → `phase:build`) or the other `gh issue`
 reads/writes (no on-disk link, writes—GitHub hole), the
 `EnterWorktree`/`ExitWorktree` tool calls and worktree/branch git
-commands (does covers only file-linked units, and none carries a fenced
+commands (does covers only file-linked runbooks, and none carries a fenced
 `-C` block for `{Commit}`), the approval gate spanning §6 into §7
 (guard containment can't cross sections), the area-discovery and
 probe-picking interviews (no primitive for a question-and-answer round
@@ -274,7 +274,7 @@ surfaces, the two owners, turn boundaries — all `#fragment` links), the `gh`
 state and write calls (issue view, blocked-by check, label moves, PR/issue
 comments, stub creation — no on-disk link, the writes—GitHub hole), or the
 `EnterWorktree` calls and worktree-only git commands (does covers only
-file-linked units). The AFK/Inline/Review-stop engagement switch, including
+file-linked runbooks). The AFK/Inline/Review-stop engagement switch, including
 the fixed `/open-pr` launch inside the Review-stop branch, has no primitive
 for a multi-way enumeration — encoding just that one branch would misstate it
 as unconditional. The runtime-chosen `Run /<skill> <N>` delegation has no

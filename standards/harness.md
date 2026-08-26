@@ -16,6 +16,8 @@ only harness currently in use.
 
 - [standards/harness/](/standards/harness/index.md) — the member
   registry and the CLAUDE.md content standard; start at Files
+- [Instruction Grammar](/standards/harness/grammar.md) — the braced-span
+  grammar that makes skill and agent bodies machine-readable
 - [Skill Conventions](/standards/harness/skill-conventions.md) — the skill-bundle
   format
 - [Skill Management](/standards/harness/skill-management.md) — where skills live

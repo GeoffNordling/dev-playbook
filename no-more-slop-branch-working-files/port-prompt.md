@@ -17,10 +17,10 @@ means the file your dispatch message named.
 The session that launches port agents runs this loop; the agents run
 the body below the rule.
 
-1. Pick a batch of unported first-party units from the
+1. Pick a batch of unported first-party runbooks from the
    [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster)
-   — never a (3P) unit before the plan's adoption-policy stage. Launch
-   one Sonnet agent per unit, in parallel, each with the two-line
+   — never a (3P) runbook before the plan's adoption-policy stage. Launch
+   one Sonnet agent per runbook, in parallel, each with the two-line
    dispatch message above. Do not regenerate this file's body into the
    prompt.
 2. Do not read the ported files or their diffs — that spends the
@@ -30,7 +30,7 @@ the body below the rule.
    `python3 no-more-slop-branch-working-files/parser/chaingen.py`
    then `--check`, and grep
    `no-more-slop-branch-working-files/RESIDUAL-LEDGER.md` for one
-   `## <name>` header per batch unit. Parallel agents race on the
+   `## <name>` header per batch runbook. Parallel agents race on the
    ledger; restore a lost section verbatim from its agent's
    transcript, never by rewriting it.
 4. Tick the batch's roster checkboxes, then report the round tally:

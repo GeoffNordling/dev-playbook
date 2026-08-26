@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""chaingen — reconstruct a unit's Reference chain from its encoded file.
+"""chaingen — reconstruct a runbook's Reference chain from its encoded file.
 
 Prototype for To-do item 1 of EDGE-ENCODING.md. Implements the certified
 transform: slice, never interpret. Cut points are the keyword, the markdown
@@ -7,7 +7,7 @@ link(s), the `with` splitter, nested braces, and the first semicolon.
 Everything between cut points is opaque verbatim text.
 
 Usage:
-    chaingen.py            regenerate chains.txt — every unit in the
+    chaingen.py            regenerate chains.txt — every runbook in the
                            corpus (dotfiles/dot-claude agents and
                            skills), blank-line separated
     chaingen.py --check    regenerate in memory and diff against
@@ -47,7 +47,7 @@ class LintError(Exception):
 
 
 def split_frontmatter(text, path):
-    """Split a unit file into its frontmatter dict and body text."""
+    """Split a runbook file into its frontmatter dict and body text."""
     lines = text.split("\n")
     if lines[0] != "---":
         raise LintError(f"{path}: no frontmatter")
@@ -182,7 +182,7 @@ def repo_root(start):
 
 
 def classify(link_text, link_target, source_file):
-    """Render a link target as a node, or as the link text for a non-unit."""
+    """Render a link target as a node, or as the link text for a non-runbook."""
     if link_target.startswith("~"):
         path = os.path.expanduser(link_target)
         # Same-repo resolution: a ~/workspace/<repo>/… path naming the repo
@@ -223,7 +223,7 @@ def classify(link_text, link_target, source_file):
     elif re.search(r"\.(sh|py|bash)$", base):
         name, ntype = base, "Script"
     else:
-        return link_text  # not a unit: the link text travels verbatim
+        return link_text  # not a runbook: the link text travels verbatim
     braces = "{{{}}}" if vendored else "[{}]"
     return f"{braces.format(name)} {ntype}"
 
@@ -343,7 +343,7 @@ def render_edge(edge, last):
 
 
 def render_unit(path):
-    """Render one unit file as its full chain, header plus edges."""
+    """Render one runbook file as its full chain, header plus edges."""
     with open(path) as f:
         text = f.read()
     meta, body = split_frontmatter(text, path)
@@ -363,15 +363,15 @@ def render_unit(path):
 # ── entry ────────────────────────────────────────────────────────────────
 
 
-def all_units(claude_dir):
-    """Every unit in the corpus: agents/*.md, then skills/*/SKILL.md."""
-    units = sorted(glob.glob(os.path.join(claude_dir, "agents", "*.md")))
-    units += sorted(glob.glob(os.path.join(claude_dir, "skills", "*", "SKILL.md")))
-    return units
+def all_runbooks(claude_dir):
+    """Every runbook in the corpus: agents/*.md, then skills/*/SKILL.md."""
+    runbooks = sorted(glob.glob(os.path.join(claude_dir, "agents", "*.md")))
+    runbooks += sorted(glob.glob(os.path.join(claude_dir, "skills", "*", "SKILL.md")))
+    return runbooks
 
 
 def unit_name(path):
-    """A unit's display name: the skill's directory or the agent's basename."""
+    """A runbook's display name: the skill's directory or the agent's basename."""
     base = os.path.basename(path)
     if base == "SKILL.md":
         return os.path.basename(os.path.dirname(path))
@@ -382,9 +382,9 @@ def main(argv):
     """Write chains.txt, or with --check diff against it."""
     here = os.path.dirname(os.path.abspath(__file__))
     chains_path = os.path.join(here, "chains.txt")
-    units = all_units(os.path.join(here, "..", "..", "dotfiles", "dot-claude"))
+    runbooks = all_runbooks(os.path.join(here, "..", "..", "dotfiles", "dot-claude"))
     rendered = []
-    for p in units:
+    for p in runbooks:
         try:
             rendered.append(render_unit(p))
         except LintError as e:
@@ -397,7 +397,7 @@ def main(argv):
         with open(chains_path) as f:
             want = f.read()
         if text == want:
-            print(f"OK: chains.txt matches all {len(units)} units")
+            print(f"OK: chains.txt matches all {len(runbooks)} runbooks")
             return 0
         print("DRIFT:")
         sys.stdout.writelines(
@@ -414,7 +414,7 @@ def main(argv):
         return 2
     with open(chains_path, "w") as f:
         f.write(text)
-    print(f"wrote {len(units)} chains to {chains_path}")
+    print(f"wrote {len(runbooks)} chains to {chains_path}")
     return 0
 
 

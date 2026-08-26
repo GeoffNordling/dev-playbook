@@ -22,7 +22,7 @@ whole software factory — without reading all of it.
 
 Documentation does things, because agents make things happen and an agent
 is a collection of documentation plus a permission set. So a documentation
-unit has an operational meaning — what reads it, when it fires, what
+runbook has an operational meaning — what reads it, when it fires, what
 changes as a result — and an abstraction names that meaning at the CLOA.
 
 ## Documentation as code
@@ -97,7 +97,7 @@ possibilities live in the same context window. Rigidity applies later, to
 adopted abstractions: see the change-cost note under the code heuristic.
 
 Candidate generation settled during the close-out: parallel reader
-agents extract each unit's chain against a shared brief, outside this
+agents extract each runbook's chain against a shared brief, outside this
 context window; rulings happen inline, between batches, and the brief
 is re-synced to the ontology before each launch.
 
@@ -138,15 +138,15 @@ down the levels.
   [Constrain to optimize understanding](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
 - **Verbatim dependencies cannot participate.** The goal is to
   generate every reference chain with deterministic code, after
-  structuring each unit to make that generation possible. A verbatim
+  structuring each runbook to make that generation possible. A verbatim
   third-party file carries none of that structure, so it cannot
   participate. Disposition is undecided until the lint plan: own
   and restructure every vendored file (zero verbatim dependencies), or
   keep some verbatim and accept that their chains stay model-generated,
   outside the deterministic system. Related open note: overrides is
-  grounded today in "a unit that cannot be edited"; if vendored files
+  grounded today in "a runbook that cannot be edited"; if vendored files
   become owned, it likely re-grounds as superseding an instruction in
-  effect at runtime, self-owned units included.
+  effect at runtime, self-owned runbooks included.
 - **Types respected.** The loop keeps the stochastic/deterministic
   distinction and the document-type distinctions explicit.
 - **Every documentation family is its own beast.** The Reference chain
@@ -176,14 +176,14 @@ down the levels.
 | Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
 | Skill           | do                            | Documentation that runs in the calling context, on its permissions |
 | Script          | do                            | Deterministic code run via the shell — not a direct LLM call |
-| Reference chain | edges: does, reads, overrides, writes, args, reports | The declared tree of a unit's behavior and its call signature — args in, reports out |
+| Reference chain | edges: does, reads, overrides, writes, args, reports | The declared tree of a runbook's behavior and its call signature — args in, reports out |
 
 - **Standard** is established and live; its open problem is the two-level
   split under [Abstraction shape](#abstraction-shape).
 - **Agent and Skill** get one verb, **do**, and no more. Specificity
   comes from the behavior being done, which documentation defines — a
   Standard's verb where one exists (the deslopper does slop-tics.enforce),
-  the whole unit where the doc is the definition (grill-with-docs does
+  the whole runbook where the doc is the definition (grill-with-docs does
   grilling). The two differ in context binding: an agent runs in a fresh
   context window, a skill in the calling one — an in-process call versus a
   subprocess. A fresh context starts from configuration (the preset
@@ -202,32 +202,32 @@ down the levels.
   node. The zoom rule collapses in-bundle documents, never an executed
   script. A sibling **Workflow** noun (deterministic orchestration in
   Claude Code's dynamic-workflow runtime) was dropped 2026-08-25 as
-  empirically vacuous: no unit in
+  empirically vacuous: no runbook in
   [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) fires a
   does-edge into one — ralph-setup, the closest, reports the
   ralph-loop launch command as a string and never runs it. The noun
-  returns if a unit ever does a workflow.
+  returns if a runbook ever does a workflow.
 
 ### Reference chain
 
-A **unit** is one documentation file, or an abstract object that functions
+A **runbook** is one documentation file, or an abstract object that functions
 like one, the way a skill functions like its SKILL.md. Every chain node is
-a unit; the nouns in the table are its types.
+a runbook; the nouns in the table are its types.
 
 The chain's origin: a skill is a command — invoked by name, args in,
 reports out, effects on state — and a command's caller is owed a
 signature. The Reference chain is that signature written down; an
 agent differs only in context binding, so it shares the shape. The
-chain carries the order the unit fires its operations in — not with
-full fidelity, because the chain is a collapse of the unit's program,
+chain carries the order the runbook fires its operations in — not with
+full fidelity, because the chain is a collapse of the runbook's program,
 and the fine-grained sequencing it drops stays below the CLOA.
 
 Notation: `[x]` self-owned, `{x}` vendored. The edges:
 
 - **does** — run a behavior some documentation defines: a Standard's verb
-  where one exists, the whole unit where the doc is the definition.
+  where one exists, the whole runbook where the doc is the definition.
 - **reads** — consulted, not run.
-- **overrides … with …** — substitute a clause in a unit that cannot be
+- **overrides … with …** — substitute a clause in a runbook that cannot be
   edited.
 - **writes** — produce or mutate state outside the chain. Write targets
   are typed `bucket(refinement)`: a fixed coarse bucket — git, GitHub,
@@ -256,7 +256,7 @@ Notation: `[x]` self-owned, `{x}` vendored. The edges:
   typed as well as named, `report_name: report_type` — a report's type
   varies, so it carries information — commit reports
   `outcome: str` — and an enumerable status is preferred, its values
-  listed as a small enum. A reporting unit declares its report in its
+  listed as a small enum. A reporting runbook declares its report in its
   own file, so the primitive view renders the declaration instead of a
   model regenerating it; the declaration format is ruled in
   [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md#the-primitive-map).
@@ -283,7 +283,7 @@ Its rules:
   lintable. A root's effects are the union of edges reachable along its
   does-path — the same rule as code, where a write belongs to the frame
   whose source contains the statement.
-- **Tree, then graph.** Each unit declares its own tree; the union across
+- **Tree, then graph.** Each runbook declares its own tree; the union across
   roots is the repo graph, where in-degree, hubs, and orphans appear. The
   code parallel is import-linter: a declared dependency contract that
   fails when reality disagrees. A lint-design candidate to evaluate when
@@ -296,9 +296,9 @@ one object, several angles.
 
 Remembered, not primitives:
 
-- **Zoom.** A unit collapses its internal files (containment is derivable
+- **Zoom.** A runbook collapses its internal files (containment is derivable
   from paths — `design/references/` sits under `design/`); zoomed in, they
-  appear as nodes inside the unit boundary with ordinary edges.
+  appear as nodes inside the runbook boundary with ordinary edges.
 - **Doc type.** A read target's frontmatter type (Guide, General-Sheet)
   is noted informally; a type earns a noun only when it demonstrates a
   verb interface, the way Standard did.
@@ -315,7 +315,7 @@ but deliberately outside the ontology until a ruling is reversed.
 - **Attestation checkpoints** — "report `READ: x`, proceed only after."
   A prompt device that raises the probability the read happens; ruled
   not accounted.
-- **Agent-held ephemeral state** — counts and set-aside lists a unit
+- **Agent-held ephemeral state** — counts and set-aside lists a runbook
   tracks only in its own working memory, persisted nowhere
   (judgments-sweep's fix-attempt cap and skip list); ruled not
   accounted.
@@ -323,7 +323,7 @@ but deliberately outside the ontology until a ruling is reversed.
   user (skill-creator's "iterate until the user is satisfied";
   grilling's whole body). Conversing is what running in the calling
   context means; ruled not accounted.
-- **Behavior-mode setting** — a unit whose body installs standing
+- **Behavior-mode setting** — a runbook whose body installs standing
   behavior in the session's ephemeral context and fires no edge at
   invocation (orchestrate: "everything below you is a subagent").
   Ruled residual; admitting it later requires a lintable,
@@ -334,13 +334,13 @@ but deliberately outside the ontology until a ruling is reversed.
 - **Presentation gestures** — opening an already-written artifact for
   the user (improve-codebase-architecture's `xdg-open` on its report);
   part of reporting the value, never an edge; ruled not accounted.
-- **Phase gates** — a step-scoped prohibition inside a unit's own
+- **Phase gates** — a step-scoped prohibition inside a runbook's own
   program, lifted by a later step (improve-codebase-architecture's "Do
   NOT propose interfaces yet"); internal sequencing below the CLOA,
   already covered by the steps-are-the-program rule; ruled not
   accounted.
 - **Written-artifact semantics** — the schema and state rules of a
-  document a unit writes and later re-reads: wayfinder's map-body
+  document a runbook writes and later re-reads: wayfinder's map-body
   sections, fog lifecycle, HITL/AFK axis, claim-by-assignment, ticket
   sizing. The artifact's contract lives in the artifact; the chain
   records only the writes and reads that touch it.
@@ -352,7 +352,7 @@ registries — the
 [document-type registry](/standards/knowledge-organization/document-types.md)
 for concept docs and the
 [Claude Code file registry](/standards/harness/files.md) for harness
-files — so "every unit accounted for" is a checkable claim, and each
+files — so "every runbook accounted for" is a checkable claim, and each
 registered type gets a disposition into the ontology. The boundary
 between the two is encoded as `classify()` in `src/dev_playbook/md.py`.
 This repo's census, taken at the registry pass, per `classify()`:
@@ -384,9 +384,9 @@ The bootstrap targets, run in order and all recorded in the ledger:
 The software factory is the graduation exercise, parked for now — see
 [Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md). It
 brings the Guide type (9 docs, all `software-factory/`) and the 13 parked
-units,
-and may leave large residuals: a Guide describes how a fleet of units
-operates together — a protocol above single-unit behavior — which no
+runbooks,
+and may leave large residuals: a Guide describes how a fleet of runbooks
+operates together — a protocol above single-runbook behavior — which no
 current noun carries. Per the remembered rule, Guide earns a noun only
 if it demonstrates a verb interface, the way Standard did; otherwise
 its content lands in chains, written-artifact semantics, and the
@@ -396,7 +396,7 @@ ledger.
 
 Every finalized chain is recorded in
 [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as it is
-ruled — the three bootstrap runs and each close-out unit — so the close-out
+ruled — the three bootstrap runs and each close-out runbook — so the close-out
 ends in a written ledger, not in compacted memory. This file keeps the
 ontology and the rulings; that file keeps the chains, their count, and the
 ruling that closed the run. The in-file structure those chains are now

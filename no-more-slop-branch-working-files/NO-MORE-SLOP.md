@@ -134,16 +134,16 @@ exemplar, worked as the abstraction shape in
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format — braced spans over a fixed keyword lexicon,
   sliced at fixed cut points but never interpreted — designed on a
-  five-unit covering set in
+  five-runbook covering set in
   [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md)
   and proven by `parser/chaingen.py`, which deterministically
-  regenerates every covered unit's chain into `parser/chains.txt` and
+  regenerates every covered runbook's chain into `parser/chains.txt` and
   fails on drift via `--check`. Remaining work rides the Now section
   below.
-- **First-party port.** Every unit we author ourselves — all twelve
+- **First-party port.** Every runbook we author ourselves — all twelve
   agents and the unmarked skills in the
   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster),
-  38 units — ported to the edge encoding by the dispatch procedure in
+  38 runbooks — ported to the edge encoding by the dispatch procedure in
   [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md), each
   with its leftovers recorded in the
   [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
@@ -241,8 +241,8 @@ works the term holds the detail. Every one is a tentative promotion to
 - **constrain to optimize understanding** — the principle that a constraint
   on form pays for itself in amortized reading, meaningful location, and a
   lintable rule.
-- **covering set** — the smallest group of exemplar units that exercises
-  every row of a design under test; edge encoding's is five units.
+- **covering set** — the smallest group of exemplar runbooks that exercises
+  every row of a design under test; edge encoding's is five runbooks.
 - **gray module** — a module the user understands approximately, because the
   user understands its tests and the tests pass.
 - **intent alignment debt** — divergence from the user's intent accrued over
@@ -256,20 +256,20 @@ works the term holds the detail. Every one is a tentative promotion to
 - **the pandas standard** — the target state: fluency with an interface —
   which objects exist, which methods fit which task — without ever reading
   inside it.
-- **Reference chain** — the declared tree of one unit's behavior and its
+- **Reference chain** — the declared tree of one runbook's behavior and its
   call signature
   ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#reference-chain)).
 - **registry pass** — the loop's first move on a repo: rule every registered
   document type important to the primitives ontology or not.
 - **residual** — whatever the current abstractions cannot express; tracked,
   never forced.
+- **runbook** — one documentation file, or an abstract object that functions
+  like one, the way a skill functions like its `SKILL.md`.
 - **slop** — output that diverges from the user's intent (low quality) or
   that the user cannot read (not understood); the Goal section splits the
   two.
 - **slop trench** — nominal ownership of a system whose details have
   outpaced inspection.
-- **unit** — one documentation file, or an abstract object that functions
-  like one, the way a skill functions like its `SKILL.md`.
 - **unread tier** — the existing thousand-odd machine-written unit tests,
   judged only by passing.
 - **the vocabulary API** — `CONTEXT.md` designed the way a library designs
@@ -302,7 +302,7 @@ and a port is nothing but an edit:
    merge while any remain.
 2. **Retire verbatim adoption.** A Decision Record changes the policy:
    external skills are no longer adopted verbatim — the corpus requires
-   every unit to carry the edge encoding, and vendored bytes cannot be
+   every runbook to carry the edge encoding, and vendored bytes cannot be
    edited, so verbatim adoption is rejected for that reason. The
    thirteen (3P) skills convert to first-class owned copies: copied
    directly into our tree, ours from then on (verbatim at the moment of
@@ -312,7 +312,7 @@ and a port is nothing but an edit:
    skill-management standard, and whatever else the sweep of those docs
    finds.
 3. **Port the converted skills.** The former (3P) thirteen, now owned,
-   go through the same port as the first-party units.
+   go through the same port as the first-party runbooks.
 4. **Final Quality Pass.** Go through the final skills and look for residual
 opportunities. We deemphasized residuals tracking during the conversion
 sweeps so we'll need a fresh eye to see if we're happy with the final result

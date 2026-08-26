@@ -111,7 +111,7 @@ verb interface, the way Standard did
   checkable today only "by absence." Declared and lintable, they might
   dissolve the largest class in the accepted-residuals ledger
   (Written-artifact semantics). Verbs might be write/read/validate.
-- **Generated units.** The three reviewers share most of their text;
+- **Generated runbooks.** The three reviewers share most of their text;
   `review-contract.md` even names its "two parameters" (review name, what
   counts as Blocking) that each supplies. A template plus parameter blocks,
   deterministically expanded, would resemble
@@ -122,7 +122,7 @@ verb interface, the way Standard did
   could become bundled scripts with `does → Script` edges. No new
   primitive — just relocation.
 
-Also noticed: some "Guide" content states rules another unit audits
+Also noticed: some "Guide" content states rules another runbook audits
 against, which is what a Standard does; retyping those would shrink the
 Guide census before any new noun is weighed.
 
@@ -138,7 +138,7 @@ as two entangled efforts — sequence them instead:
    requirements, one at a time, each ruled by the user — so the rewrite,
    if it happens, contains no ontology decisions of its own.
 3. **Native re-authoring.** Express the factory in whatever primitives
-   survive. Chains would then be born with the units rather than extracted
+   survive. Chains would then be born with the runbooks rather than extracted
    after the fact.
 4. **Close-out.** Residuals to the ledger,
    [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)

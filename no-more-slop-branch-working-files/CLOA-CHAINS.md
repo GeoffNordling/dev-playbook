@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: CLOA Chains
-description: The ledger of finalized reference chains — one recorded entry per unit, written down as it is ruled
+description: The ledger of finalized reference chains — one recorded entry per runbook, written down as it is ruled
 ---
 
 # CLOA Chains
@@ -13,18 +13,18 @@ plus its one-sentence carrier; the rulings that shaped it live in the
 abstractions file.
 
 These chains exist as proof of concept — each one written to test
-that the primitive set could express that unit's operations, and the
+that the primitive set could express that runbook's operations, and the
 set held. The final traces are generated instead, from structure
-embedded in the unit files themselves: that structure is ruled in
+embedded in the runbook files themselves: that structure is ruled in
 [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md), and
 `parser/chaingen.py` emits `parser/chains.txt` — the five covering-set
-units so far, log-friction's entry below among them. The
+runbooks so far, log-friction's entry below among them. The
 close-out ended by ruling with 22 chains recorded: batches had
-stopped producing ontology changes, and the thirteen units still
+stopped producing ontology changes, and the thirteen runbooks still
 unread were ruled expressible with the existing primitives.
 
-Excluded units record no chain: `datasheet` (Instruments exclusion) and
-`judgments-sweep` (Judgments exclusion). Deleted units record no chain:
+Excluded runbooks record no chain: `datasheet` (Instruments exclusion) and
+`judgments-sweep` (Judgments exclusion). Deleted runbooks record no chain:
 `orient` and `pymc-modeling`, removed from the workspace during the
 close-out.
 
@@ -99,7 +99,7 @@ settle, and writing the brief back audited by the two issue-review
 lenses.
 
 The chain absorbed two things cleanly. `references/design-it-twice.md`
-and `references/decompose.md` are inside the unit — the skill is its
+and `references/decompose.md` are inside the runbook — the skill is its
 directory, so they are private functions, not chain nodes. And the old
 mention-grep survey said design references eight skills; the declared
 chain has six does edges — `intake` appears only in when-to-use prose,
@@ -222,7 +222,7 @@ collides. No reports.
 One sentence carries the target: candidate-promote owns the lookup and
 the delete — authoring the issue is intake's job, and the entry leaves
 CANDIDATES.md only after intake lands the issue. First recorded edge
-into a parked factory unit; intake's own chain waits for the factory
+into a parked factory runbook; intake's own chain waits for the factory
 phase.
 
 ### usage-report
@@ -307,7 +307,7 @@ secret-redaction rule is a ledgered behavior-mode setting, not an edge.
 One sentence carries the target: writing-for-agents is pure craft
 guidance — its whole behavior is being active in the calling context;
 its only read is its own bundled reference, collapsed by the zoom rule,
-and other units do it (skill-creator) and override it where a Standard
+and other runbooks do it (skill-creator) and override it where a Standard
 collides.
 
 ### codebase-design
@@ -407,7 +407,7 @@ nothing.
 
 One sentence carries the target: update-standards-pin walks the
 GOVERNED roster doing the bump-pins Script per consumer and landing
-one commit per repo — the first unit whose writes are mostly
+one commit per repo — the first runbook whose writes are mostly
 consumer-prefixed, `consumer:` standing for whichever roster member is
 in hand.
 
@@ -425,7 +425,7 @@ in hand.
       │                                             ticket bodies on zoom
       ├ ╌ does ╌ ╌ ► setup-matt-pocock-skills      no tracker provided —
       │                                             dead reference; stays,
-      │                                             the unit is verbatim
+      │                                             the runbook is verbatim
       ├ ╌ does ╌ ╌ ► {grilling} Skill              naming the destination,
       │                                             mapping the frontier,
       │                                             whenever in doubt
