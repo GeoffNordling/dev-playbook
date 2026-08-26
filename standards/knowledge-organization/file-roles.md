@@ -25,7 +25,7 @@ and is subject to the type-lint.
 
 **Harness-owned file** — a file a tool *consumes as configuration or runs as
 code / instructions*: every non-`.md` file, plus the Claude Code file set enumerated in
-[the harness-files registry](/standards/claude-code/files.md). It carries no
+[the harness-files registry](/standards/harness/files.md). It carries no
 OKF frontmatter, is not type-linted, and keeps whatever format its consumer
 requires.
 

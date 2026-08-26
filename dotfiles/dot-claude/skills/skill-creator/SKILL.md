@@ -21,14 +21,14 @@ the first line of `SKILL.md` gets written at step 5.
 Do both before going further. They split along one seam: conventions is
 binding, craft is the skill.
 
-- {Read [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) plus its checklist, walked before done}.
-  The format `scripts/skill-lint` enforces at the commit gate: front matter,
+- {Read [skill-conventions.md](~/workspace/dev-playbook/standards/harness/skill-conventions.md) plus its checklist, walked before done}.
+  The format `scripts/harness-files-lint` enforces at the commit gate: front matter,
   file structure, length, naming, references, checklist.
 - {Run [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) in context} —
   how a document an agent consumes is written so it behaves predictably. Its
   `SKILL-MECHANICS.md` carries the skill-specific half.
 
-This skill is the workflow over those two; the rules live there. {Override [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) on craft guidance with [skill-conventions.md](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md); they collide}.
+This skill is the workflow over those two; the rules live there. {Override [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) on craft guidance with [skill-conventions.md](~/workspace/dev-playbook/standards/harness/skill-conventions.md); they collide}.
 
 ## 2. Gather requirements
 
@@ -66,7 +66,7 @@ This step is done when every question above carries the user's own answer.
 
 ## 3. Write the description
 
-`scripts/skill-lint` blocks the commit on the shape, and step 2's
+`scripts/harness-files-lint` blocks the commit on the shape, and step 2's
 invocation-mode answer picks it: model-invoked is exactly two sentences, the
 second opening `Use when` and naming the triggers verbatim, since that
 sentence is the auto-invocation match surface; user-invoked is exactly one
@@ -124,11 +124,11 @@ Revise based on feedback. Iterate until the user is satisfied.
 ## 7. Walk the checklist
 
 Walk the checklist in
-[skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md#checklist)
+[skill-conventions.md — Checklist](~/workspace/dev-playbook/standards/harness/skill-conventions.md#checklist)
 and confirm each item passes. Fix any failures before considering the skill
 done.
 
-Then run dev-playbook's `scripts/skill-lint` over the **repo root** of the
+Then run dev-playbook's `scripts/harness-files-lint` over the **repo root** of the
 repo holding the bundle. Pointing it at the bundle directory finds no skill
 roots and passes vacuously ("0 internal skills, all ok") — a pass only
 counts when the summary line shows a nonzero skill count.

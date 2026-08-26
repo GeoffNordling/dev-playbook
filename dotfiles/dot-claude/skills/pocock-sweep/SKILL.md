@@ -28,7 +28,7 @@ and delete it before the PR.
 
 Before doing anything else, {Read [external-skill-verdicts.md](~/workspace/dev-playbook/docs/external-skill-verdicts.md)
 end-to-end; the standing verdict on every skill, and the rules that bind this
-sweep} and {Read [skill-management.md](~/workspace/dev-playbook/standards/claude-code/skill-management.md)
+sweep} and {Read [skill-management.md](~/workspace/dev-playbook/standards/harness/skill-management.md)
 end-to-end; where installed skills live, the lock file, and the mirror rule}.
 
 Then say `READ: external-skill-verdicts.md, skill-management.md` and proceed

@@ -240,7 +240,7 @@ def classify(relpath: str) -> str:
 
     The concept/harness split mirrors the file roles in the docs
     standard and the Claude Code file registry
-    (standards/claude-code/files.md); keep them in step.
+    (standards/harness/files.md); keep them in step.
     """
     parts = PurePosixPath(relpath).parts
     name = parts[-1]

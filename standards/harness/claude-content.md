@@ -7,7 +7,7 @@ description: The CLAUDE.md content standard — operational scope, the global an
 # CLAUDE.md Content
 
 Claude Code injects `CLAUDE.md` into every session as operating
-configuration ([files.md](/standards/claude-code/files.md)), so it carries
+configuration ([files.md](/standards/harness/files.md)), so it carries
 no OKF frontmatter. Its scope is how to operate — commands, rules, pointers
 to other docs. It `SHALL NOT` describe what the project is, why it exists,
 or the developer: those belong to the documentation hierarchy.
@@ -34,7 +34,7 @@ repo on the machine. In this workspace it is not authored in place — its
 source is `dotfiles/dot-claude/CLAUDE.md`, Stow-symlinked into `~/.claude/`,
 so the governed artifact lives in dev-playbook and rides the normal review
 path. As a `CLAUDE.md` it is a registry member
-([files.md](/standards/claude-code/files.md)) and agent-facing
+([files.md](/standards/harness/files.md)) and agent-facing
 configuration, so it holds to the agent-facing voice — second person, never
 first ([conventions.md](/standards/prose/conventions.md)).
 

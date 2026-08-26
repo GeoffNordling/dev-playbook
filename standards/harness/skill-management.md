@@ -6,7 +6,7 @@ description: Where skills live, how third-party skills are installed, and the mi
 
 # Skill Management
 
-Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](/standards/claude-code/skill-conventions.md).
+Where Claude Code skills live in this workspace, and how they are installed, updated, and removed. For the format of skill bundles in this workspace, see [skill-conventions.md](/standards/harness/skill-conventions.md).
 
 ## When to adopt third-party skills
 
@@ -27,13 +27,13 @@ Stow links `dot-claude/` into `~/.claude/` and `.agents/` into `~/.agents/`, so 
 
 Claude Code discovers skills only from `~/.claude/skills/`. Every entry under `.agents/skills/` `SHALL` have a corresponding symlink in `dot-claude/skills/` pointing at it (`dot-claude/skills/<name>` → `../../.agents/skills/<name>`), with no stale symlinks and no authored skill colliding with an `.agents/skills/` name.
 
-Auditor and repairer are split, as [tracking](/standards/tracking.md) splits reporting from repair. The `claude-code.skill-mirror` rule in [skill-lint](/scripts/skill-lint) is the auditor: at the commit gate it reports any missing, mispointed, or stale symlink or authored/installed collision, and treats a committed `.agents/skills/` tree with no `dot-claude/skills/` mirror directory as an error, failing loudly. `scripts/sync-dotfiles` is the repairer: on every run it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
+Auditor and repairer are split, as [tracking](/standards/tracking.md) splits reporting from repair. The `harness.skill-mirror` rule in [harness-files-lint](/scripts/harness-files-lint) is the auditor: at the commit gate it reports any missing, mispointed, or stale symlink or authored/installed collision, and treats a committed `.agents/skills/` tree with no `dot-claude/skills/` mirror directory as an error, failing loudly. `scripts/sync-dotfiles` is the repairer: on every run it creates missing symlinks, removes stale ones (target no longer in `.agents/skills/`), and fails loudly if an authored skill collides with an `.agents/skills/` name.
 
 After installing or removing a third-party skill (commands below), run `scripts/sync-dotfiles` to apply the mirror — from the main checkout only; it relinks live `~/.claude`, so it's a step the user runs, never from a per-issue worktree.
 
 ## Authored skills
 
-Skills written for this workspace live in `dotfiles/dot-claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](/standards/claude-code/skill-conventions.md) for the format.
+Skills written for this workspace live in `dotfiles/dot-claude/skills/<skill-name>/`. Edit them in place. Restart Claude Code after edits — the running session caches skill content at startup. See [skill-conventions.md](/standards/harness/skill-conventions.md) for the format.
 
 ## Third-party skills
 

@@ -23,7 +23,7 @@ rejected with it, reevaluated only when the skill is.
 
 - **verbatim** — installed unmodified through the `skills` CLI and tracked in
   `dotfiles/.agents/.skill-lock.json`, never edited here
-  ([skill-management.md](/standards/claude-code/skill-management.md)).
+  ([skill-management.md](/standards/harness/skill-management.md)).
 - **adapt** — adopted, carrying the minimal named modification that fits it to a
   workspace constraint the upstream author has no view on.
 - **reject** — not adopted, reason recorded.
@@ -59,7 +59,7 @@ installed skill has grown to cover it, never whether it should exist.
 | [testing/conventions.md](/standards/testing/conventions.md) | `tdd` is rejected, and the file is mostly workspace-original pytest material. |
 | [software-factory/tdd.md](/software-factory/tdd.md) | The factory's own TDD procedure, wired to briefs and gates, with deliberate divergences from upstream's — autonomous seam forethought, in-loop refactor passes. |
 | [design/references/design-it-twice.md](/dotfiles/dot-claude/skills/design/references/design-it-twice.md) | An adaptation wired into the `/design` node: Opus pinning, worktrees, the synthesis diet. |
-| [skill-conventions.md](/standards/claude-code/skill-conventions.md) | The binding format layer, almost entirely workspace-original, and it wins where `/writing-for-agents` collides with it. |
+| [skill-conventions.md](/standards/harness/skill-conventions.md) | The binding format layer, almost entirely workspace-original, and it wins where `/writing-for-agents` collides with it. |
 
 ## Tier policy
 

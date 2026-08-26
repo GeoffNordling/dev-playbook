@@ -46,7 +46,7 @@ from dev_playbook import gitrepo, md, pyast, voice  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
-# CLAUDE.md voice and global-file checks answer the claude-code card, the
+# CLAUDE.md voice and global-file checks answer the harness card, the
 # README/CONTEXT doc-shape check answers the knowledge-organization card, and
 # the rogue future-work filenames answer the tracking card.
 # Each id is a module-level constant so every emission site references the
@@ -62,9 +62,9 @@ NAME_MAPPING = "build.name-mapping"
 SCRIPT_SHEBANG = "build.script-shebang"
 SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
-AGENT_FACING_VOICE = "claude-code.agent-facing-voice"
-GLOBAL_CLAUDE_SHAPE = "claude-code.global-claude-shape"
-GLOBAL_CLAUDE_RULES = "claude-code.global-claude-rules"
+AGENT_FACING_VOICE = "harness.agent-facing-voice"
+GLOBAL_CLAUDE_SHAPE = "harness.global-claude-shape"
+GLOBAL_CLAUDE_RULES = "harness.global-claude-rules"
 DOC_SHAPE = "knowledge-organization.doc-shape"
 ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
 
@@ -128,7 +128,7 @@ LOCKFILES = (
     "bun.lock",
     "bun.lockb",
 )
-# The same two roots skill-lint scans.
+# The same two roots harness-files-lint scans.
 SKILL_ROOTS = (".claude/skills", "dotfiles/dot-claude/skills")
 # The rule bodies' matching pair: a consumer repo carries its rules under
 # .claude/, dev-playbook authors them in the Stow source tree.

@@ -18,6 +18,6 @@ judgments:
       "I"/"my"), and reads as operating instructions to the agent rather than a
       third-person description of the system written for a reader.
     evidence:  [CLAUDE.md, dotfiles/dot-claude/CLAUDE.md]
-    reference: [standards/claude-code/claude-content.md, standards/prose/conventions.md]
+    reference: [standards/harness/claude-content.md, standards/prose/conventions.md]
     model: claude-sonnet-5
     effort: high

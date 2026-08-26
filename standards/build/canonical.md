@@ -35,7 +35,7 @@ behind one id ([distribution.md](/standards/build/distribution.md)) — the
 ruff, shellcheck, and shfmt hooks at canonical revs, and the pre-push
 `make check-judgments-cache` hook, installing both the commit and push stages.
 It serves every repo unchanged: a hook with no matching files skips itself, and
-detectors like `judgments-lint` and `skill-lint` pass trivially where a repo
+detectors like `judgments-lint` and `harness-files-lint` pass trivially where a repo
 has no `[tool.judgments]` table and no authored skills. dev-playbook
 replaces the published block with its dogfood block
 ([distribution.md](/standards/build/distribution.md#dogfooding)).

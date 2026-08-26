@@ -293,11 +293,11 @@ and a port is nothing but an edit:
 1. **The standard, and the gate goes green.** The grammar's standard
    card and the skill-standards scrub are likely one job: the new
    standard replaces what the old docs teach (the `## Name: $ARGUMENTS`
-   heading, `argument-hint`), and `scripts/skill-lint` and friends stop
+   heading, `argument-hint`), and `scripts/harness-files-lint` and friends stop
    expecting the old forms and start enforcing the map — which is also
    what fixes the failing pre-commit checks. Today every port commit
    rides `SKIP=playbook-lint` (pushes add `SKIP=make-check`) because
-   skill-lint's closed frontmatter vocabulary rejects the `arguments`
+   harness-files-lint's closed frontmatter vocabulary rejects the `arguments`
    key. The skips are deliberate and temporary; the branch does not
    merge while any remain.
 2. **Retire verbatim adoption.** A Decision Record changes the policy:

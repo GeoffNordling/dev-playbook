@@ -177,10 +177,10 @@ def test_run_gate_reports_a_clean_repo(
 def test_run_gate_reports_findings(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    fake_gate(monkeypatch, tmp_path, 1, "CLAUDE.md: claude-code.shape bad heading")
+    fake_gate(monkeypatch, tmp_path, 1, "CLAUDE.md: harness.shape bad heading")
     passed, output = bump_pins.run_gate(tmp_path)
     assert not passed
-    assert "claude-code.shape" in output
+    assert "harness.shape" in output
 
 
 def test_run_gate_refuses_to_call_a_crash_a_verdict(

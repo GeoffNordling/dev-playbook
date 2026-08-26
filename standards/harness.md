@@ -1,22 +1,24 @@
 ---
 type: Standard-Card
-title: Claude Code Harness Files
-description: Card for the Claude Code harness-files standard — how harness-consumed files are distinguished from ordinary files and what each contains
+title: Harness Files
+description: Card for the harness-files standard — how files whose meaning is fixed by the agent harness's loading contract are distinguished from ordinary files and what each contains
 ---
 
-# Claude Code Harness Files
+# Harness Files
 
-Governs how the repo files the Claude Code harness consumes — injected
-into context, read as configuration, or run as code — are distinguished
-from ordinary files, and what each may contain.
+Governs the repo files whose meaning is fixed by the agent harness's
+loading contract — injected into context, read as configuration, or run
+as instructions. The standard distinguishes these files from ordinary
+ones and states what each may contain. Claude Code is the
+only harness currently in use.
 
 ## Define
 
-- [standards/claude-code/](/standards/claude-code/index.md) — the member
+- [standards/harness/](/standards/harness/index.md) — the member
   registry and the CLAUDE.md content standard; start at Files
-- [Skill Conventions](/standards/claude-code/skill-conventions.md) — the skill-bundle
+- [Skill Conventions](/standards/harness/skill-conventions.md) — the skill-bundle
   format
-- [Skill Management](/standards/claude-code/skill-management.md) — where skills live
+- [Skill Management](/standards/harness/skill-management.md) — where skills live
   and the authored/installed mirror rule
 - [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —
   the craft layer beside the binding format, installed verbatim from
@@ -28,14 +30,14 @@ from ordinary files, and what each may contain.
 
 - [repo-lint](/scripts/repo-lint) — CLAUDE.md presence; the agent-facing
   voice of every CLAUDE.md, root to global — no first person
-  (`claude-code.agent-facing-voice`); and, in dev-playbook only, the global
+  (`harness.agent-facing-voice`); and, in dev-playbook only, the global
   CLAUDE.md source's two-section shape and the workspace-wide rules it must
-  carry (`claude-code.global-claude-shape`,
-  `claude-code.global-claude-rules`)
-- [skill-lint](/scripts/skill-lint) — skill bundles in
-  skill-authoring repos, plus the `claude-code.skill-mirror`
+  carry (`harness.global-claude-shape`,
+  `harness.global-claude-rules`)
+- [harness-files-lint](/scripts/harness-files-lint) — skill bundles in
+  skill-authoring repos, plus the `harness.skill-mirror`
   correspondence between authored and installed skills (dev-playbook)
-- [judgments/claude-code.yaml](/judgments/claude-code.yaml) — the LLM-judged
+- [judgments/harness.yaml](/judgments/harness.yaml) — the LLM-judged
   claim that the root and global CLAUDE.md genuinely read as agent-facing
   voice, the semantic check the token-level rule cannot make
 
@@ -44,11 +46,11 @@ from ordinary files, and what each may contain.
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — its published `playbook-lint` hook dispatches to both repo-lint and
-  skill-lint at the **commit gate** in every repo's suite; skill-lint
+  harness-files-lint at the **commit gate** in every repo's suite; harness-files-lint
   no-ops where a repo authors no skills
 
 ## Adopt
 
-- [CLAUDE.md Content](/standards/claude-code/claude-content.md) — a repo
+- [CLAUDE.md Content](/standards/harness/claude-content.md) — a repo
   writes its own operating knowledge into its `CLAUDE.md` and nothing more;
   the workspace-wide rules are already stationed in the global file

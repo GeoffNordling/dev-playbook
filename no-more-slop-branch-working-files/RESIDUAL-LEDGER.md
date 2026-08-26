@@ -116,7 +116,7 @@ bare link text: `classify()` has no type for docs outside
 ## skill-creator
 
 Could not express the interview loop of steps 2 and 6 (no primitive
-for a question-and-answer round), the `scripts/skill-lint` run (bare
+for a question-and-answer round), the `scripts/harness-files-lint` run (bare
 command, no link for a does edge), or the step-completion gates (no
 control-flow primitive).
 
@@ -124,7 +124,7 @@ control-flow primitive).
 
 Could not express the pre-flight `git status` check (no on-disk link, so
 no `{Read}`), forbidding commits (no primitive for a forbidden action),
-or the closing human verdict — accept-and-commit versus
+or the closing user verdict — accept-and-commit versus
 reject-and-restore-to-`HEAD` — which no primitive covers.
 
 ## doc-pr-review

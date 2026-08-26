@@ -10,8 +10,8 @@ alphabetical; directories last.
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
 - [Meta-Standard](/standards/standard.md) — Card for the meta-standard — how standards are declared as cards, cataloged, and kept honest
 - [Build](/standards/build.md) — Card for the build standard — how a repository is laid out, built, and checked
-- [Claude Code Harness Files](/standards/claude-code.md) — Card for the Claude Code harness-files standard — how harness-consumed files are distinguished from ordinary files and what each contains
 - [Decision Records](/standards/decisions.md) — Card for the decision-records standard — how hard-to-reverse decisions are recorded
+- [Harness Files](/standards/harness.md) — Card for the harness-files standard — how files whose meaning is fixed by the agent harness's loading contract are distinguished from ordinary files and what each contains
 - [Instruments](/standards/instrument.md) — Card for the instrument standard — how purpose-built devices are specified and kept conformant
 - [Knowledge Organization](/standards/knowledge-organization.md) — Card for the knowledge-organization standard — how knowledge is organized in markdown
 - [Module Design](/standards/modules.md) — Card for the module-design standard — how modules are designed
@@ -34,7 +34,7 @@ alphabetical; directories last.
 ## Directories
 
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement, bootstrap
-- [claude-code/](/standards/claude-code/index.md) — The Claude Code harness-files standard, one concern per document — the member registry, CLAUDE.md content, skill conventions, skill management
+- [harness/](/standards/harness/index.md) — The harness-files standard, one concern per document — the member registry, CLAUDE.md content, skill conventions, skill management
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, working documentation sets
 - [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — doc conventions and the named slop tics
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading

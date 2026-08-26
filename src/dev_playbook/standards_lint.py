@@ -680,7 +680,7 @@ def audit(
 
     A repo carrying no standards/ surface -- neither a catalog nor a flat card --
     is clean by construction: there is nothing to police, so the walk returns no
-    findings rather than can't-run on the absent catalog (the skill-lint
+    findings rather than can't-run on the absent catalog (the harness-files-lint
     optional-surface precedent). A repo with cards but no catalog is a malformed
     surface, so it still fails loud through ``check_catalog_order``. The
     canonical-template leg of hook-surfaces and the shadow rule are gated on the

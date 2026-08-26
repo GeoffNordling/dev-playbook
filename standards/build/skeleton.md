@@ -14,7 +14,7 @@ forbids.
 | Entry | Presence | Rule |
 |---|---|---|
 | `README.md` | Required | content per [readme-content.md](/standards/knowledge-organization/readme-content.md) |
-| `CLAUDE.md` | Required | content per [claude-content.md](/standards/claude-code/claude-content.md) |
+| `CLAUDE.md` | Required | content per [claude-content.md](/standards/harness/claude-content.md) |
 | `index.md` | Required | at the root; further indexes wherever concept docs live; content per [indexes.md](/standards/knowledge-organization/indexes.md) |
 | `.gitignore` | Required | contains the canonical baseline lines; `MAY` extend |
 | `.pre-commit-config.yaml` | Required | contains the canonical blocks; `MAY` append further hooks |
@@ -26,7 +26,7 @@ forbids.
 | `docs/` | Optional | guides and surveys that outgrow the README, each an OKF concept doc |
 | `docs/decisions/` | Optional | Decision Records per [decisions/records.md](/standards/decisions/records.md) |
 | `readings/` | Optional | instrument output artifacts, one subdirectory per instrument, per [the instrument standard](/standards/instrument/format.md); regenerated manually on demand, never hand-edited, may lag what it describes |
-| `.claude/` | Optional | Claude Code files per [the harness-files standard](/standards/claude-code/index.md); `worktrees/` gitignored |
+| `.claude/` | Optional | Claude Code files per [the harness-files standard](/standards/harness/index.md); `worktrees/` gitignored |
 | `requirements.txt` | Forbidden | anywhere in the tree; dependencies live in `pyproject.toml` + `uv.lock` |
 | `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, `IDEAS.md` | Forbidden | anywhere in the tree; uncommitted work lives in `CANDIDATES.md` and committed work in issues, per [tracking/candidates.md](/standards/tracking/candidates.md) |
 

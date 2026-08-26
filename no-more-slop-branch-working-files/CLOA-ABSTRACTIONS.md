@@ -351,7 +351,7 @@ The population a repo's loop must account for is enumerated by its two
 registries — the
 [document-type registry](/standards/knowledge-organization/document-types.md)
 for concept docs and the
-[Claude Code file registry](/standards/claude-code/files.md) for harness
+[Claude Code file registry](/standards/harness/files.md) for harness
 files — so "every unit accounted for" is a checkable claim, and each
 registered type gets a disposition into the ontology. The boundary
 between the two is encoded as `classify()` in `src/dev_playbook/md.py`.

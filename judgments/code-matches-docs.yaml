@@ -12,7 +12,7 @@
 # everything X does is sanctioned by Y, never that X covers all of Y.
 #
 # A multi-card detector is put on trial one subset judgment per card. repo-lint
-# emits build.*, docs.*, and claude-code.* rules, so each card's rule-prefix
+# emits build.*, docs.*, and harness.* rules, so each card's rule-prefix
 # slice is tried against that card's standard in its own judgment -- keeping any
 # single judge's reference set small instead of one judgment over every card.
 judgments:
@@ -22,7 +22,7 @@ judgments:
       corresponds to a requirement stated in the standards/build/ documents.
       The standard may state more than the tool checks; the tool must not
       check more than the standard states. repo-lint is a multi-card
-      detector -- its docs.* and claude-code.* checks are on trial in their
+      detector -- its docs.* and harness.* checks are on trial in their
       own judgments, not here.
     evidence:  [scripts/repo-lint]
     reference:
@@ -54,9 +54,9 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: repo-lint-claude-code-subset-of-standard
+  - id: repo-lint-harness-subset-of-standard
     claim: |
-      Every check scripts/repo-lint performs that emits a `claude-code.`
+      Every check scripts/repo-lint performs that emits a `harness.`
       rule corresponds to a requirement stated in the referenced standards:
       the agent-facing voice of every CLAUDE.md and of every first-party
       agent definition, skill, and rule body, and the global file's
@@ -65,7 +65,7 @@ judgments:
       tool checks; the tool must not check more than the standards state.
     evidence:  [scripts/repo-lint]
     reference:
-      - standards/claude-code/claude-content.md
+      - standards/harness/claude-content.md
       - standards/prose/conventions.md
     model: claude-sonnet-5
     effort: high
@@ -138,13 +138,13 @@ judgments:
     claim: |
       dev-playbook's CLAUDE.md contains only content the claude-content
       contract permits: every kind of content in the file is one that
-      standards/claude-code/claude-content.md sanctions for a repo's own
+      standards/harness/claude-content.md sanctions for a repo's own
       injected CLAUDE.md — operating knowledge specific to this repo, and
       nothing that holds for every repo, since that belongs to the global
       file. The contract may permit more than this file uses; this file must
       not exceed it.
     evidence:  [CLAUDE.md]
     reference:
-      - standards/claude-code/claude-content.md
+      - standards/harness/claude-content.md
     model: claude-sonnet-5
     effort: high

@@ -61,7 +61,7 @@ generates every chain into
 Your job is translation. Re-express this one file using only the
 existing encoding rules, so the code generates a true chain from it —
 while the prose stays natural for its other two readers: the agent that
-executes it and the human who reads it. You are not designing rules.
+executes it and the user who reads it. You are not designing rules.
 Where the rules cannot express something, do your best with what they
 allow and record the leftover honestly.
 

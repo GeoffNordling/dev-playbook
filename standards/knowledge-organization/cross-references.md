@@ -38,7 +38,7 @@ is already inside that repo), so both use the Link form for same-repo
 targets. Files with **no fixed repo root** — skills and global `~/.claude/`
 config such as `rules/` and `agents/`, loaded across arbitrary repos — have
 no root for `/` to resolve against, so they use the Citation form even for a
-same-repo target (see [skill-conventions.md — Cross-references](/standards/claude-code/skill-conventions.md#cross-references)).
+same-repo target (see [skill-conventions.md — Cross-references](/standards/harness/skill-conventions.md#cross-references)).
 That same-repo Citation resolves per
 [Same-repo resolution](/standards/knowledge-organization/cross-references.md#same-repo-resolution)
 below, against the reader's own checkout.

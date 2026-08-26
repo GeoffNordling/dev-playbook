@@ -44,24 +44,24 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-claude-code
+  - id: standard-card-harness
     claim: |
-      standards/claude-code.md is an honest card: every pointer in its
+      standards/harness.md is an honest card: every pointer in its
       define, audit, enforce, and adopt cells names a real artifact that
       genuinely serves that cell's role for the Claude Code harness-files
       standard, and no cell misrepresents what its targets do.
-    evidence:  [standards/claude-code.md]
+    evidence:  [standards/harness.md]
     reference:
       - standards/standard/format.md
-      - standards/claude-code/index.md
-      - standards/claude-code/files.md
-      - standards/claude-code/claude-content.md
-      - standards/claude-code/skill-conventions.md
-      - standards/claude-code/skill-management.md
+      - standards/harness/index.md
+      - standards/harness/files.md
+      - standards/harness/claude-content.md
+      - standards/harness/skill-conventions.md
+      - standards/harness/skill-management.md
       - dotfiles/.agents/skills/writing-for-agents/SKILL.md
       - scripts/repo-lint
-      - scripts/skill-lint
-      - judgments/claude-code.yaml
+      - scripts/harness-files-lint
+      - judgments/harness.yaml
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high

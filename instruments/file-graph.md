@@ -59,7 +59,7 @@ or third-party trees.
 
 The bucket tests follow the concept/harness boundary
 ([file-roles.md](/standards/knowledge-organization/file-roles.md)) and the harness-file registry
-([files.md](/standards/claude-code/files.md)); the reference encoding is
+([files.md](/standards/harness/files.md)); the reference encoding is
 `classify()` in [md.py](/src/dev_playbook/md.py).
 
 ## Edge accounting

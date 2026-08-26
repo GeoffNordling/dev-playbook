@@ -10,7 +10,7 @@ Conventions for Claude Code skill bundles in this workspace. For the full
 feature reference (subagent execution, shell injection, hooks, etc.), see the
 [official skill documentation](https://code.claude.com/docs/en/skills).
 
-This standard is binding, and [skill-lint](/scripts/skill-lint) enforces it at
+This standard is binding, and [harness-files-lint](/scripts/harness-files-lint) enforces it at
 the commit gate. The craft beside it is the installed `/writing-for-agents`
 skill, which covers any document an agent consumes and discloses its
 skill-specific half to `SKILL-MECHANICS.md`.

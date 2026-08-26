@@ -2,7 +2,7 @@
 """Audit internal SKILL.md files for skill-conventions.md conformance.
 
 Scans skill bundles authored in this repo against the conventions in
-dev-playbook's standards/claude-code/skill-conventions.md. Two skill roots are checked
+dev-playbook's standards/harness/skill-conventions.md. Two skill roots are checked
 when present in the target directory:
 
   - .claude/skills/                (project-level skills, any repo)
@@ -15,19 +15,19 @@ harness scratch, not bundles, and are not discovered at all. The same
 invocation is safe in any repo: with no skill roots there is nothing to scan.
 
 In a repo with a committed dotfiles/.agents/skills/ tree (dev-playbook), the
-claude-code.skill-mirror check additionally reports the symlink-mirror
+harness.skill-mirror check additionally reports the symlink-mirror
 conditions bin/sync-dotfiles.sh repairs — missing, mispointed, stale, or
 colliding entries under dotfiles/dot-claude/skills/. It is inert elsewhere.
 
 Output:
-    stdout — one finding per line, `file: claude-code.rule message`.
+    stdout — one finding per line, `file: harness.rule message`.
     stderr — non-failing advisories (body length) and one summary line.
     exit   — 0 clean, 1 findings, 2 error state (an agents tree without its
              mirror, or a directory under a skill root with no SKILL.md).
 
 Usage:
-    skill-lint [directory]
-    skill-lint --list-rules
+    harness-files-lint [directory]
+    harness-files-lint --list-rules
 """
 # /// script
 # requires-python = ">=3.14"
@@ -47,27 +47,27 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit — the skill conventions live under the
-# claude-code card. body-length is not here: it is a non-failing stderr advisory,
+# harness card. body-length is not here: it is a non-failing stderr advisory,
 # not a finding. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-PARSE = "claude-code.parse"
-FRONT_MATTER = "claude-code.front-matter"
-REQUIRED_FIELD = "claude-code.required-field"
-BANNED_FIELD = "claude-code.banned-field"
-NAME_MATCH = "claude-code.name-match"
-NAME_FORMAT = "claude-code.name-format"
-DESCRIPTION_TYPE = "claude-code.description-type"
-DESCRIPTION_LENGTH = "claude-code.description-length"
-DESCRIPTION_SENTENCES = "claude-code.description-sentences"
-DESCRIPTION_TRIGGER = "claude-code.description-trigger"
-UNKNOWN_FIELD = "claude-code.unknown-field"
-MODEL_VALUE = "claude-code.model-value"
-EFFORT_VALUE = "claude-code.effort-value"
-DMI_TYPE = "claude-code.dmi-type"
-BODY_H1 = "claude-code.body-h1"
-REFERENCES_DEPTH = "claude-code.references-depth"
-SKILL_MIRROR = "claude-code.skill-mirror"
+PARSE = "harness.parse"
+FRONT_MATTER = "harness.front-matter"
+REQUIRED_FIELD = "harness.required-field"
+BANNED_FIELD = "harness.banned-field"
+NAME_MATCH = "harness.name-match"
+NAME_FORMAT = "harness.name-format"
+DESCRIPTION_TYPE = "harness.description-type"
+DESCRIPTION_LENGTH = "harness.description-length"
+DESCRIPTION_SENTENCES = "harness.description-sentences"
+DESCRIPTION_TRIGGER = "harness.description-trigger"
+UNKNOWN_FIELD = "harness.unknown-field"
+MODEL_VALUE = "harness.model-value"
+EFFORT_VALUE = "harness.effort-value"
+DMI_TYPE = "harness.dmi-type"
+BODY_H1 = "harness.body-h1"
+REFERENCES_DEPTH = "harness.references-depth"
+SKILL_MIRROR = "harness.skill-mirror"
 
 RULES = (
     PARSE,
@@ -559,26 +559,26 @@ def main():
         # stopping condition, not a reason to withhold findings already made.
         for f in all_findings:
             print(f.render())
-        print(f"skill-lint: {err}", file=sys.stderr)
+        print(f"harness-files-lint: {err}", file=sys.stderr)
         sys.exit(2)
 
     for f in all_findings:
         print(f.render())
     for advisory in all_advisories:
-        print(f"skill-lint: {advisory}", file=sys.stderr)
+        print(f"harness-files-lint: {advisory}", file=sys.stderr)
 
     errors = len(all_findings)
     skills = len(internal_skills)
     suffix = f" (skipped {skipped} external)" if skipped else ""
     if errors:
         print(
-            f"skill-lint: {skills} internal skills, {errors} finding(s), "
+            f"harness-files-lint: {skills} internal skills, {errors} finding(s), "
             f"{len(all_advisories)} advisory(ies){suffix}",
             file=sys.stderr,
         )
     else:
         print(
-            f"skill-lint: {skills} internal skills, all ok{suffix}",
+            f"harness-files-lint: {skills} internal skills, all ok{suffix}",
             file=sys.stderr,
         )
 

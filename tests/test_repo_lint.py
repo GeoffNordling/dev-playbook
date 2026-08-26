@@ -297,7 +297,7 @@ def test_claude_md_first_person_fails(tmp_path: Path) -> None:
     files["CLAUDE.md"] += "\n## Rules\n\n- I want my tests to pass.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "claude-code.agent-facing-voice" in result.stdout
+    assert "harness.agent-facing-voice" in result.stdout
     assert "'I'" in result.stdout
     assert "'my'" in result.stdout
 
@@ -315,7 +315,7 @@ def test_nested_claude_md_voice_checked(tmp_path: Path) -> None:
     files["sub/CLAUDE.md"] = "I run the tool from here.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "sub/CLAUDE.md: claude-code.agent-facing-voice" in result.stdout
+    assert "sub/CLAUDE.md: harness.agent-facing-voice" in result.stdout
 
 
 def test_skill_body_first_person_fails(tmp_path: Path) -> None:
@@ -336,7 +336,7 @@ def test_rule_body_first_person_fails(tmp_path: Path) -> None:
     files[".claude/rules/commands.md"] = "# Commands\n\nI run my own checks.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert ".claude/rules/commands.md: claude-code.agent-facing-voice" in result.stdout
+    assert ".claude/rules/commands.md: harness.agent-facing-voice" in result.stdout
     assert "'I'" in result.stdout
     assert "'my'" in result.stdout
 
@@ -353,7 +353,7 @@ def test_agent_definition_body_first_person_fails(tmp_path: Path, relpath: str) 
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert f"{relpath}: claude-code.agent-facing-voice" in result.stdout
+    assert f"{relpath}: harness.agent-facing-voice" in result.stdout
     assert "'I'" in result.stdout
     assert "'my'" in result.stdout
 
@@ -363,7 +363,7 @@ def test_rule_body_object_pronoun_fails(tmp_path: Path) -> None:
     files[".claude/rules/commands.md"] = "# Commands\n\nHand the command to me.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert ".claude/rules/commands.md: claude-code.agent-facing-voice" in result.stdout
+    assert ".claude/rules/commands.md: harness.agent-facing-voice" in result.stdout
     assert "'me'" in result.stdout
 
 
@@ -461,10 +461,7 @@ def test_global_claude_extra_section_fails(tmp_path: Path) -> None:
     files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "\n## Extras\n\nNope.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert (
-        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-shape"
-        in result.stdout
-    )
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
 
 
 def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
@@ -479,10 +476,7 @@ def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert (
-        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-shape"
-        in result.stdout
-    )
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
 
 
 def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
@@ -494,10 +488,7 @@ def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert (
-        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-rules"
-        in result.stdout
-    )
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-rules" in result.stdout
     assert "Navigate docs by index" in result.stdout
 
 
@@ -948,12 +939,11 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     ids = set(result.stdout.split())
     assert "build.required-file" in ids
     assert "build.canonical-block" in ids
-    assert "claude-code.agent-facing-voice" in ids
+    assert "harness.agent-facing-voice" in ids
     assert "knowledge-organization.doc-shape" in ids
     assert "tracking.rogue-future-work-file" in ids
     assert all(
-        rule.split(".")[0]
-        in {"build", "claude-code", "knowledge-organization", "tracking"}
+        rule.split(".")[0] in {"build", "harness", "knowledge-organization", "tracking"}
         for rule in ids
     ), ids
 
@@ -970,10 +960,7 @@ def test_global_claude_shape_uses_claude_code_id(tmp_path: Path) -> None:
     files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "\n## Extras\n\nNope.\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert (
-        "dotfiles/dot-claude/CLAUDE.md: claude-code.global-claude-shape"
-        in result.stdout
-    )
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
 
 
 def test_canonical_dir_exempt_from_tree_rules(tmp_path: Path) -> None:

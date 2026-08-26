@@ -45,7 +45,7 @@ DETECTORS = (
     "ref-lint",
     "okf-lint",
     "decisions-lint",
-    "skill-lint",
+    "harness-files-lint",
     "judgments-lint",
     "prose-lint",
     "standards-lint",

@@ -1,6 +1,6 @@
-"""Behavioral tests for scripts/skill-lint.
+"""Behavioral tests for scripts/harness-files-lint.
 
-skill-lint declares pyyaml via PEP 723 and imports the local dev_playbook
+harness-files-lint declares pyyaml via PEP 723 and imports the local dev_playbook
 package, so it is invoked the way pre-commit runs it: `uv run --script`. It
 walks skill bundles under .claude/skills/ (no git needed).
 """
@@ -8,7 +8,9 @@ walks skill bundles under .claude/skills/ (no git needed).
 import subprocess
 from pathlib import Path
 
-SKILL_LINT = Path(__file__).resolve().parents[1] / "scripts" / "skill-lint"
+HARNESS_FILES_LINT = (
+    Path(__file__).resolve().parents[1] / "scripts" / "harness-files-lint"
+)
 
 
 def valid_skill(name: str = "greet", body: str = "# Greet\n\nDo the thing.\n") -> str:
@@ -51,7 +53,7 @@ def make_repo(tmp_path: Path, skills: dict[str, str]) -> Path:
 
 def run(repo: Path) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["uv", "run", "--script", str(SKILL_LINT), str(repo)],
+        ["uv", "run", "--script", str(HARNESS_FILES_LINT), str(repo)],
         capture_output=True,
         text=True,
     )
@@ -83,14 +85,14 @@ def test_conforming_skill_is_clean(tmp_path: Path) -> None:
     assert result.stdout == ""
 
 
-def test_missing_required_field_is_a_claude_code_finding(tmp_path: Path) -> None:
+def test_missing_required_field_is_a_harness_finding(tmp_path: Path) -> None:
     skill = "---\nname: greet\nmodel: sonnet\neffort: low\n---\n\n# Greet\n"
     repo = make_repo(tmp_path, {"greet": skill})
 
     result = run(repo)
 
     assert result.returncode == 1
-    assert ".claude/skills/greet/SKILL.md: claude-code.required-field" in result.stdout
+    assert ".claude/skills/greet/SKILL.md: harness.required-field" in result.stdout
 
 
 def test_unclosed_front_matter_names_what_is_wrong(tmp_path: Path) -> None:
@@ -101,7 +103,7 @@ def test_unclosed_front_matter_names_what_is_wrong(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.parse" in result.stdout
+    assert "harness.parse" in result.stdout
     assert "never closed" in result.stdout
 
 
@@ -111,7 +113,7 @@ def test_name_mismatch_is_flagged(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1
-    assert "claude-code.name-match" in result.stdout
+    assert "harness.name-match" in result.stdout
 
 
 def test_body_length_is_a_stderr_advisory_that_never_fails(tmp_path: Path) -> None:
@@ -145,7 +147,7 @@ def test_description_that_is_not_two_sentences_blocks(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.description-sentences" in result.stdout
+    assert "harness.description-sentences" in result.stdout
 
 
 def test_unterminated_description_counts_as_zero_sentences(tmp_path: Path) -> None:
@@ -169,7 +171,7 @@ def test_trigger_rule_binds_a_model_invoked_skill(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.description-trigger" in result.stdout
+    assert "harness.description-trigger" in result.stdout
 
 
 def test_a_user_invoked_description_is_one_sentence(tmp_path: Path) -> None:
@@ -193,7 +195,7 @@ def test_a_user_invoked_description_carrying_a_trigger_blocks(tmp_path: Path) ->
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.description-sentences" in result.stdout
+    assert "harness.description-sentences" in result.stdout
     assert "must be exactly 1" in result.stdout
 
 
@@ -209,7 +211,7 @@ def test_a_malformed_invocation_field_keeps_the_strict_description_rule(
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.description-sentences" in result.stdout
+    assert "harness.description-sentences" in result.stdout
 
 
 def test_use_when_must_open_the_second_sentence(tmp_path: Path) -> None:
@@ -222,7 +224,7 @@ def test_use_when_must_open_the_second_sentence(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.description-trigger" in result.stdout
+    assert "harness.description-trigger" in result.stdout
 
 
 def test_period_inside_a_token_does_not_end_a_sentence(tmp_path: Path) -> None:
@@ -245,7 +247,7 @@ def test_unknown_frontmatter_field_blocks(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.unknown-field" in result.stdout
+    assert "harness.unknown-field" in result.stdout
     assert "turns" in result.stdout
 
 
@@ -267,8 +269,8 @@ def test_user_invocable_is_reported_once_as_a_banned_field(tmp_path: Path) -> No
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.banned-field" in result.stdout
-    assert "claude-code.unknown-field" not in result.stdout
+    assert "harness.banned-field" in result.stdout
+    assert "harness.unknown-field" not in result.stdout
 
 
 def test_dot_directory_under_a_skill_root_is_not_a_skill(tmp_path: Path) -> None:
@@ -297,25 +299,25 @@ def test_a_directory_with_no_skill_md_is_an_error_state(tmp_path: Path) -> None:
     assert "no SKILL.md" in result.stderr
 
 
-def test_list_rules_prints_claude_code_ids_from_any_cwd(tmp_path: Path) -> None:
+def test_list_rules_prints_harness_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
-        ["uv", "run", "--script", str(SKILL_LINT), "--list-rules"],
+        ["uv", "run", "--script", str(HARNESS_FILES_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "claude-code.required-field" in ids
-    assert "claude-code.body-h1" in ids
-    assert "claude-code.description-sentences" in ids
-    assert "claude-code.unknown-field" in ids
+    assert "harness.required-field" in ids
+    assert "harness.body-h1" in ids
+    assert "harness.description-sentences" in ids
+    assert "harness.unknown-field" in ids
     assert "body-length" not in " ".join(ids)
-    assert all(rule.startswith("claude-code.") for rule in ids), ids
+    assert all(rule.startswith("harness.") for rule in ids), ids
 
 
 def test_repo_self_scan_is_clean() -> None:
-    """The dev-playbook repo's own authored skills pass skill-lint."""
+    """The dev-playbook repo's own authored skills pass harness-files-lint."""
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -329,7 +331,7 @@ def test_missing_mirror_symlink_is_a_skill_mirror_finding(tmp_path: Path) -> Non
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.skill-mirror" in result.stdout
+    assert "harness.skill-mirror" in result.stdout
     assert "caveman" in result.stdout
 
 
@@ -355,20 +357,20 @@ def test_mirror_symlink_pointing_elsewhere_is_a_finding(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.skill-mirror" in result.stdout
+    assert "harness.skill-mirror" in result.stdout
     assert "dot-claude/skills/foo" in result.stdout
 
 
 def test_list_rules_includes_skill_mirror(tmp_path: Path) -> None:
     result = subprocess.run(
-        ["uv", "run", "--script", str(SKILL_LINT), "--list-rules"],
+        ["uv", "run", "--script", str(HARNESS_FILES_LINT), "--list-rules"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
     )
 
     assert result.returncode == 0, result.stderr
-    assert "claude-code.skill-mirror" in result.stdout.split()
+    assert "harness.skill-mirror" in result.stdout.split()
 
 
 def test_correctly_mirrored_tree_is_clean(tmp_path: Path) -> None:
@@ -403,7 +405,7 @@ def test_stale_mirror_symlink_is_a_finding(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.skill-mirror" in result.stdout
+    assert "harness.skill-mirror" in result.stdout
     assert "dot-claude/skills/gone" in result.stdout
 
 
@@ -419,5 +421,5 @@ def test_real_entry_colliding_with_agents_skill_is_a_finding(tmp_path: Path) -> 
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "claude-code.skill-mirror" in result.stdout
+    assert "harness.skill-mirror" in result.stdout
     assert "dot-claude/skills/foo" in result.stdout
