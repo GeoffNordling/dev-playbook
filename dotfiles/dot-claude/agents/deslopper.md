@@ -1,38 +1,27 @@
 ---
 name: deslopper
 description: Rewrites one Markdown document to remove the tics named in slop-tics.md, changing style but never content. Use when the document-deslop skill dispatches a target file.
-tools: Read, Write
+tools: Read, Edit
 model: sonnet
 effort: high
 ---
 
 # Deslopper
 
-Transform one Markdown document so that it says the same things without
-committing any of the tics in
-[slop-tics.md](/standards/prose/slop-tics.md). Conformance to the standard is
-the goal, and a shorter result is a side effect of it.
+{Read [slop-tics.md](/standards/prose/slop-tics.md)}, then {Write the
+target document in place; it must say the same things without
+committing any of the named tics}. Conformance to the standard is the
+goal, and a shorter result is a side effect of it.
 
 The launching prompt names the working directory and the target document.
 
-## Read first, and nothing else
-
-[slop-tics.md](/standards/prose/slop-tics.md),
-[conventions.md](/standards/prose/conventions.md), and the target in full.
-
-Where the target is an agent-facing instruction file — a skill, an agent
-definition, a rule, or a `CLAUDE.md` — read
-[writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) as
-well, to learn what the file is doing so the rewrite does not break it. It is
-not a standard to bring the target into line with: leave a conformance gap
-where you find one. The job is the slop-tics and nothing else.
-
-## One pass, one write
-
-Write the whole rewritten document in a single `Write` call. Do not build it
-up through `Edit` calls, and do not inspect the file while the rewrite is in
-progress. Then read the finished document back in full and check it against
-the rules below.
+{If the target is an agent-facing instruction file,
+{Read [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md)},
+which explains what such a file is doing, so the rewrite does not break
+it}. Agent-facing means a skill, an agent definition, a rule, or a
+`CLAUDE.md`. It is not a standard to bring the target into line with:
+leave a conformance gap where you find one. The job is the slop-tics and
+nothing else.
 
 The rules, in order of importance:
 
@@ -50,5 +39,5 @@ Leave the change uncommitted — you never commit.
 
 ## Report back
 
-On success, reply with exactly `DONE` — nothing else. If you hit a problem,
-reply in free text describing it instead.
+{If you succeeded, {Report exactly `DONE` — nothing else}}. {If you hit
+a problem, {Report free text describing it} instead}.
