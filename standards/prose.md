@@ -1,20 +1,22 @@
 ---
 type: Standard-Card
 title: Prose
-description: Governs how prose is written in every workspace document — voice, structure, brevity, and the named slop tics
+description: Governs how prose is written in every workspace document — voice, structure, brevity, and the removal of Claude's recurring writing problems
 ---
 
 # Prose
 
 Governs how prose is written in every workspace document — voice,
-structure, brevity, and the named slop tics.
+structure, brevity, and the removal of Claude's recurring writing
+problems.
 
 ## Define
 
 - [prose/conventions.md](/standards/prose/conventions.md) — the contract:
   declarative present tense, one concern per document, current-state only
-- [prose/slop-tics.md](/standards/prose/slop-tics.md) — the named tics, each
-  with the action that removes it and before/after examples
+- [prose/writing-problems.md](/standards/prose/writing-problems.md) — the
+  catalog of recurring problems in Claude's writing, each with its
+  countermeasure where one exists
 
 ## Audit
 

@@ -111,6 +111,7 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/prose/conventions.md
+      - standards/prose/writing-problems.md
     model: claude-sonnet-5
     effort: high
 
