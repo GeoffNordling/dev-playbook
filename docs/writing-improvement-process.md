@@ -65,24 +65,26 @@ pattern's entry.
 
 ## Principles
 
-- Work backwards from human verifiability. The user verifies short
-  sentences in the terminal and edit diffs in the IDE. An exhaustive
-  enumeration the user cannot check is meaningless to produce, whatever
-  its accuracy.
-- User attention is the most expensive resource in the loop. A turn
+- User attention is expensive. The user can verify short sentences in
+  the terminal and view diffs in the IDE. Build processes that demand
+  realistic user attention: asking for too much user attention leads
+  to rubber stamping, which leads to slop. A turn
   that shows the user something must return real information — genuine
-  approval, pushback, correction. A rubber-stamped checkpoint returns
-  nothing and costs context rot.
-- AI degrades when doing many things at once, and document writing is
-  many things at once. Decompose into single-focus subagent tasks.
+  approval, pushback, correction.
+- AI degrades when doing multiple things at once, and document writing is
+  many things at once. Decompose into single-focus subagent tasks that
+  can stack sequentially or in parallel.
 - Codified formats are followed once written, but rigid full
   specification cannot cover infinite scenarios — structure works as
   strong guidance plus flex, a menu of sections rather than a fixed
   list.
 - Quantified back pressure — deterministic checks or scoring
-  functions — helps small iterative adjustments converge.
+  functions — helps small iterative adjustments converge. Scoring functions
+  can be deterministic code or stochastic model calls.
+- Define "what good looks like", and compell the AI to compare against it.
+- Decide on one home for information. Verify it landed in the correct place.
 
-## Platform facts (Claude Code, researched 2026-08)
+## Platform facts (Claude Code 2.1.247)
 
 - A `fork`-type subagent inherits the full parent conversation and
   returns a result, and always runs on the parent session's model.

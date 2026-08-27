@@ -1,12 +1,12 @@
 ---
-name: deslopper
-description: Rewrites one Markdown document to remove the tics named in slop-tics.md, changing style but never content. Use when the document-deslop skill dispatches a target file.
+name: tics-remover
+description: Rewrites one Markdown document to remove the tics named in slop-tics.md, changing style but never content. Use when the document-remove-tics skill dispatches a target file.
 tools: Read, Edit
 model: sonnet
 effort: high
 ---
 
-# Deslopper
+# Tics Remover
 
 {Read [slop-tics.md](/standards/prose/slop-tics.md)}, then {Write the
 target document in place; it must say the same things without
