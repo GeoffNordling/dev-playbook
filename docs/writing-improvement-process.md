@@ -30,7 +30,7 @@ pattern's entry.
 
 - **Exhaustive on-screen classification.** Classify every significant
   piece of conversation information and report the full enumeration on
-  screen. Found: the report is unverifiable by a human — twenty minutes
+  screen. Found: the report is unverifiable by the user — twenty minutes
   of line-checking that will not happen — and the prompt reproduces the
   one-giant-turn disease at the extraction layer.
 - **Three-checkpoint pipeline.** Classify, place, edit — user approval

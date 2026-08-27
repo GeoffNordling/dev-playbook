@@ -41,6 +41,22 @@ def with_user_invocation(skill: str) -> str:
     )
 
 
+def valid_agent(name: str = "scout", body: str = "# Scout\n\nGo look.\n") -> str:
+    return (
+        f"---\nname: {name}\n"
+        "description: Scouts the repo for a topic. Use when a caller "
+        "dispatches a scouting task.\n"
+        "tools: Read, Bash\nmodel: sonnet\neffort: low\n---\n\n"
+    ) + body
+
+
+def make_agent(repo: Path, filename: str, contents: str) -> None:
+    """Write one agent definition under .claude/agents/."""
+    path = repo / ".claude" / "agents" / filename
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(contents)
+
+
 def make_repo(tmp_path: Path, skills: dict[str, str]) -> Path:
     """Write {skill_name: SKILL.md contents} under .claude/skills/; return root."""
     repo = tmp_path / "repo"
@@ -261,7 +277,8 @@ def test_disallowed_tools_is_a_documented_field(tmp_path: Path) -> None:
     assert result.stdout == ""
 
 
-def test_user_invocable_is_reported_once_as_a_banned_field(tmp_path: Path) -> None:
+def test_user_invocable_is_an_unknown_field(tmp_path: Path) -> None:
+    """The retired field gets no special ban — the closed vocabulary catches it."""
     repo = make_repo(
         tmp_path, {"greet": with_field(valid_skill(), "user-invocable: true")}
     )
@@ -269,8 +286,51 @@ def test_user_invocable_is_reported_once_as_a_banned_field(tmp_path: Path) -> No
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.banned-field" in result.stdout
-    assert "harness.unknown-field" not in result.stdout
+    assert "harness.unknown-field" in result.stdout
+    assert "user-invocable" in result.stdout
+
+
+def test_argument_hint_is_an_unknown_field(tmp_path: Path) -> None:
+    """The retired argument-hint field is outside the vocabulary."""
+    skill = with_field(valid_skill(), 'argument-hint: "[topic]"')
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.unknown-field" in result.stdout
+    assert "argument-hint" in result.stdout
+
+
+def test_arguments_list_of_kebab_names_is_clean(tmp_path: Path) -> None:
+    skill = with_field(valid_skill(), "arguments: [subject, issue-number]")
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def test_arguments_that_is_not_a_list_blocks(tmp_path: Path) -> None:
+    skill = with_field(valid_skill(), "arguments: subject")
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.arguments-format" in result.stdout
+
+
+def test_non_kebab_argument_name_blocks(tmp_path: Path) -> None:
+    skill = with_field(valid_skill(), "arguments: [setHint]")
+    repo = make_repo(tmp_path, {"greet": skill})
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.arguments-format" in result.stdout
+    assert "setHint" in result.stdout
 
 
 def test_dot_directory_under_a_skill_root_is_not_a_skill(tmp_path: Path) -> None:
@@ -312,15 +372,96 @@ def test_list_rules_prints_harness_ids_from_any_cwd(tmp_path: Path) -> None:
     assert "harness.body-h1" in ids
     assert "harness.description-sentences" in ids
     assert "harness.unknown-field" in ids
+    assert "harness.arguments-format" in ids
+    assert "harness.tools-format" in ids
+    assert "harness.banned-field" not in ids
     assert "body-length" not in " ".join(ids)
     assert all(rule.startswith("harness.") for rule in ids), ids
 
 
 def test_repo_self_scan_is_clean() -> None:
-    """The dev-playbook repo's own authored skills pass harness-files-lint."""
+    """The dev-playbook repo's own authored runbooks pass harness-files-lint."""
     repo = Path(__file__).resolve().parents[1]
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_conforming_agent_is_clean(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    make_agent(repo, "scout.md", valid_agent())
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+    assert "1 agents" in result.stderr
+
+
+def test_agent_name_must_match_file_stem(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    make_agent(repo, "lookout.md", valid_agent(name="scout"))
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.name-match" in result.stdout
+    assert "file stem" in result.stdout
+
+
+def test_skill_only_field_on_an_agent_is_unknown(tmp_path: Path) -> None:
+    """The agent vocabulary is closed to its five fields."""
+    agent = valid_agent().replace(
+        "effort: low\n", "effort: low\ndisable-model-invocation: false\n", 1
+    )
+    repo = tmp_path / "repo"
+    make_agent(repo, "scout.md", agent)
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.unknown-field" in result.stdout
+    assert "disable-model-invocation" in result.stdout
+
+
+def test_agent_tools_must_be_a_string(tmp_path: Path) -> None:
+    agent = valid_agent().replace("tools: Read, Bash\n", "tools: [Read, Bash]\n", 1)
+    repo = tmp_path / "repo"
+    make_agent(repo, "scout.md", agent)
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.tools-format" in result.stdout
+
+
+def test_agent_description_takes_the_two_sentence_shape(tmp_path: Path) -> None:
+    """Agents carry no disable-model-invocation, so the trigger sentence binds."""
+    agent = valid_agent().replace(
+        "description: Scouts the repo for a topic. Use when a caller "
+        "dispatches a scouting task.\n",
+        "description: Scouts the repo for a topic.\n",
+        1,
+    )
+    repo = tmp_path / "repo"
+    make_agent(repo, "scout.md", agent)
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "harness.description-sentences" in result.stdout
+    assert "must be exactly 2" in result.stdout
+
+
+def test_agent_without_tools_field_is_clean(tmp_path: Path) -> None:
+    """tools is optional: omitting it grants the full toolset, not a finding."""
+    agent = valid_agent().replace("tools: Read, Bash\n", "", 1)
+    repo = tmp_path / "repo"
+    make_agent(repo, "scout.md", agent)
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
 
 
 def test_missing_mirror_symlink_is_a_skill_mirror_finding(tmp_path: Path) -> None:

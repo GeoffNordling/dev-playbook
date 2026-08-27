@@ -25,13 +25,6 @@
   ├─reports─► outcome: str    `outcome` `"done"`
   └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
 
-[deslopper] Agent · tools: Read, Edit, model: sonnet, effort: high
-  ├─reads───► [slop-tics] Standard
-  ├─writes──► local file    the target document in place
-  ├ ╌ reads ╌ ► {writing-for-agents} Skill    if the target is an agent-facing instruction file
-  ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
-  └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
-
 [doc-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
   ├─reads───► review contract
   ├─reads───► PR feedback
@@ -53,6 +46,13 @@
   ├─does────► [set-auditor] Agent
   ├─writes──► local file    the fix for each finding into the set's members
   └─reports─► outcome: str    a minimal report: one line per member changed, and one line per finding left unfixed with the reason
+
+[tics-remover] Agent · tools: Read, Edit, model: sonnet, effort: high
+  ├─reads───► [slop-tics] Standard
+  ├─writes──► local file    the target document in place
+  ├ ╌ reads ╌ ► {writing-for-agents} Skill    if the target is an agent-facing instruction file
+  ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
+  └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
 
 [agent-view-overwatch] Skill · model: sonnet, effort: xhigh, allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
   ├─reads───► software-factory.md
@@ -113,9 +113,9 @@
 
 {diagnosing-bugs} Skill
 
-[document-deslop] Skill · model: sonnet, effort: high
+[document-remove-tics] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
-  └─does────► [deslopper] Agent    the subagent, `model: sonnet`
+  └─does────► [tics-remover] Agent    the subagent, `model: sonnet`
 
 {domain-modeling} Skill
 
@@ -204,7 +204,6 @@
 
 [pocock-sweep] Skill · model: inherit, effort: xhigh
   ├─reads───► external-skill-verdicts.md    end-to-end
-  ├─reads───► [skill-management] Standard    end-to-end
   ├ ╌ reports ╌ ► outcome: str    that there is nothing to sweep    if the ledger already names this tag
   ├─reports─► outcome: str    which route it resolved to
   ├─writes──► local file    the ledger to the new pin
@@ -230,9 +229,9 @@
 
 [skill-creator] Skill · model: opus, effort: xhigh
   ├─args────► idea
-  ├─reads───► [skill-conventions] Standard    plus its checklist, walked before done
+  ├─reads───► [runbook-conventions] Standard
   ├─does────► {writing-for-agents} Skill    in context
-  ├─overrides─► {writing-for-agents} Skill    on craft guidance    with [skill-conventions] Standard
+  ├─overrides─► {writing-for-agents} Skill    on craft guidance    with [runbook-conventions] Standard
   └─writes──► local file    the new skill bundle, project-local or cross-project home
 
 [update-standards-pin] Skill · model: opus, effort: xhigh

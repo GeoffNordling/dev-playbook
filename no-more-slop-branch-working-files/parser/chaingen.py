@@ -28,7 +28,7 @@ LEXICON = {
     "launch": "does",
     "run": "does",
     "override": "overrides",
-    "if": "guard",
+    "if": "condition",
 }
 
 NODE_DATA_KEYS = ("tools", "model", "effort", "allowed-tools")
@@ -294,13 +294,13 @@ def edge_from_span(key, payload, span, body, source_file):
 
 
 def edges_of(body, source_file):
-    """All edges of a body in document order, guard conditions stamped."""
+    """All edges of a body in document order, conditions stamped."""
     edges = []
     for span in scan_spans(body):
         key, payload = keyword_of(span)
         if key == "if":
             if not span.children:
-                raise LintError(f"guard at offset {span.start} nests no span")
+                raise LintError(f"condition at offset {span.start} nests no span")
             # condition: raw text between the keyword and the first nested
             # span, trailing comma dropped
             condition = collapse(
@@ -314,7 +314,9 @@ def edges_of(body, source_file):
             for child in span.children:
                 ckey, cpayload = keyword_of(child)
                 if ckey == "if":
-                    raise LintError(f"guard nested in guard at offset {child.start}")
+                    raise LintError(
+                        f"condition nested in condition at offset {child.start}"
+                    )
                 edge = edge_from_span(ckey, cpayload, child, body, source_file)
                 edge.condition = "if " + condition
                 edges.append(edge)
@@ -327,7 +329,7 @@ def edges_of(body, source_file):
 
 
 def render_edge(edge, last):
-    """Render one edge line — dashed when guarded, solid otherwise."""
+    """Render one edge line — dashed when conditional, solid otherwise."""
     corner = "└" if last else "├"
     if edge.condition:
         arrow = f"{corner} ╌ {edge.label} ╌ ►"

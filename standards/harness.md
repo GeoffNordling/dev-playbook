@@ -34,9 +34,10 @@ the only harness currently in use.
   CLAUDE.md source's two-section shape and the workspace-wide rules it must
   carry (`harness.global-claude-shape`,
   `harness.global-claude-rules`)
-- [harness-files-lint](/scripts/harness-files-lint) — skill bundles in
-  skill-authoring repos, plus the `harness.skill-mirror`
-  correspondence between authored and installed skills (dev-playbook)
+- [harness-files-lint](/scripts/harness-files-lint) — skill bundles and
+  agent definitions in runbook-authoring repos, plus the
+  `harness.skill-mirror` correspondence between authored and installed
+  skills (dev-playbook)
 - [judgments/harness.yaml](/judgments/harness.yaml) — the LLM-judged
   claim that the root and global CLAUDE.md genuinely read as agent-facing
   voice, the semantic check the token-level rule cannot make
