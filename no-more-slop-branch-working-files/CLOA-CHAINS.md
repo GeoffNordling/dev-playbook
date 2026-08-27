@@ -191,16 +191,16 @@ One sentence carries the target: wizard authors a Script — deterministic
 bash the user runs later; the script's own future writes (.env, GitHub
 secrets) belong to that Script's chain, and this skill never runs it.
 
-### skill-creator
+### runbook-creator
 
-    [skill-creator] Skill · model: opus, effort: xhigh
+    [runbook-creator] Skill · model: opus, effort: xhigh
       ├─reads───► [skill-conventions] Standard    plus its checklist before done
       ├─does────► [writing-for-agents] Skill      in-context
       ├ ╌ overrides [writing-for-agents]'s craft guidance
       │    with ╌ ╌ ► [skill-conventions] Standard   they collide
       └─writes──► local file(new skill bundle)    project-local or cross-project home
 
-One sentence carries the target: skill-creator writes a new node of this
+One sentence carries the target: runbook-creator writes a new node of this
 very graph — a skill bundle authored against the conventions Standard,
 with writing-for-agents active and overridden where the Standard
 collides. No reports.
@@ -307,7 +307,7 @@ secret-redaction rule is a ledgered behavior-mode setting, not an edge.
 One sentence carries the target: writing-for-agents is pure craft
 guidance — its whole behavior is being active in the calling context;
 its only read is its own bundled reference, collapsed by the zoom rule,
-and other runbooks do it (skill-creator) and override it where a Standard
+and other runbooks do it (runbook-creator) and override it where a Standard
 collides.
 
 ### codebase-design

@@ -46,11 +46,8 @@ edit here before its first use.
   with the literal words `Use when` and names the trigger keywords,
   contexts, or file types verbatim — it is the invocation match surface,
   so be specific.
-- `disable-model-invocation` — always explicit, never left to the
-  default. `false` is the standard; `true` only for skills meant for
-  direct user invocation, and under `true` the description is exactly
-  one sentence — the summary the user reads in the slash-command list,
-  trigger sentence dropped.
+- `disable-model-invocation` — mandatory, and the user decides it every
+  time.
 - `model`, `effort` — mandatory; the user decides both explicitly, and
   `inherit` is a choice like any other. A pinned model governs only the
   turn that loads the skill, so an interactive, multi-turn skill takes

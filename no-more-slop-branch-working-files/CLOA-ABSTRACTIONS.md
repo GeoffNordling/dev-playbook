@@ -320,7 +320,7 @@ but deliberately outside the ontology until a ruling is reversed.
   (judgments-sweep's fix-attempt cap and skip list); ruled not
   accounted.
 - **User interview loops** — a mid-run, multi-round dialogue with the
-  user (skill-creator's "iterate until the user is satisfied";
+  user (runbook-creator's "iterate until the user is satisfied";
   grilling's whole body). Conversing is what running in the calling
   context means; ruled not accounted.
 - **Behavior-mode setting** — a runbook whose body installs standing
