@@ -7,8 +7,10 @@ description: How Markdown docs are written — voice, structure, brevity, curren
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Applies to every doc
-in the repo documentation hierarchy. Named tics to remove are cataloged in
-[Slop Tics](/standards/prose/slop-tics.md).
+in the repo documentation hierarchy, except a document carrying
+`type: Reference` frontmatter — a verbatim mirror of an external text, which
+keeps its author's words wherever it lives. Named tics to remove are
+cataloged in [Slop Tics](/standards/prose/slop-tics.md).
 
 ## Current state and next steps only
 
@@ -116,27 +118,10 @@ translate it: "readable", not "readable by a person". Translate instead only
 where the qualifier carries a distinction the reader needs — the system pauses
 at many points and `software-factory/user-checkpoints.md` covers the subset
 that are the user's, so dropping the word there would name the wrong set. The
-test is whether removing it loses a distinction.
+test is whether removing it loses a distinction. Prose addressed to an outside
+audience is exempt, and uses that audience's own vocabulary.
 
-## Lint exemptions
-
-Three rules here are enforced deterministically — the American spelling, the
-one word for the actor, and the first-person ban. Text they do not govern —
-captured external documents, prose authored for an outside audience in that
-audience's vocabulary, a tool file that must name a banned word in order to
-ban it — is exempted by listing its path in a tracked `.prose-lint-exempt` at
-the repo root: one repo-relative file or directory per line, a directory
-covering its whole subtree, `#` opening a comment line. Any file is listable,
-an `index.md` included. Every exemption is a reviewable line in it, ideally
-under a comment saying why.
-
-Two structural exemptions stand alongside it and need no declaration: a
-third-party skill under an `.agents/` path, carried unmodified so it can be
-re-synced from upstream, so its voice is its author's to set; and a Markdown
-verbatim mirror carrying `type: Reference` frontmatter, which follows the
-document wherever it lives.
-
-## Choose each format by argument
+## How to decide between section formats
 
 Every block's form is a decision with a reason behind it. The arguments that
 recur:
