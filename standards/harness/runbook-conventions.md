@@ -41,11 +41,13 @@ edit here before its first use.
 
 - `name` — kebab-case, matching the bundle directory. Related skills
   share a namespace prefix.
-- `description` — plain text, max 1024 chars, third person, exactly two
-  sentences. The first states what the skill does; the second begins
-  with the literal words `Use when` and names the trigger keywords,
-  contexts, or file types verbatim — it is the invocation match surface,
-  so be specific.
+- `description` — plain text, max 1024 chars, third person. Its sentence
+  count follows `disable-model-invocation`. Under `false`, exactly two:
+  the first states what the skill does, and the second begins with the
+  literal words `Use when` and names the trigger keywords, contexts, or
+  file types verbatim — it is the invocation match surface, so be
+  specific. Under `true`, exactly one — the summary the user reads in
+  the slash-command list, no trigger sentence.
 - `disable-model-invocation` — mandatory, and the user decides it every
   time.
 - `model`, `effort` — mandatory; the user decides both explicitly, and
@@ -105,7 +107,9 @@ effort: <low|medium|high|xhigh>
 
 These five fields are the whole agent vocabulary; a new one requires an
 edit here before its first use. `name`, `description`, `model`, and
-`effort` follow the skill rules above. The one agent-only field:
+`effort` follow the skill rules above — and an agent has no
+`disable-model-invocation`, so its description always takes the
+two-sentence shape. The one agent-only field:
 
 - `tools` — a hard allowlist: comma-separated tool names, and the
   launched agent has exactly these tools; omit the field and the agent
