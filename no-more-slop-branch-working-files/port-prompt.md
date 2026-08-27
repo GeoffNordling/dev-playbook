@@ -35,9 +35,8 @@ the body below the rule.
    transcript, never by rewriting it.
 4. Tick the batch's roster checkboxes, then report the round tally:
    completed vs. open, first-party vs. third-party.
-5. Commit only on the user's /commit, with `SKIP=playbook-lint`
-   (pushes add `SKIP=make-check`) until the plan's pre-commit stage
-   lands.
+5. Commit only on the user's /commit. The gate runs unaided — no
+   `SKIP`.
 
 ---
 

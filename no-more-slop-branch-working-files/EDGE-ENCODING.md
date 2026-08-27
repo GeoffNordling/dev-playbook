@@ -295,8 +295,7 @@ entry awaiting a verdict. Lives in its own file:
   uncommitted — the runbook's encoding, the map's new rows and detail
   bullets, and the ledger's new entries — so the diff against HEAD is
   the whole proposal; one ruling approves and commits it all. Commits
-  run the document linters; the test-suite hook is skipped
-  (`SKIP=make-check` on push). Proposals edit the live files directly.
+  run the full gate, unaided. Proposals edit the live files directly.
 - **Acronyms defined once**, at the top of anything we write.
 
 ## Port roster

@@ -152,6 +152,18 @@ exemplar, worked as the abstraction shape in
   [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md), each
   with its leftovers recorded in the
   [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
+- **The runbook standard, and the gate green.**
+  [Runbook Conventions](/standards/harness/runbook-conventions.md)
+  replaced what the old docs taught: `skill-management.md` deleted, the
+  `## Name: $ARGUMENTS` heading and `argument-hint` retired, `arguments`
+  declared. `scripts/harness-files-lint` audits agents as well as skills
+  against per-kind closed vocabularies and enforces the new keys
+  (`harness.arguments-format`, `harness.tools-format`);
+  `harness.banned-field` is gone. `skill-creator` became
+  `runbook-creator`, a procedure that states no rules and defers to the
+  standard. Every commit from 8d5a80f on carries no `SKIP` — the gate is
+  green unaided, which was this step's bar. A tangent off it produced
+  [the writing-improvement process](/docs/writing-improvement-process.md).
 
 **Raw ideas, none designed**
 
@@ -302,21 +314,7 @@ roster are third-party verbatim — vendored bytes under
 `dotfiles/.agents/skills/`, which the current policy forbids editing,
 and a port is nothing but an edit:
 
-1. **The standard, and the gate goes green.** The grammar's standard
-   card and the skill-standards scrub are likely one job: the new
-   standard replaces what the old docs teach (the `## Name: $ARGUMENTS`
-   heading, `argument-hint`), and `scripts/harness-files-lint` and friends stop
-   expecting the old forms and start enforcing the map — which is also
-   what fixes the failing pre-commit checks. Today every port commit
-   rides `SKIP=playbook-lint` (pushes add `SKIP=make-check`) because
-   harness-files-lint's closed frontmatter vocabulary rejects the `arguments`
-   key. The skips are deliberate and temporary; the branch does not
-   merge while any remain.
-
-   **Structured process for document writing.** I struck off a tangent from
-   Step 1 because runbook-conventions.md was total slop. NO MORE SLOP!
-   Improve this, then come back and finish Step 1.
-2. **Retire verbatim adoption.** A Decision Record changes the policy:
+1. **Retire verbatim adoption.** A Decision Record changes the policy:
    external skills are no longer adopted verbatim — the corpus requires
    every runbook to carry the edge encoding, and vendored bytes cannot be
    edited, so verbatim adoption is rejected for that reason. The
@@ -327,9 +325,9 @@ and a port is nothing but an edit:
    stance — `pocock-sweep`, the external-skill-verdicts ledger, the
    skill-management standard, and whatever else the sweep of those docs
    finds.
-3. **Port the converted skills.** The former (3P) thirteen, now owned,
+2. **Port the converted skills.** The former (3P) thirteen, now owned,
    go through the same port as the first-party runbooks.
-4. **Final Quality Pass.** Go through the final skills and look for residual
+3. **Final Quality Pass.** Go through the final skills and look for residual
 opportunities. We deemphasized residuals tracking during the conversion
 sweeps so we'll need a fresh eye to see if we're happy with the final result
 or if we need new expressions. Basically scan skills and look for important things
