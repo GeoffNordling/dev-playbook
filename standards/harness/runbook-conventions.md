@@ -20,24 +20,9 @@ Both kinds share four fields, and the rules are the same everywhere:
 | Field | Rules |
 |-------|-------|
 | `name` | Kebab-case, concise, verb-noun or noun when obvious. Related runbooks share a namespace prefix. The name must match its identity anchor — a skill's directory name, an agent's file stem. |
-| `description` | Plain text, max 1024 chars, third person, **exactly two sentences**. The first states what the runbook does; the second `SHALL` begin with the literal words `Use when` and name the trigger keywords, contexts, or file types verbatim — it is the invocation match surface, so be specific. Keep the wording minimal; nothing checks length. Sentences are counted dumbly: `.`, `!`, or `?` ends one when whitespace or the string's end follows, so a filename is safe mid-sentence but `e.g.` ends a sentence early. |
-| `model` | The model the runbook runs under — `haiku`, `sonnet`, `opus`, or `fable` — or `inherit` to follow the session model. Mandatory. **The user decides `model` and `effort` explicitly**, never an agent and never a machinery default; `inherit` is a choice like any other. |
-| `effort` | `low`, `medium`, `high`, or `xhigh`. No default — the user's decision, same as `model`. |
-
-### Body
-
-After the front matter, the body is Markdown.
-
-- Start with an `# H1` title. Use the runbook's readable name, not the
-  kebab-case ID.
-- Use `##` sections to organize instructions. The number and depth of
-  sections should match the runbook's complexity — no formula here, use
-  judgment.
-- Content decisions (what sections to include, what patterns to use) are
-  made per runbook, not prescribed by this standard.
-- Avoid time-sensitive content (hardcoded version numbers, dates,
-  release-specific paths) — it goes stale faster than the runbook is
-  updated.
+| `description` | Plain text, max 1024 chars, third person, **exactly two sentences**. The first states what the runbook does; the second `SHALL` begin with the literal words `Use when` and name the trigger keywords, contexts, or file types verbatim — it is the invocation match surface, so be specific. Keep the wording minimal.|
+| `model` | The model the runbook runs under, or `inherit` to follow the session model. Mandatory. **The user decides `model` and `effort` explicitly**. |
+| `effort` | Mandatory, no default — the user's decision, same as `model`. |
 
 ### Cross-references
 
@@ -75,18 +60,15 @@ arguments: [<name>, ...]            # optional
 ```
 
 These eight fields are the whole skill vocabulary; a new one requires an
-edit here before its first use. The fields the shared table does not
-cover:
+edit here before its first use. Where a skill adds to the shared rules:
 
 | Field | Rules |
 |-------|-------|
-| `disable-model-invocation` | Always explicit — never rely on the default. `false` is the standard; use `true` only for skills meant for direct user invocation. Under `true` the description is exactly one sentence — the one-line summary the user reads in the slash-command list, trigger sentence dropped. |
+| `disable-model-invocation` | Always explicit — never left to the default (`false`). Use `true` only for skills meant for direct user invocation. Under `true` the description is exactly one sentence — the one-line summary the user reads in the slash-command list, trigger sentence dropped. |
+| `model` | A pinned model governs only the turn that loads the skill, so an interactive, multi-turn skill takes `inherit`. |
 | `allowed-tools` | Space-separated tool specs, e.g. `Bash(git *) Bash(gh *)`, pre-approved to run without prompting. Use for focused, mechanical skills. |
 | `disallowed-tools` | Same format; denies outright. Use where a stance must be enforced rather than asked for. Don't restate a workspace-wide denial from the settings. |
 | `arguments` | One kebab-case name per input. See [Arguments](#arguments). |
-
-A pinned `model` governs only the turn that loads the skill, so an
-interactive, multi-turn skill takes `inherit`.
 
 ### Arguments
 
@@ -158,9 +140,7 @@ effort: <low|medium|high|xhigh>
 ```
 
 These five fields are the whole agent vocabulary; a new one requires an
-edit here before its first use.
-
-Beyond the shared four:
+edit here before its first use. Where an agent adds to the shared rules:
 
 | Field | Rules |
 |-------|-------|
