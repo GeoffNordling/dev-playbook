@@ -1,18 +1,30 @@
 ---
 type: General-Sheet
-title: Writing Process Attempts
-description: The record of attempts at a general document-writing process — what each tried and where it fell short
+title: Writing Improvement Process
+description: The document-writing problem, the intention to improve it iteratively, and the capture step that records what goes wrong each time a document is written
 ---
 
-# Writing Process Attempts
+# Writing Improvement Process
 
-The open problem: a long working conversation accumulates intent —
+The problem: a long working conversation accumulates intent —
 decisions, corrections, scope rulings — and one turn is then asked to
 write the document, doing everything at once. Drafts written that way
 carry the problems in
-[writing-problems.md](/standards/prose/writing-problems.md). This sheet
-records the attempts at a process fix, so the next attempt starts from
-what is known.
+[writing-improvement-problems.md](/docs/writing-improvement-process/writing-improvement-problems.md). The
+attempts below showed the problem is too large to fix in one stroke, so
+the intention is iterative: capture what goes wrong every time a
+document is written, watch the record for patterns, and build a
+mechanism for each pattern once it is known.
+
+## Capture
+
+Every document-writing session ends with an entry in
+[writing-improvement-log.md](/docs/writing-improvement-process/writing-improvement-log.md):
+which document, what went wrong, and what fixed it. When the same
+problem appears across entries, it graduates into
+[writing-improvement-problems.md](/docs/writing-improvement-process/writing-improvement-problems.md)
+as a named pattern; a countermeasure, once built, is linked from that
+pattern's entry.
 
 ## Attempts
 
@@ -31,8 +43,27 @@ what is known.
   at the ends. Tried once as a walkthrough; the interview itself
   produced a question the user could not follow, which decays into a
   rubber stamp. Neither adopted nor rejected.
+- **Classification primitives and dimensions.** A pre-defined structure
+  for conversation content, built because pointing the AI at specific
+  rules — use these primitives, use these dimensions — is how we build
+  AI workflows.
 
-## What the attempts established
+  The first pass was nine flat primitives, one bucket per item:
+
+  - decision
+  - fact
+  - goal
+  - constraint
+  - term
+  - open question
+  - deferral
+  - correction
+  - exclusion
+
+  Found: further ambiguities — the primitives were fighting one
+  another, there was no clear-cut answer, and it was left inconclusive.
+
+## Principles
 
 - Work backwards from human verifiability. The user verifies short
   sentences in the terminal and edit diffs in the IDE. An exhaustive
@@ -50,14 +81,6 @@ what is known.
   list.
 - Quantified back pressure — deterministic checks or scoring
   functions — helps small iterative adjustments converge.
-
-## Considered, not wired in
-
-A classification scheme for conversation content: every significant
-item classified on three axes at once — kind (fact, decision, goal,
-constraint, terminology, principle), status (settled, open, deferred),
-and optional flags (corrected, excluded-from-doc). Built and audited
-for overlap; no process uses it.
 
 ## Platform facts (Claude Code, researched 2026-08)
 

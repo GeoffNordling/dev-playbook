@@ -1,22 +1,18 @@
 ---
 type: Standard-Card
 title: Prose
-description: Governs how prose is written in every workspace document — voice, structure, brevity, and the removal of Claude's recurring writing problems
+description: Governs how prose is written in every workspace document — voice, structure, and brevity
 ---
 
 # Prose
 
 Governs how prose is written in every workspace document — voice,
-structure, brevity, and the removal of Claude's recurring writing
-problems.
+structure, and brevity.
 
 ## Define
 
 - [prose/conventions.md](/standards/prose/conventions.md) — the contract:
   declarative present tense, one concern per document, current-state only
-- [prose/writing-problems.md](/standards/prose/writing-problems.md) — the
-  catalog of recurring problems in Claude's writing, each with its
-  countermeasure where one exists
 
 ## Audit
 

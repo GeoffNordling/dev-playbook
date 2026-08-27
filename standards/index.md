@@ -15,7 +15,7 @@ alphabetical; directories last.
 - [Instruments](/standards/instrument.md) — Governs how purpose-built devices — artifact formats with tooling — are specified and kept conformant
 - [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — file roles, document types, indexes, cross-references, and working documentation sets
 - [Module Design](/standards/modules.md) — Governs how modules are designed — interfaces, depth, and seams
-- [Prose](/standards/prose.md) — Governs how prose is written in every workspace document — voice, structure, brevity, and the removal of Claude's recurring writing problems
+- [Prose](/standards/prose.md) — Governs how prose is written in every workspace document — voice, structure, and brevity
 - [Python](/standards/python.md) — Governs how Python source code is written — language conventions and the anti-pattern catalog
 - [Python Testing](/standards/testing.md) — Governs how Python tests are written — structure, behavioral focus, test doubles, fixtures, and humble objects
 - [Semantic Validation](/standards/semantic-validation.md) — Governs how claims only language can check — accuracy, honesty, scope — are validated and kept from drifting as the underlying files change
@@ -35,7 +35,7 @@ alphabetical; directories last.
 - [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement, bootstrap
 - [harness/](/standards/harness/index.md) — The harness-files standard, one concern per document — the member registry, CLAUDE.md content, the instruction grammar, runbook conventions, skill management
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, working documentation sets
-- [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — conventions, the writing-problems catalog, and the process-attempts record
+- [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — conventions and the slop-tics catalog
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
 - [semantic-validation/](/standards/semantic-validation/index.md) — The judgments standard, one concern per document — declarations, the cache gate, consuming from another repo
 - [tracking/](/standards/tracking/index.md) — The tracking standard's contract, one concern per document — candidate conventions, issue authoring, repository settings, tracker operations
