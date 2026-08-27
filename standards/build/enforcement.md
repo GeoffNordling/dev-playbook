@@ -74,7 +74,7 @@ defect in the code. Which machine skips what is recorded in
 | standards-lint | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |
 | shfmt | shell formatting | hook pattern |
-| harness-files-lint | skill bundles (skill-authoring repos) | hook pattern |
+| harness-files-lint | runbooks — skill bundles and agent definitions (runbook-authoring repos) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments cache gate | push gate only — never the CI gate; the judgments cache gate is skipped on the secondary machines |
 | workspace-lint | GitHub settings and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |

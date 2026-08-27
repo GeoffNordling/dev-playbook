@@ -23,7 +23,7 @@ the only harness currently in use.
 - [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —
   the craft layer beside the binding format, installed verbatim from
   mattpocock/skills: how any document an agent consumes is written so the
-  agent behaves predictably; invoke it as `/writing-for-agents`, and Skill
+  agent behaves predictably; invoke it as `/writing-for-agents`, and Runbook
   Conventions wins where the two collide
 
 ## Audit

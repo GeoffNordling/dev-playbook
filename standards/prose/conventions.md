@@ -9,8 +9,10 @@ description: How Markdown docs are written — voice, structure, brevity, curren
 How Markdown documents in workspace repos are written. Applies to every doc
 in the repo documentation hierarchy, except a document carrying
 `type: Reference` frontmatter — a verbatim mirror of an external text, which
-keeps its author's words wherever it lives. Named tics to remove are
-cataloged in [Slop Tics](/standards/prose/slop-tics.md).
+keeps its author's words wherever it lives. A repo exempts any further path
+by listing it in a tracked `.prose-lint-exempt` at its root, under a comment
+saying why. Named tics to remove are cataloged in
+[Slop Tics](/standards/prose/slop-tics.md).
 
 ## Current state and next steps only
 
@@ -34,7 +36,7 @@ live in `scripts/`", not "don't put runnables elsewhere". A prohibition
 appears only when the prohibition itself is the rule.
 
 **Person of address.** Two kinds of document, two persons.
-**Harness-injected agent instructions** — the runbook and context members of
+**Harness-loaded agent instructions** — the runbook and context members of
 the Claude Code file registry ([files.md](/standards/harness/files.md)) — are
 addressed *to* the executing agent, so they speak in the imperative and `you`,
 and never in the first person: no `I`, `me`, or `my`. A first-person sentence
@@ -107,7 +109,7 @@ terms where they apply, with no obligation to extend it.
 ## Terminology: the person is the user
 
 One actor — the dispatcher, reviewer, and approver — carries one name
-everywhere: the `user`. Harness-injected agent instructions use it because
+everywhere: the `user`. Harness-loaded agent instructions use it because
 that is what Claude Code calls the person (`AskUserQuestion`); a declarative
 document uses the same word where it describes that actor.
 
