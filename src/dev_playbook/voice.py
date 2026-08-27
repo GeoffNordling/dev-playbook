@@ -10,11 +10,12 @@ rather than agent-facing-specific, and lives in ``dev_playbook.prose_lint``;
 conventions.md -- Terminology: the person is the user.)
 
 Two actors read this vocabulary, so it lives here rather than in either of
-them: ``scripts/repo-lint`` enforces it over every CLAUDE.md, skill, and rule
-body, and ``dev_playbook.repo_init`` refuses a repo name that carries one of
-these words, since the name becomes the H1 of the CLAUDE.md a fresh scaffold
-writes. Masking prose before matching -- inline code, fenced blocks, quoted
-speech -- is the enforcing detector's job, not this module's.
+them: ``dev_playbook.prose_lint`` enforces it over every harness-loaded agent
+instruction file (``md.is_agent_instruction`` decides which), and
+``dev_playbook.repo_init`` refuses a repo name that carries one of these words,
+since the name becomes the H1 of the CLAUDE.md a fresh scaffold writes. Masking
+prose before matching -- inline code, fenced blocks, quoted speech -- is the
+enforcing detector's job, not this module's.
 """
 
 import re

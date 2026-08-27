@@ -16,14 +16,17 @@ structure, and brevity.
 
 ## Audit
 
-- [prose-lint](/scripts/prose-lint) — the prose detector; two rules:
+- [prose-lint](/scripts/prose-lint) — the prose detector; three rules:
   `prose.judgment-spelling`, flagging the British `judgement`/`judgements`
-  form in all authored Markdown outside code spans, and `prose.banned-word`,
+  form in all authored Markdown outside code spans; `prose.banned-word`,
   flagging the banned actor noun (Terminology: the person is the user) in
   every tracked file this workspace authors, of any type, with no code-span or
-  fence escape — vendored `.agents/` trees, verbatim `type: Reference`
-  mirrors, and the paths a repo declares in its root `.prose-lint-exempt` are
-  outside the scan, as Terminology exempts them
+  fence escape; and `harness.agent-facing-voice`, flagging the first person in
+  a harness-loaded agent instruction file (Voice: person of address), which
+  answers the [harness](/standards/harness.md) card since its scope is that
+  registry. Vendored `.agents/` trees, verbatim `type: Reference` mirrors, and
+  the paths a repo declares in its root `.prose-lint-exempt` are outside the
+  scan for every one of the three
 
 ## Enforce
 

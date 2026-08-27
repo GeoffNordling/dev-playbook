@@ -28,16 +28,18 @@ the only harness currently in use.
 
 ## Audit
 
-- [repo-lint](/scripts/repo-lint) — CLAUDE.md presence; the agent-facing
-  voice of every CLAUDE.md, root to global — no first person
-  (`harness.agent-facing-voice`); and, in dev-playbook only, the global
-  CLAUDE.md source's two-section shape and the workspace-wide rules it must
-  carry (`harness.global-claude-shape`,
-  `harness.global-claude-rules`)
 - [harness-files-lint](/scripts/harness-files-lint) — skill bundles and
-  agent definitions in runbook-authoring repos, plus the
-  `harness.skill-mirror` correspondence between authored and installed
-  skills (dev-playbook)
+  agent definitions in runbook-authoring repos; the `harness.skill-mirror`
+  correspondence between authored and installed skills; and, in dev-playbook
+  only, the global CLAUDE.md source's two-section shape and the
+  workspace-wide rules it must carry (`harness.global-claude-shape`,
+  `harness.global-claude-rules`)
+- [prose-lint](/scripts/prose-lint) — the first person in any harness-loaded
+  agent instruction file, every CLAUDE.md and runbook and rule body alike
+  (`harness.agent-facing-voice`). The ban is one rule over all authored text,
+  so it runs with the [prose](/standards/prose.md) rules rather than beside
+  the format ones; this card keeps the claim because the registry is what
+  fixes which files it reaches
 - [judgments/harness.yaml](/judgments/harness.yaml) — the LLM-judged
   claim that the root and global CLAUDE.md genuinely read as agent-facing
   voice, the semantic check the token-level rule cannot make
@@ -46,9 +48,9 @@ the only harness currently in use.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — its published `playbook-lint` hook dispatches to both repo-lint and
-  harness-files-lint at the **commit gate** in every repo's suite; harness-files-lint
-  no-ops where a repo authors no skills
+  — its published `playbook-lint` hook dispatches to both harness-files-lint
+  and prose-lint at the **commit gate** in every repo's suite;
+  harness-files-lint no-ops where a repo authors no runbooks
 
 ## Adopt
 

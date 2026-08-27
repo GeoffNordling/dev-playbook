@@ -42,7 +42,7 @@ addressed *to* the executing agent, so they speak in the imperative and `you`,
 and never in the first person: no `I`, `me`, or `my`. A first-person sentence
 puts the document in the agent's mouth, which inverts who is instructing whom.
 **A declarative document** states facts to a reader instead: third person, no
-`you`. `repo-lint` enforces the first-person ban deterministically.
+`you`. `prose-lint` enforces the first-person ban deterministically.
 
 The ban governs the document's own voice: a double-quoted utterance is exempt.
 Write the phrasing a user types to trigger a skill, or the reaction a

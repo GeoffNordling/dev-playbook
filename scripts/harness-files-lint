@@ -1,9 +1,14 @@
 #!/usr/bin/env -S uv run --script
-"""Audit authored runbooks — skills and agents — against runbook-conventions.md.
+"""Audit the harness files a repo authors against their content standards.
 
-Scans the runbooks authored in this repo against the conventions in
-dev-playbook's standards/harness/runbook-conventions.md. Two skill roots and
-two agent roots are checked when present in the target directory:
+The detector for the registry members that carry a content standard
+(standards/harness/files.md): the runbooks — skills and agents — against
+runbook-conventions.md, and the global CLAUDE.md source against
+claude-content.md. Their voice is not checked here; the first-person ban is one
+rule over all authored text and lives with prose-lint.
+
+Two skill roots and two agent roots are checked when present in the target
+directory:
 
   - .claude/skills/                (project-level skills, any repo)
   - dotfiles/dot-claude/skills/    (workspace-global skills, dev-playbook only)
@@ -16,6 +21,10 @@ conformance is the upstream's concern. Dot-directories under a skill root are
 harness scratch, not bundles, and are not discovered at all. The same
 invocation is safe in any repo: with no runbook roots there is nothing to
 scan.
+
+The two global-CLAUDE.md rules are gated the same way, on the presence of
+dotfiles/dot-claude/CLAUDE.md — dev-playbook authors that file, and no other
+repo has one.
 
 In a repo with a committed dotfiles/.agents/skills/ tree (dev-playbook), the
 harness.skill-mirror check additionally reports the symlink-mirror
@@ -47,6 +56,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from dev_playbook import md  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit — the runbook conventions live under
@@ -72,6 +82,8 @@ TOOLS_FORMAT = "harness.tools-format"
 BODY_H1 = "harness.body-h1"
 REFERENCES_DEPTH = "harness.references-depth"
 SKILL_MIRROR = "harness.skill-mirror"
+GLOBAL_CLAUDE_SHAPE = "harness.global-claude-shape"
+GLOBAL_CLAUDE_RULES = "harness.global-claude-rules"
 
 RULES = (
     PARSE,
@@ -92,6 +104,8 @@ RULES = (
     BODY_H1,
     REFERENCES_DEPTH,
     SKILL_MIRROR,
+    GLOBAL_CLAUDE_SHAPE,
+    GLOBAL_CLAUDE_RULES,
 )
 
 # Each kind's front matter vocabulary is closed: these fields and nothing
@@ -122,6 +136,17 @@ MODEL_INVOKED_SENTENCES = 2
 USER_INVOKED_SENTENCES = 1
 TRIGGER_PREFIX = "Use when"
 BODY_MAX_LINES = 500
+
+# The dev-playbook global CLAUDE.md source, Stow-symlinked to ~/.claude/. Its
+# presence is the marker that gates the global-file checks to the one repo that
+# owns the file (claude-content.md — The global file).
+GLOBAL_CLAUDE = "dotfiles/dot-claude/CLAUDE.md"
+# The global file's two buckets, in order: dispositional stances, then
+# operating rules for named situations.
+GLOBAL_CLAUDE_SECTIONS = ("## Principles", "## Behaviors")
+# The workspace-wide rules the global file carries for every session, since no
+# repo's own CLAUDE.md restates them (claude-content.md — The global file).
+GLOBAL_CLAUDE_REQUIRED_RULES = ("### Read the standards", "### Navigate docs by index")
 
 
 class ToolError(Exception):
@@ -574,6 +599,45 @@ def check_skill_mirror(repo_root: Path) -> list[Finding]:
     return findings
 
 
+def check_global_claude(repo_root: Path) -> list[Finding]:
+    """Audit the global CLAUDE.md source's section shape and required rules.
+
+    The global file buckets its rules under exactly two H2s, '## Principles'
+    then '## Behaviors', and carries the workspace-wide rules every session
+    needs (claude-content.md — The global file). Gated on the source file's
+    presence, so it runs only in the repo that owns it; other repos have no
+    global file. Headings inside fenced blocks do not count, so a worked example
+    in the file does not read as a section of it.
+
+    The required-rules check is what stations the workspace-wide instructions:
+    no repo's own CLAUDE.md restates them, so this file is the only place they
+    can be checked.
+    """
+    path = repo_root / GLOBAL_CLAUDE
+    if not path.is_file():
+        return []
+    headings = [
+        line.strip() for _, line in md.content_lines(path) if line.startswith("#")
+    ]
+    sections = tuple(h for h in headings if h.startswith("## "))
+    findings = []
+    if sections != GLOBAL_CLAUDE_SECTIONS:
+        findings.append(
+            Finding(
+                GLOBAL_CLAUDE,
+                GLOBAL_CLAUDE_SHAPE,
+                f"H2 sections must be exactly {list(GLOBAL_CLAUDE_SECTIONS)},"
+                f" got {list(sections)}",
+            )
+        )
+    findings.extend(
+        Finding(GLOBAL_CLAUDE, GLOBAL_CLAUDE_RULES, f"missing rule '{rule}'")
+        for rule in GLOBAL_CLAUDE_REQUIRED_RULES
+        if rule not in headings
+    )
+    return findings
+
+
 def discover_internal_skills(skills_dir: Path) -> tuple[list[Path], int]:
     """Return (internal_skill_dirs, externally_managed_count).
 
@@ -652,6 +716,7 @@ def main():
     all_findings: list[Finding] = []
     all_advisories: list[str] = []
     try:
+        all_findings.extend(check_global_claude(repo_root))
         all_findings.extend(check_skill_mirror(repo_root))
         for skill_dir in internal_skills:
             findings, advisories = audit_skill(skill_dir, repo_root)

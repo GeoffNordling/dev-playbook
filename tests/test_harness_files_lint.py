@@ -564,3 +564,101 @@ def test_real_entry_colliding_with_agents_skill_is_a_finding(tmp_path: Path) -> 
     assert result.returncode == 1, result.stdout + result.stderr
     assert "harness.skill-mirror" in result.stdout
     assert "dot-claude/skills/foo" in result.stdout
+
+
+# --- the global CLAUDE.md source (dev-playbook only) ---
+
+# A conformant global CLAUDE.md source: the two buckets, in order, carrying the
+# workspace-wide rules.
+GLOBAL_VALID = (
+    "# Global\n\n"
+    "## Principles\n\n"
+    "### Be terse\n\nBe terse.\n\n"
+    "## Behaviors\n\n"
+    "### Read the standards\n\nRead the catalog first.\n\n"
+    "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
+    "### Teach unfamiliar terms\n\nExplain the unfamiliar term.\n"
+)
+
+
+def make_global_claude(tmp_path: Path, contents: str) -> Path:
+    """Write a global CLAUDE.md source into a fresh repo and return its root."""
+    repo = tmp_path / "repo"
+    path = repo / "dotfiles" / "dot-claude" / "CLAUDE.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(contents)
+    return repo
+
+
+def test_global_claude_valid_passes(tmp_path: Path) -> None:
+    result = run(make_global_claude(tmp_path, GLOBAL_VALID))
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_global_claude_extra_section_fails(tmp_path: Path) -> None:
+    repo = make_global_claude(tmp_path, GLOBAL_VALID + "\n## Extras\n\nNope.\n")
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
+
+
+def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
+    repo = make_global_claude(
+        tmp_path,
+        "# Global\n\n"
+        "## Behaviors\n\n"
+        "### Read the standards\n\nRead the catalog first.\n\n"
+        "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
+        "## Principles\n\n"
+        "### Be terse\n\nBe terse.\n",
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
+
+
+def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
+    # No repo's own CLAUDE.md restates these, so dropping one here would leave
+    # the instruction stationed nowhere.
+    repo = make_global_claude(
+        tmp_path,
+        GLOBAL_VALID.replace(
+            "### Navigate docs by index\n\nWalk the index descriptions.\n\n", ""
+        ),
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-rules" in result.stdout
+    assert "Navigate docs by index" in result.stdout
+
+
+def test_global_claude_fenced_heading_is_not_a_section(tmp_path: Path) -> None:
+    # A worked example inside a fence is illustration, not structure.
+    repo = make_global_claude(
+        tmp_path,
+        GLOBAL_VALID + "\n```markdown\n## Extras\n\nAn example, not a section.\n```\n",
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_global_claude_absent_gates_the_check(tmp_path: Path) -> None:
+    # Owning-repo gate: a repo with no global source — even one carrying an
+    # ordinary nested CLAUDE.md — emits no global-claude-* finding.
+    repo = tmp_path / "repo"
+    (repo / "sub").mkdir(parents=True)
+    (repo / "sub" / "CLAUDE.md").write_text("Operate carefully.\n")
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "global-claude" not in result.stdout

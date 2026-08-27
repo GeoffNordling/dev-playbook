@@ -69,12 +69,12 @@ defect in the code. Which machine skips what is recorded in
 | okf-lint | concept-doc types, `index.md` freshness | hook pattern |
 | decisions-lint | Decision Record sequential numbering, status vocabulary | hook pattern |
 | ref-lint | Links and Citations | hook pattern, except the CI gate and the secondary machines (skipped — neither carries the cited repos) |
-| prose-lint | prose spelling (the American `judgment`); the banned actor noun | hook pattern |
+| prose-lint | prose spelling (the American `judgment`); the banned actor noun; the first person in harness-loaded agent instructions | hook pattern |
 | judgments-lint | judgment declarations | hook pattern |
 | standards-lint | the meta-standard's card layout, catalog order, card↔rule matrix, hook surfaces | hook pattern (dev-playbook only) |
 | shellcheck | shell scripts | hook pattern |
 | shfmt | shell formatting | hook pattern |
-| harness-files-lint | runbooks — skill bundles and agent definitions (runbook-authoring repos) | hook pattern |
+| harness-files-lint | runbooks — skill bundles and agent definitions (runbook-authoring repos); the global CLAUDE.md source's shape (dev-playbook only) | hook pattern |
 | mypy | types | push gate only — never the CI gate |
 | pytest | tests + judgments cache gate | push gate only — never the CI gate; the judgments cache gate is skipped on the secondary machines |
 | workspace-lint | GitHub settings and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme and issue/epic tracking conformance, four-tuple validity, stale pins | workspace-lint (outside the gates) |

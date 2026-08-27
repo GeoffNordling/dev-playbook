@@ -242,6 +242,44 @@ class TestHasFixedRepoRoot:
         assert md.has_fixed_repo_root("standards/skills.md") is True
 
 
+class TestIsAgentInstruction:
+    @pytest.mark.parametrize(
+        "relpath",
+        [
+            "CLAUDE.md",
+            "sub/CLAUDE.md",
+            "dotfiles/dot-claude/CLAUDE.md",
+            ".claude/skills/demo/SKILL.md",
+            ".claude/skills/demo/references/angles.md",
+            "dotfiles/dot-claude/skills/commit/SKILL.md",
+            ".claude/agents/build.md",
+            "dotfiles/dot-claude/agents/open-pr.md",
+            ".claude/rules/bash-commands.md",
+            "dotfiles/dot-claude/rules/bash-commands.md",
+        ],
+    )
+    def test_harness_loaded_files_are_agent_instructions(self, relpath: str) -> None:
+        assert md.is_agent_instruction(relpath) is True
+
+    @pytest.mark.parametrize(
+        "relpath",
+        [
+            "README.md",
+            "standards/prose/conventions.md",
+            "standards/skills.md",
+            "docs/machines.md",
+            "src/dev_playbook/md.py",
+        ],
+    )
+    def test_declarative_sources_are_not(self, relpath: str) -> None:
+        assert md.is_agent_instruction(relpath) is False
+
+    def test_the_segment_must_be_a_directory_not_the_filename(self) -> None:
+        # "agents" naming the file is a document about agents, not one loaded
+        # as an agent definition.
+        assert md.is_agent_instruction("docs/agents.md") is False
+
+
 class TestHeadingSlugs:
     def test_collects_all_levels_skips_fenced(self, tmp_path: Path) -> None:
         f = tmp_path / "t.md"

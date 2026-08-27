@@ -63,6 +63,9 @@ SLUG_WHITESPACE = re.compile(r"\s")
 # classify() spells these names out again; add a fourth segment in both places.
 ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 
+# The one file the harness injects by name rather than by directory.
+INJECTED_CONTEXT_FILE = "CLAUDE.md"
+
 
 class UnclosedFence(ValueError):
     """A fenced code block that nothing ever closes.
@@ -216,6 +219,26 @@ def has_fixed_repo_root(relpath: str) -> bool:
     answer alike.
     """
     return not (ROOTLESS_SEGMENTS & set(PurePosixPath(relpath).parts))
+
+
+def is_agent_instruction(relpath: str) -> bool:
+    """True for a harness-loaded agent instruction file — a runbook or context member.
+
+    The set the agent-facing voice rule governs (prose/conventions.md — Voice,
+    person of address): every ``CLAUDE.md`` at any depth, plus every file under a
+    skills, rules, or agents root. Scope is stated once here rather than in each
+    detector that needs it.
+
+    Membership is decided by :data:`ROOTLESS_SEGMENTS` at any depth, the same
+    roster and the same at-any-depth test :func:`has_fixed_repo_root` uses — so a
+    path that ships into ``~/.claude`` for the citation rule is agent-facing for
+    the voice rule too, and ``dotfiles/dot-claude/skills/...`` and a consumer's
+    ``.claude/skills/...`` answer alike.
+    """
+    parts = PurePosixPath(relpath).parts
+    if parts[-1] == INJECTED_CONTEXT_FILE:
+        return True
+    return bool(ROOTLESS_SEGMENTS & set(parts[:-1]))
 
 
 def classify(relpath: str) -> str:

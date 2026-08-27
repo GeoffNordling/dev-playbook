@@ -10,8 +10,6 @@ import os
 import subprocess
 from pathlib import Path
 
-import pytest
-
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "repo-lint"
 CANONICAL = Path(__file__).resolve().parents[1] / "standards" / "build" / "canonical"
 
@@ -275,241 +273,6 @@ def test_repo_claude_md_bare_heading_passes(tmp_path: Path) -> None:
     files = base_files()
     files["CLAUDE.md"] = "# Sample Repo\n"
     assert run(make_repo(tmp_path, files)).returncode == 0
-
-
-# --- agent-facing voice (CLAUDE.md, skill bodies, rule bodies) ---
-
-# A conformant global CLAUDE.md source: the two buckets, the workspace-wide
-# rules, no voice tokens.
-GLOBAL_VALID = (
-    "# Global\n\n"
-    "## Principles\n\n"
-    "### Be terse\n\nBe terse.\n\n"
-    "## Behaviors\n\n"
-    "### Read the standards\n\nRead the catalog first.\n\n"
-    "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
-    "### Teach unfamiliar terms\n\nExplain the unfamiliar term.\n"
-)
-
-
-def test_claude_md_first_person_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files["CLAUDE.md"] += "\n## Rules\n\n- I want my tests to pass.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "harness.agent-facing-voice" in result.stdout
-    assert "'I'" in result.stdout
-    assert "'my'" in result.stdout
-
-
-def test_claude_md_voice_guards_compounds(tmp_path: Path) -> None:
-    # "I/O" is an abbreviation, not a first-person violation.
-    files = base_files()
-    files["CLAUDE.md"] += "\n## Rules\n\n- Produce well-formed I/O.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_nested_claude_md_voice_checked(tmp_path: Path) -> None:
-    files = base_files()
-    files["sub/CLAUDE.md"] = "I run the tool from here.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "sub/CLAUDE.md: harness.agent-facing-voice" in result.stdout
-
-
-def test_skill_body_first_person_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files["dotfiles/dot-claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
-        "# Demo\n\nI check my work before reporting.\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "dotfiles/dot-claude/skills/demo/SKILL.md" in result.stdout
-    assert "'I'" in result.stdout
-    assert "'my'" in result.stdout
-
-
-def test_rule_body_first_person_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files[".claude/rules/commands.md"] = "# Commands\n\nI run my own checks.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert ".claude/rules/commands.md: harness.agent-facing-voice" in result.stdout
-    assert "'I'" in result.stdout
-    assert "'my'" in result.stdout
-
-
-@pytest.mark.parametrize(
-    "relpath",
-    [".claude/agents/demo.md", "dotfiles/dot-claude/agents/demo.md"],
-)
-def test_agent_definition_body_first_person_fails(tmp_path: Path, relpath: str) -> None:
-    files = base_files()
-    files[relpath] = (
-        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
-        "# Demo\n\nI run my own checks.\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert f"{relpath}: harness.agent-facing-voice" in result.stdout
-    assert "'I'" in result.stdout
-    assert "'my'" in result.stdout
-
-
-def test_rule_body_object_pronoun_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files[".claude/rules/commands.md"] = "# Commands\n\nHand the command to me.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert ".claude/rules/commands.md: harness.agent-facing-voice" in result.stdout
-    assert "'me'" in result.stdout
-
-
-def test_vendored_skill_not_inspected(tmp_path: Path) -> None:
-    # Third-party skills are carried verbatim under .agents/ and published under
-    # the skills root by symlink; neither the vendored file nor the link is ours
-    # to hold to the workspace voice.
-    files = base_files()
-    files[".agents/skills/vendor/SKILL.md"] = (
-        "---\nname: vendor\ndescription: Upstream skill.\n---\n\n"
-        "# Vendor\n\nI ask you to tell me my options.\n"
-    )
-    repo = make_repo(
-        tmp_path,
-        files,
-        symlinks=(
-            (
-                ".claude/skills/vendor/SKILL.md",
-                "../../../.agents/skills/vendor/SKILL.md",
-            ),
-        ),
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_skill_code_exempt(tmp_path: Path) -> None:
-    # A backticked token and a fenced example are code, not voice.
-    files = base_files()
-    files[".claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
-        "# Demo\n\n"
-        "Ask before running `I am ready`.\n\n"
-        "```text\nI told my agent to run it.\n```\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_skill_frontmatter_in_scope(tmp_path: Path) -> None:
-    # The description is prose the agent reads to choose the skill, so it
-    # answers to the same voice as the body.
-    files = base_files()
-    files[".claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when I run my demo.\n---\n\n"
-        "# Demo\n\nRun the demo.\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "line 3: " in result.stdout
-    assert "'I'" in result.stdout
-    assert "'my'" in result.stdout
-
-
-def test_skill_quoted_speech_exempt(tmp_path: Path) -> None:
-    # A quoted utterance is the user's voice, not the document's — the trigger
-    # phrasing a skill is written to recognize.
-    files = base_files()
-    files[".claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
-        "# Demo\n\n"
-        'Use when the user says "Show me my options before I commit."\n'
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_skill_prose_outside_quotes_still_fails(tmp_path: Path) -> None:
-    # The exemption ends at the closing quote; the sentence around it is the
-    # document speaking.
-    files = base_files()
-    files[".claude/skills/demo/SKILL.md"] = (
-        "---\nname: demo\ndescription: Use when demoing.\n---\n\n"
-        "# Demo\n\n"
-        'When the user says "ship it", I commit my work.\n'
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "'I'" in result.stdout
-    assert "'my'" in result.stdout
-
-
-# --- global CLAUDE.md structure (dev-playbook only) ---
-
-
-def test_global_claude_valid_passes(tmp_path: Path) -> None:
-    files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_global_claude_extra_section_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "\n## Extras\n\nNope.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
-
-
-def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
-    files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = (
-        "# Global\n\n"
-        "## Behaviors\n\n"
-        "### Read the standards\n\nRead the catalog first.\n\n"
-        "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
-        "## Principles\n\n"
-        "### Be terse\n\nBe terse.\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
-
-
-def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
-    # No repo's own CLAUDE.md restates these, so dropping one here would leave
-    # the instruction stationed nowhere.
-    files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID.replace(
-        "### Navigate docs by index\n\nWalk the index descriptions.\n\n", ""
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-rules" in result.stdout
-    assert "Navigate docs by index" in result.stdout
-
-
-def test_global_claude_fenced_heading_is_not_a_section(tmp_path: Path) -> None:
-    # A worked example inside a fence is illustration, not structure.
-    files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = (
-        GLOBAL_VALID + "\n```markdown\n## Extras\n\nAn example, not a section.\n```\n"
-    )
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_global_claude_absent_gates_the_check(tmp_path: Path) -> None:
-    # Owning-repo gate: a repo with no global source — even one carrying an
-    # ordinary nested CLAUDE.md — emits no global-claude-* finding.
-    files = base_files()
-    files["sub/CLAUDE.md"] = "Operate carefully.\n"
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "global-claude" not in result.stdout
 
 
 def test_context_md_with_language_passes(tmp_path: Path) -> None:
@@ -939,11 +702,13 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     ids = set(result.stdout.split())
     assert "build.required-file" in ids
     assert "build.canonical-block" in ids
-    assert "harness.agent-facing-voice" in ids
     assert "knowledge-organization.doc-shape" in ids
     assert "tracking.rogue-future-work-file" in ids
+    # No harness.* here: the voice rule is prose-lint's and the global CLAUDE.md
+    # shape is harness-files-lint's. repo-lint checks that CLAUDE.md exists,
+    # which is build.required-file, and nothing about what it says.
     assert all(
-        rule.split(".")[0] in {"build", "harness", "knowledge-organization", "tracking"}
+        rule.split(".")[0] in {"build", "knowledge-organization", "tracking"}
         for rule in ids
     ), ids
 
@@ -955,12 +720,13 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     assert "CLAUDE.md: build.required-file " in result.stdout
 
 
-def test_global_claude_shape_uses_claude_code_id(tmp_path: Path) -> None:
+def test_global_claude_source_is_not_this_detectors_business(tmp_path: Path) -> None:
+    # The global file's shape moved to harness-files-lint; a misshapen one draws
+    # nothing here, and the file's mere presence trips no build rule either.
     files = base_files()
-    files["dotfiles/dot-claude/CLAUDE.md"] = GLOBAL_VALID + "\n## Extras\n\nNope.\n"
+    files["dotfiles/dot-claude/CLAUDE.md"] = "# Global\n\n## Extras\n\nNope.\n"
     result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_canonical_dir_exempt_from_tree_rules(tmp_path: Path) -> None:
