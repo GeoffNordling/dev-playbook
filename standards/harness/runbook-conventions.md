@@ -41,8 +41,8 @@ A skill is a bundle:
 ```
 
 The directory name must match the `name` field in the front matter.
-Where skills live is
-[skill-management.md](/standards/harness/skill-management.md)'s concern.
+Global skills live in `dotfiles/dot-claude/skills/`, stow-linked into
+`~/.claude/skills/`; repo skills live in that repo's `.claude/skills/`.
 
 ### Skill front matter
 
@@ -124,8 +124,6 @@ is governed elsewhere.
 An agent definition is one flat file, `<name>.md` — no bundle. Global
 agents live in `dotfiles/dot-claude/agents/`, stow-linked into
 `~/.claude/agents/`; repo agents live in that repo's `.claude/agents/`.
-Restart Claude Code after edits — the running session caches agent
-definitions at startup.
 
 ### Agent front matter
 

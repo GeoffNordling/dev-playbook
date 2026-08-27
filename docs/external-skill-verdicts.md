@@ -22,8 +22,7 @@ to fold into workspace material, and an idea inside a rejected skill is
 rejected with it, reevaluated only when the skill is.
 
 - **verbatim** — installed unmodified through the `skills` CLI and tracked in
-  `dotfiles/.agents/.skill-lock.json`, never edited here
-  ([skill-management.md](/standards/harness/skill-management.md)).
+  `dotfiles/.agents/.skill-lock.json`, never edited here.
 - **adapt** — adopted, carrying the minimal named modification that fits it to a
   workspace constraint the upstream author has no view on.
 - **reject** — not adopted, reason recorded.

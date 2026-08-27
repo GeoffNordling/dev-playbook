@@ -57,7 +57,6 @@ judgments:
       - standards/harness/files.md
       - standards/harness/claude-content.md
       - standards/harness/runbook-conventions.md
-      - standards/harness/skill-management.md
       - dotfiles/.agents/skills/writing-for-agents/SKILL.md
       - scripts/repo-lint
       - scripts/harness-files-lint

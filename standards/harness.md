@@ -20,8 +20,6 @@ the only harness currently in use.
   grammar that makes skill and agent bodies machine-readable
 - [Runbook Conventions](/standards/harness/runbook-conventions.md) — the runbook
   format: skill bundles and agent definitions
-- [Skill Management](/standards/harness/skill-management.md) — where skills live
-  and the authored/installed mirror rule
 - [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —
   the craft layer beside the binding format, installed verbatim from
   mattpocock/skills: how any document an agent consumes is written so the
