@@ -227,12 +227,13 @@
   ├─reports─► outcome: str    the Tangential compaction summary
   └─reports─► outcome: str    the verbatim text of the rewind target
 
-[skill-creator] Skill · model: opus, effort: xhigh
+[runbook-creator] Skill · model: opus, effort: xhigh
   ├─args────► idea
-  ├─reads───► [runbook-conventions] Standard
+  ├─reads───► [runbook-conventions] Standard    end-to-end
   ├─does────► {writing-for-agents} Skill    in context
-  ├─overrides─► {writing-for-agents} Skill    on craft guidance    with [runbook-conventions] Standard
-  └─writes──► local file    the new skill bundle, project-local or cross-project home
+  ├─overrides─► {writing-for-agents} Skill    where it states runbook format    with [runbook-conventions] Standard
+  ├─writes──► local file    the new runbook
+  └─does────► playbook-lint
 
 [update-standards-pin] Skill · model: opus, effort: xhigh
   ├─reads───► [distribution] Standard

@@ -95,7 +95,7 @@ The ruled rows, in detail:
   positional with shell-style splitting — on unquoted free text they
   grab one word — so free-text skills must not use them. Verified live
   (2026-08-25, probe skill, headless and subagent contexts, byte-identical
-  results): the invented `arguments:` key is inert to the harness; the
+  results): the `arguments:` key is inert to the harness; the
   `ARGUMENTS: <input>` append fires unchanged with it declared; and
   frontmatter is stripped from rendered content — the executing agent
   never sees the argument name, which therefore carries meaning for
@@ -105,9 +105,11 @@ The ruled rows, in detail:
   just spontaneous invocation. Input reaches the agent appended after
   the whole body as `ARGUMENTS: <text>`; a future complicated skill
   could reintroduce a `$ARGUMENTS` placeholder for mid-body injection
-  — noted, out of scope. Ripple: the
-  skill standards' `## Name: $ARGUMENTS` heading convention and
-  `argument-hint` guidance retire when this merges.
+  — noted, out of scope. Ripple, since landed:
+  [runbook-conventions.md](/standards/harness/runbook-conventions.md)
+  declares `arguments` and `scripts/harness-files-lint` enforces its shape
+  (`harness.arguments-format`), while the `## Name: $ARGUMENTS` heading
+  convention and `argument-hint` are retired — an unknown field now.
 - **guard** — `{If <condition>, {edge span} …}`: the guard nests the
   span(s) it guards, so binding is containment, never sentence
   adjacency. The text between the keyword `if` and the first nested
@@ -357,7 +359,7 @@ Skills:
 - [x] ralph-setup
 - [ ] research (3P)
 - [x] rewind-compact
-- [x] skill-creator
+- [x] runbook-creator
 - [x] update-standards-pin
 - [x] user-intent-mini-interview
 - [ ] wait-what (3P)

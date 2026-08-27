@@ -8,7 +8,7 @@ effort: high
 
 # Tics Remover
 
-{Read [slop-tics.md](/standards/prose/slop-tics.md)}, then {Write the
+{Read [slop-tics.md](~/workspace/dev-playbook/standards/prose/slop-tics.md)}, then {Write the
 target document in place; it must say the same things without
 committing any of the named tics}. Conformance to the standard is the
 goal, and a shorter result is a side effect of it.
@@ -16,7 +16,7 @@ goal, and a shorter result is a side effect of it.
 The launching prompt names the working directory and the target document.
 
 {If the target is an agent-facing instruction file,
-{Read [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md)},
+{Read [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md)},
 which explains what such a file is doing, so the rewrite does not break
 it}. Agent-facing means a skill, an agent definition, a rule, or a
 `CLAUDE.md`. It is not a standard to bring the target into line with:
