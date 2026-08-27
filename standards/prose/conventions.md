@@ -31,9 +31,21 @@ State rules in the positive: what to do, where a thing lives. "Runnables
 live in `scripts/`", not "don't put runnables elsewhere". A prohibition
 appears only when the prohibition itself is the rule.
 
-No second person in declarative docs. "You" belongs to agent-facing
-instruction files — `CLAUDE.md` at every level, skills, and rules — that
-direct an executor; a standard states facts.
+**Person of address.** Two kinds of document, two persons.
+**Harness-injected agent instructions** — the runbook and context members of
+the Claude Code file registry ([files.md](/standards/harness/files.md)) — are
+addressed *to* the executing agent, so they speak in the imperative and `you`,
+and never in the first person: no `I`, `me`, or `my`. A first-person sentence
+puts the document in the agent's mouth, which inverts who is instructing whom.
+**A declarative document** states facts to a reader instead: third person, no
+`you`. `repo-lint` enforces the first-person ban deterministically.
+
+The ban governs the document's own voice: a double-quoted utterance is exempt.
+Write the phrasing a user types to trigger a skill, or the reaction a
+prototype exists to provoke, in their words — `"Show me a few options before
+I commit."` — and reserve the surrounding prose for the imperative. A
+runbook's frontmatter is not exempt: its `description` is prose the agent
+reads to choose the runbook, so it answers to the same voice as the body.
 
 ## Spelling
 
@@ -93,14 +105,9 @@ terms where they apply, with no obligation to extend it.
 ## Terminology: the person is the user
 
 One actor — the dispatcher, reviewer, and approver — carries one name
-everywhere: the `user`. Agent-facing instruction text uses it because that is
-what Claude Code calls the person (`AskUserQuestion`): `CLAUDE.md` at every
-level — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike —
-plus the agent-definition, skill, and rule bodies under
-`dotfiles/dot-claude/agents/`, `dotfiles/dot-claude/skills/`, and
-`dotfiles/dot-claude/rules/`. Declarative documentation uses the same word
-where it describes that actor in third person: `software-factory/`,
-`standards/`, `docs/`, and `README.md`.
+everywhere: the `user`. Harness-injected agent instructions use it because
+that is what Claude Code calls the person (`AskUserQuestion`); a declarative
+document uses the same word where it describes that actor.
 
 **One word, no synonyms.** The actor is `user` in every authored file — never
 an alternative noun for the same person, in any case, plural, or hyphenated
@@ -111,36 +118,23 @@ at many points and `software-factory/user-checkpoints.md` covers the subset
 that are the user's, so dropping the word there would name the wrong set. The
 test is whether removing it loses a distinction.
 
-**Exemption is declared per repo in `.prose-lint-exempt`.** Text the rule does
-not govern — captured external documents, prose authored for an outside
-audience in that audience's vocabulary, a tool file that must name the word to
-process it — is exempted by listing its path in a tracked `.prose-lint-exempt`
-at the repo root: one repo-relative file or directory per line, a directory
+## Lint exemptions
+
+Three rules here are enforced deterministically — the American spelling, the
+one word for the actor, and the first-person ban. Text they do not govern —
+captured external documents, prose authored for an outside audience in that
+audience's vocabulary, a tool file that must name a banned word in order to
+ban it — is exempted by listing its path in a tracked `.prose-lint-exempt` at
+the repo root: one repo-relative file or directory per line, a directory
 covering its whole subtree, `#` opening a comment line. Any file is listable,
-an `index.md` included — an index description that must carry the word exempts
-its index the same way. Every exemption is a reviewable line in it, ideally
-under a comment saying why. Structural exemptions stand alongside it: skills
-vendored under an `.agents/` path, and Markdown verbatim mirrors carrying
-`type: Reference` frontmatter, which follows the document wherever it lives.
+an `index.md` included. Every exemption is a reviewable line in it, ideally
+under a comment saying why.
 
-**Agent-facing instruction text never speaks in the first person.** No `I`, `me`,
-or `my` in the files listed above: they are commands addressed *to* the agent,
-so the only voices they carry are the imperative and `you`. A first-person
-sentence puts the document in the agent's mouth, which inverts who is
-instructing whom. `repo-lint` enforces this deterministically over the body of
-every first-party agent definition, skill, and rule as well as `CLAUDE.md`.
-
-The ban governs the document's own voice: a double-quoted utterance is exempt.
-Write the phrasing a user types to trigger a skill, or the reaction a
-prototype exists to provoke, in their words — `"Show me a few options before
-I commit."` — and reserve the surrounding prose for the imperative. A skill's
-frontmatter is not exempt: its `description` is prose the agent reads to
-choose the skill, so it answers to the same voice as the body.
-
-**Skills vendored verbatim are exempt.** A third-party skill under an `.agents/`
-path is an external dependency, carried unmodified so it can be re-synced from
-upstream; its voice is its author's to set. The ban governs what this workspace
-writes and owns — the skills under `.claude/`.
+Two structural exemptions stand alongside it and need no declaration: a
+third-party skill under an `.agents/` path, carried unmodified so it can be
+re-synced from upstream, so its voice is its author's to set; and a Markdown
+verbatim mirror carrying `type: Reference` frontmatter, which follows the
+document wherever it lives.
 
 ## Choose each format by argument
 
