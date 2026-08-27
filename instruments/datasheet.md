@@ -270,7 +270,6 @@ size: a real system may spend the full budget.
 
 ## Employed by
 
-[System Legibility](/standards/legibility.md) — the standard whose Define cell
-claims the datasheet as its answer to how a system's owner earns trust and
-direction without reading the code. Datasheets are regenerated on demand;
-System Legibility sets no cadence.
+No standard. The datasheet answers how a system's owner earns trust and
+direction without reading the code, but no card claims it today. Datasheets
+are regenerated on demand, on no cadence.

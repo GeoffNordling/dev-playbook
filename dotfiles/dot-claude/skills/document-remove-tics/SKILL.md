@@ -1,15 +1,15 @@
 ---
-name: document-deslop
-description: Send a Markdown document through an isolated subagent that strips the named slop tics, changing style but never content. Use when a new document has just been created or a document has received a large edit, or when asked to deslop a doc.
+name: document-remove-tics
+description: Send a Markdown document through an isolated subagent that strips the named slop tics, changing style but never content. Use when a new document has just been created or a document has received a large edit, or when asked to remove tics from a doc.
 disable-model-invocation: false
 model: sonnet
 effort: high
 arguments: [doc-hint]
 ---
 
-# Document Deslop
+# Document Remove Tics
 
-Dispatch one or more Markdown documents to the `deslopper` subagent, which
+Dispatch one or more Markdown documents to the `tics-remover` subagent, which
 rewrites each so it says the same things without committing any of the tics
 in [slop-tics.md](/standards/prose/slop-tics.md).
 
@@ -28,7 +28,7 @@ auth setup doc" all resolve.
 ## Dispatch
 
 For each resolved target, {Launch the
-[deslopper](~/.claude/agents/deslopper.md) subagent, `model: sonnet`},
+[tics-remover](~/.claude/agents/tics-remover.md) subagent, `model: sonnet`},
 naming the working directory and the target path in the prompt. Launch
 one subagent per file; for more than one target, send all the launches
 in a single message so they run in parallel — each file's rewrite is

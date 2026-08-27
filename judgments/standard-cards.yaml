@@ -221,20 +221,6 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-legibility
-    claim: |
-      standards/legibility.md is an honest card: its define cell points at
-      the instrument specs that genuinely answer how a user understands a
-      large system without reading it, its empty cells are truly empty,
-      and no cell misrepresents what its targets do.
-    evidence:  [standards/legibility.md]
-    reference:
-      - standards/standard/format.md
-      - instruments/datasheet.md
-      - instruments/file-graph.md
-    model: claude-sonnet-5
-    effort: high
-
   - id: standard-card-modules
     claim: |
       standards/modules.md is an honest card: every pointer in its define,

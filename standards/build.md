@@ -1,12 +1,13 @@
 ---
 type: Standard-Card
 title: Build
-description: Card for the build standard — how a repository is laid out, built, and checked
+description: Governs how a repository is laid out, built, and checked — layers, skeleton, Make, canonical artifacts, distribution, CI, and enforcement
 ---
 
 # Build
 
-Governs how a repository is laid out, built, and checked.
+Governs how a repository is laid out, built, and checked — layers,
+skeleton, Make, canonical artifacts, distribution, CI, and enforcement.
 
 ## Define
 

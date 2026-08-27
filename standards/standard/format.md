@@ -82,7 +82,11 @@ new sibling on the same subject keeps it.
 
 A card is a markdown file at `standards/<name>.md` with
 `type: Standard-Card` frontmatter: a heading, one sentence naming the
-governed question, then exactly four cells as sections. Each cell holds
+governed question, then exactly four cells as sections. That sentence
+opens `Governs how`, names the territory its define cell covers, and runs
+about a breath; the frontmatter `description` repeats it verbatim less the
+period, so the catalog row and the card state the same remit.
+standards-lint's `standard.card-question` checks the pairing. Each cell holds
 annotated pointers; an empty cell states an explicit "none" so gaps stay
 visible. Cards are thin — often just a handful of pointers — and never
 restate the content of their targets.

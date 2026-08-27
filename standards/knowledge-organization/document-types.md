@@ -49,8 +49,8 @@ Every concept document opens with a YAML frontmatter block:
 - **`title`** — the readable title.
 - **`description`** — the one-line summary that powers triage and the authored
   `index.md` listings: a sentence fragment naming what the document *is* or what
-  it *governs*, present tense, no trailing period, leading with the
-  distinguishing noun, roughly one breath (~20 words).
+  it *governs*, present tense, no trailing period, leading with what
+  distinguishes it, roughly one breath (~20 words soft limit).
 - **`resource`** — a path or URI to the underlying asset a document describes
   (a repo-root path like `/dotfiles/dot-claude/workflows/ralph-loop.js`, or an
   external URI). Optional in general; required on `Recipe-Description`, whose

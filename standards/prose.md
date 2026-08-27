@@ -1,20 +1,18 @@
 ---
 type: Standard-Card
 title: Prose
-description: Card for the prose standard — how workspace prose is written
+description: Governs how prose is written in every workspace document — voice, structure, and brevity
 ---
 
 # Prose
 
-Governs how prose is written — voice, structure, and brevity in every
-workspace document.
+Governs how prose is written in every workspace document — voice,
+structure, and brevity.
 
 ## Define
 
 - [prose/conventions.md](/standards/prose/conventions.md) — the contract:
   declarative present tense, one concern per document, current-state only
-- [prose/slop-tics.md](/standards/prose/slop-tics.md) — the named tics, each
-  with the action that removes it and before/after examples
 
 ## Audit
 

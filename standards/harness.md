@@ -1,16 +1,16 @@
 ---
 type: Standard-Card
 title: Harness Files
-description: Card for the harness-files standard — how files whose meaning is fixed by the agent harness's loading contract are distinguished from ordinary files and what each contains
+description: Governs how the files an agent harness loads — context, configuration, instructions — are distinguished from ordinary files and what each contains
 ---
 
 # Harness Files
 
-Governs the repo files whose meaning is fixed by the agent harness's
-loading contract — injected into context, read as configuration, or run
-as instructions. The standard distinguishes these files from ordinary
-ones and states what each may contain. Claude Code is the
-only harness currently in use.
+Governs how the files an agent harness loads — context, configuration,
+instructions — are distinguished from ordinary files and what each
+contains. The loading contract fixes their meaning: injected into
+context, read as configuration, or run as instructions. Claude Code is
+the only harness currently in use.
 
 ## Define
 
