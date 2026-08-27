@@ -11,7 +11,7 @@ arguments: [doc-hint]
 
 Dispatch one or more Markdown documents to the `tics-remover` subagent, which
 rewrites each so it says the same things without committing any of the tics
-in [slop-tics.md](/standards/prose/slop-tics.md).
+in [slop-tics.md](~/workspace/dev-playbook/standards/prose/slop-tics.md).
 
 ## Target
 

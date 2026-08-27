@@ -39,7 +39,7 @@ The sweep is parameterized by repo roots — one repo, several, or all of them:
 
 ### 1. Plan
 
-{Run [judgments-run](/scripts/judgments-run) in `plan` mode}:
+{Run [judgments-run](~/workspace/dev-playbook/scripts/judgments-run) in `plan` mode}:
 
 ```
 uv run judgments-run --root <root> [--root <root> …] plan
@@ -123,7 +123,7 @@ Limits govern this, and you track them yourself as you loop:
 
 Back to step 1, with the same roots. Your edits re-key the judgments you touched,
 so the next plan picks up exactly those plus anything that crashed. Name what you
-have set aside so it is not re-judged — {Run [judgments-run](/scripts/judgments-run)
+have set aside so it is not re-judged — {Run [judgments-run](~/workspace/dev-playbook/scripts/judgments-run)
 again, with a `--skip` per set-aside id} so it is set aside in every swept
 root that declares it:
 
