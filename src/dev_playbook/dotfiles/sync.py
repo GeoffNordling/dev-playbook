@@ -1,4 +1,4 @@
-"""Install the dotfiles tree into $HOME: stow the packages, generate the settings.
+"""Install the dotfiles tree into $HOME: stow the packages.
 
 What lands where, and the workflow around it: /dotfiles/README.md.
 """
@@ -8,9 +8,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-
-from dev_playbook.dotfiles import settings
-from dev_playbook.dotfiles.machine import detect_machine
 
 # Package directory in dotfiles/ -> the directory under $HOME it installs into.
 #
@@ -199,6 +196,24 @@ def ensure_bashrc_loader(bashrc: Path) -> bool:
     return True
 
 
+def clear_generated_settings(home: Path) -> bool:
+    """Remove a regular-file ~/.claude/settings.json so stow can link one there.
+
+    The settings file used to be generated in place (a base fragment merged
+    with a machine fragment); today it is one shared file in the dot-claude
+    package, stowed like everything else. Stow aborts on a regular file where
+    its link belongs, so the leftover from the generated era must go first —
+    its content was a rendering of the same sources, so nothing is lost. A
+    symlink is left for stow to judge: its own link is kept current, and
+    someone else's makes stow abort loudly rather than being silently replaced.
+    """
+    target = home / ".claude" / "settings.json"
+    if target.is_symlink() or not target.is_file():
+        return False
+    target.unlink()
+    return True
+
+
 def sync(repo: Path, home: Path) -> list[str]:
     """Run every install step. Returns one line per thing that changed."""
     if missing := missing_tools():
@@ -208,7 +223,6 @@ def sync(repo: Path, home: Path) -> list[str]:
         )
 
     dotfiles = repo / "dotfiles"
-    machine = detect_machine()
 
     changed = [f"mirrored skill: {name}" for name in mirror_skills(dotfiles)]
 
@@ -218,11 +232,8 @@ def sync(repo: Path, home: Path) -> list[str]:
         link.unlink()
         changed.append(f"removed stray link: {link}")
 
-    # Settings before stow, and every removal below it: stow can abort, and a
-    # run that cannot finish must not leave the machine worse than it found it.
-    target = home / ".claude" / "settings.json"
-    if settings.install(dotfiles / "settings", machine, target):
-        changed.append(f"installed settings for {machine}")
+    if clear_generated_settings(home):
+        changed.append("removed the generated settings.json; stow links it now")
 
     installed = managed_links(home)
     stow_packages(home, dotfiles)
@@ -239,49 +250,15 @@ def sync(repo: Path, home: Path) -> list[str]:
     return changed
 
 
-def drift_report(repo: Path, home: Path) -> str | None:
-    """What the session must do about stale settings, or None when current.
-
-    Addressed to the agent rather than to the user: the fix is one command the
-    agent can run itself, and making the user its courier wastes a turn.
-    """
-    settings_dir = repo / "dotfiles" / "settings"
-    target = home / ".claude" / "settings.json"
-    machine = detect_machine()
-    if settings.is_current(settings_dir, machine, target):
-        return None
-    return (
-        f"Claude Code settings are out of date for this machine ({machine}).\n"
-        f"  installed: {target}\n"
-        f"  source:    {settings_dir}/base.json + {machine}.json\n"
-        f"Run `{repo}/scripts/sync-dotfiles` yourself now, then tell the user you\n"
-        "resynced their settings and that the new file loads at their next\n"
-        "session -- this one has already read the stale copy. If the user has\n"
-        "edited the installed file directly, the sync overwrites that edit: it\n"
-        "is generated, and the change belongs in the source."
-    )
-
-
 def run_cli() -> int:
     """Entry point for scripts/sync-dotfiles."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="report whether the installed settings match, changing nothing",
-    )
-    args = parser.parse_args()
+    parser.parse_args()
 
     repo = Path(__file__).resolve().parents[3]
     home = Path.home()
 
     try:
-        if args.check:
-            if (report := drift_report(repo, home)) is None:
-                return 0
-            print(report)
-            return 1
-
         if not (changed := sync(repo, home)):
             print("already installed; nothing to do")
         for line in changed:

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# SessionStart hook: warn when ~/.claude/settings.json stops being a symlink.
+#
+# The file is a stow-managed symlink into the dev-playbook checkout, and
+# Claude Code writes settings changes through it (verified 2026-08-28, version
+# 2.1.250). If a future version replaces the file instead of writing through
+# it, the repo silently stops receiving settings changes — this is the one
+# failure the design has left, so it is the one thing checked here.
+#
+# Informational, not blocking. Every path exits 0: a non-zero exit would mean
+# "the hook broke", never "the check failed".
+set -euo pipefail
+
+target="$HOME/.claude/settings.json"
+
+[ -e "$target" ] || {
+	printf '%s is missing. Run scripts/sync-dotfiles from the main dev-playbook checkout to restore the symlink.\n' "$target"
+	exit 0
+}
+
+[ -L "$target" ] || {
+	printf '%s is a regular file again — something replaced the settings symlink, and the dev-playbook repo is no longer receiving settings changes. Compare it against dotfiles/dot-claude/settings.json, carry any difference into the repo, then run scripts/sync-dotfiles from the main checkout to restore the symlink.\n' "$target"
+	exit 0
+}
