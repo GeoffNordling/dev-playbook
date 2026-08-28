@@ -1,7 +1,7 @@
 ---
 type: Decision-Record
 title: Retire Verbatim Skill Adoption
-description: Adopt external skills by copying into the owned tree instead of installing vendored bytes — the ten adopted bundles become owned copies, three unused ones are deleted, and the skills CLI, lock file, and mirror symlinks retire
+description: Adopt external skills by copying into the owned tree instead of installing vendored bytes — the ten adopted bundles become owned copies, three unused ones are deleted, the install machinery retires, and the ledger reduces to a plain verdict table with the sweep skill deleted
 date: 2026-08-28
 status: accepted
 ---
@@ -44,7 +44,10 @@ What moved:
 - The shell standard's externally-managed exemption — added at 0020 for
   `wizard` — retired with the tree it exempted.
 
-The ledger's verdict vocabulary keeps its four words; `verbatim` and `adapt`
-now describe how the copy arrived, not a lock-tracked install. The sweep
-(`pocock-sweep`) survives with one change of mechanism: rulings land as copies
-and edits on the sweep branch, never as CLI installs on main.
+The same decision reduces the ledger to a plain record — source, skill,
+verdict, date, reason — and deletes the sweep skill (`pocock-sweep`) along
+with the release pin it maintained. With no pin there is no delta to compute,
+so nothing tracks upstream tags or commit hashes. Re-evaluation is manual:
+the user reads upstream when so moved and updates the rows by hand, and the
+row — verdict, date, reason — is the whole record of a ruling; no per-ruling
+Decision Record is written.

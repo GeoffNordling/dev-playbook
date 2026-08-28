@@ -350,7 +350,6 @@ Skills:
 - [x] issue-review-simulation
 - [x] judgments-sweep
 - [x] orchestrate
-- [x] pocock-sweep
 - [ ] prototype (3P)
 - [x] ralph-setup
 - [ ] research (3P)

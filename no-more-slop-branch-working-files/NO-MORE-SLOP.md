@@ -173,6 +173,10 @@ exemplar, worked as the abstraction shape in
   and every document that evaluates or adopts other people's skills —
   `pocock-sweep`, the verdicts ledger, the standards that named the
   vendored exemption — now states the new stance.
+- **Sweep machinery deleted.** The `pocock-sweep` skill is deleted and the
+  ledger reduced to skill / verdict / date / reason per source — no release
+  pin, no tag or commit hashes, no per-ruling Decision Record. Re-evaluation
+  is manual: the user updates the rows by hand. Recorded in 0025.
 
 **Raw ideas, none designed**
 

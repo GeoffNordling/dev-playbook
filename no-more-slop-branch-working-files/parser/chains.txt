@@ -198,12 +198,6 @@
   ├─reports─► outcome: str    a single line confirming Fable orchestration mode is on
   └ ╌ reports ╌ ► outcome: str    that immediately    if you are not Fable
 
-[pocock-sweep] Skill · model: inherit, effort: xhigh
-  ├─reads───► external-skill-verdicts.md    end-to-end
-  ├ ╌ reports ╌ ► outcome: str    that there is nothing to sweep    if the ledger already names this tag
-  ├─writes──► local file    the ledger to the new pin
-  └─writes──► local file    the Decision Record beside it
-
 [prototype] Skill · model: inherit, effort: xhigh
 
 [ralph-setup] Skill · model: inherit, effort: xhigh

@@ -280,23 +280,6 @@ for a multi-way enumeration — encoding just that one branch would misstate it
 as unconditional. The runtime-chosen `Run /<skill> <N>` delegation has no
 fixed link for `{Launch}`.
 
-## pocock-sweep
-
-Could not express the `gh api` state reads (release tag, commit SHAs) or the
-`gh pr create` write that opens the PR — no on-disk link for either, the
-writes—GitHub hole. Could not express the scratch writes — the tag clone, the
-optional cross-window plan file, and the hand-install route's bundle,
-symlink, and lock-entry copies — all writes—scratch hole, nor the
-`npx skills@latest`/`scripts/sync-dotfiles` calls, bare commands with no link
-for a does edge. Could not express the commit-SHA branch that decides step
-6's install route, or the branch-tip-versus-hand-install alternation itself —
-both would guard a later section, and guard containment can't cross sections.
-Could not express opening the worktree branch (no primitive for the
-EnterWorktree tool call), the docket-ruling round with the user (no
-primitive for a question-and-answer round), or the main-checkout commit that
-lands the installs (no fenced git block to satisfy `{Commit}`'s block
-requirement, since the staged files vary per sweep).
-
 ## open-pr
 
 Could not express the anchored read — `{Read}` fails on `#fragment`

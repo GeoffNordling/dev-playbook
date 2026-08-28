@@ -3,7 +3,7 @@
 The repo's working papers — a mixture of notes, unenforced policies,
 intentions, and explorations — and the Decision Records.
 
-- [External Skill Verdicts](/docs/external-skill-verdicts.md) — The standing verdict on every skill in each external upstream skill package, one row per skill, with the record that ruled it
+- [External Skill Verdicts](/docs/external-skill-verdicts.md) — The workspace's verdict on every external skill it has evaluated — skill, verdict, date, and reason, grouped by source
 - [Headless Operation](/docs/headless.md) — Running Claude Code headless on subscription
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
