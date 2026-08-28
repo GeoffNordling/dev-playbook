@@ -98,6 +98,15 @@ Could not express reading the invoking repo's `CANDIDATES.md` —
 invocation — or the typed report (`issue_number: int`) — reports
 render only `outcome: str`.
 
+## grilling
+
+Could not express dispatching the fact-finding sub-agent — `{Launch}` needs
+a link to one agent definition file, and this is an unnamed, ad hoc
+dispatch with none. Could not express the round-by-round design-tree loop
+itself (no primitive for an iterative Q&A frontier) or the closing
+"do not act on it until the user confirms" prohibition (no primitive for a
+forbidden action).
+
 ## orchestrate
 
 Could not express launching runtime-chosen subagents — `{Launch}`
@@ -310,6 +319,26 @@ Could not express forbidding edits or GitHub writes (no primitive for a
 forbidden action), or the `disallowed-tools` permission as node data —
 only `tools`/`model`/`effort`/`allowed-tools` render in the header.
 
+## improve-codebase-architecture
+
+Could not express reading the target codebase's `CONTEXT.md` and `docs/adr/*` —
+`{Read}` needs one fixed on-disk link, and both live in whatever repo this
+skill is run against, not in dev-playbook. Could not express spawning the
+anonymous exploration sub-agent — `{Launch}` needs a link to one agent
+definition file, and this is an ad hoc Task-tool call with none. Could not
+express writing the HTML report to the OS temp directory — the writes—scratch
+hole covers no on-disk-repo target.
+
+## diagnosing-bugs
+
+Could not express reading CONTEXT.md or the area's ADRs — both runtime-bound,
+no fixed on-disk link — or the redact-every-secret discipline, a behavior-mode
+setting with no primitive. Could not express Phase 3's ranked-list check-in
+(targets the conversation mid-run, not a terminal report) or the
+throwaway-harness and captured-trace writes (the writes—scratch hole). Could
+not express the commit that carries the confirmed hypothesis — writes—git
+bucket needs a fixed `-C <repo>` a same-repo commit can't honestly carry.
+
 ## wayfinder-to-build
 
 Could not express the anchored reads (tracker-operations.md's wayfinding
@@ -321,3 +350,65 @@ child stubs, or wiring sub-issue/blocked-by relationships (`gh` writes, the
 writes—GitHub hole). Could not express the mid-run `READ:` acknowledgment
 (targets the conversation, not the invoker) or the per-step "Done when"
 completion gates (no control-flow primitive).
+
+## codebase-design
+
+Could not express the design-it-twice fan-out — three to four fresh
+sub-agents, each pinned to a different design constraint, reporting a
+problem-space explanation before the fan-out and a comparison-and-recommendation
+after it — because that procedure lives entirely inside the private reference
+`design-it-twice.md`, outside the scanned corpus; the `{Read}` edge into it is
+as far as the map reaches. Could not express the glossary's exact-term
+discipline ("use these terms exactly... don't substitute") — a behavior-mode
+setting the whole file installs, not an edge, and the map has no primitive
+for it.
+
+## writing-for-agents
+
+Could not express the "When to split" section's second cross-reference
+to skill-mechanics.md as pointing at the read already declared above —
+the map has no primitive for citing an existing edge, only for
+declaring a fresh one, so it stays an unbraced pointer rather than a
+duplicate read to the same target.
+
+## research
+
+Could not express spawning the background research agent — `{Launch}` needs
+a link to one agent definition file, and this is an ad hoc, unnamed dispatch
+with none. Could not express reading primary sources — `{Read}` needs one
+fixed on-disk link, and the sources vary with the question asked.
+
+## domain-modeling
+
+Could not express challenging a term against `CONTEXT.md`, detecting a
+`CONTEXT-MAP.md`, or cross-referencing the code — `{Read}` needs one
+fixed on-disk link, and all three targets change with whatever repo the
+skill is invoked in.
+
+## wayfinder
+
+Could not express the GitHub state reads (the map, the frontier, ticket
+bodies) or the GitHub writes (creating, labelling, claiming, commenting on,
+and closing the map and its tickets) — no on-disk link for either, the
+writes—GitHub hole. Could not express the dead `/setup-matt-pocock-skills`
+reference, since no such skill exists in this corpus — kept verbatim as
+adopted. Could not express invoking whatever skill the map's Notes section
+names, or an effort overriding the plan-don't-do default from that same
+section — both are resolved from map content at runtime, not a link to one
+fixed runbook. Could not express the research-branch write
+(`research/<name>`) — writes—git bucket needs a fixed `-C` command block,
+and the branch name is chosen per ticket.
+
+## prototype
+
+Could not express committing the prototype to a throwaway branch —
+`git_detail()` requires a fixed `-C` fenced command, and here the repo
+and branch are chosen at runtime, not fixed. Could not express leaving
+a context pointer to that branch, or the verdict, on the implementation
+issue — the writes—GitHub hole.
+
+## wait-what
+
+Could not express reading `CONTEXT.md` for its ubiquitous language —
+`{Read}` needs one fixed on-disk link, and the target changes with
+whatever repo the skill is invoked in.

@@ -71,6 +71,8 @@
   └─reports─► outcome: str    one line: worktree and branch removed, main at that commit
 
 [codebase-design] Skill · model: sonnet, effort: xhigh
+  ├─reads───► deepening.md
+  └─reads───► design-it-twice.md
 
 [commit-off] Skill · model: inherit, effort: low
 
@@ -112,12 +114,23 @@
   └─reports─► outcome: str    the phase result and next state
 
 [diagnosing-bugs] Skill · model: inherit, effort: xhigh
+  ├ ╌ reports ╌ ► outcome: str    that redaction hid what's needed to diagnose it    if the redacted output is not enough to diagnose the bug
+  ├ ╌ writes ╌ ► local file    a copy of the HITL script, edited with this bug's steps    if the user must click
+  ├ ╌ does ╌ ► [hitl-loop.template.sh] Script    the edited copy    if the user must click
+  ├ ╌ reports ╌ ► outcome: str    what you tried, and that no loop could be built    if you genuinely cannot build a loop
+  ├ ╌ writes ╌ ► local file    a debug log at each boundary that distinguishes hypotheses    if a debugger or REPL isn't available
+  ├ ╌ writes ╌ ► local file    the minimised repro as a failing test at that seam    if a correct seam exists
+  └ ╌ does ╌ ► [improve-codebase-architecture] Skill    with the specifics    if the answer involves architectural change (no good test seam, tangled callers, hidden coupling)
 
 [document-remove-tics] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
   └─does────► [tics-remover] Agent    the subagent, `model: sonnet`
 
 [domain-modeling] Skill · model: inherit, effort: xhigh
+  ├ ╌ reads ╌ ► context-format.md    if a term is resolved
+  ├ ╌ writes ╌ ► local file    CONTEXT.md in place with the resolved entry    if a term is resolved
+  ├ ╌ reads ╌ ► adr-format.md    if all three ADR criteria hold
+  └ ╌ writes ╌ ► local file    the new ADR file under `docs/adr/`    if all three ADR criteria hold
 
 [enable-repo-governance] Skill · model: opus, effort: xhigh
   ├─reads───► [bootstrap] Standard
@@ -138,6 +151,7 @@
   └─overrides─► [domain-modeling] Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
 
 [grilling] Skill · model: inherit, effort: xhigh
+  └─reports─► outcome: str    the whole frontier in one round: number each question and give your recommended answer
 
 [handoff] Skill · model: opus, effort: medium
   ├─args────► focus
@@ -149,6 +163,12 @@
   └─does────► [idea] Skill    verbatim
 
 [improve-codebase-architecture] Skill · model: inherit, effort: xhigh
+  ├─does────► [codebase-design] Skill    for the architecture vocabulary and its principles, loaded first
+  ├─reads───► html-report.md    for the full HTML scaffold, diagram patterns, and styling guidance
+  ├─reports─► outcome: str    the finished report's absolute path, already opened for the user
+  ├ ╌ does ╌ ► [grilling] Skill    to walk the decision tree with them    if the user picks a candidate
+  ├ ╌ does ╌ ► [domain-modeling] Skill    to keep the domain model current as you go    if a new term surfaces that `CONTEXT.md` doesn't yet name, or a rejection deserves an ADR
+  └ ╌ does ╌ ► [codebase-design] Skill    again, for design-it-twice    if the user wants to explore alternative interfaces for the deepened module
 
 [intake] Skill · model: inherit, effort: xhigh
   ├─reads───► software factory standard
@@ -199,6 +219,9 @@
   └ ╌ reports ╌ ► outcome: str    that immediately    if you are not Fable
 
 [prototype] Skill · model: inherit, effort: xhigh
+  ├ ╌ reads ╌ ► logic.md    if the question is whether this logic / state model feels right
+  ├ ╌ reads ╌ ► ui.md    if the question is what this should look like
+  └ ╌ writes ╌ ► local file    to a scratch DB, or a scratch file with a clear "PROTOTYPE — wipe me" name    if the question explicitly involves a database
 
 [ralph-setup] Skill · model: inherit, effort: xhigh
   ├─args────► goal
@@ -209,6 +232,7 @@
   └─reports─► outcome: str    the full launch command for the user to run
 
 [research] Skill · model: inherit, effort: xhigh
+  └─writes──► local file    the findings to a single Markdown file, where the repo already keeps such notes, or somewhere sensible if there is no established convention
 
 [rewind-compact] Skill · model: opus, effort: medium
   ├─args────► target
@@ -241,6 +265,7 @@
   └─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
 
 [wait-what] Skill · model: sonnet, effort: xhigh
+  └─reports─► outcome: str    the last message re-pitched
 
 [wayfinder-to-build] Skill · model: inherit, effort: xhigh
   ├─args────► map
@@ -254,9 +279,17 @@
   └─reports─► outcome: str    the whole hand-off on screen
 
 [wayfinder] Skill · model: inherit, effort: xhigh
+  ├─args────► map-hint
+  ├─reads───► [tracker-operations] Standard    for the Wayfinding operations section, which states how _this_ repo expresses them
+  ├─does────► [prototype] Skill
+  ├─does────► [grilling] Skill
+  ├─does────► [domain-modeling] Skill
+  ├ ╌ reports ╌ ► outcome: str    that no map is needed    if this surfaces no fog — the way to the destination is already clear, the whole journey small enough for one session
+  └─does────► [research] Skill    to resolve it in parallel
 
 [working-doc-set-deslop] Skill · model: sonnet, effort: high
   ├─args────► set-hint
   └─does────► [set-deslopper] Agent    the subagent, `model: opus`
 
 [writing-for-agents] Skill · model: sonnet, effort: xhigh
+  └ ╌ reads ╌ ► skill-mechanics.md    for frontmatter, invocation choice, and router skills    if the document you're writing is a skill

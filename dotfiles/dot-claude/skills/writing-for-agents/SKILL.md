@@ -10,7 +10,7 @@ effort: xhigh
 
 Reference for writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output.
 
-When the document you're writing is a skill, read [skill-mechanics.md](references/skill-mechanics.md) for frontmatter, invocation choice, and router skills.
+{If the document you're writing is a skill, {Read [skill-mechanics.md](references/skill-mechanics.md) for frontmatter, invocation choice, and router skills}}.
 
 ## Context pointers
 

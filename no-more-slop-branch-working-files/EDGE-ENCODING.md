@@ -331,37 +331,37 @@ Skills:
 - [x] agent-view-overwatch
 - [x] candidate-promote
 - [x] clean-up-branch-worktree
-- [ ] codebase-design (3P)
+- [x] codebase-design (3P)
 - [x] commit — the `{Commit}` span itself skipped: `git_detail()` requires `-C`, this skill targets the ambient repo (ledgered)
 - [x] commit-off
 - [x] compact-prep
 - [x] datasheet
 - [x] design
-- [ ] diagnosing-bugs (3P)
-- [ ] domain-modeling (3P)
+- [x] diagnosing-bugs (3P)
+- [x] domain-modeling (3P)
 - [x] enable-repo-governance
-- [ ] grilling (3P)
+- [x] grilling (3P)
 - [x] handoff
 - [x] idea
-- [ ] improve-codebase-architecture (3P)
+- [x] improve-codebase-architecture (3P)
 - [x] intake
 - [x] issue-overwatch
 - [x] issue-review-claims
 - [x] issue-review-simulation
 - [x] judgments-sweep
 - [x] orchestrate
-- [ ] prototype (3P)
+- [x] prototype (3P)
 - [x] ralph-setup
-- [ ] research (3P)
+- [x] research (3P)
 - [x] rewind-compact
 - [x] runbook-creator
 - [x] update-standards-pin
 - [x] user-intent-mini-interview
-- [ ] wait-what (3P)
-- [ ] wayfinder (3P)
+- [x] wait-what (3P)
+- [x] wayfinder (3P)
 - [x] wayfinder-to-build
 - [x] working-doc-set-deslop
-- [ ] writing-for-agents (3P)
+- [x] writing-for-agents (3P)
 
 ## To-do
 

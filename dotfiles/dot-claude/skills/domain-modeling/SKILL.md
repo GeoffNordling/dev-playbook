@@ -62,7 +62,7 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [context-format.md](references/context-format.md).
+{If a term is resolved, {Read [context-format.md](references/context-format.md)} and {Write CONTEXT.md in place with the resolved entry; don't batch these up — capture it as it happens}}.
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
@@ -74,4 +74,4 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [adr-format.md](references/adr-format.md).
+{If all three ADR criteria hold, {Read [adr-format.md](references/adr-format.md)} and {Write the new ADR file under `docs/adr/`}}. If any is missing, skip the ADR.
