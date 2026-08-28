@@ -1,16 +1,12 @@
 ---
-name: writing-for-agents
-description: Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md.
-disable-model-invocation: false
-model: sonnet
-effort: xhigh
+type: Standard
+title: Writing for Agents
+description: The craft of any document an agent consumes — context pointers, the two loads, the information hierarchy, completion criteria, leading words, and pruning
 ---
 
 # Writing for Agents
 
-Reference for writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output.
-
-{If the document you're writing is a skill, {Read [skill-mechanics.md](references/skill-mechanics.md) for frontmatter, invocation choice, and router skills}}.
+The craft of writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output. [runbook-conventions.md](/standards/harness/runbook-conventions.md) binds the *format* a skill or agent takes and wins where the two collide; this document carries the craft. The skill-specific mechanics — the invocation choice and router skills — are in [Skill mechanics](#skill-mechanics).
 
 ## Context pointers
 
@@ -33,7 +29,7 @@ Material reached only through a pointer escapes context load at the price of the
 
 ## Information hierarchy
 
-A document is built from two content types — **steps** (the ordered actions the agent performs) and **reference** (definitions, rules, facts consulted on demand) — that mix freely: all steps (a recipe), all reference (a review's rules, this skill), or both. The core decision is where each piece sits on the **information hierarchy**, a ladder ranked by how immediately the agent needs the material:
+A document is built from two content types — **steps** (the ordered actions the agent performs) and **reference** (definitions, rules, facts consulted on demand) — that mix freely: all steps (a recipe), all reference (a review's rules, this document), or both. The core decision is where each piece sits on the **information hierarchy**, a ladder ranked by how immediately the agent needs the material:
 
 1. **In-file step** — the primary tier: what the agent does, in order.
 2. **In-file reference** — consulted on demand. Often a legitimately flat peer-set (every rule of a review on one rung) — a fine arrangement, not a smell.
@@ -61,7 +57,7 @@ The strongest criteria are both checkable and exhaustive.
 Splitting one document into two spends one of the two loads, so split only when the cut earns it:
 
 - **By sequence** — split a run of steps where the post-completion steps tempt the agent to rush the one in front of it. Keeping them out of view drives more legwork on the current task. Beware the reverse: merging sequences exposes each step's later steps to what follows, inviting premature completion.
-- **By invocation** — skill-specific: see [skill-mechanics.md](references/skill-mechanics.md).
+- **By invocation** — skill-specific: see [Skill mechanics](#skill-mechanics).
 
 ## Leading words
 
@@ -84,3 +80,26 @@ You win twice: fewer tokens, and a sharper hook for the agent to hang its thinki
 - The **environment** is a source of truth too — `package.json` scripts, config files, the directory layout, `--help` output — and a document that restates it is a **cache**: a copy of a lookup, earning its load only when the lookup is expensive. Cache what the agent cannot find by looking: the unwritten convention, the reason behind a choice, the gotcha no config confesses. Leave the one-file, one-command lookups to the environment, where they cannot go stale.
 - Check every line for **relevance**: does it still bear on what the document does? A line loses relevance by never bearing on the task (mere exposition, or a branch that should be disclosed) or by going stale as the behaviour or world it describes changes. Shorter documents are easier to keep relevant. Without a pruning discipline the default fate is **sediment**: stale layers that settle because adding feels safe and removing feels risky, until you must core down through them to find what is still live.
 - Hunt **no-ops** sentence by sentence: an instruction the model already obeys by default pays load to say nothing. The test — does it change behaviour versus the default? — is model-relative, not reader-relative: two people disagreeing about a no-op disagree about the default, and settle it by running the document, not by debate. When a sentence fails, delete the whole sentence rather than trim words from it. The test also grades leading words: a word too weak to beat the default (_be thorough_ when the agent is already thorough-ish) is a no-op, and the fix is a stronger word (_relentless_), not a different technique.
+
+## Skill mechanics
+
+What changes when the document is a skill: the invocation choice and router skills. The front matter fields themselves are [runbook-conventions.md](/standards/harness/runbook-conventions.md)'s to define.
+
+### Invocation
+
+Two choices, trading the two loads:
+
+- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously — and other skills can reach it. You can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the user's. The description is the skill's top-level context pointer, forced to stay loaded at all times — permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: `disable-model-invocation: false`, and a model-facing description carrying the trigger branches (the [context-pointer rules](#context-pointers) apply in full).
+- A **user-invoked** skill strips the description from the agent's reach: only the user typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load — you are the index that must remember it exists. Mechanics: `disable-model-invocation: true`; the `description` becomes user-facing — a one-line summary, trigger lists stripped.
+
+Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
+
+Shared reference that two user-invoked skills both need can live in neither — with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
+
+### Splitting by invocation
+
+The invocation cut of splitting (the sequence cut is under [When to split](#when-to-split)): split off a model-invoked skill when you have a distinct leading word that should trigger it on its own — a trigger word you actually use in your prompts — or another skill must reach it. You pay context load for the new always-loaded description, so that independent reach has to be worth it.
+
+### Router skills
+
+When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the user has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the user can reach them.

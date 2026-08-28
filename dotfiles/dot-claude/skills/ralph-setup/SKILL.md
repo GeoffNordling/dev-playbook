@@ -27,10 +27,11 @@ the files this skill writes}. Then say `READ: ralph-loop.md` and proceed.
 
 ## 2. Interview for intent
 
-{Run [/grill-with-docs](~/.claude/skills/grill-with-docs/SKILL.md)} to reach
-shared understanding of the goal: what the finished product is, what is in
-and out of scope, what "good" means. `goal`, if present, is the starting
-idea.
+{Run [/grilling](~/.claude/skills/grilling/SKILL.md)}, with
+{Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active
+throughout}, to reach shared understanding of the goal: what the finished
+product is, what is in and out of scope, what "good" means. `goal`, if
+present, is the starting idea.
 
 ## 3. Define done
 

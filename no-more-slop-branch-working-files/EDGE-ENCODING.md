@@ -154,8 +154,9 @@ The ruled rows, in detail:
   `skills/` segment; ownership from the *resolved* path — every skill
   now resolves into the dotfiles `dot-claude` tree and draws square
   brackets (the curly vendored form retired with verbatim adoption,
-  Decision Record 0025). One span per edge: grill-with-docs fires two,
-  the /grilling session and /domain-modeling active throughout.
+  Decision Record 0025). One span per edge: intake's interview beat
+  fires two, the /grilling session and /domain-modeling active
+  throughout.
 - **does → Script** — `{Run <payload containing exactly one link>}`,
   the same expression as does → Skill: the verb never carries the
   target type, the linked path does. A link to a `SKILL.md` is a Skill;
@@ -325,13 +326,11 @@ Agents:
 Skills:
 
 - [x] document-deslop — Review section still unencoded (rides the branch plan's Final Quality Pass)
-- [x] grill-with-docs
 - [x] log-friction
 - [x] usage-report
 - [x] agent-view-overwatch
 - [x] candidate-promote
 - [x] clean-up-branch-worktree
-- [x] codebase-design (3P)
 - [x] commit — the `{Commit}` span itself skipped: `git_detail()` requires `-C`, this skill targets the ambient repo (ledgered)
 - [x] commit-off
 - [x] compact-prep
@@ -361,7 +360,6 @@ Skills:
 - [x] wayfinder (3P)
 - [x] wayfinder-to-build
 - [x] working-doc-set-deslop
-- [x] writing-for-agents (3P)
 
 ## To-do
 

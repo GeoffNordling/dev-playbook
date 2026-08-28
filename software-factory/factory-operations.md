@@ -172,7 +172,7 @@ session does with an escalation is
 
 It binds no factory node. Every node the traverse launches — the reviews
 included — is a headless process ending on the report envelope above. A helper
-invoked inside a node (`/commit`, `/grill-with-docs`) is not a node and is never
+invoked inside a node (`/commit`, `/grilling`) is not a node and is never
 dispatched.
 
 **Escalation is terminal, and retries are the caller's.** A traverse never runs a

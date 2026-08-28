@@ -177,6 +177,17 @@ exemplar, worked as the abstraction shape in
   ledger reduced to skill / verdict / date / reason per source — no release
   pin, no tag or commit hashes, no per-ruling Decision Record. Re-evaluation
   is manual: the user updates the rows by hand. Recorded in 0025.
+- **Rules moved out of skills.** Under the relaxed file-roles standard
+  (rules live in documents, procedures live in runbooks), `codebase-design`
+  became `standards/modules/design.md` and `writing-for-agents` became
+  `standards/harness/writing-for-agents.md`; both skills are deleted and
+  every caller repointed. `domain-modeling` slimmed to the active
+  discipline: its `CONTEXT-MAP.md` layout (conflicting with
+  context-content.md) and its `adr-format.md` (conflicting with
+  decisions/records.md) were cut, the CONTEXT.md format folded into
+  context-content.md, and `grill-with-docs` — reduced to a one-line
+  wrapper once its override retired — was deleted, its callers running
+  `/grilling` + `/domain-modeling` directly.
 
 **Raw ideas, none designed**
 

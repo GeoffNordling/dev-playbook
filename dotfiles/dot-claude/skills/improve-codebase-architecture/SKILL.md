@@ -12,8 +12,8 @@ Surface architectural friction and propose **deepening opportunities** — refac
 
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
-- {Run [/codebase-design](~/.claude/skills/codebase-design/SKILL.md) for the architecture vocabulary and its principles, loaded first; `module`, `interface`, `depth`, `seam`, `adapter`, `leverage`, `locality` — the deletion test, "the interface is the test surface," "one adapter = hypothetical seam, two = real"}. Use these terms exactly in every suggestion — don't drift into "component," "service," "API," or "boundary."
-- The domain language in `CONTEXT.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
+- {Read [module design](~/workspace/dev-playbook/standards/modules/design.md) for the architecture vocabulary and its principles, loaded first; `module`, `interface`, `depth`, `seam`, `adapter`, `leverage`, `locality` — the deletion test, "the interface is the test surface," "one adapter = hypothetical seam, two = real"}. Use these terms exactly in every suggestion — don't drift into "component," "service," "API," or "boundary."
+- The domain language in `CONTEXT.md` gives names to good seams; Decision Records in `docs/decisions/` record decisions this command should not re-litigate.
 
 ## Process
 
@@ -24,7 +24,7 @@ This command is _informed_ by the project's domain model and built on a shared d
 - If the user named a direction — a module, a subsystem, a pain point — take it, and skip the inference below.
 - Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots — the files and areas that keep coming up — and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
 
-Read the project's domain glossary (`CONTEXT.md`) and any ADRs in the area you're touching first.
+Read the project's domain glossary (`CONTEXT.md`) and any Decision Records in the area you're touching first.
 
 Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
 
@@ -53,9 +53,9 @@ For each candidate, render a card with:
 
 End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
 
-**Use CONTEXT.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
+**Use CONTEXT.md vocabulary for the domain, and the module-design vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
 
-**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007 — but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
+**Decision Record conflicts**: if a candidate contradicts an existing Decision Record, only surface it when the friction is real enough to warrant revisiting it. Mark it clearly in the card (e.g. a warning callout: _"contradicts 0007 — but worth reopening because…"_). Don't list every theoretical refactor a record forbids.
 
 Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
 
@@ -63,9 +63,9 @@ Do NOT propose interfaces yet. After the file is written, ask the user: "Which o
 
 {If the user picks a candidate, {Run [/grilling](~/.claude/skills/grilling/SKILL.md) to walk the decision tree with them}} — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
-{If a new term surfaces that `CONTEXT.md` doesn't yet name, or a rejection deserves an ADR, {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) to keep the domain model current as you go}}:
+{If a new term surfaces that `CONTEXT.md` doesn't yet name, or a rejection deserves a Decision Record, {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) to keep the domain model current as you go}}:
 
 - **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md`. Create the file lazily if it doesn't exist.
 - **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing — skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- {If the user wants to explore alternative interfaces for the deepened module, {Run [/codebase-design](~/.claude/skills/codebase-design/SKILL.md) again, for design-it-twice; parallel sub-agents, each pinned to a different interface}}.
+- **User rejects the candidate with a load-bearing reason?** Offer a Decision Record, framed as: _"Want me to record this as a Decision Record so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing — skip ephemeral reasons ("not worth it right now") and self-evident ones.
+- {If the user wants to explore alternative interfaces for the deepened module, {Read [design-it-twice.md](references/design-it-twice.md)} and work through it: parallel sub-agents, each pinned to a different interface}.

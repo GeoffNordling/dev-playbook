@@ -17,10 +17,10 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 
 Before doing anything else:
 
-- {Run [/codebase-design](~/.claude/skills/codebase-design/SKILL.md); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
+- {Read [module design](~/workspace/dev-playbook/standards/modules/design.md); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
 - {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end; the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on}.
 
-Then report: `READ: codebase-design, issue-authoring.md`. Proceed only after.
+Then report: `READ: modules/design.md, issue-authoring.md`. Proceed only after.
 
 ## 1. Load context
 
@@ -46,7 +46,7 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 ## 3. General Interview
 
-{Run [/grill-with-docs](~/.claude/skills/grill-with-docs/SKILL.md) to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize}. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended.
+{Run [/grilling](~/.claude/skills/grilling/SKILL.md) to sharpen the approach against the codebase}, with {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active throughout, capturing significant decisions as Decision Records as they crystallize}. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended.
 
 Claims about existing reality accumulate through this interview — what a module does today, what a config holds, what a rule enforces. Collect the ones the approach stands on into a **proposed-probe list** and put it to the user; they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)). Run the picked probes immediately, in-context, as ordinary tool calls, and post the **probe-record comment** on the issue — each probe's command and its observed output, appended to on later runs. The §7 brief's `measured` claims cite it; peripheral claims ride as `assumed` freely.
 

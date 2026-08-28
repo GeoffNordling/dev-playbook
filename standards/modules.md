@@ -10,10 +10,10 @@ Governs how modules are designed — interfaces, depth, and seams.
 
 ## Define
 
-- [codebase-design](/dotfiles/dot-claude/skills/codebase-design/SKILL.md) — the
+- [Module Design Conventions](/standards/modules/design.md) — the
   contract: the vocabulary and the aliases it retires, the four principles,
-  and the three rules that make an interface testable; invoke it as
-  `/codebase-design`
+  the three rules that make an interface testable, and the dependency
+  categories that govern deepening
 
 ## Audit
 

@@ -27,16 +27,16 @@ The row is the whole record of a ruling.
 | ask-matt | reject | 2026-08-08 | A hand-maintained prose router competes with the factory graph |
 | claude-handoff | reject | 2026-08-01 | The authored `handoff` mirrors upstream's production `handoff`, which is the correct end state |
 | code-review | reject | 2026-08-08 | Its two-axis workflow duplicates `code-pr-review` and the factory's review nodes, and is wired to upstream's tracker plumbing |
-| codebase-design | **verbatim** | 2026-08-08 | The single home for the workspace's architecture vocabulary, and a dependency of `improve-codebase-architecture` |
+| codebase-design | **adapt** | 2026-08-28 | Adopted as the module-design standard (`standards/modules/design.md`) rather than a skill — its content is rules, and rules live in documents |
 | diagnosing-bugs | **verbatim** | 2026-08-08 | Builds the reproduction loop before hypothesizing, then ranks loop techniques and tests falsifiable hypotheses |
-| domain-modeling | **verbatim** | 2026-08-01 | — |
+| domain-modeling | **adapt** | 2026-08-28 | The active glossary discipline kept as the skill; its multi-context `CONTEXT-MAP.md` and `docs/adr/` conventions cut for the workspace's one-root `CONTEXT.md` and Decision Records |
 | git-guardrails-claude-code | reject | 2026-08-01 | The PAT makes the guarded operations impossible |
 | grill-me | reject | 2026-08-01 | Redundant with `grill-with-docs` |
-| grill-with-docs | **adapt** | 2026-08-08 | A thin front door onto `/grilling` + `/domain-modeling`; the one modification enables model invocation for the four workspace call sites |
+| grill-with-docs | reject | 2026-08-28 | Dissolved: once its Decision-Record override retired with the ADR-format migration, only a one-line wrapper remained; callers run `/grilling` + `/domain-modeling` directly |
 | grilling | **verbatim** | 2026-08-01 | Round-by-round frontier questioning in a mandated question-and-recommendation format |
 | handoff | reject | 2026-08-01 | Harvested near-verbatim into the authored `handoff` |
 | implement | reject | 2026-08-01 | The factory graph does this with more rigor |
-| improve-codebase-architecture | **verbatim** | 2026-08-08 | The workspace's only architecture-scanning capability — hot-spot scoping, subagent exploration under the deletion test, then grilling the candidate picked |
+| improve-codebase-architecture | **adapt** | 2026-08-28 | The workspace's only architecture-scanning capability — hot-spot scoping, subagent exploration under the deletion test, then grilling the candidate picked; repointed at the module-design standard and Decision Records |
 | loop-me | reject | 2026-08-01 | Belongs to mission-control |
 | migrate-to-shoehorn | reject | 2026-08-01 | TypeScript-only |
 | prototype | **verbatim** | 2026-08-01 | The logic branch builds a self-contained HTML demo rather than a terminal TUI |
@@ -56,7 +56,7 @@ The row is the whole record of a ruling.
 | wayfinder | **verbatim** | 2026-08-01 | — |
 | wizard | reject | 2026-08-28 | Nothing in the workspace references it, and its `template.sh` is past the shell standard's glue-only boundary |
 | writing-beats | reject | 2026-08-01 | Journey-based structure fights the workspace's current-state reference prose |
-| writing-for-agents | **verbatim** | 2026-08-08 | The craft layer for any document an agent consumes |
+| writing-for-agents | **adapt** | 2026-08-28 | Adopted as a harness standard (`standards/harness/writing-for-agents.md`) rather than a skill — the craft layer for any document an agent consumes is rules, and rules live in documents |
 | writing-fragments | reject | 2026-08-01 | Idea capture lives in mission-control |
 | writing-shape | reject | 2026-08-08 | Sits in upstream's unpromoted `in-progress` tier |
 

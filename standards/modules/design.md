@@ -1,12 +1,10 @@
 ---
-name: codebase-design
-description: Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary.
-disable-model-invocation: false
-model: sonnet
-effort: xhigh
+type: Standard
+title: Module Design Conventions
+description: The deep-module contract — the vocabulary and the aliases it retires, deep vs shallow, the principles, testability rules, and the dependency categories that govern deepening
 ---
 
-# Codebase Design
+# Module Design Conventions
 
 Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. Use this language and these principles wherever code is being designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 
@@ -62,10 +60,10 @@ When designing an interface, ask:
 
 ## Principles
 
-- **Depth is a property of the interface, not the implementation.** A deep module can be internally composed of small, mockable, swappable parts — they just aren't part of the interface. A module can have **internal seams** (private to its implementation, used by its own tests) as well as the **external seam** at its interface.
+- **Depth is a property of the interface, not the implementation.** A deep module can be internally composed of small, mockable, swappable parts — they just aren't part of the interface. A module can have **internal seams** (private to its implementation, used by its own tests) as well as the **external seam** at its interface. Don't expose internal seams through the interface just because tests use them.
 - **The deletion test.** Imagine deleting the module. If complexity vanishes, it was a pass-through. If complexity reappears across N callers, it was earning its keep.
 - **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
-- **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a seam unless something actually varies across it.
+- **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a seam unless something actually varies across it — typically production + test. A single-adapter seam is just indirection.
 
 ## Designing for testability
 
@@ -111,7 +109,31 @@ Good interfaces make testing natural:
 - **"Interface" as the TypeScript `interface` keyword or a class's public methods**: too narrow — interface here includes every fact a caller must know.
 - **"Boundary"**: overloaded with DDD's bounded context. Say **seam** or **interface**.
 
-## Going deeper
+## Dependency categories
 
-- **Deepening a cluster given its dependencies** — {Read [deepening.md](references/deepening.md)} for the dependency categories, seam discipline, and replace-don't-layer testing strategy.
-- **Exploring alternative interfaces** — {Read [design-it-twice.md](references/design-it-twice.md)} and work through it: spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.
+When assessing a cluster of shallow modules for deepening, classify its dependencies. The category determines how the deepened module is tested across its seam.
+
+### 1. In-process
+
+Pure computation, in-memory state, no I/O. Always deepenable — merge the modules and test through the new interface directly. No adapter needed.
+
+### 2. Local-substitutable
+
+Dependencies that have local test stand-ins (PGLite for Postgres, in-memory filesystem). Deepenable if the stand-in exists. The deepened module is tested with the stand-in running in the test suite. The seam is internal; no port at the module's external interface.
+
+### 3. Remote but owned (Ports & Adapters)
+
+Your own services across a network boundary (microservices, internal APIs). Define a **port** (interface) at the seam. The deep module owns the logic; the transport is injected as an **adapter**. Tests use an in-memory adapter. Production uses an HTTP/gRPC/queue adapter.
+
+Recommendation shape: *"Define a port at the seam, implement an HTTP adapter for production and an in-memory adapter for testing, so the logic sits in one deep module even though it's deployed across a network."*
+
+### 4. True external (Mock)
+
+Third-party services (Stripe, Twilio, etc.) you don't control. The deepened module takes the external dependency as an injected port; tests provide a mock adapter.
+
+## Testing strategy: replace, don't layer
+
+- Old unit tests on shallow modules become waste once tests at the deepened module's interface exist — delete them.
+- Write new tests at the deepened module's interface. The **interface is the test surface**.
+- Tests assert on observable outcomes through the interface, not internal state.
+- Tests should survive internal refactors — they describe behaviour, not implementation. If a test has to change when the implementation changes, it's testing past the interface.

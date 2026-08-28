@@ -31,7 +31,7 @@ Then say `READ: software-factory.md, issue-authoring.md`. Proceed only after.
 - **Capture** — the text passed in is the raw idea.
 - **Adopt** — `gh issue view <issue> --json title,body,comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
 
-Either way, {Run [/grill-with-docs](~/.claude/skills/grill-with-docs/SKILL.md) once to sharpen the raw idea}, then return — **every time**, in both Capture and Adopt, before the §4 draft and the §5 write. Understanding intent precedes authoring; not even a clear-seeming idea skips the grill.
+Either way, {Run [/grilling](~/.claude/skills/grilling/SKILL.md) once to sharpen the raw idea}, with {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active throughout}, then return — **every time**, in both Capture and Adopt, before the §4 draft and the §5 write. Understanding intent precedes authoring; not even a clear-seeming idea skips the grill.
 
 ### 2. Check the idea against the repo
 
@@ -75,7 +75,7 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 - **The four-tuple** — `category` / `mode` / `tests` / routed `phase`, each with a few words of why.
 - **The brief, in miniature** — a few-line sketch of the §4 draft: scope, the load-bearing decisions, the shape of the acceptance criteria. Never the body verbatim — the full text lands on the issue, where it's read. For **adopt**, say in a line what the rewrite keeps and drops from the stub.
 
-Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment: when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
+Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment: when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed §1 grill — however thorough, it sharpened *intent*, while §5 confirms the *authored artifact*. (A deeper terminology or domain dispute is a §1 grill matter, not this beat.)
 
 On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6 sets on the user's approval; the hold lasts until §6 ends, or into the next session if the user parks the beat.
 

@@ -50,7 +50,7 @@
 [tics-remover] Agent · tools: Read, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
   ├─writes──► local file    the target document in place
-  ├ ╌ reads ╌ ► [writing-for-agents] Skill    if the target is an agent-facing instruction file
+  ├ ╌ reads ╌ ► [writing-for-agents] Standard    if the target is an agent-facing instruction file
   ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
 
@@ -69,10 +69,6 @@
   ├ ╌ reports ╌ ► outcome: str    the output    if it prints anything
   ├ ╌ reports ╌ ► outcome: str    both outputs    if the SHAs differ, or the PR list is empty
   └─reports─► outcome: str    one line: worktree and branch removed, main at that commit
-
-[codebase-design] Skill · model: sonnet, effort: xhigh
-  ├─reads───► deepening.md
-  └─reads───► design-it-twice.md
 
 [commit-off] Skill · model: inherit, effort: low
 
@@ -102,9 +98,10 @@
 
 [design] Skill · model: inherit, effort: xhigh
   ├─args────► issue
-  ├─does────► [codebase-design] Skill
+  ├─reads───► [design] Standard
   ├─reads───► [issue-authoring] Standard    end-to-end
-  ├─does────► [grill-with-docs] Skill    to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize
+  ├─does────► [grilling] Skill    to sharpen the approach against the codebase
+  ├─does────► [domain-modeling] Skill    active throughout, capturing significant decisions as Decision Records as they crystallize
   ├ ╌ reads ╌ ► design-it-twice.md    if §2 settled that the public surface is load-bearing
   ├ ╌ does ╌ ► [prototype] Skill    if a question survives the interview and the code can't answer it
   ├─does────► [user-intent-mini-interview] Skill
@@ -127,10 +124,10 @@
   └─does────► [tics-remover] Agent    the subagent, `model: sonnet`
 
 [domain-modeling] Skill · model: inherit, effort: xhigh
-  ├ ╌ reads ╌ ► context-format.md    if a term is resolved
+  ├ ╌ reads ╌ ► [context-content] Standard    if a term is resolved
   ├ ╌ writes ╌ ► local file    CONTEXT.md in place with the resolved entry    if a term is resolved
-  ├ ╌ reads ╌ ► adr-format.md    if all three ADR criteria hold
-  └ ╌ writes ╌ ► local file    the new ADR file under `docs/adr/`    if all three ADR criteria hold
+  ├ ╌ reads ╌ ► [records] Standard    if a decision looks hard to reverse or would surprise a future reader
+  └ ╌ writes ╌ ► local file    the new record under `docs/decisions/`    if every criterion holds
 
 [enable-repo-governance] Skill · model: opus, effort: xhigh
   ├─reads───► [bootstrap] Standard
@@ -145,11 +142,6 @@
   ├─writes──► git(~/workspace/dev-playbook: add, commit)    that dev-playbook edit separately, one line
   └─reports─► outcome: str    per-repo results
 
-[grill-with-docs] Skill · model: inherit, effort: xhigh
-  ├─does────► [grilling] Skill
-  ├─does────► [domain-modeling] Skill    throughout
-  └─overrides─► [domain-modeling] Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
-
 [grilling] Skill · model: inherit, effort: xhigh
   └─reports─► outcome: str    the whole frontier in one round: number each question and give your recommended answer
 
@@ -163,17 +155,18 @@
   └─does────► [idea] Skill    verbatim
 
 [improve-codebase-architecture] Skill · model: inherit, effort: xhigh
-  ├─does────► [codebase-design] Skill    for the architecture vocabulary and its principles, loaded first
+  ├─reads───► [design] Standard    for the architecture vocabulary and its principles, loaded first
   ├─reads───► html-report.md    for the full HTML scaffold, diagram patterns, and styling guidance
   ├─reports─► outcome: str    the finished report's absolute path, already opened for the user
   ├ ╌ does ╌ ► [grilling] Skill    to walk the decision tree with them    if the user picks a candidate
-  ├ ╌ does ╌ ► [domain-modeling] Skill    to keep the domain model current as you go    if a new term surfaces that `CONTEXT.md` doesn't yet name, or a rejection deserves an ADR
-  └ ╌ does ╌ ► [codebase-design] Skill    again, for design-it-twice    if the user wants to explore alternative interfaces for the deepened module
+  ├ ╌ does ╌ ► [domain-modeling] Skill    to keep the domain model current as you go    if a new term surfaces that `CONTEXT.md` doesn't yet name, or a rejection deserves a Decision Record
+  └ ╌ reads ╌ ► design-it-twice.md    if the user wants to explore alternative interfaces for the deepened module
 
 [intake] Skill · model: inherit, effort: xhigh
   ├─reads───► software factory standard
   ├─reads───► [issue-authoring] Standard
-  ├─does────► [grill-with-docs] Skill    once to sharpen the raw idea
+  ├─does────► [grilling] Skill    once to sharpen the raw idea
+  ├─does────► [domain-modeling] Skill    active throughout
   ├─reads───► [factory-labels] Standard
   ├─does────► [user-intent-mini-interview] Skill    for that one
   ├─does────► [issue-review-claims] Skill    `<issue>`
@@ -226,7 +219,8 @@
 [ralph-setup] Skill · model: inherit, effort: xhigh
   ├─args────► goal
   ├─reads───► ralph-loop.md    end-to-end, before anything else
-  ├─does────► [grill-with-docs] Skill
+  ├─does────► [grilling] Skill
+  ├─does────► [domain-modeling] Skill    active throughout
   ├ ╌ writes ╌ ► local file    the plan file    if the user approved the criteria and the plan, and the gate is green
   ├ ╌ writes ╌ ► local file    the progress file    if the user approved the criteria and the plan, and the gate is green
   └─reports─► outcome: str    the full launch command for the user to run
@@ -243,8 +237,7 @@
 [runbook-creator] Skill · model: opus, effort: xhigh
   ├─args────► idea
   ├─reads───► [runbook-conventions] Standard    end-to-end
-  ├─does────► [writing-for-agents] Skill    in context
-  ├─overrides─► [writing-for-agents] Skill    where it states runbook format    with [runbook-conventions] Standard
+  ├─reads───► [writing-for-agents] Standard    end-to-end
   ├─writes──► local file    the new runbook
   └─does────► playbook-lint
 
@@ -271,7 +264,7 @@
   ├─args────► map
   ├─reads───► [issue-authoring] Standard    end-to-end
   ├─reads───► software factory    end-to-end
-  ├─does────► [codebase-design] Skill
+  ├─reads───► [design] Standard
   ├ ╌ reports ╌ ► outcome: str    exactly what is open    if anything is still open — a ticket, a fog patch
   ├─does────► [grilling] Skill    and work these branches as its design tree
   ├─reads───► the decompose exit
@@ -290,6 +283,3 @@
 [working-doc-set-deslop] Skill · model: sonnet, effort: high
   ├─args────► set-hint
   └─does────► [set-deslopper] Agent    the subagent, `model: opus`
-
-[writing-for-agents] Skill · model: sonnet, effort: xhigh
-  └ ╌ reads ╌ ► skill-mechanics.md    for frontmatter, invocation choice, and router skills    if the document you're writing is a skill

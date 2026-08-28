@@ -21,14 +21,9 @@ The rules live in these two, and this skill is only the workflow over them.
 Before doing anything else:
 
 - {Read [runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md) end-to-end; the binding format a skill or agent takes}.
-- {Run [/writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md) in context; the craft of writing what an agent consumes}.
+- {Read [writing-for-agents.md](~/workspace/dev-playbook/standards/harness/writing-for-agents.md) end-to-end; the craft of writing what an agent consumes}.
 
-{Override [/writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md)
-where it states runbook format with [runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md);
-its `references/skill-mechanics.md` carries front matter and invocation rules of its own,
-and this workspace's win}.
-
-Then report: `READ: runbook-conventions.md, writing-for-agents`. Proceed only
+Then report: `READ: runbook-conventions.md, writing-for-agents.md`. Proceed only
 after.
 
 ## 1. Interview the user

@@ -16,7 +16,7 @@ goal, and a shorter result is a side effect of it.
 The launching prompt names the working directory and the target document.
 
 {If the target is an agent-facing instruction file,
-{Read [writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md)},
+{Read [writing-for-agents.md](~/workspace/dev-playbook/standards/harness/writing-for-agents.md)},
 which explains what such a file is doing, so the rewrite does not break
 it}. Agent-facing means a skill, an agent definition, a rule, or a
 `CLAUDE.md`. It is not a standard to bring the target into line with:

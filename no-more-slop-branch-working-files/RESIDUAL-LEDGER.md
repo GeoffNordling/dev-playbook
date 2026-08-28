@@ -30,11 +30,6 @@ Partially ported; the Review section still waits. Could not express
 "this skill never commits" (no primitive for a forbidden action) or a
 report that one branch deliberately withholds.
 
-## grill-with-docs
-
-Could not express what is *not* overridden ("Everything else applies
-as written") — no primitive asserts an edge's absence.
-
 ## usage-report
 
 Could not express the script's own read of `usage.json` — a script has
@@ -351,26 +346,6 @@ writes—GitHub hole). Could not express the mid-run `READ:` acknowledgment
 (targets the conversation, not the invoker) or the per-step "Done when"
 completion gates (no control-flow primitive).
 
-## codebase-design
-
-Could not express the design-it-twice fan-out — three to four fresh
-sub-agents, each pinned to a different design constraint, reporting a
-problem-space explanation before the fan-out and a comparison-and-recommendation
-after it — because that procedure lives entirely inside the private reference
-`design-it-twice.md`, outside the scanned corpus; the `{Read}` edge into it is
-as far as the map reaches. Could not express the glossary's exact-term
-discipline ("use these terms exactly... don't substitute") — a behavior-mode
-setting the whole file installs, not an edge, and the map has no primitive
-for it.
-
-## writing-for-agents
-
-Could not express the "When to split" section's second cross-reference
-to skill-mechanics.md as pointing at the read already declared above —
-the map has no primitive for citing an existing edge, only for
-declaring a fresh one, so it stays an unbraced pointer rather than a
-duplicate read to the same target.
-
 ## research
 
 Could not express spawning the background research agent — `{Launch}` needs
@@ -380,10 +355,9 @@ fixed on-disk link, and the sources vary with the question asked.
 
 ## domain-modeling
 
-Could not express challenging a term against `CONTEXT.md`, detecting a
-`CONTEXT-MAP.md`, or cross-referencing the code — `{Read}` needs one
-fixed on-disk link, and all three targets change with whatever repo the
-skill is invoked in.
+Could not express challenging a term against `CONTEXT.md` or
+cross-referencing the code — `{Read}` needs one fixed on-disk link, and
+both targets change with whatever repo the skill is invoked in.
 
 ## wayfinder
 

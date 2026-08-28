@@ -10,37 +10,7 @@ effort: xhigh
 
 Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
-## File structure
-
-Most repos have a single context:
-
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
-
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
-
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
-
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+The model lives in two files, each created lazily — only when there is something to write. The glossary is `CONTEXT.md` at the repo root ([context-content.md](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md)); decisions are Decision Records under `docs/decisions/` ([records.md](~/workspace/dev-playbook/standards/decisions/records.md)).
 
 ## During the session
 
@@ -62,16 +32,8 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-{If a term is resolved, {Read [context-format.md](references/context-format.md)} and {Write CONTEXT.md in place with the resolved entry; don't batch these up — capture it as it happens}}.
+{If a term is resolved, {Read [context-content.md](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md)} and {Write CONTEXT.md in place with the resolved entry; don't batch these up — capture it as it happens}}.
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+### Offer Decision Records sparingly
 
-### Offer ADRs sparingly
-
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse** — the cost of changing your mind later is meaningful
-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
-
-{If all three ADR criteria hold, {Read [adr-format.md](references/adr-format.md)} and {Write the new ADR file under `docs/adr/`}}. If any is missing, skip the ADR.
+{If a decision looks hard to reverse or would surprise a future reader, {Read [records.md](~/workspace/dev-playbook/standards/decisions/records.md)} and test the decision against its when-to-offer bar}. {If every criterion holds, {Write the new record under `docs/decisions/`}}. If any criterion is missing, skip the record.
