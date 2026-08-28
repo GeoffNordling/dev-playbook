@@ -1,0 +1,19 @@
+# What the sandbox image build does NOT need from the repo root.
+#
+# The build context is the whole repo (see sandbox_probe/Containerfile), but
+# the Containerfile only copies src/, scripts/, dotfiles/, and the staged
+# claude binary. Everything listed here is excluded so the context stays small.
+
+.git
+.git/
+.claude/
+**/__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# The probe's own throwaway clone and synced home. Excluding this also stops a
+# previous run's copy of the repo being pulled back into the build.
+sandbox_probe/scratch/

@@ -24,10 +24,10 @@ SCRATCH = podman.PROBE_DIR / "scratch"
 CREDENTIALS_ON_HOST = Path.home() / ".claude/.credentials.json"
 CREDENTIALS_INSIDE = f"{HOME}/.claude/.credentials.json"
 
-# A Containerfile can only COPY files from the directory it is built in, so
-# the binary has to be staged there first. .gitignore keeps it out of the repo.
+# A Containerfile can only COPY files from the build context, so the binary
+# has to be staged there first. .gitignore keeps it out of the repo.
 CLAUDE_ON_HOST = Path.home() / ".local/bin/claude"
-CLAUDE_IN_CONTEXT = podman.PROBE_DIR / "claude"
+CLAUDE_IN_CONTEXT = podman.REPO_ROOT / "claude"
 
 # Everything the agent is handed is handed deliberately, so anything found at
 # one of these paths got in by accident.

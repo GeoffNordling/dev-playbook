@@ -1,17 +1,25 @@
-# The image the sandboxed agent runs inside.
+# The image the sandboxed agent runs inside. One image serves every agent;
+# what differs between them is the mounts, not the image.
 #
+# BUILD CONTEXT: the repo root, not this directory. A build may copy only from
+# the one directory it is pointed at, and the COPY lines below name src/,
+# scripts/, and dotfiles/, which sit at the repo root. podman.build_image()
+# passes this file with --file and the root as the context; /.containerignore
+# keeps the rest of the repo out.
+#
+# The design this implements is /sandbox_probe/SPEC.md.
+
 # Fedora, because src/dev_playbook/dotfiles/machine.py reads /etc/os-release
 # and raises on anything that is not Fedora or WSL.
-
 FROM fedora
 
 # The four tools sync-dotfiles checks for before it will run. curl is already
 # in the base image; python3 is not.
 RUN dnf install -y git stow jq python3 && dnf clean all
 
-# uv is not a Fedora package, so it comes from its own installer. Put it in
-# /usr/local/bin, which is on everyone's PATH — the installer's default is a
-# folder under the *building* user's home, and the container runs as you.
+# uv installs from astral. Put it in /usr/local/bin, which is on everyone's
+# PATH — the installer's default is a folder under the *building* user's home,
+# and the container runs as you.
 RUN curl -LsSf https://astral.sh/uv/install.sh \
     | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
 
@@ -19,6 +27,26 @@ RUN curl -LsSf https://astral.sh/uv/install.sh \
 # has to exist and belong to it. 1000 is your user's number on this machine.
 RUN mkdir -p /home/geoff && chown 1000:1000 /home/geoff
 
-# The claude binary, staged into this directory by build-image. It is one
+# The claude binary, staged into the build context by build-image. It is one
 # self-contained 214 MB program, so nothing else has to be installed for it.
 COPY claude /usr/local/bin/claude
+
+# Everything above ran as root, and files root creates belong to root. The
+# agent runs as geoff and writes to ~/.claude constantly, so switch accounts
+# before anything is created in the home directory.
+ENV HOME=/home/geoff
+USER 1000
+
+# The three trees sync-dotfiles needs: the script itself, the logic it imports
+# (dev_playbook.dotfiles.sync), and the tree it links. Ordered stablest-first,
+# so a skill edit does not force src/ to be recopied. These copies exist only
+# so the build can run — at run time the read-only mount covers them with the
+# live repo.
+COPY --chown=1000:1000 src      /home/geoff/workspace/dev-playbook/src
+COPY --chown=1000:1000 scripts  /home/geoff/workspace/dev-playbook/scripts
+COPY --chown=1000:1000 dotfiles /home/geoff/workspace/dev-playbook/dotfiles
+
+# Creates the 8 symlinks in /home/geoff/.claude. The COPY lines above are what
+# tell podman to rerun this step: its own text never changes, so without them
+# it would be reused forever and the baked config would go stale silently.
+RUN /home/geoff/workspace/dev-playbook/scripts/sync-dotfiles

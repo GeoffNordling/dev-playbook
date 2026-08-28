@@ -14,6 +14,11 @@ IMAGE = "sandbox-probe"
 # The directory holding the Containerfile: this file's parent's parent.
 PROBE_DIR = Path(__file__).resolve().parent.parent
 
+# The build context — the one directory a build may copy from. It is the repo
+# root, not PROBE_DIR, because the Containerfile copies in src/, scripts/, and
+# dotfiles/ so it can run sync-dotfiles. .containerignore keeps the rest out.
+REPO_ROOT = PROBE_DIR.parent
+
 
 @dataclass(frozen=True)
 class Mount:
@@ -87,8 +92,22 @@ def container_argv(
 
 
 def build_image(tag: str = IMAGE) -> None:
-    """Build the image from the Containerfile next to this package."""
-    run(["podman", "build", "--tag", tag, str(PROBE_DIR)])
+    """Build the image from the Containerfile next to this package.
+
+    --file and the context are separate: the recipe lives in sandbox_probe/,
+    but it copies from the repo root, so that is what the build is pointed at.
+    """
+    run(
+        [
+            "podman",
+            "build",
+            "--tag",
+            tag,
+            "--file",
+            str(PROBE_DIR / "Containerfile"),
+            str(REPO_ROOT),
+        ]
+    )
 
 
 def start(argv: list[str]) -> subprocess.Popen:
