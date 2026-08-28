@@ -2,6 +2,7 @@
   ├─reads───► review contract
   ├─reads───► deviation contract
   ├─reads───► PR feedback
+  ├─reads───► factory-operations.md's merge-message recipe    § the-merge-message-recipe
   ├─reports─► outcome: str    the settled envelope
   └ ╌ reports ╌ ► outcome: str    the escalation envelope    if you stopped instead
 
@@ -34,7 +35,7 @@
 
 [open-pr] Agent · model: sonnet, effort: low
   ├ ╌ reports ╌ ► outcome: str    that PR    if it lists one
-  ├─reads───► factory-operations.md
+  ├─reads───► factory-operations.md's merge-message recipe    § the-merge-message-recipe
   ├─reports─► outcome: str    the PR's number and whether you created it or found it already open
   └ ╌ reports ╌ ► outcome: str    the reason instead, as escalated    if the PR cannot be created at all
 
@@ -111,6 +112,8 @@
   └─reports─► outcome: str    the phase result and next state
 
 [diagnosing-bugs] Skill · model: inherit, effort: xhigh
+  ├─reads───► `CONTEXT.md`    for a clear mental model of the relevant modules
+  ├─reads───► `docs/decisions/`    for the Decision Records in the area you're touching
   ├ ╌ reports ╌ ► outcome: str    that redaction hid what's needed to diagnose it    if the redacted output is not enough to diagnose the bug
   ├ ╌ writes ╌ ► local file    a copy of the HITL script, edited with this bug's steps    if the user must click
   ├ ╌ does ╌ ► [hitl-loop.template.sh] Script    the edited copy    if the user must click
@@ -124,6 +127,7 @@
   └─does────► [tics-remover] Agent    the subagent, `model: sonnet`
 
 [domain-modeling] Skill · model: inherit, effort: xhigh
+  ├─reads───► `CONTEXT.md`    for the existing language
   ├ ╌ reads ╌ ► [context-content] Standard    if a term is resolved
   ├ ╌ writes ╌ ► local file    CONTEXT.md in place with the resolved entry    if a term is resolved
   ├ ╌ reads ╌ ► [records] Standard    if a decision looks hard to reverse or would surprise a future reader
@@ -156,6 +160,8 @@
 
 [improve-codebase-architecture] Skill · model: inherit, effort: xhigh
   ├─reads───► [design] Standard    for the architecture vocabulary and its principles, loaded first
+  ├─reads───► `CONTEXT.md`    for the project's domain glossary
+  ├─reads───► `docs/decisions/`    for the Decision Records in the area you're touching
   ├─reads───► html-report.md    for the full HTML scaffold, diagram patterns, and styling guidance
   ├─reports─► outcome: str    the finished report's absolute path, already opened for the user
   ├ ╌ does ╌ ► [grilling] Skill    to walk the decision tree with them    if the user picks a candidate
@@ -178,6 +184,7 @@
   ├─reads───► software-factory.md
   ├─reads───► factory-operations.md
   ├─reads───► user-checkpoints.md
+  ├─reads───► [issue-authoring] Standard    § readiness
   ├─writes──► local file    every body you post here
   └─reports─► outcome: str    the issue's state at the close of each turn
 
@@ -255,9 +262,11 @@
 
 [user-intent-mini-interview] Skill · model: inherit, effort: xhigh
   ├─args────► issue
+  ├─reads───► [issue-authoring] Standard    § the-build-leaf-brief-modedirect
   └─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
 
 [wait-what] Skill · model: sonnet, effort: xhigh
+  ├─reads───► `CONTEXT.md`    for its ubiquitous language
   └─reports─► outcome: str    the last message re-pitched
 
 [wayfinder-to-build] Skill · model: inherit, effort: xhigh
@@ -265,9 +274,12 @@
   ├─reads───► [issue-authoring] Standard    end-to-end
   ├─reads───► software factory    end-to-end
   ├─reads───► [design] Standard
+  ├─reads───► [tracker-operations] Standard    § wayfinding-operations
   ├ ╌ reports ╌ ► outcome: str    exactly what is open    if anything is still open — a ticket, a fog patch
   ├─does────► [grilling] Skill    and work these branches as its design tree
+  ├─reads───► [issue-authoring] Standard    § vertical-slice-rules
   ├─reads───► the decompose exit
+  ├─reads───► [issue-authoring] Standard    § the-epic-body
   ├─reads───► [tracker-operations] Standard    for the commands that wire the native relationships
   └─reports─► outcome: str    the whole hand-off on screen
 

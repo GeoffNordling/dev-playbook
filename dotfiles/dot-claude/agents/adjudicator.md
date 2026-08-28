@@ -174,9 +174,10 @@ untouched, and write it back:
 
 **At `converged`, regenerate the title and body as well.** This is the last
 pass anyone makes over them, and the body becomes the permanent commit message
-when the pull request is squashed. Rewrite them from the whole record — the
-final diff, the issue brief, the conversation, and the rulings — to the
-[merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe).
+when the pull request is squashed. {Read
+[factory-operations.md's merge-message recipe](~/workspace/dev-playbook/software-factory/factory-operations.md#the-merge-message-recipe)}
+and rewrite them from the whole record — the final diff, the issue brief, the
+conversation, and the rulings — to it.
 Preserve what the mandatory sections hold rather than rewriting them from the
 recipe alone: the accuracy of the final record wins over its freshness.
 

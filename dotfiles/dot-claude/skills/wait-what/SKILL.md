@@ -9,6 +9,7 @@ effort: xhigh
 # Wait, What?
 
 The user has lost the thread — the last message did not land.
-{Report the last message re-pitched; give a little context first, write
-in ASD-STE100 Simplified Technical English, and use the ubiquitous
-language from `CONTEXT.md`}.
+{Read `CONTEXT.md` for its ubiquitous language}. {Report the last
+message re-pitched; give a little context first, write in ASD-STE100
+Simplified Technical English, and use the ubiquitous language from
+`CONTEXT.md`}.

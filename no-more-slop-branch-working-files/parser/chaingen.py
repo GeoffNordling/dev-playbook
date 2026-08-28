@@ -4,7 +4,9 @@
 Prototype for To-do item 1 of EDGE-ENCODING.md. Implements the certified
 transform: slice, never interpret. Cut points are the keyword, the markdown
 link(s), the `with` splitter, nested braces, and the first semicolon.
-Everything between cut points is opaque verbatim text.
+Everything between cut points is opaque verbatim text. A `#fragment` on a
+read/launch/run link target splits off as a `§ fragment` annotation on the
+edge, after failing loud unless it matches a heading slug in the target.
 
 Usage:
     chaingen.py            regenerate chains.txt — every runbook in the
@@ -34,6 +36,8 @@ LEXICON = {
 NODE_DATA_KEYS = ("tools", "model", "effort", "allowed-tools")
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+
+CODE_RE = re.compile(r"`([^`]+)`")
 
 LABEL_FIELD = 8  # ─reads───► : label plus dashes fill 8 columns
 SEP = "    "  # segment separator on an edge line
@@ -168,6 +172,17 @@ def one_link(payload, where):
     return text, target, remainder
 
 
+def one_code(payload, where):
+    """Extract a linkless payload's single inline-code target and the remainder."""
+    codes = CODE_RE.findall(payload)
+    if len(codes) != 1:
+        raise LintError(
+            f"{where}: a linkless Read needs exactly one inline-code target, "
+            f"found {len(codes)}"
+        )
+    return codes[0], collapse(CODE_RE.sub(" ", payload, count=1))
+
+
 # ── target classification ────────────────────────────────────────────────
 
 
@@ -181,8 +196,8 @@ def repo_root(start):
     raise LintError(f"no repo root above {start}")
 
 
-def classify(link_text, link_target, source_file):
-    """Render a link target as a node, or as the link text for a non-runbook."""
+def resolve(link_target, source_file):
+    """Resolve a link target to an on-disk path; fail if it does not exist."""
     if link_target.startswith("~"):
         path = os.path.expanduser(link_target)
         # Same-repo resolution: a ~/workspace/<repo>/… path naming the repo
@@ -211,7 +226,12 @@ def classify(link_text, link_target, source_file):
         path = os.path.join(os.path.dirname(source_file), link_target)
     if not os.path.exists(path):
         raise LintError(f"link target does not exist: {link_target} -> {path}")
-    real = os.path.realpath(path)
+    return path
+
+
+def classify(link_text, link_target, source_file):
+    """Render a link target as a node, or as the link text for a non-runbook."""
+    real = os.path.realpath(resolve(link_target, source_file))
     vendored = "/.agents/" in real
     base = os.path.basename(real)
     if base == "SKILL.md":
@@ -226,6 +246,61 @@ def classify(link_text, link_target, source_file):
         return link_text  # not a runbook: the link text travels verbatim
     braces = "{{{}}}" if vendored else "[{}]"
     return f"{braces.format(name)} {ntype}"
+
+
+# ── fragment anchors ─────────────────────────────────────────────────────
+# Mirrors dev_playbook.md's github_slug/heading_slugs — the package is not
+# importable from this standalone prototype, so the regexes are copied.
+
+SLUG_BACKTICK = re.compile(r"`([^`]*)`")
+SLUG_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+SLUG_STAR = re.compile(r"(\*{1,2})(.+?)\1")
+SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
+SLUG_DROP = re.compile(r"[^\w\s\-]")
+SLUG_WHITESPACE = re.compile(r"\s")
+HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
+FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*(.*)$")
+
+
+def github_slug(heading):
+    """GitHub's anchor slug for a heading."""
+    text = SLUG_BACKTICK.sub(r"\1", heading)
+    text = SLUG_LINK.sub(r"\1", text)
+    text = SLUG_STAR.sub(r"\2", text)
+    text = SLUG_UNDERSCORE.sub(r"\2", text)
+    text = SLUG_DROP.sub("", text.lower())
+    return SLUG_WHITESPACE.sub("-", text)
+
+
+def heading_slugs(path):
+    """Slugs of every heading in the file at `path`, fenced code skipped."""
+    slugs, fence = set(), None
+    with open(path) as f:
+        for line in f:
+            m = FENCE_RE.match(line)
+            if m:
+                run, info = m.group(1), m.group(2)
+                if fence is None:
+                    fence = run
+                    continue
+                if run[0] == fence[0] and len(run) >= len(fence) and not info:
+                    fence = None
+                    continue
+            if fence is None and (h := HEADING_RE.match(line)):
+                slugs.add(github_slug(h.group(1)))
+    return slugs
+
+
+def split_anchor(link_target, source_file, where):
+    """Split a #fragment off a link target; the fragment must name a heading."""
+    target, _, fragment = link_target.partition("#")
+    if not fragment:
+        return link_target, ""
+    if not target.endswith(".md"):
+        raise LintError(f"{where}: #fragment on a non-markdown target: {link_target}")
+    if fragment not in heading_slugs(resolve(target, source_file)):
+        raise LintError(f"{where}: no heading slugs to '#{fragment}' in {target}")
+    return target, fragment
 
 
 # ── git bucket ───────────────────────────────────────────────────────────
@@ -267,9 +342,19 @@ def edge_from_span(key, payload, span, body, source_file):
     label = LEXICON[key]
     where = f"span at offset {span.start}"
     if key in ("read", "launch", "run"):
+        if key == "read" and not LINK_RE.search(payload):
+            # Runtime-bound target: a file in the invoking repo, named as
+            # inline code per the cross-reference standard's varied-location
+            # row. No on-disk resolution — the node is the token verbatim.
+            token, rest = one_code(payload, where)
+            return Edge(label, f"`{token}`", collapse(kernel(rest)))
         _text, target, rest = one_link(payload, where)
+        target, anchor = split_anchor(target, source_file, where)
         node = classify(_text, target, source_file)
-        return Edge(label, node, collapse(kernel(rest)))
+        annotation = SEP.join(
+            s for s in (f"§ {anchor}" if anchor else "", collapse(kernel(rest))) if s
+        )
+        return Edge(label, node, annotation)
     if key == "write":
         return Edge(label, "local file", collapse(kernel(payload)))
     if key == "commit":

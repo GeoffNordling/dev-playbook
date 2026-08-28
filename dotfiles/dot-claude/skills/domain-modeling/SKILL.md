@@ -16,7 +16,7 @@ The model lives in two files, each created lazily — only when there is somethi
 
 ### Challenge against the glossary
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+{Read `CONTEXT.md` for the existing language}, and when the user uses a term that conflicts with it, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
 
 ### Sharpen fuzzy language
 

@@ -48,9 +48,9 @@ the map:
 ## 1. Verify the map is complete
 
 The hand-off takes only a **finished** map labelled `wayfinder:map`: every
-child ticket closed (the open-children query in
-[tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#wayfinding-operations)
-returns nothing) and no fog left in **Not yet specified**. {If anything is
+child ticket closed ({Read
+[the open-children query in tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#wayfinding-operations)}
+— it must return nothing) and no fog left in **Not yet specified**. {If anything is
 still open — a ticket, a fog patch, {Report exactly what is open} and end
 the session there}.
 
@@ -76,9 +76,9 @@ every question before the next round}:
 
 1. **The delivery surface** — for each load-bearing resolution, the files and
    systems it lands on.
-2. **The slices** — cut per the
-   [vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slice-rules),
-   boundaries falling on module seams per the module-design standard, each
+2. **The slices** — {Read
+   [the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slice-rules)}
+   and cut per them, boundaries falling on module seams per the module-design standard, each
    slice tested against the One-goal bullet's two-question orthogonality test
    at epic and slice altitude. What fails the test is deferred exactly as the
    bullet says: a real tracker stub at `phase:intake`, named in the epic's
@@ -100,9 +100,9 @@ every slice passing the two-question test.
 A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
-tying the two at a glance. Label it `category:*` **only**, and give it the
-epic body from
-[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-epic-body):
+tying the two at a glance. Label it `category:*` **only**. {Read
+[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-epic-body)}
+and give it the epic body defined there:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the
   [<map name>](url)"), then states the end state in prose that stands alone.

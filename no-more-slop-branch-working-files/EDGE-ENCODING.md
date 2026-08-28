@@ -124,7 +124,14 @@ The ruled rows, in detail:
 - **reads** — `{Read <payload containing exactly one link>}`. The one
   markdown link or citation in the span is the edge target; other words in
   the span are annotation. Two reads means two spans; zero or two links in
-  one span fails the lint.
+  one span fails the lint. A `#fragment` on the target names a section:
+  the parser splits it off as a `§ fragment` annotation on the edge, and
+  fails the lint unless the fragment matches a heading slug in the target
+  file (the same applies to Launch and Run targets). A linkless Read may
+  instead carry exactly one inline-code target — a file in the invoking
+  repo, named per the cross-reference standard's varied-location row
+  (`` {Read `CONTEXT.md` …} ``) — which becomes the node verbatim,
+  backticks kept, with no on-disk resolution.
 - **writes, git bucket** — `{Commit …}` declares the edge; the fenced
   command block in the same step supplies the machine detail — repo from
   `-C`, operations from the git subcommands. The lint requires the block

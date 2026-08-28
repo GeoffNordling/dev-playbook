@@ -133,11 +133,7 @@ reject-and-restore-to-`HEAD` — which no primitive covers.
 
 ## doc-pr-review
 
-Could not express the anchored reads (review-contract.md's gh-mechanics,
-delta-re-review, findings-are-threads, resolution-ownership, and
-findings-are-not-escalations sections; declarations.md's maintenance
-section; factory-operations.md's merge-message recipe) — `{Read}` fails
-on `#fragment` links. Could not express the review's central act —
+Could not express the review's central act —
 auditing the docs in the diff and posting the findings as threads on
 the PR, and resolving verified prior-cycle threads (`gh` writes, the
 writes—GitHub hole). Could not express the diff-conditional standards
@@ -229,10 +225,8 @@ primitive for a rendered report's shape).
 
 ## bug-pr-review
 
-Could not express the anchored reads inside review-contract.md (gh-mechanics,
-delta-re-review, findings-are-threads, resolution-ownership,
-findings-are-not-escalations) — `{Read}` fails on `#fragment` links — or the
-`gh` state reads (PR threads, the diff itself) — no on-disk link. Could
+Could not express the `gh` state reads (PR threads, the diff itself) — no
+on-disk link. Could
 not express the review's central act — posting the findings as threads
 on the PR and resolving prior-cycle threads (`gh` writes, the
 writes—GitHub hole). The eight finder angles and their dedup/tag steps
@@ -254,9 +248,8 @@ GitHub-token permission preflight, which has no primitive.
 
 ## user-intent-mini-interview
 
-Could not express the anchored read of issue-authoring.md's build-leaf-brief
-section — `{Read}` fails on `#fragment` links — or the `gh issue view` read
-of the draft when `issue` is given (no on-disk link). Could not express the
+Could not express the `gh issue view` read of the draft when `issue` is
+given (no on-disk link). Could not express the
 ask/scrutinize/marry interview loop of steps 1–3 (no primitive for a
 question-and-answer round) or the closing "writes nothing to GitHub"
 assertion (no primitive for an edge's absence).
@@ -272,9 +265,7 @@ is silently absent from the chain.
 
 ## issue-overwatch
 
-Could not express the anchored reads throughout (the briefing rule, the dispatch
-table, readiness, the terminal report contract, the escalation rule, comment
-surfaces, the two owners, turn boundaries — all `#fragment` links), the `gh`
+Could not express the `gh`
 state and write calls (issue view, blocked-by check, label moves, PR/issue
 comments, stub creation — no on-disk link, the writes—GitHub hole), or the
 `EnterWorktree` calls and worktree-only git commands (does covers only
@@ -286,8 +277,7 @@ fixed link for `{Launch}`.
 
 ## open-pr
 
-Could not express the anchored read — `{Read}` fails on `#fragment`
-links, so the recipe link dropped its anchor — the `gh issue view` and
+Could not express the `gh issue view` and
 branch-diff reads (no on-disk link), the PR-body scratch write and
 `gh pr create` (writes—GitHub/scratch hole), or the issue-number input
 (agents have no `arguments` frontmatter). Three alternate reports all
@@ -316,9 +306,7 @@ only `tools`/`model`/`effort`/`allowed-tools` render in the header.
 
 ## improve-codebase-architecture
 
-Could not express reading the target codebase's `CONTEXT.md` and `docs/adr/*` —
-`{Read}` needs one fixed on-disk link, and both live in whatever repo this
-skill is run against, not in dev-playbook. Could not express spawning the
+Could not express spawning the
 anonymous exploration sub-agent — `{Launch}` needs a link to one agent
 definition file, and this is an ad hoc Task-tool call with none. Could not
 express writing the HTML report to the OS temp directory — the writes—scratch
@@ -326,8 +314,7 @@ hole covers no on-disk-repo target.
 
 ## diagnosing-bugs
 
-Could not express reading CONTEXT.md or the area's ADRs — both runtime-bound,
-no fixed on-disk link — or the redact-every-secret discipline, a behavior-mode
+Could not express the redact-every-secret discipline, a behavior-mode
 setting with no primitive. Could not express Phase 3's ranked-list check-in
 (targets the conversation mid-run, not a terminal report) or the
 throwaway-harness and captured-trace writes (the writes—scratch hole). Could
@@ -336,10 +323,7 @@ bucket needs a fixed `-C <repo>` a same-repo commit can't honestly carry.
 
 ## wayfinder-to-build
 
-Could not express the anchored reads (tracker-operations.md's wayfinding
-section, issue-authoring.md's vertical-slice-rules and epic-body sections,
-user-checkpoints.md's issue-review-verdict section) — `{Read}` fails on
-`#fragment` links. Could not express reading the map issue and its child
+Could not express reading the map issue and its child
 tickets via `gh issue view` (no on-disk link), minting the build epic and
 child stubs, or wiring sub-issue/blocked-by relationships (`gh` writes, the
 writes—GitHub hole). Could not express the mid-run `READ:` acknowledgment
@@ -355,9 +339,8 @@ fixed on-disk link, and the sources vary with the question asked.
 
 ## domain-modeling
 
-Could not express challenging a term against `CONTEXT.md` or
-cross-referencing the code — `{Read}` needs one fixed on-disk link, and
-both targets change with whatever repo the skill is invoked in.
+Could not express cross-referencing the code — the files consulted vary
+with the claim under test, so there is no single target to name.
 
 ## wayfinder
 
@@ -381,8 +364,3 @@ and branch are chosen at runtime, not fixed. Could not express leaving
 a context pointer to that branch, or the verdict, on the implementation
 issue — the writes—GitHub hole.
 
-## wait-what
-
-Could not express reading `CONTEXT.md` for its ubiquitous language —
-`{Read}` needs one fixed on-disk link, and the target changes with
-whatever repo the skill is invoked in.
