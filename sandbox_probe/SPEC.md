@@ -72,21 +72,13 @@ must precede anything created in the home directory, because root-owned files
 there would be unwritable by the agent. The three `COPY` lines must precede the
 `RUN`, because they are what makes podman rerun it.
 
-### Why the setup moved into the build
+### Why the setup is in the build
 
-The prototype ran `sync-dotfiles` in its own container, then ran Claude in a
-second one. A container's filesystem is deleted when it exits, so the config
-the first container built had to be parked on the host disk at
-`sandbox_probe/scratch/home/` and handed to the second.
-
-That parked directory is the whole reason for the ownership defect recorded in
-[NOTES.md](/sandbox_probe/NOTES.md) under the podman-created mountpoint. Podman
-creates missing mountpoints inside it owned by UID 524288, an account that
-exists nowhere on this machine, and `shutil.rmtree(..., ignore_errors=True)`
-swallows the resulting `PermissionError`.
-
-Baking the config into the image removes the handoff. Nothing passes between
-runs, so `sandbox_probe/scratch/home/` is deleted and the defect goes with it.
+Setting the config up at run time means keeping it somewhere between runs, and
+a directory shared by two containers is where the ownership defect in
+[NOTES.md](/sandbox_probe/NOTES.md) came from. Building it into the image
+removes the handoff: nothing passes between runs, so there is nothing to share
+and nothing to clean up.
 
 ### Build before every run
 
@@ -326,20 +318,35 @@ substitution directly rather than relying on the agent to extend the rule.
 
 ## The sandbox prompt
 
-A podman agent needs a short preamble that an agent outside podman does not.
-The minimum:
+The bottom row of the grid is the row an agent cannot work out for itself. The
+top row is the layout it already knows. In the bottom row it wakes up in a
+confusing file system, which may hold two directories named dev-playbook. A
+short preamble brings it up to speed:
 
-1. Your checkout is `/home/geoff/work/<repo-name>`. It is your repo. Resolve
-   same-repo paths against it.
-2. `/home/geoff/workspace/dev-playbook` is a read-only reference copy of
-   dev-playbook's main checkout. Read from it. Never write to it.
-3. You have no GitHub credential. `commit`, `branch`, `diff`, `log`, `stash`,
+1. **You are inside a podman container**, alone, running once to completion.
+
+2. **`/home/geoff/work/<repo-name>` is your checkout, and it is writable.**
+   Your repo, on your branch. Resolve same-repo paths against it. It is the
+   only writable window, so it is the only thing that survives the container.
+
+3. **`/home/geoff/workspace/dev-playbook` is the config source, and it is
+   read-only.** A copy of dev-playbook's main checkout at HEAD. Your skills,
+   rules, and hooks are symlinked into it, read from it as required, and an
+   absolute `/home/geoff/workspace/dev-playbook/...` citation resolves there.
+
+4. **You may be assigned to edit dev-playbook itself.** In that case you have
+   two copies of it. `/home/geoff/work/dev-playbook` is the writable one —
+   your checkout, the one you change. `/home/geoff/workspace/dev-playbook`
+   is the read-only one — the reference copy the harness reads. They are
+   separate clones; an edit in one does not appear in the other.
+
+5. **You have Git, but no GitHub.** `commit`, `branch`, `diff`, `log`,
    `reset`, and `checkout` work. `push`, `fetch`, `pull`, and cloning from a
    URL do not.
-4. The container is disposable. Only what you write in your checkout survives.
 
-Two or three sentences of orientation may precede these, describing the two
-checkouts and why there are two.
+6. **Everything outside your checkout is discarded** when the run ends — `/tmp`,
+   the home directory, anything installed. Put what matters in the checkout.
+   Do not bother cleaning up the rest.
 
 ## Carried over unchanged
 
