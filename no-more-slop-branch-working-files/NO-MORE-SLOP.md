@@ -177,6 +177,10 @@ exemplar, worked as the abstraction shape in
   ledger reduced to skill / verdict / date / reason per source — no release
   pin, no tag or commit hashes, no per-ruling Decision Record. Re-evaluation
   is manual: the user updates the rows by hand. Recorded in 0025.
+- **Converted-skill port.** The former (3P) ten, owned since 0025, went
+  through the same port as the first-party runbooks — the
+  [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster)
+  is fully ticked.
 - **Rules moved out of skills.** Under the relaxed file-roles standard
   (rules live in documents, procedures live in runbooks), `codebase-design`
   became `standards/modules/design.md` and `writing-for-agents` became
@@ -333,12 +337,10 @@ the encoding is settled in
 with every proven chain in
 [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md).
 
-The corpus port runs in stages; the first — retiring verbatim adoption —
-is done and recorded under Completed.
+The corpus port is done and recorded under Completed; what remains is
+the closing pass.
 
-1. **Port the converted skills.** The former (3P) ten, now owned,
-   go through the same port as the first-party runbooks.
-2. **Final Quality Pass.** Go through the final skills and look for residual
+1. **Final Quality Pass.** Go through the final skills and look for residual
 opportunities. We deemphasized residuals tracking during the conversion
 sweeps so we'll need a fresh eye to see if we're happy with the final result
 or if we need new expressions. Basically scan skills and look for important things
