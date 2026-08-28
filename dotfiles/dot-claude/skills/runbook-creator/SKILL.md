@@ -25,7 +25,7 @@ Before doing anything else:
 
 {Override [/writing-for-agents](~/.claude/skills/writing-for-agents/SKILL.md)
 where it states runbook format with [runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md);
-its `SKILL-MECHANICS.md` carries front matter and invocation rules of its own,
+its `references/skill-mechanics.md` carries front matter and invocation rules of its own,
 and this workspace's win}.
 
 Then report: `READ: runbook-conventions.md, writing-for-agents`. Proceed only

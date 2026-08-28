@@ -57,7 +57,7 @@ judgments:
       - standards/harness/files.md
       - standards/harness/claude-content.md
       - standards/harness/runbook-conventions.md
-      - dotfiles/.agents/skills/writing-for-agents/SKILL.md
+      - dotfiles/dot-claude/skills/writing-for-agents/SKILL.md
       - scripts/harness-files-lint
       - scripts/prose-lint
       - judgments/harness.yaml
@@ -232,8 +232,8 @@ judgments:
     evidence:  [standards/modules.md]
     reference:
       - standards/standard/format.md
-      - dotfiles/.agents/skills/codebase-design/SKILL.md
-      - dotfiles/.agents/skills/improve-codebase-architecture/SKILL.md
+      - dotfiles/dot-claude/skills/codebase-design/SKILL.md
+      - dotfiles/dot-claude/skills/improve-codebase-architecture/SKILL.md
     model: claude-sonnet-5
     effort: high
 

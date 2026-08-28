@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Human-in-the-loop reproduction loop.
+# HITL reproduction loop.
 # Copy this file, edit the steps below, and run it.
 # The agent runs the script; the user follows prompts in their terminal.
 #
@@ -18,15 +18,15 @@
 set -euo pipefail
 
 step() {
-  printf '\n>>> %s\n' "$1"
-  read -r -p "    [Enter when done] " _
+	printf '\n>>> %s\n' "$1"
+	read -r -p "    [Enter when done] " _
 }
 
 capture() {
-  local var="$1" question="$2" answer
-  printf '\n>>> %s\n' "$question"
-  read -r -p "    > " answer
-  printf -v "$var" '%s' "$answer"
+	local var="$1" question="$2" answer
+	printf '\n>>> %s\n' "$question"
+	read -r -p "    > " answer
+	printf -v "$var" '%s' "$answer"
 }
 
 # --- edit below ---------------------------------------------------------

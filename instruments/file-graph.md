@@ -45,17 +45,15 @@ The caller supplies the repository root. Optionally:
 | `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([file-roles.md](/standards/knowledge-organization/file-roles.md)) |
 | `index` | an `index.md` directory listing |
 | `harness-session` | markdown injected into agent context at session start: `CLAUDE.md` at any level, `rules/*.md` |
-| `harness-skill-authored` | a first-party skill bundle member — `SKILL.md` plus everything in its skill directory |
-| `harness-skill-thirdparty` | anything under an externally-managed install tree (`.agents/`) |
+| `harness-skill` | a skill bundle member — `SKILL.md` plus everything in its skill directory |
 | `reading` | an instrument's output artifact under `readings/` |
 | `code` | a file run as code: `*.py`, `*.sh`, `*.js`, executables, hooks |
 | `config` | a file read as configuration: settings, manifests, lockfiles, canonical templates |
 | `unclassified` | the residual that guarantees totality; a nonzero count is a finding |
 
-The three `harness-` buckets are one family — files the Claude Code
-harness loads into agent context — subdivided by origin and load time:
-injected every session, versus loaded on skill invocation from first-party
-or third-party trees.
+The two `harness-` buckets are one family — files the Claude Code
+harness loads into agent context — subdivided by load time:
+injected every session, versus loaded on skill invocation.
 
 The bucket tests follow the concept/harness boundary
 ([file-roles.md](/standards/knowledge-organization/file-roles.md)) and the harness-file registry

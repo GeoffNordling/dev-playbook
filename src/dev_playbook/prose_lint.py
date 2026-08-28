@@ -26,13 +26,13 @@ applies two deterministic rules:
 
 Scope is **all authored content, harness files included** (``CLAUDE.md``,
 rules, skills; for the banned-word rule, code and config too). What is out is
-``md.classify``'s ``"excluded"`` category: externally-managed vendored trees
-(which ``classify`` decides through the shared dev_playbook.external registry)
-and transient scratch (``PLAN.md`` / ``PROGRESS.md``, the root ``tmp/`` tree).
+``md.classify``'s ``"excluded"`` category: any externally-managed root the
+shared dev_playbook.external registry names (none today) and transient
+scratch (``PLAN.md`` / ``PROGRESS.md``, the root ``tmp/`` tree).
 Verbatim upstream mirrors are excluded per file via the registry's
 ``is_verbatim_doc`` (``type: Reference`` documents). Symlinks are skipped: a
 link's content belongs to its target, which is scanned at its own path when
-authored here and is not ours when vendored. Beyond those structural
+it lives in the repo and is not ours when it does not. Beyond those structural
 exclusions, each repo declares its own: a tracked root-level
 ``.prose-lint-exempt`` lists the paths — files or whole directories — that
 every rule skips (dev-playbook's own lists this module and its test file,
@@ -218,18 +218,15 @@ def audit(root: Path) -> list[Finding]:
 
     Scope is wider than ``md.classify``'s concept split — harness files are in,
     and the banned-word rule reads every tracked file, not just Markdown — but
-    ``classify``'s ``"excluded"`` category is out: externally-managed vendored
-    trees, the ``.git`` tree, and the transient scratch that is not authored
-    content (``PLAN.md`` / ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing
-    that one boundary keeps vendored-tree exclusion on the shared registry
-    (``classify`` consults it) and stops the gate firing on scratch. Verbatim
-    Reference docs are excluded per file, the repo's ``.prose-lint-exempt``
-    declarations per path; symlinks and binary files (NUL byte) are skipped.
-
-    Skipping symlinks is what keeps the voice rule off a vendored third-party
-    skill: the file itself sits under an externally-managed tree that
-    ``classify`` excludes, and the mirror link publishing it under a skills root
-    is a symlink. Neither is ours to hold to the workspace voice.
+    ``classify``'s ``"excluded"`` category is out: the ``.git`` tree, any
+    externally-managed root the shared registry names (none today), and the
+    transient scratch that is not authored content (``PLAN.md`` /
+    ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing that one boundary
+    keeps the exclusion on the shared registry (``classify`` consults it) and
+    stops the gate firing on scratch. Verbatim Reference docs are excluded per
+    file, the repo's ``.prose-lint-exempt`` declarations per path; symlinks and
+    binary files (NUL byte) are skipped — a link's content belongs to its
+    target, scanned at its own path when it lives in the repo.
     """
     exempt = exempt_paths(root)
     findings: list[Finding] = []

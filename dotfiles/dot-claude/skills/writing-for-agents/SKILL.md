@@ -10,7 +10,7 @@ effort: xhigh
 
 Reference for writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output.
 
-When the document you're writing is a skill, read [`SKILL-MECHANICS.md`](SKILL-MECHANICS.md) for frontmatter, invocation choice, and router skills.
+When the document you're writing is a skill, read [skill-mechanics.md](references/skill-mechanics.md) for frontmatter, invocation choice, and router skills.
 
 ## Context pointers
 
@@ -27,7 +27,7 @@ A pointer does two jobs — state what the material is, and list the **branches*
 Every document and pointer you add spends one of two budgets:
 
 - **Context load** — the cost of always-loaded material on the agent's window: an `AGENTS.md` line, a skill description, anything sitting in context every turn, spending tokens and attention whether or not it fires.
-- **Cognitive load** — the cost on the human: which documents exist and when to reach for each. The human is the index. Not a cost to minimise — it is the price of human agency; spend it where human judgement matters, remove it where it does not.
+- **Cognitive load** — the cost on the user: which documents exist and when to reach for each. The user is the index. Not a cost to minimise — it is the price of the user's agency; spend it where the user's judgment matters, remove it where it does not.
 
 Material reached only through a pointer escapes context load at the price of the pointer's own line; material with no pointer at all rides entirely on cognitive load.
 
@@ -61,7 +61,7 @@ The strongest criteria are both checkable and exhaustive.
 Splitting one document into two spends one of the two loads, so split only when the cut earns it:
 
 - **By sequence** — split a run of steps where the post-completion steps tempt the agent to rush the one in front of it. Keeping them out of view drives more legwork on the current task. Beware the reverse: merging sequences exposes each step's later steps to what follows, inviting premature completion.
-- **By invocation** — skill-specific: see [`SKILL-MECHANICS.md`](SKILL-MECHANICS.md).
+- **By invocation** — skill-specific: see [skill-mechanics.md](references/skill-mechanics.md).
 
 ## Leading words
 

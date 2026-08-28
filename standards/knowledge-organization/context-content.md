@@ -11,11 +11,10 @@ words compete for one concept, pick one and retire the rest.
 
 ## Format
 
-[CONTEXT-FORMAT.md](/dotfiles/.agents/skills/domain-modeling/CONTEXT-FORMAT.md)
-gives the format, installed verbatim from mattpocock/skills alongside the
-`/domain-modeling` skill: the `## Language` section, the `**Term**:`
-definition shape, the `_Avoid_` alias line, and the rules that keep
-definitions tight and specific to the project.
+[context-format.md](/dotfiles/dot-claude/skills/domain-modeling/references/context-format.md)
+gives the format, carried by the `/domain-modeling` skill: the `## Language`
+section, the `**Term**:` definition shape, the `_Avoid_` alias line, and the
+rules that keep definitions tight and specific to the project.
 
 These differences hold in this workspace:
 

@@ -173,17 +173,6 @@ def test_future_rule_skips_deprecated_tree(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_future_rule_skips_externally_managed_tree(tmp_path: Path) -> None:
-    """no-future-annotations skips externally-managed trees via the shared
-    registry (dotfiles/.agents), not a hardcoded name in this script."""
-    repo = make_repo(
-        tmp_path,
-        {"dotfiles/.agents/old.py": "from __future__ import annotations\n"},
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
 def test_repo_self_scan_is_clean() -> None:
     """The dev-playbook repo itself passes both rules."""
     repo = Path(__file__).resolve().parents[1]

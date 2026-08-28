@@ -138,15 +138,6 @@ def test_flags_harness_markdown(tmp_path: Path) -> None:
     assert [f.file for f in findings] == ["CLAUDE.md"]
 
 
-def test_skips_externally_managed_tree(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {"dotfiles/.agents/skills/x/SKILL.md": "vendored judgement text\n"},
-    )
-
-    assert prose_lint.audit(repo) == []
-
-
 def test_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
@@ -253,13 +244,10 @@ def test_ban_reaches_frontmatter(tmp_path: Path) -> None:
     assert [(f.file, f.line) for f in findings] == [("docs/x.md", 3)]
 
 
-def test_ban_skips_vendored_and_verbatim(tmp_path: Path) -> None:
+def test_ban_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {
-            "dotfiles/.agents/skills/x/SKILL.md": "the human partner\n",
-            "standards/references/spec.md": "---\ntype: Reference\n---\nhuman\n",
-        },
+        {"standards/references/spec.md": "---\ntype: Reference\n---\nhuman\n"},
     )
 
     assert prose_lint.audit(repo) == []
@@ -332,14 +320,14 @@ def test_binary_file_is_skipped(tmp_path: Path) -> None:
 
 
 def test_symlinked_content_is_not_scanned(tmp_path: Path) -> None:
-    # A symlink's content belongs to its target: vendored targets are not ours,
-    # and in-repo targets are scanned at their own path.
-    repo = make_repo(
-        tmp_path, {"dotfiles/.agents/skills/x/SKILL.md": "the human partner\n"}
-    )
+    # A symlink's content belongs to its target: an out-of-repo target is not
+    # ours, and an in-repo target is scanned at its own path.
+    target = tmp_path / "outside.md"
+    target.write_text("the human partner\n")
+    repo = make_repo(tmp_path, {})
     link = repo / "dotfiles/dot-claude/skills/x/SKILL.md"
     link.parent.mkdir(parents=True)
-    os.symlink("../../../.agents/skills/x/SKILL.md", link)
+    os.symlink(target, link)
 
     assert prose_lint.audit(repo) == []
 
@@ -478,21 +466,6 @@ def test_declarative_document_is_out_of_scope(tmp_path: Path) -> None:
     # The ban reaches agent instructions, not every authored doc: a standard
     # quoting first-person prose is describing, not instructing.
     repo = make_repo(tmp_path, {"standards/prose.md": "# Prose\n\nI, me, my.\n"})
-
-    assert voice_findings(repo) == []
-
-
-def test_vendored_skill_is_not_inspected(tmp_path: Path) -> None:
-    # Third-party skills are carried verbatim so they can be re-synced upstream;
-    # their voice is their author's to set.
-    repo = make_repo(
-        tmp_path,
-        {
-            "dotfiles/.agents/skills/x/SKILL.md": skill(
-                "I ask you to tell me my opts.\n"
-            )
-        },
-    )
 
     assert voice_findings(repo) == []
 

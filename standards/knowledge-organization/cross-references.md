@@ -84,7 +84,7 @@ means "this file exists conceptually."
 
 | Target | Style | Example |
 |---|---|---|
-| File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[UI.md](references/UI.md)` |
+| File inside the same skill bundle (sibling, `references/`, parent) | Inline link, relative path | `[ui.md](references/ui.md)` |
 | File at a stable workspace location | Inline link, absolute `~/workspace/...` path | `[<doc>](~/workspace/<repo>/<path>/<doc>.md)` |
 | File in the user's repo whose location varies (e.g. `CLAUDE.md`, `specs/design.md`, `Makefile`) | Inline code | `` `CLAUDE.md` `` |
 | Directory | Inline code | `` `docs/decisions/` `` |

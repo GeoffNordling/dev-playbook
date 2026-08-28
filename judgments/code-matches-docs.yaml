@@ -113,7 +113,7 @@ judgments:
       the lint's rule that a map or ticket carries no factory-dimension label —
       that comes from the tracking standard, not the skill.
     evidence:  [src/dev_playbook/workspace_lint.py]
-    reference: [dotfiles/.agents/skills/wayfinder/SKILL.md]
+    reference: [dotfiles/dot-claude/skills/wayfinder/SKILL.md]
     model: claude-sonnet-5
     effort: high
 

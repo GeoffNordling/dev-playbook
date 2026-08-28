@@ -20,11 +20,10 @@ the only harness currently in use.
   grammar that makes skill and agent bodies machine-readable
 - [Runbook Conventions](/standards/harness/runbook-conventions.md) — the runbook
   format: skill bundles and agent definitions
-- [writing-for-agents](/dotfiles/.agents/skills/writing-for-agents/SKILL.md) —
-  the craft layer beside the binding format, installed verbatim from
-  mattpocock/skills: how any document an agent consumes is written so the
-  agent behaves predictably; invoke it as `/writing-for-agents`, and Runbook
-  Conventions wins where the two collide
+- [writing-for-agents](/dotfiles/dot-claude/skills/writing-for-agents/SKILL.md) —
+  the craft layer beside the binding format: how any document an agent
+  consumes is written so the agent behaves predictably; invoke it as
+  `/writing-for-agents`, and Runbook Conventions wins where the two collide
 
 ## Audit
 
