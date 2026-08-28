@@ -1,14 +1,14 @@
 ---
 type: Standard
 title: File Roles
-description: The role a repository file plays and the content it may hold — behavior and procedure across concept documents and harness-owned files
+description: The role a repository file plays and the content it may hold — rules and procedures across concept documents and harness-owned files
 ---
 
 # File Roles
 
 Every file in a workspace repository plays one of two roles, and the role
-bounds what the file may hold — so a rule of the system has one place it can
-be written, and a reader knows where to look. Which files must exist is
+guides what the file holds — so a rule of the system has a home a reader
+can find. Which files must exist is
 declared once, in the build standard's
 [file skeleton](/standards/build/skeleton.md); what goes inside each is
 governed by that file's content standard, linked from the skeleton.
@@ -29,7 +29,7 @@ code / instructions*: every non-`.md` file, plus the Claude Code file set enumer
 OKF frontmatter, is not type-linted, and keeps whatever format its consumer
 requires.
 
-**Behavior** — a rule of the system: a contract, a state and the moves out
+**Rule** — a rule of the system: a contract, a state and the moves out
 of it, a format, what one part owes another. It binds every actor who
 touches the thing, whatever job that actor is doing.
 
@@ -40,21 +40,16 @@ run.
 
 ## What each role may hold
 
-The axes are independent, and three of the four cells are populated:
+The axes are independent:
 
 | | Concept document | Harness-owned file |
 |---|---|---|
-| **Behavior** | Its one home — a Standard, a Decision Record, the vocabulary. | **Forbidden.** |
+| **Rule** | Its home — a Standard, a Decision Record, the vocabulary. | Cites the document that owns it; may state what its own run needs but avoid duplication. |
 | **Procedure** | A recipe a reader follows — an adoption walkthrough, a migration. | A program the harness runs — a skill body, an agent definition. |
 
-The empty cell is the rule. A skill body or an agent definition is a program
-over the world the concept documents describe: it sequences, conditions, and
-commands, and where it needs a behavior it names the document that defines
-it. A procedure's own steps are not behavior, so a harness file that invents
-no behavior needs no reference at all. What the rule forbids is a rule of
-the system stated only in a harness file, which a reader would have to read
-every skill to find. Where a harness file needs a behavior no document
-defines, the document comes first.
-
-One behavior is restated rather than cited: a prohibition, in one sentence,
-wherever an agent must not miss it.
+The division is a general aim, not a strict gate: rules live in documents,
+procedures live in runbooks, and follow that split where it serves the
+reader. A runbook that needs a rule of the system cites the document that
+defines it rather than duplicating; the terms, formats,
+and states of a runbook's own run are part of the procedure and need no
+document.
