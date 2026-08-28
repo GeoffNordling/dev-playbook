@@ -1,7 +1,7 @@
 ---
 type: Survey
 title: Sandboxed headless Claude
-description: What the sandbox prototype is, how its fence works, what it found on this machine, and the two defects to fix next time
+description: What the sandbox prototype is, how its fence works, what it found on this machine, and the defect to fix next time
 ---
 
 # Sandboxed headless Claude — prototype
@@ -9,7 +9,9 @@ description: What the sandbox prototype is, how its fence works, what it found o
 Run a headless Claude agent inside a podman container, on subscription billing,
 with a fence a confused agent cannot cross.
 
-This is a prototype for learning. It works; do not ship it — see §8.
+This is a prototype for learning. It works; do not ship it — see §8. The design
+it is being replaced by is [Sandboxed agent design](/sandbox_probe/SPEC.md);
+where the two disagree, the spec wins.
 
 ---
 
@@ -56,9 +58,8 @@ through that sharing.
 
 Files the agent writes through a mount land on the host disk immediately and
 survive the container. Files it writes anywhere else die with the container.
-That is why the synced home directory lives at `scratch/home` on the host
-rather than inside: `sync-config` builds it in one container, and `run-task`
-needs it in the next.
+The clone is the only writable mount, so it is the only thing a run leaves
+behind.
 
 ### The fences
 
@@ -152,8 +153,9 @@ The container needs `git` installed regardless, so an image is being built
 either way. Adding `claude` to the recipe is one more line, and one method is
 simpler to maintain than two.
 
-`COPY claude /usr/local/bin/claude` needs the 214 MB binary in the build
-directory, so `.gitignore` carries `claude` to keep it out of the repo.
+`COPY claude /usr/local/bin/claude` needs the 214 MB binary inside the build
+context, which is the repo root, so `.gitignore` carries `/claude` to keep it
+out of the repo.
 
 ### Fedora base image
 
@@ -187,15 +189,20 @@ That path is relative, resolved from the folder holding the link
 `/home/geoff/workspace/dev-playbook/dotfiles/dot-claude/skills`.
 
 So inside the container: set `HOME=/home/geoff` and mount the repo at
-`/home/geoff/workspace/dev-playbook`. Mount it at `/work` instead and all
-twelve links dangle.
+`/home/geoff/workspace/dev-playbook`. Mount it at `/work` instead and every one
+of the links dangles.
 
-### Reproduce the configuration with the real script
+### Reproduce the configuration with the real script, at build time
 
-Run `dev-playbook/scripts/sync-dotfiles` inside the container. It uses `stow`,
-so it builds the whole `~/.claude/` layout. Using the real script keeps the
-sandbox identical to the host by construction, with no second definition to
-drift.
+Run `dev-playbook/scripts/sync-dotfiles` as a step in the `Containerfile`. It
+uses `stow`, so it builds the whole `~/.claude/` layout. Using the real script
+keeps the sandbox identical to the host by construction, with no second
+definition to drift.
+
+Doing it in the build rather than in a container means the links are already in
+the image when a run starts. Nothing is handed from one run to the next, so
+there is no shared directory between them — which is what closes the ownership
+defect this prototype originally exposed.
 
 `settings.json` is a symlink like the rest, stowed from
 `dotfiles/dot-claude/settings.json` — one shared file, so what the sandbox
@@ -231,7 +238,7 @@ Verified 2026-08-27.
 |---|---|
 | Podman | 5.8.4, rootless, `crun` runtime, `netavark` networking |
 | Docker | not installed; `/usr/bin/docker` is a shim that execs podman |
-| `claude` | single ELF binary, 214 MB, `~/.local/share/claude/versions/2.1.248` |
+| `claude` | single ELF binary, 214 MB, `~/.local/share/claude/versions/` |
 | Node | present on host, not needed — this is the native installer |
 | Subscription login | `~/.claude/.credentials.json`, 509 bytes, mode 600 |
 | `CLAUDE_CODE_OAUTH_TOKEN` | not set |
@@ -252,19 +259,22 @@ read-only. The subscription is billed.
 
 ### 6.3 The configuration reproduces
 
-`sync-dotfiles` runs inside the container against the throwaway clone. It
-reports `stowed 13 link(s)`. The next run's init line then lists 12 agents and
-72 skills — the user's own.
+`sync-dotfiles` runs as the last build step and reports `stowed 13 link(s)`. A
+run's init line then lists 12 agents and 72 skills — the user's own — with the
+clone as the only mount.
 
 The host-compiled `claude` binary runs on the Fedora base image.
 
-### 6.4 Ownership comes back right, mostly
+### 6.4 Ownership comes back right
 
 `--userns=keep-id` makes a file the agent writes through a mount come back
 owned by `geoff`. `run-task` proves it: the agent writes `NOTES.md` in the
 clone, and `git status` on the host reports `geoff  ?? NOTES.md`.
 
-The exception is a directory podman creates itself — see §7.2.
+It does not apply to a directory podman creates for a missing mountpoint. That
+only reaches the host disk if the missing mountpoint is itself inside a
+host-backed mount, so mounting nothing at `/home/geoff` is what keeps it inside
+the container.
 
 ### 6.5 `kill -9` on the runner strands the container
 
@@ -306,23 +316,23 @@ What the parser has to allow for:
 
 ## 7. Fix next time
 
-None of these defects is a fence problem; they are things the prototype exposed
-and left standing.
+This is not a fence problem; it is something the prototype exposed and left
+standing.
 
 ### 7.1 The events database is created fresh and thrown away
 
 **What happens.** `dotfiles/dot-claude/hooks/measure-event` appends every hook
 event to `~/.local/share/claude-measure/events.db`. Inside the container `HOME`
-is `/home/geoff`, which is the mount of `scratch/home`. So the sandbox writes
-its events to:
+is `/home/geoff`, which nothing is mounted at, so the sandbox writes its events
+to a path in the container's own filesystem:
 
 ```
-sandbox_probe/scratch/home/.local/share/claude-measure/events.db
+/home/geoff/.local/share/claude-measure/events.db
 ```
 
-That file is created by the first run, holds only that sandbox's events, and is
-deleted by `rm -rf scratch` along with everything else. The host's real database
-at `~/.local/share/claude-measure/events.db` never sees a sandboxed run.
+That file is created by the run, holds only that run's events, and dies with the
+container. The host's real database at
+`~/.local/share/claude-measure/events.db` never sees a sandboxed run.
 
 **What it costs.** Every usage report and measurement query is blind to work
 done in the sandbox. If sandboxed runs become the normal way to work, the
@@ -339,36 +349,14 @@ is to write to the real one. So this needs a decision.
 
 Whatever the answer, do not hardcode “sandbox means no hooks.”
 
-### 7.2 A podman-created mountpoint comes back unowned, and the cleanup hides it
-
-**What happens.** `sync-config` mounts the clone at
-`/home/geoff/workspace/dev-playbook`, inside a home directory that has no
-`workspace/` folder yet. Podman creates the missing directories, and
-`--userns=keep-id` does not apply to them. They come back owned by UID 524288:
-
-```
-drwxr-xr-t. 1 524288 524288 24 Aug 27 20:35 scratch/home/workspace/
-drwxr-xr-t. 1 524288 524288  0 Aug 27 20:35 scratch/home/workspace/dev-playbook/
-```
-
-`geoff` cannot delete those. `commands.fresh_home()` calls
-`shutil.rmtree(SYNCED_HOME, ignore_errors=True)`, and `ignore_errors=True`
-swallows the `PermissionError` without a word. So "a fresh home directory,
-replacing any previous" quietly is not fresh, and the next run reuses whatever
-survived.
-
-`podman unshare rm -rf <path>` deletes them.
-
-**Fix direction.** Use `podman unshare` for the wipe. More importantly, stop
-passing `ignore_errors=True` — a cleanup that cannot clean must say so, which
-is the workspace's fail-loud rule.
-
 ## 8. After the prototype
 
 **Refactor before use.** This is a prototype for learning: mostly check
-commands, `commands.py` at 378 lines. The checks earned their keep by
-finding §7.1 and §7.2, but the shape is wrong for a thing to depend on.
-Consolidate it before building on it.
+commands. The checks earned their keep by finding the defects, but the shape is
+wrong for a thing to depend on. Consolidate it before building on it, against
+[SPEC.md](/sandbox_probe/SPEC.md) rather than against what is here — in
+particular the probe still runs one repo mount where the spec calls for a
+read-only config source and a separate writable work checkout.
 
 **The real module** lives at `dev-playbook/src/dev_playbook/sandbox/`. Its API
 covers one thing — launching one sandboxed Claude session. No database; a caller
@@ -377,9 +365,10 @@ that wants history writes its own. No entanglement with the rest of the repo.
 **GitHub access.** Deferred; the user has an approach in mind. Until then the
 sandbox has no GitHub credential.
 
-Once it has one, work leaves the sandbox as a pushed branch rather than through
-the shared folder. The clone is then thrown away instead of reconciled, and
-the mount stays a copy for real work as much as for this prototype.
+Once it has one, work leaves the sandbox as a pushed branch rather than as a
+directory to inspect afterwards. The clone is then thrown away instead of
+reconciled, and the mount stays a copy for real work as much as for this
+prototype.
 
 **Network egress restriction.** Deferred.
 
@@ -394,7 +383,6 @@ the mount stays a copy for real work as much as for this prototype.
 | `check-fence` | the host filesystem is not visible from inside |
 | `check-claude` | the host-compiled `claude` binary runs inside |
 | `check-billing` | the run drew on the subscription, not the API |
-| `sync-config` | run `sync-dotfiles` inside, against a throwaway clone |
 | `check-config` | Claude loaded the user's skills, agents, and hooks |
 | `run-task` | give the agent a real prompt in the clone |
 | `check-cleanup` | what a killed runner leaves behind, and that it ends |
@@ -405,10 +393,12 @@ Everything up to `check-claude` needs no credential and spends no quota;
 The unit tests run from here too — `uv run pytest tests` — and not through the
 repo's `make test`, which pins `testpaths` to `["tests"]` at the root.
 
-**Re-run `check-fence` after changing any mount list.** `sync-config` and
-`run-task` add mounts, which is how a fence gets widened by accident. If the
-home directory is no longer empty, or `~/.config/gh` has appeared, it says so
-before Claude gets another turn.
+**Re-run `check-fence` after changing any mount list.** `check-config` and
+`run-task` add a mount, which is how a fence gets widened by accident. The
+check is the forbidden-path list, not an empty home directory: the image builds
+`.claude`, `.agents`, `.bashrc.d`, `.cache`, and `workspace`, so a populated
+`/home/geoff` is expected. What must not appear is `~/.config/gh`, `~/.ssh`,
+`~/.aws`, or the host's `~/.local/share/claude`.
 
 ### The files
 
@@ -423,5 +413,5 @@ sandbox_probe/
     __main__.py          `python3 -m probe check-billing`
   tests/
     test_billing.py
-  scratch/               throwaway clone and synced home; gitignored
+  scratch/               throwaway clone; gitignored
 ```

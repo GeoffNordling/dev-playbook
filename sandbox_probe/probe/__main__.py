@@ -10,7 +10,6 @@ COMMANDS = {
     "check-fence": commands.check_fence,
     "check-claude": commands.check_claude,
     "check-billing": commands.check_billing,
-    "sync-config": commands.sync_config,
     "check-config": commands.check_config,
     "run-task": commands.run_task,
     "check-cleanup": commands.check_cleanup,

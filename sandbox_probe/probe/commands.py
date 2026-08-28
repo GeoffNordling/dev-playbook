@@ -15,8 +15,9 @@ from probe import billing, podman, stream
 
 HOME = "/home/geoff"
 
-# Throwaway copies live here, one directory so one `rm -rf` clears them all.
-# .gitignore keeps them out of the repo.
+# The throwaway clone lives here. .gitignore keeps it out of the repo. Nothing
+# is handed from one run to the next; this exists only so the host can look at
+# what a run left behind.
 SCRATCH = podman.PROBE_DIR / "scratch"
 
 # The subscription login. The copy is what gets mounted: :Z retags whatever it
@@ -122,8 +123,8 @@ def ask_claude(prompt: str, *, skip_permissions: bool = False) -> list[str]:
 def check_billing() -> None:
     """Ask Claude one trivial question and report which account paid for it."""
     env = {"HOME": HOME}
-    # Nothing inside has generated a settings file yet, so there is none to
-    # read. sync-config is where that changes.
+    # No repo is mounted, so the baked settings.json symlink dangles and there
+    # is no settings file to read. check-config is where that changes.
     billing.refuse_if_metered(env, {})
 
     with credential_copy() as credential:
@@ -148,24 +149,24 @@ def check_billing() -> None:
 REPO_ON_HOST = Path.home() / "workspace/dev-playbook"
 REPO_INSIDE = f"{HOME}/workspace/dev-playbook"
 
-# What sync-config leaves behind for the commands after it.
 CLONE = SCRATCH / "dev-playbook"
-SYNCED_HOME = SCRATCH / "home"
 
 
-def synced_mounts(*, writable_repo: bool = False) -> list[podman.Mount]:
-    """The home directory sync-config built, and the clone its links point into.
+def repo_mounts(*, writable_repo: bool = False) -> list[podman.Mount]:
+    """The clone, at the path the baked symlinks point into.
 
-    Both are needed together: stow fills the home directory with symlinks
-    aimed at REPO_INSIDE, so without the clone every one of them dangles.
+    The home directory is not mounted. The image already carries
+    /home/geoff/.claude, built by sync-dotfiles at build time, and those
+    symlinks aim at REPO_INSIDE — so this one mount is what makes them resolve.
+
+    Nothing of the host is mounted at /home/geoff, which is why a directory
+    podman creates for a missing mountpoint stays inside the container instead
+    of appearing on your disk owned by a user that does not exist out here.
 
     The clone is read-only by default, so a command has to say it lets the
     agent write. run-task is the only one that does.
     """
-    return [
-        podman.Mount(SYNCED_HOME, Path(HOME), writable=True),
-        podman.Mount(CLONE, Path(REPO_INSIDE), writable=writable_repo),
-    ]
+    return [podman.Mount(CLONE, Path(REPO_INSIDE), writable=writable_repo)]
 
 
 def clone_repo() -> Path:
@@ -180,51 +181,25 @@ def clone_repo() -> Path:
     return CLONE
 
 
-def fresh_home() -> Path:
-    """An empty directory to be the home directory inside, replacing any previous.
+def clone_settings() -> dict:
+    """The settings file a run reads, reached from outside the container.
 
-    The container is thrown away at the end of every run, so a home directory
-    that lives only inside it would take the synced config with it. This one
-    sits outside, which is also what lets you look at the result afterwards.
+    /home/geoff/.claude/settings.json in the image is a symlink into the repo,
+    so the file behind it is the one in whichever clone is mounted.
     """
-    shutil.rmtree(SYNCED_HOME, ignore_errors=True)
-    SYNCED_HOME.mkdir(parents=True)
-    return SYNCED_HOME
-
-
-def sync_config() -> None:
-    """Run your own sync-dotfiles inside, against a throwaway clone."""
-    clone_repo()
-    fresh_home()
-    podman.run(
-        podman.container_argv(
-            # sync-dotfiles reads the repo and writes only into the home
-            # directory, so only the home directory is writable.
-            mounts=synced_mounts(),
-            env={"HOME": HOME},
-            command=[f"{REPO_INSIDE}/scripts/sync-dotfiles"],
-        )
-    )
-
-
-def synced_settings() -> dict:
-    """The settings file sync-config generated, which is the one a run reads.
-
-    Before sync-config there is none, which is why the commands above pass an
-    empty dict to refuse_if_metered instead of calling this.
-    """
-    return billing.read_settings(SYNCED_HOME / ".claude/settings.json")
+    return billing.read_settings(CLONE / "dotfiles/dot-claude/settings.json")
 
 
 def check_config() -> None:
-    """Show that Claude inside picked up the config sync-config installed."""
+    """Show that Claude inside picked up the config baked into the image."""
+    clone_repo()
     env = {"HOME": HOME}
-    billing.refuse_if_metered(env, synced_settings())
+    billing.refuse_if_metered(env, clone_settings())
 
     with credential_copy() as credential:
         finished = podman.run(
             podman.container_argv(
-                mounts=synced_mounts() + [credential],
+                mounts=repo_mounts() + [credential],
                 env=env,
                 command=ask_claude("Reply with the single word: hi"),
             ),
@@ -251,13 +226,14 @@ TASK = (
 
 def run_task(prompt: str = TASK) -> None:
     """Give the agent a real job in the clone, and show what it changed."""
+    clone_repo()
     env = {"HOME": HOME}
-    billing.refuse_if_metered(env, synced_settings())
+    billing.refuse_if_metered(env, clone_settings())
 
     with credential_copy() as credential:
         finished = podman.run(
             podman.container_argv(
-                mounts=synced_mounts(writable_repo=True) + [credential],
+                mounts=repo_mounts(writable_repo=True) + [credential],
                 env=env,
                 workdir=REPO_INSIDE,
                 timeout=TASK_TIMEOUT,
@@ -369,7 +345,7 @@ def check_fence(mounts: list[podman.Mount] | None = None) -> None:
     """Show that nothing sensitive on the host is reachable from inside.
 
     Takes the mount list so it can be re-run against a real fence later:
-    sync-config and run-task both add mounts, and that is how a fence gets
+    check-config and run-task both add a mount, and that is how a fence gets
     widened by accident.
     """
     podman.run(
