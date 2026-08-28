@@ -50,7 +50,7 @@
       "AskUserQuestion"
     ]
   },
-  "model": "opus[1m]",
+  "model": "sonnet",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -203,26 +203,6 @@
     "type": "command",
     "command": "bash \"$HOME/.claude/statusline.sh\""
   },
-  "feedbackSurveyRate": 0,
-  "effortLevel": "xhigh",
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  },
-  "autoMemoryEnabled": false,
-  "skipWorkflowUsageWarning": true,
-  "theme": "light",
-  "switchModelsOnFlag": false,
-  "agentPushNotifEnabled": true,
-  "awaySummaryEnabled": false,
-  "skipAutoPermissionPrompt": true,
-  "autoMode": {
-    "allow": [
-      "$defaults",
-      "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The software factory's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure."
-    ]
-  },
-  "voiceEnabled": true,
   "sandbox": {
     "enabled": false,
     "network": {
@@ -269,5 +249,25 @@
       "uv run pytest",
       "uv run pytest *"
     ]
-  }
+  },
+  "feedbackSurveyRate": 0,
+  "effortLevel": "xhigh",
+  "awaySummaryEnabled": false,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "autoMemoryEnabled": false,
+  "skipWorkflowUsageWarning": true,
+  "theme": "light",
+  "switchModelsOnFlag": false,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The software factory's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure."
+    ]
+  },
+  "voiceEnabled": true
 }
