@@ -1,7 +1,7 @@
 ---
 type: Survey
 title: Sandboxed headless Claude
-description: What the sandbox prototype is, how its fence works, what it found on this machine, and the three defects to fix next time
+description: What the sandbox prototype is, how its fence works, what it found on this machine, and the two defects to fix next time
 ---
 
 # Sandboxed headless Claude — prototype
@@ -157,17 +157,21 @@ directory, so `.gitignore` carries `claude` to keep it out of the repo.
 
 ### Fedora base image
 
-`dev-playbook/src/dev_playbook/dotfiles/machine.py` reads `/etc/os-release` and
-raises on anything that is not Fedora or WSL:
+`claude` here is a single ELF binary compiled against the host's Fedora
+libraries, so the base image has to carry those libraries.
+
+`sync-dotfiles` itself has no opinion — nothing under
+`dev_playbook.dotfiles.sync` reads `/etc/os-release`, so the stow step would
+run on any base. The hooks do have one. `measure-event` records only on the
+Fedora primary, and detects it by reading `/etc/os-release` itself:
 
 ```python
-if distro == FEDORA:
-    return FEDORA
-raise ValueError(f"unknown machine: /etc/os-release ID={distro!r} is not WSL and not Fedora.")
+if not on_fedora():
+    return
 ```
 
-So `sync-dotfiles` runs only on a Fedora base. Separately, `claude` here is a
-single ELF binary compiled against the host's Fedora libraries.
+A Fedora base is what makes that guard pass inside the container, so the
+choice of image decides whether a sandboxed session is measured at all.
 
 ### Mirror the host paths
 
@@ -193,9 +197,9 @@ so it builds the whole `~/.claude/` layout. Using the real script keeps the
 sandbox identical to the host by construction, with no second definition to
 drift.
 
-`settings.json` is not a symlink — the script generates it by merging
-`dotfiles/settings/base.json` with `dotfiles/settings/fedora.json`. That
-generated file is the source of the defect in §7.1.
+`settings.json` is a symlink like the rest, stowed from
+`dotfiles/dot-claude/settings.json` — one shared file, so what the sandbox
+reads is byte for byte what the host reads.
 
 ### Hand in the subscription credential as a file
 
@@ -249,8 +253,8 @@ read-only. The subscription is billed.
 ### 6.3 The configuration reproduces
 
 `sync-dotfiles` runs inside the container against the throwaway clone. It
-reports `installed settings for fedora` and `stowed 12 link(s)`. The next run's
-init line then lists 12 agents and 72 skills — the user's own.
+reports `stowed 13 link(s)`. The next run's init line then lists 12 agents and
+72 skills — the user's own.
 
 The host-compiled `claude` binary runs on the Fedora base image.
 
@@ -260,7 +264,7 @@ The host-compiled `claude` binary runs on the Fedora base image.
 owned by `geoff`. `run-task` proves it: the agent writes `NOTES.md` in the
 clone, and `git status` on the host reports `geoff  ?? NOTES.md`.
 
-The exception is a directory podman creates itself — see §7.3.
+The exception is a directory podman creates itself — see §7.2.
 
 ### 6.5 `kill -9` on the runner strands the container
 
@@ -305,36 +309,7 @@ What the parser has to allow for:
 None of these defects is a fence problem; they are things the prototype exposed
 and left standing.
 
-### 7.1 Claude rewrites `settings.json`, so the drift check fires falsely
-
-**What happens.** `sync-dotfiles` generates `~/.claude/settings.json` by merging
-`dotfiles/settings/base.json` with `fedora.json`. The `session-start-settings`
-hook then compares the installed file against a fresh rendering **byte for
-byte** (`settings.py: is_current`). Any rewrite fails that comparison.
-
-Claude Code rewrites the file on every run. Reproduced: `sync-config` installs
-settings, then one `check-config` run changes the file's md5 from
-`1323fd3e…` to `465f31af…`. Reading both as JSON:
-
-- key order changed;
-- `skipAutoPermissionPrompt` was **dropped**;
-- no key was added.
-
-So every run after the first sees drift. During `run-task` the agent spent 2 of
-its 4 turns acting on it — it read the hook's message, decided the settings were
-stale, and ran `scripts/sync-dotfiles` unasked, on a warning that was wrong.
-
-**Why it matters beyond the sandbox.** This is a `dev-playbook` defect. The
-same rewrite happens on the host; the sandbox only made it easy to see, because
-a fresh home directory gives a clean before-and-after.
-
-**Also a real bug.** `skipAutoPermissionPrompt: true` disappears from the
-installed settings on the first run, so whatever it does stops happening.
-
-**Fix direction.** The drift check should compare the keys `sync-dotfiles`
-owns, not every key in the file.
-
-### 7.2 The events database is created fresh and thrown away
+### 7.1 The events database is created fresh and thrown away
 
 **What happens.** `dotfiles/dot-claude/hooks/measure-event` appends every hook
 event to `~/.local/share/claude-measure/events.db`. Inside the container `HOME`
@@ -364,7 +339,7 @@ is to write to the real one. So this needs a decision.
 
 Whatever the answer, do not hardcode “sandbox means no hooks.”
 
-### 7.3 A podman-created mountpoint comes back unowned, and the cleanup hides it
+### 7.2 A podman-created mountpoint comes back unowned, and the cleanup hides it
 
 **What happens.** `sync-config` mounts the clone at
 `/home/geoff/workspace/dev-playbook`, inside a home directory that has no
@@ -392,7 +367,7 @@ is the workspace's fail-loud rule.
 
 **Refactor before use.** This is a prototype for learning: mostly check
 commands, `commands.py` at 378 lines. The checks earned their keep by
-finding §7.1, §7.2, and §7.3, but the shape is wrong for a thing to depend on.
+finding §7.1 and §7.2, but the shape is wrong for a thing to depend on.
 Consolidate it before building on it.
 
 **The real module** lives at `dev-playbook/src/dev_playbook/sandbox/`. Its API
