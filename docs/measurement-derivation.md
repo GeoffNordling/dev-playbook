@@ -46,11 +46,13 @@ run ledger — written and read only by `dev_playbook.factory.ledger` — and is
 outside this document's scope.
 
 Which events reach the store is declared by the hook wiring in
-`/dotfiles/settings/fedora.json`, one [`measure-event`](/dotfiles/dot-claude/hooks/measure-event)
+`/dotfiles/dot-claude/settings.json`, one [`measure-event`](/dotfiles/dot-claude/hooks/measure-event)
 entry per hook, all asynchronous. That wiring is the authority on the captured
-set: a report reads it rather than trusting a remembered list. Capture runs on
-the primary machine only ([machines.md](/docs/machines.md)) and is
-forward-only from the day the wiring merged — there is no backfill.
+set: a report reads it rather than trusting a remembered list. The settings
+file is shared by every machine, but capture runs on the primary alone
+([machines.md](/docs/machines.md)) — the hook itself detects the host and
+exits without recording elsewhere — and is forward-only from the day the
+wiring merged: there is no backfill.
 
 An `errors.log` sits beside the database. A line in it is an event that
 arrived and could not be recorded. Capture never fails a session (#255, ruling

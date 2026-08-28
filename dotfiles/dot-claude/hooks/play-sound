@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Hook wrapper: play the sound for one event, on machines that have audio.
+#
+# The settings file is shared across machines (see /dotfiles/README.md), so
+# every machine's Claude Code invokes this on Stop and Notification. Only the
+# Fedora desktop has an audio server; anywhere else this is a silent no-op.
+# Exit is always 0: a missing player or sound is not a hook failure.
+set -euo pipefail
+
+grep -qi microsoft /proc/version 2>/dev/null && exit 0
+grep -q '^ID=fedora' /etc/os-release 2>/dev/null || exit 0
+
+case "${1:-}" in
+stop)
+	bash "$HOME/workspace/sounds/play-sound-fedora.sh" || true
+	;;
+notification)
+	paplay /usr/share/sounds/freedesktop/stereo/bell.oga || true
+	;;
+*)
+	exit 0
+	;;
+esac
