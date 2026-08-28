@@ -28,3 +28,8 @@ dotfiles/dot-claude/todos/
 dotfiles/dot-claude/sessions/
 dotfiles/dot-claude/plugins/
 dotfiles/dot-claude/projects/
+
+# sandbox_probe — the 214 MB claude binary copied in as build context, and the
+# throwaway clone and synced home a run leaves behind. Never commit either.
+sandbox_probe/claude
+sandbox_probe/scratch/

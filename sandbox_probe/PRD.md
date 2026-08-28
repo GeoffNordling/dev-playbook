@@ -1,0 +1,452 @@
+---
+type: Survey
+title: Sandboxed headless Claude
+description: What the sandbox prototype is, how its fence works, what it found on this machine, and the three defects to fix next time
+---
+
+# Sandboxed headless Claude — prototype
+
+Run a headless Claude agent inside a podman container, on subscription billing,
+with a fence a confused agent cannot cross.
+
+This is a prototype for learning. It works; do not ship it — see §8.
+
+---
+
+## 1. Goal
+
+One agent, working inside a clone of `dev-playbook`, talking to Anthropic,
+billing the subscription.
+
+The agent has the user's usual configuration — skills, rules, agents, hooks —
+and can edit and commit in the repo. It cannot reach anything else on the
+machine, and it cannot reach GitHub.
+
+## 2. How the fence works
+
+The agent inside a container sees a complete filesystem — home folder, `/usr`,
+`/etc` — but none of it is the host's. The host's `~/workspace`, `~/.ssh`, and
+personal files do not exist in that process's view.
+
+Host files get in only by being mounted: one named host folder appears at one
+chosen path inside. The mount list is therefore the security surface, and it is
+short enough to check by eye. `podman.container_argv()` builds that list and
+runs nothing, so the fence can be printed and read before it is trusted.
+
+### Mount copies, never originals
+
+Every mount is a copy of the thing it stands for: a throwaway clone of the
+repo, and a copy of `.credentials.json`.
+
+SELinux tags every file, and a container may read only files tagged
+`container_file_t`. The `:Z` suffix on a mount retags the host file so the
+container can read it, and leaves it retagged. A read-only mount does not
+prevent this, because the retag happens before the container starts. A host
+program that expects the old tag can then be denied its own file.
+
+The agent also writes. Inside a copy, a confused run costs `rm -rf` of the copy.
+
+`restorecon -RvF <path>` puts a tag back, but the copies rule needs no repair.
+
+The clone is made with `git clone --no-hardlinks`. A clone on the same machine
+shares file contents by default, and the `:Z` retag would reach the real repo
+through that sharing.
+
+### A mount is a window onto the host disk
+
+Files the agent writes through a mount land on the host disk immediately and
+survive the container. Files it writes anywhere else die with the container.
+That is why the synced home directory lives at `scratch/home` on the host
+rather than inside: `sync-config` builds it in one container, and `run-task`
+needs it in the next.
+
+### The fences
+
+1. **Files shared** — what the agent can touch on the machine.
+2. **Credentials handed in** — what the agent can touch in the world.
+
+The container does not constrain the second. An agent with a GitHub token can
+force-push from inside a container. This prototype hands in no GitHub
+credential.
+
+### Two locks on two layers
+
+`--dangerously-skip-permissions` is Claude's rule about itself. A headless run
+has nobody to ask for approval, so without the flag every edit is refused and
+the agent reports it could not do the job. The `rw` versus `ro` mount mode is
+the kernel's rule.
+
+Turning the first off is safe only because the second is the real fence.
+
+## 3. Scope
+
+### In
+
+- The `dev-playbook` repo, mounted read-write, including `dotfiles/`.
+- The `claude` program.
+- The subscription login.
+- Outbound network.
+- The user's skills, rules, agents, and hooks configuration.
+
+### Out
+
+- Any GitHub credential. The agent cannot push, fetch, pull, or clone.
+- Any host file outside the mounted repo.
+- Restricting which hosts the container can reach.
+- The real module at `dev-playbook/src/dev_playbook/sandbox/`. See §8.
+
+### Blast radius
+
+Files in one cloned repo, recoverable with `git checkout .` or a fresh clone.
+Nothing else on the machine or on GitHub is reachable.
+
+## 4. Billing
+
+The run must draw on the subscription, never the metered API.
+
+In non-interactive mode a configured API key is always used when present,
+silently. So the launcher refuses to start if any of these is set:
+
+```
+ANTHROPIC_API_KEY              CLAUDE_CODE_USE_BEDROCK    ANTHROPIC_PROFILE
+ANTHROPIC_AUTH_TOKEN           CLAUDE_CODE_USE_VERTEX     ANTHROPIC_FEDERATION_RULE_ID
+ANTHROPIC_BASE_URL             CLAUDE_CODE_USE_FOUNDRY    ANTHROPIC_ORGANIZATION_ID
+```
+
+It also refuses if a settings file carries `apiKeyHelper`, `awsAuthRefresh`, or
+`awsCredentialExport`, which mint or redirect a credential.
+
+`CLAUDE_CODE_OAUTH_TOKEN` is safe — it is a subscription credential. `--bare`
+skips the login and demands an API key, so it is never passed.
+
+`billing.py` is the only safety-critical logic here, and the only module with a
+test file.
+
+### How a run reports which account it billed
+
+Run with `--output-format stream-json --verbose`. Claude writes one JSON object
+per line. The `init` line carries `apiKeySource`, `session_id`, `cwd`, `model`,
+`permissionMode`, `tools`, `agents`, and `skills`. A subscription run reports
+`apiKeySource: "none"`.
+
+Plain `--output-format json` does not carry that field.
+
+## 5. Decisions
+
+### Podman, not Docker
+
+Docker is the better tool in general: a larger ecosystem, Compose, and a
+desktop product for Mac and Windows. None of that applies to running one
+container to completion on a Linux box.
+
+For this narrow case podman is simpler. It is already installed and working
+with SELinux here, it is rootless by default so it leaves no root-owned files
+in the repo, and there is no background service to configure.
+
+Switching later is cheap — the two share a CLI and an image format, so the
+recipe file carries over.
+
+### Bake the image, do not share the binary in
+
+The container needs `git` installed regardless, so an image is being built
+either way. Adding `claude` to the recipe is one more line, and one method is
+simpler to maintain than two.
+
+`COPY claude /usr/local/bin/claude` needs the 214 MB binary in the build
+directory, so `.gitignore` carries `claude` to keep it out of the repo.
+
+### Fedora base image
+
+`dev-playbook/src/dev_playbook/dotfiles/machine.py` reads `/etc/os-release` and
+raises on anything that is not Fedora or WSL:
+
+```python
+if distro == FEDORA:
+    return FEDORA
+raise ValueError(f"unknown machine: /etc/os-release ID={distro!r} is not WSL and not Fedora.")
+```
+
+So `sync-dotfiles` runs only on a Fedora base. Separately, `claude` here is a
+single ELF binary compiled against the host's Fedora libraries.
+
+### Mirror the host paths
+
+The user's configuration is symlinked out of the repo. `~/.claude/skills`
+contains exactly:
+
+```
+../workspace/dev-playbook/dotfiles/dot-claude/skills
+```
+
+That path is relative, resolved from the folder holding the link
+(`/home/geoff/.claude/`), giving
+`/home/geoff/workspace/dev-playbook/dotfiles/dot-claude/skills`.
+
+So inside the container: set `HOME=/home/geoff` and mount the repo at
+`/home/geoff/workspace/dev-playbook`. Mount it at `/work` instead and all
+twelve links dangle.
+
+### Reproduce the configuration with the real script
+
+Run `dev-playbook/scripts/sync-dotfiles` inside the container. It uses `stow`,
+so it builds the whole `~/.claude/` layout. Using the real script keeps the
+sandbox identical to the host by construction, with no second definition to
+drift.
+
+`settings.json` is not a symlink — the script generates it by merging
+`dotfiles/settings/base.json` with `dotfiles/settings/fedora.json`. That
+generated file is the source of the defect in §7.1.
+
+### Hand in the subscription credential as a file
+
+Copy `~/.claude/.credentials.json` to a temporary directory and mount the copy
+read-only. The temporary directory is deleted when the container exits, so the
+copy exists only while a run is in flight.
+
+### Git works locally, not remotely
+
+`commit`, `branch`, `diff`, `log`, `stash`, `reset`, and `checkout` all work —
+they read and write the `.git` folder inside the repo. Only `push`, `fetch`,
+`pull`, and cloning from a URL fail, for want of a credential.
+
+### A four-hour ceiling
+
+`TASK_TIMEOUT = 4 * 60 * 60` is passed to `podman run --timeout`. It exists to
+end a container that survived a `kill -9` of its runner (§6.5), and is
+deliberately past anything a real task would reach. A cap on how long work may
+take is a different decision, and should say why it stopped rather than kill
+silently.
+
+## 6. Facts
+
+### 6.1 The machine
+
+Verified 2026-08-27.
+
+| Thing | Value |
+|---|---|
+| Podman | 5.8.4, rootless, `crun` runtime, `netavark` networking |
+| Docker | not installed; `/usr/bin/docker` is a shim that execs podman |
+| `claude` | single ELF binary, 214 MB, `~/.local/share/claude/versions/2.1.248` |
+| Node | present on host, not needed — this is the native installer |
+| Subscription login | `~/.claude/.credentials.json`, 509 bytes, mode 600 |
+| `CLAUDE_CODE_OAUTH_TOKEN` | not set |
+| GitHub token | `~/.config/gh/hosts.yml`, 94 bytes, mode 600 |
+| `GH_TOKEN` / `GITHUB_TOKEN` | not set in the environment |
+| git credential helper | none configured |
+| SELinux | Enforcing — a bind mount needs `:Z`, which retags the host file |
+| Internet | available |
+
+The GitHub token is in one unmounted file, with nothing in the environment and
+no credential helper, so denying GitHub access is a matter of omission rather
+than configuration.
+
+### 6.2 Billing works from inside
+
+`apiKeySource: "none"` on the init line, with the credential copy mounted
+read-only. The subscription is billed.
+
+### 6.3 The configuration reproduces
+
+`sync-dotfiles` runs inside the container against the throwaway clone. It
+reports `installed settings for fedora` and `stowed 12 link(s)`. The next run's
+init line then lists 12 agents and 72 skills — the user's own.
+
+The host-compiled `claude` binary runs on the Fedora base image.
+
+### 6.4 Ownership comes back right, mostly
+
+`--userns=keep-id` makes a file the agent writes through a mount come back
+owned by `geoff`. `run-task` proves it: the agent writes `NOTES.md` in the
+clone, and `git status` on the host reports `geoff  ?? NOTES.md`.
+
+The exception is a directory podman creates itself — see §7.3.
+
+### 6.5 `kill -9` on the runner strands the container
+
+`--rm` deletes the container when the command inside exits. It does not fire
+when the runner is killed with `SIGKILL`, because nothing runs cleanup code on
+`SIGKILL`. Measured:
+
+| Signal to the runner | Container |
+|---|---|
+| `SIGINT` | gone |
+| `SIGTERM` | gone |
+| `SIGKILL` | `Up 3 seconds` |
+
+A stranded container keeps running with every mount attached, including the
+copy of the login, and Claude inside keeps billing.
+
+`podman run --timeout N` is the fix. Podman enforces the deadline from inside,
+so it still works when the runner is dead. With `--timeout 10` and the runner
+killed, the container was fully gone at +10s.
+
+`check-cleanup` asserts both halves, including that `SIGKILL` *does* strand the
+container, so a change in podman's behaviour is caught.
+
+Untested: killing the runner breaks the pipe Claude writes to, and a program
+writing to a broken pipe usually dies at once. If so the real exposure is
+seconds. The ceiling is kept anyway.
+
+### 6.6 Reading the stream
+
+What the parser has to allow for:
+
+- **The `init` line is not the first line.** A session with `SessionStart`
+  hooks announces each one first, as
+  `{"type":"system","subtype":"hook_started",...}`. `stream.parse_init` finds
+  the message by identity, not by position.
+- **A failed run still exits zero.** Podman reports success whether the agent
+  did the job or refused it. The `result` line's `subtype` and `is_error` are
+  the only place failure shows.
+
+## 7. Fix next time
+
+None of these defects is a fence problem; they are things the prototype exposed
+and left standing.
+
+### 7.1 Claude rewrites `settings.json`, so the drift check fires falsely
+
+**What happens.** `sync-dotfiles` generates `~/.claude/settings.json` by merging
+`dotfiles/settings/base.json` with `fedora.json`. The `session-start-settings`
+hook then compares the installed file against a fresh rendering **byte for
+byte** (`settings.py: is_current`). Any rewrite fails that comparison.
+
+Claude Code rewrites the file on every run. Reproduced: `sync-config` installs
+settings, then one `check-config` run changes the file's md5 from
+`1323fd3e…` to `465f31af…`. Reading both as JSON:
+
+- key order changed;
+- `skipAutoPermissionPrompt` was **dropped**;
+- no key was added.
+
+So every run after the first sees drift. During `run-task` the agent spent 2 of
+its 4 turns acting on it — it read the hook's message, decided the settings were
+stale, and ran `scripts/sync-dotfiles` unasked, on a warning that was wrong.
+
+**Why it matters beyond the sandbox.** This is a `dev-playbook` defect. The
+same rewrite happens on the host; the sandbox only made it easy to see, because
+a fresh home directory gives a clean before-and-after.
+
+**Also a real bug.** `skipAutoPermissionPrompt: true` disappears from the
+installed settings on the first run, so whatever it does stops happening.
+
+**Fix direction.** The drift check should compare the keys `sync-dotfiles`
+owns, not every key in the file.
+
+### 7.2 The events database is created fresh and thrown away
+
+**What happens.** `dotfiles/dot-claude/hooks/measure-event` appends every hook
+event to `~/.local/share/claude-measure/events.db`. Inside the container `HOME`
+is `/home/geoff`, which is the mount of `scratch/home`. So the sandbox writes
+its events to:
+
+```
+sandbox_probe/scratch/home/.local/share/claude-measure/events.db
+```
+
+That file is created by the first run, holds only that sandbox's events, and is
+deleted by `rm -rf scratch` along with everything else. The host's real database
+at `~/.local/share/claude-measure/events.db` never sees a sandboxed run.
+
+**What it costs.** Every usage report and measurement query is blind to work
+done in the sandbox. If sandboxed runs become the normal way to work, the
+measurement store stops describing the machine.
+
+**Fix direction.** §8 says hooks inside the sandbox should reach the host
+database. That needs one more mount — `~/.local/share/claude-measure/`
+mounted read-write — or a port to a service on the host. Both are additive.
+
+The mount is the awkward one, because of the copies rule in §2: mounting the
+real database directory means mounting an original, and `:Z` would retag the
+host's live database. It is also the case where a copy is useless — the point
+is to write to the real one. So this needs a decision.
+
+Whatever the answer, do not hardcode “sandbox means no hooks.”
+
+### 7.3 A podman-created mountpoint comes back unowned, and the cleanup hides it
+
+**What happens.** `sync-config` mounts the clone at
+`/home/geoff/workspace/dev-playbook`, inside a home directory that has no
+`workspace/` folder yet. Podman creates the missing directories, and
+`--userns=keep-id` does not apply to them. They come back owned by UID 524288:
+
+```
+drwxr-xr-t. 1 524288 524288 24 Aug 27 20:35 scratch/home/workspace/
+drwxr-xr-t. 1 524288 524288  0 Aug 27 20:35 scratch/home/workspace/dev-playbook/
+```
+
+`geoff` cannot delete those. `commands.fresh_home()` calls
+`shutil.rmtree(SYNCED_HOME, ignore_errors=True)`, and `ignore_errors=True`
+swallows the `PermissionError` without a word. So "a fresh home directory,
+replacing any previous" quietly is not fresh, and the next run reuses whatever
+survived.
+
+`podman unshare rm -rf <path>` deletes them.
+
+**Fix direction.** Use `podman unshare` for the wipe. More importantly, stop
+passing `ignore_errors=True` — a cleanup that cannot clean must say so, which
+is the workspace's fail-loud rule.
+
+## 8. After the prototype
+
+**Refactor before use.** This is a prototype for learning: mostly check
+commands, `commands.py` at 378 lines. The checks earned their keep by
+finding §7.1, §7.2, and §7.3, but the shape is wrong for a thing to depend on.
+Consolidate it before building on it.
+
+**The real module** lives at `dev-playbook/src/dev_playbook/sandbox/`. Its API
+covers one thing — launching one sandboxed Claude session. No database; a caller
+that wants history writes its own. No entanglement with the rest of the repo.
+
+**GitHub access.** Deferred; the user has an approach in mind. Until then the
+sandbox has no GitHub credential.
+
+Once it has one, work leaves the sandbox as a pushed branch rather than through
+the shared folder. The clone is then thrown away instead of reconciled, and
+the mount stays a copy for real work as much as for this prototype.
+
+**Network egress restriction.** Deferred.
+
+## 9. Running it
+
+`python3 -m probe <command>`, from `sandbox_probe/`. Standard library only.
+
+| Command | What it does |
+|---|---|
+| `build-image` | build the image from the `Containerfile` |
+| `check-tools` | git, stow, jq, python3, uv all report a version inside |
+| `check-fence` | the host filesystem is not visible from inside |
+| `check-claude` | the host-compiled `claude` binary runs inside |
+| `check-billing` | the run drew on the subscription, not the API |
+| `sync-config` | run `sync-dotfiles` inside, against a throwaway clone |
+| `check-config` | Claude loaded the user's skills, agents, and hooks |
+| `run-task` | give the agent a real prompt in the clone |
+| `check-cleanup` | what a killed runner leaves behind, and that it ends |
+
+Everything up to `check-claude` needs no credential and spends no quota;
+`check-billing` is the first command that costs anything.
+
+The unit tests run from here too — `uv run pytest tests` — and not through the
+repo's `make test`, which pins `testpaths` to `["tests"]` at the root.
+
+**Re-run `check-fence` after changing any mount list.** `sync-config` and
+`run-task` add mounts, which is how a fence gets widened by accident. If the
+home directory is no longer empty, or `~/.config/gh` has appeared, it says so
+before Claude gets another turn.
+
+### The files
+
+```
+sandbox_probe/
+  Containerfile          the image recipe
+  probe/
+    podman.py            mounts, argv assembly, build, run, cleanup
+    billing.py           refuse to start if the run could bill the API
+    stream.py            read the JSON the run writes back
+    commands.py          one function per command above
+    __main__.py          `python3 -m probe check-billing`
+  tests/
+    test_billing.py
+  scratch/               throwaway clone and synced home; gitignored
+```

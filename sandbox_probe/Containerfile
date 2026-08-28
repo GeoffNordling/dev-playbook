@@ -1,0 +1,24 @@
+# The image the sandboxed agent runs inside.
+#
+# Fedora, because src/dev_playbook/dotfiles/machine.py reads /etc/os-release
+# and raises on anything that is not Fedora or WSL.
+
+FROM fedora
+
+# The four tools sync-dotfiles checks for before it will run. curl is already
+# in the base image; python3 is not.
+RUN dnf install -y git stow jq python3 && dnf clean all
+
+# uv is not a Fedora package, so it comes from its own installer. Put it in
+# /usr/local/bin, which is on everyone's PATH — the installer's default is a
+# folder under the *building* user's home, and the container runs as you.
+RUN curl -LsSf https://astral.sh/uv/install.sh \
+    | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
+
+# The container runs as your host account, so the home directory it expects
+# has to exist and belong to it. 1000 is your user's number on this machine.
+RUN mkdir -p /home/geoff && chown 1000:1000 /home/geoff
+
+# The claude binary, staged into this directory by build-image. It is one
+# self-contained 214 MB program, so nothing else has to be installed for it.
+COPY claude /usr/local/bin/claude
