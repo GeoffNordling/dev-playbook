@@ -346,7 +346,3 @@ sweeps so we'll need a fresh eye to see if we're happy with the final result
 or if we need new expressions. Basically scan skills and look for important things
 that are not expressed via the deterministic structure. Discuss with user which to support.
 Also scan residual log for ideas that look important.
-
-The factory phase is parked: one session read all its files and left the
-classification, the intent, and unbound rewrite sketches in
-[Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md). Start there when it unparks.
