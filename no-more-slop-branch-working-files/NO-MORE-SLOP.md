@@ -164,6 +164,15 @@ exemplar, worked as the abstraction shape in
   standard. Every commit from 8d5a80f on carries no `SKIP` — the gate is
   green unaided, which was this step's bar. A tangent off it produced
   [the writing-improvement process](/docs/writing-improvement-process.md).
+- **Verbatim adoption retired.**
+  [0025](/docs/decisions/0025-retire-verbatim-skill-adoption.md) changed
+  the policy: adoption is by copy into the owned tree. Ten (3P) skills
+  converted to owned copies; `wizard`, `marimo-batch`, and
+  `marimo-notebook` were deleted instead. The install machinery (CLI,
+  lock file, `.agents` tree, mirror symlinks, gate exemptions) retired,
+  and every document that evaluates or adopts other people's skills —
+  `pocock-sweep`, the verdicts ledger, the standards that named the
+  vendored exemption — now states the new stance.
 
 **Raw ideas, none designed**
 
@@ -309,25 +318,12 @@ the encoding is settled in
 with every proven chain in
 [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md).
 
-The corpus port runs in stages, because thirteen skills in the
-roster are third-party verbatim — vendored bytes under
-`dotfiles/.agents/skills/`, which the current policy forbids editing,
-and a port is nothing but an edit:
+The corpus port runs in stages; the first — retiring verbatim adoption —
+is done and recorded under Completed.
 
-1. **Retire verbatim adoption.** A Decision Record changes the policy:
-   external skills are no longer adopted verbatim — the corpus requires
-   every runbook to carry the edge encoding, and vendored bytes cannot be
-   edited, so verbatim adoption is rejected for that reason. The
-   thirteen (3P) skills convert to first-class owned copies: copied
-   directly into our tree, ours from then on (verbatim at the moment of
-   copy, upstream credited, no symlink, no lock entry). Every document
-   that evaluates or adopts other people's skills updates to the new
-   stance — `pocock-sweep`, the external-skill-verdicts ledger, the
-   skill-management standard, and whatever else the sweep of those docs
-   finds.
-2. **Port the converted skills.** The former (3P) thirteen, now owned,
+1. **Port the converted skills.** The former (3P) ten, now owned,
    go through the same port as the first-party runbooks.
-3. **Final Quality Pass.** Go through the final skills and look for residual
+2. **Final Quality Pass.** Go through the final skills and look for residual
 opportunities. We deemphasized residuals tracking during the conversion
 sweeps so we'll need a fresh eye to see if we're happy with the final result
 or if we need new expressions. Basically scan skills and look for important things

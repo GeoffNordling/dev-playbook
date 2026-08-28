@@ -26,9 +26,8 @@ applies two deterministic rules:
 
 Scope is **all authored content, harness files included** (``CLAUDE.md``,
 rules, skills; for the banned-word rule, code and config too). What is out is
-``md.classify``'s ``"excluded"`` category: any externally-managed root the
-shared dev_playbook.external registry names (none today) and transient
-scratch (``PLAN.md`` / ``PROGRESS.md``, the root ``tmp/`` tree).
+``md.classify``'s ``"excluded"`` category: transient scratch (``PLAN.md`` /
+``PROGRESS.md``, the root ``tmp/`` tree).
 Verbatim upstream mirrors are excluded per file via the registry's
 ``is_verbatim_doc`` (``type: Reference`` documents). Symlinks are skipped: a
 link's content belongs to its target, which is scanned at its own path when
@@ -218,11 +217,9 @@ def audit(root: Path) -> list[Finding]:
 
     Scope is wider than ``md.classify``'s concept split — harness files are in,
     and the banned-word rule reads every tracked file, not just Markdown — but
-    ``classify``'s ``"excluded"`` category is out: the ``.git`` tree, any
-    externally-managed root the shared registry names (none today), and the
+    ``classify``'s ``"excluded"`` category is out: the ``.git`` tree and the
     transient scratch that is not authored content (``PLAN.md`` /
     ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing that one boundary
-    keeps the exclusion on the shared registry (``classify`` consults it) and
     stops the gate firing on scratch. Verbatim Reference docs are excluded per
     file, the repo's ``.prose-lint-exempt`` declarations per path; symlinks and
     binary files (NUL byte) are skipped — a link's content belongs to its

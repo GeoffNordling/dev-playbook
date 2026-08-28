@@ -14,8 +14,13 @@ row per skill, stating where that skill stands today. A sweep moves the
 workspace from the pin the ledger names to the package's current release, and
 rules **only what changed**.
 
-The rules that bind a sweep are written in the ledger. Read them and follow
-them; nothing restates them here.
+The rules that bind a sweep are written in the ledger — the verdict
+vocabulary, the sweep direction, the supersede rule, the tier policy. Read
+them and follow them; nothing restates them here. The one that shapes every
+step below: adoption is by copy. An adopted skill is an owned file in
+`dotfiles/dot-claude/skills/`, free to drift from upstream, so a bumped
+skill's diff runs between the two upstream pins — never against the
+workspace's copy, whose divergence is its own.
 
 **Pacing is open.** The bootstrap run worked one stage per context window
 against a plan file it kept in the branch, and never established that as
@@ -38,30 +43,20 @@ Sweeps evaluate release tags, never `main`.
 
 ```
 gh api repos/mattpocock/skills/releases/latest --jq .tag_name
+gh api repos/mattpocock/skills/commits/<tag> --jq .sha
 ```
 
 {If the ledger already names this tag, {report that there is nothing to
-sweep} and stop}.
-
-Otherwise resolve the commits and compare them — the second decides how step
-6 installs:
-
-```
-gh api repos/mattpocock/skills/commits/<tag> --jq .sha
-gh api repos/mattpocock/skills/commits/main --jq .sha
-```
-
-Equal, and the release is the tip of his branch: the `skills` CLI fetches his
-default branch, so what it installs is exactly the tag. Unequal, and he has
-merged unreleased work since cutting the release, so step 6 installs by hand
-at the tag instead. {Report which route it resolved to; the hand route is
-slower, and the user should know why before it starts}.
+sweep} and stop}. The commit SHA travels to step 8: the ledger is where the
+pin's provenance is recorded.
 
 ## 3. Clone the tag
 
 Clone the package at the tag into a scratch directory outside the repo. This
-clone is what the sweep reads: the substantive-or-cosmetic call on every bumped
-skill comes from diffing it against the bundles already installed.
+clone is what the sweep reads: the substantive-or-cosmetic call on every
+bumped skill comes from diffing the skill between the ledger's pin and the
+new tag inside the clone's own history — both sides upstream, since the
+workspace's copies own their divergence and prove nothing about his.
 
 ## 4. Build the docket
 
@@ -72,16 +67,17 @@ is one docket item carrying a recommendation and the evidence behind it:
 - A skill upstream **deleted** — its row retires.
 - A skill that **moved tier**.
 - A row marked **reevaluate**, or still **unruled** from an earlier sweep.
-- An installed skill whose **bytes changed** at the new pin. Read the diff and
-  say which it is: a substantive change to what the skill does, or a pin bump
-  only. A substantive one has consequences — a workspace call site that
-  quotes the old behavior goes stale the moment the bytes land.
+- An adopted skill whose upstream **bytes changed** between the pins. Read
+  the diff and say which it is: a substantive change to what the skill does,
+  or a pin bump only. A substantive one is a proposal to edit the owned
+  copy — name what the edit would carry over and what workspace divergence
+  it must not touch.
 - **Supersede-rule creep** in the authored adaptations the ledger lists. The
   check is for creep, not removal: these are deliberately authored, and the
-  question is whether an installed skill has grown to cover one of them.
+  question is whether an adopted skill has grown to cover one of them.
 
-A row whose verdict and delivered artifact are both unchanged is **standing**.
-It does not enter the docket, and it is not re-argued.
+A row whose verdict is unchanged and whose upstream bytes did not move is
+**standing**. It does not enter the docket, and it is not re-argued.
 
 This step is done when every skill in the package is accounted for — docketed
 or standing — and the tally matches the package's own tier counts.
@@ -94,93 +90,51 @@ recommendation, the evidence, and what it costs either way.
 A recap clause is not a docket. An item the user has not ruled on by itself is
 unruled, however clearly the surrounding discussion pointed at an answer.
 
-## 6. Install on main
+## 6. Land the rulings on a branch
 
-The ruled installs land on the main checkout, before any branch exists, through
-the CLI that owns the lock file. Run one line per skill:
+Open a worktree branch. Everything the sweep owes lands there and ships as
+one PR: the copies, the standards edits, the accommodation work, the ledger,
+the Decision Record. No follow-up issues — a sweep that defers half its work
+leaves verdicts nobody can act on.
 
-```
-npx skills@latest add mattpocock/skills --skill <name> -g -y
-npx skills@latest update <name> -g
-```
+A newly adopted bundle is copied out of the clone into
+`dotfiles/dot-claude/skills/<name>/` and is owned from that moment. The same
+change brings it up to the workspace's own rules — the commit gate runs
+unaided over it, and whatever conventions every owned runbook carries apply
+to this one too; a copy that lands red is not landed.
 
-`add` for a new install, `update` for a skill already installed whose bytes
-moved. Then ask the user to run `scripts/sync-dotfiles` from the main checkout,
-which creates the mirror symlinks; it relinks the live `~/.claude` tree, so it
-is theirs to run and never runs from a worktree.
+An upstream delta ruled into an already-adopted skill is an ordinary edit to
+the owned copy, folding in what the ruling adopted — never a byte-copy over
+it, which would discard the workspace's own changes to that file.
 
-The CLI writes `dotfiles/.agents/.skill-lock.json` as it installs. Verify
-before committing: each installed folder matches the clone's copy
-byte-for-byte (`diff -r`). Then one commit on main carrying the bundles, the
-lock entries, and the symlinks.
-
-**When that commit reddens the gate, its accommodation goes in the same
-commit.** An install can arrive carrying a file the workspace's own lints want
-to rewrite — a vendored shell script, say — and the exclusion that exempts it
-is what makes the install committable at all. Fix it there rather than
-committing over a red gate or deferring it to the branch.
-
-**When the tag is not his branch tip** (step 2), install by hand instead. The
-CLI would fetch his unreleased work, which is not what the docket ruled on:
-every substantive-or-cosmetic call in step 4 came from diffing the tag, so
-installing the branch tip means re-ruling the whole docket against a target
-that moves again next week. The hand route keeps the sweep pointed at a fixed
-revision, and pays for it with a lock hash nobody validated for you.
-
-Copy each bundle byte-for-byte out of the clone into
-`dotfiles/.agents/skills/<name>/`, add the mirror symlink
-`dotfiles/dot-claude/skills/<name>` → `../../.agents/skills/<name>`, and write
-each lock entry's `skillFolderHash` as the upstream git tree SHA of that skill
-folder. Validate the algorithm first against a bundle byte-identical at both
-pins — its computed SHA must equal the value already in the lock — and stop to
-investigate rather than inventing a hash.
-
-**Vendored bytes belong to upstream, whichever route installed them.** A
-formatter run at a vendored path is a defect, not a fix, and the workspace's
-gates exempt those trees for exactly that reason. When a lock entry and its
-tree disagree, assume the bytes moved, not the lock — rewriting the lock to
-match locally altered bytes blesses them as upstream's.
-
-## 7. Branch, and land the rest of the rulings
-
-Open a worktree branch. Everything the sweep still owes lands there and ships
-as one PR: standards edits, accommodation work, the ledger, the Decision
-Record. No follow-up issues — a sweep that defers half its work leaves verdicts
-nobody can act on.
-
-## 8. Audit the branch
+## 7. Audit the branch
 
 An adversarial pass over the sweep's own work, before the records are written:
 
-- The mirror rule holds, and no authored skill collides with an installed name.
-- Every call site of every bumped skill still describes what that skill now
+- Every call site of every changed skill still describes what that skill now
   does.
 - The supersede-rule duplication scan comes back clean.
 - No reference dangles at a file this sweep retired.
 - The sweep obeyed the rules the sweep is enforcing. Turn each rule on the
   branch's own diff — in the bootstrap run this pass found the supersede rule
-  broken by the sweep itself: one description of an installed skill,
+  broken by the sweep itself: one description of an adopted skill,
   hand-copied to four sites, had drifted apart and was wrong at all four.
 
-## 9. Write the records
+## 8. Write the records
 
 {Write the ledger to the new pin; every row current, retired rows folded into
 a closing note, the general rules updated where a ruling changed one}. It
-is also where the pin's provenance lives: the lock file records a folder hash
-and no revision, so the tag and its commit are named in the ledger or nowhere.
+is also where the pin's provenance lives: the ledger is the pin's only
+record, so the tag and its commit are named there or nowhere.
 
 {Write the Decision Record beside it; **thin and delta-only** — what moved
 and why, the positions declined so a later sweep does not re-find them, and
 any correction to a claim the sweep made along the way}. Where a skill stands
 today is the ledger's question.
 
-## 10. Open the PR
+## 9. Open the PR
 
 The body carries the change inventory and ends with the **habit brief**: what
 changes for an operator who already knew the prior state. Behavior, not files
 — "grilling now lands in rounds, so answer by number" is the shape, and a list
 of edited paths is not.
-
-The installs are already on main from step 6, so name them in the inventory
-with the commit that carried them; the PR itself is the accommodation around
-them.

@@ -2,8 +2,8 @@
 """sync-dotfiles — install this repo's dotfiles tree into $HOME.
 
 Thin shim over dev_playbook.dotfiles.sync: stow every package into the
-directory it is named for, mirror the externally managed skills, and wire up
-the ~/.bashrc.d loader. See that package for the logic and its tests, and
+directory it is named for and wire up the ~/.bashrc.d loader. See that
+package for the logic and its tests, and
 /dotfiles/README.md for the workflow around it.
 
 Run from the main checkout only: it relinks a live $HOME, so it is a step the

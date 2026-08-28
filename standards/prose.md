@@ -24,9 +24,9 @@ structure, and brevity.
   fence escape; and `harness.agent-facing-voice`, flagging the first person in
   a harness-loaded agent instruction file (Voice: person of address), which
   answers the [harness](/standards/harness.md) card since its scope is that
-  registry. Vendored `.agents/` trees, verbatim `type: Reference` mirrors, and
-  the paths a repo declares in its root `.prose-lint-exempt` are outside the
-  scan for every one of the three
+  registry. Verbatim `type: Reference` mirrors and the paths a repo declares
+  in its root `.prose-lint-exempt` are outside the scan for every one of the
+  three
 
 ## Enforce
 

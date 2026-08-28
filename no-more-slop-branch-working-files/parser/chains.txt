@@ -50,7 +50,7 @@
 [tics-remover] Agent · tools: Read, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
   ├─writes──► local file    the target document in place
-  ├ ╌ reads ╌ ► {writing-for-agents} Skill    if the target is an agent-facing instruction file
+  ├ ╌ reads ╌ ► [writing-for-agents] Skill    if the target is an agent-facing instruction file
   ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
 
@@ -70,7 +70,7 @@
   ├ ╌ reports ╌ ► outcome: str    both outputs    if the SHAs differ, or the PR list is empty
   └─reports─► outcome: str    one line: worktree and branch removed, main at that commit
 
-{codebase-design} Skill
+[codebase-design] Skill · model: sonnet, effort: xhigh
 
 [commit-off] Skill · model: inherit, effort: low
 
@@ -100,24 +100,24 @@
 
 [design] Skill · model: inherit, effort: xhigh
   ├─args────► issue
-  ├─does────► {codebase-design} Skill
+  ├─does────► [codebase-design] Skill
   ├─reads───► [issue-authoring] Standard    end-to-end
   ├─does────► [grill-with-docs] Skill    to sharpen the approach against the codebase, capturing significant decisions as Decision Records as they crystallize
   ├ ╌ reads ╌ ► design-it-twice.md    if §2 settled that the public surface is load-bearing
-  ├ ╌ does ╌ ► {prototype} Skill    if a question survives the interview and the code can't answer it
+  ├ ╌ does ╌ ► [prototype] Skill    if a question survives the interview and the code can't answer it
   ├─does────► [user-intent-mini-interview] Skill
   ├─reads───► decompose.md
   ├─does────► [issue-review-claims] Skill
   ├─does────► [issue-review-simulation] Skill
   └─reports─► outcome: str    the phase result and next state
 
-{diagnosing-bugs} Skill
+[diagnosing-bugs] Skill · model: inherit, effort: xhigh
 
 [document-remove-tics] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
   └─does────► [tics-remover] Agent    the subagent, `model: sonnet`
 
-{domain-modeling} Skill
+[domain-modeling] Skill · model: inherit, effort: xhigh
 
 [enable-repo-governance] Skill · model: opus, effort: xhigh
   ├─reads───► [bootstrap] Standard
@@ -133,11 +133,11 @@
   └─reports─► outcome: str    per-repo results
 
 [grill-with-docs] Skill · model: inherit, effort: xhigh
-  ├─does────► {grilling} Skill
-  ├─does────► {domain-modeling} Skill    throughout
-  └─overrides─► {domain-modeling} Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
+  ├─does────► [grilling] Skill
+  ├─does────► [domain-modeling] Skill    throughout
+  └─overrides─► [domain-modeling] Skill    on its `docs/adr/` and "ADR" clause    with [records] Standard
 
-{grilling} Skill
+[grilling] Skill · model: inherit, effort: xhigh
 
 [handoff] Skill · model: opus, effort: medium
   ├─args────► focus
@@ -148,7 +148,7 @@
   ├─args────► material
   └─does────► [idea] Skill    verbatim
 
-{improve-codebase-architecture} Skill
+[improve-codebase-architecture] Skill · model: inherit, effort: xhigh
 
 [intake] Skill · model: inherit, effort: xhigh
   ├─reads───► software factory standard
@@ -194,10 +194,6 @@
   ├ ╌ writes ╌ ► git(~/workspace/mission-control: add, commit, push)    and push    if there is something to record
   └─reports─► outcome: str    one line with the entry's short name, and that the push landed
 
-{marimo-batch} Skill
-
-{marimo-notebook} Skill
-
 [orchestrate] Skill · model: inherit, effort: xhigh
   ├─reports─► outcome: str    a single line confirming Fable orchestration mode is on
   └ ╌ reports ╌ ► outcome: str    that immediately    if you are not Fable
@@ -205,11 +201,10 @@
 [pocock-sweep] Skill · model: inherit, effort: xhigh
   ├─reads───► external-skill-verdicts.md    end-to-end
   ├ ╌ reports ╌ ► outcome: str    that there is nothing to sweep    if the ledger already names this tag
-  ├─reports─► outcome: str    which route it resolved to
   ├─writes──► local file    the ledger to the new pin
   └─writes──► local file    the Decision Record beside it
 
-{prototype} Skill
+[prototype] Skill · model: inherit, effort: xhigh
 
 [ralph-setup] Skill · model: inherit, effort: xhigh
   ├─args────► goal
@@ -219,7 +214,7 @@
   ├ ╌ writes ╌ ► local file    the progress file    if the user approved the criteria and the plan, and the gate is green
   └─reports─► outcome: str    the full launch command for the user to run
 
-{research} Skill
+[research] Skill · model: inherit, effort: xhigh
 
 [rewind-compact] Skill · model: opus, effort: medium
   ├─args────► target
@@ -230,8 +225,8 @@
 [runbook-creator] Skill · model: opus, effort: xhigh
   ├─args────► idea
   ├─reads───► [runbook-conventions] Standard    end-to-end
-  ├─does────► {writing-for-agents} Skill    in context
-  ├─overrides─► {writing-for-agents} Skill    where it states runbook format    with [runbook-conventions] Standard
+  ├─does────► [writing-for-agents] Skill    in context
+  ├─overrides─► [writing-for-agents] Skill    where it states runbook format    with [runbook-conventions] Standard
   ├─writes──► local file    the new runbook
   └─does────► playbook-lint
 
@@ -251,25 +246,23 @@
   ├─args────► issue
   └─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
 
-{wait-what} Skill
+[wait-what] Skill · model: sonnet, effort: xhigh
 
 [wayfinder-to-build] Skill · model: inherit, effort: xhigh
   ├─args────► map
   ├─reads───► [issue-authoring] Standard    end-to-end
   ├─reads───► software factory    end-to-end
-  ├─does────► {codebase-design} Skill
+  ├─does────► [codebase-design] Skill
   ├ ╌ reports ╌ ► outcome: str    exactly what is open    if anything is still open — a ticket, a fog patch
-  ├─does────► {grilling} Skill    and work these branches as its design tree
+  ├─does────► [grilling] Skill    and work these branches as its design tree
   ├─reads───► the decompose exit
   ├─reads───► [tracker-operations] Standard    for the commands that wire the native relationships
   └─reports─► outcome: str    the whole hand-off on screen
 
-{wayfinder} Skill
-
-{wizard} Skill
+[wayfinder] Skill · model: inherit, effort: xhigh
 
 [working-doc-set-deslop] Skill · model: sonnet, effort: high
   ├─args────► set-hint
   └─does────► [set-deslopper] Agent    the subagent, `model: opus`
 
-{writing-for-agents} Skill
+[writing-for-agents] Skill · model: sonnet, effort: xhigh

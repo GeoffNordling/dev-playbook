@@ -21,14 +21,23 @@ A verdict covers the skill entire: upstream prose is never mined for fragments
 to fold into workspace material, and an idea inside a rejected skill is
 rejected with it, reevaluated only when the skill is.
 
-- **verbatim** — installed unmodified through the `skills` CLI and tracked in
-  `dotfiles/.agents/.skill-lock.json`, never edited here.
-- **adapt** — adopted, carrying the minimal named modification that fits it to a
-  workspace constraint the upstream author has no view on.
+- **verbatim** — copied into the owned tree unmodified at the moment of
+  adoption.
+- **adapt** — copied likewise, carrying modifications that
+  fit it to a workspace constraint the upstream author has no view on.
 - **reject** — not adopted, reason recorded.
 - **unruled** — present at the pin, awaiting a ruling.
   [0016](/docs/decisions/0016-pocock-skills-sweep-2026-07.md) records this value
   as *never considered*.
+
+Both adopting verdicts land the same way: the bundle is copied into
+`dotfiles/dot-claude/skills/` and is owned from the moment it lands — no
+install CLI, no lock file, no symlink
+([0025](/docs/decisions/0025-retire-verbatim-skill-adoption.md)). An owned
+copy answers to every workspace standard and drifts from upstream freely; the
+verdict records how the copy arrived, not that its bytes still match
+upstream. A later sweep that adopts an upstream delta does so by editing the
+owned copy.
 
 Through 0016, **adapt** meant something else: the skill left uninstalled and an
 idea out of it harvested into authored material. Rows carrying that older sense
@@ -44,14 +53,14 @@ is outside the sweep, whatever its condition.
 
 ## Supersede rule
 
-Verbatim-equivalent workspace content yields to an installed skill: a
-definition or procedure an installed skill states when invoked is not also
+Verbatim-equivalent workspace content yields to an adopted skill: a
+definition or procedure an adopted skill states when invoked is not also
 stated in `CONTEXT.md` or a standard, which would leave two sources of truth
 for one rule. Genuine adaptations — workspace machinery built around an
 adopted technique — stay authored, and each sweep checks them for creep.
 
 These are the adaptations it checks. The question at each is whether an
-installed skill has grown to cover it, never whether it should exist.
+adopted skill has grown to cover it, never whether it should exist.
 
 | File | Why it stays authored |
 |---|---|
@@ -77,10 +86,12 @@ merits.
 Pinned at release `v1.2.3` (`6acc160e4e0cd062dbbbd7a1b26ae92855edf07e`) — 35
 skills across four tiers, swept in full by
 [0020](/docs/decisions/0020-pocock-skills-sweep-2026-08.md): 11 verbatim, 1
-adapt, 23 reject. The plugin ships engineering and productivity; in-progress and
-misc are a skills-CLI-only channel. The lock file pins each install by
-skill-folder hash rather than by this commit, so a re-sweep resolves the package
-pin from upstream. Ruling-record numbers are Decision Records in
+adapt, 23 reject.
+[0025](/docs/decisions/0025-retire-verbatim-skill-adoption.md) then converted
+the adopted bundles to owned copies and deleted `wizard` rather than convert
+it. This ledger is the only record of the pin, so a re-sweep resolves the
+package's current release from upstream and compares it against the tag named
+here. Ruling-record numbers are Decision Records in
 [docs/decisions/](/docs/decisions/index.md).
 
 | Skill | Tier | Verdict | Reason | Ruling record | Notes |
@@ -89,20 +100,20 @@ pin from upstream. Ruling-record numbers are Decision Records in
 | code-review | engineering | reject | Its two-axis workflow duplicates `code-pr-review` and the factory's review nodes, and is wired to his tracker plumbing | 0016, 0020 | Relabeled from the older adapt. One exception ruled at 0020: its structural-smell baseline landed in `software-factory/refactor-catalogue.md` and `code-pr-review` |
 | codebase-design | engineering | **verbatim** | The single home for the workspace's architecture vocabulary, and a dependency of `improve-codebase-architecture` | 0020 | Reverses 0016's adapt; `CONTEXT.md` and `standards/modules.md` now defer to it. Model-invoked |
 | diagnosing-bugs | engineering | **verbatim** | Builds the reproduction loop before hypothesizing, then ranks loop techniques and tests falsifiable hypotheses | 0020 | Reverses 0016's reject, which 0016 itself recorded as unexplained. Model-invoked |
-| domain-modeling | engineering | **verbatim** | Installed unmodified from the pin | 0016 | Lock-tracked; byte-identical at this pin |
+| domain-modeling | engineering | **verbatim** | Copied unmodified from the pin | 0016 | — |
 | grill-with-docs | engineering | adapt | A thin front door onto `/grilling` + `/domain-modeling`, mirroring upstream's decomposition | 0016, 0020 | The one modification is invocation mode: upstream's `disable-model-invocation: true` would break the four workspace call sites |
 | implement | engineering | reject | The factory graph does this with more rigor | 0016 | — |
 | improve-codebase-architecture | engineering | **verbatim** | The workspace's only architecture-scanning capability — hot-spot scoping, subagent exploration under the deletion test, then grilling the candidate picked | 0020 | Was `unruled` at 0016. User-invoked; its HTML report needs a CDN at view time |
-| prototype | engineering | **verbatim** | Installed unmodified from the pin | 0016 | Lock-tracked. Substantive at this pin: the logic branch builds a self-contained HTML demo rather than a terminal TUI |
-| research | engineering | **verbatim** | Installed unmodified from the pin | 0016 | Lock-tracked; byte-identical at this pin |
+| prototype | engineering | **verbatim** | Copied unmodified from the pin | 0016 | Substantive at this pin: the logic branch builds a self-contained HTML demo rather than a terminal TUI |
+| research | engineering | **verbatim** | Copied unmodified from the pin | 0016 | — |
 | resolving-merge-conflicts | engineering | reject | Not necessary | 0016, 0020 | The 2026-07-31 reject carried no recorded rationale; 0020 records this one |
 | setup-matt-pocock-skills | engineering | reject | Its job is served by workspace standards | 0016 | `standards/tracking/tracker-operations.md` was seeded from its GitHub tracker file and delta-checks against this pin |
 | tdd | engineering | reject | Its mandatory user stop breaks the autonomous build node, its loop excludes refactoring, and `software-factory/tdd.md` is the workspace's TDD procedure | 0016, 0020 | Relabeled from the older adapt; 0020 records all three reasons |
 | to-spec | engineering | reject | Too complicated to land today, and it may conflict with `wayfinder` and the authored `wayfinder-to-build` | 0020 | **Reevaluate next sweep** |
 | to-tickets | engineering | reject | Too complicated to land today, and it may conflict with `wayfinder` and the authored `wayfinder-to-build` | 0020 | **Reevaluate next sweep** |
 | triage | engineering | reject | Its label and role vocabulary were hard-rejected at 0016 | 0016, 0020 | Relabeled from the older adapt; the redundancy check and verify-the-claim moves stay where 0016 landed them in `intake/SKILL.md` |
-| wayfinder | engineering | **verbatim** | Installed unmodified from the pin | 0016 | Lock-tracked, plus an accommodation package — five `wayfinder:*` labels, a lint check, tracker-operations rules, two judgments — which this pin leaves untouched |
-| wizard | engineering | **verbatim** | Generates staged interactive bash wizards for procedures only the user can carry out | 0020 | Its tier reject was voided by promotion out of in-progress. Its `template.sh` exceeds the shell standard's glue-only boundary, resolved by exempting externally-managed trees. Model-invoked |
+| wayfinder | engineering | **verbatim** | Copied unmodified from the pin | 0016 | Carries an accommodation package — five `wayfinder:*` labels, a lint check, tracker-operations rules, two judgments — which this pin leaves untouched |
+| wizard | engineering | reject | Deleted rather than converted to an owned copy: nothing in the workspace references it, and owning it would put its `template.sh` — past the shell standard's glue-only boundary — on the workspace's own books | 0020, 0025 | Reverses 0020's verbatim, which rested on the externally-managed exemption 0025 retired |
 | claude-handoff | in-progress | reject | The authored `handoff` mirrors his production `productivity/handoff`, which is the correct end state | 0016 | Rests on the tier policy |
 | loop-me | in-progress | reject | Belongs to mission-control | 0016 | — |
 | setup-ts-deep-modules | in-progress | reject | TypeScript-only | 0016 | — |
@@ -114,11 +125,11 @@ pin from upstream. Ruling-record numbers are Decision Records in
 | scaffold-exercises | misc | reject | Bound to his course business | 0016 | — |
 | setup-pre-commit | misc | reject | A competing Node toolchain for a problem `pre-commit` solves | 0016 | — |
 | grill-me | productivity | reject | Redundant with `grill-with-docs` | 0016, 0004 | — |
-| grilling | productivity | **verbatim** | Installed unmodified from the pin | 0016 | Lock-tracked. Substantive at this pin: round-by-round frontier questioning in a mandated question-and-recommendation format replaces one question at a time |
+| grilling | productivity | **verbatim** | Copied unmodified from the pin | 0016 | Substantive at this pin: round-by-round frontier questioning in a mandated question-and-recommendation format replaces one question at a time |
 | handoff | productivity | reject | Harvested near-verbatim at 0006, with no substantive delta at this pin | 0016, 0006 | — |
 | teach | productivity | reject | Personal productivity, outside the factory's domain | 0016 | — |
 | to-questionnaire | productivity | reject | A solo developer has no third party to send a questionnaire to | 0016, 0020 | Its tier reject was voided by promotion out of in-progress; the row reopened and was re-rejected on its merits |
-| wait-what | productivity | **verbatim** | A three-line corrective: re-pitch the last message in Simplified Technical English, using `CONTEXT.md` vocabulary | 0020 | New upstream skill. User-invoked, so it costs no context load; its first-person voice is covered by the prose standard's vendored exemption |
+| wait-what | productivity | **verbatim** | A three-line corrective: re-pitch the last message in Simplified Technical English, using `CONTEXT.md` vocabulary | 0020 | New upstream skill. User-invoked, so it costs no context load |
 | writing-for-agents | productivity | **verbatim** | The craft layer for any document an agent consumes | 0020 | Renamed from `writing-great-skills`, reversing 0016's adapt. Supersedes the two workspace files seeded from it. Model-invoked; `runbook-conventions.md` wins where the two collide |
 
 Rows retired at this pin — their skills no longer exist upstream:
@@ -130,17 +141,9 @@ landed stays where it landed, and the rulings remain readable at
 ## marimo-team/skills
 
 A flat package with no tiers. No pin sweep is recorded for this source, so the
-rows below cover the two installed skills, not the package's full roster.
+rows below cover the two skills once adopted, not the package's full roster.
 
 | Skill | Tier | Verdict | Reason | Ruling record | Notes |
 |---|---|---|---|---|---|
-| marimo-batch | — | **verbatim** | Installed verbatim; lock-tracked | unrecorded | — |
-| marimo-notebook | — | **verbatim** | Installed verbatim; lock-tracked | unrecorded | — |
-
-## pymc-labs/pymc-modeling
-
-A single-skill package. No pin sweep is recorded for this source.
-
-| Skill | Tier | Verdict | Reason | Ruling record | Notes |
-|---|---|---|---|---|---|
-| pymc-modeling | — | **verbatim** | Installed verbatim; lock-tracked | unrecorded | — |
+| marimo-batch | — | reject | Adopted without a recorded ruling and referenced by nothing in the workspace; deleted rather than converted to an owned copy | 0025 | — |
+| marimo-notebook | — | reject | Adopted without a recorded ruling and referenced by nothing in the workspace; deleted rather than converted to an owned copy | 0025 | — |

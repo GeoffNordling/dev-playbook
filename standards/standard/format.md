@@ -191,23 +191,15 @@ contract.
   repo-relative path; `:line` is omitted for a file-level finding
   (e.g. `README.md: knowledge-organization.doc-shape missing an H1 title`).
 
-### Externally-managed and verbatim content
+### Verbatim content
 
-Some content in a repo is not the repo's to hold to the authored-content
-standards: an externally-managed vendored tree — a bundle mirrored in but not
-maintained file-by-file — or a document whose body is a verbatim copy of an
-upstream external one (`type: Reference`). A detector that can import the
-registry excludes such content by consulting the shared registry
-`src/dev_playbook/external.py` —
-`is_externally_managed` for vendored roots, `is_verbatim_doc` for verbatim
-mirrors — never a path-skip hardcoded in the detector. (The exception is a
-detector whose configuration cannot import Python — ruff, shellcheck, and shfmt
-today, whose exclude lists are static config — which keeps a hand-synced literal
-mirror of the roots, carrying a comment that names `external.py` as the
-authority.) The registry is the one
-place an externally-managed root is declared, so every detector that can reach
-it excludes the same trees; the drift this norm forbids is an unsynced,
-undocumented per-detector skip list, not the acknowledged mirror.
+A document whose body is a verbatim copy of an upstream external one
+(`type: Reference`) is not the repo's to hold to the authored-content
+standards. A detector excludes such a document by consulting the shared
+registry `src/dev_playbook/external.py` (`is_verbatim_doc`) — never a
+path-skip hardcoded in the detector — so every detector excludes the same
+documents; the drift this norm forbids is an unsynced, undocumented
+per-detector skip list.
 
 ## Drift
 

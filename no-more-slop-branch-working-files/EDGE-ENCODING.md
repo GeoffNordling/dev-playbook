@@ -151,11 +151,11 @@ The ruled rows, in detail:
   Same shape as does → Agent with the verb natural to skills; the
   lexicon gains Run → does. The link is the live harness path
   (`~/.claude/skills/grilling/SKILL.md`); node type from the path's
-  `skills/` segment; ownership from the *resolved* path — a vendored
-  skill's harness symlink resolves into `.agents/skills/`, drawing the
-  chain's curly braces, while an owned skill resolves into the dotfiles
-  `dot-claude` tree. One span per edge: grill-with-docs fires two, the
-  /grilling session and /domain-modeling active throughout.
+  `skills/` segment; ownership from the *resolved* path — every skill
+  now resolves into the dotfiles `dot-claude` tree and draws square
+  brackets (the curly vendored form retired with verbatim adoption,
+  Decision Record 0025). One span per edge: grill-with-docs fires two,
+  the /grilling session and /domain-modeling active throughout.
 - **does → Script** — `{Run <payload containing exactly one link>}`,
   the same expression as does → Skill: the verb never carries the
   target type, the linked path does. A link to a `SKILL.md` is a Skill;
@@ -236,11 +236,11 @@ byte-for-byte:
   order, deduplicated.
 - The node header is `[name] Type · <node data>`: the recognized
   frontmatter keys (`tools`, `model`, `effort`, `allowed-tools`)
-  verbatim, in frontmatter order. The header's braces follow the same
-  ownership rule as targets — a runbook whose realpath resolves into
-  `.agents/` renders `{name}`, so `{grilling}` heads its own chain the
-  same way it appears on grill-with-docs's does edge. args edges lead;
-  body edges follow in document order.
+  verbatim, in frontmatter order. The header's brackets follow the same
+  ownership rule as targets — the generator still knows the curly
+  vendored form, but with no vendored runbook left every header and
+  target renders `[name]`. args edges lead; body edges follow in
+  document order.
 - Whitespace inside a slice collapses to single spaces — spans wrap
   across source lines.
 
@@ -304,12 +304,11 @@ Every runbook in the live corpus (`dotfiles/dot-claude/agents/*.md` and
 `skills/*/SKILL.md` — the tree `chaingen.py` scans). Checked means ported:
 encoded in map language and its chain certified in `parser/chains.txt`.
 
-A **(3P)** mark means third-party verbatim: the skill directory is a
-symlink into `dotfiles/.agents/skills/`, whose bytes belong to upstream
-(`.skill-lock.json` names the source — mattpocock/skills or
-marimo-team/skills). These port last, after the adoption-policy Decision
-Record converts them to first-class owned copies — see the port plan in
-[No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
+A **(3P)** mark means the skill arrived as a third-party copy at Decision
+Record 0025, which retired verbatim adoption and converted the vendored
+installs to owned bundles (`wizard`, `marimo-batch`, and `marimo-notebook`
+were deleted instead). Owned, the ten port the same way as everything
+else; the mark records provenance only.
 
 Agents:
 
@@ -350,8 +349,6 @@ Skills:
 - [x] issue-review-claims
 - [x] issue-review-simulation
 - [x] judgments-sweep
-- [ ] marimo-batch (3P)
-- [ ] marimo-notebook (3P)
 - [x] orchestrate
 - [x] pocock-sweep
 - [ ] prototype (3P)
@@ -364,7 +361,6 @@ Skills:
 - [ ] wait-what (3P)
 - [ ] wayfinder (3P)
 - [x] wayfinder-to-build
-- [ ] wizard (3P)
 - [x] working-doc-set-deslop
 - [ ] writing-for-agents (3P)
 

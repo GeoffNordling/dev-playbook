@@ -8,7 +8,7 @@ description: Claude Code configuration — skills, rules, settings, hooks — ma
 
 Claude Code configuration — skills, rules, settings, and hooks — managed via GNU Stow.
 
-Three packages are stowed into `$HOME`. The `dot-claude/` package is named without a literal `.claude` path segment so Claude Code's hardcoded protected-paths prompt does not fire when editing files under it.
+Two packages are stowed into `$HOME`. The `dot-claude/` package is named without a literal `.claude` path segment so Claude Code's hardcoded protected-paths prompt does not fire when editing files under it.
 
 Every machine runs the same configuration; the few hooks that only make sense on one machine detect the host at runtime — see [machines.md](/docs/machines.md).
 
@@ -21,14 +21,12 @@ dot-claude/          -> ~/.claude/
   rules/         Global rules applied to every conversation
   hooks/         Claude Code hook scripts
   settings.json  Claude Code settings, shared by every machine (see below)
-.agents/             -> ~/.agents/
-  skills/      Externally managed skills, mirrored into dot-claude/skills/
 .bashrc.d/           -> ~/.bashrc.d/
                  Bash snippets sourced by ~/.bashrc (the sync wires up the
                  loader where the distro's stock bashrc has none)
 ```
 
-The three stowed packages each install into the directory they are named for.
+The two stowed packages each install into the directory they are named for.
 Stow places a package's *contents* in the target, so targeting `$HOME` would
 scatter them one level too high — `scripts/sync-dotfiles` holds the mapping.
 

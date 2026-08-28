@@ -251,9 +251,6 @@ def test_mirror_finding_is_file_level_without_a_line(tmp_path: Path) -> None:
     assert "tests/test_thing.py: testing.mirror-layout " in result.stdout
 
 
-# --- externally-managed exclusion (the shared registry) ---
-
-
 # --- no-logic rule ---
 
 
