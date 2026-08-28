@@ -1,7 +1,11 @@
 ---
 name: wait-what
-description: Stop. That last message did not land — re-pitch it.
+description: Stop and re-pitch the last message — it did not land.
 disable-model-invocation: true
+model: sonnet
+effort: xhigh
 ---
 
-Wait — I don't understand where you've got to here. Re-pitch that: give me a little bit of context, talk in ASD-STE100 Simplified Technical English, and use the ubiquitous language from `CONTEXT.md`.
+# Wait, What?
+
+The user has lost the thread — the last message did not land. Re-pitch it: give a little context first, write in ASD-STE100 Simplified Technical English, and use the ubiquitous language from `CONTEXT.md`.

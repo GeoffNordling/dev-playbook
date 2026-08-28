@@ -15,9 +15,8 @@ directory:
   - .claude/agents/                (project-level agents, any repo)
   - dotfiles/dot-claude/agents/    (workspace-global agents, dev-playbook only)
 
-Externally-managed skills (those whose bundle directory is a symlink,
-typically pointing into dotfiles/.agents/skills/) are skipped — their
-conformance is the upstream's concern. Dot-directories under a skill root are
+Skills whose bundle directory is a symlink are skipped — a symlinked bundle
+belongs to whatever manages its target. Dot-directories under a skill root are
 harness scratch, not bundles, and are not discovered at all. The same
 invocation is safe in any repo: with no runbook roots there is nothing to
 scan.
@@ -25,11 +24,6 @@ scan.
 The two global-CLAUDE.md rules are gated the same way, on the presence of
 dotfiles/dot-claude/CLAUDE.md — dev-playbook authors that file, and no other
 repo has one.
-
-In a repo with a committed dotfiles/.agents/skills/ tree (dev-playbook), the
-harness.skill-mirror check additionally reports the symlink-mirror
-conditions bin/sync-dotfiles.sh repairs — missing, mispointed, stale, or
-colliding entries under dotfiles/dot-claude/skills/. It is inert elsewhere.
 
 Output:
     stdout — one finding per line, `file: harness.rule message`.
@@ -81,7 +75,6 @@ ARGUMENTS_FORMAT = "harness.arguments-format"
 TOOLS_FORMAT = "harness.tools-format"
 BODY_H1 = "harness.body-h1"
 REFERENCES_DEPTH = "harness.references-depth"
-SKILL_MIRROR = "harness.skill-mirror"
 GLOBAL_CLAUDE_SHAPE = "harness.global-claude-shape"
 GLOBAL_CLAUDE_RULES = "harness.global-claude-rules"
 
@@ -103,7 +96,6 @@ RULES = (
     TOOLS_FORMAT,
     BODY_H1,
     REFERENCES_DEPTH,
-    SKILL_MIRROR,
     GLOBAL_CLAUDE_SHAPE,
     GLOBAL_CLAUDE_RULES,
 )
@@ -530,75 +522,6 @@ def audit_agent(agent_md: Path, repo_root: Path) -> list[Finding]:
     return findings
 
 
-def _mirror_finding(entry: Path, link: Path, rel: str) -> Finding | None:
-    """The finding for how dot-claude/skills/<name> mirrors an .agents/skills entry.
-
-    ``None`` when the link correctly mirrors the entry, or when it is a broken
-    symlink — those are left to the stale-symlink pass, which owns non-resolving
-    links regardless of a matching entry, so no link is reported twice.
-    """
-    name = entry.name
-    if link.is_symlink():
-        if not link.exists():
-            return None
-        if link.resolve() != entry.resolve():
-            return Finding(
-                rel,
-                SKILL_MIRROR,
-                f"symlink points elsewhere, not to '.agents/skills/{name}'",
-            )
-        return None
-    if link.exists():
-        return Finding(
-            rel,
-            SKILL_MIRROR,
-            f"authored skill collides with externally-managed '.agents/skills/{name}'",
-        )
-    return Finding(
-        rel, SKILL_MIRROR, f"missing mirror symlink for '.agents/skills/{name}'"
-    )
-
-
-def check_skill_mirror(repo_root: Path) -> list[Finding]:
-    """Audit the committed dotfiles mirror between .agents/skills and dot-claude/skills.
-
-    Claude Code discovers skills only from dot-claude/skills/, so every
-    externally-managed skill under dotfiles/.agents/skills/ must have a
-    corresponding symlink there. This reports the conditions bin/sync-dotfiles.sh
-    repairs; it is inert in repos without a committed dotfiles/.agents/skills/ tree.
-    """
-    agents_skills = repo_root / "dotfiles" / ".agents" / "skills"
-    claude_skills = repo_root / "dotfiles" / "dot-claude" / "skills"
-
-    if not agents_skills.is_dir():
-        return []
-    if not claude_skills.is_dir():
-        raise ToolError(
-            "dotfiles/.agents/skills/ exists but its mirror directory "
-            "dotfiles/dot-claude/skills/ does not"
-        )
-
-    findings: list[Finding] = []
-    for entry in sorted(agents_skills.iterdir()):
-        if not entry.is_dir():
-            continue  # non-directories are ignored, matching the repairer
-        link = claude_skills / entry.name
-        finding = _mirror_finding(entry, link, str(link.relative_to(repo_root)))
-        if finding is not None:
-            findings.append(finding)
-
-    for link in sorted(claude_skills.iterdir()):
-        if link.is_symlink() and not link.exists():
-            findings.append(
-                Finding(
-                    str(link.relative_to(repo_root)),
-                    SKILL_MIRROR,
-                    f"stale symlink '{link.name}' does not resolve",
-                )
-            )
-    return findings
-
-
 def check_global_claude(repo_root: Path) -> list[Finding]:
     """Audit the global CLAUDE.md source's section shape and required rules.
 
@@ -639,11 +562,10 @@ def check_global_claude(repo_root: Path) -> list[Finding]:
 
 
 def discover_internal_skills(skills_dir: Path) -> tuple[list[Path], int]:
-    """Return (internal_skill_dirs, externally_managed_count).
+    """Return (internal_skill_dirs, symlinked_count).
 
-    A skill is "externally managed" when its bundle directory is a symlink —
-    typically a Stow-style symlink into dotfiles/.agents/skills/. Those
-    skills are owned upstream; their conformance is not this repo's concern.
+    A skill whose bundle directory is a symlink is skipped: a symlinked
+    bundle belongs to whatever manages its target, not to this scan.
 
     A dot-directory is neither: it is harness scratch that happens to sit
     under a skill root, and counting it as a bundle inflates the total.
@@ -717,7 +639,6 @@ def main():
     all_advisories: list[str] = []
     try:
         all_findings.extend(check_global_claude(repo_root))
-        all_findings.extend(check_skill_mirror(repo_root))
         for skill_dir in internal_skills:
             findings, advisories = audit_skill(skill_dir, repo_root)
             all_findings.extend(findings)

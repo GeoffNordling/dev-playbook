@@ -10,8 +10,9 @@ Two composable predicates -- deliberately not one monolithic skip-list, because
 each detector needs a different subset:
 
 - :func:`is_externally_managed` -- a repo-relative path inside an
-  externally-managed vendored root. The only such root today is
-  ``dotfiles/.agents``.
+  externally-managed vendored root. No such root exists today: the last one,
+  ``dotfiles/.agents``, retired when the workspace stopped adopting external
+  skills as unowned installs and took ownership of the copies.
 - :func:`is_verbatim_doc` -- a document whose frontmatter marks it a verbatim
   upstream mirror (OKF ``type: Reference``). Keying on the OKF type means the
   classification follows the document wherever it lives, not a path.
@@ -25,9 +26,7 @@ from pathlib import PurePosixPath
 # Externally-managed vendored roots: bundles the repo mirrors in but does not
 # maintain file-by-file, so authored-content rules do not reach them. Adding a
 # root here reaches every detector that consults is_externally_managed.
-EXTERNALLY_MANAGED_ROOTS: tuple[PurePosixPath, ...] = (
-    PurePosixPath("dotfiles/.agents"),
-)
+EXTERNALLY_MANAGED_ROOTS: tuple[PurePosixPath, ...] = ()
 
 # The OKF document type meaning "verbatim mirror of an external document".
 VERBATIM_DOC_TYPE = "Reference"
