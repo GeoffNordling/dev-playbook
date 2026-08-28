@@ -36,7 +36,7 @@ clean baseline.
 `model: opus`}, naming the working directory and the set's root file in
 the prompt.
 
-This skill never commits.
+{Never {Commit}}.
 
 ## Review
 

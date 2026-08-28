@@ -11,9 +11,9 @@ effort: xhigh
 <!-- Intentionally mirrors Anthropic's retired native /code-review (medium tier); keep the sections lifted from it verbatim. -->
 
 Hunt bugs in the PR diff through the finder angles below, dedup, and post the
-findings as threads on the pull request. The review is an audit only: you
-never modify the code under review, and the verdict on the findings is not
-yours to take — post them and stop.
+findings as threads on the pull request. The review is an audit only:
+{Never {Write to the code under review}}, and the verdict on the findings
+is not yours to take — post them and stop.
 
 Review for **correctness bugs**, erring toward surfacing every plausible one:
 catching a real bug matters more than avoiding a false positive.

@@ -8,8 +8,8 @@ effort: low
 
 # Commit Off
 
-Until the user turns committing back on, finish each unit of work and run no
-`git commit` — leave the changes in the working tree for review.
+Until the user turns committing back on, finish each unit of work and
+{Never {Commit}} — leave the changes in the working tree for review.
 
 Acknowledge activation with exactly:
 

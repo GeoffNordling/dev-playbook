@@ -65,4 +65,4 @@ than quietly drop something. Keep the function count low where you can, but not
 at the cost of making the callers do work.
 ```
 
-Show the paragraph to the user first, then {Report the cleaned `User intent` paragraph for the calling beat to write into the brief}. This skill writes nothing to GitHub.
+Show the paragraph to the user first, then {Report the cleaned `User intent` paragraph for the calling beat to write into the brief}. {Never {Write to GitHub}}.

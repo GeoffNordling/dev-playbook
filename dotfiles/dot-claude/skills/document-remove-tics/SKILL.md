@@ -34,7 +34,7 @@ one subagent per file; for more than one target, send all the launches
 in a single message so they run in parallel — each file's rewrite is
 independent of the others.
 
-This skill never commits.
+{Never {Commit}}.
 
 ## Review, then stay silent
 

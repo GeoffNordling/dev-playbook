@@ -7,6 +7,9 @@ link(s), the `with` splitter, nested braces, and the first semicolon.
 Everything between cut points is opaque verbatim text. A `#fragment` on a
 read/launch/run link target splits off as a `§ fragment` annotation on the
 edge, after failing loud unless it matches a heading slug in the target.
+A `{Never {…}}` span wraps one primitive span and renders a prohibition
+edge — `never <verb>`, the wrapped payload's kernel as target, possibly
+empty.
 
 Usage:
     chaingen.py            regenerate chains.txt — every runbook in the
@@ -31,9 +34,20 @@ LEXICON = {
     "run": "does",
     "override": "overrides",
     "if": "condition",
+    "never": "never",
 }
 
-NODE_DATA_KEYS = ("tools", "model", "effort", "allowed-tools")
+# A Never span wraps one primitive span and flips it from assertion to
+# prohibition. Only these keywords can be prohibited; the label keeps each
+# keyword's own verb — commit stays "commits", not the assertion fold to
+# "writes", since no git block exists to disambiguate.
+NEVER_LEXICON = {
+    "write": "writes",
+    "commit": "commits",
+    "merge": "merges",
+}
+
+NODE_DATA_KEYS = ("tools", "model", "effort", "allowed-tools", "disallowed-tools")
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
@@ -383,6 +397,28 @@ def edges_of(body, source_file):
     edges = []
     for span in scan_spans(body):
         key, payload = keyword_of(span)
+        if key == "never":
+            if len(span.children) != 1:
+                raise LintError(
+                    f"Never at offset {span.start} must wrap exactly one span"
+                )
+            if collapse(payload):
+                raise LintError(
+                    f"Never at offset {span.start} carries prose outside its span"
+                )
+            child = span.children[0]
+            stripped = child.text.lstrip()
+            # the keyword is the leading alpha run — a semicolon may follow
+            # it directly ({Never {Write; …}})
+            m = re.match(r"[A-Za-z]+", stripped)
+            word = m.group(0) if m else ""
+            if word.lower() not in NEVER_LEXICON:
+                raise LintError(
+                    f"Never cannot prohibit {word!r} at offset {child.start}"
+                )
+            target = collapse(kernel(stripped[len(word) :].strip()))
+            edges.append(Edge("never " + NEVER_LEXICON[word.lower()], target))
+            continue
         if key == "if":
             if not span.children:
                 raise LintError(f"condition at offset {span.start} nests no span")
@@ -401,6 +437,11 @@ def edges_of(body, source_file):
                 if ckey == "if":
                     raise LintError(
                         f"condition nested in condition at offset {child.start}"
+                    )
+                if ckey == "never":
+                    raise LintError(
+                        f"Never nested in condition at offset {child.start}"
+                        " is not supported"
                     )
                 edge = edge_from_span(ckey, cpayload, child, body, source_file)
                 edge.condition = "if " + condition
@@ -421,11 +462,9 @@ def render_edge(edge, last):
     else:
         pad = "─" * max(1, LABEL_FIELD - len(edge.label))
         arrow = f"{corner}─{edge.label}{pad}►"
-    segments = [edge.target]
-    if edge.annotation:
-        segments.append(edge.annotation)
-    if edge.condition:
-        segments.append(edge.condition)
+    segments = [s for s in (edge.target, edge.annotation, edge.condition) if s]
+    if not segments:  # a total prohibition: bare arrow, empty node slot
+        return f"  {arrow}"
     return f"  {arrow} " + SEP.join(segments)
 
 

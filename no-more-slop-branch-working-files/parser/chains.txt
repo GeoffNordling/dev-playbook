@@ -7,6 +7,7 @@
   └ ╌ reports ╌ ► outcome: str    the escalation envelope    if you stopped instead
 
 [bug-pr-review] Agent · tools: Read, Bash, model: sonnet, effort: xhigh
+  ├─never writes─► to the code under review
   ├─reads───► review contract
   ├─reports─► outcome: str    `outcome` `"done"`
   └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
@@ -41,17 +42,21 @@
 
 [set-auditor] Agent · tools: Read, Grep, Glob, model: opus, effort: xhigh
   ├─reads───► [working-documentation-sets] Standard
+  ├─never writes─►
+  ├─never commits─►
   └─reports─► outcome: str    findings ranked by how much each would mislead a fresh session reading the set cold, as the hand-off to the set-deslopper agent
 
 [set-deslopper] Agent · tools: Read, Write, Edit, Grep, Glob, Agent, model: opus, effort: xhigh
   ├─does────► [set-auditor] Agent
   ├─writes──► local file    the fix for each finding into the set's members
+  ├─never commits─►
   └─reports─► outcome: str    a minimal report: one line per member changed, and one line per finding left unfixed with the reason
 
 [tics-remover] Agent · tools: Read, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
   ├─writes──► local file    the target document in place
   ├ ╌ reads ╌ ► [writing-for-agents] Standard    if the target is an agent-facing instruction file
+  ├─never commits─►
   ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
 
@@ -72,6 +77,7 @@
   └─reports─► outcome: str    one line: worktree and branch removed, main at that commit
 
 [commit-off] Skill · model: inherit, effort: low
+  └─never commits─►
 
 [commit] Skill · model: sonnet, effort: low, allowed-tools: Bash(git *)
   ├─args────► fast
@@ -124,7 +130,8 @@
 
 [document-remove-tics] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
-  └─does────► [tics-remover] Agent    the subagent, `model: sonnet`
+  ├─does────► [tics-remover] Agent    the subagent, `model: sonnet`
+  └─never commits─►
 
 [domain-modeling] Skill · model: inherit, effort: xhigh
   ├─reads───► `CONTEXT.md`    for the existing language
@@ -181,6 +188,7 @@
 
 [issue-overwatch] Skill · model: inherit, effort: xhigh
   ├─args────► issue-number
+  ├─never merges─►
   ├─reads───► software-factory.md
   ├─reads───► factory-operations.md
   ├─reads───► user-checkpoints.md
@@ -188,14 +196,18 @@
   ├─writes──► local file    every body you post here
   └─reports─► outcome: str    the issue's state at the close of each turn
 
-[issue-review-claims] Skill · model: sonnet, effort: xhigh
+[issue-review-claims] Skill · model: sonnet, effort: xhigh, disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
   ├─args────► issue
+  ├─never writes─►
+  ├─never writes─► to GitHub
   ├─reads───► [issue-authoring] Standard    for claim provenance
   ├─reads───► deviation contract
   └─reports─► outcome: str    raw: a numbered list of findings — each states the claim or quote at issue, what reality shows, and why it meets the wrong-or-halt bar — then one line per sweep performed that came back clean
 
-[issue-review-simulation] Skill · model: sonnet, effort: xhigh
+[issue-review-simulation] Skill · model: sonnet, effort: xhigh, disallowed-tools: Edit MultiEdit NotebookEdit Write(/**)
   ├─args────► issue
+  ├─never writes─►
+  ├─never writes─► to GitHub
   ├─reads───► deviation contract
   └─reports─► outcome: str    findings grouped Q3–Q7
 
@@ -263,7 +275,8 @@
 [user-intent-mini-interview] Skill · model: inherit, effort: xhigh
   ├─args────► issue
   ├─reads───► [issue-authoring] Standard    § the-build-leaf-brief-modedirect
-  └─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
+  ├─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
+  └─never writes─► to GitHub
 
 [wait-what] Skill · model: sonnet, effort: xhigh
   ├─reads───► `CONTEXT.md`    for its ubiquitous language
@@ -294,4 +307,5 @@
 
 [working-doc-set-deslop] Skill · model: sonnet, effort: high
   ├─args────► set-hint
-  └─does────► [set-deslopper] Agent    the subagent, `model: opus`
+  ├─does────► [set-deslopper] Agent    the subagent, `model: opus`
+  └─never commits─►

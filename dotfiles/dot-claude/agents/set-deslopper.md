@@ -27,7 +27,7 @@ Two moves:
 The rules:
 
 1. **Edit only the set's members.** Nothing outside the set changes.
-2. **Never commit.** The uncommitted diff is the user's review.
+2. {Never {Commit}} — the uncommitted diff is the user's review.
 3. **Ask no questions.** Where a finding needs a ruling only the user
    can give, leave it unfixed and name it in the report.
 

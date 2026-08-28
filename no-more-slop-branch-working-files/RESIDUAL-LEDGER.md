@@ -26,8 +26,7 @@ any of the three.
 
 ## document-deslop
 
-Partially ported; the Review section still waits. Could not express
-"this skill never commits" (no primitive for a forbidden action) or a
+Partially ported; the Review section still waits. Could not express a
 report that one branch deliberately withholds.
 
 ## usage-report
@@ -82,9 +81,9 @@ Could not express telling the two reports apart (both `outcome: str`).
 
 ## commit-off
 
-Could not express forbidding an action ("run no `git commit`") or the
-two exact-text mid-session acknowledgments — no primitive for either.
-The chain is the bare node header.
+Could not express the two exact-text mid-session acknowledgments —
+they target the conversation, not the invoker, and no primitive covers
+them.
 
 ## candidate-promote
 
@@ -99,8 +98,9 @@ Could not express dispatching the fact-finding sub-agent — `{Launch}` needs
 a link to one agent definition file, and this is an unnamed, ad hoc
 dispatch with none. Could not express the round-by-round design-tree loop
 itself (no primitive for an iterative Q&A frontier) or the closing
-"do not act on it until the user confirms" prohibition (no primitive for a
-forbidden action).
+"do not act on it until the user confirms" prohibition — it is
+conditional on the user's confirmation, and the Never vocabulary has no
+verb for acting.
 
 ## orchestrate
 
@@ -127,8 +127,7 @@ control-flow primitive).
 ## working-doc-set-deslop
 
 Could not express the pre-flight `git status` check (no on-disk link, so
-no `{Read}`), forbidding commits (no primitive for a forbidden action),
-or the closing user verdict — accept-and-commit versus
+no `{Read}`) or the closing user verdict — accept-and-commit versus
 reject-and-restore-to-`HEAD` — which no primitive covers.
 
 ## doc-pr-review
@@ -210,9 +209,8 @@ the guard primitive gates a whole span, not a report's own contents.
 
 Could not express the set-member reads — the root and its linked working
 files are runtime-bound (named in the launching prompt), so `{Read}`'s one
-fixed on-disk link cannot cover them; they stay plain prose. No primitive
-covers forbidding an action ("edit nothing, commit nothing, ask no
-questions").
+fixed on-disk link cannot cover them; they stay plain prose. Could not
+express "ask no questions" — the Never vocabulary has no verb for it.
 
 ## agent-view-overwatch
 
@@ -235,8 +233,7 @@ are procedure, not edges, so the map has nothing to encode there.
 ## set-deslopper
 
 Could not express reading every set member — `{Read}` needs one fixed
-on-disk link, and set membership is runtime-determined — or forbidding
-the commit action itself (no primitive for a forbidden action).
+on-disk link, and set membership is runtime-determined.
 
 ## enable-repo-governance
 
@@ -251,17 +248,12 @@ GitHub-token permission preflight, which has no primitive.
 Could not express the `gh issue view` read of the draft when `issue` is
 given (no on-disk link). Could not express the
 ask/scrutinize/marry interview loop of steps 1–3 (no primitive for a
-question-and-answer round) or the closing "writes nothing to GitHub"
-assertion (no primitive for an edge's absence).
+question-and-answer round).
 
 ## issue-review-claims
 
 Could not express the `gh issue view` reads of the issue body and its parent
-epic (no on-disk link) or the forbidden actions — never edit files or the
-issue, post nothing to GitHub (no primitive for a forbidden action). The
-`disallowed-tools` frontmatter key sits outside the node-data set the header
-renders (`tools`, `model`, `effort`, `allowed-tools`), so its edit/write ban
-is silently absent from the chain.
+epic (no on-disk link).
 
 ## issue-overwatch
 
@@ -300,9 +292,6 @@ edge.
 Could not express the `gh issue view` state reads (title/body/comments,
 the parent-epic lookup) or the read of whatever files the brief names —
 `{Read}` needs one fixed on-disk link and all three are runtime-bound.
-Could not express forbidding edits or GitHub writes (no primitive for a
-forbidden action), or the `disallowed-tools` permission as node data —
-only `tools`/`model`/`effort`/`allowed-tools` render in the header.
 
 ## improve-codebase-architecture
 

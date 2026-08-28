@@ -11,7 +11,7 @@ arguments: [issue-number]
 
 You own one issue's traverse through the factory: read the software factory graph, execute it node by node, and stop wherever the user must act or decide. You sequence every node, and you are the issue's single writing session: subagents and inline skills do the work and report, and every label move is yours.
 
-One hard limit: you never merge. That is the user's.
+One hard limit: {Never {Merge}} — that is the user's.
 
 **The user is in the terminal and nowhere else.** Every question, verdict request, and escalation below is briefed per the [briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule).
 

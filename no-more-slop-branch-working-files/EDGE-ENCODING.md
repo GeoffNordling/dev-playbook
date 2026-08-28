@@ -64,7 +64,7 @@ every retrofit surfaced a fresh complexity; the map runs it forwards.
 | Higher primitive | Lower expression | Status |
 |---|---|---|
 | node type + ownership | file path | **Ruled** (derived) |
-| node data (`model`, `effort`, `allowed-tools`) | frontmatter, verbatim | **Ruled** (derived) |
+| node data (`model`, `effort`, `allowed-tools`, `disallowed-tools`) | frontmatter, verbatim | **Ruled** (derived) |
 | runbook summary | frontmatter `description` | **Ruled** (derived) |
 | args | frontmatter `arguments` list — name only | **Ruled** (derived) |
 | reads | `{Read <one link>}` | **Ruled** |
@@ -73,6 +73,7 @@ every retrofit surfaced a fresh complexity; the map runs it forwards.
 | writes — GitHub / scratch | — | **Hole** |
 | reports | `{Report <payload>}` | **Ruled** |
 | guard | `{If <condition>, {…}}` containment | **Ruled** |
+| prohibition | `{Never {<primitive> …}}` | **Ruled** |
 | does → Agent | `{Launch <one link>}` | **Ruled** |
 | does → Skill | `{Run <one link>}` | **Ruled** |
 | does → Script | `{Run <one link>}` | **Ruled** |
@@ -121,6 +122,23 @@ The ruled rows, in detail:
   plain prose and fires nothing. (Supersedes `{only where …}` and the
   same-sentence adjacency rule: the distinctive phrase and the
   heuristic are both jobs the braces do.)
+- **prohibition** — `{Never {<primitive> …}}`: the modifier wraps exactly
+  one ordinary primitive span, the way the guard nests its edges, and
+  flips it from assertion to prohibition — a named action this run must
+  not take. The inner keyword must be `Write`, `Commit`, or `Merge`
+  (`merge` exists only here — no assertion site uses it), extended only
+  when a site demands another verb; out-of-vocabulary bans ("ask no
+  questions") stay prose, ledgered. The inner payload's kernel is the
+  edge's target, verbatim and possibly empty: bare `{Never {Commit}}`
+  draws a bare-arrow `never commits` edge, and a write ban's sub-level
+  rides the payload — bare `{Never {Write}}` bans local writes,
+  `{Never {Write to GitHub}}` the GitHub side. The label keeps the inner
+  keyword's own verb (`never commits`, not the assertion fold to
+  `writes`) since no git block exists to disambiguate. Spends the
+  nesting cap like the guard, so a prohibition cannot sit inside a
+  condition — unsupported for now, wanted eventually. Unrelated to
+  `disallowed-tools`, which is node data: the frontmatter claim is
+  believed as stated, never checked against harness enforcement.
 - **reads** — `{Read <payload containing exactly one link>}`. The one
   markdown link or citation in the span is the edge target; other words in
   the span are annotation. Two reads means two spans; zero or two links in
@@ -231,7 +249,8 @@ The display conventions the generator implements — pinned by
 byte-for-byte:
 
 - An edge line is arrow, target, annotation, condition, separated by
-  four spaces; empty segments are dropped.
+  four spaces; empty segments are dropped. A total prohibition
+  (`└─never commits─►`) drops every segment and ends at the bare arrow.
 - A solid arrow pads its label to eight columns (`├─reads───►`); a
   guarded edge draws dashed (`├ ╌ reads ╌ ►`) and carries
   `if <condition>` as the rightmost segment.
@@ -243,8 +262,8 @@ byte-for-byte:
   `git(<repo>: <subcommands>)` — repo from `-C`, subcommands in command
   order, deduplicated.
 - The node header is `[name] Type · <node data>`: the recognized
-  frontmatter keys (`tools`, `model`, `effort`, `allowed-tools`)
-  verbatim, in frontmatter order. The header's brackets follow the same
+  frontmatter keys (`tools`, `model`, `effort`, `allowed-tools`,
+  `disallowed-tools`) verbatim, in frontmatter order. The header's brackets follow the same
   ownership rule as targets — the generator still knows the curly
   vendored form, but with no vendored runbook left every header and
   target renders `[name]`. args edges lead; body edges follow in
@@ -293,7 +312,8 @@ entry awaiting a verdict. Lives in its own file:
   the marked edge or be reworded away. log-friction's deleted intro
   ("Append one entry … and commit it") was the ruling case.
 - **Declared versus derived.** Node type and ownership derive from path;
-  node data (`model`, `effort`, `allowed-tools`) from frontmatter; the
+  node data (`model`, `effort`, `allowed-tools`, `disallowed-tools`)
+  from frontmatter; the
   summary from `description`; args from the frontmatter `arguments`
   list. Edges, guards, and reports are
   declared inline. No file describes another file's behavior — subtrees

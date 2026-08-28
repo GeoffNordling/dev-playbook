@@ -35,7 +35,7 @@ The rules, in order of importance:
 3. **Keep the frontmatter, the heading structure, and the document's Markdown
    conventions.** Heading text itself is rewritable.
 
-Leave the change uncommitted — you never commit.
+Leave the change uncommitted — {Never {Commit}}.
 
 ## Report back
 

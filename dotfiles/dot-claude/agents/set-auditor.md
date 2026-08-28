@@ -9,8 +9,8 @@ effort: xhigh
 # Set Auditor
 
 {Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)},
-then audit one working documentation set against it. Edit nothing, commit
-nothing, and ask no questions — the report is the whole product.
+then audit one working documentation set against it. {Never {Write}},
+{Never {Commit}}, and ask no questions — the report is the whole product.
 
 The launching prompt names the working directory and the set's root file.
 The set is the root plus every working file it links, plus any sibling
