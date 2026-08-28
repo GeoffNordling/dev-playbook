@@ -22,14 +22,14 @@ everything below treats them as a single machine key, `wsl`. Fedora's key is
 
 ## What differs
 
-Machine differences are held in these places, named by machine key:
+Machine differences branch at runtime, keyed on the host:
 
-- `dotfiles/settings/<machine>.json` — the Claude Code settings that cannot be
-  shared. `~/.claude/settings.json` is generated from `base.json` plus this
-  fragment, because Claude Code reads one user-scope settings file and offers
-  no local override layer to hold the remainder.
+- Claude Code settings are one shared file,
+  `dotfiles/dot-claude/settings.json`, stowed as `~/.claude/settings.json` on
+  every machine. Hooks that only make sense on one machine detect the host themselves and exit quietly
+  elsewhere, so the settings file never needs a per-machine variant.
 - `dotfiles/.bashrc.d/machine-env.sh` — the environment each machine needs,
-  branching at runtime rather than by generated file.
+  branching at runtime the same way.
 
 Everything else is shared, and a difference that appears anywhere else is a
 bug.

@@ -2,20 +2,19 @@
 """sync-dotfiles — install this repo's dotfiles tree into $HOME.
 
 Thin shim over dev_playbook.dotfiles.sync: stow every package into the
-directory it is named for, mirror the externally managed skills, wire up the
-~/.bashrc.d loader, and generate ~/.claude/settings.json for this machine. See
-that package for the logic and its tests, and /dotfiles/README.md for the
-workflow around it.
+directory it is named for, mirror the externally managed skills, and wire up
+the ~/.bashrc.d loader. See that package for the logic and its tests, and
+/dotfiles/README.md for the workflow around it.
 
 Run from the main checkout only: it relinks a live $HOME, so it is a step the
 user runs, never one from a per-issue worktree.
 
 Output:
     stdout -- one line per thing that changed
-    exit   -- 0 done/current, 1 settings drifted (--check only), 2 cannot run
+    exit   -- 0 done/current, 2 cannot run
 
 Usage:
-    sync-dotfiles [--check]
+    sync-dotfiles
 """
 # /// script
 # requires-python = ">=3.14"

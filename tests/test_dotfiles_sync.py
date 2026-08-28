@@ -10,6 +10,7 @@ from dev_playbook.dotfiles.sync import (
     PACKAGES,
     SyncError,
     claim_targets,
+    clear_generated_settings,
     ensure_bashrc_loader,
     mirror_skills,
     stale_links,
@@ -39,14 +40,11 @@ def a_home(tmp_path: Path) -> Path:
 
 
 def a_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """A repo complete enough for a whole sync run, on a host reporting `wsl`."""
+    """A repo complete enough for a whole sync run."""
     repo = tmp_path / "repo"
     dotfiles = a_dotfiles_tree(repo)
     (dotfiles / ".bashrc.d").mkdir()
-    (dotfiles / "settings").mkdir()
-    (dotfiles / "settings" / "base.json").write_text('{"model": "opus"}')
-    (dotfiles / "settings" / "wsl.json").write_text("{}")
-    monkeypatch.setattr("dev_playbook.dotfiles.sync.detect_machine", lambda: "wsl")
+    (dotfiles / "dot-claude" / "settings.json").write_text('{"model": "opus"}')
     monkeypatch.setattr("dev_playbook.dotfiles.sync.missing_tools", lambda: [])
     return repo
 
@@ -311,24 +309,38 @@ def test_no_bashrc_means_nothing_to_wire_up(tmp_path: Path) -> None:
     assert ensure_bashrc_loader(tmp_path / "absent") is False
 
 
+# --- clearing the generated settings file ----------------------------------
+#
+# The settings file used to be generated in place; stow aborts on a regular
+# file where its link belongs, so the leftover must go before stow runs.
+
+
+def test_a_generated_settings_file_is_removed(tmp_path: Path) -> None:
+    home = a_home(tmp_path)
+    generated = home / ".claude" / "settings.json"
+    generated.write_text('{"model": "opus"}')
+
+    assert clear_generated_settings(home) is True
+    assert not generated.exists()
+
+
+def test_a_settings_symlink_is_left_for_stow(tmp_path: Path) -> None:
+    dotfiles = a_dotfiles_tree(tmp_path)
+    source = dotfiles / "dot-claude" / "settings.json"
+    source.write_text('{"model": "opus"}')
+    home = a_home(tmp_path)
+    link = home / ".claude" / "settings.json"
+    link.symlink_to(source)
+
+    assert clear_generated_settings(home) is False
+    assert link.is_symlink()
+
+
+def test_a_home_with_no_settings_file_needs_no_clearing(tmp_path: Path) -> None:
+    assert clear_generated_settings(a_home(tmp_path)) is False
+
+
 # --- the whole run ---------------------------------------------------------
-
-
-def test_a_stow_that_aborts_still_leaves_the_settings_file_installed(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    repo = a_repo(tmp_path, monkeypatch)
-    home = tmp_path / "home"
-
-    def fail(argv: list[str], **kwargs: object) -> None:
-        raise subprocess.CalledProcessError(1, argv)
-
-    monkeypatch.setattr(subprocess, "run", fail)
-
-    with pytest.raises(subprocess.CalledProcessError):
-        sync(repo, home)
-
-    assert (home / ".claude" / "settings.json").is_file()
 
 
 def test_a_run_that_changes_nothing_reports_nothing(
