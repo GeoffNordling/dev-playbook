@@ -74,10 +74,10 @@ allow and record the leftover honestly.
 3. Two finished ports, to see what good looks like — the file beside
    its generated block in
    `no-more-slop-branch-working-files/parser/chains.txt`:
-   `dotfiles/dot-claude/skills/log-friction/SKILL.md` (guards, a git
+   `dotfiles/dot-claude/skills/log-friction/SKILL.md` (conditions, a git
    commit, reports) and
    `dotfiles/dot-claude/skills/ralph-setup/SKILL.md` (a read, a
-   skill run, guarded writes, a fenced example that must not parse).
+   skill run, conditional writes, a fenced example that must not parse).
    Notice that both still read as ordinary instructions — the braces
    ride on sentences that were already there.
 4. `<PATH>`, end to end.

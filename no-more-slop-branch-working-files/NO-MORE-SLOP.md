@@ -66,7 +66,7 @@ at the appropriate level of abstraction.
 
 These apply to both tracks.
 
-- **The CLOA** (Correct Level of Abstraction) — the level of abstraction
+- **The CLOA** — the level of abstraction
   where the AI and the user communicate in the exact same terminology.
   Its shared definitions are the primitives in
   [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) — each a noun with a small
@@ -282,7 +282,7 @@ works the term holds the detail. Every one is a tentative promotion to
 - **acceptance tier** — the small, capped, fully read test suite in
   `tests/acceptance/`, one test per behavior the user could state in a
   sentence. Its opposite is the unread tier.
-- **CLOA (Correct Level of Abstraction)** — the level of abstraction where
+- **CLOA** — the level of abstraction where
   the AI and the user communicate in the exact same terminology.
 - **constrain to optimize understanding** — the principle that a constraint
   on form pays for itself in amortized reading, meaningful location, and a
@@ -308,8 +308,8 @@ works the term holds the detail. Every one is a tentative promotion to
   document type important to the primitives ontology or not.
 - **residual** — whatever the current abstractions cannot express; tracked,
   never forced.
-- **runbook** — one documentation file, or an abstract object that functions
-  like one, the way a skill functions like its `SKILL.md`.
+- **runbook** — a skill or an agent definition; an invocable command that
+  owns a Reference chain.
 - **slop** — output that diverges from the user's intent (low quality) or
   that the user cannot read (not understood); the Goal section splits the
   two.
@@ -337,3 +337,7 @@ sweeps so we'll need a fresh eye to see if we're happy with the final result
 or if we need new expressions. Basically scan skills and look for important things
 that are not expressed via the deterministic structure. Discuss with user which to support.
 Also scan residual log for ideas that look important.
+
+## Acronyms
+
+- **CLOA** — Correct Level of Abstraction.

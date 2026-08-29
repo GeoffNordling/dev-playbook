@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """chaingen — reconstruct a runbook's Reference chain from its encoded file.
 
-Prototype for To-do item 1 of EDGE-ENCODING.md. Implements the certified
-transform: slice, never interpret. Cut points are the keyword, the markdown
+Prototype implementing ENCODING.md's certified transform: slice, never
+interpret. Cut points are the keyword, the markdown
 link(s), the `with` splitter, nested braces, and the first semicolon.
 Everything between cut points is opaque verbatim text. A `#fragment` on a
 read/launch/run link target splits off as a `§ fragment` annotation on the
@@ -263,7 +263,6 @@ def resolve(link_target, source_file):
 def classify(link_text, link_target, source_file):
     """Render a link target as a node, or as the link text for a non-runbook."""
     real = os.path.realpath(resolve(link_target, source_file))
-    vendored = "/.agents/" in real
     base = os.path.basename(real)
     if base == "SKILL.md":
         name, ntype = os.path.basename(os.path.dirname(real)), "Skill"
@@ -277,8 +276,7 @@ def classify(link_text, link_target, source_file):
         name, ntype = base, "Script"
     else:
         return link_text  # not a runbook: the link text travels verbatim
-    braces = "{{{}}}" if vendored else "[{}]"
-    return f"{braces.format(name)} {ntype}"
+    return f"[{name}] {ntype}"
 
 
 # ── fragment anchors ─────────────────────────────────────────────────────

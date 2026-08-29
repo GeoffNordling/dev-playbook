@@ -37,11 +37,28 @@ example, each document should probably have a typed signature.
 Documentation abstractions change the
 way codebases do — refactors are possible but costly.
 
+## Three readers
+
+Every structure decision must serve the readers below, in priority order:
+
+1. **The executing agent** — the primary customer. Runbook prose commands
+   the agent in natural imperative English; nothing may clutter that.
+2. **The user** — reads the file as plain English.
+3. **Deterministic code** — the parsers that generate views and the lints
+   that enforce grammars. Served by subtle helpers, never by machine
+   notation embedded in prose.
+
 ## A noun with one or more verbs
 
 One noun carrying a small fixed verb set. Nouns describe;
 verbs act. Naming nouns and giving them verbs is deterministic
 structure at the level of ideas.
+
+Every abstraction carries a **provenance**: declared or imported. A
+declared abstraction is invented here and declared in this corpus —
+Standard, the Reference chain. An imported abstraction is someone
+else's, taken as a dependency — GitHub, git, `str` — its contract as
+given.
 
 Implemented exemplars so far:
 
@@ -84,7 +101,9 @@ An expectation-maximization shape over a chosen target artifact:
   minimal — good abstractions are a codebook the corpus gets short in,
   so functionality per character runs high.
 
-Track residuals. The loop's job is awareness of what
+Track residuals in the
+[Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
+The loop's job is awareness of what
 the abstractions fail to carry; the primitive set is refactored only if
 the reduction is worth the change cost.
 
@@ -117,8 +136,8 @@ one level down in
 [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md),
 where the target is skill prose and the output is a grammar. Two adjacent
 runs connect through a map between the lower level's generated primitives
-and the higher level's existing ones, written to a stateful location
-(Edge Encoding's primitive map). One-to-one is the ideal — each higher
+and the higher level's existing ones, written to a stateful location.
+One-to-one is the ideal — each higher
 primitive with exactly one lower expression — but may not always be
 possible; the map is what matters, because it lets the next run start
 from structure instead of from conversation. The alternative is the
@@ -141,7 +160,7 @@ And the two runs this branch executed:
 ontology:   documentation corpus ──loop──► nouns + verbs
                                            (Reference chain: reads, writes, reports, …)
                                                ▲
-                                               │ the primitive map in REFERENCE-CHAIN.md:
+                                               │ the primitive map:
                                                │ reads ↔ {Read …}, writes ↔ {Write …}, …
 encoding:   runbook prose ──loop──► grammar
                                     (braced spans: {Read …}, {If …, {…}}, …)
@@ -193,3 +212,7 @@ registries — concept docs and harness files — and its ruling:
 | Settings | No | Configuration the harness reads |
 | Hook | No | Deterministic code the harness runs |
 | Workflow (`workflows/*.js`) | No | Deterministic code the harness runs |
+
+## Acronyms
+
+None.
