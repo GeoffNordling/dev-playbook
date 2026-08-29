@@ -46,7 +46,8 @@ Your prompt is the issue number, and from cycle 2 the sha the last review
 read; below, `<issue>` is that number.
 
 1. **Run the green gate** — red is an escalation (§ Escalations).
-2. **Resolve the repository and the pull request**, in the order the
+2. **{Read from GitHub the repository name and the pull request's number
+   and head sha}**, in the order the
    contract's
    [`gh` mechanics](~/workspace/dev-playbook/software-factory/review-contract.md#the-gh-mechanics)
    fix, and spell both into every later command:
@@ -59,12 +60,12 @@ read; below, `<issue>` is that number.
    so makes the number mandatory; from here the number and `-R` travel
    together on every `gh pr` call, and `headRefOid` is the `commit_id` of every
    call that posts. No pull request is an escalation (§ Escalations).
-3. **Read the pull request's existing threads and comments**, so you don't
-   re-flag what a prior bug-review cycle caught and so
+3. **{Read from GitHub the pull request's existing threads and comments}**,
+   so you don't re-flag what a prior bug-review cycle caught and so
    § Post the findings as threads has the threads it resolves.
-4. **Take the scope** the contract's
-   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
-   fixes: `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
+4. **{Read from GitHub the diff in scope}**, per the contract's
+   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review):
+   `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
    `git diff <last-reviewed-sha>..HEAD` the delta. At cycle 1 an empty diff is
    an escalation (§ Escalations); from cycle 2 an empty delta is an ordinary
    cycle, with your open threads the work.
@@ -174,13 +175,13 @@ Target **at least 4 findings**; cap at **8**, keeping the 8 most severe. If
 fewer genuine findings exist, post what you have — do not invent to hit the
 floor. On a clean pass, post the review body alone, saying so.
 
-Post one review per the
+{Write to GitHub one review with the findings as threads}, per the
 [thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),
 using the `gh` mechanics the contract carries. Rank the findings most-severe
 first.
 
-From cycle 2, resolve the threads your prior cycle opened whose fixes you have
-verified, per
+From cycle 2, {Write to GitHub resolutions of your prior cycle's threads
+whose fixes you have verified}, per
 [resolution ownership](~/workspace/dev-playbook/software-factory/review-contract.md#resolution-ownership).
 
 ## 5. Close

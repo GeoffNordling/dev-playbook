@@ -9,7 +9,9 @@ read/launch/run link target splits off as a `§ fragment` annotation on the
 edge, after failing loud unless it matches a heading slug in the target.
 A `{Never {…}}` span wraps one primitive span and renders a prohibition
 edge — `never <verb>`, the wrapped payload's kernel as target, possibly
-empty.
+empty. A bucket prefix opens a linkless payload and names the target
+node: `{Write to GitHub …}` / `{Write to scratch …}` pick the write
+bucket, `{Read from GitHub …}` the GitHub read.
 
 Usage:
     chaingen.py            regenerate chains.txt — every runbook in the
@@ -48,6 +50,12 @@ NEVER_LEXICON = {
 }
 
 NODE_DATA_KEYS = ("tools", "model", "effort", "allowed-tools", "disallowed-tools")
+
+# Bucket prefixes: a fixed literal opening a linkless payload picks the
+# target node. Write buckets serve assertion and prohibition alike, so
+# {Never {Write to GitHub}} draws the same GitHub node.
+WRITE_BUCKETS = (("to GitHub", "GitHub"), ("to scratch", "scratch"))
+READ_BUCKET = ("from GitHub", "GitHub")
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
@@ -186,6 +194,15 @@ def one_link(payload, where):
     return text, target, remainder
 
 
+def split_bucket(payload, prefix):
+    """The rest of a payload opening with the bucket prefix, or None."""
+    pat = r"\s+".join(re.escape(w) for w in prefix.split())
+    m = re.match(pat + r"\b", payload, re.IGNORECASE)
+    if not m:
+        return None
+    return payload[m.end() :].strip()
+
+
 def one_code(payload, where):
     """Extract a linkless payload's single inline-code target and the remainder."""
     codes = CODE_RE.findall(payload)
@@ -254,7 +271,9 @@ def classify(link_text, link_target, source_file):
         name, ntype = base[:-3] if base.endswith(".md") else base, "Agent"
     elif "/standards/" in real:
         name, ntype = base[:-3] if base.endswith(".md") else base, "Standard"
-    elif re.search(r"\.(sh|py|bash)$", base):
+    elif "/scripts/" in real or re.search(r"\.(sh|py|bash)$", base):
+        # the path segment types extensionless scripts (repo-lint,
+        # judgments-run), the same rule agents/ uses
         name, ntype = base, "Script"
     else:
         return link_text  # not a runbook: the link text travels verbatim
@@ -356,6 +375,15 @@ def edge_from_span(key, payload, span, body, source_file):
     label = LEXICON[key]
     where = f"span at offset {span.start}"
     if key in ("read", "launch", "run"):
+        if (
+            key == "read"
+            and (rest := split_bucket(payload, READ_BUCKET[0])) is not None
+        ):
+            # GitHub state read: no on-disk target exists, the prefix is
+            # the whole address.
+            if LINK_RE.search(payload):
+                raise LintError(f"{where}: a from-GitHub Read carries a link")
+            return Edge(label, READ_BUCKET[1], collapse(kernel(rest)))
         if key == "read" and not LINK_RE.search(payload):
             # Runtime-bound target: a file in the invoking repo, named as
             # inline code per the cross-reference standard's varied-location
@@ -370,6 +398,9 @@ def edge_from_span(key, payload, span, body, source_file):
         )
         return Edge(label, node, annotation)
     if key == "write":
+        for prefix, node in WRITE_BUCKETS:
+            if (rest := split_bucket(payload, prefix)) is not None:
+                return Edge(label, node, collapse(kernel(rest)))
         return Edge(label, "local file", collapse(kernel(payload)))
     if key == "commit":
         return Edge(label, git_detail(body, span.end), collapse(kernel(payload)))
@@ -416,8 +447,16 @@ def edges_of(body, source_file):
                 raise LintError(
                     f"Never cannot prohibit {word!r} at offset {child.start}"
                 )
-            target = collapse(kernel(stripped[len(word) :].strip()))
-            edges.append(Edge("never " + NEVER_LEXICON[word.lower()], target))
+            inner = stripped[len(word) :].strip()
+            target, annotation = collapse(kernel(inner)), ""
+            if word.lower() == "write":
+                for prefix, node in WRITE_BUCKETS:
+                    if (rest := split_bucket(inner, prefix)) is not None:
+                        target, annotation = node, collapse(kernel(rest))
+                        break
+            edges.append(
+                Edge("never " + NEVER_LEXICON[word.lower()], target, annotation)
+            )
             continue
         if key == "if":
             if not span.children:

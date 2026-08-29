@@ -41,8 +41,8 @@ read) or an agent's inputs — agents have no `arguments` frontmatter.
 
 ## handoff
 
-Could not express the OS temp-directory write (the writes—scratch
-hole) or telling the two reports apart — both render `outcome: str`.
+Could not express telling the two reports apart — both render
+`outcome: str`.
 
 ## ralph-setup
 
@@ -56,17 +56,11 @@ Could not express committing the ambient repo — `git_detail()` demands
 a `-C <repo>` no honest same-repo command carries — or the
 skip-the-amend decision itself; only its report has a primitive.
 
-## datasheet
-
-Could not express the `.datasheet/` scratch write (writes—scratch
-hole) or `griffe-outline` as a Script — `classify()` types scripts by
-`.sh`/`.py`/`.bash` extension and it has none.
-
 ## clean-up-branch-worktree
 
 Could not express the ambient-repo `git fetch`/`git merge`, the
 `ExitWorktree` tool call (does covers only file-linked runbooks), or the
-state-reading `git`/`gh` commands.
+state-reading local `git` commands.
 
 ## idea
 
@@ -110,9 +104,7 @@ session posture, which no primitive covers.
 
 ## intake
 
-Could not express the GitHub issue writes (`gh issue create`/`edit`,
-comments) — the writes—GitHub hole — the `gh issue view` read (no
-on-disk link), or the mode→phase routing table (a table has no
+Could not express the mode→phase routing table (a table has no
 sentence for the grammar to span). `software-factory.md` renders as
 bare link text: `classify()` has no type for docs outside
 `standards/`.
@@ -132,22 +124,16 @@ reject-and-restore-to-`HEAD` — which no primitive covers.
 
 ## doc-pr-review
 
-Could not express the review's central act —
-auditing the docs in the diff and posting the findings as threads on
-the PR, and resolving verified prior-cycle threads (`gh` writes, the
-writes—GitHub hole). Could not express the diff-conditional standards
-table in § Read what the diff calls for — a table has no sentence for
-the grammar to span — or the `gh` state reads (PR threads, the diff
-itself, the issue brief) — no on-disk link. The escalation bullets in
+Could not express the audit act itself — no primitive for it — or the
+diff-conditional standards table in § Read what the diff calls for — a
+table has no sentence for the grammar to span. The escalation bullets in
 § 6 restate the guard's condition rather than firing their own edges,
 since the map has no primitive for enumerating alternative trigger
 conditions under one guard.
 
 ## adjudicator
 
-Could not express the `gh` state reads (issue, PR, threads, comments) or the
-`gh api`/`gh issue create`/`gh pr edit`/`gh pr comment` writes — no on-disk
-link for either hole. Could not express the routing test and its dispositions
+Could not express the routing test and its dispositions
 (§3–§4), the ordered-first-hit routing, or the callout distinction — no
 control-flow or enumeration primitive for any of them. Could not express the
 prompt's issue-number and verdict-word input — agents have no `arguments`
@@ -156,9 +142,7 @@ not the invoker.
 
 ## build
 
-Could not express the `gh issue view` read (no on-disk link), the `gh api`
-reply and the deviation-ledger's `gh issue create`/`gh pr edit` writes (the
-writes—GitHub hole), the issue-number input (agents have no `arguments`
+Could not express the issue-number input (agents have no `arguments`
 frontmatter), the open-ended "read the standard that governs the artifact"
 instruction (an example-led rule, not an enumerable branch), telling the
 escalation and completion reports apart (both render `outcome: str`), or
@@ -167,9 +151,7 @@ repo, with no on-disk link for a does edge.
 
 ## design
 
-Could not express the phase-label move (§8's `gh issue edit`,
-`phase:design` → `phase:build`) or the other `gh issue`
-reads/writes (no on-disk link, writes—GitHub hole), the
+Could not express the
 `EnterWorktree`/`ExitWorktree` tool calls and worktree/branch git
 commands (does covers only file-linked runbooks, and none carries a fenced
 `-C` block for `{Commit}`), the approval gate spanning §6 into §7
@@ -182,17 +164,12 @@ conversation, not the invoker).
 
 Could not express dispatching the judge fan-out — `Workflow({ name: "judgments", … })`
 is neither an Agent nor a Skill/Script link, so does has no primitive for a
-Workflow call. `judgments-run` renders as bare link text, not a `Script` node:
-`classify()` types scripts by `.sh`/`.py`/`.bash` extension and this one has
-none.
+Workflow call.
 
 ## code-pr-review
 
-Could not express the review itself — auditing the diff and posting the
-findings as threads on the PR, and resolving verified prior-cycle
-threads (`gh api` writes, the writes—GitHub hole; no primitive for the
-audit act). Could not express the `gh` state reads (repo, PR list, brief,
-threads, diff) — no on-disk link — the diff-conditional standards table
+Could not express the audit act itself — no primitive for it — or the
+diff-conditional standards table
 in § Read what the diff calls for, or the presence-check and
 audit-dimension tables — a table has no sentence for the grammar to
 span. The green-gate and PR/diff-missing
@@ -214,8 +191,7 @@ express "ask no questions" — the Never vocabulary has no verb for it.
 
 ## agent-view-overwatch
 
-Could not express the `gh issue view`/`gh pr list` state reads (no
-on-disk link), the launch command handed to the user (no primitive for
+Could not express the launch command handed to the user (no primitive for
 an instruction the agent itself never runs), the teardown's
 `git worktree remove`/`git branch -D` (writes—git bucket is scoped to
 commits, not arbitrary git subcommands), or the board table (no
@@ -223,11 +199,7 @@ primitive for a rendered report's shape).
 
 ## bug-pr-review
 
-Could not express the `gh` state reads (PR threads, the diff itself) — no
-on-disk link. Could
-not express the review's central act — posting the findings as threads
-on the PR and resolving prior-cycle threads (`gh` writes, the
-writes—GitHub hole). The eight finder angles and their dedup/tag steps
+The eight finder angles and their dedup/tag steps
 are procedure, not edges, so the map has nothing to encode there.
 
 ## set-deslopper
@@ -237,48 +209,37 @@ on-disk link, and set membership is runtime-determined.
 
 ## enable-repo-governance
 
-Could not type `repo-lint`, `bootstrap-labels`, and `workspace-lint` as
-Script nodes — `classify()` types scripts by extension and these have none,
-so they render as bare `does` targets. Could not express the size-conditional
+Could not express the size-conditional
 landing choice in § 5 (a decision, not a fixed condition to guard) or the
 GitHub-token permission preflight, which has no primitive.
 
 ## user-intent-mini-interview
 
-Could not express the `gh issue view` read of the draft when `issue` is
-given (no on-disk link). Could not express the
+Could not express the
 ask/scrutinize/marry interview loop of steps 1–3 (no primitive for a
 question-and-answer round).
 
-## issue-review-claims
-
-Could not express the `gh issue view` reads of the issue body and its parent
-epic (no on-disk link).
-
 ## issue-overwatch
 
-Could not express the `gh`
-state and write calls (issue view, blocked-by check, label moves, PR/issue
-comments, stub creation — no on-disk link, the writes—GitHub hole), or the
+Could not express the
 `EnterWorktree` calls and worktree-only git commands (does covers only
 file-linked runbooks). The AFK/Inline/Review-stop engagement switch, including
 the fixed `/open-pr` launch inside the Review-stop branch, has no primitive
 for a multi-way enumeration — encoding just that one branch would misstate it
 as unconditional. The runtime-chosen `Run /<skill> <N>` delegation has no
-fixed link for `{Launch}`.
+fixed link for `{Launch}` — tabled: the factory's node-delegation process is
+in flux and likely to be overhauled, so no encoding is attempted for it now.
 
 ## open-pr
 
-Could not express the `gh issue view` and
-branch-diff reads (no on-disk link), the PR-body scratch write and
-`gh pr create` (writes—GitHub/scratch hole), or the issue-number input
-(agents have no `arguments` frontmatter). Three alternate reports all
-collapse to `outcome: str`.
+Could not express the local branch-diff read
+(`git diff origin/main...issue-<issue>` — no on-disk link) or the
+issue-number input (agents have no `arguments` frontmatter). The
+alternate reports all collapse to `outcome: str`.
 
 ## update-standards-pin
 
-Could not express the `git rev-parse`/`gh api` state read confirming the
-release is pushed, or the report-format table in § Read the report (a table
+Could not express the report-format table in § Read the report (a table
 has no sentence for the grammar to span, so its `/enable-repo-governance`
 mention stays unencoded too). Could not express the ambient dev-playbook
 commit for a release-defect fix or the per-consumer commit/push — the
@@ -289,33 +250,28 @@ edge.
 
 ## issue-review-simulation
 
-Could not express the `gh issue view` state reads (title/body/comments,
-the parent-epic lookup) or the read of whatever files the brief names —
-`{Read}` needs one fixed on-disk link and all three are runtime-bound.
+Could not express the read of whatever files the brief names —
+`{Read}` needs one fixed on-disk link and they are runtime-bound.
 
 ## improve-codebase-architecture
 
 Could not express spawning the
 anonymous exploration sub-agent — `{Launch}` needs a link to one agent
-definition file, and this is an ad hoc Task-tool call with none. Could not
-express writing the HTML report to the OS temp directory — the writes—scratch
-hole covers no on-disk-repo target.
+definition file, and this is an ad hoc Task-tool call with none.
 
 ## diagnosing-bugs
 
 Could not express the redact-every-secret discipline, a behavior-mode
 setting with no primitive. Could not express Phase 3's ranked-list check-in
 (targets the conversation mid-run, not a terminal report) or the
-throwaway-harness and captured-trace writes (the writes—scratch hole). Could
+throwaway-harness and captured-trace writes — menu options among Phase 1's
+ten ways, so an unconditional scratch edge would misstate them. Could
 not express the commit that carries the confirmed hypothesis — writes—git
 bucket needs a fixed `-C <repo>` a same-repo commit can't honestly carry.
 
 ## wayfinder-to-build
 
-Could not express reading the map issue and its child
-tickets via `gh issue view` (no on-disk link), minting the build epic and
-child stubs, or wiring sub-issue/blocked-by relationships (`gh` writes, the
-writes—GitHub hole). Could not express the mid-run `READ:` acknowledgment
+Could not express the mid-run `READ:` acknowledgment
 (targets the conversation, not the invoker) or the per-step "Done when"
 completion gates (no control-flow primitive).
 
@@ -333,10 +289,7 @@ with the claim under test, so there is no single target to name.
 
 ## wayfinder
 
-Could not express the GitHub state reads (the map, the frontier, ticket
-bodies) or the GitHub writes (creating, labelling, claiming, commenting on,
-and closing the map and its tickets) — no on-disk link for either, the
-writes—GitHub hole. Could not express the dead `/setup-matt-pocock-skills`
+Could not express the dead `/setup-matt-pocock-skills`
 reference, since no such skill exists in this corpus — kept verbatim as
 adopted. Could not express invoking whatever skill the map's Notes section
 names, or an effort overriding the plan-don't-do default from that same
@@ -349,7 +302,5 @@ and the branch name is chosen per ticket.
 
 Could not express committing the prototype to a throwaway branch —
 `git_detail()` requires a fixed `-C` fenced command, and here the repo
-and branch are chosen at runtime, not fixed. Could not express leaving
-a context pointer to that branch, or the verdict, on the implementation
-issue — the writes—GitHub hole.
+and branch are chosen at runtime, not fixed.
 

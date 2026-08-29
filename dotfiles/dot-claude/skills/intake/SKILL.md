@@ -29,7 +29,7 @@ Then say `READ: software-factory.md, issue-authoring.md`. Proceed only after.
 ### 1. Read the input
 
 - **Capture** — the text passed in is the raw idea.
-- **Adopt** — `gh issue view <issue> --json title,body,comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
+- **Adopt** — {Read from GitHub the issue's title, body, and comments as the raw idea; `gh issue view <issue> --json title,body,comments`}. Note which labels, if any, it already carries; you will rewrite its body.
 
 Either way, {Run [/grilling](~/.claude/skills/grilling/SKILL.md) once to sharpen the raw idea}, with {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active throughout}, then return — **every time**, in both Capture and Adopt, before the §4 draft and the §5 write. Understanding intent precedes authoring; not even a clear-seeming idea skips the grill.
 
@@ -79,7 +79,7 @@ Ask them to confirm or correct; on a correction, revise and re-confirm. This is 
 
 On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6 sets on the user's approval; the hold lasts until §6 ends, or into the next session if the user parks the beat.
 
-**Capture** — create the issue at that phase:
+**Capture** — {Write to GitHub the new issue at that phase}:
 
 ```bash
 gh issue create --title "..." \
@@ -87,7 +87,7 @@ gh issue create --title "..." \
   --body ...the brief...
 ```
 
-**Adopt** — set the four-tuple and overwrite the body on the existing issue:
+**Adopt** — {Write to GitHub the four-tuple and the overwritten body on the existing issue}:
 
 ```bash
 gh issue edit <issue> \
@@ -95,7 +95,7 @@ gh issue edit <issue> \
   --body ...the brief...
 ```
 
-For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.
+For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, {Write to GitHub the probe-record comment §2 accumulated; each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them}.
 
 ### 6. The issue-review beat — fast path only
 
@@ -104,7 +104,7 @@ The two lenses are **your tools** — latent instruments you run to sharpen your
 1. **Dispatch both lenses in one message**, as fresh-context subagents: {Run [/issue-review-claims](~/.claude/skills/issue-review-claims/SKILL.md) `<issue>`} and {Run [/issue-review-simulation](~/.claude/skills/issue-review-simulation/SKILL.md) `<issue>`}, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
 2. **Edit the brief in place.** Merge and deduplicate both lenses' findings, then apply or demote each on your own judgment, rewriting the body until it is a brief you would hand an autonomous builder. Never stop to have the user rule, and record nothing about the run on the issue — the repaired brief is the whole output.
 3. **Present the finished issue** — the URL, what you changed and why, and anything you could not resolve. This is where the user first reads it, so finish it before this line.
-4. **On their approval, and only then, move the phase:** `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit — always a full fresh run of both lenses.
+4. {If the user approves, and only then, {Write to GitHub the phase move; `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`}}. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit — always a full fresh run of both lenses.
 
 No label crosses out of the definition region on your own authority. The user may always skip the beat, cut it short, or advance anyway.
 

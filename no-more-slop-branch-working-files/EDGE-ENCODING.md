@@ -68,9 +68,11 @@ every retrofit surfaced a fresh complexity; the map runs it forwards.
 | runbook summary | frontmatter `description` | **Ruled** (derived) |
 | args | frontmatter `arguments` list — name only | **Ruled** (derived) |
 | reads | `{Read <one link>}` | **Ruled** |
+| reads — GitHub | `{Read from GitHub <payload>}` | **Ruled** |
 | writes — git bucket | `{Commit …}` + fenced command | **Ruled** |
 | writes — local file | `{Write <payload>}` | **Ruled** |
-| writes — GitHub / scratch | — | **Hole** |
+| writes — GitHub | `{Write to GitHub <payload>}` | **Ruled** |
+| writes — scratch | `{Write to scratch <payload>}` | **Ruled** |
 | reports | `{Report <payload>}` | **Ruled** |
 | guard | `{If <condition>, {…}}` containment | **Ruled** |
 | prohibition | `{Never {<primitive> …}}` | **Ruled** |
@@ -150,6 +152,12 @@ The ruled rows, in detail:
   repo, named per the cross-reference standard's varied-location row
   (`` {Read `CONTEXT.md` …} ``) — which becomes the node verbatim,
   backticks kept, with no on-disk resolution.
+- **reads, GitHub** — `{Read from GitHub <payload>}`. The fixed prefix
+  `from GitHub` opens the payload and is the whole address — no link, and
+  a link in the span fails the lint. The node is `GitHub`; the payload
+  kernel after the prefix is annotation (`{Read from GitHub the PR's
+  existing threads}`). Covers every `gh` state read — issue bodies, PR
+  threads, diffs — that has no on-disk file to link.
 - **writes, git bucket** — `{Commit …}` declares the edge; the fenced
   command block in the same step supplies the machine detail — repo from
   `-C`, operations from the git subcommands. The lint requires the block
@@ -161,6 +169,14 @@ The ruled rows, in detail:
   interpreted; the chain draws `local file` with the payload verbatim
   as annotation. The hand-drawn parenthetical contents
   (`local file(PLAN.md, PROGRESS.md)`) are not generatable.
+- **writes, GitHub / scratch** — `{Write to GitHub <payload>}` /
+  `{Write to scratch <payload>}`. A fixed bucket prefix opening the
+  payload picks the node — `GitHub` for `gh` writes (issues, PR threads,
+  labels, comments), `scratch` for OS-temp and dot-directory scratch
+  files — and the kernel after the prefix is annotation. A payload
+  opening with neither prefix stays the local-file bucket. The same
+  prefixes serve the prohibition side, so `{Never {Write to GitHub}}`
+  draws the same `GitHub` node.
 - **does → Agent** — `{Launch <payload containing exactly one link>}`.
   The link is the agent definition file at its live harness path
   (document-deslop links `~/.claude/agents/deslopper.md`); the target's
@@ -185,9 +201,11 @@ The ruled rows, in detail:
 - **does → Script** — `{Run <payload containing exactly one link>}`,
   the same expression as does → Skill: the verb never carries the
   target type, the linked path does. A link to a `SKILL.md` is a Skill;
-  a link to a script file (usage-report's `scripts/report.sh`) is a
-  Script, named by its filename, in-bundle when the link is relative to
-  the skill's own directory.
+  a link to a script file is a Script, named by its filename, in-bundle
+  when the link is relative to the skill's own directory. A script is
+  recognized by a `scripts/` path segment (the rule that types agents by
+  `agents/`, covering extensionless entry points like `repo-lint` and
+  `judgments-run`) or by a `.sh`/`.py`/`.bash` extension.
 - **overrides** — `{Override <one link + clause words> with
   <one link + detail words>}`. The literal word `with` splits the
   payload, the way the guard's comma-after-condition does: the link
@@ -258,7 +276,8 @@ byte-for-byte:
   from the resolved path (a SKILL.md's directory, an agent's or
   standard's basename, a script's filename); a non-runbook read target as
   the link text verbatim (`friction/log.md`); a report as
-  `outcome: str`; a local-file write as `local file`; a git write as
+  `outcome: str`; a local-file write as `local file`; a GitHub read or
+  write as `GitHub` and a scratch write as `scratch`; a git write as
   `git(<repo>: <subcommands>)` — repo from `-C`, subcommands in command
   order, deduplicated.
 - The node header is `[name] Type · <node data>`: the recognized

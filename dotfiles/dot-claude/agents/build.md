@@ -15,8 +15,8 @@ Work without waiting for approval: plan, make the changes, and commit on your ow
 
 Your prompt is the issue number; below, `<issue>` is that number.
 
-- `gh issue view <issue> --json title,body,comments` — the body is the contract; its acceptance criteria are what you must satisfy. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
-- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has run, and those threads are your work list. {Read [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md); it carries the query for reading each thread's content with `gh api`}. Work them in whatever order you judge best, since the prompt carries none. Reply on each thread you fix, and **never resolve a thread**; the next cycle's reviewer resolves what it verifies.
+- {Read from GitHub the issue; `gh issue view <issue> --json title,body,comments` — the body is the contract whose acceptance criteria you must satisfy}. Comments may carry context the body doesn't, and the issue's `tests:*` label drives §2.
+- **Rework re-entry.** A prompt naming thread ids is a rework lap: review has run, and those threads are your work list. {Read [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md); it carries the query for reading each thread's content with `gh api`}. Work them in whatever order you judge best, since the prompt carries none. {Write to GitHub a reply on each thread you fix}, and {Never {Write to GitHub thread resolutions; the next cycle's reviewer resolves what it verifies}}.
 
   **One exception, where the prompt does carry content.** A Suggestion thread listed as ruled fix comes with a line of its own, and that line is the Adjudicator's ruling — the whole of what the thread asks for. It replaces the thread's posted text, which is the unruled suggestion the ruling settled: read the thread for context, then do what the prompt's line says, not what the suggestion said. Every other thread id in the prompt is only an address.
 
@@ -71,5 +71,5 @@ With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
 2. **Commit** the remaining changes with {Run [/commit](~/.claude/skills/commit/SKILL.md)}.
-3. **Record the deviation ledger.** If any deviation was logged, record the entries in the contract's shape: before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts; on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`). No deviations — record nothing here; the PR section states `No deviations.`
+3. **Record the deviation ledger.** {If any deviation was logged, {Write to GitHub the ledger entries in the contract's shape; before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts — on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`)}}. No deviations — record nothing here; the PR section states `No deviations.`
 4. {Report the completion envelope; `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed}.

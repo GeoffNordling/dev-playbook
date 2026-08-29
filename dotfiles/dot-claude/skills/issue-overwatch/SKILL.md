@@ -29,9 +29,9 @@ Then report: `READ: software-factory.md, factory-operations.md, user-checkpoints
 
 The input is the issue number; below, `<N>` is that number.
 
-- `gh issue view <N> --json title,labels,body` — the `phase:*` label places the issue on the graph; the `mode`/`tests` labels pick the outgoing edges.
+- {Read from GitHub the issue; `gh issue view <N> --json title,labels,body` — the `phase:*` label places the issue on the graph, the `mode`/`tests` labels pick the outgoing edges}.
 - **You execute the factory region only.** An issue carrying no labels, or whose `phase:*` sits in the definition region, is not yours — refuse it, name the skill the user runs instead, and stop, per the [factory-nodes-only rule](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch).
-- **Blocked issues don't launch.** Confirm every blocker is closed: `gh api repos/{owner}/{repo}/issues/<N>/dependencies/blocked_by --jq '.[] | select(.state == "open") | .number'`. Any output → tell the user and stop.
+- **Blocked issues don't launch.** {Read from GitHub the open blockers; `gh api repos/{owner}/{repo}/issues/<N>/dependencies/blocked_by --jq '.[] | select(.state == "open") | .number'`}. Any output → tell the user and stop.
 - Re-invoked after a `/clear`, orient the same way — cwd and worktree survive, and the labels say where the traverse stands.
 
 ## 2. The traverse
@@ -42,7 +42,7 @@ Repeat until the issue merges, closes, or a stop point (§6): place the issue at
 - **Inline** — run the node yourself, at your own main loop, with the user present.
 - **Review stop** — run /open-pr first (always), then select the tracks yourself per the [review stop](~/workspace/dev-playbook/software-factory/factory-operations.md#the-review-stop). Announce the selection and its reasons on screen and dispatch immediately in parallel (§3) — no confirmation wait. Each audit posts its own PR comment; then take the single verdict on the stop yourself (§5).
 
-When a node finishes, move the phase label along the edge the graph names — `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"` — and continue.
+When a node finishes, {Write to GitHub the phase-label move along the edge the graph names; `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"`} — and continue.
 
 **Readiness gates the first crossing only.** Before the traverse's first committing node, {Read [the readiness bar](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness)} and confirm the issue meets it — its first three conditions are the observable ones, and the release is taken as given, per [readiness at the crossing](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch); escalate if one fails. A rework lap is not a crossing: the issue never left the factory, so nothing is re-checked.
 
@@ -63,19 +63,19 @@ Parse the subagent's final message per the [terminal report contract](~/workspac
 
 You open it, once, before the issue's first file-touching node, per the worktree contract:
 
-1. Confirm the base is fresh: `git rev-parse origin/main` against `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`. A mismatch is a stale base — pull the main checkout (`git -C ~/workspace/<repo> pull`), re-check, then proceed.
+1. Confirm the base is fresh: {Read from GitHub main's head sha; `gh api repos/{owner}/{repo}/branches/main --jq .commit.sha`} against `git rev-parse origin/main`. A mismatch is a stale base — pull the main checkout (`git -C ~/workspace/<repo> pull`), re-check, then proceed.
 2. `EnterWorktree(name=issue-<N>)`, then `git branch -m worktree-issue-<N> issue-<N>`.
 
 When `git worktree list` shows the worktree already exists, enter it instead: `EnterWorktree(path=.claude/worktrees/issue-<N>)`. When the branch `issue-<N>` exists but its worktree is gone, the issue's work is stranded — escalate. From then on the worktree is inherited: subagents get it as cwd, and you keep it across `/clear`.
 
 ## 5. Review-stop verdicts
 
-The audit subagents post findings and terminate; the verdict interview is yours. Read **every** [comment surface](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces) on the PR, brief the user per [the briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule), answer their questions, help them weigh, and act only on an explicit verdict.
+The audit subagents post findings and terminate; the verdict interview is yours. {Read from GitHub every comment surface on the PR}, per [the comment surfaces](~/workspace/dev-playbook/software-factory/pr-feedback.md#the-comment-surfaces); brief the user per [the briefing rule](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-briefing-rule), answer their questions, help them weigh, and act only on an explicit verdict.
 
-{Write every body you post here; save it to `/tmp/<kind>-<N>.md` and pass it with `--body-file`}.
+{Write to scratch every body you post here; save it to `/tmp/<kind>-<N>.md` and pass it with `--body-file`}.
 
-- **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, mint its tracker stub (`gh issue create` at `phase:intake`) and record the ruling as one PR comment naming the stubs (`gh pr comment --body-file`) — the approve-time regeneration lifts them into `## Deferred` from the PR record. Then regenerate the merge message from the whole PR record, per [the two owners](~/workspace/dev-playbook/software-factory/factory-operations.md#the-two-owners), and pass it with `gh pr edit --body-file`. Carry the issue to the user's final read and merge.
-- **rework** — record the user's deciding reason where the findings live (`gh issue comment --body-file` / `gh pr comment --body-file`), then move the label back along the rework edge.
+- **approve** — record the deferrals first: for each finding the user ruled real-but-not-this-issue, {Write to GitHub its tracker stub; `gh issue create` at `phase:intake`} and {Write to GitHub the ruling as one PR comment naming the stubs; `gh pr comment --body-file` — the approve-time regeneration lifts them into `## Deferred` from the PR record}. Then {Write to GitHub the merge message, regenerated from the whole PR record; per [the two owners](~/workspace/dev-playbook/software-factory/factory-operations.md#the-two-owners), passed with `gh pr edit --body-file`}. Carry the issue to the user's final read and merge.
+- **rework** — {Write to GitHub the user's deciding reason where the findings live; `gh issue comment --body-file` / `gh pr comment --body-file`}, then {Write to GitHub the label move back along the rework edge}.
 
 ## 6. Turn boundaries — the user's commands
 

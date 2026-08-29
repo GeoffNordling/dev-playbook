@@ -115,8 +115,8 @@ User invokes with a loose idea.
 
 1. **Name the destination.** Run a `/grilling` and `/domain-modeling` session to pin down what this map is finding its way to — the spec, decision, or change. The destination fixes the scope, so it's settled first.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. {If this surfaces no fog — the way to the destination is already clear, the whole journey small enough for one session, {Report that no map is needed} and stop, asking the user how they'd like to proceed}.
-3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
-4. **Create the tickets you can specify now** as child issues of the map — then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
+3. {Write to GitHub the map issue; label `wayfinder:map` — Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**}.
+4. {Write to GitHub the tickets you can specify now, as child issues of the map; then wire blocking edges in a **second pass** (issues need ids before they can reference each other)}. Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
 5. **Fire the research subagents.** For each `research` ticket you just created, {Run [/research](~/.claude/skills/research/SKILL.md) to resolve it in parallel}, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
 6. Stop — charting is one session's work; it hand-resolves nothing.
 
@@ -124,10 +124,10 @@ User invokes with a loose idea.
 
 User invokes with a map (URL or number). A ticket is **optional** — without one, you pick the next decision, not the user.
 
-1. Load the **map** — the low-res view, not every ticket body.
-2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.
-3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. If in doubt, use `/grilling` and `/domain-modeling`.
-4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
-5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+1. {Read from GitHub the map; the low-res view, not every ticket body}.
+2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: {Write to GitHub the claim; assign it to yourself before any work}.
+3. Resolve it — **zoom as needed**: {Read from GitHub the full body of any related or closed ticket, on demand}; invoke the skills the `## Notes` block names. If in doubt, use `/grilling` and `/domain-modeling`.
+4. {Write to GitHub the resolution; the answer as a resolution comment, the issue closed, and a context pointer appended to the map's Decisions-so-far}.
+5. {Write to GitHub newly-surfaced tickets, create-then-wire}; graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.

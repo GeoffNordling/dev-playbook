@@ -19,11 +19,12 @@ nor the issue}} and {Never {Write to GitHub}}.
 
 `<issue>` is the issue number given as input.
 
-- `gh issue view <issue> --json title,body,comments`. The body is the
-  brief; comments may carry probe records and rulings.
-- Its parent epic, if it has one — `gh issue view <issue> --json parent`
-  names it, since the body-and-comments read does not surface it: the
-  epic's standing rulings bind the brief and calibrate this review.
+- {Read from GitHub the issue; `gh issue view <issue> --json
+  title,body,comments` — the body is the brief, and comments may carry probe
+  records and rulings}.
+- {Read from GitHub its parent epic, if it has one; `gh issue view <issue>
+  --json parent` names it, since the body-and-comments read does not surface
+  it — the epic's standing rulings bind the brief and calibrate this review}.
 - The files the work touches — everything the brief names, and whatever
   you find the change brushes.
 

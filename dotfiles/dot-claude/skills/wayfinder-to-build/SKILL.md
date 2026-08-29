@@ -58,10 +58,11 @@ Done when: the map is verified complete, or the session ended on that report.
 
 ## 2. Read the map
 
-The map body first — destination, notes, every line of Decisions so far.
-Then every child ticket in full — question body and all comments
-(`gh issue view <n> --json title,body,comments`): harvest corpora, amendments,
-and linked assets ride in the trail. Resolutions are the canonical decisions
+{Read from GitHub the map body first; destination, notes, every line of
+Decisions so far}. Then {Read from GitHub every child ticket in full;
+question body and all comments (`gh issue view <n> --json
+title,body,comments`) — harvest corpora, amendments, and linked assets ride
+in the trail}. Resolutions are the canonical decisions
 this hand-off executes; the epic re-litigates none of them.
 
 Done when: every child ticket of the map has been read in full.
@@ -102,7 +103,7 @@ to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
 tying the two at a glance. Label it `category:*` **only**. {Read
 [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-epic-body)}
-and give it the epic body defined there:
+and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the
   [<map name>](url)"), then states the end state in prose that stands alone.
@@ -134,10 +135,10 @@ Done when: the epic is live and its body carries all three sections.
 
 ## 5. Mint and wire the children
 
-One issue per slice, in dependency order, each a **thin stub**: a title
-naming the slice, a short body stating the slice's goal and naming the
-resolutions it executes (linked, per the style above), and the full
-four-tuple at `phase:design`. Assigning that four-tuple is the children's
+{Write to GitHub one issue per slice, in dependency order; each a **thin
+stub** — a title naming the slice, a short body stating the slice's goal and
+naming the resolutions it executes (linked, per the style above), and the
+full four-tuple at `phase:design`}. Assigning that four-tuple is the children's
 intake, done here in place, same as a design decomposition's children. Each
 child is carried to brief-complete — and released at its own
 [issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)
@@ -145,8 +146,9 @@ child is carried to brief-complete — and released at its own
 
 Then {Read
 [tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md)
-for the commands that wire the native relationships}: every child a
-sub-issue of the epic, and every ordered slice blocked-by its predecessor.
+for the commands that wire the native relationships} and {Write to GitHub
+the wiring; every child a sub-issue of the epic, and every ordered slice
+blocked-by its predecessor}.
 
 Done when: every approved slice has a live, labelled stub, and both
 relationship graphs match the approved ordering.

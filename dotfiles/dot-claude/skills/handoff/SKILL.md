@@ -9,7 +9,7 @@ arguments: [focus]
 
 # Handoff
 
-Compact this conversation into a document a fresh agent resumes from, saved to the OS temporary directory, not the workspace. `focus`, when present, names what the next session will focus on; tailor the document to it.
+Compact this conversation into a document a fresh agent resumes from — {Write to scratch the handoff document; the OS temporary directory, not the workspace}. `focus`, when present, names what the next session will focus on; tailor the document to it.
 
 The document carries a **suggested skills** section naming the skills the next agent should invoke, and points at the artifacts that hold the detail — specs, plans, Decision Records, issues, commits, diffs — citing them by path or URL, not restating them. Sensitive material is redacted: API keys, passwords, personally identifiable information.
 

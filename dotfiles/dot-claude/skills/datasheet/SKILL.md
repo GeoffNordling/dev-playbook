@@ -45,8 +45,8 @@ overlap} and stop}.
 
 ## Inventory
 
-Create a self-ignoring scratch directory. {If the scope holds a Python
-package, {Run
+{Write to scratch a self-ignoring `.datasheet/` directory}. {If the scope
+holds a Python package, {Run
 [griffe-outline](~/workspace/dev-playbook/scripts/griffe-outline) over
 each package in scope, appending its outline to the scratch
 directory}}:

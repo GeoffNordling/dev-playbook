@@ -53,7 +53,8 @@ git diff --stat origin/main HEAD
 are byte-identical, so removing the branch cannot lose anything.
 
 If it prints anything, main has moved on since the merge — or the work
-never landed. Get the exact answer:
+never landed. Get the exact answer — {Read from GitHub the merged PR for
+the branch, compared with the local `HEAD`}:
 
 ```
 gh pr list --head <branch> --state merged --json number,headRefOid

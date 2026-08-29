@@ -22,7 +22,8 @@ the result committed.
 
 pre-commit installs a pin by fetching that object from GitHub, so a pin at a
 commit that exists only on this disk is uninstallable. Run each as its own
-top-level command and compare the two values yourself:
+top-level command and compare the two values yourself — {Read from GitHub
+main's head sha} against the local `git rev-parse main`:
 
 ```
 git rev-parse main

@@ -11,7 +11,7 @@ arguments: [issue]
 
 Every other heading is the agent's work — specific, literal, argued out over a long session. `User intent` is the user's: a short, high-level umbrella the build agent consults when it hits a choice the brief leaves open. It carries the user's **vibe** into an issue otherwise written end to end by an agent. {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)}, which fixes its role and shape; this skill is how the text gets written.
 
-The brief in play is the draft the calling beat holds. Run with no draft in context and `issue` names one — read its body and treat that as the draft.
+The brief in play is the draft the calling beat holds. {If run with no draft in context, {Read from GitHub the body of the issue `issue` names, and treat that as the draft}}.
 
 ## 1. Ask cold
 

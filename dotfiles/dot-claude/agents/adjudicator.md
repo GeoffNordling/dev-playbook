@@ -50,17 +50,19 @@ The verdict is not yours to second-guess. It was computed from thread state
 before you were launched, and it decides one thing for you: whether a lap
 remains for a fix to ride.
 
-1. **Resolve the repository and the pull request**, in the order the review
-   contract's `gh` mechanics fix, and spell both into every later command:
+1. **{Read from GitHub the repository name and the pull request's number}**,
+   in the order the review contract's `gh` mechanics fix, and spell both into
+   every later command:
 
        gh repo view --json nameWithOwner --jq .nameWithOwner
        gh pr list -R <owner>/<repo> --head "$(git rev-parse --abbrev-ref HEAD)" \
          --json number
 
-2. **Read the record you are judging against** — the issue and its comments
-   (`gh issue view <issue> -R <owner>/<repo> --json title,body,comments`), the
-   pull request body and conversation (`gh pr view -R <owner>/<repo> <pr>` and
-   `--comments`), and any epic or map ruling those point you at. Question 1 of
+2. **{Read from GitHub the record you are judging against; the issue and its
+   comments (`gh issue view <issue> -R <owner>/<repo> --json
+   title,body,comments`), the pull request body and conversation
+   (`gh pr view -R <owner>/<repo> <pr>` and `--comments`), and any epic or
+   map ruling those point you at}**. Question 1 of
    the routing test is answered from this and nowhere else.
 
 3. **Get your session id** — `printenv CLAUDE_CODE_SESSION_ID`. Every comment
@@ -69,8 +71,8 @@ remains for a fix to ride.
 
 ## 2. Build the docket
 
-Read every thread on the pull request. **Your docket is the open Suggestion
-threads** — a thread whose first comment opens on `Suggestion` and that nobody
+{Read from GitHub every thread on the pull request}. **Your docket is the
+open Suggestion threads** — a thread whose first comment opens on `Suggestion` and that nobody
 has resolved. A Blocking thread you leave exactly as it is: it is the builder's
 and the next reviewer's.
 
@@ -110,8 +112,9 @@ reversible, while a decline throws the finding away.
 
 ### Decline
 
-One reply, then resolve. The reply is one line: what you decided and the
-vocabulary reason it rests on, in the form `Declined (no-consequence) — …`.
+{Write to GitHub one reply, then the resolve}. The reply is one line: what you
+decided and the vocabulary reason it rests on, in the form
+`Declined (no-consequence) — …`.
 
     gh api repos/<owner>/<repo>/pulls/<pr>/comments/<databaseId>/replies \
       -f body="$(cat /tmp/reply-<issue>.md)"
@@ -122,8 +125,9 @@ review contract states, and never before your reply is on the thread.
 
 ### Defer
 
-**Mint the stub first.** A reply promising a stub that does not exist loses the
-finding, so the issue is created before anything is written to the thread:
+**{Write to GitHub the stub issue first}.** A reply promising a stub that does
+not exist loses the finding, so the issue is created before anything is
+written to the thread:
 
     gh issue create -R <owner>/<repo> \
       --title "<the suggestion, restated in one line>" \
@@ -137,7 +141,8 @@ it was held back, then a link to the thread and a link to the pull request.
 **A create that fails is an escalation** — for example a missing
 `origin:deferral` label in a repository that has not re-run `bootstrap-labels`.
 
-Then reply `Deferred (<reason>) → #<stub>` and resolve, in that order.
+Then {Write to GitHub the reply `Deferred (<reason>) → #<stub>` and the
+resolve, in that order}.
 
 ### Fix now
 
@@ -165,8 +170,8 @@ every earlier one, so neither is a diff of your own lap:
   and a link to its thread. A fixed line has no vocabulary reason to carry.
 - **`## Deferred`** — every deferral's stub, linked.
 
-Read the current body, edit those two sections, leave every other section
-untouched, and write it back:
+{Read from GitHub the current body}, edit those two sections, leave every
+other section untouched, and {Write to GitHub the updated body}:
 
     gh pr view -R <owner>/<repo> <pr> --json body --jq .body > /tmp/pr-body-<issue>.md
     # edit the two sections in that file
@@ -183,11 +188,12 @@ recipe alone: the accuracy of the final record wins over its freshness.
 
 ## 6. Callouts, then close
 
-**A callout is a decision you took that a reader needs to see.** A ruling on a
-finding that named a decision rather than a defect, and an overruling of a
-finding you judged wrong or outside its review's jurisdiction, are each written
-as a comment on the pull request (`gh pr comment -R <owner>/<repo> <pr>
---body-file …`) and repeated in your report. A disposition is not a callout —
+**A callout is a decision you took that a reader needs to see.** For each — a
+ruling on a finding that named a decision rather than a defect, or an
+overruling of a finding you judged wrong or outside its review's
+jurisdiction — {Write to GitHub a comment on the pull request;
+`gh pr comment -R <owner>/<repo> <pr> --body-file …`} and repeat it in your
+report. A disposition is not a callout —
 it is already on its thread and in the section.
 
 End on the report envelope: structured output, never a message alone.

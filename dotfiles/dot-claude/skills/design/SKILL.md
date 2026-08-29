@@ -26,7 +26,7 @@ Then report: `READ: modules/design.md, issue-authoring.md`. Proceed only after.
 
 Below, `<issue>` is the issue number given as input.
 
-- `gh issue view <issue> --json title,body,comments` — the brief is what you re-author or decompose. Comments may carry context the body doesn't.
+- {Read from GitHub the issue; `gh issue view <issue> --json title,body,comments` — the brief is what you re-author or decompose}. Comments may carry context the body doesn't.
 - **Brownfield reconnaissance.** Read the existing code the issue touches — the modules in play, their public surfaces, the seams a solution would use.
 
 Reading needs no worktree; work in the checkout the session is already in. A tree is opened only if §5 prototypes, and it is a throwaway — never the issue's factory worktree, which design has no business creating.
@@ -48,7 +48,7 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 {Run [/grilling](~/.claude/skills/grilling/SKILL.md) to sharpen the approach against the codebase}, with {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active throughout, capturing significant decisions as Decision Records as they crystallize}. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended.
 
-Claims about existing reality accumulate through this interview — what a module does today, what a config holds, what a rule enforces. Collect the ones the approach stands on into a **proposed-probe list** and put it to the user; they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)). Run the picked probes immediately, in-context, as ordinary tool calls, and post the **probe-record comment** on the issue — each probe's command and its observed output, appended to on later runs. The §7 brief's `measured` claims cite it; peripheral claims ride as `assumed` freely.
+Claims about existing reality accumulate through this interview — what a module does today, what a config holds, what a rule enforces. Collect the ones the approach stands on into a **proposed-probe list** and put it to the user; they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)). Run the picked probes immediately, in-context, as ordinary tool calls, and {Write to GitHub the probe-record comment on the issue; each probe's command and its observed output, appended to on later runs}. The §7 brief's `measured` claims cite it; peripheral claims ride as `assumed` freely.
 
 ## 4. Design it twice — only for a load-bearing surface
 
@@ -83,9 +83,9 @@ Re-author the issue's brief in place across the build-leaf headings ([issue auth
 
 Draft every heading except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md)} for that one: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
 
+{Write to GitHub the complete brief; every required heading, re-authored —
 `gh issue edit --body` replaces the whole body
-([tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#the-issue-surface)),
-so write the complete brief back — every required heading, re-authored.
+([tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#the-issue-surface))}.
 
 ### Decompose
 
@@ -96,8 +96,8 @@ When the work is bigger than one build, the issue becomes an **epic** and never 
 Only once the user has explicitly agreed design is done. No label moves in this region on the agent's own authority.
 
 1. **Run the issue-review beat** — for the leaf this session designed, fresh or decomposition-minted. The two lenses are **your tools** — latent instruments that sharpen your brief. Dispatch both in one message, as fresh-context subagents: one {Run [/issue-review-claims](~/.claude/skills/issue-review-claims/SKILL.md)} on `<issue>`, the other {Run [/issue-review-simulation](~/.claude/skills/issue-review-simulation/SKILL.md)} on `<issue>`, each pinned to the model its skill file names, reading only the issue and the repo. Merge and deduplicate their findings, then apply or demote each on your judgment, rewriting until it is a brief you would hand an autonomous builder. Never stop to have the user rule, and record nothing on the issue. Then present the finished issue: the URL, what you changed, and anything unresolved ([the issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)). They may always skip or cut short the beat.
-2. **Move the phase** — single leaf only, on their approval alone: `gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"`. Asked for changes, apply and re-present. Judged not ready, it stays at `phase:design` for a session that re-authors it; only this move is skipped — the rest run either way. A decomposed issue shed its phase at §7 and stays an epic; each child crosses on its own approval.
-3. **Keep the branch, drop the tree**, if §5 opened one. The prototype is already committed on `prototype/<issue>` (§5). Exit with `ExitWorktree(action: "keep")` — never `"remove"`, which deletes the branch too — then `git worktree remove .claude/worktrees/design-<issue>`, and leave the pointer /prototype asks for: `gh issue comment <issue> --body "Prototype preserved on branch prototype/<issue> at <dir>."`, where `<dir>` is the prototype's directory **inside that branch** — not the tree the previous command just deleted. Then push the branch — `git push -u origin prototype/<issue>` — so the citable artifact is on origin. It survives there until everything citing it has merged; after that it is deletable, with no purge duty.
+2. **Move the phase** — single leaf only. {If the user approves, and only then, {Write to GitHub the phase move; `gh issue edit <issue> --remove-label "phase:design" --add-label "phase:build"`}}. Asked for changes, apply and re-present. Judged not ready, it stays at `phase:design` for a session that re-authors it; only this move is skipped — the rest run either way. A decomposed issue shed its phase at §7 and stays an epic; each child crosses on its own approval.
+3. **Keep the branch, drop the tree**, if §5 opened one. The prototype is already committed on `prototype/<issue>` (§5). Exit with `ExitWorktree(action: "keep")` — never `"remove"`, which deletes the branch too — then `git worktree remove .claude/worktrees/design-<issue>`, and {If §5 opened a tree, {Write to GitHub the pointer /prototype asks for; `gh issue comment <issue> --body "Prototype preserved on branch prototype/<issue> at <dir>."`, where `<dir>` is the prototype's directory **inside that branch** — not the tree the previous command just deleted}}. Then push the branch — `git push -u origin prototype/<issue>` — so the citable artifact is on origin. It survives there until everything citing it has merged; after that it is deletable, with no purge duty.
 4. {Report the phase result and next state; format below} and stop:
    ```
    <repo>#<issue> · phase: design · <released to build | epic + N children, M released | awaiting verdict> · brief in issue
