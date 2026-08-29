@@ -339,13 +339,10 @@ done in the sandbox. If sandboxed runs become the normal way to work, the
 measurement store stops describing the machine.
 
 **Fix direction.** §8 says hooks inside the sandbox should reach the host
-database. That needs one more mount — `~/.local/share/claude-measure/`
-mounted read-write — or a port to a service on the host. Both are additive.
-
-The mount is the awkward one, because of the copies rule in §2: mounting the
-real database directory means mounting an original, and `:Z` would retag the
-host's live database. It is also the case where a copy is useless — the point
-is to write to the real one. So this needs a decision.
+database. The options, the ones already rejected, and what the two live ones
+still need are in
+[Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md).
+Undecided; both live options are additive.
 
 Whatever the answer, do not hardcode “sandbox means no hooks.”
 
