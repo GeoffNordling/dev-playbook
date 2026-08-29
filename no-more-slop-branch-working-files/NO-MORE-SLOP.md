@@ -86,7 +86,9 @@ These apply to both tracks.
   Stochastic functions — prompts, models, agents — are powerful but
   expensive. Deterministic backpressure — detectors, linters, gates, and
   plain contact with reality — is inviolable and efficient. Prefer it
-  wherever it can reach, but it can't do everything. Keep agentic
+  wherever it can reach, but it can't do everything. Prefer claims a lint
+  can check — "skill X references skills Y and Z" is grepable; "skill X
+  is elegant" is not. Keep agentic
   backpressure tools simple and loop friendly: simple status codes can be
   better than detailed reports.
 - **Move slowly in decision space.** Past failures were planning too much
@@ -97,7 +99,8 @@ These apply to both tracks.
   the same declarations through reduced forms designed to help the user
   understand. This amortizes reading (learn the shape once,
   read every instance fast), makes location and absence meaningful, and
-  it enables linting.
+  it enables linting. The constrained artifacts are for user eyes —
+  documentation up to now has generally optimized for agent readers.
 
 ## The pandas standard
 

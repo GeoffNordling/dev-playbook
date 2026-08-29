@@ -89,10 +89,16 @@ the abstractions fail to carry; the primitive set is refactored only if
 the reduction is worth the change cost.
 
 The first move on a repo is the **registry pass**: enumerate every
-document type from its two registries — OKF concept types and
-harness-owned kinds — and rule each one important or not to the CLOA
-primitives ontology. Unimportant types are declared so and ignored;
-targets come from the important ones.
+document type from its two registries — the
+[document-type registry](/standards/knowledge-organization/document-types.md)
+for concept docs and the
+[Claude Code file registry](/standards/harness/files.md) for harness
+files — and rule each one important or not to the CLOA primitives
+ontology. Unimportant types are declared so and ignored; targets come
+from the important ones. The registries make "every runbook accounted
+for" a checkable claim. Throughout, the loop keeps the
+stochastic/deterministic distinction and the document-type distinctions
+explicit.
 
 Before looping on a target, interview the user on what they want to
 understand about it. The CLOA is relative to the repository's purpose
@@ -141,96 +147,49 @@ encoding:   runbook prose ──loop──► grammar
                                     (braced spans: {Read …}, {If …, {…}}, …)
 ```
 
-## Constraints
+## Scope
 
-- **Deterministic backpressure where it reaches.** A claim stated in an
-  abstraction's terms is worth more when a lint can check it — "skill X
-  references skills Y and Z" is grepable; "skill X is elegant" is not — so
-  prefer lintable claims wherever a lint can reach, and accept that much
-  of what the abstractions say will never be lintable.
-- **User eyes.** The artifacts the loop produces must be easy for the
-  user to read — documentation up to this point has generally optimized
-  for agent readers. This applies the branch principle
-  [Constrain to optimize understanding](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
-- **Verbatim dependencies cannot participate.** The goal is to
-  generate every reference chain with deterministic code, after
-  structuring each runbook to make that generation possible. A verbatim
-  third-party file carries none of that structure, so it cannot
-  participate. Settled at Decision Record 0025: verbatim adoption is
-  retired and every runbook is owned — zero verbatim dependencies.
-  Consequence: overrides, grounded until then in "a runbook that cannot
-  be edited", re-grounds as superseding an instruction in effect at
-  runtime, self-owned runbooks included.
-- **Types respected.** The loop keeps the stochastic/deterministic
-  distinction and the document-type distinctions explicit.
-- **Every documentation family is its own beast.** The Reference chain
-  is the skills-family solution — skills are commands, so a
-  command-shaped abstraction fits — not the universal one. Each family
-  earns its own abstractions and its own deterministic parsing: a
-  freedom and a burden both. The registry pass's per-type dispositions
-  and the rule that a type earns a noun only by demonstrating a verb
-  interface are this constraint applied.
-- **General and hierarchical across repos.** The abstractions and the loop run on any
-  workspace repo, anchored on that repo's registries — document types
-  (upstream ∪ local) for concept docs, harness files for executors.
-  Nothing here may depend on this repo's internals.
-- **The procedure generalizes; the nouns cascade.** The procedure —
-  registry pass, EM loop, change discipline — runs on any repo. The
-  nouns generated here are not repo-local output: dev-playbook is the
-  root of the hierarchy, and every repo runs skills, so its primitives —
-  Reference chain included — cascade to consumer repos the way
-  Standards do today. A consumer repo's loop adds special-case nouns on
-  top of the inherited set; it never re-derives the root.
+An abstraction's reach runs along two axes: documentation families and
+repos.
 
-## Targets
+Every documentation family is its own beast. The Reference chain is the
+runbook-family solution: skills and agent definitions are commands, so a
+command-shaped abstraction fits. Each family earns its own abstractions
+and its own deterministic parsing.
 
-The population a repo's loop must account for is enumerated by its two
-registries — the
-[document-type registry](/standards/knowledge-organization/document-types.md)
-for concept docs and the
-[Claude Code file registry](/standards/harness/files.md) for harness
-files — so "every runbook accounted for" is a checkable claim, and each
-registered type gets a disposition into the ontology. The boundary
-between the two is encoded as `classify()` in `src/dev_playbook/md.py`.
-This repo's census, taken at the registry pass, per `classify()`:
-107 concept docs, 48 harness `.md` files, 16 indexes, 47 excluded (the
-vendored `dotfiles/.agents` tree and scratch).
+Across repos, the procedure generalizes and the nouns cascade. The
+procedure — registry pass, EM loop, change discipline — runs on any
+workspace repo, anchored on that repo's registries: document types
+(upstream ∪ local) for concept docs, harness files for executors. The
+nouns generated here are not repo-local output: dev-playbook is the
+root of the hierarchy, and every repo has runbooks, so its primitives —
+Reference chain included — cascade to consumer repos the way Standards
+do today. A consumer repo can add its own special cases but
+automatically inherits systems from its higher levels.
 
-The registry pass ruled on every registered type:
+## Registry dispositions
 
-| Type | Pop. | Important? | Ruling |
-|---|---|---|---|
-| Standard | 37 | **Yes** | The Standard noun — define, audit, enforce, adopt |
-| Standard-Card | 15 | **Yes** | Same object as Standard — its catalog surface |
-| Guide | 9 | **Yes** | All `software-factory/` — deferred to the factory phase |
-| Vocabulary | 1 | Separate | The vocabulary API, not a primitive |
-| Decision-Record | 25 | No | Takes no actions; greppable history |
-| README | 7 | No | Navigation |
-| General-Sheet | 7 | No | Parking lot for unsettled types |
-| Recipe-Description | 3 | No | Describes backing code |
-| Instrument-Spec | 2 | No — actively excluded | Instruments face possible deletion |
-| Candidate-List | 1 | No | Tracker state |
-| Reference | 1 | No | Vendored mirror |
-| Survey / Log / Spec-Item | 0 | No | No population here |
+The general registry for dev-playbook: every registered type from both
+registries — concept docs and harness files — and its ruling:
 
-The bootstrap targets, run in order and all recorded in the ledger:
-`document-deslop` (minimal, known cold — the calibration run),
-`grill-with-docs` (mid-size — five skills and a standard), `design`
-(the hub — the chain least likely to fit in the user's head).
-
-The software factory is the graduation exercise, parked for now. It
-brings the Guide type (9 docs, all `software-factory/`) and the 13 parked
-runbooks,
-and may leave large residuals: a Guide describes how a fleet of runbooks
-operates together — a protocol above single-runbook behavior — which no
-current noun carries. Per the remembered rule, Guide earns a noun only
-if it demonstrates a verb interface, the way Standard did; otherwise
-its content lands in chains, written-artifact semantics, and the
-ledger.
-
-### The chains ledger
-
-Every chain is generated into `parser/chains.txt` from in-file structure;
-that structure is
-[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md), this
-file's lower level.
+| Type | Important? | Ruling |
+|---|---|---|
+| Skill | **Yes** | A runbook — the [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) construction |
+| Agent definition | **Yes** | A runbook — the [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) construction |
+| Standard | **Yes** | The Standard noun — define, audit, enforce, adopt |
+| Standard-Card | **Yes** | Same object as Standard — its catalog surface |
+| Guide | **Yes** | No construction built yet |
+| Vocabulary | Separate | The vocabulary API, not a primitive |
+| Decision-Record | No | Takes no actions; greppable history |
+| README | No | Navigation |
+| General-Sheet | No | Parking lot for unsettled types |
+| Recipe-Description | No | Describes backing code |
+| Instrument-Spec | No — actively excluded | Instruments face possible deletion |
+| Candidate-List | No | Tracker state |
+| Reference | No | Vendored mirror |
+| Survey / Log / Spec-Item | No | No population here |
+| `CLAUDE.md` | No | Context, injected prose — read, never invoked |
+| Rule (`rules/*.md`) | No | Context, injected prose — read, never invoked |
+| Settings | No | Configuration the harness reads |
+| Hook | No | Deterministic code the harness runs |
+| Workflow (`workflows/*.js`) | No | Deterministic code the harness runs |
