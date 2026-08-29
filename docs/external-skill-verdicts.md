@@ -15,7 +15,7 @@ of the last evaluation, and the reason. Three verdicts:
 - **reject** — not adopted.
 
 An adopted copy is owned from the moment it lands
-([0025](/docs/decisions/0025-retire-verbatim-skill-adoption.md)): it answers
+([0026](/docs/decisions/0026-retire-verbatim-skill-adoption.md)): it answers
 to every workspace standard and drifts from upstream freely. Re-evaluation is
 manual — the user reads upstream when so moved and updates the rows by hand.
 The row is the whole record of a ruling.

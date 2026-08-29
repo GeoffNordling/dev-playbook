@@ -177,7 +177,7 @@ beneath Reference Chain Declaration. Two items remain:
   green unaided, which was this step's bar. A tangent off it produced
   [the writing-improvement process](/docs/writing-improvement-process.md).
 - **Verbatim adoption retired.**
-  [0025](/docs/decisions/0025-retire-verbatim-skill-adoption.md) changed
+  [0026](/docs/decisions/0026-retire-verbatim-skill-adoption.md) changed
   the policy: adoption is by copy into the owned tree. Ten (3P) skills
   converted to owned copies; `wizard`, `marimo-batch`, and
   `marimo-notebook` were deleted instead. The install machinery (CLI,
@@ -188,8 +188,8 @@ beneath Reference Chain Declaration. Two items remain:
 - **Sweep machinery deleted.** The `pocock-sweep` skill is deleted and the
   ledger reduced to skill / verdict / date / reason per source — no release
   pin, no tag or commit hashes, no per-ruling Decision Record. Re-evaluation
-  is manual: the user updates the rows by hand. Recorded in 0025.
-- **Converted-skill port.** The former (3P) ten, owned since 0025, went
+  is manual: the user updates the rows by hand. Recorded in 0026.
+- **Converted-skill port.** The former (3P) ten, owned since 0026, went
   through the same port as the first-party runbooks — the Port roster
   is fully ticked.
 - **Rules moved out of skills.** Under the relaxed file-roles standard
