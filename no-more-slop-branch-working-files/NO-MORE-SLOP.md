@@ -295,7 +295,7 @@ works the term holds the detail. Every one is a tentative promotion to
   ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance)).
 - **the loop** — the expectation-maximization procedure that generates
   primitives from a target artifact
-  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#the-loop)).
+  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#an-em-loop-for-primitive-construction)).
 - **the pandas standard** — the target state: fluency with an interface —
   which objects exist, which methods fit which task — without ever reading
   inside it.

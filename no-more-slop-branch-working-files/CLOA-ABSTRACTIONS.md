@@ -31,10 +31,11 @@ Keep the structure simple, lintable, deterministic, and high leverage.
 Treat documentation as a special case
 of code; pre-existing methods for code may work for documentation also,
 with minimal modifications. When facing a difficult problem in documentation,
-translate to the code form, solve it there, and port the analogy back.
+translate to the code form, solve it there, and port the analogy back. For
+example, each document should probably have a typed signature.
 
 Documentation abstractions change the
-way codebases do — refactors are possible but significant investments.
+way codebases do — refactors are possible but costly.
 
 ## A noun with one or more verbs
 
@@ -55,7 +56,7 @@ args, reports), and its node types — Agent, Skill, Script — ride along as
 one-verb nouns. It allows the user to understand a runbook's behavior without opening
 the body.
 
-## The loop
+## An EM loop for primitive construction
 
 In code, the programming language comes first and the functionality second.
 Thus, functionality may be expressed as code, constrained by the primitives
@@ -63,10 +64,10 @@ that were defined by the language in advance.
 
 Expressing existing documentation as code hits a problem: documentation
 has free-form, infinite possibilities. No constrained programming language
-exists apriori: the language we have is English.
+exists apriori: the language is English itself.
 
-This is solved by a backwards operation combining AI proposals with user
-intuition: it generates programmable primitives from the documentation.
+We solve with a backwards operation combining AI proposals with user
+intuition: generate programmable primitives from the documentation.
 
 An expectation-maximization shape over a chosen target artifact:
 
@@ -83,8 +84,8 @@ An expectation-maximization shape over a chosen target artifact:
   minimal — good abstractions are a codebook the corpus gets short in,
   so functionality per character runs high.
 
-Residuals are tracked. The loop's job is awareness of what
-the abstractions fail to carry; the primitive set is refactored only when
+Track residuals. The loop's job is awareness of what
+the abstractions fail to carry; the primitive set is refactored only if
 the reduction is worth the change cost.
 
 The first move on a repo is the **registry pass**: enumerate every
@@ -93,19 +94,14 @@ harness-owned kinds — and rule each one important or not to the CLOA
 primitives ontology. Unimportant types are declared so and ignored;
 targets come from the important ones.
 
-The bootstrap run is freeform — a discussion, with several branching
-possibilities live in the same context window. Rigidity applies later, to
-adopted abstractions: see the change-cost note under the code heuristic.
-
-Candidate generation settled during the close-out: parallel reader
-agents extract each runbook's chain against a shared brief, outside this
-context window; rulings happen inline, between batches, and the brief
-is re-synced to the ontology before each launch.
-
 Before looping on a target, interview the user on what they want to
-understand about it. The CLOA is relative to the repository's purpose and
-the user's wants, so without the interview the loop optimizes explanation
-in the abstract.
+understand about it. The CLOA is relative to the repository's purpose
+and the user's preferences.
+
+This algorithm can also apply to greenfield repositories. But instead of
+looking at existing documentation and pulling out useful constructions,
+the AI and the user can talk about theoretical functionality for the
+future repository in the user's imagination.
 
 ### Layer invariance
 
@@ -121,10 +117,29 @@ primitive with exactly one lower expression — but may not always be
 possible; the map is what matters, because it lets the next run start
 from structure instead of from conversation. The alternative is the
 linear mode — correcting one instance per turn, no primitive ever
-extracted — which is how a session lands back in the slop trench. The
-Constraints bullet "The procedure generalizes; the nouns cascade" claims
-the same invariance along the repo axis; this is the orthogonal axis,
-down the levels.
+extracted — which is how a session lands back in the slop trench.
+
+The shape, abstractly:
+
+```
+layer N:    target artifact ──loop──► primitives
+                                          ▲
+                                          │ the map, written statefully:
+                                          │ one lower expression per higher primitive
+layer N−1:  target artifact ──loop──► primitives
+```
+
+And the two runs this branch executed:
+
+```
+ontology:   documentation corpus ──loop──► nouns + verbs
+                                           (Reference chain: reads, writes, reports, …)
+                                               ▲
+                                               │ the primitive map in REFERENCE-CHAIN.md:
+                                               │ reads ↔ {Read …}, writes ↔ {Write …}, …
+encoding:   runbook prose ──loop──► grammar
+                                    (braced spans: {Read …}, {If …, {…}}, …)
+```
 
 ## Constraints
 
