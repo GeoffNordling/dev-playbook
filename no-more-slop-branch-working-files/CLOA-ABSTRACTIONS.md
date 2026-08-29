@@ -16,43 +16,44 @@ guess, and a sentence is settled only when it says so.
 
 Construct the minimal set of abstractions that let the user understand what
 a body of documentation does — anything from one file to one skill to the
-whole software factory — without reading all of it.
+entire repository — without having to read all of it.
 
-## Premise
+## Documentation is code
 
-Documentation does things, because agents make things happen and an agent
-is a collection of documentation plus a permission set. So a documentation
-runbook has an operational meaning — what reads it, when it fires, what
-changes as a result — and an abstraction names that meaning at the CLOA.
+Documentation is code: it does things because agents do things, and an agent
+is just documentation, a harnesss, and permissions.
 
-## Documentation as code
+Unfortunately, documentation is also stochastic and extremely high-dimensional.
+We add parsimonious structure that constructs
+high-level abstractions capturing the important parts the user cares about.
+Keep the structure simple, lintable, deterministic, and high leverage.
 
-The vision: documentation is stochastic, extremely high-dimensional
-code. The move is to add parsimonious structure — the minimum that
-deterministic code can parse — and let that structure carry a
-high-level abstraction capturing most of what the user cares about
-in the document. Keep the structure simple, enforceable,
-deterministic, and high leverage.
+Treat documentation as a special case
+of code; pre-existing methods for code may work for documentation also,
+with minimal modifications. When facing a difficult problem in documentation,
+translate to the code form, solve it there, and port the analogy back.
 
-The working heuristic follows: treat documentation as a special case
-of code, and unify the two theories when the parallel is real. When
-the documentation form of a problem is stuck, translate it to the
-code form, solve it there, and port the analogy back.
+Documentation abstractions change the
+way codebases do — refactors are possible but significant investments.
 
-**Change cost.** Adopted abstractions change the
-way a codebase does — refactors are significant investments.
+## A noun with one or more verbs
 
-## Abstraction shape
-
-One noun carrying a small fixed verb set — an interface. Nouns describe;
-verbs predict. Naming nouns and giving them verbs is deterministic
+One noun carrying a small fixed verb set. Nouns describe;
+verbs act. Naming nouns and giving them verbs is deterministic
 structure at the level of ideas.
 
-The exemplar is the **Standard**: define, audit, enforce, adopt. Its top
+Implemented exemplars so far:
+
+**Standard**: define, audit, enforce, adopt. Its top
 level works — the user predicts every card's behavior from those verbs
 without reading the rule prose or the scripts. Its bottom level does not —
-opening one standard lands in a sprawl of markdown files and scripts. The
-loop owes an answer at both levels.
+opening one standard lands in a sprawl of markdown files and scripts.
+
+**Runbook Reference chain**: the noun is the
+chain, the verbs are its six edge labels (does, reads, overrides, writes,
+args, reports), and its node types — Agent, Skill, Script — ride along as
+one-verb nouns. It allows the user to understand a runbook's behavior without opening
+the body.
 
 ## The loop
 
@@ -177,7 +178,7 @@ down the levels.
 | Reference chain | edges: does, reads, overrides, writes, args, reports | The declared tree of a runbook's behavior and its call signature — args in, reports out |
 
 - **Standard** is established and live; its open problem is the two-level
-  split under [Abstraction shape](#abstraction-shape).
+  split under [A noun with one or more verbs](#a-noun-with-one-or-more-verbs).
 - **Agent and Skill** get one verb, **do**, and no more. Specificity
   comes from the behavior being done, which documentation defines — a
   Standard's verb where one exists (the deslopper does slop-tics.enforce),

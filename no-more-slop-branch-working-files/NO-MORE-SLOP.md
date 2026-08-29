@@ -27,40 +27,40 @@ stale and the card was deleted. Whether the goal earns a card of its own is
 a question for the end of this branch, once the work has shown what would
 actually be governed.
 
-What slop is precisely is still being worked out. So far, it breaks into:
+"Slop" splits into:
 
 - **Low quality** — divergence from the user's latent intent for action and
   preference for style. For the AI this operationalizes as divergence from
   the stated standards, which are themselves ill-defined in places.
-- **Not understood** — contains critical information at the CLOA, but the
-  user cannot or will not read it, whatever its quality. Note: this does
-  not include critical information below the CLOA; the user never needs to
-  understand every line of code, for example.
+- **Not understood** — the user cannot or will not read critical information,
+  whatever its quality, because it is encoded only as illegible walls of text
+  and code, greppable by AI, but not the user.
 
 Today's stock of slop is mostly **intent alignment debt** — divergence
 from the user's intent accrued over time: the mirror of tech debt. Going
-forward, maintaining user understanding keeps new debt from accruing.
+forward, we use appropriate structure and abstractions in order to maintain
+user understanding and prevent new debt from accruing.
 
 ## Levels
 
 Understanding happens at multiple levels, for code and documentation alike:
 
-- **One file, opened.** The user zooms in on a single file and can read it.
+- **One file, opened.** The user zooms in on a single file and looks at it.
   What serves this level changes the file itself — wording, shape, length —
   never its meaning.
-- **Above the file.** The user cannot read every file, so understanding at
-  the higher levels has to come some other way. What those levels are and
-  what serves each one is not yet worked out. Code has established tools
-  up here; documentation is the open question.
+- **Above the file.** The user cannot read all files at once, so understanding at
+  the higher levels has to come some other way. Code has established tools
+  at this level; we will construct similar abstractions for documentation.
 
 Across the levels runs an abstraction/detail axis with a latent optimal
 point neither party knows a priori. Too low — too much detail — and the
-user wastes time or stops paying attention; too high and the user is
-fooled into thinking they understand; both ends produce slop. Pre-AI
+user wastes stops paying attention, rubber stamps, and intent alignment debt
+accumulates; too high and the user is
+fooled into thinking they understand temporarily; both ends produce slop. Pre-AI
 interfaces were forcing functions: pandas and git impose their
-abstractions, and a wrong mental model does not survive contact with them.
-Natural language imposes no level at all and never pushes back, so the
-operating point drifts unless the CLOA is engineered deliberately.
+abstractions, and a wrong mental model did not survive contact with them.
+Natural language imposes such constraints. We must deliberately engineer interfaces
+at the appropriate level of abstraction. 
 
 ## Principles
 
@@ -93,13 +93,11 @@ These apply to both tracks.
   and leaping too far. Small iterative steps, with backpressure from
   reality at each one; what stays small is how much is committed before
   reality answers back.
-- **Constrain to optimize understanding.** A constraint on form seems to
-  earn its keep several ways: it amortizes reading (learn the shape once,
-  read every instance fast), it makes location and absence meaningful (a
-  fact has one place it can live), and it turns a taste question into a
-  lintable rule.
-- **Use what exists.** Before building anything, check what the repo has
-  and prefer improving or modifying in place.
+- **Constrain to optimize understanding.** Apply constraints that funnel
+  the same declarations through reduced forms designed to help the user
+  understand. This amortizes reading (learn the shape once,
+  read every instance fast), makes location and absence meaningful, and
+  it enables linting.
 
 ## The pandas standard
 
@@ -112,7 +110,7 @@ software factory by operating them daily.
 
 The [Standard](/standards/standard/format.md) card system is the in-repo
 exemplar, worked as the abstraction shape in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#abstraction-shape).
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#a-noun-with-one-or-more-verbs).
 
 ## Documentation track — active
 
