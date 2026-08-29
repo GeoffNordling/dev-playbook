@@ -79,6 +79,11 @@ throughout, so a break in the pattern marks a break in meaning.
 State what the document is for and what a reader should be able to do after
 reading. Write for a reader with no prior conversation context.
 
+## Declare before use
+
+Define a concept before the prose leans on it — the definition sits above its
+first use. A concept another document defines is linked at first use.
+
 ## One rule, one place
 
 Each rule lives in the lead sentence of its section. If the lead carries the
