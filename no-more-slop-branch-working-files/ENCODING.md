@@ -13,8 +13,10 @@ code can generate every chain. This file is the spec for the writer of
 that prose. The primitive map below is the join between the two
 layers — one lower expression per higher primitive. The parser is
 `parser/chaingen.py`, which writes every chain to `parser/chains.txt`
-and fails on drift via `--check`. Same working-file conventions as the
-branch plan sets out.
+and fails on drift via `--check`; everything the writer does not
+need — how an edge draws, how a name resolves — lives in that code and
+nowhere else. Same working-file conventions as the branch plan sets
+out.
 
 Inspiration only: doctest (fenced blocks inside prose are legitimate
 deterministic parse targets) and CNL (constrain the sentence, never embed
@@ -22,10 +24,47 @@ notation). STE is loose style inspiration, unenforced. What we adopt 100%
 is our own small grammar below, to be specified as a standard card and
 enforced by our lint.
 
+## From prose to chain
+
+A chain edge must come out of the same sentence that commands the
+executing agent — no writer maintains two copies. The **span** is how
+one sentence serves both readers: braces mark the one machine-readable
+unit inside otherwise plain prose. The parser slices a span at fixed
+cut points — the keyword, the links, the splitters — and every word
+between cuts is an opaque string it carries but never reads, so the
+payload stays natural language for the agent. The two mix freely in
+one sentence, and the boundary cuts both ways: unmarked prose is never
+an edge — unbraced `if` is the deliberate way to keep a condition out
+of the chain — and prose never restates a span; a sentence that
+shadows a primitive becomes the span or is reworded away.
+
+Two live uses. In each, the span is the prose as it stands in the
+runbook file, and the edge below it is what the deterministic parser
+generates from that span. A simple read, from intake:
+
+```
+{Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md);
+the brief formats, brief principles, and the readiness bar}
+
+  ├─reads───► [issue-authoring] Standard
+```
+
+A condition nesting a read, from design:
+
+```
+{If §2 settled that the public surface is load-bearing,
+{Read [design-it-twice.md](references/design-it-twice.md)} and work through it}
+
+  ├ ╌ reads ╌ ► design-it-twice.md    if §2 settled that the public surface is load-bearing
+```
+
+The rest of this file builds that trip up piece by piece: which
+primitives come from where, and the rules for writing each span.
+
 ## The primitive map
 
 Every higher primitive is either **derived** from the runbook's file or
-**declared** in its body as a braced span.
+**declared** in its body as a span.
 
 The derived primitives:
 
@@ -56,34 +95,13 @@ The declared primitives:
 Keywords are imperative — commands to the executing agent; the chain's
 edge labels are their third-person translation.
 
-Two live uses. In each, the span is the prose as it stands in the
-runbook file, and the edge below it is what the deterministic parser
-generates from that span. A simple read, from intake:
-
-```
-{Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md);
-the brief formats, brief principles, and the readiness bar}
-
-  ├─reads───► [issue-authoring] Standard
-```
-
-A condition nesting a read, from design:
-
-```
-{If §2 settled that the public surface is load-bearing,
-{Read [design-it-twice.md](references/design-it-twice.md)} and work through it}
-
-  ├ ╌ reads ╌ ► design-it-twice.md    if §2 settled that the public surface is load-bearing
-```
-
-## The span
+## Writing the spans
 
 A span is `{keyword payload}`: flat by default, nested at most two
 deep — `If` and `Never` spend the cap. The keyword matches
-case-insensitively, and a span may wrap across source lines. Spans
-count only outside code spans and fenced blocks, and unmarked prose is
-never an edge — unbraced `if` is the deliberate way to keep a
-condition out of the chain.
+case-insensitively, a span may wrap across source lines, and spans
+count only outside code spans and fenced blocks. The rules for each
+declared form, refining the table above:
 
 **Targets.** Where the table says `<one link>`, exactly one markdown
 link in the payload names the target; every other word is annotation —
@@ -148,25 +166,6 @@ runbook's report is prose — with the payload as annotation.
 ```
 
 The edge is `outcome: str`; the whole payload rides as annotation.
-
-## The prose
-
-The spans sit inside ordinary runbook prose, which follows three
-rules. Skills are programs: no narrative intro, the body is
-instructions, and the one-sentence summary lives in the frontmatter
-`description`. No shadow prose: a sentence that restates a primitive
-either becomes the marked span or is reworded away. No file describes
-another file's behavior: node data and subtrees come from the target's
-own file, stitched by following does-edges.
-
-## The code
-
-The parser slices, never interprets: it cuts each span at fixed
-points — the keyword, the links, the splitters — and every word
-between cuts is an opaque string. All else — how an edge draws, how a
-name resolves, how whitespace collapses — belongs to the generator
-alone: `parser/chaingen.py` is the ruling, `parser/chains.txt` is the
-reference drawing, and `--check` holds them to zero drift.
 
 ## Acronyms
 

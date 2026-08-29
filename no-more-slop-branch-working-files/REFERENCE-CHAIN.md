@@ -71,7 +71,7 @@ aid, never a type.
 How each edge is written in runbook prose is ruled in
 [Encoding](/no-more-slop-branch-working-files/ENCODING.md#the-primitive-map),
 and how it draws in
-[Encoding](/no-more-slop-branch-working-files/ENCODING.md#the-code).
+[Encoding](/no-more-slop-branch-working-files/ENCODING.md).
 
 Any edge may carry a **condition** — what must hold for it to fire. A
 conditional edge draws dashed; an unconditional edge draws solid. The
