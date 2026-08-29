@@ -135,19 +135,15 @@ exemplar, worked as the abstraction shape in
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format — braced spans over a fixed keyword lexicon,
   sliced at fixed cut points but never interpreted — designed on a
-  five-runbook covering set in
-  [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md)
+  five-runbook covering set in Edge Encoding
   and proven by `parser/chaingen.py`, which deterministically
   regenerates every covered runbook's chain into `parser/chains.txt` and
   fails on drift via `--check`. Remaining work rides the Now section
   below.
 - **First-party port.** Every runbook we author ourselves — all twelve
-  agents and the unmarked skills in the
-  [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster),
+  agents and the unmarked skills in the Port roster,
   38 runbooks — ported to the edge encoding by the dispatch procedure in
-  [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md), each
-  with its leftovers recorded in the
-  [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
+  Port Prompt, each with its leftovers recorded in the Residual Ledger.
 - **The runbook standard, and the gate green.**
   [Runbook Conventions](/standards/harness/runbook-conventions.md)
   replaced what the old docs taught: `skill-management.md` deleted, the
@@ -174,8 +170,7 @@ exemplar, worked as the abstraction shape in
   pin, no tag or commit hashes, no per-ruling Decision Record. Re-evaluation
   is manual: the user updates the rows by hand. Recorded in 0025.
 - **Converted-skill port.** The former (3P) ten, owned since 0025, went
-  through the same port as the first-party runbooks — the
-  [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster)
+  through the same port as the first-party runbooks — the Port roster
   is fully ticked.
 - **Rules moved out of skills.** Under the relaxed file-roles standard
   (rules live in documents, procedures live in runbooks), `codebase-design`
@@ -305,8 +300,7 @@ works the term holds the detail. Every one is a tentative promotion to
   which objects exist, which methods fit which task — without ever reading
   inside it.
 - **Reference chain** — the declared tree of one runbook's behavior and its
-  call signature
-  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#reference-chain)).
+  call signature (Reference Chain, under CLOA Abstractions).
 - **registry pass** — the loop's first move on a repo: rule every registered
   document type important to the primitives ontology or not.
 - **residual** — whatever the current abstractions cannot express; tracked,
@@ -326,7 +320,7 @@ works the term holds the detail. Every one is a tentative promotion to
 ## Now
 
 Edge encoding is the live work: the design and its parser sit in
-[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
+Edge Encoding, under CLOA Abstractions.
 This section is the one to-do list for the branch. The ontology above
 the encoding is settled in
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).

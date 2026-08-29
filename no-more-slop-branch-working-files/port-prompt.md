@@ -18,7 +18,7 @@ The session that launches port agents runs this loop; the agents run
 the body below the rule.
 
 1. Pick a batch of unported first-party runbooks from the
-   [Port roster](/no-more-slop-branch-working-files/EDGE-ENCODING.md#port-roster)
+   Port roster in `no-more-slop-branch-working-files/REFERENCE-CHAIN.md`
    — never a (3P) runbook before the plan's adoption-policy stage. Launch
    one Sonnet agent per runbook, in parallel, each with the two-line
    dispatch message above. Do not regenerate this file's body into the
@@ -66,7 +66,7 @@ allow and record the leftover honestly.
 
 ## Read these files first, whole, in this order
 
-1. `no-more-slop-branch-working-files/EDGE-ENCODING.md` — the encoding
+1. `no-more-slop-branch-working-files/REFERENCE-CHAIN.md` — the encoding
    rules: the primitive map, the grammar, and how chains render. This
    file is the contract; nothing in this prompt overrides it.
 2. `no-more-slop-branch-working-files/RESIDUAL-LEDGER.md` — what a

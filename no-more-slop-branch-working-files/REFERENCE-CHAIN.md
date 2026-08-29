@@ -1,25 +1,22 @@
 ---
 type: General-Sheet
-title: Edge Encoding
+title: Reference Chain
 description: The one-to-one primitive map from Reference chain to skill prose — the ruled encodings, the holes, and the port roster
 ---
 
-# Edge Encoding
+# Reference Chain
 
 The lower-level design under
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md):
 machine-parseable structure inside skill and agent prose, so deterministic
 code can generate the Reference chains that file defines. Same working-file
-conventions as
-[the branch plan](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) sets
-out.
+conventions as the branch plan sets out.
 
 Acronyms used here, defined once: CNL — Controlled Natural Language, an
 engineered subset of a natural language with restricted vocabulary and
 grammar so machines can parse what a reader reads. STE — ASD-STE100
 Simplified Technical English, one specific CNL from aerospace, aimed at
-readers rather than machines. CLOA is in the branch plan's
-[terms](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#terms).
+readers rather than machines. CLOA is in the branch plan's terms.
 
 ## Three readers
 
@@ -58,6 +55,182 @@ a stateful location — is stated in
 [Layer invariance](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance).
 The earlier sentence-by-sentence retrofit ran the loop backwards, and
 every retrofit surfaced a fresh complexity; the map runs it forwards.
+
+## Abstractions so far
+
+| Noun            | Verbs                         | Is                                                |
+| --------------- | ------------------------------ | ------------------------------------------------- |
+| Standard        | define, audit, enforce, adopt | A rule the workspace runs under                   |
+| Agent           | do                            | Documentation that runs in a fresh context, on its own permission set |
+| Skill           | do                            | Documentation that runs in the calling context, on its permissions |
+| Script          | do                            | Deterministic code run via the shell — not a direct LLM call |
+| Reference chain | edges: does, reads, overrides, writes, args, reports | The declared tree of a runbook's behavior and its call signature — args in, reports out |
+
+- **Standard** is established and live; its open problem is the two-level
+  split under [A noun with one or more verbs](#a-noun-with-one-or-more-verbs).
+- **Agent and Skill** get one verb, **do**, and no more. Specificity
+  comes from the behavior being done, which documentation defines — a
+  Standard's verb where one exists (the deslopper does slop-tics.enforce),
+  the whole runbook where the doc is the definition (grill-with-docs does
+  grilling). The two differ in context binding: an agent runs in a fresh
+  context window, a skill in the calling one — an in-process call versus a
+  subprocess. A fresh context starts from configuration (the preset
+  preload, whose contents are not modeled, the way a call graph does not
+  model env vars); a skill starts from here. Permissions ride on the node:
+  an agent carries its own set, a skill the calling context's, minus any
+  clamp its frontmatter declares. Declared permissions are assumed to take
+  effect; harness enforcement fidelity is out of scope. The steps inside a
+  skill are that skill's program, file-level detail below the CLOA, never
+  an interface.
+- **Script** is deterministic code, done with the one verb **do**
+  (usage-report's bundled `report.sh`, the repro loop diagnosing-bugs
+  copies from its template). Running a script is a does-edge to a
+  Script node — marked in-bundle when it ships inside the skill's
+  directory — and the script's own reads and writes hang under that
+  node. The zoom rule collapses in-bundle documents, never an executed
+  script. A sibling **Workflow** noun (deterministic orchestration in
+  Claude Code's dynamic-workflow runtime) was dropped 2026-08-25 as
+  empirically vacuous: no recorded chain fires a
+  does-edge into one — ralph-setup, the closest, reports the
+  ralph-loop launch command as a string and never runs it. The noun
+  returns if a runbook ever does a workflow.
+
+### Reference chain
+
+A **runbook** is one documentation file, or an abstract object that functions
+like one, the way a skill functions like its SKILL.md. Every chain node is
+a runbook; the nouns in the table are its types.
+
+The chain's origin: a skill is a command — invoked by name, args in,
+reports out, effects on state — and a command's caller is owed a
+signature. The Reference chain is that signature written down; an
+agent differs only in context binding, so it shares the shape. The
+chain carries the order the runbook fires its operations in — not with
+full fidelity, because the chain is a collapse of the runbook's program,
+and the fine-grained sequencing it drops stays below the CLOA.
+
+Notation: `[x]` self-owned, `{x}` vendored. The edges:
+
+- **does** — run a behavior some documentation defines: a Standard's verb
+  where one exists, the whole runbook where the doc is the definition.
+- **reads** — consulted, not run.
+- **overrides … with …** — substitute a clause in a runbook that cannot be
+  edited.
+- **writes** — produce or mutate state outside the chain. Write targets
+  are typed `bucket(refinement)`: a fixed coarse bucket — git, GitHub,
+  local file, local cache, scratch — plus an optional free refinement,
+  as in `git(branch)` or `local cache(SQLite)`. The bucket list stays
+  fixed and lintable; the refinement is a memory aid, never a new type.
+  Targets may re-enter the graph as read sources: design writes the
+  brief that build later reads. Scratch writes carry no filenames.
+  The refinement stays machine-readable: a comma-separated sequence of
+  operations — `git(commit, push)` — never prose and never `+`. A
+  target in another repo carries that repo as the refinement's head, so
+  crossing a repo boundary is always visible in a write. How the
+  generator draws it is in
+  [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md#chain-rendering).
+- **args** — the value the caller hands in at invocation. Declared by
+  name alone: the harness substitutes text, so every arg is a string,
+  and a type that applies all the time distinguishes nothing —
+  remembered, not encoded. Never lands in state, dies with the call.
+  Where the name is declared, and what the harness does and does not
+  do with it, is ruled in
+  [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md#the-primitive-map).
+- **reports** — hand a value back to the caller, user and agent alike:
+  ralph-setup reports a launch command to the user, bump-pins reports
+  its status enum to update-standards-pin. Unlike a write, a report never
+  lands in state — it dies with the call. Unlike args, reports are
+  typed as well as named, `report_name: report_type` — a report's type
+  varies, so it carries information — commit reports
+  `outcome: str` — and an enumerable status is preferred, its values
+  listed as a small enum. A reporting runbook declares its report in its
+  own file, so the primitive view renders the declaration instead of a
+  model regenerating it; the declaration format is ruled in
+  [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md#the-primitive-map).
+  The label is the bare third-person form of the skill-prose keyword
+  `Report`, so translation adds an `s` and never swaps a word.
+
+Any edge may carry a **guard** — the condition under which it fires. A
+guarded edge draws dashed and carries its condition; an unguarded edge
+draws solid, and its trailing text is mere annotation. A call inside an
+`if` is still a call edge; the condition never changes the edge's type.
+The drawn form is in
+[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md#chain-rendering).
+
+Its rules:
+
+- **Nodes are typed** by kind (Standard, Agent, Skill, Script) and by
+  ownership — self-owned or vendored. Ownership is a color, not an edge.
+  A node may also carry its permission expression and model pin as node
+  data, quoted verbatim in the harness's own syntax —
+  `allowed-tools: Bash(git *)`, `model: sonnet`, `effort: low` — never
+  paraphrased into prose.
+- **Edges live at the definition site.** An edge belongs to the document
+  whose text contains the instruction — greppable, so the assignment is
+  lintable. A root's effects are the union of edges reachable along its
+  does-path — the same rule as code, where a write belongs to the frame
+  whose source contains the statement.
+- **Tree, then graph.** Each runbook declares its own tree; the union across
+  roots is the repo graph, where in-degree, hubs, and orphans appear. The
+  code parallel is import-linter: a declared dependency contract that
+  fails when reality disagrees. A lint-design candidate to evaluate when
+  the checker is built: the ontology-guardrails idea
+  (`~/workspace/mission-control/ideas/ontology-guardrails.md`) — declared
+  rules enforced by a solver.
+
+The chain absorbs skills as signatures, OKF traces, and the OKF graph —
+one object, several angles.
+
+Remembered, not primitives:
+
+- **Zoom.** A runbook collapses its internal files (containment is derivable
+  from paths — `design/references/` sits under `design/`); zoomed in, they
+  appear as nodes inside the runbook boundary with ordinary edges.
+- **Doc type.** A read target's frontmatter type (Guide, General-Sheet)
+  is noted informally; a type earns a noun only when it demonstrates a
+  verb interface, the way Standard did.
+
+### Accepted residuals
+
+The ledger of residuals ruled on and accepted as-is, one line each, so
+no run raises the same question twice. A construct listed here is real
+but deliberately outside the ontology until a ruling is reversed.
+
+- **Reality probes** — direct shell contact with repo state ("run the
+  gate", "confirm the git tree is clean"). A real operation; ruled not
+  accounted.
+- **Attestation checkpoints** — "report `READ: x`, proceed only after."
+  A prompt device that raises the probability the read happens; ruled
+  not accounted.
+- **Agent-held ephemeral state** — counts and set-aside lists a runbook
+  tracks only in its own working memory, persisted nowhere
+  (judgments-sweep's fix-attempt cap and skip list); ruled not
+  accounted.
+- **User interview loops** — a mid-run, multi-round dialogue with the
+  user (runbook-creator's "iterate until the user is satisfied";
+  grilling's whole body). Conversing is what running in the calling
+  context means; ruled not accounted.
+- **Behavior-mode setting** — a runbook whose body installs standing
+  behavior in the session's ephemeral context and fires no edge at
+  invocation (orchestrate: "everything below you is a subagent").
+  Ruled residual; admitting it later requires a lintable,
+  deterministic form.
+- **Vendored platform manifests** — the `agents/openai.yaml` display
+  card every vendored bundle ships for another agent platform; bundle
+  furniture, referenced by nothing, never an edge.
+- **Presentation gestures** — opening an already-written artifact for
+  the user (improve-codebase-architecture's `xdg-open` on its report);
+  part of reporting the value, never an edge; ruled not accounted.
+- **Phase gates** — a step-scoped prohibition inside a runbook's own
+  program, lifted by a later step (improve-codebase-architecture's "Do
+  NOT propose interfaces yet"); internal sequencing below the CLOA,
+  already covered by the steps-are-the-program rule; ruled not
+  accounted.
+- **Written-artifact semantics** — the schema and state rules of a
+  document a runbook writes and later re-reads: wayfinder's map-body
+  sections, fog lifecycle, HITL/AFK axis, claim-by-assignment, ticket
+  sizing. The artifact's contract lives in the artifact; the chain
+  records only the writes and reads that touch it.
 
 ## The primitive map
 
@@ -409,6 +582,5 @@ Skills:
 
 ## To-do
 
-The plan lives in one place: the
-[branch plan's Now section](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#now).
+The plan lives in one place: the branch plan's Now section.
 This file carries no step list of its own.

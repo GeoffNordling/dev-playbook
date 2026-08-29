@@ -7,7 +7,7 @@ description: Per runbook, what its full rewrite could not express in the edge-en
 # Residual Ledger
 
 Per runbook ported to the
-[Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md) map:
+[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) map:
 what the full rewrite could not express in it, recognized and written
 down at the moment of porting. That is all an entry is — a record, not
 a question awaiting a verdict.
