@@ -1,18 +1,20 @@
 ---
 type: Standard
 title: Working Documentation Sets
-description: How the in-process Markdown files of one work stream are organized as a set — root plan, child edges, single-home facts, ledgers, and local terms
+description: How the in-process Markdown files of one work stream are organized as a set — root plan, member links, single-home facts, worklists, and local terms
 ---
 
 # Working Documentation Sets
 
 A **working documentation set** is the group of Markdown files one stream of
-in-process work accumulates — plans, design notes, ledgers — committed to the
+in-process work accumulates — plans, design notes, records — committed to the
 repo and drained into permanent homes or deleted when the work merges. This
-standard governs the set level: how the files relate to each other. Each
-file's prose answers to the [prose standard](/standards/prose.md); members
-typically carry `type: General-Sheet`, the registry's genre for a working
-document whose type is not yet settled.
+standard governs the set level: how the files relate to each other. What goes
+inside each file is governed by
+[Knowledge Organization](/standards/knowledge-organization.md) and
+[Prose](/standards/prose.md), which an agent reads before it writes one.
+Members typically carry `type: General-Sheet`, the registry's genre for a
+working document whose type is not yet settled.
 
 The `/working-doc-set-deslop` skill sends a set through an agent that
 audits it against this standard and then fixes what the audit finds,
@@ -20,28 +22,27 @@ leaving every edit uncommitted for the user's diff review.
 
 ## Shape
 
-A set is a tree: one root file, and child files reached from it by links.
+A set is a tree: one root file, and every other member reached from it by a
+path of links.
 
-- The root links every member, each with a one-line summary of what it holds.
-- A child holds its own detail and links to the root or a sibling for theirs;
-  restating another member's content is duplication.
-- A working file unreachable from the root is an orphan.
+- The root is the document the work started from — the plan holding the goal.
+- A member links what it depends on: its parent, its children, the sibling
+  whose fact it defers to. The root need not link every member.
+- A working file no path from the root reaches is an orphan.
 
-## Next steps
+Links take the form
+[Cross-References](/standards/knowledge-organization/cross-references.md)
+gives them.
 
-The root holds the set's next steps — current state and what comes next for
-the work as a whole. A child may carry its own to-dos for its own topic;
-work at one level works that level's list. Plan prose is
-edit-in-place and answers to
-[current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only).
+## Worklist
 
-## Ledgers
+Work is one list of items, each a bold name and a short body. An item's state
+is which section it sits in — Planned or Completed — and a completed item
+keeps its shape and moves.
 
-A ledger is an append-only member or section: entries are added as they are
-ruled and never revised. Outcomes — rulings, finished artifacts, accepted
-residuals — go in ledgers rather than plan prose, because append-only text
-stays true without maintenance while edit-in-place text decays wherever
-attention leaves.
+Put the lists where they make sense: one pair for the whole set, or a pair
+per strand where the work splits by level or by function. However it splits,
+a strand has one Planned and one Completed, in one file.
 
 ## One home per fact
 
@@ -53,25 +54,27 @@ across the set.
 ## Buckets
 
 A bucket is a named section role a fact type files under — the single home
-above, made navigable. The set defines its own bucket names; an audit checks
-the set against the names it declares, never against a fixed list. The
-canonical buckets, a suggestion for a fresh set:
+above, made navigable. The list below is a menu: a set uses the buckets its
+work needs, skips the rest, and coins its own where none fits. An audit
+judges placement against the sections the set actually uses; a bucket the set
+does not use is never a finding.
 
 - **Goal** — what the work is for.
 - **Principles** — the judgment calls that guide choices.
 - **Constraints** — the hard bounds the work operates under, distinct from
   principles.
 - **Terms** — see below.
-- **Next steps** — the root's covers the work as a whole, a child's its own
-  topic.
-- **Ledger** — append-only outcomes.
+- **Planned** and **Completed** — the worklist above.
 - **Unfiled** — the escape valve: material fitting no bucket lands here
   explicitly, awaiting triage, instead of being force-fitted or scattered.
 
 ## Terms
 
 A term coined by the work and used in more than one member appears in the
-root's terms bucket with a one-line definition. The bucket is
-exploratory-grade — the settled subset is promoted to `CONTEXT.md` when the
-work completes, per
-[CONTEXT.md Content](/standards/knowledge-organization/context-content.md).
+root's terms bucket with a one-line definition.
+
+## Acronyms
+
+Each member ends with an Acronyms appendix — bare `None.` where the member
+uses none. An acronym is defined once in the set, in the appendix of the
+highest member that uses it; members below use it undefined.

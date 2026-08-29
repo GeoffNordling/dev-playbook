@@ -28,7 +28,7 @@ Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
 |------|------------|
 | `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [tracking/candidates.md](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
-| `General-Sheet` | A deliberately-broad genre for a working loop document whose type is not yet settled — e.g. a live record read on a cadence (a board of declared metrics, a register of selected items). |
+| `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
 | `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
 | `Instrument-Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
