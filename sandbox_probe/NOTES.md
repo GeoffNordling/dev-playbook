@@ -339,10 +339,10 @@ done in the sandbox. If sandboxed runs become the normal way to work, the
 measurement store stops describing the machine.
 
 **Fix direction.** §8 says hooks inside the sandbox should reach the host
-database. The options, the ones already rejected, and what the two live ones
-still need are in
-[Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md).
-Undecided; both live options are additive.
+database. Every option considered, and why all but one are rejected, are in
+[Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md). The
+survivor is a scratch database folded into the host store when the run ends; it
+is additive, and one open test decides whether it works.
 
 Whatever the answer, do not hardcode “sandbox means no hooks.”
 

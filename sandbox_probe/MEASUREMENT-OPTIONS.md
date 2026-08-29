@@ -1,7 +1,7 @@
 ---
 type: Survey
 title: Sandbox measurement options
-description: The options for carrying a sandboxed run's hook events into the host measurement store — what is rejected, and what the two live options still need
+description: The options for carrying a sandboxed run's hook events into the host measurement store — what is rejected and why, and the one option left standing
 ---
 
 # Sandbox measurement options
@@ -11,8 +11,10 @@ defect is described in
 [Sandboxed headless Claude §7.1](/sandbox_probe/NOTES.md#71-the-events-database-is-created-fresh-and-thrown-away);
 this document holds the options for fixing it.
 
-**Undecided.** Two options are still live and need more investigation before a
-choice is made. The rest are recorded so they are not re-argued.
+**One option is left standing** — the post-run dump. One measured finding
+removed its only serious rival on 2026-08-28: SELinux blocks the live handoff
+the rival needed. What remains is a single test that decides whether the
+survivor works at all.
 
 ## The problem in one paragraph
 
@@ -24,6 +26,11 @@ dies when the container is removed. The hook does not fail and does not
 complain — it self-bootstraps, creating the directory and the table on demand
 (`measure-event:118`, `measure-event:42-51`), which is exactly the behaviour
 that makes the loss silent.
+
+The silence has a specific cause worth naming: the sandbox image is built on
+Fedora, so `on_fedora()` (`measure-event:149-166`) — the guard that stops
+capture on machines with no store — returns true inside the container. The hook
+believes it is on the primary and records happily.
 
 ## What the answer has to do
 
@@ -40,68 +47,131 @@ that makes the loss silent.
    on the host. Nothing inside the container runs the factory, so nothing
    inside the container writes `ledger`.
 
+## Where a change would go
+
+Only one function in the hook touches SQLite: `record()`
+(`measure-event:116-128`), thirteen lines. Everything above it — the timestamp,
+the decode, the non-Bash trim, the promoted columns — is storage-agnostic. Any
+option that changes how events are stored changes that one function and nothing
+else.
+
+The hook also refuses configuration on purpose: *no configuration: a hook runs
+on every event of every session, so it may not depend on an interpreter's
+package set or a knob* (`measure-event:22-23`). So an option may not add a
+setting. It must either need no branch at all, or detect its own situation the
+way `on_fedora()` already does.
+
 ## Rejected
 
-**Mount the live store into the container.** Give the container a window onto
-the real `~/.local/share/claude-measure/` folder and let it write into the live
-database as it goes. One line of mount list, and it works. Rejected because it
-puts the only copy of a 181 MB, month-deep database inside the blast radius of
-a confused agent, and because Fedora's file labelling would have to be changed
-on the live database file itself to permit it (the `:Z` or `:z` mount suffix
-re-tags the host path). It also has to be the whole folder, not the one file,
-because SQLite in this mode writes two sidecar files next to the database.
+### Mount the live store into the container
 
-**Copy the events out after the container exits.** Let the run write to the
-container's own filesystem as it does today, then lift the database out with
-`podman cp` before the container is removed. Rejected as fragile: `--rm`
-deletes the container on exit, and a runner killed with `SIGKILL` strands it
+Give the container a window onto the real `~/.local/share/claude-measure/`
+folder and let it write into the live database as it goes. One line of mount
+list, and it works. Rejected because it puts the only copy of a 181 MB,
+month-deep database inside the blast radius of a confused agent, and because
+Fedora's file labelling would have to be changed on the live database file
+itself to permit it (the `:Z` or `:z` mount suffix re-tags the host path). It
+also has to be the whole folder, not the one file, because SQLite in this mode
+writes two sidecar files next to the database.
+
+### Copy the events out after the container exits
+
+Let the run write to the container's own filesystem as it does today, then lift
+the database out with `podman cp` before the container is removed. Rejected as
+fragile: `--rm` deletes the container on exit, and a runner killed with
+`SIGKILL` strands it
 (see [§6.5](/sandbox_probe/NOTES.md#65-kill--9-on-the-runner-strands-the-container)),
 so the one moment the copy has to happen is the moment least likely to arrive.
 
-**Fold rows in continuously during the run.** A host-side process tails the
-container's scratch database while the run is in flight and inserts rows as
-they appear, so events land in near-real time. Rejected: it adds a live process
-and a lifecycle to solve lateness, and the reader constraints below make
-lateness acceptable instead.
+### Fold rows in continuously during the run
 
-## Still open
+A host-side process tails the container's scratch database while the run is in
+flight and inserts rows as they appear, so events land in near-real time.
+Rejected: it adds a live process and a lifecycle to solve lateness, and the
+reader constraints below make lateness acceptable instead.
 
 ### The guarded hole — a host writer the container hands events to
 
-The container never touches the database. A small writer process runs on the
-host, started just before the container and stopped just after — the same
-lifecycle the container already has, no always-on service. The two talk over a
-socket file that we create in a throwaway folder and mount in. The protocol is
-one operation: *here is an event, store it.* No reads, no queries, no
-authentication — being on the other end of the socket is the authorization.
+This was the leading option until it was tested. It is written up at length
+because the reason it fails is not guessable, and re-deriving it costs another
+experiment.
 
-**What it gets right.**
+**The shape.** The container never touches the database. A small writer process
+runs on the host, started just before the container and stopped just after. The
+two talk over a socket file created in a throwaway folder and mounted in. The
+protocol is one operation: *here is an event, store it.* The agent could only
+ever append; it could not delete or corrupt anything, because it never sees the
+file. Sandbox events would enter the real database live, in true order, with
+row IDs from the same sequence as every other event — a future reader would
+never need to know a sandbox existed.
 
-- The agent can only ever append an event. It cannot delete or corrupt the
-  database, because it never sees the file.
-- Nothing real is re-tagged. The only host file the container touches is a
-  socket we made for this run and throw away after, exactly like the credential
-  copy today.
-- **Sandbox events are indistinguishable from host events.** They enter the
-  real database live, in true order, with row IDs from the same sequence as
-  everything else. A future reader never has to know a sandbox exists.
+**Why it does not work.** SELinux refuses the connection. Built and run on
+2026-08-28 against the real `sandbox-probe` image with `--userns=keep-id` and a
+`:Z` mount, the container's connect failed with `PermissionError: [Errno 13]
+Permission denied`, and the audit log gave the reason:
 
-**What it costs.**
+```
+AVC avc: denied { connectto } for comm="python3" path="/tmp/mprobe/measure.sock"
+  scontext=system_u:system_r:container_t:s0:c107,c235
+  tcontext=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+  tclass=unix_stream_socket permissive=0
+```
 
-- **`measure-event` has to change.** Today the hook opens SQLite directly, and
-  it is the same code on the host and in the sandbox — which is what makes a
-  sandboxed run trustworthy as a measurement. Talking to a socket means a
-  second code path, and it is the path that never runs on the host, so it is
-  the one that rots unnoticed. This is the main objection.
-- **A second program has to be right.** What happens when the writer dies
-  mid-run, when the container outruns it, when the container is killed with a
-  message half-written.
-- **The data has a moment where it is nowhere durable.** If the writer dies,
-  events go into a socket with nobody listening, and `measure-event` swallows
-  its own failures and exits 0 by design (`measure-event:16-20`) — so they
-  vanish with nothing said. At this scale that is a shrug, not a
-  disqualification, but it is the opposite failure mode from the other option,
-  where the data sits on disk waiting.
+The re-tag worked perfectly — the socket file came out labelled
+`container_file_t:s0:c107,c235`, matching the container — and it made no
+difference. **For a socket, SELinux does not ask whether the container may
+touch the file. It asks whether the container may talk to the listening
+program.** Our writer would be an ordinary user process (`unconfined_t`), and a
+container may not talk to those. No mount option changes this, because the
+check is not about the mount.
+
+Confirmed by elimination: the identical test with `--security-opt
+label=disable` succeeded and the host received the event. That flag removes the
+container's SELinux confinement wholesale, which is the protection the
+copies-never-originals rule exists to preserve. The only other route is a
+custom SELinux policy module installed as root, granting that permission to
+*every* container on the machine. Both are disproportionate to the goal.
+
+**The named-pipe variant, also rejected.** A named pipe (a FIFO) survives the
+same test — verified working on 2026-08-28 with `:Z` and SELinux enforcing,
+with no denial — because a pipe is a file object, so the mount re-tag grants
+exactly the access needed and no program-to-program check happens. It is
+rejected on its own merits rather than on security:
+
+- **Events can shred each other.** A pipe guarantees an unbroken write only up
+  to 4096 bytes (`PIPE_BUF`). In the live database **8.98% of payloads exceed
+  that** — 6,618 of 73,736 rows, largest 84,457 bytes, 95th percentile 6,846
+  bytes. Hooks are wired `"async": true`, so overlapping writers are normal.
+  Fixable with a lock, but it is one more thing to get right.
+- **It still needs the second program.** The pipe removes the security
+  blocker, not the daemon, its lifecycle, or the question of what happens when
+  it dies mid-run.
+- **A missing reader is a hang.** Opening a FIFO for writing blocks forever
+  with no reader attached. A non-blocking open fails immediately with `ENXIO`
+  instead, so a fast-fail path exists — but it has to be written deliberately.
+
+**One incidental constraint, recorded so it is not rediscovered.** Unix socket
+paths are capped near 108 bytes; the first attempt died on `AF_UNIX path too
+long` from an ordinary scratch path. Any future socket must live somewhere
+short.
+
+### One file per event in a mounted folder
+
+Mount an empty throwaway folder; the hook writes one small file per event into
+it and exits; the host folds the files in after the container is gone. No
+daemon, no socket, no pipe — and none of the problems above.
+
+Rejected because it is the post-run dump with a penalty. It is the same
+"write locally, fold in later" shape, but it requires `record()` to branch on
+whether it is in a sandbox, which is precisely the cost the post-run dump
+avoids by leaving the hook untouched. It buys back nothing the post-run dump
+has not already got.
+
+It is worth remembering for one contingency only: if the open test below shows
+SQLite cannot run correctly on a bind-mounted folder, this shape is the
+fallback, because it needs no database inside the container at all.
+
+## Still open
 
 ### The post-run dump — a scratch database folded in at the end
 
@@ -123,7 +193,8 @@ FROM scratch.events ORDER BY id;
 **What it gets right.**
 
 - **`measure-event` does not change.** No branch, nothing sandbox-only, nothing
-  that can rot. This is the main argument for it.
+  that can rot. This is the main argument for it, and it is the one argument
+  every rejected option above fails to match.
 - **No original is mounted.** The copies rule holds, and the mount list stays
   readable by eye.
 - **The merge runs on the host, as the user, and can fail loud** — unlike the
@@ -181,29 +252,20 @@ speak for the `ledger` table alone rather than for the file both tables share.
 
 ## What still needs finding out
 
-**For the guarded hole:**
+**The test that decides it.** Does SQLite's write-ahead mode actually engage on
+a bind-mounted folder? This is the one way the post-run dump could fail
+outright. `ledger.py` refuses to run when that mode does not take, naming
+container overlay mounts as the case where it fails (`_require_wal()`,
+`ledger.py:343-364`); `measure-event` never checks, so a silent fallback to a
+weaker mode would go unnoticed. If it engages, the post-run dump is the answer.
+If it does not, the fallback is one file per event, above.
 
-- How small can the change to `measure-event` actually be — is there a shape
-  where the socket path is also exercised on the host, so it cannot rot
-  unnoticed?
-- Does mounting a socket into the container really avoid re-tagging anything
-  real? Believed yes, untested.
-- What the writer process does when the container outruns it or when it dies
-  mid-run.
+**Then, if it passes:**
 
-**For the post-run dump:**
-
-- Does SQLite's write-ahead mode actually engage on a bind-mounted folder?
-  `ledger.py` refuses to run when it does not, naming container overlay mounts
-  as the case where it fails; `measure-event` never checks, so a silent
-  fallback would go unnoticed.
 - Does the host-side merge step read the scratch database cleanly given how the
   container creates it — owner, mode, and any leftover sidecar files.
 - Two sandbox runs at once each get their own scratch folder, so there should
   be no contention. Confirm.
-
-**For both:**
-
 - Does the container's clock agree with the host's? The hook stamps UTC
   directly (`measure-event:184`), so a skewed container clock would produce
   syntactically valid but wrong timestamps.
