@@ -23,5 +23,5 @@ live `dotfiles/dot-claude` sources on 2026-08-25.
 - [Encoding](/no-more-slop-branch-working-files/ENCODING.md) — The layer below the Reference chain — the primitive map, the grammar, and the rendering that construct chains from runbook prose
 - [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) — The branch plan — goal, principles, the two tracks, and the current step
 - [Port Prompt](/no-more-slop-branch-working-files/port-prompt.md) — The dispatch prompt for porting one skill or agent to the edge encoding — fill the <PATH> slot and send
-- [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) — The Reference chain, declared — a runbook's behavior and call signature as node types, edges, and rules
+- [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) — The Reference chain, declared — a runbook's behavior and call signature as nodes and edges
 - [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md) — The system-wide record of what the current abstractions cannot express — one section per registry type ruled important
