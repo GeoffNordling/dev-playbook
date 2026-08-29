@@ -30,8 +30,8 @@ rule, the section can stop there. Section size matches topic size.
 
 ### Current state and next steps only
 
-Describe what exists and what's planned next. Don't reference removed things,
-past state, or rejected alternatives.
+A document describes what exists and what's planned next, and doesn't
+reference removed things, past state, or rejected alternatives.
 [Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
 History earns a sentence only when the present is unintelligible without
 it — a constraint that still binds, a decision that still governs.
@@ -51,18 +51,18 @@ sets.
 
 ### Open with purpose
 
-State what the document is for and what a reader should be able to do after
-reading. Say why that matters before the reader thinks to ask. Write for a
-reader with no prior conversation context.
+The opening states what the document is for and what a reader should be able
+to do after reading. It says why that matters before the reader thinks to ask,
+and addresses a reader with no prior conversation context.
 
 ### Declare before use
 
-Define a concept before the prose leans on it — the definition sits above its
-first use. A concept another document defines is linked at first use.
+A concept is defined before the prose leans on it — the definition sits above
+its first use. A concept another document defines is linked at first use.
 
 ### Lead with the edge case when reach is surprising
 
-If a rule has surprising scope, name the edge case in the lede: "These
+A rule with surprising scope names the edge case in the lede: "These
 conventions apply to every Python sub-project, including script-only ones
 with no `src/`."
 
@@ -77,8 +77,8 @@ recur:
   derail the argument inline.
 - **Table vs repeated structure.** The same shape with the same fields three or
   more times is a table; anything fewer or uneven is prose with bold leads.
-- **Quote vs paraphrase.** Quote where the original wording is the point;
-  paraphrase where only the idea is.
+- **Quote vs paraphrase.** The quote goes where the original wording is the
+  point; the paraphrase where only the idea is.
 - **Code block vs inline code.** Multi-line, runnable, or illustrative goes in a
   block; a single token or identifier stays inline.
 
@@ -90,7 +90,7 @@ recur:
 
 ### Positive statement
 
-State rules in the positive: what to do, where a thing lives. "Runnables
+Rules read in the positive: what to do, where a thing lives. "Runnables
 live in `scripts/`", not "don't put runnables elsewhere". A prohibition
 appears only when the prohibition itself is the rule.
 
@@ -105,9 +105,9 @@ agent's mouth, which inverts who is instructing whom. **A declarative
 document** states facts to a reader instead: third person, no `you`.
 
 The ban governs the document's own voice: a double-quoted utterance is exempt.
-Write the phrasing a user types to trigger a skill, or the reaction a
-prototype exists to provoke, in their words — `"Show me a few options before
-I commit."` — and reserve the surrounding prose for the imperative. A
+The phrasing a user types to trigger a skill, or the reaction a prototype
+exists to provoke, appears in their words — `"Show me a few options before
+I commit."` — while the surrounding prose stays imperative. A
 runbook's frontmatter is not exempt: its `description` is prose the agent
 reads to choose the runbook, so it answers to the same voice as the body.
 
@@ -115,7 +115,7 @@ reads to choose the runbook, so it answers to the same voice as the body.
 
 ### Name concepts once, use consistently
 
-Pick one name per concept and use it across the document. The repo's root
+One name per concept holds across the document. The repo's root
 [`CONTEXT.md`](/CONTEXT.md) holds the established vocabulary; a doc uses its
 terms where they apply, with no obligation to extend it.
 
@@ -128,7 +128,7 @@ authored file, never a synonym, in any case, plural, or compound.
 
 ### Spelling
 
-House spelling is American English. Write `judgment`, not `judgement` — and
+House spelling is American English: `judgment`, not `judgement` — and
 `judgments`, not `judgements`.
 
 ### Heading casing
