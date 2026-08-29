@@ -121,8 +121,8 @@ exemplar, worked as the abstraction shape in
 
 The ontology is settled in
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md);
-the encoding design and its parser sit in Encoding, beneath Reference
-Chain. Two items remain:
+the encoding design and its parser sit in Reference Chain Encoding,
+beneath Reference Chain Declaration. Two items remain:
 
 - **Recursion to the bedrock of determinism.** Develop the note: the
   EM loop applies all the way down until the target stops being
@@ -152,7 +152,7 @@ Chain. Two items remain:
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format — braced spans over a fixed keyword lexicon,
   sliced at fixed cut points but never interpreted — designed on a
-  five-runbook covering set in Encoding
+  five-runbook covering set in Reference Chain Encoding
   and proven by `parser/chaingen.py`, which deterministically
   regenerates every covered runbook's chain into `parser/chains.txt` and
   fails on drift via `--check`.
@@ -201,9 +201,10 @@ Chain. Two items remain:
   wrapper once its override retired — was deleted, its callers running
   `/grilling` + `/domain-modeling` directly.
 - **Working-file reorganization.** The branch's working files rebuilt
-  as a tree with one job per file: Reference Chain declares the
-  object, Encoding beneath it is the writer's spec, the Residual
-  Ledger is the one system-wide record, and Port Prompt retired.
+  as a tree with one job per file: Reference Chain Declaration holds
+  the object, Reference Chain Encoding beneath it is the writer's
+  spec, the Residual Ledger is the one system-wide record, and Port
+  Prompt retired.
 
 **Raw ideas, none designed**
 

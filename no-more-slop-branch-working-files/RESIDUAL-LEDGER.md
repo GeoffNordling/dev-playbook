@@ -15,7 +15,7 @@ a record.
 ## Runbooks
 
 Per runbook ported to the
-[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md):
+[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md):
 what the full rewrite could not express, recognized and written down at
 the moment of porting.
 

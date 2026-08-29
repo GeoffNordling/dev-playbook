@@ -1,13 +1,13 @@
 ---
 type: General-Sheet
-title: Encoding
-description: The layer below the Reference chain — the spec a writer follows to encode chain edges in runbook prose
+title: Reference Chain Encoding
+description: The layer below the declaration — the spec a writer follows to encode chain edges in runbook prose
 ---
 
-# Encoding
+# Reference Chain Encoding
 
 The layer below
-[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md):
+[Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md):
 how chain edges are written inside runbook prose, so deterministic
 code can generate every chain. This file is the spec for the writer of
 that prose. The primitive map below is the join between the two

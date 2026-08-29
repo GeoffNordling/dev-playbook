@@ -133,7 +133,7 @@ future repository in the user's imagination.
 The loop is layer-invariant. It ran once at the ontology level — target:
 the documentation corpus; output: the primitives table below — and again
 one level down in
-[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md),
+[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md),
 where the target is skill prose and the output is a grammar. Two adjacent
 runs connect through a map between the lower level's generated primitives
 and the higher level's existing ones, written to a stateful location.
@@ -193,8 +193,8 @@ registries — concept docs and harness files — and its ruling:
 
 | Type | Important? | Ruling |
 |---|---|---|
-| Skill | **Yes** | A runbook — the [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) construction |
-| Agent definition | **Yes** | A runbook — the [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN.md) construction |
+| Skill | **Yes** | A runbook — the [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md) construction |
+| Agent definition | **Yes** | A runbook — the [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md) construction |
 | Standard | **Yes** | The Standard noun — define, audit, enforce, adopt |
 | Standard-Card | **Yes** | Same object as Standard — its catalog surface |
 | Guide | **Yes** | No construction built yet |

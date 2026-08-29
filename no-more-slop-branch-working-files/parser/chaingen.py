@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """chaingen — reconstruct a runbook's Reference chain from its encoded file.
 
-Prototype implementing ENCODING.md's certified transform: slice, never
+Prototype implementing REFERENCE-CHAIN-ENCODING.md's certified transform: slice, never
 interpret. Cut points are the keyword, the markdown
 link(s), the `with` splitter, nested braces, and the first semicolon.
 Everything between cut points is opaque verbatim text. A `#fragment` on a

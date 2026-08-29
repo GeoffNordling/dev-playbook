@@ -1,18 +1,18 @@
 ---
 type: General-Sheet
-title: Reference Chain
-description: The Reference chain, declared — a runbook's behavior and call signature as nodes and edges
+title: Reference Chain Declaration
+description: The Reference chain declared — a runbook's behavior and call signature as nodes and edges
 ---
 
-# Reference Chain
+# Reference Chain Declaration
 
 The **Reference chain** is one CLOA abstraction: the construction
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)
 rules for the runbook family. This file declares the object itself — its
 nodes and its edges. The mechanics that construct a
-chain from runbook prose — the primitive map, the grammar, the
-rendering — sit one layer down in
-[Encoding](/no-more-slop-branch-working-files/ENCODING.md). Same
+chain from runbook prose — the primitive map and the rules for
+writing spans — sit one layer down in
+[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md). Same
 working-file conventions as the branch plan sets out.
 
 ## The chain
@@ -69,9 +69,9 @@ file, scratch — plus an optional parenthetical hint, as in
 aid, never a type.
 
 How each edge is written in runbook prose is ruled in
-[Encoding](/no-more-slop-branch-working-files/ENCODING.md#the-primitive-map),
+[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md#the-primitive-map),
 and how it draws in
-[Encoding](/no-more-slop-branch-working-files/ENCODING.md).
+[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md).
 
 Any edge may carry a **condition** — what must hold for it to fire. A
 conditional edge draws dashed; an unconditional edge draws solid. The
