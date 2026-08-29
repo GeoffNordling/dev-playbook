@@ -16,9 +16,9 @@ inside each file is governed by
 Members typically carry `type: General-Sheet`, the registry's genre for a
 working document whose type is not yet settled.
 
-The `/working-doc-set-deslop` skill sends a set through an agent that
-audits it against this standard and then fixes what the audit finds,
-leaving every edit uncommitted for the user's diff review.
+The `/working-doc-set-deslop` skill audits a set against this standard
+and the prose conventions — an agent per slice — then fixes what the
+audits find, leaving every edit uncommitted for the user's diff review.
 
 ## Speculative voice
 

@@ -1,47 +1,54 @@
 ---
 name: working-doc-set-deslop
-description: Send a working documentation set through an agent that audits it against the working-documentation-sets standard and then fixes the findings, leaving every edit uncommitted for diff review. Use when a set of working docs has drifted and should be cleaned up in one autonomous pass.
-disable-model-invocation: false
-model: sonnet
+description: Audit a working documentation set with agents each assigned a slice of the standards, then fix what they find, leaving every edit uncommitted for diff review.
+disable-model-invocation: true
+model: inherit
 effort: high
 arguments: [set-hint]
 ---
 
 # Working Doc Set Deslop
 
-Audit one working documentation set against
-[Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md)
-and fix what the audit finds, editing in place and committing nothing.
+Audit one working documentation set against the standards and fix what
+the audits find, editing in place and committing nothing. The work runs
+in a fork subagent; the session dispatches and reviews.
 
 ## Target
 
-`set-hint` may name the set: its root file, its directory, or a
-description such as "the no-more-slop working files."
-
-- If `set-hint` is absent, operate on the set most clearly in focus in
-  the current conversation. Where none is, ask which.
-- If `set-hint` is present, resolve it to a root file. Where it
-  matches nothing, ask.
+A set is a collection of working Markdown documents: one root file — the
+plan the work started from — plus the files it links. Audit the set
+`set-hint` names, or the one in focus in the conversation. Where neither
+resolves to a root file, ask.
 
 ## Pre-flight
 
-The target set must be committed and clean: run `git status` and confirm
-no member carries uncommitted changes. Where one does, stop and tell the
-user — the diff review that closes this skill only reads true against a
-clean baseline.
+The target set must be committed and clean — the diff review that closes
+this skill only reads true against a clean baseline. Run `git status`;
+where a member carries uncommitted changes, commit them first.
 
 ## Dispatch
 
-{Launch the [set-deslopper](~/.claude/agents/set-deslopper.md) subagent,
-`model: opus`}, naming the working directory and the set's root file in
-the prompt.
+{Launch a fork subagent (`subagent_type: "fork"`) — it inherits this
+conversation and the session model, the model that wrote the set}. A
+fork reads no agent definition on its own, so construct its launch
+prompt from three things:
+
+1. The working directory.
+2. The set's root file.
+3. The instruction to read
+   [working-doc-set-deslopper](~/.claude/agents/working-doc-set-deslopper.md)
+   and carry out its procedure.
+
+For example: "Working directory: `<worktree path>`. The set's root file
+is `<root file path>`. Read `~/.claude/agents/working-doc-set-deslopper.md`
+and carry out its procedure."
 
 {Never {Commit}}.
 
 ## Review
 
-The subagent edits the set in place and replies with a minimal report of
-what it did. Relay the report, then read the working-tree diff yourself —
-every deletion is visible in it — and give the user your own view. The
-user rules on the edit as a whole: accepted, commit; rejected, restore
-the set's files to `HEAD`.
+The fork agent edits the set in place and replies with its report. Relay the
+report, then read the working-tree diff yourself — every deletion is
+visible in it — and give the user your own view. The user rules on the
+edit as a whole: accepted, commit; rejected, restore the set's files to
+`HEAD`.
