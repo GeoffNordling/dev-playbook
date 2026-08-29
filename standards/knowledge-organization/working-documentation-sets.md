@@ -20,6 +20,17 @@ The `/working-doc-set-deslop` skill sends a set through an agent that
 audits it against this standard and then fixes what the audit finds,
 leaving every edit uncommitted for the user's diff review.
 
+## Speculative voice
+
+A working set records work in progress, so it is exempt from the prose
+conventions'
+[declarative present tense](/standards/prose/conventions.md#declarative-present-tense)
+and
+[current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only):
+a guess is written as a guess, an open question sits beside its topic, and
+Completed keeps what is done. The root declares the set works this way;
+members inherit it.
+
 ## Shape
 
 A set is a tree: one root file, and every other member reached from it by a

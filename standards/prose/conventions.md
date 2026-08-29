@@ -23,6 +23,9 @@ single-concern documents with an `index.md`, per the
 [OKF SPEC](/standards/references/okf-spec.md). A reader crawling for one
 answer loads one small file.
 
+A subject with layers may split by layer, each file named for the layer it
+holds.
+
 ### One rule, one place
 
 Each rule lives in the lead sentence of its section. If the lead carries the
