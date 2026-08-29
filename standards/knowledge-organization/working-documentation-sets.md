@@ -22,14 +22,12 @@ leaving every edit uncommitted for the user's diff review.
 
 ## Speculative voice
 
-A working set records work in progress, so it is exempt from the prose
-conventions'
-[declarative present tense](/standards/prose/conventions.md#declarative-present-tense)
-and
-[current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only):
-a guess is written as a guess, an open question sits beside its topic, and
-Completed keeps what is done. The root declares the set works this way;
-members inherit it.
+A working set records work in progress, so it may say things it is not sure
+of: a guess is written as a guess, and an open question sits beside its
+topic. That is the whole exemption from the prose conventions'
+[declarative present tense](/standards/prose/conventions.md#declarative-present-tense).
+[Current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)
+still binds. The root declares the set works this way; members inherit it.
 
 ## Shape
 
