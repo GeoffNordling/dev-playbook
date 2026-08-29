@@ -31,8 +31,8 @@ From inside the worktree:
 git status --porcelain
 ```
 
-It must print nothing. Any output is uncommitted work — stop and show
-the user.
+It must print nothing — any output is uncommitted work. {If it prints
+anything, {report the output} and stop}.
 
 ## 2. Refresh `origin/main`
 
@@ -53,7 +53,8 @@ git diff --stat origin/main HEAD
 are byte-identical, so removing the branch cannot lose anything.
 
 If it prints anything, main has moved on since the merge — or the work
-never landed. Get the exact answer:
+never landed. Get the exact answer — {Read from GitHub the merged PR for
+the branch, compared with the local `HEAD`}:
 
 ```
 gh pr list --head <branch> --state merged --json number,headRefOid
@@ -61,8 +62,8 @@ git rev-parse HEAD
 ```
 
 Same SHA in both: every commit on the branch is inside that merged PR,
-so proceed. Different SHAs, or an empty PR list: **stop**, and show the
-user both outputs.
+so proceed. {If the SHAs differ, or the PR list is empty, {report both
+outputs} and stop}.
 
 ## 4. Remove the worktree and branch — one call
 
@@ -87,4 +88,4 @@ Fast-forward it onto the main you fetched in step 2:
 git merge --ff-only origin/main && git log --oneline -1
 ```
 
-Report one line: worktree and branch removed, main at that commit.
+{Report one line: worktree and branch removed, main at that commit}.

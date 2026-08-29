@@ -20,7 +20,6 @@ from collections.abc import Iterator
 from pathlib import Path, PurePosixPath
 
 from dev_playbook import gitrepo
-from dev_playbook.external import is_externally_managed
 
 # A CommonMark code fence: a run of three or more backticks or tildes, group 1,
 # followed by group 2's info string (empty on a closing fence). Capturing the
@@ -62,6 +61,9 @@ SLUG_WHITESPACE = re.compile(r"\s")
 # Citation form even for same-repo targets, per the cross-reference standard.
 # classify() spells these names out again; add a fourth segment in both places.
 ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
+
+# The one file the harness injects by name rather than by directory.
+INJECTED_CONTEXT_FILE = "CLAUDE.md"
 
 
 class UnclosedFence(ValueError):
@@ -218,6 +220,26 @@ def has_fixed_repo_root(relpath: str) -> bool:
     return not (ROOTLESS_SEGMENTS & set(PurePosixPath(relpath).parts))
 
 
+def is_agent_instruction(relpath: str) -> bool:
+    """True for a harness-loaded agent instruction file — a runbook or context member.
+
+    The set the agent-facing voice rule governs (prose/conventions.md — Voice,
+    person of address): every ``CLAUDE.md`` at any depth, plus every file under a
+    skills, rules, or agents root. Scope is stated once here rather than in each
+    detector that needs it.
+
+    Membership is decided by :data:`ROOTLESS_SEGMENTS` at any depth, the same
+    roster and the same at-any-depth test :func:`has_fixed_repo_root` uses — so a
+    path that ships into ``~/.claude`` for the citation rule is agent-facing for
+    the voice rule too, and ``dotfiles/dot-claude/skills/...`` and a consumer's
+    ``.claude/skills/...`` answer alike.
+    """
+    parts = PurePosixPath(relpath).parts
+    if parts[-1] == INJECTED_CONTEXT_FILE:
+        return True
+    return bool(ROOTLESS_SEGMENTS & set(parts[:-1]))
+
+
 def classify(relpath: str) -> str:
     """Classify a repo-relative path within the OKF bundle taxonomy.
 
@@ -225,9 +247,7 @@ def classify(relpath: str) -> str:
 
     - ``"excluded"`` — out of the bundle entirely: the transient ``PLAN.md``
       and ``PROGRESS.md`` (ralph-loop plan/progress pair), the root ``tmp/``
-      scratch tree, the ``.git`` directory, and anything under an
-      externally-managed vendored tree (the shared dev_playbook.external
-      registry, currently ``dotfiles/.agents``).
+      scratch tree, and the ``.git`` directory.
     - ``"index"`` — a directory listing (``index.md``): typeless, validated as
       an index rather than as a concept document.
     - ``"concept"`` — a prose concept document that carries OKF frontmatter and
@@ -235,14 +255,12 @@ def classify(relpath: str) -> str:
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
       ``references/``/``scripts/``, ``agents/``, ``rules/``, every top-level
-      ``tests/`` tree
-      (parser fixtures — tool-consumed, often deliberately malformed; see the
-      tests-tree boundary in standards/docs/bundle.md), and every non-``.md``
-      file.
+      ``tests/`` tree (fixture data a test consumes, held to no doc
+      standard), and every non-``.md`` file.
 
-    The concept/harness split mirrors the bundle boundary in the docs
+    The concept/harness split mirrors the file roles in the docs
     standard and the Claude Code file registry
-    (standards/claude-code/files.md); keep them in step.
+    (standards/harness/files.md); keep them in step.
     """
     parts = PurePosixPath(relpath).parts
     name = parts[-1]
@@ -252,7 +270,7 @@ def classify(relpath: str) -> str:
         return "excluded"
     if parts[0] == "tmp":
         return "excluded"
-    if ".git" in parts or is_externally_managed(relpath):
+    if ".git" in parts:
         return "excluded"
     if parts[0] == "tests":
         return "harness"

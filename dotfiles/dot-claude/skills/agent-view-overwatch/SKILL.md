@@ -15,10 +15,11 @@ Refer to each issue by a fixed handle — `<repo>#<N>`, the full repo name and i
 
 ## Read first
 
-Before doing anything else, read end-to-end — the software factory is your subject:
+Before doing anything else, the software factory is your subject:
 
-- [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md) — the node graph and the states an issue moves through.
-- [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md) — the two overwatch scopes, readiness, and the worktree contract whose teardown step is yours.
+{Read [software-factory.md](~/workspace/dev-playbook/software-factory/software-factory.md); the node graph and the states an issue moves through}.
+
+{Read [factory-operations.md](~/workspace/dev-playbook/software-factory/factory-operations.md); the two overwatch scopes, readiness, and the worktree contract whose teardown step is yours}.
 
 Then report: `READ: software-factory.md, factory-operations.md`. Proceed only after.
 
@@ -26,7 +27,7 @@ Then report: `READ: software-factory.md, factory-operations.md`. Proceed only af
 
 When you hand the user a launch command, state it once, clearly, in paste-safe single-line form, then assume it ran and move the board forward. Don't track whether a launch executed, don't re-surface it on a later turn, and don't ask "did you run it?" The trust is bounded: a merge stays open until the user says it merged; teardown waits for the user's word.
 
-1. **Read state.** Labels for the phase: `gh issue view <N> --json labels --jq '.labels[].name'`. Track position — don't read the body. Then look up the issue's PR for the board's PR column, keyed on the fleet's `issue-<N>` branch convention: `gh pr list --head issue-<N> --state open --json number --jq '.[0].number // empty'` — a number if a PR is open, blank if none. With several issues in flight, check each with its own `gh` call, run in parallel — never a `for`-loop over the issues. Think of each as a row `<repo>#<N> · <phase>`.
+1. **Read state.** {Read from GitHub the labels for the phase; `gh issue view <N> --json labels --jq '.labels[].name'` — track position, don't read the body}. Then {Read from GitHub the issue's PR for the board's PR column; keyed on the fleet's `issue-<N>` branch convention — `gh pr list --head issue-<N> --state open --json number --jq '.[0].number // empty'`, a number if a PR is open, blank if none}. With several issues in flight, check each with its own `gh` call, run in parallel — never a `for`-loop over the issues. Think of each as a row `<repo>#<N> · <phase>`.
 
    **Only run this on an explicit ask.** These `gh` calls fire on first contact with an issue, or when the user explicitly asks you to look something up (check labels, check the PR, refresh state). A bare "show the board" mid-session is not that ask — it means render from what you already know: prior lookups this conversation, plus whatever the user has told you directly (an issue closed, opened, blocked, unblocked). The user tracks issue state and reports it to you; do not go re-query the API to second-guess them.
 2. **Recommend the next launch.** An issue is launchable when it is unblocked per factory-operations.md's readiness rule **and** its `phase:*` sits in the factory region — a definition-phase issue is not launchable, per the [factory-nodes-only rule](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch); it waits on the user running its definition skill. Among the launchable, recommend what to launch next and say why — dependency order, a verdict waiting, work going stale.

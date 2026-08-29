@@ -85,7 +85,7 @@ from dev_playbook import md  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit, namespaced by the card whose questions
-# they answer: `docs.*` for the knowledge-organization card (frontmatter and
+# they answer: `knowledge-organization.*` for that card (frontmatter and
 # index freshness) and `instrument.*` for the instruments card (the Employed-by
 # rule). Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
@@ -118,7 +118,7 @@ RULES = (
     EMPLOYED_BY,
 )
 
-REGISTRY_DOC = "standards/docs/document-types.md"
+REGISTRY_DOC = "standards/knowledge-organization/document-types.md"
 # The canonical consumer template — the file that puts the audited tree in APEX
 # mode. Only dev-playbook (or a fixture simulating it) hosts this template;
 # consumers copy *from* it and never carry it. Keying apex mode on it rather than

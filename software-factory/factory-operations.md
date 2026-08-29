@@ -100,12 +100,15 @@ Canonical front-matter and syntax:
 
 ## Engagement
 
-A node engages the user in one of these ways — the terms are fixed in
-[the vocabulary](/CONTEXT.md):
+A node engages the user in one of two ways:
 
-- **AFK** — the node runs hands-off and reports. The user sees only the report.
+- **AFK** — the node runs hands-off and reports; the user sees only the
+  report. No user is attached, so the node runs to completion or escalates —
+  it never waits. Substrate does not decide it: a delegated subagent and a
+  headless `claude -p` process are both AFK.
 - **Inline** — a session runs the node at its own main loop, with the user
-  present in the terminal.
+  present in the terminal, free to interview, gate on the answers, and hand
+  back mid-task.
 
 A review node (a diamond) is several AFK runs followed by a verdict the script
 computes from what they left on the pull request, within the one node.
@@ -169,7 +172,7 @@ session does with an escalation is
 
 It binds no factory node. Every node the traverse launches — the reviews
 included — is a headless process ending on the report envelope above. A helper
-invoked inside a node (`/commit`, `/grill-with-docs`) is not a node and is never
+invoked inside a node (`/commit`, `/grilling`) is not a node and is never
 dispatched.
 
 **Escalation is terminal, and retries are the caller's.** A traverse never runs a
@@ -275,7 +278,7 @@ in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-au
   tree. The rule is per-phase, not per-commit: individual commits are already
   covered by the commit gate's hook suite.
 - **Judgments sit outside every node.** `make check` leaves the semantic
-  [cache gate](/standards/judgments/cache-gate.md) skipped, and no node arms it
+  [cache gate](/standards/semantic-validation/cache-gate.md) skipped, and no node arms it
   or runs a judge — judgments are settled by the periodic sweep, outside the
   factory. For a **review** skill the exclusion is total: the
   `judgments/*.yaml` declarations are outside its jurisdiction

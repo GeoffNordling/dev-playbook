@@ -6,7 +6,7 @@
 # misrepresents what its targets do. Evidence is the card under trial; reference
 # is standards/standard/format.md (the card contract) plus the artifacts the
 # card points at. One judgment per card -- semantic honesty the deterministic
-# standards-lint cannot check. See standards/judgments/.
+# standards-lint cannot check. See standards/semantic-validation/.
 judgments:
   - id: standard-card-build
     claim: |
@@ -44,24 +44,23 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-claude-code
+  - id: standard-card-harness
     claim: |
-      standards/claude-code.md is an honest card: every pointer in its
+      standards/harness.md is an honest card: every pointer in its
       define, audit, enforce, and adopt cells names a real artifact that
       genuinely serves that cell's role for the Claude Code harness-files
       standard, and no cell misrepresents what its targets do.
-    evidence:  [standards/claude-code.md]
+    evidence:  [standards/harness.md]
     reference:
       - standards/standard/format.md
-      - standards/claude-code/index.md
-      - standards/claude-code/files.md
-      - standards/claude-code/claude-content.md
-      - standards/claude-code/skill-conventions.md
-      - standards/claude-code/skill-management.md
-      - dotfiles/.agents/skills/writing-for-agents/SKILL.md
-      - scripts/repo-lint
-      - scripts/skill-lint
-      - judgments/claude-code.yaml
+      - standards/harness/index.md
+      - standards/harness/files.md
+      - standards/harness/claude-content.md
+      - standards/harness/runbook-conventions.md
+      - standards/harness/writing-for-agents.md
+      - scripts/harness-files-lint
+      - scripts/prose-lint
+      - judgments/harness.yaml
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
     effort: high
@@ -75,7 +74,7 @@ judgments:
     evidence:  [standards/knowledge-organization.md]
     reference:
       - standards/standard/format.md
-      - standards/docs/index.md
+      - standards/knowledge-organization/index.md
       - scripts/okf-lint
       - scripts/ref-lint
       - scripts/repo-lint
@@ -92,9 +91,9 @@ judgments:
     evidence:  [standards/semantic-validation.md]
     reference:
       - standards/standard/format.md
-      - standards/judgments/index.md
-      - standards/judgments/cache-gate.md
-      - standards/judgments/consuming.md
+      - standards/semantic-validation/index.md
+      - standards/semantic-validation/cache-gate.md
+      - standards/semantic-validation/consuming.md
       - scripts/judgments-lint
       - scripts/judgments-run
       - standards/build/canonical/.pre-commit-config.yaml
@@ -111,6 +110,8 @@ judgments:
     reference:
       - standards/standard/format.md
       - standards/prose/conventions.md
+      - scripts/prose-lint
+      - standards/harness.md
     model: claude-sonnet-5
     effort: high
 
@@ -221,20 +222,6 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-legibility
-    claim: |
-      standards/legibility.md is an honest card: its define cell points at
-      the instrument specs that genuinely answer how a user understands a
-      large system without reading it, its empty cells are truly empty,
-      and no cell misrepresents what its targets do.
-    evidence:  [standards/legibility.md]
-    reference:
-      - standards/standard/format.md
-      - instruments/datasheet.md
-      - instruments/file-graph.md
-    model: claude-sonnet-5
-    effort: high
-
   - id: standard-card-modules
     claim: |
       standards/modules.md is an honest card: every pointer in its define,
@@ -245,8 +232,8 @@ judgments:
     evidence:  [standards/modules.md]
     reference:
       - standards/standard/format.md
-      - dotfiles/.agents/skills/codebase-design/SKILL.md
-      - dotfiles/.agents/skills/improve-codebase-architecture/SKILL.md
+      - standards/modules/design.md
+      - dotfiles/dot-claude/skills/improve-codebase-architecture/SKILL.md
     model: claude-sonnet-5
     effort: high
 

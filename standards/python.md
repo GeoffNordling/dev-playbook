@@ -1,12 +1,13 @@
 ---
 type: Standard-Card
 title: Python
-description: Card for the Python standard — how Python source code is written
+description: Governs how Python source code is written — language conventions and the anti-pattern catalog
 ---
 
 # Python
 
-Governs how Python source code is written.
+Governs how Python source code is written — language conventions and the
+anti-pattern catalog.
 
 ## Define
 

@@ -1,7 +1,7 @@
 ---
 type: Standard-Card
 title: Instruments
-description: Card for the instrument standard — how purpose-built devices are specified and kept conformant
+description: Governs how purpose-built devices — artifact formats with tooling — are specified and kept conformant
 ---
 
 # Instruments

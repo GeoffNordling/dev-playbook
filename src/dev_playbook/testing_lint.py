@@ -41,7 +41,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dev_playbook import pyast
-from dev_playbook.external import is_externally_managed
 from dev_playbook.findings import print_rules, render
 
 # Every rule id this detector can emit, namespaced by the testing card whose
@@ -56,9 +55,7 @@ RULES = (NO_PRIVATE_ACCESS, MIRROR_LAYOUT, NO_LOGIC)
 
 # git ls-files already drops gitignored caches; this name filter also covers the
 # rare tracked copy. A test file is scanned when none of its parent directory
-# names is in this set and it is not in an externally-managed tree (that skip is
-# the shared dev_playbook.external registry, adopted here to close the drift with
-# python-lint and md.classify).
+# names is in this set.
 _CACHES = frozenset(
     {
         ".git",
@@ -344,7 +341,7 @@ def scan_file(path: Path, root: Path, mirrors: dict[str, set[str]]) -> list[Find
     dir_parts = set(Path(rel).parts[:-1])
     if not (path.name.startswith("test_") and path.suffix == ".py"):
         return []
-    if _CACHES & dir_parts or is_externally_managed(rel):
+    if _CACHES & dir_parts:
         return []
     findings: list[Finding] = []
     findings.extend(check_mirror_layout(rel, mirrors))

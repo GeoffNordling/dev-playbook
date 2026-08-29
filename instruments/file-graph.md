@@ -42,24 +42,22 @@ The caller supplies the repository root. Optionally:
 
 | Bucket | Test |
 |---|---|
-| `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([bundle.md](/standards/docs/bundle.md)) |
+| `concept` | prose `.md` carrying OKF frontmatter — the type-lint set ([file-roles.md](/standards/knowledge-organization/file-roles.md)) |
 | `index` | an `index.md` directory listing |
 | `harness-session` | markdown injected into agent context at session start: `CLAUDE.md` at any level, `rules/*.md` |
-| `harness-skill-authored` | a first-party skill bundle member — `SKILL.md` plus everything in its skill directory |
-| `harness-skill-thirdparty` | anything under an externally-managed install tree (`.agents/`) |
+| `harness-skill` | a skill bundle member — `SKILL.md` plus everything in its skill directory |
 | `reading` | an instrument's output artifact under `readings/` |
 | `code` | a file run as code: `*.py`, `*.sh`, `*.js`, executables, hooks |
 | `config` | a file read as configuration: settings, manifests, lockfiles, canonical templates |
 | `unclassified` | the residual that guarantees totality; a nonzero count is a finding |
 
-The three `harness-` buckets are one family — files the Claude Code
-harness loads into agent context — subdivided by origin and load time:
-injected every session, versus loaded on skill invocation from first-party
-or third-party trees.
+The two `harness-` buckets are one family — files the Claude Code
+harness loads into agent context — subdivided by load time:
+injected every session, versus loaded on skill invocation.
 
 The bucket tests follow the concept/harness boundary
-([bundle.md](/standards/docs/bundle.md)) and the harness-file registry
-([files.md](/standards/claude-code/files.md)); the reference encoding is
+([file-roles.md](/standards/knowledge-organization/file-roles.md)) and the harness-file registry
+([files.md](/standards/harness/files.md)); the reference encoding is
 `classify()` in [md.py](/src/dev_playbook/md.py).
 
 ## Edge accounting
@@ -71,9 +69,9 @@ not edges.
 
 | Form | Detection |
 |---|---|
-| `link` | root-absolute markdown link, per [cross-references.md](/standards/docs/cross-references.md) |
+| `link` | root-absolute markdown link, per [cross-references.md](/standards/knowledge-organization/cross-references.md) |
 | `citation` | `~/workspace/…` reference, in-link or bare |
-| `resource` | frontmatter `resource:` pointer ([document-types.md](/standards/docs/document-types.md)) |
+| `resource` | frontmatter `resource:` pointer ([document-types.md](/standards/knowledge-organization/document-types.md)) |
 | `relative` | relative markdown link — outside the reference grammar, still an edge |
 | `prose-path` | a path-shaped token in markdown that the grammar treats as prose — inline code spans, fenced blocks — resolving to an in-scope file |
 | `code-ref` | a path-shaped token in a non-markdown file that resolves to an in-scope file |
@@ -123,7 +121,6 @@ repository until someone rebuilds them.
 
 ## Employed by
 
-[System Legibility](/standards/legibility.md) — the standard whose Define cell
-claims the file graph as its answer to how a reader sees the connectivity of a
-repository without crawling it in full. File graphs are rebuilt on demand;
-System Legibility sets no cadence.
+No standard. The file graph answers how a reader sees the connectivity of a
+repository without crawling it in full, but no card claims it today. File
+graphs are rebuilt on demand, on no cadence.

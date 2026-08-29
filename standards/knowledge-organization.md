@@ -1,18 +1,18 @@
 ---
 type: Standard-Card
 title: Knowledge Organization
-description: Card for the knowledge-organization standard — how knowledge is organized in markdown
+description: Governs how knowledge is organized in markdown — file roles, document types, indexes, cross-references, and working documentation sets
 ---
 
 # Knowledge Organization
 
-Governs how knowledge is organized in markdown — the bundle, document
-types, indexes, and cross-references.
+Governs how knowledge is organized in markdown — file roles, document
+types, indexes, cross-references, and working documentation sets.
 
 ## Define
 
-- [standards/docs/](/standards/docs/index.md) — the contract, one concern
-  per document; start at The OKF Bundle
+- [standards/knowledge-organization/](/standards/knowledge-organization/index.md) — the contract, one concern
+  per document; start at File Roles
 
 ## Audit
 
@@ -21,6 +21,8 @@ types, indexes, and cross-references.
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
 - [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)
+- /working-doc-set-deslop — audit and then fix a working documentation
+  set, the edits left uncommitted for diff review
 
 ## Enforce
 

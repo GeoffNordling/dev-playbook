@@ -4,35 +4,41 @@ description: Prepare a limited conversation rewind, compressing the discarded tu
 disable-model-invocation: true
 model: opus
 effort: medium
-argument-hint: "<rewind target>"
+arguments: [target]
 ---
 
 # Rewind Compact
 
-Long tangential explorations (document polishing, design iteration, prototyping, etc.) can consume many turns whose outcome is fully captured on disk. Rewinding past them compacts the context — but past-self has no memory of what happened after the rewind target. This skill produces a concise "Tangential compaction summary" that the user pastes in after rewinding, bringing past-self up to date.
-
-The **rewind target** is the **user-typed message** the user wants to return to — the turn that initiated the tangent. `/rewind` offers only user-typed messages as checkpoints. Picking one rewinds the conversation to the state *just before that message was sent*: the target and everything after it are discarded, so whatever is worth keeping from that stretch travels in the summary the user pastes back in.
-
 ## Procedure
 
-1. **Confirm the rewind target.** Scan backward to find the turn matching `$ARGUMENTS`, which is a semantic description of the point the user wants to rewind to.
+1. **Confirm the rewind target** — the user-typed message the user wants
+   to return to, the turn that initiated the tangent. `/rewind` offers
+   only user-typed messages as checkpoints, and rewinds the conversation
+   to the state *just before* the chosen message was sent: the target and
+   everything after it are discarded. Scan backward for the turn `target`
+   describes.
 
-2. **Commit all uncommitted work.**
-   - Use /commit and label the commit as a /rewind-compact point.
+2. {Run [/commit](~/.claude/skills/commit/SKILL.md)} and label the commit
+   as a /rewind-compact point.
 
 3. **Inventory state-on-disk changes** between the rewind target and now:
    - Files written or edited (list paths).
    - Commits made (note IDs and branches).
    - Other persistent artifacts (GitHub issues, PRs).
 
-4. **Inventory in-conversation information** between the rewind target and now:
+4. **Inventory in-conversation information** between the rewind target and
+   now:
    - Instructions, decisions, side notes, insights, asides.
-   - Include only what can't be recovered by re-reading the committed files.
-   - Prepare to summarize this information concisely, keeping the important ideas and dropping the rest.
+   - Include only what can't be recovered by re-reading the committed
+     files.
+   - Prepare to summarize this information concisely, keeping the
+     important ideas and dropping the rest.
 
-5. **Output the artifacts**:
-   1. The "Tangential compaction summary" inside a fenced code block (so the user can copy it verbatim and paste it after they invoke `/rewind`).
-   2. The verbatim text of the **rewind target** — the message the user selects in `/rewind`. Label it `**Your /rewind selection target:**` and present it as a blockquote.
+5. {Report the Tangential compaction summary; inside a fenced code block,
+   so the user can copy it verbatim and paste it after invoking
+   `/rewind`} and {Report the verbatim text of the rewind target;
+   labelled `**Your /rewind selection target:**` and presented as a
+   blockquote}.
 
 ## Output format
 

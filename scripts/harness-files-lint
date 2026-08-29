@@ -1,0 +1,682 @@
+#!/usr/bin/env -S uv run --script
+"""Audit the harness files a repo authors against their content standards.
+
+The detector for the registry members that carry a content standard
+(standards/harness/files.md): the runbooks — skills and agents — against
+runbook-conventions.md, and the global CLAUDE.md source against
+claude-content.md. Their voice is not checked here; the first-person ban is one
+rule over all authored text and lives with prose-lint.
+
+Two skill roots and two agent roots are checked when present in the target
+directory:
+
+  - .claude/skills/                (project-level skills, any repo)
+  - dotfiles/dot-claude/skills/    (workspace-global skills, dev-playbook only)
+  - .claude/agents/                (project-level agents, any repo)
+  - dotfiles/dot-claude/agents/    (workspace-global agents, dev-playbook only)
+
+Skills whose bundle directory is a symlink are skipped — a symlinked bundle
+belongs to whatever manages its target. Dot-directories under a skill root are
+harness scratch, not bundles, and are not discovered at all. The same
+invocation is safe in any repo: with no runbook roots there is nothing to
+scan.
+
+The two global-CLAUDE.md rules are gated the same way, on the presence of
+dotfiles/dot-claude/CLAUDE.md — dev-playbook authors that file, and no other
+repo has one.
+
+Output:
+    stdout — one finding per line, `file: harness.rule message`.
+    stderr — non-failing advisories (body length) and one summary line.
+    exit   — 0 clean, 1 findings, 2 error state (an agents tree without its
+             mirror, or a directory under a skill root with no SKILL.md).
+
+Usage:
+    harness-files-lint [directory]
+    harness-files-lint --list-rules
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml"]
+# ///
+
+import argparse
+import re
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook import md  # noqa: E402
+from dev_playbook.findings import print_rules, render  # noqa: E402
+
+# Every rule id this detector can emit — the runbook conventions live under
+# the harness card. body-length is not here: it is a non-failing stderr
+# advisory, not a finding. Each id is a module-level constant so every
+# emission site references the constant, never a raw literal, and RULES (what
+# --list-rules prints) cannot drift from what the detector actually emits.
+PARSE = "harness.parse"
+FRONT_MATTER = "harness.front-matter"
+REQUIRED_FIELD = "harness.required-field"
+NAME_MATCH = "harness.name-match"
+NAME_FORMAT = "harness.name-format"
+DESCRIPTION_TYPE = "harness.description-type"
+DESCRIPTION_LENGTH = "harness.description-length"
+DESCRIPTION_SENTENCES = "harness.description-sentences"
+DESCRIPTION_TRIGGER = "harness.description-trigger"
+UNKNOWN_FIELD = "harness.unknown-field"
+MODEL_VALUE = "harness.model-value"
+EFFORT_VALUE = "harness.effort-value"
+DMI_TYPE = "harness.dmi-type"
+ARGUMENTS_FORMAT = "harness.arguments-format"
+TOOLS_FORMAT = "harness.tools-format"
+BODY_H1 = "harness.body-h1"
+REFERENCES_DEPTH = "harness.references-depth"
+GLOBAL_CLAUDE_SHAPE = "harness.global-claude-shape"
+GLOBAL_CLAUDE_RULES = "harness.global-claude-rules"
+
+RULES = (
+    PARSE,
+    FRONT_MATTER,
+    REQUIRED_FIELD,
+    NAME_MATCH,
+    NAME_FORMAT,
+    DESCRIPTION_TYPE,
+    DESCRIPTION_LENGTH,
+    DESCRIPTION_SENTENCES,
+    DESCRIPTION_TRIGGER,
+    UNKNOWN_FIELD,
+    MODEL_VALUE,
+    EFFORT_VALUE,
+    DMI_TYPE,
+    ARGUMENTS_FORMAT,
+    TOOLS_FORMAT,
+    BODY_H1,
+    REFERENCES_DEPTH,
+    GLOBAL_CLAUDE_SHAPE,
+    GLOBAL_CLAUDE_RULES,
+)
+
+# Each kind's front matter vocabulary is closed: these fields and nothing
+# else. Adopting a new one starts with an edit to runbook-conventions.md,
+# before its first use.
+SKILL_REQUIRED_FIELDS = (
+    "name",
+    "description",
+    "disable-model-invocation",
+    "model",
+    "effort",
+)
+SKILL_OPTIONAL_FIELDS = ("allowed-tools", "disallowed-tools", "arguments")
+SKILL_FIELDS = SKILL_REQUIRED_FIELDS + SKILL_OPTIONAL_FIELDS
+AGENT_REQUIRED_FIELDS = ("name", "description", "model", "effort")
+AGENT_OPTIONAL_FIELDS = ("tools",)
+AGENT_FIELDS = AGENT_REQUIRED_FIELDS + AGENT_OPTIONAL_FIELDS
+VALID_MODELS = ("haiku", "sonnet", "opus", "fable", "inherit")
+VALID_EFFORTS = ("low", "medium", "high", "xhigh")
+KEBAB_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+# A sentence ends at . ! or ? — optionally followed by closing quotes or
+# brackets — when whitespace or the end of the string follows. Deliberately
+# dumb: no abbreviation list, no semantic analysis, so an author can predict it.
+SENTENCE_END_RE = re.compile(r"""[.!?]["')\]]*(?:\s+|$)""")
+DESCRIPTION_MAX = 1024
+MODEL_INVOKED_SENTENCES = 2
+USER_INVOKED_SENTENCES = 1
+TRIGGER_PREFIX = "Use when"
+BODY_MAX_LINES = 500
+
+# The dev-playbook global CLAUDE.md source, Stow-symlinked to ~/.claude/. Its
+# presence is the marker that gates the global-file checks to the one repo that
+# owns the file (claude-content.md — The global file).
+GLOBAL_CLAUDE = "dotfiles/dot-claude/CLAUDE.md"
+# The global file's two buckets, in order: dispositional stances, then
+# operating rules for named situations.
+GLOBAL_CLAUDE_SECTIONS = ("## Principles", "## Behaviors")
+# The workspace-wide rules the global file carries for every session, since no
+# repo's own CLAUDE.md restates them (claude-content.md — The global file).
+GLOBAL_CLAUDE_REQUIRED_RULES = ("### Read the standards", "### Navigate docs by index")
+
+
+class ToolError(Exception):
+    """The audit hit a structural error state and cannot complete its scan."""
+
+
+@dataclass
+class Finding:
+    """One blocking finding: file, rule id, message."""
+
+    file: str
+    check: str
+    message: str
+
+    def render(self) -> str:
+        """Render the finding as a GNU-format line."""
+        return render(self.file, self.check, self.message)
+
+
+def parse_runbook(path: Path) -> tuple[dict | None, str]:
+    """Parse YAML front matter and body from a runbook file."""
+    text = path.read_text()
+    if not text.startswith("---\n"):
+        return None, text
+
+    end = text.find("\n---\n", 4)
+    if end == -1:
+        # Left to str(IndexError) this surfaces as "substring not found", which
+        # names neither the file's problem nor its fix.
+        raise ValueError("front matter opens with '---' but is never closed")
+    front_matter = yaml.safe_load(text[4:end])
+    body = text[end + 5 :]
+    return front_matter, body
+
+
+def check_required_fields(
+    fm: dict, rel: str, required: tuple[str, ...]
+) -> list[Finding]:
+    """Report each required field missing from the front matter."""
+    return [
+        Finding(rel, REQUIRED_FIELD, f"missing '{field}'")
+        for field in required
+        if field not in fm
+    ]
+
+
+def check_name(fm: dict, anchor: str, anchor_kind: str, rel: str) -> list[Finding]:
+    """Check the name field against its identity anchor.
+
+    ``anchor`` is the value the name must equal — a skill's bundle directory
+    name or an agent's file stem; ``anchor_kind`` names it in the message.
+    """
+    findings = []
+    name = fm.get("name")
+    if name is None:
+        return findings
+
+    if name != anchor:
+        findings.append(
+            Finding(
+                rel,
+                NAME_MATCH,
+                f"name '{name}' does not match {anchor_kind} '{anchor}'",
+            )
+        )
+    if not KEBAB_RE.match(name):
+        findings.append(Finding(rel, NAME_FORMAT, f"name '{name}' is not kebab-case"))
+    return findings
+
+
+def split_sentences(desc: str) -> list[str]:
+    """Split a description into sentences by SENTENCE_END_RE's boundary rule.
+
+    Only terminated sentences are returned: a trailing fragment with no
+    terminal punctuation is not a sentence, which is what makes a description
+    like "Standardize formatting across a Markdown document" count as zero.
+    """
+    parts = []
+    start = 0
+    for match in SENTENCE_END_RE.finditer(desc):
+        parts.append(desc[start : match.end()].strip())
+        start = match.end()
+    return parts
+
+
+def check_description(fm: dict, rel: str) -> list[Finding]:
+    """Check the description's type, length, sentence shape, and trigger."""
+    findings = []
+    desc = fm.get("description")
+    if desc is None:
+        return findings
+    if not isinstance(desc, str):
+        return [
+            Finding(
+                rel,
+                DESCRIPTION_TYPE,
+                f"description must be a string, got {type(desc).__name__}",
+            )
+        ]
+
+    if len(desc) > DESCRIPTION_MAX:
+        findings.append(
+            Finding(
+                rel,
+                DESCRIPTION_LENGTH,
+                f"description is {len(desc)} chars (max {DESCRIPTION_MAX})",
+            )
+        )
+
+    # The second sentence is the auto-invocation match surface, so it is
+    # demanded only of the runbooks a model can reach. A user-invoked
+    # description is the one-line label the user reads in the slash-command
+    # list: one sentence, trigger list dropped. Agents carry no
+    # disable-model-invocation field, so they always take the two-sentence
+    # shape. `is True`, not truthiness — a missing or non-boolean field
+    # already carries its own finding and must never redirect this check.
+    user_invoked = fm.get("disable-model-invocation") is True
+    expected = USER_INVOKED_SENTENCES if user_invoked else MODEL_INVOKED_SENTENCES
+    shape = (
+        "the one-line summary the user reads"
+        if user_invoked
+        else f"what the runbook does, then '{TRIGGER_PREFIX} …'"
+    )
+
+    # The trigger test only runs once the count is right; with any other count
+    # there is no "second sentence" to judge.
+    sentences = split_sentences(desc)
+    if len(sentences) != expected:
+        findings.append(
+            Finding(
+                rel,
+                DESCRIPTION_SENTENCES,
+                f"description is {len(sentences)} sentence(s), must be exactly "
+                f"{expected} — {shape}",
+            )
+        )
+    elif not user_invoked and not sentences[1].startswith(TRIGGER_PREFIX):
+        findings.append(
+            Finding(
+                rel,
+                DESCRIPTION_TRIGGER,
+                f"second sentence must begin '{TRIGGER_PREFIX}' and name the "
+                f"trigger keywords/contexts/file types, got: '{sentences[1][:40]}'",
+            )
+        )
+
+    return findings
+
+
+def check_unknown_fields(fm: dict, rel: str, known: tuple[str, ...]) -> list[Finding]:
+    """Report front matter keys outside the kind's closed vocabulary."""
+    return [
+        Finding(
+            rel,
+            UNKNOWN_FIELD,
+            f"'{field}' is not a documented front matter field "
+            f"(vocabulary is closed to {known})",
+        )
+        for field in sorted(fm, key=str)
+        if field not in known
+    ]
+
+
+def check_model(fm: dict, rel: str) -> list[Finding]:
+    """Check the model value against the closed model vocabulary."""
+    model = fm.get("model")
+    if model is None:
+        return []
+    if model not in VALID_MODELS:
+        return [Finding(rel, MODEL_VALUE, f"model '{model}' not in {VALID_MODELS}")]
+    return []
+
+
+def check_effort(fm: dict, rel: str) -> list[Finding]:
+    """Check the effort value against the closed effort vocabulary."""
+    effort = fm.get("effort")
+    if effort is None:
+        return []
+    if effort not in VALID_EFFORTS:
+        return [Finding(rel, EFFORT_VALUE, f"effort '{effort}' not in {VALID_EFFORTS}")]
+    return []
+
+
+def check_disable_model_invocation(fm: dict, rel: str) -> list[Finding]:
+    """Check disable-model-invocation is boolean when present."""
+    value = fm.get("disable-model-invocation")
+    if value is None:
+        return []
+    if not isinstance(value, bool):
+        return [
+            Finding(
+                rel,
+                DMI_TYPE,
+                f"disable-model-invocation must be boolean, got '{value}'",
+            )
+        ]
+    return []
+
+
+def check_arguments(fm: dict, rel: str) -> list[Finding]:
+    """The arguments field is a list of kebab-case names, nothing else."""
+    value = fm.get("arguments")
+    if value is None:
+        return []
+    if not isinstance(value, list) or not value:
+        return [
+            Finding(
+                rel,
+                ARGUMENTS_FORMAT,
+                f"arguments must be a non-empty list of kebab-case names, "
+                f"got '{value}'",
+            )
+        ]
+    return [
+        Finding(
+            rel,
+            ARGUMENTS_FORMAT,
+            f"argument '{item}' is not a kebab-case name",
+        )
+        for item in value
+        if not (isinstance(item, str) and KEBAB_RE.match(item))
+    ]
+
+
+def check_tools(fm: dict, rel: str) -> list[Finding]:
+    """The tools field is a comma-separated string of tool names."""
+    value = fm.get("tools")
+    if value is None:
+        return []
+    if not isinstance(value, str) or not value.strip():
+        return [
+            Finding(
+                rel,
+                TOOLS_FORMAT,
+                f"tools must be a comma-separated string of tool names, got '{value}'",
+            )
+        ]
+    if any(not token.strip() for token in value.split(",")):
+        return [
+            Finding(
+                rel,
+                TOOLS_FORMAT,
+                f"tools has an empty entry in '{value}'",
+            )
+        ]
+    return []
+
+
+def check_body_h1(body: str, rel: str) -> list[Finding]:
+    """Check the body opens with an H1 title."""
+    for line in body.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("# "):
+            return []
+        return [
+            Finding(rel, BODY_H1, f"body must start with H1, got: '{stripped[:40]}'")
+        ]
+    return [Finding(rel, BODY_H1, "body is empty")]
+
+
+def body_length_advisory(body: str, rel: str) -> str | None:
+    """A non-failing stderr advisory when a SKILL.md body runs long.
+
+    Never a finding: the body-length rule is a nudge, not a gate — it prints to
+    stderr and never affects the exit code.
+    """
+    n = len(body.splitlines())
+    if n > BODY_MAX_LINES:
+        return (
+            f"{rel}: SKILL.md body is {n} lines (>{BODY_MAX_LINES}); "
+            "consider spilling into references/"
+        )
+    return None
+
+
+def check_references_depth(skill_dir: Path, rel_dir: str) -> list[Finding]:
+    """Report links between sibling files in a skill's references/."""
+    refs_dir = skill_dir / "references"
+    if not refs_dir.is_dir():
+        return []
+
+    findings = []
+    refs_resolved = refs_dir.resolve()
+    for md_file in sorted(refs_dir.glob("*.md")):
+        rel_md = f"{rel_dir}/references/{md_file.name}"
+        text = md_file.read_text()
+        for match in LINK_RE.finditer(text):
+            target = match.group(1).split("#", 1)[0].strip()
+            if not target or target.startswith(
+                ("http://", "https://", "mailto:", "~", "/")
+            ):
+                continue
+            try:
+                resolved = (md_file.parent / target).resolve()
+            except OSError:
+                continue
+            if (
+                resolved != md_file.resolve()
+                and resolved.parent == refs_resolved
+                and resolved.suffix == ".md"
+            ):
+                findings.append(
+                    Finding(
+                        rel_md,
+                        REFERENCES_DEPTH,
+                        f"link to sibling reference file '{target}' "
+                        "(references/ must be one level deep)",
+                    )
+                )
+    return findings
+
+
+def audit_skill(skill_dir: Path, repo_root: Path) -> tuple[list[Finding], list[str]]:
+    """Return ``(findings, advisories)`` for one skill bundle.
+
+    findings are blocking (they set the exit code); advisories are non-failing
+    stderr nudges (currently only the body-length advisory).
+    """
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        # Neither a bundle nor harness scratch. Auditing nothing and moving on
+        # would leave it in the skill count, and the summary would report a
+        # number of skills the scan never looked at.
+        raise ToolError(
+            f"{skill_dir.relative_to(repo_root)} sits under a skill root but "
+            "has no SKILL.md"
+        )
+
+    rel = str(skill_md.relative_to(repo_root))
+    rel_dir = str(skill_dir.relative_to(repo_root))
+    dir_name = skill_dir.name
+
+    try:
+        fm, body = parse_runbook(skill_md)
+    except Exception as e:
+        return [Finding(rel, PARSE, str(e))], []
+
+    if fm is None:
+        return [Finding(rel, FRONT_MATTER, "no YAML front matter found")], []
+
+    findings = []
+    findings.extend(check_required_fields(fm, rel, SKILL_REQUIRED_FIELDS))
+    findings.extend(check_unknown_fields(fm, rel, SKILL_FIELDS))
+    findings.extend(check_name(fm, dir_name, "directory", rel))
+    findings.extend(check_description(fm, rel))
+    findings.extend(check_model(fm, rel))
+    findings.extend(check_effort(fm, rel))
+    findings.extend(check_disable_model_invocation(fm, rel))
+    findings.extend(check_arguments(fm, rel))
+    findings.extend(check_body_h1(body, rel))
+    findings.extend(check_references_depth(skill_dir, rel_dir))
+
+    advisory = body_length_advisory(body, rel)
+    advisories = [advisory] if advisory is not None else []
+    return findings, advisories
+
+
+def audit_agent(agent_md: Path, repo_root: Path) -> list[Finding]:
+    """Return the findings for one agent definition file."""
+    rel = str(agent_md.relative_to(repo_root))
+
+    try:
+        fm, body = parse_runbook(agent_md)
+    except Exception as e:
+        return [Finding(rel, PARSE, str(e))]
+
+    if fm is None:
+        return [Finding(rel, FRONT_MATTER, "no YAML front matter found")]
+
+    findings = []
+    findings.extend(check_required_fields(fm, rel, AGENT_REQUIRED_FIELDS))
+    findings.extend(check_unknown_fields(fm, rel, AGENT_FIELDS))
+    findings.extend(check_name(fm, agent_md.stem, "file stem", rel))
+    findings.extend(check_description(fm, rel))
+    findings.extend(check_model(fm, rel))
+    findings.extend(check_effort(fm, rel))
+    findings.extend(check_tools(fm, rel))
+    findings.extend(check_body_h1(body, rel))
+    return findings
+
+
+def check_global_claude(repo_root: Path) -> list[Finding]:
+    """Audit the global CLAUDE.md source's section shape and required rules.
+
+    The global file buckets its rules under exactly two H2s, '## Principles'
+    then '## Behaviors', and carries the workspace-wide rules every session
+    needs (claude-content.md — The global file). Gated on the source file's
+    presence, so it runs only in the repo that owns it; other repos have no
+    global file. Headings inside fenced blocks do not count, so a worked example
+    in the file does not read as a section of it.
+
+    The required-rules check is what stations the workspace-wide instructions:
+    no repo's own CLAUDE.md restates them, so this file is the only place they
+    can be checked.
+    """
+    path = repo_root / GLOBAL_CLAUDE
+    if not path.is_file():
+        return []
+    headings = [
+        line.strip() for _, line in md.content_lines(path) if line.startswith("#")
+    ]
+    sections = tuple(h for h in headings if h.startswith("## "))
+    findings = []
+    if sections != GLOBAL_CLAUDE_SECTIONS:
+        findings.append(
+            Finding(
+                GLOBAL_CLAUDE,
+                GLOBAL_CLAUDE_SHAPE,
+                f"H2 sections must be exactly {list(GLOBAL_CLAUDE_SECTIONS)},"
+                f" got {list(sections)}",
+            )
+        )
+    findings.extend(
+        Finding(GLOBAL_CLAUDE, GLOBAL_CLAUDE_RULES, f"missing rule '{rule}'")
+        for rule in GLOBAL_CLAUDE_REQUIRED_RULES
+        if rule not in headings
+    )
+    return findings
+
+
+def discover_internal_skills(skills_dir: Path) -> tuple[list[Path], int]:
+    """Return (internal_skill_dirs, symlinked_count).
+
+    A skill whose bundle directory is a symlink is skipped: a symlinked
+    bundle belongs to whatever manages its target, not to this scan.
+
+    A dot-directory is neither: it is harness scratch that happens to sit
+    under a skill root, and counting it as a bundle inflates the total.
+    """
+    internal = []
+    skipped = 0
+    for entry in sorted(skills_dir.iterdir()):
+        if not entry.is_dir():
+            continue
+        if entry.name.startswith("."):
+            continue
+        if entry.is_symlink():
+            skipped += 1
+            continue
+        internal.append(entry)
+    return internal, skipped
+
+
+def main():
+    """Parse arguments, scan the runbook roots, and report findings."""
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Repository root to scan (default: current directory)",
+    )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print the rule ids this detector can emit, one per line, and exit",
+    )
+    args = parser.parse_args()
+    if args.list_rules:
+        sys.exit(print_rules(RULES))
+
+    repo_root = Path(args.directory).resolve()
+
+    skill_roots = [
+        p
+        for p in (
+            repo_root / ".claude" / "skills",
+            repo_root / "dotfiles" / "dot-claude" / "skills",
+        )
+        if p.is_dir()
+    ]
+    agent_roots = [
+        p
+        for p in (
+            repo_root / ".claude" / "agents",
+            repo_root / "dotfiles" / "dot-claude" / "agents",
+        )
+        if p.is_dir()
+    ]
+
+    internal_skills: list[Path] = []
+    skipped = 0
+    for root in skill_roots:
+        roots_internal, roots_skipped = discover_internal_skills(root)
+        internal_skills.extend(roots_internal)
+        skipped += roots_skipped
+
+    agent_files: list[Path] = []
+    for root in agent_roots:
+        agent_files.extend(sorted(root.glob("*.md")))
+
+    all_findings: list[Finding] = []
+    all_advisories: list[str] = []
+    try:
+        all_findings.extend(check_global_claude(repo_root))
+        for skill_dir in internal_skills:
+            findings, advisories = audit_skill(skill_dir, repo_root)
+            all_findings.extend(findings)
+            all_advisories.extend(advisories)
+        for agent_md in agent_files:
+            all_findings.extend(audit_agent(agent_md, repo_root))
+    except ToolError as err:
+        # An abort still prints what the scan did reach. The error state is a
+        # stopping condition, not a reason to withhold findings already made.
+        for f in all_findings:
+            print(f.render())
+        print(f"harness-files-lint: {err}", file=sys.stderr)
+        sys.exit(2)
+
+    for f in all_findings:
+        print(f.render())
+    for advisory in all_advisories:
+        print(f"harness-files-lint: {advisory}", file=sys.stderr)
+
+    errors = len(all_findings)
+    skills = len(internal_skills)
+    agents = len(agent_files)
+    suffix = f" (skipped {skipped} external)" if skipped else ""
+    if errors:
+        print(
+            f"harness-files-lint: {skills} internal skills, {agents} agents, "
+            f"{errors} finding(s), {len(all_advisories)} advisory(ies){suffix}",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            f"harness-files-lint: {skills} internal skills, {agents} agents, "
+            f"all ok{suffix}",
+            file=sys.stderr,
+        )
+
+    sys.exit(1 if errors else 0)
+
+
+if __name__ == "__main__":
+    main()

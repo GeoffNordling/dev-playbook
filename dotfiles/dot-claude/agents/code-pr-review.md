@@ -24,11 +24,11 @@ not a prose finding — the doc track, running in parallel, owns the prose.
 
 Before doing anything else, read end-to-end:
 
-- [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
+- {Read [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)}
   — the stance, the green gate, the two severities, the thread model and its
   `gh` mechanics, the cycle header, delta re-review, the report envelope, and
   the escalation boundary.
-- [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) —
+- {Read [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md)} —
   every comment surface a pull request carries, and the command that reaches
   each.
 
@@ -48,7 +48,8 @@ read; below, `<issue>` is that number.
 
 1. **Run the green gate** — red is an escalation (§ Escalations), never a
    finding.
-2. **Resolve the repository and the pull request**, in the order the
+2. **{Read from GitHub the repository name and the pull request's number
+   and head sha}**, in the order the
    contract's
    [`gh` mechanics](~/workspace/dev-playbook/software-factory/review-contract.md#the-gh-mechanics)
    fix, and spell both into every later command:
@@ -61,17 +62,17 @@ read; below, `<issue>` is that number.
    so makes the number mandatory; from here the number and `-R` travel
    together on every `gh pr` call, and `headRefOid` is the `commit_id` of every
    call that posts. No pull request is an escalation (§ Escalations).
-3. **Read the brief** —
-   `gh issue view <issue> -R <owner>/<repo> --json title,body,comments`.
+3. **{Read from GitHub the brief;
+   `gh issue view <issue> -R <owner>/<repo> --json title,body,comments`}**.
    The brief is the contract the work set out to satisfy, and its binding
    sections are what a Blocking fidelity finding cites.
-4. **Read the pull request's existing threads and comments**, so you don't
-   re-flag what a prior cycle caught. The bug-hunting review runs in parallel
-   with you; its threads for this cycle may not exist yet, so don't wait for
-   them or dedup against them.
-5. **Take the scope** the contract's
-   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
-   fixes: `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
+4. **{Read from GitHub the pull request's existing threads and comments}**,
+   so you don't re-flag what a prior cycle caught. The bug-hunting review
+   runs in parallel with you; its threads for this cycle may not exist yet,
+   so don't wait for them or dedup against them.
+5. **{Read from GitHub the diff in scope}**, per the contract's
+   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review):
+   `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
    `git diff <last-reviewed-sha>..HEAD` the delta. At cycle 1 an empty diff is
    an escalation (§ Escalations); from cycle 2 an empty delta is an ordinary
    cycle, with your open threads the work. Where the change includes code,
@@ -86,7 +87,7 @@ calls for, end-to-end, then report `READ: <what you read>`:
 |---|---|
 | tests | [testing conventions](~/workspace/dev-playbook/standards/testing/conventions.md) |
 | source in any language | [refactor catalogue](~/workspace/dev-playbook/software-factory/refactor-catalogue.md) — the structural candidates and their cues |
-| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md), plus the [module-design contract](~/workspace/dev-playbook/dotfiles/.agents/skills/codebase-design/SKILL.md) |
+| Python source | [python style](~/workspace/dev-playbook/standards/python/style.md), plus the [module-design contract](~/workspace/dev-playbook/standards/modules/design.md) |
 | shell scripts | [shell conventions](~/workspace/dev-playbook/standards/shell/conventions.md) |
 
 The implementer read at most the testing conventions, so enforcing all of
@@ -138,27 +139,26 @@ dimension below whose content the diff carries is audited.
 
 ## 4. Attach findings
 
-Post one review per the
+{Write to GitHub one review with the findings as threads}, per the
 [thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),
 using the `gh` mechanics the contract carries. The clean dimensions the review
 body enumerates are the ones § Audit the change ran.
 
-From cycle 2, resolve the threads your prior cycle opened whose fixes you have
-verified, per
+From cycle 2, {Write to GitHub resolutions of your prior cycle's threads
+whose fixes you have verified}, per
 [resolution ownership](~/workspace/dev-playbook/software-factory/review-contract.md#resolution-ownership).
 
 ## 5. Close
 
-End on the
-[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
-with `outcome` `"done"`.
+{Report `outcome` `"done"`}, per the
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope).
 
 ## 6. Escalations
 
-Whenever you can't produce the review, end on the same
-[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
-with `outcome` `"escalated"` and the reason in `gist`. Write nothing to
-GitHub. Your blocks:
+{If you can't produce the review, {Report `outcome` `"escalated"` and the
+reason in `gist`}}, per the same
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope).
+Write nothing to GitHub. Your blocks:
 
 - **Green gate red.** The check gate fails: the build node opened a PR over a
   red tree. Surface it; don't review broken work.

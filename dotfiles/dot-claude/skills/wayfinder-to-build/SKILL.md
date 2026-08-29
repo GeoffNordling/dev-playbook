@@ -4,7 +4,7 @@ description: Hands a completed wayfinder map off to the software factory — sli
 disable-model-invocation: true
 model: inherit
 effort: xhigh
-argument-hint: "<map-number>"
+arguments: [map]
 ---
 
 # Wayfinder to Build
@@ -13,20 +13,21 @@ The hand-off. A completed wayfinder map holds every decision on the way to its
 destination — resolved on its tickets, indexed in Decisions so far — and has
 executed nothing. This skill turns the map into the factory's input: a build
 epic whose children carry the work, every piece tied back to the resolutions
-that decided it. `$ARGUMENTS` names the map.
+that decided it.
 
 ## Read first
 
 Before doing anything else:
 
-- Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
-  end-to-end.
-- Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
-  end-to-end.
-- Invoke /codebase-design: the qualities a good slice boundary preserves.
+- {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
+  end-to-end}.
+- {Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
+  end-to-end}.
+- {Read [module design](~/workspace/dev-playbook/standards/modules/design.md); the
+  qualities a good slice boundary preserves}.
 
 Then report: `READ: issue-authoring.md, software-factory.md,
-codebase-design`. Proceed only after.
+modules/design.md`. Proceed only after.
 
 ## Standalone, with provenance
 
@@ -46,21 +47,22 @@ the map:
 
 ## 1. Verify the map is complete
 
-`$ARGUMENTS` names an issue labelled `wayfinder:map`. The hand-off takes only
-a **finished** map: every child ticket closed (the open-children query in
-[tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#wayfinding-operations)
-returns nothing) and no fog left in **Not yet specified**. Anything still
-open — a ticket, a fog patch — stops the hand-off: report exactly what is
-open and end the session there.
+The hand-off takes only a **finished** map labelled `wayfinder:map`: every
+child ticket closed ({Read
+[the open-children query in tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#wayfinding-operations)}
+— it must return nothing) and no fog left in **Not yet specified**. {If anything is
+still open — a ticket, a fog patch, {Report exactly what is open} and end
+the session there}.
 
 Done when: the map is verified complete, or the session ended on that report.
 
 ## 2. Read the map
 
-The map body first — destination, notes, every line of Decisions so far.
-Then every child ticket in full — question body and all comments
-(`gh issue view <n> --json title,body,comments`): harvest corpora, amendments,
-and linked assets ride in the trail. Resolutions are the canonical decisions
+{Read from GitHub the map body first; destination, notes, every line of
+Decisions so far}. Then {Read from GitHub every child ticket in full;
+question body and all comments (`gh issue view <n> --json
+title,body,comments`) — harvest corpora, amendments, and linked assets ride
+in the trail}. Resolutions are the canonical decisions
 this hand-off executes; the epic re-litigates none of them.
 
 Done when: every child ticket of the map has been read in full.
@@ -68,16 +70,16 @@ Done when: every child ticket of the map has been read in full.
 ## 3. Slice, with the user
 
 The map planned. **Slicing is this skill's decision to take, here, with the
-user.** Invoke /grilling and work these branches as its design tree — each
-round asks the whole frontier in the skill's numbered
-question-and-recommendation format, and the user rules every question before
-the next round:
+user.** {Run [/grilling](~/.claude/skills/grilling/SKILL.md) and work these
+branches as its design tree; each round asks the whole frontier in the
+skill's numbered question-and-recommendation format, and the user rules
+every question before the next round}:
 
 1. **The delivery surface** — for each load-bearing resolution, the files and
    systems it lands on.
-2. **The slices** — cut per the
-   [vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slice-rules),
-   boundaries falling on module seams per the module-design standard, each
+2. **The slices** — {Read
+   [the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slice-rules)}
+   and cut per them, boundaries falling on module seams per the module-design standard, each
    slice tested against the One-goal bullet's two-question orthogonality test
    at epic and slice altitude. What fails the test is deferred exactly as the
    bullet says: a real tracker stub at `phase:intake`, named in the epic's
@@ -87,9 +89,9 @@ the next round:
    what an earlier slice installs is blocked by it.
 
 The children cut here are ultimately designed and released under the design
-node's own decomposition guidance —
-[the decompose exit](~/workspace/dev-playbook/dotfiles/dot-claude/skills/design/references/decompose.md)
-— so weigh that guidance while cutting.
+node's own decomposition guidance. {Read
+[the decompose exit](~/workspace/dev-playbook/dotfiles/dot-claude/skills/design/references/decompose.md);
+weigh that guidance while cutting}.
 
 Done when: the user has approved a named, dependency-ordered slice list,
 every slice passing the two-question test.
@@ -99,9 +101,9 @@ every slice passing the two-question test.
 A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
-tying the two at a glance. Label it `category:*` **only**, and give it the
-epic body from
-[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-epic-body):
+tying the two at a glance. Label it `category:*` **only**. {Read
+[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-epic-body)}
+and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the
   [<map name>](url)"), then states the end state in prose that stands alone.
@@ -133,28 +135,29 @@ Done when: the epic is live and its body carries all three sections.
 
 ## 5. Mint and wire the children
 
-One issue per slice, in dependency order, each a **thin stub**: a title
-naming the slice, a short body stating the slice's goal and naming the
-resolutions it executes (linked, per the style above), and the full
-four-tuple at `phase:design`. Assigning that four-tuple is the children's
+{Write to GitHub one issue per slice, in dependency order; each a **thin
+stub** — a title naming the slice, a short body stating the slice's goal and
+naming the resolutions it executes (linked, per the style above), and the
+full four-tuple at `phase:design`}. Assigning that four-tuple is the children's
 intake, done here in place, same as a design decomposition's children. Each
 child is carried to brief-complete — and released at its own
 [issue-review verdict](~/workspace/dev-playbook/software-factory/user-checkpoints.md#the-issue-review-verdict)
 — later, in its own design session with full attention.
 
-Then wire the native relationships, commands per
-[tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md):
-every child a sub-issue of the epic, and every ordered slice blocked-by its
-predecessor.
+Then {Read
+[tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md)
+for the commands that wire the native relationships} and {Write to GitHub
+the wiring; every child a sub-issue of the epic, and every ordered slice
+blocked-by its predecessor}.
 
 Done when: every approved slice has a live, labelled stub, and both
 relationship graphs match the approved ordering.
 
 ## 6. Report the shape
 
-Show the user the whole hand-off on screen: the epic, the ordered children
-with their four-tuples, both relationship graphs (they need not align), any
+{Report the whole hand-off on screen; the epic, the ordered children with
+their four-tuples, both relationship graphs (they need not align), any
 deferral stubs step 3 minted, and the next move — each child through
-`/design`, one at a time.
+`/design`, one at a time}.
 
 Done when: the user can see the full shape without opening GitHub.

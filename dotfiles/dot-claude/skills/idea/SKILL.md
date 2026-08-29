@@ -4,19 +4,17 @@ description: Deposit raw idea material verbatim into mission-control's inbox/ fr
 disable-model-invocation: true
 model: sonnet
 effort: xhigh
-argument-hint: "[raw idea material]"
+arguments: [material]
 ---
 
 # Idea
 
 A thin pointer so /idea works from any repo on desktop without
-`cd`-ing into mission-control. The real skill lives in mission-control:
-read [.claude/skills/idea/SKILL.md](~/workspace/mission-control/.claude/skills/idea/SKILL.md)
-now and follow it **verbatim** — it owns the routing, the deposit
-format, the `CLAUDE_CODE_REMOTE` path-selection, and the receipt.
-Apply only the cwd-translation overrides below.
-
-## Material: $ARGUMENTS
+`cd`-ing into mission-control. {Run [mission-control's idea
+skill](~/workspace/mission-control/.claude/skills/idea/SKILL.md)
+verbatim; it owns the routing, the deposit format, the
+`CLAUDE_CODE_REMOTE` path-selection, and the receipt}. Apply only the
+cwd-translation overrides below.
 
 ## Overrides
 

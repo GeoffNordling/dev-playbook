@@ -36,12 +36,22 @@ def card(
     *,
     type_: str = "Standard-Card",
     cells: tuple[str, ...] = ("Define", "Audit", "Enforce", "Adopt"),
+    question: str | None = None,
+    description: str | None = None,
+    body: str | None = None,
 ) -> str:
-    """A standard card with the given title, type, and cell sections."""
+    """A standard card with the given title, type, and cell sections.
+
+    The question sentence and the description default to the same text, as
+    ``standard.card-question`` requires; either can be overridden to break the
+    pairing, and ``body`` replaces the opening paragraph outright.
+    """
+    question = question or f"Governs how {title} is done"
+    opening = body if body is not None else f"{question}."
     front = (
         f"---\ntype: {type_}\ntitle: {title}\n"
-        f"description: Card for the {title} standard\n---\n\n"
-        f"# {title}\n\nGoverns {title}.\n"
+        f"description: {description if description is not None else question}\n"
+        f"---\n\n# {title}\n\n{opening}\n"
     )
     return front + "".join(f"\n## {cell}\n\n- none\n" for cell in cells)
 
@@ -140,6 +150,129 @@ def test_subdirectory_contract_doc_is_not_treated_as_a_card(tmp_path: Path) -> N
     )
 
     assert sa.check_card_layout(repo) == []
+
+
+# --- standard.card-question -------------------------------------------------
+
+
+def test_matching_question_and_description_pass(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {"standards/build.md": card("Build")})
+
+    assert sa.check_card_question(repo) == []
+
+
+def test_description_differing_from_the_question_is_flagged(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card(
+                "Build", description="Card for the build standard"
+            )
+        },
+    )
+
+    findings = sa.check_card_question(repo)
+
+    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert "verbatim" in findings[0].message
+
+
+def test_description_keeping_the_period_is_flagged(tmp_path: Path) -> None:
+    # The description repeats the sentence *less* its period; okf-lint forbids a
+    # trailing period in a description, so keeping it fails both rules.
+    repo = make_repo(
+        tmp_path,
+        {"standards/build.md": card("Build", description="Governs how Build is done.")},
+    )
+
+    findings = sa.check_card_question(repo)
+
+    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+
+
+def test_question_not_opening_governs_how_is_flagged(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {"standards/build.md": card("Build", question="Covers the build of a repo")},
+    )
+
+    findings = sa.check_card_question(repo)
+
+    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert "Governs how" in findings[0].message
+
+
+def test_question_wrapped_across_lines_is_flattened(tmp_path: Path) -> None:
+    # Cards wrap at the prose margin, so the sentence is read with its line
+    # breaks flattened to spaces before the description is compared to it.
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card(
+                "Build",
+                description="Governs how a repository is laid out, built, and checked",
+                body="Governs how a repository is laid out, built, and\nchecked.",
+            )
+        },
+    )
+
+    assert sa.check_card_question(repo) == []
+
+
+def test_prose_after_the_question_sentence_is_ignored(tmp_path: Path) -> None:
+    # A card may carry boundary prose after its question; only the first
+    # sentence is the question.
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card(
+                "Build",
+                description="Governs how Build is done",
+                body="Governs how Build is done. This card owns the shapes.",
+            )
+        },
+    )
+
+    assert sa.check_card_question(repo) == []
+
+
+def test_a_dotted_filename_does_not_end_the_question(tmp_path: Path) -> None:
+    # `CLAUDE.md` carries a period with no space after it, so the sentence runs
+    # past it to the real terminator.
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/harness.md": card(
+                "Harness",
+                description="Governs how CLAUDE.md is written",
+                body="Governs how CLAUDE.md is written.",
+            )
+        },
+    )
+
+    assert sa.check_card_question(repo) == []
+
+
+def test_card_with_no_paragraph_after_its_h1_is_flagged(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            "standards/build.md": card("Build", body="").replace(
+                "# Build\n\n\n", "# Build\n\n"
+            )
+        },
+    )
+
+    findings = sa.check_card_question(repo)
+
+    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert "no question sentence" in findings[0].message
+
+
+def test_mistyped_flat_file_is_left_to_card_layout(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {"standards/build.md": card("Build", type_="Standard")})
+
+    assert sa.check_card_question(repo) == []
 
 
 # --- standard.catalog-order -------------------------------------------------
@@ -1019,12 +1152,12 @@ def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
     assert findings == []
 
 
-def test_list_rules_prints_the_five_rules(capsys: pytest.CaptureFixture[str]) -> None:
+def test_list_rules_prints_every_rule(capsys: pytest.CaptureFixture[str]) -> None:
     assert sa.main(["--list-rules"]) == 0
 
     lines = [line for line in capsys.readouterr().out.splitlines() if line.strip()]
 
-    assert len(lines) == 5
+    assert sorted(lines) == sorted(sa.RULES)
     assert sa.CARD_SHADOWS in lines
 
 
@@ -1196,12 +1329,14 @@ def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
 
 
 def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
-    files = ordered_repo_files({"standards/docs/index.md": "# docs\n"})
+    files = ordered_repo_files(
+        {"standards/knowledge-organization/index.md": "# docs\n"}
+    )
     files["standards/index.md"] = catalog(
         [
             bullet("standards/README.md", "Standards"),
             bullet("standards/standard.md", "Meta-Standard"),
-            bullet("standards/docs/index.md", "docs/"),
+            bullet("standards/knowledge-organization/index.md", "docs/"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
             bullet("standards/standard/format.md", "Standards and Standard Cards"),

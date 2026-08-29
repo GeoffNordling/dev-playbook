@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Headless Operation
 description: Running Claude Code headless on subscription
 ---

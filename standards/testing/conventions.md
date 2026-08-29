@@ -15,7 +15,7 @@ Use pytest. All test files follow the `test_*.py` naming convention.
 ## Organization
 
 - **Mirror source structure.** Test files mirror the source directory layout: `src/auth/login.py` -> `tests/auth/test_login.py`. This scales naturally and avoids naming collisions. The mirror — flat, or beneath a recognized scope directory — is the one accepted location; the package path is always required.
-- **Scope directories.** A suite may interpose one recognized scope directory between `tests/` and the mirror: `unit` and `integration` each mirror `src/` beneath them (`tests/unit/auth/test_login.py`). A third, `tests/agent_review/`, holds judgment gate tests ([cache-gate.md](/standards/judgments/cache-gate.md)); their free-form stems are never measured against source modules. The set is fixed — any other directory in that position is a misplacement.
+- **Scope directories.** A suite may interpose one recognized scope directory between `tests/` and the mirror: `unit` and `integration` each mirror `src/` beneath them (`tests/unit/auth/test_login.py`). A third, `tests/agent_review/`, holds judgment gate tests ([cache-gate.md](/standards/semantic-validation/cache-gate.md)); their free-form stems are never measured against source modules. The set is fixed — any other directory in that position is a misplacement.
 - **Conftest hierarchy.** Place `conftest.py` at each directory level for fixtures relevant to that scope. Root `conftest.py` holds shared fixtures; subdirectory `conftest.py` files hold domain-specific fixtures.
 
 ## Test structure
@@ -81,7 +81,7 @@ Use `unittest.mock` to:
 
 ### Ports (services you own, reached over the network)
 
-A service you own but call over the network — an internal API, a queue consumer — has no local stand-in to swap in and is too slow to call for real. Give it a **port**: the interface at the seam, owned by the calling module. The logic stays in that module; the transport is an injected **adapter** — an HTTP, gRPC, or queue client in production, an in-memory adapter in tests. The `/codebase-design` skill covers when a seam earns its keep.
+A service you own but call over the network — an internal API, a queue consumer — has no local stand-in to swap in and is too slow to call for real. Give it a **port**: the interface at the seam, owned by the calling module. The logic stays in that module; the transport is an injected **adapter** — an HTTP, gRPC, or queue client in production, an in-memory adapter in tests. [Module design](/standards/modules/design.md) covers when a seam earns its keep.
 
 ## Fixtures and setup
 

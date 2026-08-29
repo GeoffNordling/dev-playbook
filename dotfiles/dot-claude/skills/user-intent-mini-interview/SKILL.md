@@ -4,16 +4,14 @@ description: Interview the user for a drafted brief's User intent section and wr
 disable-model-invocation: false
 model: inherit
 effort: xhigh
-argument-hint: "[issue-number]"
+arguments: [issue]
 ---
 
 # User Intent Mini-Interview
 
-Get the user's intent in their own voice, check it against the brief just drafted, and write the `User intent` section from what they said.
+Every other heading is the agent's work — specific, literal, argued out over a long session. `User intent` is the user's: a short, high-level umbrella the build agent consults when it hits a choice the brief leaves open. It carries the user's **vibe** into an issue otherwise written end to end by an agent. {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect)}, which fixes its role and shape; this skill is how the text gets written.
 
-Every other heading is the agent's work — specific, literal, argued out over a long session. `User intent` is the user's: a short, high-level umbrella the build agent consults when it hits a choice the brief leaves open. It carries the user's **vibe** into an issue otherwise written end to end by an agent. Its role and shape are fixed by [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect); this skill is how the text gets written.
-
-The brief in play is the draft the calling beat holds. Run with no draft in context and `$ARGUMENTS` names an issue — read its body and treat that as the draft.
+The brief in play is the draft the calling beat holds. {If run with no draft in context, {Read from GitHub the body of the issue `issue` names, and treat that as the draft}}.
 
 ## 1. Ask cold
 
@@ -67,4 +65,4 @@ than quietly drop something. Keep the function count low where you can, but not
 at the cost of making the callers do work.
 ```
 
-Show the cleaned paragraph so the user sees the exact text, then hand it back to the calling beat, which writes it into the brief. This skill writes nothing to GitHub.
+Show the paragraph to the user first, then {Report the cleaned `User intent` paragraph for the calling beat to write into the brief}. {Never {Write to GitHub}}.

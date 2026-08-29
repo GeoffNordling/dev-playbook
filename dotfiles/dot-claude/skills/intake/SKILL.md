@@ -17,21 +17,21 @@ The front door for work, and the first state of the [definition region](~/worksp
 
 ## Read first
 
-Before doing anything else, read end-to-end:
+Before doing anything else:
 
-- [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md) — the two regions, the label scheme, and where an issue goes when intake releases it.
-- [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) — the brief formats, brief principles, and the readiness bar.
+- {Read [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md); the two regions, the label scheme, and where an issue goes when intake releases it}.
+- {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md); the brief formats, brief principles, and the readiness bar}.
 
-Then report: `READ: software-factory.md, issue-authoring.md`. Proceed only after.
+Then say `READ: software-factory.md, issue-authoring.md`. Proceed only after.
 
 ## Process
 
 ### 1. Read the input
 
 - **Capture** — the text passed in is the raw idea.
-- **Adopt** — `gh issue view <issue> --json title,body,comments` and read its title, body, and comments as the raw idea. Note which labels, if any, it already carries; you will rewrite its body.
+- **Adopt** — {Read from GitHub the issue's title, body, and comments as the raw idea; `gh issue view <issue> --json title,body,comments`}. Note which labels, if any, it already carries; you will rewrite its body.
 
-Either way, invoke /grill-with-docs once to sharpen the raw idea, then return — **every time**, in both Capture and Adopt, before the §4 draft and the §5 write. Understanding intent precedes authoring; not even a clear-seeming idea skips the grill.
+Either way, {Run [/grilling](~/.claude/skills/grilling/SKILL.md) once to sharpen the raw idea}, with {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active throughout}, then return — **every time**, in both Capture and Adopt, before the §4 draft and the §5 write. Understanding intent precedes authoring; not even a clear-seeming idea skips the grill.
 
 ### 2. Check the idea against the repo
 
@@ -44,7 +44,7 @@ Report what both checks found and where you looked. On a hit — existing covera
 
 ### 3. Pick the four-tuple
 
-The dimensions, their values, and what each means are [factory-labels.md](~/workspace/dev-playbook/standards/tracking/factory-labels.md) — pick the appropriate value in each.
+{Read [factory-labels.md](~/workspace/dev-playbook/standards/tracking/factory-labels.md); the dimensions, their values, and what each means} — pick the appropriate value in each.
 
 - `tests:*` — for `mode:direct`, ask the user.
 - `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it, or the user parks the beat and the issue holds here for the next session.
@@ -65,7 +65,7 @@ Per the issue conventions: the build-leaf brief for `mode:direct`, the spike bri
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready — readiness is settled at the approval that releases the issue, not here.
 
-On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect) requires except `User intent`, then invoke /user-intent-mini-interview for that one, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
+On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect) requires except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
 
 ### 5. Confirm, then land
 
@@ -75,11 +75,11 @@ Before writing anything to GitHub, reflect your read back to the user and land o
 - **The four-tuple** — `category` / `mode` / `tests` / routed `phase`, each with a few words of why.
 - **The brief, in miniature** — a few-line sketch of the §4 draft: scope, the load-bearing decisions, the shape of the acceptance criteria. Never the body verbatim — the full text lands on the issue, where it's read. For **adopt**, say in a line what the rewrite keeps and drops from the stub.
 
-Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment: when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed /grill-with-docs — however thorough the §1 grill, it sharpened *intent*, while §5 confirms the *authored artifact*. (A deeper terminology or domain dispute is a /grill-with-docs matter per §1, not this beat.)
+Ask them to confirm or correct; on a correction, revise and re-confirm. This is a fast alignment: when nothing needs adjusting, they nod and you land at once. Two things do **not** satisfy this gate: a narrow clarifying question, and a completed §1 grill — however thorough, it sharpened *intent*, while §5 confirms the *authored artifact*. (A deeper terminology or domain dispute is a §1 grill matter, not this beat.)
 
 On the nod, **bind `<phase>` before running either command below**. Work routed to `design` or `spike` writes its routed phase. The fast path writes `phase:intake` — never `phase:build`, which §6 sets on the user's approval; the hold lasts until §6 ends, or into the next session if the user parks the beat.
 
-**Capture** — create the issue at that phase:
+**Capture** — {Write to GitHub the new issue at that phase}:
 
 ```bash
 gh issue create --title "..." \
@@ -87,7 +87,7 @@ gh issue create --title "..." \
   --body ...the brief...
 ```
 
-**Adopt** — set the four-tuple and overwrite the body on the existing issue:
+**Adopt** — {Write to GitHub the four-tuple and the overwritten body on the existing issue}:
 
 ```bash
 gh issue edit <issue> \
@@ -95,19 +95,19 @@ gh issue edit <issue> \
   --body ...the brief...
 ```
 
-For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, post the **probe-record comment** §2 accumulated — each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them.
+For **adopt** on a `design` or `spike` route, drop a carried `phase:intake` with `--remove-label "phase:intake"`; on the fast path it is the phase being written, so `--add-label` mints it or leaves the carried one in place. Then, with the issue live, {Write to GitHub the probe-record comment §2 accumulated; each picked probe's command and its observed output — so the brief's `measured` claims have their citation before review reads them}.
 
 ### 6. The issue-review beat — fast path only
 
 The two lenses are **your tools** — latent instruments you run to sharpen your own brief before anyone reads it. Work routed to `design` or `spike` skips this section — design runs the beat at its own exit, and a spike never enters the factory.
 
-1. **Dispatch both lenses in one message**, as fresh-context subagents: one invokes `/issue-review-claims <issue>`, the other `/issue-review-simulation <issue>`, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
+1. **Dispatch both lenses in one message**, as fresh-context subagents: {Run [/issue-review-claims](~/.claude/skills/issue-review-claims/SKILL.md) `<issue>`} and {Run [/issue-review-simulation](~/.claude/skills/issue-review-simulation/SKILL.md) `<issue>`}, each pinned to the model its skill file names. They read only the issue and the repo — never this session's conversation — and return findings raw.
 2. **Edit the brief in place.** Merge and deduplicate both lenses' findings, then apply or demote each on your own judgment, rewriting the body until it is a brief you would hand an autonomous builder. Never stop to have the user rule, and record nothing about the run on the issue — the repaired brief is the whole output.
 3. **Present the finished issue** — the URL, what you changed and why, and anything you could not resolve. This is where the user first reads it, so finish it before this line.
-4. **On their approval, and only then, move the phase:** `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit — always a full fresh run of both lenses.
+4. {If the user approves, and only then, {Write to GitHub the phase move; `gh issue edit <issue> --remove-label "phase:intake" --add-label "phase:build"`}}. Asked for changes, apply and re-present. Sent to design, route it there instead (`--add-label "phase:design"`), where the brief is re-authored and the beat reruns at design's own exit — always a full fresh run of both lenses.
 
 No label crosses out of the definition region on your own authority. The user may always skip the beat, cut it short, or advance anyway.
 
 ## Output
 
-Report in the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`. Where the user parked §6's beat, `routed to <phase>` reads `awaiting approval` instead: the issue holds at `phase:intake` until they give it.
+{Report the standard form: `<repo>#<issue> · phase: intake · <one-line summary> · routed to <phase> · brief in issue`}. Where the user parked §6's beat, `routed to <phase>` reads `awaiting approval` instead: the issue holds at `phase:intake` until they give it.
