@@ -117,6 +117,20 @@ exemplar, worked as the abstraction shape in
 
 ## Documentation track — active
 
+**Now**
+
+The ontology is settled in
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md);
+the encoding design and its parser sit in Encoding, beneath Reference
+Chain. Two items remain:
+
+- **Recursion to the bedrock of determinism.** Develop the note: the
+  EM loop applies all the way down until the target stops being
+  stochastic; maps recurse one rung further — grammar ↔ parser, the
+  certified transform, pinned by `--check`.
+- **Primitive and ontology terminology sweep.** "Primitive" and
+  "ontology" are used loosely across these files; tighten every use.
+
 **Completed**
 
 - **CLOA primitives.** Three bootstrap runs plus an empirical
@@ -138,15 +152,15 @@ exemplar, worked as the abstraction shape in
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format — braced spans over a fixed keyword lexicon,
   sliced at fixed cut points but never interpreted — designed on a
-  five-runbook covering set in Edge Encoding
+  five-runbook covering set in Encoding
   and proven by `parser/chaingen.py`, which deterministically
   regenerates every covered runbook's chain into `parser/chains.txt` and
-  fails on drift via `--check`. Remaining work rides the Now section
-  below.
+  fails on drift via `--check`.
 - **First-party port.** Every runbook we author ourselves — all twelve
   agents and the unmarked skills in the Port roster,
-  38 runbooks — ported to the edge encoding by the dispatch procedure in
-  Port Prompt, each with its leftovers recorded in the Residual Ledger.
+  38 runbooks — ported to the edge encoding by a fixed dispatch
+  prompt, since retired, each with its leftovers recorded in the
+  Residual Ledger.
 - **The runbook standard, and the gate green.**
   [Runbook Conventions](/standards/harness/runbook-conventions.md)
   replaced what the old docs taught: `skill-management.md` deleted, the
@@ -186,6 +200,10 @@ exemplar, worked as the abstraction shape in
   context-content.md, and `grill-with-docs` — reduced to a one-line
   wrapper once its override retired — was deleted, its callers running
   `/grilling` + `/domain-modeling` directly.
+- **Working-file reorganization.** The branch's working files rebuilt
+  as a tree with one job per file: Reference Chain declares the
+  object, Encoding beneath it is the writer's spec, the Residual
+  Ledger is the one system-wide record, and Port Prompt retired.
 
 **Raw ideas, none designed**
 
@@ -319,24 +337,6 @@ works the term holds the detail. Every one is a tentative promotion to
   judged only by passing.
 - **the vocabulary API** — `CONTEXT.md` designed the way a library designs
   its public surface, plus the escalation discipline that keeps it current.
-
-## Now
-
-Edge encoding is the live work: the design and its parser sit in
-Edge Encoding, under CLOA Abstractions.
-This section is the one to-do list for the branch. The ontology above
-the encoding is settled in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).
-
-The corpus port is done and recorded under Completed; what remains is
-the closing pass.
-
-1. **Final Quality Pass.** Go through the final skills and look for residual
-opportunities. We deemphasized residuals tracking during the conversion
-sweeps so we'll need a fresh eye to see if we're happy with the final result
-or if we need new expressions. Basically scan skills and look for important things
-that are not expressed via the deterministic structure. Discuss with user which to support.
-Also scan residual log for ideas that look important.
 
 ## Acronyms
 
