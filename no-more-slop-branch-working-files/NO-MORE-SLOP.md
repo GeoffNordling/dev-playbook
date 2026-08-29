@@ -123,9 +123,7 @@ exemplar, worked as the abstraction shape in
   roster — describing what documentation does at the CLOA: the user
   understands the whole surface and keeps enough control to guide the
   system, the implementation below the CLOA is delegated to the agent,
-  and deep dives stay auditable by opening actual files. Every chain
-  the close-out proved, and the ruling that closed it, are in
-  [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md). That
+  and deep dives stay auditable by opening actual files. That
   files are still too hard to read is a separate open work stream (the
   Levels section's first level).
 - **Deslop rewrite.** Every prose document rewritten in place against
@@ -331,9 +329,7 @@ Edge encoding is the live work: the design and its parser sit in
 [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md).
 This section is the one to-do list for the branch. The ontology above
 the encoding is settled in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md),
-with every proven chain in
-[CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md).
+[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md).
 
 The corpus port is done and recorded under Completed; what remains is
 the closing pass.

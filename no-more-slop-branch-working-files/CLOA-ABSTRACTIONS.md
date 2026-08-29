@@ -201,8 +201,7 @@ down the levels.
   node. The zoom rule collapses in-bundle documents, never an executed
   script. A sibling **Workflow** noun (deterministic orchestration in
   Claude Code's dynamic-workflow runtime) was dropped 2026-08-25 as
-  empirically vacuous: no runbook in
-  [CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) fires a
+  empirically vacuous: no recorded chain fires a
   does-edge into one — ralph-setup, the closest, reports the
   ralph-loop launch command as a string and never runs it. The noun
   returns if a runbook ever does a workflow.
@@ -380,8 +379,7 @@ The bootstrap targets, run in order and all recorded in the ledger:
 `grill-with-docs` (mid-size — five skills and a standard), `design`
 (the hub — the chain least likely to fit in the user's head).
 
-The software factory is the graduation exercise, parked for now — see
-[Factory Survey](/no-more-slop-branch-working-files/FACTORY-SURVEY.md). It
+The software factory is the graduation exercise, parked for now. It
 brings the Guide type (9 docs, all `software-factory/`) and the 13 parked
 runbooks,
 and may leave large residuals: a Guide describes how a fleet of runbooks
@@ -393,12 +391,7 @@ ledger.
 
 ### The chains ledger
 
-Every finalized chain is recorded in
-[CLOA Chains](/no-more-slop-branch-working-files/CLOA-CHAINS.md) as it is
-ruled — the three bootstrap runs and each close-out runbook — so the close-out
-ends in a written ledger, not in compacted memory. This file keeps the
-ontology and the rulings; that file keeps the chains, their count, and the
-ruling that closed the run. The in-file structure those chains are now
-generated from is
+Every chain is generated into `parser/chains.txt` from in-file structure;
+that structure is
 [Edge Encoding](/no-more-slop-branch-working-files/EDGE-ENCODING.md), this
 file's lower level.

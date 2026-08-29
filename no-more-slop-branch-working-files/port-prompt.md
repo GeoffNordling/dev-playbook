@@ -71,12 +71,7 @@ allow and record the leftover honestly.
    file is the contract; nothing in this prompt overrides it.
 2. `no-more-slop-branch-working-files/RESIDUAL-LEDGER.md` — what a
    residual is and how entries read. You will add a section here.
-3. `no-more-slop-branch-working-files/CLOA-CHAINS.md` — hand-drawn
-   chains from before the code existed. Find the section headed with
-   your file's name (most files have one; some do not). It shows what
-   the chain should roughly say, but it is older than some rules —
-   where it disagrees with EDGE-ENCODING.md, EDGE-ENCODING.md wins.
-4. Two finished ports, to see what good looks like — the file beside
+3. Two finished ports, to see what good looks like — the file beside
    its generated block in
    `no-more-slop-branch-working-files/parser/chains.txt`:
    `dotfiles/dot-claude/skills/log-friction/SKILL.md` (guards, a git
@@ -85,7 +80,7 @@ allow and record the leftover honestly.
    skill run, guarded writes, a fenced example that must not parse).
    Notice that both still read as ordinary instructions — the braces
    ride on sentences that were already there.
-5. `<PATH>`, end to end.
+4. `<PATH>`, end to end.
 
 ## Do
 
