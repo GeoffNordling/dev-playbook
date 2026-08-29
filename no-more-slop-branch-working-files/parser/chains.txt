@@ -389,3 +389,6 @@
   ├─args────► set-hint
   ├─does────► [set-deslopper] Agent    the subagent, `model: opus`
   └─never commits─►
+
+[working-doc-set-diagram] Skill · model: opus, effort: medium
+  └─reports─► outcome: str    the diagram
