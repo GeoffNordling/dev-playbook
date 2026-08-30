@@ -1,8 +1,8 @@
 """GNU-format finding rendering shared by the workspace detectors.
 
-Every detector emits findings in the one format the vocabulary fixes
-(CONTEXT.md "Finding") and the meta-standard's detector contract restates
-(standards/standard/format.md): ``location:line: card.rule message`` — a colon
+Every detector emits findings in the one format the meta-standard's detector
+contract fixes (standards/standard/format.md): ``location:line: card.rule
+message`` — a colon
 after the location, single spaces, a repo-relative path; ``:line`` omitted for a
 file-level finding. Rendering lives here so the format is defined once and
 cannot drift between the detectors that consume it.

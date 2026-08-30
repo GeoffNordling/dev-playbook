@@ -12,7 +12,6 @@ from dev_playbook.dotfiles.sync import (
     claim_targets,
     clear_generated_settings,
     ensure_bashrc_loader,
-    mirror_skills,
     stale_links,
     stow_packages,
     stray_links,
@@ -21,13 +20,10 @@ from dev_playbook.dotfiles.sync import (
 )
 
 
-def a_dotfiles_tree(tmp_path: Path, *skills: str) -> Path:
-    """A dotfiles tree with the mirror directories and the named .agents skills."""
+def a_dotfiles_tree(tmp_path: Path) -> Path:
+    """A dotfiles tree with the skills directory."""
     dotfiles = tmp_path / "dotfiles"
     (dotfiles / "dot-claude" / "skills").mkdir(parents=True)
-    (dotfiles / ".agents" / "skills").mkdir(parents=True)
-    for skill in skills:
-        (dotfiles / ".agents" / "skills" / skill).mkdir()
     return dotfiles
 
 
@@ -62,7 +58,6 @@ def test_every_package_installs_into_its_own_directory(tmp_path: Path) -> None:
     targets = {package: target_for(home, package) for package in PACKAGES}
 
     assert targets == {
-        ".agents": home / ".agents",
         ".bashrc.d": home / ".bashrc.d",
         "dot-claude": home / ".claude",
     }
@@ -89,7 +84,6 @@ def test_stow_is_invoked_once_per_package_with_that_package_as_target(
     stow_packages(home, dotfiles)
 
     assert calls == [
-        ["stow", "-d", str(dotfiles), "-t", str(home / ".agents"), ".agents"],
         ["stow", "-d", str(dotfiles), "-t", str(home / ".bashrc.d"), ".bashrc.d"],
         ["stow", "-d", str(dotfiles), "-t", str(home / ".claude"), "dot-claude"],
     ]
@@ -115,12 +109,12 @@ def test_a_target_linked_to_its_own_package_becomes_a_real_directory(
     dotfiles = a_dotfiles_tree(tmp_path)
     home = tmp_path / "home"
     home.mkdir()
-    (home / ".agents").symlink_to(dotfiles / ".agents")
+    (home / ".claude").symlink_to(dotfiles / "dot-claude")
 
     replaced = claim_targets(home, dotfiles)
 
-    assert replaced == [home / ".agents"]
-    assert (home / ".agents").is_dir() and not (home / ".agents").is_symlink()
+    assert replaced == [home / ".claude"]
+    assert (home / ".claude").is_dir() and not (home / ".claude").is_symlink()
 
 
 def test_a_target_linked_outside_the_repo_is_refused(tmp_path: Path) -> None:
@@ -129,7 +123,7 @@ def test_a_target_linked_outside_the_repo_is_refused(tmp_path: Path) -> None:
     home.mkdir()
     elsewhere = tmp_path / "elsewhere"
     elsewhere.mkdir()
-    (home / ".agents").symlink_to(elsewhere)
+    (home / ".claude").symlink_to(elsewhere)
 
     with pytest.raises(SyncError, match="does not manage"):
         claim_targets(home, dotfiles)
@@ -138,7 +132,7 @@ def test_a_target_linked_outside_the_repo_is_refused(tmp_path: Path) -> None:
 def test_a_target_occupied_by_a_file_is_refused(tmp_path: Path) -> None:
     home = tmp_path / "home"
     home.mkdir()
-    (home / ".agents").write_text("not a directory")
+    (home / ".claude").write_text("not a directory")
 
     with pytest.raises(SyncError, match="needs a directory"):
         claim_targets(home, tmp_path / "dotfiles")
@@ -181,47 +175,9 @@ def test_a_package_target_is_never_a_stray(tmp_path: Path) -> None:
     dotfiles = a_dotfiles_tree(tmp_path)
     home = tmp_path / "home"
     home.mkdir()
-    (home / ".agents").symlink_to(dotfiles / ".agents")
+    (home / ".claude").symlink_to(dotfiles / "dot-claude")
 
     assert stray_links(home, dotfiles) == []
-
-
-# --- skill mirroring -------------------------------------------------------
-
-
-def test_mirror_skills_links_an_externally_managed_skill(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "zoom-out")
-
-    mirrored = mirror_skills(dotfiles)
-
-    link = dotfiles / "dot-claude" / "skills" / "zoom-out"
-    assert mirrored == ["zoom-out"]
-    assert link.resolve() == (dotfiles / ".agents" / "skills" / "zoom-out").resolve()
-
-
-def test_mirror_skills_reports_nothing_on_a_second_run(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "zoom-out")
-    mirror_skills(dotfiles)
-
-    assert mirror_skills(dotfiles) == []
-
-
-def test_mirror_skills_drops_a_link_whose_skill_was_removed(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "zoom-out")
-    mirror_skills(dotfiles)
-    (dotfiles / ".agents" / "skills" / "zoom-out").rmdir()
-
-    mirror_skills(dotfiles)
-
-    assert not (dotfiles / "dot-claude" / "skills" / "zoom-out").is_symlink()
-
-
-def test_mirror_skills_refuses_to_shadow_an_authored_skill(tmp_path: Path) -> None:
-    dotfiles = a_dotfiles_tree(tmp_path, "commit")
-    (dotfiles / "dot-claude" / "skills" / "commit").mkdir()
-
-    with pytest.raises(SyncError, match="commit"):
-        mirror_skills(dotfiles)
 
 
 # --- stale links -----------------------------------------------------------

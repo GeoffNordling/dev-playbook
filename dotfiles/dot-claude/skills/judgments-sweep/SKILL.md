@@ -4,7 +4,7 @@ description: Sweep judgment declarations across one, several, or all judgment-be
 disable-model-invocation: false
 model: opus
 effort: xhigh
-argument-hint: "[root …]"
+arguments: [roots]
 ---
 
 # Judgments Sweep
@@ -13,7 +13,7 @@ A **judgment** is a specific yes/no question about specific files, ruled on by a
 LLM judge, declared as YAML and keyed by content: editing a claim or a file it
 puts on trial re-keys it, and a machine-shared cache remembers what has been
 judged-and-passed. A sweep judges whatever has drifted out of that cache.
-See the [declaration format](~/workspace/dev-playbook/standards/judgments/declarations.md).
+{Read [declaration format](~/workspace/dev-playbook/standards/semantic-validation/declarations.md)}.
 
 Steps 1–3 below are mechanical: run a command, pass its output on untouched, run
 the commands you get back. **Copy, never compose** — each hand-off is one opaque
@@ -38,6 +38,8 @@ The sweep is parameterized by repo roots — one repo, several, or all of them:
 ## The loop
 
 ### 1. Plan
+
+{Run [judgments-run](~/workspace/dev-playbook/scripts/judgments-run) in `plan` mode}:
 
 ```
 uv run judgments-run --root <root> [--root <root> …] plan
@@ -76,10 +78,11 @@ under its top-level **`result`** key, not at the top level.
 
 ### 3. Record
 
-`record` is a list of complete shell commands, one per root with passes. Run each
-verbatim. An empty list means nothing passed — then there is nothing to run. If
-one fails, the copy was mangled: each command records all or nothing, so copy it
-again exactly rather than retyping it or dropping an id.
+`record` is a list of complete shell commands, one per root with passes. {Write
+the judgment cache; run each `record` command verbatim}. An empty list means
+nothing passed — then there is nothing to run. If one fails, the copy was
+mangled: each command records all or nothing, so copy it again exactly rather
+than retyping it or dropping an id.
 
 Do this before anything else. Until it runs, the verdicts exist only in that
 result, and a re-plan will re-judge everything that passed.
@@ -120,7 +123,8 @@ Limits govern this, and you track them yourself as you loop:
 
 Back to step 1, with the same roots. Your edits re-key the judgments you touched,
 so the next plan picks up exactly those plus anything that crashed. Name what you
-have set aside so it is not re-judged — a skipped id is set aside in every swept
+have set aside so it is not re-judged — {Run [judgments-run](~/workspace/dev-playbook/scripts/judgments-run)
+again, with a `--skip` per set-aside id} so it is set aside in every swept
 root that declares it:
 
 ```
@@ -143,9 +147,9 @@ looking at the code, the doc, or the judgment.
 
 ## Report
 
-Tell the user, per root: already cached, judged, passed, fixed-then-passed (each
+{Report per root: already cached, judged, passed, fixed-then-passed (each
 id + the edit made), set aside (each id + its `opinion` or crash history + why),
-crashed-and-recovered.
+crashed-and-recovered}.
 
 A repo that tripwires its judgments via pytest arms them with
 `make check-judgments-cache` (also the canonical pre-push hook); that target goes

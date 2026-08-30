@@ -29,6 +29,11 @@ paths = ["judgments/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The suite is mostly waiting -- on fixture `git` subprocesses and the factory
+# tests' real sleeps -- so it shards well across cores. It sits here rather than
+# in the Makefile because repo-lint holds `test:` verbatim; `uv run pytest -n0`
+# turns it off for a pdb run.
+addopts = ["-n", "auto"]
 # src/ exposes the dev_playbook package; tests/ carries a bare-imported
 # transcript_fakes helper two suites pull in.
 pythonpath = ["src", "tests"]
@@ -37,19 +42,13 @@ pythonpath = ["src", "tests"]
 dev = [
     "mypy>=2.0",
     "pytest>=9.0",
+    "pytest-xdist>=3.8",
     "ruff>=0.15.20",
 ]
 
 [tool.ruff]
 target-version = "py314"
 line-length = 88
-# Externally-managed vendored trees; ruff-pre-commit passes --force-exclude so
-# this holds under the hook as well as under `uv run ruff`. The authoritative
-# list of externally-managed roots is src/dev_playbook/external.py
-# (is_externally_managed); ruff config cannot import Python, so this literal
-# mirrors that source of truth — keep the two in sync.
-extend-exclude = ["dotfiles/.agents"]
-
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF", "D"]
 # D401 (imperative-mood summaries) is excluded to keep the workspace's

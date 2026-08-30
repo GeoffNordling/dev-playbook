@@ -1,74 +1,21 @@
 ---
 type: Standard
 title: Doc Conventions
-description: How Markdown docs are written — voice, structure, brevity, current-state-only, one concern per document
+description: How Markdown docs are written — contents, opening, section formats, voice, naming, and mechanics
 ---
 
 # Doc Conventions
 
-How Markdown documents in workspace repos are written. Applies to every doc
-in the repo documentation hierarchy. Named tics to remove are cataloged in
-[Slop Tics](/standards/prose/slop-tics.md).
+How Markdown documents in workspace repos are written. Applies to every
+authored document, except one carrying `type: Reference` frontmatter — a
+verbatim mirror of an external text, which keeps its author's words wherever
+it lives. A repo exempts any further path by listing it in a tracked
+`.prose-lint-exempt` at its root, under a comment saying why. Named tics to
+remove are cataloged in [Slop Tics](/standards/prose/slop-tics.md).
 
-## Current state and next steps only
+## Contents
 
-Describe what exists and what's planned next. Don't reference removed things,
-past state, or rejected alternatives.
-[Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
-
-Decision Records are the exception. A Decision Record in `docs/decisions/` is a
-dated record of a past decision — the choice made, the alternatives rejected,
-the context that forced it — and is never rewritten to match later state.
-
-## Voice
-
-Declarative present tense. "The symlink is relative." Not "We make the
-symlink relative."
-
-State rules in the positive: what to do, where a thing lives. "Runnables
-live in `scripts/`", not "don't put runnables elsewhere". A prohibition
-appears only when the prohibition itself is the rule.
-
-No second person in declarative docs. "You" belongs to agent-facing
-instruction files — `CLAUDE.md` at every level, skills, and rules — that
-direct an executor; a standard states facts.
-
-## Spelling
-
-House spelling is American English. Write `judgment`, not `judgement` — and
-`judgments`, not `judgements`. `prose-lint` enforces this one deterministically,
-because the British form slips back in through habit and voice dictation. Naming
-the forbidden form in prose stays legible as long as it sits in backticks: the
-detector checks only text outside code spans, so this section names it without
-tripping the detector.
-
-## Heading casing
-
-H1 uses Title Case. H2 and below use sentence case.
-`# File Skeleton` at H1; `## Authored, not generated` at H2.
-
-Proper nouns and code identifiers keep their native case at every level:
-`# CLAUDE.md Content`, `## pyproject.toml`, `### Ask in prose, never AskUserQuestion`.
-
-## Grammatical parallelism
-
-Items that sit together take the same grammatical shape: the headings of a
-document, the bullets of a list, the clauses of a sentence. One form holds
-throughout, so a break in the pattern marks a break in meaning.
-
-## Open with purpose
-
-State what the document is for and what a reader should be able to do after
-reading. Write for a reader with no prior conversation context.
-
-## One rule, one place
-
-Each rule lives in the lead sentence of its section. If the lead carries the
-rule, the section can stop there. Section size matches topic size.
-
-State each rule once. Consolidate any duplicates.
-
-## One concern per document
+### One concern per document
 
 A document covers one concern. When a file accumulates several — distinct
 questions a reader might arrive with — it splits into a directory of
@@ -76,71 +23,53 @@ single-concern documents with an `index.md`, per the
 [OKF SPEC](/standards/references/okf-spec.md). A reader crawling for one
 answer loads one small file.
 
-## Lead with the edge case when reach is surprising
+A subject with layers may split by layer, each file named for the layer it
+holds.
 
-If a rule has surprising scope, name the edge case in the lede: "These
+### One rule, one place
+
+Each rule lives in the lead sentence of its section. If the lead carries the
+rule, the section can stop there. Section size matches topic size.
+
+### Current state and next steps only
+
+A document describes what exists and what's planned next, and doesn't
+reference removed things, past state, or rejected alternatives.
+[Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
+History earns a sentence only when the present is unintelligible without
+it — a constraint that still binds, a decision that still governs.
+
+Decision Records are the exception. A Decision Record in `docs/decisions/` is a
+dated record of a past decision — the choice made, the alternatives rejected,
+the context that forced it — and is never rewritten to match later state.
+
+### Point at canonical artifacts
+
+When a real file IS the standard, the doc references that file instead of
+restating its contents, in the form
+[Cross-References](/standards/knowledge-organization/cross-references.md)
+sets.
+
+## Opening
+
+### Open with purpose
+
+The opening states what the document is for and what a reader should be able
+to do after reading. It says why that matters before the reader thinks to ask,
+and addresses a reader with no prior conversation context.
+
+### Declare before use
+
+A concept is defined before the prose leans on it — the definition sits above
+its first use. A concept another document defines is linked at first use.
+
+### Lead with the edge case when reach is surprising
+
+A rule with surprising scope names the edge case in the lede: "These
 conventions apply to every Python sub-project, including script-only ones
 with no `src/`."
 
-## Name concepts once, use consistently
-
-Pick one name per concept and use it across the document. The repo's root
-[`CONTEXT.md`](/CONTEXT.md) holds the established vocabulary; a doc uses its
-terms where they apply, with no obligation to extend it.
-
-## Terminology: the person is the user
-
-One actor — the dispatcher, reviewer, and approver — carries one name
-everywhere: the `user`. Agent-facing instruction text uses it because that is
-what Claude Code calls the person (`AskUserQuestion`): `CLAUDE.md` at every
-level — root, nested, and the global `dotfiles/dot-claude/CLAUDE.md` alike —
-plus the agent-definition, skill, and rule bodies under
-`dotfiles/dot-claude/agents/`, `dotfiles/dot-claude/skills/`, and
-`dotfiles/dot-claude/rules/`. Declarative documentation uses the same word
-where it describes that actor in third person: `software-factory/`,
-`standards/`, `docs/`, and `README.md`.
-
-**One word, no synonyms.** The actor is `user` in every authored file — never
-an alternative noun for the same person, in any case, plural, or hyphenated
-compound. Where such a compound is the natural phrase, drop it rather than
-translate it: "readable", not "readable by a person". Translate instead only
-where the qualifier carries a distinction the reader needs — the system pauses
-at many points and `software-factory/user-checkpoints.md` covers the subset
-that are the user's, so dropping the word there would name the wrong set. The
-test is whether removing it loses a distinction.
-
-**Exemption is declared per repo in `.prose-lint-exempt`.** Text the rule does
-not govern — captured external documents, prose authored for an outside
-audience in that audience's vocabulary, a tool file that must name the word to
-process it — is exempted by listing its path in a tracked `.prose-lint-exempt`
-at the repo root: one repo-relative file or directory per line, a directory
-covering its whole subtree, `#` opening a comment line. Any file is listable,
-an `index.md` included — an index description that must carry the word exempts
-its index the same way. Every exemption is a reviewable line in it, ideally
-under a comment saying why. Structural exemptions stand alongside it: skills
-vendored under an `.agents/` path, and Markdown verbatim mirrors carrying
-`type: Reference` frontmatter, which follows the document wherever it lives.
-
-**Agent-facing instruction text never speaks in the first person.** No `I`, `me`,
-or `my` in the files listed above: they are commands addressed *to* the agent,
-so the only voices they carry are the imperative and `you`. A first-person
-sentence puts the document in the agent's mouth, which inverts who is
-instructing whom. `repo-lint` enforces this deterministically over the body of
-every first-party agent definition, skill, and rule as well as `CLAUDE.md`.
-
-The ban governs the document's own voice: a double-quoted utterance is exempt.
-Write the phrasing a user types to trigger a skill, or the reaction a
-prototype exists to provoke, in their words — `"Show me a few options before
-I commit."` — and reserve the surrounding prose for the imperative. A skill's
-frontmatter is not exempt: its `description` is prose the agent reads to
-choose the skill, so it answers to the same voice as the body.
-
-**Skills vendored verbatim are exempt.** A third-party skill under an `.agents/`
-path is an external dependency, carried unmodified so it can be re-synced from
-upstream; its voice is its author's to set. The ban governs what this workspace
-writes and owns — the skills under `.claude/`.
-
-## Choose each format by argument
+## How to decide between section formats
 
 Every block's form is a decision with a reason behind it. The arguments that
 recur:
@@ -151,17 +80,70 @@ recur:
   derail the argument inline.
 - **Table vs repeated structure.** The same shape with the same fields three or
   more times is a table; anything fewer or uneven is prose with bold leads.
-- **Quote vs paraphrase.** Quote where the original wording is the point;
-  paraphrase where only the idea is.
+- **Quote vs paraphrase.** The quote goes where the original wording is the
+  point; the paraphrase where only the idea is.
 - **Code block vs inline code.** Multi-line, runnable, or illustrative goes in a
   block; a single token or identifier stays inline.
 
-## Point at canonical artifacts
+## Voice
 
-When a real file IS the standard, the doc directs the reader to it.
-The build standard's `canonical.md` names each canonical artifact and points
-at the file instead of restating its contents.
+### Declarative present tense
 
-## Brevity
+"The symlink is relative." Not "We make the symlink relative."
 
-Choose brevity over completeness. Trim further than instinct says.
+### Positive statement
+
+Rules read in the positive: what to do, where a thing lives. "Runnables
+live in `scripts/`", not "don't put runnables elsewhere". A prohibition
+appears only when the prohibition itself is the rule.
+
+### Person of address
+
+Two kinds of document, two persons. **Harness-loaded agent instructions** — the
+runbook and context members of the Claude Code file registry
+([files.md](/standards/harness/files.md)) — are addressed *to* the executing
+agent, so they speak in the imperative and `you`, and never in the first
+person: no `I`, `me`, or `my`. A first-person sentence puts the document in the
+agent's mouth, which inverts who is instructing whom. **A declarative
+document** states facts to a reader instead: third person, no `you`.
+
+The ban governs the document's own voice: a double-quoted utterance is exempt.
+The phrasing a user types to trigger a skill, or the reaction a prototype
+exists to provoke, appears in their words — `"Show me a few options before
+I commit."` — while the surrounding prose stays imperative. A
+runbook's frontmatter is not exempt: its `description` is prose the agent
+reads to choose the runbook, so it answers to the same voice as the body.
+
+## Naming
+
+### Name concepts once, use consistently
+
+One name per concept holds across the document. The repo's root
+[`CONTEXT.md`](/CONTEXT.md) holds the established vocabulary; a doc uses its
+terms where they apply, with no obligation to extend it.
+
+### Terminology: the person is the user
+
+One actor — the dispatcher, reviewer, and approver — is the `user` in every
+authored file, never a synonym, in any case, plural, or compound.
+
+## Mechanics
+
+### Spelling
+
+House spelling is American English: `judgment`, not `judgement` — and
+`judgments`, not `judgements`.
+
+### Heading casing
+
+H1 uses Title Case. H2 and below use sentence case.
+`# File Skeleton` at H1; `## Authored, not generated` at H2.
+
+Proper nouns and code identifiers keep their native case at every level:
+`# CLAUDE.md Content`, `## pyproject.toml`, `### Ask in prose, never AskUserQuestion`.
+
+### Grammatical parallelism
+
+Items that sit together take the same grammatical shape: the headings of a
+document, the bullets of a list, the clauses of a sentence. One form holds
+throughout, so a break in the pattern marks a break in meaning.

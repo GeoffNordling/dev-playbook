@@ -15,23 +15,30 @@ applies two deterministic rules:
     is absolute, so the check runs over every tracked file of every type,
     whole-file — frontmatter, fenced blocks, and inline code spans included;
     there is no backtick escape hatch.
+  - **agent-facing-voice** — a harness-loaded agent instruction file is
+    addressed *to* the executing agent, so it never speaks in the first person
+    (prose/conventions.md — Voice). Unlike its two siblings this rule reads only
+    the agent-facing subset of the tree (``md.is_agent_instruction``), and it
+    carries the ``harness.`` prefix: the Harness card owns the claim, because
+    the scope comes from the Claude Code file registry, while the Prose card
+    owns the wording. Frontmatter is in scope — a runbook's ``description`` is
+    prose the agent reads to choose it.
 
 Scope is **all authored content, harness files included** (``CLAUDE.md``,
 rules, skills; for the banned-word rule, code and config too). What is out is
-``md.classify``'s ``"excluded"`` category: externally-managed vendored trees
-(which ``classify`` decides through the shared dev_playbook.external registry)
-and transient scratch (``PLAN.md`` / ``PROGRESS.md``, the root ``tmp/`` tree).
+``md.classify``'s ``"excluded"`` category: transient scratch (``PLAN.md`` /
+``PROGRESS.md``, the root ``tmp/`` tree).
 Verbatim upstream mirrors are excluded per file via the registry's
 ``is_verbatim_doc`` (``type: Reference`` documents). Symlinks are skipped: a
 link's content belongs to its target, which is scanned at its own path when
-authored here and is not ours when vendored. Beyond those structural
+it lives in the repo and is not ours when it does not. Beyond those structural
 exclusions, each repo declares its own: a tracked root-level
 ``.prose-lint-exempt`` lists the paths — files or whole directories — that
-both rules skip (dev-playbook's own lists this module and its test file,
+every rule skips (dev-playbook's own lists this module and its test file,
 which must name the banned word to ban it).
 
 Output:
-    stdout — one finding per line, ``file:line: prose.rule message``.
+    stdout — one finding per line, ``file:line: <card>.rule message``.
     stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
@@ -49,7 +56,7 @@ from pathlib import Path
 
 import yaml
 
-from dev_playbook import md
+from dev_playbook import md, voice
 from dev_playbook.external import is_verbatim_doc
 from dev_playbook.findings import print_rules, render
 
@@ -63,14 +70,16 @@ class CannotRun(Exception):
     """
 
 
-# The rule ids this detector emits, namespaced by the Prose card whose
-# questions they answer. Kept module-level constants so every emission site
-# references them, never a raw literal, and RULES (what --list-rules prints)
+# The rule ids this detector emits, each namespaced by the card whose question
+# it answers — two under Prose, and the voice rule under Harness, whose registry
+# fixes which files it governs. Kept module-level constants so every emission
+# site references them, never a raw literal, and RULES (what --list-rules prints)
 # cannot drift from what the detector emits.
 JUDGMENT_SPELLING = "prose.judgment-spelling"
 BANNED_WORD = "prose.banned-word"
+AGENT_FACING_VOICE = "harness.agent-facing-voice"
 
-RULES = (JUDGMENT_SPELLING, BANNED_WORD)
+RULES = (JUDGMENT_SPELLING, BANNED_WORD, AGENT_FACING_VOICE)
 
 # The British form: the word "judgement", optionally pluralized, as a whole word
 # so "judgemental" and the American "judgment" are both left alone. Matched
@@ -89,6 +98,13 @@ BANNED_MESSAGE = (
     "the person is the `user`; the word `human` appears in no authored file "
     "(prose/conventions.md — Terminology)"
 )
+
+# A double-quoted span on one line is somebody else's voice — the phrasing a
+# user types to trigger a skill, the reaction a prototype is built to provoke —
+# so the document is quoting, not speaking. Quotes do not span lines here: a
+# lone quotation mark closes at the newline rather than swallowing the rest of
+# the file.
+QUOTED_SPEECH_PATTERN = re.compile(r'"[^"\n]*"')
 
 # The per-repo exemption declaration: a tracked file at the repo root, one
 # repo-relative path per line, a directory entry (trailing slash optional)
@@ -149,6 +165,24 @@ def scan_banned(rel: str, text: str) -> list[Finding]:
     return findings
 
 
+def scan_voice(rel: str, text: str) -> list[Finding]:
+    """Flag every first-person token in a harness-loaded agent instruction file.
+
+    Fenced blocks are dropped by ``md.lines_outside_fences``; inline code spans
+    and double-quoted utterances are stripped per line before matching, so a
+    backticked example and a quoted phrase the document is reporting rather than
+    speaking both pass. At most one finding per line per fault, since a line
+    saying "I" three times has one thing wrong with it.
+    """
+    findings: list[Finding] = []
+    for line_num, line in md.lines_outside_fences(text):
+        prose = QUOTED_SPEECH_PATTERN.sub("", md.INLINE_CODE_PATTERN.sub("", line))
+        for pattern, fault in voice.VOICE_PATTERNS:
+            if pattern.search(prose):
+                findings.append(Finding(rel, line_num, AGENT_FACING_VOICE, fault))
+    return findings
+
+
 def exempt_paths(root: Path) -> tuple[str, ...]:
     """The paths ``root``'s ``.prose-lint-exempt`` declares, or empty.
 
@@ -179,17 +213,17 @@ def is_exempt(rel: str, exempt: tuple[str, ...]) -> bool:
 
 
 def audit(root: Path) -> list[Finding]:
-    """Scan every authored file under ``root`` for both prose rules.
+    """Scan every authored file under ``root`` for all three rules.
 
     Scope is wider than ``md.classify``'s concept split — harness files are in,
     and the banned-word rule reads every tracked file, not just Markdown — but
-    ``classify``'s ``"excluded"`` category is out: externally-managed vendored
-    trees, the ``.git`` tree, and the transient scratch that is not authored
-    content (``PLAN.md`` / ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing
-    that one boundary keeps vendored-tree exclusion on the shared registry
-    (``classify`` consults it) and stops the gate firing on scratch. Verbatim
-    Reference docs are excluded per file, the repo's ``.prose-lint-exempt``
-    declarations per path; symlinks and binary files (NUL byte) are skipped.
+    ``classify``'s ``"excluded"`` category is out: the ``.git`` tree and the
+    transient scratch that is not authored content (``PLAN.md`` /
+    ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing that one boundary
+    stops the gate firing on scratch. Verbatim Reference docs are excluded per
+    file, the repo's ``.prose-lint-exempt`` declarations per path; symlinks and
+    binary files (NUL byte) are skipped — a link's content belongs to its
+    target, scanned at its own path when it lives in the repo.
     """
     exempt = exempt_paths(root)
     findings: list[Finding] = []
@@ -215,6 +249,11 @@ def audit(root: Path) -> list[Finding]:
                 continue
             offset = text.count("\n", 0, len(text) - len(body))
             findings.extend(scan_text(rel, body, offset))
+            if md.is_agent_instruction(rel):
+                # Whole-file, not the body: a runbook's `description` is prose
+                # the agent reads to choose it, so frontmatter answers to the
+                # same voice.
+                findings.extend(scan_voice(rel, text))
         findings.extend(scan_banned(rel, text))
     return findings
 
@@ -223,7 +262,10 @@ def main(argv: list[str] | None = None) -> int:
     """Scan a repo's files and print one finding per line; return the exit code."""
     parser = argparse.ArgumentParser(
         prog="prose-lint",
-        description="Lint authored prose: judgment spelling, the banned actor noun.",
+        description=(
+            "Lint authored prose: judgment spelling, the banned actor noun, "
+            "the agent-facing voice."
+        ),
     )
     parser.add_argument(
         "directory",

@@ -27,7 +27,7 @@ governs lives wherever that population naturally lives:
 | Rules | Governed population |
 |---|---|
 | `build/` | every repo tree in the workspace |
-| `claude-code/` | the harness files in every repo |
+| `harness/` | the harness files in every repo |
 | `instrument/` | the specs in `instruments/` |
 | `standard/` | the cards in this very directory |
 

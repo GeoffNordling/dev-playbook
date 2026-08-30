@@ -16,7 +16,7 @@ A decision lives with the thing it governs: a decision about one repo is recorde
 
 ## Index
 
-The record listing lives in `docs/decisions/index.md` — one line per record, carrying the record's `description` — so a reader or skill can find the relevant records without opening every file. It follows the [indexes.md](/standards/docs/indexes.md) rules, and the staleness checker fails any commit that adds, renames, or removes a record without updating the index in the same change. Create it lazily alongside the first record.
+The record listing lives in `docs/decisions/index.md` — one line per record, carrying the record's `description` — so a reader or skill can find the relevant records without opening every file. It follows the [indexes.md](/standards/knowledge-organization/indexes.md) rules, and the staleness checker fails any commit that adds, renames, or removes a record without updating the index in the same change. Create it lazily alongside the first record.
 
 `docs/decisions/README.md` is a short narrative orientation for the directory.
 
@@ -58,7 +58,7 @@ date: {YYYY-MM-DD}
 
 A Decision Record can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
-A Decision Record is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/docs/document-types.md)). The `description` is the record's triage line and feeds `docs/decisions/index.md`; on a one-sentence record it echoes the body, since the description serves triage and the body is the record.
+A Decision Record is a concept document, so it carries the standard `type` + `title` + `description` frontmatter (see [document-types.md](/standards/knowledge-organization/document-types.md)). The `description` is the record's triage line and feeds `docs/decisions/index.md`; on a one-sentence record it echoes the body, since the description serves triage and the body is the record.
 
 ## Date
 

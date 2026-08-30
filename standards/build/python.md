@@ -101,3 +101,4 @@ Declare an entry point only when the project has a CLI:
 
 `uv init --package <repo>` generates the uv_build src layout; overwrite the
 generated `pyproject.toml` with the canonical shape.
+</content>

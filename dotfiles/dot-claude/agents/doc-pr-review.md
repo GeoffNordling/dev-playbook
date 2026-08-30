@@ -19,21 +19,21 @@ code files to the code track, which reviews in parallel with you; both are
 reference material: read them where the docs describe them, and post no
 findings on them. Judgment declarations under `judgments/` are ordinary docs
 here — a review may flag one as stale against the artifacts it names
-([Maintenance](~/workspace/dev-playbook/standards/judgments/declarations.md#maintenance));
+([Maintenance](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#maintenance));
 cache state is never a finding.
 
 ## Read first
 
 Before doing anything else, read end-to-end:
 
-- [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)
+- {Read [review contract](~/workspace/dev-playbook/software-factory/review-contract.md)}
   — the stance, the green gate, the two severities, the thread model and its
   `gh` mechanics, the cycle header, delta re-review, the report envelope, and
   the escalation boundary.
-- [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md) —
+- {Read [PR feedback](~/workspace/dev-playbook/software-factory/pr-feedback.md)} —
   every comment surface a pull request carries, and the command that reaches
   each.
-- [doc conventions](~/workspace/dev-playbook/standards/prose/conventions.md) —
+- {Read [doc conventions](~/workspace/dev-playbook/standards/prose/conventions.md)} —
   the contract every doc answers to, whatever the diff holds.
 
 Then report: `READ: review-contract.md, pr-feedback.md, doc-conventions.md`.
@@ -53,7 +53,8 @@ read; below, `<issue>` is that number.
 
 1. **Run the green gate** — red is an escalation (§ Escalations), never a
    finding.
-2. **Resolve the repository and the pull request**, in the order the
+2. **{Read from GitHub the repository name and the pull request's number
+   and head sha}**, in the order the
    contract's
    [`gh` mechanics](~/workspace/dev-playbook/software-factory/review-contract.md#the-gh-mechanics)
    fix, and spell both into every later command:
@@ -66,15 +67,15 @@ read; below, `<issue>` is that number.
    so makes the number mandatory; from here the number and `-R` travel
    together on every `gh pr` call, and `headRefOid` is the `commit_id` of every
    call that posts. No pull request is an escalation (§ Escalations).
-3. **Read the brief** —
-   `gh issue view <issue> -R <owner>/<repo> --json title,body,comments`.
+3. **{Read from GitHub the brief;
+   `gh issue view <issue> -R <owner>/<repo> --json title,body,comments`}**.
    The brief is the contract the work set out to satisfy, and its binding
    sections are what a Blocking fidelity finding cites.
-4. **Read the pull request's existing threads and comments**, so you don't
-   re-flag what a prior doc-review cycle caught.
-5. **Take the scope** the contract's
-   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review)
-   fixes: `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
+4. **{Read from GitHub the pull request's existing threads and comments}**,
+   so you don't re-flag what a prior doc-review cycle caught.
+5. **{Read from GitHub the diff in scope}**, per the contract's
+   [delta re-review](~/workspace/dev-playbook/software-factory/review-contract.md#delta-re-review):
+   `gh pr diff -R <owner>/<repo> <pr>` gives the whole diff,
    `git diff <last-reviewed-sha>..HEAD` the delta. At cycle 1 an empty diff, or
    a diff with no documentation in it, is an escalation (§ Escalations); from
    cycle 2 a delta that is empty or carries no documentation is an ordinary
@@ -88,9 +89,9 @@ conventions. Read the ones it calls for, end-to-end, then report
 
 | The diff carries | Read |
 |---|---|
-| skills or agent definitions | [skill conventions](~/workspace/dev-playbook/standards/claude-code/skill-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/dotfiles/.agents/skills/writing-for-agents/SKILL.md) for the craft both forms answer to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
+| skills or agent definitions | [runbook conventions](~/workspace/dev-playbook/standards/harness/runbook-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/standards/harness/writing-for-agents.md) for the craft both forms answer to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
 | standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
-| structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/docs/index.md) |
+| structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/knowledge-organization/index.md) |
 
 A rule you did not read cannot carry a Blocking finding.
 
@@ -149,27 +150,26 @@ hand-maintained — never flag them, not even as an out-of-scope follow-up.
 
 ## 4. Attach findings
 
-Post one review per the
+{Write to GitHub one review with the findings as threads}, per the
 [thread model](~/workspace/dev-playbook/software-factory/review-contract.md#findings-are-threads),
 using the `gh` mechanics the contract carries. The clean dimensions the review
 body enumerates are the ones § Audit the change ran.
 
-From cycle 2, resolve the threads your prior cycle opened whose fixes you have
-verified, per
+From cycle 2, {Write to GitHub resolutions of your prior cycle's threads
+whose fixes you have verified}, per
 [resolution ownership](~/workspace/dev-playbook/software-factory/review-contract.md#resolution-ownership).
 
 ## 5. Close
 
-End on the
-[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
-with `outcome` `"done"`.
+{Report `outcome` `"done"`}, per the
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope).
 
 ## 6. Escalations
 
-Whenever you can't produce the review, end on the same
-[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope)
-with `outcome` `"escalated"` and the reason in `gist`. Write nothing to
-GitHub. Your blocks:
+{If you can't produce the review, {Report `outcome` `"escalated"` and the
+reason in `gist`}}, per the same
+[report envelope](~/workspace/dev-playbook/software-factory/review-contract.md#the-report-envelope).
+Write nothing to GitHub. Your blocks:
 
 - **Green gate red.** The check gate fails — the pull request sits over a red
   tree. Surface it; don't review broken work.

@@ -138,15 +138,6 @@ def test_flags_harness_markdown(tmp_path: Path) -> None:
     assert [f.file for f in findings] == ["CLAUDE.md"]
 
 
-def test_skips_externally_managed_tree(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {"dotfiles/.agents/skills/x/SKILL.md": "vendored judgement text\n"},
-    )
-
-    assert prose_lint.audit(repo) == []
-
-
 def test_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
@@ -253,13 +244,10 @@ def test_ban_reaches_frontmatter(tmp_path: Path) -> None:
     assert [(f.file, f.line) for f in findings] == [("docs/x.md", 3)]
 
 
-def test_ban_skips_vendored_and_verbatim(tmp_path: Path) -> None:
+def test_ban_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {
-            "dotfiles/.agents/skills/x/SKILL.md": "the human partner\n",
-            "standards/references/spec.md": "---\ntype: Reference\n---\nhuman\n",
-        },
+        {"standards/references/spec.md": "---\ntype: Reference\n---\nhuman\n"},
     )
 
     assert prose_lint.audit(repo) == []
@@ -332,14 +320,14 @@ def test_binary_file_is_skipped(tmp_path: Path) -> None:
 
 
 def test_symlinked_content_is_not_scanned(tmp_path: Path) -> None:
-    # A symlink's content belongs to its target: vendored targets are not ours,
-    # and in-repo targets are scanned at their own path.
-    repo = make_repo(
-        tmp_path, {"dotfiles/.agents/skills/x/SKILL.md": "the human partner\n"}
-    )
+    # A symlink's content belongs to its target: an out-of-repo target is not
+    # ours, and an in-repo target is scanned at its own path.
+    target = tmp_path / "outside.md"
+    target.write_text("the human partner\n")
+    repo = make_repo(tmp_path, {})
     link = repo / "dotfiles/dot-claude/skills/x/SKILL.md"
     link.parent.mkdir(parents=True)
-    os.symlink("../../../.agents/skills/x/SKILL.md", link)
+    os.symlink(target, link)
 
     assert prose_lint.audit(repo) == []
 
@@ -352,6 +340,146 @@ def test_ban_reaches_repo_names(name: str) -> None:
 
     with pytest.raises(RepoInitError, match="prose-lint"):
         render_tree(spec, "0" * 40)
+
+
+# --- agent-facing voice: the first-person ban over harness-loaded files ---
+
+
+def skill(body: str, description: str = "Use when demoing.") -> str:
+    return f"---\nname: demo\ndescription: {description}\n---\n\n# Demo\n\n{body}"
+
+
+def voice_findings(repo: Path) -> list[prose_lint.Finding]:
+    return [
+        f for f in prose_lint.audit(repo) if f.rule == prose_lint.AGENT_FACING_VOICE
+    ]
+
+
+def test_claude_md_first_person_fails(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {"CLAUDE.md": "# Repo\n\nI want my tests to pass.\n"})
+
+    faults = {f.message for f in voice_findings(repo)}
+
+    assert "never speak in first person: 'I'" in faults
+    assert "never speak in first person: 'my'" in faults
+
+
+def test_voice_guards_io_abbreviation(tmp_path: Path) -> None:
+    # "I/O" is an abbreviation, not a first-person violation.
+    repo = make_repo(tmp_path, {"CLAUDE.md": "# Repo\n\nProduce well-formed I/O.\n"})
+
+    assert voice_findings(repo) == []
+
+
+def test_nested_claude_md_is_checked(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {"sub/CLAUDE.md": "I run the tool from here.\n"})
+
+    assert [f.file for f in voice_findings(repo)] == ["sub/CLAUDE.md"]
+
+
+def test_object_pronoun_fails(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path, {".claude/rules/commands.md": "# Commands\n\nHand it to me.\n"}
+    )
+
+    assert [f.message for f in voice_findings(repo)] == [
+        "never speak in first person: 'me'"
+    ]
+
+
+@pytest.mark.parametrize(
+    "relpath",
+    [
+        ".claude/skills/demo/SKILL.md",
+        "dotfiles/dot-claude/skills/demo/SKILL.md",
+        ".claude/agents/demo.md",
+        "dotfiles/dot-claude/agents/demo.md",
+        ".claude/rules/commands.md",
+        "dotfiles/dot-claude/rules/commands.md",
+    ],
+)
+def test_every_runbook_and_rule_root_is_checked(tmp_path: Path, relpath: str) -> None:
+    # One roster decides membership for the six roots, so a consumer's .claude/
+    # tree and dev-playbook's Stow source answer alike.
+    repo = make_repo(tmp_path, {relpath: skill("I check the work.\n")})
+
+    assert [f.file for f in voice_findings(repo)] == [relpath]
+
+
+def test_frontmatter_is_in_scope(tmp_path: Path) -> None:
+    # The description is prose the agent reads to choose the runbook, so it
+    # answers to the same voice as the body.
+    repo = make_repo(
+        tmp_path,
+        {".claude/skills/demo/SKILL.md": skill("Run it.\n", "Use when I run my demo.")},
+    )
+
+    assert {f.line for f in voice_findings(repo)} == {3}
+
+
+def test_code_is_not_voice(tmp_path: Path) -> None:
+    # A backticked token and a fenced example are code, not the document talking.
+    repo = make_repo(
+        tmp_path,
+        {
+            ".claude/skills/demo/SKILL.md": skill(
+                "Ask before running `I am ready`.\n\n"
+                "```text\nI told my agent to run it.\n```\n"
+            )
+        },
+    )
+
+    assert voice_findings(repo) == []
+
+
+def test_quoted_speech_is_exempt(tmp_path: Path) -> None:
+    # A quoted utterance is the user's voice, not the document's — the trigger
+    # phrasing a skill is written to recognize.
+    repo = make_repo(
+        tmp_path,
+        {
+            ".claude/skills/demo/SKILL.md": skill(
+                'Use when the user says "Show me my options before I commit."\n'
+            )
+        },
+    )
+
+    assert voice_findings(repo) == []
+
+
+def test_prose_outside_the_quotes_still_fails(tmp_path: Path) -> None:
+    # The exemption ends at the closing quote; the sentence around it is the
+    # document speaking.
+    repo = make_repo(
+        tmp_path,
+        {
+            ".claude/skills/demo/SKILL.md": skill(
+                'When the user says "ship it", I commit my work.\n'
+            )
+        },
+    )
+
+    assert len(voice_findings(repo)) == 2
+
+
+def test_declarative_document_is_out_of_scope(tmp_path: Path) -> None:
+    # The ban reaches agent instructions, not every authored doc: a standard
+    # quoting first-person prose is describing, not instructing.
+    repo = make_repo(tmp_path, {"standards/prose.md": "# Prose\n\nI, me, my.\n"})
+
+    assert voice_findings(repo) == []
+
+
+def test_exempt_declaration_covers_the_voice_rule(tmp_path: Path) -> None:
+    # One exemption mechanism for every rule this detector runs, as the standard
+    # states — a path listed here is exempt from these conventions, not from two
+    # of the three.
+    files = {
+        ".claude/skills/demo/SKILL.md": skill("I check my own work.\n"),
+        ".prose-lint-exempt": "# quoted upstream text\n.claude/skills/demo\n",
+    }
+
+    assert voice_findings(make_repo(tmp_path, files)) == []
 
 
 # --- CLI: --list-rules, exit codes, and finding format ---
@@ -375,7 +503,11 @@ def test_list_rules_prints_the_rule_id(tmp_path: Path) -> None:
     )
 
     assert result.returncode == 0, result.stderr
-    assert result.stdout.split() == ["prose.banned-word", "prose.judgment-spelling"]
+    assert result.stdout.split() == [
+        "harness.agent-facing-voice",
+        "prose.banned-word",
+        "prose.judgment-spelling",
+    ]
 
 
 def test_clean_repo_exits_zero(tmp_path: Path) -> None:

@@ -86,40 +86,15 @@ def test_readings_artifacts_bucket_as_reading_not_config_or_code(
     }
 
 
-def test_skill_buckets_split_authored_from_thirdparty(tmp_path: Path) -> None:
+def test_skill_bundle_members_bucket_as_harness_skill(tmp_path: Path) -> None:
     repo = graph_repo(
         tmp_path,
-        {
-            "dotfiles/dot-claude/skills/fmt/SKILL.md": "authored",
-            "dotfiles/.agents/skills/vendor/SKILL.md": "installed",
-        },
+        {"dotfiles/dot-claude/skills/fmt/SKILL.md": "a skill"},
     )
 
     doc = graph.build_graph(repo)
 
-    assert doc["nodes"]["dotfiles/dot-claude/skills/fmt/SKILL.md"] == (
-        "harness-skill-authored"
-    )
-    assert doc["nodes"]["dotfiles/.agents/skills/vendor/SKILL.md"] == (
-        "harness-skill-thirdparty"
-    )
-
-
-def test_agents_segment_off_the_vendored_root_is_not_thirdparty(
-    tmp_path: Path,
-) -> None:
-    # thirdparty is decided by the external registry (root-anchored at
-    # dotfiles/.agents), not a bare ".agents" segment at any depth. A skill
-    # bundle under some other ".agents" directory is authored content, so it
-    # buckets as harness-skill-authored, not harness-skill-thirdparty.
-    repo = graph_repo(
-        tmp_path,
-        {"sub/.agents/skills/x/SKILL.md": "authored"},
-    )
-
-    doc = graph.build_graph(repo)
-
-    assert doc["nodes"]["sub/.agents/skills/x/SKILL.md"] == "harness-skill-authored"
+    assert doc["nodes"]["dotfiles/dot-claude/skills/fmt/SKILL.md"] == "harness-skill"
 
 
 def test_gitignored_files_counted_per_pattern_not_as_nodes(

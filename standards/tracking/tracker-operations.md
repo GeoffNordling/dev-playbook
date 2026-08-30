@@ -83,7 +83,5 @@ the tracker are these.
 
 This document was seeded from
 `skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md` in
-[mattpocock/skills](https://github.com/mattpocock/skills), pinned at release
-`v1.2.3` (`6acc160e4e0cd062dbbbd7a1b26ae92855edf07e`), then adapted to this
-workspace's voice and stack. The pin is what a later sweep delta-checks this
-file against.
+[mattpocock/skills](https://github.com/mattpocock/skills) at release
+`v1.2.3`, then adapted to this workspace's voice and stack.

@@ -36,7 +36,7 @@ different repo resolves as written, to that repo's main checkout. The rule
 governs all same-repo file access — reads and writes — not just citation
 following.
 
-The normative definition lives in `standards/docs/cross-references.md` under the
+The normative definition lives in `standards/knowledge-organization/cross-references.md` under the
 stable anchor `#same-repo-resolution`. It is copied verbatim into the global
 `dotfiles/dot-claude/CLAUDE.md`, the one carrier an agent reliably holds
 mid-flight before it has read any standard; `skill-conventions.md` and the

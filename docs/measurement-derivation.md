@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Measurement Derivation
 description: How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
 ---

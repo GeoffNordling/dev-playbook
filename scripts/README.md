@@ -62,19 +62,19 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
 | `python-lint` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
 | `testing-lint` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
-| `ref-lint` | [cross-references.md](/standards/docs/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
-| `okf-lint` | [document-types.md](/standards/docs/document-types.md), [indexes.md](/standards/docs/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
+| `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
+| `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
-| `skill-lint` | [skill-conventions.md](/standards/claude-code/skill-conventions.md) | Skill conformance |
-| `judgments-lint` | [declarations.md](/standards/judgments/declarations.md) | Judgment declaration validity |
-| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, and the banned actor noun over every tracked file of any type, less the vendored `.agents/` trees and verbatim `type: Reference` mirrors |
+| `harness-files-lint` | [runbook-conventions.md](/standards/harness/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
+| `judgments-lint` | [declarations.md](/standards/semantic-validation/declarations.md) | Judgment declaration validity |
+| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
 | `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
 `decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
-not skip themselves when a target kind is absent. `skill-lint` and
+not skip themselves when a target kind is absent. `harness-files-lint` and
 `standards-lint` are optional-surface: each exits 0 silently when its audited
-surface is absent — no skills, no `standards/` tree — and asserts only over a
+surface is absent — no runbooks, no `standards/` tree — and asserts only over a
 surface that is present. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
@@ -84,13 +84,13 @@ full.
 The scripts share their markdown and Python primitives through the library —
 the installed `dev_playbook` package:
 
-- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, and the OKF concept-doc/harness-owned path classification. Consumed by `ref-lint` and `okf-lint`.
+- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, the OKF concept-doc/harness-owned path classification, and the agent-instruction test behind the voice rule. Consumed by `ref-lint`, `okf-lint`, and `prose-lint`.
 - `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint`, `testing-lint`, and `repo-lint`.
 - `dev_playbook.testing_lint` — the Python-testing detector logic: the three test-file rules (privacy, mirror layout, no-logic) over one walk. Consumed by `testing-lint`.
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.filegraph` — the file-graph builder: node bucketing, edge extraction, and the graph queries (`graph`), plus the self-contained HTML viz assembler (`viz`). Consumed by `file-graph`.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
-- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `repo-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
+- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `prose-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `repo-lint` self-check). Consumed by `repo-init`.
 
 The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
@@ -147,7 +147,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | `bump-pins` | Move the dev-playbook `rev` pin across the governed consumer repos and re-run each one's commit gate — the release step of [distribution.md](/standards/build/distribution.md); commits nothing |
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `repo-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
-| `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages, mirror the externally managed skills, generate `~/.claude/settings.json` for this machine; `--check` reports settings drift and is what the session-start hook runs |
+| `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages and wire up the `~/.bashrc.d` loader |
 | `traverse-issue` | Carry one factory issue from its phase label to an open PR: `traverse-issue <owner/name> <issue> <auto\|user-rework>` — per-issue lock, worktree create-or-reuse, the `build` and `open-pr` nodes launched headless, one JSON line on stdout naming the terminal status |
 
 Run any script with `--help`; each script's docstring documents its behavior in

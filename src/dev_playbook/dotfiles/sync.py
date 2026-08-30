@@ -15,7 +15,6 @@ from pathlib import Path
 # itself, so each package must be targeted at the directory it is named for.
 # Targeting $HOME scatters the contents one level too high.
 PACKAGES = {
-    ".agents": ".agents",
     ".bashrc.d": ".bashrc.d",
     "dot-claude": ".claude",
 }
@@ -104,35 +103,6 @@ def managed_links(home: Path) -> set[Path]:
 def missing_tools() -> list[str]:
     """The required tools this host does not have, in declaration order."""
     return [tool for tool in REQUIRED_TOOLS if shutil.which(tool) is None]
-
-
-def mirror_skills(dotfiles: Path) -> list[str]:
-    """Point dot-claude/skills/ at every .agents/skills/ entry. Names mirrored.
-
-    Claude Code discovers skills only under ~/.claude/skills/, so an externally
-    managed skill is unreachable until it has a symlink in the stowed package.
-    """
-    source = dotfiles / ".agents" / "skills"
-    mirror = dotfiles / "dot-claude" / "skills"
-    if not source.is_dir() or not mirror.is_dir():
-        return []
-
-    for link in mirror.iterdir():
-        if link.is_symlink() and not link.exists():
-            link.unlink()
-
-    mirrored = []
-    for entry in sorted(p for p in source.iterdir() if p.is_dir()):
-        link = mirror / entry.name
-        if link.is_symlink():
-            continue
-        if link.exists():
-            raise SyncError(
-                f"{link} is an authored skill; cannot mirror .agents/skills/{entry.name}"
-            )
-        link.symlink_to(Path("../../.agents/skills") / entry.name)
-        mirrored.append(entry.name)
-    return mirrored
 
 
 def stale_links(home: Path, dotfiles: Path) -> list[Path]:
@@ -224,8 +194,7 @@ def sync(repo: Path, home: Path) -> list[str]:
 
     dotfiles = repo / "dotfiles"
 
-    changed = [f"mirrored skill: {name}" for name in mirror_skills(dotfiles)]
-
+    changed = []
     for target in claim_targets(home, dotfiles):
         changed.append(f"replaced the {target} link with a real directory")
     for link in stray_links(home, dotfiles):
