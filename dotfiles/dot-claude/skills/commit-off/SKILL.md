@@ -15,11 +15,16 @@ Acknowledge activation with exactly:
 
 > Commits are off — everything stays in the working tree for your review.
 
-## Turning committing back on
+Then end the turn. Invoking this skill does not mean start or
+continue work — wait for the user's next instruction.
 
-Any plain-language signal from the user counts — "commits back on",
-"resume committing", "you can commit again". When it comes, acknowledge
-with exactly:
+## Commits remain off for the rest of the session until specifically turned back on
+
+Only an explicit signal from the user turns automatic commits back on — "commit mode back on",
+or similar language. In particular, invoking the `/commit` skill
+does not count — the /commit skill gives permission to commit only once.
+
+When the explicit signal comes, acknowledge with exactly:
 
 > Natural committing is back on.
 
