@@ -13,6 +13,7 @@ COMMANDS = {
     "check-config": commands.check_config,
     "run-task": commands.run_task,
     "check-cleanup": commands.check_cleanup,
+    "check-host-tcp": commands.check_host_tcp,
 }
 
 

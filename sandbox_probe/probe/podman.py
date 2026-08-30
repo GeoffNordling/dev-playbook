@@ -54,6 +54,7 @@ def container_argv(
     workdir: str | None = None,
     name: str | None = None,
     timeout: int | None = None,
+    network: str | None = None,
     image: str = IMAGE,
 ) -> list[str]:
     """The full podman command line for one run. Nothing is executed here.
@@ -84,6 +85,10 @@ def container_argv(
     # deadline from inside instead, so a stranded container ends on its own.
     if timeout:
         argv.append(f"--timeout={timeout}")
+    # The default network already allows outbound TCP; this is only for a run
+    # that needs a non-default view, like mapping the host's loopback in.
+    if network:
+        argv.append(f"--network={network}")
     argv += [mount.to_arg() for mount in mounts]
     argv += [f"--env={name}={value}" for name, value in env.items()]
     argv.append(image)

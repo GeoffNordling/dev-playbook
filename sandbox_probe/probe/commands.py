@@ -7,7 +7,9 @@ does is visible without reading anything else.
 import contextlib
 import shutil
 import signal
+import socket
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -339,6 +341,61 @@ def check_cleanup() -> None:
         description="--timeout to end the stranded container",
     )
     print("--timeout ended it. Nothing left behind either way")
+
+
+# The address the container uses to mean "the host's loopback". pasta's
+# --map-host-loopback wires it to the host's 127.0.0.1, so a listener bound
+# there is reachable from inside without ever appearing on the LAN. Link-local
+# by convention; the value itself is arbitrary.
+HOST_ALIAS = "169.254.1.2"
+
+
+def check_host_tcp() -> None:
+    """Show that a program inside can send a message to a listener on the host.
+
+    This is the fact the measurement fix rests on: the guarded-hole option died
+    because SELinux forbids a container talking to a host program over a unix
+    socket. Over TCP no such process-to-process check exists — the same policy
+    path that lets Claude inside reach Anthropic. This proves it on this
+    machine, through the real image, with the real run flags.
+
+    The listener binds the host's 127.0.0.1 only. pasta maps HOST_ALIAS inside
+    the container to that loopback, so nothing is opened to the network.
+    """
+    listener = socket.create_server(("127.0.0.1", 0))
+    port = listener.getsockname()[1]
+    received: list[bytes] = []
+
+    def accept_one() -> None:
+        conn, _ = listener.accept()
+        with conn:
+            received.append(conn.recv(4096))
+
+    waiter = threading.Thread(target=accept_one, daemon=True)
+    waiter.start()
+
+    message = "hello from the container"
+    sender = (
+        "import socket\n"
+        f"s = socket.create_connection(('{HOST_ALIAS}', {port}), timeout=10)\n"
+        f"s.sendall({message!r}.encode())\n"
+        "s.close()\n"
+        "print('sent')\n"
+    )
+    podman.run(
+        podman.container_argv(
+            mounts=[],
+            env={"HOME": HOME},
+            network=f"pasta:--map-host-loopback={HOST_ALIAS}",
+            command=["python3", "-c", sender],
+        )
+    )
+
+    waiter.join(timeout=10)
+    listener.close()
+    if not received or received[0].decode() != message:
+        raise RuntimeError(f"the listener never got the message; got {received!r}")
+    print(f"host listener on 127.0.0.1:{port} received: {received[0].decode()!r}")
 
 
 def check_fence(mounts: list[podman.Mount] | None = None) -> None:
