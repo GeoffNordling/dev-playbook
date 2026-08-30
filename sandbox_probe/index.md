@@ -4,6 +4,6 @@ A prototype that runs a headless Claude agent inside a podman container, on subs
 
 Ordering: the design first, then the record it came from, then the open question it left.
 
-- [Sandboxed agent design](/sandbox_probe/SPEC.md) — The prescribed build-and-run design for a sandboxed Claude agent — one image, three mounts, and the path layout that makes one instruction work inside and outside podman
+- [Sandboxed agent design](/sandbox_probe/SPEC.md) — The prescribed build-and-run design for a sandboxed Claude agent — one image, four mounts, and the path layout that makes one instruction work inside and outside podman
 - [Sandboxed headless Claude](/sandbox_probe/NOTES.md) — What the sandbox prototype is, how its fence works, what it found on this machine, and the defect to fix next time
 - [Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md) — How a sandboxed run's hook events will reach the host measurement store — the live TCP writer chosen for it, the post-run dump kept as fallback, and the rejected shapes

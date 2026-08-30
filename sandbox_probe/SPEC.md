@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Sandboxed agent design
-description: The prescribed build-and-run design for a sandboxed Claude agent — one image, three mounts, and the path layout that makes one instruction work inside and outside podman
+description: The prescribed build-and-run design for a sandboxed Claude agent — one image, four mounts, and the path layout that makes one instruction work inside and outside podman
 ---
 
 # Sandboxed agent design
@@ -192,7 +192,7 @@ forbidden paths, not the emptiness of the home directory.
 ## Run
 
 One container per agent, started from the shared image. Each container gets
-three mounts and nothing else from the host.
+four mounts and nothing else from the host.
 
 ### Mount 1 — the config source
 
@@ -245,6 +245,25 @@ mode:      read-only
 
 The temp directory is deleted when the run ends, so the copy exists only while
 a run is in flight.
+
+### Mount 4 — the measurement sink
+
+```
+host:      a one-line file in a temp directory, carrying the receiver's port
+container: /home/geoff/.local/share/claude-measure/sink
+mode:      read-only
+```
+
+The measurement fix, per
+[Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md): the
+launcher runs a receiver bound to the host's `127.0.0.1`, and `measure-event`
+sends each hook event to it whenever this file is present. To make the host's
+loopback reachable from inside, the run also gains
+`--network=pasta:--map-host-loopback=169.254.1.2`.
+
+The file is generated fresh per run and dies with its temp directory, like
+mount 3. Prescribed ahead of implementation; `check-host-tcp` proved the
+container-to-host path it depends on.
 
 ### Copies, never originals
 
@@ -367,9 +386,4 @@ revised here:
 - **GitHub access.** Deferred. Until a credential is handed in, work leaves the
   sandbox only through mount 2.
 - **Network egress restriction.** Deferred.
-- **The measurement database.** Hooks inside the sandbox write to a database
-  that dies with the run, so the host's measurement store never sees sandboxed
-  work. Decided but not yet built: a live TCP writer on the host, per
-  [Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md). No
-  original is mounted; `check-host-tcp` proved the container-to-host path.
 - **Writing to two repos at once.** Ruled out by the constraints above.

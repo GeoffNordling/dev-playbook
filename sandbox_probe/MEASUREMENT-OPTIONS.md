@@ -54,7 +54,8 @@ bound to the host's `127.0.0.1` on a free port, and starts the container with
 `--network=pasta:--map-host-loopback=169.254.1.2` — inside the container, that
 address means "the host's loopback", and nothing is opened to the LAN. A tiny
 file mounted read-only at `~/.local/share/claude-measure/sink` carries the
-port. When the run ends, the launcher closes the listener.
+port — mount 4 in [Sandboxed agent design](/sandbox_probe/SPEC.md). When the
+run ends, the launcher closes the listener.
 
 Inside the hook, only `record()` changes (`measure-event:116-128` — the one
 function that touches SQLite; everything above it is storage-agnostic). It
@@ -105,8 +106,9 @@ the host's `127.0.0.1`. No AVC denials.
 
 **To settle while building.**
 
-- A short connect timeout, so a hook can never hang a session; on timeout,
-  drop.
+- A 10-second timeout on every socket call — deliberately far more than a
+  loopback hop needs, and still a hard bound; on expiry, drop the event and
+  exit.
 - Hooks run `"async": true`, so overlapping connections are normal. The
   receiver accepts concurrently and serializes its SQLite inserts.
 - The receiver's insert must write exactly the columns `record()` writes —
