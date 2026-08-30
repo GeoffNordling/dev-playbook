@@ -131,7 +131,7 @@ Two items remain:
   [EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#an-em-loop-for-primitive-construction)
   applies all the way down until the target stops being stochastic; maps
   recurse one rung further — grammar ↔ parser, the certified transform,
-  pinned by `--check`.
+  pinned by `--check`. But does it stop, truly? We just shift to software engineering tools. The abstractions continue, but the "invent our own" with EM Loop changes to "decide which pre-existing tools to use."
 - **Primitive and ontology terminology sweep.** "Primitive" and
   "ontology" are used loosely across these files; tighten every use.
 
