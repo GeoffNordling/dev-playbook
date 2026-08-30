@@ -5,15 +5,18 @@ does is visible without reading anything else.
 """
 
 import contextlib
+import json
 import shutil
 import signal
 import socket
+import sqlite3
 import tempfile
 import threading
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
-from probe import billing, podman, stream
+from probe import billing, podman, sink, stream
 
 HOME = "/home/geoff"
 
@@ -227,22 +230,33 @@ TASK = (
 
 
 def run_task(prompt: str = TASK) -> None:
-    """Give the agent a real job in the clone, and show what it changed."""
+    """Give the agent a real job in the clone, and show what it changed.
+
+    Measurement rides along: the run gets a receiver, the sink mount, and the
+    loopback mapping, so the agent's own hooks write to this machine's store
+    the way a host session's do. Nothing in the prompt asks for that — the
+    events are the ones Claude raises on its own.
+    """
     clone_repo()
+    stage_working_hook()
     env = {"HOME": HOME}
     billing.refuse_if_metered(env, clone_settings())
 
-    with credential_copy() as credential:
+    with credential_copy() as credential, sink.receiving() as (receiver, sink_mount):
         finished = podman.run(
             podman.container_argv(
-                mounts=repo_mounts(writable_repo=True) + [credential],
+                mounts=repo_mounts(writable_repo=True) + [credential, sink_mount],
                 env=env,
                 workdir=REPO_INSIDE,
                 timeout=TASK_TIMEOUT,
+                network=sink.NETWORK,
                 command=ask_claude(prompt, skip_permissions=True),
             ),
             capture=True,
         )
+    print(f"the receiver took {receiver.rows} rows from the run")
+
+    show_session_rows(stream.parse_init(finished.stdout).session_id)
 
     result = stream.parse_result(finished.stdout)
     print(
@@ -253,6 +267,33 @@ def run_task(prompt: str = TASK) -> None:
         raise RuntimeError("the run reported an error; see the text above")
 
     show_changes()
+
+
+def stage_working_hook() -> None:
+    """Put the working tree's measure-event into the clone, over the cloned one.
+
+    A clone carries committed state, so without this a run exercises whatever
+    hook is on the branch it was cloned from rather than the one being edited.
+    The clone is a throwaway, and this is the file the run's hooks execute:
+    /home/geoff/.claude/hooks in the image is a symlink into the mount.
+    """
+    shutil.copy(MEASURE_HOOK, CLONE / "dotfiles/dot-claude/hooks/measure-event")
+
+
+def show_session_rows(session_id: str) -> None:
+    """What the run's own hooks put in the store, counted by kind of event."""
+    with sqlite3.connect(sink.DB_PATH) as connection:
+        rows = connection.execute(
+            "SELECT min(id), max(id), event, count(*) FROM events"
+            " WHERE session_id = ? GROUP BY event ORDER BY min(id)",
+            (session_id,),
+        ).fetchall()
+
+    if not rows:
+        raise RuntimeError(f"no row of session {session_id} reached {sink.DB_PATH}")
+    print(f"session {session_id} in {sink.DB_PATH}:")
+    for first, last, event, count in rows:
+        print(f"  {event:18} {count:3}  ids {first}-{last}")
 
 
 def show_changes() -> None:
@@ -343,13 +384,6 @@ def check_cleanup() -> None:
     print("--timeout ended it. Nothing left behind either way")
 
 
-# The address the container uses to mean "the host's loopback". pasta's
-# --map-host-loopback wires it to the host's 127.0.0.1, so a listener bound
-# there is reachable from inside without ever appearing on the LAN. Link-local
-# by convention; the value itself is arbitrary.
-HOST_ALIAS = "169.254.1.2"
-
-
 def check_host_tcp() -> None:
     """Show that a program inside can send a message to a listener on the host.
 
@@ -359,8 +393,8 @@ def check_host_tcp() -> None:
     path that lets Claude inside reach Anthropic. This proves it on this
     machine, through the real image, with the real run flags.
 
-    The listener binds the host's 127.0.0.1 only. pasta maps HOST_ALIAS inside
-    the container to that loopback, so nothing is opened to the network.
+    The listener binds the host's 127.0.0.1 only. pasta maps sink.HOST_ALIAS
+    inside the container to that loopback, so nothing is opened to the network.
     """
     listener = socket.create_server(("127.0.0.1", 0))
     port = listener.getsockname()[1]
@@ -377,7 +411,7 @@ def check_host_tcp() -> None:
     message = "hello from the container"
     sender = (
         "import socket\n"
-        f"s = socket.create_connection(('{HOST_ALIAS}', {port}), timeout=10)\n"
+        f"s = socket.create_connection(('{sink.HOST_ALIAS}', {port}), timeout=10)\n"
         f"s.sendall({message!r}.encode())\n"
         "s.close()\n"
         "print('sent')\n"
@@ -386,7 +420,7 @@ def check_host_tcp() -> None:
         podman.container_argv(
             mounts=[],
             env={"HOME": HOME},
-            network=f"pasta:--map-host-loopback={HOST_ALIAS}",
+            network=sink.NETWORK,
             command=["python3", "-c", sender],
         )
     )
@@ -396,6 +430,136 @@ def check_host_tcp() -> None:
     if not received or received[0].decode() != message:
         raise RuntimeError(f"the listener never got the message; got {received!r}")
     print(f"host listener on 127.0.0.1:{port} received: {received[0].decode()!r}")
+
+
+# The hook under test, and where the run reads it from. The real image reaches
+# it through a symlink into the mounted clone; this mounts the file itself, so
+# the hook being rehearsed is the one in this working tree rather than whatever
+# the clone happens to carry.
+MEASURE_HOOK = podman.REPO_ROOT / "dotfiles/dot-claude/hooks/measure-event"
+HOOK_INSIDE = f"{HOME}/measure-event"
+
+# The session_id every rehearsal row carries, so the rows this check wrote can
+# be told from a real session's afterwards.
+SINK_SESSION = "sink-rehearsal"
+
+# Feeds every payload to its own copy of the hook at once, the way an async
+# hook fires. Payloads come in on argv, so nothing has to survive quoting.
+HOOK_RUNNER = f"""
+import subprocess, sys
+
+running = []
+for payload in sys.argv[1:]:
+    hook = subprocess.Popen(["python3", "{HOOK_INSIDE}"], stdin=subprocess.PIPE)
+    hook.stdin.write(payload.encode())
+    hook.stdin.close()
+    running.append(hook)
+
+for hook in running:
+    if hook.wait() != 0:
+        raise SystemExit("a hook exited non-zero, which it is never allowed to do")
+print("sent", len(running), "events")
+"""
+
+
+def sink_payloads() -> list[str]:
+    """The events the rehearsal sends: the shapes that have broken things before.
+
+    The large one is the point of TCP over a named pipe — 8.98% of live rows
+    are past a pipe's 4096-byte atomic write. The non-Bash PostToolUse proves
+    the trim still happens before the row leaves the container.
+    """
+    session = SINK_SESSION
+    events = [
+        {"hook_event_name": "SessionStart", "session_id": session},
+        {
+            "hook_event_name": "UserPromptSubmit",
+            "session_id": session,
+            "prompt_id": "p1",
+        },
+        {
+            "hook_event_name": "PostToolUse",
+            "session_id": session,
+            "prompt_id": "p1",
+            "tool_name": "Read",
+            "tool_input": {"file_path": "/dev/null"},
+            "tool_response": "dropped before storage",
+        },
+        {
+            "hook_event_name": "PostToolUse",
+            "session_id": session,
+            "prompt_id": "p1",
+            "tool_name": "Bash",
+            "tool_response": "x" * 100_000,
+        },
+        {"hook_event_name": "Stop", "session_id": session},
+    ]
+    return [json.dumps(event) for event in events]
+
+
+def check_measure_sink() -> None:
+    """Show that a hook event raised inside the container lands in a host database.
+
+    The whole measurement fix end to end: a receiver on the host, the one-line
+    sink file mounted read-only where the hook looks for it, and the real
+    measure-event hook run inside with an event on stdin. What proves it is a
+    row on the host, written by a process the container never touched.
+
+    The rows land in the real store, at the ID the arrival order gives them,
+    which is the behaviour being checked. They stay there, marked as this
+    check's by their session_id.
+    """
+    payloads = sink_payloads()
+
+    with tempfile.TemporaryDirectory() as scratch:
+        hook_copy = Path(scratch) / "measure-event"
+        shutil.copy(MEASURE_HOOK, hook_copy)
+        with sink.receiving() as (receiver, sink_mount):
+            print(f"receiver listening on 127.0.0.1:{receiver.port}")
+            podman.run(
+                podman.container_argv(
+                    mounts=[sink_mount, podman.Mount(hook_copy, Path(HOOK_INSIDE))],
+                    env={"HOME": HOME},
+                    network=sink.NETWORK,
+                    command=["python3", "-c", HOOK_RUNNER, *payloads],
+                )
+            )
+
+    show_sink_rows(len(payloads))
+
+
+def show_sink_rows(expected: int) -> None:
+    """Read this run's rows back out of the real store, and check them.
+
+    Only this run's rows: the store holds every session this machine has ever
+    had, so the check reads the newest rows carrying SINK_SESSION rather than
+    the table.
+    """
+    with sqlite3.connect(sink.DB_PATH) as connection:
+        rows = connection.execute(
+            "SELECT received_at, event, session_id, prompt_id, length(payload)"
+            " FROM events WHERE session_id = ? ORDER BY id DESC LIMIT ?",
+            (SINK_SESSION, expected),
+        ).fetchall()
+    rows.reverse()
+
+    for received_at, event, session_id, prompt_id, size in rows:
+        print(
+            f"{received_at}  {event:16} {session_id} {prompt_id or '-':4} {size} bytes"
+        )
+
+    # A row that arrived without its promoted session_id fails here too: the
+    # query above cannot see it, so it reads as a row that never landed.
+    if len(rows) != expected:
+        raise RuntimeError(f"sent {expected} events, and {len(rows)} rows landed")
+    if not any(size > 4096 for *_, size in rows):
+        raise RuntimeError("the large payload did not arrive whole")
+
+    # The hook stamps the time inside the container, so a clock that disagrees
+    # with the host's would put sandboxed rows in the wrong place in the story.
+    stamps = [datetime.fromisoformat(row[0]) for row in rows]
+    skew = max(abs((datetime.now(UTC) - stamp).total_seconds()) for stamp in stamps)
+    print(f"{len(rows)} rows on the host; container clock within {skew:.1f}s of ours")
 
 
 def check_fence(mounts: list[podman.Mount] | None = None) -> None:

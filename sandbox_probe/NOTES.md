@@ -341,8 +341,11 @@ measurement store stops describing the machine.
 **Fix direction.** §8 says hooks inside the sandbox should reach the host
 database. The decision and the options behind it are in
 [Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md): a live
-TCP writer on the host, reachable from inside the container — `check-host-tcp`
-proved the path on 2026-08-29 — with the post-run dump kept as the fallback.
+TCP writer on the host, reachable from inside the container, with the post-run
+dump kept as the fallback. Both halves are built, and `run-task` now carries
+them: a real sandboxed agent's own hooks wrote rows 75394 to 75397 of
+`~/.local/share/claude-measure/events.db` on 2026-08-29, between the rows of
+the host session that launched it.
 
 Whatever the answer, do not hardcode “sandbox means no hooks.”
 
@@ -381,9 +384,10 @@ prototype.
 | `check-claude` | the host-compiled `claude` binary runs inside |
 | `check-billing` | the run drew on the subscription, not the API |
 | `check-config` | Claude loaded the user's skills, agents, and hooks |
-| `run-task` | give the agent a real prompt in the clone |
+| `run-task` | give the agent a real prompt in the clone, and record its hook events on the host |
 | `check-cleanup` | what a killed runner leaves behind, and that it ends |
 | `check-host-tcp` | a message from inside reaches a listener on the host |
+| `check-measure-sink` | the measurement path alone, on made-up events, spending no quota |
 
 Everything up to `check-claude` needs no credential and spends no quota;
 `check-billing` is the first command that costs anything.

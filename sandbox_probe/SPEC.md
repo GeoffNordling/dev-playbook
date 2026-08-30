@@ -262,8 +262,9 @@ loopback reachable from inside, the run also gains
 `--network=pasta:--map-host-loopback=169.254.1.2`.
 
 The file is generated fresh per run and dies with its temp directory, like
-mount 3. Prescribed ahead of implementation; `check-host-tcp` proved the
-container-to-host path it depends on.
+mount 3. A real sandboxed run has done this: `run-task` on 2026-08-29 put four
+rows from the agent's own hooks into the machine's store, IDs 75394 to 75397,
+in arrival order between the rows of the host session that launched it.
 
 ### Copies, never originals
 

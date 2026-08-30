@@ -104,18 +104,45 @@ the host's `127.0.0.1`. No AVC denials.
   confined to that one function, and the host path through it is untouched.
 - Dropped events when the receiver is absent, accepted above.
 
-**To settle while building.**
+**As built.** The hook side is `send_to_sink()` in `measure-event`; the host
+side is `probe/sink.py`; `python3 -m probe run-task` carries both, so a real
+sandboxed agent is measured by the same command that gives it work.
 
-- A 10-second timeout on every socket call — deliberately far more than a
-  loopback hop needs, and still a hard bound; on expiry, drop the event and
-  exit.
-- Hooks run `"async": true`, so overlapping connections are normal. The
-  receiver accepts concurrently and serializes its SQLite inserts.
-- The receiver's insert must write exactly the columns `record()` writes —
-  `received_at`, `event`, `session_id`, `prompt_id`, `payload` and the
-  promoted columns — so keep the two definitions visibly adjacent.
-- The hook stamps UTC itself (`measure-event:184`); confirm the container's
-  clock agrees with the host's.
+**What a real run did.** 2026-08-29, `run-task`: Claude ran headless in the
+container on the ordinary prompt — read `README.md`, write a summary to
+`NOTES.md` — and finished in 3 turns. Nothing in the prompt mentions
+measurement; the rows below are the events its own hooks raised.
+
+```
+75393  00:59:14.317733  PostToolUse       d218bc3c…  ← the host session
+75394  00:59:18.105279  SessionStart      2c91a139…  ← inside the container
+75395  00:59:18.163105  UserPromptSubmit  2c91a139…
+75396  00:59:19.944737  PostToolUse       2c91a139…      its Read
+75397  00:59:22.620963  PostToolUse       2c91a139…      its Write
+75398  00:59:24.082363  PostToolUse       d218bc3c…  ← the host session again
+```
+
+Four rows in `~/.local/share/claude-measure/events.db`, from one sequence of
+IDs shared with the host session that launched the run, in arrival order,
+with the timestamps rising across both boundaries — so the container's clock
+agrees with the host's and a sandboxed row sits where it belongs. This is the
+claim the whole option rests on, and it is the only claim this section makes.
+
+`Stop` and `SessionEnd` are not there, and are not lost: the same headless
+`claude -p` run on the host records `SessionStart` and `UserPromptSubmit` and
+nothing else either. A sandboxed run records what that run records anywhere.
+
+What is left is wiring: the receiver runs in the probe, not yet in the real
+launcher at `src/dev_playbook/sandbox/`, which does not exist yet
+([§8](/sandbox_probe/NOTES.md#8-after-the-prototype)).
+
+**Settled while building.** The socket timeout is 10 seconds, on connect and
+on send alike — far more than a loopback hop needs, and still a hard bound; on
+expiry the event is dropped and the hook exits 0. The receiver serves each
+connection on its own thread and serializes its inserts behind one lock,
+because hooks run `"async": true`. `sink.py` carries a copy of the hook's
+`SCHEMA` and `INSERT` and says where the original is, and the hook builds its
+row in one place, `row_values()`, which both destinations send.
 
 ## The fallback — the post-run dump
 
