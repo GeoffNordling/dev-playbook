@@ -1,7 +1,7 @@
 ---
 name: document-remove-tics
-description: Send a Markdown document through an isolated subagent that strips the named slop tics, changing style but never content. Use when a new document has just been created or a document has received a large edit, or when asked to remove tics from a doc.
-disable-model-invocation: false
+description: Send a Markdown document through an isolated subagent that strips the named slop tics, changing style but never content.
+disable-model-invocation: true
 model: sonnet
 effort: high
 arguments: [doc-hint]
