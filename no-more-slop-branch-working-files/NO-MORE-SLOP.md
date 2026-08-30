@@ -130,9 +130,6 @@ beneath Reference Chain Declaration. Two items remain:
   certified transform, pinned by `--check`.
 - **Primitive and ontology terminology sweep.** "Primitive" and
   "ontology" are used loosely across these files; tighten every use.
-- **Merge completed so far to main.** This is so our new skills and agents
-  take effect in Claude Code. We will keep no-more-slop branch and just
-  continue it after the merge. This first merge should indeed have a PR.
 
 **Completed**
 
