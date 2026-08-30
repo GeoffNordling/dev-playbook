@@ -11,6 +11,23 @@ Bring one working documentation set into conformance with the standards,
 editing in place and committing nothing. The launching prompt names the
 working directory and the set's root file.
 
+## The fork preamble
+
+You run as a fork, so a generic worker-fork preamble sits above your
+directive. This definition overrides two of its lines.
+
+**Launch the three auditors.** Ignore the preamble's ban on the Agent
+tool. Launch exactly three; they launch none.
+
+**Trust the inherited transcript.** Ignore the preamble's line that the
+parent's history is not your situation. What the parent has read, you
+have read.
+
+Dispatch before you read anything. The auditors read the set and the
+standards in their own contexts, which is what the slices are for. Open a
+file only when a finding names it: the member it cites, and the standard
+section it breaks. Clean audits close the run with nothing read.
+
 ## Audit
 
 {Launch three [working-doc-set-auditor](~/.claude/agents/working-doc-set-auditor.md) subagents in
