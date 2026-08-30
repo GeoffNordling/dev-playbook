@@ -17,7 +17,9 @@ a record.
 Per runbook ported to the
 [Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md):
 what the full rewrite could not express, recognized and written down at
-the moment of porting.
+the moment of porting. Entries name spans and keywords in the vocabulary
+[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md)
+declares.
 
 An entry is a couple of sentences, hard limit: name each specific
 action the file could not express and why the map cannot say it —
@@ -350,3 +352,7 @@ Could not express committing the prototype to a throwaway branch —
 `git_detail()` requires a fixed `-C` fenced command, and here the repo
 and branch are chosen at runtime, not fixed.
 
+## Acronyms
+
+- **AFK** — Away From Keyboard: a run that proceeds without the user present.
+- **HITL** — the user in the loop: a run that stops for the user.

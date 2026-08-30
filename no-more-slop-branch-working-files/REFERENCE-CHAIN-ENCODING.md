@@ -20,9 +20,9 @@ out.
 
 Inspiration only: doctest (fenced blocks inside prose are legitimate
 deterministic parse targets) and CNL (constrain the sentence, never embed
-notation). STE is loose style inspiration, unenforced. What we adopt 100%
-is our own small grammar below, to be specified as a standard card and
-enforced by our lint.
+notation). STE is loose style inspiration, unenforced. What binds 100% is
+the small grammar below, to be specified as a standard card and enforced
+by a lint.
 
 ## From prose to chain
 

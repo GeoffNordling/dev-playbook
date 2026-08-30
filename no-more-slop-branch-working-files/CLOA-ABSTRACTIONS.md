@@ -8,9 +8,10 @@ description: The noun-and-verb abstractions that make documentation understandab
 
 The **CLOA primitives ontology**: the abstractions the user and the AI
 share at the CLOA — each a noun with a small fixed verb set — and, as a
-detail of method, the loop that generates them. An offshoot of [NO-MORE-SLOP.md](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
-The same speculative voice applies: a guess is written as a
-guess, and a sentence is settled only when it says so.
+detail of method, the loop that generates them. An offshoot of
+[No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md). The
+same speculative voice applies: a guess is written as a guess, and a
+sentence is settled only when it says so.
 
 ## Goal
 
@@ -21,10 +22,10 @@ entire repository — without having to read all of it.
 ## Documentation is code
 
 Documentation is code: it does things because agents do things, and an agent
-is just documentation, a harnesss, and permissions.
+is just documentation, a harness, and permissions.
 
 Unfortunately, documentation is also stochastic and extremely high-dimensional.
-We add parsimonious structure that constructs
+Parsimonious structure added on top constructs
 high-level abstractions capturing the important parts the user cares about.
 Keep the structure simple, lintable, deterministic, and high leverage.
 
@@ -68,9 +69,10 @@ without reading the rule prose or the scripts. Its bottom level does not —
 opening one standard lands in a sprawl of markdown files and scripts.
 
 **Runbook Reference chain**: the noun is the
-chain, the verbs are its six edge labels (does, reads, overrides, writes,
-args, reports), and its node types — Agent, Skill, Script — ride along as
-one-verb nouns. It allows the user to understand a runbook's behavior without opening
+chain, the verbs are its edge labels, and its node types ride along as
+one-verb nouns — both rosters declared in
+[Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md).
+It allows the user to understand a runbook's behavior without opening
 the body.
 
 ## An EM loop for primitive construction
@@ -81,9 +83,9 @@ that were defined by the language in advance.
 
 Expressing existing documentation as code hits a problem: documentation
 has free-form, infinite possibilities. No constrained programming language
-exists apriori: the language is English itself.
+exists a priori: the language is English itself.
 
-We solve with a backwards operation combining AI proposals with user
+The solution is a backwards operation combining AI proposals with user
 intuition: generate programmable primitives from the documentation.
 
 An expectation-maximization shape over a chosen target artifact:
@@ -96,7 +98,9 @@ An expectation-maximization shape over a chosen target artifact:
   model's job is to challenge the filter. The burden of proof sits with
   the model: the user's accept or reject needs no justification, and the
   model validates every accepted candidate against the corpus.
-- **Convergence** is the pandas standard: the user predicts the target's
+- **Convergence** is
+  [the pandas standard](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#the-pandas-standard):
+  the user predicts the target's
   behavior without reading its bodies, and the abstraction count is
   minimal — good abstractions are a codebook the corpus gets short in,
   so functionality per character runs high.

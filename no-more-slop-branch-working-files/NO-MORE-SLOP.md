@@ -38,29 +38,29 @@ actually be governed.
 
 Today's stock of slop is mostly **intent alignment debt** — divergence
 from the user's intent accrued over time: the mirror of tech debt. Going
-forward, we use appropriate structure and abstractions in order to maintain
-user understanding and prevent new debt from accruing.
+forward, appropriate structure and abstractions maintain user
+understanding and prevent new debt from accruing.
 
 ## Levels
 
 Understanding happens at multiple levels, for code and documentation alike:
 
-- **One file, opened.** The user zooms in on a single file and looks at it.
+- **Inside one file.** The user zooms in on a single file and looks at it.
   What serves this level changes the file itself — wording, shape, length —
   never its meaning.
-- **Above the file.** The user cannot read all files at once, so understanding at
-  the higher levels has to come some other way. Code has established tools
-  at this level; we will construct similar abstractions for documentation.
+- **Above the file.** The user cannot read all files at once, so understanding
+  at the higher levels has to come some other way. Code has established tools
+  at this level; documentation gets similar abstractions constructed for it.
 
 Across the levels runs an abstraction/detail axis with a latent optimal
 point neither party knows a priori. Too low — too much detail — and the
-user wastes stops paying attention, rubber stamps, and intent alignment debt
-accumulates; too high and the user is
-fooled into thinking they understand temporarily; both ends produce slop. Pre-AI
-interfaces were forcing functions: pandas and git impose their
-abstractions, and a wrong mental model did not survive contact with them.
-Natural language imposes such constraints. We must deliberately engineer interfaces
-at the appropriate level of abstraction. 
+user stops paying attention, rubber stamps, and intent alignment debt
+accumulates; too high and the user is temporarily fooled into thinking they
+understand. Both ends produce slop. Pre-AI interfaces were forcing
+functions: pandas and git impose their abstractions, and a wrong mental
+model did not survive contact with them. Natural language imposes no such
+constraints, so interfaces at the appropriate level of abstraction are
+engineered deliberately.
 
 ## Principles
 
@@ -117,17 +117,21 @@ exemplar, worked as the abstraction shape in
 
 ## Documentation track — active
 
-**Now**
+**Planned**
 
 The ontology is settled in
 [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md);
-the encoding design and its parser sit in Reference Chain Encoding,
-beneath Reference Chain Declaration. Two items remain:
+the encoding design and its parser sit in
+[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md),
+beneath
+[Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md).
+Two items remain:
 
 - **Recursion to the bedrock of determinism.** Develop the note: the
-  EM loop applies all the way down until the target stops being
-  stochastic; maps recurse one rung further — grammar ↔ parser, the
-  certified transform, pinned by `--check`.
+  [EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#an-em-loop-for-primitive-construction)
+  applies all the way down until the target stops being stochastic; maps
+  recurse one rung further — grammar ↔ parser, the certified transform,
+  pinned by `--check`.
 - **Primitive and ontology terminology sweep.** "Primitive" and
   "ontology" are used loosely across these files; tighten every use.
 
@@ -150,17 +154,17 @@ beneath Reference Chain Declaration. Two items remain:
   Standardized in
   [file-roles.md](/standards/knowledge-organization/file-roles.md).
 - **Edge encoding and its parser.** The Reference chain's in-file
-  declaration format — braced spans over a fixed keyword lexicon,
-  sliced at fixed cut points but never interpreted — designed on a
-  five-runbook covering set in Reference Chain Encoding
-  and proven by `parser/chaingen.py`, which deterministically
-  regenerates every covered runbook's chain into `parser/chains.txt` and
-  fails on drift via `--check`.
-- **First-party port.** Every runbook we author ourselves — all twelve
-  agents and the unmarked skills in the Port roster,
+  declaration format, designed on a five-runbook covering set and ruled
+  in
+  [Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md),
+  proven by `parser/chaingen.py`, which regenerates every covered
+  runbook's chain into `parser/chains.txt` and fails on drift via
+  `--check`.
+- **First-party port.** Every runbook authored in this repo — all
+  twelve agents and the unmarked skills in the Port roster,
   38 runbooks — ported to the edge encoding by a fixed dispatch
   prompt, since retired, each with its leftovers recorded in the
-  Residual Ledger.
+  [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
 - **The runbook standard, and the gate green.**
   [Runbook Conventions](/standards/harness/runbook-conventions.md)
   replaced what the old docs taught: `skill-management.md` deleted, the
@@ -208,13 +212,13 @@ beneath Reference Chain Declaration. Two items remain:
 
 **Raw ideas, none designed**
 
-- **Each new document is a giant pile of slop.** Each new major document Claude
-  writes is a pile of slop that I have to wade through and iterate with Claude
-  to brint to acceptable condition. Every time I do this is an opportunity to
-  codify general rules, procedures, and algorithms for writing documents
-  correctly. I need to use each linear slop trench session to spin the flywheel
-  and climb out of the trench. Right now there is no flywheel and I haven't
-  even started climbing out.
+- **Each new document is a giant pile of slop.** Each new major document the
+  AI writes is a pile of slop the user wades through, iterating with the AI to
+  bring it to acceptable condition. Every one of those passes is an
+  opportunity to codify general rules, procedures, and algorithms for writing
+  documents correctly: each linear slop trench session should spin the
+  flywheel and climb out of the trench. There is no flywheel today, and the
+  climb has not started.
 - **Markdown complexity detectors.** No specifics yet on how to measure a
   document's complexity — the goal is a file the user can read without
   checking out on opening.
@@ -301,6 +305,9 @@ works the term holds the detail. Every one is a tentative promotion to
 - **acceptance tier** — the small, capped, fully read test suite in
   `tests/acceptance/`, one test per behavior the user could state in a
   sentence. Its opposite is the unread tier.
+- **bucket** — the target class of a write: git, GitHub, local file, or
+  scratch
+  ([Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md#edges)).
 - **CLOA** — the level of abstraction where
   the AI and the user communicate in the exact same terminology.
 - **constrain to optimize understanding** — the principle that a constraint
@@ -321,8 +328,15 @@ works the term holds the detail. Every one is a tentative promotion to
 - **the pandas standard** — the target state: fluency with an interface —
   which objects exist, which methods fit which task — without ever reading
   inside it.
+- **the primitive map** — the join between two adjacent loop layers: one
+  lower expression per higher primitive
+  ([Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md#the-primitive-map)).
+- **provenance** — whether an abstraction is declared in this corpus or
+  imported from outside it
+  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#a-noun-with-one-or-more-verbs)).
 - **Reference chain** — the declared tree of one runbook's behavior and its
-  call signature (Reference Chain, under CLOA Abstractions).
+  call signature
+  ([Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md)).
 - **registry pass** — the loop's first move on a repo: rule every registered
   document type important to the primitives ontology or not.
 - **residual** — whatever the current abstractions cannot express; tracked,
@@ -334,6 +348,9 @@ works the term holds the detail. Every one is a tentative promotion to
   two.
 - **slop trench** — nominal ownership of a system whose details have
   outpaced inspection.
+- **span** — the braced unit inside runbook prose that serves the executing
+  agent and the parser from one sentence
+  ([Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md#from-prose-to-chain)).
 - **unread tier** — the existing thousand-odd machine-written unit tests,
   judged only by passing.
 - **the vocabulary API** — `CONTEXT.md` designed the way a library designs
@@ -342,3 +359,5 @@ works the term holds the detail. Every one is a tentative promotion to
 ## Acronyms
 
 - **CLOA** — Correct Level of Abstraction.
+- **EM** — Expectation-Maximization: the two-step statistical procedure the
+  loop is shaped after.
