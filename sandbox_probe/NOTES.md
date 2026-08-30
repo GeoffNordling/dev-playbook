@@ -339,10 +339,10 @@ done in the sandbox. If sandboxed runs become the normal way to work, the
 measurement store stops describing the machine.
 
 **Fix direction.** §8 says hooks inside the sandbox should reach the host
-database. Every option considered, and why all but one are rejected, are in
-[Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md). The
-survivor is a scratch database folded into the host store when the run ends; it
-is additive, and one open test decides whether it works.
+database. The decision and the options behind it are in
+[Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md): a live
+TCP writer on the host, reachable from inside the container — `check-host-tcp`
+proved the path on 2026-08-29 — with the post-run dump kept as the fallback.
 
 Whatever the answer, do not hardcode “sandbox means no hooks.”
 
@@ -383,6 +383,7 @@ prototype.
 | `check-config` | Claude loaded the user's skills, agents, and hooks |
 | `run-task` | give the agent a real prompt in the clone |
 | `check-cleanup` | what a killed runner leaves behind, and that it ends |
+| `check-host-tcp` | a message from inside reaches a listener on the host |
 
 Everything up to `check-claude` needs no credential and spends no quota;
 `check-billing` is the first command that costs anything.

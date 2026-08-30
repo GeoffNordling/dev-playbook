@@ -226,7 +226,7 @@ another repo gets `/home/geoff/work/<that-repo>`.
 **`<repo-name>` is load-bearing, not decoration.**
 `dev_playbook.gitrepo.canonical_repo_name` derives the repo's name from the
 directory holding `.git`, and
-[cross-references.md](/standards/docs/cross-references.md) resolution compares a
+[cross-references.md](/standards/knowledge-organization/cross-references.md) resolution compares a
 citation's first segment against that name. A clone at `/home/geoff/work/agent-1`
 would silently break every same-repo citation in it.
 
@@ -299,7 +299,7 @@ failure is loud, which is the better direction.
 ### Same-repo resolution across the grid
 
 The canonical rule in
-[cross-references.md](/standards/docs/cross-references.md#same-repo-resolution)
+[cross-references.md](/standards/knowledge-organization/cross-references.md#same-repo-resolution)
 holds in all four cells. `~` expands to `/home/geoff` in every one, because
 `HOME=/home/geoff` is set in the image.
 
@@ -369,7 +369,7 @@ revised here:
 - **Network egress restriction.** Deferred.
 - **The measurement database.** Hooks inside the sandbox write to a database
   that dies with the run, so the host's measurement store never sees sandboxed
-  work. Recorded in [NOTES.md](/sandbox_probe/NOTES.md); unresolved, and it
-  needs a decision because the fix means mounting an original rather than a
-  copy.
+  work. Decided but not yet built: a live TCP writer on the host, per
+  [Sandbox measurement options](/sandbox_probe/MEASUREMENT-OPTIONS.md). No
+  original is mounted; `check-host-tcp` proved the container-to-host path.
 - **Writing to two repos at once.** Ruled out by the constraints above.
