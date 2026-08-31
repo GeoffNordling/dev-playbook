@@ -113,6 +113,8 @@ linkless `{Read}` may instead carry one inline-code target
 
 ```
 {Run [/grilling](~/.claude/skills/grilling/SKILL.md) once to sharpen the raw idea}
+
+  ├─does────► [/grilling] Skill
 ```
 
 The link is the target; "once to sharpen the raw idea" is annotation.
@@ -125,6 +127,8 @@ and block must agree.
 
 ```
 {Write to scratch a self-ignoring `.datasheet/` directory}
+
+  ├─writes──► scratch
 ```
 
 The `to scratch` prefix picks the bucket; bare `{Write …}` would be
@@ -140,6 +144,8 @@ to the chain: front the kernel, elaborate after the semicolon.
 ```
 {Write the target document in place; it must say the same things
 without committing any of the named tics}
+
+  ├─writes──► the target document in place
 ```
 
 "the target document in place" travels to the chain; everything after
@@ -152,6 +158,8 @@ the vocabulary cannot carry stays plain prose, recorded in the
 
 ```
 {Never {Commit}} — leave the changes in the working tree for review.
+
+  ├─never commits───►
 ```
 
 The span is the braces alone; the prose after the dash stays outside
@@ -162,6 +170,8 @@ runbook's report is prose — with the payload as annotation.
 
 ```
 {Report one line: worktree and branch removed, main at that commit}
+
+  └─reports──► outcome: str
 ```
 
 The edge is `outcome: str`; the whole payload rides as annotation.
