@@ -15,8 +15,8 @@ Same speculative-voice conventions as the branch plan.
   or instance-level.
 
   ```
-  Standard   same contract for every card  naming-conventions and modules/design
-                                           answer different questions, same four
+  Standard   same contract for every card  the harness and build cards answer
+                                           different questions, same four
                                            operations
   Runbook    one contract per instance     /intake's chain ≠ /commit's chain
   ```
