@@ -17,6 +17,7 @@ One subdirectory carries no index of its own, and
 owns what it holds: `parser/`, holding `chaingen.py` and `chains.txt`.
 
 - [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) — The noun-and-verb abstractions that make documentation understandable at the CLOA, and the loop that generates them
+- [Doc-Type](/no-more-slop-branch-working-files/doc-type.md) — The doc-type kind — operations plus a composition rule, fixing a contract shape — and the loop that produces one from a documentation family
 - [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) — The branch plan — goal, principles, the two tracks, and the current step
 - [Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md) — The Reference chain declared — a runbook's behavior and call signature as nodes and edges
 - [Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md) — The layer below the declaration — the spec a writer follows to encode chain edges in runbook prose
