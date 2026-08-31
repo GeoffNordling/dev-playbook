@@ -1,13 +1,13 @@
 ---
 type: General-Sheet
 title: Reference Chain Encoding
-description: The layer below the declaration — the spec a writer follows to encode chain edges in runbook prose
+description: The layer below the contract shape — the spec a writer follows to encode chain edges in runbook prose
 ---
 
 # Reference Chain Encoding
 
-The layer below
-[Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md):
+The layer below the
+[Reference chain](/no-more-slop-branch-working-files/runbook-contract-shape.md):
 how chain edges are written inside runbook prose, so deterministic
 code can generate every chain. This file is the spec for the writer of
 that prose. The primitive map below is the join between the two
@@ -15,8 +15,7 @@ layers — one lower expression per higher primitive. The parser is
 `parser/chaingen.py`, which writes every chain to `parser/chains.txt`
 and fails on drift via `--check`; everything the writer does not
 need — how an edge draws, how a name resolves — lives in that code and
-nowhere else. Same working-file conventions as the branch plan sets
-out.
+nowhere else.
 
 Inspiration only: doctest (fenced blocks inside prose are legitimate
 deterministic parse targets) and CNL (constrain the sentence, never embed
@@ -149,7 +148,7 @@ the semicolon stays in the file.
 **Prohibition.** `{Never {…}}` wraps exactly one span — inner keyword
 `Write`, `Commit`, or `Merge` — and flips it from action to ban. A ban
 the vocabulary cannot carry stays plain prose, recorded in the
-[Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
+[runbook-residual-ledger.md](/no-more-slop-branch-working-files/runbook-residual-ledger.md).
 
 ```
 {Never {Commit}} — leave the changes in the working tree for review.

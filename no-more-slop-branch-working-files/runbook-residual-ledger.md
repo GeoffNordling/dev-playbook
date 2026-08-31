@@ -1,24 +1,21 @@
 ---
 type: General-Sheet
-title: Residual Ledger
-description: The system-wide record of what the current abstractions cannot express — one section per registry type ruled important
+title: Runbook Residual Ledger
+description: Runbook's residual record — what the Reference chain cannot express, one entry per ported runbook
 ---
 
-# Residual Ledger
+# Runbook Residual Ledger
 
-The system-wide record of residuals: what the current abstractions
-cannot express. One section per registry type ruled important in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)'s
-registry dispositions — only Runbooks today. That is all an entry is —
-a record.
+Runbook's residual record: what the
+[Reference chain](/no-more-slop-branch-working-files/runbook-contract-shape.md)
+cannot express. That is all an entry is — a record.
 
 ## Runbooks
 
-Per runbook ported to the
-[Reference Chain](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md):
-what the full rewrite could not express, recognized and written down at
-the moment of porting. Entries name spans and keywords in the vocabulary
-[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md)
+Per runbook ported to the chain: what the full rewrite could not
+express, recognized and written down at the moment of porting.
+Entries name spans and keywords in the vocabulary
+[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md)
 declares.
 
 An entry is a couple of sentences, hard limit: name each specific
