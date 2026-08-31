@@ -21,4 +21,5 @@ owns what it holds: `parser/`, holding `chaingen.py` and `chains.txt`.
 - [Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md) — The Reference chain declared — a runbook's behavior and call signature as nodes and edges
 - [Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md) — The layer below the declaration — the spec a writer follows to encode chain edges in runbook prose
 - [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md) — The system-wide record of what the current abstractions cannot express — one section per registry type ruled important
+- [System Legibility](/no-more-slop-branch-working-files/system-legibility.md) — The doctrine — the user understands the systems they own without reading all of them — and the principles and ambitions that serve it
 - [Types](/no-more-slop-branch-working-files/TYPES.md) — Theory additions — contract, shape, composition rule — and the long-term types/ tree they settle into
