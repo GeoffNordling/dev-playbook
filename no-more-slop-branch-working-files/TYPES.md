@@ -159,6 +159,12 @@ The obligation lives in **runbook-conventions**: its Define cites
 gate. The chain itself is never a Standard, and the obligation is not
 independently adoptable.
 
+Migration note: two files hold this content on disk today —
+`standards/standard/format.md` is Standard's encoding layer and becomes
+`types/standard/encoding.md`; `standards/standard.md` is the general
+Standard definition and folds into `types/standard/`. Both leave
+`standards/` when the tree is built.
+
 ## Pinned ambiguities
 
 - The base directory is `types/`, not `theory/` — the per-type dirs are
