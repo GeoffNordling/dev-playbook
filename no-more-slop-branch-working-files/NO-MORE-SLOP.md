@@ -53,7 +53,7 @@ the Runbook doc-type's shape and encoding sit in
 [contract-shape.md](/doc-types/runbook/contract-shape.md)
 and
 [encoding.md](/doc-types/runbook/encoding.md).
-One item remains:
+The items, each a future work session:
 
 - **When the parser runs.** The move landed the parser at
   `scripts/chaingen`, writing its generated view to
@@ -67,6 +67,31 @@ One item remains:
   [definition.md](/doc-types/standard/definition.md)'s Scope.
   Hierarchical imports across repositories are the mechanism under
   both; get that right, not fast.
+- **Say the determinism outright.** Every CLOA object — a chain, a
+  graph, a report — is built by 100% deterministic code. The doctrine
+  implies this everywhere and states it nowhere; one sentence in
+  [System Legibility](/docs/system-legibility.md) (the bedrock or the
+  standing principles) settles it. This file does not count — it dies
+  at merge.
+- **The doc-type loop over the rest of the corpus.** Guide is
+  untouched, and it is roughly half of the meaningful documentation in
+  this repo. Run the loop there: new doc-types as peers of Standard
+  and Runbook, possibly more than one level — find out what works.
+  Method to try: with Standard and Runbook as few-shot exemplars and
+  the tightened corpus as input, have Fable propose the abstractions;
+  the user accepts, rejects, and steers while Claude does the
+  construction. The instruction must state the constraints outright —
+  for one, that every CLOA object is 100% deterministic.
+- **Markdown complexity detectors.** Static analyzers for markdown,
+  exactly as code has them, 100% deterministic. The cheap metrics:
+  size, line count, headings and their depth, and figures computed
+  from them. The richer one: cross-reference complexity — the link
+  graph is already linted, so it is already extractable; a linear
+  chain of documents is simple, a nest of mutual references is
+  complex. Simplicity is good; complexity is bad. Reports before
+  gates: even where a report does not produce understanding, it points
+  at hot spots for investigation. Prediction: the software factory
+  tops the list — untested, and it may simply be deleted.
 
 **Completed**
 
@@ -191,9 +216,25 @@ One item remains:
   documents correctly: each linear slop trench session should spin the
   flywheel and climb out of the trench. There is no flywheel today, and the
   climb has not started.
-- **Markdown complexity detectors.** No specifics yet on how to measure a
-  document's complexity — the goal is a file the user can read without
-  checking out on opening.
+- **OKF graphs and OKF traces.** The
+  [file-graph](/instruments/file-graph.md) instrument already renders
+  the corpus as a static HTML force graph; think about how to lean on
+  it — and on OKF views generally — to understand the system. "OKF
+  trace" is a term from paper notes with no definition yet; it may
+  already exist as the Reference chain (`scripts/chaingen` stitches
+  one runbook's do-edges into exactly a trace). Decide whether trace =
+  chain or something more.
+- **Concern counting.** `standards/standard/format.md` was one
+  document doing four jobs; a person noticed, and the split worked. No
+  static analyzer can count concerns, and pointing an agent at every
+  document is expensive and slow — not wanted. The remaining idea: an
+  audit trigger on significant change to a document that forces the
+  question "how many concerns does this file now hold?" Undesigned.
+- **Duplication detectors.** The document twin of complexity: find the
+  same content or vocabulary declared in more than one place, and
+  reduce it. The grammar triplication is the case study — three files
+  declaring one vocabulary, caught only by hand. Think about what
+  deterministic code can catch.
 - **Doc linters, re-aimed.** The existing linters are pedantic — they check
   that certain headings are present. Decide what is worth linting for and
   design toward that.
@@ -227,9 +268,13 @@ a pleasure to read.
   `--strict`.
 - **import-linter** — a declared contract over module dependencies
   ("`config` must not import `cli`"), failing CI when an import crosses a
-  forbidden line.
+  forbidden line. The contract file is a CLOA object: the user programs
+  at the level of architecture by authoring it, the AI builds until it
+  passes without editing it, and a conflict escalates rather than
+  loosening the contract.
 - **Rendered API surface** — public signatures plus docstrings, the
-  read-a-module-at-a-glance view. `griffe-outline` exists; evaluate it
+  read-a-module-at-a-glance view, for scripts as well as `src/`
+  packages. `griffe-outline` exists (built on griffe); evaluate it
   before reaching for mkdocstrings or pdoc.
 - **`tests/acceptance/`** — see the tiers below.
 
@@ -245,12 +290,31 @@ a pleasure to read.
 
 **Rejected**
 
-- **radon / xenon** — `C901` covers this in a running tool.
+- **radon / xenon** — `C901` covers this in a running tool. Rejected
+  as a gate; radon may return as a report generator for the campaign
+  (see Notes).
 - **vulture** — dead code is not a priority.
 - **pyright** — one type checker is enough.
 
 **Notes**
 
+- **The legibility campaign.** Once the tools above run, turn them on
+  this repo's own code — the scripts and the `src/` packages, six
+  months of AI-written code the user has never read. The goal is not
+  to read the lines; it is to understand the system as deep gray
+  modules — Ousterhout's deep modules, judged through the gray-module
+  test — from the tools' outputs: file trees, import graphs, call
+  graphs, rendered API surfaces, complexity and size reports. Refactor
+  what the reports condemn. The vocabulary is already standardized in
+  [Module Design Conventions](/standards/modules/design.md).
+- **Gates and reports are different tools.** ruff `C901` and the `PLR`
+  rules (too-many-statements, too-many-public-methods,
+  too-many-arguments) gate thresholds; the campaign also needs
+  measured reports — cyclomatic complexity per function, lines per
+  method, methods per class, and the distributions over the repo.
+  radon generates those reports (`radon cc`, `radon raw`); `pydeps`
+  draws the import graph, `code2flow` the call graph. All of it is
+  100% deterministic — CLOA objects for code.
 - **Two testing tiers.** The unread tier: the existing thousand-odd unit
   tests, machine-written, judged by passing. The acceptance tier:
   `tests/acceptance/`, small and capped, written in `CONTEXT.md`
