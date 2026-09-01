@@ -83,7 +83,11 @@ Documentation has three readers, in priority order:
 Declared abstractions descend layer by layer until the target stops
 being stochastic. That boundary is **the bedrock of determinism**:
 deterministic code, firm and strong, where a claim is checked by
-running something that is 100% consistent. Abstractions
+running something that is 100% consistent. The boundary is where
+documentation stops and code begins: documentation is the stochastic
+thing, code the deterministic one. Code is written above the bedrock
+in support of documentation — a parser, a lint — but that support
+stands on the bedrock; it does not move the boundary. Abstractions
 continue below the bedrock — call graphs, import graphs, industry
 tooling — but the mode flips: above, machinery is invented
 at great expense in user thought, working sessions, and

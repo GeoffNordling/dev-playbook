@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: No More Slop
-description: The branch plan — goal, principles, the two tracks, and the current step
+description: The branch plan — goal, the two tracks, the terms, and the current step
 ---
 
 # No More Slop
@@ -16,137 +16,65 @@ inline next to its topic, and a sentence is settled only when it says so.
 
 ## Goal
 
-The user can understand this repository without reading all of it. Today
-they cannot: the repo sits in the slop trench — nominal ownership of a
-system whose details have outpaced inspection. This branch works the
-documentation track; the code track waits.
+No more slop: the user understands this repository without reading all of
+it. Today they cannot — the repo sits in the slop trench, and its stock of
+slop is mostly intent alignment debt. This branch works the documentation
+track; the code track waits.
 
-Open question: no standard states this goal. A System Legibility card used
-to, pointing at the datasheet and file-graph instruments, but both went
-stale and the card was deleted. Whether the goal earns a card of its own is
-a question for the end of this branch, once the work has shown what would
-actually be governed.
+The doctrine behind the goal — slop's two kinds, the CLOA, the bedrock of
+determinism, the pandas standard, the standing principles, the vocabulary
+API — has drained into
+[System Legibility](/no-more-slop-branch-working-files/system-legibility.md).
+Whether any of it hardens into a Standard card is held there, under
+Ambitions.
 
-"Slop" splits into:
+## Zoom
 
-- **Low quality** — divergence from the user's latent intent for action and
-  preference for style. For the AI this operationalizes as divergence from
-  the stated standards, which are themselves ill-defined in places.
-- **Not understood** — the user cannot or will not read critical information,
-  whatever its quality, because it is encoded only as illegible walls of text
-  and code, greppable by AI, but not the user.
+Understanding operates at two zooms, for code and documentation alike:
 
-Today's stock of slop is mostly **intent alignment debt** — divergence
-from the user's intent accrued over time: the mirror of tech debt. Going
-forward, appropriate structure and abstractions maintain user
-understanding and prevent new debt from accruing.
-
-## Levels
-
-Understanding happens at multiple levels, for code and documentation alike:
-
-- **Inside one file.** The user zooms in on a single file and looks at it.
-  What serves this level changes the file itself — wording, shape, length —
+- **Inside one file.** The user zooms in on a single file and reads it.
+  What serves this zoom changes the file itself — wording, shape, length —
   never its meaning.
-- **Above the file.** The user cannot read all files at once, so understanding
-  at the higher levels has to come some other way. Code has established tools
-  at this level; documentation gets similar abstractions constructed for it.
+- **Above the file.** The user cannot read every file, so understanding up
+  here comes from declared contracts: the doc-type machinery for
+  documentation, established tooling for code.
 
-Across the levels runs an abstraction/detail axis with a latent optimal
-point neither party knows a priori. Too low — too much detail — and the
-user stops paying attention, rubber stamps, and intent alignment debt
-accumulates; too high and the user is temporarily fooled into thinking they
-understand. Both ends produce slop. Pre-AI interfaces were forcing
-functions: pandas and git impose their abstractions, and a wrong mental
-model did not survive contact with them. Natural language imposes no such
-constraints, so interfaces at the appropriate level of abstraction are
-engineered deliberately.
-
-## Principles
-
-These apply to both tracks.
-
-- **The CLOA** — the level of abstraction
-  where the AI and the user communicate in the exact same terminology.
-  Its shared definitions are the primitives in
-  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) — each a noun with a small
-  fixed verb set — from which the user predicts behavior without reading
-  bodies. The bets per track: the primitives carry the CLOA for
-  documentation, and the acceptance tier (code track) carries it for
-  code.
-- **The vocabulary API** — `CONTEXT.md` holds the canonical terms for
-  communication: the user understands it 100%, the AI uses its terms, and
-  a missing term is added on the spot and approved by the user. Zero vibe
-  coding in that file. It is designed the way a library designs its
-  public surface, with the internals below it AI-owned. Escalation
-  discipline is its behavioral half: the AI raises questions in
-  vocabulary terms, proposing a new term when one is missing. A default,
-  toggleable — some modes of talk need to leave the vocabulary.
-- **Deterministic backpressure preferred over stochastic functions.**
-  Stochastic functions — prompts, models, agents — are powerful but
-  expensive. Deterministic backpressure — detectors, linters, gates, and
-  plain contact with reality — is inviolable and efficient. Prefer it
-  wherever it can reach, but it can't do everything. Prefer claims a lint
-  can check — "skill X references skills Y and Z" is grepable; "skill X
-  is elegant" is not. Keep agentic
-  backpressure tools simple and loop friendly: simple status codes can be
-  better than detailed reports.
-- **Move slowly in decision space.** Past failures were planning too much
-  and leaping too far. Small iterative steps, with backpressure from
-  reality at each one; what stays small is how much is committed before
-  reality answers back.
-- **Constrain to optimize understanding.** Apply constraints that funnel
-  the same declarations through reduced forms designed to help the user
-  understand. This amortizes reading (learn the shape once,
-  read every instance fast), makes location and absence meaningful, and
-  it enables linting. The constrained artifacts are for user eyes —
-  documentation up to now has generally optimized for agent readers.
-
-## The pandas standard
-
-The target state, named for where the user lived it: years of pandas
-fluency — which objects exist, which methods fit which task, how they
-compose — without ever reading inside a pandas method. The internals
-belonged to the pandas maintainers; here they belong to the AI. The
-fluency came from being the caller: the user learned pandas, git, and the
-software factory by operating them daily.
-
-The [Standard](/standards/standard/format.md) card system is the in-repo
-exemplar, worked as the abstraction shape in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#a-noun-with-one-or-more-verbs).
+Where the correct altitude sits, and what happens off it, is the CLOA
+([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
 
 ## Documentation track — active
 
 **Planned**
 
-The ontology is settled in
-[CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md);
-the encoding design and its parser sit in
-[Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md),
-beneath
-[Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md).
+The theory is settled in
+[Doc-Type](/no-more-slop-branch-working-files/doc-type.md) and instantiated
+in [Doc-Type System](/no-more-slop-branch-working-files/doc-type-system.md);
+the Runbook doc-type's shape and encoding sit in
+[runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md)
+and
+[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md).
 Two items remain:
 
-- **Recursion to the bedrock of determinism.** Develop the note: the
-  [EM loop](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#an-em-loop-for-primitive-construction)
-  applies all the way down until the target stops being stochastic; maps
-  recurse one rung further — grammar ↔ parser, the certified transform,
-  pinned by `--check`. But does it stop, truly? We just shift to software engineering tools. The abstractions continue, but the "invent our own" with EM Loop changes to "decide which pre-existing tools to use."
-- **Primitive and ontology terminology sweep.** "Primitive" and
-  "ontology" are used loosely across these files; tighten every use.
+- **Execute the migration.** The working files already carry their future
+  basenames; [migration.md](/no-more-slop-branch-working-files/migration.md)
+  holds the path table, the standards/ split, and the repoints. It runs on
+  this branch, after the index rebuild, before merge; the standards/ split
+  is its own review stop and may fall to a follow-up issue.
+- **The parser's long-term home and behavior.** `parser/chaingen.py` is
+  slated for `scripts/chaingen`, and nothing else is decided: where
+  `chains.txt` lives (a generated view — its location is set by where
+  chaingen writes), and when the parser runs. Today it runs by hand; the
+  end state is a gate that fails when a declared chain and reality
+  disagree.
 
 **Completed**
 
-- **CLOA primitives.** Three bootstrap runs plus an empirical
-  close-out in
-  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md)
-  constructed a converged primitive set — that file's table is the
-  roster — describing what documentation does at the CLOA: the user
-  understands the whole surface and keeps enough control to guide the
-  system, the implementation below the CLOA is delegated to the agent,
-  and deep dives stay auditable by opening actual files. That
-  files are still too hard to read is a separate open work stream (the
-  Levels section's first level).
+- **CLOA primitives.** Three bootstrap runs plus an empirical close-out
+  constructed a converged primitive set describing what documentation does
+  at the CLOA; it settled as the Runbook doc-type's operations
+  ([runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md#edges)).
+  That files are still too hard to read is a separate open work stream
+  (the inside-one-file zoom).
 - **Deslop rewrite.** Every prose document rewritten in place against
   [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
   `/document-deslop` skill, which the user invokes manually.
@@ -156,7 +84,7 @@ Two items remain:
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format, designed on a five-runbook covering set and ruled
   in
-  [Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md),
+  [runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md),
   proven by `parser/chaingen.py`, which regenerates every covered
   runbook's chain into `parser/chains.txt` and fails on drift via
   `--check`.
@@ -164,7 +92,7 @@ Two items remain:
   twelve agents and the unmarked skills in the Port roster,
   38 runbooks — ported to the edge encoding by a fixed dispatch
   prompt, since retired, each with its leftovers recorded in the
-  [Residual Ledger](/no-more-slop-branch-working-files/RESIDUAL-LEDGER.md).
+  [residual ledger](/no-more-slop-branch-working-files/runbook-residual-ledger.md).
 - **The runbook standard, and the gate green.**
   [Runbook Conventions](/standards/harness/runbook-conventions.md)
   replaced what the old docs taught: `skill-management.md` deleted, the
@@ -204,11 +132,33 @@ Two items remain:
   context-content.md, and `grill-with-docs` — reduced to a one-line
   wrapper once its override retired — was deleted, its callers running
   `/grilling` + `/domain-modeling` directly.
-- **Working-file reorganization.** The branch's working files rebuilt
-  as a tree with one job per file: Reference Chain Declaration holds
-  the object, Reference Chain Encoding beneath it is the writer's
-  spec, the Residual Ledger is the one system-wide record, and Port
-  Prompt retired.
+- **Recursion to the bedrock of determinism.** The note is developed and
+  placed: the bedrock is defined in
+  [System Legibility](/no-more-slop-branch-working-files/system-legibility.md),
+  and [Doc-Type](/no-more-slop-branch-working-files/doc-type.md) carries
+  the loop's layer-invariance and the primitive map. The bedrock is where
+  documentation stops and code begins — documentation is the stochastic
+  thing, code the deterministic one, the same split this file's two
+  tracks make. The recursion does not halt at the boundary — the mode
+  flips, from inventing machinery with the loop to choosing pre-existing
+  tools.
+- **The terminology refactor.** The loose uses of "primitive" and
+  "ontology" became a settled vocabulary — doc-type, operation,
+  composition rule, shape, contract, grain, layer, primitive, primitive
+  map — defined once in
+  [Doc-Type](/no-more-slop-branch-working-files/doc-type.md); "ontology"
+  is reserved for a future solver
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md),
+  Ambitions).
+- **The working set rebuilt as the future doc-type tree.** Every theory
+  file rewritten under its future basename: system-legibility.md (the
+  doctrine), doc-type.md (the kind), doc-type-system.md (this repo's
+  instantiation), and the Runbook doc-type's four files
+  (runbook-definition.md, runbook-contract-shape.md, runbook-encoding.md,
+  runbook-residual-ledger.md). CLOA-ABSTRACTIONS.md and TYPES.md drain
+  into these and retire with the index rebuild;
+  [migration.md](/no-more-slop-branch-working-files/migration.md) holds
+  the move plan.
 
 **Raw ideas, none designed**
 
@@ -225,10 +175,6 @@ Two items remain:
 - **Doc linters, re-aimed.** The existing linters are pedantic — they check
   that certain headings are present. Decide what is worth linting for and
   design toward that.
-- **Reference chains, the lint.** The primitive was constructed in
-  [CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md) and its declaration format
-  and deterministic generation are now Completed above. Still raw:
-  the lint that fails when the declared chain and reality disagree.
 - **Deslop regression gate.** Something must keep a rewritten document from
   sliding back into slop. Deterministic rules cannot judge prose quality;
   the judgments machinery may fit here.
@@ -305,56 +251,88 @@ works the term holds the detail. Every one is a tentative promotion to
 - **acceptance tier** — the small, capped, fully read test suite in
   `tests/acceptance/`, one test per behavior the user could state in a
   sentence. Its opposite is the unread tier.
+- **the bedrock of determinism** — the boundary where targets stop being
+  stochastic; below it the work is mostly choosing pre-existing tools
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
 - **bucket** — the target class of a write: git, GitHub, local file, or
   scratch
-  ([Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md#edges)).
-- **CLOA** — the level of abstraction where
-  the AI and the user communicate in the exact same terminology.
+  ([runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md#edges)).
+- **CLOA** — the best-effort shared level where the user and the AI
+  communicate in the exact same terminology: the highest level the user
+  can trust the AI at, the lowest the AI needs the user at
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+- **composition rule** — how many operations an instance may carry and in
+  what arrangement
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
 - **constrain to optimize understanding** — the principle that a constraint
   on form pays for itself in amortized reading, meaningful location, and a
-  lintable rule.
+  lintable rule
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+- **contract** — everything a caller of an instance may rely on; contains
+  the signature — args in, results out — as its machine-checkable core
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
 - **covering set** — the smallest group of exemplar runbooks that exercises
   every row of a design under test; edge encoding's is five runbooks.
+- **doc-type** — operations plus a composition rule, handing one
+  documentation family a contract shape
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+- **grain** — a doc-type axis: type-level, one contract serves every
+  instance; instance-level, each instance fills the shape its own way
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
 - **gray module** — a module the user understands approximately, because the
   user understands its tests and the tests pass.
+- **instance** — one member of a documentation family; it has a contract,
+  it is not one
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
 - **intent alignment debt** — divergence from the user's intent accrued over
-  time; the mirror of tech debt.
-- **layer invariance** — the loop is the same algorithm at any level, with
-  adjacent runs joined by a map
-  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#layer-invariance)).
-- **the loop** — the expectation-maximization procedure that generates
-  primitives from a target artifact
-  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#an-em-loop-for-primitive-construction)).
-- **the pandas standard** — the target state: fluency with an interface —
-  which objects exist, which methods fit which task — without ever reading
-  inside it.
-- **the primitive map** — the join between two adjacent loop layers: one
-  lower expression per higher primitive
-  ([Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md#the-primitive-map)).
+  time; the mirror of tech debt
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+- **layer** — a rung where one loop run happened; the loop is
+  layer-invariant, the same algorithm at any rung
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#layers-and-the-primitive-map)).
+- **the loop** — the expectation-maximization procedure that produces a
+  doc-type from its target
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#the-loop)).
+- **operation** — an action instances of a family support
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+- **the pandas standard** — the target state: a declared abstraction feels
+  like an imported one to its caller — fluency without ever reading inside
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+- **primitive** — one of a layer's atomic units
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+- **the primitive map** — the join between two adjacent layers: one lower
+  expression per higher primitive
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#layers-and-the-primitive-map)).
 - **provenance** — whether an abstraction is declared in this corpus or
   imported from outside it
-  ([CLOA Abstractions](/no-more-slop-branch-working-files/CLOA-ABSTRACTIONS.md#a-noun-with-one-or-more-verbs)).
-- **Reference chain** — the declared tree of one runbook's behavior and its
-  call signature
-  ([Reference Chain Declaration](/no-more-slop-branch-working-files/REFERENCE-CHAIN-DECLARATION.md)).
-- **registry pass** — the loop's first move on a repo: rule every registered
-  document type important to the primitives ontology or not.
-- **residual** — whatever the current abstractions cannot express; tracked,
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+- **Reference chain** — the Runbook doc-type's contract shape: one
+  runbook's behavior and call signature as nodes and edges
+  ([runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md)).
+- **registry pass** — the loop's first move on a repo: rule every
+  registered document kind important to the type system or not
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#the-loop)).
+- **residual** — whatever the current primitives cannot express; tracked,
   never forced.
-- **runbook** — a skill or an agent definition; an invocable command that
-  owns a Reference chain.
+- **runbook** — a skill or an agent definition; an invocable command
+  ([runbook-definition.md](/no-more-slop-branch-working-files/runbook-definition.md)).
+- **shape** — the form every contract in a family takes, fixed by the
+  family's operations and composition rule
+  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
 - **slop** — output that diverges from the user's intent (low quality) or
-  that the user cannot read (not understood); the Goal section splits the
-  two.
+  that the user cannot read (not understood)
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
 - **slop trench** — nominal ownership of a system whose details have
-  outpaced inspection.
+  outpaced inspection
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
 - **span** — the braced unit inside runbook prose that serves the executing
   agent and the parser from one sentence
-  ([Reference Chain Encoding](/no-more-slop-branch-working-files/REFERENCE-CHAIN-ENCODING.md#from-prose-to-chain)).
+  ([runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md#from-prose-to-chain)).
 - **unread tier** — the existing thousand-odd machine-written unit tests,
   judged only by passing.
 - **the vocabulary API** — `CONTEXT.md` designed the way a library designs
-  its public surface, plus the escalation discipline that keeps it current.
+  its public surface, plus the escalation discipline that keeps it current
+  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
 
 ## Acronyms
 
