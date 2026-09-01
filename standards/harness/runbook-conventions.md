@@ -9,7 +9,7 @@ description: Runbook format conventions — skill and agent front matter, argume
 Format conventions for the **runbook** class — the harness files that
 act: skills and agents.
 [files.md](/standards/harness/files.md) registers the members and their
-layout; the [Instruction Grammar](/standards/harness/grammar.md) governs
+layout; the [Runbook doc-type](/doc-types/runbook/index.md) governs
 a runbook's body; this standard governs the rest — front matter,
 identity, and the content of each part. Two sections follow, one per
 kind.
@@ -71,7 +71,7 @@ the body. The reason is how invocation behaves: the harness appends the
 input after the body as `ARGUMENTS: <text>`, whole and unsplit, and the
 executing agent never sees the argument's name. Every argument is a
 string, so the name alone carries the meaning — for the user and for the
-[Reference chain](/standards/harness/grammar.md).
+[Reference chain](/doc-types/runbook/contract-shape.md).
 
 ### Progressive disclosure
 

@@ -63,7 +63,12 @@ primitives come from where, and the rules for writing each span.
 ## The primitive map
 
 Every higher primitive is either **derived** from the runbook's file or
-**declared** in its body as a span.
+**declared** in its body as a span. The primitives themselves are
+declared in
+[contract-shape.md](/doc-types/runbook/contract-shape.md), never
+here — this map only gives each one its written form. The lexicon is
+closed the same way: a new span form is an edit to this file, and its
+primitive an edit to contract-shape.md, before first use.
 
 The derived primitives:
 

@@ -16,7 +16,8 @@ Claude Code is named deliberately as the only harness currently in use.
 Every member has a **class**, naming what the harness does with it:
 
 - **runbook** — documentation that acts, invoked by name; its body is
-  governed by the [Instruction Grammar](/standards/harness/grammar.md).
+  governed by the
+  [Runbook doc-type](/doc-types/runbook/index.md).
 - **context** — prose injected into agent context; read, never invoked.
 - **configuration** — data the harness reads.
 - **code** — deterministic programs the harness runs.

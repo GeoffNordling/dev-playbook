@@ -16,8 +16,6 @@ the only harness currently in use.
 
 - [standards/harness/](/standards/harness/index.md) — the member
   registry and the CLAUDE.md content standard; start at Files
-- [Instruction Grammar](/standards/harness/grammar.md) — the braced-span
-  grammar that makes skill and agent bodies machine-readable
 - [Runbook Conventions](/standards/harness/runbook-conventions.md) — the runbook
   format: skill bundles and agent definitions
 - [Writing for Agents](/standards/harness/writing-for-agents.md) —

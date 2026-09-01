@@ -53,19 +53,34 @@ connecting the runbook to a node. A rendered chain inflects the verb
 to the third person (`reads`, `writes`), and the encoding's span
 keywords are its imperative form.
 
+Edges live at the definition site: an edge belongs to the file whose
+text declares it, and a chain is stitched by following do-edges into
+each target's own declarations — no file describes another file's
+behavior.
+
 | Operation | The action | Detail |
 | --------- | ---------- | ------ |
 | read | consult | — |
 | write | change state | target is one of four buckets — `git(commit, push)` |
 | do | run a runbook or a script | — |
 | override … with … | substitute a previous clause | — |
+| never … | prohibit | wraps one write and flips it from action to ban |
 | args | take the caller's input | by name — `friction` |
 | report | give a result back to the caller | by name and type — `outcome: str` |
 
 A write's target is one of four **buckets** — git, GitHub, local
 file, scratch — plus an optional parenthetical hint, as in
 `git(commit, push)`. The bucket list is fixed; the hint is a memory
-aid, never a type.
+aid, never a type. A read's target is a file, or one of two read
+buckets when no on-disk target exists — GitHub for remote state, the
+launch prompt for material the caller assigns at dispatch. A never
+wraps one write; a git-bucket ban may also name `merge`, a verb that
+exists only inside a prohibition.
+
+This vocabulary is closed: the tables above are all of it. A new
+operation, node type, or bucket is an edit here before its first
+use; its written form is an edit to
+[encoding.md](/doc-types/runbook/encoding.md).
 
 How each edge is written in runbook prose is ruled in
 [encoding.md](/doc-types/runbook/encoding.md#the-primitive-map),

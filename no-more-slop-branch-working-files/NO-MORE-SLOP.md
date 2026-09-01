@@ -24,7 +24,7 @@ track; the code track waits.
 The doctrine behind the goal — slop's two kinds, the CLOA, the bedrock of
 determinism, the pandas standard, the standing principles, the vocabulary
 API — has drained into
-[System Legibility](/no-more-slop-branch-working-files/system-legibility.md).
+[System Legibility](/docs/system-legibility.md).
 Whether any of it hardens into a Standard card is held there, under
 Ambitions.
 
@@ -40,39 +40,40 @@ Understanding operates at two zooms, for code and documentation alike:
   documentation, established tooling for code.
 
 Where the correct altitude sits, and what happens off it, is the CLOA
-([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+([System Legibility](/docs/system-legibility.md)).
 
 ## Documentation track — active
 
 **Planned**
 
 The theory is settled in
-[Doc-Type](/no-more-slop-branch-working-files/doc-type.md) and instantiated
-in [Doc-Type System](/no-more-slop-branch-working-files/doc-type-system.md);
+[Doc-Type](/doc-types/doc-type.md) and instantiated
+in [Doc-Type System](/doc-types/doc-type-system.md);
 the Runbook doc-type's shape and encoding sit in
-[runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md)
+[contract-shape.md](/doc-types/runbook/contract-shape.md)
 and
-[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md).
-Two items remain:
+[encoding.md](/doc-types/runbook/encoding.md).
+One item remains:
 
-- **Execute the migration.** The working files already carry their future
-  basenames; [migration.md](/no-more-slop-branch-working-files/migration.md)
-  holds the path table, the standards/ split, and the repoints. It runs on
-  this branch, after the index rebuild, before merge; the standards/ split
-  is its own review stop and may fall to a follow-up issue.
-- **The parser's long-term home and behavior.** `parser/chaingen.py` is
-  slated for `scripts/chaingen`, and nothing else is decided: where
-  `chains.txt` lives (a generated view — its location is set by where
-  chaingen writes), and when the parser runs. Today it runs by hand; the
-  end state is a gate that fails when a declared chain and reality
-  disagree.
+- **When the parser runs.** The move landed the parser at
+  `scripts/chaingen`, writing its generated view to
+  `doc-types/runbook/chains.txt` — a temporary location, to be settled
+  with the rest of this item. Undecided: when it runs. Today it runs by
+  hand; the end state is a gate that fails when a declared chain and
+  reality disagree. The same work settles shadowing: a runbook
+  shadowing lint parallel to `standard.card-shadows-upstream` (a
+  repo-local runbook may not reuse an upstream runbook's name), and
+  where the no-shadowing rule itself lives — today it sits in
+  [definition.md](/doc-types/standard/definition.md)'s Scope.
+  Hierarchical imports across repositories are the mechanism under
+  both; get that right, not fast.
 
 **Completed**
 
 - **CLOA primitives.** Three bootstrap runs plus an empirical close-out
   constructed a converged primitive set describing what documentation does
   at the CLOA; it settled as the Runbook doc-type's operations
-  ([runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md#edges)).
+  ([contract-shape.md](/doc-types/runbook/contract-shape.md#edges)).
   That files are still too hard to read is a separate open work stream
   (the inside-one-file zoom).
 - **Deslop rewrite.** Every prose document rewritten in place against
@@ -84,15 +85,15 @@ Two items remain:
 - **Edge encoding and its parser.** The Reference chain's in-file
   declaration format, designed on a five-runbook covering set and ruled
   in
-  [runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md),
-  proven by `parser/chaingen.py`, which regenerates every covered
-  runbook's chain into `parser/chains.txt` and fails on drift via
+  [encoding.md](/doc-types/runbook/encoding.md),
+  proven by `scripts/chaingen`, which regenerates every covered
+  runbook's chain into `doc-types/runbook/chains.txt` and fails on drift via
   `--check`.
 - **First-party port.** Every runbook authored in this repo — all
   twelve agents and the unmarked skills in the Port roster,
   38 runbooks — ported to the edge encoding by a fixed dispatch
   prompt, since retired, each with its leftovers recorded in the
-  [residual ledger](/no-more-slop-branch-working-files/runbook-residual-ledger.md).
+  [residual ledger](/doc-types/runbook/residual-ledger.md).
 - **The runbook standard, and the gate green.**
   [Runbook Conventions](/standards/harness/runbook-conventions.md)
   replaced what the old docs taught: `skill-management.md` deleted, the
@@ -134,8 +135,8 @@ Two items remain:
   `/grilling` + `/domain-modeling` directly.
 - **Recursion to the bedrock of determinism.** The note is developed and
   placed: the bedrock is defined in
-  [System Legibility](/no-more-slop-branch-working-files/system-legibility.md),
-  and [Doc-Type](/no-more-slop-branch-working-files/doc-type.md) carries
+  [System Legibility](/docs/system-legibility.md),
+  and [Doc-Type](/doc-types/doc-type.md) carries
   the loop's layer-invariance and the primitive map. The bedrock is where
   documentation stops and code begins — documentation is the stochastic
   thing, code the deterministic one, the same split this file's two
@@ -146,9 +147,9 @@ Two items remain:
   "ontology" became a settled vocabulary — doc-type, operation,
   composition rule, shape, contract, grain, layer, primitive, primitive
   map — defined once in
-  [Doc-Type](/no-more-slop-branch-working-files/doc-type.md); "ontology"
+  [Doc-Type](/doc-types/doc-type.md); "ontology"
   is reserved for a future solver
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md),
+  ([System Legibility](/docs/system-legibility.md),
   Ambitions).
 - **The working set rebuilt as the future doc-type tree.** Every theory
   file rewritten under its future basename: system-legibility.md (the
@@ -156,9 +157,30 @@ Two items remain:
   instantiation), and the Runbook doc-type's four files
   (runbook-definition.md, runbook-contract-shape.md, runbook-encoding.md,
   runbook-residual-ledger.md). CLOA-ABSTRACTIONS.md and TYPES.md drained
-  into these and were deleted;
-  [migration.md](/no-more-slop-branch-working-files/migration.md) holds
-  the move plan.
+  into these and were deleted.
+- **The migration.** Every working file moved to its long-term home: the
+  doctrine to `docs/system-legibility.md`, the theory and the Runbook
+  doc-type into `doc-types/`, the parser to `scripts/chaingen` writing
+  `doc-types/runbook/chains.txt`. The Standard doc-type was born in the
+  same move: `standards/standard/format.md` split into
+  `doc-types/standard/` (definition, contract shape, encoding, an empty
+  residual ledger), its detector contract and drift machinery staying
+  behind as `standards/standard/detectors.md`, and the Meta-Standard
+  card's Define cell now points at the split files. Every inbound link
+  repointed; the migration instruction sheet died with the move.
+
+- **The grammar triplication dissolved.**
+  `standards/harness/grammar.md` predated the doc-type concept — it was
+  where the Runbook primitives were shoehorned before they had a home —
+  and after the migration it declared the same vocabulary a third time,
+  beside `doc-types/runbook/contract-shape.md` and `encoding.md`. It is
+  deleted. contract-shape.md is now the sole vocabulary declaration
+  (gaining the prohibition operation, the read buckets, and the
+  edges-live-at-the-definition-site stitching rule, which existed
+  nowhere else); encoding.md is the sole declaration of written form
+  and says a primitive is never born there. The harness standard keeps
+  only its own question — `files.md`'s runbook class points at the
+  Runbook doc-type for the body.
 
 **Raw ideas, none designed**
 
@@ -184,6 +206,12 @@ Two items remain:
 - **CLOA change discipline.** A process that forces a conscientious
   decision on every term used within a CLOA communication. Without one,
   vocabulary changes unchecked.
+- **The inheritance pattern has no single home.** dev-playbook declares a
+  system once, consumers inherit it, a repo declares only what is local —
+  stated per-system in `CLAUDE.md`, the Standard doc-type's Scope, and
+  document-types.md's Local extensions. A candidate for
+  [System Legibility](/docs/system-legibility.md) or a standard of its
+  own.
 
 The core problem of this track: documentation needs far more reading by the
 user than code does. Code is deterministic and can be pinned down by tools;
@@ -253,86 +281,86 @@ works the term holds the detail. Every one is a tentative promotion to
   sentence. Its opposite is the unread tier.
 - **the bedrock of determinism** — the boundary where targets stop being
   stochastic; below it the work is mostly choosing pre-existing tools
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **bucket** — the target class of a write: git, GitHub, local file, or
   scratch
-  ([runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md#edges)).
+  ([contract-shape.md](/doc-types/runbook/contract-shape.md#edges)).
 - **CLOA** — the best-effort shared level where the user and the AI
   communicate in the exact same terminology: the highest level the user
   can trust the AI at, the lowest the AI needs the user at
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **composition rule** — how many operations an instance may carry and in
   what arrangement
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **constrain to optimize understanding** — the principle that a constraint
   on form pays for itself in amortized reading, meaningful location, and a
   lintable rule
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **contract** — everything a caller of an instance may rely on; contains
   the signature — args in, results out — as its machine-checkable core
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **covering set** — the smallest group of exemplar runbooks that exercises
   every row of a design under test; edge encoding's is five runbooks.
 - **doc-type** — operations plus a composition rule, handing one
   documentation family a contract shape
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **grain** — a doc-type axis: type-level, one contract serves every
   instance; instance-level, each instance fills the shape its own way
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **gray module** — a module the user understands approximately, because the
   user understands its tests and the tests pass.
 - **instance** — one member of a documentation family; it has a contract,
   it is not one
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **intent alignment debt** — divergence from the user's intent accrued over
   time; the mirror of tech debt
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **layer** — a rung where one loop run happened; the loop is
   layer-invariant, the same algorithm at any rung
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#layers-and-the-primitive-map)).
+  ([Doc-Type](/doc-types/doc-type.md#layers-and-the-primitive-map)).
 - **the loop** — the expectation-maximization procedure that produces a
   doc-type from its target
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#the-loop)).
+  ([Doc-Type](/doc-types/doc-type.md#the-loop)).
 - **operation** — an action instances of a family support
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **the pandas standard** — the target state: a declared abstraction feels
   like an imported one to its caller — fluency without ever reading inside
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **primitive** — one of a layer's atomic units
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **the primitive map** — the join between two adjacent layers: one lower
   expression per higher primitive
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#layers-and-the-primitive-map)).
+  ([Doc-Type](/doc-types/doc-type.md#layers-and-the-primitive-map)).
 - **provenance** — whether an abstraction is declared in this corpus or
   imported from outside it
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **Reference chain** — the Runbook doc-type's contract shape: one
   runbook's behavior and call signature as nodes and edges
-  ([runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md)).
+  ([contract-shape.md](/doc-types/runbook/contract-shape.md)).
 - **registry pass** — the loop's first move on a repo: rule every
   registered document kind important to the type system or not
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md#the-loop)).
+  ([Doc-Type](/doc-types/doc-type.md#the-loop)).
 - **residual** — whatever the current primitives cannot express; tracked,
   never forced.
 - **runbook** — a skill or an agent definition; an invocable command
-  ([runbook-definition.md](/no-more-slop-branch-working-files/runbook-definition.md)).
+  ([definition.md](/doc-types/runbook/definition.md)).
 - **shape** — the form every contract in a family takes, fixed by the
   family's operations and composition rule
-  ([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)).
+  ([Doc-Type](/doc-types/doc-type.md)).
 - **slop** — output that diverges from the user's intent (low quality) or
   that the user cannot read (not understood)
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **slop trench** — nominal ownership of a system whose details have
   outpaced inspection
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 - **span** — the braced unit inside runbook prose that serves the executing
   agent and the parser from one sentence
-  ([runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md#from-prose-to-chain)).
+  ([encoding.md](/doc-types/runbook/encoding.md#from-prose-to-chain)).
 - **unread tier** — the existing thousand-odd machine-written unit tests,
   judged only by passing.
 - **the vocabulary API** — `CONTEXT.md` designed the way a library designs
   its public surface, plus the escalation discipline that keeps it current
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)).
+  ([System Legibility](/docs/system-legibility.md)).
 
 ## Acronyms
 
