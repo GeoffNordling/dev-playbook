@@ -10,10 +10,11 @@ Most standards a repo runs are workspace-scoped — inherited from dev-playbook
 through its published hooks, governing every repo alike. A repo with a
 convention no other repo shares declares its own **repo-scoped** standard: the
 same card-and-detector machinery the
-[meta-standard](/standards/standard/format.md) defines, hosted in the consumer
-repo instead of dev-playbook. The recipe below is end-to-end; the card format,
-the detector contract, and the hosting pattern it points at are all defined in
-[format.md](/standards/standard/format.md).
+[Meta-Standard](/standards/standard.md) card defines, hosted in the consumer
+repo instead of dev-playbook. The recipe below is end-to-end; the card format
+is defined in [contract-shape.md](/doc-types/standard/contract-shape.md), the
+detector contract and the hosting pattern in
+[detectors.md](/standards/standard/detectors.md).
 
 ## 1. Grow the `standards/` tree
 
@@ -34,7 +35,7 @@ stem shadows the upstream standard and the rule
 
 Back the card's Audit cell with a detector — a `scripts/<name>` shim over the
 repo's own reusable modules. It obeys the detector contract in
-[format.md](/standards/standard/format.md): read-only, one finding per line in
+[detectors.md](/standards/standard/detectors.md): read-only, one finding per line in
 GNU format (`file:line: card.rule message`) with card-namespaced rule ids,
 answering `--list-rules`, exit 0 clean / 1 findings / 2 tool error.
 

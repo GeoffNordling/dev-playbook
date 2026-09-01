@@ -80,6 +80,6 @@ fix by judgment.
 
 ## Report back
 
-{Report: when the audits are clean, one line saying so; otherwise one
+{Report when the audits are clean, one line saying so; otherwise one
 line per member changed and one line per finding left unfixed with the
 reason}.

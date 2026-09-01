@@ -17,7 +17,8 @@ standard's contract, checkers, gates, and adoption helpers. Every directory
 holds content the cards point into: a standard's contract prose (`build/`
 behind `build.md`), templates, or vendored references. The rule is the
 tree: **flat = card, directory = content**. The contract behind the cards
-themselves is [Standards and Standard Cards](/standards/standard/format.md).
+themselves is the Standard doc-type
+([doc-types/standard/](/doc-types/standard/index.md)).
 
 ## Rules live here; their subjects live elsewhere
 
@@ -37,7 +38,7 @@ governance hierarchy. It is not — everything here is under the
 meta-standard **in form only** (the card format), while each standard's
 substance governs its own population, one rung down. A rejection always
 cites exactly one rung up: a bad Makefile is rejected by `build/`, never by
-`standard/format.md`; an unspecced device by `instrument/format.md`, never
+`standard/`; an unspecced device by `instrument/format.md`, never
 by a datasheet spec.
 
 The full catalog is [`index.md`](/standards/index.md).

@@ -74,18 +74,6 @@
   ├─reports─► outcome: str    the PR's number and whether you created it or found it already open
   └ ╌ reports ╌ ► outcome: str    the reason instead, as escalated    if the PR cannot be created at all
 
-[set-auditor] Agent · tools: Read, Grep, Glob, model: opus, effort: xhigh
-  ├─reads───► [working-documentation-sets] Standard
-  ├─never writes─►
-  ├─never commits─►
-  └─reports─► outcome: str    findings ranked by how much each would mislead a fresh session reading the set cold, as the hand-off to the set-deslopper agent
-
-[set-deslopper] Agent · tools: Read, Write, Edit, Grep, Glob, Agent, model: opus, effort: xhigh
-  ├─does────► [set-auditor] Agent
-  ├─writes──► local file    the fix for each finding into the set's members
-  ├─never commits─►
-  └─reports─► outcome: str    a minimal report: one line per member changed, and one line per finding left unfixed with the reason
-
 [tics-remover] Agent · tools: Read, Edit, model: sonnet, effort: high
   ├─reads───► [slop-tics] Standard
   ├─writes──► local file    the target document in place
@@ -93,6 +81,17 @@
   ├─never commits─►
   ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
+
+[working-doc-set-auditor] Agent · tools: Read, Grep, Glob, model: sonnet, effort: high
+  ├─never writes─►
+  ├─never commits─►
+  ├─reads───► launch prompt    the assigned standard sections
+  └─reports─► outcome: str    the findings ranked by how much each would mislead a fresh session reading the set cold
+
+[working-doc-set-deslopper] Agent · model: inherit, effort: xhigh
+  ├─does────► [working-doc-set-auditor] Agent    three subagents in one message, `model: sonnet`, `effort: high`
+  ├─never commits─►
+  └─reports─► outcome: str    when the audits are clean, one line saying so
 
 [agent-view-overwatch] Skill · model: sonnet, effort: xhigh, allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
   ├─reads───► software-factory.md
@@ -385,10 +384,10 @@
   ├─writes──► GitHub    the resolution
   └─writes──► GitHub    newly-surfaced tickets, create-then-wire
 
-[working-doc-set-deslop] Skill · model: sonnet, effort: high
+[working-doc-set-deslop] Skill · model: inherit, effort: high
   ├─args────► set-hint
-  ├─does────► [set-deslopper] Agent    the subagent, `model: opus`
+  ├─does────► [working-doc-set-deslopper] Agent    as a fork subagent (`subagent_type: "fork"`)
   └─never commits─►
 
-[working-doc-set-diagram] Skill · model: opus, effort: medium
+[working-doc-set-diagram] Skill · model: inherit, effort: medium
   └─reports─► outcome: str    the diagram

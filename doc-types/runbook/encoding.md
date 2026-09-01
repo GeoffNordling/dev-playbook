@@ -7,12 +7,12 @@ description: The layer below the contract shape — the spec a writer follows to
 # Reference Chain Encoding
 
 The layer below the
-[Reference chain](/no-more-slop-branch-working-files/runbook-contract-shape.md):
+[Reference chain](/doc-types/runbook/contract-shape.md):
 how chain edges are written inside runbook prose, so deterministic
 code can generate every chain. This file is the spec for the writer of
 that prose. The primitive map below is the join between the two
 layers — one lower expression per higher primitive. The parser is
-`parser/chaingen.py`, which writes every chain to `parser/chains.txt`
+`scripts/chaingen`, which writes every chain to `doc-types/runbook/chains.txt`
 and fails on drift via `--check`; everything the writer does not
 need — how an edge draws, how a name resolves — lives in that code and
 nowhere else.
@@ -80,6 +80,7 @@ The declared primitives:
 | --------- | ---- |
 | reads | `{Read <one link>}` |
 | reads — GitHub | `{Read from GitHub …}` |
+| reads — launch prompt | `{Read from the launch prompt …}` |
 | writes — local file | `{Write …}` |
 | writes — GitHub | `{Write to GitHub …}` |
 | writes — scratch | `{Write to scratch …}` |
@@ -121,7 +122,9 @@ The link is the target; "once to sharpen the raw idea" is annotation.
 
 **Buckets.** The keyword picks the write bucket — `Commit` is git,
 `Write` is local file — unless the payload opens with `to GitHub` or
-`to scratch`; `from GitHub` does the same for `Read`. A `{Commit …}`
+`to scratch`; `from GitHub` and `from the launch prompt` do the same
+for `Read` — the latter for material the caller assigns at dispatch,
+which no link can name. A `{Commit …}`
 span requires a fenced git command block in the same step, and span
 and block must agree.
 
@@ -154,7 +157,7 @@ the semicolon stays in the file.
 **Prohibition.** `{Never {…}}` wraps exactly one span — inner keyword
 `Write`, `Commit`, or `Merge` — and flips it from action to ban. A ban
 the vocabulary cannot carry stays plain prose, recorded in the
-[runbook-residual-ledger.md](/no-more-slop-branch-working-files/runbook-residual-ledger.md).
+[residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 
 ```
 {Never {Commit}} — leave the changes in the working tree for review.

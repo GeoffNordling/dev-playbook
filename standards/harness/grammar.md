@@ -22,7 +22,9 @@ takes in the whole runbook at a glance. The grammar is the one-to-one
 join between them: each chain element has exactly one written
 expression, so deterministic code constructs the chain from the runbook
 without a model in the loop. This document defines the chain's
-vocabulary first, then the written form that declares it.
+vocabulary first, then the written form that declares it. In the
+documentation type system, the chain is the Runbook doc-type's contract
+shape ([doc-types/runbook/](/doc-types/runbook/index.md)).
 
 The grammar serves readers in priority order: the executing agent
 (the prose commands it; nothing may clutter that), the user (who reads
@@ -41,7 +43,7 @@ vocabulary.
 | **Skill** | Documentation that runs in the calling context, on the caller's permissions, minus any clamp its own frontmatter declares. |
 | **Agent** | Documentation that runs in a fresh context, on its own permission set. |
 | **Script** | Deterministic code run via the shell — not a direct LLM call. |
-| **Standard** | A rule the workspace runs under — define, audit, enforce, adopt, per [the meta-standard](/standards/standard/format.md). Appears in a chain only as an edge target. |
+| **Standard** | A rule the workspace runs under — define, audit, enforce, adopt, per [the Standard doc-type](/doc-types/standard/contract-shape.md). Appears in a chain only as an edge target. |
 
 Kind derives from the target's path — a `skills/` segment makes a Skill,
 an `agents/` segment an Agent, a script filename a Script, marked
@@ -91,7 +93,7 @@ payload. Keywords match case-insensitively, so a sentence-initial
 
 | Keyword | Chain element | Form |
 |---|---|---|
-| `Read` | reads | `{Read <payload with exactly one link>}` |
+| `Read` | reads | `{Read <payload with exactly one link>}`, or a bucketed `{Read from GitHub …}` / `{Read from the launch prompt …}` |
 | `Write` | writes — local file | `{Write <payload>}` |
 | `Commit` | writes — git | `{Commit <payload>}` + a fenced command block in the same step |
 | `Report` | reports | `{Report <payload>}` |
@@ -107,7 +109,10 @@ form requires an edit here before its first use.
 Keywords are imperative commands to the executing agent; the chain's
 edge labels are their third-person forms. Per keyword:
 
-- **Read.** The one link is the target; exactly one per span.
+- **Read.** The one link is the target; exactly one per span. A
+  `from GitHub` or `from the launch prompt` prefix opens a linkless
+  payload — no on-disk target exists, and the prefix names the node:
+  remote state, or material the caller assigns at dispatch.
 - **Write.** Local-file bucket. The payload is opaque; no link is
   interpreted.
 - **Commit.** Git bucket. A fenced command block in the same step

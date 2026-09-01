@@ -2,7 +2,7 @@
 
 The catalog: every standard has a card here (`type: Standard-Card`), and
 each card's cells point at the files that define, audit, enforce, and
-adopt it. See [Standards and Standard Cards](/standards/standard/format.md).
+adopt it. See [Standard Card](/doc-types/standard/contract-shape.md).
 Ordering: README, then the cards — meta-standard first, the rest
 alphabetical — then the contract documents not listed by a child index,
 alphabetical; directories last.
@@ -24,11 +24,11 @@ alphabetical; directories last.
 - [Tracking](/standards/tracking.md) — Governs how work is tracked — candidates, issue authoring, factory labels, tracker operations, and repository settings
 - [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one
+- [Detectors and Drift](/standards/standard/detectors.md) — The detector contract behind every Audit cell and the drift machinery that keeps standards honest
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
 - [Module Design Conventions](/standards/modules/design.md) — The deep-module contract — the vocabulary and the aliases it retires, deep vs shallow, the principles, testability rules, and the dependency categories that govern deepening
 - [Python Style](/standards/python/style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
 - [Shell Conventions](/standards/shell/conventions.md) — How shell is written — glue-only boundary, strict mode, declared bash, shellcheck-clean
-- [Standards and Standard Cards](/standards/standard/format.md) — What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
 - [Testing Conventions](/standards/testing/conventions.md) — Default pytest conventions — structure, behavioral focus, test doubles, fixtures, and humble objects
 
 ## Directories

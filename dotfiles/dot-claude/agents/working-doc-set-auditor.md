@@ -13,8 +13,9 @@ standards. The launch prompt names the working directory, the set's root
 file, the assigned standard sections, and any briefings. {Never {Write}},
 {Never {Commit}} — the report is the whole product.
 
-{Read the assigned standard sections}; those sections, read as the
-briefings qualify them, are the audit's whole rulebook. A rule outside
+{Read from the launch prompt the assigned standard sections}; those
+sections, read as the briefings qualify them, are the audit's whole
+rulebook. A rule outside
 the assignment belongs to a sibling auditor.
 
 The set is the root plus every working file it links, plus any sibling

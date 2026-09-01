@@ -7,7 +7,7 @@ description: This repo's doc-type instantiation — the registry rulings, the ro
 # Doc-Type System
 
 This repo's instantiation of
-[Doc-Type](/no-more-slop-branch-working-files/doc-type.md): which
+[Doc-Type](/doc-types/doc-type.md): which
 document kinds matter here, which doc-types are built, and what a
 consumer repo imports.
 
@@ -23,12 +23,12 @@ ruled important.
 
 | Kind | Family | Ruling |
 |---|---|---|
-| Skill | runbooks | The [Runbook](/no-more-slop-branch-working-files/runbook-contract-shape.md) doc-type |
-| Agent definition | runbooks | The [Runbook](/no-more-slop-branch-working-files/runbook-contract-shape.md) doc-type |
-| Standard | cards | The [Standard](/standards/standard.md) doc-type |
-| Standard-Card | cards | The [Standard](/standards/standard.md) doc-type — its catalog surface |
+| Skill | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
+| Agent definition | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
+| Standard | cards | The [Standard](/doc-types/standard/definition.md) doc-type |
+| Standard-Card | cards | The [Standard](/doc-types/standard/definition.md) doc-type — its catalog surface |
 | Guide | guides | Important; no doc-type built yet |
-| Vocabulary | — | Separate — the vocabulary API ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)), not a doc-type |
+| Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |
 
 Any registry kind absent from this table is ruled not important.
 
@@ -38,9 +38,9 @@ Two doc-types are built, one sparse and one deep.
 
 **Standard** — a standard states a rule the workspace holds itself
 to, named by the question it governs
-([definition](/standards/standard/format.md)). It carries type-level
+([definition](/doc-types/standard/definition.md)). It carries type-level
 grain: one contract serves every card. Its shape — the card — is
-declared in [format.md](/standards/standard/format.md). Its fixed
+declared in [contract-shape.md](/doc-types/standard/contract-shape.md). Its fixed
 composition rule keeps the machinery sparse: headings suffice, and
 its determinism lives in the audit linters and enforcement gates its
 cards point at.
@@ -59,21 +59,21 @@ Standard
 
 **Runbook** — a runbook is an invocable command: a skill or an
 agent definition
-([definition](/no-more-slop-branch-working-files/runbook-definition.md)).
+([definition](/doc-types/runbook/definition.md)).
 It carries instance-level grain: every runbook owns a distinct
 chain. Its shape is declared in
-[runbook-contract-shape.md](/no-more-slop-branch-working-files/runbook-contract-shape.md),
+[contract-shape.md](/doc-types/runbook/contract-shape.md),
 its encoding layer in
-[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md),
+[encoding.md](/doc-types/runbook/encoding.md),
 its residuals in
-[runbook-residual-ledger.md](/no-more-slop-branch-working-files/runbook-residual-ledger.md).
+[residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 Its free composition rule demands deep machinery: a grammar, a
 parser, a drift check.
 
 ```
 Runbook
   operations:   read write do … — the full set in
-                [runbook-contract-shape.md]
+                [contract-shape.md]
   composition:  any number, coarsely ordered
     │
     └──► shape: the chain — the Reference chain

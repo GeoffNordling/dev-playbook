@@ -7,7 +7,7 @@ description: Runbook's residual record — what the Reference chain cannot expre
 # Runbook Residual Ledger
 
 Runbook's residual record: what the
-[Reference chain](/no-more-slop-branch-working-files/runbook-contract-shape.md)
+[Reference chain](/doc-types/runbook/contract-shape.md)
 cannot express. That is all an entry is — a record.
 
 ## Runbooks
@@ -15,7 +15,7 @@ cannot express. That is all an entry is — a record.
 Per runbook ported to the chain: what the full rewrite could not
 express, recognized and written down at the moment of porting.
 Entries name spans and keywords in the vocabulary
-[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md)
+[encoding.md](/doc-types/runbook/encoding.md)
 declares.
 
 An entry is a couple of sentences, hard limit: name each specific

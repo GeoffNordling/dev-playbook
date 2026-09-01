@@ -7,17 +7,17 @@ description: The Reference chain — Runbook's contract shape, declared as nodes
 # Reference Chain
 
 The **Reference chain** is Runbook's contract shape
-([Doc-Type](/no-more-slop-branch-working-files/doc-type.md)): the
+([Doc-Type](/doc-types/doc-type.md)): the
 form every runbook's contract takes. This file declares the shape —
 its nodes and its edges. How chain edges are written inside runbook
 prose sits one layer down in
-[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md).
+[encoding.md](/doc-types/runbook/encoding.md).
 
 ## The chain
 
 A Reference chain is **nodes** joined by labeled **edges**, rooted
 at one runbook
-([definition.md](/no-more-slop-branch-working-files/runbook-definition.md)).
+([definition.md](/doc-types/runbook/definition.md)).
 It is the contract written down: the signature — args in, reports
 out — plus the effects, in the coarse order they fire. The chain is
 a collapse of the runbook's program: the fine-grained sequencing it
@@ -26,7 +26,7 @@ drops stays below the CLOA, in the instance's body.
 ## Nodes
 
 A node is an abstraction; every edge lands on one. Provenance
-([System Legibility](/no-more-slop-branch-working-files/system-legibility.md))
+([System Legibility](/docs/system-legibility.md))
 decides what the drawing shows. A declared abstraction is typed —
 rendered `[name] Type` — and the type is a link to its own
 declaration, per the table below. An imported abstraction — GitHub,
@@ -35,7 +35,7 @@ more: its contract lives outside this corpus.
 
 | Type     | What chains do with it | How it runs | Where its declaration lives |
 | -------- | ---------------------- | ----------- | --------------------------- |
-| Standard | read                   | —           | The Standard doc-type ([Doc-Type System](/no-more-slop-branch-working-files/doc-type-system.md)) |
+| Standard | read                   | —           | The Standard doc-type ([Doc-Type System](/doc-types/doc-type-system.md)) |
 | Agent    | do                     | fresh context, its own permissions — a subprocess | Its own Reference chain |
 | Skill    | do                     | the calling context, the caller's permissions — in-process | Its own Reference chain |
 | Script   | do                     | deterministic code via the shell | The code itself |
@@ -68,9 +68,9 @@ file, scratch — plus an optional parenthetical hint, as in
 aid, never a type.
 
 How each edge is written in runbook prose is ruled in
-[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md#the-primitive-map),
+[encoding.md](/doc-types/runbook/encoding.md#the-primitive-map),
 and how it draws in
-[runbook-encoding.md](/no-more-slop-branch-working-files/runbook-encoding.md).
+[encoding.md](/doc-types/runbook/encoding.md).
 
 Any edge may carry a **condition** — what must hold for it to fire.
 A conditional edge draws dashed; an unconditional edge draws solid.
@@ -78,7 +78,7 @@ The condition never changes the edge's operation.
 
 Whatever a runbook's prose cannot express as an edge is a residual,
 recorded in
-[runbook-residual-ledger.md](/no-more-slop-branch-working-files/runbook-residual-ledger.md).
+[residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 
 ## Acronyms
 

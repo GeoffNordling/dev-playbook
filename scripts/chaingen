@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.14"
+# dependencies = []
+# ///
 """chaingen — reconstruct a runbook's Reference chain from its encoded file.
 
-Prototype implementing REFERENCE-CHAIN-ENCODING.md's certified transform: slice, never
+Prototype implementing doc-types/runbook/encoding.md's certified transform: slice, never
 interpret. Cut points are the keyword, the markdown
 link(s), the `with` splitter, nested braces, and the first semicolon.
 Everything between cut points is opaque verbatim text. A `#fragment` on a
@@ -11,14 +15,15 @@ A `{Never {…}}` span wraps one primitive span and renders a prohibition
 edge — `never <verb>`, the wrapped payload's kernel as target, possibly
 empty. A bucket prefix opens a linkless payload and names the target
 node: `{Write to GitHub …}` / `{Write to scratch …}` pick the write
-bucket, `{Read from GitHub …}` the GitHub read.
+bucket, `{Read from GitHub …}` the GitHub read, `{Read from the launch
+prompt …}` a read of caller-assigned material.
 
 Usage:
-    chaingen.py            regenerate chains.txt — every runbook in the
-                           corpus (dotfiles/dot-claude agents and
-                           skills), blank-line separated
-    chaingen.py --check    regenerate in memory and diff against
-                           chains.txt; exit 1 on drift
+    chaingen            regenerate doc-types/runbook/chains.txt — every
+                        runbook in the corpus (dotfiles/dot-claude agents
+                        and skills), blank-line separated
+    chaingen --check    regenerate in memory and diff against
+                        chains.txt; exit 1 on drift
 """
 
 import difflib
@@ -55,7 +60,7 @@ NODE_DATA_KEYS = ("tools", "model", "effort", "allowed-tools", "disallowed-tools
 # target node. Write buckets serve assertion and prohibition alike, so
 # {Never {Write to GitHub}} draws the same GitHub node.
 WRITE_BUCKETS = (("to GitHub", "GitHub"), ("to scratch", "scratch"))
-READ_BUCKET = ("from GitHub", "GitHub")
+READ_BUCKETS = (("from GitHub", "GitHub"), ("from the launch prompt", "launch prompt"))
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
@@ -373,15 +378,14 @@ def edge_from_span(key, payload, span, body, source_file):
     label = LEXICON[key]
     where = f"span at offset {span.start}"
     if key in ("read", "launch", "run"):
-        if (
-            key == "read"
-            and (rest := split_bucket(payload, READ_BUCKET[0])) is not None
-        ):
-            # GitHub state read: no on-disk target exists, the prefix is
-            # the whole address.
-            if LINK_RE.search(payload):
-                raise LintError(f"{where}: a from-GitHub Read carries a link")
-            return Edge(label, READ_BUCKET[1], collapse(kernel(rest)))
+        if key == "read":
+            for prefix, node in READ_BUCKETS:
+                if (rest := split_bucket(payload, prefix)) is not None:
+                    # Bucketed read: no on-disk target exists, the prefix
+                    # is the whole address.
+                    if LINK_RE.search(payload):
+                        raise LintError(f"{where}: a bucketed Read carries a link")
+                    return Edge(label, node, collapse(kernel(rest)))
         if key == "read" and not LINK_RE.search(payload):
             # Runtime-bound target: a file in the invoking repo, named as
             # inline code per the cross-reference standard's varied-location
@@ -543,9 +547,9 @@ def unit_name(path):
 
 def main(argv):
     """Write chains.txt, or with --check diff against it."""
-    here = os.path.dirname(os.path.abspath(__file__))
-    chains_path = os.path.join(here, "chains.txt")
-    runbooks = all_runbooks(os.path.join(here, "..", "..", "dotfiles", "dot-claude"))
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    chains_path = os.path.join(root, "doc-types", "runbook", "chains.txt")
+    runbooks = all_runbooks(os.path.join(root, "dotfiles", "dot-claude"))
     rendered = []
     for p in runbooks:
         try:

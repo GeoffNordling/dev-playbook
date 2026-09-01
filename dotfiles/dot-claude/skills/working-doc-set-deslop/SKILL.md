@@ -28,7 +28,9 @@ where a member carries uncommitted changes, commit them first.
 
 ## Dispatch
 
-{Launch a fork subagent (`subagent_type: "fork"`) — it inherits this
+{Launch
+[working-doc-set-deslopper](~/.claude/agents/working-doc-set-deslopper.md)
+as a fork subagent (`subagent_type: "fork"`); the fork inherits this
 conversation and the session model, the model that wrote the set}. A
 fork reads no agent definition on its own, so construct its launch
 prompt from three things:

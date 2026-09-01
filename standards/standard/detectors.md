@@ -1,122 +1,15 @@
 ---
 type: Standard
-title: Standards and Standard Cards
-description: What a standard is and the standard-card format — four pointer cells that catalog every standard for one-hop lookup
+title: Detectors and Drift
+description: The detector contract behind every Audit cell and the drift machinery that keeps standards honest
 ---
 
-# Standards and Standard Cards
+# Detectors and Drift
 
-Returning to a topic months later should not require re-deriving shared
-understanding over several turns of conversation. Each standard therefore
-gets a **standard card**: a small fixed-format record that tells a user or
-agent where to look. The files it points at define the standard; the card
-aggregates pointers so a thought that originates at the abstract level
-("how do we do X here?") resolves to concrete files in one hop.
-
-## What a standard is
-
-A standard is named by the question it governs, not by the current answer.
-"How knowledge is organized in markdown" is a standard; the OKF spec is
-today's answer, pointed at by its define cell. The litmus: if the
-implementation could be swapped while the name stays true, it is a
-standard.
-
-- **Membership is non-exclusive.** A file may belong to more than one
-  standard at once. Standards are overlapping views over the repository,
-  not a partition of it — pointers, not directory placement, say what
-  belongs to what.
-- **A standard may have sub-standards,** one level deep.
-
-## What a standard is not
-
-Not everything normative is a standard. A device built to serve a purpose
-— an artifact format, a tool, a template — is an answer, so it belongs
-inside a cell rather than in the catalog. Such devices are **instruments**;
-each carries a prescriptive contract of its own, typed `Instrument-Spec`.
-The instrument concept is defined in
-[Instruments and Instrument Specs](/standards/instrument/format.md).
-
-## Where a standard lives
-
-A document typed `Standard` lives under `standards/`; nothing outside that tree
-claims the label. okf-lint's `knowledge-organization.type-location` checks it.
-
-This binds the type label, not membership — a card's define cell still points
-wherever the contract is, and prose that governs without being a conformance
-target takes another type.
-
-## Scope
-
-Every standard has a **scope** — the population it governs:
-
-- **Workspace-scoped** — declared in dev-playbook, governing every repo in
-  `~/workspace`. The bulk of the catalog is workspace-scoped: the
-  cross-project standards every repo inherits through dev-playbook's published
-  hooks.
-- **Repo-scoped** — declared in one consumer repo, governing that repo alone.
-  A repo stands one up when it has a convention no other repo shares; the
-  recipe is
-  [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
-
-Exactly two levels — a standard governs the whole workspace or a single repo,
-never an intermediate group. Deeper nesting is deliberately unsupported
-(YAGNI): no third scope is introduced until a real population sits between
-"one repo" and "every repo."
-
-**No shadowing.** A repo-scoped card may not reuse a workspace-scoped card's
-name. A consumer's `standards/<name>.md` may not collide with a card stem
-dev-playbook publishes, because that would silently override the upstream
-standard of that name; the rule `standard.card-shadows-upstream` catches the
-collision at the consumer's commit gate.
-
-## Naming
-
-A standard's filename is kebab-case and names its topic as a noun: a plain
-noun (`conventions.md`, `records.md`, `distribution.md`), a noun compound
-(`cache-gate.md`, `context-content.md`), or a gerund compound
-(`issue-authoring.md`) — never a bare verb
-(`skill-write.md`). When a directory has an established family prefix, a
-new sibling on the same subject keeps it.
-
-## The card
-
-A card is a markdown file at `standards/<name>.md` with
-`type: Standard-Card` frontmatter: a heading, one sentence naming the
-governed question, then exactly four cells as sections. That sentence
-opens `Governs how`, names the territory its define cell covers, and runs
-about a breath; the frontmatter `description` repeats it verbatim less the
-period, so the catalog row and the card state the same remit.
-standards-lint's `standard.card-question` checks the pairing. Each cell holds
-annotated pointers; an empty cell states an explicit "none" so gaps stay
-visible. Cards are thin — often just a handful of pointers — and never
-restate the content of their targets.
-
-- **Define** — the contract: prose documents and canonical reference
-  files.
-- **Audit** — read-only deviation detection: the detectors that report
-  nonconformance without blocking anything.
-- **Enforce** — blocking gates: the rungs where nonconformance stops the
-  path to main, cited by fixed name (**commit gate**, **push gate**,
-  **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
-  A cell cites the single rung where the detector is stationed — where its
-  wiring lives (pre-commit hooks → the commit gate; tools that run only inside
-  `make check` / `make check-judgments-cache` → the push gate); the hook pattern in enforcement.md's Map
-  implies the echoes at the other rungs. Enforcement is automatic and
-  continuously in effect; a code review is a one-time checkpoint, never an
-  Enforce pointer.
-- **Adopt** — anything that helps bring a repository into conformance,
-  such as templates or migration procedures. Often "none": the generic
-  path is an agent reading the define cell and fixing the repository.
-
-The cards themselves are the examples: [Build](/standards/build.md) and
-[Meta-Standard](/standards/standard.md) — the latter is this standard's own
-card, since the meta-standard is an instance of the format it defines.
-
-## The catalog
-
-Each repo that carries cards has its own catalog at `standards/index.md`; in
-dev-playbook that is [standards/index.md](/standards/index.md). okf-lint's
-index rule forces a catalog to list every card with a matching description.
+The Meta-Standard card's machinery: the contract every detector obeys
+and the drift checks that keep standards meaning what they meant. What
+a standard *is* and the card shape it carries are declared in the
+Standard doc-type ([doc-types/standard/](/doc-types/standard/index.md)).
 
 ## Detectors
 

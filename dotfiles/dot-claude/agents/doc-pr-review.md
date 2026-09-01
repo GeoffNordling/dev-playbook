@@ -90,7 +90,7 @@ conventions. Read the ones it calls for, end-to-end, then report
 | The diff carries | Read |
 |---|---|
 | skills or agent definitions | [runbook conventions](~/workspace/dev-playbook/standards/harness/runbook-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/standards/harness/writing-for-agents.md) for the craft both forms answer to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
-| standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
+| standard cards | [the standard-card format](~/workspace/dev-playbook/doc-types/standard/contract-shape.md) |
 | structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/knowledge-organization/index.md) |
 
 A rule you did not read cannot carry a Blocking finding.

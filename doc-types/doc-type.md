@@ -9,7 +9,7 @@ description: The doc-type kind — operations plus a composition rule, fixing a 
 A **doc-type** hands one documentation family a contract shape. A
 repository's doc-types make up its documentation type system; doc-types
 are built when their benefits justify the costs. Serves
-[System Legibility](/no-more-slop-branch-working-files/system-legibility.md).
+[System Legibility](/docs/system-legibility.md).
 
 ## The kind
 
@@ -73,7 +73,7 @@ expectation-maximization procedure over its target:
   justification, and the model validates every accepted candidate
   for feasibility against the corpus.
 - **Convergence** is the pandas standard
-  ([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)): the primitives allow
+  ([System Legibility](/docs/system-legibility.md)): the primitives allow
   the user to efficiently predict the target's behavior while staying at
   the CLOA; the primitive count is minimal — good primitives are a
   simple codebook.
@@ -118,7 +118,7 @@ layer N−1:  target artifact ──the loop──► primitives
 
 The stack descends until a target stops being stochastic: the
 bedrock of determinism
-([System Legibility](/no-more-slop-branch-working-files/system-legibility.md)). Below that
+([System Legibility](/docs/system-legibility.md)). Below that
 boundary the work is mostly choosing pre-existing tools.
 
 ## Acronyms

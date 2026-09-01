@@ -8,6 +8,7 @@ intentions, and explorations — and the Decision Records.
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
 - [Sandboxing Claude agents](/docs/sandboxing.md) — The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached is still ahead
+- [System Legibility](/docs/system-legibility.md) — The doctrine — the user understands the systems they own without reading all of them — and the principles and ambitions that serve it
 - [Writing Improvement Process](/docs/writing-improvement-process.md) — The document-writing problem, the intention to improve it iteratively, and the capture step that records what goes wrong each time a document is written
 
 ## Directories

@@ -11,8 +11,14 @@ kept honest — the card format, the catalog, and drift.
 
 ## Define
 
-- [Standards and Standard Cards](/standards/standard/format.md) — the
-  contract: what a standard is, the card format, the catalog, drift
+- [Standard](/doc-types/standard/definition.md) — what a standard is and
+  is not, and the scope axis
+- [Standard Card](/doc-types/standard/contract-shape.md) — the card:
+  Standard's contract shape, four pointer cells
+- [Standard Card Encoding](/doc-types/standard/encoding.md) — where a
+  standard lives, naming, and the catalog
+- [Detectors and Drift](/standards/standard/detectors.md) — the detector
+  contract and the drift machinery
 
 ## Audit
 
