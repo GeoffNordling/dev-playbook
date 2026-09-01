@@ -155,8 +155,8 @@ Two items remain:
   doctrine), doc-type.md (the kind), doc-type-system.md (this repo's
   instantiation), and the Runbook doc-type's four files
   (runbook-definition.md, runbook-contract-shape.md, runbook-encoding.md,
-  runbook-residual-ledger.md). CLOA-ABSTRACTIONS.md and TYPES.md drain
-  into these and retire with the index rebuild;
+  runbook-residual-ledger.md). CLOA-ABSTRACTIONS.md and TYPES.md drained
+  into these and were deleted;
   [migration.md](/no-more-slop-branch-working-files/migration.md) holds
   the move plan.
 
