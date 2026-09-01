@@ -37,17 +37,36 @@ best-effort approximation of a latent optimum neither party knows a
 priori. It is both the highest level of abstraction at which the user can trust the AI
 and the lowest level at which the AI needs the user.
 
-Too low (high detail) and the user checks out: they rubber stamp, building
-intent alignment debt. Too high (low detail) and the user is temporarily
-fooled into thinking they understand what the AI is doing (i.e. vibe coding).
-The CLOA changes dynamically based on the system's purpose and the user's goal.
+Too low (too much detail) and the user stops paying attention: *rubber stamping*.
+Too high (not enough detail) and the user is temporarily fooled into thinking
+they understand the system: *vibe coding*.
+The CLOA changes dynamically depending on the system and the user goal.
 
-Before AI, deterministic interfaces were forcing functions. Pandas and Git impose
-their abstractions uncompromisingly; a wrong mental model exploded on contact
-with reality. After AI, natural language combined with AI's modus operandi to paper over uncertainty with fluent confidence (i.e., hallucinate). This enabled vibe coding, but also equipped
-unwary users to hide large amounts of intent alignment debt for long periods.
-We solve this problem by deliberately engineering customized deterministic
-interfaces at the CLOA.
+## Deterministic forcing functions
+
+Deterministic interfaces are forcing functions. Pandas and Git impose
+their abstractions uncompromisingly; a wrong mental model of their primitives
+or operations will soon fail upon contact with reality.
+
+AI, with its natural language interface, is another matter. "Programming in words"
+is convenient and magical. And yet, natural langugage is ill-defined, ambiguous, and
+high dimensional. Natural language instructions almost always present the faithful
+AI with many different valid ways to obey. The AI picks the one it thinks best.
+From the user's perspective, the AI's choice is unintelligble and unpredictable.
+As the user and AI chain many such instructions together, they jointly
+construct a *garden of forking paths* where the user steers the garden's,
+growth, but cannot see the exact path the AI chose within.
+
+The fundamental problem is stochasticity: each AI action is random,
+whether aleatoric (model internals, temperature, etc.) or epistemic
+(the user's inability or unwillingness to keep up with the details).
+When user's "vibe" too hard, they gamble that one random walk through
+the garden will just happen to align with their intent. As with all high-dimensional
+stochastic problems, when the space grows large enough, it certainly will not.
+
+The solution is determinism. We must deliberately engineer deterministic
+forcing functions at the CLOA. By building scaffolding over the garden; we
+maintain a joint line of communication between user and AI. 
 
 ## The slop trench
 
@@ -63,10 +82,10 @@ The only way to stay out of the slop trench is to stop making slop.
 
 ## Documentation is code
 
-Documentation does things: agents do things, and an agent is nothing but
+Documentation is code: it tells agents what to do. An agent is nothing but
 documentation, permissions, and a harness. Treat documentation as
-a form of code: a stochastic and high-dimensional one. When faced with
-a hard problem in documentation, translate to imaginary code, think of
+a form of code: stochastic and high-dimensional. When faced with
+a hard problem in documentation, transform in the mind's eye to code, think of
 a solution, then port back to documentation space.
 
 Documentation has three readers, in priority order:
