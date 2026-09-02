@@ -45,6 +45,12 @@ a condition, since the condition Scripts already tests presence under
 `scripts/` and a rule takes one condition; the antecedent sits inside
 the predicate.
 
+### prose/conventions
+
+Could not express the tics by name: No slop tics points at the catalog,
+so the fifteen names sit below the view, the way the canonical files'
+contents sit below Canonical Artifacts.
+
 ### standard/gates
 
 Could not express a population of three fixed members: the phrase names

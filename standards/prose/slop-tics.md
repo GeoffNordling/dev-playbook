@@ -1,12 +1,15 @@
 ---
-type: Standard
+type: General-Sheet
 title: Slop Tics
 description: The named tics in Claude's slop writing — the patterns to remove from any workspace document
 ---
 
 # Slop Tics
 
-Specific examples of tics in Claude's slop writing and how to avoid them.
+The catalog behind Doc Conventions'
+[No slop tics](/standards/prose/conventions.md#no-slop-tics): each named
+tic in Claude's slop writing, its definition, the action that removes it,
+and before-and-after examples.
 
 ## Changelog residue
 

@@ -1,0 +1,60 @@
+standards
+card          standard     population
+build         canonical    a canonical artifact: its source under standards/build/canonical/ and each governed repo's copy
+build         python       a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/
+build         skeleton     a governed repo's tree, except standards/build/canonical/ in dev-playbook
+distribution  channel      a governed repo's share of the distribution channel: its hook manifest, its local block, its dev-playbook pin, and in dev-playbook the roster
+prose         conventions  an authored document, except type: Reference and the paths in .prose-lint-exempt
+standard      gates        a gate: an automatic, unmanned blocking point on the path to main
+
+rules
+card          standard     rule                                              when
+build         canonical    ciyml                                             —
+build         canonical    gitignore                                         —
+build         canonical    makefile                                          —
+build         canonical    one-version-set                                   —
+build         canonical    pre-commit-configyaml                             —
+build         canonical    pyprojecttoml                                     —
+build         canonical    python-version                                    —
+build         canonical    the-source-directory                              —
+build         python       entry-points                                      —
+build         python       name-mapping                                      —
+build         python       package-backed-scripts-are-shims                  scripts
+build         python       shebang-and-inline-metadata                       scripts
+build         skeleton     additions-are-free                                —
+build         skeleton     dependencies-live-in-pyprojecttoml                —
+build         skeleton     lockfile-committed                                javascript
+build         skeleton     one-package-under-src                             python-package
+build         skeleton     required-files                                    —
+build         skeleton     root-only-files                                   —
+build         skeleton     runnables-live-in-scripts                         —
+build         skeleton     tests-present                                     python-source
+build         skeleton     uvlock-and-python-version                         python
+distribution  channel      a-pinned-rev                                      a-consumer
+distribution  channel      dogfood-in-place-of-the-pin                       dev-playbook
+distribution  channel      one-published-id                                  dev-playbook
+distribution  channel      public                                            dev-playbook
+distribution  channel      the-local-block-covers-the-manifest               a-publisher
+distribution  channel      the-roster                                        dev-playbook
+prose         conventions  block-form-fits-its-content                       —
+prose         conventions  current-state-and-next-steps-only                 —
+prose         conventions  declarative-present-tense                         —
+prose         conventions  declare-before-use                                —
+prose         conventions  grammatical-parallelism                           —
+prose         conventions  heading-casing                                    —
+prose         conventions  imperative-and-second-person                      harness-loaded-agent-instructions
+prose         conventions  lead-with-the-edge-case-when-reach-is-surprising  —
+prose         conventions  name-concepts-once-use-consistently               —
+prose         conventions  no-slop-tics                                      —
+prose         conventions  one-concern-per-document                          —
+prose         conventions  one-rule-one-place                                —
+prose         conventions  open-with-purpose                                 —
+prose         conventions  point-at-canonical-artifacts                      —
+prose         conventions  positive-statement                                —
+prose         conventions  spelling                                          —
+prose         conventions  terminology-the-person-is-the-user                —
+prose         conventions  third-person                                      declarative-documents
+standard      gates        a-red-ci-run-is-never-merged                      —
+standard      gates        installed-in-every-clone                          —
+standard      gates        skips                                             —
+standard      gates        three-rungs                                       —

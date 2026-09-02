@@ -12,9 +12,8 @@ structure, and brevity.
 ## Define
 
 - [prose/conventions.md](/standards/prose/conventions.md) — the contract:
-  declarative present tense, one concern per document, current-state only
-- [prose/slop-tics.md](/standards/prose/slop-tics.md) — the named tics, each
-  with the action that removes it and before/after examples
+  declarative present tense, one concern per document, current-state only,
+  none of the named slop tics
 
 ## Audit
 
@@ -39,4 +38,6 @@ structure, and brevity.
 
 ## Adopt
 
-- none
+- [document-remove-tics](/dotfiles/dot-claude/skills/document-remove-tics/SKILL.md)
+  — rewrites one document to remove the named tics through the
+  tics-remover agent, content unchanged, nothing committed

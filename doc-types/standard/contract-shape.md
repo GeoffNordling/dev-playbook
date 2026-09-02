@@ -66,16 +66,19 @@ drift:
 ```
 standards
 card   standard     population
-build  skeleton     a repo's tracked tree
+build  skeleton     a governed repo's tree, except standards/build/canonical/ in dev-playbook
 prose  conventions  an authored document, except type: Reference and the paths in .prose-lint-exempt
 
 rules
 card   standard     rule                           when
-build  skeleton     pyproject-required             python
-build  skeleton     readme-required                —
+build  skeleton     required-files                 —
+build  skeleton     tests-present                  python-source
+build  skeleton     uvlock-and-python-version      python
 prose  conventions  declarative-present-tense      —
 prose  conventions  imperative-and-second-person   harness-loaded-agent-instructions
 ```
+
+Rows of the generated file, excerpted.
 
 Card and standard together key both tables, because a stem repeats
 across cards: `standards/standard/consuming.md` and

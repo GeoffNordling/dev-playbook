@@ -42,10 +42,9 @@ modules                 audit    none
 modules                 enforce  none
 modules                 adopt    /dotfiles/dot-claude/skills/improve-codebase-architecture/SKILL.md
 prose                   define   /standards/prose/conventions.md
-prose                   define   /standards/prose/slop-tics.md
 prose                   audit    /scripts/prose-lint
 prose                   enforce  commit gate
-prose                   adopt    none
+prose                   adopt    /dotfiles/dot-claude/skills/document-remove-tics/SKILL.md
 python                  define   /standards/python/style.md
 python                  audit    /scripts/python-lint
 python                  audit    ruff

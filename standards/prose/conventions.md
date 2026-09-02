@@ -11,8 +11,7 @@ How Markdown documents in workspace repos are written. Every authored
 document is bound, except one carrying `type: Reference` frontmatter — a
 verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
-`.prose-lint-exempt` at its root, under a comment saying why. Named tics to
-remove are cataloged in [Slop Tics](/standards/prose/slop-tics.md).
+`.prose-lint-exempt` at its root, under a comment saying why.
 
 ## One concern per document
 
@@ -34,7 +33,8 @@ rule, the section can stop there. Section size matches topic size.
 
 A document describes what exists and what's planned next, and doesn't
 reference removed things, past state, or rejected alternatives.
-[Changelog residue](/standards/prose/slop-tics.md) names the forms this takes.
+[Changelog residue](/standards/prose/slop-tics.md#changelog-residue) names
+the forms this takes.
 History earns a sentence only when the present is unintelligible without
 it — a constraint that still binds, a decision that still governs.
 
@@ -93,6 +93,15 @@ runs or spans lines. The pairs:
 Rules read in the positive: what to do, where a thing lives. "Runnables
 live in `scripts/`", not "don't put runnables elsewhere". A prohibition
 appears only when the prohibition itself is the rule.
+
+## No slop tics
+
+A document commits none of the tics
+[Slop Tics](/standards/prose/slop-tics.md) names.
+
+The catalog is the rule's content: each tic's definition, the action that
+removes it, and before-and-after examples. The document-remove-tics skill
+rewrites a document against it ([Prose](/standards/prose.md#adopt)).
 
 ## Harness-loaded agent instructions
 

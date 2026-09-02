@@ -23,9 +23,9 @@ consumer.
 
 | Kind | Registry | Here | Workspace | Ruling in doc-type-system.md | Machinery today |
 |---|---|---|---|---|---|
-| Standard | document-types | 34 | 3 | Standard doc-type | `type-location` |
+| Standard | document-types | 33 | 3 | Standard doc-type | `type-location` |
 | Decision-Record | document-types | 26 | 19 | absent, so not important | template, numbering, immutability, decisions-lint |
-| General-Sheet | document-types | 20 | 32 | absent, so not important | none |
+| General-Sheet | document-types | 29 | 32 | absent, so not important | none |
 | Standard-Card | document-types | 14 | 2 | Standard doc-type | four cells, standards-lint, catalog index |
 | Guide | document-types | 10 | 58 | important, no doc-type | none |
 | README | document-types | 7 | ~32 | absent | repo-lint doc-shape |
@@ -49,7 +49,7 @@ instances.
 
 ## What the General-Sheet files hold
 
-Twenty-five files. Each row is a reading of the file's content.
+Twenty-six files. Each row is a reading of the file's content.
 
 | File | What it holds |
 |---|---|
@@ -66,7 +66,8 @@ Twenty-five files. Each row is a reading of the file's content.
 | doc-types/standard/definition.md | the Standard doc-type's definition |
 | doc-types/standard/contract-shape.md | the Standard doc-type's shape, with the two-table view |
 | doc-types/standard/encoding.md | the Standard doc-type's encoding spec |
-| doc-types/standard/residual-ledger.md | empty |
+| doc-types/standard/residual-ledger.md | one entry per ported Standard |
+| standards/prose/slop-tics.md | the tic catalog Doc Conventions' No slop tics rule points at |
 | docs/system-legibility.md | the doctrine |
 | docs/writing-improvement-process.md | a process description, its attempts, principles, and platform facts, four H2s |
 | docs/writing-improvement-process/writing-improvement-log.md | newest-first entries, one per writing session |
@@ -109,7 +110,7 @@ In the consumer repos, Guide has 58 instances and Standard has 3.
 
 ## Other readings
 
-- The 34 files typed `Standard` all live under `standards/<name>/`
+- The 33 files typed `Standard` all live under `standards/<name>/`
   directories, the content directories the cards point into.
 - Two of them describe themselves as recipes in their own
   description: `standards/standard/consuming.md` and

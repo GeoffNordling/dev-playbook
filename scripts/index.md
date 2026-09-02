@@ -9,4 +9,7 @@ repos and the dev scripts it keeps for itself, with the logic behind both in
 `chaingen` regenerates `doc-types/runbook/chains.txt` — every runbook's
 Reference chain — and fails on drift via `--check`. `cardgen` does the
 same for `doc-types/standard-card/cards.txt` — every standard card's
-cells as rows of `card, cell, pointer`.
+cells as rows of `card, cell, pointer`. `rulegen` does the same for
+`doc-types/standard/standards.txt` — every Standard's population and
+rules as two tables, `card, standard, population` and
+`card, standard, rule, when`.

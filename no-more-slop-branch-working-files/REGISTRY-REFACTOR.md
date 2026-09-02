@@ -381,14 +381,23 @@ one rule at repo-lint's grain, and a rule's id is its heading's GitHub
 slug. Residuals are in `doc-types/standard/residual-ledger.md`, evicted
 rationale and heuristics in the parking lot.
 
-1. The Standard loop, code. `scripts/rulegen`, cardgen's sibling, that
-   prints the standards and rules tables to
-   `doc-types/standard/standards.txt` and fails on drift. A first
-   draft, open to change.
-2. The Standard loop, remaining ports. Slop Tics, then every other
-   card, each read and split in the moment the way Build was, with
-   cards added, merged, or removed as the reading demands, and each
-   checked by rulegen before review.
+Done: the Standard loop's code. `scripts/rulegen` writes the standards
+and rules tables to `doc-types/standard/standards.txt` and fails on
+drift; the six encoded Standards slice clean. A first draft, open to
+change. A Standard with no `population` key is named on every run and
+skipped; when the last port lands, that skip becomes the failure the
+class's frontmatter rule states.
+
+Done: the Prose port. Slop Tics is one rule of Doc Conventions, No
+slop tics, pointing at the catalog the way Canonical Artifacts points
+at its files. The catalog is typed `General-Sheet` until the open
+question on that type is settled, and the document-remove-tics skill
+is the Prose card's Adopt pointer, since it mutates and is not gated.
+
+1. The Standard loop, remaining ports. Every other card, each read and
+   split in the moment the way Build was, with cards added, merged, or
+   removed as the reading demands, and each checked by rulegen before
+   review.
 3. Decide what becomes of the parked rationale.
 4. Then the remaining open questions.
 

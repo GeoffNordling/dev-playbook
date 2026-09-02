@@ -1,0 +1,276 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.14"
+# dependencies = []
+# ///
+"""rulegen — collapse every Standard to rows of two relations.
+
+Prototype implementing doc-types/standard/encoding.md's transform: slice,
+never interpret. A Standard is `standards/<card>/<standard>.md` typed
+`Standard`; its frontmatter `population` is one double-quoted phrase. An
+H2 with no H3 beneath it is a rule that binds every member; an H2 with H3s
+beneath it is a condition, and each H3 is a rule bound under it. A rule's
+or a condition's id is its heading's GitHub slug, and its predicate is the
+first paragraph beneath the heading. Everything else is opaque.
+
+A file typed `Standard` with no `population` key is outside the encoding:
+rulegen names it on every run and reads nothing from it.
+
+Usage:
+    rulegen            regenerate doc-types/standard/standards.txt — the
+                       standards table (card, standard, population) and
+                       the rules table (card, standard, rule, when), rows
+                       sorted by card, standard, rule
+    rulegen --check    regenerate in memory and diff against
+                       standards.txt; exit 1 on drift
+"""
+
+import difflib
+import glob
+import os
+import re
+import sys
+
+STANDARD_TYPE = "Standard"
+UNCONDITIONED = "—"
+GUTTER = "  "
+
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
+FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+NOT_PARAGRAPH_RE = re.compile(r"^(\s*[-*+]\s|\s*\d+\.\s|\s*\||\s*>|\s{4,})")
+
+# Mirrors dev_playbook.md's github_slug — the package is not importable
+# from this standalone prototype, so the regexes are copied.
+SLUG_BACKTICK = re.compile(r"`([^`]*)`")
+SLUG_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+SLUG_STAR = re.compile(r"(\*{1,2})(.+?)\1")
+SLUG_UNDERSCORE = re.compile(r"(?<!\w)(_{1,2})(?=\S)(.+?)(?<=\S)\1(?!\w)")
+SLUG_DROP = re.compile(r"[^\w\s\-]")
+SLUG_WHITESPACE = re.compile(r"\s")
+
+
+class LintError(Exception):
+    """A form violation in a Standard the generator cannot slice."""
+
+
+def github_slug(heading_text):
+    """The GitHub anchor slug of a heading, the id of a rule or a condition."""
+    text = SLUG_BACKTICK.sub(r"\1", heading_text)
+    text = SLUG_LINK.sub(r"\1", text)
+    text = SLUG_STAR.sub(r"\2", text)
+    text = SLUG_UNDERSCORE.sub(r"\2", text)
+    text = text.lower()
+    text = SLUG_DROP.sub("", text)
+    return SLUG_WHITESPACE.sub("-", text)
+
+
+# ── frontmatter ──────────────────────────────────────────────────────────
+
+
+def split_frontmatter(text, path):
+    """Split a file into its frontmatter dict and body lines."""
+    lines = text.split("\n")
+    if lines[0] != "---":
+        raise LintError(f"{path}: no frontmatter")
+    try:
+        end = lines[1:].index("---") + 1
+    except ValueError:
+        raise LintError(f"{path}: unterminated frontmatter") from None
+    meta = {}
+    for line in lines[1:end]:
+        if not line.strip():
+            continue
+        key, _, value = line.partition(":")
+        meta[key.strip()] = value.strip()
+    return meta, lines[end + 1 :]
+
+
+def population_of(meta, path):
+    """The population phrase, unquoted; fails when the key is not double-quoted."""
+    value = meta["population"]
+    if len(value) < 2 or value[0] != '"' or value[-1] != '"':
+        raise LintError(f"{path}: population is not double-quoted: {value!r}")
+    return value[1:-1]
+
+
+# ── sections ─────────────────────────────────────────────────────────────
+
+
+def sections_of(body_lines, path):
+    """Every H2 and H3 with the lines beneath it, fenced code skipped.
+
+    Lines before the first H2 are the population's prose, opaque. An H1 is
+    the title. A heading below H3 fails the generator.
+    """
+    sections, fence = [], None
+    for line in body_lines:
+        if m := FENCE_RE.match(line):
+            marker = m.group(1)[0]
+            if fence is None:
+                fence = marker
+            elif marker == fence:
+                fence = None
+        elif fence is None and (m := HEADING_RE.match(line)):
+            level, text = len(m.group(1)), m.group(2).strip()
+            if level == 1:
+                continue
+            if level > 3:
+                raise LintError(f"{path}: heading below H3: {text!r}")
+            sections.append((level, text, []))
+            continue
+        if sections:
+            sections[-1][2].append(line)
+    return sections
+
+
+def require_paragraph(lines, where):
+    """Fail unless the first block beneath a heading is a paragraph."""
+    for line in lines:
+        if not line.strip():
+            continue
+        if NOT_PARAGRAPH_RE.match(line):
+            raise LintError(
+                f"{where}: the first block beneath the heading is not a paragraph: "
+                f"{line.strip()!r}"
+            )
+        return
+    raise LintError(f"{where}: no paragraph beneath the heading")
+
+
+def slug_of(text, seen, where):
+    """A heading's slug, unique within its Standard."""
+    slug = github_slug(text)
+    if not slug:
+        raise LintError(f"{where}: heading {text!r} has an empty slug")
+    if slug in seen:
+        raise LintError(f"{where}: slug {slug!r} of {text!r} repeats {seen[slug]!r}")
+    seen[slug] = text
+    return slug
+
+
+def rows_of(path, root):
+    """One standards row and every rules row of one Standard."""
+    rel = os.path.relpath(path, root)
+    parts = rel.split(os.sep)
+    if len(parts) != 3:
+        raise LintError(f"{rel}: a Standard is standards/<card>/<standard>.md")
+    card, standard = parts[1], parts[2][: -len(".md")]
+    with open(path) as f:
+        meta, body = split_frontmatter(f.read(), rel)
+    population = population_of(meta, rel)
+    groups = []
+    for level, text, lines in sections_of(body, rel):
+        if level == 2:
+            groups.append(((text, lines), []))
+        elif not groups:
+            raise LintError(f"{rel}: H3 {text!r} with no H2 above it")
+        else:
+            groups[-1][1].append((text, lines))
+    seen, rules = {}, []
+    for (text, lines), children in groups:
+        where = f"{rel} § {text}"
+        slug = slug_of(text, seen, where)
+        require_paragraph(lines, where)
+        if not children:
+            rules.append((card, standard, slug, UNCONDITIONED))
+        for child_text, child_lines in children:
+            child_where = f"{rel} § {child_text}"
+            child_slug = slug_of(child_text, seen, child_where)
+            require_paragraph(child_lines, child_where)
+            rules.append((card, standard, child_slug, slug))
+    return (card, standard, population), rules
+
+
+# ── rendering ────────────────────────────────────────────────────────────
+
+
+def table(header, rows):
+    """One fixed-width table with a header line; the last column unpadded."""
+    widths = [max(len(r[i]) for r in (header, *rows)) for i in range(len(header) - 1)]
+    lines = []
+    for row in (header, *rows):
+        cells = [row[i].ljust(widths[i]) for i in range(len(widths))] + [row[-1]]
+        lines.append(GUTTER.join(cells))
+    return lines
+
+
+def render(standards, rules):
+    """Render the two tables, blank-line separated."""
+    lines = ["standards", *table(("card", "standard", "population"), standards)]
+    lines += ["", "rules", *table(("card", "standard", "rule", "when"), rules)]
+    return "\n".join(lines) + "\n"
+
+
+# ── entry ────────────────────────────────────────────────────────────────
+
+
+def all_standards(root):
+    """Every file typed Standard under standards/, split into encoded and unported."""
+    encoded, unported = [], []
+    pattern = os.path.join(root, "standards", "**", "*.md")
+    for path in sorted(glob.glob(pattern, recursive=True)):
+        if os.path.basename(path) in ("README.md", "index.md"):
+            continue
+        with open(path) as f:
+            meta, _ = split_frontmatter(f.read(), os.path.relpath(path, root))
+        if meta.get("type") != STANDARD_TYPE:
+            continue
+        (encoded if "population" in meta else unported).append(path)
+    return encoded, unported
+
+
+def main(argv):
+    """Write standards.txt, or with --check diff against it."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    out_path = os.path.join(root, "doc-types", "standard", "standards.txt")
+    encoded, unported = all_standards(root)
+    standards, rules = [], []
+    for path in encoded:
+        standard, standard_rules = rows_of(path, root)
+        standards.append(standard)
+        rules.extend(standard_rules)
+    standards.sort()
+    rules.sort()
+    text = render(standards, rules)
+    if unported:
+        names = ", ".join(
+            "/".join(os.path.relpath(p, root).split(os.sep)[1:])[: -len(".md")]
+            for p in unported
+        )
+        print(f"unported, no population: {len(unported)} — {names}")
+    if argv == ["--check"]:
+        if not os.path.exists(out_path):
+            print("DRIFT: standards.txt does not exist")
+            return 1
+        with open(out_path) as f:
+            want = f.read()
+        if text == want:
+            print(f"OK: standards.txt matches all {len(standards)} standards")
+            return 0
+        print("DRIFT:")
+        sys.stdout.writelines(
+            difflib.unified_diff(
+                want.splitlines(keepends=True),
+                text.splitlines(keepends=True),
+                "standards.txt",
+                "regenerated",
+            )
+        )
+        return 1
+    if argv:
+        print(__doc__)
+        return 2
+    with open(out_path, "w") as f:
+        f.write(text)
+    print(
+        f"wrote {len(standards)} standards and {len(rules)} rules to {out_path}"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except LintError as e:
+        print(f"lint: {e}", file=sys.stderr)
+        sys.exit(1)
