@@ -288,7 +288,8 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "tracking.epic-shape" in ids
     assert "tracking.tuple-valid" in ids
     assert all(
-        rule.split(".")[0] in {"tracking", "build", "software-factory"} for rule in ids
+        rule.split(".")[0] in {"tracking", "distribution", "software-factory"}
+        for rule in ids
     ), ids
 
 

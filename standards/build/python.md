@@ -1,104 +1,52 @@
 ---
 type: Standard
 title: The Python Project
-description: The root Python project — name mapping, the canonical pyproject.toml, scripts, entry points, and initial setup
+description: The root Python project — the name mapping, what a Python file in scripts/ carries, and when an entry point is declared
+population: "a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/"
 ---
 
 # The Python Project
 
-A repo has at most one Python project: `pyproject.toml` at the root, per the
-[skeleton](/standards/build/skeleton.md). A repo that genuinely needs
-multiple projects uses a
-[uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) — one root
-`uv.lock`, members declared in the root `pyproject.toml` — and amends this
-standard first. Code-level conventions live in
-[python/style.md](/standards/python/style.md); pytest
-conventions in [testing/conventions.md](/standards/testing/conventions.md).
+A governed repo has one Python project, at the root
+([File Skeleton](/standards/build/skeleton.md#root-only-files)); this
+Standard binds it. Its `pyproject.toml` is a canonical artifact
+([Canonical Artifacts](/standards/build/canonical.md#pyprojecttoml)).
+Code-level conventions are [Python Style](/standards/python/style.md);
+pytest conventions are
+[Testing Conventions](/standards/testing/conventions.md).
 
 ## Name mapping
 
-Repo name → project `name`: lowercased (`My-Repo` → `my-repo`). Project name
-→ import package: hyphens become underscores (`my_repo`). Further code nests
-inside that package as subpackages.
-
-## pyproject.toml
-
-The canonical shape is [/standards/build/canonical/pyproject.toml](/standards/build/canonical/pyproject.toml),
-with `<repo>` and `<package>` placeholders. It pins: the `uv_build` backend,
-pytest `testpaths`, the `dev` dependency group (mypy, pytest, ruff floors),
-the ruff target/line-length/rule selection (including the pydocstyle
-`convention`, the `tests/**` + `__init__.py` docstring per-file-ignores, and
-the isort `known-first-party` naming the repo's own import package per
-[Name mapping](#name-mapping)), and the mypy strictness set. `requires-python`
-states the floor matching `.python-version`.
-
-A scripts-only repo (no `src/`) is not a package: it sets
-`[tool.uv] package = false` and omits `[build-system]`; everything else is
-unchanged.
-
-### Rationale
-
-The reasons behind the canonical file's pins:
-
-- **`uv_build`** over other backends: it is bundled inside the uv binary,
-  so building the package — including editable installs by consumers —
-  needs no network and no PyPI, and its default layout is exactly this
-  standard's (`src/<package>`, named from the project name).
-- **`disallow_untyped_defs` + `disallow_incomplete_defs`** instead of
-  `strict = true`: the pair guarantees every function signature is fully
-  annotated, while full strict also turns on `disallow_untyped_calls`
-  (chokes on every untyped third-party lib) and `disallow_any_generics`
-  (noisy about every bare `list`/`dict`).
-- **`disable_error_code = ["import-untyped"]`**: importing a library that
-  ships no type stubs works without `# type: ignore` at each import site;
-  `types-*` stub packages join `dev` when a specific library warrants them.
-- **The ruff families** beyond the `E`/`W`/`F` core: each catches a
-  distinct defect class — `I` import order, `UP` outdated syntax, `B`
-  bug-prone patterns, `SIM` needless complexity, `SLF` private-member
-  access from outside the defining class, and `D` docstring presence and
-  format (pydocstyle), enforcing the docstring conventions in
-  [python/style.md](/standards/python/style.md).
-- **`[tool.ruff.lint.pydocstyle] convention = "pep257"`**: `D` on its own
-  turns on mutually-exclusive members (`D203` vs `D211`, `D212` vs `D213`),
-  so `ruff check` is unsatisfiable until a `convention` selects between
-  them — pinning it is what keeps the family usable. Per-file ignores then
-  drop all of `D` for `tests/**` (test functions carry no docstrings by
-  convention) and `D104` for `__init__.py` (an empty init has none — see
-  `python.empty-init`).
-- **`ignore = ["E501", "D401"]`**: `ruff format` owns line length, so the
-  `E501` lint rule would report the same overruns a second time; `D401`
-  (imperative-mood summaries) is dropped to keep the workspace's
-  noun-phrase docstring voice.
-
-## Scripts
-
-For Python files in `scripts/`:
-
-- **Standalone script** (imports nothing from the repo): shebang
-  `#!/usr/bin/env -S uv run --script`, dependencies declared in a PEP 723
-  inline block whose `requires-python` states the floor matching
-  `.python-version`. Runs from a bare clone with nothing installed — what
-  pre-commit hook entries require.
-- **Script backed by the package**: expose it as an entry point (below)
-  instead of path-hacking imports. A file in `scripts/` then exists only
-  when a checked-in path is required (a pre-commit `entry`), as a thin
-  shim — and that shim still carries the standalone shebang and PEP 723
-  block above, since as a pre-commit `entry` it too runs from a bare clone.
-- **Workspace-wide utility**: `uv tool install -e .` puts the project's
-  entry points on `PATH` machine-wide, editable — the tool tracks the
-  checkout.
+The project `name` is the repo name lowercased, `My-Repo` → `my-repo`, and
+the import package is the project name with each hyphen an underscore,
+`my_repo`; further code nests inside that package as subpackages.
 
 ## Entry points
 
-Declare an entry point only when the project has a CLI:
+`[project.scripts]` is declared only when the project has a CLI, each
+entry `<command> = "<package>.cli:main"`.
 
 ```toml
 [project.scripts]
 <command> = "<package>.cli:main"
 ```
 
-## Initial setup
+## Scripts
 
-`uv init --package <repo>` generates the uv_build src layout; overwrite the
-generated `pyproject.toml` with the canonical shape.
-</content>
+A Python file under `scripts/`.
+
+### Shebang and inline metadata
+
+An executable Python file in `scripts/` opens with
+`#!/usr/bin/env -S uv run --script` and carries a PEP 723 inline block
+whose `requires-python` states the floor matching `.python-version`.
+
+It then runs from a bare clone with nothing installed, which a pre-commit
+hook `entry` requires.
+
+### Package-backed scripts are shims
+
+A script that imports the package is exposed as an entry point, and a file
+for it exists in `scripts/` only when a checked-in path is required, a
+pre-commit `entry`, as a thin shim that carries the shebang and block
+above.

@@ -1,8 +1,8 @@
 card                    cell     pointer
-build                   define   /standards/build/index.md
+build                   define   /standards/build/skeleton.md
 build                   define   /standards/build/canonical.md
+build                   define   /standards/build/python.md
 build                   audit    /scripts/repo-lint
-build                   audit    /scripts/workspace-lint
 build                   enforce  commit gate
 build                   enforce  push gate
 build                   enforce  CI gate
@@ -12,6 +12,12 @@ decisions               define   /standards/decisions/records.md
 decisions               audit    /scripts/decisions-lint
 decisions               enforce  commit gate
 decisions               adopt    none
+distribution            define   /standards/distribution/channel.md
+distribution            audit    /scripts/workspace-lint
+distribution            audit    /scripts/repo-lint
+distribution            enforce  commit gate
+distribution            adopt    /scripts/bump-pins
+distribution            adopt    /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
 harness                 define   /standards/harness/index.md
 harness                 define   /standards/harness/runbook-conventions.md
 harness                 define   /standards/harness/writing-for-agents.md
@@ -62,6 +68,7 @@ standard                define   /doc-types/standard-card/definition.md
 standard                define   /doc-types/standard-card/contract-shape.md
 standard                define   /doc-types/standard-card/encoding.md
 standard                define   /doc-types/standard/definition.md
+standard                define   /standards/standard/gates.md
 standard                define   /standards/standard/detectors.md
 standard                audit    /scripts/standards-lint
 standard                audit    /judgments/standard-cards.yaml

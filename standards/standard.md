@@ -21,6 +21,8 @@ kept honest — the card format, the catalog, and drift.
   catalog
 - [Standard](/doc-types/standard/definition.md) — what a Standard is: a
   population and the rules over it, and where it lives
+- [Gates](/standards/standard/gates.md) — the three rungs an Enforce cell
+  names, the local two in every clone, the red CI rule, and skips
 - [Detectors and Drift](/standards/standard/detectors.md) — the detector
   contract and the drift machinery
 

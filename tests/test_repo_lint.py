@@ -585,7 +585,7 @@ def test_hook_repo_dogfood_drift_fails(tmp_path: Path) -> None:
     files[".pre-commit-hooks.yaml"] += "- id: brand-new-hook\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "self-audit" in result.stdout
+    assert "distribution.dogfood" in result.stdout
     assert "missing: brand-new-hook" in result.stdout
 
 
@@ -654,7 +654,8 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     # shape is harness-files-lint's. repo-lint checks that CLAUDE.md exists,
     # which is build.required-file, and nothing about what it says.
     assert all(
-        rule.split(".")[0] in {"build", "knowledge-organization", "tracking"}
+        rule.split(".")[0]
+        in {"build", "distribution", "knowledge-organization", "tracking"}
         for rule in ids
     ), ids
 

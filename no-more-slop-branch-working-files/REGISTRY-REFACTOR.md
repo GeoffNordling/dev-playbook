@@ -333,8 +333,12 @@ complete, with low residuals.
 ## Next steps
 
 In order. Each kind runs one loop: design, then the files, then the
-code that reads them. Code comes last because it reads what the design
-and the ported files say.
+code that reads them. For the Standard loop the code moves up: it
+comes after the first port, Build, so every later port is checked
+against a generator, the way cardgen checked the cards. The first
+draft of the generator is not locked in; a port that fails it may
+change the script or widen the encoding, and which one is decided at
+the failure.
 
 Done: `doc-types/` is three, `standard-card/`, `standard/`, `runbook/`,
 and the card loop is closed. The Standard-Card files sit under their
@@ -345,35 +349,30 @@ first link, and the bold gate; `scripts/cardgen` prints
 on drift. Four bullets in four cards moved to fit the encoding, meaning
 kept.
 
-Drafted, awaiting the user's review: the Standard loop's design.
-`doc-types/standard/` holds the contract shape, the encoding, and a
-rewritten definition. The draft encoding names the cut points the
-corpus already had: the population is one frontmatter key,
-`population`, exclusions included; a rule is a heading, its slug the
-rule column, its first paragraph the predicate; a condition is an H2
-whose section holds H3 rules, its slug the `when` column. The rules table
-carries a card column, since `consuming.md` is a stem under two cards.
-Doc Conventions is ported as the proof: its five navigation headings
-went, its person-of-address rule became two rules under two conditions,
-and its section-format section stays as a rule under a stateful
-heading. The parking lot,
+Done: the Standard loop's design, reviewed and committed.
+`doc-types/standard/` holds the definition, the contract shape with
+its two-table view, the encoding, and an empty residual ledger; the
+encoding is the authority on the marks. Doc Conventions is the one
+Standard in the encoding, and the parking lot,
 [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md),
 exists and is empty. Permanent files carry the design and no progress
 notes; what is ported, what is built, and what remains is tracked only
 here.
 
-1. The Standard loop, files. Port every standard under every card,
-   rewriting the files into the encoding. Build first, with its split,
-   then Slop Tics; those fix the encoding, and the rest follow, each
-   card read and split in the moment the way Build was, with cards
-   added, merged, or removed as the reading demands. Record residuals
-   in `doc-types/standard/residual-ledger.md`. Park the evicted
-   rationale and heuristics in the parking lot.
+1. The Standard loop, first port. Build, with its split, held
+   uncommitted for review. Residuals go to
+   `doc-types/standard/residual-ledger.md`, evicted rationale and
+   heuristics to the parking lot.
 2. The Standard loop, code. `scripts/rulegen`, cardgen's sibling, that
    prints the standards and rules tables to
-   `doc-types/standard/standards.txt` and fails on drift.
-3. Decide what becomes of the parked rationale.
-4. Then the remaining open questions.
+   `doc-types/standard/standards.txt` and fails on drift. A first
+   draft, open to change.
+3. The Standard loop, remaining ports. Slop Tics, then every other
+   card, each read and split in the moment the way Build was, with
+   cards added, merged, or removed as the reading demands, and each
+   checked by rulegen before review.
+4. Decide what becomes of the parked rationale.
+5. Then the remaining open questions.
 
 ## Acronyms
 

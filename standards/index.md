@@ -9,8 +9,9 @@ alphabetical; directories last.
 
 - [Standards](/standards/README.md) — Cross-project engineering standards that apply to every repository in the workspace
 - [Meta-Standard](/standards/standard.md) — Governs how the workspace's standards themselves are declared, found, and kept honest — the card format, the catalog, and drift
-- [Build](/standards/build.md) — Governs how a repository is laid out, built, and checked — layers, skeleton, Make, canonical artifacts, distribution, CI, and enforcement
+- [Build](/standards/build.md) — Governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 - [Decision Records](/standards/decisions.md) — Governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, immutability, and status vocabulary
+- [Distribution](/standards/distribution.md) — Governs how dev-playbook's checks reach the governed repos — the published hook, the roster, dogfooding, and the pinned rev
 - [Harness Files](/standards/harness.md) — Governs how the files an agent harness loads — context, configuration, instructions — are distinguished from ordinary files and what each contains
 - [Instruments](/standards/instrument.md) — Governs how purpose-built devices — artifact formats with tooling — are specified and kept conformant
 - [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — file roles, document types, indexes, cross-references, and working documentation sets
@@ -24,6 +25,8 @@ alphabetical; directories last.
 - [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one
 - [Detectors and Drift](/standards/standard/detectors.md) — The detector contract behind every Audit cell and the drift machinery that keeps standards honest
+- [Distribution Channel](/standards/distribution/channel.md) — How dev-playbook's checks reach the governed repos — the one published hook, the roster, a publisher's local block, and a consumer's pinned rev
+- [Gates](/standards/standard/gates.md) — The three gates on the path to main — what each runs, the local two in every clone, the red CI rule, and when a detector is skipped
 - [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
 - [Module Design Conventions](/standards/modules/design.md) — The deep-module contract — the vocabulary and the aliases it retires, deep vs shallow, the principles, testability rules, and the dependency categories that govern deepening
 - [Python Style](/standards/python/style.md) — Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
@@ -32,7 +35,7 @@ alphabetical; directories last.
 
 ## Directories
 
-- [build/](/standards/build/index.md) — The layered repo standard, one concern per document — layers, skeleton, the Python project, Make, canonical artifacts, distribution, thin CI, enforcement, bootstrap
+- [build/](/standards/build/index.md) — The build standard's Standards, one population each, and the guide to joining the workspace — the file skeleton, the canonical artifacts, the Python project, bootstrap
 - [harness/](/standards/harness/index.md) — The harness-files standard, one concern per document — the member registry, CLAUDE.md content, runbook conventions
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, working documentation sets
 - [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — conventions and the slop-tics catalog
