@@ -149,7 +149,7 @@ GOVERNED = (
     "story-forge",
     "spec-tools",
     "mission-control",
-    "fedora-playbook",
+    "sysadmin-playbook",
     "sounds",
     "personal-trainer",
 )

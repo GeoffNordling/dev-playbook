@@ -8,11 +8,14 @@ description: The machines the workspace runs on — one Fedora primary and two W
 
 The workspace runs on the machines below, under one user. Nearly all work
 happens on the primary; the secondaries exist so the workspace is reachable
-from the Windows side of the same hardware.
+from the Windows side of the same hardware. Hardware and OS facts belong to
+sysadmin-playbook's
+[machines doc](~/workspace/sysadmin-playbook/docs/machines.md); this file
+records only what the workspace does per machine key.
 
 | Machine | Role | Notes |
 |---|---|---|
-| Fedora | **primary** | Dual-booted on the framework laptop. Air-gapped by intent — it is where development happens. |
+| Fedora | **primary** | Dual-booted on the framework laptop. BitLocker keeps the Windows partition unreadable from Fedora, so the two halves share hardware but not data. It is where development happens. |
 | Windows 11 desktop | secondary | Ubuntu WSL guest. |
 | Windows 11 framework laptop | secondary | Ubuntu WSL guest; the other half of the primary's hardware. |
 
