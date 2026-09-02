@@ -185,6 +185,21 @@ Preserved: what each rule means, and what each existing lint checks.
 Headings, tables, and file boundaries in today's files are not
 constraints.
 
+**A document does one thing.** The standing principle in
+[System Legibility](/docs/system-legibility.md#standing-principles),
+and the guide for every representation and encoding invented from
+here: a document does one thing, predictably, in a structured way, and
+the thing and its structure are fixed at the CLOA by the document's
+type. A Standard's one thing is one population and its rules. Content
+found in an existing file that cannot sit in a Standard without
+breaking this moves to the parking lot.
+
+**The parking lot.** One location, under the greenfield license, for
+what is important but belongs elsewhere: evicted rationale,
+heuristics, anything a port cannot place. It exists so nothing is
+forgotten while the ports move fast; sorting it is its own action
+item, after the ports.
+
 **One encoding.** One written form for the population, one for a rule
 with its name, one for a guard, designed for the parser and made once
 in the Standard doc-type's encoding file. Everything unmarked is opaque

@@ -142,6 +142,12 @@ one to its caller.
   form amortizes reading — learn the shape once, read every instance
   fast — makes location and absence meaningful, and yields rules a
   lint can hold.
+- **A document does one thing.** It does that thing predictably and
+  in a structured way. What the thing is, and the structure it takes,
+  is fixed at the CLOA by the document's type: each doc-type has its
+  own CLOA shape and representation — a runbook's chain, a card's four
+  cells, a standard's population and rules. Content that does a second
+  thing belongs in a second document.
 
 ### The vocabulary API
 
