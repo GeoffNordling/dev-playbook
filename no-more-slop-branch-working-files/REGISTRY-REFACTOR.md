@@ -6,24 +6,27 @@ description: The decisions aligned on for the document-type registry refactor �
 
 # Registry Refactor
 
-The decisions the user and Claude aligned on in the 2026-09-02 session
+The decisions the user and Claude aligned on in the 2026-09-02 sessions
 that opened the registry refactor. Member of
 [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md). The
 file counts and per-file readings behind these decisions are the audit
 record, [Registry Audit](/no-more-slop-branch-working-files/REGISTRY-AUDIT.md);
 nothing there is a decision.
 
-Only what was said in that session is written here. Where a question was
-raised and not settled, it sits under Open questions with no lean.
+Only what was said in those sessions is written here. Where a question
+was raised and not settled, it sits under Open questions with no lean.
 
 ## Goal
 
 Refactor the document-type registry before building any new doc-type:
 settle what a Standard is, what a Guide is, and how the kinds are
 organized. The settling happens at one level, parsimonious and precise
-enough to show on screen as pseudocode, definitions and instantiations
-together. Decisions are made at that level; everything below it is
-implementation, audit, and enforcement.
+enough to show on screen. Decisions are made at that level; everything
+below it is implementation, audit, and enforcement.
+
+The end product is a CLOA object for the standards: a view, generated
+by deterministic code from the standard files, that the user and an
+agent read at the same level. What that view is, is settled below.
 
 ## Decisions
 
@@ -93,6 +96,165 @@ the label four-tuple) become a Standard under
 them become a Guide where they are; the `gh` mechanics move into the
 review runbooks. Rules that link to no standard are acceptable.
 
+**The level.** A kind is expressed as a class with typed fields and
+rules over its own state, one screen. A constraint on what a field may
+hold goes in its type hint, not in a separate rule; a rule the type
+hints already imply is dropped. Pseudocode is a thinking aid for
+seeing the shape, not a target: no markdown is being translated to
+Python. The rows of a Standard, the lint rule IDs, and any repo-level
+binding object are below the level and stay out. The model of the
+level:
+
+```python
+class StandardCard(Object):
+    """One card per standard. Points; never restates."""
+
+    question: str                       # "Governs how ..." — one breath
+
+    # four cells; a cell is a list of pointers, or the literal word "none"
+    define:  list[Pointer[Standard]]                # required, at least one
+    audit:   list[Pointer[Audit]]    | None
+    enforce: list[Pointer[Gate]]     | None         # Gate = commit | push | CI
+    adopt:   list[Pointer[Adoption]] | None
+
+    # rules: each a predicate over one card's state
+    location    = path == f"standards/{name}.md"            # flat, never nested
+    frontmatter = type == "Standard-Card" and description == question
+    layout      = h2s == ["Define", "Audit", "Enforce", "Adopt"]
+```
+
+Defining the Audit and Adoption kinds is deferred.
+
+**Only existing kinds.** The kinds expressed are the ones that exist:
+Standard-Card, Standard, Runbook. Nothing new is invented until a port
+needs it.
+
+**Standard's shape.** Two primitives roll into Standard: ObjectClass,
+the one class of thing with its exclusions, and Rule, name × guard ×
+predicate. A guard narrows the member set, the way layer membership
+does in the build standard and the kind of document does in the prose
+standard; None means every member. A Standard carries no pointer back
+to its card, which the path derives, and no rationale field. A rule
+delegating to another Standard was considered and dropped: the other
+Standard's population already binds the same object.
+
+**The CLOA object of the standards is two tables.** A Standard is a
+collection, not a sequence, so its view is a relation: unordered rows,
+sorted for stable diffs, greppable, joinable. One generated file holds
+the whole workspace in two tables:
+
+```
+standards
+card    standard              population
+build   canonical-artifacts   a repo's copy of one canonical file
+build   skeleton              a repo's tracked tree
+prose   conventions           an authored document, except type: Reference and exempt paths
+
+rules
+standard              rule                        when
+canonical-artifacts   ci-yml-identical            —
+canonical-artifacts   makefile-targets-present    python
+conventions           no-first-person             harness-loaded
+conventions           no-second-person            declarative
+skeleton              pyproject-required          python
+skeleton              readme-required             —
+```
+
+The view shows which rules exist, which Standard holds each, and which
+card points at each Standard. Card to Standard is the standards table;
+every other question is a grep. A third table, rule to lint, joins on
+the rule column later, and drift is a set difference; no redesign.
+
+**The CLOA object is not the complete system.** If it were, the tables
+would be stored and everything beneath deleted. Rules keep their
+markdown, examples, agents, and scripts beneath the view. The object's
+job is to let the user and the agent operate at the same level in a
+structured way; the system stays more complex underneath.
+
+**Two determinisms.** The focus is deterministic construction of CLOA
+objects, the way chaingen parses runbook spans into chains.
+Deterministic linting is wanted wherever it comes free and is not
+required: the branch can merge without a new linter.
+
+**Greenfield license.** Every standard file may be rewritten entirely:
+restructured, split, merged, moved between files, new files made.
+Preserved: what each rule means, and what each existing lint checks.
+Headings, tables, and file boundaries in today's files are not
+constraints.
+
+**One encoding.** One written form for the population, one for a rule
+with its name, one for a guard, designed for the parser and made once
+in the Standard doc-type's encoding file. Everything unmarked is opaque
+prose the parser carries but never reads, so examples, definitions,
+and rationale sit wherever the writer wants them.
+
+**Standard's build follows Runbook's.** Definition, contract shape (the
+two tables), encoding, generator with a drift check, ports, residual
+ledger.
+
+**`doc-types/` becomes three.** Today it holds `standard/` and
+`runbook/`, and `standard/` is Standard-Card's files under Standard's
+name. It becomes `standard-card/`, `standard/`, `runbook/`.
+
+## Findings from two readings
+
+Readings, not decisions. Each proposal below is evaluated file by file
+when its port happens; the reading was one pass, and the agent doing
+the port checks that each move still makes sense in the moment.
+
+**Build, the structural reading.** Nine files under `standards/build/`,
+all pointed at by the Build card through two Define pointers. They hold
+rules over three object classes, plus a definition of the Gate kind, a
+distribution channel, a procedure, and rationale. The proposed port:
+
+- Skeleton stays: layers.md merged into skeleton.md. Population: a
+  repo's tracked tree. Layer membership becomes the guards, read from
+  facts on disk; each entry is a presence rule, required, optional, or
+  forbidden. Layers is not a Standard of its own.
+- Canonical Artifacts stays: canonical.md absorbs ci.md, make.md's
+  target table, and python.md's pyproject section. Population: a
+  repo's copy of one canonical file, with the compare mode as
+  per-member data. The files under `canonical/` are the content.
+- Python Project stays: python.md less the pyproject pins, the
+  Rationale, and Initial setup. Population: the root Python project.
+  It sits on the boundary with the Python card; lean Build, since it
+  is layout.
+- Enforcement leaves for the Meta-Standard card. Its gate table is the
+  definition of the Gate kind, the thing a card's Enforce cell points
+  at. Its Map is the hand-written form of the computed join and is
+  retired. Its one rule over a pull request, a red CI run is never
+  merged, goes with the pull request rules.
+- Distribution becomes its own card. Its question is how dev-playbook's
+  checks reach the governed repos. Populations: the hook manifest, the
+  roster in workspace-lint's source, a publisher's own config. The
+  consumer-side pin is already a row of the canonical pre-commit
+  config.
+- Bootstrap leaves Define. It is two procedures; it stays under Adopt,
+  retyped, since the enable-repo-governance runbook shadows it.
+- Rationale in python, ci, make, and distribution leaves the
+  Standards. A Standard boils down to its rules and the specific ways
+  they are enforced, and rationale is neither. It moves to a parking
+  lot; what becomes of it is its own action item, and it is not a
+  Guide, because it guides nothing. The pyproject rationale is worth
+  keeping.
+- make.md's judgment-cache and per-machine paragraphs belong to
+  Semantic Validation and machines.md.
+
+**Prose, the prose reading.** Two files under `standards/prose/`.
+Population: an authored document, except `type: Reference` mirrors and
+the paths a repo lists in `.prose-lint-exempt`; that declaration is
+conventions.md's opening paragraph. Roughly thirty rules across
+conventions.md and slop-tics.md. Most predicates are English and will
+stay English; a reviewer citing them satisfies the axis. Person of
+address is one rule with two guards, harness-loaded and declarative.
+Each tic's definition and before-and-after examples stay in the body,
+below the collapse, like a runbook's fine steps. "How to decide between
+section formats" is heuristics for a writer, not a rule; it leaves the
+Standard for the same parking lot as the build rationale. The lint
+rule names do not match today's headings: `prose.banned-word` sits
+under "Terminology: the person is the user"; renaming happens at port
+time.
+
 ## The rule/procedure split
 
 Located, because the user wanted to remember where it is. One home:
@@ -113,6 +275,10 @@ Raised, not settled. No lean recorded.
   what type working-set files carry.
 - The type the doc-type family's own files carry.
 - The three files typed `Standard` that describe themselves as recipes.
+  Bootstrap is one; the Build port retypes it, and the kind it becomes
+  is not named.
+- Whether a population's exclusions are written in the population mark
+  or in the file's prose.
 - Which of this file's decisions move to a permanent home in the
   repository, and where. Some will; not all; which is not yet known.
 - Edge cases not yet examined.
@@ -124,6 +290,10 @@ instruments. The user is not happy with the current implementation and
 does not want to delete it either. Set aside; not thought about in this
 refactor.
 
+Judgments, the same way. The user is not happy with them and may delete
+them soon. No rule in this refactor is checked by a judgment, and no
+shape is designed to hold one.
+
 ## Done when
 
 Every area of the repository's documentation is covered, in one of two
@@ -134,11 +304,34 @@ that connect to the bedrock of determinism. None of it needs to be
 implemented in code yet. The high-level abstract objects must be
 complete, with low residuals.
 
-## Next step
+## Next steps
 
-Write the abstractions as pseudocode on screen: Object, Process,
-Standard-Card, Standard, Guide, Runbook, their definitions and this
-repo's instantiations. Then work the open questions at that level.
+In order. Each kind runs one loop: design, then the files, then the
+code that reads them. Code comes last because it reads what the design
+and the ported files say.
+
+1. Refactor `doc-types/` into `standard-card/`, `standard/`,
+   `runbook/`.
+2. The card loop. Confirm the Standard-Card design, which is settled
+   above and already linted; move the built doc-type's files to
+   `standard-card/` under their real name; then write the generator
+   that prints `card, cell, pointer`. The population column is not
+   the card's and arrives in the next loop.
+3. The Standard loop, design. Write `standard/`'s definition and
+   contract shape, the two tables, and a draft encoding: the marks for
+   the population, a rule with its name, and a guard.
+4. The Standard loop, files. Port every standard under every card,
+   rewriting the files into the encoding. Build first, with its split,
+   then Prose; those two fix the encoding, and the rest follow, each
+   card read and split in the moment the way Build was, with cards
+   added, merged, or removed as the reading demands. Record residuals.
+   Park the evicted rationale and heuristics in one parking-lot
+   location.
+5. The Standard loop, code. The generator, chaingen's sibling, that
+   prints the standards and rules tables to one file and fails on
+   drift.
+6. Decide what becomes of the parked rationale.
+7. Then the remaining open questions.
 
 ## Acronyms
 
