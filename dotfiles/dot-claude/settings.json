@@ -252,6 +252,11 @@
   },
   "feedbackSurveyRate": 0,
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-fable-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "awaySummaryEnabled": false,
   "voice": {
     "enabled": true,
@@ -262,7 +267,6 @@
   "theme": "light",
   "switchModelsOnFlag": false,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
   "autoMode": {
     "allow": [
       "$defaults",
@@ -270,9 +274,5 @@
     ]
   },
   "voiceEnabled": true,
-  "modelSettings": {
-    "claude-fable-5": {
-      "effortLevel": "xhigh"
-    }
-  }
+  "remoteControlAtStartup": true
 }
