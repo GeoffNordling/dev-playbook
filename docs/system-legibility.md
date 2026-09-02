@@ -25,27 +25,10 @@ system is either:
 Over time, the user accumulates **intent alignment debt**, a parallel
 of tech debt.
 
-## The CLOA
+## Why slop happens
 
-The Correct Level of Abstraction: a happy place where the user and the AI
-communicate in shared terminology at the correct level
-of abstraction to achieve the user's latent goal efficiently. This shared level is a
-best-effort approximation of a latent optimum neither party knows a
-priori. It is both the highest level of abstraction at which the user can trust the AI
-and the lowest level at which the AI needs the user.
-
-Too low (too much detail) and the user stops paying attention: *rubber stamping*.
-Too high (not enough detail) and the user is temporarily fooled into thinking
-they understand the system: *vibe coding*.
-The CLOA changes dynamically depending on the system and the user goal.
-
-## Determinism as a forcing function
-
-Determinism is a forcing function. Pandas and Git impose
-their abstractions uncompromisingly; a wrong mental model of their operations fails fast upon contact with reality.
-
-AI, with its natural language interface, is another matter. "Programming in words"
-is convenient and magical. Yet, natural langugage is ill-defined, ambiguous, and
+AI's natural language interface — "programming in words" — is convenient
+and magical. Yet, natural langugage is ill-defined, ambiguous, and
 high dimensional. Natural language instructions present a faithful
 AI with many different ways to obey, all technically valid: the AI picks one.
 From the user's perspective, this choice is unpredictable and
@@ -60,11 +43,21 @@ whether aleatoric (model internals, temperature, etc.) or epistemic
 When user's "vibe" too hard, they gamble that one random walk through
 the garden will just happen to align with their intent.
 
-The solution is determinism. We must deliberately engineer deterministic
-forcing functions at the CLOA. By building observation platforms over the
-garden; the user maintains sight of the AI and keeps it aligned with their intent. 
+## The CLOA
 
-## The slop trench
+The Correct Level of Abstraction: a happy place where the user and the AI
+communicate in shared terminology at the correct level
+of abstraction to achieve the user's latent goal efficiently. This shared level is a
+best-effort approximation of a latent optimum neither party knows a
+priori. It is both the highest level of abstraction at which the user can trust the AI
+and the lowest level at which the AI needs the user.
+
+Too low (too much detail) and the user stops paying attention: *rubber stamping*.
+Too high (not enough detail) and the user is temporarily fooled into thinking
+they understand the system: *vibe coding*.
+The CLOA changes dynamically depending on the system and the user goal.
+
+### The slop trench
 
 Users who operate off of the CLOA will find themselves in the
 **slop trench**. This is a dirty, nasty, sad place; the slop can be deep. Digging
@@ -76,7 +69,15 @@ the slop trench to begin with, will surely return to it soon.
 
 The only way to stay out of the slop trench is to stop making slop.
 
-## Documentation is code
+## Determinism as a forcing function
+
+Pandas and Git impose
+their abstractions uncompromisingly; a wrong mental model of their operations fails fast upon contact with reality.
+The solution is determinism. We must deliberately engineer deterministic
+forcing functions at the CLOA. By building observation platforms over the
+garden; the user maintains sight of the AI and keeps it aligned with their intent.
+
+### Documentation is code
 
 Documentation is code: it tells agents what to do. An agent is nothing but
 documentation, permissions, and a harness. Treat documentation as
@@ -93,7 +94,7 @@ Documentation has three readers, in priority order:
 3. **Deterministic code** — the parsers and linters. A light touch
    needed; we prioritize the agent and the user.
 
-## The bedrock of determinism
+### The bedrock of determinism
 
 Declared abstractions descend layer by layer until the target stops
 being stochastic. That boundary is **the bedrock of determinism**:
@@ -108,7 +109,7 @@ tooling — but the mode flips: above, machinery is invented
 at great expense in user thought, working sessions, and
 supporting code. Below, we often choose pre-existing tools.
 
-## Provenance and the pandas standard
+### Provenance and the pandas standard
 
 Every abstraction carries a **provenance**: **declared** — invented
 here, its contract written in this corpus — or **imported** — someone
@@ -139,7 +140,7 @@ one to its caller.
   fast — makes location and absence meaningful, and yields rules a
   lint can hold.
 
-## The vocabulary API
+### The vocabulary API
 
 `CONTEXT.md` holds the canonical terms for communication: the user
 understands it completely, the AI uses its terms, and missing terms
