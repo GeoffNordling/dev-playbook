@@ -23,11 +23,11 @@ consumer.
 
 | Kind | Registry | Here | Workspace | Ruling in doc-type-system.md | Machinery today |
 |---|---|---|---|---|---|
-| Standard | document-types | 38 | 3 | Standard doc-type | `type-location` |
+| Standard | document-types | 34 | 3 | Standard doc-type | `type-location` |
 | Decision-Record | document-types | 26 | 19 | absent, so not important | template, numbering, immutability, decisions-lint |
 | General-Sheet | document-types | 20 | 32 | absent, so not important | none |
 | Standard-Card | document-types | 14 | 2 | Standard doc-type | four cells, standards-lint, catalog index |
-| Guide | document-types | 9 | 58 | important, no doc-type | none |
+| Guide | document-types | 10 | 58 | important, no doc-type | none |
 | README | document-types | 7 | ~32 | absent | repo-lint doc-shape |
 | Recipe-Description | document-types | 3 | 0 | absent | `resource` required |
 | Instrument-Spec | document-types | 2 | 0 | absent | `## Employed by` required |
@@ -109,12 +109,13 @@ In the consumer repos, Guide has 58 instances and Standard has 3.
 
 ## Other readings
 
-- The 38 files typed `Standard` all live under `standards/<name>/`
+- The 34 files typed `Standard` all live under `standards/<name>/`
   directories, the content directories the cards point into.
-- Three of them describe themselves as recipes in their own
-  description: `standards/standard/consuming.md`,
-  `standards/semantic-validation/consuming.md`, and
-  `standards/build/bootstrap.md`.
+- Two of them describe themselves as recipes in their own
+  description: `standards/standard/consuming.md` and
+  `standards/semantic-validation/consuming.md`. A third,
+  `standards/build/bootstrap.md`, did until the Build port retyped it
+  `Guide`.
 - Decision-Record's machinery is a template, sequential numbering, and
   immutability in
   [Decision Record Conventions](/standards/decisions/records.md), and

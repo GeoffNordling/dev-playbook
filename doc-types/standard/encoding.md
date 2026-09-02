@@ -35,10 +35,15 @@ exclusions, and links the neighbors; rulegen carries nothing from it.
 A rule is a heading; its section is the rule.
 
 - **The name.** The heading's text, in sentence case, naming the rule:
-  `Declarative present tense`, `README.md required`. The rule column is
-  its slug: lowercased, every run of characters outside letters and
-  digits one hyphen, edge hyphens dropped (`declarative-present-tense`,
-  `readme-md-required`). Slugs are unique within a Standard.
+  `Declarative present tense`, `tests/ present`, `ci.yml`. The rule
+  column is the heading's GitHub slug, the anchor a link to the section
+  uses and the one ref-lint resolves: inline marks stripped, lowercased,
+  every character outside letters, digits, whitespace, and hyphens
+  dropped, each run of whitespace one hyphen
+  (`declarative-present-tense`, `tests-present`, `ciyml`,
+  `pre-commit-configyaml`). A view row's rule column is therefore the
+  anchor a citation of the rule ends in. Slugs are unique within a
+  Standard.
 - **The predicate.** The first paragraph under the heading. It states
   the check whole: a reader with only that paragraph can apply it.
 - **The body.** Everything after the first paragraph: the definition,
@@ -47,10 +52,10 @@ A rule is a heading; its section is the rule.
 ## Conditions
 
 A condition is an H2 whose section holds H3s. Its text names the
-member subset, its slug is the `when` column of every rule beneath it,
-and its first paragraph states the membership test: `a repo in which
-pyproject.toml exists at the root`. Each H3 beneath it is a rule
-bound under that condition.
+member subset, its slug, formed the same way as a rule's, is the
+`when` column of every rule beneath it, and its first paragraph states
+the membership test: `a repo in which pyproject.toml exists at the
+root`. Each H3 beneath it is a rule bound under that condition.
 
 Heading levels are the whole of the mark. An H2 with no H3 beneath it
 is a rule that binds every member, `—` in the view. An H2 with H3s

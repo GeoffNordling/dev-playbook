@@ -85,6 +85,37 @@ sorting a section, ask whether a reviewer could reject a document by
 comparing its state to the sentences, and let the heading be rewritten
 to match the answer.
 
+## Rule ids follow the card
+
+The Build port moved the pin rule and the dogfood mirror out of Build
+into a new Distribution card, and their ids moved with them:
+`build.pin` became `distribution.pin`, and the mirror half of
+`build.self-audit` became `distribution.dogfood`. standards-lint's rule
+matrix forced it: every prefix a detector emits must belong to a card
+whose Audit cell cites that detector. The card boundary is real in the
+code, so a rule that changes card changes id, and the tests that pin
+the prefix sets change with it. Moving a rule between cards is a hook
+change consumers see at their next pin bump.
+
+## Bundle at the lint's grain
+
+File Skeleton's seven required files are one rule, Required files,
+because repo-lint reports them under one id, `build.required-file`.
+The contract shape's example had implied one rule per file. The grain
+a rule takes was decided by the lint that checks it: a finer grain in
+the Standard than in the lint would give the third table rows with no
+partner.
+
+## The slug is the anchor
+
+The rule column was first defined as a slug of its own, lowercase with
+runs of non-alphanumerics as hyphens. The Build port's headings named
+files, `ci.yml` and `.pre-commit-config.yaml`, and a second slug rule
+would have given every rule two names, one for the view and one for
+links. The GitHub heading slug that ref-lint already resolves became
+the rule's id, so a view row's rule column is the anchor a citation
+uses. One existing mark reused, instead of a new one invented.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

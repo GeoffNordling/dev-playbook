@@ -212,6 +212,17 @@ once in the Standard doc-type's encoding file. Everything unmarked is opaque
 prose the parser carries but never reads, so examples, definitions,
 and rationale sit wherever the writer wants them.
 
+**Rule ids follow the card.** A lint rule's prefix is the card whose
+Audit cell cites the detector, which standards-lint's rule matrix
+holds; a rule that moves to another card takes that card's prefix.
+The Build port's pin and dogfood rules became `distribution.pin` and
+`distribution.dogfood` this way.
+
+**The slug is the anchor.** A rule's id in the view is its heading's
+GitHub slug, the anchor a link to the section uses and the one
+ref-lint resolves. A condition's `when` value is the same slug. No
+second naming rule.
+
 **Standard's build follows Runbook's.** Definition, contract shape (the
 two tables), encoding, generator with a drift check, ports, residual
 ledger.
@@ -300,9 +311,10 @@ Raised, not settled. No lean recorded.
 - What replaces `General-Sheet`, which the user named a cop-out, and
   what type working-set files carry.
 - The type the doc-type family's own files carry.
-- The three files typed `Standard` that describe themselves as recipes.
-  Bootstrap is one; the Build port retypes it, and the kind it becomes
-  is not named.
+- The files typed `Standard` that describe themselves as recipes, the
+  two `consuming.md`. Bootstrap was the third; the Build port retyped it
+  `Guide`, and whether Guide is the kind a procedure carries is not
+  settled.
 - Whether a population's exclusions are written in the population mark
   or in the file's prose.
 - Which of this file's decisions move to a permanent home in the
@@ -359,20 +371,26 @@ exists and is empty. Permanent files carry the design and no progress
 notes; what is ported, what is built, and what remains is tracked only
 here.
 
-1. The Standard loop, first port. Build, with its split, held
-   uncommitted for review. Residuals go to
-   `doc-types/standard/residual-ledger.md`, evicted rationale and
-   heuristics to the parking lot.
-2. The Standard loop, code. `scripts/rulegen`, cardgen's sibling, that
+Done: the Standard loop's first port, Build, reviewed and committed.
+Nine files became five Standards across three cards: File Skeleton,
+Canonical Artifacts, and The Python Project under Build; Distribution
+Channel under the new Distribution card; Gates under the Meta-Standard.
+Bootstrap is a Guide under Adopt. The rule ids that changed cards
+changed prefix. Two calls were reviewed and stand: required files are
+one rule at repo-lint's grain, and a rule's id is its heading's GitHub
+slug. Residuals are in `doc-types/standard/residual-ledger.md`, evicted
+rationale and heuristics in the parking lot.
+
+1. The Standard loop, code. `scripts/rulegen`, cardgen's sibling, that
    prints the standards and rules tables to
    `doc-types/standard/standards.txt` and fails on drift. A first
    draft, open to change.
-3. The Standard loop, remaining ports. Slop Tics, then every other
+2. The Standard loop, remaining ports. Slop Tics, then every other
    card, each read and split in the moment the way Build was, with
    cards added, merged, or removed as the reading demands, and each
    checked by rulegen before review.
-4. Decide what becomes of the parked rationale.
-5. Then the remaining open questions.
+3. Decide what becomes of the parked rationale.
+4. Then the remaining open questions.
 
 ## Acronyms
 
