@@ -8,21 +8,18 @@ description: The doctrine — the user understands the systems they own without 
 
 The doctrine for keeping the workspace's systems understandable by
 the user. It motivates the legibility machinery — shared vocabulary,
-declared contracts, deterministic gates — and holds the intentions
-that have not yet hardened into anything enforceable. Parts of this
-paper may later harden into a Standard card, once they grow audit and
-enforce teeth; until then the doctrine lives here.
+declared contracts, deterministic gates — and holds future intentions.
 
 ## The goal
 
-No more slop! The user will understand every system they own without
-reading all of it directly. **Slop** defeats this. Slop is when the
+No more slop! The user will understand systems without
+reading all of them directly. **Slop** defeats this. Slop is when the
 system is either:
 
 - **Low quality** — diverges from the user's latent intent.
 - **Not understood** — critical information is recorded in incomprehensible
   piles of text and code, greppable by AI, but illegible to the user.
-  The things within may or may not be aligned with user intent; the
+  The system may or may not be aligned with user intent; the
   user does not know because they do not comprehend it.
 
 Over time, the user accumulates **intent alignment debt**, a parallel
@@ -42,38 +39,37 @@ Too high (not enough detail) and the user is temporarily fooled into thinking
 they understand the system: *vibe coding*.
 The CLOA changes dynamically depending on the system and the user goal.
 
-## Deterministic forcing functions
+## Determinism as a forcing function
 
-Deterministic interfaces are forcing functions. Pandas and Git impose
-their abstractions uncompromisingly; a wrong mental model of their primitives
-or operations will soon fail upon contact with reality.
+Determinism is a forcing function. Pandas and Git impose
+their abstractions uncompromisingly; a wrong mental model of their operations fails fast upon contact with reality.
 
 AI, with its natural language interface, is another matter. "Programming in words"
-is convenient and magical. And yet, natural langugage is ill-defined, ambiguous, and
-high dimensional. Natural language instructions almost always present the faithful
-AI with many different valid ways to obey. The AI picks the one it thinks best.
-From the user's perspective, the AI's choice is unintelligble and unpredictable.
-As the user and AI chain many such instructions together, they jointly
-construct a *garden of forking paths* where the user steers the garden's,
-growth, but cannot see the exact path the AI chose within.
+is convenient and magical. Yet, natural langugage is ill-defined, ambiguous, and
+high dimensional. Natural language instructions present a faithful
+AI with many different ways to obey, all technically valid: the AI picks one.
+From the user's perspective, this choice is unpredictable and
+unobservable (too costly to observe). Chaining many such instructions
+together grows a thick garden forking paths. Some paths align with user intent,
+others do not. The user loses track of the AI's specific path; they know only
+that the AI is in the garden *somewhere*.
 
 The fundamental problem is stochasticity: each AI action is random,
 whether aleatoric (model internals, temperature, etc.) or epistemic
 (the user's inability or unwillingness to keep up with the details).
 When user's "vibe" too hard, they gamble that one random walk through
-the garden will just happen to align with their intent. As with all high-dimensional
-stochastic problems, when the space grows large enough, it certainly will not.
+the garden will just happen to align with their intent.
 
 The solution is determinism. We must deliberately engineer deterministic
-forcing functions at the CLOA. By building scaffolding over the garden; we
-maintain a joint line of communication between user and AI. 
+forcing functions at the CLOA. By building observation platforms over the
+garden; the user maintains sight of the AI and keeps it aligned with their intent. 
 
 ## The slop trench
 
 Users who operate off of the CLOA will find themselves in the
-**slop trench**. This is a place where users are buried in slop. Digging
-out requires careful, repeated, sequential, corrective conversation turns with the
-AI to dig out of the slop and pay off the intent alignment debt.
+**slop trench**. This is a dirty, nasty, sad place; the slop can be deep. Digging
+out requires careful, repeated, corrective conversation turns with the
+AI to recover and pay off the intent alignment debt.
 
 Users who dig out, but do not reflect on how they got themselves into
 the slop trench to begin with, will surely return to it soon.
@@ -131,11 +127,11 @@ one to its caller.
   expensive. Deterministic backpressure — detectors, linters, gates,
   plain contact with reality — is inviolable and efficient. Prefer it
   wherever it can reach, and prefer claims a lint can check: "skill X
-  references skill Y" is greppable; "skill X is elegant" is not. Keep
+  references skill Y" is greppable; "skill X is clean" is not. Keep
   agentic backpressure tools simple and loop-friendly — a status code
   beats a detailed report.
 - **Move slowly in decision space.** Small iterative steps, with
-  backpressure from real-world contact. Reality has a veto;
+  backpressure from real-world contact. Reality gets a veto;
   we prefer to hear its opinion early and often.
 - **Constrain to optimize understanding.** Funnel declarations
   through reduced forms designed for the user's eyes. A constraint on
