@@ -29,7 +29,7 @@ before that dash, and, in Enforce, the bold gate name.
 - **Enforce.** The pointer is the gate the bullet names in bold —
   `**commit gate**`, `**push gate**`, or `**CI gate**` — exactly one per
   bullet, wherever it sits in the bullet. The three names are fixed by
-  [enforcement.md](/standards/build/enforcement.md).
+  [Gates](/standards/standard/gates.md#three-rungs).
 - **none.** A cell with nothing to point at holds the one bullet `none`,
   optionally followed by a colon and the reason. It renders as one `none`
   row.

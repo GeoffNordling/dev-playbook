@@ -1,8 +1,8 @@
 """Move the dev-playbook pin across the governed consumer repos.
 
 The library behind the ``bump-pins`` shim — the release step of
-[distribution.md](/standards/build/distribution.md), where *the rev bump is the
-release*. A consumer runs the standard as of its pinned ``rev`` and nothing
+[Distribution Channel](/standards/distribution/channel.md), where *the rev bump
+is the release*. A consumer runs the standard as of its pinned ``rev`` and nothing
 else: a detector added upstream, a rule tightened, a canonical artifact
 changed, none of it reaches that repo until its pin moves. Moving the pin is
 therefore the whole delivery mechanism, and it is mechanical.

@@ -35,10 +35,10 @@ restate the content of their targets.
   nonconformance without blocking anything.
 - **Enforce** — blocking gates: the rungs where nonconformance stops the
   path to main, cited by fixed name (**commit gate**, **push gate**,
-  **CI gate**), defined in [enforcement.md](/standards/build/enforcement.md).
+  **CI gate**), defined in [Gates](/standards/standard/gates.md).
   A cell cites the single rung where the detector is stationed — where its
   wiring lives (pre-commit hooks → the commit gate; tools that run only inside
-  `make check` / `make check-judgments-cache` → the push gate); the hook pattern in enforcement.md's Map
+  `make check` / `make check-judgments-cache` → the push gate); the hook pattern in Gates
   implies the echoes at the other rungs. Enforcement is automatic and
   continuously in effect; a code review is a one-time checkpoint, never an
   Enforce pointer.

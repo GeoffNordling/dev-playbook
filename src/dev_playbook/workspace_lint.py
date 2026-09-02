@@ -78,7 +78,7 @@ ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
 EPIC_SHAPE = "tracking.epic-shape"
 WAYFINDER_SHAPE = "tracking.wayfinder-shape"
 TUPLE_VALID = "tracking.tuple-valid"
-PIN = "build.pin"
+PIN = "distribution.pin"
 
 RULES = (
     SETTINGS,

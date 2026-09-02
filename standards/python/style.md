@@ -10,7 +10,7 @@ Default Python conventions for projects in this workspace. Individual
 projects may supercede.
 
 For build/task-runner conventions (Makefile targets, `make check`), see
-[make.md](/standards/build/make.md).
+[Canonical Artifacts](/standards/build/canonical.md#makefile).
 
 ## Package initialization
 

@@ -633,7 +633,7 @@ def test_manifest_without_canonical_dir_enforces_dogfood_mirror(
     files[".pre-commit-hooks.yaml"] += "- id: unmirrored-lint\n"
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert ".pre-commit-config.yaml: build.self-audit" in result.stdout
+    assert ".pre-commit-config.yaml: distribution.dogfood" in result.stdout
     assert "missing: unmirrored-lint" in result.stdout
 
 

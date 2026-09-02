@@ -8,25 +8,6 @@
 # card points at. One judgment per card -- semantic honesty the deterministic
 # standards-lint cannot check. See standards/semantic-validation/.
 judgments:
-  - id: standard-card-build
-    claim: |
-      standards/build.md is an honest card: every pointer in its define,
-      audit, enforce, and adopt cells names a real artifact that genuinely
-      serves that cell's role for the build standard, and no cell
-      misrepresents what its targets do.
-    evidence:  [standards/build.md]
-    reference:
-      - doc-types/standard-card/contract-shape.md
-      - standards/build/index.md
-      - standards/build/canonical.md
-      - scripts/repo-lint
-      - scripts/workspace-lint
-      - standards/build/canonical/.pre-commit-config.yaml
-      - standards/build/canonical/Makefile.base
-      - standards/build/canonical/ci.yml
-    model: claude-sonnet-5
-    effort: high
-
   - id: standard-card-standard
     claim: |
       standards/standard.md is an honest card: every pointer in its define,

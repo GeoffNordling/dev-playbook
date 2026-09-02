@@ -59,14 +59,14 @@ repo is now the topmost instance of the hosting pattern for its own standard.
 Add the same hook id to the repo's `repo: local` block in
 `.pre-commit-config.yaml`, so the repo runs from its working tree what it
 publishes. This is the dogfooding invariant every manifest-shipping repo owes
-([distribution.md](/standards/build/distribution.md)); repo-lint's
-`build.self-audit` rule checks the mirror.
+([Distribution Channel](/standards/distribution/channel.md#the-local-block-covers-the-manifest));
+repo-lint's `distribution.dogfood` rule checks the mirror.
 
 ## 5. Station it at a gate
 
 The local-block wiring runs the detector at the **commit gate**. Record that
 rung in the card's Enforce cell, exactly as
-[enforcement.md](/standards/build/enforcement.md) prescribes, so the card names
+[Gates](/standards/standard/gates.md) prescribes, so the card names
 where nonconformance blocks the path to main.
 
 ## 6. Turn the meta-standard's own policing on

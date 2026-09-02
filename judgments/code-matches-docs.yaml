@@ -16,28 +16,6 @@
 # slice is tried against that card's standard in its own judgment -- keeping any
 # single judge's reference set small instead of one judgment over every card.
 judgments:
-  - id: repo-lint-build-subset-of-standard
-    claim: |
-      Every check scripts/repo-lint performs that emits a `build.` rule
-      corresponds to a requirement stated in the standards/build/ documents.
-      The standard may state more than the tool checks; the tool must not
-      check more than the standard states. repo-lint is a multi-card
-      detector -- its docs.* and harness.* checks are on trial in their
-      own judgments, not here.
-    evidence:  [scripts/repo-lint]
-    reference:
-      - standards/build/index.md
-      - standards/build/layers.md
-      - standards/build/skeleton.md
-      - standards/build/make.md
-      - standards/build/python.md
-      - standards/build/ci.md
-      - standards/build/canonical.md
-      - standards/build/distribution.md
-      - standards/build/enforcement.md
-    model: claude-sonnet-5
-    effort: high
-
   - id: repo-lint-docs-subset-of-standard
     claim: |
       Every check scripts/repo-lint performs that emits the

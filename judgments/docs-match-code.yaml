@@ -58,35 +58,6 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: build-standard-matches-artifacts
-    claim: |
-      The standards/build/ documents promise exactly what ships: every
-      concrete statement they make about the canonical artifacts in
-      standards/build/canonical/ and about the published hook manifest
-      (.pre-commit-hooks.yaml) — file names, hook ids, targets, commands,
-      pins, entry paths — is true of those files as they exist today.
-    evidence:
-      - standards/build/index.md
-      - standards/build/layers.md
-      - standards/build/skeleton.md
-      - standards/build/make.md
-      - standards/build/python.md
-      - standards/build/ci.md
-      - standards/build/canonical.md
-      - standards/build/distribution.md
-      - standards/build/enforcement.md
-    reference:
-      - standards/build/canonical/Makefile.base
-      - standards/build/canonical/Makefile.python
-      - standards/build/canonical/ci.yml
-      - standards/build/canonical/pyproject.toml
-      - standards/build/canonical/.pre-commit-config.yaml
-      - standards/build/canonical/.python-version
-      - standards/build/canonical/.gitignore
-      - .pre-commit-hooks.yaml
-    model: claude-sonnet-5
-    effort: high
-
   - id: script-responsibility
     claim: |
       scripts/README.md gives every script exactly one home and one job:

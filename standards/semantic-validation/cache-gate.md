@@ -87,7 +87,7 @@ itself:
 | Invocation | `SKIP_JUDGMENTS` | The gate |
 |---|---|---|
 | `make check`, `make test` | `1` (the Makefile default, exported) | **skipped** |
-| `make check-judgments-cache` | `0` — or `1` on machines without the cache (`NO_JUDGMENT_CACHE`, [make.md](/standards/build/make.md)) | **armed** |
+| `make check-judgments-cache` | `0` — or `1` on machines without the cache (`NO_JUDGMENT_CACHE`, [Machines](/docs/machines.md)) | **armed** |
 | bare `uv run pytest` | unset | **armed** (fail-safe) |
 
 When `SKIP_JUDGMENTS` is exactly `1`, the helper **skips** each case with a

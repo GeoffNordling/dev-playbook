@@ -50,11 +50,11 @@ run.
   is a primary-machine activity. Judges never run on a secondary;
   `SKIP_JUDGMENTS=1` turns each gated judgment into a named pytest skip,
   and `NO_JUDGMENT_CACHE=1` keeps the push gate from checking the cache
-  either ([make.md](/standards/build/make.md)).
+  either ([Canonical Artifacts](/standards/build/canonical.md#makefile)).
 - **`ref-lint`.** Cross-repo Citations resolve only where the cited repo is
   cloned, and a secondary deliberately carries only some of the workspace's
   repos. `SKIP=ref-lint` stands the detector down.
 
 The primary carries every repo and runs every check, so nothing goes
 permanently unchecked. Which gates this affects is recorded in
-[enforcement.md](/standards/build/enforcement.md).
+[Gates](/standards/standard/gates.md#skips).

@@ -67,7 +67,8 @@ contract.
   `repo: local` block — dev-playbook is the topmost instance of this pattern. A
   repo that ships a manifest must run what it ships from its own local block;
   that dogfooding invariant is stated once in
-  [distribution.md](/standards/build/distribution.md) and not restated here.
+  [Distribution Channel](/standards/distribution/channel.md#the-local-block-covers-the-manifest)
+  and not restated here.
 - **Card-namespaced rule ids.** Every finding carries a rule id of the form
   `card.rule`, namespaced by the card whose question it answers and named
   after that question — never after the tool that happens to detect it.

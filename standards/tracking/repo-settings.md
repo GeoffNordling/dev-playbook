@@ -69,5 +69,5 @@ Extra rules and extra rulesets are fine — the destructive-operation rules
 above are a floor.
 
 This is deliberately not [branch protection with required status
-checks](/standards/build/enforcement.md): nothing here makes CI a merge
+checks](/standards/standard/gates.md#a-red-ci-run-is-never-merged): nothing here makes CI a merge
 precondition, which stays the user's standing rule.

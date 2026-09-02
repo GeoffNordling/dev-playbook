@@ -100,12 +100,12 @@ on CI.
 The gate is two-tier, keyed off one environment variable `SKIP_JUDGMENTS` that
 `assert_judgment_cached` reads ([cache-gate.md](/standards/semantic-validation/cache-gate.md)):
 exactly `1` skips the check with a visible pytest skip, any other value or
-unset arms it. The canonical [Makefile](/standards/build/make.md) defaults it
+unset arms it. The canonical [Makefile](/standards/build/canonical.md#makefile) defaults it
 to `1` and exports it, so `make check` and `make test` **skip** the gate — a
 subagent running them never hits a miss only a sweep can fill.
 `make check-judgments-cache` arms the gate — except on machines without the
 cache, where the `NO_JUDGMENT_CACHE` conditional keeps it skipped
-([make.md](/standards/build/make.md)) — and is the entry of the canonical
+([Machines](/docs/machines.md)) — and is the entry of the canonical
 pre-push hook: a miss blocks the push until the cache is filled, and a repo
 with nothing gated passes vacuously. A bare `uv run pytest` arms it too
 (fail-safe).
@@ -119,7 +119,7 @@ stops running the gate while nothing at the push enforces it.
 `judgments-lint` fails malformed or stale declarations fast at the commit
 gate. It runs as part of dev-playbook's published `playbook-lint` hook,
 which the canonical `.pre-commit-config.yaml` pins
-([distribution.md](/standards/build/distribution.md)) — any repo on the
+([Distribution Channel](/standards/distribution/channel.md)) — any repo on the
 canonical config runs it on every commit.
 
 The hook runs from pre-commit's own clone of dev-playbook at the pinned

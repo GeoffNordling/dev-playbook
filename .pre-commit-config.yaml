@@ -4,7 +4,7 @@
 # by URL + pinned rev. dev-playbook is the hook repo itself, so the canonical
 # template's pinned dev-playbook block is replaced here by the `- repo: local`
 # dogfood block below; it mirrors that manifest, so keep the two in sync.
-# See standards/build/distribution.md.
+# See standards/distribution/channel.md.
 default_install_hook_types: [pre-commit, pre-push]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
