@@ -14,5 +14,3 @@ imperative English commanding the executing agent.
 The family is the repo's harness commands: every skill and every
 agent definition. A command's caller is owed a contract, so every
 runbook carries one, written into its own prose as spans.
-Runbook's contract shape is the Reference chain, declared in
-[contract-shape.md](/doc-types/runbook/contract-shape.md).

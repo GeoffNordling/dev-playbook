@@ -49,7 +49,7 @@ instances.
 
 ## What the General-Sheet files hold
 
-Twenty-one files. Each row is a reading of the file's content.
+Twenty-five files. Each row is a reading of the file's content.
 
 | File | What it holds |
 |---|---|
@@ -62,8 +62,11 @@ Twenty-one files. Each row is a reading of the file's content.
 | doc-types/standard-card/definition.md | the Standard-Card doc-type's definition |
 | doc-types/standard-card/contract-shape.md | the Standard-Card doc-type's shape, with the generated view |
 | doc-types/standard-card/encoding.md | the Standard-Card doc-type's encoding spec |
-| doc-types/standard-card/residual-ledger.md | one entry, software-factory |
-| doc-types/standard/definition.md | the Standard doc-type's definition, settled sentences only |
+| doc-types/standard-card/residual-ledger.md | empty, every card fits the four cells |
+| doc-types/standard/definition.md | the Standard doc-type's definition |
+| doc-types/standard/contract-shape.md | the Standard doc-type's shape, with the two-table view |
+| doc-types/standard/encoding.md | the Standard doc-type's encoding spec |
+| doc-types/standard/residual-ledger.md | empty |
 | docs/system-legibility.md | the doctrine |
 | docs/writing-improvement-process.md | a process description, its attempts, principles, and platform facts, four H2s |
 | docs/writing-improvement-process/writing-improvement-log.md | newest-first entries, one per writing session |
@@ -74,6 +77,7 @@ Twenty-one files. Each row is a reading of the file's content.
 | docs/sandboxing.md | the sandbox's status after Decision Record 0024 and the intended direction |
 | docs/measurement-derivation.md | how captured hook events become metrics, with the assertions run first |
 | NO-MORE-SLOP.md | the branch plan, the working set's root |
+| PARKING-LOT.md | text evicted from Standards during the ports, one entry each with provenance |
 
 Related facts. The registry defines `Log` as "a chronological
 operational record whose entries are appended as events occur".

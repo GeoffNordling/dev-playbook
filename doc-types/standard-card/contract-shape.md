@@ -14,8 +14,7 @@ therefore gets a **standard card**: a small fixed-format record that tells
 a user or agent where to look. The files it points at define the
 standard; the card aggregates pointers so a thought that originates at
 the abstract level ("how do we do X here?") resolves to concrete files in
-one hop. How a cell's bullets are written sits one layer down in
-[encoding.md](/doc-types/standard-card/encoding.md).
+one hop.
 
 ## The card
 
@@ -50,7 +49,25 @@ restate the content of their targets.
 The cards themselves are the examples: [Build](/standards/build.md) and
 [Meta-Standard](/standards/standard.md) — the latter is the card of the
 standard that governs cards, since the meta-standard is an instance of
-the format it defines.
+the format it defines. The shape in pseudocode:
+
+```python
+class StandardCard(Object):
+    """One card per standard. Points; never restates."""
+
+    question: str                       # "Governs how ..." — one breath
+
+    # four cells; a cell is a list of pointers, or the literal word "none"
+    define:  list[Pointer[Standard]]                # required, at least one
+    audit:   list[Pointer[Detector]] | None
+    enforce: list[Pointer[Gate]]     | None         # Gate = commit | push | CI
+    adopt:   list[Pointer[Adoption]] | None
+
+    # rules: each a predicate over one card's state
+    location    = path == f"standards/{name}.md"            # flat, never nested
+    frontmatter = type == "Standard-Card" and description == question
+    layout      = h2s == ["Define", "Audit", "Enforce", "Adopt"]
+```
 
 ## The view
 
@@ -73,6 +90,3 @@ gap stays visible in the view as it does in the card. Cards sort
 alphabetically, cells keep the card's order, and pointers keep their
 bullet order. The annotation after each pointer stays below the collapse,
 in the card.
-
-Whatever a card cannot express in its cells is a residual, recorded in
-[residual-ledger.md](/doc-types/standard-card/residual-ledger.md).

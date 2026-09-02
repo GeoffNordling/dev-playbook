@@ -52,9 +52,10 @@ the set's root file, and that auditor's assigned sections:
   [current state and next steps only](~/workspace/dev-playbook/standards/prose/conventions.md#current-state-and-next-steps-only),
   [open with purpose](~/workspace/dev-playbook/standards/prose/conventions.md#open-with-purpose),
   [lead with the edge case](~/workspace/dev-playbook/standards/prose/conventions.md#lead-with-the-edge-case-when-reach-is-surprising),
-  [section formats](~/workspace/dev-playbook/standards/prose/conventions.md#how-to-decide-between-section-formats),
+  [block form](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
   [positive statement](~/workspace/dev-playbook/standards/prose/conventions.md#positive-statement),
-  [person of address](~/workspace/dev-playbook/standards/prose/conventions.md#person-of-address),
+  [imperative and second person](~/workspace/dev-playbook/standards/prose/conventions.md#imperative-and-second-person),
+  [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person),
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
   [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).

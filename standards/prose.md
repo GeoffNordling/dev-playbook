@@ -24,7 +24,7 @@ structure, and brevity.
   flagging the banned actor noun (Terminology: the person is the user) in
   every tracked file this workspace authors, of any type, with no code-span or
   fence escape; and `harness.agent-facing-voice`, flagging the first person in
-  a harness-loaded agent instruction file (Voice: person of address), which
+  a harness-loaded agent instruction file (Imperative and second person), which
   answers the [harness](/standards/harness.md) card since its scope is that
   registry. Verbatim `type: Reference` mirrors and the paths a repo declares
   in its root `.prose-lint-exempt` are outside the scan for every one of the

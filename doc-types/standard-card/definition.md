@@ -9,10 +9,7 @@ description: What a standard card is — the catalog record for one standard, na
 A **standard card** is the catalog record for one standard: it names the
 question the standard governs and points at the files that define,
 audit, enforce, and adopt it. The family is the population of cards, the
-flat files under `standards/`, and the Standard-Card doc-type hands it
-its contract shape: the four cells, declared in
-[contract-shape.md](/doc-types/standard-card/contract-shape.md). A card
-points; it never restates. What a standard *is* — a population and the
+flat files under `standards/`. A card points; it never restates. What a standard *is* — a population and the
 rules over it — belongs to the Standard doc-type,
 [doc-types/standard/](/doc-types/standard/index.md).
 

@@ -9,9 +9,7 @@ description: The Reference chain — Runbook's contract shape, declared as nodes
 The **Reference chain** is Runbook's contract shape
 ([Doc-Type](/doc-types/doc-type.md)): the
 form every runbook's contract takes. This file declares the shape —
-its nodes and its edges. How chain edges are written inside runbook
-prose sits one layer down in
-[encoding.md](/doc-types/runbook/encoding.md).
+its nodes and its edges.
 
 ## The chain
 
@@ -21,7 +19,33 @@ at one runbook
 It is the contract written down: the signature — args in, reports
 out — plus the effects, in the coarse order they fire. The chain is
 a collapse of the runbook's program: the fine-grained sequencing it
-drops stays below the CLOA, in the instance's body.
+drops stays below the CLOA, in the instance's body. The shape in
+pseudocode:
+
+```python
+class Runbook(Object):
+    """One invocable command. Its chain is its contract, written as spans in its own prose."""
+
+    summary: str                        # frontmatter description
+    args:    list[str]                  # frontmatter arguments, names only
+    chain:   list[Edge]                 # any number, coarsely ordered, rooted here
+
+    # rules: each a predicate over one runbook's state
+    location = path == f"skills/{name}/SKILL.md" or path == f"agents/{name}.md"
+    rooted   = every edge in chain is declared in this file's own body   # no file describes another's behavior
+
+
+class Edge:
+    operation: read | write | do | override | never | args | report
+    target:    Node | Bucket            # Bucket = git | GitHub | local file | scratch, for writes and targetless reads
+    condition: str | None               # what must hold for the edge to fire; None fires always
+
+
+class Node:
+    name: str
+    type: Standard | Agent | Skill | Script | None   # None is imported: named where the edge touches it
+    data: dict                          # permission expression, model pin, verbatim
+```
 
 ## Nodes
 
@@ -82,18 +106,9 @@ operation, node type, or bucket is an edit here before its first
 use; its written form is an edit to
 [encoding.md](/doc-types/runbook/encoding.md).
 
-How each edge is written in runbook prose is ruled in
-[encoding.md](/doc-types/runbook/encoding.md#the-primitive-map),
-and how it draws in
-[encoding.md](/doc-types/runbook/encoding.md).
-
 Any edge may carry a **condition** — what must hold for it to fire.
 A conditional edge draws dashed; an unconditional edge draws solid.
 The condition never changes the edge's operation.
-
-Whatever a runbook's prose cannot express as an edge is a residual,
-recorded in
-[residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 
 ## Acronyms
 

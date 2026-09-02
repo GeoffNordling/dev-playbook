@@ -65,6 +65,26 @@ Before designing marks for a kind, read how its files already write
 the thing the view needs. The marks may already be there, and an
 encoding that names what exists costs the port almost nothing.
 
+## A heading level is a mark
+
+The Standard encoding spends heading levels on meaning: an H2 is a
+rule or a condition, an H3 is a rule under a condition. Doc Conventions had
+spent its H2s on navigation, `Contents`, `Voice`, `Mechanics`, and
+those went in the port, because a parser that reads levels cannot
+also let a level mean nothing. A markdown file has few marks a parser
+can slice on, and the levels are the strongest; once one carries
+meaning, navigation moves to the description and the generated view.
+
+## Test the predicate, not the heading
+
+"How to decide between section formats" read as a writer's process,
+and the first pass evicted it. Its bullets were each a predicate over
+a block as it stands: a list of items that are not parallel is wrong
+on sight. The heading was about process; the content was a rule. When
+sorting a section, ask whether a reviewer could reject a document by
+comparing its state to the sentences, and let the heading be rewritten
+to match the answer.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

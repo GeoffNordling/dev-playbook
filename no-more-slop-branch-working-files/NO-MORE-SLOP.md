@@ -63,6 +63,8 @@ The items, each a future work session:
   What has worked while constructing CLOA objects is noted as it
   occurs in
   [Algorithm Notes](/no-more-slop-branch-working-files/ALGORITHM-NOTES.md).
+  What the ports evict waits in
+  [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md).
 - **When the parser runs.** The move landed the parser at
   `scripts/chaingen`, writing its generated view to
   `doc-types/runbook/chains.txt` — a temporary location, to be settled
@@ -369,6 +371,11 @@ works the term holds the detail. Every one is a tentative promotion to
 - **composition rule** — how many operations an instance may carry and in
   what arrangement
   ([Doc-Type](/doc-types/doc-type.md)).
+- **condition** — what must hold for a runbook edge to fire, or for a
+  Standard's rule to bind a member; one word in both doc-types, never
+  "guard"
+  ([Reference Chain](/doc-types/runbook/contract-shape.md#edges),
+  [Population and Rules](/doc-types/standard/contract-shape.md#the-shape)).
 - **constrain to optimize understanding** — the principle that a constraint
   on form pays for itself in amortized reading, meaningful location, and a
   lintable rule

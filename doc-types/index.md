@@ -14,4 +14,4 @@ instantiation, and one directory per built doc-type.
 
 - [runbook/](/doc-types/runbook/index.md) — The Runbook doc-type — definition, contract shape, encoding, and residual ledger for the repo's invocable commands
 - [standard-card/](/doc-types/standard-card/index.md) — The Standard-Card doc-type — definition, contract shape, encoding, the generated cards view, and residual ledger for the catalog's cards
-- [standard/](/doc-types/standard/index.md) — The Standard doc-type — the kind a card's Define cell points at; the definition only, until its loop runs
+- [standard/](/doc-types/standard/index.md) — The Standard doc-type — definition, contract shape, encoding, and residual ledger for the documents a card's Define cell points at

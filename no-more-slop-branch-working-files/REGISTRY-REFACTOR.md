@@ -105,8 +105,9 @@ hold goes in its type hint, not in a separate rule; a rule the type
 hints already imply is dropped. Pseudocode is a thinking aid for
 seeing the shape, not a target: no markdown is being translated to
 Python. The rows of a Standard, the lint rule IDs, and any repo-level
-binding object are below the level and stay out. The model of the
-level:
+binding object are below the level and stay out. Each doc-type's
+class lives in its own `contract-shape.md`, every doc-type alike. The
+model of the level:
 
 ```python
 class StandardCard(Object):
@@ -133,8 +134,8 @@ Standard-Card, Standard, Runbook. Nothing new is invented until a port
 needs it.
 
 **Standard's shape.** Two primitives roll into Standard: ObjectClass,
-the one class of thing with its exclusions, and Rule, name × guard ×
-predicate. A guard narrows the member set, the way layer membership
+the one class of thing with its exclusions, and Rule, name × condition ×
+predicate. A condition narrows the member set, the way layer membership
 does in the build standard and the kind of document does in the prose
 standard; None means every member. A Standard carries no pointer back
 to its card, which the path derives, and no rationale field. A rule
@@ -200,9 +201,14 @@ heuristics, anything a port cannot place. It exists so nothing is
 forgotten while the ports move fast; sorting it is its own action
 item, after the ports.
 
+**Condition, not guard.** The member subset a rule binds is its
+condition, the word Runbook already uses for what must hold for an
+edge to fire; one word serves both doc-types, and "guard" is not used.
+A rule with no condition binds every member.
+
 **One encoding.** One written form for the population, one for a rule
-with its name, one for a guard, designed for the parser and made once
-in the Standard doc-type's encoding file. Everything unmarked is opaque
+with its name, one for a condition, designed for the parser and made
+once in the Standard doc-type's encoding file. Everything unmarked is opaque
 prose the parser carries but never reads, so examples, definitions,
 and rationale sit wherever the writer wants them.
 
@@ -226,7 +232,7 @@ rules over three object classes, plus a definition of the Gate kind, a
 distribution channel, a procedure, and rationale. The proposed port:
 
 - Skeleton stays: layers.md merged into skeleton.md. Population: a
-  repo's tracked tree. Layer membership becomes the guards, read from
+  repo's tracked tree. Layer membership becomes the conditions, read from
   facts on disk; each entry is a presence rule, required, optional, or
   forbidden. Layers is not a Standard of its own.
 - Canonical Artifacts stays: canonical.md absorbs ci.md, make.md's
@@ -264,11 +270,13 @@ the paths a repo lists in `.prose-lint-exempt`; that declaration is
 conventions.md's opening paragraph. Roughly thirty rules across
 conventions.md and slop-tics.md. Most predicates are English and will
 stay English; a reviewer citing them satisfies the axis. Person of
-address is one rule with two guards, harness-loaded and declarative.
+address is one rule with two conditions, harness-loaded and declarative.
 Each tic's definition and before-and-after examples stay in the body,
 below the collapse, like a runbook's fine steps. "How to decide between
-section formats" is heuristics for a writer, not a rule; it leaves the
-Standard for the same parking lot as the build rationale. The lint
+section formats" read as a writer's heuristics on its heading alone;
+each of its bullets is a predicate over a block as it stands, so it
+stays as a rule under a stateful heading, Block form fits its
+content. The lint
 rule names do not match today's headings: `prose.banned-word` sits
 under "Terminology: the person is the user"; renaming happens at port
 time.
@@ -280,8 +288,10 @@ Located, because the user wanted to remember where it is. One home:
 binds every actor who touches the thing, whatever job that actor is
 doing; a procedure binds one actor for the length of one run. The split
 is declared "a general aim, not a strict gate". The
-imperative-versus-declarative voice rule is a separate rule, in
-[Doc Conventions](/standards/prose/conventions.md#person-of-address).
+imperative-versus-declarative voice rule is two conditioned rules in Doc
+Conventions,
+[Imperative and second person](/standards/prose/conventions.md#imperative-and-second-person)
+and [Third person](/standards/prose/conventions.md#third-person).
 
 ## Open questions
 
@@ -333,25 +343,37 @@ points a cell's bullets already had, the lead, the spaced em dash, the
 first link, and the bold gate; `scripts/cardgen` prints
 `card, cell, pointer` to `doc-types/standard-card/cards.txt` and fails
 on drift. Four bullets in four cards moved to fit the encoding, meaning
-kept. `doc-types/standard/` holds only its definition, the settled
-sentences, until its loop runs.
+kept.
 
-1. The Standard loop, design. Write `standard/`'s contract shape, the
-   two tables, and a draft encoding: the marks for the population, a
-   rule with its name, and a guard. Rewrite its definition as the
-   design settles.
-2. The Standard loop, files. Port every standard under every card,
+Drafted, awaiting the user's review: the Standard loop's design.
+`doc-types/standard/` holds the contract shape, the encoding, and a
+rewritten definition. The draft encoding names the cut points the
+corpus already had: the population is one frontmatter key,
+`population`, exclusions included; a rule is a heading, its slug the
+rule column, its first paragraph the predicate; a condition is an H2
+whose section holds H3 rules, its slug the `when` column. The rules table
+carries a card column, since `consuming.md` is a stem under two cards.
+Doc Conventions is ported as the proof: its five navigation headings
+went, its person-of-address rule became two rules under two conditions,
+and its section-format section stays as a rule under a stateful
+heading. The parking lot,
+[Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md),
+exists and is empty. Permanent files carry the design and no progress
+notes; what is ported, what is built, and what remains is tracked only
+here.
+
+1. The Standard loop, files. Port every standard under every card,
    rewriting the files into the encoding. Build first, with its split,
-   then Prose; those two fix the encoding, and the rest follow, each
+   then Slop Tics; those fix the encoding, and the rest follow, each
    card read and split in the moment the way Build was, with cards
-   added, merged, or removed as the reading demands. Record residuals.
-   Park the evicted rationale and heuristics in one parking-lot
-   location.
-3. The Standard loop, code. The generator, chaingen's sibling, that
-   prints the standards and rules tables to one file and fails on
-   drift.
-4. Decide what becomes of the parked rationale.
-5. Then the remaining open questions.
+   added, merged, or removed as the reading demands. Record residuals
+   in `doc-types/standard/residual-ledger.md`. Park the evicted
+   rationale and heuristics in the parking lot.
+2. The Standard loop, code. `scripts/rulegen`, cardgen's sibling, that
+   prints the standards and rules tables to
+   `doc-types/standard/standards.txt` and fails on drift.
+3. Decide what becomes of the parked rationale.
+4. Then the remaining open questions.
 
 ## Acronyms
 

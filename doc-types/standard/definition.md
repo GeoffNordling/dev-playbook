@@ -1,20 +1,25 @@
 ---
 type: General-Sheet
 title: Standard
-description: What a Standard is — one object class as its population, plus named rules over that class's state — and where it lives
+description: What a Standard is — one class of object as its population, plus named rules over one member's state — the family it serves, and where it lives
 ---
 
 # Standard
 
 A **Standard** is the kind a card's Define cell points at
-([Standard-Card](/doc-types/standard-card/definition.md)): one object
-class as its population, plus named rules, each a predicate over that
-class's state. A reviewer or a lint cites a Standard to reject work; the
+([Standard-Card](/doc-types/standard-card/definition.md)): one class of
+object as its population, plus named rules, each a predicate over one
+member's state. A reviewer or a lint cites a rule to reject work; the
 rejection is about the state of one object at one moment, never about
-the process that produced it. The documents typed `Standard` under the
-card directories are the family. Its loop has not run: this file holds
-what is settled, and the contract shape, the encoding, the generator,
-and the residual ledger arrive with the loop.
+the process that produced it.
+
+The family is the documents typed `Standard` under the card
+directories: `standards/prose/conventions.md` binds an authored
+document, `standards/build/skeleton.md` binds a repo's tracked tree. A
+Standard does one thing
+([System Legibility](/docs/system-legibility.md#standing-principles)):
+its population and its rules. Rationale, procedure, and a writer's
+heuristics are other documents' things.
 
 ## Where a Standard lives
 

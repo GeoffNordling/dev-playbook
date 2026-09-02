@@ -25,7 +25,7 @@ ruled important.
 |---|---|---|
 | Skill | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
 | Agent definition | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
-| Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type — its loop not yet run |
+| Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
 | Standard-Card | cards | The [Standard-Card](/doc-types/standard-card/definition.md) doc-type |
 | Guide | guides | Important; no doc-type built yet |
 | Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |
@@ -34,16 +34,14 @@ Any registry kind absent from this table is ruled not important.
 
 ## The roster
 
-Three doc-types: two built, one sparse and one deep, and a third whose
-loop has not run.
+Three doc-types: Standard-Card sparse, Runbook and Standard deep.
 
 **Standard-Card** — a card is the catalog record for one standard,
 named by the question the standard governs
 ([definition](/doc-types/standard-card/definition.md)). It carries
-type-level grain: one contract serves every card. Its shape — the four
-cells — is declared in
-[contract-shape.md](/doc-types/standard-card/contract-shape.md), and
-`scripts/cardgen` collapses every card to rows of `card, cell, pointer`.
+type-level grain: one contract serves every card. Its shape is the
+four cells, and `scripts/cardgen` collapses every card to rows of
+`card, cell, pointer`.
 Its fixed composition rule keeps the machinery sparse: headings suffice,
 and its determinism lives in the audit linters and enforcement gates its
 cards point at.
@@ -61,22 +59,20 @@ Standard-Card
 ```
 
 **Standard** — a Standard is the kind a card's Define cell points at:
-one object class as its population, plus named rules over that class's
-state ([definition](/doc-types/standard/definition.md)). Its loop has not
-run; the definition is what is settled.
+one class of object as its population, plus named rules over one
+member's state ([definition](/doc-types/standard/definition.md)). It
+carries instance-level grain: every Standard owns a distinct rule set.
+Its shape is one population and its rules, and `scripts/rulegen`
+collapses every Standard to two tables, `card, standard, population`
+and `card, standard, rule, when`.
 
 **Runbook** — a runbook is an invocable command: a skill or an
 agent definition
 ([definition](/doc-types/runbook/definition.md)).
 It carries instance-level grain: every runbook owns a distinct
-chain. Its shape is declared in
-[contract-shape.md](/doc-types/runbook/contract-shape.md),
-its encoding layer in
-[encoding.md](/doc-types/runbook/encoding.md),
-its residuals in
-[residual-ledger.md](/doc-types/runbook/residual-ledger.md).
-Its free composition rule demands deep machinery: a grammar, a
-parser, a drift check.
+chain. Its shape is the Reference chain, and `scripts/chaingen`
+draws every runbook's chain. Its free composition rule demands deep
+machinery: a grammar, a parser, a drift check.
 
 ```
 Runbook
@@ -98,6 +94,23 @@ its contract the way a runbook's prose body sits below its chain.
 Instances never live in the doc-type tree — they stay with their
 populations, and a contract rides inside its instance file.
 
+## The bundle
+
+A built doc-type is one directory under `doc-types/`, and every
+directory holds the same files, each one layer. `definition.md` says
+what the kind is and names its family. `contract-shape.md` declares
+the shape, in prose and in one screen of pseudocode, a class with
+typed fields and rules over its own state, and the view: the CLOA
+object every instance collapses to.
+`encoding.md` is the layer below the shape: how the family's instances
+are written so deterministic code generates the view, the primitive
+map of [Doc-Type](/doc-types/doc-type.md#layers-and-the-primitive-map)
+written down. A generator under `scripts/` writes the view to one
+file in the directory and fails on drift with `--check`.
+`residual-ledger.md` records what the shape cannot express, one entry
+per instance that has one. Each file holds its own layer and the
+directory's `index.md` is the map between them.
+
 ## Shape and obligation
 
 A doc-type declares what a contract shape *is*; it never binds
@@ -117,3 +130,7 @@ It never copies the kind definition or a shape. This is the
 workspace's general pattern: dev-playbook declares a system once,
 every consumer repo inherits it, and a repo declares only what is
 local to it.
+
+## Acronyms
+
+- **CLOA** — Correct Level of Abstraction.
