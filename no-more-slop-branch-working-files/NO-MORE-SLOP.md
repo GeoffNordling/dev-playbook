@@ -55,6 +55,12 @@ and
 [encoding.md](/doc-types/runbook/encoding.md).
 The items, each a future work session:
 
+- **The registry refactor.** Settle what a Standard is, what a Guide
+  is, and how the kinds are organized, before building any new
+  doc-type. The decisions so far and the open questions are in
+  [Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md).
+  Next: write the abstractions as pseudocode on screen and work the
+  open questions at that level.
 - **When the parser runs.** The move landed the parser at
   `scripts/chaingen`, writing its generated view to
   `doc-types/runbook/chains.txt` — a temporary location, to be settled
