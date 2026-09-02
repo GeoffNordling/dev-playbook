@@ -1,18 +1,21 @@
 ---
 type: General-Sheet
-title: Standard Card
-description: The card — Standard's contract shape — four pointer cells that catalog every standard for one-hop lookup
+title: Card Cells
+description: The four cells — Standard-Card's contract shape — and the one relation every card collapses to, card × cell × pointer
 ---
 
-# Standard Card
+# Card Cells
 
-The card is Standard's contract shape. Returning to a topic months
-later should not require re-deriving shared understanding over several
-turns of conversation. Each standard therefore gets a **standard
-card**: a small fixed-format record that tells a user or agent where
-to look. The files it points at define the standard; the card
-aggregates pointers so a thought that originates at the abstract level
-("how do we do X here?") resolves to concrete files in one hop.
+The four cells are Standard-Card's contract shape
+([Doc-Type](/doc-types/doc-type.md)): the form every card's contract
+takes. Returning to a topic months later should not require re-deriving
+shared understanding over several turns of conversation. Each standard
+therefore gets a **standard card**: a small fixed-format record that tells
+a user or agent where to look. The files it points at define the
+standard; the card aggregates pointers so a thought that originates at
+the abstract level ("how do we do X here?") resolves to concrete files in
+one hop. How a cell's bullets are written sits one layer down in
+[encoding.md](/doc-types/standard-card/encoding.md).
 
 ## The card
 
@@ -27,8 +30,8 @@ annotated pointers; an empty cell states an explicit "none" so gaps stay
 visible. Cards are thin — often just a handful of pointers — and never
 restate the content of their targets.
 
-- **Define** — the contract: prose documents and canonical reference
-  files.
+- **Define** — the Standards: documents typed `Standard`, each one
+  population and its rules.
 - **Audit** — read-only deviation detection: the detectors that report
   nonconformance without blocking anything.
 - **Enforce** — blocking gates: the rungs where nonconformance stops the
@@ -48,3 +51,28 @@ The cards themselves are the examples: [Build](/standards/build.md) and
 [Meta-Standard](/standards/standard.md) — the latter is the card of the
 standard that governs cards, since the meta-standard is an instance of
 the format it defines.
+
+## The view
+
+Every card in the catalog collapses to rows of one relation,
+`card, cell, pointer`. `scripts/cardgen` writes the whole catalog to
+`doc-types/standard-card/cards.txt` and, with `--check`, fails on drift:
+
+```
+card     cell     pointer
+build    define   /standards/build/canonical.md
+build    audit    /scripts/repo-lint
+build    enforce  commit gate
+modules  audit    none
+```
+
+A Define, Audit, or Adopt pointer is the file a bullet leads with, or the
+bare name of a third-party detector cited by its pin. An Enforce pointer
+is one of the three gate names. An empty cell is one `none` row, so the
+gap stays visible in the view as it does in the card. Cards sort
+alphabetically, cells keep the card's order, and pointers keep their
+bullet order. The annotation after each pointer stays below the collapse,
+in the card.
+
+Whatever a card cannot express in its cells is a residual, recorded in
+[residual-ledger.md](/doc-types/standard-card/residual-ledger.md).

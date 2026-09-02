@@ -18,7 +18,7 @@ anti-pattern catalog.
 
 - [python-lint](/scripts/python-lint) — the workspace Python-source
   detector; read-only, run ad hoc or by the suite
-- ruff (`ruff-check`) — third-party lint and docstring detector (the
+- ruff — third-party lint and docstring detector, hook `ruff-check` (the
   pydocstyle `D` family, configured in the canonical
   [pyproject.toml](/standards/build/canonical/pyproject.toml)), located by its
   pin in the canonical

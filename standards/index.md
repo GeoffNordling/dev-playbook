@@ -2,7 +2,7 @@
 
 The catalog: every standard has a card here (`type: Standard-Card`), and
 each card's cells point at the files that define, audit, enforce, and
-adopt it. See [Standard Card](/doc-types/standard/contract-shape.md).
+adopt it. See [Card Cells](/doc-types/standard-card/contract-shape.md).
 Ordering: README, then the cards — meta-standard first, the rest
 alphabetical — then the contract documents not listed by a child index,
 alphabetical; directories last.
@@ -20,7 +20,6 @@ alphabetical; directories last.
 - [Python Testing](/standards/testing.md) — Governs how Python tests are written — structure, behavioral focus, test doubles, fixtures, and humble objects
 - [Semantic Validation](/standards/semantic-validation.md) — Governs how claims only language can check — accuracy, honesty, scope — are validated and kept from drifting as the underlying files change
 - [Shell](/standards/shell.md) — Governs how shell is written — the glue-only boundary, strict mode, declared bash, and shellcheck-clean
-- [Software Factory](/standards/software-factory.md) — Governs how an idea becomes a merged pull request — the state graph, the node contracts, review, and the user's checkpoints
 - [Tracking](/standards/tracking.md) — Governs how work is tracked — candidates, issue authoring, factory labels, tracker operations, and repository settings
 - [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 - [Decision Record Conventions](/standards/decisions/records.md) — When to write a Decision Record, its template, sequential numbering, immutability, status vocabulary, scope, and the hard-to-reverse-or-surprising bar that justifies one

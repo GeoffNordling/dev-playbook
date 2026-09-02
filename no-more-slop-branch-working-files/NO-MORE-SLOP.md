@@ -57,13 +57,11 @@ The items, each a future work session:
 
 - **The registry refactor.** Settle what a Standard is, what a Guide
   is, and how the kinds are organized, before building any new
-  doc-type. The decisions so far and the open questions are in
+  doc-type. The decisions, the open questions, and the next steps are
+  in
   [Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md).
-  The shapes are settled and the end product is named: two generated
-  tables, standards and rules. Next: refactor `doc-types/` into three,
-  design the Standard encoding, write the generator, then port Build
-  and Prose. What has worked while constructing CLOA objects is noted
-  as it occurs in
+  What has worked while constructing CLOA objects is noted as it
+  occurs in
   [Algorithm Notes](/no-more-slop-branch-working-files/ALGORITHM-NOTES.md).
 - **When the parser runs.** The move landed the parser at
   `scripts/chaingen`, writing its generated view to
@@ -74,7 +72,7 @@ The items, each a future work session:
   shadowing lint parallel to `standard.card-shadows-upstream` (a
   repo-local runbook may not reuse an upstream runbook's name), and
   where the no-shadowing rule itself lives — today it sits in
-  [definition.md](/doc-types/standard/definition.md)'s Scope.
+  [definition.md](/doc-types/standard-card/definition.md)'s Scope.
   Hierarchical imports across repositories are the mechanism under
   both; get that right, not fast.
 - **The doc-type loop over the rest of the corpus.** Guide is

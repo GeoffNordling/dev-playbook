@@ -4,7 +4,7 @@
 # Enforce, and Adopt cells names a real artifact that genuinely serves that
 # cell's role, any cell that declares "none" is genuinely empty, and no cell
 # misrepresents what its targets do. Evidence is the card under trial; reference
-# is doc-types/standard/contract-shape.md (the card contract) plus the artifacts the
+# is doc-types/standard-card/contract-shape.md (the card contract) plus the artifacts the
 # card points at. One judgment per card -- semantic honesty the deterministic
 # standards-lint cannot check. See standards/semantic-validation/.
 judgments:
@@ -16,7 +16,7 @@ judgments:
       misrepresents what its targets do.
     evidence:  [standards/build.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/build/index.md
       - standards/build/canonical.md
       - scripts/repo-lint
@@ -35,7 +35,7 @@ judgments:
       misrepresents what its targets do.
     evidence:  [standards/standard.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - scripts/standards-lint
       - judgments/standard-cards.yaml
       - .pre-commit-config.yaml
@@ -52,7 +52,7 @@ judgments:
       standard, and no cell misrepresents what its targets do.
     evidence:  [standards/harness.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/harness/index.md
       - standards/harness/files.md
       - standards/harness/claude-content.md
@@ -73,7 +73,7 @@ judgments:
       no cell misrepresents what its targets do.
     evidence:  [standards/knowledge-organization.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/knowledge-organization/index.md
       - scripts/okf-lint
       - scripts/ref-lint
@@ -90,7 +90,7 @@ judgments:
       standard, and no cell misrepresents what its targets do.
     evidence:  [standards/semantic-validation.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/semantic-validation/index.md
       - standards/semantic-validation/cache-gate.md
       - standards/semantic-validation/consuming.md
@@ -108,7 +108,7 @@ judgments:
       truly empty, and no cell misrepresents what its targets do.
     evidence:  [standards/prose.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/prose/conventions.md
       - scripts/prose-lint
       - standards/harness.md
@@ -123,7 +123,7 @@ judgments:
       misrepresents what its targets do.
     evidence:  [standards/python.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/python/style.md
       - scripts/python-lint
       - standards/build/canonical/.pre-commit-config.yaml
@@ -139,7 +139,7 @@ judgments:
       misrepresents what its targets do.
     evidence:  [standards/shell.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/shell/conventions.md
       - standards/build/canonical/.pre-commit-config.yaml
     model: claude-sonnet-5
@@ -153,7 +153,7 @@ judgments:
       misrepresents what its targets do.
     evidence:  [standards/testing.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/testing/conventions.md
       - scripts/testing-lint
       - standards/build/canonical/Makefile.python
@@ -169,7 +169,7 @@ judgments:
       misrepresents what its targets do.
     evidence:  [standards/tracking.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/tracking/index.md
       - standards/tracking/candidates.md
       - standards/tracking/issue-authoring.md
@@ -181,31 +181,6 @@ judgments:
     model: claude-sonnet-5
     effort: high
 
-  - id: standard-card-software-factory
-    claim: |
-      standards/software-factory.md is an honest card: every pointer in its
-      define, audit, enforce, and adopt cells names a real artifact that
-      genuinely serves that cell's role for the software factory standard, its
-      empty cells are truly empty, and no cell misrepresents what its
-      targets do.
-    evidence:  [standards/software-factory.md]
-    reference:
-      - doc-types/standard/contract-shape.md
-      - software-factory/software-factory.md
-      - software-factory/factory-operations.md
-      - software-factory/user-checkpoints.md
-      - software-factory/node-agent-and-skill-authoring.md
-      - software-factory/review-contract.md
-      - software-factory/pr-feedback.md
-      - software-factory/tdd.md
-      - software-factory/refactor-catalogue.md
-      - software-factory/deviation-contract.md
-      - scripts/traverse-issue
-      - scripts/workspace-lint
-      - src/dev_playbook/workspace_lint.py
-    model: claude-sonnet-5
-    effort: high
-
   - id: standard-card-instrument
     claim: |
       standards/instrument.md is an honest card: every pointer in its
@@ -214,7 +189,7 @@ judgments:
       no cell misrepresents what its targets do.
     evidence:  [standards/instrument.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/instrument/format.md
       - scripts/okf-lint
       - instruments/index.md
@@ -231,7 +206,7 @@ judgments:
       do.
     evidence:  [standards/modules.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/modules/design.md
       - dotfiles/dot-claude/skills/improve-codebase-architecture/SKILL.md
     model: claude-sonnet-5
@@ -245,7 +220,7 @@ judgments:
       and no cell misrepresents what its targets do.
     evidence:  [standards/decisions.md]
     reference:
-      - doc-types/standard/contract-shape.md
+      - doc-types/standard-card/contract-shape.md
       - standards/decisions/records.md
       - scripts/decisions-lint
     model: claude-sonnet-5

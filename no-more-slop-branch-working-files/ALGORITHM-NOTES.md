@@ -54,6 +54,17 @@ to whatever group of documentation is in hand: a sequence, a relation,
 a tree, a graph. Which one is decided case by case, not by what
 worked last time.
 
+## Read the corpus for cut points before inventing marks
+
+The card generator needed no new mark. Every card already wrote its
+bullets one way: a lead, a spaced em dash, an annotation, and in
+Enforce a gate name in bold. The encoding named those cut points and
+the generator sliced on them; only four bullets in four cards had to
+move, and each move was a remark that had been sitting in a bullet.
+Before designing marks for a kind, read how its files already write
+the thing the view needs. The marks may already be there, and an
+encoding that names what exists costs the port almost nothing.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

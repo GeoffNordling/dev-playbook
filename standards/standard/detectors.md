@@ -7,9 +7,11 @@ description: The detector contract behind every Audit cell and the drift machine
 # Detectors and Drift
 
 The Meta-Standard card's machinery: the contract every detector obeys
-and the drift checks that keep standards meaning what they meant. What
-a standard *is* and the card shape it carries are declared in the
-Standard doc-type ([doc-types/standard/](/doc-types/standard/index.md)).
+and the drift checks that keep standards meaning what they meant. The
+card shape is declared in the Standard-Card doc-type
+([doc-types/standard-card/](/doc-types/standard-card/index.md)); what a
+standard *is* belongs to the Standard doc-type
+([doc-types/standard/](/doc-types/standard/index.md)).
 
 ## Detectors
 

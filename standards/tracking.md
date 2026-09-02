@@ -54,10 +54,11 @@ this one's.
   inside the file is convention, not a checked rule — a candidate register that
   drifts into a shadow issue tracker is an authoring problem, not a detector
   gap
-- GitHub itself sits outside every gate: workspace-lint reports, the weekly
-  ritual and bootstrap-labels repair, but nothing blocks a malformed issue, a
-  drifted label, or a drifted setting. Settings repairs stay manual — admin
-  permissions are too broad to automate, so no repair tool is built
+
+GitHub itself sits outside every gate: workspace-lint reports, the weekly
+ritual and bootstrap-labels repair, but nothing blocks a malformed issue, a
+drifted label, or a drifted setting. Settings repairs stay manual — admin
+permissions are too broad to automate, so no repair tool is built.
 
 ## Adopt
 

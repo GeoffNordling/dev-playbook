@@ -89,7 +89,10 @@ linked from a Standard's prose, never from a card.
 **The software factory.** Its current documentation is not worth
 reorganizing around, and it is not the long-term state. It stays typed
 `Guide` for now, knowingly mislabeled, and the factory needs no card
-until its rules exist. The intended split, when the rewrite comes:
+until its rules exist: the card `standards/software-factory.md` is
+deleted, since every file its Define cell pointed at was a Guide, and a
+card returns when a Standard exists to point at. The intended split,
+when the rewrite comes:
 object-state rules (the pull request body's sections, the cycle header,
 the label four-tuple) become a Standard under
 `standards/software-factory/`; the two regions and the moves between
@@ -269,8 +272,6 @@ imperative-versus-declarative voice rule is a separate rule, in
 
 Raised, not settled. No lean recorded.
 
-- The fate of the existing card `standards/software-factory.md`, which
-  lists all nine factory documents in its Define cell.
 - What replaces `General-Sheet`, which the user named a cop-out, and
   what type working-set files carry.
 - The type the doc-type family's own files carry.
@@ -310,28 +311,32 @@ In order. Each kind runs one loop: design, then the files, then the
 code that reads them. Code comes last because it reads what the design
 and the ported files say.
 
-1. Refactor `doc-types/` into `standard-card/`, `standard/`,
-   `runbook/`.
-2. The card loop. Confirm the Standard-Card design, which is settled
-   above and already linted; move the built doc-type's files to
-   `standard-card/` under their real name; then write the generator
-   that prints `card, cell, pointer`. The population column is not
-   the card's and arrives in the next loop.
-3. The Standard loop, design. Write `standard/`'s definition and
-   contract shape, the two tables, and a draft encoding: the marks for
-   the population, a rule with its name, and a guard.
-4. The Standard loop, files. Port every standard under every card,
+Done: `doc-types/` is three, `standard-card/`, `standard/`, `runbook/`,
+and the card loop is closed. The Standard-Card files sit under their
+real name, `doc-types/standard-card/`; its encoding names the cut
+points a cell's bullets already had, the lead, the spaced em dash, the
+first link, and the bold gate; `scripts/cardgen` prints
+`card, cell, pointer` to `doc-types/standard-card/cards.txt` and fails
+on drift. Four bullets in four cards moved to fit the encoding, meaning
+kept. `doc-types/standard/` holds only its definition, the settled
+sentences, until its loop runs.
+
+1. The Standard loop, design. Write `standard/`'s contract shape, the
+   two tables, and a draft encoding: the marks for the population, a
+   rule with its name, and a guard. Rewrite its definition as the
+   design settles.
+2. The Standard loop, files. Port every standard under every card,
    rewriting the files into the encoding. Build first, with its split,
    then Prose; those two fix the encoding, and the rest follow, each
    card read and split in the moment the way Build was, with cards
    added, merged, or removed as the reading demands. Record residuals.
    Park the evicted rationale and heuristics in one parking-lot
    location.
-5. The Standard loop, code. The generator, chaingen's sibling, that
+3. The Standard loop, code. The generator, chaingen's sibling, that
    prints the standards and rules tables to one file and fails on
    drift.
-6. Decide what becomes of the parked rationale.
-7. Then the remaining open questions.
+4. Decide what becomes of the parked rationale.
+5. Then the remaining open questions.
 
 ## Acronyms
 

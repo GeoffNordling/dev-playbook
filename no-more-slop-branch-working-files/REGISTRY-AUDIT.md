@@ -49,7 +49,7 @@ instances.
 
 ## What the General-Sheet files hold
 
-Twenty files. Each row is a reading of the file's content.
+Twenty-one files. Each row is a reading of the file's content.
 
 | File | What it holds |
 |---|---|
@@ -59,10 +59,11 @@ Twenty files. Each row is a reading of the file's content.
 | doc-types/runbook/contract-shape.md | the Runbook doc-type's shape |
 | doc-types/runbook/encoding.md | the Runbook doc-type's encoding spec |
 | doc-types/runbook/residual-ledger.md | a table, one row per ported runbook |
-| doc-types/standard/definition.md | the Standard doc-type's definition |
-| doc-types/standard/contract-shape.md | the Standard doc-type's shape |
-| doc-types/standard/encoding.md | the Standard doc-type's encoding spec |
-| doc-types/standard/residual-ledger.md | a table, empty |
+| doc-types/standard-card/definition.md | the Standard-Card doc-type's definition |
+| doc-types/standard-card/contract-shape.md | the Standard-Card doc-type's shape, with the generated view |
+| doc-types/standard-card/encoding.md | the Standard-Card doc-type's encoding spec |
+| doc-types/standard-card/residual-ledger.md | one entry, software-factory |
+| doc-types/standard/definition.md | the Standard doc-type's definition, settled sentences only |
 | docs/system-legibility.md | the doctrine |
 | docs/writing-improvement-process.md | a process description, its attempts, principles, and platform facts, four H2s |
 | docs/writing-improvement-process/writing-improvement-log.md | newest-first entries, one per writing session |
@@ -83,8 +84,9 @@ files.
 
 ## What the Guide files hold
 
-Nine files, all under `software-factory/`. All nine are listed in the
-Define cell of [the Software Factory card](/standards/software-factory.md).
+Nine files, all under `software-factory/`. All nine were listed in the
+Define cell of the Software Factory card, `standards/software-factory.md`,
+since deleted.
 The registry defines Guide as "a teaching or procedure doc, read to
 learn how to do or think about something, not to be measured against".
 Three name themselves a contract in their own title or description:

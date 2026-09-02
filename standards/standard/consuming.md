@@ -12,7 +12,7 @@ convention no other repo shares declares its own **repo-scoped** standard: the
 same card-and-detector machinery the
 [Meta-Standard](/standards/standard.md) card defines, hosted in the consumer
 repo instead of dev-playbook. The recipe below is end-to-end; the card format
-is defined in [contract-shape.md](/doc-types/standard/contract-shape.md), the
+is defined in [contract-shape.md](/doc-types/standard-card/contract-shape.md), the
 detector contract and the hosting pattern in
 [detectors.md](/standards/standard/detectors.md).
 

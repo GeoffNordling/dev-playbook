@@ -25,8 +25,8 @@ ruled important.
 |---|---|---|
 | Skill | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
 | Agent definition | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
-| Standard | cards | The [Standard](/doc-types/standard/definition.md) doc-type |
-| Standard-Card | cards | The [Standard](/doc-types/standard/definition.md) doc-type — its catalog surface |
+| Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type — its loop not yet run |
+| Standard-Card | cards | The [Standard-Card](/doc-types/standard-card/definition.md) doc-type |
 | Guide | guides | Important; no doc-type built yet |
 | Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |
 
@@ -34,19 +34,22 @@ Any registry kind absent from this table is ruled not important.
 
 ## The roster
 
-Two doc-types are built, one sparse and one deep.
+Three doc-types: two built, one sparse and one deep, and a third whose
+loop has not run.
 
-**Standard** — a standard states a rule the workspace holds itself
-to, named by the question it governs
-([definition](/doc-types/standard/definition.md)). It carries type-level
-grain: one contract serves every card. Its shape — the card — is
-declared in [contract-shape.md](/doc-types/standard/contract-shape.md). Its fixed
-composition rule keeps the machinery sparse: headings suffice, and
-its determinism lives in the audit linters and enforcement gates its
+**Standard-Card** — a card is the catalog record for one standard,
+named by the question the standard governs
+([definition](/doc-types/standard-card/definition.md)). It carries
+type-level grain: one contract serves every card. Its shape — the four
+cells — is declared in
+[contract-shape.md](/doc-types/standard-card/contract-shape.md), and
+`scripts/cardgen` collapses every card to rows of `card, cell, pointer`.
+Its fixed composition rule keeps the machinery sparse: headings suffice,
+and its determinism lives in the audit linters and enforcement gates its
 cards point at.
 
 ```
-Standard
+Standard-Card
   operations:   define audit enforce adopt
   composition:  one of each
     │
@@ -56,6 +59,11 @@ Standard
            ├─ the build card — its four sections filled
            └─ … one per card in the catalog
 ```
+
+**Standard** — a Standard is the kind a card's Define cell points at:
+one object class as its population, plus named rules over that class's
+state ([definition](/doc-types/standard/definition.md)). Its loop has not
+run; the definition is what is settled.
 
 **Runbook** — a runbook is an invocable command: a skill or an
 agent definition
@@ -83,8 +91,8 @@ Runbook
            └─ … one per runbook
 ```
 
-A card is to Standard what `/intake` is to Runbook: one instance, one
-filled shape, one contract. The detail files under a card sit below
+A card is to Standard-Card what `/intake` is to Runbook: one instance,
+one filled shape, one contract. The detail files under a card sit below
 its contract the way a runbook's prose body sits below its chain.
 
 Instances never live in the doc-type tree — they stay with their
@@ -98,12 +106,12 @@ must carry its contract — is a Standard card's job: Runbook's
 obligation rides
 [runbook-conventions](/standards/harness/runbook-conventions.md),
 audited by the chain drift check. The shape is never itself a
-Standard, so Standard and Runbook remain peers in this roster.
+Standard, so Standard-Card and Runbook remain peers in this roster.
 
 ## The import surface
 
 A consumer repo writes its own doc-type-system file: an import
-declaration — Runbook and Standard, from dev-playbook — plus its
+declaration — Runbook and Standard-Card, from dev-playbook — plus its
 local rulings, and a doc-type of its own only when it declares one.
 It never copies the kind definition or a shape. This is the
 workspace's general pattern: dev-playbook declares a system once,

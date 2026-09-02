@@ -17,8 +17,8 @@ standard's contract, checkers, gates, and adoption helpers. Every directory
 holds content the cards point into: a standard's contract prose (`build/`
 behind `build.md`), templates, or vendored references. The rule is the
 tree: **flat = card, directory = content**. The contract behind the cards
-themselves is the Standard doc-type
-([doc-types/standard/](/doc-types/standard/index.md)).
+themselves is the Standard-Card doc-type
+([doc-types/standard-card/](/doc-types/standard-card/index.md)).
 
 ## Rules live here; their subjects live elsewhere
 

@@ -11,12 +11,16 @@ kept honest — the card format, the catalog, and drift.
 
 ## Define
 
-- [Standard](/doc-types/standard/definition.md) — what a standard is and
-  is not, and the scope axis
-- [Standard Card](/doc-types/standard/contract-shape.md) — the card:
-  Standard's contract shape, four pointer cells
-- [Standard Card Encoding](/doc-types/standard/encoding.md) — where a
-  standard lives, naming, and the catalog
+- [Standard-Card](/doc-types/standard-card/definition.md) — what a
+  standard card is and is not, and the scope axis
+- [Card Cells](/doc-types/standard-card/contract-shape.md) — the card:
+  Standard-Card's contract shape, four pointer cells, and the generated
+  view every card collapses to
+- [Card Cells Encoding](/doc-types/standard-card/encoding.md) — how a
+  cell's bullets encode pointers, where a card lives, naming, and the
+  catalog
+- [Standard](/doc-types/standard/definition.md) — what a Standard is: a
+  population and the rules over it, and where it lives
 - [Detectors and Drift](/standards/standard/detectors.md) — the detector
   contract and the drift machinery
 

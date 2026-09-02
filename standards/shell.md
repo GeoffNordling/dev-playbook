@@ -20,9 +20,10 @@ declared bash, and shellcheck-clean.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
 - shfmt — third-party formatting detector, located by its pin in the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-- third-party detectors only, by choice: rules 1–3 of the contract (boundary,
-  strict mode, declared bash) are prose the reviewer checks, so no first-party
-  shell detector exists — a chosen gap, not a forgotten one
+
+Third-party detectors only, by choice: rules 1–3 of the contract (boundary,
+strict mode, declared bash) are prose the reviewer checks, so no first-party
+shell detector exists — a chosen gap, not a forgotten one.
 
 ## Enforce
 
