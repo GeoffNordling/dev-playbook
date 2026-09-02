@@ -54,6 +54,7 @@ the set's root file, and that auditor's assigned sections:
   [lead with the edge case](~/workspace/dev-playbook/standards/prose/conventions.md#lead-with-the-edge-case-when-reach-is-surprising),
   [block form](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
   [positive statement](~/workspace/dev-playbook/standards/prose/conventions.md#positive-statement),
+  [no slop tics](~/workspace/dev-playbook/standards/prose/conventions.md#no-slop-tics),
   [imperative and second person](~/workspace/dev-playbook/standards/prose/conventions.md#imperative-and-second-person),
   [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person),
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
