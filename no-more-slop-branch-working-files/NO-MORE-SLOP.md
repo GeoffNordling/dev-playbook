@@ -67,12 +67,6 @@ The items, each a future work session:
   [definition.md](/doc-types/standard/definition.md)'s Scope.
   Hierarchical imports across repositories are the mechanism under
   both; get that right, not fast.
-- **Say the determinism outright.** Every CLOA object — a chain, a
-  graph, a report — is built by 100% deterministic code. The doctrine
-  implies this everywhere and states it nowhere; one sentence in
-  [System Legibility](/docs/system-legibility.md) (the bedrock or the
-  standing principles) settles it. This file does not count — it dies
-  at merge.
 - **The doc-type loop over the rest of the corpus.** Guide is
   untouched, and it is roughly half of the meaningful documentation in
   this repo. Run the loop there: new doc-types as peers of Standard
@@ -95,6 +89,12 @@ The items, each a future work session:
 
 **Completed**
 
+- **The determinism said outright.**
+  [System Legibility](/docs/system-legibility.md) now defines the CLOA
+  object under Determinism as a forcing function: only deterministic
+  code stands between a CLOA object and the system it shows —
+  generated from it, or declared by the user and checked against it.
+  No agent stands in that gap.
 - **CLOA primitives.** Three bootstrap runs plus an empirical close-out
   constructed a converged primitive set describing what documentation does
   at the CLOA; it settled as the Runbook doc-type's operations
@@ -352,6 +352,11 @@ works the term holds the detail. Every one is a tentative promotion to
 - **CLOA** — the best-effort shared level where the user and the AI
   communicate in the exact same terminology: the highest level the user
   can trust the AI at, the lowest the AI needs the user at
+  ([System Legibility](/docs/system-legibility.md)).
+- **CLOA object** — an artifact that shows the system at the CLOA, with
+  only deterministic code between it and the system: generated from it
+  (a chain, a graph, a report) or declared by the user and checked
+  against it (an import contract, a card)
   ([System Legibility](/docs/system-legibility.md)).
 - **composition rule** — how many operations an instance may carry and in
   what arrangement

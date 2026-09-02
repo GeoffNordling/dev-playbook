@@ -75,7 +75,10 @@ Pandas and Git impose
 their abstractions uncompromisingly; a wrong mental model of their operations fails fast upon contact with reality.
 The solution is determinism. We must deliberately engineer deterministic
 forcing functions at the CLOA. By building observation platforms over the
-garden; the user maintains sight of the AI and keeps it aligned with their intent.
+garden, the user maintains sight of the AI and keeps it aligned with their intent.
+
+CLOA platforms are 100% deterministic objects that give the user and AI
+one shared view of the system.
 
 ### Documentation is code
 
