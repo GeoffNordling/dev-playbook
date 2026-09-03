@@ -55,10 +55,9 @@ the set's root file, and that auditor's assigned sections:
   [block form](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
   [positive statement](~/workspace/dev-playbook/standards/prose/conventions.md#positive-statement),
   [no slop tics](~/workspace/dev-playbook/standards/prose/conventions.md#no-slop-tics),
-  [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person),
-  the rule under the
-  [declarative documents](~/workspace/dev-playbook/standards/prose/conventions.md#declarative-documents)
-  condition that a set member meets,
+  [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person)
+  — a set member is always a declarative document, never harness-loaded,
+  so imperative and second person never binds it,
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
   [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
