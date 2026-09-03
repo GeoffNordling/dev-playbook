@@ -26,6 +26,11 @@ contract.
   `gh api`, writing findings to stdout and a summary to stderr — reading
   remote state and mutating nothing git tracks — so it is read-only and
   belongs in an Audit cell.
+- **A formatter is a detector by its check mode.** `shfmt -d` and
+  `ruff format --check` report and mutate nothing, so the tool is a
+  detector and an Audit cell cites it. The commit gate stations the write
+  mode, `shfmt -w`, and that run is Enforcement, never an audit
+  ([Vocabulary](/CONTEXT.md#governance)).
 - **Wired throughout its scope; applicability lives inside the detector.** A
   workspace-scoped detector runs in every repo, a repo-scoped one throughout
   its host repo; the population it governs runs the full menu, never a

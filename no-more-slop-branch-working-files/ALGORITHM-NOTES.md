@@ -136,6 +136,18 @@ and CONTEXT.md Content. Both resolved the same way: the object class
 decides which Standard a rule sits in, and the lint id follows it or is
 shared. Bundle at the lint's grain sets a rule's size, never its home.
 
+## Place by effect, mark by trigger
+
+The deslop skill fit no cell: it mutates, so not Audit as defined; it
+is not gated, so not Enforce as defined; and it runs routinely, so not
+Adopt as intended. The first instinct, a fifth cell, would have changed
+the layout rule, cardgen, and every card for a distinction the commit
+gate does not make, since `ruff format` rewrites there already. The
+English words settled it: an audit only reports, and to enforce is to
+compel, by hand as much as by machine. A cell is chosen by what a tool
+does to the object, and how it is triggered is one bold word inside the
+bullet.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

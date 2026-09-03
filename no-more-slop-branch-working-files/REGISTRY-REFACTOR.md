@@ -223,6 +223,16 @@ GitHub slug, the anchor a link to the section uses and the one
 ref-lint resolves. A condition's `when` value is the same slug. No
 second naming rule.
 
+**Enforce has two modes.** Audit reports and never mutates, which is
+what the English word means, so a tool that rewrites an object into
+conformance is not an audit. Enforce is what compels conformance, by
+refusal at a gate or by rewrite on demand, a script or skill the user, a
+schedule, or a process step invokes. An Enforce bullet marks its mode in
+bold, a rung name or `on demand`. Adopt is first pickup only: a
+scaffold, a template, a migration, a recipe. No fifth cell. A formatter
+is a detector by its check mode, `shfmt -d`, and Enforcement by its
+write mode at the gate, so shfmt keeps its Audit row on the Shell card.
+
 **Standard's build follows Runbook's.** Definition, contract shape (the
 two tables), encoding, generator with a drift check, ports, residual
 ledger.
@@ -291,6 +301,13 @@ content. The lint
 rule names do not match today's headings: `prose.banned-word` sits
 under "Terminology: the person is the user"; renaming happens at port
 time.
+
+**Formatters at the gate, for the Shell and Python ports.** The
+canonical pre-commit config stations `shfmt -w` and `ruff format`, and
+neither `standards/shell/conventions.md` nor `standards/python/style.md`
+states a formatting rule; the Python card names `ruff-check` and not
+`ruff-format`. Each port either writes the rule its formatter enforces
+or records why the gate runs a tool no Standard backs.
 
 ## The rule/procedure split
 

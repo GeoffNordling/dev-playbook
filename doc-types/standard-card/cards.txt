@@ -16,8 +16,9 @@ distribution            define   /standards/distribution/channel.md
 distribution            audit    /scripts/workspace-lint
 distribution            audit    /scripts/repo-lint
 distribution            enforce  commit gate
-distribution            adopt    /scripts/bump-pins
-distribution            adopt    /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
+distribution            enforce  /scripts/bump-pins
+distribution            enforce  /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
+distribution            adopt    none
 harness                 define   /standards/harness/index.md
 harness                 define   /standards/harness/runbook-conventions.md
 harness                 define   /standards/harness/writing-for-agents.md
@@ -40,8 +41,9 @@ knowledge-organization  define   /standards/knowledge-organization/working-docum
 knowledge-organization  audit    /scripts/okf-lint
 knowledge-organization  audit    /scripts/ref-lint
 knowledge-organization  audit    /scripts/repo-lint
-knowledge-organization  audit    /dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md
+knowledge-organization  audit    /dotfiles/dot-claude/agents/working-doc-set-auditor.md
 knowledge-organization  enforce  commit gate
+knowledge-organization  enforce  /dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md
 knowledge-organization  adopt    none
 modules                 define   /standards/modules/design.md
 modules                 audit    none
@@ -50,7 +52,8 @@ modules                 adopt    /dotfiles/dot-claude/skills/improve-codebase-ar
 prose                   define   /standards/prose/conventions.md
 prose                   audit    /scripts/prose-lint
 prose                   enforce  commit gate
-prose                   adopt    /dotfiles/dot-claude/skills/document-remove-tics/SKILL.md
+prose                   enforce  /dotfiles/dot-claude/skills/document-remove-tics/SKILL.md
+prose                   adopt    none
 python                  define   /standards/python/style.md
 python                  audit    /scripts/python-lint
 python                  audit    ruff

@@ -32,19 +32,24 @@ restate the content of their targets.
 - **Define** — the Standards: documents typed `Standard`, each one
   population and its rules.
 - **Audit** — read-only deviation detection: the detectors that report
-  nonconformance without blocking anything.
-- **Enforce** — blocking gates: the rungs where nonconformance stops the
-  path to main, cited by fixed name (**commit gate**, **push gate**,
-  **CI gate**), defined in [Gates](/standards/standard/gates.md).
-  A cell cites the single rung where the detector is stationed — where its
-  wiring lives (pre-commit hooks → the commit gate; tools that run only inside
-  `make check` / `make check-judgments-cache` → the push gate); the hook pattern in Gates
-  implies the echoes at the other rungs. Enforcement is automatic and
-  continuously in effect; a code review is a one-time checkpoint, never an
-  Enforce pointer.
-- **Adopt** — anything that helps bring a repository into conformance,
-  such as templates or migration procedures. Often "none": the generic
-  path is an agent reading the define cell and fixing the repository.
+  nonconformance without blocking anything. A formatter is a detector by
+  its check mode ([Detectors](/standards/standard/detectors.md#detectors)).
+- **Enforce** — what compels conformance, in one of two modes. At a
+  gate: the rung where nonconformance stops the path to main, cited by
+  fixed name (**commit gate**, **push gate**, **CI gate**), defined in
+  [Gates](/standards/standard/gates.md). A cell cites the single rung
+  where the detector is stationed — where its wiring lives (pre-commit
+  hooks → the commit gate; tools that run only inside `make check` /
+  `make check-judgments-cache` → the push gate); the hook pattern in Gates
+  implies the echoes at the other rungs. On demand: a script or skill the
+  user, a schedule, or a process step invokes, which rewrites the object
+  into conformance and leaves the result for review, marked
+  **on demand** beside its link. A code review is a one-time checkpoint,
+  never an Enforce pointer.
+- **Adopt** — what brings a repository into conformance the first time:
+  a scaffold, a template, a migration procedure, a first-pickup recipe.
+  Often "none": the generic path is an agent reading the define cell and
+  fixing the repository.
 
 The cards themselves are the examples: [Build](/standards/build.md) and
 [Meta-Standard](/standards/standard.md) — the latter is the card of the
@@ -60,7 +65,7 @@ class StandardCard(Object):
     # four cells; a cell is a list of pointers, or the literal word "none"
     define:  list[Pointer[Standard]]                # required, at least one
     audit:   list[Pointer[Detector]] | None
-    enforce: list[Pointer[Gate]]     | None         # Gate = commit | push | CI
+    enforce: list[Pointer[Gate | OnDemand]] | None  # Gate = commit | push | CI; OnDemand = a tool that rewrites
     adopt:   list[Pointer[Adoption]] | None
 
     # rules: each a predicate over one card's state
@@ -85,7 +90,8 @@ modules  audit    none
 
 A Define, Audit, or Adopt pointer is the file a bullet leads with, or the
 bare name of a third-party detector cited by its pin. An Enforce pointer
-is one of the three gate names. An empty cell is one `none` row, so the
+is one of the three gate names, or the file of a tool marked on demand.
+An empty cell is one `none` row, so the
 gap stays visible in the view as it does in the card. Cards sort
 alphabetically, cells keep the card's order, and pointers keep their
 bullet order. The annotation after each pointer stays below the collapse,

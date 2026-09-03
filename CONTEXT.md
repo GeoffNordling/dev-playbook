@@ -28,12 +28,12 @@ The read-only check that inspects the repository against one or more standards a
 _Avoid_: audit, for the check itself — an audit is a *run* of one or more detectors.
 
 **Gate**
-An automatic, unmanned blocking point on the path to main. An audit never blocks; a gate is what blocks.
+An automatic, unmanned blocking point on the path to main, continuously in effect. An audit never blocks; a gate is what blocks.
 _Avoid_: venue (retired — say **gate**, or a rung name).
 
 **Enforcement**
-An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect.
-_Avoid_: audit, where the blocking is the point — an audit run by hand is not Enforcement.
+What compels conformance, in one of two modes: an audit stationed at a gate, whose findings block the path to main there, or a tool invoked on demand, which rewrites the object into conformance.
+_Avoid_: audit, where the blocking or the rewriting is the point — an audit only reports, however it is run.
 
 ### File roles
 

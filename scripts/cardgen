@@ -9,9 +9,10 @@ Prototype implementing doc-types/standard-card/encoding.md's transform:
 slice, never interpret. A card's four cells each hold bullets. A bullet's
 lead — its text up to the first spaced em dash — carries the pointer: the
 target of the first link in the lead, or the lead verbatim when it holds no
-link (a third-party detector named by its pin). An Enforce bullet's pointer
-is the one gate it names in bold. A cell holding the single bullet `none`
-is one `none` row. Prose in a cell that is not a bullet is opaque.
+link (a third-party detector named by its pin). An Enforce bullet names its
+mode in bold, a gate or `on demand`: at a gate the pointer is the gate name,
+on demand it is the first link in the lead. A cell holding the single bullet
+`none` is one `none` row. Prose in a cell that is not a bullet is opaque.
 
 Usage:
     cardgen            regenerate doc-types/standard-card/cards.txt — one
@@ -30,6 +31,8 @@ import sys
 
 CELLS = ("Define", "Audit", "Enforce", "Adopt")
 GATES = ("commit gate", "push gate", "CI gate")
+ON_DEMAND = "on demand"
+MODES = (*GATES, ON_DEMAND)
 CARD_TYPE = "Standard-Card"
 
 DASH = " — "  # the spaced em dash that ends a bullet's lead
@@ -113,17 +116,24 @@ def bullets_of(lines, where):
 
 def pointer_of(cell, bullet, where):
     """Slice one bullet into its pointer per the cell's rule."""
-    if cell == "Enforce":
-        gates = [b for b in BOLD_RE.findall(bullet) if b in GATES]
-        if len(gates) != 1:
-            raise LintError(
-                f"{where}: an Enforce bullet names exactly one gate in bold, "
-                f"found {len(gates)}: {bullet!r}"
-            )
-        return gates[0]
     lead = bullet.split(DASH, 1)[0].strip()
-    if m := LINK_RE.search(lead):
-        return m.group(2)
+    link = LINK_RE.search(lead)
+    if cell == "Enforce":
+        modes = [b for b in BOLD_RE.findall(bullet) if b in MODES]
+        if len(modes) != 1:
+            raise LintError(
+                f"{where}: an Enforce bullet names exactly one mode in bold, "
+                f"a gate or {ON_DEMAND!r}, found {len(modes)}: {bullet!r}"
+            )
+        if modes[0] != ON_DEMAND:
+            return modes[0]
+        if not link:
+            raise LintError(
+                f"{where}: an on-demand Enforce bullet leads with a link: {bullet!r}"
+            )
+        return link.group(2)
+    if link:
+        return link.group(2)
     if cell == "Define":
         raise LintError(f"{where}: a Define bullet leads with a link: {bullet!r}")
     return lead

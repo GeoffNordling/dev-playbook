@@ -17,7 +17,7 @@ every card.
 A cell is a bullet list, one pointer per bullet, or the single bullet
 `none`. cardgen slices; it never interprets. The cut points are the
 bullet marker, the first spaced em dash (` — `), the first markdown link
-before that dash, and, in Enforce, the bold gate name.
+before that dash, and, in Enforce, the bold mode name.
 
 - **The lead.** A bullet's text up to its first ` — ` is the lead.
   Everything after the dash is annotation: carried in the card, never
@@ -26,10 +26,12 @@ before that dash, and, in Enforce, the bold gate name.
   in the lead. A lead with no link is the pointer verbatim — the form for
   a third-party detector cited by its pin (`ruff`, `mypy`, `shellcheck`,
   `shfmt`), whose home is a pin, not a file in this repository.
-- **Enforce.** The pointer is the gate the bullet names in bold —
-  `**commit gate**`, `**push gate**`, or `**CI gate**` — exactly one per
-  bullet, wherever it sits in the bullet. The three names are fixed by
-  [Gates](/standards/standard/gates.md#three-rungs).
+- **Enforce.** A bullet names its mode in bold, exactly one per bullet,
+  wherever it sits: a gate, `**commit gate**`, `**push gate**`, or
+  `**CI gate**`, the three names fixed by
+  [Gates](/standards/standard/gates.md#three-rungs), or `**on demand**`.
+  At a gate the pointer is the gate name. On demand the pointer is the
+  target of the first link in the lead, the tool invoked.
 - **none.** A cell with nothing to point at holds the one bullet `none`,
   optionally followed by a colon and the reason. It renders as one `none`
   row.
@@ -38,7 +40,8 @@ before that dash, and, in Enforce, the bold gate name.
   what sits outside every gate — goes there, never in a bullet.
 
 A bullet that breaks the form — a Define bullet with no link, an Enforce
-bullet naming no gate or two, a `none` beside other bullets — fails the
+bullet naming no mode or two, or on demand with no link, a `none` beside
+other bullets — fails the
 generator: a card that cannot be sliced cannot be viewed.
 
 ## Where a card lives

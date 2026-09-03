@@ -105,7 +105,8 @@ A document commits none of the tics
 
 The catalog is the rule's content: each tic's definition, the action that
 removes it, and before-and-after examples. The document-remove-tics skill
-rewrites a document against it ([Prose](/standards/prose.md#adopt)).
+rewrites a document against it on demand
+([Prose](/standards/prose.md#enforce)).
 
 ## Harness-loaded agent instructions
 

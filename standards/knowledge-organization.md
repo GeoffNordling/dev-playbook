@@ -37,9 +37,9 @@ sets.
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
 - [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)
-- [working-doc-set-deslop](/dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md)
-  — audit and then fix a working documentation set, the edits left
-  uncommitted for diff review; invoke it as /working-doc-set-deslop
+- [working-doc-set-auditor](/dotfiles/dot-claude/agents/working-doc-set-auditor.md)
+  — the LLM judge over one working documentation set, one slice of the
+  Standards per launch, reporting and editing nothing
 
 ## Enforce
 
@@ -47,6 +47,10 @@ sets.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — okf-lint, ref-lint, and repo-lint at the **commit gate** in every
   repo's suite, all three dispatched by the published `playbook-lint` hook
+- [working-doc-set-deslop](/dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md)
+  — **on demand**, audits a working documentation set through three
+  auditor slices and then fixes it, the edits left uncommitted for diff
+  review; invoke it as /working-doc-set-deslop
 
 ## Adopt
 

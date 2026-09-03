@@ -18,7 +18,8 @@ declared bash, and shellcheck-clean.
 
 - shellcheck — third-party lint detector, located by its pin in the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-- shfmt — third-party formatting detector, located by its pin in the canonical
+- shfmt — third-party formatter, a detector in its diff mode (`shfmt -d`);
+  the commit gate stations its write mode, located by its pin in the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
 
 Third-party detectors only, by choice: rules 1–3 of the contract (boundary,

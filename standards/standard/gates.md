@@ -7,8 +7,9 @@ population: "a gate: an automatic, unmanned blocking point on the path to main"
 
 # Gates
 
-An audit stationed at a gate is Enforcement: its findings block the path
-to main there ([Vocabulary](/CONTEXT.md#governance)). This Standard fixes
+An audit stationed at a gate is Enforcement's blocking mode: its findings
+stop the path to main there ([Vocabulary](/CONTEXT.md#governance)); the
+other mode, a tool invoked on demand, is no gate. This Standard fixes
 the gates: what each is, where it blocks, and what may be skipped at one.
 A card's Enforce cell names a gate by its rung name
 ([Card Cells Encoding](/doc-types/standard-card/encoding.md#cells)).

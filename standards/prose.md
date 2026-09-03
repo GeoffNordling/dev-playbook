@@ -35,9 +35,10 @@ structure, and brevity.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — the **commit gate**, where prose-lint blocks every commit by way of
   the published `playbook-lint` hook
+- [document-remove-tics](/dotfiles/dot-claude/skills/document-remove-tics/SKILL.md)
+  — **on demand**, rewrites one document to remove the named tics through
+  the tics-remover agent, content unchanged, nothing committed
 
 ## Adopt
 
-- [document-remove-tics](/dotfiles/dot-claude/skills/document-remove-tics/SKILL.md)
-  — rewrites one document to remove the named tics through the
-  tics-remover agent, content unchanged, nothing committed
+- none
