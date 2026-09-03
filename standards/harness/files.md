@@ -7,8 +7,9 @@ description: The registry of repo files the Claude Code harness consumes — eac
 # Claude Code Files
 
 The files in a workspace repo that exist for the Claude Code harness.
-They carry no OKF frontmatter and sit outside the type-lint. The
-concept/harness boundary rule is [file-roles.md](/standards/knowledge-organization/file-roles.md);
+They carry no OKF frontmatter and sit outside okf-lint. The
+concept/harness boundary is the population of
+[Document Types](/standards/knowledge-organization/document-types.md);
 its code encoding is `classify()` in [md.py](/src/dev_playbook/md.py).
 
 Claude Code is named deliberately as the only harness currently in use.

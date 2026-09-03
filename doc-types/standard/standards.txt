@@ -1,60 +1,111 @@
 standards
-card          standard     population
-build         canonical    a canonical artifact: its source under standards/build/canonical/ and each governed repo's copy
-build         python       a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/
-build         skeleton     a governed repo's tree, except standards/build/canonical/ in dev-playbook
-distribution  channel      a governed repo's share of the distribution channel: its hook manifest, its local block, its dev-playbook pin, and in dev-playbook the roster
-prose         conventions  an authored document, except type: Reference and the paths in .prose-lint-exempt
-standard      gates        a gate: an automatic, unmanned blocking point on the path to main
+card                    standard                    population
+build                   canonical                   a canonical artifact: its source under standards/build/canonical/ and each governed repo's copy
+build                   python                      a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/
+build                   skeleton                    a governed repo's tree, except standards/build/canonical/ in dev-playbook
+distribution            channel                     a governed repo's share of the distribution channel: its hook manifest, its local block, its dev-playbook pin, and in dev-playbook the roster
+knowledge-organization  context-content             a repo's CONTEXT.md
+knowledge-organization  cross-references            a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block
+knowledge-organization  document-types              a concept document
+knowledge-organization  indexes                     an index.md
+knowledge-organization  readme-content              a README.md
+knowledge-organization  type-registry               a document-type registry's Types table, the global one in dev-playbook or a consumer's local extension
+knowledge-organization  working-documentation-sets  a working documentation set, the Markdown files one stream of in-process work accumulates
+prose                   conventions                 an authored document, except type: Reference and the paths in .prose-lint-exempt
+standard                gates                       a gate: an automatic, unmanned blocking point on the path to main
 
 rules
-card          standard     rule                                              when
-build         canonical    ciyml                                             —
-build         canonical    gitignore                                         —
-build         canonical    makefile                                          —
-build         canonical    one-version-set                                   —
-build         canonical    pre-commit-configyaml                             —
-build         canonical    pyprojecttoml                                     —
-build         canonical    python-version                                    —
-build         canonical    the-source-directory                              —
-build         python       entry-points                                      —
-build         python       name-mapping                                      —
-build         python       package-backed-scripts-are-shims                  scripts
-build         python       shebang-and-inline-metadata                       scripts
-build         skeleton     additions-are-free                                —
-build         skeleton     dependencies-live-in-pyprojecttoml                —
-build         skeleton     lockfile-committed                                javascript
-build         skeleton     one-package-under-src                             python-package
-build         skeleton     required-files                                    —
-build         skeleton     root-only-files                                   —
-build         skeleton     runnables-live-in-scripts                         —
-build         skeleton     tests-present                                     python-source
-build         skeleton     uvlock-and-python-version                         python
-distribution  channel      a-pinned-rev                                      a-consumer
-distribution  channel      dogfood-in-place-of-the-pin                       dev-playbook
-distribution  channel      one-published-id                                  dev-playbook
-distribution  channel      public                                            dev-playbook
-distribution  channel      the-local-block-covers-the-manifest               a-publisher
-distribution  channel      the-roster                                        dev-playbook
-prose         conventions  block-form-fits-its-content                       —
-prose         conventions  current-state-and-next-steps-only                 —
-prose         conventions  declarative-present-tense                         —
-prose         conventions  declare-before-use                                —
-prose         conventions  grammatical-parallelism                           —
-prose         conventions  heading-casing                                    —
-prose         conventions  imperative-and-second-person                      harness-loaded-agent-instructions
-prose         conventions  lead-with-the-edge-case-when-reach-is-surprising  —
-prose         conventions  name-concepts-once-use-consistently               —
-prose         conventions  no-slop-tics                                      —
-prose         conventions  one-concern-per-document                          —
-prose         conventions  one-rule-one-place                                —
-prose         conventions  open-with-purpose                                 —
-prose         conventions  point-at-canonical-artifacts                      —
-prose         conventions  positive-statement                                —
-prose         conventions  spelling                                          —
-prose         conventions  terminology-the-person-is-the-user                —
-prose         conventions  third-person                                      declarative-documents
-standard      gates        a-red-ci-run-is-never-merged                      —
-standard      gates        installed-in-every-clone                          —
-standard      gates        skips                                             —
-standard      gates        three-rungs                                       —
+card                    standard                    rule                                              when
+build                   canonical                   ciyml                                             —
+build                   canonical                   gitignore                                         —
+build                   canonical                   makefile                                          —
+build                   canonical                   one-version-set                                   —
+build                   canonical                   pre-commit-configyaml                             —
+build                   canonical                   pyprojecttoml                                     —
+build                   canonical                   python-version                                    —
+build                   canonical                   the-source-directory                              —
+build                   python                      entry-points                                      —
+build                   python                      name-mapping                                      —
+build                   python                      package-backed-scripts-are-shims                  scripts
+build                   python                      shebang-and-inline-metadata                       scripts
+build                   skeleton                    additions-are-free                                —
+build                   skeleton                    dependencies-live-in-pyprojecttoml                —
+build                   skeleton                    lockfile-committed                                javascript
+build                   skeleton                    one-package-under-src                             python-package
+build                   skeleton                    required-files                                    —
+build                   skeleton                    root-only-files                                   —
+build                   skeleton                    runnables-live-in-scripts                         —
+build                   skeleton                    tests-present                                     python-source
+build                   skeleton                    uvlock-and-python-version                         python
+distribution            channel                     a-pinned-rev                                      a-consumer
+distribution            channel                     dogfood-in-place-of-the-pin                       dev-playbook
+distribution            channel                     one-published-id                                  dev-playbook
+distribution            channel                     public                                            dev-playbook
+distribution            channel                     the-local-block-covers-the-manifest               a-publisher
+distribution            channel                     the-roster                                        dev-playbook
+knowledge-organization  context-content             entry-shape                                       —
+knowledge-organization  context-content             glossary-only                                     —
+knowledge-organization  context-content             okf-frontmatter                                   —
+knowledge-organization  context-content             one-word-per-concept                              —
+knowledge-organization  context-content             project-terms-only                                —
+knowledge-organization  context-content             the-language-section                              —
+knowledge-organization  context-content             tight-definitions                                 —
+knowledge-organization  cross-references            bare-skill-invocation                             no-fixed-repo-root
+knowledge-organization  cross-references            citation-another-repo                             fixed-repo-root
+knowledge-organization  cross-references            fragment-anchor-matches-the-slug                  —
+knowledge-organization  cross-references            inline-code-for-a-varying-location                no-fixed-repo-root
+knowledge-organization  cross-references            link-same-bundle                                  fixed-repo-root
+knowledge-organization  cross-references            relative-path-inside-the-bundle                   no-fixed-repo-root
+knowledge-organization  cross-references            stable-named-anchor                               —
+knowledge-organization  cross-references            workspace-path-for-a-stable-location              no-fixed-repo-root
+knowledge-organization  document-types              description                                       —
+knowledge-organization  document-types              frontmatter-block                                 —
+knowledge-organization  document-types              no-tags-or-timestamp                              —
+knowledge-organization  document-types              resource                                          —
+knowledge-organization  document-types              resource-present                                  recipe-description
+knowledge-organization  document-types              title                                             —
+knowledge-organization  document-types              types                                             —
+knowledge-organization  document-types              under-standards                                   typed-standard
+knowledge-organization  indexes                     authored-not-generated                            —
+knowledge-organization  indexes                     okf-version-declared                              the-root-index
+knowledge-organization  indexes                     ordering                                          —
+knowledge-organization  indexes                     the-introduction                                  —
+knowledge-organization  indexes                     the-listing                                       —
+knowledge-organization  indexes                     typeless                                          —
+knowledge-organization  readme-content              h1-and-purpose                                    —
+knowledge-organization  readme-content              no-agent-instructions-or-decisions                —
+knowledge-organization  readme-content              no-roster-of-harness-injected-files               —
+knowledge-organization  readme-content              okf-frontmatter                                   —
+knowledge-organization  type-registry               add-never-shadow                                  local-extension
+knowledge-organization  type-registry               alphabetical-order                                —
+knowledge-organization  type-registry               name-and-description-only                         local-extension
+knowledge-organization  type-registry               row-shape                                         —
+knowledge-organization  working-documentation-sets  acronyms                                          —
+knowledge-organization  working-documentation-sets  buckets                                           —
+knowledge-organization  working-documentation-sets  one-home-per-fact                                 —
+knowledge-organization  working-documentation-sets  shape                                             —
+knowledge-organization  working-documentation-sets  speculative-voice                                 —
+knowledge-organization  working-documentation-sets  terms                                             —
+knowledge-organization  working-documentation-sets  worklist                                          —
+prose                   conventions                 block-form-fits-its-content                       —
+prose                   conventions                 current-state-and-next-steps-only                 —
+prose                   conventions                 declarative-present-tense                         —
+prose                   conventions                 declare-before-use                                —
+prose                   conventions                 grammatical-parallelism                           —
+prose                   conventions                 heading-casing                                    —
+prose                   conventions                 imperative-and-second-person                      harness-loaded-agent-instructions
+prose                   conventions                 lead-with-the-edge-case-when-reach-is-surprising  —
+prose                   conventions                 name-concepts-once-use-consistently               —
+prose                   conventions                 no-slop-tics                                      —
+prose                   conventions                 one-concern-per-document                          —
+prose                   conventions                 one-rule-one-place                                —
+prose                   conventions                 open-with-purpose                                 —
+prose                   conventions                 point-at-canonical-artifacts                      —
+prose                   conventions                 positive-statement                                —
+prose                   conventions                 spelling                                          —
+prose                   conventions                 terminology-the-person-is-the-user                —
+prose                   conventions                 third-person                                      declarative-documents
+standard                gates                       a-red-ci-run-is-never-merged                      —
+standard                gates                       installed-in-every-clone                          —
+standard                gates                       skips                                             —
+standard                gates                       three-rungs                                       —

@@ -394,6 +394,15 @@ at its files. The catalog is typed `General-Sheet` until the open
 question on that type is settled, and the document-remove-tics skill
 is the Prose card's Adopt pointer, since it mutates and is not gated.
 
+Done: the Knowledge Organization port. Seven files became seven
+Standards and a Guide. File Roles is the Guide, its four definitions in
+CONTEXT.md and its concept/harness boundary Document Types' population.
+Document Types split: the Types table's shape and the local-extension
+law are Type Registry. Same-repo resolution left Cross-References for
+its home, dotfiles CLAUDE.md, and Declarative present tense carries the
+working-set exemption in one added sentence. Every rule id okf-lint,
+ref-lint, and repo-lint emit for the card has a rule row. No residual.
+
 1. The Standard loop, remaining ports. Every other card, each read and
    split in the moment the way Build was, with cards added, merged, or
    removed as the reading demands, and each checked by rulegen before

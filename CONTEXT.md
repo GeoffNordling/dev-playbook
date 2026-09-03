@@ -34,3 +34,20 @@ _Avoid_: venue (retired — say **gate**, or a rung name).
 **Enforcement**
 An audit stationed at a gate — the audit's findings block the path to main there. Enforcement is automatic and continuously in effect.
 _Avoid_: audit, where the blocking is the point — an audit run by hand is not Enforcement.
+
+### File roles
+
+The two axes a repository file sits on, its role and its content
+([File Roles](/standards/knowledge-organization/file-roles.md)).
+
+**Concept document**
+Prose a reader loads to understand something. It carries OKF frontmatter, and okf-lint reads its type.
+
+**Harness-owned file**
+A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the harness-files registry enumerates. It carries no OKF frontmatter.
+
+**Rule**
+A rule of the system: a contract, a state and the moves out of it, a format, what one part owes another. It binds every actor who touches the thing, whatever job that actor is doing.
+
+**Procedure**
+The steps of one job: its trigger, its target, the order of the steps, the conditions it branches on, the commands it issues, when it stops, what it reports. It binds one actor for the length of one run.

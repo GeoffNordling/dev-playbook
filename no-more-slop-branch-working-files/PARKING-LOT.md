@@ -246,6 +246,72 @@ dev-playbook consumes its own hook from the working tree via a
 `repo: local` block in its `.pre-commit-config.yaml`, so detector edits are
 testable in place before release.
 
+## Broken extension degrades, never aborts
+
+From `standards/knowledge-organization/document-types.md`, the Knowledge
+Organization port; okf-lint's `check_extension` docstring states the
+same behavior, and no Standard names it.
+
+- **Broken extension degrades, never aborts.** A malformed or empty extension
+  table yields findings on that file (`knowledge-organization.registry-row`,
+  `knowledge-organization.index-ordering`) while the rest of the repo is still
+  fully checked.
+
+## How okf-lint tells the registry from an extension
+
+From `standards/knowledge-organization/document-types.md`, the Knowledge
+Organization port; cited by nothing.
+
+(okf-lint tells the two apart by the canonical consumer template, not by the
+registry file's presence: only dev-playbook hosts that template, so a consumer's
+extension never flips the audit into replacing the global registry.)
+
+## Group terms under subheadings
+
+From `standards/knowledge-organization/context-content.md`, the
+Knowledge Organization port; cited by nothing.
+
+- **Group terms under subheadings** when natural clusters emerge. If all
+  terms belong to a single cohesive area, a flat list is fine.
+
+## Create CONTEXT.md lazily
+
+From `standards/knowledge-organization/context-content.md`, the
+Knowledge Organization port; cited by nothing.
+
+Create it lazily — when the first term is
+resolved.
+
+## VS Code and the two link forms
+
+From `standards/knowledge-organization/cross-references.md`, the
+Knowledge Organization port; cited by nothing.
+
+VS Code does not expand `~/` in markdown links, and it resolves a leading
+`/` against the filesystem root rather than the bundle root, so neither
+form is clickable from the editor
+([vscode#103542](https://github.com/microsoft/vscode/issues/103542)).
+Accepted — agents are the primary audience, and both forms are what the
+`ref-lint` linter (`/scripts/ref-lint`) validates.
+
+## Why same-repo resolution is a written rule
+
+From `standards/knowledge-organization/cross-references.md`, the
+Knowledge Organization port; the wording's home is
+`dotfiles/dot-claude/CLAUDE.md`, and Decision Record 0009 records the
+same reasoning.
+
+The written form is kept because no static path can encode this: the same
+`~/workspace/<repo>/…` citation must resolve to a different checkout
+depending on where the reader stands — a globally-loaded skill resolves a
+dev-playbook citation to dev-playbook's main checkout from another repo's
+worktree, but to the worktree when run inside a dev-playbook worktree — so
+the meaning has to be a reader-side rule. `ref-lint` already resolves
+same-repo citations this way, against the invoking checkout, so this rule
+states at read time what the linter has enforced at commit time all along;
+the [same-repo-resolution Decision Record](/docs/decisions/0009-same-repo-resolution.md)
+records why the alternatives were rejected.
+
 ## Acronyms
 
 None.

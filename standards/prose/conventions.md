@@ -88,6 +88,10 @@ runs or spans lines. The pairs:
 
 "The symlink is relative." Not "We make the symlink relative."
 
+A member of a
+[working documentation set](/standards/knowledge-organization/working-documentation-sets.md)
+may write a guess as a guess.
+
 ## Positive statement
 
 Rules read in the positive: what to do, where a thing lives. "Runnables

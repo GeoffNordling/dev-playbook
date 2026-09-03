@@ -14,7 +14,7 @@ alphabetical; directories last.
 - [Distribution](/standards/distribution.md) — Governs how dev-playbook's checks reach the governed repos — the published hook, the roster, dogfooding, and the pinned rev
 - [Harness Files](/standards/harness.md) — Governs how the files an agent harness loads — context, configuration, instructions — are distinguished from ordinary files and what each contains
 - [Instruments](/standards/instrument.md) — Governs how purpose-built devices — artifact formats with tooling — are specified and kept conformant
-- [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — file roles, document types, indexes, cross-references, and working documentation sets
+- [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and working documentation sets
 - [Module Design](/standards/modules.md) — Governs how modules are designed — interfaces, depth, and seams
 - [Prose](/standards/prose.md) — Governs how prose is written in every workspace document — voice, structure, and brevity
 - [Python](/standards/python.md) — Governs how Python source code is written — language conventions and the anti-pattern catalog

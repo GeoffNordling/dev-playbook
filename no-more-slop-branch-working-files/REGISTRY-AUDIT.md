@@ -27,7 +27,7 @@ consumer.
 | Decision-Record | document-types | 26 | 19 | absent, so not important | template, numbering, immutability, decisions-lint |
 | General-Sheet | document-types | 29 | 32 | absent, so not important | none |
 | Standard-Card | document-types | 14 | 2 | Standard doc-type | four cells, standards-lint, catalog index |
-| Guide | document-types | 10 | 58 | important, no doc-type | none |
+| Guide | document-types | 11 | 58 | important, no doc-type | none |
 | README | document-types | 7 | ~32 | absent | repo-lint doc-shape |
 | Recipe-Description | document-types | 3 | 0 | absent | `resource` required |
 | Instrument-Spec | document-types | 2 | 0 | absent | `## Employed by` required |
@@ -89,9 +89,9 @@ files.
 
 ## What the Guide files hold
 
-Nine files, all under `software-factory/`. All nine were listed in the
-Define cell of the Software Factory card, `standards/software-factory.md`,
-since deleted.
+Eleven files: nine under `software-factory/`, Bootstrap, and File
+Roles. All nine were listed in the Define cell of the Software Factory
+card, `standards/software-factory.md`, since deleted.
 The registry defines Guide as "a teaching or procedure doc, read to
 learn how to do or think about something, not to be measured against".
 Three name themselves a contract in their own title or description:

@@ -116,6 +116,26 @@ links. The GitHub heading slug that ref-lint already resolves became
 the rule's id, so a view row's rule column is the anchor a citation
 uses. One existing mark reused, instead of a new one invented.
 
+## Definitions go to the vocabulary
+
+File Roles was four definitions, concept document, harness-owned file,
+rule, procedure, and one aim it called "a general aim, not a strict
+gate". A definition is not a predicate over a member's state, and an aim
+that is not a gate fails the axis, so nothing in the file was a rule.
+The definitions went to CONTEXT.md, the file became a Guide, and the one
+hard boundary it implied, which files are concept documents, became
+Document Types' population sentence. A Standard whose sections all
+define terms is a vocabulary wearing the label.
+
+## The population is the primary key
+
+Document Types held rules over two object classes, a concept document's
+frontmatter and the registry's Types table, and one lint id,
+`knowledge-organization.doc-shape`, checks two Standards, README Content
+and CONTEXT.md Content. Both resolved the same way: the object class
+decides which Standard a rule sits in, and the lint id follows it or is
+shared. Bundle at the lint's grain sets a rule's size, never its home.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

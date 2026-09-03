@@ -86,8 +86,8 @@ extension**: the repo's own `standards/knowledge-organization/document-types.md`
 table of the same shape as the [global registry](/standards/knowledge-organization/document-types.md),
 listing only the repo's local types. okf-lint unions its valid names onto the
 upstream registry (upstream ∪ local). The hierarchy law — additive, downhill
-only, no shadowing — is defined in the
-[registry doc](/standards/knowledge-organization/document-types.md#local-extensions).
+only, no shadowing — is defined in
+[Type Registry](/standards/knowledge-organization/type-registry.md).
 
 The extension file is itself a **concept document**, so it obeys the same rules
 as any doc in the bundle:

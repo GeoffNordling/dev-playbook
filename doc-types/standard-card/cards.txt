@@ -30,7 +30,13 @@ instrument              define   /standards/instrument/format.md
 instrument              audit    /scripts/okf-lint
 instrument              enforce  commit gate
 instrument              adopt    none
-knowledge-organization  define   /standards/knowledge-organization/index.md
+knowledge-organization  define   /standards/knowledge-organization/document-types.md
+knowledge-organization  define   /standards/knowledge-organization/type-registry.md
+knowledge-organization  define   /standards/knowledge-organization/indexes.md
+knowledge-organization  define   /standards/knowledge-organization/readme-content.md
+knowledge-organization  define   /standards/knowledge-organization/context-content.md
+knowledge-organization  define   /standards/knowledge-organization/cross-references.md
+knowledge-organization  define   /standards/knowledge-organization/working-documentation-sets.md
 knowledge-organization  audit    /scripts/okf-lint
 knowledge-organization  audit    /scripts/ref-lint
 knowledge-organization  audit    /scripts/repo-lint
