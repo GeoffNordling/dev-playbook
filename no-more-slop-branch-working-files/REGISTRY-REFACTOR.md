@@ -290,31 +290,44 @@ complete, with low residuals.
 
 ## State
 
-Every card but Instruments is ported to the Standard encoding and
-reviewed. `doc-types/` is three, `standard-card/`, `standard/`, and
-`runbook/`, each holding a definition, a contract shape, an encoding,
-and a residual ledger. `scripts/cardgen` writes
-`doc-types/standard-card/cards.txt` and `scripts/rulegen` writes
-`doc-types/standard/standards.txt`; both fail on drift. rulegen names
-`instrument/format.md`, the one Standard with no `population`, and
-skips it. What the ports evicted sits in
+rulegen names `instrument/format.md`, the one Standard with no
+`population`, and skips it. What the ports evicted sits in
 [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md); what
 the encoding cannot carry sits in
 [the residual ledger](/doc-types/standard/residual-ledger.md).
 `judgments/docs-match-code.yaml` holds the four judgments the branch
 leaves.
 
-## Next steps
+## Planned
 
-In order. The generator is a first draft: a port that fails it may
-change the script or widen the encoding, and which one is decided at
-the failure.
+In order.
 
-1. Make rulegen fail on a Standard with no `population`, with an
-   exclusion mark for `instrument/format.md`, so the skip becomes the
-   failure the class's frontmatter rule states.
-2. Decide what becomes of the parked rationale.
-3. Then the remaining open questions.
+- **rulegen fails on a missing population** — with an exclusion mark
+  for `instrument/format.md`, so the skip becomes the failure the
+  class's frontmatter rule states. The generator is a first draft: a
+  port that fails it may change the script or widen the encoding, and
+  which one is decided at the failure.
+- **The parked rationale** — decide what becomes of it.
+- **The open questions** — the ones above, in whatever order they
+  unblock.
+
+## Completed
+
+- **The card loop** — `doc-types/` became `standard-card/`,
+  `standard/`, and `runbook/`, and `scripts/cardgen` writes
+  `doc-types/standard-card/cards.txt` from the cut points the cards
+  already had.
+- **The Standard loop's design** — `doc-types/standard/` holds the
+  definition, the two-table contract shape, the encoding, and the
+  residual ledger.
+- **The Standard loop's code** — `scripts/rulegen` writes the two
+  tables to `doc-types/standard/standards.txt` and fails on drift.
+- **The ports** — Build, Prose, Knowledge Organization, Tracking,
+  Shell, Python, Testing, Modules, Decisions, Semantic Validation,
+  Harness, and the Meta-Standard, so every card but Instruments is on
+  the Standard encoding.
+- **The port review** — every ported Standard read file by file and
+  scrubbed against the encoding.
 
 ## Acronyms
 

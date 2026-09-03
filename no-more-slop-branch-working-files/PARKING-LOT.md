@@ -15,7 +15,7 @@ Member of
 Each entry is the evicted text verbatim under a heading, with one line
 of provenance: the file it left, the port that moved it, and who still
 cites it. Sorting the lot into permanent homes is its own step in
-[Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md#next-steps).
+[Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md#planned).
 
 ## The src/ conjunction
 
