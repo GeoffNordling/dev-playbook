@@ -104,8 +104,7 @@ The rest of the push gate — mypy, pytest, the hook suite — runs everywhere
 
 ## The pyproject pins, the reasons
 
-From `standards/build/python.md`, the Build port; worth keeping
-([Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md#findings-from-two-readings));
+From `standards/build/python.md`, the Build port; worth keeping.
 Canonical Artifacts' pyproject.toml rule lists the pins, and nothing
 carries the reasons.
 

@@ -238,85 +238,6 @@ ledger.
 `runbook/`, and `standard/` is Standard-Card's files under Standard's
 name. It becomes `standard-card/`, `standard/`, `runbook/`.
 
-## Findings from two readings
-
-Readings, not decisions. Each proposal below is evaluated file by file
-when its port happens; the reading was one pass, and the agent doing
-the port checks that each move still makes sense in the moment.
-
-**Build, the structural reading.** Nine files under `standards/build/`,
-all pointed at by the Build card through two Define pointers. They hold
-rules over three object classes, plus a definition of the Gate kind, a
-distribution channel, a procedure, and rationale. The proposed port:
-
-- Skeleton stays: layers.md merged into skeleton.md. Population: a
-  repo's tracked tree. Layer membership becomes the conditions, read from
-  facts on disk; each entry is a presence rule, required, optional, or
-  forbidden. Layers is not a Standard of its own.
-- Canonical Artifacts stays: canonical.md absorbs ci.md, make.md's
-  target table, and python.md's pyproject section. Population: a
-  repo's copy of one canonical file, with the compare mode as
-  per-member data. The files under `canonical/` are the content.
-- Python Project stays: python.md less the pyproject pins, the
-  Rationale, and Initial setup. Population: the root Python project.
-  It sits on the boundary with the Python card; lean Build, since it
-  is layout.
-- Enforcement leaves for the Meta-Standard card. Its gate table is the
-  definition of the Gate kind, the thing a card's Enforce cell points
-  at. Its Map is the hand-written form of the computed join and is
-  retired. Its one rule over a pull request, a red CI run is never
-  merged, goes with the pull request rules.
-- Distribution becomes its own card. Its question is how dev-playbook's
-  checks reach the governed repos. Populations: the hook manifest, the
-  roster in workspace-lint's source, a publisher's own config. The
-  consumer-side pin is already a row of the canonical pre-commit
-  config.
-- Bootstrap leaves Define. It is two procedures; it stays under Adopt,
-  retyped, since the enable-repo-governance runbook shadows it.
-- Rationale in python, ci, make, and distribution leaves the
-  Standards. A Standard boils down to its rules and the specific ways
-  they are enforced, and rationale is neither. It moves to a parking
-  lot; what becomes of it is its own action item, and it is not a
-  Guide, because it guides nothing. The pyproject rationale is worth
-  keeping.
-- make.md's judgment-cache and per-machine paragraphs belong to
-  Semantic Validation and machines.md.
-
-**Prose, the prose reading.** Two files under `standards/prose/`.
-Population: an authored document, except `type: Reference` mirrors and
-the paths a repo lists in `.prose-lint-exempt`; that declaration is
-conventions.md's opening paragraph. Roughly thirty rules across
-conventions.md and slop-tics.md. Most predicates are English and will
-stay English; a reviewer citing them satisfies the axis. Person of
-address is one rule with two conditions, harness-loaded and declarative.
-Each tic's definition and before-and-after examples stay in the body,
-below the collapse, like a runbook's fine steps. "How to decide between
-section formats" read as a writer's heuristics on its heading alone;
-each of its bullets is a predicate over a block as it stands, so it
-stays as a rule under a stateful heading, Block form fits its
-content. The lint
-rule names do not match today's headings: `prose.banned-word` sits
-under "Terminology: the person is the user"; renaming happens at port
-time.
-
-**Formatters at the gate, for the Shell and Python ports.** The
-canonical pre-commit config stations `shfmt -w` and `ruff format`, and
-neither `standards/shell/conventions.md` nor `standards/python/style.md`
-states a formatting rule; the Python card names `ruff-check` and not
-`ruff-format`. Each port either writes the rule its formatter enforces
-or records why the gate runs a tool no Standard backs.
-
-**A port expires the judgments that reference the file.** The judgment
-cache keys on the digest of every evidence and reference file, so
-rewriting a Standard a judgment references, `label-scheme.md` for
-`scheme-vs-graph` and `scheme-vs-tracker`, `standards/tracking.md` for
-`standard-card-tracking`, expires the verdict, and the push gate's
-`make check-judgments-cache` fails until the judgment is re-run. Every
-remaining port touches a referenced file: the Harness Standards and the
-Python, Shell, and Semantic Validation cards are all references. The
-re-run is the user's, after the diff is approved, and it costs a model
-call per expired judgment.
-
 ## The rule/procedure split
 
 Located, because the user wanted to remember where it is. One home:
@@ -367,162 +288,27 @@ that connect to the bedrock of determinism. None of it needs to be
 implemented in code yet. The high-level abstract objects must be
 complete, with low residuals.
 
+## State
+
+Every card but Instruments is ported to the Standard encoding and
+reviewed. `doc-types/` is three, `standard-card/`, `standard/`, and
+`runbook/`, each holding a definition, a contract shape, an encoding,
+and a residual ledger. `scripts/cardgen` writes
+`doc-types/standard-card/cards.txt` and `scripts/rulegen` writes
+`doc-types/standard/standards.txt`; both fail on drift. rulegen names
+`instrument/format.md`, the one Standard with no `population`, and
+skips it. What the ports evicted sits in
+[Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md); what
+the encoding cannot carry sits in
+[the residual ledger](/doc-types/standard/residual-ledger.md).
+`judgments/docs-match-code.yaml` holds the four judgments the branch
+leaves.
+
 ## Next steps
 
-In order. Each kind runs one loop: design, then the files, then the
-code that reads them. For the Standard loop the code moves up: it
-comes after the first port, Build, so every later port is checked
-against a generator, the way cardgen checked the cards. The first
-draft of the generator is not locked in; a port that fails it may
+In order. The generator is a first draft: a port that fails it may
 change the script or widen the encoding, and which one is decided at
 the failure.
-
-Done: `doc-types/` is three, `standard-card/`, `standard/`, `runbook/`,
-and the card loop is closed. The Standard-Card files sit under their
-real name, `doc-types/standard-card/`; its encoding names the cut
-points a cell's bullets already had, the lead, the spaced em dash, the
-first link, and the bold gate; `scripts/cardgen` prints
-`card, cell, pointer` to `doc-types/standard-card/cards.txt` and fails
-on drift. Four bullets in four cards moved to fit the encoding, meaning
-kept.
-
-Done: the Standard loop's design, reviewed and committed.
-`doc-types/standard/` holds the definition, the contract shape with
-its two-table view, the encoding, and an empty residual ledger; the
-encoding is the authority on the marks. Doc Conventions is the one
-Standard in the encoding, and the parking lot,
-[Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md),
-exists and is empty. Permanent files carry the design and no progress
-notes; what is ported, what is built, and what remains is tracked only
-here.
-
-Done: the Standard loop's first port, Build, reviewed and committed.
-Nine files became five Standards across three cards: File Skeleton,
-Canonical Artifacts, and The Python Project under Build; Distribution
-Channel under the new Distribution card; Gates under the Meta-Standard.
-Bootstrap is a Guide under Adopt. The rule ids that changed cards
-changed prefix. Two calls were reviewed and stand: required files are
-one rule at repo-lint's grain, and a rule's id is its heading's GitHub
-slug. Residuals are in `doc-types/standard/residual-ledger.md`, evicted
-rationale and heuristics in the parking lot.
-
-Done: the Standard loop's code. `scripts/rulegen` writes the standards
-and rules tables to `doc-types/standard/standards.txt` and fails on
-drift; the six encoded Standards slice clean. A first draft, open to
-change. A Standard with no `population` key is named on every run and
-skipped; when the last port lands, that skip becomes the failure the
-class's frontmatter rule states.
-
-Done: the Prose port. Slop Tics is one rule of Doc Conventions, No
-slop tics, pointing at the catalog the way Canonical Artifacts points
-at its files. The catalog is typed `General-Sheet` until the open
-question on that type is settled, and the document-remove-tics skill
-is the Prose card's Adopt pointer, since it mutates and is not gated.
-
-Done: the Knowledge Organization port. Seven files became seven
-Standards and a Guide. File Roles is the Guide, its four definitions in
-CONTEXT.md and its concept/harness boundary Document Types' population.
-Document Types split: the Types table's shape and the local-extension
-law are Type Registry. Same-repo resolution left Cross-References for
-its home, dotfiles CLAUDE.md, and Declarative present tense carries the
-working-set exemption in one added sentence. Every rule id okf-lint,
-ref-lint, and repo-lint emit for the card has a rule row. No residual.
-
-Done: the Tracking port. Five files became four Standards and a Guide.
-Factory Labels became Label Scheme, population a governed repo's GitHub
-labels, and took the wayfinder vocabulary from Tracker Operations; the
-per-issue label rules, the four-tuple, category only, no factory label,
-went to Issue Authoring, whose conditions are the roles the tracker
-derives: leaf, build leaf, spike, epic, wayfinder map or ticket. Tracker
-Operations is a Guide, its two state rules moved out first. Candidates
-merged the commitment test into one rule, Uncommitted work; Repository
-Settings gained GitHub origin for `tracking.remote`. bootstrap-labels
-moved from Adopt to Enforce on demand, since it repairs as readily as it
-mints. Every id workspace-lint and repo-lint emit for the card has a rule
-row; three residuals in the ledger; two evictions in the parking lot.
-The scheme judgments reference the rewritten files and are expired.
-
-Done: the Shell port. Shell Conventions binds a shell file in a
-governed repo with nine rules. Four bind every file: Bash, declared;
-shellcheck-clean; Disable carries a reason; and Formatting, the new
-rule behind the shfmt the commit gate has run all along. Executable
-scripts, tested by the exec bit, holds Glue only and Strict mode;
-Sourced fragments, tested by the `.bashrc.d/` path, holds the
-fragment's three. Nothing evicted; one residual.
-
-Done: the Python port. Python Style binds a Python file a governed repo
-tracks with nine rules: Empty under the Package initializers condition,
-eight on every file, two of them new, Formatted by ruff format and
-Annotated signatures, so the formatter and mypy each back a stated
-rule. The default-conventions sentence and seven rationale blocks went
-to the parking lot. The card names both ruff hooks and mypy and says in
-prose that five reviewer-checked rules are a chosen gap.
-
-Done: the Testing port. Testing Conventions binds a repo's Python test
-suite with twenty-one unconditioned rules; the three testing-lint ids
-sit on Mirror source structure, No logic in tests, and Access only
-public names. The humble-object design half and the Ports section went
-to the parking lot with Module Design named as their home; the
-default-conventions sentence went with Python's. Two residuals.
-
-Done: the Modules port. Module Design Conventions binds a module in a
-governed repo's source with eight unconditioned rules, from Deep, not
-shallow to Results are returned, not written. The vocabulary stayed in
-the lead prose and the rule bodies; the dependency categories moved
-into the improve-codebase-architecture skill, their only reader; four
-evictions in the parking lot. Audit is none, with a remark saying the
-reviewer is the only check.
-
-Done: the Decisions port. Decision Record Conventions binds a numbered
-record under `docs/decisions/` with ten rules, one of them, What was
-examined, under the External-convention evaluation condition. The
-warrant survives as The bar; The directory is new and writes down what
-ref-lint enforced by hand; the Index section went to its neighbours,
-Indexes and README Content. Cross-References' population gained the
-record exemption. Four evictions; three residuals.
-
-Done: the Semantic Validation port, at the minimal grain. Judgment
-Declarations binds a repo's opt-in table, declaration files, and
-entries with seven unconditioned rules and no Claims hold rule; The
-Cache Gate and Consuming Judgments retyped Guide, bodies intact. The
-card audits with judgments-lint alone and says in prose that the push
-gate holds a state no rule covers. Four evictions; one residual. The
-judgments themselves are untouched, and the ones citing rewritten files
-are expired.
-
-Done: the Harness port. Four files became two Standards and two
-Guides. CLAUDE.md Content binds a `CLAUDE.md` at any scope: no
-frontmatter, operational scope, one scope, and the global source's
-shape under a dev-playbook-only condition. Runbook Conventions binds a
-skill bundle or an agent definition: location, closed front matter, the
-forked description, values, the H1, completion criteria, the chain,
-then the Skill and Agent conditions. Every one of harness-files-lint's
-nineteen ids has a rule row. Claude Code Files is the registry, Writing
-for Agents the craft, runbook-creator the Adopt; Runbook and Context
-file went to CONTEXT.md. The voice rule's id moved to the Prose card,
-`prose.agent-facing-voice`, since prose-lint emits it. Five evictions;
-two residuals.
-
-Done: the Meta-Standard port. The card defines itself by three
-Standards. Card Catalog is new and binds a repo's flat cards and their
-index with six rules, so every `standard.*` id has a row; the four
-doc-types pointers left Define, and the card's lead paragraph links
-both doc-type indexes instead. Detectors keeps only the detector: three
-rules on any, eight on a first-party script under one condition, and
-Drift went to the parking lot. Gates is untouched. Adopting a
-Repo-Scoped Standard is a Guide under Adopt, and `standards/standard/`
-gained an index. Four evictions; two residuals.
-
-Done: every card but Instruments is ported. The eight ports above ran
-as one batch: eight scouts read and tabled, the rulings were made
-once, and eight porters wrote patches in their own worktrees that were
-applied here in series. `rulegen` names one unported Standard,
-`instrument/format.md`, and skips it. The judgments the branch expired,
-twenty-two of twenty-six, were deleted rather than re-run: three
-declaration files went whole, with the three Audit bullets that cited
-them, and four recipe-and-tooling judgments remain in
-`judgments/docs-match-code.yaml`. `chains.txt` was regenerated, so the
-Carries its chain rule holds again.
 
 1. Make rulegen fail on a Standard with no `population`, with an
    exclusion mark for `instrument/format.md`, so the skip becomes the

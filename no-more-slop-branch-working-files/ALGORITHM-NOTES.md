@@ -174,14 +174,12 @@ conditions.
 
 ## Scout, rule, port
 
-Eight cards ported in one batch as three phases: a scout per card read
-the files and tabled the facts, the rule candidates, the evictions, and
-the quandaries with a lean; the rulings were made once over all eight
-tables; a porter per card wrote the patch in its own worktree against
-its scout's table. The scouts cost more than a direct port had, and the
-cost was the brief: it demanded exhaustive verification of every fact.
-The porter brief said trust the scout's facts and capped the report,
-and the porters came in at a third of the tokens. Everything a phase
+A batch port runs as three phases: a scout per card reads the files and
+tables the facts, the rule candidates, the evictions, and the quandaries
+with a lean; the rulings are made once over all the tables; a porter per
+card writes the patch in its own worktree against its scout's table. The
+scout brief demands exhaustive verification of every fact; the porter
+brief trusts the scout's facts and caps the report. Everything a phase
 hands on is a file on disk, so the coordinator can compact between
 phases.
 
