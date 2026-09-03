@@ -52,7 +52,7 @@ DETECTORS = (
 )
 
 # Audit scripts a card's Audit cell may cite that deliberately run outside the
-# commit gate (enforcement.md — outside the gates). standards-lint's
+# commit gate (outside the gates, per standards/standard/gates.md). standards-lint's
 # hook-surfaces closure accepts these as cited-but-unenrolled; anything else
 # cited and missing from DETECTORS is an enrollment hole.
 UNGATED_AUDITS = frozenset({"workspace-lint"})

@@ -5,7 +5,7 @@
 # Claude.ai (Pro/Max) subscription rate limits, so this script doubles as the
 # capture point: a session with no other way to see its own usage reads the
 # cache this writes.
-set -uo pipefail
+set -euo pipefail
 
 input=$(cat)
 

@@ -41,6 +41,10 @@ the stub it needs — the signature is designed here, since the brief pins
 behavior, not interfaces. Body is `raise NotImplementedError` for functions and
 methods, `pass` for `__init__`. Don't pre-stub symbols not yet under test.
 
+**Fixtures define the contract.** A fixture that constructs an object, a fake
+included, is the interface contract the Green step implements against; keep it
+minimal, only the parameters the spec implies.
+
 **Green.** Write the minimal implementation that makes the failing test pass.
 Don't add code for behaviors not yet tested. Run `make test`; confirm green.
 

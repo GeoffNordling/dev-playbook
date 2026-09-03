@@ -81,8 +81,8 @@ prose  conventions  imperative-and-second-person   harness-loaded-agent-instruct
 Rows of the generated file, excerpted.
 
 Card and standard together key both tables, because a stem repeats
-across cards: `standards/standard/consuming.md` and
-`standards/semantic-validation/consuming.md`. The card column is the
+across cards: `standards/prose/conventions.md` and
+`standards/shell/conventions.md`. The card column is the
 path's first directory, never a pointer in the file. A rule with no
 condition shows `—`. Rows sort by card, standard, then rule, so the
 file diffs stably.
