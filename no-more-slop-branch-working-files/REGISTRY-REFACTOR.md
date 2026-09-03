@@ -31,13 +31,6 @@ agent read at the same level. What that view is, is settled below.
 Yes is a Standard. No is something else: possibly a Guide, possibly a
 file type not yet defined.
 
-**State, never process.** "Reject", based on a Standard, means the state of an object at one
-moment. Standards govern objects. A process is never audited by its
-trace; it is checked only through the objects it produces. Auditing that
-an agent followed a documented process step for step, and rejecting the
-result on a deviation, is the wrong kind of audit and the wrong kind of
-enforcement.
-
 **Object.** A thing with a state readable at one moment: a file, a tree,
 a pull request, an issue, a label set.
 
@@ -46,6 +39,13 @@ objects. A process is described for a reader or executed by an agent.
 
 Object and Process are provisional: it is not settled that either
 needs defining precisely.
+
+**State, never process.** "Reject", based on a Standard, means the state of an object at one
+moment. Standards govern objects. A process is never audited by its
+trace; it is checked only through the objects it produces. Auditing that
+an agent followed a documented process step for step, and rejecting the
+result on a deviation, is the wrong kind of audit and the wrong kind of
+enforcement.
 
 **Standard-Card.** What the built doc-type today named Standard actually
 is: its own definition file says the family is the population of cards
@@ -142,7 +142,7 @@ Standard's population already binds the same object.
 **The CLOA object of the standards is two tables.** A Standard is a
 collection, not a sequence, so its view is a relation: unordered rows,
 sorted for stable diffs, greppable, joinable. One generated file holds
-the whole workspace in two tables:
+the whole workspace:
 
 ```
 standards
@@ -198,10 +198,10 @@ heuristics, anything a port cannot place. It exists so nothing is
 forgotten while the ports move fast; sorting it is its own action
 item, after the ports.
 
-**Condition, not guard.** The member subset a rule binds is its
-condition, the word Runbook already uses for what must hold for an
-edge to fire; one word serves both doc-types, and "guard" is not used.
-A rule with no condition binds every member.
+**Condition, not guard.** One word serves both doc-types, defined in the
+root's terms bucket
+([No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#terms));
+"guard" is not used.
 
 **One encoding.** One written form for the population, one for a rule
 with its name, one for a condition, designed for the parser and made
@@ -241,10 +241,7 @@ name. It becomes `standard-card/`, `standard/`, `runbook/`.
 ## The rule/procedure split
 
 Located, because the user wanted to remember where it is. One home:
-[File Roles](/standards/knowledge-organization/file-roles.md). A rule
-binds every actor who touches the thing, whatever job that actor is
-doing; a procedure binds one actor for the length of one run. The split
-is declared "a general aim, not a strict gate". The
+[File Roles](/standards/knowledge-organization/file-roles.md). The
 imperative-versus-declarative voice rule is two conditioned rules in Doc
 Conventions,
 [Imperative and second person](/standards/prose/conventions.md#imperative-and-second-person)

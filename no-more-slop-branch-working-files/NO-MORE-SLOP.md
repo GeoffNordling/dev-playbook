@@ -65,7 +65,7 @@ The items, each a future work session:
   [Algorithm Notes](/no-more-slop-branch-working-files/ALGORITHM-NOTES.md).
   What the ports evict waits in
   [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md).
-- **When the parser runs.** The move landed the parser at
+- **The parser's trigger.** The move landed the parser at
   `scripts/chaingen`, writing its generated view to
   `doc-types/runbook/chains.txt` — a temporary location, to be settled
   with the rest of this item. Undecided: when it runs. Today it runs by
@@ -189,7 +189,7 @@ The items, each a future work session:
 - **The working set rebuilt as the future doc-type tree.** Every theory
   file rewritten under its future basename: system-legibility.md (the
   doctrine), doc-type.md (the kind), doc-type-system.md (this repo's
-  instantiation), and the Runbook doc-type's four files
+  instantiation), and the Runbook doc-type's files
   (runbook-definition.md, runbook-contract-shape.md, runbook-encoding.md,
   runbook-residual-ledger.md). CLOA-ABSTRACTIONS.md and TYPES.md drained
   into these and were deleted.
@@ -353,6 +353,9 @@ works the term holds the detail. Every one is a tentative promotion to
 - **acceptance tier** — the small, capped, fully read test suite in
   `tests/acceptance/`, one test per behavior the user could state in a
   sentence. Its opposite is the unread tier.
+- **the axis** — the test that sorts a document into a kind: can a
+  reviewer or a lint cite it to reject work?
+  ([Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md#decisions)).
 - **the bedrock of determinism** — the boundary where targets stop being
   stochastic; below it the work is mostly choosing pre-existing tools
   ([System Legibility](/docs/system-legibility.md)).
@@ -426,6 +429,9 @@ works the term holds the detail. Every one is a tentative promotion to
   ([Doc-Type](/doc-types/doc-type.md#the-loop)).
 - **residual** — whatever the current primitives cannot express; tracked,
   never forced.
+- **Rule** — the primitive at the heart of the Standard doc-type: a name,
+  a condition, and a predicate over one member's state
+  ([contract-shape.md](/doc-types/standard/contract-shape.md)).
 - **runbook** — a skill or an agent definition; an invocable command
   ([definition.md](/doc-types/runbook/definition.md)).
 - **shape** — the form every contract in a family takes, fixed by the

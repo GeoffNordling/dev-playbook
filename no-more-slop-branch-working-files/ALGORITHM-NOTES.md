@@ -87,15 +87,15 @@ to match the answer.
 
 ## Rule ids follow the card
 
-The Build port moved the pin rule and the dogfood mirror out of Build
-into a new Distribution card, and their ids moved with them:
-`build.pin` became `distribution.pin`, and the mirror half of
-`build.self-audit` became `distribution.dogfood`. standards-lint's rule
-matrix forced it: every prefix a detector emits must belong to a card
-whose Audit cell cites that detector. The card boundary is real in the
-code, so a rule that changes card changes id, and the tests that pin
-the prefix sets change with it. Moving a rule between cards is a hook
-change consumers see at their next pin bump.
+The decision is in
+[Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md#decisions).
+What made it, and what generalizes: standards-lint's rule matrix forced
+it, because every prefix a detector emits must belong to a card whose
+Audit cell cites that detector. So when the Build port moved the pin
+rule onto a new Distribution card, `build.pin` had to become
+`distribution.pin`. The card boundary is real in the code, so the tests
+that pin the prefix sets change with the rule, and moving a rule between
+cards is a hook change consumers see at their next pin bump.
 
 ## Bundle at the lint's grain
 
@@ -108,18 +108,19 @@ partner.
 
 ## The slug is the anchor
 
-The rule column was first defined as a slug of its own, lowercase with
-runs of non-alphanumerics as hyphens. The Build port's headings named
-files, `ci.yml` and `.pre-commit-config.yaml`, and a second slug rule
-would have given every rule two names, one for the view and one for
-links. The GitHub heading slug that ref-lint already resolves became
-the rule's id, so a view row's rule column is the anchor a citation
-uses. One existing mark reused, instead of a new one invented.
+The decision is in
+[Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md#decisions).
+What made it: the rule column was first defined as a slug of its own,
+lowercase with runs of non-alphanumerics as hyphens, and the Build
+port's headings named files, `ci.yml` and `.pre-commit-config.yaml`, so
+a second slug rule would have given every rule two names, one for the
+view and one for links. One existing mark reused beats a new one
+invented.
 
 ## Definitions go to the vocabulary
 
-File Roles was four definitions, concept document, harness-owned file,
-rule, procedure, and one aim it called "a general aim, not a strict
+File Roles was definitions — concept document, harness-owned file,
+rule, procedure — and one aim it called "a general aim, not a strict
 gate". A definition is not a predicate over a member's state, and an aim
 that is not a gate fails the axis, so nothing in the file was a rule.
 The definitions went to CONTEXT.md, the file became a Guide, and the one
@@ -174,7 +175,7 @@ conditions.
 
 ## Scout, rule, port
 
-A batch port runs as three phases: a scout per card reads the files and
+A batch port runs in phases: a scout per card reads the files and
 tables the facts, the rule candidates, the evictions, and the quandaries
 with a lean; the rulings are made once over all the tables; a porter per
 card writes the patch in its own worktree against its scout's table. The
