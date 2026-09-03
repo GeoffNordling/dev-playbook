@@ -312,7 +312,7 @@ issue and its PR carry, never left as a placeholder.
     incidental bugs, cleanups, adjacent improvements, and review findings
     the user rules real-but-not-this-issue. Each entry is a real tracker
     stub at `phase:intake`, named by issue link — never a Candidate
-    ([the one-goal principle](/standards/tracking/issue-authoring.md#brief-principles)).
+    ([the one-goal principle](/standards/tracking/issue-authoring.md#one-goal)).
     `Nothing deferred.` explicitly when empty.
   - `## Suggestion dispositions` — one line per Suggestion thread the review
     loop settled, naming its outcome and the thread. It is the merge read's

@@ -13,6 +13,10 @@ knowledge-organization  type-registry               a document-type registry's T
 knowledge-organization  working-documentation-sets  a working documentation set, the Markdown files one stream of in-process work accumulates
 prose                   conventions                 an authored document, except type: Reference and the paths in .prose-lint-exempt
 standard                gates                       a gate: an automatic, unmanned blocking point on the path to main
+tracking                candidates                  a repo's CANDIDATES.md
+tracking                issue-authoring             a GitHub issue in a governed repo
+tracking                label-scheme                a governed repo's GitHub labels
+tracking                repo-settings               a governed repo's GitHub settings: its merge settings and the rules in force on its default branch
 
 rules
 card                    standard                    rule                                              when
@@ -109,3 +113,36 @@ standard                gates                       a-red-ci-run-is-never-merged
 standard                gates                       installed-in-every-clone                          —
 standard                gates                       skips                                             —
 standard                gates                       three-rungs                                       —
+tracking                candidates                  entry-shape                                       —
+tracking                candidates                  promotion                                         —
+tracking                candidates                  structure                                         —
+tracking                candidates                  the-only-future-work-file                         —
+tracking                candidates                  uncommitted-work                                  —
+tracking                issue-authoring             acceptance-criteria                               build-leaf
+tracking                issue-authoring             behavioural-not-procedural                        —
+tracking                issue-authoring             category-only                                     epic
+tracking                issue-authoring             claim-provenance                                  —
+tracking                issue-authoring             no-factory-label                                  wayfinder-map-or-ticket
+tracking                issue-authoring             one-goal                                          —
+tracking                issue-authoring             optional-sections                                 epic
+tracking                issue-authoring             prohibited-surfaces                               build-leaf
+tracking                issue-authoring             prototype-claims                                  —
+tracking                issue-authoring             readiness                                         leaf
+tracking                issue-authoring             relationships                                     —
+tracking                issue-authoring             required-headings                                 build-leaf
+tracking                issue-authoring             roles                                             —
+tracking                issue-authoring             spike-headings                                    spike
+tracking                issue-authoring             the-artifacts-section                             build-leaf
+tracking                issue-authoring             the-brief-freeze                                  —
+tracking                issue-authoring             the-epic-body                                     epic
+tracking                issue-authoring             the-four-tuple                                    leaf
+tracking                issue-authoring             user-intent                                       build-leaf
+tracking                issue-authoring             vertical-slices                                   leaf
+tracking                issue-authoring             wayfinder-labels                                  wayfinder-map-or-ticket
+tracking                issue-authoring             written-for-the-user                              —
+tracking                label-scheme                no-blocked-label                                  —
+tracking                label-scheme                phase-labels                                      —
+tracking                label-scheme                valid-labels                                      —
+tracking                repo-settings               default-branch-protection                         —
+tracking                repo-settings               github-origin                                     —
+tracking                repo-settings               squash-only-merges                                —

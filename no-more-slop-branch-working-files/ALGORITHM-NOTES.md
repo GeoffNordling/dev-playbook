@@ -148,6 +148,30 @@ compel, by hand as much as by machine. A cell is chosen by what a tool
 does to the object, and how it is triggered is one bold word inside the
 bullet.
 
+## A procedure hides rules
+
+Tracker Operations read as a command reference, the `gh` calls that
+create, link, and close an issue, and the axis said Guide on the first
+pass. Inside it sat two state rules: a map carries `wayfinder:map`, a
+ticket carries one `wayfinder:<type>` and is a sub-issue of its map; and
+the scheme-vs-tracker judgment held the label scheme to that section,
+so the vocabulary lived in a procedure. The rules moved to Issue
+Authoring and Label Scheme first, and the file retyped after. Before a
+procedure leaves the Standards, read it for the object states its
+commands assume; those are rules, and they need a population before the
+procedure loses its type.
+
+## Roles are conditions
+
+Issue Authoring's rules bind by what an issue is, a leaf, a build leaf,
+a spike, an epic, a wayfinder issue, and each of those is a fact the
+tracker holds: sub-issues or none, `mode:direct` or `mode:spike`, a
+`wayfinder:*` label or not. The conditions wrote themselves from the
+role derivation, and the brief formats fell under them as H3s with the
+lint's two heading tuples as their predicates. When a Standard's prose
+keeps saying "a leaf carries" and "an epic never", the nouns are the
+conditions.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

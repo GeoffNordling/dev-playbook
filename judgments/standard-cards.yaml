@@ -154,8 +154,8 @@ judgments:
       - standards/tracking/index.md
       - standards/tracking/candidates.md
       - standards/tracking/issue-authoring.md
+      - standards/tracking/label-scheme.md
       - standards/tracking/repo-settings.md
-      - standards/tracking/tracker-operations.md
       - scripts/workspace-lint
       - scripts/repo-lint
       - scripts/bootstrap-labels

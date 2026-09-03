@@ -309,6 +309,17 @@ states a formatting rule; the Python card names `ruff-check` and not
 `ruff-format`. Each port either writes the rule its formatter enforces
 or records why the gate runs a tool no Standard backs.
 
+**A port expires the judgments that reference the file.** The judgment
+cache keys on the digest of every evidence and reference file, so
+rewriting a Standard a judgment references, `label-scheme.md` for
+`scheme-vs-graph` and `scheme-vs-tracker`, `standards/tracking.md` for
+`standard-card-tracking`, expires the verdict, and the push gate's
+`make check-judgments-cache` fails until the judgment is re-run. Every
+remaining port touches a referenced file: the Harness Standards and the
+Python, Shell, and Semantic Validation cards are all references. The
+re-run is the user's, after the diff is approved, and it costs a model
+call per expired judgment.
+
 ## The rule/procedure split
 
 Located, because the user wanted to remember where it is. One home:
@@ -330,8 +341,8 @@ Raised, not settled. No lean recorded.
 - The type the doc-type family's own files carry.
 - The files typed `Standard` that describe themselves as recipes, the
   two `consuming.md`. Bootstrap was the third; the Build port retyped it
-  `Guide`, and whether Guide is the kind a procedure carries is not
-  settled.
+  `Guide`, the Tracking port did the same to Tracker Operations, and
+  whether Guide is the kind a procedure carries is not settled.
 - Whether a population's exclusions are written in the population mark
   or in the file's prose.
 - Which of this file's decisions move to a permanent home in the
@@ -419,6 +430,20 @@ law are Type Registry. Same-repo resolution left Cross-References for
 its home, dotfiles CLAUDE.md, and Declarative present tense carries the
 working-set exemption in one added sentence. Every rule id okf-lint,
 ref-lint, and repo-lint emit for the card has a rule row. No residual.
+
+Done: the Tracking port. Five files became four Standards and a Guide.
+Factory Labels became Label Scheme, population a governed repo's GitHub
+labels, and took the wayfinder vocabulary from Tracker Operations; the
+per-issue label rules, the four-tuple, category only, no factory label,
+went to Issue Authoring, whose conditions are the roles the tracker
+derives: leaf, build leaf, spike, epic, wayfinder map or ticket. Tracker
+Operations is a Guide, its two state rules moved out first. Candidates
+merged the commitment test into one rule, Uncommitted work; Repository
+Settings gained GitHub origin for `tracking.remote`. bootstrap-labels
+moved from Adopt to Enforce on demand, since it repairs as readily as it
+mints. Every id workspace-lint and repo-lint emit for the card has a rule
+row; three residuals in the ledger; two evictions in the parking lot.
+The scheme judgments reference the rewritten files and are expired.
 
 1. The Standard loop, remaining ports. Every other card, each read and
    split in the moment the way Build was, with cards added, merged, or

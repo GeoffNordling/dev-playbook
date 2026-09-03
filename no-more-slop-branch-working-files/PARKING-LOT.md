@@ -312,6 +312,27 @@ states at read time what the linter has enforced at commit time all along;
 the [same-repo-resolution Decision Record](/docs/decisions/0009-same-repo-resolution.md)
 records why the alternatives were rejected.
 
+## The refinement step
+
+From `standards/tracking/issue-authoring.md`, the Tracking port; the
+Readiness rule keeps the bar and the one-crossing exemption, and the
+intake and design skills carry the interview itself. Cited by nothing.
+
+The refinement interview — intake, or the `design` node — is the **refinement
+step** that carries a leaf to ready by authoring its brief; the issue-review
+verdict at the beat's end is what releases it.
+
+## Agents serve the work nodes
+
+From `standards/tracking/factory-labels.md`, the Tracking port, which
+renamed the file `label-scheme.md`; a fact about the factory, with no
+rule in it. Cited by nothing.
+
+The factory region's work nodes are served by typed agent definitions that the
+traverse script launches — several of them at a review diamond. A
+definition-region node is usually served by a slash-command of the same name
+(`design` → `/design`), but that mapping is not guaranteed.
+
 ## Acronyms
 
 None.

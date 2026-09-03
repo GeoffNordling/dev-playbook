@@ -64,3 +64,23 @@ Could not express one class of object: the population spans four kinds
 of state, a manifest, a local block, a pin, and the roster, joined only
 by the repo that holds them. Could not express the roster rule over an
 object in a tree: its member is one line of workspace-lint's source.
+
+### tracking/candidates
+
+Could not express The only future-work file over the member: its objects
+are the rogue `ROADMAP.md` and its kin elsewhere in the tree, so it binds
+a member outside the population, the way Gates' red-CI rule does.
+
+### tracking/issue-authoring
+
+Could not express Build leaf and Spike as subsets of Leaf: conditions do
+not nest, so each restates the leaf test with its mode. Could not express
+the wayfinder body shape at all: the rule is the `/wayfinder` skill's,
+and the half of `tracking.wayfinder-shape` that checks a map's sections
+has no rule row.
+
+### tracking/repo-settings
+
+Could not express GitHub origin over the member: the remote is the
+clone's, and the settings it opens are the population, so the rule binds
+the object that makes the population readable.

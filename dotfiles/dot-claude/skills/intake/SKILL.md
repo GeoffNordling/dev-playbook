@@ -44,7 +44,7 @@ Report what both checks found and where you looked. On a hit — existing covera
 
 ### 3. Pick the four-tuple
 
-{Read [factory-labels.md](~/workspace/dev-playbook/standards/tracking/factory-labels.md); the dimensions, their values, and what each means} — pick the appropriate value in each.
+{Read [Label Scheme](~/workspace/dev-playbook/standards/tracking/label-scheme.md); the dimensions, their values, and what each means} — pick the appropriate value in each.
 
 - `tests:*` — for `mode:direct`, ask the user.
 - `phase:*` — the routing decision, and intake's real deliverable. Never leave the issue at `phase:intake` — on the fast path §5 holds it there only until §6's verdict moves it, or the user parks the beat and the issue holds here for the next session.
@@ -65,7 +65,7 @@ Per the issue conventions: the build-leaf brief for `mode:direct`, the spike bri
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready — readiness is settled at the approval that releases the issue, not here.
 
-On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-build-leaf-brief-modedirect) requires except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
+On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#required-headings) requires except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
 
 ### 5. Confirm, then land
 

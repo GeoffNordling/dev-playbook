@@ -86,9 +86,13 @@ testing                 define   /standards/testing/conventions.md
 testing                 audit    /scripts/testing-lint
 testing                 enforce  commit gate
 testing                 adopt    none
-tracking                define   /standards/tracking/index.md
+tracking                define   /standards/tracking/candidates.md
+tracking                define   /standards/tracking/issue-authoring.md
+tracking                define   /standards/tracking/label-scheme.md
+tracking                define   /standards/tracking/repo-settings.md
 tracking                audit    /scripts/workspace-lint
 tracking                audit    /scripts/repo-lint
 tracking                audit    /judgments/code-matches-docs.yaml
 tracking                enforce  commit gate
-tracking                adopt    /scripts/bootstrap-labels
+tracking                enforce  /scripts/bootstrap-labels
+tracking                adopt    none

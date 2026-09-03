@@ -264,7 +264,7 @@ finds every disposition of a kind.
   cycle that has since converged. It stays a Suggestion throughout: it never
   gates convergence and it never escalates.
 - **Defer** — a real tracker stub at `phase:intake`, labeled `origin:deferral`
-  ([factory-labels.md](/standards/tracking/factory-labels.md#valid-labels)), so
+  ([Label Scheme](/standards/tracking/label-scheme.md#valid-labels)), so
   every issue born of a factory deferral is one query away. Doubt lands here: a
   stub is reversible, and information a decline drops is gone.
 - **Decline** — a one-line reply naming its reason from the vocabulary, and no

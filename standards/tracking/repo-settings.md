@@ -1,16 +1,29 @@
 ---
 type: Standard
 title: Repository Settings
-description: GitHub repository settings every repo should have — squash-only merges, PR message format, auto-deleted merged branches, a default branch protected from destructive operations
+description: The GitHub settings every governed repo carries — a GitHub origin, squash-only merges with the PR message format and auto-deleted merged branches, and a default branch protected from destructive operations
+population: "a governed repo's GitHub settings: its merge settings and the rules in force on its default branch"
 ---
 
 # Repository Settings
 
-GitHub settings every repository in the workspace `SHALL` have.
+The GitHub settings every governed repo carries. The merge settings and
+the rulesets both sit behind GitHub's all-or-nothing **Administration**
+permission, too broad to grant for a one-time toggle, so they are set by
+hand and only audited: workspace-lint reads them over `gh api` and
+reports drift, and no repair tool exists.
 
-## Merge strategy: squash only
+## GitHub origin
 
-In **Settings → General → Pull Requests**:
+The repo's `origin` remote is a GitHub repository. Without one there are
+no settings to read; workspace-lint reports the repo and checks nothing
+further (`tracking.remote`).
+
+## Squash-only merges
+
+One pull request lands as one commit on `main`, its message from the PR
+title and body, and the merged branch is deleted: in **Settings → General
+→ Pull Requests**, every row of the table holds (`tracking.settings`).
 
 | Setting | Value |
 |---------|-------|
@@ -20,15 +33,11 @@ In **Settings → General → Pull Requests**:
 | Allow rebase merging | off |
 | Automatically delete head branches | on |
 
-One pull request lands as one commit on `main`, its message from the PR title
-and body. Set these by hand — the merge settings sit behind GitHub's
-all-or-nothing **Administration** permission, too broad to grant for a
-one-time toggle.
+## Default branch protection
 
-## Default branch: protected from destructive operations
-
-The default branch `SHALL` carry a **ruleset** targeting it with enforcement
-**Active** and the destructive-operation rules on:
+The default branch carries a ruleset named `protect-main`, enforcement
+**Active**, an empty bypass list, targeting the default branch, with the
+two destructive-operation rules on (`tracking.branch-protection`).
 
 | Rule | Denies |
 |---|---|
@@ -36,14 +45,11 @@ The default branch `SHALL` carry a **ruleset** targeting it with enforcement
 | Restrict deletions | removing the branch |
 
 Together these make the branch's history append-only: every commit that
-reaches `main` stays reachable, so a mistaken push cannot erase reviewed work
-and no recovery depends on someone's local reflog.
-
-### The canonical ruleset
+reaches `main` stays reachable, so a mistaken push cannot erase reviewed
+work and no recovery depends on someone's local reflog.
 
 Create it at **Settings → Rules → Rulesets → New ruleset → New branch
-ruleset**. Rulesets sit behind the same all-or-nothing **Administration**
-permission as the merge settings, so this too is set by hand. Every field:
+ruleset**. Every field:
 
 | Field | Value |
 |---|---|
@@ -54,20 +60,21 @@ permission as the merge settings, so this too is set by hand. Every field:
 | Restrict deletions | checked |
 | Block force pushes | checked |
 
-Every other rule stays unchecked, and nothing is added to the bypass list — a
-bypass actor would return the destructive operations to whoever holds it,
-which is the one thing this ruleset exists to deny.
+Every other rule stays unchecked, and nothing is added to the bypass
+list — a bypass actor would return the destructive operations to whoever
+holds it, which is the one thing this ruleset exists to deny.
 
-Every field above is audited. workspace-lint reads the rules **in force on
-the default branch**: a ruleset that is inactive or aimed elsewhere supplies
-no rule to read, which settles enforcement and targeting. It then reads the
-ruleset behind each destructive-operation rule and requires an empty bypass
-list, with at least one named `protect-main`. A ruleset it cannot read is
-reported, not assumed empty.
+Every field above is audited. workspace-lint reads the rules **in force
+on the default branch**: a ruleset that is inactive or aimed elsewhere
+supplies no rule to read, which settles enforcement and targeting. It
+then reads the ruleset behind each destructive-operation rule and
+requires an empty bypass list, with at least one named `protect-main`. A
+ruleset it cannot read is reported, not assumed empty.
 
 Extra rules and extra rulesets are fine — the destructive-operation rules
 above are a floor.
 
 This is deliberately not [branch protection with required status
-checks](/standards/standard/gates.md#a-red-ci-run-is-never-merged): nothing here makes CI a merge
-precondition, which stays the user's standing rule.
+checks](/standards/standard/gates.md#a-red-ci-run-is-never-merged):
+nothing here makes CI a merge precondition, which stays the user's
+standing rule.

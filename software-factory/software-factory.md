@@ -83,7 +83,7 @@ deliverable — triage *is* the four-tuple.
 research, prototypes, tradeoffs. Prototyping happens in a disposable worktree
 that is deleted on exit; the `prototype/<issue>` branch pushed from it survives
 as the citable artifact
-([issue-authoring.md](/standards/tracking/issue-authoring.md#brief-principles)).
+([issue-authoring.md](/standards/tracking/issue-authoring.md#prototype-claims)).
 Nothing merges out of definition. A design session exits:
 
 - **A single leaf.** The chosen approach is written back into the issue by
@@ -137,4 +137,4 @@ does, who runs it, and under what contract is
 ## Labels
 
 The labels naming these states are defined in
-[factory-labels.md](/standards/tracking/factory-labels.md).
+[Label Scheme](/standards/tracking/label-scheme.md).
