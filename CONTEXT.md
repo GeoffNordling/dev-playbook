@@ -51,3 +51,9 @@ A rule of the system: a contract, a state and the moves out of it, a format, wha
 
 **Procedure**
 The steps of one job: its trigger, its target, the order of the steps, the conditions it branches on, the commands it issues, when it stops, what it reports. It binds one actor for the length of one run.
+
+**Runbook**
+An invocable command written as documentation: a skill or an agent definition. It is invoked by name, args in, a report out, effects on state in between, and its body is natural imperative English commanding the executing agent ([Runbook](/doc-types/runbook/definition.md)).
+
+**Context file**
+Prose the harness injects into agent context, read and never invoked: a `CLAUDE.md` at any scope and every `rules/*.md` ([Claude Code Files](/standards/harness/files.md)).

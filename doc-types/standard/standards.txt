@@ -3,16 +3,26 @@ card                    standard                    population
 build                   canonical                   a canonical artifact: its source under standards/build/canonical/ and each governed repo's copy
 build                   python                      a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/
 build                   skeleton                    a governed repo's tree, except standards/build/canonical/ in dev-playbook
+decisions               records                     a Decision Record: a numbered NNNN-slug.md file under a repo's docs/decisions/, except that directory's index.md and README.md
 distribution            channel                     a governed repo's share of the distribution channel: its hook manifest, its local block, its dev-playbook pin, and in dev-playbook the roster
+harness                 claude-content              a CLAUDE.md: a repo's root file, a nested <dir>/CLAUDE.md, or in dev-playbook the global source dotfiles/dot-claude/CLAUDE.md
+harness                 runbook-conventions         a runbook: a skill bundle or an agent definition under a governed repo's .claude/ or dev-playbook's dotfiles/dot-claude/
 knowledge-organization  context-content             a repo's CONTEXT.md
-knowledge-organization  cross-references            a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block
+knowledge-organization  cross-references            a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record
 knowledge-organization  document-types              a concept document
 knowledge-organization  indexes                     an index.md
 knowledge-organization  readme-content              a README.md
 knowledge-organization  type-registry               a document-type registry's Types table, the global one in dev-playbook or a consumer's local extension
 knowledge-organization  working-documentation-sets  a working documentation set, the Markdown files one stream of in-process work accumulates
+modules                 design                      a module in a governed repo's source: anything with an interface and an implementation
 prose                   conventions                 an authored document, except type: Reference and the paths in .prose-lint-exempt
+python                  style                       a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang
+semantic-validation     declarations                a repo's judgment declarations: the [tool.judgments] table in its pyproject.toml, the declaration files the table's globs match, and every entry in them
+shell                   conventions                 a shell file in a governed repo
+standard                cards                       a repo's card catalog: the flat standards/<name>.md cards and the standards/index.md that lists them
+standard                detectors                   a detector: a read-only check an Audit cell cites, first-party at scripts/<name> or third-party by its pin
 standard                gates                       a gate: an automatic, unmanned blocking point on the path to main
+testing                 conventions                 a governed repo's Python test suite: the test_*.py files anywhere in its tree, and the conftest.py and fake modules under tests/
 tracking                candidates                  a repo's CANDIDATES.md
 tracking                issue-authoring             a GitHub issue in a governed repo
 tracking                label-scheme                a governed repo's GitHub labels
@@ -41,12 +51,46 @@ build                   skeleton                    root-only-files             
 build                   skeleton                    runnables-live-in-scripts                         —
 build                   skeleton                    tests-present                                     python-source
 build                   skeleton                    uvlock-and-python-version                         python
+decisions               records                     date                                              —
+decisions               records                     immutability                                      —
+decisions               records                     optional-sections                                 —
+decisions               records                     scope                                             —
+decisions               records                     sequential-numbering                              —
+decisions               records                     status-vocabulary                                 —
+decisions               records                     template                                          —
+decisions               records                     the-bar                                           —
+decisions               records                     the-directory                                     —
+decisions               records                     what-was-examined                                 external-convention-evaluation
 distribution            channel                     a-pinned-rev                                      a-consumer
 distribution            channel                     dogfood-in-place-of-the-pin                       dev-playbook
 distribution            channel                     one-published-id                                  dev-playbook
 distribution            channel                     public                                            dev-playbook
 distribution            channel                     the-local-block-covers-the-manifest               a-publisher
 distribution            channel                     the-roster                                        dev-playbook
+harness                 claude-content              no-frontmatter                                    —
+harness                 claude-content              one-rule-per-heading                              global-file
+harness                 claude-content              one-scope                                         —
+harness                 claude-content              operational-scope                                 —
+harness                 claude-content              required-rules                                    global-file
+harness                 claude-content              two-sections                                      global-file
+harness                 runbook-conventions         arguments                                         skill
+harness                 runbook-conventions         body-opens-with-an-h1                             —
+harness                 runbook-conventions         bundle-layout                                     skill
+harness                 runbook-conventions         carries-its-chain                                 —
+harness                 runbook-conventions         description                                       —
+harness                 runbook-conventions         front-matter                                      —
+harness                 runbook-conventions         interactive-skills-inherit                        skill
+harness                 runbook-conventions         kebab-case-name                                   —
+harness                 runbook-conventions         location                                          —
+harness                 runbook-conventions         model-and-effort                                  —
+harness                 runbook-conventions         model-invocation-flag                             skill
+harness                 runbook-conventions         name-matches-its-home                             —
+harness                 runbook-conventions         no-arguments                                      agent
+harness                 runbook-conventions         references-one-level-deep                         skill
+harness                 runbook-conventions         skillmd-under-500-lines                           skill
+harness                 runbook-conventions         steps-end-on-a-completion-criterion               —
+harness                 runbook-conventions         tool-fields                                       skill
+harness                 runbook-conventions         tools                                             agent
 knowledge-organization  context-content             entry-shape                                       —
 knowledge-organization  context-content             glossary-only                                     —
 knowledge-organization  context-content             okf-frontmatter                                   —
@@ -91,6 +135,14 @@ knowledge-organization  working-documentation-sets  shape                       
 knowledge-organization  working-documentation-sets  speculative-voice                                 —
 knowledge-organization  working-documentation-sets  terms                                             —
 knowledge-organization  working-documentation-sets  worklist                                          —
+modules                 design                      a-port-at-a-process-boundary                      —
+modules                 design                      deep-not-shallow                                  —
+modules                 design                      dependencies-are-accepted-not-constructed         —
+modules                 design                      internal-seams-stay-inside                        —
+modules                 design                      results-are-returned-not-written                  —
+modules                 design                      the-deletion-test                                 —
+modules                 design                      the-interface-is-the-test-surface                 —
+modules                 design                      two-adapters-or-no-seam                           —
 prose                   conventions                 block-form-fits-its-content                       —
 prose                   conventions                 current-state-and-next-steps-only                 —
 prose                   conventions                 declarative-present-tense                         —
@@ -109,10 +161,73 @@ prose                   conventions                 positive-statement          
 prose                   conventions                 spelling                                          —
 prose                   conventions                 terminology-the-person-is-the-user                —
 prose                   conventions                 third-person                                      declarative-documents
+python                  style                       annotated-signatures                              —
+python                  style                       docstrings                                        —
+python                  style                       empty                                             package-initializers
+python                  style                       fail-loudly                                       —
+python                  style                       formatted-by-ruff-format                          —
+python                  style                       helper-justification                              —
+python                  style                       helper-placement                                  —
+python                  style                       module-layout                                     —
+python                  style                       no-future-annotations                             —
+semantic-validation     declarations                evidence-and-reference-paths                      —
+semantic-validation     declarations                fields                                            —
+semantic-validation     declarations                file-shape                                        —
+semantic-validation     declarations                one-file-per-claim-family                         —
+semantic-validation     declarations                opt-in-table                                      —
+semantic-validation     declarations                the-bar                                           —
+semantic-validation     declarations                unique-id                                         —
+shell                   conventions                 bash-declared                                     —
+shell                   conventions                 bounded-to-shell-integration                      sourced-fragments
+shell                   conventions                 dialect-directive                                 sourced-fragments
+shell                   conventions                 disable-carries-a-reason                          —
+shell                   conventions                 formatting                                        —
+shell                   conventions                 glue-only                                         executable-scripts
+shell                   conventions                 no-shebang-no-strict-mode                         sourced-fragments
+shell                   conventions                 shellcheck-clean                                  —
+shell                   conventions                 strict-mode                                       executable-scripts
+standard                cards                       audit-cites-a-lint-or-an-audit                    —
+standard                cards                       define-points-only-at-standards                   —
+standard                cards                       flat-layout                                       —
+standard                cards                       no-shadowing                                      —
+standard                cards                       the-catalog                                       —
+standard                cards                       the-question-sentence                             —
+standard                detectors                   --list-rules                                      a-first-party-detector
+standard                detectors                   a-formatter-is-a-detector-by-its-check-mode       —
+standard                detectors                   card-namespaced-rule-ids                          a-first-party-detector
+standard                detectors                   exit-codes                                        a-first-party-detector
+standard                detectors                   explicit-roots-outrank-the-hook-environment       a-first-party-detector
+standard                detectors                   finding-format                                    a-first-party-detector
+standard                detectors                   read-only                                         —
+standard                detectors                   the-hosting-pattern                               a-first-party-detector
+standard                detectors                   thin-shims                                        a-first-party-detector
+standard                detectors                   verbatim-content                                  a-first-party-detector
+standard                detectors                   wired-throughout-its-scope                        —
 standard                gates                       a-red-ci-run-is-never-merged                      —
 standard                gates                       installed-in-every-clone                          —
 standard                gates                       skips                                             —
 standard                gates                       three-rungs                                       —
+testing                 conventions                 access-only-public-names                          —
+testing                 conventions                 arrange-act-assert                                —
+testing                 conventions                 assert-on-observable-outputs                      —
+testing                 conventions                 assert-on-outcomes-not-call-sequences             —
+testing                 conventions                 conftest-hierarchy                                —
+testing                 conventions                 descriptive-names                                 —
+testing                 conventions                 expected-values-come-from-outside-the-code        —
+testing                 conventions                 fakes-for-stateful-dependencies                   —
+testing                 conventions                 fakes-live-in-the-test-tree                       —
+testing                 conventions                 fixtures-for-setup-and-teardown                   —
+testing                 conventions                 mirror-source-structure                           —
+testing                 conventions                 mocks-at-boundaries-only                          —
+testing                 conventions                 name-by-capability-not-mechanism                  —
+testing                 conventions                 narrowest-fixture-scope                           —
+testing                 conventions                 no-logic-in-tests                                 —
+testing                 conventions                 no-test-of-a-non-deterministic-decision           —
+testing                 conventions                 one-concept-per-test                              —
+testing                 conventions                 pytest                                            —
+testing                 conventions                 replace-dont-layer                                —
+testing                 conventions                 test-file-naming                                  —
+testing                 conventions                 the-lightest-double                               —
 tracking                candidates                  entry-shape                                       —
 tracking                candidates                  promotion                                         —
 tracking                candidates                  structure                                         —

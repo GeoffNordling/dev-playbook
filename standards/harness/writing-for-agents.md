@@ -1,7 +1,7 @@
 ---
-type: Standard
+type: Guide
 title: Writing for Agents
-description: The craft of any document an agent consumes — the two loads, the information hierarchy, context pointers, completion criteria, leading words, and pruning
+description: The craft behind any document an agent consumes — the two loads, the information hierarchy, context pointers, completion criteria, leading words, and pruning; read to write one, never cited to reject one
 ---
 
 # Writing for Agents
@@ -43,9 +43,11 @@ A pointer does two jobs — state what the material is, and list the **branches*
 - **One trigger per branch.** Synonyms that rename a single branch are one branch written twice; collapse them and keep only genuinely distinct branches.
 - **Cut identity the body already carries.**
 
+For a runbook's `description`, Runbook Conventions' [Description](/standards/harness/runbook-conventions.md#description) binds the three.
+
 ## Steps and completion criteria
 
-Every step ends on a **completion criterion** — the condition that tells the agent the work is done. Two properties make it a lever:
+Every step ends on a **completion criterion** — the condition that tells the agent the work is done; for a runbook, Runbook Conventions' [Steps end on a completion criterion](/standards/harness/runbook-conventions.md#steps-end-on-a-completion-criterion) binds it. Two properties make it a lever:
 
 - **Clarity** — can the agent tell done from not-done? A vague bound ("understanding reached") invites **premature completion**: ending the step before it is genuinely done, attention slipping to _being done_. The visible steps still ahead — the **post-completion steps** — supply the pull; the criterion's clarity is the resistance. Defend in order: **sharpen the bound first** (local and cheap); only if it is irreducibly fuzzy _and_ you observe the rush, hide the later steps by splitting the sequence.
 - **Demand** — how much it requires. "Every modified model accounted for" forces thorough work where "produce a change list" does not. Demand drives **legwork** — the digging the agent does within the work, latent in the wording rather than written as its own step — and it is not step-bound: "every rule applied" binds a body of flat reference just as "every step done" binds a sequence, which is how an all-reference document still carries an exhaustiveness bar.

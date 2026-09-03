@@ -88,7 +88,7 @@ holds a `.py` file.
 
 `tests/` exists and is not empty.
 
-Its content is [Testing Conventions](/standards/testing/conventions.md)'.
+Its content is [Testing Conventions](/standards/testing/conventions.md).
 
 ## JavaScript
 

@@ -64,8 +64,8 @@ its rectangles and diamonds — mapped that way, exactly:
 `intake, design, spike, build, pr-review`.
 
 **The parity invariant.** A scheme value no node answers to, or a node no
-scheme value names, is the violation; the `scheme-vs-graph` judgment
-checks it. Exempt, and only these:
+scheme value names, is the violation; no detector reads the graph, so a
+reviewer checks it. Exempt, and only these:
 
 - **Pre-issue states** — `CANDIDATES.md` and the idea funnel. No issue exists, so
   there is nothing to label.

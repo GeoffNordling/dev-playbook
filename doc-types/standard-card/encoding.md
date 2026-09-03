@@ -48,7 +48,8 @@ generator: a card that cannot be sliced cannot be viewed.
 
 A card is `standards/<name>.md`, flat, and every flat file there except
 `README.md` and `index.md` is a card; the tree's rule is flat = card,
-directory = content. standards-lint's `standard.card-layout` checks it.
+directory = content. The rule and its lint are
+[Flat layout](/standards/standard/cards.md#flat-layout).
 Where a document typed `Standard` lives is the Standard doc-type's rule,
 in [definition.md](/doc-types/standard/definition.md#where-a-standard-lives).
 
@@ -65,5 +66,6 @@ new sibling on the same subject keeps it.
 ## The catalog
 
 Each repo that carries cards has its own catalog at `standards/index.md`; in
-dev-playbook that is [standards/index.md](/standards/index.md). okf-lint's
-index rule forces a catalog to list every card with a matching description.
+dev-playbook that is [standards/index.md](/standards/index.md). Its
+membership and order are
+[The catalog](/standards/standard/cards.md#the-catalog).

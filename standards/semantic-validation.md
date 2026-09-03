@@ -21,17 +21,17 @@ copies two opaque strings and is left with only the refutations to weigh.
 
 ## Define
 
-- [standards/semantic-validation/](/standards/semantic-validation/index.md) — the contract, one
-  concern per document; start at Judgment Declarations
+- [Judgment Declarations](/standards/semantic-validation/declarations.md) — a
+  repo's opt-in table, its family files, an entry's fields, and the bar a
+  claim clears
 
 ## Audit
 
-- [judgments-lint](/scripts/judgments-lint) — checks declaration shape,
-  deterministically
-- [the LLM judgments](/standards/semantic-validation/declarations.md) — an LLM judge
-  rules on each declared claim against its evidence, dispatched by the
-  periodic `judgments-sweep` — for an ungated judgment, the only checker
-  there is; the audit-kind detector no deterministic lint can stand in for
+- [judgments-lint](/scripts/judgments-lint) — deterministically, over every
+  declaration file the opt-in table names: a malformed table, file, or entry,
+  and a duplicate id (`semantic-validation.declaration`); an absolute,
+  `..`-bearing, or missing evidence or reference path
+  (`semantic-validation.evidence-path`)
 
 ## Enforce
 
@@ -43,6 +43,11 @@ copies two opaque strings and is left with only the refutations to weigh.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — judgments-lint at the **commit gate** in every repo's suite,
   dispatched by the published `playbook-lint` hook
+
+The push gate holds a gated judgment's verdict current with the content it
+names, a state no rule of Judgment Declarations covers: that Standard binds a
+declaration's shape, and only the LLM judge rules on whether a claim still
+holds.
 
 ## Adopt
 

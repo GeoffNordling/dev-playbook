@@ -18,8 +18,9 @@ alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and
 code files to the code track, which reviews in parallel with you; both are
 reference material: read them where the docs describe them, and post no
 findings on them. Judgment declarations under `judgments/` are ordinary docs
-here — a review may flag one as stale against the artifacts it names
-([Maintenance](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#maintenance));
+here — a review may flag one as stale against the artifacts it names, or as a
+claim that misses
+[the bar](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#the-bar);
 cache state is never a finding.
 
 ## Read first

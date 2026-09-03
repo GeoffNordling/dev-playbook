@@ -23,17 +23,21 @@ A card is a markdown file at `standards/<name>.md` with
 governed question, then exactly four cells as sections. That sentence
 opens `Governs how`, names the territory its define cell covers, and runs
 about a breath; the frontmatter `description` repeats it verbatim less the
-period, so the catalog row and the card state the same remit.
-standards-lint's `standard.card-question` checks the pairing. Each cell holds
+period, so the catalog row and the card state the same remit; the rule
+and its lint are
+[The question sentence](/standards/standard/cards.md#the-question-sentence).
+Each cell holds
 annotated pointers; an empty cell states an explicit "none" so gaps stay
 visible. Cards are thin — often just a handful of pointers — and never
 restate the content of their targets.
 
 - **Define** — the Standards: documents typed `Standard`, each one
-  population and its rules.
+  population and its rules
+  ([Define points only at Standards](/standards/standard/cards.md#define-points-only-at-standards)).
 - **Audit** — read-only deviation detection: the detectors that report
   nonconformance without blocking anything. A formatter is a detector by
-  its check mode ([Detectors](/standards/standard/detectors.md#detectors)).
+  its check mode
+  ([Detectors](/standards/standard/detectors.md#a-formatter-is-a-detector-by-its-check-mode)).
 - **Enforce** — what compels conformance, in one of two modes. At a
   gate: the rung where nonconformance stops the path to main, cited by
   fixed name (**commit gate**, **push gate**, **CI gate**), defined in

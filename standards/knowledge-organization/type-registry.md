@@ -16,7 +16,7 @@ holding a `## Types` table of the same shape; okf-lint resolves a
 document's `type` against the union of the two, and against the global
 table alone when the repo carries no extension. Declaring a local
 extension is one step of
-[Consuming a Standard](/standards/standard/consuming.md). okf-lint is the
+[Adopting a Repo-Scoped Standard](/standards/standard/consuming.md). okf-lint is the
 authority ([Knowledge Organization](/standards/knowledge-organization.md)).
 
 ## Row shape

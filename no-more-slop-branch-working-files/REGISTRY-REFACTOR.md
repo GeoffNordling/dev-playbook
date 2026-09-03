@@ -445,12 +445,93 @@ mints. Every id workspace-lint and repo-lint emit for the card has a rule
 row; three residuals in the ledger; two evictions in the parking lot.
 The scheme judgments reference the rewritten files and are expired.
 
-1. The Standard loop, remaining ports. Every other card, each read and
-   split in the moment the way Build was, with cards added, merged, or
-   removed as the reading demands, and each checked by rulegen before
-   review.
-3. Decide what becomes of the parked rationale.
-4. Then the remaining open questions.
+Done: the Shell port. Shell Conventions binds a shell file in a
+governed repo with nine rules. Four bind every file: Bash, declared;
+shellcheck-clean; Disable carries a reason; and Formatting, the new
+rule behind the shfmt the commit gate has run all along. Executable
+scripts, tested by the exec bit, holds Glue only and Strict mode;
+Sourced fragments, tested by the `.bashrc.d/` path, holds the
+fragment's three. Nothing evicted; one residual.
+
+Done: the Python port. Python Style binds a Python file a governed repo
+tracks with nine rules: Empty under the Package initializers condition,
+eight on every file, two of them new, Formatted by ruff format and
+Annotated signatures, so the formatter and mypy each back a stated
+rule. The default-conventions sentence and seven rationale blocks went
+to the parking lot. The card names both ruff hooks and mypy and says in
+prose that five reviewer-checked rules are a chosen gap.
+
+Done: the Testing port. Testing Conventions binds a repo's Python test
+suite with twenty-one unconditioned rules; the three testing-lint ids
+sit on Mirror source structure, No logic in tests, and Access only
+public names. The humble-object design half and the Ports section went
+to the parking lot with Module Design named as their home; the
+default-conventions sentence went with Python's. Two residuals.
+
+Done: the Modules port. Module Design Conventions binds a module in a
+governed repo's source with eight unconditioned rules, from Deep, not
+shallow to Results are returned, not written. The vocabulary stayed in
+the lead prose and the rule bodies; the dependency categories moved
+into the improve-codebase-architecture skill, their only reader; four
+evictions in the parking lot. Audit is none, with a remark saying the
+reviewer is the only check.
+
+Done: the Decisions port. Decision Record Conventions binds a numbered
+record under `docs/decisions/` with ten rules, one of them, What was
+examined, under the External-convention evaluation condition. The
+warrant survives as The bar; The directory is new and writes down what
+ref-lint enforced by hand; the Index section went to its neighbours,
+Indexes and README Content. Cross-References' population gained the
+record exemption. Four evictions; three residuals.
+
+Done: the Semantic Validation port, at the minimal grain. Judgment
+Declarations binds a repo's opt-in table, declaration files, and
+entries with seven unconditioned rules and no Claims hold rule; The
+Cache Gate and Consuming Judgments retyped Guide, bodies intact. The
+card audits with judgments-lint alone and says in prose that the push
+gate holds a state no rule covers. Four evictions; one residual. The
+judgments themselves are untouched, and the ones citing rewritten files
+are expired.
+
+Done: the Harness port. Four files became two Standards and two
+Guides. CLAUDE.md Content binds a `CLAUDE.md` at any scope: no
+frontmatter, operational scope, one scope, and the global source's
+shape under a dev-playbook-only condition. Runbook Conventions binds a
+skill bundle or an agent definition: location, closed front matter, the
+forked description, values, the H1, completion criteria, the chain,
+then the Skill and Agent conditions. Every one of harness-files-lint's
+nineteen ids has a rule row. Claude Code Files is the registry, Writing
+for Agents the craft, runbook-creator the Adopt; Runbook and Context
+file went to CONTEXT.md. The voice rule's id moved to the Prose card,
+`prose.agent-facing-voice`, since prose-lint emits it. Five evictions;
+two residuals.
+
+Done: the Meta-Standard port. The card defines itself by three
+Standards. Card Catalog is new and binds a repo's flat cards and their
+index with six rules, so every `standard.*` id has a row; the four
+doc-types pointers left Define, and the card's lead paragraph links
+both doc-type indexes instead. Detectors keeps only the detector: three
+rules on any, eight on a first-party script under one condition, and
+Drift went to the parking lot. Gates is untouched. Adopting a
+Repo-Scoped Standard is a Guide under Adopt, and `standards/standard/`
+gained an index. Four evictions; two residuals.
+
+Done: every card but Instruments is ported. The eight ports above ran
+as one batch: eight scouts read and tabled, the rulings were made
+once, and eight porters wrote patches in their own worktrees that were
+applied here in series. `rulegen` names one unported Standard,
+`instrument/format.md`, and skips it. The judgments the branch expired,
+twenty-two of twenty-six, were deleted rather than re-run: three
+declaration files went whole, with the three Audit bullets that cited
+them, and four recipe-and-tooling judgments remain in
+`judgments/docs-match-code.yaml`. `chains.txt` was regenerated, so the
+Carries its chain rule holds again.
+
+1. Make rulegen fail on a Standard with no `population`, with an
+   exclusion mark for `instrument/format.md`, so the skip becomes the
+   failure the class's frontmatter rule states.
+2. Decide what becomes of the parked rationale.
+3. Then the remaining open questions.
 
 ## Acronyms
 

@@ -10,14 +10,20 @@ Governs how modules are designed — interfaces, depth, and seams.
 
 ## Define
 
-- [Module Design Conventions](/standards/modules/design.md) — the
-  contract: the vocabulary and the aliases it retires, the four principles,
-  the three rules that make an interface testable, and the dependency
-  categories that govern deepening
+- [Module Design Conventions](/standards/modules/design.md) — the contract:
+  depth, the deletion test, the seam rules, and the port at a process boundary
 
 ## Audit
 
 - none
+
+No detector exists. Whether an interface is small against the behaviour behind
+it is a comparison a reader makes, not a state deterministic code reads, and an
+Audit cell admits only a lint cited by a `/scripts/` link or a judgment link
+([Detectors](/standards/standard/detectors.md#detectors)). The reviewer at code
+review is the only check: `dotfiles/dot-claude/agents/code-pr-review.md` routes
+every diff carrying Python source to this contract. A code review is a one-time
+checkpoint, never an Enforce pointer.
 
 ## Enforce
 

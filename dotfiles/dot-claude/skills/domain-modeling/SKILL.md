@@ -36,4 +36,4 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Offer Decision Records sparingly
 
-{If a decision looks hard to reverse or would surprise a future reader, {Read [records.md](~/workspace/dev-playbook/standards/decisions/records.md)} and test the decision against its when-to-offer bar}. {If every criterion holds, {Write the new record under `docs/decisions/`}}. If any criterion is missing, skip the record.
+{If a decision looks hard to reverse or would surprise a future reader, {Read [records.md](~/workspace/dev-playbook/standards/decisions/records.md)} and test the decision against The bar}. {If every criterion holds, {Write the new record under `docs/decisions/`}}. If any criterion is missing, skip the record.

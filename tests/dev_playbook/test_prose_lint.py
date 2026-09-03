@@ -504,7 +504,7 @@ def test_list_rules_prints_the_rule_id(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     assert result.stdout.split() == [
-        "harness.agent-facing-voice",
+        "prose.agent-facing-voice",
         "prose.banned-word",
         "prose.judgment-spelling",
     ]

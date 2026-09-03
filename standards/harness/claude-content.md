@@ -1,75 +1,77 @@
 ---
 type: Standard
 title: CLAUDE.md Content
-description: The CLAUDE.md content standard — operational scope, the global and repo files, the nested-file hierarchy
+description: What a CLAUDE.md carries — no frontmatter, operational content at one scope, and the two sections and required rules of the global source in dev-playbook
+population: "a CLAUDE.md: a repo's root file, a nested <dir>/CLAUDE.md, or in dev-playbook the global source dotfiles/dot-claude/CLAUDE.md"
 ---
 
 # CLAUDE.md Content
 
-Claude Code injects `CLAUDE.md` into every session as operating
-configuration ([files.md](/standards/harness/files.md)), so it carries
-no OKF frontmatter. Its scope is how to operate — commands, rules, pointers
-to other docs. It `SHALL NOT` describe what the project is, why it exists,
-or the developer: those belong to the documentation hierarchy.
+A `CLAUDE.md` that Claude Code injects into a session as operating
+configuration: a repo's root file, a nested `<dir>/CLAUDE.md` below it,
+or the global source `dotfiles/dot-claude/CLAUDE.md` in dev-playbook,
+which Stow links to `~/.claude/CLAUDE.md`. The harness loads the global
+file into every session on the machine, then walks up the directory
+tree from the session's cwd and stacks each `CLAUDE.md` it finds, so a
+session inside `<repo>/<dir>/` receives the nested file, the root file,
+and the global file at once. The registry of every file the harness
+loads is [Claude Code Files](/standards/harness/files.md); the voice a
+`CLAUDE.md` speaks in is Doc Conventions'
+[Imperative and second person](/standards/prose/conventions.md#imperative-and-second-person).
 
-**Scope is the only thing that separates them**: the global file carries
-what holds for every session on the machine, a repo's file carries what
-holds for that repo alone. A rule `SHALL` live at the widest scope where it
-is true, and at exactly one.
+## No frontmatter
 
-## The repo file
+The file opens on its content, with no YAML frontmatter block: it is
+injected as operating configuration, and okf-lint never reads it.
 
-A repo's `CLAUDE.md` carries its own operating knowledge and nothing else —
-its commands, its gotchas, the traps that would cost an agent an hour. No
-content is mandated: the workspace-wide instructions live in the global
-file, and a repo with nothing repo-specific to say writes nothing but a
-title. Structure is the repo's own; it is checked for form, never for
-content.
+## Operational scope
 
-## The global file
+The file holds only how to operate: commands, rules, and pointers to
+other docs.
 
-A user's `~/.claude/CLAUDE.md` is injected into every session regardless of
-repo: it sits above the per-repo hierarchy and carries what is true of every
-repo on the machine. In this workspace it is not authored in place — its
-source is `dotfiles/dot-claude/CLAUDE.md`, Stow-symlinked into `~/.claude/`,
-so the governed artifact lives in dev-playbook and rides the normal review
-path. As a `CLAUDE.md` it is a registry member
-([files.md](/standards/harness/files.md)) and agent-facing
-configuration, so it holds to the agent-facing voice — second person, never
-first ([conventions.md](/standards/prose/conventions.md)).
+What the project is, why it exists, and who develops it belong to the
+documentation hierarchy, so a `CLAUDE.md` carries none of it. A root
+file's content is its repo's own operating knowledge: its commands, its
+gotchas, the traps that would cost an agent an hour.
 
-The file `SHALL` bucket its rules under exactly two H2 sections, in order:
+## One scope
 
-- `## Principles` — dispositional stances, how to carry yourself.
-- `## Behaviors` — operating rules for named situations, what to do.
+A rule sits at the widest scope where it is true, and at exactly one:
+the global source carries what holds for every session on the machine,
+a root file carries what holds for its repo alone, and a nested file
+carries only the delta from the files above it.
 
-Each rule is one `###` heading under its bucket. Behaviors are `REQUIRED`,
-because no repo file restates them and this is the only place they can be
-placed: **Read the standards**, which sends every agent to the standards
-catalog at session start, and **Navigate docs by index**, which states how
-to walk OKF indexes without loading whole trees. Their workspace paths are
-backticked prose rather than live citations, since a citation would be
-`wrong-form` inside dev-playbook itself
-([cross-references.md](/standards/knowledge-organization/cross-references.md)).
+A root file with nothing repo-specific to say is a title alone. A
+nested file sits in a directory whose operating conventions diverge
+from the root.
 
-The section shape and the two required rules are checked deterministically,
-but only in dev-playbook, where the source file lives — other repos have no
-global file to check.
+## Global file
 
-## Hierarchy
+`dotfiles/dot-claude/CLAUDE.md` in dev-playbook: the source Stow links
+to `~/.claude/CLAUDE.md`. harness-files-lint checks the rules below
+where the source lives, so in dev-playbook only.
 
-Claude Code loads `CLAUDE.md` files by walking up the directory tree from
-the session's cwd, stacking each file it finds. A session inside
-`<repo>/<dir>/` therefore receives both the nested `CLAUDE.md` and the
-repo-root `CLAUDE.md`.
+### Two sections
 
-A repository `MAY` add a nested `CLAUDE.md` in a directory whose operating
-conventions diverge from the repo root. The nested file holds **only the
-delta** — content in the parent `SHALL NOT` be repeated, which is the same
-one-scope rule that empties the repo file of workspace-wide content. A
-directory with nothing repo-divergent to say doesn't need one.
+The H2 headings are exactly `## Principles` then `## Behaviors`, in
+that order, headings inside fenced blocks excluded
+(`harness.global-claude-shape`).
 
-Nested files follow the same scope as the root: operational instructions
-for an agent operating inside that directory. They `SHALL NOT` contain
-project description, architecture decisions, or roadmap — those belong
-elsewhere in the documentation hierarchy.
+`## Principles` holds dispositional stances, how the agent carries
+itself; `## Behaviors` holds operating rules for named situations, what
+the agent does.
+
+### Required rules
+
+The headings `### Read the standards` and `### Navigate docs by index`
+are present (`harness.global-claude-rules`).
+
+Both are Behaviors. Read the standards sends every agent to the
+standards catalog at session start; Navigate docs by index states how
+to walk OKF indexes without loading whole trees.
+
+### One rule per heading
+
+Each rule is one `###` heading under its bucket: a dispositional stance
+under `## Principles`, an operating rule for a named situation under
+`## Behaviors`.

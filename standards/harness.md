@@ -1,45 +1,56 @@
 ---
 type: Standard-Card
 title: Harness Files
-description: Governs how the files an agent harness loads — context, configuration, instructions — are distinguished from ordinary files and what each contains
+description: Governs how the files Claude Code loads are written — a CLAUDE.md's content and a runbook's format
 ---
 
 # Harness Files
 
-Governs how the files an agent harness loads — context, configuration,
-instructions — are distinguished from ordinary files and what each
-contains. The loading contract fixes their meaning: injected into
-context, read as configuration, or run as instructions. Claude Code is
-the only harness currently in use.
+Governs how the files Claude Code loads are written — a CLAUDE.md's
+content and a runbook's format. Which files the harness loads, and
+what it does with each, is the registry
+[Claude Code Files](/standards/harness/files.md); the craft behind any
+document an agent consumes is
+[Writing for Agents](/standards/harness/writing-for-agents.md), read to
+write one. The voice every harness-loaded file speaks in is the
+[Prose](/standards/prose.md) card's. Claude Code is the only harness in
+use.
 
 ## Define
 
-- [standards/harness/](/standards/harness/index.md) — the member
-  registry and the CLAUDE.md content standard; start at Files
-- [Runbook Conventions](/standards/harness/runbook-conventions.md) — the runbook
-  format: skill bundles and agent definitions
-- [Writing for Agents](/standards/harness/writing-for-agents.md) —
-  the craft layer beside the binding format: how any document an agent
-  consumes is written so the agent behaves predictably; Runbook
-  Conventions wins where the two collide
+- [CLAUDE.md Content](/standards/harness/claude-content.md) — a
+  `CLAUDE.md` at any scope: no frontmatter, operational content, one
+  scope per rule, and the two sections and required rules of the global
+  source in dev-playbook
+- [Runbook Conventions](/standards/harness/runbook-conventions.md) — a
+  skill bundle or an agent definition: location, front matter, the
+  description, model and effort, the H1, completion criteria, the chain,
+  and the rules each kind adds
 
 ## Audit
 
-- [harness-files-lint](/scripts/harness-files-lint) — skill bundles and
-  agent definitions in runbook-authoring repos; the `harness.skill-mirror`
-  correspondence between authored and installed skills; and, in dev-playbook
-  only, the global CLAUDE.md source's two-section shape and the
-  workspace-wide rules it must carry (`harness.global-claude-shape`,
-  `harness.global-claude-rules`)
-- [prose-lint](/scripts/prose-lint) — the first person in any harness-loaded
-  agent instruction file, every CLAUDE.md and runbook and rule body alike
-  (`harness.agent-facing-voice`). The ban is one rule over all authored text,
-  so it runs with the [prose](/standards/prose.md) rules rather than beside
-  the format ones; this card keeps the claim because the registry is what
-  fixes which files it reaches
-- [judgments/harness.yaml](/judgments/harness.yaml) — the LLM-judged
-  claim that the root and global CLAUDE.md genuinely read as agent-facing
-  voice, the semantic check the token-level rule cannot make
+- [harness-files-lint](/scripts/harness-files-lint) — every skill bundle
+  and agent definition under a repo's runbook roots: the front matter's
+  parse and closed vocabulary (`harness.parse`, `harness.front-matter`,
+  `harness.required-field`, `harness.unknown-field`); the name's form and
+  its match to the bundle directory or file stem (`harness.name-format`,
+  `harness.name-match`); the description's type, length, sentence count,
+  and trigger sentence (`harness.description-type`,
+  `harness.description-length`, `harness.description-sentences`,
+  `harness.description-trigger`); the values of `model`, `effort`,
+  `disable-model-invocation`, `arguments`, and `tools`
+  (`harness.model-value`, `harness.effort-value`, `harness.dmi-type`,
+  `harness.arguments-format`, `harness.tools-format`); the body's opening
+  H1 (`harness.body-h1`); and the depth of `references/`
+  (`harness.references-depth`). In dev-playbook only, the global
+  CLAUDE.md source's two sections and required rules
+  (`harness.global-claude-shape`, `harness.global-claude-rules`)
+
+No detector reaches Operational scope, One scope, One rule per heading,
+Location, Bundle layout, Interactive skills inherit, Tool fields, the
+placeholder half of Arguments, Steps end on a completion criterion, or
+Carries its chain: a reviewer cites them. SKILL.md under 500 lines draws
+an advisory from harness-files-lint with no rule id.
 
 ## Enforce
 
@@ -51,6 +62,7 @@ the only harness currently in use.
 
 ## Adopt
 
-- [CLAUDE.md Content](/standards/harness/claude-content.md) — a repo
-  writes its own operating knowledge into its `CLAUDE.md` and nothing more;
-  the workspace-wide rules are already stationed in the global file
+- [runbook-creator](/dotfiles/dot-claude/skills/runbook-creator/SKILL.md)
+  — the scaffold: it reads both Standards end-to-end, interviews the user
+  for every front matter field, and writes a conforming skill bundle or
+  agent definition; invoke it as /runbook-creator

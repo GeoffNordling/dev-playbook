@@ -84,3 +84,90 @@ has no rule row.
 Could not express GitHub origin over the member: the remote is the
 clone's, and the settings it opens are the population, so the rule binds
 the object that makes the population readable.
+
+### shell/conventions
+
+Could not express the shell file that is neither executable nor sourced:
+the two conditions test a mode bit and a path, and there is no
+"otherwise", so a mode-644 script run as `bash <file>` falls under no
+condition and is bound only by the rules under `—`.
+
+### python/style
+
+Could not express Formatted by ruff format and Annotated signatures over
+the member alone: each binds one file's bytes, but the threshold, the
+`line-length` and the `[tool.mypy]` keys, lives in the canonical
+`pyproject.toml`, so each predicate points outward. Could not express
+the two halves of Docstrings, presence and plain English, as two rules,
+since one heading carries one predicate.
+
+### testing/conventions
+
+Could not express the member as one kind of file: the population names
+a `test_*.py` anywhere plus the `conftest.py` files and fakes under
+`tests/`, because Conftest hierarchy and Fakes live in the test tree
+bind objects no test file is. Could not express Behavioral focus as a
+name: it frames five rules without being a member subset, so its
+sentence sits in the lead prose and the view carries no name for the
+group.
+
+### modules/design
+
+Could not express the process-boundary antecedent as a condition: it
+holds one rule, so it sits inside the predicate of A port at a process
+boundary, the way `build/python` keeps the executable-file antecedent.
+Could not express the vocabulary the rules are written in as a rule:
+Module, Interface, and Implementation sit in the lead prose, the other
+five terms in the body of the rule that first uses each, and the view
+carries none of them.
+
+### decisions/records
+
+Could not express the contiguity half of Sequential numbering over one
+member: a gap is a property of the whole directory, which is why
+decisions-lint reports it against `docs/decisions/` and not a file.
+Could not express The directory over the member: its object is the
+directory that holds the population, the way Repository Settings'
+GitHub origin binds the clone. Could not express the obligation that a
+deliberate external evaluation ends in a record: its object is the
+evaluation, an event, so it binds outside the population the way
+Candidates' The only future-work file does.
+
+### semantic-validation/declarations
+
+Could not express one class of object: the population spans a TOML
+table, a YAML file, and an entry, joined only by the repo that holds
+them, the way `distribution/channel` does. Could not name the bench
+values: Fields points at `bench.py`, the way No slop tics points at the
+catalog. Could not express that a claim still holds of its evidence:
+that state is a fact about files outside the population, and only the
+LLM judge rules on it.
+
+### harness/claude-content
+
+Could not express One scope over one member alone: a nested file's
+delta compares it to the files above it. Could not name the global
+source in the population phrase without its path: no other mark picks
+it out.
+
+### harness/runbook-conventions
+
+Could not express the invocation mode as a condition without three
+restated conditions, so the fork sits inside Description's predicate.
+Could not give the no-`SKILL.md` directory and the 500-line advisory a
+lint partner: both emit no rule id. Could not give Carries its chain an
+Audit pointer: `chaingen --check` answers no `--list-rules`.
+
+### standard/cards
+
+Could not express one class of object: the population is the cards and
+the index listing them, joined only by the tree. Could not express the
+dev-playbook meta-card lead slot as a condition; it is a clause of The
+catalog.
+
+### standard/detectors
+
+Could not express Verbatim content over a consumer's script: it names
+`src/dev_playbook/external.py`, which only dev-playbook imports. Could
+not express the optional-surface fork of Wired throughout its scope as
+a condition: it is a fact about the population, not the detector.

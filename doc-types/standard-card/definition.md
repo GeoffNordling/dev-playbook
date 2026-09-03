@@ -53,8 +53,7 @@ never an intermediate group. Deeper nesting is deliberately unsupported
 (YAGNI): no third scope is introduced until a real population sits between
 "one repo" and "every repo."
 
-**No shadowing.** A repo-scoped card may not reuse a workspace-scoped card's
-name. A consumer's `standards/<name>.md` may not collide with a card stem
-dev-playbook publishes, because that would silently override the upstream
-standard of that name; the rule `standard.card-shadows-upstream` catches the
-collision at the consumer's commit gate.
+**No shadowing.** A repo-scoped card's stem is one no workspace-scoped
+card carries, since a consumer's `standards/<name>.md` on an upstream stem
+would silently override the upstream standard of that name; the rule and
+its lint are [No shadowing](/standards/standard/cards.md#no-shadowing).

@@ -290,7 +290,8 @@ def _opening_sentence(path: Path) -> tuple[int, str] | None:
 def check_card_question(root: Path) -> list[Finding]:
     """Flag a card whose question sentence and description have come apart.
 
-    format.md binds the two: the sentence after the H1 opens ``Governs how`` and
+    Card Catalog's The question sentence (standards/standard/cards.md) binds the
+    two: the sentence after the H1 opens ``Governs how`` and
     names the governed question, and the frontmatter description repeats it
     verbatim less the period, so the catalog row and the card state one remit.
     """
@@ -669,7 +670,8 @@ def check_hook_surfaces(
     the aggregate hook, which owns no rules and earns no card). Dev-playbook
     mode adds the closure leg: a ``/scripts/`` name cited by any Audit cell
     must be enrolled in the roster or registered in ``ungated`` (the audits
-    enforcement.md stations outside the gates), so a detector card cannot be
+    standards/standard/gates.md leaves outside the gates), so a detector card
+    cannot be
     authored without gating its detector.
     """
     manifest_all, manifest = _manifest_ids(root)
@@ -797,7 +799,8 @@ def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
     """Run ``scripts/<name> --list-rules`` and return its printed rule ids.
 
     The detector's own ``uv run --script`` shebang resolves its dependencies, so
-    this is the trusted ground truth format.md §Detectors fixes. Raises
+    this is the trusted ground truth standards/standard/detectors.md
+    (``--list-rules``) fixes. Raises
     ``CannotRun`` when the script is absent or does not answer the flag.
 
     standards-lint runs at a git gate and can inherit an absolute ``GIT_DIR`` the

@@ -304,9 +304,9 @@ def ordered_repo_files(extra: dict[str, str]) -> dict[str, str]:
         "standards/standard.md": card("Meta-Standard"),
         "standards/build.md": card("Build"),
         "standards/python.md": card("Python"),
-        "standards/standard/format.md": (
-            "---\ntype: Standard\ntitle: Standards and Standard Cards\n"
-            "description: d\n---\n\n# Standards and Standard Cards\n"
+        "standards/standard/cards.md": (
+            "---\ntype: Standard\ntitle: Card Catalog\n"
+            "description: d\n---\n\n# Card Catalog\n"
         ),
         "standards/build/canonical/.pre-commit-config.yaml": _canonical([]),
         **extra,
@@ -321,7 +321,7 @@ def test_catalog_in_declared_order_passes(tmp_path: Path) -> None:
             bullet("standards/standard.md", "Meta-Standard"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     repo = make_repo(tmp_path, files)
@@ -337,7 +337,7 @@ def test_readme_not_first_is_flagged(tmp_path: Path) -> None:
             bullet("standards/README.md", "Standards"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     repo = make_repo(tmp_path, files)
@@ -355,7 +355,7 @@ def test_cards_out_of_alphabetical_order_flagged(tmp_path: Path) -> None:
             bullet("standards/standard.md", "Meta-Standard"),
             bullet("standards/python.md", "Python"),
             bullet("standards/build.md", "Build"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     repo = make_repo(tmp_path, files)
@@ -371,7 +371,7 @@ def test_contract_doc_before_a_card_flagged(tmp_path: Path) -> None:
         [
             bullet("standards/README.md", "Standards"),
             bullet("standards/standard.md", "Meta-Standard"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
         ]
@@ -1192,7 +1192,7 @@ def test_dangling_catalog_target_cannot_run(tmp_path: Path) -> None:
             bullet("standards/ghost.md", "Ghost"),  # no such file
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     repo = make_repo(tmp_path, files)
@@ -1239,7 +1239,7 @@ def test_main_exits_two_on_a_dangling_catalog_link(tmp_path: Path) -> None:
             bullet("standards/ghost.md", "Ghost"),  # no such file
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     repo = make_repo(tmp_path, files)
@@ -1266,7 +1266,7 @@ def test_a_spawned_detector_does_not_inherit_the_hook_ambient_git_dir(
             bullet("standards/standard.md", "Meta-Standard"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     files["standards/foo.md"] = card_citing("Foo", [cite("foo")])
@@ -1301,7 +1301,7 @@ def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
             bullet("standards/standard.md", "Meta-Standard"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     files["standards/foo.md"] = card_citing("Foo", [cite("foo")])
@@ -1339,7 +1339,7 @@ def test_directory_before_a_document_flagged(tmp_path: Path) -> None:
             bullet("standards/knowledge-organization/index.md", "docs/"),
             bullet("standards/build.md", "Build"),
             bullet("standards/python.md", "Python"),
-            bullet("standards/standard/format.md", "Standards and Standard Cards"),
+            bullet("standards/standard/cards.md", "Card Catalog"),
         ]
     )
     repo = make_repo(tmp_path, files)
