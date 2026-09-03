@@ -2,7 +2,7 @@
 type: Standard
 title: Cross-References
 description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the runbook forms, and fragment anchors that match a heading's slug
-population: "a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block"
+population: "a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record"
 ---
 
 # Cross-References
@@ -13,7 +13,11 @@ another, and on whether the referencing file has a fixed repo root, a
 single repo it is always read from. Both link forms are inline; there
 is no separate citations section. A fenced code block, triple backticks
 or `~~~`, may hold `~/workspace/` and `/`-root paths in shell examples
-or sample output, and ref-lint skips it. ref-lint is the authority
+or sample output, and ref-lint skips it. A numbered
+[Decision Record](/standards/decisions/records.md) is exempt as a
+source, since a record frozen at merge goes stale as its referents
+move; references to a record are checked like any other. ref-lint is
+the authority
 ([Knowledge Organization](/standards/knowledge-organization.md)).
 
 ## Fragment anchor matches the slug

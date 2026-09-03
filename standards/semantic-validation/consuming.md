@@ -1,7 +1,7 @@
 ---
-type: Standard
+type: Guide
 title: Consuming Judgments
-description: The consumer-repo recipe — editable path dependency, declarations, a position on the gate spectrum, lint hook, sweep pickup
+description: How another repo picks the judgments tooling up — the editable path dependency, its own declarations, a position on the gate spectrum, the lint hook, and sweep pickup
 ---
 
 # Consuming Judgments
@@ -52,10 +52,10 @@ PATH.
 ## 2. Declare the repo's judgments
 
 Opt in exactly as
-[declarations.md — Config and root resolution](/standards/semantic-validation/declarations.md#config-and-root-resolution)
+[declarations.md — Opt-in table](/standards/semantic-validation/declarations.md#opt-in-table)
 defines: a `[tool.judgments]` table in the consumer's own `pyproject.toml`
 and one or more declaration YAML files in
-[the YAML declaration format](/standards/semantic-validation/declarations.md#the-yaml-declaration-format).
+[the declaration file shape](/standards/semantic-validation/declarations.md#file-shape).
 
 ```toml
 [tool.judgments]

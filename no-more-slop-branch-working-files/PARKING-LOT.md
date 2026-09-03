@@ -333,6 +333,407 @@ traverse script launches — several of them at a review diamond. A
 definition-region node is usually served by a slash-command of the same name
 (`design` → `/design`), but that mapping is not guaranteed.
 
+## Individual projects may supercede
+
+From `standards/testing/conventions.md` and `standards/python/style.md`,
+the Testing and Python ports; the same sentence with the same misspelling
+opened both, and evicting it makes each Standard binding rather than a
+default. Cited by nothing.
+
+These are default testing conventions. Individual projects may supercede.
+
+Default Python conventions for projects in this workspace. Individual
+projects may supercede.
+
+## Extract logic away from the non-deterministic boundary
+
+From `standards/testing/conventions.md`, the Testing port; a candidate
+home is [Module Design](/standards/modules/design.md), whose
+`Designing for testability` list already states it. Testing keeps the
+test half as No test of a non-deterministic decision.
+
+When testing systems with non-deterministic components (LLM calls, network
+requests, randomness), apply the Humble Object pattern: extract all testable
+logic away from the non-deterministic boundary, leaving the non-deterministic
+part as thin as possible.
+
+## Ports (services you own, reached over the network)
+
+From `standards/testing/conventions.md`, the Testing port; a candidate
+home is [Module Design](/standards/modules/design.md), where
+`3. Remote but owned (Ports & Adapters)` already states it. The one
+sentence Testing keeps is "the double then sits at that seam", in The
+lightest double.
+
+A service you own but call over the network — an internal API, a queue
+consumer — has no local stand-in to swap in and is too slow to call for real.
+Give it a **port**: the interface at the seam, owned by the calling module. The
+logic stays in that module; the transport is an injected **adapter** — an HTTP,
+gRPC, or queue client in production, an in-memory adapter in tests.
+
+## Integration tests trade speed for confidence
+
+From `standards/testing/conventions.md`, the Testing port; rationale. The
+rule half folded into The lightest double. Cited by nothing.
+
+Integration tests that exercise the real dependency give the highest
+confidence but are slower and harder to isolate.
+
+## A deep mock is a design problem
+
+From `standards/testing/conventions.md`, the Testing port; rationale about
+the module. Mocks at boundaries only keeps the action, "deeper in the call
+chain a fake takes its place". Cited by nothing.
+
+Needing a mock deep inside the code under test signals a design problem —
+extract an interface and use a fake instead.
+
+## Why an initializer stays blank
+
+From `standards/python/style.md`, the Python port; Python Style's Empty
+rule states the emptiness, and nothing carries the reason.
+
+Rationale: a blank `__init__.py` has no import-time side effects, surfaces the
+true source of every name to readers and tooling, and avoids the
+circular-import traps that grow with populated package initializers.
+
+## Why a docstring earns its place
+
+From `standards/python/style.md`, the Python port; cited by nothing.
+
+Rationale: a name says what something is called; a docstring says what it
+does. Readers (user and agent) should not have to read the body to learn
+the contract.
+
+## Why a hidden fallback costs more
+
+From `standards/python/style.md`, the Python port; cited by nothing.
+
+Rationale: a fallback that hides a bug delays the failure to a place far
+from the cause, where it's much harder to diagnose. Failing at the point of
+the missing value points straight at the defect.
+
+## Why constants sit at the top
+
+From `standards/python/style.md`, the Python port; cited by nothing.
+
+Rationale: a reader scanning a new module wants to find its dependencies and
+its tunable values without searching. Mixing constants into the body of the
+file hides them — a reader who doesn't already know the constant exists
+won't think to look for it past the first `def`. The cost of putting every
+constant at the top is one scroll; the cost of hiding one is a bug that
+slips past review because nobody saw it.
+
+## Why 3.11 needs no future import
+
+From `standards/python/style.md`, the Python port; Python Style's No
+future annotations rule states the ban, and nothing carries the reason.
+
+Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`),
+builtin generics (`list[int]`), and string-quoted forward references.
+
+## Asking for a future import
+
+From `standards/python/style.md`, the Python port; cited by nothing.
+`python.no-future-annotations` rejects the import unconditionally, so no
+escape hatch exists to document.
+
+If a future import is truly necessary, ask the user for permission.
+
+## Why the helper bar is written down
+
+From `standards/python/style.md`, the Python port; cited by nothing.
+
+Rationale: every helper costs the reader a jump. Helpers that genuinely
+encapsulate a concept pay that cost back; helpers that just relocate a few
+lines don't. Pinning these criteria explicitly keeps review consistent —
+without them, "should this be extracted?" becomes a matter of taste, and
+codebases drift toward over-factored or under-factored extremes depending
+on who reviewed last.
+
+## Use the module vocabulary exactly
+
+From `standards/modules/design.md`, the Modules port; cited by nothing.
+Its population is an authored document or a review comment, not a
+module. Its shape is Doc Conventions' Terminology rule; whether it
+becomes a rule there is the Prose card's call.
+
+Use these terms exactly — don't substitute "component," "service," "API," or
+"boundary." Consistent language is the whole point.
+
+## Rejected framings of depth
+
+From `standards/modules/design.md`, the Modules port; cited by nothing.
+Rationale for a vocabulary choice, and Doc Conventions' Current state and
+next steps only bans rejected alternatives. The operative half of each
+survives in a term definition: depth as leverage in Deep, not shallow,
+and seam over boundary in Internal seams stay inside.
+
+- **Depth as ratio of implementation-lines to interface-lines** (Ousterhout): rewards padding the implementation. We use depth-as-leverage instead.
+- **"Interface" as the TypeScript `interface` keyword or a class's public methods**: too narrow — interface here includes every fact a caller must know.
+- **"Boundary"**: overloaded with DDD's bounded context. Say **seam** or **interface**.
+
+## Interface design questions
+
+From `standards/modules/design.md`, the Modules port; cited by nothing.
+A writer's prompt in the second person; no state fails it.
+
+When designing an interface, ask:
+
+- Can you reduce the number of methods?
+- Can you simplify the parameters?
+- Can you hide more complexity inside?
+
+## Small surface area
+
+From `standards/modules/design.md`, the Modules port; cited by nothing.
+Restates Deep, not shallow with no separate threshold.
+
+3. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
+
+## The date backfill
+
+From `standards/decisions/records.md`, the Decisions port; cited by
+nothing.
+
+Records predating this key (introduced 2026-08-01) were backfilled from the
+dates their own text or git history could prove, null otherwise.
+
+## No deterministic check for immutability
+
+From `standards/decisions/records.md`, the Decisions port; the rule to
+lint join computes the same fact, and nothing else carries the warning.
+
+There is deliberately no deterministic check for immutability; it is a rule
+the reviewer upholds.
+
+## The template is not a form
+
+From `standards/decisions/records.md`, the Decisions port; Template's
+body keeps "A Decision Record can be a single paragraph", and nothing
+carries the reason.
+
+The value is in recording *that* a decision was made and *why* — not in
+filling out sections.
+
+## Why an external evaluation is recorded
+
+From `standards/decisions/records.md`, the Decisions port; What was
+examined states the pin, and nothing carries the reason.
+
+the record is what stops the same source being re-evaluated from scratch in
+six months
+
+## A judgment's case, and the content-addressed key
+
+From `standards/semantic-validation/declarations.md`, the Semantic
+Validation port; mechanism of the tooling, not a predicate over a
+declaration. The key is built in `src/dev_playbook/judgments/core.py`;
+a candidate home is
+[the cache gate](/standards/semantic-validation/cache-gate.md), whose
+`assert_judgment_cached` walkthrough now says "keys the named judgment"
+with nothing behind it.
+
+A declaration sets a judgment's **case** — its claim, files, and bench. It
+does not set the **procedure**: every judgment is ruled through one fixed
+judge prompt and output schema (constants in
+[`src/dev_playbook/judgments/core.py`](/src/dev_playbook/judgments/core.py)),
+uniform across all judgments, so there is nothing to declare for it.
+
+The claim, the contents of every evidence and reference file, the bench, and
+that fixed procedure together form a content-addressed **key**. The key is
+what the cache is keyed on, so a judgment is re-judged exactly when one of
+those inputs changes. The `id` (below) is a label only; it never enters the
+key. Renaming an `id` with unchanged content stays a cache hit; changing
+content under the same `id` is a miss.
+
+## The key is root-invariant
+
+From `standards/semantic-validation/declarations.md`, the Semantic
+Validation port; mechanism, and the sentence depends on the key entry
+above. The Standard's lead prose keeps the `root` definition, which is
+the population's boundary; nothing carries this consequence.
+
+Because the key is **root-invariant** (the root only *locates* files; it
+never enters the key), the same judgment caches identically across worktrees
+and checkouts.
+
+## Why a judgment is spent sparingly
+
+From `standards/semantic-validation/declarations.md`, the Semantic
+Validation port; rationale and a writer's heuristic behind The bar,
+which keeps the predicate. Cited through `#the-bar` by
+`dotfiles/dot-claude/agents/build.md` and
+`dotfiles/dot-claude/agents/doc-pr-review.md`.
+
+A judgment is expensive — every sweep re-judges it whenever the bytes of any
+input change, and each re-run is a fresh chance for a stochastic false
+refutation someone must weigh — so it is spent only where it buys the most.
+When in doubt, do not add one.
+
+## Who maintains a declaration
+
+From `standards/semantic-validation/declarations.md`, its Maintenance
+section, the Semantic Validation port; process, not a predicate over a
+declaration. `dotfiles/dot-claude/agents/build.md` carries the
+same-change duty and `software-factory/factory-operations.md` the
+no-judge-in-a-node rule.
+
+Declarations are peer documentation: whoever edits an artifact updates,
+removes, or adds the declarations that describe it in the same change — and
+never runs judges or touches the cache; judging belongs to the periodic
+`judgments-sweep`. Kept this way, the sweep opens on declarations that mean
+what they say.
+
+## The governed artifact rides review
+
+From `standards/harness/claude-content.md`, the Harness port; Global
+file names the source path, and nothing carries the reason. Cited by
+nothing.
+
+In this workspace it is not authored in place — its source is
+`dotfiles/dot-claude/CLAUDE.md`, Stow-symlinked into `~/.claude/`, so the
+governed artifact lives in dev-playbook and rides the normal review path.
+
+## Behaviors are required
+
+From `standards/harness/claude-content.md`, the Harness port; Required
+rules names the headings, and nothing carries the reason. Cited by
+nothing.
+
+Behaviors are `REQUIRED`, because no repo file restates them and this is
+the only place they can be placed
+
+## The global file's citation form
+
+From `standards/harness/claude-content.md`, the Harness port; a
+Knowledge Organization matter: ref-lint treats the global file as
+fixed-root, Cross-References does not. Cited by nothing.
+
+Their workspace paths are backticked prose rather than live citations, since
+a citation would be `wrong-form` inside dev-playbook itself
+([cross-references.md](/standards/knowledge-organization/cross-references.md)).
+
+## A new front matter field is an amendment
+
+From `standards/harness/runbook-conventions.md`, the Harness port; Front
+matter's predicate holds the closed set. Cited by nothing.
+
+These eight fields are the whole skill vocabulary; a new one requires an
+edit here before its first use.
+
+These five fields are the whole agent vocabulary; a new one requires an
+edit here before its first use.
+
+## Related skills share a prefix
+
+From `standards/harness/runbook-conventions.md`, the Harness port; a
+heuristic with no test for "related". Cited by nothing.
+
+Related skills share a namespace prefix.
+
+## A card may have more than one detector
+
+From `standards/standard/detectors.md`, the Meta-Standard port;
+Card-namespaced rule ids carries the one-to-one invariant, Card
+Catalog's Audit rule the `none` cell. Cited by nothing.
+
+- **A card may have more than one detector.** Cards are organized by the question they govern; detectors by the mechanism they run. Question and mechanism cross-cut, so the relation is one-to-many: one question can need several mechanisms (a card cited by more than one detector), and one mechanism can serve several questions (a detector cited by more than one card). The one-to-one invariant lives a level down, at the rule — every `card.rule` id belongs to exactly one card. A card may still audit `none` when no automatic check exists.
+
+## Drift at the fine grain
+
+From `standards/standard/detectors.md`, the Meta-Standard port; the
+cache is The Cache Gate's. Cited by nothing.
+
+Standards drift, each grain with its own detector:
+
+1. **Fine grain** — a specific document or passage must keep meaning what it meant when validated. [Judgments](/standards/semantic-validation/index.md) cover this: the content-addressed cache expires a verdict the moment the underlying bytes change.
+
+## Drift at the contract grain
+
+From `standards/standard/detectors.md`, the Meta-Standard port; the
+state half is Distribution Channel's A pinned rev, and nothing carries
+the rework obligation. Cited by nothing.
+
+2. **Contract grain** — a change to a define cell obligates rework across the standard's adopting population. For a workspace-scoped standard that population is every repo in the workspace: a version bump propagated and verified by workspace-lint. For a repo-scoped standard the adopting population is the host repo itself, so no workspace-lint obligation attaches — the rework lands in the same repo as the define-cell change.
+
+## Declare a type only when a population carries it
+
+From `standards/standard/consuming.md`, the Meta-Standard port; a
+heuristic Type Registry lacks. Cited by nothing.
+
+- Declare a type only when a population of documents actually carries it — a vocabulary word earns its place by the documents that use it, and it stays as local as that population.
+
+## The two vocabularies are closed
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; the Front matter predicate already says `exactly`.
+Cited by nothing.
+
+The two vocabularies are closed: the fields above are all of them.
+
+## The description is the invocation match surface
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; rationale and three writer's heuristics. Writing for
+Agents' [Context pointers](/standards/harness/writing-for-agents.md#context-pointers)
+already carries the three verbatim.
+
+The two-sentence form is the invocation match surface, the context pointer the agent reads to reach the runbook, so it is specific, and every word of it costs on every turn:
+
+- **Front-load the leading word.** The pointer is where it does its triggering work.
+- **One trigger per branch.** Synonyms that rename a single branch are one branch written twice; collapse them and keep only genuinely distinct branches.
+- **Cut identity the body already carries.**
+
+## The two levers of a completion criterion
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; a summary of what Writing for Agents'
+[Steps and completion criteria](/standards/harness/writing-for-agents.md#steps-and-completion-criteria)
+explains at length. Cited by nothing.
+
+The criterion's clarity, whether the agent can tell done from not-done, and its demand, how much it requires, are the two levers Writing for Agents explains.
+
+## Why material spills into references/
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; the context-cost reason behind Bundle layout. Cited
+by nothing.
+
+... so the agent loads each file on demand instead of paying the context cost up front.
+
+## When to reach for allowed-tools and disallowed-tools
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; a writer's heuristic for choosing between the two
+fields. Cited by nothing.
+
+`allowed-tools` pre-approves the listed calls to run without prompting, the form for a focused, mechanical skill; `disallowed-tools` denies outright, the form for a stance that must be enforced rather than asked for.
+
+## Why an argument's name carries its meaning
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; the reason behind the bare-name form. Cited by
+nothing.
+
+Every argument is a string, so the name alone carries the meaning, for the user and for the [Reference chain](/doc-types/runbook/contract-shape.md).
+
+## The lazy-load pattern assumes a flat tree
+
+From `standards/harness/runbook-conventions.md`, the Harness port,
+scrubbed at review; the reason behind References one level deep. Cited
+by nothing.
+
+The lazy-load pattern assumes a flat tree: the agent loads each file on demand from `SKILL.md`.
+
+## Leverage and locality
+
+From `standards/modules/design.md`, the Modules port, scrubbed at
+review; the payoff argument for depth, and the Glossary entries for two
+terms no rule in the Standard uses. Cited by nothing.
+
+Depth pays out twice. **Leverage** is what callers get: more capability per unit of interface they learn, so one implementation pays back across N call sites and M tests. **Locality** is what maintainers get: change, bugs, knowledge, and verification concentrate in one place instead of spreading across callers, so a fix lands once and holds everywhere.
+
 ## Acronyms
 
 None.

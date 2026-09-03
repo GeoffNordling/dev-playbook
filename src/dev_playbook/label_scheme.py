@@ -10,9 +10,9 @@ The semantic authority for what the labels *mean* stays with the docs:
 standards/tracking/label-scheme.md's Valid labels table for every dimension's
 fixed values, its Phase labels rule and software-factory.md's state-machine
 graph for the phase values, and the ``/wayfinder`` skill for what each ticket
-type asks. This file is the operational data either way. The scheme-vs-graph consistency between
-the factory dimensions and the factory doc is left to a judgment, never parsed
-here.
+type asks. This file is the operational data either way. The consistency
+between the factory dimensions and the factory doc is a reviewer's reading,
+never parsed here.
 """
 
 import json

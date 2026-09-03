@@ -44,15 +44,6 @@ states an issue occupies and the moves between them — is
 - [repo-lint](/scripts/repo-lint) — a `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or
   `IDEAS.md` at any depth (`tracking.rogue-future-work-file`), and a
   `CANDIDATES.md` outside the repo root (`build.forbidden`)
-- [judgments/code-matches-docs.yaml](/judgments/code-matches-docs.yaml) — the
-  LLM-judged `scheme-vs-graph` claim that the label scheme's factory
-  dimensions mint exactly what
-  [Label Scheme](/standards/tracking/label-scheme.md) states, the parity
-  invariant against the factory graph included; `scheme-vs-tracker` that
-  its wayfinder dimension mints exactly the values the same Standard's
-  table names; and `wayfinder-lint-mirrors-skill` that workspace-lint's
-  map and ticket body rules restate only what the `/wayfinder` skill
-  states
 
 A `CANDIDATES.md` carries `Candidate-List` frontmatter and an index entry like
 any concept doc; okf-lint checks both under the

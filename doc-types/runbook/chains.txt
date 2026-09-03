@@ -117,8 +117,6 @@
 
 [commit] Skill · model: sonnet, effort: low, allowed-tools: Bash(git *)
   ├─args────► fast
-  ├─args────► amend
-  ├ ╌ reports ╌ ► outcome: str    that amend was downgraded to a fresh commit because HEAD was already on `<remote/branch>`    if it lists any remote branches
   └─reports─► outcome: str    tree clean or which files remain uncommitted, and that the push landed
 
 [compact-prep] Skill · model: inherit, effort: xhigh
@@ -225,7 +223,7 @@
   ├─reads───► GitHub    the issue's title, body, and comments as the raw idea
   ├─does────► [grilling] Skill    once to sharpen the raw idea
   ├─does────► [domain-modeling] Skill    active throughout
-  ├─reads───► [factory-labels] Standard
+  ├─reads───► [label-scheme] Standard
   ├─does────► [user-intent-mini-interview] Skill    for that one
   ├─writes──► GitHub    the new issue at that phase
   ├─writes──► GitHub    the four-tuple and the overwritten body on the existing issue
@@ -326,7 +324,7 @@
   └─does────► [playbook-lint] Script
 
 [update-standards-pin] Skill · model: opus, effort: xhigh
-  ├─reads───► [distribution] Standard
+  ├─reads───► [channel] Standard
   ├─reads───► GitHub    main's head sha
   ├ ╌ reports ╌ ► outcome: str    that the release is unpushed    if the two values are unequal
   ├─reads───► [workspace_lint.py] Script    for the `GOVERNED` roster
@@ -340,7 +338,7 @@
 
 [user-intent-mini-interview] Skill · model: inherit, effort: xhigh
   ├─args────► issue
-  ├─reads───► [issue-authoring] Standard    § the-build-leaf-brief-modedirect
+  ├─reads───► [issue-authoring] Standard    § user-intent
   ├ ╌ reads ╌ ► GitHub    the body of the issue `issue` names, and treat that as the draft    if run with no draft in context
   ├─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
   └─never writes─► GitHub
@@ -359,7 +357,7 @@
   ├─reads───► GitHub    the map body first
   ├─reads───► GitHub    every child ticket in full
   ├─does────► [grilling] Skill    and work these branches as its design tree
-  ├─reads───► [issue-authoring] Standard    § vertical-slice-rules
+  ├─reads───► [issue-authoring] Standard    § vertical-slices
   ├─reads───► the decompose exit
   ├─reads───► [issue-authoring] Standard    § the-epic-body
   ├─writes──► GitHub    the epic with the body defined there

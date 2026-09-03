@@ -1,144 +1,147 @@
 ---
 type: Standard
 title: Python Style
-description: Default Python language conventions and anti-pattern catalog — fail-loud, docstrings, module layout, helper extraction
+description: How a Python file is written — empty initializers, docstrings, fail-loud values, statement order, banned future imports, helper shape, formatting, and annotations
+population: "a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang"
 ---
 
 # Python Style
 
-Default Python conventions for projects in this workspace. Individual
-projects may supercede.
+A Python file a governed repo tracks: any `.py` file, and any
+extensionless file whose first line is a Python shebang. Every rule below
+binds one file's own state. The repo-level shape around that file, meaning
+`pyproject.toml`'s name mapping, `[project.scripts]`, and what a `scripts/`
+file carries to run from a bare clone, is
+[The Python Project](/standards/build/python.md). The task-runner targets
+that invoke ruff and mypy are
+[Canonical Artifacts](/standards/build/canonical.md#makefile), and pytest
+conventions are
+[Testing Conventions](/standards/testing/conventions.md).
 
-For build/task-runner conventions (Makefile targets, `make check`), see
-[Canonical Artifacts](/standards/build/canonical.md#makefile).
+## Package initializers
 
-## Package initialization
+A file named `__init__.py`.
 
-`__init__.py` files are empty: no docstring, no code — ideally 0 bytes.
+### Empty
 
-Imports, re-exports, `__all__` declarations, and any other code live in named
-modules, not in `__init__.py`. Callers import from the specific submodule
-(`from pkg.sub import thing`), not from the package root. The module
-docstring rule applies here too: an `__init__.py` carries no docstring; a
-package's overview belongs in its primary named module or a README.
+The file holds no docstring and no code, ideally zero bytes; every import,
+re-export, and `__all__` declaration sits in a named module instead.
+python-lint reports one that does not (`python.empty-init`).
 
-Rationale: a blank `__init__.py` has no import-time side effects, surfaces the
-true source of every name to readers and tooling, and avoids the
-circular-import traps that grow with populated package initializers.
+Callers import from the specific submodule, `from pkg.sub import thing`,
+rather than from the package root. A package's overview belongs in its
+primary named module or in a README.
 
 ## Docstrings
 
-Every function, method, class, and module has a docstring — except
-`__init__.py`, which stays empty (see Package initialization). The docstring
-explains in plain English what the thing does. One short sentence is fine
-when the behavior is simple; longer when it isn't.
+Every module, class, function, and method carries a docstring saying in
+plain English what it does, except an `__init__.py`, which stays empty,
+and a pytest test function, whose name carries the behavior. One short
+sentence is enough when the behavior is simple, longer when it is not.
 
-Enforcement of these rules is delegated to ruff's pydocstyle (`D`) family,
-configured in the canonical [pyproject.toml](/standards/build/canonical/pyproject.toml)
-with `D401` (imperative mood) disabled to preserve the noun-phrase voice and
-`tests/` plus `__init__.py` exempted.
-
-Rationale: a name says what something is called; a docstring says what it
-does. Readers (user and agent) should not have to read the body to learn
-the contract.
-
-**Exception: tests.** Pytest test functions follow a `test_<behavior>` naming
-convention literal enough that a docstring would just restate the name. Skip
-docstrings on test functions. Test-module-level helpers (factories, fixtures
-defined as plain functions) still need docstrings — their names are not
-similarly load-bearing.
+A pytest test function follows a `test_<behavior>` naming convention
+literal enough that a docstring restates the name. A test module's own
+helpers, meaning the factories and fixtures defined as plain functions,
+carry docstrings: their names are not similarly load-bearing.
 
 ## Fail loudly
 
-When a value is required for the code to do its job, missing it is a bug —
-the code raises rather than substituting a default. This applies to all the
-usual shapes that quietly hide a missing value:
+A value the code requires is read directly, so a missing one raises; a
+fallback for a state that is genuinely runtime carries an inline comment
+giving the reason. These are the shapes that quietly hide a missing value:
 
-- `dict.get(key, default)` where `key` is always expected to be present —
-  use `dict[key]` and let the `KeyError` surface.
-- `if x is None: return default` (or `x or default`) guarding a value that
-  should always exist.
-- `try: ... except Exception: return default` swallowing errors into a
+- `dict.get(key, default)` where `key` is always present. `dict[key]`
+  raises `KeyError` instead.
+- `if x is None: return default`, or `x or default`, conditioning a value
+  that always exists.
+- `try: ... except Exception: return default`, swallowing the error into a
   sentinel.
-- `getattr(obj, "attr", default)` for an attribute the object is required to
-  have — use `obj.attr`.
-- Default parameter values that paper over state the caller should always
-  supply.
+- `getattr(obj, "attr", default)` for an attribute the object is required
+  to have. `obj.attr` raises instead.
+- A default parameter value papering over state the caller always
+  supplies.
 
-Some fallbacks are legitimate — the missing value is a real runtime state,
-not a programming error. When that's the case, leave an inline comment
-explaining *why* the fallback is intentional. The comment is the signal that
-the author thought about it.
-
-Rationale: a fallback that hides a bug delays the failure to a place far
-from the cause, where it's much harder to diagnose. Failing at the point of
-the missing value points straight at the defect.
+A legitimate fallback is one where the missing value is a real runtime
+state rather than a programming error. Its inline comment is the signal
+that the author weighed it.
 
 ## Module layout
 
-A module's top-level statements appear in this order:
+A module's top-level statements run in one order: the module docstring,
+the imports, the plain-literal constants, then the definitions
+interleaved with the derived constants, each derived constant placed
+directly after what it derives from.
 
 1. The module docstring.
 2. `import` and `from ... import` statements.
-3. Plain-literal module constants (`UPPER_SNAKE_CASE` names whose values
-   are literals, tuples of literals, or `re.compile(...)` patterns).
-   Includes `_PRIVATE` constants.
+3. Plain-literal module constants: `UPPER_SNAKE_CASE` names whose values
+   are literals, tuples of literals, or `re.compile(...)` patterns,
+   `_PRIVATE` constants included.
 4. Type aliases, dataclasses, classes, and functions, interleaved with
-   *derived* constants — module-level `UPPER_SNAKE_CASE` names whose
-   values depend on a class, function, or enum defined in the file.
-   A derived constant goes immediately after the things it derives from,
-   in a labeled section.
+   *derived* constants: module-level `UPPER_SNAKE_CASE` names whose values
+   depend on a class, function, or enum defined in the file. A derived
+   constant sits immediately after the things it derives from, in a
+   labeled section.
 
-Single-use constants go at the top too (or, for derived ones, in their
-grouped section near their dependencies), not next to their one user
-mid-file.
+A single-use constant sits at the top with the rest, or, when it is
+derived, in its grouped section near its dependencies, never beside its
+one user mid-file.
 
-Rationale: a reader scanning a new module wants to find its dependencies and
-its tunable values without searching. Mixing constants into the body of the
-file hides them — a reader who doesn't already know the constant exists
-won't think to look for it past the first `def`. The cost of putting every
-constant at the top is one scroll; the cost of hiding one is a bug that
-slips past review because nobody saw it.
+## No future annotations
 
-## Future imports
+`from __future__ import annotations` does not appear in the file.
 
-`from __future__ import annotations` is banned. Python 3.11+ already provides every motivation: PEP 604 unions (`X | Y`), builtin generics (`list[int]`), and string-quoted forward references. The `python-lint` pre-commit hook (its `no-future-annotations` rule) auto-rejects the import. If a future import is truly necessary, ask the user for permission.
+python-lint rejects the import (`python.no-future-annotations`).
 
-## Helpers
+## Helper justification
 
-A helper function is justified by one of these:
+Every helper function is multi-use, substantial in body, a distinct
+concern at another abstraction level, or an entry in a dispatch table,
+registry, or strategy map.
 
 - **Multi-use**: called from two or more sites. De-duplication is the
   clearest justification.
 - **Substantial body**: the logic is long or intricate enough that lifting
-  it out makes the caller readable. A 1–2 line helper called once is
-  almost always pure relocation; inline it.
-- **Distinct concern at a different abstraction level**: the helper's job
-  belongs to a different layer than its caller (e.g., a regex-based
-  enforcement check inside a high-level dispatch loop). The name then
+  it out makes the caller readable. A one-line or two-line helper called
+  once is pure relocation, and belongs inline.
+- **Distinct concern at another abstraction level**: the helper's job
+  belongs to a different layer than its caller, such as a regex-based
+  enforcement check inside a high-level dispatch loop. The name then
   documents the layer boundary.
 - **Architectural pluggability**: an entry in a dispatch table, registry,
-  or strategy map. These look "single-use" by static call count but are
+  or strategy map. These look single-use by static call count and are
   pluggable by design.
 
-A helper is **not** justified by:
+These do not justify a helper:
 
-- "Symmetry with siblings" alone — three functions of the same shape, where
-  one is single-use and trivial, is not a reason to keep the trivial one.
-  Justify each on its own merits.
-- "It already existed" — the bar is the same for new helpers and for
-  helpers inherited from earlier work.
-- Speculative reuse — extract when the second caller appears, not in
-  anticipation of one.
+- **Symmetry with siblings**: a trivial single-use function beside two
+  siblings of the same shape is still trivial. Each helper stands on its
+  own merits.
+- **Prior existence**: the bar is the same for a new helper and for one
+  inherited from earlier work.
+- **Speculative reuse**: extraction waits for the second caller.
 
-When a helper is justified, put it directly under the function that uses it
-(or, for helpers shared by several functions, in a clearly labeled section).
-Group related helpers into sections with a `# ---` banner so a reader can
-navigate by concern, not by call graph.
+## Helper placement
 
-Rationale: every helper costs the reader a jump. Helpers that genuinely
-encapsulate a concept pay that cost back; helpers that just relocate a few
-lines don't. Pinning these criteria explicitly keeps review consistent —
-without them, "should this be extracted?" becomes a matter of taste, and
-codebases drift toward over-factored or under-factored extremes depending
-on who reviewed last.
+A justified helper sits directly beneath the function that uses it, or in
+a `# ---` banner section when several callers share it.
+
+The banner sections let a reader navigate a file by concern rather than by
+call graph.
+
+## Formatted by ruff format
+
+The file is byte-identical to `ruff format`'s output under the canonical
+`line-length`.
+
+`line-length` is pinned by the canonical
+[pyproject.toml](/standards/build/canonical/pyproject.toml).
+
+## Annotated signatures
+
+Every function and method annotates each parameter and its return, so the
+file passes mypy under the canonical `[tool.mypy]` keys.
+
+[Canonical Artifacts](/standards/build/canonical.md#pyprojecttoml) pins
+those keys: `disallow_untyped_defs` and `disallow_incomplete_defs`
+together make a partly annotated signature an error.

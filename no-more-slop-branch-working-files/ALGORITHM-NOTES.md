@@ -172,6 +172,37 @@ lint's two heading tuples as their predicates. When a Standard's prose
 keeps saying "a leaf carries" and "an epic never", the nouns are the
 conditions.
 
+## Scout, rule, port
+
+Eight cards ported in one batch as three phases: a scout per card read
+the files and tabled the facts, the rule candidates, the evictions, and
+the quandaries with a lean; the rulings were made once over all eight
+tables; a porter per card wrote the patch in its own worktree against
+its scout's table. The scouts cost more than a direct port had, and the
+cost was the brief: it demanded exhaustive verification of every fact.
+The porter brief said trust the scout's facts and capped the report,
+and the porters came in at a third of the tokens. Everything a phase
+hands on is a file on disk, so the coordinator can compact between
+phases.
+
+## A gate tool with no rule
+
+shfmt, `ruff format --check`, and mypy all sat at a gate with no rule
+in any Standard saying what they check. Enforcement of nothing stated
+is the Formatting rule in Shell and the Formatted by ruff format and
+Annotated signatures rules in Python: when a tool is stationed at a
+gate, the Standard carries the predicate the tool computes, and the
+card's Audit names the tool as the detector.
+
+## An agent worktree starts on main
+
+The Agent tool's worktree isolation cuts each worktree from `main`, not
+from the launching session's branch, so every porter opened on a tree
+with no `doc-types/`. The brief named the base commit and each porter
+reset to it before reading anything. A brief for an isolated agent
+names the commit its patch must apply to, and the porter's first step
+is to stand on it.
+
 ## Acronyms
 
 None. CLOA and EM are defined in the root,

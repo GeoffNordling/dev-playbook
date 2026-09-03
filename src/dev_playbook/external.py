@@ -9,7 +9,7 @@ each hardcoding its own drifting skip list.
   upstream mirror (OKF ``type: Reference``). Keying on the OKF type means the
   classification follows the document wherever it lives, not a path.
 
-See standards/standard/detectors.md (Detectors -- verbatim content) for the norm
+See standards/standard/detectors.md (Verbatim content) for the norm
 this module anchors.
 """
 

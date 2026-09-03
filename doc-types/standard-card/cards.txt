@@ -19,14 +19,11 @@ distribution            enforce  commit gate
 distribution            enforce  /scripts/bump-pins
 distribution            enforce  /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
 distribution            adopt    none
-harness                 define   /standards/harness/index.md
+harness                 define   /standards/harness/claude-content.md
 harness                 define   /standards/harness/runbook-conventions.md
-harness                 define   /standards/harness/writing-for-agents.md
 harness                 audit    /scripts/harness-files-lint
-harness                 audit    /scripts/prose-lint
-harness                 audit    /judgments/harness.yaml
 harness                 enforce  commit gate
-harness                 adopt    /standards/harness/claude-content.md
+harness                 adopt    /dotfiles/dot-claude/skills/runbook-creator/SKILL.md
 instrument              define   /standards/instrument/format.md
 instrument              audit    /scripts/okf-lint
 instrument              enforce  commit gate
@@ -61,9 +58,8 @@ python                  audit    mypy
 python                  enforce  commit gate
 python                  enforce  push gate
 python                  adopt    none
-semantic-validation     define   /standards/semantic-validation/index.md
+semantic-validation     define   /standards/semantic-validation/declarations.md
 semantic-validation     audit    /scripts/judgments-lint
-semantic-validation     audit    /standards/semantic-validation/declarations.md
 semantic-validation     enforce  push gate
 semantic-validation     enforce  commit gate
 semantic-validation     adopt    /standards/semantic-validation/consuming.md
@@ -72,14 +68,10 @@ shell                   audit    shellcheck
 shell                   audit    shfmt
 shell                   enforce  commit gate
 shell                   adopt    none
-standard                define   /doc-types/standard-card/definition.md
-standard                define   /doc-types/standard-card/contract-shape.md
-standard                define   /doc-types/standard-card/encoding.md
-standard                define   /doc-types/standard/definition.md
+standard                define   /standards/standard/cards.md
 standard                define   /standards/standard/gates.md
 standard                define   /standards/standard/detectors.md
 standard                audit    /scripts/standards-lint
-standard                audit    /judgments/standard-cards.yaml
 standard                enforce  commit gate
 standard                adopt    /standards/standard/consuming.md
 testing                 define   /standards/testing/conventions.md
@@ -92,7 +84,6 @@ tracking                define   /standards/tracking/label-scheme.md
 tracking                define   /standards/tracking/repo-settings.md
 tracking                audit    /scripts/workspace-lint
 tracking                audit    /scripts/repo-lint
-tracking                audit    /judgments/code-matches-docs.yaml
 tracking                enforce  commit gate
 tracking                enforce  /scripts/bootstrap-labels
 tracking                adopt    none

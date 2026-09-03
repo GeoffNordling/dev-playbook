@@ -6,9 +6,9 @@ okf_version: "0.1"
 
 The Standard-Card doc-type. `cards.txt` also lives here: the generated view
 of every card's cells, one row per pointer, written and checked by
-`scripts/cardgen`. The obligation machinery — the detector contract and
-drift — stays with the Meta-Standard card, under
-[standards/standard/](/standards/standard/detectors.md).
+`scripts/cardgen`. The rules a card and its catalog obey, and the
+detector contract behind an Audit cell, stay with the Meta-Standard card,
+under [standards/standard/](/standards/standard/index.md).
 
 - [Card Cells](/doc-types/standard-card/contract-shape.md) — The four cells — Standard-Card's contract shape — and the one relation every card collapses to, card × cell × pointer
 - [Card Cells Encoding](/doc-types/standard-card/encoding.md) — The layer below the card — how a cell's bullets encode pointers for cardgen, where a card lives, how it is named, and the catalog that lists it
