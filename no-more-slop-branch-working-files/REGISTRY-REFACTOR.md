@@ -8,10 +8,7 @@ description: The decisions aligned on for the document-type registry refactor â€
 
 The decisions the user and Claude aligned on in the 2026-09-02 sessions
 that opened the registry refactor. Member of
-[No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md). The
-file counts and per-file readings behind these decisions are the audit
-record, [Registry Audit](/no-more-slop-branch-working-files/REGISTRY-AUDIT.md);
-nothing there is a decision.
+[No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
 
 Only what was said in those sessions is written here. Where a question
 was raised and not settled, it sits under Open questions with no lean.
