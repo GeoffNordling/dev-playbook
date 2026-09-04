@@ -50,7 +50,7 @@
       "AskUserQuestion"
     ]
   },
-  "model": "claude-fable-5-1[1m]",
+  "model": "sonnet",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
