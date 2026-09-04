@@ -21,12 +21,8 @@ it. Today they cannot — the repo sits in the slop trench, and its stock of
 slop is mostly intent alignment debt. This branch works the documentation
 track; the code track waits.
 
-The doctrine behind the goal — slop's two kinds, the CLOA, the bedrock of
-determinism, the pandas standard, the standing principles, the vocabulary
-API — has drained into
+The doctrine behind the goal is written in 
 [System Legibility](/docs/system-legibility.md).
-Whether any of it hardens into a Standard card is held there, under
-Ambitions.
 
 ## Zoom
 
@@ -99,21 +95,13 @@ The items, each a future work session:
 
 **Completed**
 
-- **The determinism said outright.**
-  [System Legibility](/docs/system-legibility.md) now defines the CLOA
-  object under Determinism as a forcing function: only deterministic
-  code stands between a CLOA object and the system it shows —
-  generated from it, or declared by the user and checked against it.
-  No agent stands in that gap.
-- **CLOA primitives.** Three bootstrap runs plus an empirical close-out
-  constructed a converged primitive set describing what documentation does
-  at the CLOA; it settled as the Runbook doc-type's operations
-  ([contract-shape.md](/doc-types/runbook/contract-shape.md#edges)).
-  That files are still too hard to read is a separate open work stream
-  (the inside-one-file zoom).
-- **Deslop rewrite.** Every prose document rewritten in place against
-  [Slop Tics](/standards/prose/slop-tics.md). Productionized as the
-  `/document-deslop` skill, which the user invokes manually.
+Two lines maximum per item — a hard cap, whatever the size of the work.
+The detail lives in the documents the work produced.
+
+- **The determinism said outright.** Only deterministic code may stand between
+  a CLOA object and its system ([System Legibility](/docs/system-legibility.md)).
+- **CLOA primitives.** Bootstrap runs and an empirical close-out converged on
+  the CLOA primitive set, now the Runbook operations ([contract-shape.md](/doc-types/runbook/contract-shape.md#edges)).
 - **Documents hold behavior; skills and agents hold procedure.**
   Standardized in
   [file-roles.md](/standards/knowledge-organization/file-roles.md).
