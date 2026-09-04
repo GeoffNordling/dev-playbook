@@ -40,7 +40,7 @@ that the AI is in the garden *somewhere*.
 The fundamental problem is stochasticity: each AI action is random,
 whether aleatoric (model internals, temperature, etc.) or epistemic
 (the user's inability or unwillingness to keep up with the details).
-When user's "vibe" too hard, they gamble that one random walk through
+When user's "vibe", they gamble that one random walk through
 the garden will just happen to align with their intent.
 
 ## The CLOA
@@ -128,7 +128,7 @@ one to its caller.
 
 - **Deterministic backpressure over stochastic functions.**
   Stochastic functions — user/AI conversations, prompts, models, agents — are powerful but
-  expensive. Deterministic backpressure — detectors, linters, gates,
+  expensive and create slop if not handled carefully. Deterministic backpressure — detectors, linters, gates,
   plain contact with reality — is inviolable and efficient. Prefer it
   wherever it can reach, and prefer claims a lint can check: "skill X
   references skill Y" is greppable; "skill X is clean" is not. Keep
@@ -138,7 +138,7 @@ one to its caller.
   backpressure from real-world contact. Reality gets a veto;
   we prefer to hear its opinion early and often.
 - **Constrain to optimize understanding.** Funnel declarations
-  through reduced forms designed for the user's eyes. A constraint on
+  through reduced forms designed for user understanding. A constraint on
   form amortizes reading — learn the shape once, read every instance
   fast — makes location and absence meaningful, and yields rules a
   lint can hold.
