@@ -105,105 +105,32 @@ The detail lives in the documents the work produced.
 - **Documents hold behavior; skills and agents hold procedure.**
   Standardized in
   [file-roles.md](/standards/knowledge-organization/file-roles.md).
-- **Edge encoding and its parser.** The Reference chain's in-file
-  declaration format, designed on a five-runbook covering set and ruled
-  in
-  [encoding.md](/doc-types/runbook/encoding.md),
-  proven by `scripts/chaingen`, which regenerates every covered
-  runbook's chain into `doc-types/runbook/chains.txt` and fails on drift via
-  `--check`.
-- **First-party port.** Every runbook authored in this repo — all
-  twelve agents and the unmarked skills in the Port roster,
-  38 runbooks — ported to the edge encoding by a fixed dispatch
-  prompt, since retired, each with its leftovers recorded in the
-  [residual ledger](/doc-types/runbook/residual-ledger.md).
+- **Edge encoding and its parser.** The Reference chain's declaration format
+  is ruled in [encoding.md](/doc-types/runbook/encoding.md); `scripts/chaingen` proves it and fails on drift via `--check`.
+- **First-party port.** All 38 first-party runbooks ported to the edge
+  encoding, leftovers recorded in the [residual ledger](/doc-types/runbook/residual-ledger.md).
 - **The runbook standard, and the gate green.**
-  [Runbook Conventions](/standards/harness/runbook-conventions.md)
-  replaced what the old docs taught: `skill-management.md` deleted, the
-  `## Name: $ARGUMENTS` heading and `argument-hint` retired, `arguments`
-  declared. `scripts/harness-files-lint` audits agents as well as skills
-  against per-kind closed vocabularies and enforces the new keys
-  (`harness.arguments-format`, `harness.tools-format`);
-  `harness.banned-field` is gone. `skill-creator` became
-  `runbook-creator`, a procedure that states no rules and defers to the
-  standard. Every commit from 8d5a80f on carries no `SKIP` — the gate is
-  green unaided, which was this step's bar. A tangent off it produced
-  [the writing-improvement process](/docs/writing-improvement-process.md).
+  [Runbook Conventions](/standards/harness/runbook-conventions.md) replaced
+  the old skill-management docs; `scripts/harness-files-lint` enforces it and every commit since carries no `SKIP`.
 - **Verbatim adoption retired.**
-  [0026](/docs/decisions/0026-retire-verbatim-skill-adoption.md) changed
-  the policy: adoption is by copy into the owned tree. Ten (3P) skills
-  converted to owned copies; `wizard`, `marimo-batch`, and
-  `marimo-notebook` were deleted instead. The install machinery (CLI,
-  lock file, `.agents` tree, mirror symlinks, gate exemptions) retired,
-  and every document that evaluates or adopts other people's skills —
-  `pocock-sweep`, the verdicts ledger, the standards that named the
-  vendored exemption — now states the new stance.
-- **Sweep machinery deleted.** The `pocock-sweep` skill is deleted and the
-  ledger reduced to skill / verdict / date / reason per source — no release
-  pin, no tag or commit hashes, no per-ruling Decision Record. Re-evaluation
-  is manual: the user updates the rows by hand. Recorded in 0026.
-- **Converted-skill port.** The former (3P) ten, owned since 0026, went
-  through the same port as the first-party runbooks — the Port roster
-  is fully ticked.
-- **Rules moved out of skills.** Under the relaxed file-roles standard
-  (rules live in documents, procedures live in runbooks), `codebase-design`
-  became `standards/modules/design.md` and `writing-for-agents` became
-  `standards/harness/writing-for-agents.md`; both skills are deleted and
-  every caller repointed. `domain-modeling` slimmed to the active
-  discipline: its `CONTEXT-MAP.md` layout (conflicting with
-  context-content.md) and its `adr-format.md` (conflicting with
-  decisions/records.md) were cut, the CONTEXT.md format folded into
-  context-content.md, and `grill-with-docs` — reduced to a one-line
-  wrapper once its override retired — was deleted, its callers running
-  `/grilling` + `/domain-modeling` directly.
-- **Recursion to the bedrock of determinism.** The note is developed and
-  placed: the bedrock is defined in
-  [System Legibility](/docs/system-legibility.md),
-  and [Doc-Type](/doc-types/doc-type.md) carries
-  the loop's layer-invariance and the primitive map. The bedrock is where
-  documentation stops and code begins — documentation is the stochastic
-  thing, code the deterministic one, the same split this file's two
-  tracks make. The recursion does not halt at the boundary — the mode
-  flips, from inventing machinery with the loop to choosing pre-existing
-  tools.
+  [0026](/docs/decisions/0026-retire-verbatim-skill-adoption.md) moved
+  adoption to owned copies; the install machinery and its exemptions are gone.
+- **Sweep machinery deleted.** `pocock-sweep` is deleted; the verdicts
+  ledger is now skill / verdict / date / reason, updated by hand (0026).
+- **Converted-skill port.** The ten converted (3P) skills went through the
+  same edge-encoding port as the first-party runbooks.
+- **Rules moved out of skills.** `codebase-design` and `writing-for-agents`
+  became standards documents; `domain-modeling` slimmed to its active discipline and `grill-with-docs` was deleted.
+- **Recursion to the bedrock of determinism.** The bedrock — where
+  documentation's stochastic work ends and code's deterministic work begins — is defined in [System Legibility](/docs/system-legibility.md).
 - **The terminology refactor.** The loose uses of "primitive" and
-  "ontology" became a settled vocabulary — doc-type, operation,
-  composition rule, shape, contract, grain, layer, primitive, primitive
-  map — defined once in
-  [Doc-Type](/doc-types/doc-type.md); "ontology"
-  is reserved for a future solver
-  ([System Legibility](/docs/system-legibility.md),
-  Ambitions).
+  "ontology" settled into one vocabulary, defined once in [Doc-Type](/doc-types/doc-type.md).
 - **The working set rebuilt as the future doc-type tree.** Every theory
-  file rewritten under its future basename: system-legibility.md (the
-  doctrine), doc-type.md (the kind), doc-type-system.md (this repo's
-  instantiation), and the Runbook doc-type's files
-  (runbook-definition.md, runbook-contract-shape.md, runbook-encoding.md,
-  runbook-residual-ledger.md). CLOA-ABSTRACTIONS.md and TYPES.md drained
-  into these and were deleted.
-- **The migration.** Every working file moved to its long-term home: the
-  doctrine to `docs/system-legibility.md`, the theory and the Runbook
-  doc-type into `doc-types/`, the parser to `scripts/chaingen` writing
-  `doc-types/runbook/chains.txt`. The Standard doc-type was born in the
-  same move: `standards/standard/format.md` split into
-  `doc-types/standard/` (definition, contract shape, encoding, an empty
-  residual ledger), its detector contract and drift machinery staying
-  behind as `standards/standard/detectors.md`, and the Meta-Standard
-  card's Define cell now points at the split files. Every inbound link
-  repointed; the migration instruction sheet died with the move.
-
-- **The grammar triplication dissolved.**
-  `standards/harness/grammar.md` predated the doc-type concept — it was
-  where the Runbook primitives were shoehorned before they had a home —
-  and after the migration it declared the same vocabulary a third time,
-  beside `doc-types/runbook/contract-shape.md` and `encoding.md`. It is
-  deleted. contract-shape.md is now the sole vocabulary declaration
-  (gaining the prohibition operation, the read buckets, and the
-  edges-live-at-the-definition-site stitching rule, which existed
-  nowhere else); encoding.md is the sole declaration of written form
-  and says a primitive is never born there. The harness standard keeps
-  only its own question — `files.md`'s runbook class points at the
-  Runbook doc-type for the body.
+  file was rewritten under its future basename; CLOA-ABSTRACTIONS.md and TYPES.md drained into them and were deleted.
+- **The migration.** Every working file moved to its long-term home under
+  `docs/` and `doc-types/`, and the Standard doc-type was born in the same move from `standards/standard/format.md`.
+- **The grammar triplication dissolved.** `standards/harness/grammar.md`
+  declared the vocabulary a third time and is deleted; contract-shape.md and encoding.md are now the sole declarations.
 
 **Raw ideas, none designed**
 
