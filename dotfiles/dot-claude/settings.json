@@ -50,7 +50,7 @@
       "AskUserQuestion"
     ]
   },
-  "model": "sonnet",
+  "model": "claude-fable-5-1[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -266,6 +266,7 @@
   "skipWorkflowUsageWarning": true,
   "theme": "light",
   "switchModelsOnFlag": false,
+  "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "autoMode": {
     "allow": [
@@ -273,6 +274,5 @@
       "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The software factory's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure."
     ]
   },
-  "voiceEnabled": true,
-  "remoteControlAtStartup": true
+  "voiceEnabled": true
 }
