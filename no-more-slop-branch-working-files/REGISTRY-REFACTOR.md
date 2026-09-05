@@ -30,15 +30,10 @@ Decisions.
 
 ## Done when
 
-Every area of the repository's documentation is covered, in one of two
-ways: excluded explicitly in the registry as not important, or
-expressed reliably, precisely, and parsimoniously as high-level
-abstract pseudocode, deterministically connectable to CLOA objects
-that connect to
-[the bedrock of determinism](/docs/system-legibility.md#the-bedrock-of-determinism).
-None of it needs to be
-implemented in code yet. The high-level abstract objects must be
-complete, with low residuals.
+Every row of the registry's Types table
+([document-types.md](/standards/knowledge-organization/document-types.md))
+is accounted for: ruled on, with the ruling recorded. How much a ruling
+commits to is decided per type, at the ruling.
 
 ## Planned
 
@@ -46,10 +41,12 @@ complete, with low residuals.
   ([document-types.md](/standards/knowledge-organization/document-types.md))
   holds fourteen types, and three are ruled on: Standard and
   Standard-Card have doc-types, and Guide has its decision. Rule on
-  each of the other eleven, one of three ways: it becomes a doc-type,
-  with a population and a contract shape; it stays in the registry,
-  marked excluded as not important; or it leaves the registry. Done
-  when is met when every row is ruled.
+  each of the other eleven. Done when is met when every row is ruled.
+  The ambition below sets the target of a ruling; the shape a thin
+  doc-type takes is the open question under it.
+- **Decision-Record's doc-type.** The first build of the pass, and the
+  clearest: twenty-six records, already numbered, dated, templated, and
+  linted. It runs the six-step procedure Standard and Runbook ran.
 
 ## Completed
 
@@ -197,6 +194,15 @@ Defining the Audit and Adoption kinds is deferred.
 **Only existing kinds.** The kinds expressed are the ones that exist:
 Standard-Card, Standard, Runbook. Nothing new is invented until a port
 needs it.
+
+**Every type becomes a doc-type.** The ambition for the registry pass:
+no row is excluded. A type nobody cares much about is cheaper to carry
+as a thin doc-type than as an exclusion, because an exclusion is a
+second kind of row a reader must learn, and the registry is one thing
+or it is two. Whether the thin case is real is untested, so the pass
+evaluates each type rather than assuming: Decision-Record first, where
+the shape is obvious, and the rows with one or two files last, where
+the answer will show.
 
 **Standard's shape.** Two primitives roll into Standard: ObjectClass,
 the one class of thing with its exclusions, and Rule, name × condition ×
