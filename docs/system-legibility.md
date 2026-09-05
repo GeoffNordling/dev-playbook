@@ -22,7 +22,7 @@ system is either:
   The system may or may not be aligned with user intent; the
   user does not know because they do not comprehend it.
 
-Over time, the user accumulates **intent alignment debt**, a parallel
+Over time, the user accumulates **intent debt**, a parallel
 of tech debt.
 
 ## Why slop happens
@@ -62,7 +62,7 @@ The CLOA changes dynamically depending on the system and the user goal.
 Users who operate off of the CLOA will find themselves in the
 **slop trench**. This is a dirty, nasty, sad place; the slop can be deep. Digging
 out requires careful, repeated, corrective conversation turns with the
-AI to recover and pay off the intent alignment debt.
+AI to recover and pay off the intent debt.
 
 Users who dig out, but do not reflect on how they got themselves into
 the slop trench to begin with, will surely return to it soon.
@@ -78,7 +78,7 @@ forcing functions at the CLOA. By building observation platforms over the
 garden, the user maintains sight of the AI and keeps it aligned with their intent.
 
 CLOA platforms are 100% deterministic objects that give the user and AI
-one shared view of the system.
+one shared view of the system. Because they are deterministic, they fence in various parts of the garden and constrain the AI to a better-understood path.
 
 ### Documentation is code
 
