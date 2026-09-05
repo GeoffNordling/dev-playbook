@@ -91,6 +91,4 @@ A file that cannot be sliced fails the generator: a `population` that
 is not double-quoted, a rule or condition heading with no paragraph
 beneath it or with a list, table, quote, or fence as its first block,
 two headings with one slug in one Standard, an H3 with no H2 above it,
-or a heading below H3. A file typed `Standard` with no `population` key
-is outside the encoding: rulegen names it on every run and reads
-nothing from it.
+or a heading below H3, or no `population` key at all.

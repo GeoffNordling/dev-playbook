@@ -2,6 +2,7 @@
 type: Standard
 title: Instruments and Instrument Specs
 description: What an instrument is and the Instrument Spec contract every instrument carries
+population: "an instrument"
 ---
 
 # Instruments and Instrument Specs
@@ -12,6 +13,9 @@ question a repository must answer, an instrument *is* an answer — a device
 that standards, skills, and rituals employ.
 
 ## What makes a device an instrument
+
+An instrument defines an artifact format, carries a prescriptive
+contract, and is invoked rather than adopted.
 
 - **It defines an artifact format.** Invoking an instrument yields a
   concrete artifact with a prescribed form.

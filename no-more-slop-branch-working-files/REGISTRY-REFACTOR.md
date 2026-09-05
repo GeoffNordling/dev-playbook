@@ -11,8 +11,7 @@ and the work that remains. Member of
 [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
 
 A decision is written only once it is aligned on. Where a question was
-raised and not settled, it sits under Planned as a decision with no
-lean.
+raised and not settled, it sits under Deferred with no lean.
 
 ## Goal
 
@@ -43,40 +42,21 @@ complete, with low residuals.
 
 ## Planned
 
-Work first, in order; then the decisions — questions raised and not
-settled, in whatever order they unblock, none with a lean recorded.
-
-- **rulegen's missing-population failure.** Today rulegen names
-  `instrument/format.md`, the one Standard with no `population`, and
-  skips it. Add an exclusion mark for that file, so the skip becomes
-  the failure the class's frontmatter rule states. The generator is a
-  first draft: a port that fails it may change the script or widen the
-  encoding, and which one is decided at the failure. What the encoding
-  cannot carry today sits in
-  [the residual ledger](/doc-types/standard/residual-ledger.md).
-- **Guide's registry sentence.** The registry
-  ([document-types.md](/standards/knowledge-organization/document-types.md))
-  still describes Guide as "not to be measured against". Replace that
-  with the Guide decision below.
 - **The parked rationale.** What the ports evicted sits in
   [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md).
   Decide what becomes of it.
-- **General-Sheet's replacement.** What replaces `General-Sheet`, which
-  the user named a cop-out, and what type working-set files carry.
-- **The doc-type family's own type.** The type the doc-type family's
-  own files carry.
-- **Guide as the procedure kind.** Whether Guide is the kind a
-  procedure carries. The two `consuming.md` are typed `Standard` and
-  describe themselves as recipes; Bootstrap and Tracker Operations, the
-  same shape, are typed `Guide`.
-- **Where exclusions are written.** Whether a population's exclusions
-  are written in the population mark or in the file's prose.
-- **This file's permanent homes.** Which of this file's decisions move
-  to a permanent home in the repository, and where. Some will; not all.
-- **Edge cases.** Not yet examined.
 
 ## Completed
 
+- **rulegen's missing-population failure.** A Standard with no
+  `population` fails rulegen, now that the last one, the instruments
+  Standard, is on the encoding. The generator is a first draft: a port
+  that fails it may change the script or widen the encoding, and which
+  one is decided at the failure. What the encoding cannot carry today
+  sits in [the residual ledger](/doc-types/standard/residual-ledger.md).
+- **Guide's registry sentence.** The registry's Guide row
+  ([document-types.md](/standards/knowledge-organization/document-types.md))
+  carries the Guide decision.
 - **The card loop.** `doc-types/` became `standard-card/`,
   `standard/`, and `runbook/`, and `scripts/cardgen` writes
   `doc-types/standard-card/cards.txt` from the cut points the cards
@@ -88,10 +68,26 @@ settled, in whatever order they unblock, none with a lean recorded.
   tables to `doc-types/standard/standards.txt` and fails on drift.
 - **The ports.** Build, Prose, Knowledge Organization, Tracking,
   Shell, Python, Testing, Modules, Decisions, Semantic Validation,
-  Harness, and the Meta-Standard, so every card but Instruments is on
+  Harness, the Meta-Standard, and Instruments, so every card is on
   the Standard encoding.
 - **The port review.** Every ported Standard read file by file and
   scrubbed against the encoding.
+
+## Deferred
+
+Questions raised and not settled, none with a lean recorded. A deferred
+question is answered when a port needs it, not before.
+
+- **General-Sheet's replacement.** What replaces `General-Sheet`, which
+  the user named a cop-out, and what type working-set files carry.
+- **The doc-type family's own type.** The type the doc-type family's
+  own files carry.
+- **Guide as the procedure kind.** Whether Guide is the kind a
+  procedure carries. The two `consuming.md` are typed `Standard` and
+  describe themselves as recipes; Bootstrap and Tracker Operations, the
+  same shape, are typed `Guide`.
+- **Where exclusions are written.** Whether a population's exclusions
+  are written in the population mark or in the file's prose.
 
 ## Decisions
 
@@ -303,6 +299,12 @@ ledger.
 — one directory per doc-type, each holding that doc-type's definition,
 contract shape, encoding, residual ledger, and generated view.
 
+**Instruments.** On the encoding like every other card, ported with
+the smallest change that slices, so the generator has no special case.
+The user does not stand behind instruments in their current form and
+plans to remake them, so the port relaxes where the file does not fit
+rather than inventing, and nothing in this refactor is built on them.
+
 ## The rule/procedure split
 
 Located, because the user wanted to remember where it is. One home:
@@ -314,13 +316,7 @@ and [Third person](/standards/prose/conventions.md#third-person).
 
 ## Out of scope
 
-The instrument, the instrument spec, and anything to do with
-instruments. The user is not happy with the current implementation and
-does not want to delete it either. Set aside; not thought about in this
-refactor.
-
-Judgments, the same way. The user is not happy with them and may delete
-them soon. No rule in this refactor is checked by a judgment, and no
+Judgments. The user is not happy with them and may delete them soon. No rule in this refactor is checked by a judgment, and no
 shape is designed to hold one. `judgments/docs-match-code.yaml` holds
 the four judgments the branch leaves.
 

@@ -7,6 +7,7 @@ decisions               records                     a Decision Record: a numbere
 distribution            channel                     a governed repo's share of the distribution channel: its hook manifest, its local block, its dev-playbook pin, and in dev-playbook the roster
 harness                 claude-content              a CLAUDE.md: a repo's root file, a nested <dir>/CLAUDE.md, or in dev-playbook the global source dotfiles/dot-claude/CLAUDE.md
 harness                 runbook-conventions         a runbook: a skill bundle or an agent definition under a governed repo's .claude/ or dev-playbook's dotfiles/dot-claude/
+instrument              format                      an instrument
 knowledge-organization  context-content             a repo's CONTEXT.md
 knowledge-organization  cross-references            a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record
 knowledge-organization  document-types              a concept document
@@ -91,6 +92,11 @@ harness                 runbook-conventions         skillmd-under-500-lines     
 harness                 runbook-conventions         steps-end-on-a-completion-criterion               —
 harness                 runbook-conventions         tool-fields                                       skill
 harness                 runbook-conventions         tools                                             agent
+instrument              format                      employed-by                                       —
+instrument              format                      executors                                         —
+instrument              format                      readings                                          —
+instrument              format                      the-instrument-spec                               —
+instrument              format                      what-makes-a-device-an-instrument                 —
 knowledge-organization  context-content             entry-shape                                       —
 knowledge-organization  context-content             glossary-only                                     —
 knowledge-organization  context-content             okf-frontmatter                                   —

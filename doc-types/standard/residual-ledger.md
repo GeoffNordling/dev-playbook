@@ -79,6 +79,13 @@ the wayfinder body shape at all: the rule is the `/wayfinder` skill's,
 and the half of `tracking.wayfinder-shape` that checks a map's sections
 has no rule row.
 
+### instrument/format
+
+Could not express one class of object: the population is an
+instrument, while The Instrument Spec and Employed by bind its spec and
+Readings binds its artifacts, so three rules bind members outside the
+population, the way Gates' red-CI rule does.
+
 ### tracking/repo-settings
 
 Could not express GitHub origin over the member: the remote is the
