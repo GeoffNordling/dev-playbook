@@ -53,9 +53,10 @@ scientist samples and a manager checks in. Looking below is
 what earns the claim of understanding. At the end of a run the user
 reads the diff.
 
-When the user does not like the result, the user changes the loop — a
-contract, a detector, the runbook — and runs it again. The user does not
-fix the output by hand.
+The agent cooks; the user checks back later. When the user does not
+like the result, the user changes the loop — a contract, a detector, a standard — and runs it again. The user does not fix the output by hand.
+The aim is a flywheel of autonomy: user time is never spent on work a
+loop could do.
 
 A linear session is for work that does not repeat: a foundational
 document, a decision. Work that repeats gets a loop.
