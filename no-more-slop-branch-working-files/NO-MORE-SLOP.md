@@ -59,8 +59,6 @@ The items, each a future work session:
   What has worked while constructing CLOA objects is noted as it
   occurs in
   [Algorithm Notes](/no-more-slop-branch-working-files/ALGORITHM-NOTES.md).
-  What the ports evict waits in
-  [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md).
 - **The parser's trigger.** The move landed the parser at
   `scripts/chaingen`, writing its generated view to
   `doc-types/runbook/chains.txt` — a temporary location, to be settled

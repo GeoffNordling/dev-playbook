@@ -91,7 +91,8 @@ date: {YYYY-MM-DD}
 {1-3 sentences: what's the context, what did we decide, and why.}
 ```
 
-A Decision Record can be a single paragraph.
+A Decision Record can be a single paragraph: the value is in recording
+that a decision was made and why, not in filling out sections.
 
 A Decision Record is a concept document, so it carries the standard
 `type` + `title` + `description` frontmatter (see

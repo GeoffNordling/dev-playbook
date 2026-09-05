@@ -47,7 +47,8 @@ A rule is a heading; its section is the rule.
 - **The predicate.** The first paragraph under the heading. It states
   the check whole: a reader with only that paragraph can apply it.
 - **The body.** Everything after the first paragraph: the definition,
-  the exemptions, the action, the examples. Carried, never read.
+  the exemptions, the action, the examples, the reason. Carried, never
+  read.
 
 ## Conditions
 
@@ -67,10 +68,12 @@ is written as neither: the view would print it as a condition.
 
 ## Everything else
 
-Content that is not the population, a condition, or a rule has its
-home in another document: rationale, procedure, and a writer's
+Content that is not the population, a condition, a rule, or a rule's
+reason has its home in another document: procedure and a writer's
 heuristics each do a second thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)).
+A reason stays only where the rule would look wrong without it, one
+concrete fact that stops a reader from undoing the rule.
 
 ## Where a Standard lives
 

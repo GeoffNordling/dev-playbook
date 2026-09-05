@@ -65,6 +65,10 @@ A legitimate fallback is one where the missing value is a real runtime
 state rather than a programming error. Its inline comment is the signal
 that the author weighed it.
 
+A fallback that hides a bug delays the failure to a place far from the
+cause, where it is much harder to diagnose. Failing at the point of the
+missing value points straight at the defect.
+
 ## Module layout
 
 A module's top-level statements run in one order: the module docstring,
@@ -92,6 +96,10 @@ one user mid-file.
 `from __future__ import annotations` does not appear in the file.
 
 python-lint rejects the import (`python.no-future-annotations`).
+
+Python 3.11+ already provides every motivation for it: PEP 604 unions
+(`X | Y`), builtin generics (`list[int]`), and string-quoted forward
+references.
 
 ## Helper justification
 

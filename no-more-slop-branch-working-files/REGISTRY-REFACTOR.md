@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Registry Refactor
-description: The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the work that remains
+description: The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the questions deferred
 ---
 
 # Registry Refactor
@@ -42,12 +42,12 @@ complete, with low residuals.
 
 ## Planned
 
-- **The parked rationale.** What the ports evicted sits in
-  [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md).
-  Decide what becomes of it.
+None.
 
 ## Completed
 
+- **The parked rationale.** The parking lot is sorted and deleted:
+  eight reasons sit under the rules they guard, and the rest is gone.
 - **rulegen's missing-population failure.** A Standard with no
   `population` fails rulegen, now that the last one, the instruments
   Standard, is on the encoding. The generator is a first draft: a port
@@ -251,13 +251,16 @@ here: a document does one thing, predictably, in a structured way, and
 the thing and its structure are fixed at the CLOA by the document's
 type. A Standard's one thing is one population and its rules. Content
 found in an existing file that cannot sit in a Standard without
-breaking this moves to the parking lot.
+breaking this is deleted, or moved to the document that does that
+thing.
 
-**The parking lot.** One location, under the greenfield license, for
-what is important but belongs elsewhere: evicted rationale,
-heuristics, anything a port cannot place. It exists so nothing is
-forgotten while a port moves fast; sorting it is its own item under
-Planned.
+**A rule's reason.** A rule's body carries its reason when the rule
+would look wrong without one: one concrete fact about the environment
+that stops a reader from undoing the rule, the way the ci.yml rule says
+a test suite depends on a local path dependency no cloud runner has.
+The view never reads a body, so the tables are unchanged. A reason that
+justifies dev-playbook's own plumbing, the hook channel's design being
+the type case, guards nothing and is deleted.
 
 **Condition, not guard.** One word serves both doc-types, defined in the
 root's terms bucket

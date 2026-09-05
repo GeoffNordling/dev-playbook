@@ -74,6 +74,10 @@ A repo in which `pyproject.toml` exists at the root.
 
 A Python repo in which `src/` exists.
 
+`src/` is the default source root of most JavaScript build tools as
+well, so the condition is a conjunction: a repo without `pyproject.toml`
+is not Python, whatever it keeps in `src/`.
+
 ### One package under src/
 
 `src/` holds exactly one directory, the import package the

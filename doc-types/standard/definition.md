@@ -18,8 +18,9 @@ directories: `standards/prose/conventions.md` binds an authored
 document, `standards/build/skeleton.md` binds a repo's tracked tree. A
 Standard does one thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)):
-its population and its rules. Rationale, procedure, and a writer's
-heuristics are other documents' things.
+its population and its rules. A rule's body may carry the reason that
+keeps the rule from looking wrong; procedure and a writer's heuristics
+are other documents' things.
 
 ## Where a Standard lives
 

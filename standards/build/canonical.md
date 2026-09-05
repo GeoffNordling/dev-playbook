@@ -28,6 +28,11 @@ with `SKIP: ref-lint`, on every push and pull request to `main`. It runs
 the hook suite and nothing else; tests run at the
 [push gate](/standards/standard/gates.md#three-rungs).
 
+Tests stay local: the workspace is local-first, and a test suite depends
+on dev-playbook as a local path dependency that does not exist on a
+cloud runner. The pre-push hook does not fire under `pre-commit run`,
+so CI stays test-free without a rule of its own.
+
 ## .python-version
 
 `.python-version` is byte-identical to the canonical
@@ -84,6 +89,38 @@ The pinned values: `project.name`, the project name of the
 repo's own import package; and every `[tool.mypy]` key. The floors are
 mypy, pytest, and ruff. The canonical file writes `<repo>` and `<package>`
 where a copy writes its own names.
+
+The reasons behind the pins, each a choice that looks reversible until
+the reason is read:
+
+- **`uv_build`** over other backends: it is bundled inside the uv binary,
+  so building the package, including editable installs by consumers,
+  needs no network and no PyPI, and its default layout is exactly this
+  standard's (`src/<package>`, named from the project name).
+- **`disallow_untyped_defs` + `disallow_incomplete_defs`** instead of
+  `strict = true`: the pair guarantees every function signature is fully
+  annotated, while full strict also turns on `disallow_untyped_calls`
+  (chokes on every untyped third-party lib) and `disallow_any_generics`
+  (noisy about every bare `list`/`dict`).
+- **`disable_error_code = ["import-untyped"]`**: importing a library that
+  ships no type stubs works without `# type: ignore` at each import site;
+  `types-*` stub packages join `dev` when a specific library warrants them.
+- **The ruff families** beyond the `E`/`W`/`F` core: each catches a
+  distinct defect class: `I` import order, `UP` outdated syntax, `B`
+  bug-prone patterns, `SIM` needless complexity, `SLF` private-member
+  access from outside the defining class, and `D` docstring presence and
+  format (pydocstyle), enforcing the docstring conventions in
+  [python/style.md](/standards/python/style.md).
+- **`[tool.ruff.lint.pydocstyle] convention = "pep257"`**: `D` on its own
+  turns on mutually-exclusive members (`D203` vs `D211`, `D212` vs `D213`),
+  so `ruff check` is unsatisfiable until a `convention` selects between
+  them. Per-file ignores then drop all of `D` for `tests/**` (test
+  functions carry no docstrings by convention) and `D104` for
+  `__init__.py` (an empty init has none).
+- **`ignore = ["E501", "D401"]`**: `ruff format` owns line length, so the
+  `E501` lint rule would report the same overruns a second time; `D401`
+  (imperative-mood summaries) is dropped to keep the workspace's
+  noun-phrase docstring voice.
 
 ## .gitignore
 

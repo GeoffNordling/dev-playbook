@@ -70,4 +70,6 @@ itself on every run, and which machine skips what is recorded in
 [Machines](/docs/machines.md).
 
 The canonical workflow skips ref-lint this way, since a CI runner checks
-out one repo and a cross-repo Citation cannot resolve there.
+out one repo and a cross-repo Citation cannot resolve there. Local
+pre-commit stays the strict reference gate. okf-lint runs in CI, since
+everything it checks is in the repo.
