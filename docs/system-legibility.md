@@ -40,7 +40,7 @@ that the AI is in the garden *somewhere*.
 The fundamental problem is stochasticity: each AI action is random,
 whether aleatoric (model internals, temperature, etc.) or epistemic
 (the user's inability or unwillingness to keep up with the details).
-When user's "vibe", they gamble that one random walk through
+When users "vibe", they gamble that one random walk through
 the garden will just happen to align with their intent.
 
 ## The CLOA
