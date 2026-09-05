@@ -12,4 +12,4 @@ the doctrine lives at `docs/system-legibility.md`, the type system under
 
 - [Algorithm Notes](/no-more-slop-branch-working-files/ALGORITHM-NOTES.md) — Scratch notes on what worked while constructing new CLOA objects — tentative, gathered as we go, a possible complement to the EM loop documentation later
 - [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md) — The branch plan — goal, the two tracks, the terms, and the current step
-- [Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md) — The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the questions deferred
+- [Registry Refactor](/no-more-slop-branch-working-files/REGISTRY-REFACTOR.md) — The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the work that remains

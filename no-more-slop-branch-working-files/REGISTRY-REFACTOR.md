@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Registry Refactor
-description: The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the questions deferred
+description: The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the work that remains
 ---
 
 # Registry Refactor
@@ -42,7 +42,14 @@ complete, with low residuals.
 
 ## Planned
 
-None.
+- **The registry pass.** The registry's Types table
+  ([document-types.md](/standards/knowledge-organization/document-types.md))
+  holds fourteen types, and three are ruled on: Standard and
+  Standard-Card have doc-types, and Guide has its decision. Rule on
+  each of the other eleven, one of three ways: it becomes a doc-type,
+  with a population and a contract shape; it stays in the registry,
+  marked excluded as not important; or it leaves the registry. Done
+  when is met when every row is ruled.
 
 ## Completed
 
