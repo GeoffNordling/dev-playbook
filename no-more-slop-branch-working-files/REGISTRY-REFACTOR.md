@@ -1,17 +1,18 @@
 ---
 type: General-Sheet
 title: Registry Refactor
-description: The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position, and the open questions
+description: The decisions aligned on for the document-type registry refactor — the rejection axis, the abstractions, the software factory's position — and the work that remains
 ---
 
 # Registry Refactor
 
-The decisions the user and Claude aligned on in the 2026-09-02 sessions
-that opened the registry refactor. Member of
+The decisions the user and Claude aligned on for the registry refactor,
+and the work that remains. Member of
 [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md).
 
-Only what was said in those sessions is written here. Where a question
-was raised and not settled, it sits under Open questions with no lean.
+A decision is written only once it is aligned on. Where a question was
+raised and not settled, it sits under Planned as a decision with no
+lean.
 
 ## Goal
 
@@ -21,9 +22,76 @@ organized. The settling happens at one level, parsimonious and precise
 enough to show on screen. Decisions are made at that level; everything
 below it is implementation, audit, and enforcement.
 
-The end product is a CLOA object for the standards: a view, generated
+The end product is a
+[CLOA object](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#terms)
+for the standards: a view, generated
 by deterministic code from the standard files, that the user and an
-agent read at the same level. What that view is, is settled below.
+agent read at the same level. What that view is, is settled under
+Decisions.
+
+## Done when
+
+Every area of the repository's documentation is covered, in one of two
+ways: excluded explicitly in the registry as not important, or
+expressed reliably, precisely, and parsimoniously as high-level
+abstract pseudocode, deterministically connectable to CLOA objects
+that connect to
+[the bedrock of determinism](/docs/system-legibility.md#the-bedrock-of-determinism).
+None of it needs to be
+implemented in code yet. The high-level abstract objects must be
+complete, with low residuals.
+
+## Planned
+
+Work first, in order; then the decisions — questions raised and not
+settled, in whatever order they unblock, none with a lean recorded.
+
+- **rulegen's missing-population failure.** Today rulegen names
+  `instrument/format.md`, the one Standard with no `population`, and
+  skips it. Add an exclusion mark for that file, so the skip becomes
+  the failure the class's frontmatter rule states. The generator is a
+  first draft: a port that fails it may change the script or widen the
+  encoding, and which one is decided at the failure. What the encoding
+  cannot carry today sits in
+  [the residual ledger](/doc-types/standard/residual-ledger.md).
+- **Guide's registry sentence.** The registry
+  ([document-types.md](/standards/knowledge-organization/document-types.md))
+  still describes Guide as "not to be measured against". Replace that
+  with the Guide decision below.
+- **The parked rationale.** What the ports evicted sits in
+  [Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md).
+  Decide what becomes of it.
+- **General-Sheet's replacement.** What replaces `General-Sheet`, which
+  the user named a cop-out, and what type working-set files carry.
+- **The doc-type family's own type.** The type the doc-type family's
+  own files carry.
+- **Guide as the procedure kind.** Whether Guide is the kind a
+  procedure carries. The two `consuming.md` are typed `Standard` and
+  describe themselves as recipes; Bootstrap and Tracker Operations, the
+  same shape, are typed `Guide`.
+- **Where exclusions are written.** Whether a population's exclusions
+  are written in the population mark or in the file's prose.
+- **This file's permanent homes.** Which of this file's decisions move
+  to a permanent home in the repository, and where. Some will; not all.
+- **Edge cases.** Not yet examined.
+
+## Completed
+
+- **The card loop.** `doc-types/` became `standard-card/`,
+  `standard/`, and `runbook/`, and `scripts/cardgen` writes
+  `doc-types/standard-card/cards.txt` from the cut points the cards
+  already had.
+- **The Standard loop's design.** `doc-types/standard/` holds the
+  definition, the two-table contract shape, the encoding, and the
+  residual ledger.
+- **The Standard loop's code.** `scripts/rulegen` writes the two
+  tables to `doc-types/standard/standards.txt` and fails on drift.
+- **The ports.** Build, Prose, Knowledge Organization, Tracking,
+  Shell, Python, Testing, Modules, Decisions, Semantic Validation,
+  Harness, and the Meta-Standard, so every card but Instruments is on
+  the Standard encoding.
+- **The port review.** Every ported Standard read file by file and
+  scrubbed against the encoding.
 
 ## Decisions
 
@@ -47,15 +115,13 @@ an agent followed a documented process step for step, and rejecting the
 result on a deviation, is the wrong kind of audit and the wrong kind of
 enforcement.
 
-**Standard-Card.** What the built doc-type today named Standard actually
-is: its own definition file says the family is the population of cards
-under `standards/`, so the shape, the cells, and the lint belong to the
-card. Rename it.
+**Standard-Card.** The doc-type of the cards under `standards/`. The
+shape, the cells, and the lint belong to the card, not to the Standard
+it points at.
 
-**Standard.** The kind a card's Define cell points at, and the doc-type
-not yet built. One object class as its population, plus named rules,
-each a predicate over that class's state. Today's 38 files typed
-`Standard` are this kind's population.
+**Standard.** The kind a card's Define cell points at. One object class
+as its population, plus named rules, each a predicate over that class's
+state. The files typed `Standard` are this kind's population.
 
 **Three collections, computed correspondence.** Think of it as code: a
 collection of rules, a collection of audits, a collection of
@@ -75,8 +141,7 @@ precise pseudocode, which lets it all be scaffolded by 100%
 deterministic code rising from the bedrock of determinism.
 
 **Guide.** Explanation of a process or a system, read to understand it.
-Never cited to reject. The registry's sentence "not to be measured
-against" is retired and replaced by what a Guide is.
+Never cited to reject.
 
 **Location.** Cards stay flat under `standards/`, Standards stay under
 `standards/<name>/`, and both lints stay. The documents a card points at
@@ -195,8 +260,8 @@ breaking this moves to the parking lot.
 **The parking lot.** One location, under the greenfield license, for
 what is important but belongs elsewhere: evicted rationale,
 heuristics, anything a port cannot place. It exists so nothing is
-forgotten while the ports move fast; sorting it is its own action
-item, after the ports.
+forgotten while a port moves fast; sorting it is its own item under
+Planned.
 
 **Condition, not guard.** One word serves both doc-types, defined in the
 root's terms bucket
@@ -234,9 +299,9 @@ write mode at the gate, so shfmt keeps its Audit row on the Shell card.
 two tables), encoding, generator with a drift check, ports, residual
 ledger.
 
-**`doc-types/` becomes three.** Today it holds `standard/` and
-`runbook/`, and `standard/` is Standard-Card's files under Standard's
-name. It becomes `standard-card/`, `standard/`, `runbook/`.
+**`doc-types/` is three.** `standard-card/`, `standard/`, `runbook/`
+— one directory per doc-type, each holding that doc-type's definition,
+contract shape, encoding, residual ledger, and generated view.
 
 ## The rule/procedure split
 
@@ -247,23 +312,6 @@ Conventions,
 [Imperative and second person](/standards/prose/conventions.md#imperative-and-second-person)
 and [Third person](/standards/prose/conventions.md#third-person).
 
-## Open questions
-
-Raised, not settled. No lean recorded.
-
-- What replaces `General-Sheet`, which the user named a cop-out, and
-  what type working-set files carry.
-- The type the doc-type family's own files carry.
-- The files typed `Standard` that describe themselves as recipes, the
-  two `consuming.md`. Bootstrap was the third; the Build port retyped it
-  `Guide`, the Tracking port did the same to Tracker Operations, and
-  whether Guide is the kind a procedure carries is not settled.
-- Whether a population's exclusions are written in the population mark
-  or in the file's prose.
-- Which of this file's decisions move to a permanent home in the
-  repository, and where. Some will; not all; which is not yet known.
-- Edge cases not yet examined.
-
 ## Out of scope
 
 The instrument, the instrument spec, and anything to do with
@@ -273,59 +321,9 @@ refactor.
 
 Judgments, the same way. The user is not happy with them and may delete
 them soon. No rule in this refactor is checked by a judgment, and no
-shape is designed to hold one.
-
-## Done when
-
-Every area of the repository's documentation is covered, in one of two
-ways: excluded explicitly in the registry as not important, or
-expressed reliably, precisely, and parsimoniously as high-level
-abstract pseudocode, deterministically connectable to CLOA objects
-that connect to the bedrock of determinism. None of it needs to be
-implemented in code yet. The high-level abstract objects must be
-complete, with low residuals.
-
-## State
-
-rulegen names `instrument/format.md`, the one Standard with no
-`population`, and skips it. What the ports evicted sits in
-[Parking Lot](/no-more-slop-branch-working-files/PARKING-LOT.md); what
-the encoding cannot carry sits in
-[the residual ledger](/doc-types/standard/residual-ledger.md).
-`judgments/docs-match-code.yaml` holds the four judgments the branch
-leaves.
-
-## Planned
-
-In order.
-
-- **rulegen fails on a missing population** — with an exclusion mark
-  for `instrument/format.md`, so the skip becomes the failure the
-  class's frontmatter rule states. The generator is a first draft: a
-  port that fails it may change the script or widen the encoding, and
-  which one is decided at the failure.
-- **The parked rationale** — decide what becomes of it.
-- **The open questions** — the ones above, in whatever order they
-  unblock.
-
-## Completed
-
-- **The card loop** — `doc-types/` became `standard-card/`,
-  `standard/`, and `runbook/`, and `scripts/cardgen` writes
-  `doc-types/standard-card/cards.txt` from the cut points the cards
-  already had.
-- **The Standard loop's design** — `doc-types/standard/` holds the
-  definition, the two-table contract shape, the encoding, and the
-  residual ledger.
-- **The Standard loop's code** — `scripts/rulegen` writes the two
-  tables to `doc-types/standard/standards.txt` and fails on drift.
-- **The ports** — Build, Prose, Knowledge Organization, Tracking,
-  Shell, Python, Testing, Modules, Decisions, Semantic Validation,
-  Harness, and the Meta-Standard, so every card but Instruments is on
-  the Standard encoding.
-- **The port review** — every ported Standard read file by file and
-  scrubbed against the encoding.
+shape is designed to hold one. `judgments/docs-match-code.yaml` holds
+the four judgments the branch leaves.
 
 ## Acronyms
 
-None. CLOA is defined in the root, [No More Slop](/no-more-slop-branch-working-files/NO-MORE-SLOP.md#acronyms).
+None.
