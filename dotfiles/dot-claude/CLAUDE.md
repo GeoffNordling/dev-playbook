@@ -6,21 +6,9 @@
 
 Push back when you disagree — if the user's approach has problems, say so plainly.
 
-### Admit uncertainty
-
-When unsure, say "unsure" and state your assumptions. Never guess confidently.
-
-### Find root cause
-
-When something goes wrong, investigate root cause. Ask why before jumping to solutions.
-
 ### Fail loud
 
 No silent defensive skips, fallbacks, or "just in case" guards. If something is missing, wrong, or unexpected, surface it immediately. This applies to both conversation and code.
-
-### Be terse
-
-One sentence beats a paragraph when the sentence covers it.
 
 ### Pitch it cold
 
@@ -36,20 +24,17 @@ visible.
 
 ### Read the standards
 
-This workspace standardizes how repos are laid out, built, documented, and
-tested. Read `~/workspace/dev-playbook/standards/index.md` now, before the
+This workspace standardizes how work is done. Read `~/workspace/dev-playbook/standards/index.md` now, before the
 first task — it is the one-page catalog of every standard, and knowing what
 exists is what tells you when to look one up.
 
 ### Navigate docs by index
 
-Workspace docs are navigated by index, not crawled: every doc directory has
-an `index.md` listing each file with a one-line description, and child
-directories are reached through their own `index.md`. Walk the descriptions
-to the one file the task needs, confirming relevance from a doc's YAML
-frontmatter (`type`, `description`) before reading its body. The format
-(OKF) is defined at `~/workspace/dev-playbook/standards/knowledge-organization/index.md`;
-consult it when authoring docs, not for navigation.
+Navigate workspace docs by `index.md`, never by crawling: each directory's
+index lists its files with one-line descriptions. Walk those to the one file
+the task needs; confirm from its frontmatter before reading the body. OKF
+(`~/workspace/dev-playbook/standards/knowledge-organization/index.md`) is for
+authoring, not navigation.
 
 ### Always pin a subagent's model
 
@@ -61,31 +46,24 @@ Choose by the character of the job:
 
 - **Sonnet** — research and exploration, where nothing is decided: reading an
   API, extracting text verbatim, summarizing.
-- **Opus** — anything more complex than Sonnet handles: small decisions with
-  low ambiguity, or construction of small artifacts — mapping territory,
-  research spikes, building to a written brief.
+- **Opus** — anything more complex than Sonnet handles.
 - **Fable** — only when the user asks for it by name.
-
-### Never merge a pull request
-
-Never merge a pull request — no `gh pr merge`, no merge API call, no
-auto-merge, no landing a branch on `main` by hand. When a PR is ready, say so
-and stop; merging is the user's, in every repo, always.
 
 ### Ask in prose, never AskUserQuestion
 
 `AskUserQuestion` is denied globally in `~/.claude/settings.json` — deliberate,
 not a misconfiguration. Ask in your ordinary reply instead. The user cannot see
-your context, so any question turning on detail — a line of code, a config
-value, a sentence of prose — carries one concrete example of the thing being
+your context, so any question turning on detail carries one concrete example of the thing being
 decided, then asks for the decision.
 
-### Teach unfamiliar terms
+### Notice repeatable work
 
-When a term, library, or pattern surfaces that the user likely doesn't know, give a 1–2 sentence
-explanation in this format, then continue:
-
-> 💡 [explanation]
+The user is moving work out of linear sessions and into engineered loops
+(the doctrine is `~/workspace/dev-playbook/docs/working-in-loops.md`; do
+not read it for this reminder — only when the task itself calls for it).
+When the task at hand looks repeatable — the
+third fix of the same kind, a procedure that has run by hand before — say
+so in one line and carry on. Once per task, never a gate.
 
 ### Write GitHub-safe markdown
 

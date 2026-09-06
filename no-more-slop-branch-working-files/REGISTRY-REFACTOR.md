@@ -143,6 +143,11 @@ deterministic code rising from the bedrock of determinism.
 **Guide.** Explanation of a process or a system, read to understand it.
 Never cited to reject.
 
+**Log, Spec-Item, Survey.** Spec-Item leaves the registry: its one tooled
+population is spec-tools, which the user does not care about. Log and
+Survey stay as rows of the pass, first class, the user's to rule on.
+Breaking a consumer repo is acceptable throughout this refactor.
+
 **Location.** Cards stay flat under `standards/`, Standards stay under
 `standards/<name>/`, and both lints stay. The documents a card points at
 may live anywhere. A Define cell points only at Standards; a Guide is
