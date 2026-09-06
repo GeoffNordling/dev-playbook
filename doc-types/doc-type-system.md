@@ -21,16 +21,35 @@ files. A registry kind is finer than a family: the registries name
 every kind that may exist; a doc-type is built only for a family
 ruled important.
 
+Every kind in both registries has a row, and no kind is excluded: a
+type with few files and little at stake is carried as a thin doc-type,
+never as an exclusion, since an exclusion is a second kind of row a
+reader must learn. A row reading *pending* is not yet ruled; the pass
+rules on Decision-Record first, where the shape is obvious, and on the
+rows with one or two files last.
+
 | Kind | Family | Ruling |
 |---|---|---|
-| Skill | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
-| Agent definition | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
+| Candidate-List | candidate lists | Pending |
+| Decision-Record | decision records | Pending — the first run of the doc-type build loop ([#474](https://github.com/GeoffNordling/dev-playbook/issues/474)) |
+| General-Sheet | — | Pending; its replacement is an open question ([Candidates](/CANDIDATES.md)) |
+| Guide | guides | Important; no doc-type built yet |
+| Instrument-Spec | instruments | Pending; the instruments are to be remade first ([Candidates](/CANDIDATES.md)) |
+| Log | logs | Pending; the user's to rule |
+| README | readmes | Pending |
+| Recipe-Description | recipes | Pending |
+| Reference | references | Pending |
 | Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
 | Standard-Card | cards | The [Standard-Card](/doc-types/standard-card/definition.md) doc-type |
-| Guide | guides | Important; no doc-type built yet |
+| Survey | surveys | Pending; the user's to rule |
 | Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |
-
-Any registry kind absent from this table is ruled not important.
+| Skill | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
+| Agent definition | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
+| `CLAUDE.md` | context files | Pending |
+| `rules/*.md` | context files | Pending |
+| `settings.json`, `settings.local.json` | configuration | Pending |
+| `hooks/` | hooks | Pending |
+| `.claude/workflows/*.js` | workflows | Pending |
 
 ## The roster
 

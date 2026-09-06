@@ -10,6 +10,23 @@ The workspace's established vocabulary — the canonical terms every doc uses ex
 
 ## Language
 
+### Legibility
+
+The words the user and the AI meet on
+([System Legibility](/docs/system-legibility.md)).
+
+**Slop**
+Output that diverges from the user's intent, or that the user cannot read.
+
+**CLOA**
+Correct Level of Abstraction: the best-effort shared level where the user and the AI communicate in exactly the same terminology — the highest level the user can trust the AI at, and the lowest the AI needs the user at.
+
+**Doc-type**
+Operations plus a composition rule, handing one documentation family a contract shape ([Doc-Type](/doc-types/doc-type.md)).
+
+**Contract**
+Everything a caller of an instance may rely on; its machine-checkable core is the signature — args in, results out ([Doc-Type](/doc-types/doc-type.md#contract)).
+
 ### Governance
 
 Five words once swirled around one idea — the thing that inspects the

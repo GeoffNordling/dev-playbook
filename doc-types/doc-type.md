@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Doc-Type
-description: The doc-type kind — operations plus a composition rule, fixing a contract shape — and the loop that produces one from a documentation family
+description: The doc-type kind — operations plus a composition rule, fixing a contract shape — and the doc-type build loop that produces one from a documentation family
 ---
 
 # Doc-Type
@@ -26,9 +26,9 @@ Those two fix a **shape**: the form every contract in the family
 takes. A **contract** is the shape filled with instance detail.
 
 ```
-family ──the loop──► doc-type = operations + composition rule
-                       │
-                       └──► shape ──filled per instance──► contract
+family ──doc-type build loop──► doc-type = operations + composition rule
+                                  │
+                                  └──► shape ──filled per instance──► contract
 ```
 
 An instance *has* a contract; it is not one. Grain is an axis of
@@ -58,11 +58,11 @@ headings suffice to hold it; a rule of "any number, coarsely
 ordered" yields a chain, and the chain needs a grammar, a parser,
 and a drift check.
 
-## The loop
+## The doc-type build loop
 
-The **target** is what one loop run makes predictable — a family, a
-corpus, a single artifact. A doc-type is produced by an
-expectation-maximization procedure over its target:
+The **doc-type build loop** produces a doc-type. Its **target** is what
+one run makes predictable — a family, a corpus, a single artifact — and
+the loop is an expectation-maximization procedure over that target:
 
 - **E-step.** An agent re-expresses the target entirely in the
   current primitives. Whatever forces a drop to file-level detail is
@@ -78,28 +78,49 @@ expectation-maximization procedure over its target:
   the CLOA; the primitive count is minimal — good primitives are a
   simple codebook.
 
-Before looping on a target, interview the user on what they want to
+Before running the build loop on a target, interview the user on what they want to
 understand about it: the CLOA is relative to the repository's purpose
 and the user's preferences. Residuals are recorded in the doc-type's
 residual ledger; the primitive set is refactored only when the
 reduction is worth the change cost.
 
-The loop's first move on a repo is the **registry pass**: enumerate
-every document kind from the repo's registries and rule each one
-important to the type system or not. Unimportant kinds are declared
-so and ignored; loop targets come from the important ones. The
+The build loop's first move on a repo is the **registry pass**:
+enumerate every document kind from the repo's registries and rule each
+one important to the type system or not. Unimportant kinds are declared
+so and ignored; build-loop targets come from the important ones. The
 registries make "every family accounted for" a checkable claim.
 
-On a greenfield repo the loop runs the same way, with conversation in
+On a greenfield repo the build loop runs the same way, with conversation in
 place of a corpus: the user and the AI talk through the repository's
 intended functionality and the primitives come from the user's
 imagination and intuition.
 
+### Practices
+
+What has worked while running the loop:
+
+- **Pseudocode is a muscle, not a target.** Writing a kind as
+  pseudocode forces precision where prose blurs: the fields, what they
+  may hold, the rules over the object's own state. Stop one screen
+  above the content; pseudocode that holds the markdown's rows has gone
+  too deep.
+- **Name the primitive first.** A kind that resists expression is made
+  of one primitive it has not named yet. Name it, and the CLOA object
+  follows.
+- **Greenfield mindset.** The agent's tendency is to keep what it finds:
+  today's headings, tables, and file boundaries. None of that is a
+  constraint. What is preserved is what the rules mean and what the
+  existing lints check; everything else is open. This needs saying
+  repeatedly, because the tendency returns.
+- **Borrow the abstraction that fits.** Some computer-science
+  abstraction matches every family: a sequence, a relation, a tree, a
+  graph. Which one is decided per kind, never by what worked last time.
+
 ## Layers and the primitive map
 
-A **layer** is a rung where one loop run happened, and the loop is
-layer-invariant: the same algorithm runs at any rung, on whatever
-target that rung holds.
+A **layer** is a rung where one run of the doc-type build loop
+happened, and the build loop is layer-invariant: the same algorithm
+runs at any rung, on whatever target that rung holds.
 
 Adjacent runs join through the **primitive map**: one lower
 expression per higher primitive, written to a stateful location.
@@ -108,12 +129,12 @@ what matters, because it lets the next run start from structure
 that connects the levels.
 
 ```
-layer N:    target artifact ──the loop──► primitives
-                                              ▲
-                                              │ the primitive map:
-                                              │ one lower expression
-                                              │ per higher primitive
-layer N−1:  target artifact ──the loop──► primitives
+layer N:    target artifact ──doc-type build loop──► primitives
+                                                         ▲
+                                                         │ the primitive map:
+                                                         │ one lower expression
+                                                         │ per higher primitive
+layer N−1:  target artifact ──doc-type build loop──► primitives
 ```
 
 The stack descends until a target stops being stochastic: the
@@ -125,4 +146,4 @@ boundary the work is mostly choosing pre-existing tools.
 
 - **CLOA** — Correct Level of Abstraction.
 - **EM** — Expectation-Maximization: the two-step statistical
-  procedure that inspired the loop.
+  procedure that inspired the doc-type build loop.

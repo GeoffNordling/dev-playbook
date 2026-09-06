@@ -45,7 +45,6 @@ and its shape is Type Registry's rule. Alphabetical by type name.
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `Spec-Item` | One item of a machine-validated specification tree — a functional requirement or design node with typed edges, operated on by tooling rather than only read. |
 | `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work; lives under `standards/`, the one tree reserved for it (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
 | `Standard-Card` | The thin catalog record for one standard — pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
