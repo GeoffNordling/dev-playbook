@@ -42,10 +42,10 @@ runbook file, and the edge below it is what the deterministic parser
 generates from that span. A simple read, from intake:
 
 ```
-{Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md);
-the brief formats, brief principles, and the readiness bar}
+{Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md);
+the brief formats and the rules every body obeys}
 
-  ├─reads───► [issue-authoring] Standard
+  ├─reads───► [issue-shapes] Standard
 ```
 
 A condition nesting a read, from design:

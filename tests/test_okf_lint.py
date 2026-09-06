@@ -384,7 +384,7 @@ def test_bullet_inside_a_four_backtick_artifact_fence_is_not_read_as_an_entry(
 ) -> None:
     """A four-backtick fence wrapping three-backtick content stays one block.
 
-    An index illustrating the artifact form issue-authoring.md mandates quotes
+    An index illustrating the artifact form issue-shapes.md mandates quotes
     a bullet inside such a fence; the quoted bullet is shown, not listed, so it
     draws no index finding.
     """

@@ -58,7 +58,7 @@ one of these sources. Everything else is a Suggestion at most:
 1. **A binding section of the issue brief** — `Acceptance criteria`,
    `Desired behavior`, `Out of scope`, `Prohibited surfaces`, and `Artifacts`
    in a brief that carries one
-   ([the section binds when present](/standards/tracking/issue-authoring.md#the-artifacts-section);
+   ([the section binds when present](/standards/tracking/issue-shapes.md#build-headings);
    the lint never requires the heading). `Key interfaces` is advisory and
    `User intent` guides micro-decisions — neither feeds Blocking.
 2. **A named rule of a standard the review was required to read** — each

@@ -25,10 +25,9 @@ Below, `<issue>` is the issue number given as input.
 - {Read from GitHub its parent epic, if it has one; `gh issue view <issue>
   --json parent` names it, since the body-and-comments read does not surface
   it — the epic's standing rulings bind the brief and calibrate this review}.
-- This sweep enforces one rule: {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
-  for claim provenance; every empirical claim about existing reality is
-  `measured` (probe run, observed output cited) or `assumed`, and a
-  `measured` claim without checkable evidence is demoted to `assumed`}.
+- This sweep enforces one rule: every empirical claim about existing reality
+  is `measured` (probe run, observed output cited) or `assumed`, and a
+  `measured` claim without checkable evidence is demoted to `assumed`.
 
 ## Audit questions
 

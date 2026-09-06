@@ -71,10 +71,10 @@ Could not express The only future-work file over the member: its objects
 are the rogue `ROADMAP.md` and its kin elsewhere in the tree, so it binds
 a member outside the population, the way Gates' red-CI rule does.
 
-### tracking/issue-authoring
+### tracking/issue-shapes
 
-Could not express Build leaf and Spike as subsets of Leaf: conditions do
-not nest, so each restates the leaf test with its mode. Could not express
+Could not express Build leaf, Spike, and Session leaf as subsets of Leaf:
+conditions do not nest, so each restates the leaf test with its mode. Could not express
 the wayfinder body shape at all: the rule is the `/wayfinder` skill's,
 and the half of `tracking.wayfinder-shape` that checks a map's sections
 has no rule row.

@@ -79,7 +79,7 @@ testing                 audit    /scripts/testing-lint
 testing                 enforce  commit gate
 testing                 adopt    none
 tracking                define   /standards/tracking/candidates.md
-tracking                define   /standards/tracking/issue-authoring.md
+tracking                define   /standards/tracking/issue-shapes.md
 tracking                define   /standards/tracking/label-scheme.md
 tracking                define   /standards/tracking/repo-settings.md
 tracking                audit    /scripts/workspace-lint

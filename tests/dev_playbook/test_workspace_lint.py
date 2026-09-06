@@ -287,6 +287,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "tracking.issue-brief-shape" in ids
     assert "tracking.epic-shape" in ids
     assert "tracking.tuple-valid" in ids
+    assert "tracking.session-shape" in ids
     assert all(
         rule.split(".")[0] in {"tracking", "distribution", "software-factory"}
         for rule in ids
@@ -1263,6 +1264,83 @@ def test_epic_with_invalid_category_value_is_a_finding(tmp_path: Path) -> None:
     )
     assert "alpha: tracking.epic-shape" in result.stdout
     assert "#15" in result.stdout
+
+
+# --- the session leaf: user-led, never dispatched ---
+
+SESSION_BODY = (
+    "**Summary:** s\n\n**User intent:** i\n\n"
+    "**Current behavior:** c\n\n**Desired behavior:** d\n\n"
+    "**Acceptance criteria:** a\n\n**Out of scope:** Unknown; dealt with when found.\n"
+)
+VALID_SESSION = ["category:extension", "mode:session"]
+
+
+def test_wellformed_session_leaf_raises_no_finding(tmp_path: Path) -> None:
+    result = run_with_issue(tmp_path, issue(40, VALID_SESSION, body=SESSION_BODY))
+    assert "tracking.session-shape" not in result.stdout
+    assert "tracking.issue-brief-shape" not in result.stdout
+    assert "tracking.tuple-valid" not in result.stdout
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_session_leaf_is_checked_without_a_phase_label(tmp_path: Path) -> None:
+    # No phase label means the post-intake gate never opens; the session
+    # branch is what makes the brief visible to the audit at all.
+    body = SESSION_BODY.replace("**Acceptance criteria:** a\n\n", "")
+    result = run_with_issue(tmp_path, issue(41, VALID_SESSION, body=body))
+    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "Acceptance criteria" in result.stdout
+
+
+def test_session_leaf_never_needs_the_factory_only_headings(tmp_path: Path) -> None:
+    result = run_with_issue(tmp_path, issue(42, VALID_SESSION, body=SESSION_BODY))
+    assert "Key interfaces" not in result.stdout
+    assert "Prohibited surfaces" not in result.stdout
+
+
+def test_session_leaf_with_phase_label_is_a_finding(tmp_path: Path) -> None:
+    labels = [*VALID_SESSION, "phase:build"]
+    result = run_with_issue(tmp_path, issue(43, labels, body=SESSION_BODY))
+    assert "alpha: tracking.session-shape" in result.stdout
+    assert "phase:build" in result.stdout
+    assert "tracking.tuple-valid" not in result.stdout
+
+
+def test_session_leaf_with_tests_label_is_a_finding(tmp_path: Path) -> None:
+    labels = [*VALID_SESSION, "tests:no"]
+    result = run_with_issue(tmp_path, issue(44, labels, body=SESSION_BODY))
+    assert "alpha: tracking.session-shape" in result.stdout
+    assert "tests:no" in result.stdout
+
+
+def test_session_leaf_with_second_mode_is_a_finding(tmp_path: Path) -> None:
+    labels = [*VALID_SESSION, "mode:direct"]
+    result = run_with_issue(tmp_path, issue(45, labels, body=SESSION_BODY))
+    assert "alpha: tracking.session-shape" in result.stdout
+    assert "mode:direct" in result.stdout
+
+
+def test_session_leaf_without_category_is_a_finding(tmp_path: Path) -> None:
+    result = run_with_issue(tmp_path, issue(46, ["mode:session"], body=SESSION_BODY))
+    assert "alpha: tracking.session-shape" in result.stdout
+    assert "missing category" in result.stdout
+
+
+def test_session_leaf_with_invalid_category_is_a_finding(tmp_path: Path) -> None:
+    labels = ["category:frobnicate", "mode:session"]
+    result = run_with_issue(tmp_path, issue(47, labels, body=SESSION_BODY))
+    assert "alpha: tracking.session-shape" in result.stdout
+    assert "category:frobnicate" in result.stdout
+
+
+def test_epic_carrying_mode_session_is_an_epic_finding(tmp_path: Path) -> None:
+    # Children make an epic before a mode label makes a session leaf.
+    result = run_with_issue(
+        tmp_path, issue(48, VALID_SESSION, body="", sub_issues_total=2)
+    )
+    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "tracking.session-shape" not in result.stdout
 
 
 # --- wayfinder species: the map and the decision ticket ---

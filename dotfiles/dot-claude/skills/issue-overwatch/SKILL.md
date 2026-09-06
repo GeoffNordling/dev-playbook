@@ -44,7 +44,7 @@ Repeat until the issue merges, closes, or a stop point (§6): place the issue at
 
 When a node finishes, {Write to GitHub the phase-label move along the edge the graph names; `gh issue edit <N> --remove-label "phase:<from>" --add-label "phase:<to>"`} — and continue.
 
-**Readiness gates the first crossing only.** Before the traverse's first committing node, {Read [the readiness bar](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness)} and confirm the issue meets it — its first three conditions are the observable ones, and the release is taken as given, per [readiness at the crossing](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch); escalate if one fails. A rework lap is not a crossing: the issue never left the factory, so nothing is re-checked.
+**Readiness gates the first crossing only.** Before the traverse's first committing node, {Read [readiness at the crossing](~/workspace/dev-playbook/software-factory/factory-operations.md#dispatch)} and confirm the issue meets the bar — a leaf, unblocked, and brief-complete are the observable conditions, and the release is taken as given; escalate if one fails. A rework lap is not a crossing: the issue never left the factory, so nothing is re-checked.
 
 ## 3. AFK delegation
 

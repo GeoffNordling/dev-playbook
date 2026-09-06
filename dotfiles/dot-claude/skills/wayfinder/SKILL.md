@@ -27,7 +27,7 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** {Read [tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md) for the Wayfinding operations section, which states how _this_ repo expresses them}.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** {Read [linking issues](~/workspace/dev-playbook/standards/tracking/linking-issues.md) for the sub-issue, blocked-by, and open sub-issues calls _this_ repo's tracker uses}.
 
 ### The map body
 

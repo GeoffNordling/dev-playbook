@@ -47,7 +47,7 @@ class TestLinesOutsideFences:
 
     def test_longer_fence_wraps_shorter_fenced_content(self) -> None:
         # A four-backtick fence exists to wrap content that carries its own
-        # triple-backtick fences — the form issue-authoring.md mandates for
+        # triple-backtick fences — the form issue-shapes.md mandates for
         # artifact blocks. The inner fence must not close the outer block.
         text = "a\n````\n```\nhidden\n```\n````\nb\n"
         got = [line.rstrip("\n") for _, line in md.lines_outside_fences(text)]
