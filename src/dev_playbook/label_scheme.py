@@ -6,14 +6,13 @@ carries its label color, a description recipe, and its values — so the two
 consumers read one authority and cannot disagree: ``bootstrap-labels`` mints the
 scheme into a repo, and ``workspace-lint`` checks live repos against it.
 
-The semantic authority for what the labels *mean* stays with the doc that governs
-each dimension: standards/tracking/factory-labels.md's label table for the four
-factory dimensions (category, mode, tests, phase) and for origin,
-software-factory.md's state-machine graph for the states those phase labels name,
-and standards/tracking/tracker-operations.md for the wayfinder dimension. This
-file is the operational data either way. The scheme-vs-graph consistency between
-the factory dimensions and the factory doc is left to a judgment, never parsed
-here.
+The semantic authority for what the labels *mean* stays with the docs:
+standards/tracking/label-scheme.md's Valid labels table for every dimension's
+fixed values, its Phase labels rule and software-factory.md's state-machine
+graph for the phase values, and the ``/wayfinder`` skill for what each ticket
+type asks. This file is the operational data either way. The consistency
+between the factory dimensions and the factory doc is a reviewer's reading,
+never parsed here.
 """
 
 import json

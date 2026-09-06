@@ -51,7 +51,7 @@ The commit-gate detectors. They run automatically on every commit through
 (`src/dev_playbook/playbook_lint.py`) dispatches every detector below
 concurrently and aggregates their exits — and consumer repos run that hook
 from a pinned clone (see
-[distribution.md](/standards/build/distribution.md)). Each script exits 0
+[Distribution Channel](/standards/distribution/channel.md)). Each script exits 0
 on success / 1 on findings / 2 on tool error, writes machine-readable findings
 to stdout (one per line) and a one-line summary to stderr. Each takes the
 repository root as its argument (default: cwd) and discovers its targets
@@ -59,7 +59,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 
 | Script | Standard | Purpose |
 |--------|----------|---------|
-| `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape |
+| `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape, the dogfood mirror |
 | `python-lint` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
 | `testing-lint` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
 | `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
@@ -68,7 +68,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `harness-files-lint` | [runbook-conventions.md](/standards/harness/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
 | `judgments-lint` | [declarations.md](/standards/semantic-validation/declarations.md) | Judgment declaration validity |
 | `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
-| `standards-lint` | [standard/format.md](/standards/standard/format.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
+| `standards-lint` | [standard.md](/standards/standard.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
 `decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
@@ -121,7 +121,7 @@ directory.
 Each *published* hook entry runs in two environments and MUST work in both:
 
 1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
-2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [distribution.md](/standards/build/distribution.md).
+2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [Distribution Channel](/standards/distribution/channel.md).
 
 In both, pre-commit resolves the script by the relative `entry:` path declared
 in [`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml) (mirrored in the local
@@ -144,7 +144,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | `griffe-outline` | Print class/function structure of a Python package |
 | `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
-| `bump-pins` | Move the dev-playbook `rev` pin across the governed consumer repos and re-run each one's commit gate — the release step of [distribution.md](/standards/build/distribution.md); commits nothing |
+| `bump-pins` | Move the dev-playbook `rev` pin across the governed consumer repos and re-run each one's commit gate — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `repo-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages and wire up the `~/.bashrc.d` loader |

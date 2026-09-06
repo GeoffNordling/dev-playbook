@@ -280,7 +280,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     ids = set(result.stdout.split())
     assert "tracking.settings" in ids
     assert "tracking.remote" in ids
-    assert "build.pin" in ids
+    assert "distribution.pin" in ids
     # the tracking and software-factory rules this slice adds
     assert "tracking.label-scheme" in ids
     assert "tracking.no-blocked-label" in ids
@@ -288,7 +288,8 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "tracking.epic-shape" in ids
     assert "tracking.tuple-valid" in ids
     assert all(
-        rule.split(".")[0] in {"tracking", "build", "software-factory"} for rule in ids
+        rule.split(".")[0] in {"tracking", "distribution", "software-factory"}
+        for rule in ids
     ), ids
 
 
@@ -314,11 +315,11 @@ def test_pin_current_stale_and_absent(tmp_path: Path) -> None:
     assert result.returncode == 1, result.stdout + result.stderr
     assert "alpha: pin current" in result.stderr
     assert re.search(
-        r"beta: build.pin 0{16} \(hook repo main is \w{12}\)", result.stdout
+        r"beta: distribution.pin 0{16} \(hook repo main is \w{12}\)", result.stdout
     )
-    assert "gamma: build.pin no .pre-commit-config.yaml" in result.stdout
+    assert "gamma: distribution.pin no .pre-commit-config.yaml" in result.stdout
     # The stale pin is advisory and the absent one is a finding; the summary
-    # counts them apart even though both carry build.pin.
+    # counts them apart even though both carry distribution.pin.
     assert "1 finding(s), 1 stale pin(s)" in result.stderr
 
 
@@ -353,7 +354,7 @@ def test_config_without_hook_repo_pin(tmp_path: Path) -> None:
     )
     result = run(ws, "--pins-only")
     assert result.returncode == 1
-    assert "delta: build.pin no dev-playbook pin" in result.stdout
+    assert "delta: distribution.pin no dev-playbook pin" in result.stdout
 
 
 def test_hook_repo_itself_has_no_pin_line() -> None:
@@ -381,7 +382,7 @@ def test_consumer_publishing_its_own_hooks_is_still_pin_checked(
         },
     )
     result = run(ws, "--pins-only")
-    assert "publisher: build.pin 0000000000000000" in result.stdout
+    assert "publisher: distribution.pin 0000000000000000" in result.stdout
 
 
 # --- the governed roster ---

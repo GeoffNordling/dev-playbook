@@ -2,32 +2,32 @@
 type: Standard
 title: Working Documentation Sets
 description: How the in-process Markdown files of one work stream are organized as a set — root plan, member links, single-home facts, worklists, and local terms
+population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
 # Working Documentation Sets
 
 A **working documentation set** is the group of Markdown files one stream of
-in-process work accumulates — plans, design notes, records — committed to the
-repo and drained into permanent homes or deleted when the work merges. This
-standard governs the set level: how the files relate to each other. What goes
-inside each file is governed by
-[Knowledge Organization](/standards/knowledge-organization.md) and
-[Prose](/standards/prose.md), which an agent reads before it writes one.
+in-process work accumulates, plans, design notes, records, committed to the
+repo and drained into permanent homes or deleted when the work merges. The
+rules bind the set level, how the files relate to each other. What goes
+inside each file is
+[Knowledge Organization](/standards/knowledge-organization.md)'s and
+[Prose](/standards/prose.md)'s, which an agent reads before it writes one.
 Members typically carry `type: General-Sheet`, the registry's genre for a
-working document whose type is not yet settled.
-
-The `/working-doc-set-deslop` skill audits a set against this standard
-and the prose conventions — an agent per slice — then fixes what the
-audits find, leaving every edit uncommitted for the user's diff review.
+working document whose type is not yet settled. The working-doc-set-deslop
+skill enforces the rules on demand
+([Knowledge Organization](/standards/knowledge-organization.md#enforce)).
 
 ## Speculative voice
 
-A working set records work in progress, so it may say things it is not sure
-of: a guess is written as a guess, and an open question sits beside its
-topic. That is the whole exemption from the prose conventions'
+The root declares the set speculative, and members inherit it: a guess
+is written as a guess, and an open question sits beside its topic.
+
+That is the whole exemption from the prose conventions'
 [declarative present tense](/standards/prose/conventions.md#declarative-present-tense).
 [Current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)
-still binds. The root declares the set works this way; members inherit it.
+still binds.
 
 ## Shape
 

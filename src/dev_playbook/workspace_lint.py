@@ -78,7 +78,7 @@ ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
 EPIC_SHAPE = "tracking.epic-shape"
 WAYFINDER_SHAPE = "tracking.wayfinder-shape"
 TUPLE_VALID = "tracking.tuple-valid"
-PIN = "build.pin"
+PIN = "distribution.pin"
 
 RULES = (
     SETTINGS,
@@ -94,8 +94,9 @@ RULES = (
 )
 
 # The required headings of each brief format, stated here exactly as
-# standards/tracking/issue-authoring.md states them — the doc and this rule
-# read one contract and cannot disagree. A build leaf carries the whole build
+# standards/tracking/issue-authoring.md states them (§ Required headings and
+# § Spike headings) — the doc and this rule read one contract and cannot
+# disagree. A build leaf carries the whole build
 # tuple below; a spike leaf carries the spike shape.
 BUILD_HEADINGS = (
     "Summary",
@@ -113,7 +114,7 @@ SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
 # exactly as the ``/wayfinder`` skill states them (``§ The map body`` and
 # ``§ Tickets`` of dotfiles/.agents/skills/wayfinder/SKILL.md). The skill — not
 # this workspace — is the definition of a map's shape, per
-# standards/tracking/issue-authoring.md § Two species of epic, so this rule
+# standards/tracking/issue-authoring.md § Wayfinder map or ticket, so this rule
 # mirrors the skill directly, the way BUILD_HEADINGS mirrors the brief standard.
 # The bundle is installed verbatim at a pin, which is what makes the mirror
 # stable: a pin bump delta-checks these tuples against the upstream text.
@@ -149,7 +150,7 @@ GOVERNED = (
     "story-forge",
     "spec-tools",
     "mission-control",
-    "fedora-playbook",
+    "sysadmin-playbook",
     "sounds",
     "personal-trainer",
     "idea-tree",
@@ -199,8 +200,8 @@ REQUIRED_RULES = {
     "DELETION": "deletion",
 }
 
-# The canonical ruleset of standards/tracking/repo-settings.md § The canonical
-# ruleset. Its name is audited so that the protection of every governed repo is
+# The canonical ruleset of standards/tracking/repo-settings.md § Default branch
+# protection. Its name is audited so that the protection of every governed repo is
 # filed in one findable place: a repo whose branch is protected under some other
 # name is protected, but not the way the standard describes, and the finding is
 # how it gets told which.

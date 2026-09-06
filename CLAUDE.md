@@ -7,5 +7,5 @@
   standards for that audience, never around this repo's internals.
 - Before changing the published hooks (the `scripts/` entry points or
   `.pre-commit-hooks.yaml`), read
-  [distribution.md](/standards/build/distribution.md) — consumer repos pin a
+  [Distribution Channel](/standards/distribution/channel.md) — consumer repos pin a
   `rev` and need a bump after hook changes.

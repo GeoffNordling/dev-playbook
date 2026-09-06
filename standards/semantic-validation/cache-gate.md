@@ -1,7 +1,7 @@
 ---
-type: Standard
+type: Guide
 title: The Cache Gate
-description: The deterministic pytest gate and the spectrum of positions on it — a judgment is gated iff a pytest asserts its cache entry
+description: How a judgment is gated — the offline cache check a pytest makes, the spectrum of positions a repo picks from, and the environment variable that arms the gate
 ---
 
 # The Cache Gate
@@ -18,11 +18,9 @@ def test_errors_exhaustive():
 ```
 
 `assert_judgment_cached(id)` resolves the root
-([declarations.md — Config and root resolution](/standards/semantic-validation/declarations.md#config-and-root-resolution)),
-keys the named judgment
-([declarations.md — What a judgment is](/standards/semantic-validation/declarations.md#what-a-judgment-is)),
-and asks the seen-set whether that exact content has been
-judged-and-passed:
+([declarations.md — Opt-in table](/standards/semantic-validation/declarations.md#opt-in-table)),
+keys the named judgment, and asks the seen-set whether that exact content has
+been judged-and-passed:
 
 - **cache hit → the test passes.** The judge has ruled the content true.
 - **cache miss → the test fails** with `judgment '<id>': cache miss`. The
@@ -87,7 +85,7 @@ itself:
 | Invocation | `SKIP_JUDGMENTS` | The gate |
 |---|---|---|
 | `make check`, `make test` | `1` (the Makefile default, exported) | **skipped** |
-| `make check-judgments-cache` | `0` — or `1` on machines without the cache (`NO_JUDGMENT_CACHE`, [make.md](/standards/build/make.md)) | **armed** |
+| `make check-judgments-cache` | `0` — or `1` on machines without the cache (`NO_JUDGMENT_CACHE`, [Machines](/docs/machines.md)) | **armed** |
 | bare `uv run pytest` | unset | **armed** (fail-safe) |
 
 When `SKIP_JUDGMENTS` is exactly `1`, the helper **skips** each case with a

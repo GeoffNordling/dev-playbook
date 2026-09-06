@@ -8,8 +8,7 @@ same-repo resolution: from a dev-playbook issue worktree, edit that
 worktree's `dotfiles/dot-claude/` so the change rides the issue branch, not
 the live main checkout.
 
-(The source directory is `dot-claude/`, not `.claude/`, so editing it does
-not trigger Claude Code's hardcoded protected-paths prompt. Stow links it
-into `~/.claude/` at runtime.)
+The source directory is `dot-claude/`, not `.claude/`. Stow links it
+into `~/.claude/` at runtime.
 
 After editing, commit and push the dev-playbook repo.

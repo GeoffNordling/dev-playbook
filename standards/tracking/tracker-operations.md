@@ -1,16 +1,17 @@
 ---
-type: Standard
+type: Guide
 title: Tracker Operations
-description: How the GitHub tracker is driven — the `gh` CLI surface, native sub-issues and dependencies, and wayfinding operations
+description: How the GitHub tracker is driven — the `gh` CLI surface, the API calls behind native sub-issues and dependencies, and the moves a wayfinder map runs on
 ---
 
 # Tracker Operations
 
-How the tracker is driven. Every operation on an issue — create, read, label,
-link, close — goes through the `gh` CLI, which infers the repo from the clone it
-runs inside. What goes *into* an issue body is
-[issue-authoring.md](/standards/tracking/issue-authoring.md); this document
-covers the commands that move issues around. Pull requests belong to the
+How the tracker is driven. Every operation on an issue — create, read,
+label, link, close — goes through the `gh` CLI, which infers the repo from
+the clone it runs inside. What goes *into* an issue, and which labels and
+relationships it carries, is
+[Issue Authoring](/standards/tracking/issue-authoring.md); this guide
+holds the commands that move issues around. Pull requests belong to the
 [software factory](/software-factory/factory-operations.md#pull-requests).
 
 ## The issue surface
@@ -35,9 +36,8 @@ may be either: `gh pr view 42` resolves it, falling back to `gh issue view 42`.
 ## Native relationships
 
 Hierarchy (sub-issues) and dependency (blocked-by) are native GitHub
-relationships, never body fields and never labels — the rule and its rationale
-are in
-[issue-authoring.md § Relationships](/standards/tracking/issue-authoring.md#relationships).
+relationships, never body fields and never labels
+([Relationships](/standards/tracking/issue-authoring.md#relationships)).
 Neither has a `gh` subcommand, so both go through `gh api`, and both endpoints
 take the target issue's internal **database id** rather than its number:
 
@@ -64,14 +64,14 @@ readable from the tracker.
 
 The `/wayfinder` skill drives a **wayfinder map** — a planning epic whose
 children are decision tickets
-([issue-authoring.md § Two species of epic](/standards/tracking/issue-authoring.md#two-species-of-epic))
-— across this same surface. The skill owns the method; the moves it makes on
-the tracker are these.
+([Wayfinder map or ticket](/standards/tracking/issue-authoring.md#wayfinder-map-or-ticket))
+— across this same surface. The skill owns the method, the labels are
+[Label Scheme](/standards/tracking/label-scheme.md#valid-labels)'s, and
+the moves the skill makes on the tracker are these.
 
-- **Map** — one issue labelled `wayfinder:map`, created with
-  `gh issue create --label wayfinder:map`.
-- **Ticket** — a child issue linked to the map as a native sub-issue, labelled
-  `wayfinder:<type>` (`research`, `prototype`, `grilling`, or `task`).
+- **Map** — `gh issue create --label wayfinder:map`.
+- **Ticket** — a child issue, created with its `wayfinder:<type>` label and
+  linked to the map as a native sub-issue.
 - **Ordering** — a ticket that must wait for another is linked blocked-by it.
 - **Frontier** — the map's open children, read with
   `gh api repos/{owner}/{repo}/issues/<map>/sub_issues --jq '.[] | select(.state == "open") | .number'`

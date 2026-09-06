@@ -17,12 +17,11 @@ applies two deterministic rules:
     there is no backtick escape hatch.
   - **agent-facing-voice** — a harness-loaded agent instruction file is
     addressed *to* the executing agent, so it never speaks in the first person
-    (prose/conventions.md — Voice). Unlike its two siblings this rule reads only
-    the agent-facing subset of the tree (``md.is_agent_instruction``), and it
-    carries the ``harness.`` prefix: the Harness card owns the claim, because
-    the scope comes from the Claude Code file registry, while the Prose card
-    owns the wording. Frontmatter is in scope — a runbook's ``description`` is
-    prose the agent reads to choose it.
+    (prose/conventions.md — Imperative and second person). Unlike its two
+    siblings this rule reads only the agent-facing subset of the tree
+    (``md.is_agent_instruction``), the members of Doc Conventions' condition
+    Harness-loaded agent instructions. Frontmatter is in scope — a runbook's
+    ``description`` is prose the agent reads to choose it.
 
 Scope is **all authored content, harness files included** (``CLAUDE.md``,
 rules, skills; for the banned-word rule, code and config too). What is out is
@@ -71,13 +70,13 @@ class CannotRun(Exception):
 
 
 # The rule ids this detector emits, each namespaced by the card whose question
-# it answers — two under Prose, and the voice rule under Harness, whose registry
-# fixes which files it governs. Kept module-level constants so every emission
-# site references them, never a raw literal, and RULES (what --list-rules prints)
-# cannot drift from what the detector emits.
+# it answers — all three under Prose, whose Doc Conventions holds every rule row.
+# Kept module-level constants so every emission site references them, never a
+# raw literal, and RULES (what --list-rules prints) cannot drift from what the
+# detector emits.
 JUDGMENT_SPELLING = "prose.judgment-spelling"
 BANNED_WORD = "prose.banned-word"
-AGENT_FACING_VOICE = "harness.agent-facing-voice"
+AGENT_FACING_VOICE = "prose.agent-facing-voice"
 
 RULES = (JUDGMENT_SPELLING, BANNED_WORD, AGENT_FACING_VOICE)
 

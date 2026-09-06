@@ -1,100 +1,95 @@
 ---
 type: Standard
 title: Document Types
-description: The OKF document-type registry and the frontmatter profile every concept doc carries
+description: The frontmatter profile every concept document carries — a registered type, a title, a one-breath description, and a resource where an asset backs the document
+population: "a concept document"
 ---
 
 # Document Types
 
-The registry of document types for this repo's Open Knowledge Format (OKF)
-bundle, and the frontmatter profile every concept document carries. The
-type-lint (a pre-commit hook) asserts that every concept document's `type` is
-one of the names below.
+The frontmatter a concept document carries, the prose `.md` file a
+reader loads to understand something
+([File Roles](/standards/knowledge-organization/file-roles.md)). The
+boundary is drawn by exclusion from a repo's `.md` files: `index.md` is a
+typeless listing ([Indexes](/standards/knowledge-organization/indexes.md));
+the members of the Claude Code file registry
+([Claude Code Files](/standards/harness/files.md)) are harness-owned, a
+tool consumes them as configuration or runs them as code, and they carry
+no frontmatter; and `classify()` in [md.py](/src/dev_playbook/md.py)
+holds the boundary in code with its further exclusions, the transient
+`PLAN.md` and `PROGRESS.md` pair, the root `tmp/` tree, and every
+top-level `tests/` tree. okf-lint is the authority
+([Knowledge Organization](/standards/knowledge-organization.md)).
 
-This governs **concept documents** — the prose `.md` files an agent crawls and
-loads to understand something. Harness-owned files are in the bundle too, but a
-tool consumes them as configuration or runs them as code rather than reading
-them as prose, so they are not concept documents and carry no OKF frontmatter.
-The boundary rule lives in [file-roles.md](/standards/knowledge-organization/file-roles.md); the
-Claude Code file set is enumerated in
-[the harness-files registry](/standards/harness/files.md).
+## Frontmatter block
+
+A concept document opens with a YAML frontmatter block.
 
 ## Types
 
-Title Case, hyphen-joined for multi-word names (e.g. `Decision-Record`,
-`Standard-Card`); acronyms stay upper. Listed alphabetically.
+`type` is present and names one row of the table below, or of the repo's
+own local extension of it
+([Type Registry](/standards/knowledge-organization/type-registry.md)).
+
+This table is the global registry, the vocabulary every repo inherits,
+and its shape is Type Registry's rule. Alphabetical by type name.
 
 | Type | What it is |
 |------|------------|
 | `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [tracking/candidates.md](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
-| `Guide` | A teaching or procedure doc, read to learn how to do or think about something, not to be measured against. |
+| `Guide` | An explanation of a process or a system, read to understand it; never cited to reject work. |
 | `Instrument-Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `Spec-Item` | One item of a machine-validated specification tree — a functional requirement or design node with typed edges, operated on by tooling rather than only read. |
-| `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work; lives under `standards/`, the one tree reserved for it (see [standard/format.md](/standards/standard/format.md#where-a-standard-lives)). |
+| `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work; lives under `standards/`, the one tree reserved for it (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
 | `Standard-Card` | The thin catalog record for one standard — pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
-## Frontmatter profile
+## Title
 
-Every concept document opens with a YAML frontmatter block:
+`title` is present and holds the readable title.
 
-- **`type`** — REQUIRED. Exactly one of the names above.
-- **`title`** — the readable title.
-- **`description`** — the one-line summary that powers triage and the authored
-  `index.md` listings: a sentence fragment naming what the document *is* or what
-  it *governs*, present tense, no trailing period, leading with what
-  distinguishes it, roughly one breath (~20 words soft limit).
-- **`resource`** — a path or URI to the underlying asset a document describes
-  (a repo-root path like `/dotfiles/dot-claude/workflows/ralph-loop.js`, or an
-  external URI). Optional in general; required on `Recipe-Description`, whose
-  whole job is to describe a backing `.js`. For those, link any companion skill
-  in the body, not here.
+## Description
 
-Not used: `tags`, `timestamp`.
+`description` is present and holds a one-line summary: a sentence
+fragment naming what the document is or what it governs, present tense,
+no trailing period, leading with what distinguishes it, roughly one
+breath, twenty words as a soft limit.
 
-## Local extensions
+The description powers triage and the authored `index.md` listings
+([Indexes](/standards/knowledge-organization/indexes.md)).
 
-The registry is hierarchical, exactly two levels deep. **This file, in
-dev-playbook, is the global registry** — the upstream vocabulary every repo
-inherits. A consumer repo that carries a document type no other repo shares
-declares it in a **local extension**: its own `standards/knowledge-organization/document-types.md`,
-a `## Types` table of the same shape. okf-lint resolves a document's `type`
-against **upstream ∪ local** — the global registry plus the audited repo's
-extension, defaulting to upstream alone when the repo carries no extension.
-(okf-lint tells the two apart by the canonical consumer template, not by the
-registry file's presence: only dev-playbook hosts that template, so a consumer's
-extension never flips the audit into replacing the global registry.)
+## resource
 
-Extension is **additive and downhill only**:
+`resource`, when present, holds a repo-root path or an external URI to
+the asset the document describes:
+`/dotfiles/dot-claude/workflows/ralph-loop.js`.
 
-- **Add, never shadow, loosen, or drop.** A local table may only introduce new
-  types. A local name that case-insensitively equals an upstream one is a shadow
-  — okf-lint's `knowledge-organization.type-shadows-upstream` rule flags it, one
-  finding per offending row. (Membership itself stays exact-case; the
-  case-insensitive shadow rule is what stops a consumer aliasing upstream `Guide`
-  as a distinct `GUIDE`.) A consumer cannot loosen or remove an upstream type,
-  because it never edits this file.
-- **Downhill only.** A local type is legal only in the repo that declares it (and
-  any repo downstream of it); it is invisible uphill to dev-playbook and sideways
-  to sibling consumers.
-- **Name and description only.** A local type carries just its name and its
-  `## Types` cell. The per-type constraints upstream types may impose (a
-  `resource` on `Recipe-Description`, an `## Employed by` section on
-  `Instrument-Spec`) stay hardcoded upstream; a local type cannot declare its
-  own.
-- **Broken extension degrades, never aborts.** A malformed or empty extension
-  table yields findings on that file (`knowledge-organization.registry-row`,
-  `knowledge-organization.index-ordering`) while the rest of the repo is still
-  fully checked.
+## No tags or timestamp
 
-Authoring a local extension is one step of the
-[repo-scoped standard recipe](/standards/standard/consuming.md); it is itself a
-concept document, so the same Title-Case, alphabetical-table, and index-listing
-rules this file follows apply to it.
+`tags` and `timestamp`, the OKF spec's optional keys, are absent.
+
+## Recipe-Description
+
+A concept document whose `type` is `Recipe-Description`, whose whole job
+is to describe a backing `.js`.
+
+### resource present
+
+`resource` is present and names the backing file.
+
+A companion skill is linked in the body, not in `resource`.
+
+## Typed Standard
+
+A concept document whose `type` is `Standard`.
+
+### Under standards/
+
+The file lives under `standards/`, the one tree reserved for the label
+([Standard](/doc-types/standard/definition.md#where-a-standard-lives)).

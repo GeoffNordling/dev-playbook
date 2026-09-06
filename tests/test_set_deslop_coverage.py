@@ -35,6 +35,9 @@ EXEMPT: dict[Path, frozenset[str]] = {
         {
             # Working sets are exempt by the speculative-voice section.
             "declarative-present-tense",
+            # A working-set member is always a declarative document, never
+            # harness-loaded, so this voice rule never binds it.
+            "imperative-and-second-person",
             # prose-lint enforces these deterministically.
             "spelling",
             "terminology-the-person-is-the-user",

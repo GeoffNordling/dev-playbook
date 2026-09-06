@@ -78,7 +78,7 @@ every question before the next round}:
 1. **The delivery surface** — for each load-bearing resolution, the files and
    systems it lands on.
 2. **The slices** — {Read
-   [the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slice-rules)}
+   [the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slices)}
    and cut per them, boundaries falling on module seams per the module-design standard, each
    slice tested against the One-goal bullet's two-question orthogonality test
    at epic and slice altitude. What fails the test is deferred exactly as the

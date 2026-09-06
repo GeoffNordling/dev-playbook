@@ -45,8 +45,9 @@ from dev_playbook import gitrepo, md, pyast  # noqa: E402
 from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # Every rule id this detector can emit. Most answer the build card. The
-# README/CONTEXT doc-shape check answers the knowledge-organization card, and
-# the rogue future-work filenames answer the tracking card. CLAUDE.md is
+# README/CONTEXT doc-shape check answers the knowledge-organization card, the
+# rogue future-work filenames answer the tracking card, and the dogfood mirror
+# answers the distribution card. CLAUDE.md is
 # structure here — its presence, nothing about its content: the voice rule is
 # prose-lint's and the global file's shape is harness-files-lint's.
 # Each id is a module-level constant so every emission site references the
@@ -61,6 +62,7 @@ NAME_MAPPING = "build.name-mapping"
 SCRIPT_SHEBANG = "build.script-shebang"
 SCRIPT_PYTHON = "build.script-python"
 SELF_AUDIT = "build.self-audit"
+DOGFOOD = "distribution.dogfood"
 DOC_SHAPE = "knowledge-organization.doc-shape"
 ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
 
@@ -78,6 +80,7 @@ RULES = (
     SCRIPT_SHEBANG,
     SCRIPT_PYTHON,
     SELF_AUDIT,
+    DOGFOOD,
     DOC_SHAPE,
     ROGUE_FUTURE_WORK,
 )
@@ -696,7 +699,7 @@ def check_dogfood_mirror(root: Path) -> list[Finding]:
         return [
             Finding(
                 ".pre-commit-config.yaml",
-                SELF_AUDIT,
+                DOGFOOD,
                 f"dogfood local hooks must cover the published manifest "
                 f"(missing: {', '.join(sorted(missing))})",
             )

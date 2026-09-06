@@ -1,7 +1,7 @@
 ---
-type: Standard
+type: Guide
 title: Consuming Judgments
-description: The consumer-repo recipe — editable path dependency, declarations, a position on the gate spectrum, lint hook, sweep pickup
+description: How another repo picks the judgments tooling up — the editable path dependency, its own declarations, a position on the gate spectrum, the lint hook, and sweep pickup
 ---
 
 # Consuming Judgments
@@ -52,10 +52,10 @@ PATH.
 ## 2. Declare the repo's judgments
 
 Opt in exactly as
-[declarations.md — Config and root resolution](/standards/semantic-validation/declarations.md#config-and-root-resolution)
+[declarations.md — Opt-in table](/standards/semantic-validation/declarations.md#opt-in-table)
 defines: a `[tool.judgments]` table in the consumer's own `pyproject.toml`
 and one or more declaration YAML files in
-[the YAML declaration format](/standards/semantic-validation/declarations.md#the-yaml-declaration-format).
+[the declaration file shape](/standards/semantic-validation/declarations.md#file-shape).
 
 ```toml
 [tool.judgments]
@@ -100,12 +100,12 @@ on CI.
 The gate is two-tier, keyed off one environment variable `SKIP_JUDGMENTS` that
 `assert_judgment_cached` reads ([cache-gate.md](/standards/semantic-validation/cache-gate.md)):
 exactly `1` skips the check with a visible pytest skip, any other value or
-unset arms it. The canonical [Makefile](/standards/build/make.md) defaults it
+unset arms it. The canonical [Makefile](/standards/build/canonical.md#makefile) defaults it
 to `1` and exports it, so `make check` and `make test` **skip** the gate — a
 subagent running them never hits a miss only a sweep can fill.
 `make check-judgments-cache` arms the gate — except on machines without the
 cache, where the `NO_JUDGMENT_CACHE` conditional keeps it skipped
-([make.md](/standards/build/make.md)) — and is the entry of the canonical
+([Machines](/docs/machines.md)) — and is the entry of the canonical
 pre-push hook: a miss blocks the push until the cache is filled, and a repo
 with nothing gated passes vacuously. A bare `uv run pytest` arms it too
 (fail-safe).
@@ -119,7 +119,7 @@ stops running the gate while nothing at the push enforces it.
 `judgments-lint` fails malformed or stale declarations fast at the commit
 gate. It runs as part of dev-playbook's published `playbook-lint` hook,
 which the canonical `.pre-commit-config.yaml` pins
-([distribution.md](/standards/build/distribution.md)) — any repo on the
+([Distribution Channel](/standards/distribution/channel.md)) — any repo on the
 canonical config runs it on every commit.
 
 The hook runs from pre-commit's own clone of dev-playbook at the pinned

@@ -8,11 +8,14 @@ description: The machines the workspace runs on — one Fedora primary and two W
 
 The workspace runs on the machines below, under one user. Nearly all work
 happens on the primary; the secondaries exist so the workspace is reachable
-from the Windows side of the same hardware.
+from the Windows side of the same hardware. Hardware and OS facts belong to
+sysadmin-playbook's
+[machines doc](~/workspace/sysadmin-playbook/docs/machines.md); this file
+records only what the workspace does per machine key.
 
 | Machine | Role | Notes |
 |---|---|---|
-| Fedora | **primary** | Dual-booted on the framework laptop. Air-gapped by intent — it is where development happens. |
+| Fedora | **primary** | Dual-booted on the framework laptop. BitLocker keeps the Windows partition unreadable from Fedora, so the two halves share hardware but not data. It is where development happens. |
 | Windows 11 desktop | secondary | Ubuntu WSL guest. |
 | Windows 11 framework laptop | secondary | Ubuntu WSL guest; the other half of the primary's hardware. |
 
@@ -47,11 +50,11 @@ run.
   is a primary-machine activity. Judges never run on a secondary;
   `SKIP_JUDGMENTS=1` turns each gated judgment into a named pytest skip,
   and `NO_JUDGMENT_CACHE=1` keeps the push gate from checking the cache
-  either ([make.md](/standards/build/make.md)).
+  either ([Canonical Artifacts](/standards/build/canonical.md#makefile)).
 - **`ref-lint`.** Cross-repo Citations resolve only where the cited repo is
   cloned, and a secondary deliberately carries only some of the workspace's
   repos. `SKIP=ref-lint` stands the detector down.
 
 The primary carries every repo and runs every check, so nothing goes
 permanently unchecked. Which gates this affects is recorded in
-[enforcement.md](/standards/build/enforcement.md).
+[Gates](/standards/standard/gates.md#skips).

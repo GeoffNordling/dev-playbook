@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Guide
 title: Bootstrap
 description: How a repository joins the workspace — repo-init scaffolds a fresh tree, adoption brings an existing one to green; the GitHub tail and roster enrollment complete both
 ---
@@ -33,9 +33,9 @@ The first commit is yours to make after review; the commit gate runs on it.
 An existing repo joins by being brought to green against the pinned
 standard, in this order:
 
-1. **Read the layers.** Membership is inferred from facts on disk
-   ([layers.md](/standards/build/layers.md)); what the repo must contain is
-   the [skeleton](/standards/build/skeleton.md) for exactly those layers.
+1. **Read the layers.** Membership is inferred from facts on disk; what
+   the repo must contain is the [skeleton](/standards/build/skeleton.md)
+   for exactly those layers.
 2. **Wire the pin.** No `.pre-commit-config.yaml` → copy the
    [canonical one](/standards/build/canonical.md), substituting
    `<pinned-sha>` with dev-playbook's `origin/main`. An existing config →
@@ -76,5 +76,5 @@ Both paths finish on GitHub, in order:
 Add the repo to workspace-lint's `GOVERNED` roster — a dev-playbook edit,
 made only once the repo is green. Inclusion is declared, never inferred from
 the directory listing
-([distribution.md](/standards/build/distribution.md#which-repos-are-consumers));
+([Distribution Channel](/standards/distribution/channel.md#the-roster));
 until enrolled, the repo is not audited and its pin drift never reported.

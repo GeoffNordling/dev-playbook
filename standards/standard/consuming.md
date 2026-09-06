@@ -1,104 +1,91 @@
 ---
-type: Standard
+type: Guide
 title: Adopting a Repo-Scoped Standard
 description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
 ---
 
 # Adopting a Repo-Scoped Standard
 
-Most standards a repo runs are workspace-scoped — inherited from dev-playbook
-through its published hooks, governing every repo alike. A repo with a
-convention no other repo shares declares its own **repo-scoped** standard: the
-same card-and-detector machinery the
-[meta-standard](/standards/standard/format.md) defines, hosted in the consumer
-repo instead of dev-playbook. The recipe below is end-to-end; the card format,
-the detector contract, and the hosting pattern it points at are all defined in
-[format.md](/standards/standard/format.md).
+Most standards a repo runs are workspace-scoped: inherited from
+dev-playbook through its published hooks, governing every repo alike. A
+repo with a convention no other repo shares declares its own
+**repo-scoped** standard, the same card-and-detector machinery the
+[Meta-Standard](/standards/standard.md) card defines, hosted in the
+consumer repo instead of dev-playbook. The recipe below is the order of
+operations; every rule a step meets is stated once, in the Standard the
+step links.
 
 ## 1. Grow the `standards/` tree
 
 If the repo has no `standards/` tree yet, create its landing doc first:
-`standards/README.md` (`type: README`) and `standards/index.md`, with the README
-listed **first** in the index. The catalog-order rule `standard.catalog-order`
-requires that leading `standards/README.md` entry, so an index without it fails
-the commit.
-
-Add the standard's **card** at `standards/<name>.md` (`type: Standard-Card`, the
-four cells) and the **define doc** it points at — the contract prose. Register
-the card in the repo's own `standards/index.md` so the catalog stays complete.
-Pick a name no workspace-scoped card already uses: reusing a dev-playbook card
-stem shadows the upstream standard and the rule
-`standard.card-shadows-upstream` fails the commit (see step 6).
+`standards/README.md` (`type: README`) and `standards/index.md`, with
+the README listed first. Add the standard's **card** at
+`standards/<name>.md`, the four cells, and the **Standard** it points
+at under `standards/<name>/`, and register both in the index. The
+layout, the stem, and the index order are
+[Card Catalog](/standards/standard/cards.md): a stem no dev-playbook card
+carries ([No shadowing](/standards/standard/cards.md#no-shadowing)), and
+the README-first catalog
+([The catalog](/standards/standard/cards.md#the-catalog)).
 
 ## 2. Write a contract-conforming detector
 
-Back the card's Audit cell with a detector — a `scripts/<name>` shim over the
-repo's own reusable modules. It obeys the detector contract in
-[format.md](/standards/standard/format.md): read-only, one finding per line in
-GNU format (`file:line: card.rule message`) with card-namespaced rule ids,
-answering `--list-rules`, exit 0 clean / 1 findings / 2 tool error.
-
-One contract clause is invisible until a hook runs: the explicit-root rule —
-a git-shelling detector scrubs the repository-locating variables `git
-rev-parse --local-env-vars` names from its subprocess environment, and its
-test suite clears the same set per test. The commit gate is a git hook, and a
-hook inherits an absolute `GIT_DIR` whenever discovery would otherwise find
-the wrong repository — always from a linked worktree, so anyone working the
-way this workspace does meets it immediately, even though a plain clone's
-hook exports no absolute `GIT_DIR`.
+Back the card's Audit cell with a detector, a `scripts/<name>` shim over
+the repo's own reusable modules, obeying the first-party rules in
+[Detectors](/standards/standard/detectors.md#a-first-party-detector):
+read-only, one finding per line in GNU format with card-namespaced rule
+ids, answering `--list-rules`, exit 0 clean, 1 findings, 2 cannot run.
+The one clause invisible until a hook runs is
+[Explicit roots outrank the hook environment](/standards/standard/detectors.md#explicit-roots-outrank-the-hook-environment):
+the commit gate is a git hook, and from a linked worktree it exports an
+absolute `GIT_DIR`, so anyone working the way this workspace does meets
+the clause immediately.
 
 ## 3. Publish it in the repo's own manifest
 
-Add the hook to the consumer repo's own `.pre-commit-hooks.yaml`, backed by the
-`scripts/<name>` entry — the same way dev-playbook publishes its hooks. The
-repo is now the topmost instance of the hosting pattern for its own standard.
+Add the hook to the consumer repo's own `.pre-commit-hooks.yaml`, backed
+by the `scripts/<name>` entry, the same way dev-playbook publishes its
+hooks
+([The hosting pattern](/standards/standard/detectors.md#the-hosting-pattern)).
+The repo is now the topmost instance of the hosting pattern for its own
+standard.
 
 ## 4. Mirror it in the local block
 
 Add the same hook id to the repo's `repo: local` block in
 `.pre-commit-config.yaml`, so the repo runs from its working tree what it
-publishes. This is the dogfooding invariant every manifest-shipping repo owes
-([distribution.md](/standards/build/distribution.md)); repo-lint's
-`build.self-audit` rule checks the mirror.
+publishes
+([The local block covers the manifest](/standards/distribution/channel.md#the-local-block-covers-the-manifest));
+repo-lint's `distribution.dogfood` checks the mirror.
 
 ## 5. Station it at a gate
 
-The local-block wiring runs the detector at the **commit gate**. Record that
-rung in the card's Enforce cell, exactly as
-[enforcement.md](/standards/build/enforcement.md) prescribes, so the card names
-where nonconformance blocks the path to main.
+The local-block wiring runs the detector at the **commit gate**. Record
+that rung in the card's Enforce cell
+([Cells](/doc-types/standard-card/encoding.md#cells)), so the card names
+where nonconformance blocks the path to main
+([Gates](/standards/standard/gates.md#three-rungs)).
 
 ## 6. Turn the meta-standard's own policing on
 
-The meta-standard's detector, `standards-lint`, is a published dev-playbook
-hook. Pin-bumping to a dev-playbook `rev` that carries it wires it over the
-consumer's `standards/` tree in consumer mode: from that rev it runs the
-consumer-mode `standards-lint` rules over the tree (`standards-lint
---list-rules` is the registry). Until the pin moves, the tree is unpoliced by
-the meta-standard.
+The meta-standard's detector, `standards-lint`, is a published
+dev-playbook hook. Bump the pin to a dev-playbook `rev` that carries it
+([A pinned rev](/standards/distribution/channel.md#a-pinned-rev)): from
+that rev it runs the consumer-mode rules over the repo's `standards/`
+tree (`standards-lint --list-rules` is the registry). Until the pin
+moves, the tree is unpoliced by the meta-standard.
 
 ## 7. Register a local document type (only if the standard needs one)
 
-Skip this step unless the new standard governs a **document type** the global
-OKF registry does not carry. If it does, declare that type in a **local
-extension**: the repo's own `standards/knowledge-organization/document-types.md`, a `## Types`
-table of the same shape as the [global registry](/standards/knowledge-organization/document-types.md),
-listing only the repo's local types. okf-lint unions its valid names onto the
-upstream registry (upstream ∪ local). The hierarchy law — additive, downhill
-only, no shadowing — is defined in the
-[registry doc](/standards/knowledge-organization/document-types.md#local-extensions).
-
-The extension file is itself a **concept document**, so it obeys the same rules
-as any doc in the bundle:
-
-- `type: Standard` frontmatter, with a `description` that byte-matches its entry
-  in the nearest `index.md` — where it must be listed, like every concept doc.
-- Type names in Title Case, hyphen-joined for multi-word names; the `## Types`
-  table alphabetical by name.
-- Declare a type only when a population of documents actually carries it — a
-  vocabulary word earns its place by the documents that use it, and it stays as
-  local as that population.
-
-A local type carries name and description only. The per-type constraints upstream
-types impose (a required `resource`, an `## Employed by` section) stay upstream;
-a local extension cannot declare its own.
+Skip this step unless the new standard governs a **document type** the
+global OKF registry does not carry. If it does, declare the type in a
+local extension, the repo's own
+`standards/knowledge-organization/document-types.md` holding a
+`## Types` table of the same shape as the
+[global registry](/standards/knowledge-organization/document-types.md);
+okf-lint unions its valid names onto the upstream registry. The table's
+rules, the row shape, alphabetical order, add-never-shadow, and name and
+description only, are
+[Type Registry](/standards/knowledge-organization/type-registry.md#local-extension),
+and the extension file is itself a concept document bound by
+[Document Types](/standards/knowledge-organization/document-types.md).

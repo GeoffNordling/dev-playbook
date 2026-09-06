@@ -1,0 +1,89 @@
+card                    cell     pointer
+build                   define   /standards/build/skeleton.md
+build                   define   /standards/build/canonical.md
+build                   define   /standards/build/python.md
+build                   audit    /scripts/repo-lint
+build                   enforce  commit gate
+build                   enforce  push gate
+build                   enforce  CI gate
+build                   adopt    /standards/build/bootstrap.md
+build                   adopt    /dotfiles/dot-claude/skills/enable-repo-governance/SKILL.md
+decisions               define   /standards/decisions/records.md
+decisions               audit    /scripts/decisions-lint
+decisions               enforce  commit gate
+decisions               adopt    none
+distribution            define   /standards/distribution/channel.md
+distribution            audit    /scripts/workspace-lint
+distribution            audit    /scripts/repo-lint
+distribution            enforce  commit gate
+distribution            enforce  /scripts/bump-pins
+distribution            enforce  /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
+distribution            adopt    none
+harness                 define   /standards/harness/claude-content.md
+harness                 define   /standards/harness/runbook-conventions.md
+harness                 audit    /scripts/harness-files-lint
+harness                 enforce  commit gate
+harness                 adopt    /dotfiles/dot-claude/skills/runbook-creator/SKILL.md
+instrument              define   /standards/instrument/format.md
+instrument              audit    /scripts/okf-lint
+instrument              enforce  commit gate
+instrument              adopt    none
+knowledge-organization  define   /standards/knowledge-organization/document-types.md
+knowledge-organization  define   /standards/knowledge-organization/type-registry.md
+knowledge-organization  define   /standards/knowledge-organization/indexes.md
+knowledge-organization  define   /standards/knowledge-organization/readme-content.md
+knowledge-organization  define   /standards/knowledge-organization/context-content.md
+knowledge-organization  define   /standards/knowledge-organization/cross-references.md
+knowledge-organization  define   /standards/knowledge-organization/working-documentation-sets.md
+knowledge-organization  audit    /scripts/okf-lint
+knowledge-organization  audit    /scripts/ref-lint
+knowledge-organization  audit    /scripts/repo-lint
+knowledge-organization  audit    /dotfiles/dot-claude/agents/working-doc-set-auditor.md
+knowledge-organization  enforce  commit gate
+knowledge-organization  enforce  /dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md
+knowledge-organization  adopt    none
+modules                 define   /standards/modules/design.md
+modules                 audit    none
+modules                 enforce  none
+modules                 adopt    /dotfiles/dot-claude/skills/improve-codebase-architecture/SKILL.md
+prose                   define   /standards/prose/conventions.md
+prose                   audit    /scripts/prose-lint
+prose                   enforce  commit gate
+prose                   enforce  /dotfiles/dot-claude/skills/document-remove-tics/SKILL.md
+prose                   adopt    none
+python                  define   /standards/python/style.md
+python                  audit    /scripts/python-lint
+python                  audit    ruff
+python                  audit    mypy
+python                  enforce  commit gate
+python                  enforce  push gate
+python                  adopt    none
+semantic-validation     define   /standards/semantic-validation/declarations.md
+semantic-validation     audit    /scripts/judgments-lint
+semantic-validation     enforce  push gate
+semantic-validation     enforce  commit gate
+semantic-validation     adopt    /standards/semantic-validation/consuming.md
+shell                   define   /standards/shell/conventions.md
+shell                   audit    shellcheck
+shell                   audit    shfmt
+shell                   enforce  commit gate
+shell                   adopt    none
+standard                define   /standards/standard/cards.md
+standard                define   /standards/standard/gates.md
+standard                define   /standards/standard/detectors.md
+standard                audit    /scripts/standards-lint
+standard                enforce  commit gate
+standard                adopt    /standards/standard/consuming.md
+testing                 define   /standards/testing/conventions.md
+testing                 audit    /scripts/testing-lint
+testing                 enforce  commit gate
+testing                 adopt    none
+tracking                define   /standards/tracking/candidates.md
+tracking                define   /standards/tracking/issue-authoring.md
+tracking                define   /standards/tracking/label-scheme.md
+tracking                define   /standards/tracking/repo-settings.md
+tracking                audit    /scripts/workspace-lint
+tracking                audit    /scripts/repo-lint
+tracking                enforce  commit gate
+tracking                enforce  /scripts/bootstrap-labels
+tracking                adopt    none

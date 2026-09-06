@@ -1,0 +1,232 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.14"
+# dependencies = []
+# ///
+"""cardgen — collapse every standard card to rows of one relation.
+
+Prototype implementing doc-types/standard-card/encoding.md's transform:
+slice, never interpret. A card's four cells each hold bullets. A bullet's
+lead — its text up to the first spaced em dash — carries the pointer: the
+target of the first link in the lead, or the lead verbatim when it holds no
+link (a third-party detector named by its pin). An Enforce bullet names its
+mode in bold, a gate or `on demand`: at a gate the pointer is the gate name,
+on demand it is the first link in the lead. A cell holding the single bullet
+`none` is one `none` row. Prose in a cell that is not a bullet is opaque.
+
+Usage:
+    cardgen            regenerate doc-types/standard-card/cards.txt — one
+                       row per pointer over every card under standards/,
+                       cards alphabetical, cells in card order, pointers
+                       in bullet order
+    cardgen --check    regenerate in memory and diff against cards.txt;
+                       exit 1 on drift
+"""
+
+import difflib
+import glob
+import os
+import re
+import sys
+
+CELLS = ("Define", "Audit", "Enforce", "Adopt")
+GATES = ("commit gate", "push gate", "CI gate")
+ON_DEMAND = "on demand"
+MODES = (*GATES, ON_DEMAND)
+CARD_TYPE = "Standard-Card"
+
+DASH = " — "  # the spaced em dash that ends a bullet's lead
+LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
+BOLD_RE = re.compile(r"\*\*([^*]+)\*\*")
+H2_RE = re.compile(r"^##\s+(.+?)\s*#*\s*$")
+BULLET_RE = re.compile(r"^- (.*)$")
+CONTINUATION_RE = re.compile(r"^\s+(\S.*)$")
+NESTED_BULLET_RE = re.compile(r"^\s+[-*]\s")
+NONE_RE = re.compile(r"^none\b")
+
+GUTTER = "  "
+
+
+class LintError(Exception):
+    """A form violation in a card the generator cannot slice."""
+
+
+# ── frontmatter ──────────────────────────────────────────────────────────
+
+
+def split_frontmatter(text, path):
+    """Split a card into its frontmatter dict and body lines."""
+    lines = text.split("\n")
+    if lines[0] != "---":
+        raise LintError(f"{path}: no frontmatter")
+    try:
+        end = lines[1:].index("---") + 1
+    except ValueError:
+        raise LintError(f"{path}: unterminated frontmatter") from None
+    meta = {}
+    for line in lines[1:end]:
+        if not line.strip():
+            continue
+        key, _, value = line.partition(":")
+        meta[key.strip()] = value.strip()
+    return meta, lines[end + 1 :]
+
+
+# ── cells ────────────────────────────────────────────────────────────────
+
+
+def cells_of(body_lines, path):
+    """Map each of the four cells to its lines, in the card's order."""
+    cells, current = {}, None
+    for line in body_lines:
+        m = H2_RE.match(line)
+        if m:
+            current = m.group(1).strip()
+            if current in cells:
+                raise LintError(f"{path}: duplicate cell {current}")
+            cells[current] = []
+            continue
+        if current is not None:
+            cells[current].append(line)
+    if tuple(cells) != CELLS:
+        raise LintError(f"{path}: cells are {list(cells)}, want {list(CELLS)}")
+    return cells
+
+
+def bullets_of(lines, where):
+    """The top-level bullets of a cell, each collapsed to one line.
+
+    A bullet opens with ``- `` at column zero and continues on indented
+    lines until a blank line or an unindented line. Anything else in the
+    cell — a paragraph after the list — is opaque and skipped.
+    """
+    bullets, current = [], None
+    for line in lines:
+        if NESTED_BULLET_RE.match(line):
+            raise LintError(f"{where}: nested bullet")
+        if m := BULLET_RE.match(line):
+            current = [m.group(1)]
+            bullets.append(current)
+        elif current is not None and (m := CONTINUATION_RE.match(line)):
+            current.append(m.group(1))
+        else:
+            current = None
+    return [" ".join(" ".join(parts).split()) for parts in bullets]
+
+
+def pointer_of(cell, bullet, where):
+    """Slice one bullet into its pointer per the cell's rule."""
+    lead = bullet.split(DASH, 1)[0].strip()
+    link = LINK_RE.search(lead)
+    if cell == "Enforce":
+        modes = [b for b in BOLD_RE.findall(bullet) if b in MODES]
+        if len(modes) != 1:
+            raise LintError(
+                f"{where}: an Enforce bullet names exactly one mode in bold, "
+                f"a gate or {ON_DEMAND!r}, found {len(modes)}: {bullet!r}"
+            )
+        if modes[0] != ON_DEMAND:
+            return modes[0]
+        if not link:
+            raise LintError(
+                f"{where}: an on-demand Enforce bullet leads with a link: {bullet!r}"
+            )
+        return link.group(2)
+    if link:
+        return link.group(2)
+    if cell == "Define":
+        raise LintError(f"{where}: a Define bullet leads with a link: {bullet!r}")
+    return lead
+
+
+def rows_of(path):
+    """Every ``(card, cell, pointer)`` row of one card, in bullet order."""
+    with open(path) as f:
+        text = f.read()
+    meta, body = split_frontmatter(text, path)
+    if meta.get("type") != CARD_TYPE:
+        raise LintError(f"{path}: type is {meta.get('type')!r}, want {CARD_TYPE!r}")
+    card = os.path.basename(path)[: -len(".md")]
+    rows = []
+    for cell, lines in cells_of(body, path).items():
+        where = f"{path} § {cell}"
+        bullets = bullets_of(lines, where)
+        if not bullets:
+            raise LintError(f"{where}: no bullets")
+        if any(NONE_RE.match(b) for b in bullets):
+            if len(bullets) != 1:
+                raise LintError(f"{where}: `none` beside other bullets")
+            rows.append((card, cell.lower(), "none"))
+            continue
+        for bullet in bullets:
+            rows.append((card, cell.lower(), pointer_of(cell, bullet, where)))
+    return rows
+
+
+# ── rendering ────────────────────────────────────────────────────────────
+
+
+def render(rows):
+    """Render rows as one fixed-width table with a header line."""
+    header = ("card", "cell", "pointer")
+    widths = [max(len(r[i]) for r in (header, *rows)) for i in range(2)]
+    lines = []
+    for card, cell, pointer in (header, *rows):
+        lines.append(
+            GUTTER.join((card.ljust(widths[0]), cell.ljust(widths[1]), pointer))
+        )
+    return "\n".join(lines) + "\n"
+
+
+# ── entry ────────────────────────────────────────────────────────────────
+
+
+def all_cards(root):
+    """Every flat card under standards/, alphabetical by stem."""
+    paths = sorted(glob.glob(os.path.join(root, "standards", "*.md")))
+    return [p for p in paths if os.path.basename(p) not in ("README.md", "index.md")]
+
+
+def main(argv):
+    """Write cards.txt, or with --check diff against it."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    cards_path = os.path.join(root, "doc-types", "standard-card", "cards.txt")
+    cards = all_cards(root)
+    rows = []
+    for p in cards:
+        rows.extend(rows_of(p))
+    text = render(rows)
+    if argv == ["--check"]:
+        if not os.path.exists(cards_path):
+            print("DRIFT: cards.txt does not exist")
+            return 1
+        with open(cards_path) as f:
+            want = f.read()
+        if text == want:
+            print(f"OK: cards.txt matches all {len(cards)} cards")
+            return 0
+        print("DRIFT:")
+        sys.stdout.writelines(
+            difflib.unified_diff(
+                want.splitlines(keepends=True),
+                text.splitlines(keepends=True),
+                "cards.txt",
+                "regenerated",
+            )
+        )
+        return 1
+    if argv:
+        print(__doc__)
+        return 2
+    with open(cards_path, "w") as f:
+        f.write(text)
+    print(f"wrote {len(rows)} rows from {len(cards)} cards to {cards_path}")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except LintError as e:
+        print(f"lint: {e}", file=sys.stderr)
+        sys.exit(1)

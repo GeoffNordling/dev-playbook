@@ -18,8 +18,9 @@ alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and
 code files to the code track, which reviews in parallel with you; both are
 reference material: read them where the docs describe them, and post no
 findings on them. Judgment declarations under `judgments/` are ordinary docs
-here — a review may flag one as stale against the artifacts it names
-([Maintenance](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#maintenance));
+here — a review may flag one as stale against the artifacts it names, or as a
+claim that misses
+[the bar](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#the-bar);
 cache state is never a finding.
 
 ## Read first
@@ -90,7 +91,7 @@ conventions. Read the ones it calls for, end-to-end, then report
 | The diff carries | Read |
 |---|---|
 | skills or agent definitions | [runbook conventions](~/workspace/dev-playbook/standards/harness/runbook-conventions.md) — the binding format, plus [writing for agents](~/workspace/dev-playbook/standards/harness/writing-for-agents.md) for the craft both forms answer to; and for a factory node's agent definition or `phase:*` skill, [node-agent and skill authoring](~/workspace/dev-playbook/software-factory/node-agent-and-skill-authoring.md) on top |
-| standard cards | [the standard-card format](~/workspace/dev-playbook/standards/standard/format.md) |
+| standard cards | [the standard-card format](~/workspace/dev-playbook/doc-types/standard-card/contract-shape.md) |
 | structure in question — frontmatter, indexes, cross-references | [the OKF docs](~/workspace/dev-playbook/standards/knowledge-organization/index.md) |
 
 A rule you did not read cannot carry a Blocking finding.

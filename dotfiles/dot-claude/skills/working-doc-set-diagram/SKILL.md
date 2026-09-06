@@ -2,7 +2,7 @@
 name: working-doc-set-diagram
 description: Draw the working document set in focus as an ASCII tree of filenames, links, and section names.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: medium
 ---
 

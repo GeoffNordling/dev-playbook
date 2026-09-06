@@ -14,6 +14,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 
 ## Directories
 
+- [doc-types/](/doc-types/index.md) — The documentation type system — what a doc-type is, this repo's instantiation, and one directory per built doc-type
 - [docs/](/docs/index.md) — Surveys of third-party tooling and the Decision Records
 - [dotfiles/](/dotfiles/index.md) — Claude Code configuration — skills, rules, settings, hooks — managed via GNU Stow, symlinked into home
 - [harness-recipes/](/harness-recipes/index.md) — Reusable harness orchestration patterns — prose descriptions of multi-agent workflows backed by code and skills

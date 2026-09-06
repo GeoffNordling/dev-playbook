@@ -11,7 +11,7 @@ effort: xhigh
 A consumer repo runs the standards as of the dev-playbook `rev` it pins, and
 nothing else: a detector added upstream, a rule tightened, a canonical artifact
 changed — none of it reaches that repo until the pin moves. {Read
-[distribution.md](~/workspace/dev-playbook/standards/build/distribution.md);
+[Distribution Channel](~/workspace/dev-playbook/standards/distribution/channel.md);
 the bump *is* the release}.
 
 `bump-pins` owns the mechanical half; this skill owns the half it

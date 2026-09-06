@@ -130,7 +130,7 @@ CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # The type reserved to one tree, and that tree. A normative conformance target
 # lives under standards/ and nothing else claims the label, so a Standard found
-# elsewhere is either misfiled or mistyped — see standards/standard/format.md.
+# elsewhere is either misfiled or mistyped — see doc-types/standard/encoding.md.
 LOCATION_BOUND_TYPE = "Standard"
 STANDARDS_DIR = "standards/"
 # The type whose docs must carry an `## Employed by` section, and that section's

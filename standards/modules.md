@@ -10,10 +10,8 @@ Governs how modules are designed — interfaces, depth, and seams.
 
 ## Define
 
-- [Module Design Conventions](/standards/modules/design.md) — the
-  contract: the vocabulary and the aliases it retires, the four principles,
-  the three rules that make an interface testable, and the dependency
-  categories that govern deepening
+- [Module Design Conventions](/standards/modules/design.md) — the contract:
+  depth, the deletion test, the seam rules, and the port at a process boundary
 
 ## Audit
 

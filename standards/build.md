@@ -1,28 +1,29 @@
 ---
 type: Standard-Card
 title: Build
-description: Governs how a repository is laid out, built, and checked — layers, skeleton, Make, canonical artifacts, distribution, CI, and enforcement
+description: Governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 ---
 
 # Build
 
-Governs how a repository is laid out, built, and checked — layers,
-skeleton, Make, canonical artifacts, distribution, CI, and enforcement.
+Governs how a repository is laid out, built, and checked — the file
+skeleton, the canonical artifacts, and the Python project.
 
 ## Define
 
-- [standards/build/](/standards/build/index.md) — the contract, one concern
-  per document; start at Layers
+- [File Skeleton](/standards/build/skeleton.md) — the tree: the entries
+  every repo requires, keeps at the root, and forbids, and what each layer
+  adds
 - [Canonical Artifacts](/standards/build/canonical.md) — the single-source
-  files under `standards/build/canonical/` and how each repo copy is
+  files under `standards/build/canonical/` and how each repo's copy is
   compared
+- [The Python Project](/standards/build/python.md) — the name mapping,
+  scripts, and entry points
 
 ## Audit
 
 - [repo-lint](/scripts/repo-lint) — structural conformance and canonical
-  byte comparison for one repository
-- [workspace-lint](/scripts/workspace-lint) — pin drift across the governed
-  repos: a stale pinned hook rev, or none at all
+  comparison for one repository
 
 ## Enforce
 
