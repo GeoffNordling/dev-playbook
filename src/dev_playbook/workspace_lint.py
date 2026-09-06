@@ -153,6 +153,7 @@ GOVERNED = (
     "sysadmin-playbook",
     "sounds",
     "personal-trainer",
+    "idea-tree",
 )
 
 # Expected GitHub settings, under the REST field names. The audit only reads;
