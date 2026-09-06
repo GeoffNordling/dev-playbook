@@ -24,6 +24,7 @@ EXPECTED_LABELS = [
     ("category:extension", "cccccc", "Category: extension."),
     ("mode:direct", "cccccc", "Mode: direct."),
     ("mode:spike", "cccccc", "Mode: spike."),
+    ("mode:session", "cccccc", "Mode: session."),
     ("tests:yes", "cccccc", "Tests: yes."),
     ("tests:no", "cccccc", "Tests: no."),
     ("phase:intake", "fbca04", "Phase: intake."),
@@ -55,7 +56,7 @@ def test_values_by_dimension_exposes_the_tuple_dimensions() -> None:
     values = label_scheme.values_by_dimension()
 
     assert values["category"] == {"maintenance", "extension"}
-    assert values["mode"] == {"direct", "spike"}
+    assert values["mode"] == {"direct", "spike", "session"}
     assert values["tests"] == {"yes", "no"}
     assert "spike" in values["phase"]
     assert "pr-review" in values["phase"]

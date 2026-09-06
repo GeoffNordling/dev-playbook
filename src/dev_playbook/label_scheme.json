@@ -10,7 +10,7 @@
       "name": "mode",
       "color": "cccccc",
       "description": "Mode: {value}.",
-      "values": ["direct", "spike"]
+      "values": ["direct", "spike", "session"]
     },
     {
       "name": "tests",
