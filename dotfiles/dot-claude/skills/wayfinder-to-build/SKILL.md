@@ -19,14 +19,14 @@ that decided it.
 
 Before doing anything else:
 
-- {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md)
+- {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md)
   end-to-end}.
 - {Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
   end-to-end}.
 - {Read [module design](~/workspace/dev-playbook/standards/modules/design.md); the
   qualities a good slice boundary preserves}.
 
-Then report: `READ: issue-authoring.md, software-factory.md,
+Then report: `READ: issue-shapes.md, software-factory.md,
 modules/design.md`. Proceed only after.
 
 ## Standalone, with provenance
@@ -49,7 +49,7 @@ the map:
 
 The hand-off takes only a **finished** map labelled `wayfinder:map`: every
 child ticket closed ({Read
-[the open-children query in tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#wayfinding-operations)}
+[the open sub-issues query in linking issues](~/workspace/dev-playbook/standards/tracking/linking-issues.md)}
 — it must return nothing) and no fog left in **Not yet specified**. {If anything is
 still open — a ticket, a fog patch, {Report exactly what is open} and end
 the session there}.
@@ -77,10 +77,9 @@ every question before the next round}:
 
 1. **The delivery surface** — for each load-bearing resolution, the files and
    systems it lands on.
-2. **The slices** — {Read
-   [the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slices)}
-   and cut per them, boundaries falling on module seams per the module-design standard, each
-   slice tested against the One-goal bullet's two-question orthogonality test
+2. **The slices** — cut thin vertical slices, each a complete path through
+   every layer, boundaries falling on module seams per the module-design standard, each
+   slice tested against [One goal](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#one-goal)'s two-question test
    at epic and slice altitude. What fails the test is deferred exactly as the
    bullet says: a real tracker stub at `phase:intake`, named in the epic's
    Out of scope.
@@ -102,7 +101,7 @@ A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
 tying the two at a glance. Label it `category:*` **only**. {Read
-[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#the-epic-body)}
+[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#epic-headings)}
 and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the
@@ -145,7 +144,7 @@ child is carried to brief-complete — and released at its own
 — later, in its own design session with full attention.
 
 Then {Read
-[tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md)
+[linking issues](~/workspace/dev-playbook/standards/tracking/linking-issues.md)
 for the commands that wire the native relationships} and {Write to GitHub
 the wiring; every child a sub-issue of the epic, and every ordered slice
 blocked-by its predecessor}.

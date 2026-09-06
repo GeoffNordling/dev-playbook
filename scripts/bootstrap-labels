@@ -4,9 +4,8 @@
 Closed-world: labels in the canonical set are created or updated to match;
 labels not in the canonical set are deleted. Idempotent. The canonical scheme is
 policy-as-data in ``dev_playbook.label_scheme`` (``label_scheme.json``); this
-script is the thin shim that mints it into the current repo over `gh`. See
-~/workspace/dev-playbook/standards/tracking/label-scheme.md (§Valid labels and §Phase labels)
-for the scheme's semantic authority.
+script is the thin shim that mints it into the current repo over `gh`; the
+same data renders as the table in standards/tracking/label-scheme.md.
 """
 # /// script
 # requires-python = ">=3.14"

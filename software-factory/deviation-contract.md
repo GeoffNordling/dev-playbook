@@ -25,7 +25,7 @@ yes/no questions:
    interface named under `Prohibited surfaces`, or an idea the brief put
    under `Out of scope`? The first half is mechanical: compare the file about
    to be edited against the path list, and no judgment is owed
-   ([the two headings and the split between them](/standards/tracking/issue-authoring.md#prohibited-surfaces)).
+   ([the two headings](/standards/tracking/issue-shapes.md#build-headings)).
 3. Does the fix contradict a decision recorded on the issue, PR, an epic's
    standing rulings, or a map?
 
@@ -57,8 +57,7 @@ The user's reply is the ruling, recorded as a comment on the issue or the
 pull request — typed there by the user, or said at the terminal and posted by
 the session that heard it. That comment is what limiter 3 reads, so every
 later deviation binds to it automatically. The brief body itself is never
-the place — it is frozen, per
-[the brief freeze](/standards/tracking/issue-authoring.md#the-brief-freeze).
+the place: it is frozen from launch, and rulings live beside it.
 
 ## The halt-commit-escalate lane
 

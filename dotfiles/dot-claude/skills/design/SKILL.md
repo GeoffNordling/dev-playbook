@@ -18,9 +18,9 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 Before doing anything else:
 
 - {Read [module design](~/workspace/dev-playbook/standards/modules/design.md); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
-- {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md) end-to-end; the brief formats and the readiness bar, plus the vertical-slice rules and native relationships the decompose exit runs on}.
+- {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md) end-to-end; the brief formats, the epic body, and the relationships the decompose exit wires}.
 
-Then report: `READ: modules/design.md, issue-authoring.md`. Proceed only after.
+Then report: `READ: modules/design.md, issue-shapes.md`. Proceed only after.
 
 ## 1. Load context
 
@@ -48,7 +48,7 @@ Surface your read of which areas look load-bearing and why; ask the user to conf
 
 {Run [/grilling](~/.claude/skills/grilling/SKILL.md) to sharpen the approach against the codebase}, with {Run [/domain-modeling](~/.claude/skills/domain-modeling/SKILL.md) active throughout, capturing significant decisions as Decision Records as they crystallize}. Where an area has discrete options — solution shape, module placement, interface — surface them, each option carrying a recommendation and the reason it is recommended.
 
-Claims about existing reality accumulate through this interview — what a module does today, what a config holds, what a rule enforces. Collect the ones the approach stands on into a **proposed-probe list** and put it to the user; they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)). Run the picked probes immediately, in-context, as ordinary tool calls, and {Write to GitHub the probe-record comment on the issue; each probe's command and its observed output, appended to on later runs}. The §7 brief's `measured` claims cite it; peripheral claims ride as `assumed` freely.
+Claims about existing reality accumulate through this interview — what a module does today, what a config holds, what a rule enforces. Collect the ones the approach stands on into a **proposed-probe list** and put it to the user; they pick which are worth measuring. Run the picked probes immediately, in-context, as ordinary tool calls, and {Write to GitHub the probe-record comment on the issue; each probe's command and its observed output, appended to on later runs}. The §7 brief's `measured` claims cite it; peripheral claims ride as `assumed` freely.
 
 ## 4. Design it twice — only for a load-bearing surface
 
@@ -79,13 +79,12 @@ Nothing below this line is written to GitHub before the user approves.
 
 ### Single leaf
 
-Re-author the issue's brief in place across the build-leaf headings ([issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#required-headings)), which is where the required set is fixed. A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief.
+Re-author the issue's brief in place across the build-leaf headings ([issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#build-headings)), which is where the required set is fixed. A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief.
 
 Draft every heading except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md)} for that one: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
 
 {Write to GitHub the complete brief; every required heading, re-authored —
-`gh issue edit --body` replaces the whole body
-([tracker operations](~/workspace/dev-playbook/standards/tracking/tracker-operations.md#the-issue-surface))}.
+`gh issue edit --body` replaces the whole body}.
 
 ### Decompose
 

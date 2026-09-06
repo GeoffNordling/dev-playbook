@@ -25,7 +25,7 @@ standard                detectors                   a detector: a read-only chec
 standard                gates                       a gate: an automatic, unmanned blocking point on the path to main
 testing                 conventions                 a governed repo's Python test suite: the test_*.py files anywhere in its tree, and the conftest.py and fake modules under tests/
 tracking                candidates                  a repo's CANDIDATES.md
-tracking                issue-authoring             a GitHub issue in a governed repo
+tracking                issue-shapes                a GitHub issue in a governed repo
 tracking                label-scheme                a governed repo's GitHub labels
 tracking                repo-settings               a governed repo's GitHub settings: its merge settings and the rules in force on its default branch
 
@@ -239,30 +239,22 @@ tracking                candidates                  promotion                   
 tracking                candidates                  structure                                         —
 tracking                candidates                  the-only-future-work-file                         —
 tracking                candidates                  uncommitted-work                                  —
-tracking                issue-authoring             acceptance-criteria                               build-leaf
-tracking                issue-authoring             behavioural-not-procedural                        —
-tracking                issue-authoring             category-only                                     epic
-tracking                issue-authoring             claim-provenance                                  —
-tracking                issue-authoring             no-factory-label                                  wayfinder-map-or-ticket
-tracking                issue-authoring             one-goal                                          —
-tracking                issue-authoring             optional-sections                                 epic
-tracking                issue-authoring             prohibited-surfaces                               build-leaf
-tracking                issue-authoring             prototype-claims                                  —
-tracking                issue-authoring             readiness                                         leaf
-tracking                issue-authoring             relationships                                     —
-tracking                issue-authoring             required-headings                                 build-leaf
-tracking                issue-authoring             roles                                             —
-tracking                issue-authoring             spike-headings                                    spike
-tracking                issue-authoring             the-artifacts-section                             build-leaf
-tracking                issue-authoring             the-brief-freeze                                  —
-tracking                issue-authoring             the-epic-body                                     epic
-tracking                issue-authoring             the-four-tuple                                    leaf
-tracking                issue-authoring             user-intent                                       build-leaf
-tracking                issue-authoring             vertical-slices                                   leaf
-tracking                issue-authoring             wayfinder-labels                                  wayfinder-map-or-ticket
-tracking                issue-authoring             written-for-the-user                              —
+tracking                issue-shapes                a-stable-body                                     session-leaf
+tracking                issue-shapes                behavioural-not-procedural                        —
+tracking                issue-shapes                build-headings                                    build-leaf
+tracking                issue-shapes                build-labels                                      build-leaf
+tracking                issue-shapes                category-only                                     epic
+tracking                issue-shapes                epic-headings                                     epic
+tracking                issue-shapes                one-goal                                          —
+tracking                issue-shapes                relationships                                     —
+tracking                issue-shapes                roles                                             —
+tracking                issue-shapes                session-headings                                  session-leaf
+tracking                issue-shapes                session-labels                                    session-leaf
+tracking                issue-shapes                spike-headings                                    spike
+tracking                issue-shapes                spike-labels                                      spike
+tracking                issue-shapes                wayfinder-labels                                  wayfinder-map-or-ticket
+tracking                issue-shapes                written-for-the-user                              —
 tracking                label-scheme                no-blocked-label                                  —
-tracking                label-scheme                phase-labels                                      —
 tracking                label-scheme                valid-labels                                      —
 tracking                repo-settings               default-branch-protection                         —
 tracking                repo-settings               github-origin                                     —

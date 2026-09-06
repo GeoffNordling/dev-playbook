@@ -114,7 +114,7 @@ def lines_outside_fences(text: str) -> Iterator[tuple[int, str]]:
     Fences nest by length, as CommonMark has them: a block closes only on a run
     of the same character, at least as long as the one that opened it, and
     carrying no info string. That is what makes a four-backtick fence able to
-    wrap three-backtick content — the form issue-authoring.md mandates for an
+    wrap three-backtick content — the form issue-shapes.md mandates for an
     artifact block whose content carries its own fences — instead of ending on
     the first inner fence.
 

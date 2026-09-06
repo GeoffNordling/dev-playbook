@@ -82,8 +82,7 @@ deliverable — triage *is* the four-tuple.
 **`design` — research and decomposition.** The approach is explored here:
 research, prototypes, tradeoffs. Prototyping happens in a disposable worktree
 that is deleted on exit; the `prototype/<issue>` branch pushed from it survives
-as the citable artifact
-([issue-authoring.md](/standards/tracking/issue-authoring.md#prototype-claims)).
+as the citable artifact.
 Nothing merges out of definition. A design session exits:
 
 - **A single leaf.** The chosen approach is written back into the issue by
@@ -97,7 +96,7 @@ Nothing merges out of definition. A design session exits:
   `design` in a session of its own, which re-authors its brief and crosses it
   into the factory on its issue-review verdict. The epic body carries the
   outcome and the decomposition rationale
-  ([issue-authoring.md](/standards/tracking/issue-authoring.md)).
+  ([issue-shapes.md](/standards/tracking/issue-shapes.md#epic-headings)).
 
 **`spike` — a question.** A spike is an issue whose deliverable is an answer.
 Everything it produces lands on the issue itself: the findings in its closing
@@ -108,10 +107,8 @@ A spike may stand alone or serve a design effort, where its answer shapes how an
 epic slices. A question that turns out to need an interview to answer was design,
 not a spike.
 
-**The readiness bar.** What makes an issue ready to leave the region — a leaf,
-unblocked, brief-complete, released at an issue-review verdict — is
-defined once in
-[issue-authoring.md](/standards/tracking/issue-authoring.md#readiness).
+**The readiness bar.** An issue is ready to leave the region when it is a
+leaf, unblocked, brief-complete, and released at an issue-review verdict.
 
 ## The factory
 

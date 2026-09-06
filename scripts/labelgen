@@ -1,0 +1,66 @@
+#!/usr/bin/env -S uv run --script
+"""labelgen — render the label scheme as the table in the Label Scheme standard.
+
+The scheme is policy-as-data in ``dev_playbook.label_scheme`` (``label_scheme.json``);
+this script writes it as a markdown table between the ``labelgen`` markers in
+standards/tracking/label-scheme.md, so the standard's table and the labels
+bootstrap-labels mints read one authority and cannot disagree.
+
+Usage:
+    labelgen            rewrite the table between the markers
+    labelgen --check    render in memory and diff against the file; exit 1 on drift
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import difflib
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from dev_playbook.label_scheme import render_table  # noqa: E402
+
+DOC = ROOT / "standards" / "tracking" / "label-scheme.md"
+START = "<!-- labelgen:start -->"
+END = "<!-- labelgen:end -->"
+BLOCK = re.compile(rf"{re.escape(START)}\n.*?{re.escape(END)}", re.DOTALL)
+
+
+def rendered(text: str) -> str:
+    """``text`` with the block between the markers replaced by the scheme's table."""
+    if len(BLOCK.findall(text)) != 1:
+        raise SystemExit(f"{DOC}: expected exactly one {START} … {END} block")
+    return BLOCK.sub(lambda _: f"{START}\n{render_table()}{END}", text)
+
+
+def main(argv: list[str]) -> int:
+    have = DOC.read_text(encoding="utf-8")
+    want = rendered(have)
+    if argv == ["--check"]:
+        if have == want:
+            print(f"OK: {DOC.relative_to(ROOT)} matches the scheme")
+            return 0
+        print("DRIFT:")
+        sys.stdout.writelines(
+            difflib.unified_diff(
+                have.splitlines(keepends=True),
+                want.splitlines(keepends=True),
+                str(DOC.relative_to(ROOT)),
+                "regenerated",
+            )
+        )
+        return 1
+    if argv:
+        print(__doc__)
+        return 2
+    DOC.write_text(want, encoding="utf-8")
+    print(f"wrote the label table to {DOC.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

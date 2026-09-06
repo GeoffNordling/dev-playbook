@@ -3,44 +3,56 @@
     {
       "name": "category",
       "color": "cccccc",
-      "description": "Category: {value}.",
-      "values": ["maintenance", "extension"]
+      "values": {
+        "maintenance": "Maintains shipped state: a fix, hygiene, or polish that adds no capability.",
+        "extension": "Extends a system past its shipped line: a capability it lacks today."
+      }
     },
     {
       "name": "mode",
       "color": "cccccc",
-      "description": "Mode: {value}.",
-      "values": ["direct", "spike"]
+      "values": {
+        "direct": "Built by the software factory against its brief; ends in merged code.",
+        "spike": "A question; the answer closes the issue in a comment, and no PR opens.",
+        "session": "Led by the user in a session: worked in a worktree, PR opened by hand, never dispatched."
+      }
     },
     {
       "name": "tests",
       "color": "cccccc",
-      "description": "Tests: {value}.",
-      "values": ["yes", "no"]
+      "values": {
+        "yes": "The work writes or changes tests, so the build runs test-first.",
+        "no": "The work touches no tests, so the build implements directly."
+      }
     },
     {
       "name": "phase",
       "color": "fbca04",
-      "description": "Phase: {value}.",
-      "values": [
-        "intake",
-        "design",
-        "spike",
-        "build",
-        "pr-review"
-      ]
+      "values": {
+        "intake": "Untriaged; intake authors the brief and routes the issue.",
+        "design": "The approach is explored and the brief re-authored or decomposed.",
+        "spike": "The question is being answered.",
+        "build": "Released to the factory; the build node runs next.",
+        "pr-review": "A pull request is open and in the review loop."
+      }
     },
     {
       "name": "wayfinder",
       "color": "1d76db",
-      "description": "Wayfinder: {value}.",
-      "values": ["map", "research", "prototype", "grilling", "task"]
+      "values": {
+        "map": "A wayfinder map: the planning epic the /wayfinder skill drives.",
+        "research": "A decision ticket resolved by research: sources outside the working directory.",
+        "prototype": "A decision ticket resolved by a cheap, concrete artifact to react to.",
+        "grilling": "A decision ticket resolved in conversation with the user.",
+        "task": "A decision ticket resolved by manual work that unblocks a decision."
+      }
     },
     {
       "name": "origin",
       "color": "cccccc",
-      "description": "Origin: {value}.",
-      "values": ["deferral"]
+      "values": {
+        "deferral": "Opened by the factory to hold work a review suggested and the run deferred."
+      }
     }
   ]
 }

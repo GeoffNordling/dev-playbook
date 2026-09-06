@@ -141,7 +141,7 @@
 [design] Skill · model: inherit, effort: xhigh
   ├─args────► issue
   ├─reads───► [design] Standard
-  ├─reads───► [issue-authoring] Standard    end-to-end
+  ├─reads───► [issue-shapes] Standard    end-to-end
   ├─reads───► GitHub    the issue
   ├─does────► [grilling] Skill    to sharpen the approach against the codebase
   ├─does────► [domain-modeling] Skill    active throughout, capturing significant decisions as Decision Records as they crystallize
@@ -219,7 +219,7 @@
 
 [intake] Skill · model: inherit, effort: xhigh
   ├─reads───► software factory standard
-  ├─reads───► [issue-authoring] Standard
+  ├─reads───► [issue-shapes] Standard
   ├─reads───► GitHub    the issue's title, body, and comments as the raw idea
   ├─does────► [grilling] Skill    once to sharpen the raw idea
   ├─does────► [domain-modeling] Skill    active throughout
@@ -242,7 +242,7 @@
   ├─reads───► GitHub    the issue
   ├─reads───► GitHub    the open blockers
   ├─writes──► GitHub    the phase-label move along the edge the graph names
-  ├─reads───► [issue-authoring] Standard    § readiness
+  ├─reads───► readiness at the crossing    § dispatch
   ├─reads───► GitHub    main's head sha
   ├─reads───► GitHub    every comment surface on the PR
   ├─writes──► scratch    every body you post here
@@ -259,7 +259,6 @@
   ├─never writes─► GitHub
   ├─reads───► GitHub    the issue under audit
   ├─reads───► GitHub    its parent epic, if it has one
-  ├─reads───► [issue-authoring] Standard    for claim provenance
   ├─reads───► deviation contract
   └─reports─► outcome: str    raw: a numbered list of findings — each states the claim or quote at issue, what reality shows, and why it meets the wrong-or-halt bar — then one line per sweep performed that came back clean
 
@@ -338,7 +337,7 @@
 
 [user-intent-mini-interview] Skill · model: inherit, effort: xhigh
   ├─args────► issue
-  ├─reads───► [issue-authoring] Standard    § user-intent
+  ├─reads───► [issue-shapes] Standard    § build-headings
   ├ ╌ reads ╌ ► GitHub    the body of the issue `issue` names, and treat that as the draft    if run with no draft in context
   ├─reports─► outcome: str    the cleaned `User intent` paragraph for the calling beat to write into the brief
   └─never writes─► GitHub
@@ -349,26 +348,25 @@
 
 [wayfinder-to-build] Skill · model: inherit, effort: xhigh
   ├─args────► map
-  ├─reads───► [issue-authoring] Standard    end-to-end
+  ├─reads───► [issue-shapes] Standard    end-to-end
   ├─reads───► software factory    end-to-end
   ├─reads───► [design] Standard
-  ├─reads───► [tracker-operations] Standard    § wayfinding-operations
+  ├─reads───► [linking-issues] Standard
   ├ ╌ reports ╌ ► outcome: str    exactly what is open    if anything is still open — a ticket, a fog patch
   ├─reads───► GitHub    the map body first
   ├─reads───► GitHub    every child ticket in full
   ├─does────► [grilling] Skill    and work these branches as its design tree
-  ├─reads───► [issue-authoring] Standard    § vertical-slices
   ├─reads───► the decompose exit
-  ├─reads───► [issue-authoring] Standard    § the-epic-body
+  ├─reads───► [issue-shapes] Standard    § epic-headings
   ├─writes──► GitHub    the epic with the body defined there
   ├─writes──► GitHub    one issue per slice, in dependency order
-  ├─reads───► [tracker-operations] Standard    for the commands that wire the native relationships
+  ├─reads───► [linking-issues] Standard    for the commands that wire the native relationships
   ├─writes──► GitHub    the wiring
   └─reports─► outcome: str    the whole hand-off on screen
 
 [wayfinder] Skill · model: inherit, effort: xhigh
   ├─args────► map-hint
-  ├─reads───► [tracker-operations] Standard    for the Wayfinding operations section, which states how _this_ repo expresses them
+  ├─reads───► [linking-issues] Standard    for the sub-issue, blocked-by, and open sub-issues calls _this_ repo's tracker uses
   ├─does────► [prototype] Skill
   ├─does────► [grilling] Skill
   ├─does────► [domain-modeling] Skill

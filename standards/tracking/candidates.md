@@ -9,7 +9,7 @@ population: "a repo's CANDIDATES.md"
 
 A repo's `CANDIDATES.md`, the register of the future work it has not
 committed to. Committed work lives in GitHub issues
-([Issue Authoring](/standards/tracking/issue-authoring.md)); a
+([Issue Shapes](/standards/tracking/issue-shapes.md)); a
 **Candidate** is work described but not yet decided, and a unit of work
 has exactly one home. The file is optional, one per repo, at the root
 ([File Skeleton](/standards/build/skeleton.md#root-only-files)); its
@@ -98,6 +98,6 @@ subtree as one issue, never as an issue per child.
 
 Intake does not slice, so the subtree's decomposition is deferred to the
 `design` node like any other multi-issue plan
-([Issue Authoring](/standards/tracking/issue-authoring.md)). Deleting an
+([Issue Shapes](/standards/tracking/issue-shapes.md)). Deleting an
 entry without promoting it is ordinary editing: a Candidate that no longer
 appeals is removed, and nothing records that it was once considered.

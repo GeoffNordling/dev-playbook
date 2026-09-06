@@ -167,7 +167,7 @@ def test_root_link_inside_a_four_backtick_artifact_fence_is_skipped(
 ) -> None:
     """A four-backtick fence wrapping three-backtick content stays one block.
 
-    This is the artifact form issue-authoring.md mandates for approved prose
+    This is the artifact form issue-shapes.md mandates for approved prose
     that carries its own fences; a link quoted inside it is being shown, not
     made, so ref-lint must not resolve it.
     """

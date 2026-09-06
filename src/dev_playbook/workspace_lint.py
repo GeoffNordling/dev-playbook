@@ -78,6 +78,7 @@ ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
 EPIC_SHAPE = "tracking.epic-shape"
 WAYFINDER_SHAPE = "tracking.wayfinder-shape"
 TUPLE_VALID = "tracking.tuple-valid"
+SESSION_SHAPE = "tracking.session-shape"
 PIN = "distribution.pin"
 
 RULES = (
@@ -90,14 +91,14 @@ RULES = (
     EPIC_SHAPE,
     WAYFINDER_SHAPE,
     TUPLE_VALID,
+    SESSION_SHAPE,
     PIN,
 )
 
 # The required headings of each brief format, stated here exactly as
-# standards/tracking/issue-authoring.md states them (§ Required headings and
-# § Spike headings) — the doc and this rule read one contract and cannot
-# disagree. A build leaf carries the whole build
-# tuple below; a spike leaf carries the spike shape.
+# standards/tracking/issue-shapes.md states them (§ Build headings, § Spike
+# headings, and § Session headings) — the doc and this rule read one contract
+# and cannot disagree.
 BUILD_HEADINGS = (
     "Summary",
     "User intent",
@@ -109,12 +110,20 @@ BUILD_HEADINGS = (
     "Out of scope",
 )
 SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
+SESSION_HEADINGS = (
+    "Summary",
+    "User intent",
+    "Current behavior",
+    "Desired behavior",
+    "Acceptance criteria",
+    "Out of scope",
+)
 
 # The body sections of a wayfinder map and of a decision ticket, stated here
 # exactly as the ``/wayfinder`` skill states them (``§ The map body`` and
 # ``§ Tickets`` of dotfiles/.agents/skills/wayfinder/SKILL.md). The skill — not
 # this workspace — is the definition of a map's shape, per
-# standards/tracking/issue-authoring.md § Wayfinder map or ticket, so this rule
+# standards/tracking/issue-shapes.md § Wayfinder map or ticket, so this rule
 # mirrors the skill directly, the way BUILD_HEADINGS mirrors the brief standard.
 # The bundle is installed verbatim at a pin, which is what makes the mirror
 # stable: a pin bump delta-checks these tuples against the upstream text.
@@ -945,6 +954,63 @@ def _epic_findings(
     return lines
 
 
+def _session_findings(
+    name: str, number: int, labels: set[str], scheme: dict[str, set[str]]
+) -> list[Line]:
+    """Findings for a session leaf that breaks its labels-only shape.
+
+    A session leaf (``mode:session``) is led by the user, never dispatched, so
+    it carries exactly one valid category label beside its mode and nothing
+    the factory routes on: no tests, no phase, and no second mode.
+    """
+    lines: list[Line] = []
+    offending = sorted(
+        label
+        for label in labels
+        if label.startswith(("phase:", "tests:"))
+        or (label.startswith("mode:") and label != "mode:session")
+    )
+    if offending:
+        lines.append(
+            Line(
+                name,
+                SESSION_SHAPE,
+                f"#{number} session leaf carries {offending}; a session leaf "
+                "carries a category label and mode:session only",
+                blocking=True,
+            )
+        )
+    categories = _dimension_values(labels, "category")
+    if not categories:
+        lines.append(
+            Line(
+                name,
+                SESSION_SHAPE,
+                f"#{number} session leaf missing category label",
+                blocking=True,
+            )
+        )
+    elif len(categories) > 1:
+        lines.append(
+            Line(
+                name,
+                SESSION_SHAPE,
+                f"#{number} session leaf has multiple category labels: {categories}",
+                blocking=True,
+            )
+        )
+    elif categories[0] not in scheme["category"]:
+        lines.append(
+            Line(
+                name,
+                SESSION_SHAPE,
+                f"#{number} session leaf category:{categories[0]} is not a scheme value",
+                blocking=True,
+            )
+        )
+    return lines
+
+
 def _tuple_findings(
     name: str, number: int, labels: set[str], scheme: dict[str, set[str]]
 ) -> list[Line]:
@@ -1004,6 +1070,8 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
         required = SPIKE_HEADINGS
     elif mode == "direct":
         required = BUILD_HEADINGS
+    elif mode == "session":
+        required = SESSION_HEADINGS
     else:
         return []  # an unknown mode value is tuple-valid's finding
     try:
@@ -1038,11 +1106,12 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
 def check_issues(name: str, issues: list) -> list[Line]:
     """Every open issue against the shape rules of its species.
 
-    Four species, each with its own contract: a **wayfinder map** and a
+    Five species, each with its own contract: a **wayfinder map** and a
     **decision ticket** (told by their ``wayfinder:*`` labels, shaped as the
     ``/wayfinder`` skill states), a **build epic** (told by having children,
-    category-only), and a **build leaf** (the four-tuple and brief shape, checked
-    only once triaged past intake).
+    category-only), a **session leaf** (told by ``mode:session``: category and
+    mode only, plus its brief shape), and a **build leaf** (the four-tuple and
+    brief shape, checked only once triaged past intake).
 
     Species comes off the label set and sub_issues_summary — no per-issue API
     call. Pull requests the issues endpoint returns are skipped.
@@ -1075,6 +1144,12 @@ def check_issues(name: str, issues: list) -> list[Line]:
             # not gated on post-intake (a phase label on an epic is itself a
             # finding).
             lines.extend(_epic_findings(name, number, labels, scheme))
+        elif "mode:session" in labels:
+            # A session leaf carries no phase label, so it would otherwise fall
+            # past the post-intake gate unchecked; its labels and its brief are
+            # checked from the moment it is opened.
+            lines.extend(_session_findings(name, number, labels, scheme))
+            lines.extend(_brief_findings(name, number, labels, body))
         elif _post_intake(labels):
             # A leaf is checked only once triaged; untriaged leaves are out.
             lines.extend(_tuple_findings(name, number, labels, scheme))

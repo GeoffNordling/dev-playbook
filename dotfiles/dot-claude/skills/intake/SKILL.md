@@ -20,9 +20,9 @@ The front door for work, and the first state of the [definition region](~/worksp
 Before doing anything else:
 
 - {Read [software factory standard](~/workspace/dev-playbook/software-factory/software-factory.md); the two regions, the label scheme, and where an issue goes when intake releases it}.
-- {Read [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md); the brief formats, brief principles, and the readiness bar}.
+- {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md); the brief formats and the rules every body obeys}.
 
-Then say `READ: software-factory.md, issue-authoring.md`. Proceed only after.
+Then say `READ: software-factory.md, issue-shapes.md`. Proceed only after.
 
 ## Process
 
@@ -38,7 +38,7 @@ Either way, {Run [/grilling](~/.claude/skills/grilling/SKILL.md) once to sharpen
 Checks, run before a line of the brief is written:
 
 - **Redundancy.** Search dev-playbook's skills, standards, and scripts, plus the open issues of the repo the idea belongs to, for work that already covers the idea. Search by concept, not by the wording the idea arrived in.
-- **Claims — surface and pick.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and sort it: the ones the approach stands on go to the user as a **proposed-probe list**, and they pick which are worth measuring ([Claim provenance](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#claim-provenance)); peripheral claims ride as `assumed` freely. Run the picked probes immediately, in-context, as ordinary tool calls, keeping each probe's command and observed output for the probe-record comment §5 posts.
+- **Claims — surface and pick.** Take each factual claim the idea rests on — a file is missing, a script behaves a certain way, a rule goes unenforced — and sort it: the ones the approach stands on go to the user as a **proposed-probe list**, and they pick which are worth measuring; peripheral claims ride as `assumed` freely. Run the picked probes immediately, in-context, as ordinary tool calls, keeping each probe's command and observed output for the probe-record comment §5 posts.
 
 Report what both checks found and where you looked. On a hit — existing coverage, or a picked probe that fails — put the evidence to the user; the proceed-or-kill call is theirs.
 
@@ -54,7 +54,7 @@ Routing, given the mode:
 | The work | Routes to | Why |
 |---|---|---|
 | `mode:spike` | `phase:spike` | A question is answered inside the definition region; it never enters the factory. |
-| `mode:direct`, specifiable on the spot | `phase:build`, set at §6 on the user's approval — §5 writes `phase:intake` | The brief is complete and the approach settled, so nothing is left to design. Their approval releases the issue — brief completion alone does not, per [readiness](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness). |
+| `mode:direct`, specifiable on the spot | `phase:build`, set at §6 on the user's approval — §5 writes `phase:intake` | The brief is complete and the approach settled, so nothing is left to design. Their approval releases the issue — brief completion alone does not. |
 | `mode:direct`, needing exploration, tradeoffs, or slicing | `phase:design` | The approach isn't settled, or the work is bigger than one build. Design re-authors the brief or decomposes. |
 
 Ask the user when the call isn't clear. Routing is a one-way handoff — nothing comes back to intake.
@@ -65,7 +65,7 @@ Per the issue conventions: the build-leaf brief for `mode:direct`, the spike bri
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready — readiness is settled at the approval that releases the issue, not here.
 
-On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#required-headings) requires except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
+On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#build-headings) requires except `User intent`, then {Run [/user-intent-mini-interview](~/.claude/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
 
 ### 5. Confirm, then land
 

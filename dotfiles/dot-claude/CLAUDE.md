@@ -75,3 +75,7 @@ GitHub renders Markdown before LaTeX, so:
 ### Resolve same-repo paths
 
 **Same-repo resolution:** a `~/workspace/<repo>/…` path whose `<repo>` is the repo your session is working in — its main checkout or any of its worktrees — resolves inside your own checkout: substitute your checkout root for `~/workspace/<repo>/`. A path into a different repo resolves as written, to that repo's main checkout. Touching your repo's main checkout from a worktree is legitimate only as a deliberate comparison against published state — say so when you do it.
+
+### Never merge a PR
+
+Open a PR and push to it, but never merge one — the user merges every PR by hand.

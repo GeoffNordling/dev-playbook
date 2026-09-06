@@ -54,8 +54,7 @@ there is nowhere for the label to go. A launched agent never writes a label, so
 nothing can advance the board out from under whatever is sequencing it.
 
 **Readiness at the crossing.** An issue must meet the readiness bar — a leaf,
-unblocked, brief-complete, released at an issue-review verdict — defined in the
-[tracking standard](/standards/tracking/issue-authoring.md#readiness). The whole
+unblocked, brief-complete, released at an issue-review verdict. The whole
 bar is a definition-region obligation, carried across the crossing by the
 `phase:build` label the user's approval sets.
 
@@ -312,7 +311,7 @@ issue and its PR carry, never left as a placeholder.
     incidental bugs, cleanups, adjacent improvements, and review findings
     the user rules real-but-not-this-issue. Each entry is a real tracker
     stub at `phase:intake`, named by issue link — never a Candidate
-    ([the one-goal principle](/standards/tracking/issue-authoring.md#one-goal)).
+    ([the one-goal principle](/standards/tracking/issue-shapes.md#one-goal)).
     `Nothing deferred.` explicitly when empty.
   - `## Suggestion dispositions` — one line per Suggestion thread the review
     loop settled, naming its outcome and the thread. It is the merge read's

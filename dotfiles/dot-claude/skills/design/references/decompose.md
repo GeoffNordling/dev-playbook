@@ -9,8 +9,7 @@ The children's intake happens here, in place, so none round-trips through
 with the four-tuple, the build-leaf headings, and its relationships wired, but
 its substance still provisional. Each becomes **brief-complete** in its own
 `/design` session, which re-authors that brief, and **ready** at that
-session's issue-review verdict. The readiness bar is
-[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#readiness).
+session's issue-review verdict.
 
 ## 1. Rewrite the issue as the epic
 
@@ -28,15 +27,13 @@ gh issue edit <epic#> \
 
 Before slicing, test the epic's outcome — and then each slice as it is cut —
 against the two-question orthogonality test in the
-[One-goal principle](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#one-goal);
+[One-goal principle](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#one-goal);
 apply its statement, never a paraphrase. What fails out is deferred exactly as
 the bullet says: a real tracker stub minted at `phase:intake`, named in the
 deferring body's `Out of scope`. Deferral itself implies no dependency edge.
 
-Vertical slices, per
-[the vertical-slice rules](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#vertical-slices)
-— each one a thin complete path through every layer, sized so building it keeps
-an agent well inside its context budget. The builder will not resize the work,
+Vertical slices: each one a thin complete path through every layer, sized so
+building it keeps an agent well inside its context budget. The builder will not resize the work,
 so the split has to be right here.
 
 Order the slices by dependency before creating any of them; step 4 links each to
@@ -46,7 +43,7 @@ a blocker that must already exist.
 
 One `gh issue create` per slice, in dependency order, each with a full
 four-tuple and every build-leaf heading
-[issue authoring](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#required-headings)
+[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#build-headings)
 requires from minting on — a leaf missing one is a lint finding whatever its
 phase.
 
@@ -71,7 +68,7 @@ gh issue create --title "..." \
 ## 4. Wire the relationships
 
 Independent native relationships, per
-[Relationships](~/workspace/dev-playbook/standards/tracking/issue-authoring.md#relationships):
+[Relationships](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#relationships):
 each ordered slice **blocked-by** its predecessor, and every slice a
 **sub-issue** of the epic. Neither is a body field and neither is a label.
 
