@@ -7,8 +7,9 @@ description: Running Claude Code headless on subscription
 # Headless Operation
 
 Claude Code runs headless with `claude -p` — no terminal, no prompts, one
-process per invocation. This covers how it is billed, what each run reports
-about itself, and why its file permissions cannot be scoped to a directory.
+process per invocation. This covers how it is billed, what the harness loads
+into every run, what each run reports about itself, and why its file
+permissions cannot be scoped to a directory.
 The decision to use it is [0023](/docs/decisions/0023-headless-on-subscription.md).
 
 ## Billing
@@ -70,6 +71,32 @@ complied once proves nothing about the next run; an `init` message reporting
 
 `apiKeySource` appears only in the stream — the plain `--output-format json`
 envelope does not carry it.
+
+## What the harness loads
+
+A headless run carries everything Claude Code loads ahead of the task, and
+only part of it is the caller's:
+
+| Part | Owner | Off switch |
+|---|---|---|
+| system prompt | Anthropic | `--bare`, which is never passed |
+| CLAUDE.md, rules, skills, agents | the workspace | per file |
+| base tools | Anthropic | `--allowedTools` trims; the base cannot be replaced |
+| loop body — parse, dispatch, permission gate, compaction, retries | Anthropic, unreadable | none |
+| turn budget | the caller | `--max-turns` |
+| transcript, `--resume` | Anthropic | comes free |
+
+The system prompt and the loop body change between Claude Code releases
+and have no versioned source in the workspace.
+
+CLAUDE.md and rules load on every run; skills load on invocation.
+
+A run that stops to ask the user returns early with the question as its
+result, and the caller's verification fails. What the system prompt says
+about the user, and how often it leads a headless run to ask, is
+unmeasured. The task
+prompt or `--append-system-prompt` can state that no user is present, that
+every decision is the model's, and that the result goes to disk.
 
 ## What the flags buy
 

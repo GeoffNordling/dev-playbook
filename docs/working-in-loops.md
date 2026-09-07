@@ -7,15 +7,17 @@ description: The doctrine — agents work in loops, and the user works on the lo
 # Working in Loops
 
 How work gets done in the workspace: agents work in loops, and the user
-works on the loops.
+works on the loops. This sheet says what a loop is, where it sits relative
+to the harness, where the user sits inside it, and how the user improves
+it.
 
 ## The goal
 
 Linear work — one session, the user and one agent, one task at a time,
 powering through — is unsustainable. It built this repository, and the
-backlog grew faster than the sessions drained it. The user has less free time and the models are stronger every month; a way of working
-that spends the scarce resource one result at a time does not survive
-that.
+backlog grew faster than the sessions drained it. The user has less free
+time and the models are stronger every month; a way of working that spends
+the scarce resource one result at a time does not survive that.
 
 The user's time goes into loops, contracts, and detectors. A loop runs
 without the user. A detector catches its class of slop before it bubbles up.
@@ -24,7 +26,7 @@ without the user. A detector catches its class of slop before it bubbles up.
 
 A shape is defined and agents are dispatched. The output comes back in
 the right shape and full of slop: comments through the prose, claims the
-user cannot tell from inventions. The user fixes it by hand, turn by
+user cannot tell from inventions. The user fixes it in the loop, turn by
 turn. The fix is consumed once, and the next dispatch makes the same
 slop. The shape was a contract and the agents obeyed it; nothing
 verified what the shape did not say.
@@ -35,16 +37,116 @@ Improvement needs verification. Verification needs measurement.
 Measurement needs expression: a property written as a programmable
 operation over the object's state. Each layer stands on the one below.
 
+Verification reads the object's state after the run — the file on disk,
+the exit code of `make validate`, the test suite — and treats the agent's
+own report of what it did as feedback for the next attempt. The user
+leaves a loop at the moment the predicate that replaces the user is
+written; a loop without that predicate still has the user in it.
+
+## The harness is the innermost loop
+
+Every loop in the workspace has Claude Code as its innermost loop: the
+model plans, acts through a tool, observes the result, and repeats until
+it has an answer or runs out of turns. The workspace writes no
+model-and-tool loop of its own, because API billing is out of scope ([Headless Operation, Billing](/docs/headless.md#billing)).
+
+An attended session yields: the loop suspends, the user types, and the
+loop resumes with the same context. A headless run (`claude -p`) returns:
+the process exits, its context is gone, and only stdout and the disk
+survive.
+
 ## Loops
 
 A **loop** is a named, registered procedure: it dispatches agents over a
 population against a contract, verifies the output, and stops at an exit
-condition. It runs without the user; the user looks at the end.
+condition. It runs without the user, and stops at the end or at a named
+wait where the user decides.
+
+In code, with `claude(prompt)` standing for one headless run that returns
+its stdout:
+
+```python
+def batch(
+    work_items: list[str],
+    task: Callable[[str], str],
+    ok: Callable[[str], bool],
+    max_retries: int = 2,
+) -> list[str]:
+    """Run every item through the harness and return the ones that need the user."""
+    parked: list[str] = []
+    for work_item in work_items:
+        prompt = task(work_item)
+        for _ in range(max_retries):
+            out = claude(prompt)
+            if ok(work_item):
+                break
+            prompt += f"\n\nLast attempt failed verification:\n{out}"
+        else:
+            parked.append(work_item)
+    return parked
+```
+
+The population is `work_items`, one independent unit of work each: a story to
+fix, a posting to assess, an issue to build. The contract is `task(work_item)`,
+the prompt, and it states what `ok` checks, because the model cannot see
+`ok`. Verification is `ok(work_item)`. The exit condition is the end of
+`work_items`; `parked` is what the user reads.
+
+Each `claude(prompt)` starts with an empty context, so the population can
+be large.
 
 A loop is described in markdown, so Loop is a doc-type; its shape is
 found the way every doc-type's is, by running the loop on the family
 ([Doc-Type](/doc-types/doc-type.md)). The registry of loops is its
 generated view — one place lists every loop.
+
+## Where a loop lives
+
+A loop is placed by whether the user sits at a node inside it and by
+whether the loop runs inside the harness or outside it.
+
+Inside the harness, the loop is prose in the task: the model executes it
+by reading it, so a step can be skipped or the loop stopped early, and
+its state is the context window. Outside the harness, the loop is code:
+`claude -p` is one tool inside it, and the `for` terminates.
+
+The user is inside a loop when an edge is the user's to choose: every
+turn of an attended session, every permission prompt, every merge.
+
+| | inside the harness | outside the harness |
+|---|---|---|
+| user in | an attended session | a script runs `claude -p`, opens a PR, and waits for the merge |
+| user out | `/loop`, a Workflow, a subagent fan-out after the user says "go" | cron, `claude -p`, and a predicate |
+
+`claude -p` takes the user out of the inner loop by construction, so an
+inner loop with the user in it is an attended session, and the loop
+around it is the user.
+
+### Which cell
+
+Whether the predicate can be written decides the user axis: a judgment
+("is this the right design") keeps the user at that node and at no other.
+An irreversible action keeps the user regardless — a merge, a force-push —
+because a wrong predicate there has unbounded cost.
+
+Whether the loop has to be code decides the harness axis.
+
+## A loop is a graph
+
+A loop written out as a graph: a **node** is a function that reads and
+writes a shared state object and returns either the next node or a stop;
+an **edge** is that returned choice. Each branch of the loop body becomes a
+node and each `return` becomes a stop.
+
+What the graph form buys: the position in the loop becomes data, so a run
+can stop at a node, save the state, and resume later — which a wait on the
+user needs, because the wait can be days. The diagram is derived from the
+node table, so it cannot go stale. Fan-out and join are native.
+
+The loop form is the debugging angle: one function, one stack, one
+breakpoint. The graph form is the altitude angle: the shape on screen is
+the whole procedure, legible to a reader who knows the primitives. The
+graph form is the intended default: agents make the boilerplate cheap.
 
 ## The user's position
 
@@ -54,17 +156,19 @@ what earns the claim of understanding. At the end of a run the user
 reads the diff.
 
 The agent cooks; the user checks back later. When the user does not
-like the result, the user changes the loop — a contract, a detector, a standard — and runs it again. The user does not fix the output by hand.
+like the result, the user changes the loop — a contract, a detector, a
+standard — and runs it again. The user does not fix the output by hand.
 The aim is a flywheel of autonomy: user time is never spent on work a
 loop could do.
 
-A linear session is for work that does not repeat: a foundational
-document, a decision. Work that repeats gets a loop.
+A linear session — the user in, inside the harness — is for work that does
+not repeat: a foundational document, a decision. Work that repeats gets a
+loop.
 
-Whether work repeats depends on the level one thinks at. This specific document
-is written once, but many documents are written every week. Ask the
-question one level up, then one level again, until the
-repetition shows.
+Whether work repeats depends on the level one thinks at. This specific
+document is written once, but many documents are written every week. Ask
+the question one level up, then one level again, until the repetition
+shows.
 
 ## The meta-loop
 
